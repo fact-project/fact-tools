@@ -1,0 +1,9 @@
+#
+# default settings for the streams framework
+#
+
+# The STREAMS_HOME variable defines the basic directory from which
+# all the jars and plugins are searched.
+# It should generally be safe to leave this untouched.
+#
+#STREAMS_HOME=/opt/streams

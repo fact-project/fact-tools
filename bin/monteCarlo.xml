@@ -1,0 +1,20 @@
+<container>
+	<property name="path" value="/Users/kaibrugge/FactTest" />
+	
+	<stream id="factMC" class="fact.io.ReadMCcsv"     url="file:${path}/monteCarlo.csv"  />
+	
+	<process input="factMC">
+			<stream.logger.Message message="EventNum: %{Data.EventNum}" />
+			<fact.data.MonteCarloCalibration overWrite="false"/>
+			<RemoveKeys keys="DataMC" />
+			<fact.data.MaxAmplitude keys="DataMCCalibrated" />
+			<fact.data.CalculatePhotonCharge keys="DataMCCalibrated"/> 
+			<fact.data.cleaning.CoreNeighborClean keys="DataMCCalibrated" corePixelThreshold="5" neighborPixelThreshold="2"/>
+			<fact.data.GenerateFeatures keys="DataMCCalibrated" showerThreshold="0.8" minSize="2" />
+<!-- 			<fact.image.ShowImage/> -->
+
+			<stream.io.CsvWriter  keys="EventNum,mEnergy,mTheta,showerPhotonCharge,stdDevArrivalTimes,numberOfIslands" separator=";" url="file:${path}/test_mc.csv" />
+			
+	
+	</process>
+</container>

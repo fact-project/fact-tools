@@ -1,0 +1,23 @@
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\newcommand\subsubsubsection{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\newcommand{\StreamSection}[1]{\subsubsection{\label{api:#1}#1}}
+\newcommand{\Stream}[1]{\subsection{\label{api:#1}#1}}
+\newcommand{\PackageSection}[1]{\section*{#1}}
+
+\newcommand{\ProcessorSection}[1]{\paragraph{\label{api:#1}Processor {\ttfamily #1}}}
+
+\newcommand{\Package}[1]{\clearpage\subsection{\label{api:#1}Processors in Package {\ttfamily #1}}}
+\newcommand{\Processor}[1]{\afterpage{\clearpage}\subsubsection*{\label{api:#1}Processor {\ttfamily #1}}}
+%\newcomnmand{\Processor}[1]{\subsubsubsection{\label{api:#1}Processor {\ttfamily #1}}
+
+\newcommand{\parameterDescriptionWidth}{8cm}

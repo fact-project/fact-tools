@@ -1,0 +1,15 @@
+<container>
+
+	<stream id="weather" class="fact.io.WeatherStream" debug="true"
+		    url="file:${user.home}/weather.data" />
+		    
+		    
+	<process input="weather">
+	    <PrintData />	
+		<stream.logger.Message message="Event: %{data.@id}" />
+		
+		<stream.net.DataTap address="0.0.0.0" port="16000" />
+	
+	</process>
+	
+</container>

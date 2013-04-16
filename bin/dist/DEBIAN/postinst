@@ -1,0 +1,13 @@
+#!/bin/sh
+
+HOME=/opt/streams
+
+#
+#
+chown -R root $HOME
+chgrp -R root $HOME
+
+chmod 755 $HOME/bin/*
+
+rm -f /usr/bin/stream.run
+ln -s /opt/streams/bin/stream.run /usr/bin/stream.run

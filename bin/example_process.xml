@@ -1,0 +1,85 @@
+<container>
+
+<!-- 	Triggertypes 
+
+		416 - interleaved lightpulse fxd
+		4 -physiks
+		1024 - interleaved pedestal
+		512 - interleaved lighpulse Int 
+		33792 - Time Calibration 
+		-->
+<!-- 	<stream id="fact" class="fact.io.FactDataStream"  -->
+<!--  		    url="file:/home/bruegge/20120120_070.fits" /> -->
+
+<!-- <property name="path" value="/home/bruegge/FactTest" /> -->
+<property name="data" value="20111126_042.fits" />
+<property name="dataDRS" value="20120229_132.drs.fits" />
+<property name="noise" value="20130124_040.fits" />
+<property name="noiseDRS" value="20130124_033.drs.fits" />
+	<property name="path" value="/home/bruegge/FactTest" />
+
+<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
+ 
+
+<!-- ls8 path -->
+	<stream id="fact" class="fact.io.FactEventStream" 
+ 		    url="file:${path}/${data}"  />
+		    
+		<process input="fact" copies="1">
+			<Skip condition="%{data.TriggerType} != 4" />
+			<Skip condition="%{data.EventNum} &lt; 2" />
+			<fact.data.DrsCalibration drsFile="${path}/${dataDRS}"/>
+<!-- 		<RemoveKeys keys="Data" /> -->
+			<fact.data.CutSlices keys="Data,DataCalibrated" start="15" end="165" />
+			<fact.data.MultiplyValues key="DataCalibrated" factor="-1"/>
+			<fact.data.RemoveSpikesMars key="DataCalibrated" /> 
+			<fact.data.InterpolateBadPixel key="DataCalibrated"  />
+<!-- 			<fact.data.Diff key="DataCalibrated" offset="2"/> -->
+<!-- 			<fact.data.FirstOrderExponentialSmoothing key="DataCalibrated" output="smoothed" alpha="0.3"/> -->
+<!-- 			<fact.data.Diff key="smoothed" output="diffSmoothed" offset="2"/> -->
+<!-- 			<fact.data.MaxAmplitude key="DataCalibrated" /> -->
+<!-- 			<fact.data.CalculatePhotonCharge key="DataCalibrated" /> -->
+<!-- 			<fact.data.ExFit keys="DataCalibrated"/> -->
+<!-- 			<fact.data.SliceNormalization keys="DataCalibrated" overwrite="false"/> -->
+<!-- 			<fact.data.SliceNormalization keys="ExFit" overwrite="false"/> -->
+<!-- 			<fact.data.cleaning.StdClean key="DataCalibrated" showerThreshold="0.8"/> -->
+<!-- 			<fact.data.cleaning.CoreNeighborClean key="DataCalibrated" corePixelThreshold="5" neighborPixelThreshold="2"/> -->
+<!-- 		<fact.data.GenerateFeatures keys="DataCalibrated" showerThreshold="0.8" minSize="2" /> -->
+<!-- 		<fact.data.GenerateFeatures keys="DataCalibrated" showerThreshold="0.8" minSize="2" outputString="1" /> -->
+
+<!-- 		<fact.data.GenerateFeatures keys="DataCalibrated" showerThreshold="0.8" minSize="2" outputString="2"  /> -->
+				
+<!-- 		<fact.data.CalculatePhotonCharge keys="DataCalibrated" overwrite="false" writeAverage="true"/> -->
+		
+		<fact.data.HillasParameter keys="DataCalibrated" showerThreshold="0.7" minSize="2"/>
+
+
+<!-- 		<fact.data.RisingEdge keys="DataCalibrated" />  -->
+<!-- 		<fact.data.HillasParameter keys="DataCalibrated"/> -->
+
+
+<!-- 		<fact.data.HillasParameter keys="DataCalibrated" showerThreshold="0.7" minSize="2"/> -->
+<!-- 		<Skip condition="%{data.HillasNumberOfIslands} = null" /> -->
+<!-- 		<Skip condition="%{data.EllipseArea} &lt; 1" /> -->
+
+<!-- 			<fact.image.HistogramPlotter keys="showerPhotonCharge,showerPhotonCharge_1,showerPhotonCharge_2" /> -->
+<!-- 			<fact.image.HistogramPlotter keys="photoncharge" drawErrors="false"/> -->
+<!-- 		<fact.data.OnlineAverage keys="photoncharge" /> -->
+<!-- 		<stream.plotter.Plotter  -->
+<!-- 			history="500" -->
+<!--             keepOpen="true" -->
+<!--             keys="photoncharge_avg,photoncharge" -->
+<!--             title="photonCharge"/> -->
+<!-- 			<fact.image.ScatterPlotPanel keys="photoncharge,showerSize" /> -->
+<!-- 			<fact.image.ScatterPlotter compValue="showerPhotonCharge" keys="showerPhotonCharge_1,showerPhotonCharge_2" /> -->
+<!-- 			<stream.monitor.DataRate every="10" /> -->
+<!-- 		<fact.image.monitors.CameraPlotter keys="photoncharge" />  -->
+<!-- 		<fact.image.monitors.LiveCameraPlotter key="DataCalibrated" />  -->
+<!-- 		<fact.image.monitors.LiveCameraPlotter key="Diff" />  -->
+<!-- 		<fact.image.monitors.LiveCameraPlotter key="diffSmoothed" />  -->
+<!-- 		<fact.image.monitors.ShowerCameraPlotter key="DataCalibrated" showerKey="standardDevShower"/>  -->
+<!-- 		<fact.image.monitors.ShowerCameraPlotter key="DataCalibrated" showerKey="coreNeighbourPixel"/>  -->
+<!-- 		<fact.image.monitors.StatusWindow /> -->
+		<fact.image.ShowImage/>
+		</process>
+</container>

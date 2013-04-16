@@ -1,0 +1,9 @@
+This processor calculates first-order exponential smoothing.
+Let $y$ be the original Series and $s$ be the smoothed one,
+then:
+\begin{eqnarray*}
+s_0 = y_0
+s_i = \alpha \cdot y_i + (1-\alpha) \cdot s_{i-1}.
+\end{eqnarray*}
+
+For details see \url{http://en.wikipedia.org/wiki/Exponential\_smoothing}

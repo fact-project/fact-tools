@@ -1,0 +1,15 @@
+<experiment>
+
+
+    <Stream class="fact.io.FactEventStream" id="stream.input.default" limit="1"
+            url="file:///Volumes/ramdisk/20111122_059.fits" />
+
+    <process>
+      <processor class="fact.data.DisplayData" />
+      <processor class="fact.temme.WritePixl" pixelId="3" file="output.txt" keys="pixel1,pixel3,eventNum" />
+      
+      <fact.femme.SelectPixel pixel="3" />
+      <stream.data.CsvWriter keys="eventNum,pixel1" file="test.csv" /> 
+      
+    </process>
+</experiment>

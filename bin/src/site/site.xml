@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="fact-analysis">
+  <bannerLeft>
+    <name>streams</name>
+    <src>http://www-ai.cs.uni-dortmund.de/ci/Medienpool/Seitenbilder/logo_tu.png</src>
+    <href>http://www.uni-dortmund.de/</href>
+  </bannerLeft>
+  
+  <bannerRight>
+    <name></name>
+    <src>http://www-ai.cs.uni-dortmund.de/header-bg-topLeft.png</src>
+    <href></href>
+  </bannerRight>
+  
+  <body>
+  
+    <links>
+    </links>
+
+	<menu ref="parent">
+	</menu>
+
+	<menu name="Documentation">
+		<item name="Overview" href="index.html"/>
+		<item name="Fact Viewer" href="viewer.html" />
+		<item name="Building" href="build.html"/>
+
+                <item name="Examples" href="examples.html">
+                     <item name="Examples" href="processor.html" />
+                </item>
+	</menu>
+	
+<!--
+	<menu name="Download">
+		<item collapse="true" name="Download" href="download.html">
+		  <item name="Debian Repository" href="debian.html" />
+		</item>
+	</menu>
+  -->
+
+	<menu ref="reports"/>
+
+  </body>
+
+  <skin>
+  	<groupId>edu.udo</groupId>
+  	<artifactId>sfb876-skin</artifactId>
+  	<version>0.1</version>
+  </skin>
+
+<!--
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-stylus-skin</artifactId>
+    <version>1.2</version>
+  </skin>
+  -->
+</project>

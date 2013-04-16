@@ -1,0 +1,37 @@
+<container>
+
+<!-- 	Triggertypes 
+
+		416 - interleaved lightpulse fxd
+		4 -physiks
+		1024 - interleaved pedestal
+		512 - interleaved lighpulse Int 
+		33792 - Time Calibration 
+		-->
+<!-- 	<stream id="fact" class="fact.io.FactDataStream"  -->
+<!--  		    url="file:/home/bruegge/20120120_070.fits" /> -->
+
+<!-- <property name="path" value="/home/bruegge/FactTest" /> -->
+<property name="data" value="20111126_042.fits" />
+<property name="dataDRS" value="20111126_034.drs.fits" />
+<property name="noise" value="20130124_040.fits" />
+<property name="noiseDRS" value="20130124_033.drs.fits" />
+<property name="mc" value="/jafsOut/mc_20130325_001.fits" />
+<property name="mcDRS" value="/jafsOut/mc_20130325_001.drs.fits" />
+<property name="test" value="/jafsOut/mc_20130325_002.fits" />
+<property name="testDRS" value="/jafsOut/mc_20130325_001.drs.fits" />
+<!-- 	<property name="path" value="/home/bruegge/FactTest" /> -->
+
+ 	<property name="path" value="/Users/kaibrugge/FactTest" />
+ 
+
+<!-- ls8 path -->
+	<stream id="fact" class="fact.io.FactEventStream" 
+ 		    url="file:${path}/${test}"  />
+		    
+		<process input="fact" copies="1">
+			<fact.data.DrsCalibration drsFile="${path}/${testDRS}"/>	
+<!-- 			<fact.image.monitors.StatusWindow /> -->
+		<fact.image.ShowImage/>
+		</process>
+</container>

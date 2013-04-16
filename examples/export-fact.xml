@@ -1,0 +1,17 @@
+<container>
+
+    <Stream id="fact-data" class="fact.io.FactDataStream" limit="4"
+            url="file:///Users/chris/Downloads/20111126_042.fits" />
+
+
+    <Process input="fact-data" multiply="5">
+	<PrintData />
+	<stream.flow.Enqueue queue-ref="write-queue" />
+    </Process>
+
+    <Process input="write-queue">
+	<PrintData/>
+	<fact.io.BinaryFactWriter file="/Volumes/RamDisk/fact-events.dat" key="Data" />
+    </Process>
+
+ </container>

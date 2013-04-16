@@ -1,0 +1,54 @@
+/**
+ * 
+ */
+package fact.tools;
+
+import java.io.File;
+
+import stream.runtime.ProcessContainer;
+
+/**
+ * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
+ * 
+ */
+public class CommandLine {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		if (args.length == 0) {
+			System.out.println();
+			System.out.println("Usage:");
+			System.out
+					.println("\tjava -jar fact-tools.jar path/to/experiment.xml");
+			System.out.println();
+			System.exit(-1);
+		}
+
+		File file = new File(args[0]);
+		if (!file.exists()) {
+			System.err.println("Cannot find file " + file.getAbsolutePath()
+					+ " !");
+			System.exit(-1);
+		} else {
+			try {
+				ProcessContainer container = new ProcessContainer(file.toURI()
+						.toURL());
+				container.run();
+			} catch (Exception e) {
+				System.err.println("Error: " + e.getMessage());
+				System.exit(-1);
+			}
+		}
+	}
+
+	public static void waitForReturn() {
+		try {
+			System.out.println("Press RETURN to continue...");
+			System.in.read();
+		} catch (Exception e) {
+		}
+	}
+}

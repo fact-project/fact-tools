@@ -1,0 +1,35 @@
+<container>
+
+<property name="data" value="20111126_042.fits" />
+<property name="dataDRS" value="20111126_034.drs.fits" />
+<property name="noise" value="20130124_040.fits" />
+<property name="noiseDRS" value="20130124_033.drs.fits" />
+<property name="mc" value="jafsout/mc_20130325_002.fits" />
+<property name="mcDRS" value="jafsout/mc_20130325_001.drs.fits" />
+
+<property name="path" value="/home/bruegge/FactTest" />
+<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
+ 
+
+	<stream id="fact" class="fact.io.FactEventStream" 
+ 		    url="file:${path}/${data}"  />
+		<process input="fact" copies="1">
+			<fact.data.DrsCalibration drsFile="${path}/${dataDRS}"/>
+			<fact.data.CalculatePhotonCharge key="DataCalibrated" overwrite="false" writeAverage="true"/>
+			<fact.data.FirstOrderExponentialSmoothing key="DataCalibrated" output="smoothed" alpha="0.3"/>
+			<fact.data.CalculatePhotonCharge key="smoothed" output="smoothed" overwrite="false" writeAverage="true"/>
+			
+		<fact.image.monitors.HistogramPlotter keys="photoncharge_average,smoothed_average" drawErrors="true"/>
+<!-- 		<fact.data.OnlineAverage keys="photoncharge" /> -->
+		<stream.plotter.Plotter 
+			history="900"
+            keepOpen="true"
+            keys="photoncharge_average,smoothed_average"
+            title="photonCharge"/>
+			
+<!-- 			<fact.data.HillasParameter keys="DataCalibrated" showerThreshold="0.7" minSize="2"/> -->
+			<fact.image.ShowImage/>
+		<fact.image.monitors.StatusWindow />
+		</process>
+</container>
+

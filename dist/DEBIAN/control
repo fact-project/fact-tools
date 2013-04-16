@@ -1,0 +1,8 @@
+Package: fact-tools
+Version: 0.9.5-0
+Section: admin
+Priority: optional
+Depends: streams (>= 0.9.5)
+Architecture: all
+Maintainer: Christian Bockermann <christian.bockermann@udo.edu>
+Description: This package provides the classes required to process FACT telescope data with the streams library.

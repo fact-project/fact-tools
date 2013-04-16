@@ -1,0 +1,16 @@
+<container>
+
+    <Stream class="fact.io.FactEventStream" id="fact" limit="100"
+            url="file:/Users/chris/Downloads/20111126_042.fits" />
+
+    <process input="fact">
+    
+    	<fact.data.DrsCalibration drsFile="/Users/chris/Downloads/20111126_034.drs.fits" keep="true" />
+    <!-- 
+      <processor class="fact.data.DisplayData" />
+      <processor class="fact.temme.WritePixl" pixelId="3" file="output.txt" keys="pixel1,pixel3,eventNum" />
+     -->
+
+		<stream.monitor.DataRate every="25" />      
+    </process>
+</container>
