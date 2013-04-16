@@ -20,7 +20,8 @@ import fact.Constants;
 public class Diff implements Processor {
 	static Logger log = LoggerFactory.getLogger(Diff.class);
 	private String key, keyB;
-	private String output;
+	private String outputKey;
+	
 	private int offset=1;
 
 	public Diff(){}
@@ -34,10 +35,10 @@ public class Diff implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		if(output == null || output ==""){
+		if(outputKey == null || outputKey ==""){
 			input.put(Constants.KEY_DIFF, processEvent(input, key));
 		} else {
-			input.put(output, processEvent(input, key));
+			input.put(outputKey, processEvent(input, key));
 		}
 		return input;
 	}
@@ -112,11 +113,11 @@ public class Diff implements Processor {
 	 * Getter and Setter
 	 */
 	
-	public String getOutput() {
-		return output;
+	public String getOutputKey() {
+		return  outputKey;
 	}
-	public void setOutput(String output) {
-		this.output = output;
+	public void setOutputKey(String output) {
+		this.outputKey = output;
 	}
 	
 	
