@@ -1,16 +1,9 @@
-/**
- * 
- */
 package fact.data;
-
-import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import stream.Processor;
 import stream.annotations.Parameter;
-import stream.Data;
 import fact.Constants;
 
 /**
@@ -19,70 +12,19 @@ import fact.Constants;
   * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class InterpolateBadPixel implements Processor {
+public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float[]> {
 	static Logger log = LoggerFactory.getLogger(InterpolateBadPixel.class);
 	private float[] nData;
 	private int[] badChIds =  {863,868,297,927,80,873,1093,1094,527,528,721,722};
 //	private int twins[] = {1093,1094,527,528,721,722};
 //	private int crazy[] = {863,868,297};
 //	private int bad[] = {927,80,873};
-//	private Integer badCrazy[] =  {863,868,297,927,80,873,1093,1094,527,528,721,722};
-	private String key, output;
-
-	public InterpolateBadPixel() {
-		
-	}
-	public InterpolateBadPixel(String key) {
-		this.key=key;
-	}
-
-
 	
-	/**
-	 * @see stream.DataProcessor#process(stream.Data)
-	 */
 	@Override
-	public Data process(Data input) {
-
-		if(output == null || output ==""){
-			input.put(key, processEvent(input, key));
-		} else {
-			input.put(output, processEvent(input, key));
-		}
-		
-		return input;
-	}
-
-	public float[] processEvent(Data input, String key) {
-		
-		Serializable value = null;
-		
-		if(input.containsKey(key)){
-			 value = input.get(key);
-		} else {
-			//key doesnt exist in map
-			log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		
-		if (value != null && value.getClass().isArray()
-				&& value.getClass().getComponentType().equals(float.class)) {
-			return processSeries((float[]) value);
-			
-		}
-		//in case value in Map is of the wrong type to do this calculation
-		else
-		{
-			log.info(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		
-	}
-
 	public float[] processSeries(float[] series) {
 		int roi = series.length / Constants.NUMBEROFPIXEL;
 		//copy the whole data intzo a new array. 
-		if(output != null || output !="") {	
+		if(outputKey != null && !outputKey.equals("")) {	
 			nData = new float[series.length];
 			for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
 				//if were looking at a badPixel
@@ -134,7 +76,6 @@ public class InterpolateBadPixel implements Processor {
 					}
 					//set value of current slice to average of surrounding pixels
 					series[pos] = avg/(float)numNeighbours;
-					
 				}
 			}
 		}
@@ -152,17 +93,4 @@ public class InterpolateBadPixel implements Processor {
 	public void setBadChidIds(int[] badChIds) {
 		this.badChIds = badChIds;
 	}
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public String getOutput() {
-		return output;
-	}
-	public void setOutput(String output) {
-		this.output = output;
-	}
-	
 }

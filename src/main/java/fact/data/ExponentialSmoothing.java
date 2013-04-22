@@ -16,11 +16,12 @@ import fact.Constants;
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
-public class FirstOrderExponentialSmoothing extends SimpleFactProcessor<float[],float[]> {
-	static Logger log = LoggerFactory.getLogger(FirstOrderExponentialSmoothing.class);
+public class ExponentialSmoothing extends SimpleFactEventProcessor<float[],float[]> {
+	static Logger log = LoggerFactory.getLogger(ExponentialSmoothing.class);
 	
 	float alpha = 0.5f;
-
+	
+	@Override
 	public float[] processSeries(float[] data) {
 			int roi = data.length / Constants.NUMBEROFPIXEL;
 			float[] smoothedData= new float[data.length];

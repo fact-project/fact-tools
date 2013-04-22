@@ -12,7 +12,7 @@ import stream.annotations.Parameter;
  * 
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
-public class MultiplyValues extends SimpleFactProcessor<float[], float[]> {
+public class MultiplyValues extends SimpleFactEventProcessor<float[], float[]> {
 	static Logger log = LoggerFactory.getLogger(MultiplyValues.class);
 	
 	private float factor = -1;

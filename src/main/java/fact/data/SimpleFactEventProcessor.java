@@ -10,7 +10,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
 
-public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput extends Serializable> implements Processor {
+public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements Processor {
 	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 	
 	protected String key;
@@ -52,7 +52,7 @@ public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput e
 	}
 	
 	//this has to be implemented by all processes subclassing this class
-	public abstract TOutput processSeries(TInput value);
+	public abstract TOutput processSeries(TInput data);
 
 	
 	
@@ -60,6 +60,7 @@ public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput e
 	public String getKey() {
 		return key;
 	}
+	@Parameter(description = "The data elements to apply the filter on, i.e. the name of the pixels array (floats).")
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -69,10 +70,11 @@ public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput e
 	public String getOutputKey() {
 		return outputKey;
 	}
-
+	@Parameter(description = "The name of the result array that will be written to the stream.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
+	
 	
 	//brownish
 	public String getColor() {
