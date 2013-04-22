@@ -105,6 +105,7 @@ public class FitsDataStream extends AbstractStream {
 				FileOutputStream out = new FileOutputStream(f, true);
 				byte[] byteArray = new byte[bytesToAppend];
 				out.write(byteArray);
+				out.close();
 				log.debug("Added " + bytesToAppend + " bytes to the file");
 				log.debug("Updated Filesize % 2880 " + f.length()%2880 + "   (should be 0)") ;
 				}

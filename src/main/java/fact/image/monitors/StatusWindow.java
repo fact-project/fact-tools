@@ -9,6 +9,8 @@ import java.util.TimeZone;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +21,6 @@ import stream.data.Statistics;
 import stream.monitor.DataRate;
 import stream.plotter.DataVisualizer;
 import stream.plotter.PlotPanel;
-import javax.swing.JList;
-import javax.swing.JTextPane;
-import javax.swing.JScrollPane;
 
 public class StatusWindow extends DataVisualizer {
 	static Logger log = LoggerFactory.getLogger(PlotPanel.class);
@@ -135,10 +134,5 @@ public class StatusWindow extends DataVisualizer {
 			log.debug("Keeping plot frame visible...");
 		}
 	}
-
-
-	
-	
-
 }
 
