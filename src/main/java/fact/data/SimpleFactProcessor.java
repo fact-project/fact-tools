@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 import fact.Constants;
 
 public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput extends Serializable> implements Processor {
@@ -14,6 +15,7 @@ public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput e
 	
 	protected String key;
 	protected String outputKey;
+	private String color;
 	
 	@Override
 	public Data process(Data input) {
@@ -35,11 +37,17 @@ public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput e
 			}
 
 			//if outputkey is not defined just overwrite the old data
-			if(outputKey != null || outputKey !=""){		
-				input.put(outputKey, processSeries(value));
-			} else {
-				input.put(key, processSeries(value));
+			if(outputKey == null || outputKey.equals("")){
+				outputKey = key;
 			}
+			input.put(outputKey, processSeries(value));
+			
+			//add color value if set
+			if(color !=  null && !color.equals("")){
+				input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
+			}
+			
+			
 			return input;
 	}
 	
@@ -64,6 +72,15 @@ public abstract class SimpleFactProcessor<TInput extends Serializable, TOutput e
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
+	}
+	
+	//brownish
+	public String getColor() {
+		return color;
+	}
+	@Parameter(required = false, description = "RGB/Hex description String for the color that will be drawn in the FactViewer ChartPanel")
+	public void setColor(String color) {
+		this.color = color;
 	}
 
 }

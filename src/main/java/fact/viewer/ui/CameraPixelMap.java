@@ -48,6 +48,7 @@ import fact.image.Transformation;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
 import fact.viewer.colorMappings.ColorMapping;
+import fact.viewer.colorMappings.NeutralColorMapping;
 
 /**
  * @author chris

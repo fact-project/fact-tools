@@ -24,7 +24,6 @@ import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -239,11 +238,18 @@ public class SimplePlotPanel extends JPanel {
 		String key = "@" + Constants.KEY_COLOR + "_" + name;
 
 		if (event.containsKey(key)) {
-			return Color.decode((String) event.get(key));
+			try{
+				return Color.decode((String) event.get(key));
+			} catch (NumberFormatException e){
+				log.error("Could not parse the Color String. " +  (String) event.get(key) + " is not a valid color String of the form \" #HHHHHH \". " );
+			}
 		}
 
-		if (name.startsWith("DataCalibrated")) {
-			return Color.DARK_GRAY;
+		if (name.equals("DataCalibrated")) {
+			return Color.BLACK;
+		}
+		if (name.equals("Data")) {
+			return Color.GRAY;
 		}
 
 		return null;

@@ -31,6 +31,9 @@
 		    
 		<process input="fact" copies="1">
 			<fact.data.DrsCalibration drsFile="${path}/${testDRS}"/>	
+			<fact.data.FirstOrderExponentialSmoothing key="DataCalibrated" outputKey="smoothedData05" alpha="0.5" color="#FF0AB9" />
+			<fact.data.FirstOrderExponentialSmoothing key="DataCalibrated" outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" />
+			<fact.data.FirstOrderExponentialSmoothing key="DataCalibrated" outputKey="smoothedData08" alpha="0.8" color="#AA4AF9" />
 <!-- 			<fact.image.monitors.StatusWindow /> -->
 		<fact.image.ShowImage/>
 		</process>

@@ -1,14 +1,13 @@
 /**
  * 
  */
-package fact.viewer.ui;
+package fact.viewer.colorMappings;
 
 import java.awt.Color;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.viewer.colorMappings.ColorMapping;
 
 /**
  * Map values to color by linear interpolation from neutralColor to max/minColor.

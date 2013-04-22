@@ -41,7 +41,6 @@ public class MaxAmplitude implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-
 		if(output == null || output ==""){		
 			input.put(Constants.KEY_MAX_AMPLITUDE_POSITIONS, processEvent(input, key));
 			input.put(Constants.KEY_MAX_AMPLITUDES, amplitudes);

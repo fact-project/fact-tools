@@ -7,9 +7,9 @@ import javax.swing.JMenuItem;
 
 import fact.viewer.colorMappings.ColorMapping;
 import fact.viewer.colorMappings.GrayScaleColorMapping;
+import fact.viewer.colorMappings.NeutralColorMapping;
 import fact.viewer.colorMappings.TwoToneAbsoluteColorMapping;
 import fact.viewer.ui.CameraPixelMap;
-import fact.viewer.ui.NeutralColorMapping;
 import fact.viewer.ui.ScalePanel;
 
 public class ChangeColorMap implements ActionListener {
