@@ -8,11 +8,10 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.Constants;
-import fact.data.MaxAmplitude;
-
-import stream.Processor;
 import stream.Data;
+import stream.Processor;
+import fact.Constants;
+import fact.data.MaxAmplitudePosition;
 
 /**
  * TODO: this needs to be redone. the orignal code is a joke. talk to fabian about outofbounds errors. Also CFD is better here
@@ -135,7 +134,7 @@ public class RisingEdge implements Processor {
 	}
 
 	public int[] processSeries(float[] input) {
-		int[] positions = new  MaxAmplitude().processSeries(input);
+		int[] positions = new  MaxAmplitudePosition().processSeries(input);
 	
 		int roi = input.length / Constants.NUMBEROFPIXEL;
 		

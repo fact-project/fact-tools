@@ -80,8 +80,6 @@ public class StdClean implements Processor{
 		} else {
 			//key doesnt exist in map
 			log.debug(Constants.ERROR_WRONG_KEY + inKey + ",  " + this.getClass().getSimpleName() + ". Using ExFit operator as Default");
-			comp = new ExFit().processEvent(input, key);
-			
 		}
 
 
@@ -101,10 +99,7 @@ public class StdClean implements Processor{
 
 	public ArrayList<ArrayList<Integer>> processSeries(float[] data) {
 
-		//TODO: This statement should never be true. remove it?
-		if (comp == null){
-			comp = new ExFit().processSeries(data);
-		}
+		comp = new ExFit().processSeries(data);
 		data = new SliceNormalization().processSeries(data);
 		comp = new SliceNormalization().processSeries(comp);
 		

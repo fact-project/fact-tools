@@ -6,11 +6,11 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.Constants;
-import fact.data.MaxAmplitude;
+import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.Data;
+import fact.Constants;
+import fact.data.MaxAmplitudePosition;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 
@@ -79,8 +79,7 @@ public class CalculatePhotonCharge implements Processor {
 		photonCharge = new float[Constants.NUMBEROFPIXEL];
 		
 		float[] data = value;
-		MaxAmplitude mA = new MaxAmplitude();
-		int[] positions = mA.processSeries(data);
+		int[] positions = new MaxAmplitudePosition().processSeries(data);
 //		mA = null;
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		

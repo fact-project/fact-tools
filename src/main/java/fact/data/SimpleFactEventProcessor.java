@@ -13,10 +13,11 @@ import fact.Constants;
 public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements Processor {
 	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 	
-	protected String key;
+	protected String key = "DataCalibrated";
 	protected String outputKey;
 	private String color;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Data process(Data input) {
 
@@ -40,17 +41,26 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 			if(outputKey == null || outputKey.equals("")){
 				outputKey = key;
 			}
-			input.put(outputKey, processSeries(value));
+			input.put(outputKey, process(value));
 			
 			//add color value if set
 			if(color !=  null && !color.equals("")){
 				input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
 			}
 			
-			
 			return input;
 	}
 	
+	private TOutput process(TInput value) {
+		try{
+			return processSeries(value);		
+		} catch (ClassCastException e){
+			//in case value in Map is of the wrong type to do this calculation
+			log.error(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
+			return null;
+		}
+	}
+
 	//this has to be implemented by all processes subclassing this class
 	public abstract TOutput processSeries(TInput data);
 

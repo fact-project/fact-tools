@@ -70,11 +70,7 @@ public class FirFilter extends SimpleFactEventProcessor<float[], float[]>{
 		this.template = templateString.toLowerCase();
 		if (template.equals("cfd")) {
 			setCoefficents(Constants.COEFFICENTS_CFD);
-		}
-		// if(template == "laplace"){
-		// setCoefficents(Constants.COEFFICENTS_LAPLACE);
-		// }
-		if (template.equals("n3_average")) {
+		} else if (template.equals("n3_average")) {
 			setCoefficents(Constants.COEFFICENTS_N3);
 		} else if (template.equals("n5_average")) {
 			setCoefficents(Constants.COEFFICENTS_N5);
