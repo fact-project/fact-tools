@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import stream.Processor;
 import stream.Data;
 import fact.Constants;
-import fact.parfactProcessors.CalculatePhotonCharge;
-import fact.parfactProcessors.RisingEdge;
+import fact.processors.parfact.CalculatePhotonCharge;
+import fact.processors.parfact.RisingEdge;
 
 /**
  * 

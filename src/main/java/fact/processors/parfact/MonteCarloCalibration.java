@@ -1,4 +1,4 @@
-package fact.parfactProcessors;
+package fact.processors.parfact;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

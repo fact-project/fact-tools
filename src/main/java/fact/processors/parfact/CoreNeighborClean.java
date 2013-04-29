@@ -1,4 +1,4 @@
-package fact.parfactProcessors;
+package fact.processors.parfact;
 
 import java.io.Serializable;
 import java.util.ArrayList;

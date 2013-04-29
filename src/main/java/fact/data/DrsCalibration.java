@@ -16,6 +16,7 @@ import stream.annotations.Parameter;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 import uk.ac.starlink.util.URLDataSource;
+import fact.Constants;
 import fact.io.FitsDataStream;
 
 /**
@@ -39,17 +40,12 @@ public class DrsCalibration implements Processor {
 	String drsFile = null;
 	String fileName = "";
 	String filePath = "";
+	private String color;
 
 	Data drsData = null;
 
 	
 	String pathToAuxfiles = "/home/mackaiver/FactTest/aux/";
-	public String getPathToAuxfiles() {
-		return pathToAuxfiles;
-	}
-	public void setPathToAuxfiles(String pathToAuxfiles) {
-		this.pathToAuxfiles = pathToAuxfiles;
-	}
 
 	boolean keepData = true;
 
@@ -224,6 +220,11 @@ public class DrsCalibration implements Processor {
 			data.put("Data", calibrated);
 		else
 			data.put("DataCalibrated", calibrated);
+		
+		//add color value if set
+		if(color !=  null && !color.equals("")){
+			data.put("@" + Constants.KEY_COLOR + "_"+"DataCalibrated", color);
+		}
 
 		return data;
 	}
@@ -371,6 +372,21 @@ public class DrsCalibration implements Processor {
 		}
 		return destination;
 	}
+	
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
+	}
+	public String getPathToAuxfiles() {
+		return pathToAuxfiles;
+	}
+	public void setPathToAuxfiles(String pathToAuxfiles) {
+		this.pathToAuxfiles = pathToAuxfiles;
+	}
+
+	
 }
 class drsFileFilter implements FilenameFilter
 {

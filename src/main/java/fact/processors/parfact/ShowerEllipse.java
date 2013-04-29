@@ -1,4 +1,4 @@
-package fact.parfactProcessors;
+package fact.processors.parfact;
 
 import fact.Constants;
 import fact.viewer.ui.DefaultPixelMapping;

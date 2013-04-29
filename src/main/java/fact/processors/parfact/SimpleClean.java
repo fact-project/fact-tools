@@ -1,4 +1,4 @@
-package fact.parfactProcessors;
+package fact.processors.parfact;
 
 import java.util.ArrayList;
 import stream.Processor;

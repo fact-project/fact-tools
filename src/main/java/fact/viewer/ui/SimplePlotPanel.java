@@ -245,13 +245,6 @@ public class SimplePlotPanel extends JPanel {
 			}
 		}
 
-		if (name.equals("DataCalibrated")) {
-			return Color.BLACK;
-		}
-		if (name.equals("Data")) {
-			return Color.GRAY;
-		}
-
 		return null;
 	}
 
