@@ -17,32 +17,29 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 	protected String outputKey;
 	private String color;
 	
-	@SuppressWarnings("unchecked")
+	
 	@Override
 	public Data process(Data input) {
 
-			TInput value = null;
-			
-			if(input.containsKey(key)){
-				try{
-					value =  (TInput) input.get(key);
-				} catch (ClassCastException e){
-					//in case value in Map is of the wrong type to do this calculation
-					log.error(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-					return null;
-				}
-			} else {
+			if(!input.containsKey(key)){
 				//key doesn't exist in map. return.
 				log.error(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
 				return null;
 			}
-
 			//if outputkey is not defined just overwrite the old data
 			if(outputKey == null || outputKey.equals("")){
 				outputKey = key;
 			}
-			input.put(outputKey, process(value));
 			
+			try{
+				@SuppressWarnings("unchecked")
+				TInput value =  (TInput) input.get(key);
+				input.put(outputKey, process(value, input));
+			} catch (ClassCastException e){
+				//in case value in Map is of the wrong type to do this calculation
+				log.error(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
+				return null;
+			}
 			//add color value if set
 			if(color !=  null && !color.equals("")){
 				input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
@@ -51,14 +48,8 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 			return input;
 	}
 	
-	private TOutput process(TInput value) {
-		try{
+	private TOutput process(TInput value, Data event) {
 			return processSeries(value);		
-		} catch (ClassCastException e){
-			//in case value in Map is of the wrong type to do this calculation
-			log.error(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
 	}
 
 	//this has to be implemented by all processes subclassing this class

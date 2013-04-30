@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import fact.Constants;
 
 /**
- * This processor simply calculates the maximum value for all time slices in each Pixel.  
+ * This processor counts the number of Pixels in each event that have a value > maxValue.  
  * 
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
@@ -18,15 +18,7 @@ public class ThresholdPixelCounter extends SimpleFactEventProcessor<float[], Lon
 	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 	private float maxValue = 2048;
 	private long counter = 0;
-	
 
-	
-	public float getMaxValue() {
-		return maxValue;
-	}
-	public void setMaxValue(float maxValue) {
-		this.maxValue = maxValue;
-	}
 	@Override
 	public Long processSeries(float[] data) {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -44,5 +36,13 @@ public class ThresholdPixelCounter extends SimpleFactEventProcessor<float[], Lon
 		}
 		counter += pC;
 		return counter;
+	}
+	
+	
+	public float getMaxValue() {
+		return maxValue;
+	}
+	public void setMaxValue(float maxValue) {
+		this.maxValue = maxValue;
 	}
 }
