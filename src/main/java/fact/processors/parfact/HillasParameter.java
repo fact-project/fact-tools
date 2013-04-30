@@ -12,8 +12,8 @@ import stream.annotations.Parameter;
 import stream.Data;
 import fact.Constants;
 import fact.data.EventUtils;
-import fact.data.FactEvent;
 import fact.image.overlays.EllipseOverlay;
+import fact.processors.FactEvent;
 
 /**
  *Calculates the Hillas Parameter from the Ellipse. Some processor to identify showerpixels has to be run before.

@@ -10,7 +10,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.data.MaxAmplitudePosition;
+import fact.processors.MaxAmplitudePosition;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 

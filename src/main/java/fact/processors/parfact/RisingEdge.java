@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import fact.Constants;
-import fact.data.MaxAmplitudePosition;
+import fact.processors.MaxAmplitudePosition;
 
 /**
  * TODO: this needs to be redone. the orignal code is a joke. talk to fabian about outofbounds errors. Also CFD is better here

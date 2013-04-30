@@ -8,9 +8,9 @@ import stream.annotations.Parameter;
 import stream.Data;
 import fact.Constants;
 import fact.data.EventUtils;
-import fact.data.FactEvent;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
+import fact.processors.FactEvent;
 /**
  *CoreNeighborClean. Identifies showerPixel in the image array.
  *	 Cleaning in three Steps:

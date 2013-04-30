@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fact.data;
+package fact.processors;
 
 import fact.viewer.ui.DefaultPixelMapping;
 

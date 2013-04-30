@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fact.processors.FactEvent;
+
 /**
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;

@@ -1,4 +1,4 @@
-package fact.data;
+package fact.processors;
 
 
 import java.io.Serializable;
