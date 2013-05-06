@@ -9,13 +9,13 @@ import java.lang.reflect.Array;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.Data;
 import stream.data.DataFactory;
 
 /**
- * @author chris
+ * @author chris, niklaswulf
  * 
  */
 public class CutSlices implements Processor {
@@ -94,19 +94,27 @@ public class CutSlices implements Processor {
 
 					int newLen = (end - start);
 
-					Object result = Array.newInstance(s.getClass()
-							.getComponentType(), rows * newLen);
+					// Object result = Array.newInstance(s.getClass()
+					// .getComponentType(), rows * newLen);
+
+					float[] original = (float[]) s;
+					float[] result = new float[newLen * rows];
+
 					for (int row = 0; row < rows; row++) {
 
-						for (int i = 0; i < newLen && i < (end - start); i++) {
-							int fromPos = row * oldLen + start + i;
-							int toPos = row * newLen + i;
+						System.arraycopy(original, row * oldLen + start,
+								result, row * newLen, newLen);
 
-							Array.set(result, toPos, Array.get(s, fromPos));
-						}
+						// for (int i = 0; i < newLen && i < (end - start); i++)
+						// {
+						// int fromPos = row * oldLen + start + i;
+						// int toPos = row * newLen + i;
+						//
+						// Array.set(result, toPos, Array.get(s, fromPos));
+						// }
 					}
 
-					data.put(key, (Serializable) result);
+					data.put(key, result);
 
 				} else {
 					log.error("Skipping non-array type object '{}'", key);
