@@ -7,6 +7,7 @@ import fact.Constants;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class RemoveJumps implements Processor{
 
@@ -15,6 +16,7 @@ public class RemoveJumps implements Processor{
 	
 	protected String key = "DataCalibrated";
 	protected String outputKey = "DataCalibrated";
+	private String color = "#A5D417";
 
 	private double jumpThreshold = 8.0;
 	int window = 3;
@@ -36,6 +38,7 @@ public class RemoveJumps implements Processor{
 		if(previousStartCells.isEmpty()){
 			previousStartCells.addFirst(startCellArray);
 			previousStopCells.addFirst(stopCellArray);
+			input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
 			input.put(outputKey, data);
 			return input;
 		}
@@ -52,6 +55,7 @@ public class RemoveJumps implements Processor{
 			ArrayList<Short> startCandidates = new ArrayList<Short>();
 			ArrayList<Short> stopCandidates = new ArrayList<Short>();
 			
+			//Save the start- and stopcell for the current pixel 
 			short currentStartCell = startCellArray[pix];
 			short currentStopCell = stopCellArray[pix];
 			
@@ -105,7 +109,7 @@ public class RemoveJumps implements Processor{
 		if(previousStopCells.size() > 50){
 			previousStopCells.removeLast();
 		}	
-		
+		input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
 		input.put(outputKey, result);
 		return input;
 	}
@@ -140,6 +144,16 @@ public class RemoveJumps implements Processor{
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
+	}
+	
+	
+	//brownish
+	public String getColor() {
+		return color;
+	}
+	@Parameter(required = false, description = "RGB/Hex description String for the color that will be drawn in the FactViewer ChartPanel")
+	public void setColor(String color) {
+		this.color = color;
 	}
 
 }
