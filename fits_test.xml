@@ -1,0 +1,26 @@
+<container>
+
+<!-- 	Triggertypes 
+
+		416 - interleaved lightpulse fxd
+		4 -physiks
+		1024 - interleaved pedestal
+		512 - interleaved lighpulse Int 
+		33792 - Time Calibration 
+		-->
+<!-- 	<stream id="fact" class="fact.io.FactDataStream"  -->
+<!--  		    url="file:/home/bruegge/20120120_070.fits" /> -->
+
+<!-- <property name="path" value="/home/bruegge/FactTest" /> -->
+<property name="data" value="20111126_042.fits" />
+<property name="dataDRS" value="20111126_034.drs.fits" />
+<property name="path" value="/home/bruegge/FactTest" />
+<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
+ 
+
+	<stream id="fact" class="fact.io.FitsStream" 
+ 		    url="file:${path}/${data}"  />
+		    
+		<process input="fact" copies="1">
+		</process>
+</container>

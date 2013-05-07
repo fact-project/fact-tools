@@ -48,6 +48,7 @@ public class RemoveJumps implements Processor{
 		}
 
 		//calculate the stopcellArray for the current event
+		//thius wont be necessary
 		for (int i = 0; i < startCellArray.length; ++i){
 			//there are 1024 capacitors in the ringbuffer
 			stopCellArray[i] = (short) ((startCellArray[i] + roi)% 1024);
@@ -57,60 +58,55 @@ public class RemoveJumps implements Processor{
 		
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			
-			ArrayList<Short> startCandidates = new ArrayList<Short>();
-			ArrayList<Short> stopCandidates = new ArrayList<Short>();
+			ArrayList<Integer> startCandidateSlices = new ArrayList<Integer>();
+			ArrayList<Integer> stopCandidateSlices = new ArrayList<Integer>();
 			
-			//Save the start- and stopcell for the current pixel 
-			short currentStartCell = startCellArray[pix];
-			short currentStopCell = stopCellArray[pix];
 			
 			
 			//create the list of possible start and stopcandidates
 			//these are all previuous start-orstopcells that can be found between the current start- and stopcell
+			
 			for(short[] c: previousStartCells){
-				if (c[pix] > currentStartCell  && c[pix] - currentStopCell < roi){
-					startCandidates.add(c[pix]);
+				//for some reason there seems to be an offset of + 3 slices between the stopcell and the real jump
+				int slice = getSliceFromCell(c[pix] + 3, roi, startCellArray[pix]) ;
+				if(slice > 0 && slice < roi) {
+					startCandidateSlices.add(slice);
 				}
 			}
 			
 			for(short[] c: previousStopCells){
-				if (c[pix] >= startCellArray[pix] && c[pix] < currentStopCell) {
-					stopCandidates.add(c[pix]);
+				//for some reason there seems to be an offset of +9 slices between the stopcell and the real jump
+				int slice = getSliceFromCell(c[pix] + 9, roi, startCellArray[pix]) ;
+				if(slice > 0 && slice < roi) {
+					stopCandidateSlices.add(slice);
 				}
 			}
 			
-			for(short candidateCell : startCandidates){
-				//for some reason there seems to be an offset of + 3 slices between the startcell and the real jump
-				candidateCell += 3;
-				
-				int slice = candidateCell - currentStartCell;
-				double h = jumpHeight(pix, slice , data);
+			
+			for(int candidateSlice : startCandidateSlices){
+				if(candidateSlice > roi || candidateSlice <0){
+					System.out.println("WTF");
+				}
+				double h = jumpHeight(pix, candidateSlice, data);
 				if(Math.abs(h) > jumpThreshold){
 					//rechts an links Anpassen
 					// c is any number between currentStart and currentStopCell. 0< c < 1024 
-					for (int i =  slice ; i < roi ; ++i){
+					for (int i =  candidateSlice ; i < roi ; ++i){
 						int pos = pix*roi + i;
-						result[pos] += h;
+						result[pos] -= h;
 					}
 				}
 			}
 			
 			
-			for(short candidateCell : stopCandidates){
-				//for some reason there seems to be an offset of + 3 slices between the stopcell and the real jump
-				candidateCell += 9;
-				int slice = candidateCell - currentStartCell;
-				double h = jumpHeight(pix, slice , data);
+			for(int candidateSlice : stopCandidateSlices){
+				double h = jumpHeight(pix, candidateSlice, data);
 				if(Math.abs(h) > jumpThreshold){
 					//links an rechts Anpassen
 					// c is any number between currentStart and currentStopCell. 0< c < 1024
-					try{
-					for (int i = slice; i >= 0 ; --i){
+					for (int i = candidateSlice; i >= 0 ; --i){
 						int pos = pix*roi + i ;
 						result[pos] += h;
-					}
-					} catch(ArrayIndexOutOfBoundsException e){
-						System.out.println("FALSCH anpassung links an rechts: slice: " + slice  + "  currentStartSlice:  "  +  currentStartCell + "  candidateCell: " + candidateCell);
 					}
 				}
 			}
@@ -129,6 +125,11 @@ public class RemoveJumps implements Processor{
 		input.put(outputKey, result);
 		return input;
 	}
+	
+	private int getSliceFromCell(int c, int roi, int currentStartCell){
+		return (c+roi) % 1024 - (currentStartCell + roi)%1024;
+	}
+	
 
 	/**
 	 * returns the jumpheight in the data array at position c; No conversion between slicenumber and position in the array takes place here. the caller has to handle that
@@ -142,7 +143,7 @@ public class RemoveJumps implements Processor{
 		
 		double baseLeft = 0;
 		try{
-		for (int i = Math.max(0, slice-window) ; i < roi ; ++i){
+		for (int i = Math.max(0, slice-window) ; i < slice ; ++i){
 			int pos = pix*roi + i;
 			baseLeft += data[pos];
 		}
@@ -153,7 +154,7 @@ public class RemoveJumps implements Processor{
 		
 		double baseRight = 0;
 		try{
-		for (int i = slice + 1 ; i < Math.min(slice+window, roi) ; ++i){
+		for (int i = slice ; i < Math.min(slice+window, roi) ; ++i){
 			int pos = pix*roi + i;
 			baseRight += data[pos];
 		}
