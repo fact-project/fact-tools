@@ -22,16 +22,11 @@ import stream.Data;
  */
 public class RemoveSpikesMars implements Processor {
 	static Logger log = LoggerFactory.getLogger(StdDeviation.class);
-	private String key;
+	private String key = "DataCalibrated";
 	private String output;
 	//color that will be drawn in graph window
 	private String color = "#1E9E08";
 
-	public RemoveSpikesMars() {
-	}
-	public RemoveSpikesMars(String key) {
-		this.key=key;
-	}
 
 	/**
 	 * @see stream.DataProcessor#process(stream.Data)

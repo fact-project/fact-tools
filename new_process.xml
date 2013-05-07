@@ -27,14 +27,19 @@
 
 <!-- ls8 path -->
 	<stream id="fact" class="fact.io.FactEventStream" 
- 		    url="file:${path}/${test}"  />
+ 		    url="file:${path}/${data}"  />
 		    
 		<process input="fact" copies="1">
-			<fact.data.DrsCalibration drsFile="${path}/${testDRS}"/>	
-			<fact.data.MaxAmplitudePosition key="DataCalibrated" outputKey="amplitudePositions"/>
-			<fact.data.MaxAmplitude outputKey="amplitudes"/>
-			<fact.data.ExponentialSmoothing outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" />
+<!-- 			<Skip condition="%{data.EventNum} &lt; 12" /> -->
+			<fact.processors.DrsCalibration drsFile="${path}/${dataDRS}" color="#5C311F"/>	
+			<fact.processors.parfact.RemoveSpikesMars  />
+<!-- 			<fact.processors.CutSlices keys="DataCalibrated"  start="15" /> -->
+			<fact.processors.RemoveJumps outputKey="removedJumps" color="#FF00FF" />
+<!-- 			<fact.processors.CutSlices keys="DataCalibrated,removedJumps"  start="0" end="240" /> -->
+<!-- 			<fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="amplitudePositions"/> -->
+<!-- 			<fact.processors.MaxAmplitude outputKey="amplitudes"/> -->
+<!-- 			<fact.processors.ExponentialSmoothing outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" /> -->
 <!-- 			<fact.image.monitors.StatusWindow /> -->
-		<fact.image.ShowImage/>
+<!-- 		<fact.image.ShowImage/> -->
 		</process>
 </container>

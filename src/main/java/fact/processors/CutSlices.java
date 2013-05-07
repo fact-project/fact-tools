@@ -25,7 +25,7 @@ public class CutSlices implements Processor {
 	Integer end = 300;
 	Integer elements = 1440;
 
-	String[] keys = new String[] { "Data" };
+	String[] keys = new String[] { "DataCalibrated" };
 
 	/**
 	 * @return the start
