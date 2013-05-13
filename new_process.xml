@@ -44,6 +44,7 @@
 <!-- 			<fact.processors.ExponentialSmoothing outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" /> -->
 <!-- 			<stream.monitor.DataRate every="50"/> -->
 <!-- 			<fact.image.monitors.StatusWindow /> -->
-		<fact.image.ShowImage/>
+			<stream.io.CsvWriter file="PFAD"  
+			<fact.image.ShowImage/>
 		</process>
 </container>

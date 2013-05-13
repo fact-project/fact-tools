@@ -3,17 +3,29 @@
 <!-- Pfade zu den fits files. -->
 <property name="data" value="20111126_042.fits" />
 <property name="dataDRS" value="20111126_034.drs.fits" />
+<property name="data2" value="20130104_095.fits" />
+<property name="data2DRS" value="20120209_050.drs.fits.gz" />
 
-<property name="path" value="/home/bruegge/FactTest" />
-<!-- <property name="path" value=" /Users/kaibrugge/FactTest" /> -->
+<!-- <property name="path" value="/home/bruegge/FactTest" /> -->
+<property name="path" value=" /Users/kaibrugge/FactTest" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
 	<stream id="fact" class="fact.io.FactEventStream"  url="file:${path}/${data}"  />
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
-		<fact.data.DrsCalibration drsFile="${path}/${dataDRS}"/>
-		<fact.image.ShowImage/>
+		<Skip condition="%{data.TriggerType} != 4" />
+		<fact.processors.DrsCalibration drsFile="${path}/${dataDRS}"/>
+		<fact.processors.CutSlices start="15" end="220" />
+		<fact.processors.parfact.RemoveSpikesMars />
+		<fact.processors.RemoveJumps outputKey="jumpsRemoved"/>
+		<fact.processors.parfact.CalculatePhotonCharge key="jumpsRemoved" outputKey="chargeremoved" />
+		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="charge" />
+		<fact.processors.SumKey key="chargeremoved" outputKey="Sum" />
+		<fact.processors.SumKey key="charge" outputKey="jumpsRemovedSum" />
+<!-- 		<fact.image.monitors.HistogramPlotter keys="jumpsRemovedSum,Sum" drawErrors="true"/> -->
+			<fact.image.monitors.StatusWindow every="40" />
+<!-- 		<fact.image.ShowImage/> -->
 	</process>
 		
 		

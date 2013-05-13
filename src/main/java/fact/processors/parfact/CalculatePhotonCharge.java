@@ -27,7 +27,7 @@ public class CalculatePhotonCharge implements Processor {
 	static Logger log = LoggerFactory.getLogger(CalculatePhotonCharge.class);
 	float[] photonCharge = null;
 	float[] arrivalTime = null;
-	private String output = null;
+	private String outputKey = null;
 
 	private String key;
 	private	double average = 0.0;
@@ -43,12 +43,12 @@ public class CalculatePhotonCharge implements Processor {
 	public Data process(Data input) {
 		
 		processEvent(input, key);
-		if(output == null || output ==""){
+		if(outputKey == null || outputKey ==""){
 			input.put(Constants.KEY_PHOTONCHARGE+"_average",average);
 			input.put(Constants.KEY_PHOTONCHARGE, photonCharge);
 		} else {
-			input.put(output+"_average",average);
-			input.put(output, photonCharge);
+			input.put(outputKey+"_average",average);
+			input.put(outputKey, photonCharge);
 		}
 		return input;
 	}
@@ -141,11 +141,11 @@ public class CalculatePhotonCharge implements Processor {
 	}
 	
 
-	public String getOutput() {
-		return output;
+	public String getOutputKey() {
+		return outputKey;
 	}
-	public void setOutput(String output) {
-		this.output = output;
+	public void setOutputKey(String output) {
+		this.outputKey = output;
 	}
 	
 	

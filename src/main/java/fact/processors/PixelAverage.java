@@ -20,7 +20,7 @@ import fact.Constants;
 public class PixelAverage implements Processor {
 	static Logger log = LoggerFactory.getLogger(PixelAverage.class);
 	private String key;
-	private String output;
+	private String outputKey;
 
 	public PixelAverage(){}
 	public PixelAverage(String key){
@@ -33,10 +33,10 @@ public class PixelAverage implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		if(output == null || output ==""){
+		if(outputKey == null || outputKey ==""){
 			input.put(Constants.KEY_AVERAGES, processEvent(input, key));
 		} else {
-			input.put(output, processEvent(input, key));
+			input.put(outputKey, processEvent(input, key));
 		}
 		return input;
 	}
@@ -92,10 +92,10 @@ public class PixelAverage implements Processor {
 	 */
 	
 	public String getOutput() {
-		return output;
+		return outputKey;
 	}
 	public void setOutput(String output) {
-		this.output = output;
+		this.outputKey = output;
 	}
 	
 	
