@@ -1,17 +1,18 @@
 package fact.io;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.zip.GZIPInputStream;
 
+import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,21 +24,25 @@ import stream.io.SourceURL;
 public class FitsStream extends AbstractStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
 	final static int blockSize = 2880;
+	final static int lineLength = 80;
+	private int headerSize = 7 * blockSize; 
+
+
 	private BufferedInputStream bufferedStream;
 	int roi = 300;
-	private int eventBytes;
 	private DataInputStream dataStream;
 	private int[] lengthArray;
 	private String[] nameArray;
 	private String[] typeArray;
-	
+	private int eventBytes;
+
 	public FitsStream(SourceURL url){
 		this(url.getFile());
 	}
-	
+
 	public FitsStream(String path){
 		try {
-			
+
 			//simpl,e filename cheack to see wether file is zipped or not
 			InputStream fileStream = new FileInputStream(path);
 			if (path.endsWith(".gz")){
@@ -62,23 +67,34 @@ public class FitsStream extends AbstractStream {
 	@Override
 	public void init() throws Exception {
 		//read the header of the fits file
-		byte[] headerBytes = new byte[5* blockSize ];
-		//mark position in bufferedStream so we can reset it later ti that position
-		bufferedStream.mark(10* blockSize);
-		int numberOfbytes = bufferedStream.read(headerBytes);
-		if (numberOfbytes < 3*blockSize){
-			log.error("Cannot read header of fits file. Its to short.");
+		//mark position in bufferedStream so we can reset it later to that position. This assumes there is a maximum header size.
+		bufferedStream.mark(2 * headerSize);
+
+		//try to find the size of the header. its n*blocksize long
+		byte[] buf = new byte[lineLength];
+		//we skip the first header. There ahs to be a second one.
+		bufferedStream.skip(blockSize);
+		//count the number of bytes we read before we find the end line
+		int lineCounter = 0;
+		while ((bufferedStream.read(buf))  > 0){
+			lineCounter++;
+			String line = new String(buf, "US-ASCII");
+			if (line.startsWith("END")){
+				break;
+			}
 		}
-		//Im creating a BufferdReader which allows me to read the bytes with the set encoding.
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(headerBytes), "US-ASCII"));
-		//the first header is completely irrelevant to us
-		reader.skip(blockSize);
-		
+		//we read linecounter * 80 bytes and skipped the first 2880
+		//we want to know the number of blocks we read multiplied by the blocksize
+		headerSize = (int) ((blockSize + lineCounter*lineLength)/blockSize + 1)*blockSize ;
+		//lets start over from hte top and read the header to find out how many fields we have.
+		bufferedStream.reset();
+		bufferedStream.mark(headerSize);
+		//skip the first header
+		bufferedStream.skip(blockSize);
+
 		int numberOfFields = 0;
-		char[] cbuf = new char[80];
-		while((reader.read(cbuf))  > 0){
-			String valueName = new String(cbuf);
-			System.out.println(valueName);
+		while((bufferedStream.read(buf))  > 0){
+			String valueName = new String(buf,"US-ASCII" );
 			if(valueName.startsWith("TFIELDS")){
 				valueName =  valueName.split("=|/")[1];
 				numberOfFields = Integer.parseInt(valueName.trim());
@@ -94,15 +110,15 @@ public class FitsStream extends AbstractStream {
 		typeArray = new String[numberOfFields];
 		nameArray = new String[numberOfFields];
 		lengthArray = new int[numberOfFields];
-		
-		
-		reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(headerBytes), "US-ASCII"));
+
+		//
+		bufferedStream.reset();
+		bufferedStream.mark(headerSize);
 		//the first header is completely irrelevant to us
-		reader.skip(blockSize);
+		bufferedStream.skip(blockSize);
 		// read number of fields
-		while((reader.read(cbuf))  > 0){
-			String valueName = new String(cbuf);
-			System.out.println(valueName);
+		while((bufferedStream.read(buf))  > 0){
+			String valueName = new String(buf);
 			if (valueName.substring(0, 3).equals("NROI"))
 			{
 				roi = Integer.parseInt(valueName.split("=|/")[1].trim()); 
@@ -116,123 +132,128 @@ public class FitsStream extends AbstractStream {
 			{
 				String[] split = valueName.split("=|'");
 				int number = Integer.parseInt((split[0].replaceAll("\\D+", "")).trim());
-				nameArray[number-1] =  split[2];
+				nameArray[number-1] =  split[2].trim();
 			}
 			//type name . ie. J,I,b....
+			//line starts with TFORM1, or TFORM2 ...
 			else if(valueName.startsWith("TFORM"))
 			{
-				String[] split = valueName.split("=|'");
-				int number = Integer.parseInt((split[0].replaceAll("\\D+", "")).trim());
-				typeArray[number-1] =  split[2].replaceAll("\\d+", "").trim();
-				lengthArray[number-1] =  Integer.parseInt((split[2].replaceAll("\\D+", "")).trim());
+				//TODO lets split direferntly
+				String[] split = valueName.split("=|/");
+				String comment = split[split.length-1];
+				String name = split[0].trim();
+				String value = split[1].replaceAll("'", "").trim();
 
-//				typeMap.put(valueName.trim(), valueType.trim());
+				int numberOfElements;
+				int index;
+				try{
+					//parse the index from the name string by removing all non digit characters 
+					String indexString = name.replaceAll("\\D+", "").trim();
+					index = Integer.parseInt(indexString);
+				} catch (NumberFormatException e){
+					Log.error("Couldnt parse the index of the TFORM in the header. Assuming a value of 0");
+					index = 0;
+				}
+
+				try{
+					//parse the numberOfElemetns from the value string by removing all non digit characters 
+					String numberString = value.replaceAll("\\D+", "").trim();
+					numberOfElements = Integer.parseInt(numberString);
+				} catch (NumberFormatException e){
+					Log.error("Couldnt parse the number of TFROM elements numbers in the header. Assuming a value of 1");
+					numberOfElements = 1;
+				}
+
+				//get the type from the name by removing the number
+				String type = value.replaceAll("\\d+", "").trim();
+				typeArray[index-1] =  type;
+				lengthArray[index-1] = numberOfElements;
+				//typeMap.put(valueName.trim(), valueType.trim());
 			}
 			else if(valueName.trim().startsWith("END"))
 			{
 				break;
 			}
-			
-			
 		}
 		bufferedStream.reset();
-		bufferedStream.skip(4*blockSize);
+		bufferedStream.skip(headerSize);
 		dataStream = new DataInputStream(bufferedStream);
 
-//		System.out.println("numberOffields: " + numberOfFields + " namemap.size" + nameMap.size());
-		//TODO: for all keys save the length and the type in a format which allows for efficient use of the 'case' statement
-//		System.out.println(eventBytes);
-//		System.out.println(roi);
-
-		
 	}
 
 	@Override
 	public Data readNext() throws Exception {
 		Data item = DataFactory.create();
-		
-		for(int n = 0; n < nameArray.length;  n++ ){
-			
-			if(typeArray[n].equals("J")){
-				int numberOfelements = lengthArray[n];
-				
-				if(numberOfelements > 1){
-					int[] el =  new int[numberOfelements];
-					for(int i = 0;  i < numberOfelements; i++ ){
-						el[i] = dataStream.readInt();
-					}		
-					item.put(nameArray[n], el);
-				} else if (numberOfelements ==1) {
-					item.put(nameArray[n], dataStream.readInt());
+		try{
+			for(int n = 0; n < nameArray.length;  n++ ){
+
+				//read int
+				if(typeArray[n].equals("J")){
+					int numberOfelements = lengthArray[n];
+
+					if(numberOfelements > 1){
+						int[] el =  new int[numberOfelements];
+						for(int i = 0;  i < numberOfelements; i++ ){
+							el[i] = dataStream.readInt();
+						}		
+						item.put(nameArray[n], el);
+					} else if (numberOfelements ==1) {
+						item.put(nameArray[n], dataStream.readInt());
+					}
+				}
+
+				//read byte
+				if(typeArray[n].equals("B")){
+					int numberOfelements = lengthArray[n];
+
+					if(numberOfelements > 1){
+						byte[] el =  new byte[numberOfelements];
+						for(int i = 0;  i < numberOfelements; i++ ){
+							el[i] = dataStream.readByte();
+						}		
+						item.put(nameArray[n], el);
+					} else if (numberOfelements ==1) {
+						item.put(nameArray[n], dataStream.readByte());
+					}
+				}
+
+				//read a short
+				if(typeArray[n].equals("I")){
+					int numberOfelements = lengthArray[n];
+
+					if(numberOfelements > 128){
+						//lets try to be even quicker
+						//to save n shorts we need 2*n bytes
+						byte[] el = new byte[2*numberOfelements];
+						dataStream.read(el);
+						ShortBuffer sBuf = ByteBuffer.wrap(el).asShortBuffer();
+						short[] ar =  new short[numberOfelements];
+						sBuf.get(ar);
+						item.put(nameArray[n],ar);
+					}
+					else 	if(numberOfelements > 1 )
+					{
+						short[] el =  new short[numberOfelements];
+						for(int i = 0;  i < numberOfelements; i++ ){
+							el[i] = dataStream.readShort();
+						}		
+						item.put(nameArray[n], el);
+					} else if (numberOfelements ==1) {
+						item.put(nameArray[n], dataStream.readShort());
+					}
 				}
 			}
-			
-			if(typeArray[n].equals("B")){
-				int numberOfelements = lengthArray[n];
-				
-				if(numberOfelements > 1){
-					byte[] el =  new byte[numberOfelements];
-					for(int i = 0;  i < numberOfelements; i++ ){
-						el[i] = dataStream.readByte();
-					}		
-					item.put(nameArray[n], el);
-				} else if (numberOfelements ==1) {
-					item.put(nameArray[n], dataStream.readByte());
-				}
-			}
-			
-			
-			if(typeArray[n].equals("I")){
-				int numberOfelements = lengthArray[n];
-				
-				if(numberOfelements > 1){
-					short[] el =  new short[numberOfelements];
-					for(int i = 0;  i < numberOfelements; i++ ){
-						el[i] = dataStream.readShort();
-					}		
-					item.put(nameArray[n], el);
-				} else if (numberOfelements ==1) {
-					item.put(nameArray[n], dataStream.readShort());
-				}
-			}
+
+			//		System.out.println(item.toString());
+			new fact.processors.Short2Float().process(item);
+		} catch (EOFException e){
+			log.info("End of file reached. ");
+			dataStream.close();
+			bufferedStream.close();
+
+			return null;
 		}
-//		System.out.println("read event " + item.toString());
-//			String value = typeMap.get(key);
-//			String type = value.replaceAll("\\d+", "");
-//			String number = (value.replaceAll("\\D+", ""));
-//			int numberOfElements = 1;
-//			if(!number.trim().equals("")){
-//				numberOfElements = Integer.parseInt(number.trim());
-//			}
-//			if(numberOfElements == 0){
-//				break;
-//			}
-//			if(type.equals("J")){
-//				dataStream.readInt();
-//			}
-//			if(type.equals("B")){
-//				dataStream.readUnsignedByte();
-//			}
-//			if(type.equals("I")){
-//				//this is a 16 bit int
-//				dataStream.readByte();
-//			}
-//			if(type.equals("E")){
-//				dataStream.readFloat();
-//			}
-//			if(type.equals("D")){
-//				dataStream.readDouble();
-//			}
-////			System.out.println(type);
-////			System.out.println(numberOfElements);
-//		}
-
-
-		
-		new fact.processors.Short2Float().process(item);
-		
-		
 		return item;
 	}
-	
+
 }

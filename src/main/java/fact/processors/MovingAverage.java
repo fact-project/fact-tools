@@ -47,6 +47,7 @@ public class MovingAverage extends SimpleFactEventProcessor<float[],  float[]> {
 			
 			for (int slice = 1; slice < roi; slice++) {
 				int pos = pix * roi + slice;
+				//if the window is beyond the edge of the array I repeat the last value
 				if(pos + pivot > end ){
 					result[pos] = result[pos-1] + (data[end] - data[pos-pivot])/length;
 				} else if(pos - pivot < start ){
