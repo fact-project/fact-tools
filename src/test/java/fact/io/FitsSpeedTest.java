@@ -23,7 +23,7 @@ import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
-import fact.data.DrsCalibration;
+import fact.processors.DrsCalibration;
 
 /**
  * @author chris

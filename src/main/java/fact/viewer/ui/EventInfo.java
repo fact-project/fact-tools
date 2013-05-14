@@ -10,7 +10,7 @@ import javax.swing.text.html.StyleSheet;
 
 import stream.Data;
 import fact.Constants;
-import fact.data.FactEvent;
+import fact.processors.FactEvent;
 
 /**
  * this creates the String for the EventInfoWindow

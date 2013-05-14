@@ -44,7 +44,7 @@ public class ShowImage extends AbstractProcessor {
 								public void actionPerformed(ActionEvent arg0) {
 									synchronized (lock) {
 										lock.set(!lock.get());
-										log.info("Notifying all listeners on lock...");
+										log.debug("Notifying all listeners on lock...");
 										lock.notifyAll();
 									}
 								}
@@ -56,7 +56,7 @@ public class ShowImage extends AbstractProcessor {
 								public void actionPerformed(ActionEvent arg0) {
 									synchronized (lock) {
 										lock.set(!lock.get());
-										log.info("Notifying all listeners on lock...");
+										log.debug("Notifying all listeners on lock...");
 										lock.notifyAll();
 									}
 								}
@@ -71,9 +71,9 @@ public class ShowImage extends AbstractProcessor {
 		synchronized (lock) {
 			while (lock.get()) {
 				try {
-					log.info("Waiting on lock...");
+					log.debug("Waiting on lock...");
 					lock.wait();
-					log.info("Notification occured on lock!");
+					log.debug("Notification occured on lock!");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

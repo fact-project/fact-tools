@@ -13,9 +13,9 @@ import stream.annotations.Description;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.SourceURL;
-import fact.data.DrsCalibration;
 import fact.data.EventKey;
-import fact.data.FactEvent;
+import fact.processors.DrsCalibration;
+import fact.processors.FactEvent;
 import fact.tools.FitsExplore;
 
 /**

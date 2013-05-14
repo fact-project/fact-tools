@@ -14,27 +14,37 @@
 <!-- <property name="path" value="/home/bruegge/FactTest" /> -->
 <property name="data" value="20111126_042.fits" />
 <property name="dataDRS" value="20111126_034.drs.fits" />
+<property name="data2" value="20120209_061.fits" />
+<property name="data2DRS" value="20120209_050.drs.fits.gz" />
 <property name="noise" value="20130124_040.fits" />
 <property name="noiseDRS" value="20130124_033.drs.fits" />
 <property name="mc" value="/jafsOut/mc_20130325_001.fits" />
 <property name="mcDRS" value="/jafsOut/mc_20130325_001.drs.fits" />
 <property name="test" value="/jafsOut/mc_20130325_002.fits" />
 <property name="testDRS" value="/jafsOut/mc_20130325_001.drs.fits" />
-<!-- 	<property name="path" value="/home/bruegge/FactTest" /> -->
+	<property name="path" value="/home/bruegge/FactTest" />
 
- 	<property name="path" value="/Users/kaibrugge/FactTest" />
+<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
  
 
 <!-- ls8 path -->
 	<stream id="fact" class="fact.io.FactEventStream" 
- 		    url="file:${path}/${test}"  />
+ 		    url="file:${path}/${data2}"  />
 		    
 		<process input="fact" copies="1">
-			<fact.data.DrsCalibration drsFile="${path}/${testDRS}"/>	
-			<fact.data.MaxAmplitudePosition key="DataCalibrated" outputKey="amplitudePositions"/>
-			<fact.data.MaxAmplitude outputKey="amplitudes"/>
-			<fact.data.ExponentialSmoothing outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" />
+			<Skip condition="%{data.EventNum} &lt; 48" />
+			<fact.processors.DrsCalibration drsFile="${path}/${data2DRS}" color="#5C311F"/>	
+			<fact.processors.parfact.RemoveSpikesMars  />
+			<fact.processors.CutSlices keys="DataCalibrated"  start="22" end="220"/>
+			<fact.processors.RemoveJumps outputKey="removedJumps" color="#FF00FF" />
+<!-- 			<fact.processors.CutSlices keys="DataCalibrated"  start="0" end="220" /> -->
+<!-- 			<fact.processors.CutSlices keys="DataCalibrated,removedJumps"  start="0" end="240" /> -->
+<!-- 			<fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="amplitudePositions"/> -->
+<!-- 			<fact.processors.MaxAmplitude outputKey="amplitudes"/> -->
+<!-- 			<fact.processors.ExponentialSmoothing outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" /> -->
+<!-- 			<stream.monitor.DataRate every="50"/> -->
 <!-- 			<fact.image.monitors.StatusWindow /> -->
-		<fact.image.ShowImage/>
+			<stream.io.CsvWriter file="PFAD"  
+			<fact.image.ShowImage/>
 		</process>
 </container>
