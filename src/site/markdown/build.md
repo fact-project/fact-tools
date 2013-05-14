@@ -6,7 +6,10 @@ fact-analysis project. Therefore, for building the tools, you have to
 have the Apache Maven build-tool installed.
 
 Apache *Maven* can be downloaded from [maven.apache.org](http://maven.apache.org)
-or installed on Ubuntu systems using `apt-get install maven2`.
+or installed on Ubuntu systems using apt-get:
+
+     # sudo apt-get install maven2
+
 
 
 Building the FACT Tools
