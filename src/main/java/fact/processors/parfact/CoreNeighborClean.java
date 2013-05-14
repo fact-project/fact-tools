@@ -21,7 +21,7 @@ import fact.processors.FactEvent;
  *
  */
 public class CoreNeighborClean implements Processor{
-	private String key;
+	private String key = "DataCalibrated";
 	private String output;
 	private  PixelSet corePixelSet;
 	private  float corePixelThreshold = 5.0f;

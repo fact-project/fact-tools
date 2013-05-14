@@ -1,0 +1,25 @@
+<container>
+
+
+<property name="data" value="20120209_061.fits" />
+<property name="dataDRS" value="20120209_050.drs.fits.gz" />
+
+<property name="path " value="/home/bruegge/FactTest" />
+<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
+ 
+
+	<stream id="fact" class="fact.io.FitsStream" 
+ 		    url="file:${path}/${data}"  />
+		    
+		<process input="fact">
+			<Skip condition="%{data.EventNum} &lt; 48" />
+			<fact.processors.DrsCalibration drsFile="${path}/${dataDRS}" color="#5C311F"/>	
+			<fact.processors.parfact.RemoveSpikesMars  />
+			<fact.processors.CutSlices keys="DataCalibrated"  start="22" end="220"/>
+			<fact.processors.RemoveJumps outputKey="removedJumps" color="#FF00FF" />
+			<fact.processors.ExponentialSmoothing outputKey="smoothed" alpha="0.3" color="#AF4AB9" />
+<!-- 			<stream.monitor.DataRate every="50"/> -->
+<!-- 			<fact.image.monitors.StatusWindow /> -->
+			<fact.image.ShowImage/>
+		</process>
+</container>

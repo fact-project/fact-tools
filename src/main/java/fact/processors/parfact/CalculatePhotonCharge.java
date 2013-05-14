@@ -29,15 +29,10 @@ public class CalculatePhotonCharge implements Processor {
 	float[] arrivalTime = null;
 	private String outputKey = null;
 
-	private String key;
+	private String key = "DataCalibrated";
 	private	double average = 0.0;
 	private float integralGain = 244.0f;
 
-	public CalculatePhotonCharge(){
-	}
-	public CalculatePhotonCharge(String key){
-		this.key =  key;
-	}
 	
 	@Override
 	public Data process(Data input) {

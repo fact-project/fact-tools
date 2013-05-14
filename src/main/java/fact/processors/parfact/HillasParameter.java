@@ -46,7 +46,7 @@ public class HillasParameter implements Processor {
 	private  float neighborPixelThreshold = 2.0f;
 	private int minSize = 2;
 	private double showerThreshold = 0.8;
-	private String key;
+	private String key = "DataCalibrated";
 	/**
 	 * members from the original c++ code
 	 */
@@ -61,14 +61,6 @@ public class HillasParameter implements Processor {
 	private boolean hasShower;
 	private boolean overwrite =  true;
 	
-	public HillasParameter() {
-		
-	}
-	public HillasParameter(String key) {
-		this.key=key;
-	}
-
-
 
 //	public boolean isOverwrite() {
 //		return overwrite;

@@ -1,0 +1,9 @@
+<container>
+    <stream id="firstStream" class="stream.io.CsvStream"
+            url="http://www.jwall.org/streams/sample-stream.csv" limit="10" />
+
+    <process input="firstStream">
+        <PrintData />
+<!--          <stream.plotter.Plotter x-axis="cluster1" y-axis="cluster2" keepOpen="true"/> -->
+    </process>
+ </container>

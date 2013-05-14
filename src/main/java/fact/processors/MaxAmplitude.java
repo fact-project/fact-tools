@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class MaxAmplitude extends SimpleFactPixelProcessor{
 	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 	private float minValue= -3000;
-	private float maxValue = 2048;
+	private float maxValue = 3000;
 	
 	@Override
 	public float processPixel(float[] pixelData) {

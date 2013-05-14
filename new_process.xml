@@ -29,7 +29,7 @@
 
 <!-- ls8 path -->
 	<stream id="fact" class="fact.io.FactEventStream" 
- 		    url="file:${path}/${data2}"  />
+ 		    url="file:${path}/${data}"  />
 		    
 		<process input="fact" copies="1">
 			<Skip condition="%{data.EventNum} &lt; 48" />
@@ -44,7 +44,6 @@
 <!-- 			<fact.processors.ExponentialSmoothing outputKey="smoothedData01" alpha="0.1" color="#AF4AB9" /> -->
 <!-- 			<stream.monitor.DataRate every="50"/> -->
 <!-- 			<fact.image.monitors.StatusWindow /> -->
-			<stream.io.CsvWriter file="PFAD"  
 			<fact.image.ShowImage/>
 		</process>
 </container>

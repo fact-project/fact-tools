@@ -1,22 +1,7 @@
 <container>
 
-<!-- 	Triggertypes 
-
-		416 - interleaved lightpulse fxd
-		4 -physiks
-		1024 - interleaved pedestal
-		512 - interleaved lighpulse Int 
-		33792 - Time Calibration 
-		-->
-<!-- 	<stream id="fact" class="fact.io.FactDataStream"  -->
-<!--  		    url="file:/home/bruegge/20120120_070.fits" /> -->
-
-<!-- <property name="path" value="/home/bruegge/FactTest" /> -->
 <property name="data2012" value="20120209_061.fits" />
 <property name="dataDRS2012" value="20120209_050.drs.fits.gz" />
-
-<property name="data" value="20130124_040.fits" />
-<property name="dataDRS" value="20130124_033.drs.fits" />
 
 <property name="path " value="/home/bruegge/FactTest" />
 <!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
@@ -25,12 +10,10 @@
 	<stream id="fact" class="fact.io.FitsStream" 
  		    url="file:${path}/${data2012}"  />
 		    
-		<process input="fact" copies="1">
-<!-- 			<fact.image.monitors.StatusWindow every="5" /> -->
-
+		<process input="fact">
 					<fact.processors.DrsCalibration drsFile="${path}/${dataDRS2012}"/>
 					<fact.processors.CutSlices start="15" end="220" />
- 					<stream.monitor.DataRate every="40"/>;
+ 					<stream.monitor.DataRate every="300"/>;
 <!-- 					<fact.image.monitors.StatusWindow every="40" /> -->
 <!-- 					<fact.image.ShowImage/> -->
 		</process>

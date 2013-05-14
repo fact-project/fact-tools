@@ -64,9 +64,16 @@ public class FitsStream extends AbstractStream {
 		}
 	}
 
+	/**
+	 * This consists of 3 steps
+	 * 1. Get the size of the fits header. A header contains 2 subheaders. We ingnore the first one and read the second one until we reach "END"
+	 * 	  From the line read we get the header size since we know its a multiple of the blocksize (2880)
+	 * 2. Then we parse the headers for the number of fields the fits file contains. 
+	 * 3. Each file has a name, datatype and a number of elements. The header is parsed again  
+	 */
 	@Override
 	public void init() throws Exception {
-		//read the header of the fits file
+		//1. ------------------
 		//mark position in bufferedStream so we can reset it later to that position. This assumes there is a maximum header size.
 		bufferedStream.mark(2 * headerSize);
 
@@ -86,6 +93,8 @@ public class FitsStream extends AbstractStream {
 		//we read linecounter * 80 bytes and skipped the first 2880
 		//we want to know the number of blocks we read multiplied by the blocksize
 		headerSize = (int) ((blockSize + lineCounter*lineLength)/blockSize + 1)*blockSize ;
+		
+		//2. --------------------
 		//lets start over from hte top and read the header to find out how many fields we have.
 		bufferedStream.reset();
 		bufferedStream.mark(headerSize);
@@ -111,7 +120,7 @@ public class FitsStream extends AbstractStream {
 		nameArray = new String[numberOfFields];
 		lengthArray = new int[numberOfFields];
 
-		//
+		//3------------------------
 		bufferedStream.reset();
 		bufferedStream.mark(headerSize);
 		//the first header is completely irrelevant to us
@@ -181,6 +190,10 @@ public class FitsStream extends AbstractStream {
 
 	}
 
+	/**
+	 * this parses an event from the datastream and the bytebuffer
+	 * in case we read alot of shorts(more than 128) We use a NIO buffer to load a complete bunch of bytes and intepret them as a short array
+	 */
 	@Override
 	public Data readNext() throws Exception {
 		Data item = DataFactory.create();
@@ -220,7 +233,7 @@ public class FitsStream extends AbstractStream {
 				//read a short
 				if(typeArray[n].equals("I")){
 					int numberOfelements = lengthArray[n];
-
+					//--------------this is where the magic happens-------------
 					if(numberOfelements > 128){
 						//lets try to be even quicker
 						//to save n shorts we need 2*n bytes
@@ -244,8 +257,8 @@ public class FitsStream extends AbstractStream {
 				}
 			}
 
-			//		System.out.println(item.toString());
 			new fact.processors.Short2Float().process(item);
+			
 		} catch (EOFException e){
 			log.info("End of file reached. ");
 			dataStream.close();
