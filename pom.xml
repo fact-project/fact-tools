@@ -4,17 +4,17 @@
 	<groupId>edu.udo</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-        <version>0.3.0</version>
+	<version>0.3.0</version>
 
 
 	<properties>
-   		 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
 
 		<streams.version>0.9.9</streams.version>
 
 		<binary.name>fact-tools</binary.name>
- 	</properties>
+	</properties>
 
 	<distributionManagement>
 		<!-- use the following if you're not using a snapshot version. -->
@@ -24,11 +24,11 @@
 			<url>https://secure.jwall.org/maven/repository/jwall</url>
 		</repository>
 		<!-- use the following if you ARE using a snapshot version. -->
-<!-- 		<snapshotRepository> -->
-<!-- 			<id>jwall-snapshots</id> -->
-<!-- 			<name>jwall.org Maven Snapshot Repository</name> -->
-<!-- 			<url>https://secure.jwall.org/maven/repository/snapshots</url> -->
-<!-- 		</snapshotRepository> -->
+		<!-- <snapshotRepository> -->
+		<!-- <id>jwall-snapshots</id> -->
+		<!-- <name>jwall.org Maven Snapshot Repository</name> -->
+		<!-- <url>https://secure.jwall.org/maven/repository/snapshots</url> -->
+		<!-- </snapshotRepository> -->
 	</distributionManagement>
 
 	<repositories>
@@ -37,11 +37,11 @@
 			<name>jwall.org Maven Repository</name>
 			<url>http://secure.jwall.org/maven/repository/jwall</url>
 		</repository>
- 		<repository> 
- 			<id>sonatype-snapshots</id> 
- 			<name>jwall.org Maven Repository</name> 
- 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url> 
- 		</repository> 
+		<repository>
+			<id>sonatype-snapshots</id>
+			<name>jwall.org Maven Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -51,14 +51,13 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- 
-		 -->
-		 <dependency>
+		<!-- -->
+		<dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
 			<version>1.2</version>
-		 </dependency>
-		 <dependency>
+		</dependency>
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.23</version>
@@ -108,13 +107,8 @@
 			<artifactId>jgoodies-common</artifactId>
 			<version>1.4.0</version>
 		</dependency>
-<!--
-		<dependency>
-			<groupId>ant</groupId>
-			<artifactId>ant</artifactId>
-			<version>1.7.0</version>
-		</dependency>
-  -->
+		<!-- <dependency> <groupId>ant</groupId> <artifactId>ant</artifactId> <version>1.7.0</version> 
+			</dependency> -->
 	</dependencies>
 
 	<build>
@@ -138,58 +132,45 @@
 					<attach>false</attach>
 				</configuration>
 			</plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.5</version>
-        <configuration>
-<!--
-              <artifactSet>
-                <excludes>
-		  <exclude>jsqlparser:*</exclude>
-		  <exclude>spy:*</exclude>
-                  <exclude>junit:junit</exclude>
-                  <exclude>jmock:*</exclude>
-                  <exclude>com.rapid-i:*</exclude>
-                  <exclude>weka:*</exclude>
-                  <exclude>mysql:*</exclude>
-                  <exclude>colt:*</exclude>
-                  <exclude>org.jruby:*</exclude>
-                  <exclude>org.markdown:*</exclude>
-		  <exclude>org.apache.wicket:*</exclude>
-		  <exclude>**/*.MF</exclude>
-		  <exclude>**/.SF</exclude>
-                </excludes>
-              </artifactSet>
--->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<!-- <artifactSet> <excludes> <exclude>jsqlparser:*</exclude> <exclude>spy:*</exclude> 
+						<exclude>junit:junit</exclude> <exclude>jmock:*</exclude> <exclude>com.rapid-i:*</exclude> 
+						<exclude>weka:*</exclude> <exclude>mysql:*</exclude> <exclude>colt:*</exclude> 
+						<exclude>org.jruby:*</exclude> <exclude>org.markdown:*</exclude> <exclude>org.apache.wicket:*</exclude> 
+						<exclude>**/*.MF</exclude> <exclude>**/.SF</exclude> </excludes> </artifactSet> -->
 
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-			<main-class>stream.run</main-class>
-                  </manifestEntries>
-                </transformer>
-              </transformers>
-      <filters>
-         <filter>
-            <artifact>*:*</artifact>
-               <excludes>
-                  <exclude>META-INF/*.SF</exclude>
-                  <exclude>META-INF/*.DSA</exclude>
-                  <exclude>META-INF/*.RSA</exclude>
-               </excludes>
-            </filter>
-         </filters>
-            </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+					<transformers>
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<manifestEntries>
+								<main-class>stream.run</main-class>
+							</manifestEntries>
+						</transformer>
+					</transformers>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>

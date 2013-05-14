@@ -4,6 +4,7 @@
 package fact.io;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import stream.Data;
@@ -144,24 +145,27 @@ public class FactEventStream extends FitsDataStream {
 				EventKey key = new EventKey(date, run, num);
 				String[] split = source.split(File.separator);
 				int depth = split.length;
-				String directory="";
-				int counter=0;
-				for(int i = depth-1 ; i > 0 ; i--){
-					if(!split[i-1].isEmpty()){
-						directory = split[i-1] + File.separator + directory;
+				String directory = "";
+				int counter = 0;
+				for (int i = depth - 1; i > 0; i--) {
+					if (!split[i - 1].isEmpty()) {
+						directory = split[i - 1] + File.separator + directory;
 						counter++;
 					}
-					if(counter == 3) break;
+					if (counter == 3)
+						break;
 				}
 				directory = File.separator + directory;
-//				String directory = split[depth-4]+ File.separator + split[depth-3]+ File.separator + split[depth-2];
+				// String directory = split[depth-4]+ File.separator +
+				// split[depth-3]+ File.separator + split[depth-2];
 				log.debug("EventKey is: {}", key.toString());
 				data.put("@id", key.toString());
-//				data.put("@directory",(new SimpleDateFormat("yyyy/MM/dd")).format(date) + "/" + run);
-				data.put("@directory",directory);
+				data.put("@day",
+						(new SimpleDateFormat("yyyy/MM/dd")).format(date));
+				data.put("@directory", directory);
 				data.put("@date", date);
 				data.put("@run", run.intValue());
-//				data.put("@runId", src);
+				// data.put("@runId", src);
 
 				if (source != null)
 					data.put("@source", source);
