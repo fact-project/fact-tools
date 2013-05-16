@@ -4,7 +4,7 @@
 	<groupId>edu.udo</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-	<version>0.3.0</version>
+	<version>0.3.1-SNAPSHOT</version>
 
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
@@ -12,7 +12,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
 		<streams.version>0.9.10-SNAPSHOT</streams.version>
-		<binary.name>fact-tools</binary.name>
+		<binary.name>fact-tools-${version}</binary.name>
 	</properties>
 
 
@@ -69,12 +69,12 @@
 		<!-- <name>jwall.org Maven Snapshot Repository</name> -->
 		<!-- <url>https://secure.jwall.org/maven/repository/snapshots</url> -->
 		<!-- </snapshotRepository> -->
-                <site>
-                        <id>fact-site</id>
-                        <!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
-                        <!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
-                        <url>scp://kirmes.cs.uni-dortmund.de:/var/www/FACT</url>
-                </site>
+		<site>
+			<id>fact-site</id>
+			<!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
+			<!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
+			<url>scp://kirmes.cs.uni-dortmund.de:/var/www/FACT</url>
+		</site>
 	</distributionManagement>
 
 	<repositories>
@@ -271,4 +271,49 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+
+	<profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>building:site</name>
+					<value>jenkins</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.goldin</groupId>
+						<artifactId>copy-maven-plugin</artifactId>
+						<version>0.2.5</version>
+						<executions>
+							<execution>
+								<id>create-archive</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<!-- ~~~~~~~~~~~~~~ -->
+										<!-- Copy resources -->
+										<!-- ~~~~~~~~~~~~~~ -->
+										<resource>
+											<targetPath>/var/www/download.jwall.org/htdocs/fact-tools/</targetPath>
+											<directory>${project.basedir}/target/</directory>
+											<includes>
+												<include>${binary.name}.jar</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
 </project>
