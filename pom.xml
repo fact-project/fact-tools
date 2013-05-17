@@ -323,6 +323,20 @@
 				</plugins>
 			</build>
 		</profile>
-
+		<profile>
+			<id>ls8-deployment</id>
+			<activation>
+				<property>
+					<name>building:site</name>
+					<value>ls8</value>
+				</property>
+			</activation>
+			<distributionManagement>
+				<site>
+					<id>fact-site</id>
+					<url>scp://webadm@kissen.cs.uni-dortmund.de:/home/info-systeme/WWW/sfb876doc/FACT</url>
+				</site>
+			</distributionManagement>
+		</profile>
 	</profiles>
 </project>
