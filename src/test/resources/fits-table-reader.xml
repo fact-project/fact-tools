@@ -4,14 +4,14 @@
 		<limit>100</limit>
 	</properties>
 
-	<stream id="events" class="fact.io.FactEventStream" limit="${limit}"
+	<stream id="events" class="fact.io.FitsStream" limit="${limit}"
 		   url="file:/Users/chris/Downloads/20111126_042.fits" />
 
 
 	<process input="events">
 		<!-- 
-		<PrintData />
-		 -->
 		 <stream.logger.Message message = "Hello, world!" />
+		 -->
+		<PrintData />
 	</process>
 </container>
