@@ -3,15 +3,22 @@
  */
 package fact.io;
 
-import static org.junit.Assert.fail;
-
+import java.io.EOFException;
+import java.io.ObjectInputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import stream.runtime.ProcessContainer;
+import stream.Data;
+import stream.io.SourceURL;
 
 /**
  * @author chris
@@ -21,28 +28,124 @@ public class FactEventStreamTest {
 
 	static Logger log = LoggerFactory.getLogger(FactEventStreamTest.class);
 
+	final List<Data> events = new ArrayList<Data>();
+	final ExpectedDataTypes typeCheck = new ExpectedDataTypes();
+
+	@Before
+	public void setup() throws Exception {
+		typeCheck.addType("EventNum", new Integer(1));
+		typeCheck.addType("TriggerNum", new Integer(1));
+		typeCheck.addType("TriggerType", new Integer(4));
+		typeCheck.addType("NumBoards", new Integer(40));
+		typeCheck.addType("Errors", new byte[40]);
+
+		events.clear();
+
+		URL url = FactEventStreamTest.class.getResource("/fact-events.obj.gz");
+		log.info("Reading serialized events from {}", url);
+
+		ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(
+				url.openStream()));
+
+		Data item = (Data) ois.readObject();
+		while (item != null) {
+			item = removeSpecialKeys(item);
+			log.info("Adding event {}", item);
+			events.add(item);
+			try {
+				item = (Data) ois.readObject();
+			} catch (EOFException eof) {
+				log.info("EndOfStream reached.");
+				// eof.printStackTrace();
+				break;
+			}
+		}
+
+		log.info("{} events read from {}.", events, url);
+	}
+
 	@Test
-	public void testSpeed() {
+	public void testRead() throws Exception {
 
-		try {
-			URL url = FactEventStreamTest.class
-					.getResource("/fits-table-reader.xml");
+		SourceURL url = new SourceURL("classpath:/20111126_042.fits.part.gz");
+		log.info("Reading FITS events from {}", url);
+		FitsStream fits = new FitsStream(url);
 
-			Long limit = 1000L;
-			System.setProperty("limit", limit.toString());
+		fits.init();
 
-			ProcessContainer container = new ProcessContainer(url);
-			Long time = container.run();
-			log.info("Container ran for {} ms.", time);
+		List<Data> evts = new ArrayList<Data>();
+		Data item = fits.read();
+		while (item != null && evts.size() < events.size()) {
+			item = removeSpecialKeys(item);
+			log.info("Adding event {}", item);
+			evts.add(item);
+			item = fits.read();
+		}
 
-			Double seconds = time.doubleValue() / 1000.0d;
+		fits.close();
 
-			log.info("Event rate: {} events/second", limit.doubleValue()
-					/ seconds);
+		log.info("Read {} events from {}", evts.size(), url);
+		Assert.assertEquals(events.size(), evts.size());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Not yet implemented");
+		for (int i = 0; i < 1 && i < events.size() && i < evts.size(); i++) {
+			Data item2 = evts.get(i);
+			Assert.assertTrue("Checking for equal keys", typeCheck.check(item2));
 		}
 	}
+
+	private Data removeSpecialKeys(Data item) {
+		Iterator<String> it = item.keySet().iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			if (key.startsWith("@")) {
+				// log.info("Removing key '{}'", key);
+				it.remove();
+			}
+		}
+		return item;
+	}
+
+	private boolean keysAreEqual(Data item1, Data item2) {
+
+		if (item1.keySet().size() != item2.keySet().size()) {
+			log.error("Number of keys differ!");
+			return false;
+		}
+
+		for (String key : item1.keySet()) {
+			if (!item2.containsKey(key)) {
+				log.error("Key '{}' is present in item1 but not in item2!");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	//
+	// @Test
+	// public void testSpeed() {
+	//
+	// try {
+	//
+	// URL url = FactEventStreamTest.class
+	// .getResource("/fits-table-reader.xml");
+	//
+	// Long limit = 10L;
+	// System.setProperty("limit", limit.toString());
+	//
+	// ProcessContainer container = new ProcessContainer(url);
+	// Long time = container.run();
+	// log.info("Container ran for {} ms.", time);
+	//
+	// Double seconds = time.doubleValue() / 1000.0d;
+	//
+	// log.info("Event rate: {} events/second", limit.doubleValue()
+	// / seconds);
+	//
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// fail("Not yet implemented");
+	// }
+	// }
 }
