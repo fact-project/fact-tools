@@ -56,11 +56,11 @@ public class FitsStream extends AbstractStream {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Could not find file. " + path);
+//			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Could not open file. Is it readable? " + path);
+//			e.printStackTrace();
 		}
 	}
 
@@ -134,7 +134,8 @@ public class FitsStream extends AbstractStream {
 			}
 			else if (valueName.startsWith("NAXIS1"))
 			{
-				eventBytes = Integer.parseInt(valueName.split("=|/")[1].trim()); 
+				eventBytes = Integer.parseInt(valueName.split("=|/")[1].trim());
+				log.debug("Reading " + eventBytes + " bytes per event"); 
 			}
 			//keys name
 			else if(valueName.startsWith("TTYPE"))
@@ -149,7 +150,7 @@ public class FitsStream extends AbstractStream {
 			{
 				//TODO lets split direferntly
 				String[] split = valueName.split("=|/");
-				String comment = split[split.length-1];
+//				String comment = split[split.length-1];
 				String name = split[0].trim();
 				String value = split[1].replaceAll("'", "").trim();
 
