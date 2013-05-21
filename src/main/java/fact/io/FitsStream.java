@@ -104,10 +104,12 @@ public class FitsStream extends AbstractStream {
 		// read number of fields
 		while ((bufferedStream.read(buf)) > 0) {
 			String valueName = new String(buf);
+
 			if (valueName.substring(0, 3).equals("NROI")) {
 				roi = Integer.parseInt(valueName.split("=|/")[1].trim());
 			} else if (valueName.startsWith("NAXIS1")) {
 				eventBytes = Integer.parseInt(valueName.split("=|/")[1].trim());
+				log.debug("Reading " + eventBytes + " bytes per event");
 			}
 			// keys name
 			else if (valueName.startsWith("TTYPE")) {
@@ -121,7 +123,7 @@ public class FitsStream extends AbstractStream {
 			else if (valueName.startsWith("TFORM")) {
 				// TODO lets split direferntly
 				String[] split = valueName.split("=|/");
-				String comment = split[split.length - 1];
+				// String comment = split[split.length-1];
 				String name = split[0].trim();
 				String value = split[1].replaceAll("'", "").trim();
 
