@@ -5,9 +5,10 @@
 		    
 		<process input="fact">
 					<fact.processors.DrsCalibration file="/home/bruegge/FactTest/20120209_050.drs.fits.gz"/>
-					<fact.processors.MaxAmplitude key="DataCalibrated" outputKey="amplitude"/>
+<!-- 					<fact.processors.MaxAmplitude key="DataCalibrated" outputKey="amplitude"/> -->
 <!-- 					<fact.processors.SumKey key="amplitude"  /> -->
-<!-- 				    <stream.plotter.Plotter keys="amplitude" keepOpen="true"/> --> -->
+					<stream.monitor.DataRate every="300"/>;
+<!-- 				    <stream.plotter.Plotter keys="amplitude" keepOpen="false"/> --> -->
 		</process>
 		
 		

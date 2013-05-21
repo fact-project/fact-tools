@@ -19,7 +19,7 @@ import fact.image.OnlineStatistics;
 import fact.viewer.ui.MapView;
 
 public class CameraPlotter extends DataVisualizer  {
-	static Logger log = LoggerFactory.getLogger(HistogramPlotter.class);
+	static Logger log = LoggerFactory.getLogger(AverageBarPlotter.class);
 	JFrame frame;
 	LinkedHashMap<String, double[]> valueMap = new LinkedHashMap<String , double[]>();
 	//this map contains counters that count the number of vales that have arrived for every key
