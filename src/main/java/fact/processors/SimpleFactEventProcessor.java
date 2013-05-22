@@ -6,11 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
-import stream.Processor;
+import stream.ProcessContext;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
 
-public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements Processor {
+public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 	
 	protected String key = "DataCalibrated";
@@ -55,6 +56,13 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 	//this has to be implemented by all processes subclassing this class
 	public abstract TOutput processSeries(TInput data);
 
+	//implement the stateful processor interface.
+	@Override
+	public void init(ProcessContext context){}
+	@Override
+	public void resetState(){}
+	@Override
+	public void finish() {}
 	
 	
 	

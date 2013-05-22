@@ -18,8 +18,6 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.IIOImage;
@@ -30,10 +28,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,9 +159,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		CsvStream stream = new CsvStream(new SourceURL(mapping), "\\s+");
 		stream.init();
 		Data item = stream.readNext();
-		int i = 0;
 		while (item != null) {
-			i++;
 			log.debug("{}", item);
 			
 //			int id = new Double((Double) item.get("softID")).intValue();

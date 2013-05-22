@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.plotter.PlotPanel;
 
-public class HistogramPlotPanel extends JPanel {
+public class BarPlotPanel extends JPanel {
 	private static final long serialVersionUID = -135743189148617433L;
 	static Logger log = LoggerFactory.getLogger(PlotPanel.class);
 //	private boolean showErrorBars = true;
@@ -41,7 +41,7 @@ public class HistogramPlotPanel extends JPanel {
 //		}
 	}
 	
-	public HistogramPlotPanel(boolean drawError){
+	public BarPlotPanel(boolean drawError){
 		JFreeChart freeChart = ChartFactory.createBarChart("Test", "selected Keys", "Mean ", dataset, PlotOrientation.VERTICAL, false, false,false);
 		plot = freeChart.getCategoryPlot();
 
