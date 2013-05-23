@@ -12,15 +12,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
 		<streams.version>0.9.10-SNAPSHOT</streams.version>
-		<binary.name>fact-tools-${version}</binary.name>
+		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>true</skipTests>
 	</properties>
 
 
 	<licenses>
 		<license>
-			<name>GNU Affero General Public License, Version 3</name>
-			<url>http://www.gnu.org/licenses/agpl-3.0-standalone.html</url>
+			<name>GNU General Public License, Version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
 		</license>
 	</licenses>
 
@@ -64,12 +64,6 @@
 			<name>jwall.org Maven Repository</name>
 			<url>https://secure.jwall.org/maven/repository/jwall</url>
 		</repository>
-		<!-- use the following if you ARE using a snapshot version. -->
-		<!-- <snapshotRepository> -->
-		<!-- <id>jwall-snapshots</id> -->
-		<!-- <name>jwall.org Maven Snapshot Repository</name> -->
-		<!-- <url>https://secure.jwall.org/maven/repository/snapshots</url> -->
-		<!-- </snapshotRepository> -->
 		<site>
 			<id>fact-site</id>
 			<!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
