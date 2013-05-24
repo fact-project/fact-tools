@@ -34,7 +34,7 @@ public class FitsStream extends AbstractStream {
 	private int[] lengthArray;
 	private String[] nameArray;
 	private String[] typeArray;
-	private int eventBytes;
+//	private int eventBytes;
 
 	public FitsStream(SourceURL url){
 		this(url.getFile());
@@ -46,7 +46,8 @@ public class FitsStream extends AbstractStream {
 			//simpl,e filename cheack to see wether file is zipped or not
 			InputStream fileStream = new FileInputStream(path);
 			if (path.endsWith(".gz")){
-				InputStream gzipStream = new GZIPInputStream(fileStream);
+				InputStream gzipStream = new GZIPInputStream(fileStream, 2048);
+				log.info("Opening gzip inputstream.");
 				bufferedStream = new BufferedInputStream(gzipStream);
 			} else {
 				bufferedStream = new BufferedInputStream(fileStream);
@@ -61,7 +62,7 @@ public class FitsStream extends AbstractStream {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 	}
 
 	/**
@@ -134,7 +135,7 @@ public class FitsStream extends AbstractStream {
 			}
 			else if (valueName.startsWith("NAXIS1"))
 			{
-				eventBytes = Integer.parseInt(valueName.split("=|/")[1].trim()); 
+//				eventBytes = Integer.parseInt(valueName.split("=|/")[1].trim()); 
 			}
 			//keys name
 			else if(valueName.startsWith("TTYPE"))
@@ -149,7 +150,7 @@ public class FitsStream extends AbstractStream {
 			{
 				//TODO lets split direferntly
 				String[] split = valueName.split("=|/");
-				String comment = split[split.length-1];
+//				String comment = split[split.length-1];
 				String name = split[0].trim();
 				String value = split[1].replaceAll("'", "").trim();
 
