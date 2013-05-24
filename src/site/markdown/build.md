@@ -20,16 +20,13 @@ fact-tools code and enter the directory. By running the `mvn` command,
 Maven will take care of the build:
 
      # cd fact-tools
-     # mvn -DskipTests=true package
+     # mvn package
      
   This will download all required dependencies, will compile the
 classes and will create a single, executable JAR archive in the
-default maven output directory `target`. The `-DskipTests=true` flag
-will skip all the junit tests. As there is currently no way of
-distributing example DRS/Fits files for testing, these unit tests are
-of interest for developers only.
+default maven output directory `target`.
 
-The resulting file can be found in `target/fact-tools.jar` and contains
+The resulting file can be found in `target/fact-tools-VERSION.jar` and contains
 all the classes required to run the *fact-tools*.
 
 
@@ -45,7 +42,7 @@ as described above essentially contains two important components:
 The *FactViewer* is intended to inspect and display FITS files that
 provide FACT data. The *FactViewer* can be started by running:
 
-    # java -cp target/fact-tools.jar fact.FactViewer
+    # java -cp target/fact-tools-VERSION.jar fact.FactViewer
 
 
 The *streams* framework is intended to run XML process configurations
@@ -55,6 +52,19 @@ other custom implementations that are to be applied to a stream of
 FACT data items (events).
 
 For running an XML configuration with the *streams* framework, simply
-start the `fact-tools.jar` with the XML definition as parameter:
+start the `fact-tools-VERSION.jar` with the XML definition as parameter:
 
-    # java -jar target/fact-tools.jar /path/to/config.xml
+    # java -jar target/fact-tools-VERSION.jar /path/to/config.xml
+    
+    
+### Adding Parameters
+
+The XML configuration can include simple parameters in the format `${name}`,
+which will be expanded to their value at startup time. These parameters
+can be set in a file `$HOME/.streams.properties` or by using the `-D` flag
+of Java:
+
+    # java -DmyVariable=myValue -jar target/fact-tools-VERSION.jar /path/config.xml
+    
+This will set the variable `myVariable` to the value `myValue`. Any occurrence
+of `${myVariable}` in the XML will automatically be replaced by `myValue`.

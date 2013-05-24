@@ -30,13 +30,9 @@
                 </item>
 	</menu>
 	
-<!--
-	<menu name="Download">
-		<item collapse="true" name="Download" href="download.html">
-		  <item name="Debian Repository" href="debian.html" />
-		</item>
+	<menu name="Download" >
+		<item name="Download from jwall.org" href="download.html"/>
 	</menu>
-  -->
 
 	<menu ref="reports"/>
 

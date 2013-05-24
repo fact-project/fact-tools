@@ -14,10 +14,10 @@ More features are to follow.
     
 ## Download of the Viewer
 
-The current version of the FactViewer is `0.3.1`. It can be found
+The current version of the FactViewer is `0.3.1-SNAPSHOT`. It can be found
 as a standalone Java archive at:
 <div style="text-align: center;">
-   <a href="http://download.jwall.org/fact/FactTools.jar">http://download.jwall.org/fact/FactTools.jar</a>
+   <a href="http://download.jwall.org/fact-tools/fact-tools-0.3.1-SNAPSHOT.jar">http://download.jwall.org/fact-tools/fact-tools-0.3.1-SNAPSHOT.jar</a>
 </div>
     
 ## Running the Viewer
@@ -25,7 +25,7 @@ as a standalone Java archive at:
 The viewer is provided as a standalone JAR archive that can be
 executed with Java right away:
 
-     # java -cp FactTools.jar fact.FactViewer
+     # java -cp fact-tools-0.3.1-SNAPSHOT.jar fact.FactViewer
      
 The exact name of the JAR archive may change according to the version.
 For instructions to build the viewer from source, see the build section
@@ -35,7 +35,7 @@ In order to view DRS calibrated data within the viewer, it needs to
 be started with the FITS data file and the FITS DRS file as arguments,
 for example:
 
-     # java -cp FactTools.jar fact.FactViewer 20111126_042.fits.gz 20111126_034.drs.fits.gz
+     # java -cp fact-tools-0.3.1-SNAPSHOT.jar fact.FactViewer 20111126_042.fits.gz 20111126_034.drs.fits.gz
 
 
 ### Using the Viewer
@@ -62,7 +62,7 @@ Building the viewer is rather simple and just requires invoking
 maven with the *assembly* target:
 
      # cd fact-tools
-     # mvn assembly:assembly
+     # mvn package
      
 This will download all required dependencies, will compile the
 viewer classes and will create a single, executable JAR archive
@@ -71,7 +71,7 @@ in the default maven output directory `target`.
 After building the viewer can be started by running the executable
 JAR archive file with Java:
 
-    # java -cp target/FactTools.jar fact.FactViewer
+    # java -cp target/fact-tools-0.3.1-SNAPSHOT.jar fact.FactViewer
     
 Depending on the actual version of the fact-tools, the exact filename
 of this JAR archive may slightly differ.

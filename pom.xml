@@ -12,14 +12,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
 		<streams.version>0.9.10-SNAPSHOT</streams.version>
-		<binary.name>fact-tools-${version}</binary.name>
+		<binary.name>fact-tools-${project.version}</binary.name>
+		<skipTests>true</skipTests>
 	</properties>
 
 
 	<licenses>
 		<license>
-			<name>GNU Affero General Public License, Version 3</name>
-			<url>http://www.gnu.org/licenses/agpl-3.0-standalone.html</url>
+			<name>GNU General Public License, Version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
 		</license>
 	</licenses>
 
@@ -63,12 +64,6 @@
 			<name>jwall.org Maven Repository</name>
 			<url>https://secure.jwall.org/maven/repository/jwall</url>
 		</repository>
-		<!-- use the following if you ARE using a snapshot version. -->
-		<!-- <snapshotRepository> -->
-		<!-- <id>jwall-snapshots</id> -->
-		<!-- <name>jwall.org Maven Snapshot Repository</name> -->
-		<!-- <url>https://secure.jwall.org/maven/repository/snapshots</url> -->
-		<!-- </snapshotRepository> -->
 		<site>
 			<id>fact-site</id>
 			<!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
@@ -167,6 +162,14 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.14.1</version>
+				<configuration>
+					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -314,6 +317,20 @@
 				</plugins>
 			</build>
 		</profile>
-
+		<profile>
+			<id>ls8-deployment</id>
+			<activation>
+				<property>
+					<name>building:site</name>
+					<value>ls8</value>
+				</property>
+			</activation>
+			<distributionManagement>
+				<site>
+					<id>fact-site</id>
+					<url>scp://webadm@kissen.cs.uni-dortmund.de:/home/info-systeme/WWW/sfb876doc/FACT</url>
+				</site>
+			</distributionManagement>
+		</profile>
 	</profiles>
 </project>

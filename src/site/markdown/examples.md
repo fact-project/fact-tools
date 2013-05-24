@@ -8,7 +8,7 @@ into a file and can be executed by using the FactViewer jar file.
 The FactViewer jar file provides a small `stream.run` method that needs to be
 provided with the XML file to execute:
 
-    # java -jar FactTools.jar experiment.xml
+    # java -jar fact-tools-VERSION.jar experiment.xml
 
 As soon as all items of the streams defined in the `experiment.xml` file have
 been processed, the Java process terminates.
@@ -22,7 +22,7 @@ FITS data file and applies the DRS calibration:
 
      <container>
 
-        <Stream id="fact-data" class="fact.io.FitsDataStream"
+        <Stream id="fact-data" class="fact.io.FactEventStream"
                 url="file:///tmp/fact-data.fits.gz" />
 
 
@@ -55,7 +55,7 @@ part, i.e. the calibrated data, into a file in binary form.
 
      <container>
 
-        <stream id="fact-data" class="fact.io.FactDataStream"
+        <stream id="fact-data" class="fact.io.FactEventStream"
                 url="file:///tmp/fact-data.fits.gz" />
 
 
