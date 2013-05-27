@@ -26,17 +26,18 @@ import fact.Constants;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
-public class CSVWriter extends CsvWriter {
+public class RootASCIIWriter extends CsvWriter {
 
-	static Logger log = LoggerFactory.getLogger(CSVWriter.class);
+	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);
 	String[] keys = {"DataCalibrated"};
 	CsvWriter writer = null;
-	private boolean writeTreeDescriptor = false;
+	private boolean writeTreeDescriptor = true;
 
 
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
+		setSeparator(" ");
 	}
 
 	/**
@@ -61,8 +62,6 @@ public class CSVWriter extends CsvWriter {
 					Log.error("Could not create the TreeDescriptionHeader. Wrong Datatypes");
 				}
 			}
-
-
 			//			List<Data> pixels = EventExpander.expand(data, 1440, key, 0, 300);
 			Data item  = DataFactory.create();
 			for(int i = 0; i < keys.length; i++){
@@ -111,12 +110,10 @@ public class CSVWriter extends CsvWriter {
 				}
 			}
 			writer.process(item);
-
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to write file: "
 					+ e.getMessage());
 		}
-		
 		return data;
 	}
 

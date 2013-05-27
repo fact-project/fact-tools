@@ -8,8 +8,8 @@ import javax.swing.JFileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.io.CsvWriter;
 import fact.FactViewer;
-import fact.io.CSVWriter;
 
 /**
  * @author chris
@@ -52,7 +52,7 @@ public class ExportCSVAction extends ExportAction {
 			int ret = jfc.showSaveDialog(null);
 			if (ret == JFileChooser.APPROVE_OPTION) {
 
-				CSVWriter writer = new CSVWriter();
+				CsvWriter writer = new CsvWriter();
 
 				//TODO: export all interesting keys? or just some selected ones?
 				String key = viewer.getCurrentKey();
