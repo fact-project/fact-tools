@@ -15,7 +15,6 @@ import stream.ProcessContext;
 import stream.data.DataFactory;
 import stream.io.CsvWriter;
 import fact.Constants;
-import fact.data.EventUtils;
 
 /**
  * <p>
@@ -79,17 +78,14 @@ public class WriterTest extends CsvWriter {
 				}
 				//Check if value is of the right type
 				if (value.getClass().isArray()) {
-					try{
-						Serializable[] arr = (Serializable[]) value;
-						double[] s  = EventUtils.toDoubleArray(arr);
+					Class<?> type = value.getClass().getComponentType();
+					if(value instanceof Number[]){
+						Number[] s = (Number[]) value;
 						for(int k = 0; k < s.length; k++){
 							item.put(keys[i] + "_" + k, s[k]);
 						}
-					} catch(ClassCastException e){
-						//pass
 					}
-					Class<?> type = value.getClass().getComponentType();
-					if(type == float.class){
+					else if(type == float.class){
 						float[] s = ((float[]) value);
 						for(int k = 0; k < s.length; k++){
 							item.put(keys[i] + "_" + k, s[k]);
@@ -114,15 +110,10 @@ public class WriterTest extends CsvWriter {
 						}
 					}
 				} else {
-					item.put(keys[i],value);
+					item.put(keys[i],value.toString());
 				}
 			}
 			writer.process(item);
-
-			//			for (Data pixel : pixels) {
-			//				log.debug("Writing pixel {}", pixel);
-			//				writer.process(pixel);
-			//			}
 
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to write file: "
@@ -184,7 +175,8 @@ public class WriterTest extends CsvWriter {
 			}
 			headerString += ":";
 		}
-		headerString.replaceAll(":$", "");
+		//remove last colon
+		headerString = headerString.substring(0, headerString.length()-1);
 		return headerString;
 	}
 
