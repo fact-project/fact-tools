@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.FactViewer;
-import fact.io.CSVFactWriter;
+import fact.io.CSVWriter;
 
 /**
  * @author chris
@@ -52,13 +52,14 @@ public class ExportCSVAction extends ExportAction {
 			int ret = jfc.showSaveDialog(null);
 			if (ret == JFileChooser.APPROVE_OPTION) {
 
-				CSVFactWriter writer = new CSVFactWriter();
+				CSVWriter writer = new CSVWriter();
 
 				//TODO: export all interesting keys? or just some selected ones?
 				String key = viewer.getCurrentKey();
 				log.info("Exporting source '{}'", key);
 
-				writer.setKey(key);
+				String[] keys = {key}; 
+				writer.setKeys(keys);
 				writer.setUrl(jfc.getSelectedFile().toURI().toURL().toString());
 				writer.process(viewer.getEvent());
 				writer.finish();

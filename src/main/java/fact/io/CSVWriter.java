@@ -26,9 +26,9 @@ import fact.Constants;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
-public class WriterTest extends CsvWriter {
+public class CSVWriter extends CsvWriter {
 
-	static Logger log = LoggerFactory.getLogger(WriterTest.class);
+	static Logger log = LoggerFactory.getLogger(CSVWriter.class);
 	String[] keys = {"DataCalibrated"};
 	CsvWriter writer = null;
 	private boolean writeTreeDescriptor = false;
@@ -38,9 +38,6 @@ public class WriterTest extends CsvWriter {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 	}
-
-
-
 
 	/**
 	 * @see stream.DataProcessor#process(stream.Data)
