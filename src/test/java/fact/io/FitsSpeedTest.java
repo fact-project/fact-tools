@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessorList;
+import stream.io.SourceURL;
 import stream.runtime.ProcessContextImpl;
 import uk.ac.starlink.fits.FitsTableBuilder;
 import uk.ac.starlink.table.ColumnInfo;
@@ -24,6 +25,8 @@ import uk.ac.starlink.table.StoragePolicy;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 import fact.processors.DrsCalibration;
+import fact.processors.MaxAmplitude;
+import fact.processors.parfact.CalculatePhotonCharge;
 
 /**
  * @author chris
@@ -42,47 +45,29 @@ public class FitsSpeedTest {
 		int limit = 100;
 
 		try {
-			URL url =  FitsStreamTest.class.getResource("/sample.fits.gz");
-			ds = new URLDataSource(url);
-
-			FitsTableBuilder ftb = new FitsTableBuilder();
-			StarTable table = ftb.makeStarTable(ds, false,
-					StoragePolicy.ADAPTIVE);
-
-			// header = checkHeader(table);
-			rowSequence = table.getRowSequence();
-
-			for (int c = 0; c < table.getColumnCount(); c++) {
-				ColumnInfo col = table.getColumnInfo(c);
-				// log.info( "Adding column '{}'", col.getName() );
-				if (!col.getName().trim().equals("")) {
-					cols.add(col.getName());
-				}
-			}
+			SourceURL url = new SourceURL(FitsStreamTest.class.getResource("/sample.fits.gz"));
+			FitsStream stream = new FitsStream(url);
+			stream.init();
 
 			ProcessorList preprocess = new ProcessorList();
-			preprocess.add(new FactEventStream.Short2FloatData());
-
+			preprocess.add(new MaxAmplitude());
+			preprocess.add(new CalculatePhotonCharge());
 			DrsCalibration drs = new DrsCalibration();
 			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
 			drs.setDrsFile(u.getPath());
 			preprocess.add(drs);
 
 			preprocess.init(new ProcessContextImpl());
-
 			Long start = System.currentTimeMillis();
+			Data item = stream.read();
+			log.info( "size of data array: {}",
+					((float[]) item.get("Data")).length 
+					);
 			int i = 0;
-			while (rowSequence.next() && i++ < limit) {
-
-				Data item = processRow(rowSequence.getRow());
+			while (item != null) {
+				item = stream.read();
 				item = preprocess.process(item);
-				// if (i > 0 && i % 100 == 0) {
-				// log.info("{} rows processed.", i);
-				// Long end = System.currentTimeMillis();
-				// Double seconds = (end - start) / 1000.0d;
-				// log.info("Reading {} rows took {} ms", i, end - start);
-				// log.info(" {} rows/sec", limit / seconds.doubleValue());
-				// }
+				i++;
 			}
 			Long end = System.currentTimeMillis();
 			Double seconds = (end - start) / 1000.0d;
@@ -95,18 +80,4 @@ public class FitsSpeedTest {
 		}
 	}
 
-	public Data processRow(Object[] row) {
-		// for (int c = 0; c < row.length; c++) {
-		// String colName = cols.get(c);
-		// Object val = row[c];
-		// Class<?> clazz = val.getClass();
-		// if (clazz.isArray()) {
-		// // datum.put(colName, (Serializable) val);
-		// } else {
-		// // datum.put(colName, row[c] + "");
-		// }
-		// }
-
-		return FitsDataStream.convert(row, cols);
-	}
 }

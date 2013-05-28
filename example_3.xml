@@ -1,7 +1,7 @@
 <container>
 
 
-<property name="data" value="20130104_095.fits" />
+<property name="data" value="20130104_095.fits.gz" />
 <property name="dataDRS" value="20130104_076.drs.fits" />
 <property name="drive_file" value="drive_file.fits" />
 
@@ -10,7 +10,7 @@
  
 
 	<stream id="fact" class="fact.io.FitsStream" 
- 		    url="file:${path}/${data}" limit="10"  />
+ 		    url="file:${path}/${data}"  />
 		    
 		<process input="fact">
             <fact.processors.DrsCalibration file="${path}/${dataDRS}" key="data"  outputKey="DataCalibrated"/>  
@@ -27,8 +27,8 @@
             <fact.processors.parfact.CalcSourcePosition file="${path}/${drive_file}" outputKey="sourcePosition"/>
             <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
             
-            <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:${path}/test.txt" />
+<!--             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:./test.txt" /> -->
 <!-- 			<fact.image.ShowImage/> -->
-<!-- 			<fact.image.monitors.StatusWindow /> -->
+			<fact.image.monitors.StatusWindow every="40" />
 		</process>
 </container>

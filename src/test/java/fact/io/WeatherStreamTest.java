@@ -25,7 +25,6 @@ public class WeatherStreamTest {
 		try {
 			SourceURL url = new SourceURL(
 					WeatherStreamTest.class.getResource("/weather.data"));
-			url = new SourceURL("file:/Users/chris/weather.data/");
 			WeatherStream stream = new WeatherStream(url);
 			stream.init();
 

@@ -92,7 +92,6 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 	}
 	@Parameter(required = true, description = "A List of ChIds for Pixels that are considered defect", defaultValue="The softIds Taken from https://www.fact-project.org/logbook/misc.php?page=known_problems")
 	public void setBadChidIds(String[] badChIdStrings) {
-		System.out.println(badChIdStrings);
 		try{
 			int i=0;
 			for(String n : badChIdStrings ){
