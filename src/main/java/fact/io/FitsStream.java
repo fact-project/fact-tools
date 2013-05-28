@@ -77,13 +77,17 @@ public class FitsStream extends AbstractStream {
 				continue;
 
 			int cs = line.indexOf("/", eq);
-			if (cs < 0) {
-				continue;
-			}
 
 			String key = line.substring(0, eq);
-			String val = line.substring(eq + 1, cs);
-			String comment = line.substring(cs + 1);
+			String val = null;
+			String comment = null;
+			if (cs > 0) {
+				val = line.substring(eq + 1, cs);
+				comment = line.substring(cs + 1);
+			} else {
+				val = line.substring(eq + 1);
+				comment = "";
+			}
 
 			log.debug("key: {}", key);
 			log.debug("value: {}", val);
@@ -117,6 +121,7 @@ public class FitsStream extends AbstractStream {
 			if (key.startsWith("TTYPE")) {
 				int index = Integer.parseInt(key.replaceAll("\\D+", "").trim());
 				nameArray[index - 1] = val.replaceAll("'", "").trim();
+				log.info("field[{}] = {}", index - 1, nameArray[index - 1]);
 			}
 
 			if ("NROI".equals(key)) {
@@ -155,6 +160,20 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
 						item.put(nameArray[n], dataStream.readInt());
+					}
+				}
+
+				if (typeArray[n].equals("E")) {
+					log.info("Reading field '{}'", nameArray[n]);
+					int numberOfElements = lengthArray[n];
+					if (numberOfElements > 1) {
+						float[] el = new float[numberOfElements];
+						for (int i = 0; i < numberOfElements; i++) {
+							el[i] = dataStream.readFloat();
+						}
+						item.put(nameArray[n], el);
+					} else {
+						item.put(nameArray[n], dataStream.readFloat());
 					}
 				}
 
