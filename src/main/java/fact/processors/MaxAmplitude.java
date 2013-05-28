@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This processor simply calculates the maximum value for all time slices in each Pixel.  
+ * This processor simply calculates the maximum value for all time slices in each Pixel. 
+ * The output is a float array 
  * 
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 

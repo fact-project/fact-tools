@@ -40,13 +40,13 @@ public class ShowerEllipse {
 	public float alphaOff1;
 	public float alphaOff2;
 	public float alphaOff3;
-	private Double sourcePosX;
-	Double sourcePosY;
+	private float sourcePosX;
+	private float sourcePosY;
 
-public ShowerEllipse(int[] showerPixel, float[] photonCharge, Double sourcePosX, Double sourcePosY) 
+public ShowerEllipse(int[] showerPixel, float[] photonCharge, float source, float source2) 
 {
-		this.sourcePosX = sourcePosX;
-		this.sourcePosY = sourcePosY;
+		this.sourcePosX = source;
+		this.sourcePosY = source2;
 
 		this.showerPixel          = showerPixel;
 		this.photonCharge = photonCharge;

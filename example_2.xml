@@ -1,10 +1,10 @@
 <container>
 
-	<stream id="fact" class="fact.io.FitsStream"   url="file:/home/bruegge/FactTest/20120209_061.fits" limit="10000" />
+	<stream id="fact" class="fact.io.FitsStream"   url="file:/Users/kaibrugge/FactTest/20130104_095.fits" limit="10000" />
 		    
 		    
 		<process input="fact">
-					<fact.processors.DrsCalibration file="/home/bruegge/FactTest/20120209_050.drs.fits.gz"/>
+					<fact.processors.DrsCalibration file="/Users/kaibrugge/FactTest/20130104_076.drs.fits" outputKey="DataCalibrated"/>
 					<fact.processors.MovingAverage length="20" outputKey="smoothed"/>
 
 					

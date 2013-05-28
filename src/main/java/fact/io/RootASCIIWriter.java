@@ -69,7 +69,7 @@ public class RootASCIIWriter extends CsvWriter {
 				if(data.containsKey(keys[i])){
 					value = data.get(keys[i]);
 				} else {
-					log.info(Constants.ERROR_WRONG_KEY + keys+ ",  " + this.getClass().getSimpleName() );
+					log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
 					return null;
 				}
 				//Check if value is of the right type

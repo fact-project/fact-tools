@@ -28,10 +28,7 @@ public class CalcSourcePosition implements Processor {
 	String drsFile = null;
 
 	Data drsData = null;
-
-	boolean keepData = true;
-
-
+	private String outputKey = "sourcePosition";
 	double                          mPointingRightAscension;
     double                          mPointingDeclination;
 
@@ -66,73 +63,7 @@ public class CalcSourcePosition implements Processor {
     double mDistance                   = 4890.0;
     double eventTime;
 
-	/**
-	 * @return the drsFile
-	 */
-	public String getDrsFile() {
-		return drsFile;
-	}
 
-	/**
-	 * @param drsFile
-	 *            the drsFile to set
-	 */
-	public void setDrsFile(String drsFile) {
-		File file = new File(drsFile);
-		if (!file.canRead()) {
-			throw new RuntimeException("Cannot open file " + drsFile
-					+ " for reading!");
-		}
-
-		try {
-			loadDrsData(new FileDataSource(file));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-
-		this.drsFile = drsFile;
-	}
-
-	public void setDrsUrl(String urlString) {
-		try {
-			URL url = new URL(urlString);
-			loadDrsData(new URLDataSource(url));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 * 
-	 * @return
-	 */
-	public String getFile() {
-		return getDrsFile();
-	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 */
-	public void setFile(String file) {
-		this.setDrsFile(file);
-	}
-
-	/**
-	 * @return the keepData
-	 */
-	public boolean isKeepData() {
-		return keepData;
-	}
-
-	/**
-	 * @param keepData
-	 *            the keepData to set
-	 */
-	public void setKeepData(boolean keepData) {
-		this.keepData = keepData;
-	}
-	
 	FitsDataStream stream;
 
 	/**
@@ -196,8 +127,8 @@ public class CalcSourcePosition implements Processor {
 		
 		//add circle overlay to map
 		data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay(mSourceX, mSourceY) );
-		data.put(Constants.SOURCE_POS_X, mSourceX);
-		data.put(Constants.SOURCE_POS_Y, mSourceY);
+		float[] source = {(float) mSourceX, (float) mSourceY};
+		data.put(outputKey, source);
 		return data;
 	}
 
@@ -316,5 +247,65 @@ public class CalcSourcePosition implements Processor {
 	    rotateToZdAz(sourceRightAscension,sourceDeclination, false);
 	    rotatePointingTo00();
 	}
+	public String getOutputKey() {
+		return outputKey;
+	}
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+	
+	/**
+	 * @return the drsFile
+	 */
+	public String getDrsFile() {
+		return drsFile;
+	}
+
+	/**
+	 * @param drsFile
+	 *            the drsFile to set
+	 */
+	public void setDrsFile(String drsFile) {
+		File file = new File(drsFile);
+		if (!file.canRead()) {
+			throw new RuntimeException("Cannot open file " + drsFile
+					+ " for reading!");
+		}
+
+		try {
+			loadDrsData(new FileDataSource(file));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+		this.drsFile = drsFile;
+	}
+
+	public void setDrsUrl(String urlString) {
+		try {
+			URL url = new URL(urlString);
+			loadDrsData(new URLDataSource(url));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * This is just an alias for the drsFile parameter.
+	 * 
+	 * @return
+	 */
+	public String getFile() {
+		return getDrsFile();
+	}
+
+	/**
+	 * This is just an alias for the drsFile parameter.
+	 */
+	public void setFile(String file) {
+		this.setDrsFile(file);
+	}
+
+	
 
 }

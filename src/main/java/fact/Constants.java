@@ -29,7 +29,7 @@ public class Constants {
 	public static final String KEY_PLOT_COLORMAP = "@plotPanelColor";
 	public static final String KEY_EVENT_TIME = "UnixTimeUTC";
 	public static final String KEY_NORMALIZED_SLICES= "normalizedSlices";
-	public static final String KEY_SOURCE_POSITION_OVERLAY= "sourcePosition" ;
+	public static final String KEY_SOURCE_POSITION_OVERLAY= "sourcePositionOverlay" ;
 	public static final String KEY_NUMBER_ISLANDS =  "numberOfIslands";
 	public static final String KEY_SHOWER_PHOTONCHARGE = "showerPhotonCharge";
 	public static final String KEY_SHOWER_ARRIVALTIME_DEV = "stdDevArrivalTimes";

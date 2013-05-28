@@ -12,7 +12,7 @@ import stream.annotations.Parameter;
 import fact.Constants;
 
 public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements StatefulProcessor {
-	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
+	static Logger log = LoggerFactory.getLogger(SimpleFactEventProcessor.class);
 	
 	protected String key = "DataCalibrated";
 	protected String outputKey;

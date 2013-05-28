@@ -41,13 +41,14 @@ public class DrsCalibration implements Processor {
 	String fileName = "";
 	String filePath = "";
 	private String color;
+	
+	private String outputKey = "DataCalibrated";
+	private String key="Data";
 
 	Data drsData = null;
 
 	
 	String pathToAuxfiles = "/home/mackaiver/FactTest/aux/";
-
-	boolean keepData = true;
 
 	float[] drsBaselineMean;
 	float[] drsBaselineRms;
@@ -118,21 +119,7 @@ public class DrsCalibration implements Processor {
 		this.setDrsFile(file);
 	}
 
-	/**
-	 * @return the keepData
-	 */
-	public boolean isKeepData() {
-		return keepData;
-	}
 
-	/**
-	 * @param keepData
-	 *            the keepData to set
-	 */
-	@Parameter(description = "This flag signals if calibrated data should overwrite the original data in key `Data`. If set to `false` (default), the calibrated data is stored in `DataCalibrated`.")
-	public void setKeepData(boolean keepData) {
-		this.keepData = keepData;
-	}
 
 	/**
 	 * This method reads the DRS calibration values from the given data source.
@@ -204,26 +191,17 @@ public class DrsCalibration implements Processor {
 		log.debug("StartCellData has {} elements", startCell.length);
 
 		float[] output = rawData;
-		if (isKeepData()) {
+		if (!key.equals(outputKey)) {
 			output = new float[rawData.length];
 		}
 
 		float[] calibrated = applyDrsCalibration(rawData, output, startCell);
-		for (int i = 0; i < rawData.length; i++) {
-			//I dont see why this should  
-			//rawData[i] += 2048.0f;
-			//this shouldnt be happewning here. You always have to undo that by hand otherwise.
-			//calibrated[i] *= -1;
-		}
 
-		if (!isKeepData())
-			data.put("Data", calibrated);
-		else
-			data.put("DataCalibrated", calibrated);
+		data.put(outputKey, calibrated);
 		
 		//add color value if set
 		if(color !=  null && !color.equals("")){
-			data.put("@" + Constants.KEY_COLOR + "_"+"DataCalibrated", color);
+			data.put("@" + Constants.KEY_COLOR + "_"+key, color);
 		}
 
 		return data;

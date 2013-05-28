@@ -1,8 +1,6 @@
 
 package fact.processors.parfact;
 
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +12,10 @@ import fact.processors.MaxAmplitudePosition;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 
- * 1. 	Use the MaxAmplitude Processor to find the maximum Value in the slices.
- * 2.	In the area between amplitudePosition...amplitudePositon-25 search for the position having 0.5 of the original maxAmplitude.
- * 3.	Now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.
- * 4. 	Divide the sum by the integralGain and save the result.
+ * 1. 	Use the MaxAmplitude Processor to find the maximum Value in the slices.</br>
+ * 2.	In the area between amplitudePosition...amplitudePositon-25 search for the position having 0.5 of the original maxAmplitude.</br>
+ * 3.	Now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.</br>
+ * 4. 	Divide the sum by the integralGain and save the result.</br>
  * 
  * Treatment of edge Cases is currently very arbitrary since Pixels with these values should not be considered as showerPixels anyways.
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
@@ -25,59 +23,32 @@ import fact.processors.MaxAmplitudePosition;
  */
 public class CalculatePhotonCharge implements Processor {
 	static Logger log = LoggerFactory.getLogger(CalculatePhotonCharge.class);
-	float[] photonCharge = null;
-	float[] arrivalTime = null;
-	private String outputKey = null;
+	private float[] photonCharge = null;
 
-	private String key = "DataCalibrated";
 	private	double average = 0.0;
 	private float integralGain = 244.0f;
 
+	private String positions = null;
+	private String key = "DataCalibrated";
+	private String outputKey = key;
 	
 	@Override
 	public Data process(Data input) {
-		
-		processEvent(input, key);
-		if(outputKey == null || outputKey ==""){
-			input.put(Constants.KEY_PHOTONCHARGE+"_average",average);
-			input.put(Constants.KEY_PHOTONCHARGE, photonCharge);
-		} else {
-			input.put(outputKey+"_average",average);
-			input.put(outputKey, photonCharge);
+		int[] posArray = null;
+		float[] data = null;
+		try{
+			data = (float[]) input.get(key);
+			if(positions==null){
+				posArray=(int[]) input.get(positions);
+			} else {
+				posArray=new MaxAmplitudePosition().processSeries(data);
+			}
+		} catch(Exception e){
+			log.error("Could not get the right items from the map. wrong keys?");
 		}
-		return input;
-	}
-	
-	public float[] processEvent(Data input, String key) {
-		
-		Serializable value = null;
-		if(input.containsKey(key)){
-			 value = input.get(key);
-		} else {
-			log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		//Check if value is of the right type
-		if (value != null && value.getClass().isArray()
-				&& value.getClass().getComponentType().equals(float.class)) {
-			return processSeries((float[]) value);
-			
-		}
-		else 
-		{
-			log.info(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-	
-	}
-	public float[] processSeries(float[] value) {
 		photonCharge = new float[Constants.NUMBEROFPIXEL];
 		
-		float[] data = value;
-		int[] positions = new MaxAmplitudePosition().processSeries(data);
-//		mA = null;
 		int roi = data.length / Constants.NUMBEROFPIXEL;
-		
 		// for each pixel
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
     	
@@ -85,7 +56,7 @@ public class CalculatePhotonCharge implements Processor {
 		    	 * watch out. index can get out of bounds!
 		    	 */
 				int pos = pix*roi;
-			    int positionOfMaximum                 = positions[pix];
+			    int positionOfMaximum                 = posArray[pix];
 			    int positionOfHalfMaximumValue            = 0;
 			    if(positionOfMaximum <=25){
 			    	positionOfMaximum=25;
@@ -114,9 +85,10 @@ public class CalculatePhotonCharge implements Processor {
 			
 		}
 		average = average/Constants.NUMBEROFPIXEL;  
-		return photonCharge;
+		input.put(outputKey, photonCharge);
+		return input;
 	}
-	
+
 	
 	/*Getters and Setters */
 	
@@ -127,22 +99,27 @@ public class CalculatePhotonCharge implements Processor {
 	public void setIntegralGain(float integralGain) {
 		this.integralGain = integralGain;
 	}
-	
+
+
+	@Parameter(required = false, description = "The positions from which to integrate. If no input is given here this processor will use the posititions of the max amplitude", defaultValue = "MaxAmplitudePositons")
+	public void setPositions(String positions) {
+		this.positions = positions;
+	}
+
 	public String getKey() {
 		return key;
 	}
+
 	public void setKey(String key) {
 		this.key = key;
 	}
-	
+
 
 	public String getOutputKey() {
 		return outputKey;
 	}
-	public void setOutputKey(String output) {
-		this.outputKey = output;
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
-	
-	
-	
+
 }

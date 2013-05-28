@@ -6,6 +6,8 @@ package fact.processors.parfact;
 import java.io.Serializable;
 
 import org.jfree.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -13,6 +15,7 @@ import stream.Data;
 import fact.Constants;
 import fact.data.EventUtils;
 import fact.image.overlays.EllipseOverlay;
+import fact.image.overlays.PixelSet;
 import fact.processors.FactEvent;
 
 /**
@@ -40,13 +43,11 @@ HillasParameter::CalculateParameter()
  * 
  */
 public class HillasParameter implements Processor {
-	private String cleaningMethod = "default";
-	String[] showerPixel = new String []{Constants.KEY_CORENEIGHBOURCLEAN};
+	static Logger log = LoggerFactory.getLogger(HillasParameter.class);
 	private  float corePixelThreshold = 5.0f;
 	private  float neighborPixelThreshold = 2.0f;
 	private int minSize = 2;
 	private double showerThreshold = 0.8;
-	private String key = "DataCalibrated";
 	/**
 	 * members from the original c++ code
 	 */
@@ -55,19 +56,19 @@ public class HillasParameter implements Processor {
 	private float concentration1Pixel;
 	private float concentration2Pixel;
 	private ShowerEllipse ellipse;
-	private Data item;
 	private int numberOfIslands;
 	private float showerSize;
 	private boolean hasShower;
-	private boolean overwrite =  true;
 	
+	private String key = "DataCalibrated";
+	private String outputKey = key;
+	private String pixels = "showerPixel";
+	private int[] showerPixelArray =  null;
+	private String photonEquivalent="photonCharge";
+	private float[] pE = null;
+	private String sourcePosition = "sourcePosition";
+	private float[] source = null;
 
-//	public boolean isOverwrite() {
-//		return overwrite;
-//	}
-//	public void setOverwrite(boolean overwrite) {
-//		this.overwrite = overwrite;
-//	}
 	/**
 	 * calculates the sum of all photoncharges for all showerPixel
 	 */
@@ -126,6 +127,17 @@ public class HillasParameter implements Processor {
 	@Override
 	public Data process(Data input) {
 	
+		try{
+			showerPixelArray = (int[]) input.get(pixels);
+			pE = (float[]) input.get(photonEquivalent);
+			source  = (float[]) input.get(sourcePosition);
+		} catch (ClassCastException e){
+			log.error("wrong types" + e.toString());
+		}
+		if(showerPixelArray == null || pE ==null ||source==null){
+			log.error("Map does not conatin the right values for the keys");
+			return null;
+		}
 		
 //				input.put(Constants.KEY_CORENEIGHBOURCLEAN + "_" + key, processEvent(input, key));
 //				input.put(Constants.KEY_CORENEIGHBOURCLEAN+"_"+key+"_"+Constants.PIXELSET, corePixelSet);
@@ -137,55 +149,30 @@ public class HillasParameter implements Processor {
 //			    mHillasParameterWritingStream << "SourceX;SourceY;";
 //			    mHillasParameterWritingStream << "NominalZenith;NominalAzimuth;NumberIslands;" ;
 //			    mHillasParameterWritingStream << "NumberShowerPixel;LeakageBorder;LeakageSecondBorder;EventTime" << endl;
-				if(hasShower && !overwrite) {
-					input.put(Constants.ELLIPSE_DELTA+"_"+key, ellipse.mDelta);
-					input.put(Constants.ELLIPSE_ALPHA +"_"+key, ellipse.alpha);
-					input.put(Constants.ELLIPSE_ALPHA_1 +"_"+key, ellipse.alphaOff1);
-					input.put(Constants.ELLIPSE_ALPHA_2 +"_"+key, ellipse.alphaOff2);
-					input.put(Constants.ELLIPSE_ALPHA_3 +"_"+key, ellipse.alphaOff3);
-					input.put(Constants.ELLIPSE_AREA +"_"+key, ellipse.area);
-					input.put(Constants.ELLIPSE_SIZE +"_"+key, ellipse.size);
-					input.put(Constants.ELLIPSE_DISTANCE +"_"+key, ellipse.mDistance);
-					input.put(Constants.ELLIPSE_WIDTH +"_"+key, ellipse.width);
-					input.put(Constants.ELLIPSE_LENGTH +"_"+key, ellipse.length);
-					input.put(Constants.HILLAS_CONCENTRATION1 +"_"+key, concentration1Pixel);
-					input.put(Constants.HILLAS_CONCENTRATION2 +"_"+key, concentration2Pixel);
-					input.put(Constants.HILLAS_LEAKAGE_BORDER+"_"+key, leakageBorder);
-					input.put(Constants.HILLAS_LEAKAGE_SECONDBORDER+"_"+key, leakageSecondBorder);
-					input.put(Constants.HILLAS_NUMBER_ISLANDS+"_"+key, numberOfIslands);
-					input.put(Constants.ELLIPSE_OVERLAY+"_"+key, new EllipseOverlay(ellipse.centerX, ellipse.centerY, ellipse.width, ellipse.length, ellipse.auxilaryDistance , ellipse.mDelta) );
-				} else if(hasShower && overwrite){
-					input.put(Constants.ELLIPSE_DELTA , ellipse.mDelta);
-					input.put(Constants.ELLIPSE_ALPHA  , ellipse.alpha);
-					input.put(Constants.ELLIPSE_ALPHA_1  , ellipse.alphaOff1);
-					input.put(Constants.ELLIPSE_ALPHA_2  , ellipse.alphaOff2);
-					input.put(Constants.ELLIPSE_ALPHA_3  , ellipse.alphaOff3);
-					input.put(Constants.ELLIPSE_AREA  , ellipse.area);
-					input.put(Constants.ELLIPSE_SIZE  , ellipse.size);
-					input.put(Constants.ELLIPSE_DISTANCE  , ellipse.mDistance);
-					input.put(Constants.HILLAS_CONCENTRATION1  , concentration1Pixel);
-					input.put(Constants.HILLAS_CONCENTRATION2  , concentration2Pixel);
-					input.put(Constants.HILLAS_LEAKAGE_BORDER , leakageBorder);
-					input.put(Constants.HILLAS_LEAKAGE_SECONDBORDER , leakageSecondBorder);
-					input.put(Constants.HILLAS_NUMBER_ISLANDS , numberOfIslands);
-					input.put(Constants.ELLIPSE_WIDTH, ellipse.width);
-					input.put(Constants.ELLIPSE_LENGTH, ellipse.length);
-					input.put(Constants.ELLIPSE_OVERLAY , new EllipseOverlay(ellipse.centerX, ellipse.centerY, ellipse.width, ellipse.length, ellipse.auxilaryDistance , ellipse.mDelta) );
-				}
-				
-				
+				if(hasShower) {
+					input.put(outputKey+"Delta", ellipse.mDelta);
+					input.put(outputKey+"Alpha", ellipse.alpha);
+					input.put(outputKey+"AlphaOff1", ellipse.alphaOff1);
+					input.put(outputKey+"AlphaOff2", ellipse.alphaOff2);
+					input.put(outputKey+"AlphaOff3", ellipse.alphaOff3);
+					input.put(outputKey+"Area", ellipse.area);
+					input.put(outputKey+"Size", ellipse.size);
+					input.put(outputKey+"Distance", ellipse.mDistance);
+					input.put(outputKey+"Width", ellipse.width);
+					input.put(outputKey+"Length", ellipse.length);
+					input.put(outputKey+"Concentration", concentration1Pixel);
+					input.put(outputKey+"Concentration2", concentration2Pixel);
+					input.put(outputKey+"Leakage", leakageBorder);
+					input.put(outputKey+"Secondleakage", leakageSecondBorder);
+//					input.put(outputKey+"alphaOff1", numberOfIslands);
+//					input.put(Constants.ELLIPSE_OVERLAY, new EllipseOverlay(ellipse.centerX, ellipse.centerY, ellipse.width, ellipse.length, ellipse.auxilaryDistance , ellipse.mDelta) );
+				} 				
 
 		return input;
 
-		//
-		//
-		//String[] keys = new String[] { "Data", "DataCalibrated" };
-
-	}
-	
+	}	
 	public void processEvent(Data input, String key) {
 		
-		item = input;
 		Serializable value = null;
 		
 		if(input.containsKey(key)){
@@ -209,28 +196,6 @@ public class HillasParameter implements Processor {
 	}
 
 	public void processSeries(float[] value) {
-//	    SetAllParameterToZero();
-
-		//TODO: allow other  cleaning methods
-		//create showerPixelarray first since the other methods need it; maybe just keep this a local reference for clarity?
-		CoreNeighborClean core = new CoreNeighborClean();
-		core.setCorePixelThreshold(corePixelThreshold);
-		core.setNeighborPixelThreshold(neighborPixelThreshold);
-		int[] showerPixelArray = core.processSeries(value);
-		
-		
-//		ArrayList<ArrayList<Integer>> ll = new StdClean().processSeries(value, showerThreshold);
-//		ArrayList<Integer> l = new ArrayList<Integer>();
-//		//maybe add filter for island size here
-//		for(ArrayList<Integer> li :ll){
-//			if(li.size() >= minSize){
-//				l.addAll(li);
-//			}
-//		}
-//		int [] showerPixelArray = new int[l.size()];
-//		for(int i = 0; i< l.size();i++){
-//			showerPixelArray[i] = l.get(i);
-//		}
 		
 		if(showerPixelArray.length == 0) {
 			//no shower in event detected
@@ -239,16 +204,7 @@ public class HillasParameter implements Processor {
 		} else {
 			hasShower = true;
 		}
-		float[] photonCharges =  new CalculatePhotonCharge().processSeries(value);
-		if (item.containsKey(Constants.SOURCE_POS_X) && item.containsKey(Constants.SOURCE_POS_Y)){
-			ellipse = new ShowerEllipse(showerPixelArray, photonCharges,  (Double) item.get(Constants.SOURCE_POS_X), (Double) item.get(Constants.SOURCE_POS_Y));
-		} else {
-			//TODO: handle tat case
-//			System.out.println("call calcsourcepos before! bieatch!");
-			Log.info("Source Position was not calculated. You need to call the calcSourcePosition processor before creating Hillas Parameter");
-			return;
-
-		}
+		ellipse = new ShowerEllipse(showerPixelArray, pE,  source[0], source[1]);
 		
 		//This will calculate the ellipse properties asymetry and centerofgravity
 //		ellipse = new ShowerEllipse(showerPixelArray, photonCharges, source_x, source_y);
@@ -256,12 +212,12 @@ public class HillasParameter implements Processor {
 		//now some shower specific properties
 		numberOfIslands =  calculateNumberOfIslands(showerPixelArray);
 //		System.out.println("Hillas numIslands: " + numberOfIslands + " hillas showerpixelnumber: " + showerPixelArray.length);
-	   	showerSize = calculateSize(showerPixelArray, photonCharges);
+	   	showerSize = calculateSize(showerPixelArray, pE);
 //	   	System.out.println("showersize" + showerSize);
 	    //sets the two leakage globals
-	    calculateLeakage(showerPixelArray, photonCharges, showerSize);
+	    calculateLeakage(showerPixelArray, pE, showerSize);
 	    //sets concentration1Pixel and concentration2Pixel
-	    calculateConcentration(showerPixelArray, photonCharges, showerSize);
+	    calculateConcentration(showerPixelArray, pE, showerSize);
 
 
 		return;
@@ -305,25 +261,6 @@ public class HillasParameter implements Processor {
  * Getter and Setter
  */
 
-	public String getCleaningMethod() {
-		return cleaningMethod;
-	}
-	public void setCleaningMethod(String cleaningMethod) {
-		this.cleaningMethod = cleaningMethod;
-	}
-
-
-	public String[] getShowerPixel() {
-		return showerPixel;
-	}
-
-	public void setShowerPixel(String[] showerPixel) {
-		this.showerPixel = showerPixel;
-	}
-	
-	
-	
-
 	public float getCorePixelThreshold() {
 		return corePixelThreshold;
 	}
@@ -360,11 +297,40 @@ public class HillasParameter implements Processor {
 	public void setShowerThreshold(double showerThreshold) {
 		this.showerThreshold = showerThreshold;
 	}
+	
 	public String getKey() {
 		return key;
 	}
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+	public String getPixels() {
+		return pixels;
+	}
+	public void setPixels(String pixels) {
+		this.pixels = pixels;
+	}
+
+	public String getPhotonEquivalent() {
+		return photonEquivalent;
+	}
+	public void setPhotonEquivalent(String photonEquivalent) {
+		this.photonEquivalent = photonEquivalent;
+	}
+
+	public String getSourcePosition() {
+		return sourcePosition;
+	}
+	public void setSourcePosition(String sourcePosition) {
+		this.sourcePosition = sourcePosition;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 	
 }

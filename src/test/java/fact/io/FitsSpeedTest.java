@@ -42,7 +42,7 @@ public class FitsSpeedTest {
 		int limit = 100;
 
 		try {
-			URL url = new URL("file:/Users/chris/Downloads/20111126_042.fits");
+			URL url =  FitsStreamTest.class.getResource("/sample.fits.gz");
 			ds = new URLDataSource(url);
 
 			FitsTableBuilder ftb = new FitsTableBuilder();
@@ -64,8 +64,8 @@ public class FitsSpeedTest {
 			preprocess.add(new FactEventStream.Short2FloatData());
 
 			DrsCalibration drs = new DrsCalibration();
-			drs.setDrsFile("/Users/chris/Downloads/20111126_034.drs.fits");
-			drs.setKeepData(false);
+			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			drs.setDrsFile(u.getPath());
 			preprocess.add(drs);
 
 			preprocess.init(new ProcessContextImpl());

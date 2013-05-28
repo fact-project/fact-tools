@@ -1,11 +1,13 @@
 package fact.processors.parfact;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.Data;
 import fact.Constants;
 import fact.data.EventUtils;
 import fact.image.Pixel;
@@ -21,52 +23,27 @@ import fact.processors.FactEvent;
  *
  */
 public class CoreNeighborClean implements Processor{
-	private String key = "DataCalibrated";
-	private String output;
+	static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
+	private String key = "photoncharge";
+	private String outputKey;
 	private  PixelSet corePixelSet;
 	private  float corePixelThreshold = 5.0f;
 	private  float neighborPixelThreshold = 2.0f;
-	private boolean overwrite = true;
 	private int minSize = 2;
+	float[] photonCharge = new float[Constants.NUMBEROFPIXEL];
+	
 
 	@Override
 	public Data process(Data input) {
-		if(output == null || output ==""){
-			input.put(Constants.KEY_CORENEIGHBOURCLEAN, processEvent(input, key));
-			input.put(Constants.KEY_CORENEIGHBOURCLEAN+"_"+Constants.PIXELSET, corePixelSet);
-		} else {
-			input.put(output, processEvent(input, key));
-			input.put(output +"_" + Constants.PIXELSET, corePixelSet);
+		try{
+			photonCharge= (float[]) input.get(key);
+			if(photonCharge == null){
+				return null;
+			}
+		} catch(ClassCastException e){
+			log.error("Could cast the key: " + key + "to a float[]");
 		}
-		return input;
-	}
-
-	public int[] processEvent(Data input, String key) {
-		Serializable value = null;
-		if(input.containsKey(key)){
-			value = input.get(key);
-		} else {
-			//key doesn't exist in map
-			return null;
-		}
-		if (value != null && value.getClass().isArray()
-				&& value.getClass().getComponentType().equals(float.class)) {
-			return processSeries((float[]) value);
-		}
-		//in case value in Map is of the wrong type to do this calculation
-		else
-		{
-			return null;
-		}
-
-	}
-
-	public int[] processSeries(float[] value) {
-
-		float[] photonCharge = new float[Constants.NUMBEROFPIXEL];
-		float[] data = value;
 		int[] currentNeighbors;
-		photonCharge = new CalculatePhotonCharge().processSeries(data);
 
 		ArrayList<Integer> showerPixel= new ArrayList<Integer>();
 
@@ -103,7 +80,16 @@ public class CoreNeighborClean implements Processor{
 			showerPixelArray[i] = showerPixel.get(i);
 			corePixelSet.add(new Pixel(showerPixel.get(i)));
 		}
-		return showerPixelArray;
+		
+		
+		if(outputKey == null || outputKey ==""){
+			input.put(key, showerPixelArray);
+			input.put(key+"_"+Constants.PIXELSET, corePixelSet);
+		} else {
+			input.put(outputKey, showerPixelArray);
+			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
+		}
+		return input;
 	}
 
 	/*
@@ -127,14 +113,6 @@ public class CoreNeighborClean implements Processor{
 		this.neighborPixelThreshold = neighborPixelThreshold;
 	}
 
-	public boolean isOverwrite() {
-		return overwrite;
-	}
-	@Parameter (required = false, description = "If true this operator will output the result as " + Constants.KEY_CORENEIGHBOURCLEAN +"+{current Key}. Else the result will be named " + Constants.KEY_CORENEIGHBOURCLEAN)
-	public void setOverwrite(boolean overwrite) {
-		this.overwrite = overwrite;
-	}
-
 	public int getMinSize() {
 		return minSize;
 	}
@@ -151,11 +129,11 @@ public class CoreNeighborClean implements Processor{
 	}
 
 
-	public String getOutput() {
-		return output;
+	public String getOutputKey() {
+		return outputKey;
 	}
-	public void setOutput(String output) {
-		this.output = output;
+	public void setOutputKey(String output) {
+		this.outputKey = output;
 	}
 
 }

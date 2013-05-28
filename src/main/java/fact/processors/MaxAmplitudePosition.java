@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import fact.Constants;
 
 /**
- * This processor simply calculates the maximum value and its position for all time slices in each Pixel.  
+ * This processor simply calculates the position of the maximum value for all time slices in each Pixel.
+ * outputs an int array  
  * 
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 

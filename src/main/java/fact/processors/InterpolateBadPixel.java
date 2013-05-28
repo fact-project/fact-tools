@@ -91,7 +91,16 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 		return badChIds;
 	}
 	@Parameter(required = true, description = "A List of ChIds for Pixels that are considered defect", defaultValue="The softIds Taken from https://www.fact-project.org/logbook/misc.php?page=known_problems")
-	public void setBadChidIds(int[] badChIds) {
-		this.badChIds = badChIds;
+	public void setBadChidIds(String[] badChIdStrings) {
+		System.out.println(badChIdStrings);
+		try{
+			int i=0;
+			for(String n : badChIdStrings ){
+				badChIds[i] = Integer.parseInt(n);
+				i++;
+			}
+		} catch(NumberFormatException e){
+			log.error("couldnt parse badchids from xml.");			
+		}
 	}
 }

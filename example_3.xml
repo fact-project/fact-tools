@@ -1,25 +1,34 @@
 <container>
 
 
-<property name="data" value="20120209_061.fits" />
-<property name="dataDRS" value="20120209_050.drs.fits.gz" />
+<property name="data" value="20130104_095.fits" />
+<property name="dataDRS" value="20130104_076.drs.fits" />
+<property name="drive_file" value="drive_file.fits" />
 
-<property name="path " value="/home/bruegge/FactTest" />
-<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
+<!-- <property name="path " value="/home/bruegge/FactTest" /> -->
+ 	<property name="path" value="/Users/kaibrugge/FactTest" />
  
 
 	<stream id="fact" class="fact.io.FitsStream" 
- 		    url="file:${path}/${data}"  />
+ 		    url="file:${path}/${data}" limit="10"  />
 		    
 		<process input="fact">
-			<Skip condition="%{data.EventNum} &lt; 48" />
-			<fact.processors.DrsCalibration drsFile="${path}/${dataDRS}" color="#5C311F"/>	
-			<fact.processors.parfact.RemoveSpikesMars  />
-			<fact.processors.CutSlices keys="DataCalibrated"  start="22" end="220"/>
-			<fact.processors.RemoveJumps outputKey="removedJumps" color="#FF00FF" />
-			<fact.processors.ExponentialSmoothing outputKey="smoothed" alpha="0.3" color="#AF4AB9" />
-<!-- 			<stream.monitor.DataRate every="50"/> -->
+            <fact.processors.DrsCalibration file="${path}/${dataDRS}" key="data"  outputKey="DataCalibrated"/>  
+            <fact.processors.CutSlices  start="22" end="220"/>
+            <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+            <fact.processors.parfact.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
+            <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" />
+            
+            <fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
+            <fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/>
+            
+            <fact.processors.parfact.CoreNeighborClean key="photonCharge" CorePixelThreshold="5.0" neighborPixelThreshold="2.0" outputKey="showerPixel" />
+            <fact.processors.parfact.CalcSourcePosition file="${path}/${drive_file}" outputKey="sourcePosition"/>
+            <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
+            
+            <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:${path}/test.txt" />
+<!-- 			<fact.image.ShowImage/> -->
 <!-- 			<fact.image.monitors.StatusWindow /> -->
-			<fact.image.ShowImage/>
 		</process>
 </container>
