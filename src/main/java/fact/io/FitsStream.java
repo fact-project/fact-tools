@@ -147,7 +147,7 @@ public class FitsStream extends AbstractStream {
 
 		try {
 			for (int n = 0; n < nameArray.length; n++) {
-
+				log.debug("Reading {}", nameArray[n]);
 				// read int
 				if (typeArray[n].equals("J")) {
 					int numberOfelements = lengthArray[n];
