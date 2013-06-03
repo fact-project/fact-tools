@@ -52,5 +52,6 @@ public class Weird8ByteChunkStreamTest {
 				len++;
 			}
 		}
+		stream.close();
 	}
 }

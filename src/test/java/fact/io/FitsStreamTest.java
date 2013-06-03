@@ -77,14 +77,14 @@ public class FitsStreamTest {
 			stream.init();
 
 			Data item = stream.read();
-//			while (item != null) {
-//				if (!(item.containsKey("RunNumberBaseline")&& item.containsKey("GainMean") && item.containsKey("BaselineMean"))){
-//					fail("fitsStream is not reading the right keys");
-//				}
-//				float[] arr = (float[]) item.get("TriggerOffsetMean");
-//				int numberBaseline = (Integer) item.get("GainMean");
-//				item = stream.read();
-//			}
+			while (item != null) {
+				if (!(item.containsKey("RunNumberBaseline")&& item.containsKey("GainMean") && item.containsKey("BaselineMean"))){
+					fail("fitsStream is not reading the right keys");
+				}
+				item.get("TriggerOffsetMean");
+				item.get("GainMean");
+				item = stream.read();
+			}
 			log.info("Read all the required keys");
 		} catch(ClassCastException e){
 			fail("Wrong datatypes.");

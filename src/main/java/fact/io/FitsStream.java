@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class FitsStream extends AbstractStream {
 	final static int lineLength = 80;
 
 	int roi = 300;
+	int numberOfPixel = 1440;
 	private DataInputStream dataStream;
 	private int[] lengthArray;
 	private String[] nameArray;
@@ -108,7 +110,7 @@ public class FitsStream extends AbstractStream {
 					String numberString = value.replaceAll("\\D+", "").trim();
 					numberOfElements = Integer.parseInt(numberString);
 				} catch (NumberFormatException e) {
-					log.error("Couldnt parse the number of TFROM elements numbers in the header. Assuming a value of 1");
+					log.info("Couldnt parse the number of TFORM elements in the header. Assuming a value of 1.");
 					numberOfElements = 1;
 				}
 
@@ -127,6 +129,11 @@ public class FitsStream extends AbstractStream {
 			if ("NROI".equals(key)) {
 				roi = Integer.parseInt(val.trim());
 				log.info("roi is: {}", roi);
+			}
+			
+			if ("NPIX".equals(key)) {
+				numberOfPixel = Integer.parseInt(val.trim());
+				log.info("numberOfPixel is: {}", numberOfPixel);
 			}
 
 			if ("NAXIS1".equals(key)) {
@@ -166,7 +173,15 @@ public class FitsStream extends AbstractStream {
 				if (typeArray[n].equals("E")) {
 					log.info("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
-					if (numberOfElements > 1) {
+					if (numberOfElements > 128) {
+						//save all the floats into a float buffer. to save n floats we need 4*n bytes
+						byte[] el = new byte[4 * numberOfElements];
+						dataStream.read(el);
+						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
+						float[] ar = new float[numberOfElements];
+						sBuf.get(ar);
+						item.put(nameArray[n], ar);
+					}else if (numberOfElements > 1) {
 						float[] el = new float[numberOfElements];
 						for (int i = 0; i < numberOfElements; i++) {
 							el[i] = dataStream.readFloat();
@@ -227,7 +242,7 @@ public class FitsStream extends AbstractStream {
 		}
 
 		item.put("@source", url.getProtocol() + ":" + url.getPath());
-
+		item.put("numberOfPixel", numberOfPixel);
 		return item;
 	}
 
