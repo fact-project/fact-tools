@@ -123,22 +123,22 @@ public class FitsStream extends AbstractStream {
 			if (key.startsWith("TTYPE")) {
 				int index = Integer.parseInt(key.replaceAll("\\D+", "").trim());
 				nameArray[index - 1] = val.replaceAll("'", "").trim();
-				log.info("field[{}] = {}", index - 1, nameArray[index - 1]);
+				log.debug("field[{}] = {}", index - 1, nameArray[index - 1]);
 			}
 
 			if ("NROI".equals(key)) {
 				roi = Integer.parseInt(val.trim());
-				log.info("roi is: {}", roi);
+				log.debug("roi is: {}", roi);
 			}
 			
 			if ("NPIX".equals(key)) {
 				numberOfPixel = Integer.parseInt(val.trim());
-				log.info("numberOfPixel is: {}", numberOfPixel);
+				log.debug("numberOfPixel is: {}", numberOfPixel);
 			}
 
 			if ("NAXIS1".equals(key)) {
 				eventBytes = Integer.parseInt(val.trim());
-				log.info("event bytes: {}", eventBytes);
+				log.debug("event bytes: {}", eventBytes);
 			}
 		}
 	}
@@ -171,7 +171,7 @@ public class FitsStream extends AbstractStream {
 				}
 
 				if (typeArray[n].equals("E")) {
-					log.info("Reading field '{}'", nameArray[n]);
+					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
 					if (numberOfElements > 128) {
 						//save all the floats into a float buffer. to save n floats we need 4*n bytes
@@ -255,7 +255,7 @@ public class FitsStream extends AbstractStream {
 			pos += read;
 
 			if ((new String(data, "US-ASCII")).trim().endsWith("END")) {
-				log.info("Found end-of-header! Header length is {}", pos);
+				log.debug("Found end-of-header! Header length is {}", pos);
 				break;
 			}
 

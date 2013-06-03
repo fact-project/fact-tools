@@ -6,6 +6,9 @@ import java.util.Set;
 
 import javax.swing.JFrame;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import fact.FactViewer;
 
@@ -14,6 +17,7 @@ public class CamWindow {
 	short selectIndex = 0;
 	Data event;
 	final FactViewer mainWindow;
+	static Logger log = LoggerFactory.getLogger(CamWindow.class);
 
 	private MapView mapPanel;
 
@@ -35,7 +39,9 @@ public class CamWindow {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				mainWindow.getCamWindowList().remove(this);
+				log.debug("CamWindow is being closed. camwindowlist size is currently: " + mainWindow.getCamWindowList().size());
+				mainWindow.getCamWindowList().remove(CamWindow.this);
+				log.debug("CamWindow has been closed. camwindowlist size is currently: " + mainWindow.getCamWindowList().size());
 			}
 		});
 		frame.pack();

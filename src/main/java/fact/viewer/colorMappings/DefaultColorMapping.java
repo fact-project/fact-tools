@@ -10,20 +10,15 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * @author chris
+ * @author kai
  *
  */
 public class DefaultColorMapping 
 	implements ColorMapping 
 {
 	static Logger log = LoggerFactory.getLogger( DefaultColorMapping.class );
-	Double min = 0.0d;
-	public float getMinValue() {	return min.floatValue();	}
-	Double max = 1.0d;
-	public float getMaxValue() {	return max.floatValue();	}
-
-	Double scale = 1.0d;
-	
+	float scale = 1.0f;
+	float minValue, maxValue;
 	public DefaultColorMapping(){
 	}
 	
@@ -32,57 +27,46 @@ public class DefaultColorMapping
 	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Double)
 	 */
 	@Override
-	public Color map(Double v) {
-		if(v.equals(Double.NaN)){
-			v = 0.0;
+	public Color map(float value, float min, float max) {
+		scale = (max - min);
+		if( scale == 0.0d )
+			scale = 1.0f;
+		
+		if(Float.isNaN(value)){
+			value = 0.0f;
 		}
-		Double value = v;
 		//log.info( "Scaling {} with {}", v, scale );
-		value = (v - min) / scale; //scale * v;
+		value = (value - min) / scale; //scale * v;
 		//log.info( "     {} ~> {}", v, value );
 		//Double range = Math.PI / 3.0f * 2.0f;
 		//Double offset = Math.PI * 4.0f / 3.0f;
 		//Double scaled = offset - value * range;
-		Double d = Math.PI + 0.25d * Math.PI * value;
-		
-		
-		Double weight0 = value;
-		if( weight0 > 1.0d )
-			weight0 = 1.0d;
+		float d = (float) (Math.PI + 0.25d * Math.PI * value);
+		float weight0 = value;
+		if( weight0 > 1.0f )
+			weight0 = 1.0f;
 		
 		if( weight0 < 0.0d )
-			weight0 = 0.0d;
-		
-		
-		
-		//return Color.getHSBColor(  d.floatValue(), 1.0f - value.floatValue() * value.floatValue(), 1.0f * (1.0f - value.floatValue()));
-		return Color.getHSBColor(  d.floatValue(), 1.0f - value.floatValue() * value.floatValue(), 1.0f * (1.0f - value.floatValue()));
-		//return Color.getHSBColor(  d.floatValue(), 1.0f - value.floatValue(), 1.0f * (1.0f - value.floatValue()));
+			weight0 = 0.0f;
+		return Color.getHSBColor(  d, 1.0f - value * value, 1.0f * (1.0f - value));
 	}
+	
 
-	
-	public void setMinMax( Double min, Double max ){
-		
-		this.min = min ; 
-		this.max = max ;
-		scale = (this.max - this.min);
-		if( scale == 0.0d )
-			scale = 1.0d;
-	}
-	
-	
-	public void setMinMax( Float min, Float max ){
-		setMinMax( min.doubleValue(), max.doubleValue() );
-	}
-	
-	public void setMinMax( float min, float max ){
-		setMinMax( Float.valueOf(min), Float.valueOf(max) );
-	}
-	/**
-	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Float)
-	 */
-	@Override
-	public Color map(Float f) {
-		return map( f.doubleValue() );
-	}
+//	@Override
+//	public Color map(float value) {
+//		if(this.maxValue !=  0.0){
+//			map(value, minValue, maxValue);
+//		} else {
+//			map(value,0.0f, 600.0f);
+//		}
+//		return null;
+//	}
+//
+//
+//	public float getMinValue() {
+//		return minValue;
+//	}
+//	public float getMaxValue() {
+//		return maxValue;
+//	}
 }

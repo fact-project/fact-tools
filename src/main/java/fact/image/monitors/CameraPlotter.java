@@ -106,11 +106,11 @@ public class CameraPlotter extends DataVisualizer  {
 				Serializable val = data.get(key);
 				Class<?> clazz = val.getClass().getComponentType();
 				if(clazz.equals(float.class)||clazz.equals(double.class)||clazz.equals(int.class)){
-					double[] valArray = EventUtils.toDoubleArray(val);
+					float[] valArray = EventUtils.toFloatArray(val);
 					if(valArray.length == Constants.NUMBEROFPIXEL){
 						if(showAverage){
-							onStat.updateValues(key, valArray);
-							mapView.setData(onStat.getValueMap().get(key+"_avg"));
+							onStat.updateValues(key, EventUtils.toDoubleArray(valArray));
+							mapView.setData(EventUtils.toFloatArray(onStat.getValueMap().get(key+"_avg")));
 						}
 						else
 						{
@@ -124,10 +124,7 @@ public class CameraPlotter extends DataVisualizer  {
 			{
 				log.info("This data cannot be displayed in a camera window");
 			}
-				
 		}
-
-
 		return data;
 	}
 	

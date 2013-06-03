@@ -25,14 +25,16 @@ public class ScalePanel extends JPanel {
 	private static final long serialVersionUID = -84543261667712932L;
 	static Logger log = LoggerFactory.getLogger( ScalePanel.class );
 	
-	Double min = 0.0d;
-	Double max = 0.0d;
+	float min = 0.0f;
+	float max = 0.0f;
 	ColorMapping map;
 	DecimalFormat df = new DecimalFormat( "0.00" );
 	
-	public ScalePanel( ColorMapping cm ){
+	public ScalePanel( ColorMapping cm, float min, float  max ){
 		setBorder( null );
 		map = cm;
+		this.min = min;
+		this.max = max;
 	}
 	
 	
@@ -73,9 +75,9 @@ public class ScalePanel extends JPanel {
 		g.setFont( g.getFont().deriveFont( 10.0f ) );
 		
 		for( int i = 0; i < barHeight; i++ ){
-			float range = map.getMaxValue() - map.getMinValue();
-			float value = map.getMinValue() + (range)*(((float)i)/((float)barHeight-1));
-			Color c = map.map( value );
+			float range = max - min;
+			float value = min + (range)*(((float)i)/((float)barHeight-1));
+			Color c = map.map(value, min, max );
 			g.setColor( c );
 			g.drawLine( 40, barHeight - i, w, barHeight - i );
 			if(i % 20 == 0 || i == barHeight-1){
@@ -87,8 +89,26 @@ public class ScalePanel extends JPanel {
 
 
 	public void setColorMapping(ColorMapping c) {
+//		this.min = min;
+//		this.max = max;
 		this.map = c;
 		this.repaint();
 		
+	}
+
+
+	public float getMin() {
+		return min;
+	}
+	public void setMin(float min) {
+		this.min = min;
+	}
+
+
+	public float getMax() {
+		return max;
+	}
+	public void setMax(float max) {
+		this.max = max;
 	}
 }

@@ -10,11 +10,9 @@ import java.awt.Color;
  *
  */
 public interface ColorMapping {
-
-	public float getMinValue();
-	public float getMaxValue();
-	public Color map( Double d );
 	
-	public Color map( Float f );
-	public void setMinMax(Float min, Float max);
+	public Color map(float value,  float minValue,  float maxValue);
+	//public Color map(float value);
+//	public float getMinValue();
+//	public float getMaxValue();
 }

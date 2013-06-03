@@ -24,8 +24,6 @@ public class ChangeColorMap implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JMenuItem bla = (JMenuItem) e.getSource();
-		float min = cameraMap.minValue;
-		float max = cameraMap.maxValue;
 		if(bla.getText().equals("TwoToneAbsolute")){
 			c = new TwoToneAbsoluteColorMapping();
 		} else if(bla.getText().equals("NeutralColor")) {
@@ -33,9 +31,9 @@ public class ChangeColorMap implements ActionListener {
 		} else if(bla.getText().equals("GrayScale")){
 			c = new GrayScaleColorMapping();
 		}
-		c.setMinMax(min, max);
+//		c.setMin(min, max);
 		cameraMap.setColorMapping(c);
-		scale.setColorMapping(c);		
+		scale.setColorMapping(c);
 	}
 
 }

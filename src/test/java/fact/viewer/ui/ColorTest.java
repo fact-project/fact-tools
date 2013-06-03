@@ -35,6 +35,9 @@ public class ColorTest
 
 	@Test
 	public void test(){
+		TestFrame frame = new TestFrame( new DefaultColorMapping() );
+		frame.setSize( 1024, 768 );
+		frame.setVisible( true );
 	}
 	
 	
@@ -68,7 +71,7 @@ public class ColorTest
 		
 		for( int i = 0; i < this.getHeight(); i++ ){
 			Double y = (height.doubleValue() - i) / height.doubleValue();
-			Color c = map.map( y.doubleValue() );
+			Color c = map.map( y.floatValue(), 0, 600 );
 			log.info( "Mapping {} to {}", y, c );
 			y = y * height.doubleValue();
 			g.setColor( c );
@@ -104,13 +107,5 @@ public class ColorTest
 		public void mouseMoved(MouseEvent arg0) {
 			pos.setText( "Position: (" + arg0.getX() + "," + arg0.getY() + "), Value: " + test.getValue( arg0.getX(), arg0.getY() ) );
 		}
-	}
-	
-	
-	public static void main( String[] args ){
-	
-		TestFrame frame = new TestFrame( new DefaultColorMapping() );
-		frame.setSize( 1024, 768 );
-		frame.setVisible( true );
 	}
 }
