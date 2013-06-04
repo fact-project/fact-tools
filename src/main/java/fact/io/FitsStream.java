@@ -45,7 +45,6 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public void init() throws Exception {
-
 		dataStream = new DataInputStream(new BufferedInputStream(
 				getInputStream()));
 
@@ -247,18 +246,20 @@ public class FitsStream extends AbstractStream {
 	}
 
 	public FitsHeader readHeader(DataInputStream in) throws IOException {
-
 		byte[] data = new byte[16 * 2880];
 		int pos = 0;
 		int read = in.read(data, pos, 2880);
+		//try to find the END keyword. It can be followed by a comment ie. a /. 
 		while (read > 0) {
 			pos += read;
-
-			if ((new String(data, "US-ASCII")).trim().endsWith("END")) {
+			String str = (new String(data, "US-ASCII")).trim();
+			if (str.endsWith("END")) {
 				log.debug("Found end-of-header! Header length is {}", pos);
 				break;
 			}
-
+			if(pos > data.length-2880){
+				log.error("header was too long. ");
+			}
 			read = in.read(data, pos, 2880);
 		}
 

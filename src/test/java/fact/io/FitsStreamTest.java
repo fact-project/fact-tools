@@ -67,7 +67,7 @@ public class FitsStreamTest {
 			fail("Could not read FitsFile");
 		}
 	}
-	
+
 	@Test
 	public void testDRSKeys(){
 		try {
@@ -75,12 +75,44 @@ public class FitsStreamTest {
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();
-			String[] requiredKeys = {"BaselineMean","BaselineRms","TriggerOffsetMean","TriggerOffsetRms","GainMean","GainRms"};
+
+			// The following keys are required to exist in the DRS data
+			final String[] drsKeys = new String[] { "RunNumberBaseline",
+					"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
+					"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
+			"TriggerOffsetRms" };
+
+			Data item = stream.read();
+			while (item != null) {
+				for(String key : drsKeys){
+					if (!(item.containsKey(key))){
+						fail("fitsStream is not reading the right keys");
+					}
+				}
+				item = stream.read();
+			}
+			log.info("Read all the required keys");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Could not read FitsFile");
+		}
+	}
+	
+	@Test
+	public void testDrsTypes(){
+		try{
+			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			SourceURL url = new SourceURL(u);
+			FitsStream stream = new FitsStream(url);
+			stream.init();
+
+			String[] requiredFloatArrayKeys = {"BaselineMean","BaselineRms","TriggerOffsetMean","TriggerOffsetRms","GainMean","GainRms"};
 			Data item = stream.read();
 			@SuppressWarnings("unused")
 			float[] ar;
 			while (item != null) {
-				for(String key : requiredKeys){
+				for(String key : requiredFloatArrayKeys){
 					if (!(item.containsKey(key))){
 						fail("fitsStream is not reading the right keys");
 					}
@@ -89,12 +121,13 @@ public class FitsStreamTest {
 				item = stream.read();
 			}
 			log.info("Read all the required keys");
+			
 		} catch(ClassCastException e){
-			fail("Wrong datatypes.");
-		} catch (Exception e) {
+			fail("Wrong datatzypes in the drs file");
 			e.printStackTrace();
+		} catch (Exception e){
 			fail("Could not read FitsFile");
+			e.printStackTrace();
 		}
 	}
-	
 }

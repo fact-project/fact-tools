@@ -39,6 +39,7 @@ public class CommandLine {
 				container.run();
 			} catch (Exception e) {
 				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace();
 				System.exit(-1);
 			}
 		}

@@ -65,61 +65,6 @@ public class DrsCalibration implements Processor {
 			"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
 			"TriggerOffsetRms" };
 
-	/**
-	 * @return the drsFile
-	 */
-	public String getDrsFile() {
-		return drsFile;
-	}
-
-	/**
-	 * @param drsFile
-	 *            the drsFile to set
-	 */
-	@Parameter(description = "The path to the DRS file holding the calibration data (in FITS format).")
-	public void setDrsFile(String drsFile) {
-		File file = new File(drsFile);
-		if (!file.canRead()) {
-			throw new RuntimeException("Cannot open file " + drsFile
-					+ " for reading!");
-		}
-
-		try {
-			loadDrsData(new FileDataSource(file));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-
-		this.drsFile = drsFile;
-	}
-
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
-	public void setDrsUrl(String urlString) {
-		try {
-			URL url = new URL(urlString);
-			loadDrsData(new URLDataSource(url));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 * 
-	 * @return
-	 */
-	public String getFile() {
-		return getDrsFile();
-	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 */
-	public void setFile(String file) {
-		this.setDrsFile(file);
-	}
-
-
 
 	/**
 	 * This method reads the DRS calibration values from the given data source.
@@ -179,6 +124,7 @@ public class DrsCalibration implements Processor {
 	public Data process(Data data) {
 		if (this.drsData == null){
 			//file not loaded yet. try to lookup path in map.
+			log.warn("No url to drs file specified. trying to find one automaticly");
 			String directory = (String)data.get("@directory");
 			int run = (Integer)data.get("@run");
 			setDrsFile(directory, run);
@@ -207,25 +153,6 @@ public class DrsCalibration implements Processor {
 		return data;
 	}
 
-	private void setDrsFile(String directoryPath, int run) {
-		String drsDirectory = pathToAuxfiles+directoryPath;
-		File directory = new File(drsDirectory);
-		File[] fList = directory.listFiles(new drsFileFilter());
-		int currentRun = 0;
-		File drsFile = null;
-		for (File file : fList){
-			currentRun = Integer.parseInt(((file.getName().split("[_/.]"))[1]));
-			if (currentRun <= run){
-				drsFile = file;
-			}
-		}
-		
-		try {
-			loadDrsData(new FileDataSource(drsFile));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
 	
 	public float[] applyDrsCalibration(float[] data, float[] destination,
 			short[] StartCellVector) {
@@ -351,6 +278,9 @@ public class DrsCalibration implements Processor {
 		return destination;
 	}
 	
+	
+	//-----------getter setter---------------------
+	
 	public String getColor() {
 		return color;
 	}
@@ -362,6 +292,88 @@ public class DrsCalibration implements Processor {
 	}
 	public void setPathToAuxfiles(String pathToAuxfiles) {
 		this.pathToAuxfiles = pathToAuxfiles;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+	
+	/**
+	 * @return the drsFile
+	 */
+	public String getDrsFile() {
+		return drsFile;
+	}
+
+	/**
+	 * @param drsFile
+	 *            the drsFile to set
+	 */
+	@Parameter(description = "The path to the DRS file holding the calibration data (in FITS format).")
+	public void setDrsFile(String drsFile) {
+		File file = new File(drsFile);
+		if (!file.canRead()) {
+			throw new RuntimeException("Cannot open file " + drsFile
+					+ " for reading!");
+		}
+
+		try {
+			loadDrsData(new FileDataSource(file));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+		this.drsFile = drsFile;
+	}
+
+	@Parameter(description = "A URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
+	public void setUrl(String urlString) {
+		try {
+			URL url = new URL(urlString);
+			loadDrsData(new URLDataSource(url));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * This is just an alias for the drsFile parameter.
+	 * 
+	 * @return
+	 */
+	public String getFile() {
+		return getDrsFile();
+	}
+
+	/**
+	 * This is just an alias for the drsFile parameter.
+	 */
+	public void setFile(String file) {
+		this.setDrsFile(file);
+	}
+
+	private void setDrsFile(String directoryPath, int run) {
+		String drsDirectory = pathToAuxfiles+directoryPath;
+		File directory = new File(drsDirectory);
+		File[] fList = directory.listFiles(new drsFileFilter());
+		int currentRun = 0;
+		File drsFile = null;
+		for (File file : fList){
+			currentRun = Integer.parseInt(((file.getName().split("[_/.]"))[1]));
+			if (currentRun <= run){
+				drsFile = file;
+			}
+		}
+		
+		try {
+			loadDrsData(new FileDataSource(drsFile));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 
 	
