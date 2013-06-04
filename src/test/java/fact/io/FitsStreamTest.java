@@ -75,14 +75,17 @@ public class FitsStreamTest {
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();
-
+			String[] requiredKeys = {"BaselineMean","BaselineRms","TriggerOffsetMean","TriggerOffsetRms","GainMean","GainRms"};
 			Data item = stream.read();
+			@SuppressWarnings("unused")
+			float[] ar;
 			while (item != null) {
-				if (!(item.containsKey("RunNumberBaseline")&& item.containsKey("GainMean") && item.containsKey("BaselineMean"))){
-					fail("fitsStream is not reading the right keys");
+				for(String key : requiredKeys){
+					if (!(item.containsKey(key))){
+						fail("fitsStream is not reading the right keys");
+					}
+					ar = (float[]) item.get(key);
 				}
-				item.get("TriggerOffsetMean");
-				item.get("GainMean");
 				item = stream.read();
 			}
 			log.info("Read all the required keys");
