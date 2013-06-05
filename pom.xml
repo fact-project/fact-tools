@@ -11,7 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>0.9.10-SNAPSHOT</streams.version>
+		<streams.version>0.9.10</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>true</skipTests>
 	</properties>

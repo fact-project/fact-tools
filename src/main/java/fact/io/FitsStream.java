@@ -244,7 +244,13 @@ public class FitsStream extends AbstractStream {
 				break;
 			}
 
-			read = in.read(data, pos, 2880);
+			int cur = 0;
+			while (cur < 2880) {
+				int br = in.read(data, pos + cur, 2880 - cur);
+				cur += br;
+			}
+
+			read += cur;
 		}
 
 		byte[] header = new byte[pos];
