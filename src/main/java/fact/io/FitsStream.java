@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class FitsStream extends AbstractStream {
 	final static int lineLength = 80;
 
 	int roi = 300;
+	int numberOfPixel = 1440;
 	private DataInputStream dataStream;
 	private int[] lengthArray;
 	private String[] nameArray;
@@ -43,7 +45,6 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public void init() throws Exception {
-
 		dataStream = new DataInputStream(new BufferedInputStream(
 				getInputStream()));
 
@@ -108,7 +109,7 @@ public class FitsStream extends AbstractStream {
 					String numberString = value.replaceAll("\\D+", "").trim();
 					numberOfElements = Integer.parseInt(numberString);
 				} catch (NumberFormatException e) {
-					log.error("Couldnt parse the number of TFROM elements numbers in the header. Assuming a value of 1");
+					log.info("Couldnt parse the number of TFORM elements in the header. Assuming a value of 1.");
 					numberOfElements = 1;
 				}
 
@@ -121,17 +122,22 @@ public class FitsStream extends AbstractStream {
 			if (key.startsWith("TTYPE")) {
 				int index = Integer.parseInt(key.replaceAll("\\D+", "").trim());
 				nameArray[index - 1] = val.replaceAll("'", "").trim();
-				log.info("field[{}] = {}", index - 1, nameArray[index - 1]);
+				log.debug("field[{}] = {}", index - 1, nameArray[index - 1]);
 			}
 
 			if ("NROI".equals(key)) {
 				roi = Integer.parseInt(val.trim());
-				log.info("roi is: {}", roi);
+				log.debug("roi is: {}", roi);
+			}
+
+			if ("NPIX".equals(key)) {
+				numberOfPixel = Integer.parseInt(val.trim());
+				log.debug("numberOfPixel is: {}", numberOfPixel);
 			}
 
 			if ("NAXIS1".equals(key)) {
 				eventBytes = Integer.parseInt(val.trim());
-				log.info("event bytes: {}", eventBytes);
+				log.debug("event bytes: {}", eventBytes);
 			}
 		}
 	}
@@ -164,9 +170,18 @@ public class FitsStream extends AbstractStream {
 				}
 
 				if (typeArray[n].equals("E")) {
-					log.info("Reading field '{}'", nameArray[n]);
+					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
-					if (numberOfElements > 1) {
+					if (numberOfElements > 128) {
+						// save all the floats into a float buffer. to save n
+						// floats we need 4*n bytes
+						byte[] el = new byte[4 * numberOfElements];
+						dataStream.read(el);
+						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
+						float[] ar = new float[numberOfElements];
+						sBuf.get(ar);
+						item.put(nameArray[n], ar);
+					} else if (numberOfElements > 1) {
 						float[] el = new float[numberOfElements];
 						for (int i = 0; i < numberOfElements; i++) {
 							el[i] = dataStream.readFloat();
@@ -227,20 +242,20 @@ public class FitsStream extends AbstractStream {
 		}
 
 		item.put("@source", url.getProtocol() + ":" + url.getPath());
-
+		item.put("numberOfPixel", numberOfPixel);
 		return item;
 	}
 
 	public FitsHeader readHeader(DataInputStream in) throws IOException {
-
 		byte[] data = new byte[16 * 2880];
 		int pos = 0;
 		int read = in.read(data, pos, 2880);
+		// try to find the END keyword. It can be followed by a comment ie. a /.
 		while (read > 0) {
 			pos += read;
-
-			if ((new String(data, "US-ASCII")).trim().endsWith("END")) {
-				log.info("Found end-of-header! Header length is {}", pos);
+			String str = (new String(data, "US-ASCII")).trim();
+			if (str.endsWith("END")) {
+				log.debug("Found end-of-header! Header length is {}", pos);
 				break;
 			}
 

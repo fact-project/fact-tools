@@ -31,7 +31,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 				//if were looking at a badPixel
 				if(EventUtils.arrayContains(badChIds, pix)){
 					int[] currentNeighbors = FactEvent.PIXEL_MAPPING.getNeighborsFromChid(pix);
-					
+//					log.debug("interpolating pix number: " + pix);
 					//iterate over all slices
 					for (int slice = 0; slice < roi; slice++) {
 						int pos = pix * roi + slice;
@@ -56,28 +56,26 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 					}
 				}
 			}
+			return nData;
 		}
-		else //overwrite
-		{
-			for (int pix: badChIds) {
-				int[] currentNeighbors = FactEvent.PIXEL_MAPPING.getNeighborsFromChid(pix);
-				
-				//iterate over all slices
-				for (int slice = 0; slice < roi; slice++) {
-					int pos = pix * roi + slice;
-					//temp save the current value
-					float avg = 0.0f; 
-					int numNeighbours = 0;
-					for(int nPix: currentNeighbors){
-						//if neighbour exists
-						if (nPix != -1 && !EventUtils.arrayContains(badChIds,  nPix) ){
-							avg += series[nPix*roi + slice];
-							numNeighbours++;
-						}
+		for (int pix: badChIds) {
+			int[] currentNeighbors = FactEvent.PIXEL_MAPPING.getNeighborsFromChid(pix);
+			
+			//iterate over all slices
+			for (int slice = 0; slice < roi; slice++) {
+				int pos = pix * roi + slice;
+				//temp save the current value
+				float avg = 0.0f; 
+				int numNeighbours = 0;
+				for(int nPix: currentNeighbors){
+					//if neighbour exists
+					if (nPix != -1 && !EventUtils.arrayContains(badChIds,  nPix) ){
+						avg += series[nPix*roi + slice];
+						numNeighbours++;
 					}
-					//set value of current slice to average of surrounding pixels
-					series[pos] = avg/(float)numNeighbours;
 				}
+				//set value of current slice to average of surrounding pixels
+				series[pos] = avg/(float)numNeighbours;
 			}
 		}
 		return series;
@@ -92,7 +90,6 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 	}
 	@Parameter(required = true, description = "A List of ChIds for Pixels that are considered defect", defaultValue="The softIds Taken from https://www.fact-project.org/logbook/misc.php?page=known_problems")
 	public void setBadChidIds(String[] badChIdStrings) {
-		System.out.println(badChIdStrings);
 		try{
 			int i=0;
 			for(String n : badChIdStrings ){

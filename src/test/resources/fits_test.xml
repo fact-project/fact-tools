@@ -1,9 +1,0 @@
-<container>
-
-<property name="path " value="sample.fits.gz" />
-	<stream id="fact" class="fact.io.FitsStream" 
- 		    url="file:${path}/${data2012}"  />
-		    
-		<process input="fact">
-		</process>
-</container>

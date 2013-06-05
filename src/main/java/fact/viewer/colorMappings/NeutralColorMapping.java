@@ -17,16 +17,15 @@ public class NeutralColorMapping
 	implements ColorMapping 
 {
 	static Logger log = LoggerFactory.getLogger( NeutralColorMapping.class );
-	Double neutralValue = 0.0d;
+	float neutralValue = 0.0f;
 	Color maxColor = Color.yellow;
 	Color minColor = Color.blue;
 	Color neutralColor = Color.black;
 	private	float[] neutralHsbVals = new float[3];
 	private float[] maxHsbVals = new float[3];
 	private float[] minHsbVals = new float[3];
-	public float minValue,maxValue;
-	public float getMinValue() {	return minValue;	}
-	public float getMaxValue() {	return maxValue;	}
+	
+	float minValue, maxValue;
 
 
 	public NeutralColorMapping(){
@@ -40,23 +39,23 @@ public class NeutralColorMapping
 	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Double)
 	 */
 	@Override
-	public Color map(Double v) {
-		if(v.equals(Double.NaN)){
-			v = neutralValue;
+	public Color map(float v, float minValue, float maxValue) {
+		Float value = new Float(v);
+		if(value.equals(Double.NaN)){
+			value = neutralValue;
 		}
-		Double value = v;
 
 		//log.info( "Scaling {} with {}", v, scale );
 		if (v >= neutralValue){
 			//map to positive color
-			value = Math.abs( v/(maxValue-neutralValue) );
+			value = (float) Math.abs( v/(maxValue-neutralValue) );
 			float hue = (float) (neutralHsbVals[0] + (maxHsbVals[0] - neutralHsbVals[0])*value);
 			float sat = (float) (neutralHsbVals[1] + (maxHsbVals[1] - neutralHsbVals[1])*value);
 			float bri = (float) (neutralHsbVals[2] + (maxHsbVals[2] - neutralHsbVals[2])*value);
 			return Color.getHSBColor(hue, sat, bri);
 		} else {
 			//map to negative color
-			value = Math.abs( v/(neutralValue-minValue) );
+			value = (float) Math.abs( v/(neutralValue-minValue) );
 			float hue = (float) (neutralHsbVals[0] + (minHsbVals[0] - neutralHsbVals[0])*value);
 			float sat = (float) (neutralHsbVals[1] + (minHsbVals[1] - neutralHsbVals[1])*value);
 			float bri = (float) (neutralHsbVals[2] + (minHsbVals[2] - neutralHsbVals[2])*value);
@@ -64,24 +63,25 @@ public class NeutralColorMapping
 		}
 
 	}
+//	
+//
+//	@Override
+//	public Color map(float value) {
+//		if(this.maxValue !=  0.0){
+//			map(value, minValue, maxValue);
+//		} else {
+//			map(value,0.0f, 600.0f);
+//		}
+//		return null;
+//	}
+//
+//
+//	public float getMinValue() {
+//		return minValue;
+//	}
+//	public float getMaxValue() {
+//		return maxValue;
+//	}
 
-	
-	public void setMinMax( Double min, Double max ){
-		this.minValue = min.floatValue() ; 
-		this.maxValue = max.floatValue() ;
-	}
-	
-	
-	public void setMinMax( Float min, Float max ){
-		setMinMax( min.doubleValue(), max.doubleValue() );
-	}
-	
-	
-	/**
-	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Float)
-	 */
-	@Override
-	public Color map(Float f) {
-		return map( f.doubleValue() );
-	}
+
 }

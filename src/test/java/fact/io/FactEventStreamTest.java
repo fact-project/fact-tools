@@ -35,9 +35,9 @@ public class FactEventStreamTest {
 	public void setup() throws Exception {
 		typeCheck.addType("EventNum", new Integer(1));
 		typeCheck.addType("TriggerNum", new Integer(1));
-		typeCheck.addType("TriggerType", new Integer(4));
+		typeCheck.addType("TriggerType", new Short((short) 4));
 		typeCheck.addType("NumBoards", new Integer(40));
-		typeCheck.addType("Errors", new byte[40]);
+		typeCheck.addType("Errors", new byte[4]);
 
 		events.clear();
 
@@ -67,7 +67,7 @@ public class FactEventStreamTest {
 	@Test
 	public void testRead() throws Exception {
 
-		SourceURL url = new SourceURL("classpath:/20111126_042.fits.part.gz");
+		SourceURL url = new SourceURL("classpath:/sample.fits.gz");
 		log.info("Reading FITS events from {}", url);
 		FitsStream fits = new FitsStream(url);
 
@@ -104,48 +104,4 @@ public class FactEventStreamTest {
 		}
 		return item;
 	}
-
-	private boolean keysAreEqual(Data item1, Data item2) {
-
-		if (item1.keySet().size() != item2.keySet().size()) {
-			log.error("Number of keys differ!");
-			return false;
-		}
-
-		for (String key : item1.keySet()) {
-			if (!item2.containsKey(key)) {
-				log.error("Key '{}' is present in item1 but not in item2!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	//
-	// @Test
-	// public void testSpeed() {
-	//
-	// try {
-	//
-	// URL url = FactEventStreamTest.class
-	// .getResource("/fits-table-reader.xml");
-	//
-	// Long limit = 10L;
-	// System.setProperty("limit", limit.toString());
-	//
-	// ProcessContainer container = new ProcessContainer(url);
-	// Long time = container.run();
-	// log.info("Container ran for {} ms.", time);
-	//
-	// Double seconds = time.doubleValue() / 1000.0d;
-	//
-	// log.info("Event rate: {} events/second", limit.doubleValue()
-	// / seconds);
-	//
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// fail("Not yet implemented");
-	// }
-	// }
 }

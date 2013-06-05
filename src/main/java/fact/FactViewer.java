@@ -308,7 +308,7 @@ public class FactViewer extends JFrame {
 				null, null));
 		camMap.setBackground(Color.BLACK);
 		mapPanel.add(camMap, BorderLayout.CENTER);
-		scale = new ScalePanel(camMap.getColorMapping());
+		scale = new ScalePanel(camMap.getColorMapping(), -10, 700);
 		scale.setBackground(camMap.getBackground());
 		mapPanel.add(scale, BorderLayout.EAST);
 		getContentPane().add(mapPanel, "1, 2, default, top");
@@ -428,7 +428,7 @@ public class FactViewer extends JFrame {
 			} catch (Exception e) {
 				log.error("Error: {}", e.getMessage());
 			}
-			log.info("Pre-selected source: {}", this.source);
+			log.debug("Pre-selected source: {}", this.source);
 
 			// clear the chartpanel
 			chartPanel.clearSeries();
@@ -471,7 +471,9 @@ public class FactViewer extends JFrame {
 			over.set(event);
 			over.revalidate();
 			camMap.setEvent(event);
-			scale.repaint();
+			
+			
+
 			for (CamWindow c : camWindowList) {
 				c.setEvent(event);
 			}
@@ -481,6 +483,10 @@ public class FactViewer extends JFrame {
 			for (EventInfoWindow evW : evWList) {
 				evW.setEvent(event);
 			}
+			
+			scale.setMax(camMap.getMaxValue());
+			scale.setMin(camMap.getMinValue());
+			scale.repaint();
 			// sourceSelection.setEvent(event); //sourcelist
 			// overlays.set(event); //overlays
 			// eventInfo.setEvent(event); //eventinfo window

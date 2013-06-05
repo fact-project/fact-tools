@@ -21,10 +21,6 @@ import fact.FactViewer;
 import fact.data.EventUtils;
 import fact.viewer.actions.ChangeColorMap;
 
-/**
- * 
- * 
- */
 public class MapView extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -76,7 +72,7 @@ public class MapView extends JPanel {
 		cameraMap.setSelectable(false);
 		cameraMap.setBackground(Color.BLACK);
 		this.add(cameraMap, BorderLayout.CENTER);
-		scale = new ScalePanel(cameraMap.getColorMapping());
+		scale = new ScalePanel(cameraMap.getColorMapping(), cameraMap.getMinValue(), cameraMap.getMaxValue());
 		scale.setBackground(cameraMap.getBackground());
 		this.add(scale, BorderLayout.EAST);
 		if(sourceSelection){
@@ -163,9 +159,7 @@ public class MapView extends JPanel {
 			if(currentSelection != null){
 				comboBox.setSelectedItem(currentSelection);
 			}
-			scale.repaint();
 		}
-		
 		if(live){
 			if (event != null) {
 				int length = 0;
@@ -178,11 +172,8 @@ public class MapView extends JPanel {
 						} else {
 							cameraMap.setData((float[]) (event.get(key)));
 						}
-					} else if (val.getClass().getComponentType() == double.class) {
-						cameraMap.setData((double[]) (event.get(key)));
 					} 
 				}
-				scale.repaint();
 				for (int i = 0; i < length/Constants.NUMBEROFPIXEL; i++ ){
 					try {
 						Thread.sleep(5);
@@ -194,6 +185,9 @@ public class MapView extends JPanel {
 				}
 			}
 		}
+		scale.setMax(cameraMap.getMaxValue());
+		scale.setMin(cameraMap.getMinValue());
+		scale.repaint();
 	}
 	public float[] setIds(int[] chids, float[] values){
 		int roi = values.length/Constants.NUMBEROFPIXEL;
@@ -209,8 +203,10 @@ public class MapView extends JPanel {
 	}
 
 
-	public void setData(double[] valArray){
+	public void setData(float[] valArray){
 		cameraMap.setData(valArray);
+		scale.setMax(cameraMap.getMaxValue());
+		scale.setMin(cameraMap.getMinValue());
 		scale.repaint();
 	}
 	public void setSlice(int i) {

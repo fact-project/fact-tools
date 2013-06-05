@@ -36,10 +36,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
-import fact.Constants;
 import fact.FactViewer;
-import fact.data.EventUtils;
-import fact.image.Transformation;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
 import fact.viewer.colorMappings.ColorMapping;
@@ -65,11 +62,9 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	float colorOffset = 2049.0f;
 	float colorScaler = 4096.0f;
 
-	public float[][] vals = new float[1440][300];
-	float[][] transformed = new float[1440][1];
-	double[] average = new double[300];
 
-	DefaultPixelMapping defaultPixelMapping = new DefaultPixelMapping();
+
+//	DefaultPixelMapping defaultPixelMapping = new DefaultPixelMapping();
 	
 	//WTF is that supposed to be ?
 //	PixelMapping[] pixelMappings = new PixelMapping[] { defaultPixelMapping };
@@ -78,6 +73,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	int selectedCell = -1;
 
 	Date date = new Date();
+	
 	Integer run = -1;
 	String eventNum = "?";
 	ColorMapping colorMap = new NeutralColorMapping();
@@ -90,31 +86,12 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	Data event;
 
 	private CellHighlighter cellHighlighter;
-
 	private HexTile nCell;
-
 	private HexTile oldCell;
 
-	
-	public float minValue;
-	public float maxValue;
-
-	private int roi;
-
-	
-	
 	public CameraPixelMap(Double radius) {
 		super(45, 41, radius);
 		this.setBorderColor(Color.BLACK);
-
-		for (int i = 0; i < vals.length; i++) {
-			for (int j = 0; j < vals[i].length; j++) {
-				vals[i][j] = 0.0f;
-			}
-		}
-
-		for (int i = 0; i < vals[0].length; i++)
-			average[i] = 0.0d;
 
 		try {
 			loadCells("fact-map.txt");
@@ -133,19 +110,19 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		selectionListener.add(l);
 	}
 
-	public void selectOriginal() {
-		for (int i = 0; i < vals.length; i++) {
-			getCell(i).setColor(colorMap.map(vals[i][currentSlice]));
-		}
-		repaint();
-	}
-
-	public void transform(Transformation tfn) {
-		for (int i = 0; i < vals.length; i++) {
-			getCell(i).setColor(colorMap.map(tfn.transform(vals[i])));
-		}
-		repaint();
-	}
+//	public void selectOriginal() {
+//		for (int i = 0; i < vals.length; i++) {
+//			getCell(i).setColor(colorMap.map(vals[i][currentSlice], minValue, maxValue));
+//		}
+//		repaint();
+//	}
+//
+//	public void transform(Transformation tfn) {
+//		for (int i = 0; i < vals.length; i++) {
+//			getCell(i).setColor(colorMap.map(tfn.transform(vals[i]), minValue, maxValue));
+//		}
+//		repaint();
+//	}
 
 	public void loadCells(String map) throws Exception {
 
@@ -203,26 +180,6 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		return cell;
 	}
 
-	public void selectSlice(int i) {
-		log.debug("Selecting slice: {}", i);
-
-		if (i >= 0 && i < vals[0].length) {
-			currentSlice = i;
-			for (int p = 0; p < vals.length; p++) {
-				if (cellBySoftId[p] != null)
-					cellBySoftId[p].setColor(colorMap.map(vals[p][i]));
-
-				if (p == selectedCell && log.isDebugEnabled()) {
-					log.debug("Value of cell {} is: {}", p, vals[p][i]);
-					log.debug("   current offset is: {}", colorOffset);
-					log.debug("   current scaler is: {}", colorScaler);
-				}
-			}
-			this.repaint();
-		}
-	}
-
-
 	/**
 	 * This simply renews the list of overlays that can be drawn in the current
 	 * event
@@ -240,11 +197,11 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		}
 	}
 
-	public int getNumberOfSlices() {
-		if (vals != null && vals.length > 0)
-			return vals[0].length;
-		return 0;
-	}
+//	public int getNumberOfSlices() {
+//		if (vals != null && vals.length > 0)
+//			return vals[0].length;
+//		return 0;
+//	}
 
 	public double[] getSliceAverages() {
 		return average;
@@ -381,7 +338,23 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			}
 		}
 	}
+	
+	public void selectSlice(int i) {
+		log.debug("Selecting slice: {}", i);
+		if (i >= 0 && i < sliceValues[0].length) {
+			currentSlice = i;
+			for (int p = 0; p < sliceValues.length; p++) {
+				if (cellBySoftId[p] != null)
+					cellBySoftId[p].setColor(colorMap.map(sliceValues[p][i], this.getMinValue(), this.getMaxValue()));
 
+				if (p == selectedCell && log.isDebugEnabled()) {
+					log.debug("Value of cell {} is: {}", p, sliceValues[p][i]);
+				}
+			}
+			this.repaint();
+		}
+	}
+	
 	public void drawImage(Graphics g, int width, int height, int slice) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
@@ -483,30 +456,6 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			}
 		}
 
-//		if (arg0.getButton() == MouseEvent.BUTTON3) {
-//
-//			JPopupMenu popup = new JPopupMenu();
-//
-//			Map<String, JPopupMenu> groups = new LinkedHashMap<String, JPopupMenu>();
-//
-//			for (Action action : mapActions) {
-//
-//				if (action instanceof SelectAction) {
-//					SelectAction sa = (SelectAction) action;
-//					JPopupMenu menu = groups.get(sa.getGroup());
-//					if (menu == null) {
-//						menu = new JPopupMenu(sa.getGroup());
-//						groups.put(sa.getGroup(), menu);
-//						popup.add(menu);
-//						menu.add(sa);
-//					}
-//				} else {
-//					popup.add(new JMenuItem(action));
-//				}
-//			}
-//
-//			popup.show(this, arg0.getX(), arg0.getY());
-//		}
 	}
 
 	@Override
@@ -589,29 +538,36 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		this.isSelectable = isSelectable;
 	}
 	
-	public int getRoi() {
-		return roi;
-	}
-	public void setRoi(int roi) {
-		this.roi = roi;
-	}
 	
 	
 	
-	/**
-	 * @return the date
-	 */
-	public Date getDate() {
-		return date;
+	public HexTile getCell(Point p) {
+		for (HexTile cell : cellBySoftId) {
+			if (cell.polygon.contains(p)) {
+				return cell;
+			}
+		}
+		return null;
 	}
-	/**
-	 * @param date
-	 *            the date to set
-	 */
-	public void setDate(Date date) {
-		this.date = date;
-	}
+//	public HexTile[] getCells() {
+//		return cellBySoftId;
+//	}
+//	public HexTile getCell(int softId) {
+//		return cellBySoftId[softId];
+//	}
+//
+//	public int getMaxCellId() {
+//		return maxCellId;
+//	}
 
+	/**
+	 * @see fact.viewer.ui.HexMap#setCell(int, int, fact.viewer.ui.HexTile)
+	 */
+	@Override
+	public void setCell(int i, int j, HexTile cell) {
+		super.setCell(i, j, cell);
+		cell.setBorderColor(Color.white);
+	}
 	
 	
 	/**
@@ -628,101 +584,11 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		this.run = run;
 	}
 	
+//	public void setData(double[] ds) {
+//		setData(EventUtils.doubleToFloatArray(ds));
+//	}
+
 	
-	
-	public HexTile getCell(Point p) {
-		for (HexTile cell : cellBySoftId) {
-			if (cell.polygon.contains(p)) {
-				return cell;
-			}
-		}
-		return null;
-	}
-	public HexTile[] getCells() {
-		return cellBySoftId;
-	}
-	
-	
-	
-	public HexTile getCell(int softId) {
-		return cellBySoftId[softId];
-	}
-
-	public int getMaxCellId() {
-		return maxCellId;
-	}
-
-	/**
-	 * @see fact.viewer.ui.HexMap#setCell(int, int, fact.viewer.ui.HexTile)
-	 */
-	@Override
-	public void setCell(int i, int j, HexTile cell) {
-		super.setCell(i, j, cell);
-		cell.setBorderColor(Color.white);
-	}
-	
-	
-	
-	
-	public void setData(double[] ds) {
-		setData(EventUtils.doubleToFloatArray(ds));
-	}
-
-	public void setData(float[] slices) {
-		if (slices == null) {
-			log.error("No data found in event!");
-			return;
-		}
-
-		// i want to keep pixels selected
-		// clearSelection();
-
-		minValue = Float.MAX_VALUE;
-		maxValue = Float.MIN_VALUE;
-
-		roi = slices.length / Constants.NUMBEROFPIXEL;
-		average = new double[roi];
-		vals = new float[Constants.NUMBEROFPIXEL][roi];
-		// float[] calibrated = (float[]) event.get( "DataCalibrated" );
-		// if( calibrated != null )
-		// slices = calibrated;
-		float[][] values = defaultPixelMapping.sortPixels(slices);
-
-		// if( calibrated != null ){
-		// vals = defaultPixelMapping.sortPixels( calibrated, offsets );
-		// }
-
-		for (int row = 0; row < vals.length && row < values.length; row++) {
-			for (int s = 0; s < vals[row].length && s < values[row].length; s++) {
-				vals[row][s] = values[row][s];
-				if (!Float.isNaN(vals[row][s])) {
-					minValue = Math.min(minValue, vals[row][s]);
-					maxValue = Math.max(maxValue, vals[row][s]);
-				}
-				
-				//this is somewhat weird. average in the first slice will be the value of the first slice in the last row.
-//				if (s == 0) {
-//					average[s] = vals[row][s];
-//				} else {
-//					average[s] += vals[row][s];
-//				}
-				
-				//this looks better
-				average[s] += vals[row][s];
-			}
-		}
-
-		log.debug("minimum is: {}, maximum is: {}", minValue, maxValue);
-		(colorMap).setMinMax(minValue, maxValue);
-		for (int i = 0; i < average.length; i++) {
-			average[i] = average[i] / vals.length;
-		}
-
-		log.debug("Slices loaded.");
-		selectSlice(currentSlice);
-		repaint();
-	}
-
 	public void setEvent(Data item) {
 		if (item != null) {
 			event = item;
@@ -735,6 +601,14 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			}
 			this.repaint();
 		}
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 	
 }

@@ -125,7 +125,7 @@ public class StatusWindow extends DataVisualizer {
 
 	@Override
 	public void finish() throws Exception {
-		if (!keepOpen) {
+		if (!keepOpen && frame != null) {
 			log.debug("Closing plot frame");
 			frame.setVisible(false);
 			frame.dispose();

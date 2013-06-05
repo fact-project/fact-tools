@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.Constants;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
 import fact.viewer.colorMappings.ColorMapping;
@@ -71,6 +72,15 @@ public class HexMap extends JPanel {
 	List<Action> mapActions = new ArrayList<Action>();
 
 	List<Overlay> overlays = new ArrayList<Overlay>();
+	
+	private float minValue, maxValue;
+	private int roi;
+	public float[][] sliceValues = new float[1440][300];
+//	float[][] transformed = new float[1440][1];
+	double[] average = new double[300];
+	int currentSlice;
+	
+	DefaultPixelMapping defaultPixelMapping = new DefaultPixelMapping();
 
 	// protected final List<Overlay> eventOverlays = new ArrayList<Overlay>();
 
@@ -256,13 +266,59 @@ public class HexMap extends JPanel {
 					// tiles[i][j].setBorderColor( Color.BLACK );
 					Integer id = tiles[i][j].getId();
 					if (id != null && i >= 0 && i < values.length) {
-						tiles[i][j].paintBackground(g, cm.map(values[id]));
+						tiles[i][j].paintBackground(g,  cm.map( (float) values[id], getMinValue(), getMaxValue() )  );
 					} else
 						tiles[i][j].paint(g);
 				}
 			}
 		}
 	}
+	
+	
+	
+	public void setData(float[] slices) {
+		
+		if (slices == null) {
+			log.error("No data found in event!");
+			return;
+		}
+		minValue = Float.MAX_VALUE;
+		maxValue = Float.MIN_VALUE;
+
+		roi = slices.length / Constants.NUMBEROFPIXEL;
+		average = new double[roi];
+		sliceValues = new float[Constants.NUMBEROFPIXEL][roi];
+		float[][] values = defaultPixelMapping.sortPixels(slices);
+
+
+		for (int row = 0; row < sliceValues.length && row < values.length; row++) {
+			for (int s = 0; s < sliceValues[row].length && s < values[row].length; s++) {
+				sliceValues[row][s] = values[row][s];
+				if (!Float.isNaN(sliceValues[row][s])) {
+					minValue = Math.min(minValue, sliceValues[row][s]);
+					maxValue = Math.max(maxValue, sliceValues[row][s]);
+				}
+				average[s] += sliceValues[row][s];
+			}
+		}
+
+		log.debug("minimum is: {}, maximum is: {}", minValue, maxValue);
+//		(colorMap).setMinMax(minValue, maxValue);
+		
+		for (int i = 0; i < average.length; i++) {
+			average[i] = average[i] / sliceValues.length;
+		}
+
+		log.debug("Slices loaded.");
+		selectSlice(currentSlice);
+		repaint();
+	}
+	
+	public void selectSlice(int slice){
+		
+	}
+
+	
 
 	public void paintSelected(Graphics g) {
 		for (HexTile tile : selectedTiles) {
@@ -366,22 +422,6 @@ public class HexMap extends JPanel {
 	public void update(Graphics g) {
 		super.paint(g);
 		this.paint(g);
-	}
-
-	public int getNumberOfRows() {
-		return rows;
-	}
-
-	public int getNumberOfColums(int row) {
-		return cols;
-	}
-
-	public void setCell(int i, int j, HexTile cell) {
-		this.tiles[i][j] = cell;
-	}
-
-	public HexTile getCell(int i, int j) {
-		return tiles[i][j];
 	}
 
 	public void addAction(Action action) {
@@ -542,6 +582,40 @@ public class HexMap extends JPanel {
 		if (o instanceof MouseMotionListener) {
 			this.addMouseMotionListener((MouseMotionListener) o);
 		}
+	}
+	
+	
+	//------Getter and Setter----------------
+	public int getNumberOfRows() {
+		return rows;
+	}
+
+	public int getNumberOfColums(int row) {
+		return cols;
+	}
+
+	public void setCell(int i, int j, HexTile cell) {
+		this.tiles[i][j] = cell;
+	}
+
+	public HexTile getCell(int i, int j) {
+		return tiles[i][j];
+	}
+
+	public float getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(float minValue) {
+		this.minValue = minValue;
+	}
+
+	public float getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(float maxValue) {
+		this.maxValue = maxValue;
 	}
 
 }
