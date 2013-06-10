@@ -3,7 +3,6 @@ package fact.io;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -177,7 +176,7 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], dataStream.readInt());
 					}
 				}
-
+				//read float
 				if (typeArray[n].equals("E")) {
 					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
@@ -199,6 +198,21 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], el);
 					} else {
 						item.put(nameArray[n], dataStream.readFloat());
+					}
+				}
+				
+				// read double
+				if (typeArray[n].equals("D")) {
+					int numberOfelements = lengthArray[n];
+
+					if (numberOfelements > 1) {
+						double[] el = new double[numberOfelements];
+						for (int i = 0; i < numberOfelements; i++) {
+							el[i] = dataStream.readDouble();
+						}
+						item.put(nameArray[n], el);
+					} else if (numberOfelements == 1) {
+						item.put(nameArray[n], dataStream.readDouble());
 					}
 				}
 
