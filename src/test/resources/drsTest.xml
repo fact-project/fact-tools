@@ -1,0 +1,10 @@
+<container>
+
+<property name="path " value="sample.fits.gz" />
+	<stream id="fact" class="fact.io.FitsStream" 
+ 		    url="${input}"  />
+		<process input="fact">
+			<fact.processors.DrsCalibration url="${drsInput}" outputKey="DataCalibrated"/>
+		</process>
+</container>
+
