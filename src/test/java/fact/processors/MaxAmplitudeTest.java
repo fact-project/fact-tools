@@ -10,37 +10,35 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.Constants;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 
 
-public class DrsCalibrationTest {
+public class MaxAmplitudeTest {
 
-	static Logger log = LoggerFactory.getLogger(DrsCalibrationTest.class);
+	static Logger log = LoggerFactory.getLogger(MaxAmplitudeTest.class);
 
 
-	@Test
-	public void drsCalibXML() {
-
-		try {
-			URL url = DrsCalibrationTest.class.getResource("/drsTest.xml");
-			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
-			String[] args = {url.toString(), "-Dinput="+dataUrl.toString(), "-DdrsInput="+drsUrl.toString()};
-			stream.run.main(args);
-		} catch (Exception e) {
-			fail("Could not run the ./drsTest.xml");
-			e.printStackTrace();
-		}
-	}
 	@Test
 	public void drsCalibProcessor() {
 
 		try {
+			
 			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
 			DrsCalibration pr = new DrsCalibration();
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test");
+			
+			MaxAmplitude maxAmp = new MaxAmplitude();
+			maxAmp.setKey("test");
+			maxAmp.setOutputKey("amps");
+			
+
+			MaxAmplitudePosition maxAmpPos = new MaxAmplitudePosition();
+			maxAmpPos.setKey("test");
+			maxAmpPos.setOutputKey("ampPos");
+			
 			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			
@@ -49,14 +47,20 @@ public class DrsCalibrationTest {
 			Data item = stream.read();
 			while (item != null) {
 				pr.process(item);
+				maxAmp.process(item);
+				maxAmpPos.process(item);
 				if (!item.containsKey("test"))
 					fail("Item does not contain the right key after drs calibration");
 				try{
-					float[] result = (float[]) item.get("test");
-					float[] ar = (float[]) item.get("Data");
-					if(ar.length != result.length){
-						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
+					int[] pos = (int[]) item.get("ampPos");
+					if(pos.length != Constants.NUMBEROFPIXEL){
+						fail("MaxAmplitudePosition does not produce the right output");
 					}
+					float[] amps = (float[]) item.get("amps");
+					if(amps.length != Constants.NUMBEROFPIXEL){
+						fail("MaxAmplitude does not produce the right output");
+					}
+					
 				} catch(ClassCastException e){
 					fail("Failed to cast items to float[]");
 				}

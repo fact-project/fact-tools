@@ -3,6 +3,7 @@ package fact.processors;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,33 +15,35 @@ import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 
 
-public class DrsCalibrationTest {
+public class FilterTests {
 
-	static Logger log = LoggerFactory.getLogger(DrsCalibrationTest.class);
+	static Logger log = LoggerFactory.getLogger(FilterTests.class);
 
 
-	@Test
-	public void drsCalibXML() {
-
-		try {
-			URL url = DrsCalibrationTest.class.getResource("/drsTest.xml");
-			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
-			String[] args = {url.toString(), "-Dinput="+dataUrl.toString(), "-DdrsInput="+drsUrl.toString()};
-			stream.run.main(args);
-		} catch (Exception e) {
-			fail("Could not run the ./drsTest.xml");
-			e.printStackTrace();
-		}
-	}
 	@Test
 	public void drsCalibProcessor() {
 
 		try {
+			
 			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
 			DrsCalibration pr = new DrsCalibration();
 			pr.setUrl(drsUrl.toString());
-			pr.setOutputKey("test");
+			pr.setOutputKey("test0");
+			
+			ArrayList<SimpleFactEventProcessor<float[], float[]>> pList = new ArrayList<>();
+			pList.add(new FirFilter());
+			pList.add(new MovingAverage());
+			pList.add(new ExponentialSmoothing());
+			pList.add(new InterpolateBadPixel());
+			pList.add(new MultiplyValues());
+			pList.add(new ExFit());
+			
+			int i = 0;
+			for(SimpleFactEventProcessor<float[], float[]> filter : pList){
+				filter.setKey("test" + i);
+				filter.setOutputKey("test"+(i+1));
+			}
+			
 			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			
@@ -49,14 +52,18 @@ public class DrsCalibrationTest {
 			Data item = stream.read();
 			while (item != null) {
 				pr.process(item);
-				if (!item.containsKey("test"))
+				if (!item.containsKey("test0"))
 					fail("Item does not contain the right key after drs calibration");
 				try{
-					float[] result = (float[]) item.get("test");
-					float[] ar = (float[]) item.get("Data");
-					if(ar.length != result.length){
-						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
+					
+					for(SimpleFactEventProcessor<float[], float[]> filter : pList){
+						filter.process(item);
+						if(!item.containsKey(filter.outputKey)){
+							fail("item does not conatin the right outputkey after applying " + filter.getClass().getSimpleName());
+						}
+						float[] result = (float[]) item.get(filter.outputKey);
 					}
+					
 				} catch(ClassCastException e){
 					fail("Failed to cast items to float[]");
 				}
