@@ -45,7 +45,6 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public void init() throws Exception {
-
 		dataStream = new DataInputStream(new BufferedInputStream(
 				getInputStream()));
 
@@ -130,7 +129,7 @@ public class FitsStream extends AbstractStream {
 				roi = Integer.parseInt(val.trim());
 				log.debug("roi is: {}", roi);
 			}
-			
+
 			if ("NPIX".equals(key)) {
 				numberOfPixel = Integer.parseInt(val.trim());
 				log.debug("numberOfPixel is: {}", numberOfPixel);
@@ -174,14 +173,15 @@ public class FitsStream extends AbstractStream {
 					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
 					if (numberOfElements > 128) {
-						//save all the floats into a float buffer. to save n floats we need 4*n bytes
+						// save all the floats into a float buffer. to save n
+						// floats we need 4*n bytes
 						byte[] el = new byte[4 * numberOfElements];
 						dataStream.read(el);
 						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
 						float[] ar = new float[numberOfElements];
 						sBuf.get(ar);
 						item.put(nameArray[n], ar);
-					}else if (numberOfElements > 1) {
+					} else if (numberOfElements > 1) {
 						float[] el = new float[numberOfElements];
 						for (int i = 0; i < numberOfElements; i++) {
 							el[i] = dataStream.readFloat();
@@ -247,19 +247,25 @@ public class FitsStream extends AbstractStream {
 	}
 
 	public FitsHeader readHeader(DataInputStream in) throws IOException {
-
 		byte[] data = new byte[16 * 2880];
 		int pos = 0;
 		int read = in.read(data, pos, 2880);
+		// try to find the END keyword. It can be followed by a comment ie. a /.
 		while (read > 0) {
 			pos += read;
-
-			if ((new String(data, "US-ASCII")).trim().endsWith("END")) {
+			String str = (new String(data, "US-ASCII")).trim();
+			if (str.endsWith("END")) {
 				log.debug("Found end-of-header! Header length is {}", pos);
 				break;
 			}
 
-			read = in.read(data, pos, 2880);
+			int cur = 0;
+			while (cur < 2880) {
+				int br = in.read(data, pos + cur, 2880 - cur);
+				cur += br;
+			}
+
+			read += cur;
 		}
 
 		byte[] header = new byte[pos];

@@ -1,12 +1,12 @@
 <container>
 
 
-<property name="data" value="20130104_095.fits.gz" />
-<property name="dataDRS" value="20130104_076.drs.fits" />
+<property name="data" value="cer1.fits.gz" />
+<property name="dataDRS" value="test.drs.fits.gz" />
 <property name="drive_file" value="drive_file.fits" />
 
-<!-- <property name="path " value="/home/bruegge/FactTest" /> -->
- 	<property name="path" value="/Users/kaibrugge/FactTest" />
+<property name="path " value="/home/bruegge/FactTest" />
+<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
  
 
 	<stream id="fact" class="fact.io.FitsStream" 
@@ -19,14 +19,15 @@
             <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
             <fact.processors.parfact.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" color="#080808"/>
+
 <!--             <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" /> -->
             
-            <fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
-            <fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/>
+<!--             <fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" /> -->
+<!--             <fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/> -->
             
             <fact.processors.parfact.CoreNeighborClean key="photonCharge" CorePixelThreshold="5.0" neighborPixelThreshold="2.0" outputKey="showerPixel" />
-            <fact.processors.parfact.CalcSourcePosition file="${path}/${drive_file}" outputKey="sourcePosition"/>
-            <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
+<!--             <fact.processors.parfact.CalcSourcePosition file="${path}/${drive_file}" outputKey="sourcePosition"/> -->
+<!--             <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
             
 <!--             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:./test.txt" /> -->
 			<fact.image.ShowImage/>
