@@ -13,12 +13,13 @@
  		    url="file:${path}/${data}"  />
 		    
 		<process input="fact">
+		<Skip condition="%{data.EventNum} &lt; 78" />
             <fact.processors.DrsCalibration file="${path}/${dataDRS}" key="data"  outputKey="DataCalibrated"/>  
             <fact.processors.CutSlices  start="22" end="220"/>
             <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-            <fact.processors.parfact.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
-            <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" />
+            <fact.processors.parfact.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" color="#080808"/>
+<!--             <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" /> -->
             
             <fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
             <fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/>
@@ -28,7 +29,7 @@
             <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
             
 <!--             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:./test.txt" /> -->
-<!-- 			<fact.image.ShowImage/> -->
-			<fact.image.monitors.StatusWindow every="40" />
+			<fact.image.ShowImage/>
+<!-- 			<fact.image.monitors.StatusWindow every="40" /> -->
 		</process>
 </container>
