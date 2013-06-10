@@ -5,6 +5,7 @@ package fact.processors;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.slf4j.Logger;
@@ -13,11 +14,9 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import uk.ac.starlink.util.DataSource;
-import uk.ac.starlink.util.FileDataSource;
-import uk.ac.starlink.util.URLDataSource;
+import stream.io.SourceURL;
 import fact.Constants;
-import fact.io.FitsDataStream;
+import fact.io.FitsStream;
 
 /**
  * <p>
@@ -37,7 +36,7 @@ public class DrsCalibration implements Processor {
 
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	String drsFile = null;
+//	String drsFile = null;
 	String fileName = "";
 	String filePath = "";
 	private String color;
@@ -76,10 +75,10 @@ public class DrsCalibration implements Processor {
 	 * 
 	 * @param in
 	 */
-	protected void loadDrsData(DataSource in) {
+	protected void loadDrsData(SourceURL  in) {
 		try {
 
-			FitsDataStream stream = new FitsDataStream(in);
+			FitsStream stream = new FitsStream(in);
 			stream.init();
 			drsData = stream.readNext();
 			log.debug("Read DRS data: {}", drsData);
@@ -302,59 +301,30 @@ public class DrsCalibration implements Processor {
 		this.outputKey = outputKey;
 	}
 	
-	/**
-	 * @return the drsFile
-	 */
-	public String getDrsFile() {
-		return drsFile;
-	}
 
-	/**
-	 * @param drsFile
-	 *            the drsFile to set
-	 */
-	@Parameter(description = "The path to the DRS file holding the calibration data (in FITS format).")
-	public void setDrsFile(String drsFile) {
-		File file = new File(drsFile);
-		if (!file.canRead()) {
-			throw new RuntimeException("Cannot open file " + drsFile
-					+ " for reading!");
-		}
 
+	@Parameter(description = "A URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
+	public void setUrl(URL url) {
 		try {
-			loadDrsData(new FileDataSource(file));
+			loadDrsData(new SourceURL(url));
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
-
-		this.drsFile = drsFile;
 	}
-
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
+	
+	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
 	public void setUrl(String urlString) {
 		try {
 			URL url = new URL(urlString);
-			loadDrsData(new URLDataSource(url));
+			loadDrsData(new SourceURL(url));
+		} catch (MalformedURLException e){
+			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
+			throw new RuntimeException("Cant open drsFile");
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 * 
-	 * @return
-	 */
-	public String getFile() {
-		return getDrsFile();
-	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 */
-	public void setFile(String file) {
-		this.setDrsFile(file);
-	}
 
 	private void setDrsFile(String directoryPath, int run) {
 		String drsDirectory = pathToAuxfiles+directoryPath;
@@ -370,7 +340,7 @@ public class DrsCalibration implements Processor {
 		}
 		
 		try {
-			loadDrsData(new FileDataSource(drsFile));
+			loadDrsData(new SourceURL(drsFile.getAbsolutePath()));
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}

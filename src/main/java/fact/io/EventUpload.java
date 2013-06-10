@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.io.SourceURL;
 import stream.util.MD5;
 import fact.data.EventKey;
 import fact.tools.FitsExplore;
@@ -35,7 +36,7 @@ public class EventUpload {
 
 
 
-		FitsDataStream stream = new FitsDataStream( file );
+		FitsStream stream = new FitsStream( new SourceURL(file.getAbsolutePath()) );
 		int id = 0;
 		int skip = 20;
 		int limit = 100;

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.io.SourceURL;
 
 /**
  * @author chris
@@ -58,7 +59,7 @@ public class FitsEventSplitter {
 		}
 		
 		
-		FitsDataStream stream = new FitsDataStream( file );
+		FitsStream stream = new FitsStream( new SourceURL(file.getAbsolutePath()) );
 		int id = 0;
 		Data event = stream.readNext();
 		while( event != null && id < limit ){

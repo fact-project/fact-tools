@@ -98,7 +98,7 @@ public class FitsStreamTest {
 			fail("Could not read FitsFile");
 		}
 	}
-	
+
 	@Test
 	public void testDrsTypes(){
 		try{
@@ -121,7 +121,38 @@ public class FitsStreamTest {
 				item = stream.read();
 			}
 			log.info("Read all the required keys");
-			
+
+		} catch(ClassCastException e){
+			fail("Wrong datatzypes in the drs file");
+			e.printStackTrace();
+		} catch (Exception e){
+			fail("Could not read FitsFile");
+			e.printStackTrace();
+		}
+	}
+	@Test
+	public void testDriveFile(){
+		try{
+			URL u =  FitsStreamTest.class.getResource("/drive_file.fits");
+			SourceURL url = new SourceURL(u);
+			FitsStream stream = new FitsStream(url);
+			stream.init();
+
+			String[] requiredDoubleKeys = {"dev","dZd","dAz","Zd","Dec","Time", "Az"};
+			Data item = stream.read();
+			@SuppressWarnings("unused")
+			double ar;
+			while (item != null) {
+				for(String key : requiredDoubleKeys){
+					if (!(item.containsKey(key))){
+						fail("fitsStream is not reading the right keys");
+					}
+					ar = (Double) item.get(key);
+				}
+				item = stream.read();
+			}
+			log.info("Read all the required keys");
+
 		} catch(ClassCastException e){
 			fail("Wrong datatzypes in the drs file");
 			e.printStackTrace();

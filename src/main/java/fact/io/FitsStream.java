@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -25,11 +26,13 @@ public class FitsStream extends AbstractStream {
 	int roi = 300;
 	int numberOfPixel = 1440;
 	private DataInputStream dataStream;
+	private BufferedInputStream bStream;
 	private int[] lengthArray;
 	private String[] nameArray;
 	private String[] typeArray;
-
+	
 	protected int eventBytes;
+//	private FileChannel inChannel;
 
 	public FitsStream(SourceURL url) {
 		super(url);
@@ -45,9 +48,14 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public void init() throws Exception {
-		dataStream = new DataInputStream(new BufferedInputStream(
-				getInputStream()));
-
+		bStream = new BufferedInputStream(getInputStream());
+		dataStream = new DataInputStream(bStream);
+//		inChannel = fileStream.getChannel();
+		
+//		FileInputStream fileStream = new FileInputStream(url.getFile());
+//		bufferdStream = new BufferedInputStream(fileStream);
+//		
+		
 		FitsHeader header = this.readHeader(dataStream);
 		log.debug("Header #1 read:\n{}", header);
 
@@ -129,7 +137,7 @@ public class FitsStream extends AbstractStream {
 				roi = Integer.parseInt(val.trim());
 				log.debug("roi is: {}", roi);
 			}
-			
+
 			if ("NPIX".equals(key)) {
 				numberOfPixel = Integer.parseInt(val.trim());
 				log.debug("numberOfPixel is: {}", numberOfPixel);
@@ -168,19 +176,21 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], dataStream.readInt());
 					}
 				}
-
+				//read float
 				if (typeArray[n].equals("E")) {
 					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
 					if (numberOfElements > 128) {
-						//save all the floats into a float buffer. to save n floats we need 4*n bytes
+						// save all the floats into a float buffer. to save n
+						// floats we need 4*n bytes
 						byte[] el = new byte[4 * numberOfElements];
 						dataStream.read(el);
+//						bStream.read(el);
 						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
 						float[] ar = new float[numberOfElements];
 						sBuf.get(ar);
 						item.put(nameArray[n], ar);
-					}else if (numberOfElements > 1) {
+					} else if (numberOfElements > 1) {
 						float[] el = new float[numberOfElements];
 						for (int i = 0; i < numberOfElements; i++) {
 							el[i] = dataStream.readFloat();
@@ -188,6 +198,21 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], el);
 					} else {
 						item.put(nameArray[n], dataStream.readFloat());
+					}
+				}
+				
+				// read double
+				if (typeArray[n].equals("D")) {
+					int numberOfelements = lengthArray[n];
+
+					if (numberOfelements > 1) {
+						double[] el = new double[numberOfelements];
+						for (int i = 0; i < numberOfelements; i++) {
+							el[i] = dataStream.readDouble();
+						}
+						item.put(nameArray[n], el);
+					} else if (numberOfelements == 1) {
+						item.put(nameArray[n], dataStream.readDouble());
 					}
 				}
 
@@ -212,8 +237,14 @@ public class FitsStream extends AbstractStream {
 					// --------------this is where the magic
 					// happens-------------
 					if (numberOfelements > 128) {
+						
 						// lets try to be even quicker
 						// to save n shorts we need 2*n bytes
+//						byte[] el = new byte[2 * numberOfelements];
+//						ByteBuffer byteBuffer2 = ByteBuffer.wrap(el);
+//						inChannel.read(byteBuffer2);
+//						bStream.read(el);
+//						ShortBuffer sBuf = byteBuffer2.asShortBuffer();
 						byte[] el = new byte[2 * numberOfelements];
 						dataStream.read(el);
 						ShortBuffer sBuf = ByteBuffer.wrap(el).asShortBuffer();
@@ -245,22 +276,29 @@ public class FitsStream extends AbstractStream {
 		return item;
 	}
 
-	public FitsHeader readHeader(DataInputStream in) throws IOException {
+	public FitsHeader readHeader(InputStream in) throws IOException {
 		byte[] data = new byte[16 * 2880];
 		int pos = 0;
 		int read = in.read(data, pos, 2880);
-		//try to find the END keyword. It can be followed by a comment ie. a /. 
+		boolean parsedHeader = false;
+		
+		// try to find the END keyword. 
 		while (read > 0) {
 			pos += read;
 			String str = (new String(data, "US-ASCII")).trim();
 			if (str.endsWith("END")) {
 				log.debug("Found end-of-header! Header length is {}", pos);
+				parsedHeader = true;
 				break;
 			}
-			if(pos > data.length-2880){
-				log.error("header was too long. ");
-			}
 			read = in.read(data, pos, 2880);
+			//this might result in an infinite loop also the unit tests fail.
+//			int cur = 0;
+//			while (cur < 2880) {
+//				int br = in.read(data, pos + cur, 2880 - cur);
+//				cur += br;
+//			}
+//			read += cur;
 		}
 
 		byte[] header = new byte[pos];
@@ -271,6 +309,9 @@ public class FitsStream extends AbstractStream {
 		if (read % 2880 != 0) {
 			throw new IOException("Failed to read header: " + 2880
 					+ " bytes expected, only " + read + " bytes could be read!");
+		}
+		if (!parsedHeader){
+			throw new IOException("Failed to read header. Did not find the END keyword");
 		}
 
 		return new FitsHeader(header);
@@ -299,7 +340,6 @@ public class FitsStream extends AbstractStream {
 					lines[i] = "";
 				}
 			}
-
 			return lines;
 		}
 

@@ -42,7 +42,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
-import fact.io.FactEventStream;
+import fact.io.FitsStream;
 import fact.io.SerializedEventStream;
 import fact.viewer.actions.ChangeColorMap;
 import fact.viewer.ui.CamWindow;
@@ -377,7 +377,7 @@ public class FactViewer extends JFrame {
 				|| file.getName().endsWith(".event.gz")) {
 			stream = new SerializedEventStream(file);
 		} else
-			stream = new FactEventStream(new SourceURL(file.toURI().toURL()));
+			stream = new FitsStream(new SourceURL(file.toURI().toURL()));
 
 		navigation.getNextButton().setEnabled(stream != null);
 		navigation.setFile(file);

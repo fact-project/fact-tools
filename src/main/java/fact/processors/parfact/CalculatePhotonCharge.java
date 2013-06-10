@@ -38,16 +38,21 @@ public class CalculatePhotonCharge implements Processor {
 		float[] data = null;
 		try{
 			data = (float[]) input.get(key);
-			if(positions==null){
+			if (data == null){
+				throw new Exception();
+			}
+			if(positions != null){
 				posArray=(int[]) input.get(positions);
 			} else {
 				posArray=new MaxAmplitudePosition().processSeries(data);
 			}
+		} catch (ClassCastException e){
+			log.error("Could not cast data to float[]   "+ key);
 		} catch(Exception e){
-			log.error("Could not get the right items from the map. wrong keys?");
+			log.error("Could not get the right items from the map. wrong key?   " + key );
 		}
-		photonCharge = new float[Constants.NUMBEROFPIXEL];
 		
+		photonCharge = new float[Constants.NUMBEROFPIXEL];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		// for each pixel
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){

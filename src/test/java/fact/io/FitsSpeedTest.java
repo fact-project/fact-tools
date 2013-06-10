@@ -49,7 +49,7 @@ public class FitsSpeedTest {
 			preprocess.add(new CalculatePhotonCharge());
 			DrsCalibration drs = new DrsCalibration();
 			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
-			drs.setDrsFile(u.getPath());
+			drs.setUrl(u);
 			preprocess.add(drs);
 
 			preprocess.init(new ProcessContextImpl());
