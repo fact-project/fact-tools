@@ -33,7 +33,7 @@ public class ColorTest
 	static Logger log = LoggerFactory.getLogger( ColorTest.class );
 	ColorMapping map;
 
-	@Test
+	
 	public void test(){
 		TestFrame frame = new TestFrame( new DefaultColorMapping() );
 		frame.setSize( 1024, 768 );
