@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.io.SourceURL;
 import fact.tools.FitsExplore;
 import fact.viewer.ui.CameraPixelMap;
 
@@ -91,7 +92,7 @@ public class CreateAnimatedGif {
 		Integer eventId = new Integer( args[1] );
 		Integer run = FitsExplore.extractRun( file.getName() );
 
-		FitsDataStream stream = new FitsDataStream( file );
+		FitsStream stream = new FitsStream( new SourceURL(file.getAbsolutePath()) );
 		Data event = stream.readNext();
 		int i = 1;
 		while( event != null && i < eventId ){

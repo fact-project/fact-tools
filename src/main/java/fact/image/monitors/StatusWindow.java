@@ -104,21 +104,23 @@ public class StatusWindow extends DataVisualizer {
 	@Override
 	public Data processMatchingData(Data data) {
 		monitor.process(data);
-		stats = monitor.getStatistics();
 		if(eventCounter % every == 0){
+			stats = monitor.getStatistics();
 			rateLabel.setText( stats.get("dataRate").toString()  );
 			eventCounterLabel.setText(Long.toString(eventCounter));
 			elapsed = System.currentTimeMillis() - start;
 			timerLabel.setText(df.format(new Date(elapsed)));
+			
+			b.setLength(0);
+			for (String str : data.keySet()) {
+				b.append(str);
+				b.append("\n");
+			}
+			textPane.setText(b.toString());
 		}
 		eventCounter++;
 		
-		b.setLength(0);
-		for (String str : data.keySet()) {
-			b.append(str);
-			b.append("\n");
-		}
-		textPane.setText(b.toString());
+
 		
 		return data;
 	}

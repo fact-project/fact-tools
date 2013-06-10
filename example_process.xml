@@ -1,89 +1,32 @@
 <container>
 
-<!-- 	Triggertypes 
-
-		416 - interleaved lightpulse fxd
-		4 -physiks
-		1024 - interleaved pedestal
-		512 - interleaved lighpulse Int 
-		33792 - Time Calibration 
-		-->
-<!-- 	<stream id="fact" class="fact.io.FactDataStream"  -->
-<!--  		    url="file:/home/bruegge/20120120_070.fits" /> -->
+<!-- Pfade zu den fits files. -->
+<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
+<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
 
 <!-- <property name="path" value="/home/bruegge/FactTest" /> -->
-<property name="data" value="20111126_042.fits" />
-<property name="dataDRS" value="20120229_132.drs.fits" />
-<property name="noise" value="20130124_040.fits" />
-<property name="noiseDRS" value="20130124_033.drs.fits" />
-	<property name="path" value="/home/bruegge/FactTest" />
 
-<!--  	<property name="path" value="/Users/kaibrugge/FactTest" /> -->
- 
-
-<!-- ls8 path -->
-	<stream id="fact" class="fact.io.FactEventStream" 
- 		    url="file:${path}/${data}"  />
-		    
-		<process input="fact" copies="1">
-			<Skip condition="%{data.TriggerType} != 4" />
-			<Skip condition="%{data.EventNum} &lt; 2" />
-			<fact.data.DrsCalibration drsFile="${path}/${dataDRS}"/>
-<!-- 		<RemoveKeys keys="Data" /> -->
-			<fact.data.CutSlices keys="Data,DataCalibrated" start="15" end="165" />
-		<fact.data.MovingAverage key="DataCalibrated" outputKey="windowed_5" length="6"/>
-		<fact.data.MovingAverage key="DataCalibrated" outputKey="windowed_14" length="14" color="#A0A0A0"/>
-<!-- 			<fact.data.MultiplyValues key="DataCalibrated" factor="-1"/> -->
-<!-- 			<fact.data.RemoveSpikesMars key="DataCalibrated" />  -->
-<!-- 			<fact.data.InterpolateBadPixel key="DataCalibrated"  /> -->
-		<fact.data.Diff key="windowed_14" outputKey="diff2" offset="2"/>
-		<fact.data.Diff key="windowed_14" outputKey="diff4" offset="4"/>
-<!-- 			<fact.data.FirstOrderExponentialSmoothing key="DataCalibrated" output="smoothed" alpha="0.3"/> -->
-<!-- 			<fact.data.Diff key="smoothed" output="diffSmoothed" offset="2"/> -->
-<!-- 			<fact.data.MaxAmplitude key="DataCalibrated" /> -->
-<!-- 			<fact.data.CalculatePhotonCharge key="DataCalibrated" /> -->
-<!-- 			<fact.data.ExFit keys="DataCalibrated"/> -->
-<!-- 			<fact.data.SliceNormalization keys="DataCalibrated" overwrite="false"/> -->
-<!-- 			<fact.data.SliceNormalization keys="ExFit" overwrite="false"/> -->
-<!-- 			<fact.data.cleaning.StdClean key="DataCalibrated" showerThreshold="0.8"/> -->
-<!-- 			<fact.data.cleaning.CoreNeighborClean key="DataCalibrated" corePixelThreshold="5" neighborPixelThreshold="2"/> -->
-<!-- 		<fact.data.GenerateFeatures keys="DataCalibrated" showerThreshold="0.8" minSize="2" /> -->
-<!-- 		<fact.data.GenerateFeatures keys="DataCalibrated" showerThreshold="0.8" minSize="2" outputString="1" /> -->
-
-<!-- 		<fact.data.GenerateFeatures keys="DataCalibrated" showerThreshold="0.8" minSize="2" outputString="2"  /> -->
-				
-<!-- 		<fact.data.CalculatePhotonCharge keys="DataCalibrated" overwrite="false" writeAverage="true"/> -->
-		
-<!-- 		<fact.data.HillasParameter keys="DataCalibrated" showerThreshold="0.7" minSize="2"/> -->
-
-
-<!-- 		<fact.data.RisingEdge keys="DataCalibrated" />  -->
-<!-- 		<fact.data.HillasParameter keys="DataCalibrated"/> -->
-
-
-<!-- 		<fact.data.HillasParameter keys="DataCalibrated" showerThreshold="0.7" minSize="2"/> -->
-<!-- 		<Skip condition="%{data.HillasNumberOfIslands} = null" /> -->
-<!-- 		<Skip condition="%{data.EllipseArea} &lt; 1" /> -->
-
-<!-- 			<fact.image.HistogramPlotter keys="showerPhotonCharge,showerPhotonCharge_1,showerPhotonCharge_2" /> -->
-<!-- 			<fact.image.HistogramPlotter keys="photoncharge" drawErrors="false"/> -->
-<!-- 		<fact.data.OnlineAverage keys="photoncharge" /> -->
-<!-- 		<stream.plotter.Plotter  -->
-<!-- 			history="500" -->
-<!--             keepOpen="true" -->
-<!--             keys="photoncharge_avg,photoncharge" -->
-<!--             title="photonCharge"/> -->
-<!-- 			<fact.image.ScatterPlotPanel keys="photoncharge,showerSize" /> -->
-<!-- 			<fact.image.ScatterPlotter compValue="showerPhotonCharge" keys="showerPhotonCharge_1,showerPhotonCharge_2" /> -->
-<!-- 			<stream.monitor.DataRate every="10" /> -->
-<!-- 		<fact.image.monitors.CameraPlotter keys="photoncharge" />  -->
-		<fact.image.monitors.LiveCameraPlotter key="DataCalibrated" /> 
-		<fact.image.monitors.LiveCameraPlotter key="diff2" /> 
-		<fact.image.monitors.LiveCameraPlotter key="diff4" /> 
-<!-- 		<fact.image.monitors.LiveCameraPlotter key="diffSmoothed" />  -->
-<!-- 		<fact.image.monitors.ShowerCameraPlotter key="DataCalibrated" showerKey="standardDevShower"/>  -->
-<!-- 		<fact.image.monitors.ShowerCameraPlotter key="DataCalibrated" showerKey="coreNeighbourPixel"/>  -->
-		<fact.image.monitors.StatusWindow />
+	<!-- Name des Streams und pfad zu dem Daten-File -->
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
+	
+	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
+	<process input="fact" copies="1">
+		<Skip condition="%{data.TriggerType} != 4" />
+		<fact.processors.DrsCalibration url="file:${dataDRS}"/>
+		<fact.processors.CutSlices start="15" end="220" />
+		<fact.processors.parfact.RemoveSpikesMars />
+		<fact.processors.RemoveJumps key="DataCalibrated" outputKey="jumpsRemoved" />
+		<fact.processors.parfact.CalculatePhotonCharge key="jumpsRemoved" outputKey="chargeremoved" />
+		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="charge" />
+		<fact.processors.SumKey key="chargeremoved" outputKey="Sum" />
+		<fact.processors.SumKey key="charge" outputKey="jumpsRemovedSum" />
+<!-- 		<fact.image.monitors.AverageBarPlotter keys="jumpsRemovedSum,Sum" drawErrors="true"/> -->
+<!-- 		<fact.image.monitors.StatusWindow every="40" /> -->
+		<stream.monitor.DataRate every="40" />
 <!-- 		<fact.image.ShowImage/> -->
-		</process>
+	</process>
+		
+		
+		
 </container>
+

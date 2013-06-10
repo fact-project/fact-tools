@@ -1,19 +1,18 @@
 package fact.processors.parfact;
 
-import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import stream.Processor;
 import stream.Data;
-import uk.ac.starlink.util.DataSource;
-import uk.ac.starlink.util.FileDataSource;
-import uk.ac.starlink.util.URLDataSource;
+import stream.Processor;
+import stream.annotations.Parameter;
+import stream.io.SourceURL;
 import fact.Constants;
 import fact.image.overlays.SourceOverlay;
-import fact.io.FitsDataStream;
+import fact.io.FitsStream;
 
 /**
  * This is supposed to calculate the position of the source in the camera. 
@@ -25,7 +24,6 @@ public class CalcSourcePosition implements Processor {
 
 	static Logger log = LoggerFactory.getLogger(CalcSourcePosition.class);
 
-	String drsFile = null;
 
 	Data drsData = null;
 	private String outputKey = "sourcePosition";
@@ -64,16 +62,16 @@ public class CalcSourcePosition implements Processor {
     double eventTime;
 
 
-	FitsDataStream stream;
+	FitsStream stream;
 
 	/**
 
 	 * @param in
 	 */
-	protected void loadDrsData(DataSource in) {
+	protected void loadDrsData(SourceURL in) {
 		try {
 
-			stream = new FitsDataStream(in);
+			stream = new FitsStream(in);
 			stream.init();
 			drsData = stream.readNext();
 			eventTime =	Double.parseDouble(drsData.get("Time").toString()) + 40587;
@@ -254,58 +252,26 @@ public class CalcSourcePosition implements Processor {
 		this.outputKey = outputKey;
 	}
 	
-	/**
-	 * @return the drsFile
-	 */
-	public String getDrsFile() {
-		return drsFile;
-	}
 
-	/**
-	 * @param drsFile
-	 *            the drsFile to set
-	 */
-	public void setDrsFile(String drsFile) {
-		File file = new File(drsFile);
-		if (!file.canRead()) {
-			throw new RuntimeException("Cannot open file " + drsFile
-					+ " for reading!");
-		}
-
+	@Parameter(description = "A URL to the FITS file.")
+	public void setUrl(URL url) {
 		try {
-			loadDrsData(new FileDataSource(file));
+			loadDrsData(new SourceURL(url));
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
-
-		this.drsFile = drsFile;
 	}
-
-	public void setDrsUrl(String urlString) {
+	
+	@Parameter(description = "A String with a valid URL FITS file.")
+	public void setUrl(String urlString) {
 		try {
 			URL url = new URL(urlString);
-			loadDrsData(new URLDataSource(url));
+			loadDrsData(new SourceURL(url));
+		} catch (MalformedURLException e){
+			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
+			throw new RuntimeException("Cant open drsFile");
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 * 
-	 * @return
-	 */
-	public String getFile() {
-		return getDrsFile();
-	}
-
-	/**
-	 * This is just an alias for the drsFile parameter.
-	 */
-	public void setFile(String file) {
-		this.setDrsFile(file);
-	}
-
-	
-
 }
