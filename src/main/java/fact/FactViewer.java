@@ -156,6 +156,19 @@ public class FactViewer extends JFrame {
 		});
 		file.add(open);
 		menu.add(file);
+//		
+//		JMenu exportMenu = new JMenu("Export");
+//		
+//		JMenuItem exportGif =  new JMenuItem("Export as animated .gif File");
+//		exportGif.addActionListener(new ExportAnimatedGifAction(this));
+//		exportMenu.add(exportGif);
+//		
+//		JMenuItem exportPNG =  new JMenuItem("Export as .png File");
+//		exportGif.addActionListener(new ExportPNGAction(this.getCamMap()));
+//		exportMenu.add(exportPNG);
+//		
+//		
+//		menu.add(exportMenu);
 
 		JMenu select = new JMenu("Selection");
 		JMenuItem invert = new JMenuItem("Invert");

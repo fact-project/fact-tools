@@ -34,7 +34,6 @@ import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StoragePolicy;
 import uk.ac.starlink.util.FileDataSource;
-import edu.udo.cs.ai.fact.MJDMapper;
 
 /**
  * @author chris
@@ -266,6 +265,16 @@ public class FitsDBDumper {
 
 	}
 
+
+	public Long mjd2unixtime(Double mjd) {
+		double JD_MJD_DIFF = 2400000.5d;
+		double UNIX_JD_OFFSET = 2440587.5;
+		double jd = mjd + JD_MJD_DIFF;
+		Double unix = (jd - UNIX_JD_OFFSET) * 86400 * 1000;
+		return unix.longValue();
+	}
+
+
 	public void insert(String table, Data item) {
 		StringBuffer cols = new StringBuffer();
 		StringBuffer vals = new StringBuffer();
@@ -278,7 +287,7 @@ public class FitsDBDumper {
 		if (item.containsKey("Time")) {
 			//the time format stored in the fits files is different from any other known time format. Why?? WHO THE FUCK KNOWS!
 			//so better add 40587.5 for some reason. IDIOTS!
-			Long unix = MJDMapper.mjd2unixtime(new Double(item.get("Time")
+			Long unix = mjd2unixtime(new Double(item.get("Time")
 					.toString())  + 40587.5);
 			vals.append(unix + ", ");
 			cols.append("_DATETIME_, ");

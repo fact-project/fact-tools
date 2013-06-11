@@ -61,6 +61,8 @@ public class FilterTests {
 						if(!item.containsKey(filter.outputKey)){
 							fail("item does not conatin the right outputkey after applying " + filter.getClass().getSimpleName());
 						}
+						
+						@SuppressWarnings("unused")
 						float[] result = (float[]) item.get(filter.outputKey);
 					}
 					

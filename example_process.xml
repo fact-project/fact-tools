@@ -1,10 +1,14 @@
 <container>
 
 <!-- Pfade zu den fits files. -->
-<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
-<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
-<property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" />
-<property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" />
+<property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />
+<property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />
+<property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />
+<property name="outfile" value="/home/bruegge/FactTest/test.txt" />
+<!-- <property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" /> -->
+<!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" /> -->
+<!-- <property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" /> -->
+<!-- <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" /> -->
 <!-- <property name="path" value="/home/bruegge/FactTest" /> -->
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
@@ -19,9 +23,6 @@
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
                 
             <fact.processors.parfact.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
-<!--
-            <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" />
--->
             
             <fact.processors.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
             <fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/>
@@ -44,8 +45,8 @@
 <!-- 		<fact.processors.SumKey key="charge" outputKey="jumpsRemovedSum" /> -->
 <!-- 		<fact.image.monitors.AverageBarPlotter keys="jumpsRemovedSum,Sum" drawErrors="true"/> -->
 <!-- 		<fact.image.monitors.StatusWindow every="40" /> -->
-		<stream.monitor.DataRate every="40" />
-<!-- 		<fact.image.ShowImage/> -->
+<!-- 		<stream.monitor.DataRate every="200" /> -->
+		<fact.image.ShowImage/>
 	</process>
 		
 		

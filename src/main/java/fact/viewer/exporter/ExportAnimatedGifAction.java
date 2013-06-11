@@ -33,7 +33,7 @@ public class ExportAnimatedGifAction extends ExportAction {
 	@Override
 	public void export() {
 		
-		File out = this.chooseOutputFile( ".gif" );
+		File out = this.chooseOutputFile( "gif" );
 		if( out != null ){
 
 			try {

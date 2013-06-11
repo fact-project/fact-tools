@@ -3,7 +3,6 @@
  */
 package fact.viewer.ui;
 
-import java.awt.geom.Point2D;
 import java.net.URL;
 
 import org.slf4j.Logger;
@@ -73,7 +72,7 @@ public class DefaultPixelMapping implements PixelMapping {
 		return neighboursFromSoftId[softID];
 	}
 
-	public void load(String map) throws Exception {
+	private void load(String map) throws Exception {
 		int minX = 0;
 		int maxX = 0;
 		int minY = 0;
@@ -231,69 +230,5 @@ public class DefaultPixelMapping implements PixelMapping {
 		}
 
 		return true;
-	}
-
-	public Point2D getGeometricCoordinates(int softId) {
-		int hardId = software2chId[softId];
-		double radius = 7.0;
-		Double height = 2.0d * radius * Math.sin(Math.PI / 3.0d);
-		Double s = 3.0d * radius / 2.0d;
-		Double width = 2.0d * radius;
-		// double cellHeight = 2 * radius;
-		// double geoX = (chid2geomXmm[hardId]+22)*radius*Math.sin( Math.PI /
-		// 3.0d); //60 degrees in radians
-		// double geoY = (chid2geomYmm[hardId]+19)*2.0d * radius;
-		int cx = (chid2geomXmm[hardId] + 22) * s.intValue()
-				+ (int) (1.5 * width.intValue());
-		int cy = width.intValue() + (chid2geomYmm[hardId] + 19)
-				* height.intValue() + (int) (0.5 * height);
-
-		if (chid2geomXmm[hardId] % 2 == 0) {
-			cy -= 0.5 * height;
-		}
-		Point2D p = new Point2D.Double(cx, cy);
-
-		return p;
-
-		/**
-
-		 */
-
-	}
-
-	public static void main(String[] args) {
-		new DefaultPixelMapping();
-		(new DefaultPixelMapping()).getNeighboursFromSoftIds();
-		System.out.println("x=-5, y=2   softid should be 70 ---->: "
-				+ geomId2SoftId[-5 + 22][2 + 20]);
-		System.out.println("x=-8, y=-13   softid should be 876 ---->:  "
-				+ geomId2SoftId[-8 + 22][-13 + 20]);
-		System.out.println("x=7, y=4   softid should be 169 ---->: "
-				+ geomId2SoftId[7 + 22][4 + 20]);
-		System.out.println("x=22, y=-5   softid should be 1410 ---->: "
-				+ geomId2SoftId[22 + 22][-5 + 20]);
-
-		System.out.println("------------------------------------");
-		System.out
-				.println("Neighbours of Pixels 969 should be 1079, 1080, 968, 970, 865, 864 ----------->"
-						+ printAr(neighboursFromSoftId[969]));
-		System.out
-				.println("Neighbours of Pixels 1080 should be 1079, 1081, 969, 970, 1197, 1196 ----------->"
-						+ printAr(neighboursFromSoftId[1080]));
-		System.out
-				.println("Neighbours of Pixels 27 should not be 0000 ----------->"
-						+ printAr(neighboursFromSoftId[27]));
-
-		// for (int i = 0; i < hardware2softwareID.length; i++) {
-		// log.info("hardId: {}  =>  softId: {}", i, hardware2softwareID[i]);
-		// }
-	}
-
-	private static String printAr(int[] ar) {
-		String ret = "";
-		for (int i : ar) {
-			ret = ret + i + ",  ";
-		}
-		return ret;
 	}
 }

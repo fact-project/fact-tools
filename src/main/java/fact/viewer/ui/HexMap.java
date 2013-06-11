@@ -303,7 +303,6 @@ public class HexMap extends JPanel {
 		}
 
 		log.debug("minimum is: {}, maximum is: {}", minValue, maxValue);
-//		(colorMap).setMinMax(minValue, maxValue);
 		
 		for (int i = 0; i < average.length; i++) {
 			average[i] = average[i] / sliceValues.length;
@@ -428,106 +427,6 @@ public class HexMap extends JPanel {
 		mapActions.add(action);
 	}
 
-	public void saveAnimatedGif(File image) {
-		if (image != null) {
-			log.info("Saving GIF in {}", image);
-
-			try {
-				BufferedImage buf = new BufferedImage(this.getWidth(),
-						this.getHeight() + 8, BufferedImage.TYPE_INT_RGB);
-				// Graphics2D g = buf.createGraphics();
-
-				ImageWriter gifWriter = (ImageWriter) ImageIO
-						.getImageWritersBySuffix("GIF").next(); // getWriter(
-																// buf ); // my
-																// method to
-																// create a
-																// writer
-				ImageWriteParam imageWriteParam = gifWriter
-						.getDefaultWriteParam();
-				ImageTypeSpecifier imageTypeSpecifier = new ImageTypeSpecifier(
-						buf);
-
-				IIOMetadata imageMetaData = gifWriter.getDefaultImageMetadata(
-						imageTypeSpecifier, imageWriteParam);
-				String metaFormatName = imageMetaData
-						.getNativeMetadataFormatName();
-
-				IIOMetadataNode root = (IIOMetadataNode) imageMetaData
-						.getAsTree(metaFormatName);
-				IIOMetadataNode graphicsControlExtensionNode = getNode(root,
-						"GraphicControlExtension");
-
-				graphicsControlExtensionNode.setAttribute("disposalMethod",
-						"none");
-				graphicsControlExtensionNode.setAttribute("userInputFlag",
-						"FALSE");
-				graphicsControlExtensionNode.setAttribute(
-						"transparentColorFlag", "FALSE");
-				graphicsControlExtensionNode.setAttribute("delayTime",
-						Integer.toString(1 / 10));
-				graphicsControlExtensionNode.setAttribute(
-						"transparentColorIndex", "0");
-
-				IIOMetadataNode commentsNode = getNode(root,
-						"CommentExtensions");
-				commentsNode.setAttribute("CommentExtension",
-						"Created by FactViewer");
-
-				IIOMetadataNode appEntensionsNode = getNode(root,
-						"ApplicationExtensions");
-				IIOMetadataNode child = new IIOMetadataNode(
-						"ApplicationExtension");
-
-				child.setAttribute("applicationID", "NETSCAPE");
-				child.setAttribute("authenticationCode", "2.0");
-
-				int loop = 1;
-
-				child.setUserObject(new byte[] { 0x1, (byte) (loop & 0xFF),
-						(byte) ((loop >> 8) & 0xFF) });
-				appEntensionsNode.appendChild(child);
-
-				imageMetaData.setFromTree(metaFormatName, root);
-
-				FileOutputStream outputStream = new FileOutputStream(image); // ScreenShotWriterThread.getOutputStream(frame,
-																				// gifWriter,
-																				// suggestedFileName);
-
-				gifWriter.setOutput(outputStream);
-
-				Graphics2D g = buf.createGraphics();
-
-				gifWriter.prepareWriteSequence(null);
-
-				for (int i = 0; i < 300; i++) {
-					// Draw into the BufferedImage, and then do
-					g.setColor(Color.BLACK);
-					g.fillRect(0, 0, buf.getWidth(), buf.getHeight());
-					paint(g);
-
-					int y = buf.getHeight() - 10;
-					int x = 10;
-					g.setColor(Color.WHITE);
-					g.setFont(g.getFont().deriveFont(8.0f));
-					g.drawString("2011/11/27, Run 32, Event 321", x, y);
-
-					paintVersion(g, buf.getWidth(), buf.getHeight());
-					gifWriter.writeToSequence(new IIOImage(buf, null,
-							imageMetaData), imageWriteParam);
-				}
-				gifWriter.endWriteSequence();
-
-				paintVersion(g, buf.getWidth(), buf.getHeight());
-				ImageIO.write(buf, "gif", image);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			log.info("Saving of GIF cancelled.");
-		}
-	}
 
 	public void paintVersion(Graphics graph, int imageWidth, int imageHeight) {
 		String ver = "Created with jFactViewer 0.1";
