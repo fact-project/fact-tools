@@ -275,7 +275,7 @@ public class FactViewer extends JFrame {
 			public void stateChanged(ChangeEvent arg0) {
 				int slice = navigation.getSliceSlider().getValue();
 				navigation.getSliceField().setText("" + slice);
-				camMap.selectSlice(slice);
+				camMap.setCurrentSlice(slice);
 				for (CamWindow c : camWindowList) {
 					c.setSlice(slice);
 				}
@@ -511,7 +511,7 @@ public class FactViewer extends JFrame {
 	}
 
 	public void selectSlice(int i) {
-		camMap.selectSlice(i);
+		camMap.setCurrentSlice(i);
 		navigation.getSliceField().setText("" + i);
 		navigation.getSliceSlider().setValue(i);
 	}

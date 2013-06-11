@@ -343,7 +343,7 @@ public class DrsCalibration implements Processor {
 	
 
 
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
+	@Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
 	public void setUrl(URL url) {
 		try {
 			loadDrsData(new SourceURL(url));
@@ -352,7 +352,7 @@ public class DrsCalibration implements Processor {
 		}
 	}
 	
-	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats), as alternative to `drsFile`.")
+	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats)")
 	public void setUrl(String urlString) {
 		try {
 			URL url = new URL(urlString);

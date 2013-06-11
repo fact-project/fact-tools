@@ -211,7 +211,7 @@ public class MapView extends JPanel {
 	}
 	public void setSlice(int i) {
 		slice = i;
-		cameraMap.selectSlice(slice);
+		cameraMap.setCurrentSlice(slice);
 
 	}
 

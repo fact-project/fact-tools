@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This operator simply multiplies all values by the given factor.
+ * This operator simply sums up all values with the given key.
  * 
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
@@ -18,15 +18,6 @@ public class SumKey extends SimpleFactEventProcessor<float[], Double> {
 		for(float i : data){
 			sum += i;
 		}
-//		int roi = data.length / Constants.NUMBEROFPIXEL;
-		//for each pixel
-//		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-//			//iterate over all slices
-//			for (int slice = 0; slice < roi; slice++) {
-//				int pos = pix * roi + slice;
-//					sum += data[pos];
-//			}
-//		}
 		return sum;	
 	}
 	

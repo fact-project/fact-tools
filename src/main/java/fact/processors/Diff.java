@@ -1,17 +1,14 @@
 package fact.processors;
 
 
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Description;
-import fact.Constants;
 /**
- * This operator calculates the difference of all the slices in each Pixel between two arrays given by the keys key and keyB and stores the result as a double array.
+ * This operator calculates the difference of all the slices in each Pixel between two arrays given by the keys keyA and keyB and stores the result as a float array named outputKey.
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
@@ -19,95 +16,51 @@ import fact.Constants;
 @Description(group = "Data Stream.FACT")
 public class Diff implements Processor {
 	static Logger log = LoggerFactory.getLogger(Diff.class);
-	private String key, keyB;
+	private String keyA, keyB;
 	private String outputKey;
-	
-	private int offset=1;
-
-	public Diff(){}
-	public Diff(String key){
-		this.key =  key;
-	}
-	
 
 	/**
 	 * @see stream.DataProcessor#process(stream.Data)
 	 */
 	@Override
 	public Data process(Data input) {
-		if(outputKey == null || outputKey ==""){
-			input.put(Constants.KEY_DIFF, processEvent(input, key));
-		} else {
-			input.put(outputKey, processEvent(input, key));
+		
+		if(!(input.containsKey(keyA) && input.containsKey(keyB))){
+			log.error("map does not contain the right keys");
+			return null;
+		}
+		if(keyA == null || keyB == null){
+			log.error("You did not specify keyA or keyB");
+			return null;
+		}
+		
+		try {
+			float[] a = (float[]) input.get(keyA);
+			float[] b = (float[]) input.get(keyB);
+			
+			float[] result;
+			if (outputKey == null){
+				outputKey = keyA;
+				result = a;
+			} else {
+				result = new float[a.length];
+			}
+			
+			
+			for(int i = 0; i < a.length; ++i){
+				result[i] = a[i] - b[i];
+			}
+		
+			input.put(outputKey, result);
+
+		} catch(ClassCastException e){
+			log.error("Could not cast the keys in the map to float arrays");
+		} catch(ArrayIndexOutOfBoundsException e){
+			log.error("Index out of bounds. The keyA has to refer to an array of length <= the lenght of array from keyB");
 		}
 		return input;
 	}
-	
-	
-	public float[] processEvent(Data input, String key) {
-		
-		Serializable valueA = null;
-		
-		if(input.containsKey(key)){
-			 valueA = input.get(key);
-		} else {
-			//key doesnt exist in map
-			log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		
-		
-		Serializable valueB = null;
-		if(valueB == null) valueB = valueA;
-		
-		if(input.containsKey(key)){
-			 valueB = input.get(key);
-		} else {
-			//key doesnt exist in map
-			log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		
-		if (!(valueA != null && valueA.getClass().isArray()
-				&& valueA.getClass().getComponentType().equals(float.class)) ) {
-			log.info(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		if (!(valueB != null && valueB.getClass().isArray()
-				&& valueB.getClass().getComponentType().equals(float.class)) ) {
-			log.info(Constants.EXPECT_ARRAY_F + keyB + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		if(((float[])valueA).length != ((float[])valueB).length){
-			log.info("The arrays dont have the same length. ->  " + key+ ", " + keyB + ":  " +this.getClass().getSimpleName() );
-		}
-		return processSeries((float[])valueA, (float[])valueB);
-		
-	}
 
-
-	public float[] processSeries(float [] seriesA, float[] seriesB){
-		int roi = seriesA.length / Constants.NUMBEROFPIXEL;
-		float[] diff = new float[seriesA.length];
-		//Iterate over all Pixels in event.
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
-			for (int slice = 0; slice < roi; slice++) {
-				int pos = pix * roi + slice;
-				int sliceB = slice + offset;
-				if(sliceB>= 0 && sliceB < roi){
-					int posB = pix * roi + sliceB;
-					diff[pos] = seriesA[pos] - seriesB[posB];
-				}
-				if(sliceB < 0){
-					diff[pos] = seriesA[pos] - seriesB[0];
-				} else if(sliceB > roi){
-					diff[pos] = seriesA[pos] - seriesB[roi-1];
-				}
-			}
-		}
-		return diff;
-
-	}
 	
 	/*
 	 * Getter and Setter
@@ -121,11 +74,11 @@ public class Diff implements Processor {
 	}
 	
 	
-	public String getKey() {
-		return key;
+	public String getKeyA() {
+		return keyA;
 	}
-	public void setKey(String key) {
-		this.key = key;
+	public void setKeyA(String keyA) {
+		this.keyA = keyA;
 	}
 	
 	
@@ -135,14 +88,4 @@ public class Diff implements Processor {
 	public void setKeyB(String keyB) {
 		this.keyB = keyB;
 	}
-	
-	
-	public int getOffset() {
-		return offset;
-	}
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-
-	
 }
