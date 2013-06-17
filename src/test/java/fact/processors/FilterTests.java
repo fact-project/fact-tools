@@ -30,7 +30,7 @@ public class FilterTests {
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test0");
 			
-			ArrayList<SimpleFactEventProcessor<float[], float[]>> pList = new ArrayList<>();
+			ArrayList<SimpleFactEventProcessor<float[], float[]>> pList = new ArrayList<SimpleFactEventProcessor<float[], float[]>>();
 			pList.add(new FirFilter());
 			pList.add(new MovingAverage());
 			pList.add(new ExponentialSmoothing());
