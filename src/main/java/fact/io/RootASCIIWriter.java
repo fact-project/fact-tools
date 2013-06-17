@@ -38,6 +38,14 @@ public class RootASCIIWriter extends CsvWriter {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 		setSeparator(" ");
+		if (writer == null) {
+			//File outFile = new File(file);
+			log.debug("Creating new output-stream to '{}'", url);
+			url = new URL(urlString);
+			writer = new CsvWriter(url);
+			writer.setSeparator(" ");
+			
+		}
 	}
 
 	/**
@@ -46,14 +54,7 @@ public class RootASCIIWriter extends CsvWriter {
 	@Override
 	public Data process(Data data) {
 		try {
-			if (writer == null) {
-				//File outFile = new File(file);
-				log.debug("Creating new output-stream to '{}'", url);
-				url = new URL(urlString);
-				writer = new CsvWriter(url);
-				writer.setSeparator(" ");
-				
-			}
+
 			if(writeTreeDescriptor){
 				writeTreeDescriptor = false;
 				Data headerItem = DataFactory.create();
@@ -124,7 +125,9 @@ public class RootASCIIWriter extends CsvWriter {
 	 */
 	@Override
 	public void finish() throws Exception {
-		writer.finish();
+		if(writer != null){
+			writer.finish();
+		}
 	}
 
 	private String generateHeaderString(Data data) throws ClassCastException{

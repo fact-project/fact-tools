@@ -21,7 +21,7 @@ public class FilterTests {
 
 
 	@Test
-	public void drsCalibProcessor() {
+	public void testFilterLikeProcessors() {
 
 		try {
 			

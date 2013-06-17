@@ -1,14 +1,18 @@
 <container>
 
 <!-- Pfade zu den fits files. -->
-<property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />
-<property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />
-<property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />
-<property name="outfile" value="/home/bruegge/FactTest/test.txt" />
+<!-- <property name="data" value="/home/bruegge/FactTest/20120209_061.fits" /> -->
+<!-- <property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" /> -->
+<!-- <property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" /> -->
+<!-- <property name="outfile" value="/home/bruegge/FactTest/test.txt" /> -->
+
+<property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" />
+<property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" />
+
 <!-- <property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" /> -->
 <!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" /> -->
-<!-- <property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" /> -->
-<!-- <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" /> -->
+<property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" />
+<property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" />
 <!-- <property name="path" value="/home/bruegge/FactTest" /> -->
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
@@ -32,7 +36,7 @@
             <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
             <fact.processors.MovingAverage key="DataCalibrated" outputKey="smooth" length="10" />
             <fact.processors.MotionDiff key="smooth" outputKey="diff" offset="10" />
-            <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:${outfile}" />
+<!--             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:${outfile}" /> -->
             
 	
 <!-- 		<Skip condition="%{data.TriggerType} != 4" /> -->

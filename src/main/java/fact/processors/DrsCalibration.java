@@ -141,59 +141,6 @@ public class DrsCalibration implements Processor {
 		}
 
 		float[] calibrated = applyDrsCalibration(rawData, output, startCell);
-		
-		
-		
-		
-
-//		int roi = rawData.length / 1440;
-//
-//
-//		float dconv = 2000.0f / 4096.0f;
-//		float vraw;
-//
-//		// the vector drs_triggeroffsetmean is not 1440 * 1024 entries long
-//		// but has hopefully the length 1440 * RegionOfInterest (or longer)
-//		if (this.drsTriggerOffsetMean.length < 1440 * roi) {
-//			throw new RuntimeException(
-//					"Error: drs_triggeroffsetmean.size() < 1440*RegionOfInterest");
-//		}
-//
-//		int pos, OffsetPos, TriggerOffsetPos;
-//		for (int pixel = 0; pixel < 1440; pixel++) {
-//			for (int slice = 0; slice < roi; slice++) {
-//
-//				pos = pixel * roi + slice;
-//				// Offset and Gain vector *should look the same
-//				int start =  startCell[pixel] != -1 ? startCell[pixel] : 0;
-//				
-//				OffsetPos = pixel * drsBaselineMean.length / 1440
-//						+ ((slice + start)	% (drsBaselineMean.length / 1440));
-//
-//				TriggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
-//						+ slice;
-//
-//				vraw = rawData[pos] * dconv;
-//				vraw -= drsBaselineMean[OffsetPos];
-//				vraw -= drsTriggerOffsetMean[TriggerOffsetPos];
-//				vraw /= drsGainMean[OffsetPos];
-//				vraw *= 1907.35;
-//
-//
-//				output[pos] = vraw;
-//			}
-//		}
-//		float[] calibrated = output;
-		
-		
-		
-		
-		
-		
-		
-		
-		
-
 		data.put(outputKey, calibrated);
 		
 		//add color value if set

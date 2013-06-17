@@ -46,8 +46,6 @@ public class ChartWindow {
 	}
 
 	/**
-	 * TODO: ticksbutton, colormapping, sourceselection.
-	 * 
 	 * @param m
 	 */
 	public ChartWindow(FactViewer m) {
@@ -105,21 +103,9 @@ public class ChartWindow {
 		set = setP;
 		if (event != null) {
 			plotPanel.clearSeries();
-			if (sL.getSelectedKeys().isEmpty()) {
-				if (event.keySet().contains(Constants.DEFAULT_KEY_CALIBRATED)) {
-					// plotPanel.addSeries(Constants.DEFAULT_KEY_CALIBRATED,
-					// (float[])event.get(Constants.DEFAULT_KEY_CALIBRATED) );
-					addSeriesToPlot(event, set,
-							Constants.DEFAULT_KEY_CALIBRATED);
-				} else {
-					System.out.println("Nothign to draw.");
-				}
-			} else {
 				for (String key : sL.getSelectedKeys()) {
 					addSeriesToPlot(event, set, key);
 				}
-			}
-
 		}
 	}
 

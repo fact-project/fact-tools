@@ -28,6 +28,7 @@ public class SourceSelector extends JPanel {
 		setBackground(Color.WHITE);
 		this.cW = cW;
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		
 	}
 
 	public void setEvent(Data event) {
