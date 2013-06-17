@@ -6,7 +6,7 @@ package fact.viewer.colorMappings;
 import java.awt.Color;
 
 /**
- * @author chris
+ * @author Kai
  *
  */
 public interface ColorMapping {

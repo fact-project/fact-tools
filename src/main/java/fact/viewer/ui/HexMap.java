@@ -13,21 +13,12 @@ import java.awt.Point;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.swing.Action;
 import javax.swing.JPanel;
@@ -39,12 +30,13 @@ import fact.Constants;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
 import fact.viewer.colorMappings.ColorMapping;
+import fact.viewer.colorMappings.NeutralColorMapping;
 
 /**
  * @author chris
  * 
  */
-public class HexMap extends JPanel {
+public class HexMap extends JPanel implements PixelMap {
 	/** The unique class ID */
 	private static final long serialVersionUID = -4015808725138908874L;
 
@@ -64,7 +56,10 @@ public class HexMap extends JPanel {
 	Double cellWidth;
 	public Double cellRadius;
 	Color borderColor = Color.BLACK; // Color.BLUE;
-
+	
+	ColorMapping colorMap = new NeutralColorMapping();
+	HexTile cellBySoftId[] = new HexTile[1440];
+	
 	List<SelectionListener> selectionListener = new ArrayList<SelectionListener>();
 	Set<HexTile> selectedTiles = new LinkedHashSet<HexTile>();
 	Set<HexTile> annotatedTiles = new LinkedHashSet<HexTile>();
@@ -221,31 +216,11 @@ public class HexMap extends JPanel {
 	 * @return
 	 */
 	public Point getPixelCoordsFromRealCoords(double x, double y) {
-		// double scaleY = cellHeight / rows;
-		// double scaleX = cellWidth / cols;
-		// double s = 3.0d * cellRadius / 2.0d;
-		//
-		// int xOff = (int) ((xValue+22) * s + (4*scaleX* cellWidth) -15);
-		// int yOff = (int) (cellWidth + (yValue+19) * cellHeight + (2*scaleY *
-		// cellHeight) - 8);
 
 		int xOff = (int) ((getWidth() * 0.5)) - 43;
 		int yOff = (int) ((getHeight() * 0.5)) - 23;
 
 		return new Point(xOff + ((int) x), yOff + ((int) y));
-		// double camPixelX = cellRadius * cols; // short for cellRadius*2 *
-		// // (cols/2)
-		// double camPixelY = cellRadius * rows;
-		// double camRadiusX = 430;// ca TODO: lookup
-		// double camRadiusY = 430;
-		// double kx = camPixelX * 0.5 + (camPixelX / camRadiusX) * xValue;
-		// double ky = camPixelY * 0.5 + (camPixelY / camRadiusY) * yValue;
-		// System.out.println("xValue:   " + xValue + " yValue:   " + yValue);
-		// System.out.println("kX:   " + kx + " kY:   " + ky);
-		// System.out.println("camPixelX:   " + camPixelX + " camPixelY:   "
-		// + camPixelY);
-		//
-		// return new Point(Math.round((float) kx), Math.round((float) ky));
 	}
 
 	public void paintTiles(Graphics g) {
@@ -303,22 +278,27 @@ public class HexMap extends JPanel {
 		}
 
 		log.debug("minimum is: {}, maximum is: {}", minValue, maxValue);
-//		(colorMap).setMinMax(minValue, maxValue);
 		
 		for (int i = 0; i < average.length; i++) {
 			average[i] = average[i] / sliceValues.length;
 		}
 
 		log.debug("Slices loaded.");
-		selectSlice(currentSlice);
+		setCurrentSlice(currentSlice);
 		repaint();
 	}
 	
-	public void selectSlice(int slice){
-		
+	public void setCurrentSlice(int i) {
+		log.debug("Selecting slice: {}", i);
+		if (i >= 0 && i < sliceValues[0].length) {
+			currentSlice = i;
+			for (int p = 0; p < sliceValues.length; p++) {
+				if (getCellById(p) != null)
+					getCellById(p).setColor(colorMap.map(sliceValues[p][i], this.getMinValue(), this.getMaxValue()));
+			}
+			this.repaint();
+		}
 	}
-
-	
 
 	public void paintSelected(Graphics g) {
 		for (HexTile tile : selectedTiles) {
@@ -428,106 +408,6 @@ public class HexMap extends JPanel {
 		mapActions.add(action);
 	}
 
-	public void saveAnimatedGif(File image) {
-		if (image != null) {
-			log.info("Saving GIF in {}", image);
-
-			try {
-				BufferedImage buf = new BufferedImage(this.getWidth(),
-						this.getHeight() + 8, BufferedImage.TYPE_INT_RGB);
-				// Graphics2D g = buf.createGraphics();
-
-				ImageWriter gifWriter = (ImageWriter) ImageIO
-						.getImageWritersBySuffix("GIF").next(); // getWriter(
-																// buf ); // my
-																// method to
-																// create a
-																// writer
-				ImageWriteParam imageWriteParam = gifWriter
-						.getDefaultWriteParam();
-				ImageTypeSpecifier imageTypeSpecifier = new ImageTypeSpecifier(
-						buf);
-
-				IIOMetadata imageMetaData = gifWriter.getDefaultImageMetadata(
-						imageTypeSpecifier, imageWriteParam);
-				String metaFormatName = imageMetaData
-						.getNativeMetadataFormatName();
-
-				IIOMetadataNode root = (IIOMetadataNode) imageMetaData
-						.getAsTree(metaFormatName);
-				IIOMetadataNode graphicsControlExtensionNode = getNode(root,
-						"GraphicControlExtension");
-
-				graphicsControlExtensionNode.setAttribute("disposalMethod",
-						"none");
-				graphicsControlExtensionNode.setAttribute("userInputFlag",
-						"FALSE");
-				graphicsControlExtensionNode.setAttribute(
-						"transparentColorFlag", "FALSE");
-				graphicsControlExtensionNode.setAttribute("delayTime",
-						Integer.toString(1 / 10));
-				graphicsControlExtensionNode.setAttribute(
-						"transparentColorIndex", "0");
-
-				IIOMetadataNode commentsNode = getNode(root,
-						"CommentExtensions");
-				commentsNode.setAttribute("CommentExtension",
-						"Created by FactViewer");
-
-				IIOMetadataNode appEntensionsNode = getNode(root,
-						"ApplicationExtensions");
-				IIOMetadataNode child = new IIOMetadataNode(
-						"ApplicationExtension");
-
-				child.setAttribute("applicationID", "NETSCAPE");
-				child.setAttribute("authenticationCode", "2.0");
-
-				int loop = 1;
-
-				child.setUserObject(new byte[] { 0x1, (byte) (loop & 0xFF),
-						(byte) ((loop >> 8) & 0xFF) });
-				appEntensionsNode.appendChild(child);
-
-				imageMetaData.setFromTree(metaFormatName, root);
-
-				FileOutputStream outputStream = new FileOutputStream(image); // ScreenShotWriterThread.getOutputStream(frame,
-																				// gifWriter,
-																				// suggestedFileName);
-
-				gifWriter.setOutput(outputStream);
-
-				Graphics2D g = buf.createGraphics();
-
-				gifWriter.prepareWriteSequence(null);
-
-				for (int i = 0; i < 300; i++) {
-					// Draw into the BufferedImage, and then do
-					g.setColor(Color.BLACK);
-					g.fillRect(0, 0, buf.getWidth(), buf.getHeight());
-					paint(g);
-
-					int y = buf.getHeight() - 10;
-					int x = 10;
-					g.setColor(Color.WHITE);
-					g.setFont(g.getFont().deriveFont(8.0f));
-					g.drawString("2011/11/27, Run 32, Event 321", x, y);
-
-					paintVersion(g, buf.getWidth(), buf.getHeight());
-					gifWriter.writeToSequence(new IIOImage(buf, null,
-							imageMetaData), imageWriteParam);
-				}
-				gifWriter.endWriteSequence();
-
-				paintVersion(g, buf.getWidth(), buf.getHeight());
-				ImageIO.write(buf, "gif", image);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			log.info("Saving of GIF cancelled.");
-		}
-	}
 
 	public void paintVersion(Graphics graph, int imageWidth, int imageHeight) {
 		String ver = "Created with jFactViewer 0.1";
@@ -616,6 +496,22 @@ public class HexMap extends JPanel {
 
 	public void setMaxValue(float maxValue) {
 		this.maxValue = maxValue;
+	}
+
+	@Override
+	public HexTile addCell(int id, int i, int j) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HexTile getCellById(int id) {
+		return cellBySoftId[id];
+	}
+
+	@Override
+	public int getSelectedSlice() {
+		return currentSlice;
 	}
 
 }

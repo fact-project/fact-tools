@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 import fact.tools.FitsExplore;
+import fact.viewer.colorMappings.DefaultColorMapping;
 import fact.viewer.ui.CameraPixelMap;
 
 /**
@@ -27,10 +28,11 @@ public class CreateAnimatedGif {
 
 	public static File createAnimatedGif( File out, Date date, Integer run, Data event, int start, int end, int step ){
 		try {
-			CameraPixelMap map = new CameraPixelMap( 4.0d );
+			CameraPixelMap map = new CameraPixelMap( 6.0d );
 			map.setDate( date );
 			map.setRun( run );
 			map.setEvent( event );
+			map.setColorMapping(new DefaultColorMapping());
 			//map.saveAnimatedGif(); // new File( "/Users/chris/test.gif"), 0, 125, 2 );
 			map.saveAnimagedGif( out, start, end, step );
 			return out;

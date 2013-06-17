@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Map values to color by linear interpolation from neutralColor to max/minColor.
+ * Map values to grayscale by linear interpolation from minimal Value in camera to maximum value in camera.
  * @author kai
  */
 public class GrayScaleColorMapping 

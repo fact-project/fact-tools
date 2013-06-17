@@ -40,7 +40,6 @@ import fact.FactViewer;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
 import fact.viewer.colorMappings.ColorMapping;
-import fact.viewer.colorMappings.NeutralColorMapping;
 
 /**
  * @author chris
@@ -56,9 +55,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			"yyyy/MM/dd HH:mm:ss");
 	final static DecimalFormat df = new DecimalFormat("000");
 
-	HexTile cellBySoftId[] = new HexTile[1440];
+	
 
-	int currentSlice = 0;
 	float colorOffset = 2049.0f;
 	float colorScaler = 4096.0f;
 
@@ -76,7 +74,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	
 	Integer run = -1;
 	String eventNum = "?";
-	ColorMapping colorMap = new NeutralColorMapping();
+	
 	// Selected Overlay keys
 	private Set<String> selectedOverlayKeys = null;
 
@@ -166,7 +164,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		log.debug(" x range is {}, {}", minX, maxX);
 		log.debug(" y range is {}, {}", minY, maxY);
 	}
-
+	
+	@Override
 	public HexTile addCell(int softId, int i, int j) {
 		HexTile cell = new HexTile(i + 22, j + 19, getCellRadius());
 		cell.setColor(Color.blue);
@@ -339,28 +338,14 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		}
 	}
 	
-	public void selectSlice(int i) {
-		log.debug("Selecting slice: {}", i);
-		if (i >= 0 && i < sliceValues[0].length) {
-			currentSlice = i;
-			for (int p = 0; p < sliceValues.length; p++) {
-				if (cellBySoftId[p] != null)
-					cellBySoftId[p].setColor(colorMap.map(sliceValues[p][i], this.getMinValue(), this.getMaxValue()));
 
-				if (p == selectedCell && log.isDebugEnabled()) {
-					log.debug("Value of cell {} is: {}", p, sliceValues[p][i]);
-				}
-			}
-			this.repaint();
-		}
-	}
 	
 	public void drawImage(Graphics g, int width, int height, int slice) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		// System.out.println("Dimensions CamMap:  " + width + ", " + height);
 
-		this.selectSlice(slice);
+		this.setCurrentSlice(slice);
 		// double[] values = getValuesInSlice( slice );
 		// paintTiles( g, values, colorMap );
 		this.paint(g);
@@ -527,7 +512,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	}
 	public void setColorMapping(ColorMapping c){
 		this.colorMap = c;
-		this.selectSlice(currentSlice);
+		this.setCurrentSlice(currentSlice);
 	}
 	
 	public boolean isSelectable() {

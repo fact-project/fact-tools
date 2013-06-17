@@ -51,12 +51,14 @@ public class RootASCIIWriter extends CsvWriter {
 				log.debug("Creating new output-stream to '{}'", url);
 				url = new URL(urlString);
 				writer = new CsvWriter(url);
+				writer.setSeparator(" ");
+				
 			}
 			if(writeTreeDescriptor){
 				writeTreeDescriptor = false;
 				Data headerItem = DataFactory.create();
 				try{
-					headerItem.put("header", generateHeaderString(data) );
+					headerItem.put("rootheader", generateHeaderString(data) );
 					writer.process(headerItem);
 				} catch(ClassCastException e ){
 					Log.error("Could not create the TreeDescriptionHeader. Wrong Datatypes");

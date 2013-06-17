@@ -156,6 +156,19 @@ public class FactViewer extends JFrame {
 		});
 		file.add(open);
 		menu.add(file);
+//		
+//		JMenu exportMenu = new JMenu("Export");
+//		
+//		JMenuItem exportGif =  new JMenuItem("Export as animated .gif File");
+//		exportGif.addActionListener(new ExportAnimatedGifAction(this));
+//		exportMenu.add(exportGif);
+//		
+//		JMenuItem exportPNG =  new JMenuItem("Export as .png File");
+//		exportGif.addActionListener(new ExportPNGAction(this.getCamMap()));
+//		exportMenu.add(exportPNG);
+//		
+//		
+//		menu.add(exportMenu);
 
 		JMenu select = new JMenu("Selection");
 		JMenuItem invert = new JMenuItem("Invert");
@@ -262,7 +275,7 @@ public class FactViewer extends JFrame {
 			public void stateChanged(ChangeEvent arg0) {
 				int slice = navigation.getSliceSlider().getValue();
 				navigation.getSliceField().setText("" + slice);
-				camMap.selectSlice(slice);
+				camMap.setCurrentSlice(slice);
 				for (CamWindow c : camWindowList) {
 					c.setSlice(slice);
 				}
@@ -498,7 +511,7 @@ public class FactViewer extends JFrame {
 	}
 
 	public void selectSlice(int i) {
-		camMap.selectSlice(i);
+		camMap.setCurrentSlice(i);
 		navigation.getSliceField().setText("" + i);
 		navigation.getSliceSlider().setValue(i);
 	}
