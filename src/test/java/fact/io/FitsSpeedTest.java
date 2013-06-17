@@ -17,8 +17,6 @@ import stream.Data;
 import stream.ProcessorList;
 import stream.io.SourceURL;
 import stream.runtime.ProcessContextImpl;
-import uk.ac.starlink.table.RowSequence;
-import uk.ac.starlink.util.DataSource;
 import fact.processors.DrsCalibration;
 import fact.processors.MaxAmplitude;
 import fact.processors.parfact.CalculatePhotonCharge;
@@ -30,9 +28,7 @@ import fact.processors.parfact.CalculatePhotonCharge;
 public class FitsSpeedTest {
 
 	static Logger log = LoggerFactory.getLogger(FitsSpeedTest.class);
-	RowSequence rowSequence;
 	List<String> cols = new ArrayList<String>();
-	DataSource ds;
 
 	@Test
 	public void test() {

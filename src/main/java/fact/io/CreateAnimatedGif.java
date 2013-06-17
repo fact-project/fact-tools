@@ -4,7 +4,6 @@
 package fact.io;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
-import fact.tools.FitsExplore;
 import fact.viewer.colorMappings.DefaultColorMapping;
 import fact.viewer.ui.CameraPixelMap;
 
@@ -92,7 +90,6 @@ public class CreateAnimatedGif {
 
 		File file = new File( args[0] );
 		Integer eventId = new Integer( args[1] );
-		Integer run = FitsExplore.extractRun( file.getName() );
 
 		FitsStream stream = new FitsStream( new SourceURL(file.getAbsolutePath()) );
 		Data event = stream.readNext();
@@ -115,18 +112,15 @@ public class CreateAnimatedGif {
 		log.info( "timestamp of event is {}", date );
 
 
-		DecimalFormat df = new DecimalFormat( "000" );
 		SimpleDateFormat fmt = new SimpleDateFormat( "yyyyMMdd_" );
-		String runString = "???";
-		if( run != null )
-			runString = df.format( run );
+		String runString = "00";
 
 		File out = new File( outDir.getAbsolutePath() + File.separator + fmt.format( date ) + runString + "_" + eventId + ".gif" );
 		//System.out.println( "Writing GIF to " + out.getAbsolutePath() );
 
 		CameraPixelMap map = new CameraPixelMap( 4.0d );
 		map.setDate( date );
-		map.setRun( run );
+		map.setRun( 0 );
 		map.setEvent( event );
 		//map.saveAnimatedGif(); // new File( "/Users/chris/test.gif"), 0, 125, 2 );
 		map.saveAnimagedGif( out, start, end, step );
