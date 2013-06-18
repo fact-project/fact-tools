@@ -145,7 +145,7 @@ public class DrsCalibration implements Processor {
 		
 		//add color value if set
 		if(color !=  null && !color.equals("")){
-			data.put("@" + Constants.KEY_COLOR + "_"+key, color);
+			data.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
 		}
 
 		return data;

@@ -8,9 +8,9 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-import javax.vecmath.Point2d;
 
 import fact.viewer.ui.CameraPixelMap;
 import fact.viewer.ui.HexTile;
@@ -23,7 +23,7 @@ public class SourceOverlay implements Overlay, Serializable {
 	private Shape shape;
 	private Stroke stroke = new BasicStroke(2.0f);
 	public CameraPixelMap camMap;
-	protected Point2d point;
+	protected Point2D point;
 
 	protected double height;
 
@@ -37,13 +37,13 @@ public class SourceOverlay implements Overlay, Serializable {
 
 	}
 
-	public SourceOverlay(Point2d p) {
+	public SourceOverlay(Point2D p) {
 		this.point = p;
 
 	}
 
 	public SourceOverlay(double mSourceX, double mSourceY) {
-		this.point = new Point2d(mSourceX, mSourceY);
+		this.point = new Point2D.Double(mSourceX, mSourceY);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class SourceOverlay implements Overlay, Serializable {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setColor(color);
 		g2.setStroke(stroke);
-		Point p = camMap.getPixelCoordsFromRealCoords(point.x, point.y);
+		Point p = camMap.getPixelCoordsFromRealCoords(point.getX(), point.getY());
 		shape = new Ellipse2D.Double(p.x, p.y, 10.0, 10);
 		g2.draw(shape);
 		// g2.setColor(Color.WHITE);

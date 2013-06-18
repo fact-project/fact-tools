@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
 
 
 public class FilterTests {
@@ -25,7 +24,7 @@ public class FilterTests {
 
 		try {
 			
-			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			URL drsUrl =  FilterTests.class.getResource("/test.drs.fits.gz");
 			DrsCalibration pr = new DrsCalibration();
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test0");
@@ -45,7 +44,7 @@ public class FilterTests {
 				filter.setOutputKey("test"+(i+1));
 			}
 			
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL dataUrl =  FilterTests.class.getResource("/sample.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			
 			FitsStream stream = new FitsStream(url);

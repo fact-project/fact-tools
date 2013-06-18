@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
 
 
 public class DiffTest {
@@ -24,7 +23,7 @@ public class DiffTest {
 
 		try {
 			
-			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			URL drsUrl =  DiffTest.class.getResource("/test.drs.fits.gz");
 			DrsCalibration pr = new DrsCalibration();
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test");
@@ -38,7 +37,7 @@ public class DiffTest {
 			d.setKeyB("out");
 			d.setOutputKey("out");
 			
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL dataUrl =  DiffTest.class.getResource("/sample.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			
 			FitsStream stream = new FitsStream(url);

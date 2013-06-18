@@ -13,8 +13,8 @@ import stream.ProcessContext;
 public class CreateHistogram extends SimpleFactEventProcessor<float[],int[]> {
 	static Logger log = LoggerFactory.getLogger(CreateHistogram.class);
 	private int numberOfBins = 12;
-	private float maxBin = 500;
-	private float minbin = 0;
+	private float max = 500;
+	private float min = 0;
 	int[] bin;
 	
 	@Override
@@ -27,14 +27,14 @@ public class CreateHistogram extends SimpleFactEventProcessor<float[],int[]> {
 	public int[] processSeries(float[] data) {
 		for(float f: data){
 			int index = 0;
-			if(f < minbin){
+			if(f < min){
 				//thius goes into the underflow bin
 				index = 0;
-			} else if( f > maxBin){
+			} else if( f > max){
 				//this goes into the overflow bin
 				index = numberOfBins + 1;
 			} else {
-				index= (int)( (f/maxBin)*numberOfBins + 1);
+				index= (int)( (f/max)*numberOfBins + 1);
 			}
 			bin[index]++;
 		}
@@ -46,17 +46,17 @@ public class CreateHistogram extends SimpleFactEventProcessor<float[],int[]> {
 	public void setNumberOfBins(int numberOfBins) {
 		this.numberOfBins = numberOfBins;
 	}
-	public float getMaxBin() {
-		return maxBin;
+	public float getMax() {
+		return max;
 	}
-	public void setMaxBin(float maxBin) {
-		this.maxBin = maxBin;
+	public void setMax(float maxBin) {
+		this.max = maxBin;
 	}
-	public float getMinbin() {
-		return minbin;
+	public float getMin() {
+		return min;
 	}
-	public void setMinbin(float minbin) {
-		this.minbin = minbin;
+	public void setMin(float minbin) {
+		this.min = minbin;
 	}
 
 	
