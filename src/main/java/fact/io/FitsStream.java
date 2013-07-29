@@ -3,6 +3,7 @@ package fact.io;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -48,6 +49,10 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public void init() throws Exception {
+		File f = new File(this.url.getFile());
+		if (!f.canRead()){
+			log.error("Cannot read file. Wrong path? ");
+		}
 		bStream = new BufferedInputStream(getInputStream());
 		dataStream = new DataInputStream(bStream);
 //		inChannel = fileStream.getChannel();
@@ -228,6 +233,32 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
 						item.put(nameArray[n], dataStream.readByte());
+					}
+				}
+				// read byte of type L. whatever that means. is it signed? see page 21 of the .fits file standard pdf
+				if (typeArray[n].equals("L")) {
+					int numberOfelements = lengthArray[n];
+
+					if (numberOfelements > 1) {
+						boolean[] el = new boolean[numberOfelements];
+						for (int i = 0; i < numberOfelements; i++) {
+							char b = dataStream.readChar();
+							if(b == 'F' || b == 'f'){
+								el[i] = false; 
+							} else {
+								el[i] = true;
+							}
+						}
+						item.put(nameArray[n], el);
+					} else if (numberOfelements == 1) {
+						char c = dataStream.readChar();
+						boolean b = false;
+						if(c == 'F' || c == 'f'){
+							b = false; 
+						} else {
+							b = true;
+						}
+						item.put(nameArray[n], b);
 					}
 				}
 
