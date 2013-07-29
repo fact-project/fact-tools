@@ -129,10 +129,17 @@ public class DrsCalibration implements Processor {
 			setDrsFile(directory, run);
 		}
 		log.debug("Processing Data item by applying DRS calibration...");
-		float[] rawData = (float[]) data.get("Data");
-		log.debug("raw data has {} elements", rawData.length);
-
+		float[] rawData = (float[]) data.get(key);
+		if(rawData == null){
+			log.error(" data .fits file did not contain the value for the key " + key + ". cannot apply drscalibration");
+			return null;
+		}
 		short[] startCell = (short[]) data.get("StartCellData");
+		if(startCell == null){
+			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
+			return null;
+		}
+		log.debug("raw data has {} elements", rawData.length);
 		log.debug("StartCellData has {} elements", startCell.length);
 
 		float[] output = rawData;
