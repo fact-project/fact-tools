@@ -49,8 +49,15 @@ public class CalcSourcePosition implements StatefulProcessor {
 	}
 	/**
 	 * read the complete TRACKING_POSITION file and save the values in the locList.
-	 * For the calculation of the appropriate sky coordinates (that is Azimuth and Zentith) we only need the values "Time", "Ra" and "Dec". 
-	 * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check.  
+	 * For the calculation of the appropriate sky coordinates (that is Azimuth and Zenith) we only need the values "Time", "Ra" and "Dec". 
+	 * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check. 
+	 * These values differ by what seems to be a constant amount in both Az and Zd. This is an expected deviation of 1 to 3 degrees.
+	 * The time unit in the TRACKING file is in unixtime/86400.0. Its still called MJD for some reason.
+	 * 
+	 * The correct conversion would be: 
+	 * mjd  =  timestamp/86400.0 +  2440587.5d
+	 * for some effing reason. To get the correct coordinates we have to do it like this:
+	 * mjd  =  timestamp/86400.0 +  2440587.0d
 	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
@@ -62,7 +69,7 @@ public class CalcSourcePosition implements StatefulProcessor {
 			while(slowData !=  null){
 				// Eventime, Ra, Dec, Az, Zd
 				double[] pointRaDec = new double[5];
-				pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.5d;
+				pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
 
 				double ra = Double.parseDouble( slowData.get("Ra").toString());
 				pointRaDec[1] = ra/24 *360.0;
@@ -112,8 +119,8 @@ public class CalcSourcePosition implements StatefulProcessor {
 	 * 2. mjd
 	 * 3. gmst
 	 * The conversion steps are necessary because I stole the mjd2gmst conversion from Fabian Temme and dont know how to get gmst dirtectly from unixtime.
-	 * Also for some reason the Time format in the slow controll file is NOT unixtime but some reason MJD.
-	 * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is unclear what to do with the second one.
+	 * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is unclear what to do with the second one. I simply used the sum of both in seconds.. 
+	 * Eventhough the numbers are small enough to NOT make a difference anyways.
 	 * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by comparing the times. We use the point closest in time to the current dataitem.
 	 * 
 	 * @see fact.data.FactProcessor#process(stream.Data)
@@ -122,35 +129,39 @@ public class CalcSourcePosition implements StatefulProcessor {
 	public Data process(Data data) {
 
 		int[] eventTime = (int[]) data.get("UnixTimeUTC");
-		long  timestamp = ((long)eventTime[0]) + ( ((long)eventTime[1])/1000000) ; 
-		double mjd  =  ((double) timestamp)/86400.0 +  40587.5d+2400000.0;
+		long  timestamp = ((long)eventTime[0])  + ( ((long)eventTime[1])/1000000) ; 
+		double mjd  =  ((double) timestamp)/86400.0 +  40587.0d+2400000.0; // usually  + 0.5 here
 		double gmst =  mjdToGmst(mjd);
 		double[] point = null;
-		if (timeIndex < locList.size()-1){
-			double t = 0;
-			double t1 = 0;
-			//check which point to use
+		double t = 0;
+		double t1 = 0;
+		//check which point to use
+
+		if(timeIndex < locList.size()-1){
 			t = (locList.get(timeIndex))[0];
 			t1 = (locList.get(timeIndex+1))[0];
-			while(!( t < mjd && mjd < t1)){
-				timeIndex++;
-				t = (locList.get(timeIndex))[0];
-				t1 = (locList.get(timeIndex+1))[0];
+			while(!( t < mjd && mjd < t1) && timeIndex < locList.size()-2){
+					timeIndex++;
+					t = (locList.get(timeIndex))[0];
+					t1 = (locList.get(timeIndex+1))[0];
 			}
-			if(Math.abs(mjd-t) < Math.abs(mjd -t1)){
+			if(Math.abs(mjd-t) < Math.abs(mjd -t1) ){
 				point = locList.get(timeIndex);
 			} else {
 				point = locList.get(timeIndex+1);
 			}
 		} else {
-			log.warn("End of TRACKING file reached");
-			point = locList.get(timeIndex-1);
+			log.warn("End of TRACKING file reached. Source position might be wrong");
+			point = locList.get(timeIndex);
 		}
 
 		if (point == null){
 			log.error("Did not get the right point from the list. point was null");
 		}
+
 		double[] pointingAzDe = getAzZd(point[1], point[2], gmst);
+//		System.out.println("Az: "+  pointingAzDe[0] + " Zd: " + pointingAzDe[1] );
+//		System.out.println("Az: "+  point[3] + " Zd: " + point[4] );
 		double[] sourceAzDe = getAzZd(sourceRightAscension, sourceDeclination, gmst);
 		double[] sourcePosition =  getSourcePosition(pointingAzDe[0], pointingAzDe[1], sourceAzDe[0], sourceAzDe[1]);
 
@@ -158,6 +169,7 @@ public class CalcSourcePosition implements StatefulProcessor {
 		data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
 		//add source position to dataitem
 		float[] source = {(float) sourcePosition[0], (float) sourcePosition[1]};
+//		System.out.println("x: "+  source[0] + " y: " +source[1] );
 		data.put(outputKey, source);
 		//add deviation between the calculated point az,dz and the az,dz in the file
 		float[] deviation = {(float) (pointingAzDe[0] - point[3]), (float) ( pointingAzDe[1] - point[4]) };

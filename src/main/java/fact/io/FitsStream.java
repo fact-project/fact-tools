@@ -297,7 +297,7 @@ public class FitsStream extends AbstractStream {
 			new fact.processors.Short2Float().process(item);
 
 		} catch (EOFException e) {
-			log.info("End of file reached. ");
+			log.info("End of file reached. " + url.getFile());
 			dataStream.close();
 			return null;
 		}
