@@ -17,19 +17,33 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessContext;
-import stream.data.Statistics;
-import stream.monitor.DataRate;
 import stream.plotter.DataVisualizer;
 import stream.plotter.PlotPanel;
-
+/**
+ * <PRE format="md">
+ * This opens up a small window containing some information about the currently running stream like number of items per second or the names of the keys in the item.
+ * ![Alt text](/status_window.jpg)
+ * ![Alt text](/images/status_window.jpg)
+ * ![Alt text](/images/status_window)
+ * ![Alt text](status_window)
+ * ![Alt text](src/main/resources/images/status_window.jpg)
+ * ![Alt text](/home/bruegge/Documents/workspace/fact/src/main/resources/images/status_window.jpg)
+ * 
+ * </PRE>
+ * <img src="images/status_window.jpg">
+ * <img src="status_window.jpg">
+ * <img src="./status_window.jpg">
+ * <img src="/home/bruegge/Documents/workspace/fact/src/main/resources/images/status_window.jpg">
+ * 
+ * @author bruegge
+ *
+ */
 public class StatusWindow extends DataVisualizer {
 	static Logger log = LoggerFactory.getLogger(PlotPanel.class);
 //	private boolean showErrorBars = true;
 	private JFrame frame;
 	private boolean keepOpen;
-	private DataRate monitor;
 	JPanel panel;
-	Statistics stats;
 	private int every = 5;
 	long eventCounter = 0;
 	private JLabel rateInfoLabel;
@@ -63,8 +77,6 @@ public class StatusWindow extends DataVisualizer {
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setSize(488, 315);
 		frame.setVisible(true);
-		monitor = new  stream.monitor.DataRate();
-		monitor.setEvery(every);
 		
 		textPane = new JTextPane();
 		scrollPane = new JScrollPane(textPane);
@@ -75,7 +87,7 @@ public class StatusWindow extends DataVisualizer {
 		panel.setLayout(new GridLayout(4, 2, 1, 0));
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
 		
-		rateInfoLabel = new JLabel("DataRate currently is: ");
+		rateInfoLabel = new JLabel("Average DataRate currently is: ");
 		panel.add(rateInfoLabel);
 		
 		rateLabel = new JLabel(" ");
@@ -103,13 +115,11 @@ public class StatusWindow extends DataVisualizer {
 
 	@Override
 	public Data processMatchingData(Data data) {
-		monitor.process(data);
 		if(eventCounter % every == 0){
-			stats = monitor.getStatistics();
-			rateLabel.setText( stats.get("dataRate").toString()  );
 			eventCounterLabel.setText(Long.toString(eventCounter));
 			elapsed = System.currentTimeMillis() - start;
 			timerLabel.setText(df.format(new Date(elapsed)));
+			rateLabel.setText( Double.toString((((double)eventCounter)/elapsed)*1000)  );
 			
 			b.setLength(0);
 			for (String str : data.keySet()) {
