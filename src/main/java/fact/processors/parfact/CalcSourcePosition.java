@@ -17,77 +17,89 @@ import fact.image.overlays.SourceOverlay;
 import fact.io.FitsStream;
 
 /**
- * This is supposed to calculate the position of the source in the camera. 
+ *  This is supposed to calculate the position of the source in the camera. 
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
 public class CalcSourcePosition implements StatefulProcessor {
-
-
 	static Logger log = LoggerFactory.getLogger(CalcSourcePosition.class);
 
-
-	Data drsData = null;
+	Data slowData = null;
 	private String outputKey = "sourcePosition";
+	private String physicalSource = "crab";
 
 	double	sourceRightAscension = 0;
 	double	sourceDeclination = 0;    
-	
-	private String physicalSource = "crab";
 
-
-
-	/**
-	 * Hardcoded values of the telescopes position 
-	 * 
-	 */
-	double mLongitude                  = -17.890701389;
-	double mLatitude                   = 28.761795;
-	double mDistance                   = 4890.0;
-
-
-	FitsStream stream;
-
+	//position of the Telescope
+	static final double mLongitude                  = -17.890701389;
+	static final double mLatitude                   = 28.761795;
+	//Distance from earth center
+	static final double mDistance                   = 4890.0;
+	//This is a counter to access the right rows in the tracking_file
 	int timeIndex = 0;
 
+	//The url to the TRACKING_POSITION slow control file
 	private SourceURL trackingUrl;
+	//This list will be populated with 
 	private ArrayList<double[]> locList = new ArrayList<double[]>();
 
 	@Override
 	public void finish() throws Exception {
 		// TODO Auto-generated method stub
-
 	}
+	/**
+	 * read the complete TRACKING_POSITION file and save the values in the locList.
+	 * For the calculation of the appropriate sky coordinates (that is Azimuth and Zentith) we only need the values "Time", "Ra" and "Dec". 
+	 * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check.  
+	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
+		FitsStream stream = new FitsStream(trackingUrl);
 		try {
 
-			stream = new FitsStream(trackingUrl);
 			stream.init();
-			drsData = stream.readNext();
-			while(drsData !=  null){
+			slowData = stream.readNext();
+			while(slowData !=  null){
 				// Eventime, Ra, Dec, Az, Zd
 				double[] pointRaDec = new double[5];
-				pointRaDec[0] =	Double.parseDouble(drsData.get("Time").toString()) + 2440587.5d;
+				pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.5d;
 
-				double ra = Double.parseDouble( drsData.get("Ra").toString());
+				double ra = Double.parseDouble( slowData.get("Ra").toString());
 				pointRaDec[1] = ra/24 *360.0;
-				pointRaDec[2] = Double.parseDouble( drsData.get("Dec").toString());
+				pointRaDec[2] = Double.parseDouble( slowData.get("Dec").toString());
 
-				pointRaDec[3] = Double.parseDouble( drsData.get("Az").toString());
-				pointRaDec[4]= Double.parseDouble( drsData.get("Zd").toString());
-				System.out.println("Right Ascension: " + pointRaDec[1] + "  Declination:  " + pointRaDec[2] + "  Azimuth: " + pointRaDec[3] + "  Zenith: " + pointRaDec[4]);
+				pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
+				pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
+
 				locList.add(pointRaDec);
-				drsData = stream.readNext();
+				slowData = stream.readNext();
 			}
 
 			stream.close();
+		}catch (NumberFormatException e){
+			log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
+			stream.close();
 		} catch (Exception e) {
-			log.error("Failed to load DRS data: {}", e.getMessage());
-				e.printStackTrace();
-			this.drsData = null;
+			log.error("Failed to load data from TRACKING_POSITION file: {}", e.getMessage());
+			e.printStackTrace();
+			this.slowData = null;
 			stream.close();
 			throw new RuntimeException(e.getMessage());
-		}		
+		}
+
+		//check the physicalSource parameter from the user
+		if(sourceRightAscension == 0 || sourceDeclination == 0 ) {
+			if(physicalSource.toLowerCase().equals("crab")){
+				sourceIsCrab();
+				log.info("Using the crab nebula as source");
+			} else if (physicalSource.toLowerCase().equals("mrk421")){
+				sourceIsMrk421();
+				log.info("Using the mrk421 as source");
+			} else {
+				sourceIsCrab();
+				log.warn("physicalsource or sourceRightAscension and sourceDeclination isnt set. Using the crab nebula as source");
+			}
+		}
 	}
 	@Override
 	public void resetState() throws Exception {
@@ -95,43 +107,46 @@ public class CalcSourcePosition implements StatefulProcessor {
 	}
 
 	/**
+	 * Here we read the eventtime from the current dataitem and convert it to 
+	 * 1. unixtime 
+	 * 2. mjd
+	 * 3. gmst
+	 * The conversion steps are necessary because I stole the mjd2gmst conversion from Fabian Temme and dont know how to get gmst dirtectly from unixtime.
+	 * Also for some reason the Time format in the slow controll file is NOT unixtime but some reason MJD.
+	 * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is unclear what to do with the second one.
+	 * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by comparing the times. We use the point closest in time to the current dataitem.
+	 * 
 	 * @see fact.data.FactProcessor#process(stream.Data)
 	 */
 	@Override
 	public Data process(Data data) {
-		if(sourceRightAscension == 0 || sourceDeclination == 0 ) {
-			if(physicalSource.equals("crab")){
-				sourceIsCrab();
-				log.info("Using the crab nebula as source");
-			} else if (physicalSource.equals("mrk421")){
-				sourceIsMrk421();
-				log.info("Using the mrk421 as source");
-			} else {
-				sourceIsCrab();
-				log.info("sourceRightAscension or sourceDeclination isnt set. Using the crab nebula as source");
-			}
-		}
 
 		int[] eventTime = (int[]) data.get("UnixTimeUTC");
-		long  timestamp = ((long)eventTime[0])*1000; 
-		double mjd  =  ((double) timestamp/(1000.0))/86400.0 +  40587.5d+2400000.0;
+		long  timestamp = ((long)eventTime[0]) + ( ((long)eventTime[1])/1000000) ; 
+		double mjd  =  ((double) timestamp)/86400.0 +  40587.5d+2400000.0;
 		double gmst =  mjdToGmst(mjd);
 		double[] point = null;
-		double t = 0;
-		if(timeIndex < locList.size()){
+		if (timeIndex < locList.size()-1){
+			double t = 0;
+			double t1 = 0;
+			//check which point to use
 			t = (locList.get(timeIndex))[0];
-			double t1 = (locList.get(timeIndex + 1))[0];
-
-			if(mjd - t < mjd - t1){
-				point = locList.get(timeIndex);
-				if(t < mjd ){
-				timeIndex++;	
-				}
-			} else{
-				point = locList.get(timeIndex+1);
+			t1 = (locList.get(timeIndex+1))[0];
+			while(!( t < mjd && mjd < t1)){
 				timeIndex++;
+				t = (locList.get(timeIndex))[0];
+				t1 = (locList.get(timeIndex+1))[0];
 			}
+			if(Math.abs(mjd-t) < Math.abs(mjd -t1)){
+				point = locList.get(timeIndex);
+			} else {
+				point = locList.get(timeIndex+1);
+			}
+		} else {
+			log.warn("End of TRACKING file reached");
+			point = locList.get(timeIndex-1);
 		}
+
 		if (point == null){
 			log.error("Did not get the right point from the list. point was null");
 		}
@@ -141,12 +156,12 @@ public class CalcSourcePosition implements StatefulProcessor {
 
 		//add circle overlay to map
 		data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
+		//add source position to dataitem
 		float[] source = {(float) sourcePosition[0], (float) sourcePosition[1]};
 		data.put(outputKey, source);
-		data.put("X", sourcePosition[0]);
-		data.put("Y", sourcePosition[1]);
-		data.put("driveX", point[0]);
-		data.put("driveY", point[1]);
+		//add deviation between the calculated point az,dz and the az,dz in the file
+		float[] deviation = {(float) (pointingAzDe[0] - point[3]), (float) ( pointingAzDe[1] - point[4]) };
+		data.put(outputKey+"pointingDeviation", deviation);
 		return data;
 	}
 
@@ -160,7 +175,7 @@ public class CalcSourcePosition implements StatefulProcessor {
 	{
 		sourceRightAscension       = (11.0 + 4.0/60 + 27.0/3600) / 24.0 * 360.0;
 		sourceDeclination          = 38.0 + 12.0/60 + 32.0/3600;
-		
+
 	}
 
 	void setRaDec(double ra, double dec)
@@ -168,17 +183,17 @@ public class CalcSourcePosition implements StatefulProcessor {
 		sourceRightAscension       = ra;
 		sourceDeclination          = dec;
 	}
-/**
- * This is an adaption of the C++ Code by F.Temme
- * @param ra
- * @param dec
- * @param gmst the Eventtime of the current event in gmst format
- * @return an array of length 2 containg {azimuth, zenith};
- */
+	/**
+	 * This is an adaption of the C++ Code by F.Temme
+	 * @param ra
+	 * @param dec
+	 * @param gmst the Eventtime of the current event in gmst format
+	 * @return an array of length 2 containing {azimuth, zenith};
+	 */
 	double[] getAzZd(double ra,double dec, double gmst){
 		double phi              =  ra / 180.0 * Math.PI;
 		double theta            =  (90 - dec) / 180.0 * Math.PI;
-		
+
 		double x                =Math.sin(theta) *Math.cos(phi);
 		double y                =Math.sin(theta) *Math.sin(phi);
 		double z                =Math.cos(theta);
@@ -210,6 +225,7 @@ public class CalcSourcePosition implements StatefulProcessor {
 		return r;
 	}
 
+	//Code by fabian temme
 	private double mjdToGmst(double mjd) {
 		// nach Jean Meeus: Astronomical Algorithms, 2. Auflage, Willman-Bell,
 		// Rochmond Virginia 1998, ISBN 0-943396-61-1 (Literatur von Wiki entnommen)
@@ -253,8 +269,8 @@ public class CalcSourcePosition implements StatefulProcessor {
 	}
 
 
-	
-	
+
+
 	public String getOutputKey() {
 		return outputKey;
 	}
@@ -278,15 +294,15 @@ public class CalcSourcePosition implements StatefulProcessor {
 			throw new RuntimeException("Cant open drsFile");
 		}
 	}
-	
-	
+
+
 	public double getSourceDeclination() {	
 		return sourceDeclination;	
 	}
 	public void setSourceDeclination(double sourceDeclination) {
 		this.sourceDeclination = sourceDeclination;	
 	}
-	
+
 	public double getSourceRightAscension() {	
 		return sourceRightAscension; 
 	}
