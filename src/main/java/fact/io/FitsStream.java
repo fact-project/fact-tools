@@ -31,6 +31,7 @@ public class FitsStream extends AbstractStream {
 	private int[] lengthArray;
 	private String[] nameArray;
 	private String[] typeArray;
+	private Data headerItem = DataFactory.create();
 	
 	protected int eventBytes;
 //	private FileChannel inChannel;
@@ -130,14 +131,31 @@ public class FitsStream extends AbstractStream {
 				String type = value.replaceAll("\\d+", "").trim();
 				typeArray[index - 1] = type;
 				lengthArray[index - 1] = numberOfElements;
-			}
-
-			if (key.startsWith("TTYPE")) {
+			} else if (key.startsWith("TTYPE")) {
 				int index = Integer.parseInt(key.replaceAll("\\D+", "").trim());
 				nameArray[index - 1] = val.replaceAll("'", "").trim();
 				log.debug("field[{}] = {}", index - 1, nameArray[index - 1]);
+			} else {
+				String value = val.replaceAll("'", "").trim();
+				key = key.trim();
+				try{
+					Float v = Float.parseFloat(value);
+					headerItem.put(key, v);
+				} catch (NumberFormatException e){
+					if(value.equals("f") || value.equals("F")){
+						Boolean b = new Boolean(false);
+						headerItem.put(key, b);
+					} else if (value.equals("t") || value.equals("T")){
+						Boolean b = new Boolean(true);
+						headerItem.put(key, b);
+					} else {
+						headerItem.put(key, value);
+					}
+						
+				}
 			}
 
+			
 			if ("NROI".equals(key)) {
 				roi = Integer.parseInt(val.trim());
 				log.debug("roi is: {}", roi);
@@ -162,7 +180,7 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public Data readNext() throws Exception {
-		Data item = DataFactory.create();
+		Data item = DataFactory.create(headerItem);
 
 		try {
 			for (int n = 0; n < nameArray.length; n++) {

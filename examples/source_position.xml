@@ -15,20 +15,21 @@
 <property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres.fits" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${dataCeres}"  />
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
 <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
-<!-- 	        <fact.processors.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>   -->
+	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
+ 			<fact.utils.Remapping outputKey="DataRemapped" color="#00FF00"/>  
 <!--             <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
 <!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
                 
             <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="source" physicalSource="mrk421" />
-	    	<stream.plotter.Plotter x-axis="X" y-axis="Y" keys="sourcepointingDeviation,test"  keepOpen="true"/>
-			<stream.monitor.DataRate every="200" />
+<!-- 	    	<stream.plotter.Plotter x-axis="X" y-axis="Y" keys="sourcepointingDeviation,test"  keepOpen="true"/> -->
+<!-- 			<stream.monitor.DataRate every="200" /> -->
 <!-- 		<PrintData/> -->
-<!-- 		<fact.image.ShowImage/> -->
+		<fact.image.ShowImage/>
 	</process>
 </container>
 

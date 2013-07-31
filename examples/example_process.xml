@@ -1,19 +1,18 @@
 <container>
 
 <!-- Pfade zu den fits files. -->
-<property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />
-<property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />
-<property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />
-<property name="outfile" value="/home/bruegge/FactTest/test.txt" />
+<!-- <property name="data" value="/home/bruegge/FactTest/20120209_061.fits" /> -->
+<!-- <property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" /> -->
+<!-- <property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" /> -->
+<!-- <property name="outfile" value="/home/bruegge/FactTest/test.txt" /> -->
 
 <!-- <property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" /> -->
 <!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" /> -->
 
-<!-- <property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" /> -->
-<!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" /> -->
-<!-- <property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" /> -->
-<!-- <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" /> -->
-<!-- <property name="path" value="/home/bruegge/FactTest" /> -->
+<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
+<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
+<property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" />
+<property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
 	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
@@ -21,21 +20,15 @@
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
 			<Skip condition="%{data.TriggerType} != 4" />
-	        <fact.processors.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
-            <fact.processors.CutSlices  start="22" end="220"/>
-            <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
+            <fact.utils.CutSlices  start="22" end="220"/>
+            <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
                 
-<!--             <fact.processors.parfact.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" /> -->
-            
-            <fact.processors.MaxAmplitude key="DataCalibrated" outputKey="max" />
-<!--             <fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/> -->
-            
-<!--             <fact.processors.parfact.CoreNeighborClean key="photonCharge" CorePixelThreshold="5.0" neighborPixelThreshold="2.0" outputKey="showerPixel" /> -->
-<!--             <fact.processors.parfact.CalcSourcePosition url="file:${drive_file}" outputKey="sourcePosition"/> -->
+            <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="sourcePosition"/>
 <!--             <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
-            <fact.processors.MovingAverage key="DataCalibrated" outputKey="smooth" length="10" color="#FF0000"/>
-            <fact.processors.MotionDiff key="smooth" outputKey="diff" offset="3" color="#888888"/>
+<!--             <fact.processors.MovingAverage key="DataCalibrated" outputKey="smooth" length="10" color="#FF0000"/> -->
+<!--             <fact.processors.MotionDiff key="smooth" outputKey="diff" offset="3" color="#888888"/> -->
 <!--             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:${outfile}" /> -->
             
 	
@@ -44,15 +37,15 @@
 <!-- 		<fact.processors.CutSlices start="15" end="220" /> -->
 <!-- 		<fact.processors.parfact.RemoveSpikesMars /> -->
 <!-- 		<fact.processors.RemoveJumps key="DataCalibrated" outputKey="jumpsRemoved" /> -->
-		<fact.processors.parfact.CalculatePhotonCharge key="smooth" outputKey="s" />
-		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="c" />
-		<fact.processors.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/>
-		<fact.processors.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/>
-		<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/>
-		<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true"/>
+<!-- 		<fact.processors.parfact.CalculatePhotonCharge key="smooth" outputKey="s" /> -->
+<!-- 		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="c" /> -->
+<!-- 		<fact.processors.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/> -->
+<!-- 		<fact.processors.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/> -->
+<!-- 		<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/> -->
+<!-- 		<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true"/> -->
 <!-- 		<fact.image.monitors.StatusWindow every="40" /> -->
-		<stream.monitor.DataRate every="200" />
-<!-- 		<fact.image.ShowImage/> -->
+<!-- 		<stream.monitor.DataRate every="200" /> -->
+		<fact.image.ShowImage/>
 	</process>
 		
 		

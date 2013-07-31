@@ -21,8 +21,8 @@ public class DefaultPixelMapping implements PixelMapping {
 
 	static Logger log = LoggerFactory.getLogger(DefaultPixelMapping.class);
 
-	final static int[] chId2softId = new int[1440];
-	final static int[] software2chId = new int[1440];
+	final static public int[] chId2softId = new int[1440];
+	final static public int[] software2chId = new int[1440];
 	final static public int[] chid2geomXmm = new int[1440];
 	final static public int[] chid2geomYmm = new int[1440];
 	final static public float[] chid2posXmm = new float[1440];

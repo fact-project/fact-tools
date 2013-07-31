@@ -448,7 +448,6 @@ public class FactViewer extends JFrame {
 			// draw on hexmap. either calibrated or default data;
 			int roi = 300;
 			if (event.keySet().contains(Constants.DEFAULT_KEY_CALIBRATED)) {
-
 				camMap.setData((float[]) event
 						.get(Constants.DEFAULT_KEY_CALIBRATED));
 				roi = ((float[]) event.get(Constants.DEFAULT_KEY_CALIBRATED)).length
@@ -458,28 +457,25 @@ public class FactViewer extends JFrame {
 						camMap.getSliceAverages());
 
 			} else if (event.keySet().contains(Constants.DEFAULT_KEY)) {
-				camMap.setData((float[]) event.get(Constants.DEFAULT_KEY));
-				roi = ((float[]) event.get(Constants.DEFAULT_KEY)).length
-						/ Constants.NUMBEROFPIXEL;
+				float[] array;
+				try{
+					float[] rawData = (float[]) event.get(Constants.DEFAULT_KEY);
+					array = rawData;
+				} catch (ClassCastException e){
+					short[] rawshortData = (short[]) event.get(Constants.DEFAULT_KEY);
+					float[] rawfloatData = new float[rawshortData.length];
+					for (int i = 0; i < rawshortData.length; i++) {
+						rawfloatData[i] = rawshortData[i];
+					}
+					array = rawfloatData;
+				}
+				
+				camMap.setData(array);
+				roi = array.length/ Constants.NUMBEROFPIXEL;
 				// also add average of all pixels to chartpanel
 				chartPanel.addSeries("Avg-" + Constants.DEFAULT_KEY,
 						camMap.getSliceAverages());
-			} else if (event.keySet().contains(Constants.DEFAULT_KEY_MC)) {
-				camMap.setData((float[]) event.get(Constants.DEFAULT_KEY_MC));
-				roi = ((float[]) event.get(Constants.DEFAULT_KEY_MC)).length
-						/ Constants.NUMBEROFPIXEL;
-				chartPanel.addSeries("Avg-" + Constants.DEFAULT_KEY_MC,
-						camMap.getSliceAverages());
-			} else if (event.keySet().contains(
-					Constants.DEFAULT_KEY_MC_CALIBRATED)) {
-				camMap.setData((float[]) event
-						.get(Constants.DEFAULT_KEY_MC_CALIBRATED));
-				roi = ((float[]) event.get(Constants.DEFAULT_KEY_MC_CALIBRATED)).length
-						/ Constants.NUMBEROFPIXEL;
-				chartPanel.addSeries("Avg-"
-						+ Constants.DEFAULT_KEY_MC_CALIBRATED,
-						camMap.getSliceAverages());
-			}
+			} 
 			navigation.setRoi(roi);
 			over.set(event);
 			over.revalidate();
