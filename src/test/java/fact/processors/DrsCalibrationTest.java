@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 
@@ -53,7 +54,7 @@ public class DrsCalibrationTest {
 					fail("Item does not contain the right key after drs calibration");
 				try{
 					float[] result = (float[]) item.get("test");
-					float[] ar = (float[]) item.get("Data");
+					short[] ar = (short[]) item.get("Data");
 					if(ar.length != result.length){
 						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
 					}

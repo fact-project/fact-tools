@@ -17,9 +17,9 @@ import stream.Data;
 import stream.ProcessorList;
 import stream.io.SourceURL;
 import stream.runtime.ProcessContextImpl;
-import fact.processors.DrsCalibration;
-import fact.processors.MaxAmplitude;
-import fact.processors.parfact.CalculatePhotonCharge;
+import fact.features.CalculatePhotonCharge;
+import fact.features.MaxAmplitude;
+import fact.filter.DrsCalibration;
 
 /**
  * @author chris
@@ -52,7 +52,7 @@ public class FitsSpeedTest {
 			Long start = System.currentTimeMillis();
 			Data item = stream.read();
 			log.info( "size of data array: {}",
-					((float[]) item.get("Data")).length 
+					((short[]) item.get("Data")).length 
 					);
 			int i = 0;
 			while (item != null) {

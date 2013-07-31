@@ -16,7 +16,7 @@ import fact.Constants;
 import fact.data.EventUtils;
 import fact.image.overlays.EllipseOverlay;
 import fact.image.overlays.PixelSet;
-import fact.processors.FactEvent;
+import fact.utils.FactEvent;
 
 /**
  *Calculates the Hillas Parameter from the Ellipse. Some processor to identify showerpixels has to be run before.

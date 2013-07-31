@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
+import fact.statistics.MovingAverage;
+import fact.utils.Diff;
 
 
 public class DiffTest {

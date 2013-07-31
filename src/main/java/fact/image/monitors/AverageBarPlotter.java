@@ -81,6 +81,9 @@ public class AverageBarPlotter extends DataVisualizer {
 		frame.getContentPane().add(histPanel, BorderLayout.CENTER);
 		frame.setSize(width, height);
 		frame.setVisible(true);
+		if(keys==null){
+			log.error("The keys paramter was null. Did you set it in the .xml file?");
+		}
 	}
 
 	@Override
@@ -89,6 +92,7 @@ public class AverageBarPlotter extends DataVisualizer {
 		// each value will be set to a different index so the bars can have
 		// custom colors.
 		// int keyNumber = 0;
+		
 		for (String key : getKeys()) {
 
 			if (data.containsKey(key)) {

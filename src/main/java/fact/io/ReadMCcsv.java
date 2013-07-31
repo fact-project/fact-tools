@@ -19,7 +19,7 @@ import stream.io.AbstractLineStream;
 import stream.io.SourceURL;
 import fact.Constants;
 import fact.data.EventUtils;
-import fact.processors.FactEvent;
+import fact.utils.FactEvent;
 
 /**
  * 

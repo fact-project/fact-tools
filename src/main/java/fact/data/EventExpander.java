@@ -11,7 +11,7 @@ import java.util.List;
 
 import stream.Data;
 import stream.data.DataFactory;
-import fact.processors.FactEvent;
+import fact.utils.FactEvent;
 import fact.viewer.ui.DefaultPixelMapping;
 
 /**

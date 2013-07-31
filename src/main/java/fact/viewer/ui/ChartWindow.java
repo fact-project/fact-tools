@@ -16,7 +16,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import fact.Constants;
 import fact.FactViewer;
-import fact.processors.FactEvent;
+import fact.utils.FactEvent;
 
 public class ChartWindow {
 
