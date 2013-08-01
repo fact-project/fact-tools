@@ -260,8 +260,8 @@ public class FitsStream extends AbstractStream {
 					if (numberOfelements > 1) {
 						boolean[] el = new boolean[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
-							char b = dataStream.readChar();
-							if(b == 'F' || b == 'f'){
+							byte b = dataStream.readByte();
+							if(b == '0'){
 								el[i] = false; 
 							} else {
 								el[i] = true;
@@ -269,9 +269,9 @@ public class FitsStream extends AbstractStream {
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
-						char c = dataStream.readChar();
 						boolean b = false;
-						if(c == 'F' || c == 'f'){
+						byte c = dataStream.readByte();
+						if(c == 0){
 							b = false; 
 						} else {
 							b = true;
