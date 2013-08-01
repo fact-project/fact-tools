@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import stream.annotations.Parameter;
 import fact.Constants;
 import fact.data.EventUtils;
-import fact.utils.FactEvent;
 import fact.utils.SimpleFactEventProcessor;
+import fact.viewer.ui.DefaultPixelMapping;
 
 /**
  * 
@@ -32,7 +32,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 			for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
 				//if were looking at a badPixel
 				if(EventUtils.arrayContains(badChIds, pix)){
-					int[] currentNeighbors = FactEvent.PIXEL_MAPPING.getNeighborsFromChid(pix);
+					int[] currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
 //					log.debug("interpolating pix number: " + pix);
 					//iterate over all slices
 					for (int slice = 0; slice < roi; slice++) {
@@ -61,7 +61,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 			return nData;
 		}
 		for (int pix: badChIds) {
-			int[] currentNeighbors = FactEvent.PIXEL_MAPPING.getNeighborsFromChid(pix);
+			int[] currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
 			
 			//iterate over all slices
 			for (int slice = 0; slice < roi; slice++) {

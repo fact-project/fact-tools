@@ -16,7 +16,6 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import fact.Constants;
 import fact.FactViewer;
-import fact.utils.FactEvent;
 
 public class ChartWindow {
 
@@ -119,7 +118,7 @@ public class ChartWindow {
 				/**
 				 * TODO: why get hId??
 				 */
-				id = FactEvent.PIXEL_MAPPING.getChidID(id);
+				id = DefaultPixelMapping.getChidID(id);
 				float[] data = (float[]) event.get(key);
 				int roi = data.length / Constants.NUMBEROFPIXEL;
 				plotPanel.addSeries(key + "-" + id, data, roi * id, (roi * id)

@@ -12,7 +12,7 @@ import fact.Constants;
 import fact.data.EventUtils;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
-import fact.utils.FactEvent;
+import fact.viewer.ui.DefaultPixelMapping;
 /**
  *CoreNeighborClean. Identifies showerPixel in the image array.
  *	 Cleaning in three Steps:
@@ -65,7 +65,7 @@ public class CoreNeighborClean implements Processor{
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		newList.addAll(showerPixel);
 		for (int pix: showerPixel){
-			currentNeighbors = FactEvent.PIXEL_MAPPING.getNeighborsFromChid(pix);
+			currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
 			for (int nPix:currentNeighbors){
 				if(nPix != -1    && photonCharge[nPix] > neighborPixelThreshold && !newList.contains(nPix)){
 					newList.add(nPix);

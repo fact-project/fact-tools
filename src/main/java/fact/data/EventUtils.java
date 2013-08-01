@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import fact.utils.FactEvent;
+import fact.viewer.ui.DefaultPixelMapping;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class EventUtils {
 				// cannot use the enhanced for loop here.
 				for (int index = 0; index < q.size() && !q.isEmpty(); index++) {
 					// add neighbours to q
-					for (int i : FactEvent.PIXEL_MAPPING.getNeighborsFromChid(q
+					for (int i : DefaultPixelMapping.getNeighborsFromChid(q
 							.get(index))) {
 						if (showerPixel.contains(i) && !marked.contains(i)) {
 							q.add(i);

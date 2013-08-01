@@ -58,8 +58,8 @@ public ShowerEllipse(int[] showerPixel, float[] photonCharge, float source, floa
     /// @Todo remove 1 by the real value
 	    
 	    mLengthOfPixel          = Constants.PIXEL_SIZE;
-	    mpGeomXCoord            = DefaultPixelMapping.chid2posXmm;
-	    mpGeomYCoord            = DefaultPixelMapping.chid2posYmm;
+	    mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
+	    mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 	    mpWeights               = photonCharge;
 	    if(mNumberOfShowerPixel > 0){
 		    calculateEllipseMars();

@@ -25,7 +25,7 @@
 <!--             <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
 <!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
                 
-            <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="source" physicalSource="mrk421" />
+<!--             <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="source" physicalSource="mrk421" /> -->
 <!-- 	    	<stream.plotter.Plotter x-axis="X" y-axis="Y" keys="sourcepointingDeviation,test"  keepOpen="true"/> -->
 <!-- 			<stream.monitor.DataRate every="200" /> -->
 <!-- 		<PrintData/> -->
