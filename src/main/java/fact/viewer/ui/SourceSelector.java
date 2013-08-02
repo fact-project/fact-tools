@@ -13,7 +13,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.ui.Layer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,12 @@ public class SourceSelector extends JPanel {
 							)) {
 				if (!checkboxes.containsKey(key)) {
 					final JCheckBox box = new JCheckBox(key);
-					box.setBackground(Color.WHITE);
+					Color c = cW.getMatchingColorFromKey(key, event);
+					if(c != null){
+						box.setForeground(c);
+					} else {
+						box.setForeground(Color.BLACK);
+					}
 					box.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(ItemEvent arg0) {

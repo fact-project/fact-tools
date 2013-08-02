@@ -103,10 +103,10 @@ public class PhotonCharge implements Processor {
 		average = average/Constants.NUMBEROFPIXEL;
 
 		//add color value if set
-		if(color !=  null && !color.equals("")){
-			input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
-		}		
 		input.put(outputKey+"Marker", m);
+		if(color !=  null && !color.equals("")){
+			input.put("@" + Constants.KEY_COLOR + "_"+outputKey+"Marker", color);
+		}		
 		input.put(outputKey, photonCharge);
 		return input;
 	}

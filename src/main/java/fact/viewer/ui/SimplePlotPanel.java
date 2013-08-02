@@ -24,7 +24,6 @@ import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -32,13 +31,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.Layer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import fact.Constants;
-import fact.FactViewer;
 
 /**
  * @author chris
@@ -190,15 +184,6 @@ public class SimplePlotPanel extends JPanel {
 		listener.add(v);
 	}
 
-	public void plot(String name, float[] data) {
-		clearSeries();
-		addSeries(name, data);
-		/*
-		 * double[] d = new double[data.length]; for( int i = 0; i <
-		 * data.length; i++ ){ d[i] = data[i]; } plot( name, d );
-		 */
-	}
-
 	public void clearSeries() {
 
 		redCount = .0f;
@@ -219,39 +204,24 @@ public class SimplePlotPanel extends JPanel {
 		series.addSeries(createSeries(name, data, start, end));
 	}
 
-	public void addSeries(String name, float[] data) {
+	public void addSeries(String name, Color c, float[] data) {
 		series.addSeries(createSeries(name, data));
 		plot.getRenderer().setSeriesPaint(series.getSeriesIndex(name),
-				semanticColorMapping(name));
+				c);
 		// plot.getRenderer().setSeriesPaint(series.getSeriesIndex(name),
 		// Color.green);
 	}
 
-	public void addSeries(String name, float[] data, int start, int end) {
+	public void addSeries(String name, Color c, float[] data, int start, int end) {
 
 		series.addSeries(createSeries(name, data, start, end));
 		plot.getRenderer().setSeriesPaint(series.getSeriesIndex(name),
-				semanticColorMapping(name));
+				c);
 		// plot.getRenderer().setSeriesPaint(series.getSeriesIndex(name),
 		// Color.green);
 	}
 
-	private Color semanticColorMapping(String name) {
-		Data event = FactViewer.getInstance().getEvent();
-		// remove pixelnumber from name
-		name = name.replaceAll("-(\\d){1,4}", "");
-		String key = "@" + Constants.KEY_COLOR + "_" + name;
 
-		if (event.containsKey(key)) {
-			try{
-				return Color.decode((String) event.get(key));
-			} catch (NumberFormatException e){
-				log.error("Could not parse the Color String. " +  (String) event.get(key) + " is not a valid color String of the form \" #HHHHHH \". " );
-			}
-		}
-
-		return null;
-	}
 
 	public XYDataset createDataset(String name, double[] data) {
 		return new XYSeriesCollection(createSeries(name, data));

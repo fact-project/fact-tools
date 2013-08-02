@@ -1,5 +1,6 @@
 package fact.viewer.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -10,6 +11,8 @@ import javax.swing.JFrame;
 
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.ui.Layer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import stream.Data;
 
@@ -30,6 +33,7 @@ public class ChartWindow {
 	private SimplePlotPanel plotPanel;
 	private SourceSelector sL;
 	private Set<Integer> selectedPixelSet;
+	static Logger log = LoggerFactory.getLogger(ChartWindow.class);
 
 	/**
 	 * @param m
@@ -55,7 +59,7 @@ public class ChartWindow {
 		sL = new SourceSelector(event, this);
 		sL.setAlignmentX(Component.CENTER_ALIGNMENT);
 		sL.setAlignmentY(Component.TOP_ALIGNMENT);
-		sL.setPreferredSize(new Dimension(100,
+		sL.setPreferredSize(new Dimension(170,
 				plotPanel.getPreferredSize().height));
 		frame.getContentPane().add(sL, "2, 1, fill, fill");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -125,21 +129,39 @@ public class ChartWindow {
 	 * @param set
 	 */
 	private void addSeriesToPlot(Data event, Set<Integer> set, String key, IntervalMarker[] m) {
+		Color color = getMatchingColorFromKey(key, event);
 		if (!set.isEmpty()) {
 			for (int id : set) {
 				id = DefaultPixelMapping.getChidID(id);
 				float[] data = (float[]) event.get(key);
 				int roi = data.length / Constants.NUMBEROFPIXEL;
-				plotPanel.addSeries(key + "-" + id, data, roi * id, (roi * id)
+				plotPanel.addSeries(key + "-" + id, color, data, roi * id, (roi * id)
 						+ roi);
 			}
 		} else {
 			int id = 0;
 			float[] data = (float[]) event.get(key);
 			int roi = data.length / Constants.NUMBEROFPIXEL;
-			plotPanel.addSeries(key + "-" + id, data, roi * id, (roi * id)
+			plotPanel.addSeries(key + "-" + id, color, data, roi * id, (roi * id)
 					+ roi);
 		}
+	}
+	
+	public Color getMatchingColorFromKey(String key, Data event) {
+//		Data event = FactViewer.getInstance().getEvent();
+		// remove pixelnumber from name
+		key = key.replaceAll("-(\\d){1,4}", "");
+		String colorKey = "@" + Constants.KEY_COLOR + "_" + key;
+
+		if (event.containsKey(colorKey)) {
+			try{
+				return Color.decode((String) event.get(colorKey));
+			} catch (NumberFormatException e){
+				log.error("Could not parse the Color String. " +  (String) event.get(colorKey) + " is not a valid color String of the form \" #HHHHHH \". " );
+			}
+		}
+
+		return null;
 	}
 
 	public void setSlice(int i) {
