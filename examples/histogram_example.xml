@@ -7,24 +7,25 @@
 <property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres.fits" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
+	<stream id="otto" class="fact.io.FitsStream"  url="file:${data}"  />
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
-	<process input="fact" copies="1">
+	<process input="otto" copies="1">
 			<Skip condition="%{data.TriggerType} != 4" />
+			
 	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
             <fact.utils.CutSlices  start="22" end="220"/>
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
                 
-            
-        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" />
-		<fact.features.CalculatePhotonCharge key="DataCalibrated" outputKey="c" />
-		<fact.statistics.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/>
-		<fact.statistics.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/>
-		<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/>
-		<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true"/>
-		<stream.monitor.DataRate every="200" />
+	            
+	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" />
+			<fact.features.PhotonCharge key="DataCalibrated" outputKey="c" />
+			<fact.statistics.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/>
+			<fact.statistics.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/>
+			<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/>
+			<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true"/>
+			<stream.monitor.DataRate every="200" />
 <!-- 		<fact.image.ShowImage/> -->
 	</process>
 		

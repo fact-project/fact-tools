@@ -115,13 +115,13 @@ public class CoreNeighborClean implements Processor{
 			int[] newShowerPixelArray = new int[c];
 			int k = 0;
 			for(int pixel: showerPixelArray){
-				System.out.println(Math.abs(positions[pixel] - median));
+//				System.out.println(Math.abs(positions[pixel] - median));
 				if(Math.abs(positions[pixel] - median) < timeThreshold){
 					newShowerPixelArray[k] = pixel;
 					k++;
 				}
 			}
-			System.out.println("vorher: " + showerPixelArray.length + "  nachher: " + newShowerPixelArray.length);
+//			System.out.println("vorher: " + showerPixelArray.length + "  nachher: " + newShowerPixelArray.length);
 			showerPixelArray = newShowerPixelArray;
 		}
 		
