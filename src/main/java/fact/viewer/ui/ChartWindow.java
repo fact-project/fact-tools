@@ -8,6 +8,9 @@ import java.util.Set;
 
 import javax.swing.JFrame;
 
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.ui.Layer;
+
 import stream.Data;
 
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -26,23 +29,7 @@ public class ChartWindow {
 	FactViewer mainWindow;
 	private SimplePlotPanel plotPanel;
 	private SourceSelector sL;
-	private Set<Integer> set;
-
-	public Set<Integer> getSet() {
-		return set;
-	}
-
-	public void setSet(Set<Integer> set) {
-		this.set = set;
-	}
-
-	public SimplePlotPanel getPlotPanel() {
-		return plotPanel;
-	}
-
-	public void setPlotPanel(SimplePlotPanel plotPanel) {
-		this.plotPanel = plotPanel;
-	}
+	private Set<Integer> selectedPixelSet;
 
 	/**
 	 * @param m
@@ -56,9 +43,9 @@ public class ChartWindow {
 		frame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("pref:grow"),
 				ColumnSpec.decode("pref:grow"),},
-			new RowSpec[] {
+				new RowSpec[] {
 				RowSpec.decode("max(445px;min):grow"),}));
-	
+
 		// frame.setResizable(false);
 
 		plotPanel = new SimplePlotPanel();
@@ -91,39 +78,60 @@ public class ChartWindow {
 
 	// just redraw some shiiiit
 	public void updateGraph() {
-		updateGraph(event, set);
+		updateGraph(event, selectedPixelSet);
 	}
 
 	/**
 	 * @param event
-	 * @param set
+	 * @param selectedPixelSet
 	 */
 	public void updateGraph(Data event, Set<Integer> setP) {
-		set = setP;
+		selectedPixelSet = setP;
 		if (event != null) {
 			plotPanel.clearSeries();
-				for (String key : sL.getSelectedKeys()) {
-					addSeriesToPlot(event, set, key);
+			plotPanel.getPlot().clearDomainMarkers();
+			for (String key : sL.getSelectedKeys()) {
+				try{
+					IntervalMarker[] m = (IntervalMarker[]) event.get(key);
+					addMarkerToPlot(event, selectedPixelSet, key, m);
+				} catch(ClassCastException  e){
+					addSeriesToPlot(event, selectedPixelSet, key, null);
 				}
+			}
 		}
+	}
+	
+	private void addMarkerToPlot(Data event, Set<Integer> set,
+			String key, IntervalMarker[] m) {
+
+		if (!set.isEmpty()) {
+			for (int id : set) {
+				id = DefaultPixelMapping.getChidID(id);
+				if(m != null && m[id] != null){
+					plotPanel.getPlot().addDomainMarker(m[id], Layer.BACKGROUND);
+				}
+			}
+		} else {
+			int id = 0;
+			if(m != null && m[id] != null){
+				plotPanel.getPlot().addDomainMarker(m[id], Layer.BACKGROUND);
+			}
+		}
+		
 	}
 
 	/**
 	 * @param event
 	 * @param set
 	 */
-	private void addSeriesToPlot(Data event, Set<Integer> set, String key) {
+	private void addSeriesToPlot(Data event, Set<Integer> set, String key, IntervalMarker[] m) {
 		if (!set.isEmpty()) {
 			for (int id : set) {
-				/**
-				 * TODO: why get hId??
-				 */
 				id = DefaultPixelMapping.getChidID(id);
 				float[] data = (float[]) event.get(key);
 				int roi = data.length / Constants.NUMBEROFPIXEL;
 				plotPanel.addSeries(key + "-" + id, data, roi * id, (roi * id)
 						+ roi);
-
 			}
 		} else {
 			int id = 0;
@@ -137,6 +145,23 @@ public class ChartWindow {
 	public void setSlice(int i) {
 		slice = i;
 		plotPanel.setSlice(slice);
+	}
+
+
+	public Set<Integer> getSet() {
+		return selectedPixelSet;
+	}
+
+	public void setSet(Set<Integer> set) {
+		this.selectedPixelSet = set;
+	}
+
+	public SimplePlotPanel getPlotPanel() {
+		return plotPanel;
+	}
+
+	public void setPlotPanel(SimplePlotPanel plotPanel) {
+		this.plotPanel = plotPanel;
 	}
 
 }

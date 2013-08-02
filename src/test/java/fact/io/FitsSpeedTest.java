@@ -17,7 +17,7 @@ import stream.Data;
 import stream.ProcessorList;
 import stream.io.SourceURL;
 import stream.runtime.ProcessContextImpl;
-import fact.features.CalculatePhotonCharge;
+import fact.features.PhotonCharge;
 import fact.features.MaxAmplitude;
 import fact.filter.DrsCalibration;
 
@@ -42,7 +42,7 @@ public class FitsSpeedTest {
 
 			ProcessorList preprocess = new ProcessorList();
 			preprocess.add(new MaxAmplitude());
-			preprocess.add(new CalculatePhotonCharge());
+			preprocess.add(new PhotonCharge());
 			DrsCalibration drs = new DrsCalibration();
 			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
 			drs.setUrl(u);

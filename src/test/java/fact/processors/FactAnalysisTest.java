@@ -12,8 +12,8 @@ import stream.Data;
 import stream.io.SourceURL;
 
 import fact.cleaning.CoreNeighborClean;
-import fact.features.CalcSourcePosition;
-import fact.features.CalculatePhotonCharge;
+import fact.features.SourcePosition;
+import fact.features.PhotonCharge;
 import fact.features.MaxAmplitudePosition;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
@@ -56,7 +56,7 @@ public class FactAnalysisTest {
 			pP.setKey("test");
 			pP.setOutputKey("positions");
 
-			CalculatePhotonCharge c = new CalculatePhotonCharge();
+			PhotonCharge c = new PhotonCharge();
 			c.setKey("test");
 			c.setOutputKey("photonCharge");
 
@@ -65,7 +65,7 @@ public class FactAnalysisTest {
 			clean.setOutputKey("shower");
 
 			URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
-			CalcSourcePosition poser = new CalcSourcePosition();
+			SourcePosition poser = new SourcePosition();
 			poser.setUrl(driveURL);
 			poser.setOutputKey("pos");
 			poser.init(null);

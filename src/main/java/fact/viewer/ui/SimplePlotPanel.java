@@ -24,6 +24,7 @@ import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -31,6 +32,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.Layer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +108,9 @@ public class SimplePlotPanel extends JPanel {
 				0.0f)); // Dash phase
 		marker.setLabel("Slice");
 		plot.addDomainMarker(marker);
+		// Add some sort of interval rendering here-. 
+
+		
 		final JFreeChart chart = new JFreeChart(plot);
 		final ChartPanel p = new ChartPanel(chart);
 		p.addChartMouseListener(new ChartMouseListener() {
@@ -286,6 +291,10 @@ public class SimplePlotPanel extends JPanel {
 		}
 		return series;
 	}
+	
+//	public void addInterVallMarker(IntervalMarker m){
+//		plot.addDomainMarker(m, Layer.BACKGROUND);
+//	}
 
 	public XYItemRenderer getRender() {
 		return render;
@@ -297,6 +306,6 @@ public class SimplePlotPanel extends JPanel {
 
 	public void setSlice(int slice) {
 		marker.setValue(slice);
-
 	}
+
 }

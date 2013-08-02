@@ -24,8 +24,8 @@ import fact.io.FitsStream;
  *  
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
-public class CalcSourcePosition implements StatefulProcessor {
-	static Logger log = LoggerFactory.getLogger(CalcSourcePosition.class);
+public class SourcePosition implements StatefulProcessor {
+	static Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
 	Data slowData = null;
 	private String outputKey = "sourcePosition";

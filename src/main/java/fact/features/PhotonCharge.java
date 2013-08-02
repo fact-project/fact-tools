@@ -1,6 +1,9 @@
 
 package fact.features;
 
+import java.awt.Color;
+
+import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +23,20 @@ import fact.Constants;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
-public class CalculatePhotonCharge implements Processor {
-	static Logger log = LoggerFactory.getLogger(CalculatePhotonCharge.class);
+public class PhotonCharge implements Processor {
+	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	private float[] photonCharge = null;
+
+	private String color = "#00F0F0";
 
 	private	double average = 0.0;
 	private float integralGain = 244.0f;
+	private int alpha = 64;
 
 	private String positions = null;
 	private String key = "DataCalibrated";
 	private String outputKey = key;
-	
+
 	@Override
 	public Data process(Data input) {
 		int[] posArray = null;
@@ -50,52 +56,64 @@ public class CalculatePhotonCharge implements Processor {
 		} catch(Exception e){
 			log.error("Could not get the right items from the map. wrong key?   " + key );
 		}
-		
+
+		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		photonCharge = new float[Constants.NUMBEROFPIXEL];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		// for each pixel
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
-    	
-		    	/**
-		    	 * watch out. index can get out of bounds!
-		    	 */
-				int pos = pix*roi;
-			    int positionOfMaximum                 = posArray[pix];
-			    int positionOfHalfMaximumValue            = 0;
-			    if(positionOfMaximum <=25){
-			    	positionOfMaximum=25;
-			    }
-			    //in an area of amplitudePosition...amplitudePositon-25 search for the postion having 0.5of the original maxAmplitude
-			    for (int sl = positionOfMaximum ; sl > positionOfMaximum - 25 ; sl--)
-			    {
-			        positionOfHalfMaximumValue        = sl;
 
-			        if (data[pos + sl-1] < data[pos + positionOfMaximum] / 2  && data[pos + sl] >= data[pos + positionOfMaximum] / 2)
-			        {
-			            break;
-			        }
-			    }
-			    
-			    float integral              = 0;
-			    //and now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.
-			    //watch out for right margin of array here
-			    if(positionOfHalfMaximumValue + 30 < roi ){
-			    	for (int sl = positionOfHalfMaximumValue ; sl < positionOfHalfMaximumValue + 30 ; sl++)  integral += data[sl + (pix*roi)];
-			    } else {
-			    	integral = data[positionOfMaximum +pix*roi] / 9.0f;
-			    }			    
-			    photonCharge[pix] = integral/integralGain;
-			   	average += photonCharge[pix];
+			/**
+			 * watch out. index can get out of bounds!
+			 */
+			int pos = pix*roi;
+			int positionOfMaximum                 = posArray[pix];
+			int positionOfHalfMaximumValue            = 0;
+			if(positionOfMaximum <=25){
+				positionOfMaximum=25;
+			}
+			//in an area of amplitudePosition...amplitudePositon-25 search for the postion having 0.5of the original maxAmplitude
+			for (int sl = positionOfMaximum ; sl > positionOfMaximum - 25 ; sl--)
+			{
+				positionOfHalfMaximumValue        = sl;
+
+				if (data[pos + sl-1] < data[pos + positionOfMaximum] / 2  && data[pos + sl] >= data[pos + positionOfMaximum] / 2)
+				{
+					break;
+				}
+			}
+
+			float integral              = 0;
+			//and now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.
+			//watch out for right margin of array here
+			if(positionOfHalfMaximumValue + 30 < roi ){
+				for (int sl = positionOfHalfMaximumValue ; sl < positionOfHalfMaximumValue + 30 ; sl++)  integral += data[sl + (pix*roi)];
+			} else {
+				integral = data[positionOfMaximum +pix*roi] / 9.0f;
+			}			    
+			photonCharge[pix] = integral/integralGain;
+			average += photonCharge[pix];
+			Color c = Color.decode(color);
+			int r = c.getRed();
+			int g = c.getGreen();
+			int b = c.getBlue();
 			
+			m[pix] = new IntervalMarker(positionOfHalfMaximumValue, positionOfHalfMaximumValue + 30, new Color(r,g,b, alpha));
 		}
-		average = average/Constants.NUMBEROFPIXEL;  
+		average = average/Constants.NUMBEROFPIXEL;
+
+		//add color value if set
+		if(color !=  null && !color.equals("")){
+			input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
+		}		
+		input.put(outputKey+"Marker", m);
 		input.put(outputKey, photonCharge);
 		return input;
 	}
 
-	
+
 	/*Getters and Setters */
-	
+
 	public float getIntegralGain() {
 		return integralGain;
 	}
@@ -119,11 +137,30 @@ public class CalculatePhotonCharge implements Processor {
 	}
 
 
+
 	public String getOutputKey() {
 		return outputKey;
 	}
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
+	}
+
+
+	public String getColor() {
+		return color;
+	}
+
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+
+	public int getAlpha() {
+		return alpha;
+	}
+	public void setAlpha(int alpha) {
+		this.alpha = alpha;
 	}
 
 }
