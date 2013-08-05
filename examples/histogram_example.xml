@@ -23,8 +23,8 @@
 			<fact.features.PhotonCharge key="DataCalibrated" outputKey="c" />
 			<fact.statistics.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/>
 			<fact.statistics.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/>
-			<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/>
-			<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true"/>
+<!-- 			<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/> -->
+<!-- 			<fact.image.monitors.HistogramPlotter key="th"  logAxis="true"/> -->
 			<stream.monitor.DataRate every="200" />
 <!-- 		<fact.image.ShowImage/> -->
 	</process>

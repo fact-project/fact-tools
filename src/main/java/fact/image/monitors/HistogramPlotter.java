@@ -10,6 +10,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -32,12 +34,11 @@ public class HistogramPlotter extends DataVisualizer {
 
 	private boolean keepOpen = true;
 	private String key;
-	private boolean drawErrors = true;
-	private float max= 500;
+
+	private float max= 10;
 	private float min = 0;
 	private boolean logAxis = false;
-	//	private JFreeChart chart;
-	//	float[] a = {0.2f,0.32f,0.323f};
+
 	private IntervalXYDataset dataset;
 	private XYPlot xyplot;
 	private float binSize;
@@ -66,6 +67,12 @@ public class HistogramPlotter extends DataVisualizer {
 		xyplot = chart.getXYPlot();
 		if(logAxis)
 			xyplot.setRangeAxis(new LogarithmicAxis("#"));
+		final XYBarRenderer r = (XYBarRenderer) xyplot.getRenderer();
+		r.setDrawBarOutline(false);
+		r.setShadowVisible(false);
+//		r.setDefaultShadowsVisible(false);
+		r.setMargin(0.05);
+		r.setBarPainter(new StandardXYBarPainter());
 		
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		frame = new JFrame();
@@ -73,8 +80,6 @@ public class HistogramPlotter extends DataVisualizer {
 		frame.getContentPane().add(chartPanel, BorderLayout.CENTER);
 		frame.setSize(width, height);
 		frame.setVisible(true);
-
-
 	}
 
 	@Override
@@ -86,8 +91,9 @@ public class HistogramPlotter extends DataVisualizer {
 		try{
 			if (data.containsKey(key)) {
 				int[] hist = (int[]) data.get(key);
-				binSize = max/hist.length;
+				binSize = max/(hist.length);
 				fillDataSet(hist);
+				xyplot.getDomainAxis().setRange(min - binSize, max + binSize);
 			}
 		} catch (ClassCastException e){
 			log.error("Key did not refer to an int array");
@@ -113,7 +119,7 @@ public class HistogramPlotter extends DataVisualizer {
 
 			@Override
 			public double getEndXValue(int series, int item) {
-				return binSize * (item + 1) - 1;
+				return binSize * (item + 1) ;
 			}
 
 		};
@@ -152,16 +158,6 @@ public class HistogramPlotter extends DataVisualizer {
 	@Parameter(required = true, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
 	public void setKey(String key) {
 		this.key = key;
-	}
-
-
-	public boolean isDrawErrors() {
-		return drawErrors;
-	}
-
-	@Parameter(required = true, description = "Flag to toggle drawing of Errorbars in plot.")
-	public void setDrawErrors(boolean drawErrors) {
-		this.drawErrors = drawErrors;
 	}
 
 

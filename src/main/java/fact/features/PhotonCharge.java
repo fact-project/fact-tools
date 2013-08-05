@@ -108,6 +108,8 @@ public class PhotonCharge implements Processor {
 			input.put("@" + Constants.KEY_COLOR + "_"+outputKey+"Marker", color);
 		}		
 		input.put(outputKey, photonCharge);
+		int[] t = {10,20,100,1000,500,150};
+		input.put("th", t);
 		return input;
 	}
 
