@@ -3,18 +3,16 @@
  */
 package fact.utils;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import fact.Constants;
 
 /**
- * @author chris, niklaswulf
+ * @author chris, niklaswulf, kai
  * 
  */
 public class CutSlices implements Processor {
@@ -26,6 +24,40 @@ public class CutSlices implements Processor {
 
 	String[] keys = new String[] { "DataCalibrated" };
 
+
+
+	/**
+	 * @see stream.DataProcessor#process(stream.Data)
+	 */
+	@Override
+	public Data process(Data data) {
+
+		for (String key : keys) {
+
+			try{
+				float[] original = (float[]) data.get(key);
+				int rows = elements;
+				
+				int oldRoi = original.length / rows;
+				int newRoi = (end - start);
+
+				float[] result = new float[newRoi * rows];
+				for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+					System.arraycopy(original, pix * oldRoi + start,
+							result, pix * newRoi, newRoi);
+				}
+				data.put(key, result);
+				data.put("@start" + key, start);
+				data.put("@end" + key, start);
+
+			} catch(ClassCastException e){
+				log.error("The key " + key + " does not refer to a float array." );
+			}
+		}
+		return data;
+	}
+
+	
 	/**
 	 * @return the start
 	 */
@@ -72,82 +104,5 @@ public class CutSlices implements Processor {
 	@Parameter(name = "keys", defaultValue = "Data", values = { "Data" }, required = false)
 	public void setKeys(String[] keys) {
 		this.keys = keys;
-	}
-
-	/**
-	 * @see stream.DataProcessor#process(stream.Data)
-	 */
-	@Override
-	public Data process(Data data) {
-
-		for (String key : keys) {
-			if (data.containsKey(key) && data.get(key).getClass().isArray()) {
-				Serializable s = data.get(key);
-				log.debug("Cutting array of type {}", s.getClass()
-						.getComponentType());
-
-				if (s.getClass().isArray()) {
-
-					int rows = elements;
-					int oldLen = Array.getLength(s) / rows;
-
-					int newLen = (end - start);
-
-					// Object result = Array.newInstance(s.getClass()
-					// .getComponentType(), rows * newLen);
-
-					float[] original = (float[]) s;
-					float[] result = new float[newLen * rows];
-
-					for (int row = 0; row < rows; row++) {
-
-						System.arraycopy(original, row * oldLen + start,
-								result, row * newLen, newLen);
-
-						// for (int i = 0; i < newLen && i < (end - start); i++)
-						// {
-						// int fromPos = row * oldLen + start + i;
-						// int toPos = row * newLen + i;
-						//
-						// Array.set(result, toPos, Array.get(s, fromPos));
-						// }
-					}
-
-					data.put(key, result);
-
-				} else {
-					log.error("Skipping non-array type object '{}'", key);
-				}
-
-				// float[] dat = (float[]) data.get( key );
-				// dat = subArray( dat, dat.length / elements, start, end );
-				// data.put( key, dat );
-			} else {
-				log.warn("Key '{}' is not refering to an array!", key);
-			}
-		}
-
-		return data;
-	}
-
-	protected float[] subArray(float[] data, int rowLength, int start, int end) {
-
-		int oldLen = rowLength;
-		int rows = data.length / rowLength;
-		log.debug("Old ROI is {}", oldLen);
-		int newLen = end - start;
-
-		float[] result = new float[rows * newLen];
-
-		for (int row = 0; row < rows; row++) {
-
-			int off = row * oldLen;
-			int newOff = row * newLen;
-
-			for (int i = 0; i < newLen && i < oldLen; i++) {
-				result[newOff + i] = data[off + start + i];
-			}
-		}
-		return result;
 	}
 }
