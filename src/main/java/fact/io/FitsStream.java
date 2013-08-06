@@ -32,9 +32,9 @@ public class FitsStream extends AbstractStream {
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
-	
+
 	protected int eventBytes;
-//	private FileChannel inChannel;
+	//	private FileChannel inChannel;
 
 	public FitsStream(SourceURL url) {
 		super(url);
@@ -56,12 +56,12 @@ public class FitsStream extends AbstractStream {
 		}
 		bStream = new BufferedInputStream(getInputStream());
 		dataStream = new DataInputStream(bStream);
-//		inChannel = fileStream.getChannel();
-		
-//		FileInputStream fileStream = new FileInputStream(url.getFile());
-//		bufferdStream = new BufferedInputStream(fileStream);
-//		
-		
+		//		inChannel = fileStream.getChannel();
+
+		//		FileInputStream fileStream = new FileInputStream(url.getFile());
+		//		bufferdStream = new BufferedInputStream(fileStream);
+		//		
+
 		FitsHeader header = this.readHeader(dataStream);
 		log.debug("Header #1 read:\n{}", header);
 
@@ -139,23 +139,27 @@ public class FitsStream extends AbstractStream {
 				String value = val.replaceAll("'", "").trim();
 				key = key.trim();
 				try{
-					Float v = Float.parseFloat(value);
+					Integer v = Integer.parseInt(value);
 					headerItem.put(key, v);
 				} catch (NumberFormatException e){
-					if(value.equals("f") || value.equals("F")){
-						Boolean b = new Boolean(false);
-						headerItem.put(key, b);
-					} else if (value.equals("t") || value.equals("T")){
-						Boolean b = new Boolean(true);
-						headerItem.put(key, b);
-					} else {
-						headerItem.put(key, value);
+					try{
+						Float v = Float.parseFloat(value);
+						headerItem.put(key, v);
+					} catch (NumberFormatException ef){
+						if(value.equals("f") || value.equals("F")){
+							Boolean b = new Boolean(false);
+							headerItem.put(key, b);
+						} else if (value.equals("t") || value.equals("T")){
+							Boolean b = new Boolean(true);
+							headerItem.put(key, b);
+						} else {
+							headerItem.put(key, value);
+						}
 					}
-						
 				}
 			}
 
-			
+
 			if ("NROI".equals(key)) {
 				roi = Integer.parseInt(val.trim());
 				log.debug("roi is: {}", roi);
@@ -208,7 +212,7 @@ public class FitsStream extends AbstractStream {
 						// floats we need 4*n bytes
 						byte[] el = new byte[4 * numberOfElements];
 						dataStream.read(el);
-//						bStream.read(el);
+						//						bStream.read(el);
 						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
 						float[] ar = new float[numberOfElements];
 						sBuf.get(ar);
@@ -223,7 +227,7 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], dataStream.readFloat());
 					}
 				}
-				
+
 				// read double
 				if (typeArray[n].equals("D")) {
 					int numberOfelements = lengthArray[n];
@@ -286,14 +290,14 @@ public class FitsStream extends AbstractStream {
 					// --------------this is where the magic
 					// happens-------------
 					if (numberOfelements > 128) {
-						
+
 						// lets try to be even quicker
 						// to save n shorts we need 2*n bytes
-//						byte[] el = new byte[2 * numberOfelements];
-//						ByteBuffer byteBuffer2 = ByteBuffer.wrap(el);
-//						inChannel.read(byteBuffer2);
-//						bStream.read(el);
-//						ShortBuffer sBuf = byteBuffer2.asShortBuffer();
+						//						byte[] el = new byte[2 * numberOfelements];
+						//						ByteBuffer byteBuffer2 = ByteBuffer.wrap(el);
+						//						inChannel.read(byteBuffer2);
+						//						bStream.read(el);
+						//						ShortBuffer sBuf = byteBuffer2.asShortBuffer();
 						byte[] el = new byte[2 * numberOfelements];
 						dataStream.read(el);
 						ShortBuffer sBuf = ByteBuffer.wrap(el).asShortBuffer();
@@ -329,7 +333,7 @@ public class FitsStream extends AbstractStream {
 		int pos = 0;
 		int read = in.read(data, pos, 2880);
 		boolean parsedHeader = false;
-		
+
 		// try to find the END keyword. 
 		while (read > 0) {
 			pos += read;
@@ -341,12 +345,12 @@ public class FitsStream extends AbstractStream {
 			}
 			read = in.read(data, pos, 2880);
 			//this might result in an infinite loop also the unit tests fail.
-//			int cur = 0;
-//			while (cur < 2880) {
-//				int br = in.read(data, pos + cur, 2880 - cur);
-//				cur += br;
-//			}
-//			read += cur;
+			//			int cur = 0;
+			//			while (cur < 2880) {
+			//				int br = in.read(data, pos + cur, 2880 - cur);
+			//				cur += br;
+			//			}
+			//			read += cur;
 		}
 
 		byte[] header = new byte[pos];
