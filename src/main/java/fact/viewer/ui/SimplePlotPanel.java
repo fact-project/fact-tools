@@ -275,6 +275,7 @@ public class SimplePlotPanel extends JPanel {
 	}
 
 	public void setSlice(int slice) {
+//		System.out.println("slice set");
 		marker.setValue(slice);
 	}
 

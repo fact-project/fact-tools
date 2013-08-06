@@ -87,9 +87,12 @@ public class PhotonCharge implements Processor {
 			//and now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.
 			//watch out for right margin of array here
 			if(positionOfHalfMaximumValue + 30 < roi ){
-				for (int sl = positionOfHalfMaximumValue ; sl < positionOfHalfMaximumValue + 30 ; sl++)  integral += data[sl + (pix*roi)];
-			} else {
-				integral = data[positionOfMaximum +pix*roi] / 9.0f;
+				for (int sl = positionOfHalfMaximumValue ; sl < positionOfHalfMaximumValue + 30 ; sl++){  
+					integral += data[sl + (pix*roi)];
+				}
+			}
+			else {
+				integral = 0;
 			}			    
 			photonCharge[pix] = integral/integralGain;
 			average += photonCharge[pix];
@@ -97,7 +100,7 @@ public class PhotonCharge implements Processor {
 			int r = c.getRed();
 			int g = c.getGreen();
 			int b = c.getBlue();
-			
+
 			m[pix] = new IntervalMarker(positionOfHalfMaximumValue, positionOfHalfMaximumValue + 30, new Color(r,g,b, alpha));
 		}
 		average = average/Constants.NUMBEROFPIXEL;
@@ -108,8 +111,6 @@ public class PhotonCharge implements Processor {
 			input.put("@" + Constants.KEY_COLOR + "_"+outputKey+"Marker", color);
 		}		
 		input.put(outputKey, photonCharge);
-		int[] t = {10,20,100,1000,500,150};
-		input.put("th", t);
 		return input;
 	}
 

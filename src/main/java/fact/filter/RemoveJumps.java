@@ -82,33 +82,40 @@ public class RemoveJumps implements Processor{
 				}
 			}
 			
-			
+			int a = 0;
 			for(int candidateSlice : startCandidateSlices){
-				if(candidateSlice > roi || candidateSlice <0){
-					System.out.println("WTF");
-				}
 				double h = jumpHeight(pix, candidateSlice, data);
 				if(Math.abs(h) > jumpThreshold){
 					//rechts an links Anpassen
 					// c is any number between currentStart and currentStopCell. 0< c < 1024 
+					System.out.println("jump up: " + candidateSlice + " pixel: " + pix);
 					for (int i =  candidateSlice ; i < roi ; ++i){
 						int pos = pix*roi + i;
 						result[pos] -= h;
 					}
+					for(int k = a; k < previousStartCells.size(); k++){
+						previousStartCells.remove(k);
+					}
+					break;
 				}
+				a++;
 			}
 			
-			
+			a = 0;
 			for(int candidateSlice : stopCandidateSlices){
 				double h = jumpHeight(pix, candidateSlice, data);
 				if(Math.abs(h) > jumpThreshold){
+					System.out.println("jump down: " + candidateSlice + " pixel: " + pix);
 					//links an rechts Anpassen
 					// c is any number between currentStart and currentStopCell. 0< c < 1024
 					for (int i = candidateSlice; i >= 0 ; --i){
 						int pos = pix*roi + i ;
 						result[pos] += h;
 					}
+
+					break;
 				}
+				a++;
 			}
 			
 		}		

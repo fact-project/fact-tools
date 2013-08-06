@@ -6,6 +6,8 @@ package fact.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.annotations.Parameter;
+
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
 
@@ -17,6 +19,7 @@ import fact.utils.SimpleFactEventProcessor;
  */
 public class RemoveSpikesMars extends SimpleFactEventProcessor<float[], float[]> {
 	static Logger log = LoggerFactory.getLogger(RemoveSpikesMars.class);
+	private float topSlope = 4.0f;
 	@Override
 	public float[] processSeries(float[] data) {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -38,7 +41,7 @@ public class RemoveSpikesMars extends SimpleFactEventProcessor<float[], float[]>
 				if (data[sl] - data[sl-1] > 22)
 				{
 					// check if immediately a small step follows
-					if (Math.abs((data[sl+1] - data[sl])) < 4 )
+					if (Math.abs((data[sl+1] - data[sl])) < topSlope )
 					{
 						// check if then a one slice jump down follows
 						// ==> Double Spike
@@ -53,5 +56,13 @@ public class RemoveSpikesMars extends SimpleFactEventProcessor<float[], float[]>
 			}
 		}
 		return data;
+	}
+	
+	@Parameter(required = false, description = "A Spike can consist of two slices. That means the peak has two data points which are higher than the rest. This parameter describes the maximum difference these two points are allowed to have.", defaultValue="8")
+	public float getTopSlope() {
+		return topSlope;
+	}
+	public void setTopSlope(float topSlope) {
+		this.topSlope = topSlope;
 	}
 }

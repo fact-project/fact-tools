@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 
 import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.ui.Layer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import fact.FactViewer;
 public class ChartWindow {
 
 	short selectIndex = 0;
-	private int slice;
+	private int slice = 0;
 	// private CameraPixelMap camMap;
 	Data event;
 	FactViewer mainWindow;
@@ -102,6 +103,7 @@ public class ChartWindow {
 					addSeriesToPlot(event, selectedPixelSet, key, null);
 				}
 			}
+			plotPanel.setSlice(slice);
 		}
 	}
 	
@@ -166,7 +168,9 @@ public class ChartWindow {
 
 	public void setSlice(int i) {
 		slice = i;
-		plotPanel.setSlice(slice);
+//		plotPanel.setSlice(slice);
+		plotPanel.getPlot().clearDomainMarkers(2);
+		plotPanel.getPlot().addDomainMarker(2, new ValueMarker(i), Layer.FOREGROUND);
 	}
 
 
