@@ -1,12 +1,18 @@
 package fact.image.monitors;
 
-import java.awt.BorderLayout;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
-import javax.swing.JFrame;
-
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.ApplicationFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +20,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
-import fact.Constants;
 import fact.data.EventUtils;
-import fact.image.OnlineStatistics;
 
 /**
  * 
@@ -25,19 +29,101 @@ import fact.image.OnlineStatistics;
  */
 public class ScatterPlotter extends DataVisualizer {
 	static Logger log = LoggerFactory.getLogger(ScatterPlotter.class);
-	private ScatterPlotPanel scatterPlotter;
-	JFrame frame;
-	
-	private String compValue = "";
-	public String getCompValue() {
-		return compValue;
-	}
-	public void setCompValue(String compValue) {
-		this.compValue = compValue;
-	}
+	//	JFrame frame;
+
+	private XYSeriesCollection dataset;
+	private XYSeries series;
+
+	private String xValue = "";
+	private String yValue = "";
 
 	private boolean keepOpen = true;
 
+	private int i;
+	private double x;
+
+	private double y;
+
+	public ScatterPlotter() {
+		dataset = new XYSeriesCollection();
+		series = new XYSeries("data", false);
+//		series.add(2, 2); //Point 4
+		dataset.addSeries(series);
+		showGraph();
+	}
+
+	private void showGraph() {
+		final JFreeChart chart = ChartFactory.createScatterPlot(
+				"Title",                  // chart title
+				"X",                      // x axis label
+				"Y",                      // y axis label
+				dataset,                  // data
+				PlotOrientation.VERTICAL,
+				true,                     // include legend
+				true,                     // tooltips
+				false                     // urls
+				);
+		XYPlot plot = (XYPlot) chart.getPlot();
+		DemoRenderer renderer = new DemoRenderer();
+//		renderer.setSeriesLinesVisible(0, true);
+		plot.setRenderer(renderer);
+		final ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setPreferredSize(new java.awt.Dimension(640, 480));
+		final ApplicationFrame frame = new ApplicationFrame("Title");
+		frame.setContentPane(chartPanel);
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+
+	@Override
+	public void init(ProcessContext ctx) throws Exception {
+		super.init(ctx);
+	}
+
+	@Override
+	public Data processMatchingData(Data data) {
+		if (data.containsKey(xValue) && data.containsKey(yValue)) {
+			x = (Double) data.get(xValue);
+			y = (Double) data.get(yValue);
+		} else {
+			log.info("The key " + xValue +  "  or " + yValue + " does not exist in the Event");
+		}
+//		System.out.println(x);
+//		System.out.println(y);
+		series.add(x,y);
+		//		
+		//		series.add(2, 3);
+		//		series.add(2, 4);
+		//		series.add(2, 5);
+		//		series.add(2, 6);
+		//		series.add(2, 7);
+
+		//		dataset.addSeries(series);
+		return data;
+	}
+
+	@Override
+	public void finish() throws Exception {
+		if (!keepOpen) {
+			log.debug("Closing plot frame");
+			//			frame.setVisible(false);
+			//			frame.dispose();
+			//			frame = null;
+		} else {
+			log.debug("Keeping plot frame visible...");
+		}
+	}
+
+	class DemoRenderer extends XYShapeRenderer {
+		private static final long serialVersionUID = 4804521867675934134L;
+
+		@Override
+		public java.awt.Shape getSeriesShape(int series){
+			return new Rectangle2D.Double(-2, -2, 4, 4);
+			
+		}
+	}
 
 	public boolean isKeepOpen() {
 		return keepOpen;
@@ -48,110 +134,17 @@ public class ScatterPlotter extends DataVisualizer {
 		this.keepOpen = keepOpen;
 	}
 
-	private String[] keys;
-
-	public String[] getKeys() {
-		return keys;
+	public String getxValue() {
+		return xValue;
 	}
-
-	@Parameter(required = false, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
-	public void setKeys(String[] keys) {
-		this.keys = keys;
+	public void setxValue(String xValue) {
+		this.xValue = xValue;
 	}
-
-	private boolean drawErrors = true;
-
-	public boolean isDrawErrors() {
-		return drawErrors;
+	
+	public String getyValue() {
+		return yValue;
 	}
-
-	@Parameter(required = true, description = "Flag to toggle drawing of Errorbars in plot.")
-	public void setDrawErrors(boolean drawErrors) {
-		this.drawErrors = drawErrors;
-	}
-
-	public ScatterPlotter() {
-		width = 690;
-		height = 460;
-		// this.setHistory(1440);
-		// prevDataItem = DataFactory.create();
-	}
-
-	OnlineStatistics onStat = null;
-	private XYSeriesCollection dataset;
-	private XYSeries[] sAr;
-
-	@Override
-	public void init(ProcessContext ctx) throws Exception {
-		super.init(ctx);
-		scatterPlotter = new ScatterPlotPanel(compValue);
-		frame = new JFrame();
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().add(scatterPlotter, BorderLayout.CENTER);
-		frame.setSize(width, height);
-		frame.setVisible(true);
-		dataset = new XYSeriesCollection();
-		scatterPlotter.setDataset(dataset);
-		sAr = new XYSeries[keys.length];
-		for(int i = 0 ; i < keys.length; i++){
-			sAr[i] = new XYSeries(keys[i]);
-			dataset.addSeries(sAr[i]);
-		}
-
-	}
-
-	@Override
-	public Data processMatchingData(Data data) {
-
-		double first = 0.0;
-		if (data.containsKey(compValue)) {
-				Serializable val = data.get(compValue);
-				// in case the "key" describes a single value per event
-				if (val.getClass().equals(float.class)
-						|| val.getClass().equals(double.class)
-						|| val.getClass().equals(int.class)
-						|| val instanceof Number) {
-		
-					first = EventUtils.valueToDouble(val);
-				} else if (val.getClass().isArray()) {
-					log.info("This plotter cant handle arrays. Its just too much");
-				}
-		} else {
-			log.info("The key " + compValue + " does not exist in the Event");
-		}
-		
-		for (int i = 0; i < sAr.length; i++){
-			XYSeries series = sAr[i];
-			Serializable val = data.get(keys[i]);
-			double y = 0;
-			// in case the "key" describes a single value per event
-			if(val == null){
-				log.info(Constants.ERROR_WRONG_KEY + keys[i] + ",  " + this.getClass().getSimpleName() );
-			} else if (val.getClass().equals(float.class)
-					|| val.getClass().equals(double.class)
-					|| val.getClass().equals(int.class)
-					|| val instanceof Number)
-			{
-				y = EventUtils.valueToDouble(val);
-			}
-			series.add(first, y);
-		}
-		
-		
-//		series.add(rand.nextDouble(), rand.nextDouble());
-//		scatterPlotter.setDataset(dataset);
-		return data;
-	}
-
-	@Override
-	public void finish() throws Exception {
-		if (!keepOpen) {
-			log.debug("Closing plot frame");
-			frame.setVisible(false);
-			frame.dispose();
-			frame = null;
-		} else {
-			log.debug("Keeping plot frame visible...");
-		}
+	public void setyValue(String yValue) {
+		this.yValue = yValue;
 	}
 }
