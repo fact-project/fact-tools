@@ -1,14 +1,13 @@
 package fact.image.monitors;
 
+import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -20,7 +19,6 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
-import fact.data.EventUtils;
 
 /**
  * 
@@ -36,25 +34,24 @@ public class ScatterPlotter extends DataVisualizer {
 
 	private String xValue = "";
 	private String yValue = "";
+	
+	private String title = "Default Title";
+	private String color = "#F0D0E0";
 
 	private boolean keepOpen = true;
 
-	private int i;
+//	private int i;
 	private double x;
 
 	private double y;
 
 	public ScatterPlotter() {
-		dataset = new XYSeriesCollection();
-		series = new XYSeries("data", false);
-//		series.add(2, 2); //Point 4
-		dataset.addSeries(series);
-		showGraph();
+
 	}
 
 	private void showGraph() {
 		final JFreeChart chart = ChartFactory.createScatterPlot(
-				"Title",                  // chart title
+				title,                  // chart title
 				"X",                      // x axis label
 				"Y",                      // y axis label
 				dataset,                  // data
@@ -65,6 +62,7 @@ public class ScatterPlotter extends DataVisualizer {
 				);
 		XYPlot plot = (XYPlot) chart.getPlot();
 		DemoRenderer renderer = new DemoRenderer();
+//		renderer.setBasePaint(Color.blue);
 //		renderer.setSeriesLinesVisible(0, true);
 		plot.setRenderer(renderer);
 		final ChartPanel chartPanel = new ChartPanel(chart);
@@ -78,6 +76,11 @@ public class ScatterPlotter extends DataVisualizer {
 
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
+		dataset = new XYSeriesCollection();
+		series = new XYSeries("data", false);
+//		series.add(2, 2); //Point 4
+		dataset.addSeries(series);
+		showGraph();
 		super.init(ctx);
 	}
 
@@ -120,7 +123,19 @@ public class ScatterPlotter extends DataVisualizer {
 
 		@Override
 		public java.awt.Shape getSeriesShape(int series){
-			return new Rectangle2D.Double(-2, -2, 4, 4);
+			return new Rectangle2D.Double(-1, -1, 2, 2);
+			
+		}
+		
+		@Override
+		public java.awt.Paint getSeriesPaint(int series){
+			try{
+				Color c = Color.decode(color);
+				return c;
+			} catch (NumberFormatException e) {
+				log.warn("Could not decode Colorstring. String should look like this: #FAFAFA");
+				return Color.blue;
+			}
 			
 		}
 	}
@@ -128,7 +143,6 @@ public class ScatterPlotter extends DataVisualizer {
 	public boolean isKeepOpen() {
 		return keepOpen;
 	}
-
 	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
 	public void setKeepOpen(boolean keepOpen) {
 		this.keepOpen = keepOpen;
@@ -146,5 +160,21 @@ public class ScatterPlotter extends DataVisualizer {
 	}
 	public void setyValue(String yValue) {
 		this.yValue = yValue;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+	@Parameter(required = true, description = "Title String of the plot", defaultValue = "true")
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
 	}
 }
