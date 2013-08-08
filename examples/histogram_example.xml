@@ -5,6 +5,7 @@
 <property name="dataDRS" value="/Users/kaibrugge/FactTest/20120229_132.drs.fits" />
 <property name="drive_file" value="/Users/kaibrugge/FactTest/20120229_144.DRIVE_CONTROL_TRACKING_POSITION.fits" />
 <property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres.fits" />
+<property name="csv" value="/Users/kaibrugge/FactTest/output.csv" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
 	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
@@ -19,9 +20,10 @@
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 	        <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
 <!--             <fact.filter.RemoveJumps key="DataCalibrated" outputKey="removed"/> -->
-            <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="avgremoved" color="#FD0404"/>
-			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="heightStart"/>
-			
+            <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/>
+			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_startJumpHeight" title="StartCell Jumps" color="#993366"/>
+			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_stopJumpHeight" title="StopCell Jumps" color="#006600"/>
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="heightEnd"/> -->
 <!--             <Skip condition="%{data.EventNum} &lt; 60" /> -->
 <!-- 	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" /> -->
 <!-- 			<fact.features.PhotonCharge key="DataCalibrated" outputKey="c" /> -->
@@ -30,6 +32,7 @@
 <!-- 			<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true" max="400"/> -->
 <!-- 			<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true" max="400"/> -->
 <!-- 			<stream.monitor.DataRate every="200" /> -->
+<!-- 				<stream.io.CsvWriter keys="deltaT,heightStart,heightEnd" url="file:${csv}" /> -->
 <!--             <Skip condition="%{data.EventNum} &lt; 71" /> -->
 <!-- 			<fact.image.ShowImage/> -->
 	</process>

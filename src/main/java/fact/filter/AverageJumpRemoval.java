@@ -116,10 +116,10 @@ public class AverageJumpRemoval implements Processor{
 
 		int selectedPreviousStartEvent = 0;
 		int selectedPreviousStopEvent = 0;
-		if(previousStartCells.size() > 10){
+		if(previousStartCells.size() >= limit){
 
 
-			for(int i = 0; i < 2 ; i++){
+			for(int i = 0; i < limit ; i++){
 				startCells = previousStartCells.get(i);
 				stopCells = previousStopCells.get(i);
 
@@ -174,6 +174,8 @@ public class AverageJumpRemoval implements Processor{
 			}
 
 		}		
+		
+		
 		previousStartCells.addFirst(startCellArray);
 		previousStopCells.addFirst(stopCellArray);
 
