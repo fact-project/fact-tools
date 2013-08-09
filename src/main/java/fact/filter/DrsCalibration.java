@@ -165,7 +165,7 @@ public class DrsCalibration implements Processor {
 
 
 	public float[] applyDrsCalibration(float[] data, float[] destination,
-			short[] StartCellVector) {
+			short[] startCellVector) {
 
 		if (destination == null || destination.length != data.length)
 			destination = new float[data.length];
@@ -246,7 +246,7 @@ public class DrsCalibration implements Processor {
 
 				pos = pixel * roi + slice;
 				// Offset and Gain vector *should look the same
-				int start =  StartCellVector[pixel] != -1 ? StartCellVector[pixel] : 0;
+				int start =  startCellVector[pixel] != -1 ? startCellVector[pixel] : 0;
 
 				offsetPos = pixel * drsBaselineMean.length / 1440
 						+ ((slice + start)	% (drsBaselineMean.length / 1440));

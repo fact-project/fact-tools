@@ -15,13 +15,13 @@ import fact.viewer.ui.DefaultPixelMapping;
  * @author kai
  * 
  */
-public class Remapping extends SimpleFactEventProcessor<float[], float[]>{
+public class Remapping extends SimpleFactEventProcessor<short[], short[]>{
 	static Logger log = LoggerFactory.getLogger(Remapping.class);
 	@Override
-	public float[] processSeries(float[] data) {
+	public short[] processSeries(short[] data) {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		//copy the whole data into a new array.
-		float[] remapped = new float[data.length];
+		short[] remapped = new short[data.length];
 		for(int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++){
 			int chid = DefaultPixelMapping.getChidID(softId);
 			System.arraycopy(data, softId*roi, remapped, chid*roi, roi );

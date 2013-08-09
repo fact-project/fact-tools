@@ -136,7 +136,6 @@ public class ScatterPlotter extends DataVisualizer {
 				log.warn("Could not decode Colorstring. String should look like this: #FAFAFA");
 				return Color.blue;
 			}
-			
 		}
 	}
 

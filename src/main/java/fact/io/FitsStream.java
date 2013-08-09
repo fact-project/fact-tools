@@ -32,6 +32,7 @@ public class FitsStream extends AbstractStream {
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
+	
 
 	protected int eventBytes;
 	//	private FileChannel inChannel;
@@ -158,22 +159,6 @@ public class FitsStream extends AbstractStream {
 					}
 				}
 			}
-
-
-			if ("NROI".equals(key)) {
-				roi = Integer.parseInt(val.trim());
-				log.debug("roi is: {}", roi);
-			}
-
-			if ("NPIX".equals(key)) {
-				numberOfPixel = Integer.parseInt(val.trim());
-				log.debug("numberOfPixel is: {}", numberOfPixel);
-			}
-
-			if ("NAXIS1".equals(key)) {
-				eventBytes = Integer.parseInt(val.trim());
-				log.debug("event bytes: {}", eventBytes);
-			}
 		}
 	}
 
@@ -185,7 +170,7 @@ public class FitsStream extends AbstractStream {
 	@Override
 	public Data readNext() throws Exception {
 		Data item = DataFactory.create(headerItem);
-
+//		Data item = headerItem;
 		try {
 			for (int n = 0; n < nameArray.length; n++) {
 				log.debug("Reading {}", nameArray[n]);
@@ -203,7 +188,7 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], dataStream.readInt());
 					}
 				}
-				//read float
+//				//read float
 				if (typeArray[n].equals("E")) {
 					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
@@ -228,7 +213,7 @@ public class FitsStream extends AbstractStream {
 					}
 				}
 
-				// read double
+//				// read double
 				if (typeArray[n].equals("D")) {
 					int numberOfelements = lengthArray[n];
 
@@ -242,8 +227,8 @@ public class FitsStream extends AbstractStream {
 						item.put(nameArray[n], dataStream.readDouble());
 					}
 				}
-
-				// read byte
+//
+//				// read byte
 				if (typeArray[n].equals("B")) {
 					int numberOfelements = lengthArray[n];
 
@@ -299,11 +284,13 @@ public class FitsStream extends AbstractStream {
 						//						bStream.read(el);
 						//						ShortBuffer sBuf = byteBuffer2.asShortBuffer();
 						byte[] el = new byte[2 * numberOfelements];
+						
 						dataStream.read(el);
 						ShortBuffer sBuf = ByteBuffer.wrap(el).asShortBuffer();
 						short[] ar = new short[numberOfelements];
 						sBuf.get(ar);
 						item.put(nameArray[n], ar);
+						
 					} else if (numberOfelements > 1) {
 						short[] el = new short[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
@@ -322,7 +309,6 @@ public class FitsStream extends AbstractStream {
 			dataStream.close();
 			return null;
 		}
-
 		item.put("@source", url.getProtocol() + ":" + url.getPath());
 		item.put("numberOfPixel", numberOfPixel);
 		return item;

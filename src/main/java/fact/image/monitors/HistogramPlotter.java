@@ -1,6 +1,7 @@
 package fact.image.monitors;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import javax.swing.JFrame;
 
@@ -42,6 +43,8 @@ public class HistogramPlotter extends DataVisualizer {
 	private IntervalXYDataset dataset;
 	private XYPlot xyplot;
 	private float binSize;
+	private String title;
+	private String color = "#666699";
 
 	public HistogramPlotter() {
 		width = 690;
@@ -67,12 +70,19 @@ public class HistogramPlotter extends DataVisualizer {
 		xyplot = chart.getXYPlot();
 		if(logAxis)
 			xyplot.setRangeAxis(new LogarithmicAxis("#"));
+		chart.setTitle(title);
 		final XYBarRenderer r = (XYBarRenderer) xyplot.getRenderer();
 		r.setDrawBarOutline(false);
 		r.setShadowVisible(false);
 //		r.setDefaultShadowsVisible(false);
 		r.setMargin(0.05);
 		r.setBarPainter(new StandardXYBarPainter());
+		try{
+			Color c = Color.decode(color);
+			r.setSeriesPaint(0, c);
+		} catch(NumberFormatException e){
+			log.warn("Could not parse the color string. has to look like: #f0f0f0");
+		}
 		
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		frame = new JFrame();
@@ -154,39 +164,50 @@ public class HistogramPlotter extends DataVisualizer {
 	public String getKey() {
 		return key;
 	}
-
 	@Parameter(required = true, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
 	public void setKey(String key) {
 		this.key = key;
 	}
 
 
-	public float getMinBin() {
+	public float getMin() {
 		return min;
 	}
-
-
-	public void setMinBin(float minBin) {
+	public void setMin(float minBin) {
 		this.min = minBin;
 	}
 
 
-	public float getMaxBin() {
+	public float getMax() {
 		return max;
 	}
-
-
-	public void setMaxBin(float maxBin) {
+	public void setMax(float maxBin) {
 		this.max = maxBin;
 	}
 
 	public boolean isLogAxis() {
 		return logAxis;
 	}
-
-
 	public void setLogAxis(boolean logAxis) {
 		this.logAxis = logAxis;
+	}
+
+
+	public String getTitle() {
+		return title;
+	}
+	@Parameter(required = false, description = "The title string of the window")
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+
+	public String getColor() {
+		return color;
+	}
+	@Parameter(required = false, description = "The color of the bars to be drawn #f4f4f4")
+	public void setColor(String color) {
+		this.color = color;
 	}
 
 }

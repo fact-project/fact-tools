@@ -44,7 +44,6 @@ public class RootASCIIWriter extends CsvWriter {
 			url = new URL(urlString);
 			writer = new CsvWriter(url);
 			writer.setSeparator(" ");
-			
 		}
 	}
 
