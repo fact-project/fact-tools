@@ -11,7 +11,16 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.filter.DrsCalibration;
+import fact.filter.ExponentialSmoothing;
+import fact.filter.FirFilter;
+import fact.filter.InterpolateBadPixel;
+import fact.filter.MotionDiff;
+import fact.filter.MultiplyValues;
 import fact.io.FitsStream;
+import fact.statistics.MovingAverage;
+import fact.utils.ExFit;
+import fact.utils.SimpleFactEventProcessor;
 
 
 public class FilterTests {
@@ -58,12 +67,12 @@ public class FilterTests {
 					
 					for(SimpleFactEventProcessor<float[], float[]> filter : pList){
 						filter.process(item);
-						if(!item.containsKey(filter.outputKey)){
+						if(!item.containsKey(filter.getOutputKey())){
 							fail("item does not conatin the right outputkey after applying " + filter.getClass().getSimpleName());
 						}
 						
 						@SuppressWarnings("unused")
-						float[] result = (float[]) item.get(filter.outputKey);
+						float[] result = (float[]) item.get(filter.getOutputKey());
 					}
 					
 				} catch(ClassCastException e){

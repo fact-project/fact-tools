@@ -18,7 +18,6 @@ public class Pixel implements Serializable, Comparable<Pixel> {
 
 	/** The unique class ID */
 	private static final long serialVersionUID = -2835016779288598332L;
-	final static DefaultPixelMapping mapping = new DefaultPixelMapping();
 
 	static Logger log = LoggerFactory.getLogger(Pixel.class);
 
@@ -38,8 +37,8 @@ public class Pixel implements Serializable, Comparable<Pixel> {
 	public Pixel(Integer softId) {
 		chid = 0;
 		this.softId = softId;
-		x = mapping.getGeomX(softId) + 22;
-		y = mapping.getGeomY(softId) + 19;
+		x = DefaultPixelMapping.getGeomX(softId) + 22;
+		y = DefaultPixelMapping.getGeomY(softId) + 19;
 	}
 
 	public Pixel(int x, int y) {

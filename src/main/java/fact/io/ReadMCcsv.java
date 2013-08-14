@@ -19,7 +19,7 @@ import stream.io.AbstractLineStream;
 import stream.io.SourceURL;
 import fact.Constants;
 import fact.data.EventUtils;
-import fact.processors.FactEvent;
+import fact.viewer.ui.DefaultPixelMapping;
 
 /**
  * 
@@ -242,7 +242,7 @@ public class ReadMCcsv extends AbstractLineStream {
 				//read pixelNumber
 				int softId = Integer.parseInt(t.nextToken());
 				
-				int pos = FactEvent.PIXEL_MAPPING.getChidID(softId)*roi;
+				int pos = DefaultPixelMapping.getChidID(softId)*roi;
 				while (t.hasMoreElements()){
 					data[pos] =  Double.parseDouble(t.nextToken());
 					pos++;

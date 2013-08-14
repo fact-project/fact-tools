@@ -16,13 +16,12 @@ rm "$outputDir/$outputFileName.aux"
 javadoc -docletpath ./TeXDoclet.jar \
 -doclet org.stfm.texdoclet.TeXDoclet \
 -hyperref \
--imagespath "images" \
 -output "$outputDir/$outputFileName.tex" \
 -title "Fact-Tools Documentation" \
 -subtitle "Fact-Tools Dokumentation mit JavaDocs" \
 -author "Christian Bockermann \and Kai Bruegge" \
 -sourcepath ../../../src/main/java \
--subpackages fact.processors fact.image fact.io \
+-subpackages fact.processors fact.image.monitors fact.io \
 -noinherited \
 -nosummaries \
 -public \

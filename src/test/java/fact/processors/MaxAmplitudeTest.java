@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 import fact.Constants;
+import fact.features.MaxAmplitude;
+import fact.features.MaxAmplitudePosition;
+import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 

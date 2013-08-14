@@ -11,7 +11,7 @@ import java.util.List;
 
 import stream.Data;
 import stream.data.DataFactory;
-import fact.processors.FactEvent;
+import fact.utils.FactEvent;
 import fact.viewer.ui.DefaultPixelMapping;
 
 /**
@@ -58,11 +58,11 @@ public class EventExpander {
 			pixel.put("@chid", "" + i);
 			pixel.put("@EventID", eventId);
 			pixel.put("@TriggerType", triggerType);
-			pixel.put("@SoftID", map.getSoftwareID(i));
-			pixel.put("@gridX", map.getGeomX(i));
-			pixel.put("@gridY", map.getGeomY(i));
-			pixel.put("x", (20.0d + map.getGeomX(i)) / 20.0d);
-			pixel.put("y", (20.0d + map.getGeomY(i)) / 20.0d);
+			pixel.put("@SoftID", DefaultPixelMapping.getSoftwareID(i));
+			pixel.put("@gridX", DefaultPixelMapping.getGeomX(i));
+			pixel.put("@gridY", DefaultPixelMapping.getGeomY(i));
+			pixel.put("x", (20.0d + DefaultPixelMapping.getGeomX(i)) / 20.0d);
+			pixel.put("y", (20.0d + DefaultPixelMapping.getGeomY(i)) / 20.0d);
 
 			for (int j = 0; j < roi; j++) {
 				if (j >= fromSlice && j <= toSlice) {

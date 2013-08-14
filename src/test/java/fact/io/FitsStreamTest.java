@@ -33,7 +33,7 @@ public class FitsStreamTest {
 
 			Data item = stream.read();
 			log.info( "size of data array: {}",
-					((float[]) item.get("Data")).length 
+					((short[]) item.get("Data")).length 
 					);
 			while (item != null) {
 				item = stream.read();

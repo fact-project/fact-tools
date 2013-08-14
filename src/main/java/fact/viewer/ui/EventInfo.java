@@ -10,7 +10,6 @@ import javax.swing.text.html.StyleSheet;
 
 import stream.Data;
 import fact.Constants;
-import fact.processors.FactEvent;
 
 /**
  * this creates the String for the EventInfoWindow
@@ -139,7 +138,7 @@ public class EventInfo extends JEditorPane {
 					pixels = (float[]) event.get(st);
 					if (pixels.length == Constants.NUMBEROFPIXEL) {
 						strB.append(st + ": "
-								+ pixels[FactEvent.PIXEL_MAPPING.getChidID(o)]);
+								+ pixels[DefaultPixelMapping.getChidID(o)]);
 						strB.append("<br />");
 					}
 				}

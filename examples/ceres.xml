@@ -1,0 +1,64 @@
+<container>
+
+<!-- Pfade zu den fits files. -->
+<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
+<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
+<property name="drive_file" value="/Users/kaibrugge/FactTest/20120229_144.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+<property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres_gamma_4.fits" />
+<property name="ceresDRS" value="/Users/kaibrugge/FactTest/ceres.drs.fits" />
+<property name="csv" value="/Users/kaibrugge/FactTest/output.csv" />
+<property name="csvCeres" value="/Users/kaibrugge/FactTest/outputCeres_4.csv" />
+
+	<!-- Name des Streams und pfad zu dem Daten-File -->
+	<stream id="ceres" class="fact.io.FitsStream"  url="file:${dataCeres}"  />
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
+	
+	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
+	<process id="2" input="ceres">
+<!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
+			<fact.utils.Remapping key="Data" />
+	        <fact.filter.DrsCalibration url="file:${ceresDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+<!--             <fact.utils.CutSlices  start="22" end="220"/> -->
+<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
+<!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
+            
+<!-- 	        <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/> -->
+<!--             <fact.filter.RemoveJumps key="DataCalibrated" outputKey="removed"/> -->
+<!--             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/> -->
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_startJumpHeight" title="StartCell Jumps" color="#993366"/> -->
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_stopJumpHeight" title="StopCell Jumps" color="#006600"/> -->
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="heightEnd"/> -->
+<!--             <Skip condition="%{data.EventNum} &lt; 60" /> -->
+	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" />
+			<fact.features.PhotonCharge key="DataCalibrated" outputKey="c" />
+			<fact.statistics.CreateHistogram key="max" min="0" max="1000" numberOfBins="40" outputKey="maxAmpH" />
+			<fact.statistics.CreateHistogram key="c"  min="0" max="100" numberOfBins="40" outputKey="chargeH" />
+<!-- 			<fact.image.monitors.HistogramPlotter key="maxAmpH"  logAxis="true" max="1000" title="Amplituden Cers"/> -->
+<!-- 			<fact.image.monitors.HistogramPlotter key="chargeH"  logAxis="true" max="100" title="PhotonCharge Ceres"/> -->
+			<stream.monitor.DataRate every="100" />
+<!-- 			<fact.io.RootASCIIWriter keys="c" url="file:${csvCeres}" /> -->
+<!--             <Skip condition="%{data.EventNum} &lt; 71" /> -->
+			<fact.image.ShowImage/>
+	</process>
+
+<!-- 	<process id="1" input="fact"> -->
+<!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
+<!-- 	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>   -->
+<!--             <fact.utils.CutSlices  start="22" end="220"/> -->
+<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
+<!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
+<!-- 	        <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/> -->
+<!--             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/> -->
+<!-- 	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" /> -->
+<!-- 			<fact.features.PhotonCharge key="DataCalibrated" outputKey="c" /> -->
+<!-- 			<fact.statistics.CreateHistogram key="max" min="0" max="2800" numberOfBins="280" outputKey="maxAmpH" /> -->
+<!-- 			<fact.statistics.CreateHistogram key="c"  min="0" max="280" numberOfBins="280" outputKey="chargeH" /> -->
+<!-- 			<fact.image.monitors.HistogramPlotter key="maxAmpH"  logAxis="true" max="2800" title="Amplituden" color="#FF6600"/> -->
+<!-- 			<fact.image.monitors.HistogramPlotter key="chargeH"  logAxis="true" max="280" title="PhotonCharge" color="#FF6600"/> -->
+<!-- 			<stream.monitor.DataRate every="100" /> -->
+<!-- 			<stream.io.CsvWriter keys="chargeH" url="file:${csv}" /> -->
+<!-- 	</process> -->
+		
+		
+</container>
+

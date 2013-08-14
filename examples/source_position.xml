@@ -1,0 +1,35 @@
+<container>
+
+<!-- Pfade zu den fits files. -->
+<!-- <property name="data" value="/home/bruegge/FactTest/20120209_061.fits" /> -->
+<!-- <property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" /> -->
+<!-- <property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" /> -->
+<!-- <property name="outfile" value="/home/bruegge/FactTest/test.txt" /> -->
+
+<!-- <property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" /> -->
+<!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" /> -->
+
+<property name="data" value="/Users/kaibrugge/FactTest/20120229_144.fits.gz" />
+<property name="dataDRS" value="/Users/kaibrugge/FactTest/20120229_132.drs.fits" />
+<property name="drive_file" value="/Users/kaibrugge/FactTest/20120229_144.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+<property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres.fits" />
+
+	<!-- Name des Streams und pfad zu dem Daten-File -->
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${dataCeres}"  />
+	
+	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
+	<process input="fact" copies="1">
+<!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
+	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
+ 			<fact.utils.Remapping outputKey="DataRemapped" color="#00FF00"/>  
+<!--             <fact.processors.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
+<!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
+                
+<!--             <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="source" physicalSource="mrk421" /> -->
+<!-- 	    	<stream.plotter.Plotter x-axis="X" y-axis="Y" keys="sourcepointingDeviation,test"  keepOpen="true"/> -->
+<!-- 			<stream.monitor.DataRate every="200" /> -->
+<!-- 		<PrintData/> -->
+		<fact.image.ShowImage/>
+	</process>
+</container>
+

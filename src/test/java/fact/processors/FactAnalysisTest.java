@@ -11,11 +11,13 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 
+import fact.cleaning.CoreNeighborClean;
+import fact.features.SourcePosition;
+import fact.features.PhotonCharge;
+import fact.features.MaxAmplitudePosition;
+import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-import fact.processors.parfact.CalcSourcePosition;
-import fact.processors.parfact.CalculatePhotonCharge;
-import fact.processors.parfact.CoreNeighborClean;
 
 
 public class FactAnalysisTest {
@@ -54,7 +56,7 @@ public class FactAnalysisTest {
 			pP.setKey("test");
 			pP.setOutputKey("positions");
 
-			CalculatePhotonCharge c = new CalculatePhotonCharge();
+			PhotonCharge c = new PhotonCharge();
 			c.setKey("test");
 			c.setOutputKey("photonCharge");
 
@@ -63,9 +65,10 @@ public class FactAnalysisTest {
 			clean.setOutputKey("shower");
 
 			URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
-			CalcSourcePosition poser = new CalcSourcePosition();
+			SourcePosition poser = new SourcePosition();
 			poser.setUrl(driveURL);
 			poser.setOutputKey("pos");
+			poser.init(null);
 
 			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
@@ -79,7 +82,7 @@ public class FactAnalysisTest {
 					fail("Item does not contain the right key after drs calibration");
 				try{
 					float[] result = (float[]) item.get("test");
-					float[] ar = (float[]) item.get("Data");
+					short[] ar = (short[]) item.get("Data");
 					if(ar.length != result.length){
 						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
 					}

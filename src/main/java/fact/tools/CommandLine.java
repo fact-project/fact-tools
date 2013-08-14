@@ -4,6 +4,9 @@
 package fact.tools;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.jfree.util.Log;
 
 import stream.runtime.ProcessContainer;
 
@@ -37,6 +40,12 @@ public class CommandLine {
 				ProcessContainer container = new ProcessContainer(file.toURI()
 						.toURL());
 				container.run();
+			} catch (IOException e){
+				Log.error("Could not open file");
+				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+				
 			} catch (Exception e) {
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace();

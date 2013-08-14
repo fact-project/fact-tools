@@ -13,8 +13,7 @@ public class PixelMappingTest {
 
 	@Test
 	public void testFactMapping() {
-		DefaultPixelMapping map = new DefaultPixelMapping();
-		int[] n = map.getNeighborsFromSoftID(969);
+		int[] n = DefaultPixelMapping.getNeighborsFromSoftID(969);
 		Integer[] nS = {1079, 1080, 968, 970, 865, 864};
 		List<Integer> l = Arrays.asList(nS);
 		
@@ -24,7 +23,7 @@ public class PixelMappingTest {
 			}
 		}
 		
-		n = map.getNeighborsFromSoftID(1080);
+		n = DefaultPixelMapping.getNeighborsFromSoftID(1080);
 		Integer[] nS2 = {1079, 1081, 969, 970, 1197, 1196};
 		l = Arrays.asList(nS2);
 		for(int p : n){
@@ -33,7 +32,7 @@ public class PixelMappingTest {
 			}
 		}
 		for (int chid = 0; chid < 1440; ++chid){
-			if (map.getNeighborsFromChid(chid).length != 6){
+			if (DefaultPixelMapping.getNeighborsFromChid(chid).length != 6){
 				fail("map did not return the right array for chid " + chid);
 			}
 		}

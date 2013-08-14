@@ -5,18 +5,14 @@ package fact.processors.parfact;
 
 import java.io.Serializable;
 
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.Data;
-import fact.Constants;
 import fact.data.EventUtils;
-import fact.image.overlays.EllipseOverlay;
-import fact.image.overlays.PixelSet;
-import fact.processors.FactEvent;
+import fact.viewer.ui.DefaultPixelMapping;
 
 /**
  *Calculates the Hillas Parameter from the Ellipse. Some processor to identify showerpixels has to be run before.
@@ -105,7 +101,7 @@ public class HillasParameter implements Processor {
 
 	//this is of course not the most efficient solution
 	boolean isSecondBorderPixel(int pix){
-		for(int nPix: FactEvent.PIXEL_MAPPING.getNeighborsFromSoftID(pix))
+		for(int nPix: DefaultPixelMapping.getNeighborsFromSoftID(pix))
 		{
 			if(isBorderPixel(nPix)){
 				return true;
@@ -115,7 +111,7 @@ public class HillasParameter implements Processor {
 		return false;
 	}
 	boolean isBorderPixel(int pix){
-		for(int i : FactEvent.PIXEL_MAPPING.getNeighborsFromSoftID(pix)){
+		for(int i : DefaultPixelMapping.getNeighborsFromSoftID(pix)){
 			if(i == -1) return true;
 		}
 		return false;
