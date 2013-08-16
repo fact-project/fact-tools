@@ -41,6 +41,9 @@ public class SourcePosition implements StatefulProcessor {
 	static final double mDistance                   = 4890.0;
 	//This is a counter to access the right rows in the tracking_file
 	int timeIndex = 0;
+	//
+	private Float x = null;
+	private Float y = null;
 
 	//The url to the TRACKING_POSITION slow control file
 	private SourceURL trackingUrl;
@@ -66,37 +69,42 @@ public class SourcePosition implements StatefulProcessor {
 	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
-		FitsStream stream = new FitsStream(trackingUrl);
-		try {
-
-			stream.init();
-			slowData = stream.readNext();
-			while(slowData !=  null){
-				// Eventime, Ra, Dec, Az, Zd
-				double[] pointRaDec = new double[5];
-				pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
-
-				double ra = Double.parseDouble( slowData.get("Ra").toString());
-				pointRaDec[1] = ra/24 *360.0;
-				pointRaDec[2] = Double.parseDouble( slowData.get("Dec").toString());
-
-				pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
-				pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
-
-				locList.add(pointRaDec);
+		if(trackingUrl == null && x !=  null && y != null){
+			log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
+			
+		} else {
+			FitsStream stream = new FitsStream(trackingUrl);
+			try {
+	
+				stream.init();
 				slowData = stream.readNext();
+				while(slowData !=  null){
+					// Eventime, Ra, Dec, Az, Zd
+					double[] pointRaDec = new double[5];
+					pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
+	
+					double ra = Double.parseDouble( slowData.get("Ra").toString());
+					pointRaDec[1] = ra/24 *360.0;
+					pointRaDec[2] = Double.parseDouble( slowData.get("Dec").toString());
+	
+					pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
+					pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
+	
+					locList.add(pointRaDec);
+					slowData = stream.readNext();
+				}
+	
+				stream.close();
+			}catch (NumberFormatException e){
+				log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
+				stream.close();
+			} catch (Exception e) {
+				log.error("Failed to load data from TRACKING_POSITION file: {}", e.getMessage());
+				e.printStackTrace();
+				this.slowData = null;
+				stream.close();
+				throw new RuntimeException(e.getMessage());
 			}
-
-			stream.close();
-		}catch (NumberFormatException e){
-			log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
-			stream.close();
-		} catch (Exception e) {
-			log.error("Failed to load data from TRACKING_POSITION file: {}", e.getMessage());
-			e.printStackTrace();
-			this.slowData = null;
-			stream.close();
-			throw new RuntimeException(e.getMessage());
 		}
 
 		//check the physicalSource parameter from the user
@@ -132,6 +140,15 @@ public class SourcePosition implements StatefulProcessor {
 	 */
 	@Override
 	public Data process(Data data) {
+		if(x != null && y !=  null && trackingUrl == null){
+			//add circle overlay to map
+			data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay(x, y) );
+			//add source position to dataitem
+			float[] source = {x, y};
+//			System.out.println("x: "+  source[0] + " y: " +source[1] );
+			data.put(outputKey, source);
+			return data;
+		}
 
 		int[] eventTime = (int[]) data.get("UnixTimeUTC");
 		if(eventTime == null){
@@ -182,6 +199,7 @@ public class SourcePosition implements StatefulProcessor {
 		float[] deviation = {(float) (pointingAzDe[0] - point[3]), (float) ( pointingAzDe[1] - point[4]) };
 		data.put(outputKey+"pointingDeviation", deviation);
 		data.put("test", source[0]);
+		log.info( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ; 
 		return data;
 	}
 
@@ -322,17 +340,32 @@ public class SourcePosition implements StatefulProcessor {
 		this.sourceDeclination = sourceDeclination;	
 	}
 
+	
 	public double getSourceRightAscension() {	
 		return sourceRightAscension; 
 	}
 	public void setSourceRightAscension(double sourceRightAscension) {	
 		this.sourceRightAscension = sourceRightAscension; 
 	}
+	
+	
 	public String getPhysicalSource() {
 		return physicalSource;
 	}
 	public void setPhysicalSource(String physicalSource) {
 		this.physicalSource = physicalSource;
+	}
+	public Float getX() {
+		return x;
+	}
+	public void setX(Float x) {
+		this.x = x;
+	}
+	public Float getY() {
+		return y;
+	}
+	public void setY(Float y) {
+		this.y = y;
 	}
 
 }

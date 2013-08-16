@@ -87,8 +87,16 @@ public class ScatterPlotter extends DataVisualizer {
 	@Override
 	public Data processMatchingData(Data data) {
 		if (data.containsKey(xValue) && data.containsKey(yValue)) {
-			x = (Double) data.get(xValue);
-			y = (Double) data.get(yValue);
+			try{
+				x = (Double) data.get(xValue);
+			} catch(ClassCastException e){
+				x = ((Integer) data.get(xValue)).doubleValue();
+			}
+			try{
+				y = (Double) data.get(yValue);
+			} catch (ClassCastException e){
+				y = ((Integer) data.get(yValue)).doubleValue();
+			}
 		} else {
 			log.info("The key " + xValue +  "  or " + yValue + " does not exist in the Event");
 		}

@@ -1,15 +1,11 @@
 package fact.statistics;
 
 
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import stream.Data;
-import stream.Processor;
 import stream.annotations.Description;
-import fact.Constants;
+import fact.utils.SimpleFactPixelProcessor;
 /**
  * This operator calculates the average of all the slices in each Pixel and stores the result as a double array.
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
@@ -17,93 +13,21 @@ import fact.Constants;
  */
 
 @Description(group = "Data Stream.FACT")
-public class PixelAverage implements Processor {
+public class PixelAverage extends SimpleFactPixelProcessor {
 	static Logger log = LoggerFactory.getLogger(PixelAverage.class);
-	private String key;
-	private String outputKey;
-
-	public PixelAverage(){}
-	public PixelAverage(String key){
-		this.key =  key;
-	}
 	
 
 	/**
 	 * @see stream.DataProcessor#process(stream.Data)
-	 */
+	 **/
+	
 	@Override
-	public Data process(Data input) {
-		if(outputKey == null || outputKey ==""){
-			input.put(Constants.KEY_AVERAGES, processEvent(input, key));
-		} else {
-			input.put(outputKey, processEvent(input, key));
+	public float processPixel(float[] pixelData) {
+		float avg = 0;
+		for (float f : pixelData){
+			avg += f;
 		}
-		return input;
-	}
-	
-	
-	public double[] processEvent(Data input, String key) {
-		
-		Serializable value = null;
-		
-		if(input.containsKey(key)){
-			 value = input.get(key);
-		} else {
-			//key doesnt exist in map
-			log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		
-		if (value != null && value.getClass().isArray()
-				&& value.getClass().getComponentType().equals(float.class)) {
-			return processSeries((float[]) value);
-		}
-		else
-		{
-			log.info(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-			return null;
-		}
-		
-	}
-
-
-	public double[] processSeries(float [] series){
-		double[] averages= new double[Constants.NUMBEROFPIXEL];
-		int roi = series.length / Constants.NUMBEROFPIXEL;
-		//Iterate over all Pixels in event.
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
-			//currentPixel = event.getPixels()[pix];
-			float avg = 0.0f;
-			//smoothedData[pix*roi] = data[pix*roi];  
-			
-			for (int slice = 0; slice < roi; slice++) {
-				int pos = pix * roi + slice;
-				avg+=series[pos];
-			}
-			//calculate Average over all timeslices
-			averages[pix] =avg/roi;
-		}
-		return averages;
-
-	}
-	
-	/*
-	 * Getter and Setter
-	 */
-	
-	public String getOutput() {
-		return outputKey;
-	}
-	public void setOutput(String output) {
-		this.outputKey = output;
-	}
-	
-	
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
+		return avg/pixelData.length;
 	}
 
 	

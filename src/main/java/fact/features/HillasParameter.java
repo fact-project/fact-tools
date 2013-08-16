@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fact.processors.parfact;
+package fact.features;
 
 import java.io.Serializable;
 

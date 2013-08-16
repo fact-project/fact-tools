@@ -108,8 +108,8 @@ public class AverageJumpRemoval implements Processor{
 			set.add(s);
 
 
-		double heightStart = 0.0;
-		double heightEnd= 0.0;
+		double heightAtStartCell = 0.0;
+		double heightAtStopCell= 0.0;
 
 		short[] startCells = previousStartCells.get(0);
 		short[] stopCells = previousStopCells.get(0);
@@ -129,8 +129,8 @@ public class AverageJumpRemoval implements Processor{
 				//lets find the maximum jumpheight in the event
 				if(s > 0  && s < roi){
 					float h = jumpHeight(s, roi, 5, average);
-					if(Math.abs(h) > Math.abs(heightStart) ){
-						heightStart = h;
+					if(Math.abs(h) > Math.abs(heightAtStartCell) ){
+						heightAtStartCell = h;
 						m[0] = new IntervalMarker(s, s + 1 , new Color(r,g,b, 250));
 						selectedPreviousStartEvent = i;
 					}
@@ -138,8 +138,8 @@ public class AverageJumpRemoval implements Processor{
 				}
 				if(e > 0 && e < roi){
 					float h = jumpHeight(e, roi, 5, average);
-					if(Math.abs(h) > Math.abs(heightEnd) ){
-						heightEnd = h;
+					if(Math.abs(h) > Math.abs(heightAtStopCell) ){
+						heightAtStopCell = h;
 						me[0] = new IntervalMarker(e, e + 1 , new Color(0,g,b, 250));
 						selectedPreviousStopEvent = i;
 					}
@@ -148,28 +148,26 @@ public class AverageJumpRemoval implements Processor{
 			}
 		}
 
-		if(Math.abs(heightStart) < threshold ) heightStart = Double.NaN;
-		if(Math.abs(heightEnd) < threshold) heightEnd = Double.NaN;
 
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			//recht runterschieben
 			startCells = previousStartCells.get(selectedPreviousStartEvent);
 			int s = getSliceFromCell(startCells[pix], length, startCellArray[pix], start, end) +3;
-			if(s > 0  && s < roi && heightStart  != 0){
+			if(s > 0  && s < roi && heightAtStartCell  != 0){
 				for (int i =  s ; i < roi ; ++i){
 					int pos = pix*roi + i;
-					result[pos] -= heightStart;
+					result[pos] -= heightAtStartCell;
 				}
 			}
 			
 			//links runterschieben
 			stopCells = previousStopCells.get(selectedPreviousStopEvent);
 			int e = getSliceFromCell(stopCells[pix], length, startCellArray[pix], start, end) +9;
-			if(e > 0  && e < roi && heightEnd  != 0){
+			if(e > 0  && e < roi && heightAtStopCell  != 0){
 				//jetzt links 
 				for (int i =  e ; i >= 0 ; --i){
 					int pos = pix*roi + i;
-					result[pos] += heightEnd;
+					result[pos] += heightAtStopCell;
 				}
 			}
 
@@ -187,8 +185,8 @@ public class AverageJumpRemoval implements Processor{
 		}	
 
 		
-		input.put(outputKey + "_startJumpHeight", heightStart);
-		input.put(outputKey + "_stopJumpHeight", heightEnd);
+		input.put(outputKey + "_startJumpHeight", heightAtStartCell);
+		input.put(outputKey + "_stopJumpHeight", heightAtStopCell);
 
 		//add color value if set
 		input.put(outputKey+"Marker", m);

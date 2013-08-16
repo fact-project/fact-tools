@@ -33,7 +33,7 @@ public class CoreNeighborClean implements Processor{
 	private  float corePixelThreshold = 5.0f;
 	private  float neighborPixelThreshold = 2.0f;
 	private  float timeThreshold = 0.0f; 
-	private int minSize = 2;
+	private int minSize = 4;
 	float[] photonCharge = new float[Constants.NUMBEROFPIXEL];
 	
 
@@ -61,7 +61,7 @@ public class CoreNeighborClean implements Processor{
 		ArrayList<ArrayList<Integer>> listOfLists = EventUtils.breadthFirstSearch(showerPixel);
 		showerPixel.clear();
 		for (ArrayList<Integer> l: listOfLists){
-			if(l.size() >=2){
+			if(l.size() >= minSize){
 				showerPixel.addAll(l);
 			}
 		}
