@@ -1,0 +1,13 @@
+<container>
+
+	<stream id="input" class="stream.io.DataObjectStream"
+                url="tcp://129.217.160.65:16000" />
+
+        <process input="input">
+		<fact.weather.ParseWeatherMessage prefix="weather:" />
+		<PrintData />
+	
+		<stream.plotter.Plotter keys="weather:dewpoint,weather:humidity" />
+        </process>
+
+</container>

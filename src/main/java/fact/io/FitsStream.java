@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
@@ -35,6 +36,7 @@ public class FitsStream extends AbstractStream {
 	
 
 	protected int eventBytes;
+	private int bufferSize = 8*1024;
 	//	private FileChannel inChannel;
 
 	public FitsStream(SourceURL url) {
@@ -55,7 +57,7 @@ public class FitsStream extends AbstractStream {
 		if (!f.canRead()){
 			log.error("Cannot read file. Wrong path? ");
 		}
-		bStream = new BufferedInputStream(getInputStream());
+		bStream = new BufferedInputStream(getInputStream(), bufferSize );
 		dataStream = new DataInputStream(bStream);
 		//		inChannel = fileStream.getChannel();
 
@@ -389,5 +391,13 @@ public class FitsStream extends AbstractStream {
 			}
 			return s.toString();
 		}
+	}
+
+	public int getBufferSize() {
+		return bufferSize;
+	}
+	@Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
 	}
 }
