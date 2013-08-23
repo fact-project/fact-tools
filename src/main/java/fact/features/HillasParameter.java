@@ -40,8 +40,8 @@ HillasParameter::CalculateParameter()
  */
 public class HillasParameter implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasParameter.class);
-	private  float corePixelThreshold = 5.0f;
-	private  float neighborPixelThreshold = 2.0f;
+//	private  float corePixelThreshold = 5.0f;
+//	private  float neighborPixelThreshold = 2.0f;
 	private int minSize = 2;
 	private double showerThreshold = 0.8;
 	/**
@@ -257,23 +257,6 @@ public class HillasParameter implements Processor {
  * Getter and Setter
  */
 
-	public float getCorePixelThreshold() {
-		return corePixelThreshold;
-	}
-	@Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have to be identified as a CorePixel", defaultValue = "5.0")
-	public void setCorePixelThreshold(float corePixelThreshold) {
-		this.corePixelThreshold = corePixelThreshold;
-	}
-
-
-
-	public float getNeighborPixelThreshold() {
-		return neighborPixelThreshold;
-	}
-	@Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have thats adjacent to a previously identified corePixel", defaultValue = "2.0")
-	public void setNeighborPixelThreshold(float neighborPixelThreshold) {
-		this.neighborPixelThreshold = neighborPixelThreshold;
-	}
 	
 	/**
 	 * 
