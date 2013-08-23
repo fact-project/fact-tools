@@ -34,6 +34,8 @@ public class CoreNeighborClean implements Processor{
 	private  float neighborPixelThreshold = 2.0f;
 	private  float timeThreshold = 0.0f; 
 	private int minSize = 4;
+	private int numCorePixel = 0;
+	
 	float[] photonCharge = new float[Constants.NUMBEROFPIXEL];
 	
 
@@ -48,6 +50,7 @@ public class CoreNeighborClean implements Processor{
 			log.error("Could cast the key: " + key + "to a float[]");
 		}
 		int[] currentNeighbors;
+		numCorePixel = 0;
 
 		ArrayList<Integer> showerPixel= new ArrayList<Integer>();
 
@@ -55,6 +58,7 @@ public class CoreNeighborClean implements Processor{
 		{ 
 			if (photonCharge[pix] > corePixelThreshold){
 				showerPixel.add(pix);
+				numCorePixel++;
 			}
 		}
 
@@ -132,6 +136,7 @@ public class CoreNeighborClean implements Processor{
 		if(outputKey == null || outputKey ==""){
 			input.put(key, showerPixelArray);
 			input.put(key+"_"+Constants.PIXELSET, corePixelSet);
+			input.put(key+"_numCorePixel", numCorePixel);
 		} else {
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
