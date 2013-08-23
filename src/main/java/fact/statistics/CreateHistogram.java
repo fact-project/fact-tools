@@ -9,6 +9,7 @@ import stream.ProcessContext;
 
 
 /**
+ * Takes a float[] and returns an int[]
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
