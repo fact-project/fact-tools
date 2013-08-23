@@ -140,6 +140,7 @@ public class CoreNeighborClean implements Processor{
 		} else {
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
+			input.put(outputKey+"_numCorePixel", numCorePixel);
 		}
 		return input;
 	}
