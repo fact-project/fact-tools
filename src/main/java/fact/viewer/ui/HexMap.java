@@ -195,6 +195,7 @@ public class HexMap extends JPanel implements PixelMap {
 		paintSelected(g);
 		paintAnnotated(g);
 
+		//paint the 0,0 point in the camera
 		Point p = getPixelCoordsFromRealCoords(0, 0);
 
 		Graphics2D g2 = (Graphics2D) g;
@@ -202,6 +203,7 @@ public class HexMap extends JPanel implements PixelMap {
 		g2.setStroke(new BasicStroke(2.0f));
 		g2.draw(new Ellipse2D.Double(p.x, p.y, 10.0, 10));
 
+		
 		for (Overlay overlay : overlays) {
 			overlay.paint(g, tiles);
 		}

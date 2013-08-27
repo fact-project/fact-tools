@@ -215,6 +215,19 @@ public class DefaultPixelMapping implements PixelMapping {
 		return true;
 	}
 	
+	/**
+	 * Takes a pixel and rotates the geometric pixel coordinates by the given angle 
+	 * @param chid
+	 */
+	public static double[] rotate(int chid , double phi){
+		double x =  getGeomX(chid)*Math.cos(phi) - getGeomY(chid) * Math.sin(phi) ;
+		double y =  getGeomX(chid)*Math.sin(phi) + getGeomY(chid) * Math.cos(phi) ;
+//		System.out.println("rotating  x old: " + getGeomX(chid) + "    new x :" + x );
+//		System.out.println("rotating  y old: " + getGeomY(chid) + "    new y :" + y );
+		double[] c = {x,y};
+		return c;
+	}
+	
 	public static int getChidID(Integer softId) {
 		if(!init){
 			init();
