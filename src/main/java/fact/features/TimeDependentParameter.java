@@ -20,7 +20,7 @@ import stream.annotations.Parameter;
  * 		* The COGX and COGY for every slice of event
  * 		* The COG{X,Y and sqrt(X^2 + Y^2)}-Velocity for every slice transition
  * 		? The velocity in shower coordinate system
- * 		? The error of COGX and COGY
+ * 		? The variance of COGX and COGY
  *		
  *	Calculated values for separation
  *		? MaxVelocity in both systems
@@ -34,6 +34,8 @@ import stream.annotations.Parameter;
 
 public class TimeDependentParameter implements Processor
 {
+	
+
 	@Override
 	public Data process(Data input)
 	{
@@ -69,6 +71,8 @@ public class TimeDependentParameter implements Processor
 		int sliceCount = dataCalibratedArray.length / Constants.NUMBEROFPIXEL; // ROI
 		cogx = new float[sliceCount];
 		cogy = new float[sliceCount];
+		varcogx = new float[sliceCount];
+		varcogy = new float[sliceCount];
 		
 		cogVelocityX = new float[sliceCount - 1];
 		cogVelocityY = new float[sliceCount - 1];
@@ -89,7 +93,10 @@ public class TimeDependentParameter implements Processor
 			size[slice] = 0;
 			cogx[slice] = 0;
 			cogy[slice] = 0;
+			varcogx[slice] = 0;
+			varcogy[slice] = 0;
 			
+			// Calculate COGs
 			for(int pix : showerPixelArray)
 			{
 				
@@ -100,7 +107,17 @@ public class TimeDependentParameter implements Processor
 			}
 			cogx[slice] /= size[slice];
 			cogy[slice] /= size[slice];
-			
+
+			// Calculate variance
+		    for (int pix: showerPixelArray )
+		    {
+		        varcogx[slice]            += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline)  * (mpGeomXCoord[pix] - cogx[slice]) * (mpGeomXCoord[pix] - cogx[slice]);
+		        varcogy[slice]            += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline)  * (mpGeomYCoord[pix] - cogy[slice]) * (mpGeomYCoord[pix] - cogy[slice]);
+		    }
+			varcogx[slice] /= size[slice];
+			varcogy[slice] /= size[slice];
+		    
+		    // Calculate velocities on the fly
 			if (slice > 0)
 			{
 				cogVelocityX[slice - 1] = (cogx[slice] - cogx[slice-1]) / 0.5f;
@@ -112,8 +129,13 @@ public class TimeDependentParameter implements Processor
 		
 		input.put(outputKey + "COGX", cogx);
 		input.put(outputKey + "COGY", cogy);
+		
+		input.put(outputKey + "VARCOGX", varcogx);
+		input.put(outputKey + "VARCOGY", varcogy);
+		
 		input.put(outputKey + "COGVX", cogVelocityX);
 		input.put(outputKey + "COGVY", cogVelocityY);
+		
 		input.put(outputKey + "COGV", cogVelocity);
 		return input;
 	}
@@ -176,6 +198,8 @@ public class TimeDependentParameter implements Processor
 	// COG of showerPixelSet for every slice
 	private float[] cogx = null;
 	private float[] cogy = null;
+	private float[] varcogx = null;
+	private float[] varcogy = null;
 	
 	// Velocity of COG of showerPixel
 	private float[] cogVelocityX;
