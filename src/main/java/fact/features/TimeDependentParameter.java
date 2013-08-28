@@ -13,8 +13,22 @@ import stream.annotations.Parameter;
 
 
 /**
- * This class calculates the parameter rho.
- * This parameter is a measure for the source-gamma-ness of an event
+ * This class calculates time dependent parameters:
+ * The symbol '*' means implemented, '?' means in progress or unsure
+ * 
+ * 	Calculated helper values
+ * 		* The COGX and COGY for every slice of event
+ * 		* The COG{X,Y and sqrt(X^2 + Y^2)}-Velocity for every slice transition
+ * 		? The velocity in shower coordinate system
+ * 		? The error of COGX and COGY
+ *		
+ *	Calculated values for separation
+ *		? MaxVelocity in both systems
+ *		? MeanVelocity and error in interval [arrival - 10 slices, arrival + 10 slices]
+ *		
+ *
+ * 		? "Rhode"-Parameter (working title)
+ * 			This parameter is a measure for the source-gamma-ness of an event
  * 
  */
 
@@ -26,8 +40,6 @@ public class TimeDependentParameter implements Processor
 		/// init helper and utils
 	    mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
 	    mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
-	    
-	    
 	    
 		/// get input
 	
@@ -106,6 +118,38 @@ public class TimeDependentParameter implements Processor
 		return input;
 	}
 	
+	public String getArrivalTime() {
+		return arrivalTime;
+	}
+
+	public void setArrivalTime(String arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+	public String getSourcePosition() {
+		return sourcePosition;
+	}
+
+	public void setSourcePosition(String sourcePosition) {
+		this.sourcePosition = sourcePosition;
+	}
+
+	public String getShowerPixel() {
+		return showerPixel;
+	}
+
+	public void setShowerPixel(String showerPixel) {
+		this.showerPixel = showerPixel;
+	}
+
+	public String getDataCalibrated() {
+		return dataCalibrated;
+	}
+
+	public void setDataCalibrated(String dataCalibrated) {
+		this.dataCalibrated = dataCalibrated;
+	}
+
 	static Logger log = LoggerFactory.getLogger(TimeDependentParameter.class);
 	
 	/// @Todo: insert get/set

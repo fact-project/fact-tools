@@ -177,7 +177,7 @@
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.1.2</version>
 				<configuration>
-					<finalName>fact-tools-${pom.version}</finalName>
+					<finalName>fact-tools-${project.version}</finalName>
 					<attach>false</attach>
 				</configuration>
 			</plugin>
