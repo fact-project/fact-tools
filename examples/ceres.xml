@@ -4,14 +4,14 @@
 <property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
 <property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
 <property name="drive_file" value="/Users/kaibrugge/FactTest/20130104.DRIVE_CONTROL_TRACKING_POSITION.fits" />
-<property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres3.fits" />
+<property name="dataCeres" value="/Users/kaibrugge/FactTest/ceres_gamma_2.fits" />
 <property name="ceresDRS" value="/Users/kaibrugge/FactTest/ceres.drs.fits" />
 <property name="csv" value="/Users/kaibrugge/FactTest/output.csv" />
-<property name="csvCeres" value="/Users/kaibrugge/FactTest/outputCeresProton.csv" />
+<property name="csvCeres" value="/Users/kaibrugge/FactTest/outputCeresGamma.csv" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
 	<stream id="ceres" class="fact.io.FitsStream"  url="file:${dataCeres}"  />
-<!-- 	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  /> -->
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" limit="1000" />
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
 	<process id="2" input="ceres">
@@ -24,13 +24,19 @@
             <fact.features.SourcePosition outputKey="sourcePosition" X="0.0" Y="0.0"/>
 			
             <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
-<!-- 			<fact.io.RootASCIIWriter keys="Hillas_Size" url="file:${csvCeres}" /> -->
 <!-- 			<PrintData /> -->
 			<stream.monitor.DataRate every="100" />
-			<Skip condition="%{data.Hillas_Size} == null" /> 
-<!-- 			<fact.image.monitors.ScatterPlotter xValue="Hillas_Size" yValue="MMcEvt.fPhotElfromShower" color="#B34C0B"/> -->
+<!-- 			<fact.features.RisingEdge key="DataCalibrated" outputKey="arrivalTime"/> -->
+<!-- 			<fact.statistics.CreateHistogram key="arrivalTime"  min="0" max="150" numberOfBins="301" outputKey="aH"/> -->
+<!-- 			<fact.image.monitors.HistogramPlotter key="aH"  logAxis="true" max="150"/> -->
+
+			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+			<Skip condition="%{data.alpha} == NaN" /> 
+			<fact.io.RootASCIIWriter keys="alpha,alpha2" url="file:${csvCeres}" />
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="photoncharge" yValue="arrivalTime" color="#B34C0B"/> -->
 <!-- 			<fact.image.monitors.ScatterPlotter xValue="Hillas_Area" yValue="MMcEvt.fPhotElfromShower" color="#039C0B"/> -->
-			<stream.io.CsvWriter keys="Hillas_Size,Hillas_Area,Hillas_Alpha,Hillas_Delta,MMcEvt.fPhotElfromShower" url="file:${csvCeres}" />
+<!-- 			<stream.io.CsvWriter keys="Hillas_Size,Hillas_Area,Hillas_Alpha,Hillas_Delta,MMcEvt.fPhotElfromShower" url="file:${csvCeres}" /> -->
 <!-- 			<fact.image.ShowImage/> -->
 	</process>
 
@@ -42,15 +48,10 @@
 <!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
 <!-- 	        <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/> -->
 <!--             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/> -->
-<!-- 	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" /> -->
-<!-- 			<fact.features.PhotonCharge key="DataCalibrated" outputKey="c" /> -->
-<!--             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" timeThreshold="30" /> -->
-               
-<!--             <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition"/> -->
-			
-<!--             <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
 <!-- 			<stream.monitor.DataRate every="100" /> -->
-<!-- 			<fact.image.ShowImage/> -->
+<!-- 			<fact.features.RisingEdge key="DataCalibrated" outputKey="arrivalTime"/> -->
+<!-- 			<fact.statistics.CreateHistogram key="arrivalTime"  min="0" max="198" numberOfBins="198" outputKey="aH"/> -->
+<!-- 			<fact.image.monitors.HistogramPlotter key="aH"  logAxis="true" max="198" color="#FD0404"/> -->
 
 <!-- 	</process> -->
 		

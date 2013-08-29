@@ -106,7 +106,7 @@ public void calculateEllipseMars()
 	              / (2 * alpha_xy);
 
 	    mLineGradientAngle      = Math.atan(A);
-	    System.out.println("mlinegradientamngle: " + mLineGradientAngle);
+//	    System.out.println("mlinegradientamngle: " + mLineGradientAngle);
 	    mLineSlope              = Math.tan(mLineGradientAngle);
 	    mLineIntercept          = centerY - (mLineSlope * centerX);
 
@@ -125,8 +125,8 @@ public void calculateEllipseMars()
 	    
 		length             = mSemiMajorAxis;
 	    width              = mSemiMinorAxis;
-	    System.out.println("widthhillas: " + width);
-	    System.out.println("lengthhillas: " + length);
+//	    System.out.println("widthhillas: " + width);
+//	    System.out.println("lengthhillas: " + length);
 	    area               = length * width * Math.PI;
 	    mDelta              = mLineGradientAngle / Math.PI * 180;
 	    

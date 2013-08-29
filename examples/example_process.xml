@@ -11,7 +11,7 @@
 
 <property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
 <property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
-<property name="drive_file" value="/Users/kaibrugge/FactTest/drive_file.fits" />
+<property name="drive_file" value="/Users/kaibrugge/FactTest/20130104.DRIVE_CONTROL_TRACKING_POSITION.fits" />
 <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" />
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
@@ -20,34 +20,38 @@
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
 			<Skip condition="%{data.TriggerType} != 4" />
+			<Skip condition="%{data.EventNum} &lt; 49" />
 	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
             <fact.utils.CutSlices  start="22" end="220"/>
+            <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
+            <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/>
+            
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
             <fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
-               <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" />
-               <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="showerTime" keyPositions="position" timeThreshold="20" />
+
+            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" />
+            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="showerTime" keyPositions="position" timeThreshold="20" />
                
-                
-<!--             <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="sourcePosition"/> -->
-<!--             <fact.processors.parfact.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
-<!--             <fact.processors.MovingAverage key="DataCalibrated" outputKey="smooth" length="10" color="#FF0000"/> -->
-<!--             <fact.processors.MotionDiff key="smooth" outputKey="diff" offset="3" color="#888888"/> -->
-<!--             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="file:${outfile}" /> -->
-            
+            <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition"/>
+<!--             <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
+			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
 	
 <!-- 		<fact.processors.parfact.RemoveSpikesMars /> -->
 <!-- 		<fact.processors.RemoveJumps key="DataCalibrated" outputKey="jumpsRemoved" /> -->
 <!-- 		<fact.processors.parfact.CalculatePhotonCharge key="smooth" outputKey="s" /> -->
 <!-- 		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="c" /> -->
-<!-- 		<fact.processors.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/> -->
-<!-- 		<fact.processors.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/> -->
-<!-- 		<fact.image.monitors.HistogramPlotter key="maxH"  logAxis="true"/> -->
-<!-- 		<fact.image.monitors.HistogramPlotter key="cH"  logAxis="true"/> -->
+<!-- 		<fact.statistics.CreateHistogram key="alpha" min="0" max="180" numberOfBins="181" outputKey="alphaH"/> -->
+<!-- 		<fact.statistics.CreateHistogram key="alpha2" min="0" max="180" numberOfBins="181" outputKey="alphaH2"/> -->
+
+<!-- 		<fact.image.monitors.HistogramPlotter key="alphaH"  logAxis="true"/> -->
+<!-- 		<fact.image.monitors.HistogramPlotter key="alphaH2"  logAxis="true"/> -->
 <!-- 		<fact.image.monitors.StatusWindow every="40" /> -->
-<!-- 		<stream.monitor.DataRate every="200" /> -->
-		<fact.image.ShowImage/>
+		<fact.io.RootASCIIWriter keys="alpha,alpha2" url="file:${outfile}" />
+		<stream.monitor.DataRate every="200" />
+<!-- 		<fact.image.ShowImage/> -->
 	</process>
 		
 		

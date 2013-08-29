@@ -138,15 +138,16 @@ public Data process(Data input) {
     EigenDecomposition eig = new EigenDecomposition(m);
     double eigenValue1 = eig.getRealEigenvalue(0);
     double eigenValue2 = eig.getRealEigenvalue(1);
-//    System.out.println("length: " + length);
-//    System.out.println("width: " + width);
+    double eigenVarianceX =  eigenValue1/size;
+    double eigenVarianceY =  eigenValue2/size;
+//    System.out.println("width: " + Math.sqrt(eigenValue2/size) );
     
     double x = eig.getEigenvector(0).getEntry(0);
     double y = eig.getEigenvector(0).getEntry(1);
     double delta = Math.atan2(y,x);
 //    System.out.println("angle of eigenvectors: " + delta );
 //    System.out.println("--------");
-    PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, centerX, centerY, eigenValue1, eigenValue2, delta, size);
+    PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, centerX, centerY, eigenVarianceX, eigenVarianceY,  delta, size);
     input.put(outputKey , dist);
     input.put(outputKey+"_width", Math.sqrt(eigenValue1/size) );
     input.put(outputKey+"_length", Math.sqrt(eigenValue2/size) );

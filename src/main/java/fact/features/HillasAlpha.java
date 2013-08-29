@@ -37,7 +37,7 @@ public class HillasAlpha implements Processor {
 		}
 
 		float alpha = 0.0f;
-	    double auxiliary_angle  = Math.atan( (source[0] - dist.getCenterY() )/(source[1] - dist.getCenterX()) );
+	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
 	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
 	
@@ -51,16 +51,18 @@ public class HillasAlpha implements Processor {
 	    {
 	        alpha              = 180 + alpha;
 	    }
-	    System.out.println(alpha);
-	    
-		alpha = 0.0f;
-	    auxiliary_angle  = Math.atan2( (source[0] - dist.getCenterY() ),(source[1] - dist.getCenterX()) );
+//	    System.out.println(alpha);
+	    double alpha2 = 0;
+		alpha2 = 0.0f;
+	    auxiliary_angle  = Math.atan2( (source[1] - dist.getCenterY() ),(source[0] - dist.getCenterX()) );
 	
 	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
 	
-	    alpha                  = (float) (dist.getAngle() - auxiliary_angle);
-	    System.out.println(alpha);
-	    
+	    alpha2                  = (float) (dist.getAngle() - auxiliary_angle);
+//	    System.out.println(alpha);
+//	    System.out.println(alpha - alpha2);
+	    input.put("alpha2", alpha2);
+	    input.put("alpha", alpha);
 		return input;
 	}
 

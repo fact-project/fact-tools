@@ -14,49 +14,37 @@ public class PixelDistribution2D implements Serializable {
 	private double covariance;
 	private double centerX; 
 	private double centerY;
-	private double eigenValueX;
-	private double eigenValueY;
 	private double angle;
 	private double size;
+	private double eigenVarianceX, eigenVarianceY;
 	
 	public PixelDistribution2D(double varianceX, double varianceY,
-			double covariance, double centerX, double centerY, double eigenValueX,
-			double eigenValueY, double angle, double size) {
+			double covariance, double centerX, double centerY, double eigenVarianceX, double eigenVarianceY, double angle, double sumOfWeights) {
 				
 				this.setVarianceX(varianceX);
 				this.setVarianceY(varianceY);
 				this.setCovariance(covariance);
 				this.setCenterX(centerX);
 				this.setCenterY(centerY);
-				this.setEigenValueX(eigenValueX);
-				this.setEigenValueY(eigenValueY);
 				this.setAngle(angle);
-				this.setSize(size);
-				
-	}
-	public PixelDistribution2D(double varianceX, double varianceY,
-			double covariance, double centerX, double centerY, double eigenValueX,
-			double eigenValueY, double angle) {
-				
-				this.setVarianceX(varianceX);
-				this.setVarianceY(varianceY);
-				this.setCovariance(covariance);
-				this.setCenterX(centerX);
-				this.setCenterY(centerY);
-				this.setEigenValueX(eigenValueX);
-				this.setEigenValueY(eigenValueY);
-				this.setAngle(angle);
-				//assume 1 
-				this.setSize(1);
+				this.setSize(sumOfWeights);
 				
 	}
 	
-	//special setters for with and length
+
+	//special setters for with and length which are just other names for the standardeviation of the distribution in its eigenspace
 	public double getLength(){
-		return Math.sqrt(eigenValueX/size);
+		return getEigenDeviationX();
 	}
 	public double getWidth(){
-		return Math.sqrt(eigenValueY/size);
+		return getEigenDeviationY();
+	}
+	
+	public double getEigenDeviationX(){
+		return Math.sqrt(eigenVarianceX);
+	}
+	public double getEigenDeviationY(){
+		return Math.sqrt(eigenVarianceY);
 	}
 	
 	
@@ -96,20 +84,6 @@ public class PixelDistribution2D implements Serializable {
 		this.centerY = centerY;
 	}
 
-	public double getEigenValueX() {
-		return eigenValueX;
-	}
-	public void setEigenValueX(double eigenValueX) {
-		this.eigenValueX = eigenValueX;
-	}
-
-	public double getEigenValueY() {
-		return eigenValueY;
-	}
-	public void setEigenValueY(double eigenValueY) {
-		this.eigenValueY = eigenValueY;
-	}
-
 	public double getAngle() {
 		return angle;
 	}
@@ -122,6 +96,22 @@ public class PixelDistribution2D implements Serializable {
 	}
 	public void setSize(double size) {
 		this.size = size;
+	}
+
+
+	public double getEigenVarianceX() {
+		return eigenVarianceX;
+	}
+	public void setEigenVarianceX(double eigenVarianceX) {
+		this.eigenVarianceX = eigenVarianceX;
+	}
+
+
+	public double getEigenVarianceY() {
+		return eigenVarianceY;
+	}
+	public void setEigenVarianceY(double eigenVarianceY) {
+		this.eigenVarianceY = eigenVarianceY;
 	}
 	
 
