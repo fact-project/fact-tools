@@ -3,14 +3,15 @@ package fact.features;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.statistics.PixelDistribution2D;
 import stream.Data;
 import stream.Processor;
+import fact.statistics.PixelDistribution2D;
 
 public class HillasAlpha implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasAlpha.class);
 	private String distribution = null;
 	private String sourcePosition = null;
+	private String outputKey = "alpha";
 	
 	@Override
 	public Data process(Data input) {
@@ -51,18 +52,18 @@ public class HillasAlpha implements Processor {
 	    {
 	        alpha              = 180 + alpha;
 	    }
-//	    System.out.println(alpha);
-	    double alpha2 = 0;
-		alpha2 = 0.0f;
-	    auxiliary_angle  = Math.atan2( (source[1] - dist.getCenterY() ),(source[0] - dist.getCenterX()) );
-	
-	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
-	
-	    alpha2                  = (float) (dist.getAngle() - auxiliary_angle);
-//	    System.out.println(alpha);
-//	    System.out.println(alpha - alpha2);
-	    input.put("alpha2", alpha2);
-	    input.put("alpha", alpha);
+////	    System.out.println(alpha);
+//	    double alpha2 = 0;
+//		alpha2 = 0.0f;
+//	    auxiliary_angle  = Math.atan2( (source[1] - dist.getCenterY() ),(source[0] - dist.getCenterX()) );
+//	
+//	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
+//	
+//	    alpha2                  = (float) (dist.getAngle() - auxiliary_angle);
+////	    System.out.println(alpha);
+////	    System.out.println(alpha - alpha2);
+//	    input.put("alpha2", alpha2);
+	    input.put(outputKey, alpha);
 		return input;
 	}
 
@@ -71,7 +72,6 @@ public class HillasAlpha implements Processor {
 	public String getDistribution() {
 		return distribution;
 	}
-
 	public void setDistribution(String distribution) {
 		this.distribution = distribution;
 	}
@@ -82,10 +82,17 @@ public class HillasAlpha implements Processor {
 		return sourcePosition;
 	}
 
-
-
 	public void setSourcePosition(String sourcePosition) {
 		this.sourcePosition = sourcePosition;
+	}
+
+
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 
 
