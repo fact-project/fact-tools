@@ -1,15 +1,13 @@
 package fact.features;
 
 
-import fact.Constants;
-import fact.viewer.ui.DefaultPixelMapping;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import stream.annotations.Parameter;
+import fact.Constants;
+import fact.viewer.ui.DefaultPixelMapping;
 
 
 /**
@@ -185,7 +183,7 @@ public class TimeDependentParameter implements Processor
 	private float[] dataCalibratedArray = null;
 	
 	private String arrivalTime = "arrivalTime";
-	private float[] arrivalTimeArray = null;
+//	private float[] arrivalTimeArray = null;
 	
 	// Helper and utils
 	private float[] mpGeomXCoord;

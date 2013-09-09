@@ -19,24 +19,32 @@
 	        <fact.filter.DrsCalibration url="file:${ceresDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
 			<fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
+            <!-- 			<fact.features.RisingEdge key="DataCalibrated" outputKey="arrivalTime"/> -->
             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" timeThreshold="30"  minSize="4"/>
             
             <fact.features.SourcePosition outputKey="sourcePosition" X="0.0" Y="0.0"/>
 			
-            <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
-<!-- 			<PrintData /> -->
+<!--             <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
 			<stream.monitor.DataRate every="100" />
 <!-- 			<fact.features.RisingEdge key="DataCalibrated" outputKey="arrivalTime"/> -->
 <!-- 			<fact.statistics.CreateHistogram key="arrivalTime"  min="0" max="150" numberOfBins="301" outputKey="aH"/> -->
 <!-- 			<fact.image.monitors.HistogramPlotter key="aH"  logAxis="true" max="150"/> -->
 
 			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+			
 			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
-			<Skip condition="%{data.alpha} == NaN" /> 
-			<fact.io.RootASCIIWriter keys="alpha,alpha2" url="file:${csvCeres}" />
+			<fact.features.HillasDistance distribution="dist" sourcePosition="sourcePosition" outputKey="distance" />
+			<fact.features.HillasLength distribution="dist" outputKey="length" />
+			<fact.features.HillasWidth distribution="dist" outputKey="width" />
+			<fact.features.HillasConcentration shower="shower" weights="photoncharge" outputKey="concentration" />
+			
+			
+			<fact.image.monitors.ScatterPlotter xValue="length" yValue="width" color="#039C0B"/>
+			<Skip condition="%{data.alpha} == NaN" />
+<!-- 			<PrintData /> -->
+<!-- 			<fact.io.RootASCIIWriter keys="alpha,alpha2" url="file:${csvCeres}" /> -->
 <!-- 			<fact.image.monitors.ScatterPlotter xValue="photoncharge" yValue="arrivalTime" color="#B34C0B"/> -->
-<!-- 			<fact.image.monitors.ScatterPlotter xValue="Hillas_Area" yValue="MMcEvt.fPhotElfromShower" color="#039C0B"/> -->
-<!-- 			<stream.io.CsvWriter keys="Hillas_Size,Hillas_Area,Hillas_Alpha,Hillas_Delta,MMcEvt.fPhotElfromShower" url="file:${csvCeres}" /> -->
+			<stream.io.CsvWriter keys="Hillas_Width,Hillas_Length,Hillas_Size,Hillas_Area,Hillas_Alpha,Hillas_Distance,Hillas_Concentration,Hillas_Concentration2,Hillas_Leakage,Hillas_Secondleakage,MCorsikaEvtHeader.fEvtNumber,MCorsikaEvtHeader.fTotalEnergy,MMcEvt.fPhotElfromShower,MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,@source" url="file:${csvCeres}" />
 <!-- 			<fact.image.ShowImage/> -->
 	</process>
 

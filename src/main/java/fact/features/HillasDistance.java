@@ -8,23 +8,31 @@ import stream.Processor;
 import fact.data.EventUtils;
 import fact.statistics.PixelDistribution2D;
 
-public class HillasWidth implements Processor {
-	static Logger log = LoggerFactory.getLogger(HillasWidth.class);
+public class HillasDistance implements Processor {
+	static Logger log = LoggerFactory.getLogger(HillasDistance.class);
 	private String distribution = null;
 	private String sourcePosition = null;
-	private String outputKey = "alpha";
+	private String outputKey = "distance";
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)){
+		if(!(	EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)
+				&& EventUtils.isKeyValid(input, sourcePosition, float[].class)
+				)){
 			return null;
 		}
-	
-		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-		float width = (float) Math.sqrt(dist.getEigenVarianceX());
-	    input.put(outputKey, width);
 		
-	    return input;
+		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
+		float[] source  = (float[]) input.get(sourcePosition);
+		
+		float x = source[0];
+		float y = source[1];
+
+		input.put(outputKey, 
+				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
+		        + (dist.getCenterX() - x) * (dist.getCenterX() - x) )
+		        );
+		return input;
 	}
 
 	
@@ -41,7 +49,6 @@ public class HillasWidth implements Processor {
 	public String getSourcePosition() {
 		return sourcePosition;
 	}
-
 	public void setSourcePosition(String sourcePosition) {
 		this.sourcePosition = sourcePosition;
 	}

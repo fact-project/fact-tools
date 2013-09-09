@@ -128,8 +128,6 @@ public Data process(Data input) {
         covariance_xy          += wheightsArray[pix] * (mpGeomXCoord[pix] - centerX) * (mpGeomYCoord[pix] - centerY);
     }
 	
-    
-    
 //    Covariance cov = new Covariance(data, true);
     double[][] matrixData = {   {variance_xx, covariance_xy}, 
     							{covariance_xy,variance_yy }
