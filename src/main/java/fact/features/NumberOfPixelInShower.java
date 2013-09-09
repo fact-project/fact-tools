@@ -1,0 +1,36 @@
+package fact.features;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import stream.Data;
+import stream.Processor;
+import fact.data.EventUtils;
+
+public class NumberOfPixelInShower implements Processor {
+	static Logger log = LoggerFactory.getLogger(NumberOfPixelInShower.class);
+	private String showerKey = "shower";
+	private String outputKey = "numUsedPixel";
+	
+	@Override
+	public Data process(Data input) {
+		if(!EventUtils.isKeyValid(input, showerKey, int[].class)){
+			return null;
+		}
+	
+		int[] shower = (int[]) input.get(showerKey);
+	    input.put(outputKey, shower.length);
+		
+	    return input;
+	}
+
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+
+}
