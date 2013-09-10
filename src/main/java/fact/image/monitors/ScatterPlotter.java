@@ -88,12 +88,12 @@ public class ScatterPlotter extends DataVisualizer {
 	public Data processMatchingData(Data data) {
 		if (data.containsKey(xValue) && data.containsKey(yValue)) {
 			try{
-				x = (Double) data.get(xValue);
+				x = (Float) data.get(xValue);
 			} catch(ClassCastException e){
 				x = ((Integer) data.get(xValue)).doubleValue();
 			}
 			try{
-				y = (Double) data.get(yValue);
+				y = (Float) data.get(yValue);
 			} catch (ClassCastException e){
 				y = ((Integer) data.get(yValue)).doubleValue();
 			}

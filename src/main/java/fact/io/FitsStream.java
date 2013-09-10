@@ -33,7 +33,7 @@ public class FitsStream extends AbstractStream {
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
-	
+	private String filename;
 
 	protected int eventBytes;
 	private int bufferSize = 8*1024;

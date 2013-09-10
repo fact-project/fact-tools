@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import stream.Data;
 import fact.viewer.ui.DefaultPixelMapping;
 
 /**
@@ -12,7 +16,8 @@ import fact.viewer.ui.DefaultPixelMapping;
  * 
  */
 public class EventUtils {
-
+	static Logger log = LoggerFactory.getLogger(EventUtils.class);
+	
 	/**
 	 * Finds all unconnected sets of pixel in the showerPixel List and returns a
 	 * list of lists. Each list containing one separate set. Does a BFs search.
@@ -174,6 +179,24 @@ public class EventUtils {
 		} else {
 			return null;
 		}
+	}
+	
+	public static boolean isKeyValid(Data item, String key, Class<?> cl){
+		if(!item.containsKey(key)){
+			log.error("Data does not contain the key " + key);
+			return false;
+		}
+		try{
+			Object value  = cl.cast( item.get(key));
+			if(value ==  null){
+				log.error("The value with the key" + key  + " is null");
+				return false;
+			}
+		} catch (ClassCastException e){
+			log.error("The value for the key " + key + " cannot be cast to " + cl.getSimpleName());
+			return false;
+		}
+		return true;
 	}
 	
 }

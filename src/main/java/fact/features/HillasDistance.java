@@ -1,0 +1,66 @@
+package fact.features;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import stream.Data;
+import stream.Processor;
+import fact.data.EventUtils;
+import fact.statistics.PixelDistribution2D;
+
+public class HillasDistance implements Processor {
+	static Logger log = LoggerFactory.getLogger(HillasDistance.class);
+	private String distribution = null;
+	private String sourcePosition = null;
+	private String outputKey = "distance";
+	
+	@Override
+	public Data process(Data input) {
+		if(!(	EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)
+				&& EventUtils.isKeyValid(input, sourcePosition, float[].class)
+				)){
+			return null;
+		}
+		
+		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
+		float[] source  = (float[]) input.get(sourcePosition);
+		
+		float x = source[0];
+		float y = source[1];
+
+		input.put(outputKey, 
+				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
+		        + (dist.getCenterX() - x) * (dist.getCenterX() - x) )
+		        );
+		return input;
+	}
+
+	
+	
+	public String getDistribution() {
+		return distribution;
+	}
+	public void setDistribution(String distribution) {
+		this.distribution = distribution;
+	}
+
+
+
+	public String getSourcePosition() {
+		return sourcePosition;
+	}
+	public void setSourcePosition(String sourcePosition) {
+		this.sourcePosition = sourcePosition;
+	}
+
+
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+
+}

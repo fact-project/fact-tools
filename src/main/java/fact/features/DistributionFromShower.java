@@ -128,8 +128,6 @@ public Data process(Data input) {
         covariance_xy          += wheightsArray[pix] * (mpGeomXCoord[pix] - centerX) * (mpGeomYCoord[pix] - centerY);
     }
 	
-    
-    
 //    Covariance cov = new Covariance(data, true);
     double[][] matrixData = {   {variance_xx, covariance_xy}, 
     							{covariance_xy,variance_yy }
@@ -149,9 +147,9 @@ public Data process(Data input) {
 //    System.out.println("--------");
     PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, centerX, centerY, eigenVarianceX, eigenVarianceY,  delta, size);
     input.put(outputKey , dist);
-    input.put(outputKey+"_width", Math.sqrt(eigenValue1/size) );
-    input.put(outputKey+"_length", Math.sqrt(eigenValue2/size) );
-    input.put(outputKey+"_delta", delta );
+//    input.put(outputKey+"_width", Math.sqrt(eigenValue1/size) );
+//    input.put(outputKey+"_length", Math.sqrt(eigenValue2/size) );
+//    input.put(outputKey+"_delta", delta );
     
     input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(centerX, centerY, delta, Color.green));
 

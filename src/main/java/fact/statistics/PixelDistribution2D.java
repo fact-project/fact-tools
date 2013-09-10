@@ -28,6 +28,8 @@ public class PixelDistribution2D implements Serializable {
 				this.setCenterY(centerY);
 				this.setAngle(angle);
 				this.setSize(sumOfWeights);
+				this.setEigenVarianceX(eigenVarianceX);
+				this.setEigenVarianceY(eigenVarianceY);
 				
 	}
 	
