@@ -130,8 +130,8 @@ public class DefaultPixelMapping implements PixelMapping {
 
 			float posX = new Float(item.get("pos_X").toString());
 			float posY = new Float(item.get("pos_Y").toString());
-			chid2posXmm[chId] = posX * 10;
-			chid2posYmm[chId] = posY * 10;
+			chid2posXmm[chId] = posX * 9.5f;
+			chid2posYmm[chId] = posY * 9.5f;
 			// log.info("softId " + id + " = ( {}, {} )", x, y);
 
 			// HexTile cell = addCell( id, x, y );
@@ -141,6 +141,34 @@ public class DefaultPixelMapping implements PixelMapping {
 
 		log.trace(" x range is {}, {}", minX, maxX);
 		log.trace(" y range is {}, {}", minY, maxY);
+	}
+	
+	//get the pixel under the following x,y  values which are given in millimeters
+	public static int geomToChid(float x, float y){
+		if(!init){
+			init();
+		}
+		double ix =  (x /Math.sin(60* (Math.PI/180)));
+		ix =  Math.round(ix);
+		double iy = y;
+		if(ix % 2 == 0){
+			iy = y-0.5;
+		}
+		iy = -Math.round(iy);
+		
+		int chid = 0;
+		for(float kx : chid2geomXmm){
+			if(kx == ix ){
+				if(chid2geomYmm[chid] == iy){
+					break;
+				}
+			}
+			chid++;
+		}
+		if(chid == 1440){
+			return -1;
+		}
+		return chid;
 	}
 
 	/**
