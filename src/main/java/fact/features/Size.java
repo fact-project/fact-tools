@@ -17,7 +17,7 @@ public class Size implements Processor {
 			return null;
 		}
 		
-		if(!EventUtils.isKeyValid(input, photonChargeKey, int[].class)){
+		if(!EventUtils.isKeyValid(input, photonChargeKey, float[].class)){
 			return null;
 		}
 

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import fact.Constants;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public class PixelMappingTest {
@@ -41,7 +42,29 @@ public class PixelMappingTest {
 		// log.info("hardId: {}  =>  softId: {}", i, hardware2softwareID[i]);
 		// }
 	}
-	
+	@Test
+	public void testKoordinateToChid() {
+		// -180,999 .... 180,999
+		float[] x = {-123.28f};
+		// -180,5 .... 190,0
+		float[] y = {104.3f};
+		for (int i = 0 ; i<x.length ; i++)
+		{
+			int nearestChid = -1;
+			double lowestDistance = 100000.0d;
+			for (int chid = 0 ; chid < Constants.NUMBEROFPIXEL ; chid++ )
+			{
+				float xChid = DefaultPixelMapping.getGeomX(chid);
+				float yChid = DefaultPixelMapping.getGeomY(chid);
+				double distance = Math.sqrt((xChid-x[i])*(xChid-x[i])+(yChid-y[i])*(yChid-y[i]));
+				if (distance < lowestDistance)
+				{
+					nearestChid = chid;
+					lowestDistance = distance;
+				}
+			}
+		}
+	}
 	@Test
 	public void testGeoToChid(){
 		//check inside camera bounds
