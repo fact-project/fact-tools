@@ -138,7 +138,7 @@ public class EventInfo extends JEditorPane {
 					pixels = (float[]) event.get(st);
 					if (pixels.length == Constants.NUMBEROFPIXEL) {
 						strB.append(st + ": "
-								+ pixels[DefaultPixelMapping.getChidID(o)]);
+								+ pixels[DefaultPixelMapping.getChidFromSoftId(o)]);
 						strB.append("<br />");
 					}
 				}

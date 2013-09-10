@@ -79,43 +79,43 @@ public class HillasParameter implements Processor {
 	 */
 	
 
-	private void calculateLeakage(int[] showerPixel, float[] photonCharge, float size)
-	{
-	    leakageBorder          = 0;
-	    leakageSecondBorder    = 0;
-	    for (int pix: showerPixel)
-	    {
-	        if (isBorderPixel(pix) )
-	        {
-	            leakageBorder          += photonCharge[pix];
-	            leakageSecondBorder    += photonCharge[pix];
-	        }
-	        else if (isSecondBorderPixel(pix))
-	        {
-	            leakageSecondBorder    += photonCharge[pix];
-	        }
-	    }
-	    leakageBorder          = leakageBorder        / size;
-	    leakageSecondBorder    = leakageSecondBorder  / size;
-	}
-
-	//this is of course not the most efficient solution
-	boolean isSecondBorderPixel(int pix){
-		for(int nPix: DefaultPixelMapping.getNeighborsFromSoftID(pix))
-		{
-			if(isBorderPixel(nPix)){
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	boolean isBorderPixel(int pix){
-		for(int i : DefaultPixelMapping.getNeighborsFromSoftID(pix)){
-			if(i == -1) return true;
-		}
-		return false;
-	}
+//	private void calculateLeakage(int[] showerPixel, float[] photonCharge, float size)
+//	{
+//	    leakageBorder          = 0;
+//	    leakageSecondBorder    = 0;
+//	    for (int pix: showerPixel)
+//	    {
+//	        if (isBorderPixel(pix) )
+//	        {
+//	            leakageBorder          += photonCharge[pix];
+//	            leakageSecondBorder    += photonCharge[pix];
+//	        }
+//	        else if (isSecondBorderPixel(pix))
+//	        {
+//	            leakageSecondBorder    += photonCharge[pix];
+//	        }
+//	    }
+//	    leakageBorder          = leakageBorder        / size;
+//	    leakageSecondBorder    = leakageSecondBorder  / size;
+//	}
+//
+//	//this is of course not the most efficient solution
+//	boolean isSecondBorderPixel(int pix){
+//		for(int nPix: DefaultPixelMapping.getNeighborsFromSoftID(pix))
+//		{
+//			if(isBorderPixel(nPix)){
+//				return true;
+//			}
+//		}
+//		
+//		return false;
+//	}
+//	boolean isBorderPixel(int pix){
+//		for(int i : DefaultPixelMapping.getNeighborsFromSoftID(pix)){
+//			if(i == -1) return true;
+//		}
+//		return false;
+//	}
 	
 	/**
 	 * @see stream.DataProcessor#process(stream.Data)
@@ -211,7 +211,7 @@ public class HillasParameter implements Processor {
 	   	showerSize = calculateSize(showerPixelArray, pE);
 //	   	System.out.println("showersize" + showerSize);
 	    //sets the two leakage globals
-	    calculateLeakage(showerPixelArray, pE, showerSize);
+//	    calculateLeakage(showerPixelArray, pE, showerSize);
 	    //sets concentration1Pixel and concentration2Pixel
 	    calculateConcentration(showerPixelArray, pE, showerSize);
 

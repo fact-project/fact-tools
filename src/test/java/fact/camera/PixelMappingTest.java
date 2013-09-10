@@ -15,72 +15,95 @@ public class PixelMappingTest {
 
 	@Test
 	public void testFactMapping() {
-		int[] n = DefaultPixelMapping.getNeighborsFromSoftID(969);
-		Integer[] nS = {1079, 1080, 968, 970, 865, 864};
-		List<Integer> l = Arrays.asList(nS);
+		int chid = DefaultPixelMapping.getChidFromSoftId(969);
+		int[] n = DefaultPixelMapping.getNeighborsFromChid(chid);
 		
+		Integer[] nS = {1079, 1080, 968, 970, 865, 864};
+		for(int i = 0; i < nS.length; i++){
+			nS[i] = DefaultPixelMapping.getChidFromSoftId(nS[i]);
+		}
+		
+		List<Integer> l = Arrays.asList(nS);
 		for(int p : n){
 			if(!l.contains(p)){
 				fail("Pixelmapping did not deliver the correct neighbours for softid 969");
 			}
 		}
 		
-		n = DefaultPixelMapping.getNeighborsFromSoftID(1080);
-		Integer[] nS2 = {1079, 1081, 969, 970, 1197, 1196};
-		l = Arrays.asList(nS2);
+		chid = DefaultPixelMapping.getChidFromSoftId(1080);
+		n = DefaultPixelMapping.getNeighborsFromChid(chid);
+		
+		Integer[] nS2h = {1079, 1081, 969, 970, 1197, 1196};
+		for(int i = 0; i < nS2h.length; i++){
+			nS2h[i] = DefaultPixelMapping.getChidFromSoftId(nS2h[i]);
+		}
+		
+		l = Arrays.asList(nS2h);
 		for(int p : n){
 			if(!l.contains(p)){
-				fail("Pixelmapping did not deliver the correct neighbours for softid 1080");
+				fail("Pixelmapping did not deliver the correct neighbours for hardid with softid 1080");
 			}
 		}
-		for (int chid = 0; chid < 1440; ++chid){
-			if (DefaultPixelMapping.getNeighborsFromChid(chid).length != 6){
-				fail("map did not return the right array for chid " + chid);
+		
+		
+		
+		for (int id = 0; id < 1440; ++id){
+			if (DefaultPixelMapping.getNeighborsFromChid(id).length != 6){
+				fail("map did not return the right array for chid " + id);
 			}
 		}
-		// for (int i = 0; i < hardware2softwareID.length; i++) {
-		// log.info("hardId: {}  =>  softId: {}", i, hardware2softwareID[i]);
-		// }
+		
+		
 	}
+	
 	@Test
 	public void testKoordinateToChid() {
 		// -180,999 .... 180,999
-		float[] x = {-123.28f};
-		// -180,5 .... 190,0
-		float[] y = {104.3f};
-		for (int i = 0 ; i<x.length ; i++)
-		{
+		float[] xs = {120.513f, 12.22f,-80.324f};
+		float[] ys = {80.113f, 102.22f,-5.324f};
+//		float x = -6.93f  * 9.5f;
+//		float y = 3.5f  * 9.5f;
+		
+		for (int i = 0; i < xs.length; i++){
+			float x = xs[i];
+			float y = ys[i];
 			int nearestChid = -1;
 			double lowestDistance = 100000.0d;
 			for (int chid = 0 ; chid < Constants.NUMBEROFPIXEL ; chid++ )
 			{
-				float xChid = DefaultPixelMapping.getGeomX(chid);
-				float yChid = DefaultPixelMapping.getGeomY(chid);
-				double distance = Math.sqrt((xChid-x[i])*(xChid-x[i])+(yChid-y[i])*(yChid-y[i]));
+				float xChid = DefaultPixelMapping.getPosX(chid);
+				float yChid = DefaultPixelMapping.getPosY(chid);
+				double distance = Math.sqrt( (xChid-x)*(xChid-x) + (yChid-y)*(yChid-y) );
 				if (distance < lowestDistance)
 				{
 					nearestChid = chid;
 					lowestDistance = distance;
 				}
 			}
+			assertEquals("Fail: x,y : " + x + ", " + y,nearestChid, DefaultPixelMapping.geomToChid(x, y));
 		}
+//		System.out.println("x and y of nearest chid: " + DefaultPixelMapping.getGeomX(nearestChid) + "  " + DefaultPixelMapping.getGeomY(nearestChid) + "           x and y given: " + x + " " + y);
 	}
+	
+	
+	
 	@Test
 	public void testGeoToChid(){
 		//check inside camera bounds
 		float x = -6.93f  * 9.5f;
 		float y = 3.5f  * 9.5f;
-		int chid =  DefaultPixelMapping.getChidID(191);
+		int chid =  DefaultPixelMapping.getChidFromSoftId(191);
+		//911
 		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
 		
 		x = -19.05f * 9.5f;
 		y = 5.5f * 9.5f;
-		chid =  DefaultPixelMapping.getChidID(1393);
+		chid =  DefaultPixelMapping.getChidFromSoftId(1393);
 		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
 		
 		x = -19.06f  * 9.5f;
 		y = 5.6f  * 9.5f;
-		chid =  DefaultPixelMapping.getChidID(1393);
+		chid =  DefaultPixelMapping.getChidFromSoftId(1393);
 		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
 		
 		//outside camera bounds

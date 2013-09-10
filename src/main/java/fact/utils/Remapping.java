@@ -23,7 +23,7 @@ public class Remapping extends SimpleFactEventProcessor<short[], short[]>{
 		//copy the whole data into a new array.
 		short[] remapped = new short[data.length];
 		for(int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++){
-			int chid = DefaultPixelMapping.getChidID(softId);
+			int chid = DefaultPixelMapping.getChidFromSoftId(softId);
 			System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
 		}
 		return remapped;

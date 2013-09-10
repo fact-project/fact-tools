@@ -28,7 +28,7 @@ public class DefaultPixelMapping implements PixelMapping {
 	static private float[] chid2posYmm;
 	static private float[] chid2posXmm;
 	// one tile can only have <= 6 neighbours
-	public static int[][] neighboursFromSoftId;
+//	public static int[][] neighboursFromSoftId;
 
 	// one tile can only have <= 6 neighbours
 	public static int[][] neighboursFromChId;
@@ -36,7 +36,7 @@ public class DefaultPixelMapping implements PixelMapping {
 	// 
 	static boolean init = false;
 	// x, y
-	final static private int[][] geomId2SoftId = new int[44 + 2][39 + 2];
+	final static private int[][] geomId2Chid = new int[44 + 2][39 + 2];
 
 	public DefaultPixelMapping() {
 		init();
@@ -45,7 +45,7 @@ public class DefaultPixelMapping implements PixelMapping {
 	private static void init(){
 		try {
 			load("fact-map.txt");
-			calculateNeighboursFromSoftIds();
+			calculateNeighboursFromChids();
 			init = true;
 		} catch (Exception e) {
 			log.error("Failed to load pixel-map: {}", e.getMessage());
@@ -100,8 +100,8 @@ public class DefaultPixelMapping implements PixelMapping {
 			//	int y = new Double((Double) item.get("geom_j")).intValue();
 
 
-			int x = (int)(Double.parseDouble(item.get("geom_i").toString()));
-			int y = (int)(Double.parseDouble(item.get("geom_j").toString()));
+			int geomX = (int)(Double.parseDouble(item.get("geom_i").toString()));
+			int geomY = (int)(Double.parseDouble(item.get("geom_j").toString()));
 
 			/**
 			 * using a 2d array to map geomIds to softids. geoIds go from -22 -
@@ -109,24 +109,24 @@ public class DefaultPixelMapping implements PixelMapping {
 			 */
 			int iX, iY;
 
-			iX = x + 22;
-			iY = y + 20;
-			geomId2SoftId[iX][iY] = id;
+			iX = geomX + 22;
+			iY = geomY + 20;
+			geomId2Chid[iX][iY] = chId;
 
-			if (x < minX)
-				minX = x;
+			if (geomX < minX)
+				minX = geomX;
 
-			if (x > maxX)
-				maxX = x;
+			if (geomX > maxX)
+				maxX = geomX;
 
-			if (y < minY)
-				minY = y;
+			if (geomY < minY)
+				minY = geomY;
 
-			if (y > maxY)
-				maxY = y;
+			if (geomY > maxY)
+				maxY = geomY;
 
-			chid2geomXmm[chId] = x;
-			chid2geomYmm[chId] = y;
+			chid2geomXmm[chId] = geomX;
+			chid2geomYmm[chId] = geomY;
 
 			float posX = new Float(item.get("pos_X").toString());
 			float posY = new Float(item.get("pos_Y").toString());
@@ -194,41 +194,36 @@ public class DefaultPixelMapping implements PixelMapping {
 		return pixels;
 	}
 
-	private static void calculateNeighboursFromSoftIds() {
+	private static void calculateNeighboursFromChids() {
 		neighboursFromChId  = new int[Constants.NUMBEROFPIXEL][6];
-		neighboursFromSoftId = new int[Constants.NUMBEROFPIXEL][6];
-		for (int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++) {
-			int x = chid2geomXmm[software2chId[softId]];
-			int y = chid2geomYmm[software2chId[softId]];
+//		neighboursFromSoftId = new int[Constants.NUMBEROFPIXEL][6];
+		for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+//			int chid = software2chId[softId];
+			int x = chid2geomXmm[chid];
+			int y = chid2geomYmm[chid];
 			int iX, iY;
 
 			iX = x + 22;
 			iY = y + 20;
 
 			int[] neighbours = new int[6];
-			neighbours[0] = check(x, y - 1) ? geomId2SoftId[iX][iY - 1] : -1;
-			neighbours[1] = check(x, y + 1) ? geomId2SoftId[iX][iY + 1] : -1;
-			neighbours[2] = check(x - 1, y) ? geomId2SoftId[iX - 1][iY] : -1;
-			neighbours[4] = check(x + 1, y) ? geomId2SoftId[iX + 1][iY] : -1;
+			neighbours[0] = check(x, y - 1) ? geomId2Chid[iX][iY - 1] : -1;
+			neighbours[1] = check(x, y + 1) ? geomId2Chid[iX][iY + 1] : -1;
+			neighbours[2] = check(x - 1, y) ? geomId2Chid[iX - 1][iY] : -1;
+			neighbours[4] = check(x + 1, y) ? geomId2Chid[iX + 1][iY] : -1;
 			if (x % 2 == 0) {
-				neighbours[3] = check(x - 1, y - 1) ? geomId2SoftId[iX - 1][iY - 1]
+				neighbours[3] = check(x - 1, y - 1) ? geomId2Chid[iX - 1][iY - 1]
 						: -1;
-				neighbours[5] = check(x + 1, y - 1) ? geomId2SoftId[iX + 1][iY - 1]
+				neighbours[5] = check(x + 1, y - 1) ? geomId2Chid[iX + 1][iY - 1]
 						: -1;
 			} else {
-				neighbours[3] = check(x - 1, y + 1) ? geomId2SoftId[iX - 1][iY + 1]
+				neighbours[3] = check(x - 1, y + 1) ? geomId2Chid[iX - 1][iY + 1]
 						: -1;
-				neighbours[5] = check(x + 1, y + 1) ? geomId2SoftId[iX + 1][iY + 1]
+				neighbours[5] = check(x + 1, y + 1) ? geomId2Chid[iX + 1][iY + 1]
 						: -1;
 			}
 
-			int[] chidNeighbours = new int[6];
-			for (int i = 0; i < 6; i++) {
-				chidNeighbours[i] = (neighbours[i] != -1) ? software2chId[neighbours[i]]
-						: -1;
-			}
-			neighboursFromChId[software2chId[softId]] = chidNeighbours;
-			neighboursFromSoftId[softId] = neighbours;
+			neighboursFromChId[chid] = neighbours;
 		}
 
 	}
@@ -238,7 +233,7 @@ public class DefaultPixelMapping implements PixelMapping {
 		if (Math.abs(x) > 22 || y < -19 || y > 20) {
 			return false;
 		}
-		if ((x != 0 || y != 0) && geomId2SoftId[x + 22][y + 20] == 0) {
+		if ((x != 0 || y != 0) && geomId2Chid[x + 22][y + 20] == 0) {
 			return false;
 		}
 
@@ -258,33 +253,57 @@ public class DefaultPixelMapping implements PixelMapping {
 		return c;
 	}
 	
-	public static int getChidID(Integer softId) {
+	public static int getChidFromSoftId(Integer softId) {
 		if(!init){
 			init();
 		}
 		return software2chId[softId];
 	}
 
-	public static int getSoftwareID(Integer hardId) {
+	public static int getSoftwareID(Integer chid) {
 		if(!init){
 			init();
 		}
-		return chId2softId[hardId];
+		return chId2softId[chid];
 	}
-
-	public static int getGeomX(Integer hardId) {
+/**
+ * 
+ * @param chid
+ * @return the geometric X value. This is the abstract position shifted by 22 pixelunits.
+ */
+	public static int getGeomX(Integer chid) {
 		if(!init){
 			init();
 		}
-		return chid2geomXmm[hardId];
+		return chid2geomXmm[chid];
 	}
-
-	public static int getGeomY(Integer hardId) {
+	public static int getGeomY(Integer chid) {
 		if(!init){
 			init();
 		}
-		return chid2geomYmm[hardId];
+		return chid2geomYmm[chid];
 	}
+	
+	
+	/**
+	 * 
+	 * @param chid
+	 * @return the x coordinate of the pixel in mm. As seen from the camera coordinate system
+	 */
+	public static float getPosX(Integer chid) {
+		if(!init){
+			init();
+		}
+		return chid2posXmm[chid];
+	}
+	public static float getPosY(Integer chid) {
+		if(!init){
+			init();
+		}
+		return chid2posYmm[chid];
+	}
+	
+	
 
 	public static int[] getNeighborsFromChid(int chid) {
 		if(!init){
@@ -292,13 +311,7 @@ public class DefaultPixelMapping implements PixelMapping {
 		}
 		return neighboursFromChId[chid];
 	}
-
-	public static int[] getNeighborsFromSoftID(int softID) {
-		if(!init){
-			init();
-		}
-		return neighboursFromSoftId[softID];
-	}
+	
 	
 	public static float[] getGeomXArray() {
 		if(!init){

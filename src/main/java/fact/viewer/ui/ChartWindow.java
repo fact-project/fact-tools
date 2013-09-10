@@ -112,7 +112,7 @@ public class ChartWindow {
 
 		if (!set.isEmpty()) {
 			for (int id : set) {
-				id = DefaultPixelMapping.getChidID(id);
+				id = DefaultPixelMapping.getChidFromSoftId(id);
 				if(m != null && m[id] != null){
 					plotPanel.getPlot().addDomainMarker(m[id], Layer.BACKGROUND);
 				}
@@ -134,7 +134,7 @@ public class ChartWindow {
 		Color color = getMatchingColorFromKey(key, event);
 		if (!set.isEmpty()) {
 			for (int id : set) {
-				id = DefaultPixelMapping.getChidID(id);
+				id = DefaultPixelMapping.getChidFromSoftId(id);
 				float[] data = (float[]) event.get(key);
 				int roi = data.length / Constants.NUMBEROFPIXEL;
 				plotPanel.addSeries(key + "-" + id, color, data, roi * id, (roi * id)
