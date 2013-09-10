@@ -2,9 +2,13 @@ package fact.features;
 
 import java.awt.Color;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.linear.DecompositionSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +25,9 @@ public class DistributionFromShower implements StatefulProcessor {
 	
 	private float[] mpGeomXCoord;
 	private float[] mpGeomYCoord;
+	
+	private float[] mpEigenGeomXCoord;
+	private float[] mpEigenGeomYCoord;
 
 //	private float[] photonCharge;
 	public float mCenterOfGravityX;
@@ -74,7 +81,7 @@ public Data process(Data input) {
 	if(weights == null){
 		log.info("Wheights were null. Setting all weights to 1");
 
-		wheightsArray = new float[showerPixel.length];
+		wheightsArray = new float[Constants.NUMBEROFPIXEL];
 		for(int i = 0; i < wheightsArray.length; i++){
 			wheightsArray[i] = 1.0f;
 		}
@@ -98,17 +105,17 @@ public Data process(Data input) {
     for(int pix: showerPixel){
     	size += wheightsArray[pix];
     }
-	double centerX = 0;
-	double centerY = 0;
+	double cogX = 0;
+	double cogY = 0;
 	//find wheighted center of the shower. assuming we have no islands this works.
     for (int pix: showerPixel)
     {
-        centerX            += wheightsArray[pix] * mpGeomXCoord[pix];
-        centerY            += wheightsArray[pix] * mpGeomYCoord[pix];
+        cogX            += wheightsArray[pix] * mpGeomXCoord[pix];
+        cogY            += wheightsArray[pix] * mpGeomYCoord[pix];
     }
     //divide the center coordinates by size. I'm not sure if this is correct. I checked it. It is.
-    centerX                /= size;
-    centerY                /= size;
+    cogX                /= size;
+    cogY                /= size;
 	
     // These names are somewhat misleading. I think what's happening here is a linear regression on both axis.
     // See also http://de.wikipedia.org/wiki/Lineare_Regression#Berechnung_der_Regressionsgeraden
@@ -123,9 +130,9 @@ public Data process(Data input) {
     
     for (int pix: showerPixel )
     {
-        variance_xx            += wheightsArray[pix] * (mpGeomXCoord[pix] - centerX) * (mpGeomXCoord[pix] - centerX);
-        variance_yy            += wheightsArray[pix] * (mpGeomYCoord[pix] - centerY) * (mpGeomYCoord[pix] - centerY);
-        covariance_xy          += wheightsArray[pix] * (mpGeomXCoord[pix] - centerX) * (mpGeomYCoord[pix] - centerY);
+        variance_xx            += wheightsArray[pix] * (mpGeomXCoord[pix] - cogX) * (mpGeomXCoord[pix] - cogX);
+        variance_yy            += wheightsArray[pix] * (mpGeomYCoord[pix] - cogY) * (mpGeomYCoord[pix] - cogY);
+        covariance_xy          += wheightsArray[pix] * (mpGeomXCoord[pix] - cogX) * (mpGeomYCoord[pix] - cogY);
     }
 	
 //    Covariance cov = new Covariance(data, true);
@@ -145,13 +152,84 @@ public Data process(Data input) {
     double delta = Math.atan2(y,x);
 //    System.out.println("angle of eigenvectors: " + delta );
 //    System.out.println("--------");
-    PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, centerX, centerY, eigenVarianceX, eigenVarianceY,  delta, size);
+    
+    //Calculation of the 3. Moment (Skewness)
+    //=======================================
+    // Rotate the shower by the angle delta in order to have the ellipse main axis in parallel to the Camera-Coordinates X-Axis
+    
+    //rotation Matirix
+    double[][] rotMatrixZ = {	{Math.cos(-delta),-Math.sin(-delta)},
+    							{Math.sin(-delta), Math.cos(-delta)}
+    						};
+    RealMatrix rotZ = MatrixUtils.createRealMatrix(rotMatrixZ);
+    
+    //allocate variables for rotated coordinates    
+    mpEigenGeomXCoord = new float[mpGeomXCoord.length];
+    mpEigenGeomYCoord = new float[mpGeomXCoord.length];
+
+    //Loop over pixel in Order to calculate the rotated coordinates
+    for (int pix: showerPixel )
+    {
+    	// set pixel coordinates to be a vector
+    	RealVector pixCoordinates 		= new ArrayRealVector(new double[] {mpGeomXCoord[pix], mpGeomYCoord[pix]}, false );
+    	
+    	// multiply the rotation matrix to the coordinates vector
+    	RealVector eigenPixCoordinates 	= rotZ.operate(pixCoordinates);
+    	
+    	// fill array of new pixel coordinates
+    	mpEigenGeomXCoord[pix]			= (float) eigenPixCoordinates.getEntry(0);
+    	mpEigenGeomYCoord[pix]			= (float) eigenPixCoordinates.getEntry(1);
+    }
+    //create COG coordinates vector
+    RealVector cogVec 		= new ArrayRealVector(new double[] {cogX, cogY}, false );
+    // multiply the rotation matrix to the COG coordinates vector
+    RealVector eigenCogVec 	= rotZ.operate(cogVec);
+    
+    float eigenCogX = (float) eigenCogVec.getEntry(0);
+    float eigenCogY = (float) eigenCogVec.getEntry(1);
+    
+    
+    // allocate variables for moments of longitudenal and transversal shower distribution 
+    double[] distMoment_xx = new double[4];
+    double[] distMoment_yy = new double[4];
+     
+    for (int pix: showerPixel )
+    {
+    	for (int moment=0; moment < distMoment_xx.length; moment++){
+    		distMoment_xx[moment] += wheightsArray[pix] * Math.pow((mpEigenGeomXCoord[pix] - eigenCogX), moment + 1);
+    	}
+    	for (int moment=0; moment < distMoment_xx.length; moment++){
+    		distMoment_yy[moment] += wheightsArray[pix] * Math.pow((mpEigenGeomYCoord[pix] - eigenCogY), moment + 1);
+    	}
+    	
+//    	distMoment_xx[1] += wheightsArray[pix] * Math.pow((mpEigenGeomXCoord[pix] - eigenCogX), 2);
+//    	distMoment_yy[1] += wheightsArray[pix] * Math.pow((mpEigenGeomYCoord[pix] - eigenCogY), 2);
+    }
+    
+    for (int moment=0; moment < distMoment_xx.length; moment++){
+    	distMoment_xx[moment] /= size;
+    	distMoment_yy[moment] /= size;
+    }
+    
+    
+    
+ //   PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, cogX, cogY, eigenVarianceX, eigenVarianceY,  delta, size);
+    PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, cogX, cogY, eigenVarianceX, eigenVarianceY, distMoment_xx[2], 
+    		distMoment_yy[2], distMoment_xx[3], distMoment_yy[3], delta, size);
     input.put(outputKey , dist);
+    input.put("varianceLong",	eigenVarianceX );
+    input.put("varianceTrans", 	eigenVarianceY );
+    input.put("M3Long",	distMoment_xx[2] );
+    input.put("M3trans", distMoment_yy[2] );
+    input.put("M4Long", 	distMoment_xx[3] );
+    input.put("M4Trans", distMoment_yy[3] );
+    input.put("COGx", 	cogX );
+    input.put("COGy", cogY );
 //    input.put(outputKey+"_width", Math.sqrt(eigenValue1/size) );
 //    input.put(outputKey+"_length", Math.sqrt(eigenValue2/size) );
 //    input.put(outputKey+"_delta", delta );
     
-    input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(centerX, centerY, delta, Color.green));
+    input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
 
     //At this point you usually want to get the regression coefficents. (The b in the wikipedia article)
     //What happens however is quite unusual. Which means I dont understand it :P
