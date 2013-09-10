@@ -20,12 +20,13 @@ import stream.annotations.Parameter;
  * 		* The COGX and COGY for every slice of event
  * 		* The COG{X,Y and sqrt(X^2 + Y^2)}-Velocity for every slice transition
  * 		? The velocity in shower coordinate system
- * 		? The variance of COGX and COGY
+ * 		* The variance of COGX and COGY
+ * 		? The variance of COG-Velocity
  *		
  *	Calculated values for separation
  *		? MaxVelocity in both systems
  *		? MeanVelocity and error in interval [arrival - 10 slices, arrival + 10 slices]
- *		
+ *		? Mean Velocity at position of minimal variace of COG +/- 5 slices
  *
  * 		? "Rhode"-Parameter (working title)
  * 			This parameter is a measure for the source-gamma-ness of an event
