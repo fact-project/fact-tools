@@ -2,6 +2,8 @@ package fact.statistics;
 
 import java.io.Serializable;
 
+import org.apache.commons.math3.stat.descriptive.moment.Skewness;
+
 public class PixelDistribution2D implements Serializable {
 	private static final long serialVersionUID = 3815070753769798637L;
 	//	Double variance_x = null;
@@ -17,9 +19,27 @@ public class PixelDistribution2D implements Serializable {
 	private double angle;
 	private double size;
 	private double eigenVarianceX, eigenVarianceY;
+	private double eigenSkewnessX, eigenSkewnessY;
+	private double eigenKurtosisX, eigenKurtosisY;
 	
 	public PixelDistribution2D(double varianceX, double varianceY,
 			double covariance, double centerX, double centerY, double eigenVarianceX, double eigenVarianceY, double angle, double sumOfWeights) {
+				
+				this.setVarianceX(varianceX);
+				this.setVarianceY(varianceY);
+				this.setCovariance(covariance);
+				this.setCenterX(centerX);
+				this.setCenterY(centerY);
+				this.setAngle(angle);
+				this.setSize(sumOfWeights);
+				this.setEigenVarianceX(eigenVarianceX);
+				this.setEigenVarianceY(eigenVarianceY);
+				
+	}
+	
+	public PixelDistribution2D(double varianceX, double varianceY,
+			double covariance, double centerX, double centerY, double eigenVarianceX, double eigenVarianceY, 
+			double eigenSkewnessX, double eigenSkewnessY, double eigenKurtosisX, double eigenKurtosisY, double angle, double sumOfWeights) {
 				
 				this.setVarianceX(varianceX);
 				this.setVarianceY(varianceY);
@@ -48,8 +68,6 @@ public class PixelDistribution2D implements Serializable {
 	public double getEigenDeviationY(){
 		return Math.sqrt(eigenVarianceY);
 	}
-	
-	
 
 	public double getVarianceX() {
 		return varianceX;
@@ -114,6 +132,46 @@ public class PixelDistribution2D implements Serializable {
 	}
 	public void setEigenVarianceY(double eigenVarianceY) {
 		this.eigenVarianceY = eigenVarianceY;
+	}
+
+
+	public double getEigenSkewnessX() {
+		return eigenSkewnessX;
+	}
+
+
+	public void setEigenSkewnessX(double eigenSkewnessX) {
+		this.eigenSkewnessX = eigenSkewnessX;
+	}
+
+
+	public double getEigenSkewnessY() {
+		return eigenSkewnessY;
+	}
+
+
+	public void setEigenSkewnessY(double eigenSkewnessY) {
+		this.eigenSkewnessY = eigenSkewnessY;
+	}
+
+
+	public double getEigenKurtosisX() {
+		return eigenKurtosisX;
+	}
+
+
+	public void setEigenKurtosisX(double eigenKurtosisX) {
+		this.eigenKurtosisX = eigenKurtosisX;
+	}
+
+
+	public double getEigenKurtosisY() {
+		return eigenKurtosisY;
+	}
+
+
+	public void setEigenKurtosisY(double eigenKurtosisY) {
+		this.eigenKurtosisY = eigenKurtosisY;
 	}
 	
 
