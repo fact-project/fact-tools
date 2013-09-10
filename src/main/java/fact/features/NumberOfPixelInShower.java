@@ -20,8 +20,7 @@ public class NumberOfPixelInShower implements Processor {
 	
 		int[] shower = (int[]) input.get(showerKey);
 	    input.put(outputKey, shower.length);
-		
-	    return input;
+		return input;
 	}
 
 
