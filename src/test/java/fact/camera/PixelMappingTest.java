@@ -44,25 +44,25 @@ public class PixelMappingTest {
 	
 	@Test
 	public void testGeoToChid(){
-		//191    2512      -8      -3    1611   71.12   6  10     -6.93      3.50     
-		float x = -6.93f;
-		float y = 3.5f;
+		//check inside camera bounds
+		float x = -6.93f  * 9.5f;
+		float y = 3.5f  * 9.5f;
 		int chid =  DefaultPixelMapping.getChidID(191);
 		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
 		
-		x = -19.05f;
-		y = 5.5f;
+		x = -19.05f * 9.5f;
+		y = 5.5f * 9.5f;
 		chid =  DefaultPixelMapping.getChidID(1393);
 		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
 		
-		x = -19.06f;
-		y = 5.6f;
+		x = -19.06f  * 9.5f;
+		y = 5.6f  * 9.5f;
 		chid =  DefaultPixelMapping.getChidID(1393);
 		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
 		
-		//außerhalb
-		x = -30.06f;
-		y = 9.6f;
+		//outside camera bounds
+		x = -30.06f * 9.5f;
+		y = 9.6f * 9.5f;
 		assertEquals(-1, DefaultPixelMapping.geomToChid(x, y));
 	}
 	

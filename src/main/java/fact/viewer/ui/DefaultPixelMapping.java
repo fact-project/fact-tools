@@ -144,11 +144,12 @@ public class DefaultPixelMapping implements PixelMapping {
 	}
 	
 	//get the pixel under the following x,y  values which are given in millimeters
-	//TODO: divide by 9.5
 	public static int geomToChid(float x, float y){
 		if(!init){
 			init();
 		}
+		x = x/9.5f;
+		y = y/9.5f;
 		double ix =  (x /Math.sin(60* (Math.PI/180)));
 		ix =  Math.round(ix);
 		double iy = y;
