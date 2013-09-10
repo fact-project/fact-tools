@@ -44,9 +44,9 @@ public class PixelMappingTest {
 	
 	public void testKoordinateToChid() {
 		// -180,999 .... 180,999
-		float[] x = {-123.28};
+		float[] x = {-123.28f};
 		// -180,5 .... 190,0
-		float[] y = {104.3};
+		float[] y = {104.3f};
 		for (int i = 0 ; i<x.length ; i++)
 		{
 			int nearestChid = -1;

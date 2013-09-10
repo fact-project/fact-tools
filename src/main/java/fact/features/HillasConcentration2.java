@@ -39,19 +39,49 @@ public class HillasConcentration2 implements Processor {
 
 		}
 		float sizeValue = 0;
-		if(EventUtils.isKeyValid(input, size, float.class))
+		if(EventUtils.isKeyValid(input, size, Float.class))
 		{
 			sizeValue = (Float)input.get(size);
 		}
 		else
 		{
-			sizeValue = 0;
-			for(float s: photonCharge) sizeValue += s; 
+			return null;
 		}
 
 		input.put(outputKey , (max_photon_charge + second_max_photon_charge) / sizeValue);
 		
-		return null;
+		return input;
+	}
+	
+	public String getShower() {
+		return shower;
 	}
 
+	public void setShower(String shower) {
+		this.shower = shower;
+	}
+
+	public String getWeights() {
+		return weights;
+	}
+
+	public void setWeights(String weights) {
+		this.weights = weights;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
 }

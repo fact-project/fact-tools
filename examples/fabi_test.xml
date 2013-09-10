@@ -7,12 +7,19 @@
 
 	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" />
 	
-	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
+	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
 	<process input="fact">
-	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+	        <fact.utils.CutSlices  start="22" end="220"/>  
+	        <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
 			<fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" timeThreshold="30"  minSize="4"/>
+            <fact.features.Size showerKey="shower" outputKey="size" photonChargeKey="photoncharge"/>
+            <fact.features.HillasConcentration2 shower="shower" weights="photoncharge" outputkey="HillasConcentration2" size="size"/>
+            <PrintData></PrintData>
+            <fact.statistics.CreateHistogram key="HillasConcentration2" outputKey="conc2histo" min="0.0" max="1.0" numberOfBins="20"/>
+            <fact.image.monitors.HistogramPlotter min="0.0" max="1.0" numberOfBins="20" key="conc2histo"/>
 	</process>
 
 </container>
