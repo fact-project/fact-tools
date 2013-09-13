@@ -171,64 +171,65 @@ public Data process(Data input) {
     	// set pixel coordinates to be a vector
     	RealVector pixCoordinates 		= new ArrayRealVector(new double[] {mpGeomXCoord[pix], mpGeomYCoord[pix]}, false );
     	
-    	// multiply the rotation matrix to the coordinates vector
+    	// rotate coordinates vector in a system parallel to the cartesic camera coordinates
     	RealVector eigenPixCoordinates 	= rotZ.operate(pixCoordinates);
     	
     	// fill array of new pixel coordinates
     	mpEigenGeomXCoord[pix]			= (float) eigenPixCoordinates.getEntry(0);
     	mpEigenGeomYCoord[pix]			= (float) eigenPixCoordinates.getEntry(1);
     }
+    
     //create COG coordinates vector
     RealVector cogVec 		= new ArrayRealVector(new double[] {cogX, cogY}, false );
-    // multiply the rotation matrix to the COG coordinates vector
+    // rotate COG coordinates vector in a system parallel to the cartesic camera coordinates
     RealVector eigenCogVec 	= rotZ.operate(cogVec);
     
+    //allocate variables for x and s coordinate of COG in the rotated shower system
     float eigenCogX = (float) eigenCogVec.getEntry(0);
     float eigenCogY = (float) eigenCogVec.getEntry(1);
-    
     
     // allocate variables for moments of longitudenal and transversal shower distribution 
     double[] distMoment_xx = new double[4];
     double[] distMoment_yy = new double[4];
      
+    //loop over shower pixel to calculate statistical moments of the shower distributions
     for (int pix: showerPixel )
     {
+    	//loop over moments in x direction
     	for (int moment=0; moment < distMoment_xx.length; moment++){
     		distMoment_xx[moment] += wheightsArray[pix] * Math.pow((mpEigenGeomXCoord[pix] - eigenCogX), moment + 1);
     	}
+    	//loop over moments in y direction
     	for (int moment=0; moment < distMoment_xx.length; moment++){
     		distMoment_yy[moment] += wheightsArray[pix] * Math.pow((mpEigenGeomYCoord[pix] - eigenCogY), moment + 1);
     	}
-    	
-//    	distMoment_xx[1] += wheightsArray[pix] * Math.pow((mpEigenGeomXCoord[pix] - eigenCogX), 2);
-//    	distMoment_yy[1] += wheightsArray[pix] * Math.pow((mpEigenGeomYCoord[pix] - eigenCogY), 2);
     }
     
+    //loop over moments in both directions an normalize with size
     for (int moment=0; moment < distMoment_xx.length; moment++){
     	distMoment_xx[moment] /= size;
     	distMoment_yy[moment] /= size;
     }
     
-    
-    
- //   PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, cogX, cogY, eigenVarianceX, eigenVarianceY,  delta, size);
     PixelDistribution2D dist = new PixelDistribution2D(variance_xx, variance_yy, covariance_xy, cogX, cogY, eigenVarianceX, eigenVarianceY, distMoment_xx[2], 
     		distMoment_yy[2], distMoment_xx[3], distMoment_yy[3], delta, size);
-    input.put(outputKey , dist);
+    
+    //add calculated shower parameters to data item
+    input.put(outputKey , 		dist);
     input.put("varianceLong",	eigenVarianceX );
     input.put("varianceTrans", 	eigenVarianceY );
-    input.put("M3Long",	distMoment_xx[2] );
-    input.put("M3trans", distMoment_yy[2] );
-    input.put("M4Long", 	distMoment_xx[3] );
-    input.put("M4Trans", distMoment_yy[3] );
-    input.put("COGx", 	cogX );
-    input.put("COGy", cogY );
+    input.put("M3Long",			distMoment_xx[2] );
+    input.put("M3trans", 		distMoment_yy[2] );
+    input.put("M4Long", 		distMoment_xx[3] );
+    input.put("M4Trans", 		distMoment_yy[3] );
+    input.put("COGx", 			cogX );
+    input.put("COGy", 			cogY );
 //    input.put(outputKey+"_width", Math.sqrt(eigenValue1/size) );
 //    input.put(outputKey+"_length", Math.sqrt(eigenValue2/size) );
 //    input.put(outputKey+"_delta", delta );
     
     input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
-
+ 
     //At this point you usually want to get the regression coefficents. (The b in the wikipedia article)
     //What happens however is quite unusual. Which means I dont understand it :P
     //A variable called A. What does it do?? It has a sqrt. So lets look for equations with a sqrt. None fit. Lets find some other wikipedia article with a sqrt.
