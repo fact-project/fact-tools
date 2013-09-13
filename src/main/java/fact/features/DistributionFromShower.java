@@ -151,7 +151,7 @@ public Data process(Data input) {
 //    System.out.println("angle of eigenvectors: " + delta );
 //    System.out.println("--------");
     
-    //Calculation of the 3. Moment (Skewness)
+    //Calculation of the showers statistical moments (Variance, Skewness, Kurtosis)
     //=======================================
     // Rotate the shower by the angle delta in order to have the ellipse main axis in parallel to the Camera-Coordinates X-Axis
     
