@@ -3,12 +3,19 @@ package fact.features;
 import fact.data.EventUtils;
 import stream.Data;
 import stream.Processor;
-
-public class Size implements Processor {
+/**
+ * Sum up all the weights for pixel between the max and min values.
+ * The output of this processor is the sum of the pixel weights in the shower array iff the weight is > min and < max.
+ *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ *
+ */
+public class SizeInInterval implements Processor {
 
 	private String showerKey;
 	private String photonChargeKey;
 	private String outputKey;
+	private float  min = 0;
+	private float  max = 2048; //sensor limit?
 	
 	@Override
 	public Data process(Data input) {
@@ -16,7 +23,6 @@ public class Size implements Processor {
 		if(!EventUtils.isKeyValid(input, showerKey, int[].class)){
 			return null;
 		}
-		
 		if(!EventUtils.isKeyValid(input, photonChargeKey, float[].class)){
 			return null;
 		}
@@ -26,10 +32,12 @@ public class Size implements Processor {
 		
 		float size = 0;
 		for (int i = 0; i < shower.length; i++){
-			size += charge[shower[i]];
+			if (shower[i] > min &&  shower[i] < max){
+				size += charge[shower[i]];
+			}
 		}
 		input.put(outputKey, size);
-		System.out.println("Size: " + size);
+		System.out.println("Sizeininterval: " + size);
 		return input;
 	}
 
@@ -53,6 +61,22 @@ public class Size implements Processor {
 	}
 	public void setPhotonChargeKey(String photonChargeKey) {
 		this.photonChargeKey = photonChargeKey;
+	}
+
+	public float getMin() {
+		return min;
+	}
+
+	public void setMin(float min) {
+		this.min = min;
+	}
+
+	public float getMax() {
+		return max;
+	}
+
+	public void setMax(float max) {
+		this.max = max;
 	}
 
 }

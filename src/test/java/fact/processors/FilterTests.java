@@ -16,9 +16,9 @@ import fact.filter.ExponentialSmoothing;
 import fact.filter.FirFilter;
 import fact.filter.InterpolateBadPixel;
 import fact.filter.MotionDiff;
+import fact.filter.MovingAverage;
 import fact.filter.MultiplyValues;
 import fact.io.FitsStream;
-import fact.statistics.MovingAverage;
 import fact.utils.ExFit;
 import fact.utils.SimpleFactEventProcessor;
 

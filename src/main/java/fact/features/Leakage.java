@@ -51,7 +51,7 @@ public class Leakage implements Processor {
 
 		
 		input.put(outputKey , leakageBorder);
-//		concentration2Pixel                         = (max_photon_charge + second_max_photon_charge) / size;
+		input.put(outputKey + "2" , leakageSecondBorder);
 		return input;
 		
 		

@@ -182,6 +182,10 @@ public class EventUtils {
 	}
 	
 	public static boolean isKeyValid(Data item, String key, Class<?> cl){
+		if(key == null || key.equals("")){
+			log.error("Key was empty");
+			return false;
+		}
 		if(!item.containsKey(key)){
 			log.error("Data does not contain the key " + key);
 			return false;
