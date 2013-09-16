@@ -71,17 +71,20 @@ public class CoreNeighborClean implements StatefulProcessor{
 		} catch(ClassCastException e){
 			log.error("Could cast the key: " + key + "to a float[]");
 		}
+		
+
 		int[] currentNeighbors;
-
 		ArrayList<Integer> showerPixel= new ArrayList<Integer>();
-
+		// Add all pixel with a weight > corePixelThrshold to the showerpixel list.
 		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++)
 		{ 
 			if (photonCharge[pix] > corePixelThreshold){
 				showerPixel.add(pix);
 			}
 		}
-
+		Integer[] level1 = new Integer[showerPixel.size()];
+		showerPixel.toArray(level1);
+		//
 		ArrayList<ArrayList<Integer>> listOfLists = EventUtils.breadthFirstSearch(showerPixel);
 		showerPixel.clear();
 		for (ArrayList<Integer> l: listOfLists){
@@ -89,7 +92,9 @@ public class CoreNeighborClean implements StatefulProcessor{
 				showerPixel.addAll(l);
 			}
 		}
-
+		Integer[] level2 = new Integer[showerPixel.size()];
+		showerPixel.toArray(level2);
+		
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		newList.addAll(showerPixel);
 		for (int pix: showerPixel){
@@ -100,7 +105,9 @@ public class CoreNeighborClean implements StatefulProcessor{
 				}
 			}
 		}
-
+		showerPixel = newList;
+		Integer[] level3 = new Integer[newList.size()];
+		showerPixel.toArray(level3);
 
 		int[] showerPixelArray =  new int[showerPixel.size()];
 		for(int i = 0; i < showerPixel.size(); i++){
@@ -156,8 +163,29 @@ public class CoreNeighborClean implements StatefulProcessor{
 		for(int i = 0; i < showerPixelArray.length; i++){
 			corePixelSet.add(new Pixel(showerPixelArray[i]));
 		}
+		
+		PixelSet l1 = new PixelSet();
+		for(int i = 0; i < level1.length; i++){
+			l1.add(new Pixel(level1[i]));
+		}
+		PixelSet l3 = new PixelSet();
+		for(int i = 0; i < level3.length; i++){
+			l3.add(new Pixel(level3[i]));
+		}
+		PixelSet l2 = new PixelSet();
+		for(int i = 0; i < level2.length; i++){
+			l2.add(new Pixel(level2[i]));
+		}
+
+			input.put(outputKey+"_level1", level1);
+			input.put(outputKey+"_level1" +"_"+Constants.PIXELSET, l1);
+			input.put(outputKey+"_level2", level2);
+			input.put(outputKey+"_level2" +"_"+Constants.PIXELSET, l2);
+			input.put(outputKey+"_level3", level3);
+			input.put(outputKey+"_level3" +"_"+Constants.PIXELSET, l3);
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
+			
 //			input.put(outputKey+"_numCorePixel", numCorePixel);
 		return input;
 	}
