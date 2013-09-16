@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
-import stream.Processor;
+import stream.ProcessContext;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
 import fact.data.EventUtils;
@@ -24,21 +25,42 @@ import fact.viewer.ui.DefaultPixelMapping;
  *
  */
 
-public class CoreNeighborClean implements Processor{
+public class CoreNeighborClean implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	private String key = "photoncharge";
 	private String keyPositions = null;
 	private String outputKey;
 	private  PixelSet corePixelSet;
-	private  float corePixelThreshold = 5.0f;
-	private  float neighborPixelThreshold = 2.0f;
+	private  float corePixelThreshold = 0.0f;
+	private  float neighborPixelThreshold = 0.0f;
 	private  float timeThreshold = 0.0f; 
-	private int minSize = 4;
-	private int numCorePixel = 0;
+	private int minNumberOfPixel = 0;
 	
 	float[] photonCharge = new float[Constants.NUMBEROFPIXEL];
 	
+	@Override
+	public void resetState() throws Exception {
+	}
+	@Override
+	public void finish() throws Exception {
+	}
 
+	@Override
+	public void init(ProcessContext context) throws Exception {
+		if(corePixelThreshold == 0){
+			log.warn("corePixelThrtshold not set using 5.0 as default ");
+			corePixelThreshold = 5.0f;
+		}
+		if(neighborPixelThreshold == 0){
+			log.warn("neighbourPixelThtschold not set using 2.0 as default ");
+			neighborPixelThreshold = 2.0f;
+		}
+		if(minNumberOfPixel == 0){
+			log.warn("minNumberOfPixel not set using 2 as default ");
+			minNumberOfPixel = 2;
+		}
+	}
+	
 	@Override
 	public Data process(Data input) {
 		try{
@@ -50,7 +72,6 @@ public class CoreNeighborClean implements Processor{
 			log.error("Could cast the key: " + key + "to a float[]");
 		}
 		int[] currentNeighbors;
-		numCorePixel = 0;
 
 		ArrayList<Integer> showerPixel= new ArrayList<Integer>();
 
@@ -58,14 +79,13 @@ public class CoreNeighborClean implements Processor{
 		{ 
 			if (photonCharge[pix] > corePixelThreshold){
 				showerPixel.add(pix);
-				numCorePixel++;
 			}
 		}
 
 		ArrayList<ArrayList<Integer>> listOfLists = EventUtils.breadthFirstSearch(showerPixel);
 		showerPixel.clear();
 		for (ArrayList<Integer> l: listOfLists){
-			if(l.size() >= minSize){
+			if(l.size() >= minNumberOfPixel){
 				showerPixel.addAll(l);
 			}
 		}
@@ -90,6 +110,7 @@ public class CoreNeighborClean implements Processor{
 		double median;
 		//do a "timeMedianClean" in case the timethrshold is set 
 		if(timeThreshold > 0 && keyPositions != null && showerPixelArray.length != 0){
+			
 			int[] positions = (int[]) input.get(keyPositions);
 			if (positions == null){
 				log.error("The key " + keyPositions + "  was not found in the data");
@@ -109,6 +130,8 @@ public class CoreNeighborClean implements Processor{
 			} else {
 				median = 0.5*(  showerArrivals[(length)/2] + showerArrivals[(length)/2 - 1] );
 			}
+			
+			
 			//count number of pixel with arrival time within the threshold
 			int c = 0;
 			for(int pixel: showerPixelArray){
@@ -133,15 +156,9 @@ public class CoreNeighborClean implements Processor{
 		for(int i = 0; i < showerPixelArray.length; i++){
 			corePixelSet.add(new Pixel(showerPixelArray[i]));
 		}
-		if(outputKey == null || outputKey ==""){
-			input.put(key, showerPixelArray);
-			input.put(key+"_"+Constants.PIXELSET, corePixelSet);
-			input.put(key+"_numCorePixel", numCorePixel);
-		} else {
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
-			input.put(outputKey+"_numCorePixel", numCorePixel);
-		}
+//			input.put(outputKey+"_numCorePixel", numCorePixel);
 		return input;
 	}
 
@@ -165,12 +182,12 @@ public class CoreNeighborClean implements Processor{
 		this.neighborPixelThreshold = neighborPixelThreshold;
 	}
 
-	public int getMinSize() {
-		return minSize;
+	public int getMinNumberOfPixel() {
+		return minNumberOfPixel;
 	}
 	@Parameter(required = false, description = "Number of Pixels a patch of CorePixel must have before its Neighbours are even considered for NeighbourCorePixel. If Size is smaller than minSize the Pixels will be discarded", defaultValue = "2.0")
-	public void setMinSize(int minSize) {
-		this.minSize = minSize;
+	public void setMinNumberOfPixel(int minSize) {
+		this.minNumberOfPixel = minSize;
 	}
 
 	public String getKey() {
@@ -205,5 +222,4 @@ public class CoreNeighborClean implements Processor{
 	public void setTimeThreshold(float timeThreshold) {
 		this.timeThreshold = timeThreshold;
 	}
-
 }
