@@ -45,15 +45,11 @@ public class ScatterPlotter extends DataVisualizer {
 
 	private double y;
 
-	public ScatterPlotter() {
-
-	}
-
 	private void showGraph() {
 		final JFreeChart chart = ChartFactory.createScatterPlot(
 				title,                  // chart title
-				"X",                      // x axis label
-				"Y",                      // y axis label
+				xValue,                      // x axis label
+				yValue,                      // y axis label
 				dataset,                  // data
 				PlotOrientation.VERTICAL,
 				true,                     // include legend
@@ -100,17 +96,10 @@ public class ScatterPlotter extends DataVisualizer {
 		} else {
 			log.info("The key " + xValue +  "  or " + yValue + " does not exist in the Event");
 		}
-//		System.out.println(x);
-//		System.out.println(y);
+
 		series.add(x,y);
 		//		
-		//		series.add(2, 3);
-		//		series.add(2, 4);
-		//		series.add(2, 5);
-		//		series.add(2, 6);
-		//		series.add(2, 7);
 
-		//		dataset.addSeries(series);
 		return data;
 	}
 

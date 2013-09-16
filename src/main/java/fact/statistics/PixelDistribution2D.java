@@ -2,8 +2,6 @@ package fact.statistics;
 
 import java.io.Serializable;
 
-import org.apache.commons.math3.stat.descriptive.moment.Skewness;
-
 public class PixelDistribution2D implements Serializable {
 	private static final long serialVersionUID = 3815070753769798637L;
 	//	Double variance_x = null;

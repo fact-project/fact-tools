@@ -40,10 +40,10 @@ public class Size implements Processor {
 		this.outputKey = outputKey;
 	}
 
+	
 	public String getShowerKey() {
 		return showerKey;
 	}
-
 	public void setShowerKey(String showerKey) {
 		this.showerKey = showerKey;
 	}
@@ -51,7 +51,6 @@ public class Size implements Processor {
 	public String getPhotonChargeKey() {
 		return photonChargeKey;
 	}
-
 	public void setPhotonChargeKey(String photonChargeKey) {
 		this.photonChargeKey = photonChargeKey;
 	}

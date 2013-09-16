@@ -23,12 +23,20 @@ public class NumberOfPixelInShower implements Processor {
 		return input;
 	}
 
-
+//getter and setter for keys passed in the xml
 	public String getOutputKey() {
 		return outputKey;
 	}
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
+	}
+
+
+	public String getShowerKey() {
+		return showerKey;
+	}
+	public void setShowerKey(String showerKey) {
+		this.showerKey = showerKey;
 	}
 
 

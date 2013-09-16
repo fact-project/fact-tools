@@ -147,6 +147,8 @@ public class HillasParameter implements Processor {
 //			    mHillasParameterWritingStream << "NumberShowerPixel;LeakageBorder;LeakageSecondBorder;EventTime" << endl;
 				if(hasShower) {
 					input.put(outputKey+"Delta", ellipse.mDelta);
+					System.out.println("------Delta: " + ellipse.mDelta);
+					
 					input.put(outputKey+"Alpha", ellipse.alpha);
 					input.put(outputKey+"AlphaOff1", ellipse.alphaOff1);
 					input.put(outputKey+"AlphaOff2", ellipse.alphaOff2);

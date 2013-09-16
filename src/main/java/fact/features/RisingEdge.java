@@ -84,7 +84,6 @@ public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
 	public int getSearchWindowRight() {
 		return searchWindowRight;
 	}
-
 	public void setSearchWindowRight(int searchWindowRight) {
 		this.searchWindowRight = searchWindowRight;
 	}
@@ -92,7 +91,6 @@ public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
 	public int getSearchWindowLeft() {
 		return searchWindowLeft;
 	}
-
 	public void setSearchWindowLeft(int searchWindowLeft) {
 		this.searchWindowLeft = searchWindowLeft;
 	}

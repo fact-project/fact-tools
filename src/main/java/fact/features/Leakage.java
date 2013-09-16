@@ -26,6 +26,8 @@ public class Leakage implements Processor {
 	
 		int[] 	showerPixel = (int[])input.get(shower);
 		float[] photonCharge = (float[]) input.get(weights);
+		
+		
 		float size = 0;
 		for(float s: photonCharge) {size += s;} 
 	
@@ -73,26 +75,26 @@ public class Leakage implements Processor {
 		return false;
 	}
 
+	
 	public String getShower() {
 		return shower;
 	}
-
 	public void setShower(String shower) {
 		this.shower = shower;
 	}
+	
 
 	public String getWeights() {
 		return weights;
 	}
-
 	public void setWeights(String weights) {
 		this.weights = weights;
 	}
+	
 
 	public String getOutputKey() {
 		return outputKey;
 	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
