@@ -2,3 +2,10 @@ bin
 target
 .settings
 .classpath
+*.tex
+*.aux
+*.tex.map
+docs.out
+docs.log
+docs.toc
+docs.idx

@@ -12,7 +12,10 @@ import stream.annotations.Parameter;
 import fact.Constants;
 
 /**
+ * 
+ * This is a processor to cut slices of a Fact-Event in each Pixel. It takes the rawdata from a fact-event and cuts  of all \textit{slice}  
  * @author chris, niklaswulf, kai
+ * 
  * 
  */
 public class CutSlices implements Processor {

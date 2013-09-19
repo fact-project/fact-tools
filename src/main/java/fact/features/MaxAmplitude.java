@@ -10,7 +10,7 @@ import fact.utils.SimpleFactPixelProcessor;
 
 /**
  * This processor simply calculates the maximum value for all time slices in each Pixel. 
- * The output is a float array 
+ * The output is a float array with an entry for each Pixel.
  * 
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 

@@ -8,6 +8,17 @@ import stream.Processor;
 import fact.data.EventUtils;
 import fact.statistics.PixelDistribution2D;
 
+/**
+ * blavsdföldsfsdlfs fsdfsd  
+ *  sdfsdfds
+ * <PRE format="md" >
+ * Hallo ich bin mardown __Fett__
+ * </PRE>
+ * 
+ * <TEX txt="\[ F\left( x \right) = \int_{ -
+* \infty }^x {\frac{1}{{\sqrt {2\pi } }}e^{ - \frac{{z^2 }}{2}} dz} \]"  >
+ * 
+ */
 public class HillasWidth implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasWidth.class);
 	private String distribution = null;
