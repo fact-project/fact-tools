@@ -159,7 +159,7 @@
 
 	<build>
 		<finalName>${binary.name}</finalName>
-
+		 <pluginManagement>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -251,7 +251,7 @@
 			  <groupId>org.codehaus.mojo</groupId>
 			  <executions>
 			    <execution><!-- Run our version calculation script -->
-			      <id>Version Calculation</id>
+			      <id>documentation</id>
 			      <phase>generate-sources</phase>
 			      <goals>
 			        <goal>exec</goal>
@@ -263,6 +263,7 @@
 			  </executions>
 			</plugin>
 		</plugins>
+		 </pluginManagement>
 	</build>
 
 
