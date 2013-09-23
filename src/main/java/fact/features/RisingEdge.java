@@ -42,9 +42,10 @@ public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
 				float value = data[pos];
 				if(value > max){
 					max = value;
-					posMaxAmp = pos; 
+					posMaxAmp = slice; 
 				}
 			}
+			
 			/**
 			 * original c++ code by F.Temme with some modifications
 			 * one-liner comments by F.Temme  
@@ -62,22 +63,61 @@ public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
 			int             search_window_right = posMaxAmp;
 			int arrivalPos = 0;
 			/// Loop over all timeslices of given Window
-			for( int sl = search_window_left; sl < search_window_right; sl++)
+			for( int slice = search_window_left; slice < search_window_right; slice++)
 			{
-				if( sl + 2 < roi) {
-					current_slope              = data[sl+2] - data[sl-2];
+				int pos = pix * roi + slice;
+				if( slice + 2 < roi) {
+					current_slope              = data[pos+2] - data[pos-2];
 				} else {
 					break;
 				}
 				if (current_slope > max_slope)
 				{
 					max_slope       = current_slope;
-					arrivalPos             = sl;
+					arrivalPos             = slice;
 				}
 			}
 			positions[pix] = arrivalPos;
 		}
 		return positions;
+		
+//		
+//	    float           current_slope   = 0;
+//	    float           max_slope       = 0;
+//	    int             pos             = 0;
+//	    int search_window_left          = 0;
+//	    /// @todo remove magic numbers for the search window
+//	    if (mpEvent->mpRun->mIsMonteCarlo == false)
+//	    {
+//	        search_window_left      = mpAmplitude->Position() - 25;
+//	        if (search_window_left < 10)
+//	        {
+//	            search_window_left = 10;
+//	        }
+//	    }
+//	    else
+//	    {
+//	        search_window_left      = (int) (mpAmplitude->Position() - 25.0 / 300.0 * mpEvent->mpRun->mRegionOfInterest);
+//	        if (search_window_left < (10 / 300.0 * mpEvent->mpRun->mRegionOfInterest))
+//	        {
+//	            search_window_left = (int) (10 / 300.0 * mpEvent->mpRun->mRegionOfInterest);
+//	        }
+//	    }
+//	    int search_window_right         = mpAmplitude->Position();
+//
+//	    // Loop over all timeslices of given the window
+//	    for( int sl = search_window_left; sl < search_window_right; sl++)
+//	    {
+//	        current_slope              = mpCalibratedVoltage[sl+2] - mpCalibratedVoltage[sl-2];
+//
+//	        if (current_slope > max_slope)
+//	        {
+//	            max_slope       = current_slope;
+//	            pos             = sl;
+//	        }
+//	    }
+//	    mRisingEdge             = pos;
+		
 	}
 
 
