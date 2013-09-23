@@ -29,7 +29,6 @@ public class Size implements Processor {
 			size += charge[shower[i]];
 		}
 		input.put(outputKey, size);
-		System.out.println("Size: " + size);
 		return input;
 	}
 

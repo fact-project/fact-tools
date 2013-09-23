@@ -1,0 +1,43 @@
+<container>
+
+<property name="data" value="/Users/kaibrugge/FactTest/20120229_144.fits.gz" />
+<property name="dataDRS" value="/Users/kaibrugge/FactTest/20120229_132.drs.fits" />
+<property name="drive_file" value="/Users/kaibrugge/FactTest/20120229_144.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+<property name="csv" value="/Users/kaibrugge/FactTest/output.csv" />
+
+
+<stream id="fact" class="fact.io.FitsStream" url="file:${data}" />
+    <process input="fact">
+
+        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated"/>
+        <fact.utils.CutSlices  start="22" end="220"/>
+        <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+            badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+        <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
+        <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="removed" />
+        
+         <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition"/>
+        
+        <fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
+        <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
+            
+        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
+        
+        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+
+		<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+		<fact.features.HillasDistance distribution="dist" sourcePosition="sourcePosition" outputKey="distance" />
+		<fact.features.HillasLength distribution="dist" outputKey="length" />
+		<fact.features.HillasWidth distribution="dist" outputKey="width" />
+		<fact.features.HillasConcentration shower="shower" weights="photoncharge" outputKey="concentration" />
+		<fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="size" />
+
+        <stream.monitor.DataRate every="100" />
+
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <Skip condition="%{data.alpha} == NaN" />
+<!--         <fact.image.ShowImage/> -->
+            <stream.io.CsvWriter keys="alpha,length,size,width,distance,concentration" url="file:${csv}" />
+            
+	</process>
+</container>
