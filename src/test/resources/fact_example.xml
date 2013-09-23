@@ -1,10 +1,6 @@
 <container>
 
 
-<!-- <property name="data" value="/home/dneise/JAFS/jafs/pyjafs/cer1.fits.gz" /> -->
-<!-- <property name="dataDRS" value="/home/dneise/JAFS/jafs/pyjafs/dummy.drs.fits.gz" /> -->
-<!-- <property name="drive_file" value="/home/dneise/JAFS/jafs/pyjafs/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" /> -->
-<!-- <property name="outfile" value="/home/dneise/fact-tools/test.txt" /> -->
 
     <stream id="fact" class="fact.io.FitsStream" 
             url="${data}" />
@@ -25,7 +21,7 @@
             
             <fact.cleaning.CoreNeighborClean key="photonCharge" CorePixelThreshold="5.0" neighborPixelThreshold="2.0" outputKey="showerPixel" />
             <fact.features.SourcePosition url="${drive_file}" outputKey="sourcePosition"/>
-            <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/>
+<!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
             
             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="${outfile}" />
 		</process>
