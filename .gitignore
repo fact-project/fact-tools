@@ -2,8 +2,8 @@ bin
 target
 .settings
 .classpath
-*.tex
-*.aux
+docs.aux
+docs.tex
 *.tex.map
 docs.out
 docs.log
