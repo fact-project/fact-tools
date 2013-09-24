@@ -13,9 +13,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.data.statistics.SimpleHistogramBin;
+import org.jfree.data.statistics.SimpleHistogramDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +22,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
+import fact.data.EventUtils;
 
 /**
  * 
@@ -32,24 +32,24 @@ import stream.plotter.DataVisualizer;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class HistogramPlotter extends DataVisualizer {
-	static Logger log = LoggerFactory.getLogger(HistogramPlotter.class);
+public class HistogramTest extends DataVisualizer {
+	static Logger log = LoggerFactory.getLogger(HistogramTest.class);
 	JFrame frame;
 
 	private boolean keepOpen = true;
 	private String key;
 
-	private float max= 10;
-	private float min = 0;
+	private double binWidth = 0.5f;
+	
 	private boolean logAxis = false;
 
-	private IntervalXYDataset dataset;
-	private XYPlot xyplot;
-	private float binSize;
+	private SimpleHistogramDataset dataset;
 	private String title;
 	private String color = "#666699";
+	private JFreeChart chart;
+	private int counter = 0;
 
-	public HistogramPlotter() {
+	public HistogramTest() {
 		width = 690;
 		height = 460;
 	}
@@ -59,35 +59,35 @@ public class HistogramPlotter extends DataVisualizer {
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
-//		binSize = (max)/numberOfBins;
-		final JFreeChart chart = ChartFactory.createXYBarChart(
-				"Histogram",
-				key, 
-				false,
-				"#", 
-				null,
-				PlotOrientation.VERTICAL,
-				true,
-				true,
-				false
-				);
-		xyplot = chart.getXYPlot();
+		
+	    dataset = new SimpleHistogramDataset(key);
+	   
+	    chart = ChartFactory.createHistogram(
+	              "Histogram",
+	              key,
+	              "#",
+	              dataset,
+	              PlotOrientation.VERTICAL,
+	              true,
+	              true,
+	              false
+	          );
+
+	    chart.setBackgroundPaint(new Color(230,230,230));
+	    XYPlot xyplot = (XYPlot)chart.getPlot();
 		if(logAxis)
 			xyplot.setRangeAxis(new LogarithmicAxis("#"));
+
 		chart.setTitle(title);
-		final XYBarRenderer r = (XYBarRenderer) xyplot.getRenderer();
-		r.setDrawBarOutline(false);
-		r.setShadowVisible(false);
-//		r.setDefaultShadowsVisible(false);
-		r.setMargin(0.05);
-		r.setBarPainter(new StandardXYBarPainter());
-		try{
-			Color c = Color.decode(color);
-			r.setSeriesPaint(0, c);
-		} catch(NumberFormatException e){
-			log.warn("Could not parse the color string. has to look like: #f0f0f0");
-		}
-		
+	    xyplot.setForegroundAlpha(0.7F);
+	    xyplot.setBackgroundPaint(Color.WHITE);
+	    xyplot.setDomainGridlinePaint(new Color(150,150,150));
+	    xyplot.setRangeGridlinePaint(new Color(150,150,150));
+	    XYBarRenderer xybarrenderer = (XYBarRenderer)xyplot.getRenderer();
+	    xybarrenderer.setShadowVisible(false);
+	    xybarrenderer.setBarPainter(new StandardXYBarPainter());
+//	    xybarrenderer.setDrawBarOutline(false);
+	    
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
@@ -102,43 +102,37 @@ public class HistogramPlotter extends DataVisualizer {
 			log.warn("No keys specified for HistogramPLotter");
 			return null;
 		}
-		try{
-			if (data.containsKey(key)) {
-				int[] hist = (int[]) data.get(key);
-				binSize = max/(hist.length);
-				fillDataSet(hist);
-				xyplot.getDomainAxis().setRange(min - binSize, max + binSize);
+
+		if(  EventUtils.isKeyValid(data, key, Double.class)){
+			double v = (Double) data.get(key);
+			try{
+				dataset.addObservation(v);
+				chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
+			} catch(RuntimeException e ) {
+				
+				SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth, false, false);
+				dataset.addBin(bin);
+				dataset.addObservation(v);
+				chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
 			}
-		} catch (ClassCastException e){
-			log.error("Key did not refer to an int array");
-			return null;
-		}
+		} 
+		//else if ( EventUtils.isKeyValid(data, key, Double.class) ) {
+			//dataset.addObservation(((Double) data.get(key)).floatValue());
+		//}
+		
+		//dataset.addObservations(EventUtils.toDoubleArray(data.get(key)));
+//		try{
+//			if (data.containsKey(key)) {
+//				int[] hist = (int[]) data.get(key);
+//				binSize = max/(hist.length);
+//				fillDataSet(hist);
+//				xyplot.getDomainAxis().setRange(min - binSize, max + binSize);
+//			}
+//		} catch (ClassCastException e){
+//			log.error("Key did not refer to an int array");
+//			return null;
+//		}
 		return data;
-	}
-
-	private void fillDataSet(int[] bins) {
-		XYSeries series = new XYSeries("");
-		for (int i = 0; i < bins.length; ++i) {
-			if (bins[i] > 0){
-				series.add(i * binSize, bins[i]);
-			}
-		}		
-		dataset = new XYSeriesCollection(series) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public double getStartXValue(int series, int item) {
-				return binSize * item;
-			}
-
-			@Override
-			public double getEndXValue(int series, int item) {
-				return binSize * (item + 1) ;
-			}
-
-		};
-		xyplot.setDataset(dataset);
-
 	}
 
 
@@ -174,20 +168,7 @@ public class HistogramPlotter extends DataVisualizer {
 	}
 
 
-	public float getMin() {
-		return min;
-	}
-	public void setMin(float minBin) {
-		this.min = minBin;
-	}
-
-
-	public float getMax() {
-		return max;
-	}
-	public void setMax(float maxBin) {
-		this.max = maxBin;
-	}
+	
 
 	public boolean isLogAxis() {
 		return logAxis;
@@ -212,6 +193,18 @@ public class HistogramPlotter extends DataVisualizer {
 	@Parameter(required = false, description = "The color of the bars to be drawn #f4f4f4")
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+
+
+	public double getBinWidth() {
+		return binWidth;
+	}
+
+
+
+	public void setBinWidth(double binWidth) {
+		this.binWidth = binWidth;
 	}
 
 }

@@ -8,8 +8,8 @@ import stream.annotations.Description;
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
 /**
- * This operator calculates between data[i] and data[i+offset] for each pixel in each event and stores the result as a float array named outputKey. <\br>
- * if i+offset is greater or smaller the current window the first respectively the last value will be continued. 
+ * This operator calculates the difference between data[i] and data[i+offset] for each pixel in each event and stores the result as a float array named outputKey. <\br>
+ * if i+offset is greater or smaller the current window the first respectively the last value will be repeated. 
  *  
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *

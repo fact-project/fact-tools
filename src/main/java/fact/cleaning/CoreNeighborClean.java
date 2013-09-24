@@ -66,7 +66,8 @@ public class CoreNeighborClean implements StatefulProcessor{
 		try{
 			photonCharge= (float[]) input.get(key);
 			if(photonCharge == null){
-				return null;
+				log.error("No weights found in event. Aborting.");
+				throw new RuntimeException("No weights found in event. Aborting.");
 			}
 		} catch(ClassCastException e){
 			log.error("Could cast the key: " + key + "to a float[]");

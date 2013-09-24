@@ -5,6 +5,8 @@ package fact.utils;
 
 import java.io.Serializable;
 
+import org.jfree.util.Log;
+
 import stream.Data;
 import stream.Processor;
 import fact.data.EventUtils;
@@ -23,21 +25,25 @@ public class SelectIndecesFromArray implements Processor{
 	
 	@Override
 	public Data process(Data input) {
-		EventUtils.isKeyValid(input, key, Serializable.class);
+		if(!EventUtils.isKeyValid(input, key, Serializable.class)){
+			throw new RuntimeException("Key wasnt valid");
+		}
 		Serializable value = input.get(key);
-		int[] indexArray = null;
 
+		int[] indexArray = null;
 		if(EventUtils.isKeyValid(input, indices, int[].class)){
 			indexArray = (int[]) input.get(indices);
 		} else if(EventUtils.isKeyValid(input, indices, Integer[].class)) {
 			indexArray = EventUtils.toIntArray((Integer[]) input.get(indices));
+		} else {
+			throw new RuntimeException("indeces wasnt valid");
 		}
 		
 		double[] sAr = new double[indexArray.length];
 		
 		if(value.getClass().isArray()){
 			double[] arr = EventUtils.toDoubleArray(value);
-			System.out.println("arr.length: " + arr.length);
+//			System.out.println("arr.length: " + arr.length);
 			int i = 0;
 			for(int pix : indexArray){
 				double b =  arr[pix];
