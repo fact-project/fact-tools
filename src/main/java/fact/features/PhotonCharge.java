@@ -11,6 +11,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
+import fact.data.EventUtils;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 
@@ -34,29 +35,25 @@ public class PhotonCharge implements Processor {
 	private int alpha = 64;
 
 	private String positions = null;
+
 	private String key = "DataCalibrated";
 	private String outputKey = key;
 
 	@Override
 	public Data process(Data input) {
-		int[] posArray = null;
-		float[] data = null;
-		try{
-			data = (float[]) input.get(key);
-			if (data == null){
-				throw new Exception();
-			}
-			if(positions != null){
-				posArray=(int[]) input.get(positions);
-			} else {
-				posArray=new MaxAmplitudePosition().processSeries(data);
-			}
-		} catch (ClassCastException e){
-			log.error("Could not cast data to float[]   "+ key);
-		} catch(Exception e){
-			log.error("Could not get the right items from the map. wrong key?   " + key );
+		if(!EventUtils.isKeyValid(input, positions, int[].class)){
+			log.error("Position data not found in data map.");
+			throw new RuntimeException("Position data not found in data map.");
 		}
-
+		int[] posArray = (int[]) input.get(positions);
+		
+		if(!EventUtils.isKeyValid(input, key, float[].class)){
+			log.error("Key to data not found in data map.");
+			throw new RuntimeException();
+		}
+		float[] data = (float[]) input.get(key);
+		
+		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		photonCharge = new float[Constants.NUMBEROFPIXEL];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -126,11 +123,16 @@ public class PhotonCharge implements Processor {
 	}
 
 
-	@Parameter(required = false, description = "The positions from which to integrate. If no input is given here this processor will use the posititions of the max amplitude", defaultValue = "MaxAmplitudePositons")
+	public String getPositions() {
+		return positions;
+	}
+	@Parameter(required = false, description = "The positions from which to integrate.", defaultValue = "positions")
 	public void setPositions(String positions) {
 		this.positions = positions;
 	}
 
+	
+	
 	public String getKey() {
 		return key;
 	}
