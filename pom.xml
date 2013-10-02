@@ -74,13 +74,8 @@
 
 	<repositories>
 		<repository>
-			<id>jwall</id>
-			<name>jwall.org Maven Repository</name>
-			<url>http://secure.jwall.org/maven/repository/jwall</url>
-		</repository>
-		<repository>
 			<id>sonatype-snapshots</id>
-			<name>jwall.org Maven Repository</name>
+			<name>SonaType Snapshot Maven Repository</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
@@ -220,7 +215,7 @@
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>shade:shade</goal>
 						</goals>
 					</execution>
 				</executions>
