@@ -5,9 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import stream.util.parser.MParser;
-import fact.Constants;
-import fact.features.video.CenterOfGravity;
 import fact.viewer.ui.DefaultPixelMapping;
 
 /**
