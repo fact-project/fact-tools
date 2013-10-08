@@ -38,7 +38,7 @@ public class FilterTests {
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test0");
 			
-			ArrayList<SimpleFactEventProcessor<float[], float[]>> pList = new ArrayList<SimpleFactEventProcessor<float[], float[]>>();
+			ArrayList<SimpleFactEventProcessor<double[], double[]>> pList = new ArrayList<SimpleFactEventProcessor<double[], double[]>>();
 			pList.add(new FirFilter());
 			pList.add(new MovingAverage());
 			pList.add(new ExponentialSmoothing());
@@ -48,7 +48,7 @@ public class FilterTests {
 			pList.add(new MotionDiff());
 			
 			int i = 0;
-			for(SimpleFactEventProcessor<float[], float[]> filter : pList){
+			for(SimpleFactEventProcessor<double[], double[]> filter : pList){
 				filter.setKey("test" + i);
 				filter.setOutputKey("test"+(i+1));
 			}
@@ -65,18 +65,18 @@ public class FilterTests {
 					fail("Item does not contain the right key after drs calibration");
 				try{
 					
-					for(SimpleFactEventProcessor<float[], float[]> filter : pList){
+					for(SimpleFactEventProcessor<double[], double[]> filter : pList){
 						filter.process(item);
 						if(!item.containsKey(filter.getOutputKey())){
 							fail("item does not conatin the right outputkey after applying " + filter.getClass().getSimpleName());
 						}
 						
 						@SuppressWarnings("unused")
-						float[] result = (float[]) item.get(filter.getOutputKey());
+						double[] result = (double[]) item.get(filter.getOutputKey());
 					}
 					
 				} catch(ClassCastException e){
-					fail("Failed to cast items to float[]");
+					fail("Failed to cast items to double[]");
 				}
 				item = stream.read();
 			}
