@@ -136,7 +136,7 @@ public class SourcePosition implements StatefulProcessor {
 			//add circle overlay to map
 			data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay(x, y) );
 			//add source position to dataitem
-			float[] source = {x, y};
+			double[] source = {x, y};
 //			System.out.println("x: "+  source[0] + " y: " +source[1] );
 			data.put(outputKey, source);
 			return data;
@@ -184,11 +184,11 @@ public class SourcePosition implements StatefulProcessor {
 		//add circle overlay to map
 		data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
 		//add source position to dataitem
-		float[] source = {(float) sourcePosition[0], (float) sourcePosition[1]};
+		double[] source = {(double) sourcePosition[0], (double) sourcePosition[1]};
 //		System.out.println("x: "+  source[0] + " y: " +source[1] );
 		data.put(outputKey, source);
 		//add deviation between the calculated point az,dz and the az,dz in the file
-		float[] deviation = {(float) (pointingAzDe[0] - point[3]), (float) ( pointingAzDe[1] - point[4]) };
+		double[] deviation = {(double) (pointingAzDe[0] - point[3]), (double) ( pointingAzDe[1] - point[4]) };
 		data.put(outputKey+"pointingDeviation", deviation);
 		log.debug ("Pointing deviation: " + deviation);
 		log.debug( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ; 

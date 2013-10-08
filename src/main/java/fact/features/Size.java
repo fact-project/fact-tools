@@ -25,12 +25,12 @@ public class Size implements Processor {
 			return null;
 		}
 		
-		if(!EventUtils.isKeyValid(input, photonChargeKey, float[].class)){
+		if(!EventUtils.isKeyValid(input, photonChargeKey, double[].class)){
 			return null;
 		}
 
 		int[] shower 	= (int[])input.get(showerKey);
-		float[] charge 	= (float[])input.get(photonChargeKey);
+		double[] charge 	= (double[])input.get(photonChargeKey);
 		
 		double size = 0;
 		for (int i = 0; i < shower.length; i++){

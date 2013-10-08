@@ -23,16 +23,17 @@ public class HillasDistance implements Processor {
 	@Override
 	public Data process(Data input) {
 		if(!(	EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)
-				&& EventUtils.isKeyValid(input, sourcePosition, float[].class)
+				&& EventUtils.isKeyValid(input, sourcePosition, double[].class)
 				)){
+			log.error("invalid key");
 			return null;
 		}
 		
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-		float[] source  = (float[]) input.get(sourcePosition);
+		double[] source  = (double[]) input.get(sourcePosition);
 		
-		float x = source[0];
-		float y = source[1];
+		double x = source[0];
+		double y = source[1];
 
 		input.put(outputKey, 
 				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
