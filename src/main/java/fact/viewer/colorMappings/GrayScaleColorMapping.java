@@ -17,27 +17,27 @@ public class GrayScaleColorMapping
 	implements ColorMapping 
 {
 	static Logger log = LoggerFactory.getLogger( GrayScaleColorMapping.class );
-	float neutralValue = 0.0f;
+	double neutralValue = 0.0f;
 	Color maxColor = Color.white;
 	Color minColor = Color.black;
-	float minValue, maxValue;
+	double minValue, maxValue;
 	/**
 	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Double)
 	 */
 	@Override
-	public Color map(float v, float minValue, float maxValue) {
-		if(Float.isNaN(v)){
+	public Color map(double v, double minValue, double maxValue) {
+		if(Double.isNaN(v)){
 			v = neutralValue;
 		}
-			float value = v + Math.abs(minValue);
+			double value = v + Math.abs(minValue);
 			value = value/(maxValue-minValue);
-			return Color.getHSBColor(0.0f, 0.0f, value);
+			return Color.getHSBColor(0.0f, 0.0f, (float)value);
 		
 	}
 	
 
 //	@Override
-//	public Color map(float value) {
+//	public Color map(double value) {
 //		if(this.maxValue !=  0.0){
 //			map(value, minValue, maxValue);
 //		} else {
@@ -47,10 +47,10 @@ public class GrayScaleColorMapping
 //	}
 //
 //
-//	public float getMinValue() {
+//	public double getMinValue() {
 //		return minValue;
 //	}
-//	public float getMaxValue() {
+//	public double getMaxValue() {
 //		return maxValue;
 //	}
 	

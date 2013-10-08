@@ -17,7 +17,7 @@ public class NeutralColorMapping
 	implements ColorMapping 
 {
 	static Logger log = LoggerFactory.getLogger( NeutralColorMapping.class );
-	float neutralValue = 0.0f;
+	double neutralValue = 0.0f;
 	Color maxColor = Color.yellow;
 	Color minColor = Color.blue;
 	Color neutralColor = Color.black;
@@ -25,13 +25,13 @@ public class NeutralColorMapping
 	private float[] maxHsbVals = new float[3];
 	private float[] minHsbVals = new float[3];
 	
-	float minValue, maxValue;
+	double minValue, maxValue;
 
 
 	public NeutralColorMapping(){
 		Color.RGBtoHSB(neutralColor.getRed(), neutralColor.getGreen(), neutralColor.getBlue(), neutralHsbVals);
 		Color.RGBtoHSB(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(), maxHsbVals);
-		Color.RGBtoHSB(minColor.getRed(), minColor.getGreen(), minColor.getBlue(), minHsbVals);
+		Color.RGBtoHSB(minColor.getRed(),minColor.getGreen(), minColor.getBlue(), minHsbVals);
 	}
 	
 
@@ -39,8 +39,8 @@ public class NeutralColorMapping
 	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Double)
 	 */
 	@Override
-	public Color map(float v, float minValue, float maxValue) {
-		Float value = new Float(v);
+	public Color map(double v, double minValue, double maxValue) {
+		Double value = new Double(v);
 		if(value.equals(Double.NaN)){
 			value = neutralValue;
 		}
@@ -48,14 +48,14 @@ public class NeutralColorMapping
 		//log.info( "Scaling {} with {}", v, scale );
 		if (v >= neutralValue){
 			//map to positive color
-			value = (float) Math.abs( v/(maxValue-neutralValue) );
+			value = (double) Math.abs( v/(maxValue-neutralValue) );
 			float hue = (float) (neutralHsbVals[0] + (maxHsbVals[0] - neutralHsbVals[0])*value);
 			float sat = (float) (neutralHsbVals[1] + (maxHsbVals[1] - neutralHsbVals[1])*value);
 			float bri = (float) (neutralHsbVals[2] + (maxHsbVals[2] - neutralHsbVals[2])*value);
 			return Color.getHSBColor(hue, sat, bri);
 		} else {
 			//map to negative color
-			value = (float) Math.abs( v/(neutralValue-minValue) );
+			value = (double) Math.abs( v/(neutralValue-minValue) );
 			float hue = (float) (neutralHsbVals[0] + (minHsbVals[0] - neutralHsbVals[0])*value);
 			float sat = (float) (neutralHsbVals[1] + (minHsbVals[1] - neutralHsbVals[1])*value);
 			float bri = (float) (neutralHsbVals[2] + (minHsbVals[2] - neutralHsbVals[2])*value);
@@ -66,7 +66,7 @@ public class NeutralColorMapping
 //	
 //
 //	@Override
-//	public Color map(float value) {
+//	public Color map(double value) {
 //		if(this.maxValue !=  0.0){
 //			map(value, minValue, maxValue);
 //		} else {
@@ -76,10 +76,10 @@ public class NeutralColorMapping
 //	}
 //
 //
-//	public float getMinValue() {
+//	public double getMinValue() {
 //		return minValue;
 //	}
-//	public float getMaxValue() {
+//	public double getMaxValue() {
 //		return maxValue;
 //	}
 
