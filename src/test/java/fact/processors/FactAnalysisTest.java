@@ -99,9 +99,9 @@ public class FactAnalysisTest {
 					double[] charge = (double[]) item.get("photonCharge");
 
 					clean.process(item);
-					if (!item.containsKey("shower"))
-						fail("Item does not contain the right key after cleaning");
-					int[] s = (int[]) item.get("shower");
+//					if (!item.containsKey("shower"))
+//						fail("Item does not contain the right key after cleaning");
+//					int[] s = (int[]) item.get("shower");
 
 					poser.process(item);
 					if (!item.containsKey("pos"))
