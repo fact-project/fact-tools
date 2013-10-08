@@ -11,15 +11,15 @@ import fact.utils.SimpleFactEventProcessor;
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
-public abstract class StdDeviation extends SimpleFactEventProcessor<float[], float[]> {
+public abstract class StdDeviation extends SimpleFactEventProcessor<double[], double[]> {
 	static Logger log = LoggerFactory.getLogger(StdDeviation.class);
 	
 
-	public float[] processSeries(float[] data) {
+	public double[] processSeries(double[] data) {
 		//get the average value in each pixel
-		float[] avgs = new PixelAverage().processSeries(data);
+		double[] avgs = new PixelAverage().processSeries(data);
 		
-		float[] stds = new float[avgs.length];
+		double[] stds = new double[avgs.length];
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		double difference = 0.0f;
@@ -30,7 +30,7 @@ public abstract class StdDeviation extends SimpleFactEventProcessor<float[], flo
 				int pos = pix * roi + slice;
 				difference += Math.pow((data[pos]- avgs[pix]),2);
 			}
-			stds[pix] = (float) Math.sqrt((1/((double)data.length - 1)) * difference); 
+			stds[pix] = (double) Math.sqrt((1/((double)data.length - 1)) * difference); 
 			difference = 0.0f;
 		}
 		return stds;

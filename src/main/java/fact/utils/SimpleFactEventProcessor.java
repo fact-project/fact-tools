@@ -25,7 +25,8 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 			if(!input.containsKey(key)){
 				//key doesn't exist in map. return.
 				log.error(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-				return null;
+				throw new RuntimeException("Key not found");
+//				return null;
 			}
 			//if outputkey is not defined just overwrite the old data
 			if(outputKey == null || outputKey.equals("")){
