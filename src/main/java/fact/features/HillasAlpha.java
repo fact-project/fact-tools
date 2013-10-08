@@ -32,9 +32,9 @@ public class HillasAlpha implements Processor {
 			log.error("distribution is not of type PixelDistribution2D. Aborting");
 			return null;
 		}
-		float[] source = null;
+		double[] source = null;
 		try{
-			source  = (float[]) input.get(sourcePosition);
+			source  = (double[]) input.get(sourcePosition);
 			if(source ==  null){
 				log.info("No sourcePosition found in this event. Not calculating alpha");
 				return input;
@@ -43,12 +43,12 @@ public class HillasAlpha implements Processor {
 			log.error("wrong types" + e.toString());
 		}
 
-		float alpha = 0.0f;
+		double alpha = 0.0;
 	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
 	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
 	
-	    alpha                  = (float) (dist.getAngle() - auxiliary_angle);
+	    alpha                  = (double) (dist.getAngle() - auxiliary_angle);
 	
 	    if (alpha > 90)
 	    {
