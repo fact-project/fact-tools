@@ -19,10 +19,9 @@
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 	        <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
-<!--             <fact.filter.RemoveJumps key="DataCalibrated" outputKey="removed"/> -->
             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/>
-			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_startJumpHeight" title="StartCell Jumps" color="#993366"/>
-			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_stopJumpHeight" title="StopCell Jumps" color="#006600"/>
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_startJumpHeight" title="StartCell Jumps" color="#993366"/> -->
+<!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_stopJumpHeight" title="StopCell Jumps" color="#006600"/> -->
 <!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="heightEnd"/> -->
 <!--             <Skip condition="%{data.EventNum} &lt; 60" /> -->
 <!-- 	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" /> -->

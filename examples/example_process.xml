@@ -28,28 +28,38 @@
             
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-            <fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
-            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
 
-            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" />
-            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="showerTime" keyPositions="position" timeThreshold="20" />
-               
+            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
+            <fact.features.RisingEdge key="DataCalibrated" outputKey="risingedge"/>
+            
+            
             <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition"/>
-<!--             <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
-			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+        <fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
+        <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
+            
+        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
+        
+        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+            
 			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+<!--             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" /> -->
+<!--             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="showerTime" keyPositions="position" timeThreshold="20" /> -->
+               
+<!-- 			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" /> -->
 	
 <!-- 		<fact.processors.parfact.RemoveSpikesMars /> -->
 <!-- 		<fact.processors.RemoveJumps key="DataCalibrated" outputKey="jumpsRemoved" /> -->
 <!-- 		<fact.processors.parfact.CalculatePhotonCharge key="smooth" outputKey="s" /> -->
 <!-- 		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="c" /> -->
-<!-- 		<fact.statistics.CreateHistogram key="alpha" min="0" max="180" numberOfBins="181" outputKey="alphaH"/> -->
-<!-- 		<fact.statistics.CreateHistogram key="alpha2" min="0" max="180" numberOfBins="181" outputKey="alphaH2"/> -->
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <Skip condition="%{data.alpha} == NaN" />
+		<fact.statistics.CreateHistogram key="risingedge" min="0" max="197" numberOfBins="198" outputKey="risingH"/>
+		<fact.statistics.CreateHistogram key="position" min="0" max="197" numberOfBins="198" outputKey="positionH"/>
 
-<!-- 		<fact.image.monitors.HistogramPlotter key="alphaH"  logAxis="true"/> -->
-<!-- 		<fact.image.monitors.HistogramPlotter key="alphaH2"  logAxis="true"/> -->
+		<fact.image.monitors.HistogramPlotter key="risingH"  min="0" max="197"  logAxis="true"/>
+		<fact.image.monitors.HistogramPlotter key="positionH"  min="0" max="197"  logAxis="true"/>
 <!-- 		<fact.image.monitors.StatusWindow every="40" /> -->
-		<fact.io.RootASCIIWriter keys="alpha,alpha2" url="file:${outfile}" />
+<!-- 		<fact.io.RootASCIIWriter keys="alpha,alpha2" url="file:${outfile}" /> -->
 		<stream.monitor.DataRate every="200" />
 <!-- 		<fact.image.ShowImage/> -->
 	</process>
