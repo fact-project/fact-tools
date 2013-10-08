@@ -3,13 +3,21 @@ package fact.features;
 import fact.data.EventUtils;
 import stream.Data;
 import stream.Processor;
-
+/**
+ * Calculate the feature called Size. A physicist would call this the number of Photons in a shower. This basicly sums up all weights that belong to a shower.
+ * In short size is the sum of the photonCharge of all showerPixel. 
+ * @author kaibrugge
+ *
+ */
 public class Size implements Processor {
 
 	private String showerKey;
 	private String photonChargeKey;
 	private String outputKey;
-	
+	/**
+	 * This checks for the type and existence of the two input keys showerKey and photonChargeKey
+	 * @return the input map with {@code double size} added with the key {@code outputKey}, this method will return null if the input keys are not valid.
+	 */
 	@Override
 	public Data process(Data input) {
 
@@ -24,13 +32,14 @@ public class Size implements Processor {
 		int[] shower 	= (int[])input.get(showerKey);
 		float[] charge 	= (float[])input.get(photonChargeKey);
 		
-		float size = 0;
+		double size = 0;
 		for (int i = 0; i < shower.length; i++){
 			size += charge[shower[i]];
 		}
 		input.put(outputKey, size);
 		return input;
 	}
+	
 
 	public String getOutputKey() {
 		return outputKey;
