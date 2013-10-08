@@ -9,5 +9,5 @@ package fact.viewer.ui;
  */
 public interface PixelMapping {
 
-	public float[][] sortPixels( float[] data );
+	public double[][] sortPixels( double[] data );
 }

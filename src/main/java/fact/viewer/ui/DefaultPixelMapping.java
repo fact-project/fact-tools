@@ -177,16 +177,16 @@ public class DefaultPixelMapping implements PixelMapping {
 	 * @see fact.viewer.ui.PixelMapping#sortPixels(short[], short[])
 	 */
 	@Override
-	public float[][] sortPixels(float[] data) {
+	public double[][] sortPixels(double[] data) {
 
 		int roi = data.length / 1440;
-		float[][] pixels = new float[1440][roi];
+		double[][] pixels = new double[1440][roi];
 
 		for (int pix = 0; pix < 1440; pix++) {
 			for (int slice = 0; slice < roi; slice++) {
 				int hwId = software2chId[pix];
 				int pixId = hwId * roi + slice;
-				float value = data[pixId];
+				double value = data[pixId];
 				pixels[pix][slice] = value;
 			}
 		}
