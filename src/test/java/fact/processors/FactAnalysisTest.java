@@ -59,6 +59,10 @@ public class FactAnalysisTest {
 			PhotonCharge c = new PhotonCharge();
 			c.setKey("test");
 			c.setOutputKey("photonCharge");
+			c.setPositions("positions");
+			if(!c.getPositions().equals("positions")){
+				fail("Setter in phgotoncharge didnt do anything");
+			}
 
 			CoreNeighborClean clean = new CoreNeighborClean();
 			clean.setKey("photonCharge");

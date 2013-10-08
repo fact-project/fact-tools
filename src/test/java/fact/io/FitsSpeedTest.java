@@ -45,8 +45,8 @@ public class FitsSpeedTest {
 			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
 			drs.setUrl(u);
 			preprocess.add(drs);
-			preprocess.add(new PhotonCharge());
-			preprocess.add(new MaxAmplitude());
+//			preprocess.add(new PhotonCharge());
+//			preprocess.add(new MaxAmplitude());
 
 			preprocess.init(new ProcessContextImpl());
 			Long start = System.currentTimeMillis();

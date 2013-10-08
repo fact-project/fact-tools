@@ -58,6 +58,7 @@ public class FeatureTests {
 		PhotonCharge c = new PhotonCharge();
 		c.setKey("test");
 		c.setOutputKey("photonCharge");
+		c.setPositions(rE.getOutputKey());
 		p = new Pair<String, Class<?>>(c.getOutputKey(), double[].class );
 		typeMap.put(c, p);
 		
@@ -100,6 +101,7 @@ public class FeatureTests {
 		PhotonCharge charge = new PhotonCharge();
 		charge.setKey(cut.getOutputKey());
 		charge.setOutputKey("photonCharge");
+		charge.setPositions(rE.getOutputKey());
 		p = new Pair<String, Class<?>>(charge.getOutputKey(), double[].class );
 		typeMap.put(charge, p);
 		
