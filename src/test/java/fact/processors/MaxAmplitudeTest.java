@@ -59,13 +59,13 @@ public class MaxAmplitudeTest {
 					if(pos.length != Constants.NUMBEROFPIXEL){
 						fail("MaxAmplitudePosition does not produce the right output");
 					}
-					float[] amps = (float[]) item.get("amps");
+					double[] amps = (double[]) item.get("amps");
 					if(amps.length != Constants.NUMBEROFPIXEL){
 						fail("MaxAmplitude does not produce the right output");
 					}
 					
 				} catch(ClassCastException e){
-					fail("Failed to cast items to float[]");
+					fail("Failed to cast items to double[]");
 				}
 				item = stream.read();
 			}

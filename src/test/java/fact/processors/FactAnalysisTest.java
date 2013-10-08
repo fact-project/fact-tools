@@ -82,7 +82,7 @@ public class FactAnalysisTest {
 				if (!item.containsKey("test"))
 					fail("Item does not contain the right key after drs calibration");
 				try{
-					float[] result = (float[]) item.get("test");
+					double[] result = (double[]) item.get("test");
 					short[] ar = (short[]) item.get("Data");
 					if(ar.length != result.length){
 						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
@@ -96,7 +96,7 @@ public class FactAnalysisTest {
 					c.process(item);
 					if (!item.containsKey("photonCharge"))
 						fail("Item does not contain the right key after calcphotoncharge");
-					float[] charge = (float[]) item.get("photonCharge");
+					double[] charge = (double[]) item.get("photonCharge");
 
 					clean.process(item);
 					if (!item.containsKey("shower"))
@@ -106,7 +106,7 @@ public class FactAnalysisTest {
 					poser.process(item);
 					if (!item.containsKey("pos"))
 						fail("Item does not contain the right key after calcsourcepos");
-					float[] p = (float[]) item.get("pos");
+					double[] p = (double[]) item.get("pos");
 					if(p.length != 2){
 						fail("Calcsourcepost did not output the right array");
 					}
