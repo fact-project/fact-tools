@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.filter.AverageJumpRemoval;
 import fact.filter.DrsCalibration;
 import fact.filter.ExponentialSmoothing;
 import fact.filter.FirFilter;
@@ -18,6 +19,8 @@ import fact.filter.InterpolateBadPixel;
 import fact.filter.MotionDiff;
 import fact.filter.MovingAverage;
 import fact.filter.MultiplyValues;
+import fact.filter.RemoveSpikesMars;
+import fact.filter.SliceNormalization;
 import fact.io.FitsStream;
 import fact.utils.ExFit;
 import fact.utils.SimpleFactEventProcessor;
@@ -46,6 +49,7 @@ public class FilterTests {
 			pList.add(new MultiplyValues());
 			pList.add(new ExFit());
 			pList.add(new MotionDiff());
+			pList.add(new SliceNormalization());
 			
 			int i = 0;
 			for(SimpleFactEventProcessor<double[], double[]> filter : pList){
