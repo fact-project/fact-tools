@@ -67,6 +67,7 @@ public class FactAnalysisTest {
 			URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
 			SourcePosition poser = new SourcePosition();
 			poser.setUrl(driveURL);
+			poser.setPhysicalSource("crab");
 			poser.setOutputKey("pos");
 			poser.init(null);
 

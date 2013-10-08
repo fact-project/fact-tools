@@ -53,7 +53,7 @@ public class DrsCalibrationTest {
 				if (!item.containsKey("test"))
 					fail("Item does not contain the right key after drs calibration");
 				try{
-					float[] result = (float[]) item.get("test");
+					double[] result = (double[]) item.get("test");
 					short[] ar = (short[]) item.get("Data");
 					if(ar.length != result.length){
 						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
