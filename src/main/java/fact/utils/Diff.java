@@ -35,15 +35,15 @@ public class Diff implements Processor {
 		}
 		
 		try {
-			float[] a = (float[]) input.get(keyA);
-			float[] b = (float[]) input.get(keyB);
+			double[] a = (double[]) input.get(keyA);
+			double[] b = (double[]) input.get(keyB);
 			
-			float[] result;
+			double[] result;
 			if (outputKey == null){
 				outputKey = keyA;
 				result = a;
 			} else {
-				result = new float[a.length];
+				result = new double[a.length];
 			}
 			for(int i = 0; i < a.length; ++i){
 				result[i] = a[i] - b[i];
@@ -51,9 +51,11 @@ public class Diff implements Processor {
 			input.put(outputKey, result);
 
 		} catch(ClassCastException e){
-			log.error("Could not cast the keys in the map to float arrays");
+			log.error("Could not cast the keys in the map to double arrays");
+			throw new RuntimeException("Cannot cast to double array");
 		} catch(ArrayIndexOutOfBoundsException e){
 			log.error("Index out of bounds. The keyA has to refer to an array of length <= the lenght of array from keyB");
+			throw e;
 		}
 		return input;
 	}

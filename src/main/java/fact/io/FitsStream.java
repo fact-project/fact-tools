@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -56,6 +57,7 @@ public class FitsStream extends AbstractStream {
 		File f = new File(this.url.getFile());
 		if (!f.canRead()){
 			log.error("Cannot read file. Wrong path? ");
+			throw new FileNotFoundException("Cannot read file");
 		}
 		bStream = new BufferedInputStream(getInputStream(), bufferSize );
 		dataStream = new DataInputStream(bStream);

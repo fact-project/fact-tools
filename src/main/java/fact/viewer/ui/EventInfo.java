@@ -133,9 +133,9 @@ public class EventInfo extends JEditorPane {
 			for (Integer o : selectedSet) {
 				strB.append("<strong> SoftID: </strong> " + o);
 				strB.append("<br />");
-				float[] pixels;
+				double[] pixels;
 				for (String st : pixelInfos) {
-					pixels = (float[]) event.get(st);
+					pixels = (double[]) event.get(st);
 					if (pixels.length == Constants.NUMBEROFPIXEL) {
 						strB.append(st + ": "
 								+ pixels[DefaultPixelMapping.getChidFromSoftId(o)]);

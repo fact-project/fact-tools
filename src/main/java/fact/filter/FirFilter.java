@@ -21,7 +21,7 @@ import fact.utils.SimpleFactEventProcessor;
  * 
  */
 @Description(group = "Fact Tools.Filter", text = "")
-public class FirFilter extends SimpleFactEventProcessor<float[], float[]>{
+public class FirFilter extends SimpleFactEventProcessor<double[], double[]>{
 	static Logger log = LoggerFactory.getLogger(FirFilter.class);
 	double[] coefficients = { 0.5f, 0.2f, 0.1f };
 	
@@ -30,8 +30,8 @@ public class FirFilter extends SimpleFactEventProcessor<float[], float[]>{
 	
 
 	@Override
-	public float[] processSeries(float[] data) {
-		float[] result = new float[data.length];
+	public double[] processSeries(double[] data) {
+		double[] result = new double[data.length];
 
 		// foreach pixel
 		int roi = data.length / Constants.NUMBEROFPIXEL;

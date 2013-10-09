@@ -57,8 +57,8 @@ public class DiffTest {
 				
 				try{
 					@SuppressWarnings("unused")
-					float[] amps = (float[]) item.get("out");
-					amps = (float[]) item.get("test");
+					double[] amps = (double[]) item.get("out");
+					amps = (double[]) item.get("test");
 					
 				} catch(ClassCastException e){
 					fail("Failed to cast items to float[]");

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+import stream.annotations.Parameter;
 import fact.Constants;
 import fact.image.overlays.LineOverlay;
 import fact.statistics.PixelDistribution2D;
@@ -38,7 +39,7 @@ static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
 //what do we need to calculate the ellipse?
 private String weights =  null;
 private String pixel =  null;
-private float[] wheightsArray;
+private double[] wheightsArray;
 private int[] showerPixel;
 
 //hte in and outputkeys
@@ -74,19 +75,19 @@ public Data process(Data input) {
 	if(weights == null){
 		log.info("Wheights were null. Setting all weights to 1");
 
-		wheightsArray = new float[Constants.NUMBEROFPIXEL];
+		wheightsArray = new double[Constants.NUMBEROFPIXEL];
 		for(int i = 0; i < wheightsArray.length; i++){
 			wheightsArray[i] = 1.0f;
 		}
 	} else {
 		try{
-			wheightsArray = (float[]) input.get(weights);
+			wheightsArray = (double[]) input.get(weights);
 			if(wheightsArray ==  null){
 				log.error("The values for weight were not found in the map. Aborting");
 				return null;
 			}
 		} catch (ClassCastException e){
-			log.error("Wheights is not of type float[]. Aborting");
+			log.error("Wheights is not of type double[]. Aborting");
 			return null;
 		}
 	}
@@ -248,6 +249,7 @@ public void setWeights(String wheights) {
 public String getPixel() {
 	return pixel;
 }
+@Parameter(required = true, description = "The key to the showerPixel. That is some sort of int[] containing pixel chids.  ", defaultValue = "MaxAmplitudePositons")
 public void setPixel(String pixel) {
 	this.pixel = pixel;
 }
@@ -268,6 +270,7 @@ public void finish() throws Exception {
 public String getKey() {
 	return key;
 }
+@Parameter(required = false, description = "This is just an alias for the \"Pixel\" key")
 public void setKey(String key) {
 	this.key = key;
 }

@@ -20,11 +20,10 @@ public class PixelAverage extends SimpleFactPixelProcessor {
 	/**
 	 * @see stream.DataProcessor#process(stream.Data)
 	 **/
-	
 	@Override
-	public float processPixel(float[] pixelData) {
-		float avg = 0;
-		for (float f : pixelData){
+	public double processPixel(double[] pixelData) {
+		double avg = 0;
+		for (double f : pixelData){
 			avg += f;
 		}
 		return avg/pixelData.length;

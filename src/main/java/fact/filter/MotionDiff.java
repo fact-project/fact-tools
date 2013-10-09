@@ -16,15 +16,15 @@ import fact.utils.SimpleFactEventProcessor;
  */
 
 @Description(group = "Data Stream.FACT")
-public class MotionDiff extends SimpleFactEventProcessor<float[], float[]> {
+public class MotionDiff extends SimpleFactEventProcessor<double[], double[]> {
 	static Logger log = LoggerFactory.getLogger(MotionDiff.class);
 	
 	private int offset = 0;
 	@Override
-	public float[] processSeries(float[] data) {
-		float[] result =  data;
+	public double[] processSeries(double[] data) {
+		double[] result =  data;
 		if(! key.equals(outputKey)){
-			result = new float[data.length];
+			result = new double[data.length];
 		}
 		
 		

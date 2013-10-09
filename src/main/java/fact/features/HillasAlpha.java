@@ -6,7 +6,13 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import fact.statistics.PixelDistribution2D;
-
+/**
+ * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution (aka the shower ellipse)... <a>
+ *I have no idea.
+ * 
+ *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ * 
+ */
 public class HillasAlpha implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasAlpha.class);
 	private String distribution = null;
@@ -26,9 +32,9 @@ public class HillasAlpha implements Processor {
 			log.error("distribution is not of type PixelDistribution2D. Aborting");
 			return null;
 		}
-		float[] source = null;
+		double[] source = null;
 		try{
-			source  = (float[]) input.get(sourcePosition);
+			source  = (double[]) input.get(sourcePosition);
 			if(source ==  null){
 				log.info("No sourcePosition found in this event. Not calculating alpha");
 				return input;
@@ -37,12 +43,12 @@ public class HillasAlpha implements Processor {
 			log.error("wrong types" + e.toString());
 		}
 
-		float alpha = 0.0f;
+		double alpha = 0.0;
 	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
 	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
 	
-	    alpha                  = (float) (dist.getAngle() - auxiliary_angle);
+	    alpha                  = (double) (dist.getAngle() - auxiliary_angle);
 	
 	    if (alpha > 90)
 	    {
@@ -52,17 +58,6 @@ public class HillasAlpha implements Processor {
 	    {
 	        alpha              = 180 + alpha;
 	    }
-////	    System.out.println(alpha);
-//	    double alpha2 = 0;
-//		alpha2 = 0.0f;
-//	    auxiliary_angle  = Math.atan2( (source[1] - dist.getCenterY() ),(source[0] - dist.getCenterX()) );
-//	
-//	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
-//	
-//	    alpha2                  = (float) (dist.getAngle() - auxiliary_angle);
-////	    System.out.println(alpha);
-////	    System.out.println(alpha - alpha2);
-//	    input.put("alpha2", alpha2);
 	    input.put(outputKey, alpha);
 		return input;
 	}

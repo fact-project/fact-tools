@@ -17,11 +17,11 @@ import fact.utils.SimpleFactEventProcessor;
  * Takes a float array and creates a float array as output
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
-public class RemoveSpikesMars extends SimpleFactEventProcessor<float[], float[]> {
+public class RemoveSpikesMars extends SimpleFactEventProcessor<double[], double[]> {
 	static Logger log = LoggerFactory.getLogger(RemoveSpikesMars.class);
-	private float topSlope = 4.0f;
+	private double topSlope = 4.0f;
 	@Override
-	public float[] processSeries(float[] data) {
+	public double[] processSeries(double[] data) {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			//iterate over all slices
@@ -59,10 +59,10 @@ public class RemoveSpikesMars extends SimpleFactEventProcessor<float[], float[]>
 	}
 	
 	@Parameter(required = false, description = "A Spike can consist of two slices. That means the peak has two data points which are higher than the rest. This parameter describes the maximum difference these two points are allowed to have.", defaultValue="8")
-	public float getTopSlope() {
+	public double getTopSlope() {
 		return topSlope;
 	}
-	public void setTopSlope(float topSlope) {
+	public void setTopSlope(double topSlope) {
 		this.topSlope = topSlope;
 	}
 }

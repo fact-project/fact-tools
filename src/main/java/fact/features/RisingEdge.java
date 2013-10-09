@@ -14,7 +14,7 @@ import fact.utils.SimpleFactEventProcessor;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
+public class RisingEdge extends SimpleFactEventProcessor<double[], int[]> {
 
 	static Logger log = LoggerFactory.getLogger(RisingEdge.class);
 
@@ -29,17 +29,17 @@ public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
 
 	
 	@Override
-	public int[] processSeries(float[] data) {
+	public int[] processSeries(double[] data) {
 		int[] positions =  new int[Constants.NUMBEROFPIXEL];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			//find max amplitude
-			float max = 0;
+			double max = 0;
 			int posMaxAmp = 0;
 			for (int slice = 0; slice < roi; slice++) {
 				int pos = pix * roi + slice;
-				float value = data[pos];
+				double value = data[pos];
 				if(value > max){
 					max = value;
 					posMaxAmp = slice; 
@@ -52,8 +52,8 @@ public class RisingEdge extends SimpleFactEventProcessor<float[], int[]> {
 			 */
 	
 			/// temp. Variables
-			float           current_slope   = 0;
-			float           max_slope       = 0;
+			double           current_slope   = 0;
+			double           max_slope       = 0;
 			/// @todo remove magic numbers for the search window
 			int             search_window_left  = posMaxAmp - 25;
 			if (search_window_left < 10)
