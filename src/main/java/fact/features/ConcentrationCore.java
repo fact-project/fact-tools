@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import stream.annotations.Parameter;
 import fact.Constants;
+import fact.data.EventUtils;
+import fact.features.video.CenterOfGravity;
+import fact.statistics.PixelDistribution2D;
 import fact.viewer.ui.DefaultPixelMapping;
 
 
@@ -17,6 +20,30 @@ public class ConcentrationCore implements Processor{
 	@Override
 	public Data process(Data input)
 	{
+
+		if(!EventUtils.isKeyValid(input, cogX, Double.class)){
+			return null;
+		}
+		if(!EventUtils.isKeyValid(input, cogY, Double.class)){
+			return null;
+		}
+		if(!EventUtils.isKeyValid(input, delta, Double.class)){
+			return null;
+		}
+		if(!EventUtils.isKeyValid(input, photonCharge, double[].class)){
+			return null;
+		}		
+		if(!EventUtils.isKeyValid(input, showerPixel, int[].class)){
+			return null;
+		}
+		
+		Double cogx = (Double) input.get(cogX);
+		Double cogy = (Double) input.get(cogY);
+		Double d = (Double) input.get(delta);
+		double [] photonChargeArray = (double[]) input.get(photonCharge);
+		int [] showerPixelArray = (int[]) input.get(showerPixel);
+		
+		
 		
 		return input;
 	}
@@ -76,4 +103,7 @@ public class ConcentrationCore implements Processor{
 	private String photonCharge;
 	private String showerPixel;
 	
+	final private double pixelRadius = 1;
+	
+	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 }
