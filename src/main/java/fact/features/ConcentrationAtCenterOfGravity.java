@@ -5,21 +5,17 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 import fact.viewer.ui.DefaultPixelMapping;
 
-/**
- * This class calculates the concentration at the center of gavity including the 2 nearest pixel
- * @param cogx The key of the center of gravity x
- * @param cogy The key of the center of gravity y
- * @param hillasSize The key of the HillasSize of the event
- * @param PhotonCharge The photoncharge!
- *
- * @return ConcCOG The concentration of the 3 closest pixel to the COG 
- */
+
+
 public class ConcentrationAtCenterOfGravity implements Processor
 {
 	
-	
+	/**
+	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
+	 */
 	@Override
 	public Data process(Data input)
 	{
@@ -84,30 +80,35 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	public String getPhotonCharge() {
 		return photonCharge;
 	}
+	@Parameter(required = true, defaultValue = "photoncharge", description = "Key of the array of photoncharge.")
 	public void setPhotonCharge(String photonCharge) {
 		this.photonCharge = photonCharge;
 	}
 	public String getCogX() {
 		return cogX;
 	}
+	@Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
 	public void setCogX(String cogX) {
 		this.cogX = cogX;
 	}
 	public String getCogY() {
 		return cogY;
 	}
+	@Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
 	public void setCogY(String cogY) {
 		this.cogY = cogY;
 	}
 	public String getOutputKey() {
 		return outputKey;
 	}
+	@Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 	public String getHillasSize() {
 		return hillasSize;
 	}
+	@Parameter(required = true, defaultValue  = "Hillas_size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
 	public void setHillasSize(String hillasSize) {
 		this.hillasSize = hillasSize;
 	}
@@ -122,10 +123,10 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	
 	private float[] photonChargeArray = null;
 	
-	private String photonCharge = "photoncharge";
-	private String cogX = "COGx";
-	private String cogY = "COGy";
-	private String hillasSize = "Hillas_Size";
-	private String outputKey = "ConcCOG";
+	private String photonCharge;
+	private String cogX;
+	private String cogY;
+	private String hillasSize;
+	private String outputKey;
 	
 }

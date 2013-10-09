@@ -6,31 +6,17 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 import fact.Constants;
 import fact.viewer.ui.DefaultPixelMapping;
 
 
-/**
- * This class calculates the center of gravity for every slice. It uses only shower pixel.
- * It also calculates the variance and covariance of the center of gravity.
- *
- * @param ShowerPixel Array containing shower pixel
- * @param DataCalibrated Array containing the calibrated dataCalibrated
- * @param NumberOfShowerPixelThreshold Constant that triggers calculation based on the number of shower pixel
- * @param OutputKey String contains the name of the output key
- *
- * @return X Array contains the X position of the center of gravity
- * @return Y Array contains the Y position of the center of gravity
- * @return VarX Array contains the X variance of the center of gravity
- * @return VarY Array contains the Y variance of the center of gravity
- * @return CovXY Array contains the covariance of the center of gravity in X and Y
- * @return VelX Array contains the X velocity of the center of gravity
- * @return VelY Array contains the Y velocity of the center of gravity
- * @return Vel Array contains the velocity of the center of gravity
- */
-
 public class CenterOfGravity implements Processor
 {
+	/**
+	 * This function calculates the center of gravity for every slice. It uses only shower pixel.
+	 * It also calculates the variance and covariance of the center of gravity.
+	 */
 	
 	@Override
 	public Data process(Data input)
@@ -147,7 +133,8 @@ public class CenterOfGravity implements Processor
 	public String getShowerPixel() {
 		return showerPixel;
 	}
-
+	
+	@Parameter(required = true, defaultValue = "showerPixel", description = "Key to the array of showerpixel Chids.")
 	public void setShowerPixel(String showerPixel) {
 		this.showerPixel = showerPixel;
 	}
@@ -155,7 +142,8 @@ public class CenterOfGravity implements Processor
 	public String getDataCalibrated() {
 		return dataCalibrated;
 	}
-
+	
+	@Parameter(required = true, defaultValue = "DataCalibrated", description = "Key to the calibrated data array.")
 	public void setDataCalibrated(String dataCalibrated) {
 		this.dataCalibrated = dataCalibrated;
 	}
@@ -163,7 +151,8 @@ public class CenterOfGravity implements Processor
 	public String getOutputKey() {
 		return outputKey;
 	}
-
+	
+	@Parameter(required = true, defaultValue  = "CenterOfGravity", description = "The output key tag. Will be inserted before all output keys.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
@@ -171,17 +160,18 @@ public class CenterOfGravity implements Processor
 	public int getNumberOfShowerPixelThreshold() {
 		return numberOfShowerPixelThreshold;
 	}
-
+	
+	@Parameter(required = true, defaultValue = "4", description = "Minimum of shower pixel to start calculation.")
 	public void setNumberOfShowerPixelThreshold(int numberOfShowerPixelThreshold) {
 		this.numberOfShowerPixelThreshold = numberOfShowerPixelThreshold;
 	}
 
 	static Logger log = LoggerFactory.getLogger(CenterOfGravity.class);
 	
-	private String showerPixel = "showerPixel";
+	private String showerPixel;
 	private int[] showerPixelArray = null;
 	
-	private String dataCalibrated = "DataCalibrated";
+	private String dataCalibrated;
 	private float[] dataCalibratedArray = null;
 	
 	// Helper and utilities
@@ -190,7 +180,7 @@ public class CenterOfGravity implements Processor
 	private float[] size;
 	private float eventBaseline;
 
-	private int numberOfShowerPixelThreshold = 5;
+	private int numberOfShowerPixelThreshold;
 	
 	// COG of showerPixelSet for every slice
 	private float[] cogx = null;
@@ -205,7 +195,7 @@ public class CenterOfGravity implements Processor
 	private float[] cogVelocity;
 	
 	
-	private String outputKey = "CenterOfGravity";
+	private String outputKey;
 	
 
 }
