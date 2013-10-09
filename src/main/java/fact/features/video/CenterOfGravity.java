@@ -22,14 +22,14 @@ public class CenterOfGravity implements Processor
 	public Data process(Data input)
 	{
 		/// init helper and utils
-	    mpGeomXCoord = DefaultPixelMapping.getGeomXArray();
-	    mpGeomYCoord = DefaultPixelMapping.getGeomYArray();
+	    mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
+	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
 		/// get input
 		try
 		{
 			showerPixelArray = (int[]) input.get(showerPixel);
-			dataCalibratedArray = (float[]) input.get(dataCalibrated);
+			dataCalibratedArray = (double[]) input.get(dataCalibrated);
 		}
 		catch (ClassCastException e)
 		{
@@ -52,18 +52,18 @@ public class CenterOfGravity implements Processor
 		// COG for every slice
 		int sliceCount = dataCalibratedArray.length / Constants.NUMBEROFPIXEL; // ROI
 		
-		cogx = new float[sliceCount];
-		cogy = new float[sliceCount];
+		cogx = new double[sliceCount];
+		cogy = new double[sliceCount];
 		
-		varcogx = new float[sliceCount];
-		varcogy = new float[sliceCount];
-		covcog = new float[sliceCount];
+		varcogx = new double[sliceCount];
+		varcogy = new double[sliceCount];
+		covcog = new double[sliceCount];
 
-		cogVelocityX = new float[sliceCount - 1];
-		cogVelocityY = new float[sliceCount - 1];
-		cogVelocity = new float[sliceCount - 1];
+		cogVelocityX = new double[sliceCount - 1];
+		cogVelocityY = new double[sliceCount - 1];
+		cogVelocity = new double[sliceCount - 1];
 		
-		size = new float[sliceCount];
+		size = new double[sliceCount];
 		
 		// Baseline correction
 		eventBaseline = 0.0f;
@@ -172,27 +172,27 @@ public class CenterOfGravity implements Processor
 	private int[] showerPixelArray = null;
 	
 	private String dataCalibrated;
-	private float[] dataCalibratedArray = null;
+	private double[] dataCalibratedArray = null;
 	
 	// Helper and utilities
 	private float[] mpGeomXCoord;
 	private float[] mpGeomYCoord;
-	private float[] size;
-	private float eventBaseline;
+	private double[] size;
+	private double eventBaseline;
 
 	private int numberOfShowerPixelThreshold;
 	
 	// COG of showerPixelSet for every slice
-	private float[] cogx = null;
-	private float[] cogy = null;
-	private float[] varcogx = null;
-	private float[] varcogy = null;
-	private float[] covcog = null;
+	private double[] cogx = null;
+	private double[] cogy = null;
+	private double[] varcogx = null;
+	private double[] varcogy = null;
+	private double[] covcog = null;
 
 	// Velocity of COG of showerPixel
-	private float[] cogVelocityX;
-	private float[] cogVelocityY;
-	private float[] cogVelocity;
+	private double[] cogVelocityX;
+	private double[] cogVelocityY;
+	private double[] cogVelocity;
 	
 	
 	private String outputKey;
