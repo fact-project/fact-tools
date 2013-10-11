@@ -166,7 +166,7 @@ public class MapView extends JPanel {
 				Serializable val = event.get(key);
 				if (val.getClass().isArray()) {
 					if (val.getClass().getComponentType() == double.class) {
-						length = ((float[]) (event.get(key))).length;
+						length = ((double[]) (event.get(key))).length;
 						if(showerChids != null){
 							cameraMap.setData(setIds(showerChids,(double[]) (event.get(key))));
 						} else {
