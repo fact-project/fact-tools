@@ -26,8 +26,7 @@ import fact.data.EventUtils;
 
 /**
  * 
- * This plotter takes an int[] and interprets its values as a histogram. Meaning every entry in the array is a dimensionless counter for something.
- * 
+ * This plotter class needs only two parameters. The binWidth and the key to the data.
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
@@ -44,10 +43,10 @@ public class HistogramTest extends DataVisualizer {
 	private boolean logAxis = false;
 
 	private SimpleHistogramDataset dataset;
-	private String title;
+	private String title = "Histogram";
 	private String color = "#666699";
 	private JFreeChart chart;
-	private int counter = 0;
+	private long counter = 0;
 
 	public HistogramTest() {
 		width = 690;
@@ -63,7 +62,7 @@ public class HistogramTest extends DataVisualizer {
 	    dataset = new SimpleHistogramDataset(key);
 	   
 	    chart = ChartFactory.createHistogram(
-	              "Histogram",
+	              title,
 	              key,
 	              "#",
 	              dataset,
@@ -105,15 +104,22 @@ public class HistogramTest extends DataVisualizer {
 
 		if(  EventUtils.isKeyValid(data, key, Double.class)){
 			double v = (Double) data.get(key);
+			if(Double.isNaN(v)){
+				log.warn("This doesnt handle NaNs very well.");
+			}
 			try{
 				dataset.addObservation(v);
-				chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
+				chart.setTitle(title + " " + key + "    " + counter++ + " entries");
 			} catch(RuntimeException e ) {
 				
-				SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth, false, false);
-				dataset.addBin(bin);
-				dataset.addObservation(v);
-				chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
+				SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth, true, false);
+				try{
+					dataset.addBin(bin);
+					dataset.addObservation(v);
+					chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
+				} catch (Exception ee){
+					log.warn("Overlapping bin");
+				}
 			}
 		} 
 		//else if ( EventUtils.isKeyValid(data, key, Double.class) ) {

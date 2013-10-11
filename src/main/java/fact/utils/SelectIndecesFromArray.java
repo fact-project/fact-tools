@@ -5,8 +5,6 @@ package fact.utils;
 
 import java.io.Serializable;
 
-import org.jfree.util.Log;
-
 import stream.Data;
 import stream.Processor;
 import fact.data.EventUtils;
@@ -36,7 +34,7 @@ public class SelectIndecesFromArray implements Processor{
 		} else if(EventUtils.isKeyValid(input, indices, Integer[].class)) {
 			indexArray = EventUtils.toIntArray((Integer[]) input.get(indices));
 		} else {
-			throw new RuntimeException("indeces wasnt valid");
+			throw new RuntimeException("indices wasnt valid");
 		}
 		
 		double[] sAr = new double[indexArray.length];
@@ -59,7 +57,6 @@ public class SelectIndecesFromArray implements Processor{
 	public String getIndices() {
 		return indices;
 	}
-
 	public void setIndices(String indices) {
 		this.indices = indices;
 	}
@@ -67,7 +64,6 @@ public class SelectIndecesFromArray implements Processor{
 	public String getKey() {
 		return key;
 	}
-
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -75,7 +71,6 @@ public class SelectIndecesFromArray implements Processor{
 	public String getOutputKey() {
 		return outputKey;
 	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
