@@ -26,12 +26,12 @@ import fact.data.EventUtils;
  */
 public class PhotonCharge implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
-	private float[] photonCharge = null;
+	private double[] photonCharge = null;
 
 	private String color = "#00F0F0";
 
 	private	double average = 0.0;
-	private float integralGain = 244.0f;
+	private double integralGain = 244.0f;
 	private int alpha = 64;
 
 	private String positions = null;
@@ -47,15 +47,15 @@ public class PhotonCharge implements Processor {
 		}
 		int[] posArray = (int[]) input.get(positions);
 		
-		if(!EventUtils.isKeyValid(input, key, float[].class)){
+		if(!EventUtils.isKeyValid(input, key, double[].class)){
 			log.error("Key to data not found in data map.");
 			throw new RuntimeException();
 		}
-		float[] data = (float[]) input.get(key);
+		double[] data = (double[]) input.get(key);
 		
 		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
-		photonCharge = new float[Constants.NUMBEROFPIXEL];
+		photonCharge = new double[Constants.NUMBEROFPIXEL];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		// for each pixel
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
@@ -114,7 +114,7 @@ public class PhotonCharge implements Processor {
 
 	/*Getters and Setters */
 
-	public float getIntegralGain() {
+	public double getIntegralGain() {
 		return integralGain;
 	}
 	@Parameter(required = false, description = "Value for the integral Gain. This is a measured Constant.", defaultValue = "244.0")

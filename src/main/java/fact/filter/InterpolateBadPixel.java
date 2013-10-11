@@ -15,20 +15,20 @@ import fact.viewer.ui.DefaultPixelMapping;
   * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float[]> {
+public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], double[]> {
 	static Logger log = LoggerFactory.getLogger(InterpolateBadPixel.class);
-	private float[] nData;
+	private double[] nData;
 	private int[] badChIds =  {863,868,297,927,80,873,1093,1094,527,528,721,722};
 //	private int twins[] = {1093,1094,527,528,721,722};
 //	private int crazy[] = {863,868,297};
 //	private int bad[] = {927,80,873};
 	
 	@Override
-	public float[] processSeries(float[] series) {
+	public double[] processSeries(double[] series) {
 		int roi = series.length / Constants.NUMBEROFPIXEL;
 		//copy the whole data intzo a new array. 
 		if(outputKey != null && !outputKey.equals("")) {	
-			nData = new float[series.length];
+			nData = new double[series.length];
 			for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
 				//if were looking at a badPixel
 				if(EventUtils.arrayContains(badChIds, pix)){
@@ -37,7 +37,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 					//iterate over all slices
 					for (int slice = 0; slice < roi; slice++) {
 						int pos = pix * roi + slice;
-						float avg = 0.0f; 
+						double avg = 0.0f; 
 						int numNeighbours = 0;
 						for(int nPix: currentNeighbors){
 							//if neighbour exists
@@ -47,7 +47,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 							}
 						}
 						//set value of current slice to average of surrounding pixels
-						nData[pos] = avg/(float)numNeighbours;
+						nData[pos] = avg/(double)numNeighbours;
 					}	
 				} 
 				else//not a bad pixel. just copy the data
@@ -67,7 +67,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 			for (int slice = 0; slice < roi; slice++) {
 				int pos = pix * roi + slice;
 				//temp save the current value
-				float avg = 0.0f; 
+				double avg = 0.0f; 
 				int numNeighbours = 0;
 				for(int nPix: currentNeighbors){
 					//if neighbour exists
@@ -77,7 +77,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<float[], float
 					}
 				}
 				//set value of current slice to average of surrounding pixels
-				series[pos] = avg/(float)numNeighbours;
+				series[pos] = avg/(double)numNeighbours;
 			}
 		}
 		return series;

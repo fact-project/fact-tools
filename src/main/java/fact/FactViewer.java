@@ -448,22 +448,22 @@ public class FactViewer extends JFrame {
 			// draw on hexmap. either calibrated or default data;
 			int roi = 300;
 			if (event.keySet().contains(Constants.DEFAULT_KEY_CALIBRATED)) {
-				camMap.setData((float[]) event
+				camMap.setData((double[]) event
 						.get(Constants.DEFAULT_KEY_CALIBRATED));
-				roi = ((float[]) event.get(Constants.DEFAULT_KEY_CALIBRATED)).length
+				roi = ((double[]) event.get(Constants.DEFAULT_KEY_CALIBRATED)).length
 						/ Constants.NUMBEROFPIXEL;
 				// also add average of all pixels to chartpanel
 				chartPanel.addSeries("Avg-" + Constants.DEFAULT_KEY_CALIBRATED,
 						camMap.getSliceAverages());
 
 			} else if (event.keySet().contains(Constants.DEFAULT_KEY)) {
-				float[] array;
+				double[] array;
 				try{
-					float[] rawData = (float[]) event.get(Constants.DEFAULT_KEY);
+					double[] rawData = (double[]) event.get(Constants.DEFAULT_KEY);
 					array = rawData;
 				} catch (ClassCastException e){
 					short[] rawshortData = (short[]) event.get(Constants.DEFAULT_KEY);
-					float[] rawfloatData = new float[rawshortData.length];
+					double[] rawfloatData = new double[rawshortData.length];
 					for (int i = 0; i < rawshortData.length; i++) {
 						rawfloatData[i] = rawshortData[i];
 					}

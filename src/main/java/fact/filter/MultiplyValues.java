@@ -13,16 +13,16 @@ import stream.annotations.Parameter;
  * 
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
-public class MultiplyValues extends SimpleFactEventProcessor<float[], float[]> {
+public class MultiplyValues extends SimpleFactEventProcessor<double[], double[]> {
 	static Logger log = LoggerFactory.getLogger(MultiplyValues.class);
 	
-	private float factor = -1;
+	private double factor = -1;
 
 
 	@Override
-	public float[] processSeries(float[] data) {
+	public double[] processSeries(double[] data) {
 
-		float[] arr = new float[data.length];
+		double[] arr = new double[data.length];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
@@ -40,11 +40,11 @@ public class MultiplyValues extends SimpleFactEventProcessor<float[], float[]> {
 	/*
 	 * Getter and setter
 	 */
-	public float getFactor() {
+	public double getFactor() {
 		return factor;
 	}
 	@Parameter(required = false, description = "The factor by which to multiply", defaultValue="-1")
-	public void setFactor(float threshold) {
+	public void setFactor(double threshold) {
 		this.factor = threshold;
 	}
 }

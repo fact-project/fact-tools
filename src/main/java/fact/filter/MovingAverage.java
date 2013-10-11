@@ -13,21 +13,21 @@ import fact.utils.SimpleFactEventProcessor;
  * 
  */
 @Description(group = "Fact Tools.Filter", text = "A simple running average")
-public class MovingAverage extends SimpleFactEventProcessor<float[],  float[]> {
+public class MovingAverage extends SimpleFactEventProcessor<double[],  double[]> {
 	
 	static Logger log = LoggerFactory.getLogger(MovingAverage.class);
 
 	private int length = 5;
 
 	@Override
-	public float[] processSeries(float[] data) {
+	public double[] processSeries(double[] data) {
 		if(length%2 == 0){
 			length++;
 			log.info("CentralMovingAverage only supports uneven window lengths. New length is: " + length);
 		}
 		int pivot = (int) (length/2.0);
-		float[] result;
-		result = new float[data.length];
+		double[] result;
+		result = new double[data.length];
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 
@@ -37,7 +37,7 @@ public class MovingAverage extends SimpleFactEventProcessor<float[],  float[]> {
 			int start = pix*roi;
 			int end = pix*roi + (roi-1);
 			
-			float sum = 0;
+			double sum = 0;
 			//iterate over window to get sma
 			for(int i = 0; i < pivot ; ++i){
 				sum += data[i];

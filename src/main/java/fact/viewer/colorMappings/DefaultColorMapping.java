@@ -17,8 +17,8 @@ public class DefaultColorMapping
 	implements ColorMapping 
 {
 	static Logger log = LoggerFactory.getLogger( DefaultColorMapping.class );
-	float scale = 1.0f;
-	float minValue, maxValue;
+	double scale = 1.0f;
+	double minValue, maxValue;
 	public DefaultColorMapping(){
 	}
 	
@@ -27,12 +27,12 @@ public class DefaultColorMapping
 	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Double)
 	 */
 	@Override
-	public Color map(float value, float min, float max) {
+	public Color map(double value, double min, double max) {
 		scale = (max - min);
 		if( scale == 0.0d )
 			scale = 1.0f;
 		
-		if(Float.isNaN(value)){
+		if(Double.isNaN(value)){
 			value = 0.0f;
 		}
 		//log.info( "Scaling {} with {}", v, scale );
@@ -41,14 +41,14 @@ public class DefaultColorMapping
 		//Double range = Math.PI / 3.0f * 2.0f;
 		//Double offset = Math.PI * 4.0f / 3.0f;
 		//Double scaled = offset - value * range;
-		float d = (float) (Math.PI + 0.25d * Math.PI * value);
-		float weight0 = value;
+		double d = (double) (Math.PI + 0.25d * Math.PI * value);
+		double  weight0 = value;
 		if( weight0 > 1.0f )
 			weight0 = 1.0f;
 		
 		if( weight0 < 0.0d )
 			weight0 = 0.0f;
-		return Color.getHSBColor(  d, 1.0f - value * value, 1.0f * (1.0f - value));
+		return Color.getHSBColor(  (float) d, (float) (1.0f - value * value) ,(float) (1.0f * (1.0f - value)));
 	}
 	
 

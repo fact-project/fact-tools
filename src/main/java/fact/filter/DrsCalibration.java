@@ -134,7 +134,10 @@ public class DrsCalibration implements Processor {
 			log.error(" data .fits file did not contain the value for the key " + key + ". cannot apply drscalibration");
 			return null;
 		}
-		float[] rawfloatData = new float[rawData.length];
+		
+		
+		double[] rawfloatData = new double[rawData.length];
+//		System.arraycopy(rawData, 0, rawfloatData, 0, rawData.length);
 		for (int i = 0; i < rawData.length; i++) {
 			rawfloatData[i] = rawData[i];
 		}
@@ -147,12 +150,12 @@ public class DrsCalibration implements Processor {
 		log.debug("raw data has {} elements", rawData.length);
 		log.debug("StartCellData has {} elements", startCell.length);
 
-		float[] output = rawfloatData;
+		double[] output = rawfloatData;
 		if (!key.equals(outputKey)) {
-			output = new float[rawData.length];
+			output = new double[rawData.length];
 		}
 
-		float[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
+		double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
 		data.put(outputKey, calibrated);
 
 		//add color value if set
@@ -164,11 +167,11 @@ public class DrsCalibration implements Processor {
 	}
 
 
-	public float[] applyDrsCalibration(float[] data, float[] destination,
+	public double[] applyDrsCalibration(double[] data, double[] destination,
 			short[] startCellVector) {
 
 		if (destination == null || destination.length != data.length)
-			destination = new float[data.length];
+			destination = new double[data.length];
 		int roi = data.length / 1440;
 
 		// We do not entirely know how the calibration constants, which are
@@ -237,8 +240,8 @@ public class DrsCalibration implements Processor {
 		// TrueValue[c][s] = ( RawValue[c][s] - Offset[c][ (c+t)%1024 ] ) /
 		// Gain[c][ (c+t)%1024 ] * 1907.35 - TriggerOffset[c][s]
 
-		float dconv = 2000.0f / 4096.0f;
-		float vraw;
+		double dconv = 2000.0f / 4096.0f;
+		double vraw;
 
 		int pos, offsetPos, triggerOffsetPos;
 		for (int pixel = 0; pixel < 1440; pixel++) {

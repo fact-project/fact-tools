@@ -10,13 +10,13 @@ import fact.Constants;
  *
  * @param <TOutput>
  */
-public abstract class SimpleFactPixelProcessor extends SimpleFactEventProcessor<float[], float[]> {
+public abstract class SimpleFactPixelProcessor extends SimpleFactEventProcessor<double[], double[]> {
 
 	@Override
-	public float[] processSeries(float[] data) {
+	public double[] processSeries(double[] data) {
 
 		int roi = data.length/Constants.NUMBEROFPIXEL;
-		float[] resultArray = new float[Constants.NUMBEROFPIXEL];
+		double[] resultArray = new double[Constants.NUMBEROFPIXEL];
 		
 		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; ++pix){
 			resultArray[pix] =  processPixel(Arrays.copyOfRange(data, pix*roi, (pix+1)*roi));
@@ -24,6 +24,6 @@ public abstract class SimpleFactPixelProcessor extends SimpleFactEventProcessor<
 		return resultArray;
 	}
 	//---has to be overwritten----//
-	public abstract float processPixel(float[] pixelData);
+	public abstract double processPixel(double[] pixelData);
 
 }

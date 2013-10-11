@@ -15,19 +15,19 @@ import fact.features.MaxAmplitudePosition;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class ExFit extends SimpleFactEventProcessor<float[], float[]> {
+public class ExFit extends SimpleFactEventProcessor<double[], double[]> {
 	
 	
 	@Override
-	public  float[] processSeries(float[] value) {
-		float[] data = (float[])value;
+	public  double[] processSeries(double[] value) {
+		double[] data = (double[])value;
 		int[] positions = new MaxAmplitudePosition().processSeries(data);
-		float[] amplitudes = new MaxAmplitude().processSeries(data);
+		double[] amplitudes = new MaxAmplitude().processSeries(data);
 					
 		
 // Iterieren ueber alle Pixel
 
-		float[] exF = new float[data.length];
+		double[] exF = new double[data.length];
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
@@ -43,24 +43,24 @@ public class ExFit extends SimpleFactEventProcessor<float[], float[]> {
 		return exF;
 	}
 	
-	private  float fit(int amplitudePos, float ampl, int slice, int roi) {
+	private  double fit(int amplitudePos, double ampl, int slice, int roi) {
 		float offset = 12;
 		float peakOffset = 3;
 		float tail =  40;
 		
 		if(amplitudePos - offset < 0) {
-			return 0.0f;
+			return 0.0;
 		}
 		if(slice < (amplitudePos - offset)){
-			return 0.0f;
+			return 0.0;
 		} else if(slice >= (amplitudePos -offset) && slice < (amplitudePos-peakOffset) ){
-			return (float) (ampl* (  Math.pow( Math.E ,(   (slice-(amplitudePos-offset))*(1/(offset))  )) -1 ) );
+			return (double) (ampl* (  Math.pow( Math.E ,(   (slice-(amplitudePos-offset))*(1/(offset))  )) -1 ) );
 		} else if(slice >= amplitudePos-peakOffset && slice < (amplitudePos+peakOffset) ){
-			return (float) (ampl - Math.pow((amplitudePos-slice),2.0));
+			return (double) (ampl - Math.pow((amplitudePos-slice),2.0));
 		} else if (slice >= amplitudePos +peakOffset){
-			return (float) (ampl* (  Math.pow( Math.E ,(   -(slice-amplitudePos)*(1/(tail))    ))));
+			return (double) (ampl* (  Math.pow( Math.E ,(   -(slice-amplitudePos)*(1/(tail))    ))));
 		}
-		return 0.0f; 
+		return 0.0; 
 		
 	}
 	

@@ -21,10 +21,10 @@ public class MaxAmplitude extends SimpleFactPixelProcessor{
 	private float maxValue = 3000;	
 	
 	@Override
-	public float processPixel(float[] pixelData) {
-		float tempMaxValue = 0;
+	public double processPixel(double[] pixelData) {
+		double tempMaxValue = 0;
 		for (int slice = 0; slice < pixelData.length; slice++) {
-			float value = pixelData[slice];
+			double value = pixelData[slice];
 			//update maxvalue and position if current value exceeds old value and is still below the threshold set by the user
 			if( value > tempMaxValue  && value <= maxValue && value >= minValue ){
 				tempMaxValue = value;

@@ -16,16 +16,16 @@ import stream.annotations.Description;
  * 
  */
 @Description(group = "Data Stream.FACT")
-public class SliceNormalization extends SimpleFactEventProcessor<float[], float[]> {
+public class SliceNormalization extends SimpleFactEventProcessor<double[], double[]> {
 
 	static Logger log = LoggerFactory.getLogger(SliceNormalization.class);
 
 	
-	public float[] processSeries(float[] value){
+	public double[] processSeries(double[] value){
 		log.debug("Normalizing image array (key: {})...");
 
-		float[] image =  value;
-		float[] normalizedSlices =  new float[image.length];
+		double[] image =  value;
+		double[] normalizedSlices =  new double[image.length];
 		
 		
 		int pixels = 1440;
@@ -33,15 +33,15 @@ public class SliceNormalization extends SimpleFactEventProcessor<float[], float[
 
 		
 		for (int pix = 0; pix < pixels; pix++) {
-			float min = Float.MAX_VALUE;
-			float max = Float.MIN_VALUE;
+			double min = Double.MAX_VALUE;
+			double max = Double.MIN_VALUE;
 			for (int slice = 0; slice < roi; slice++) {
 				int pos = pix * roi + slice;
 				min = Math.min(min, image[pos]);
 				max = Math.max(max, image[pos]);
 			}
 
-			float range = Math.abs(max) - Math.abs(min);
+			double range = Math.abs(max) - Math.abs(min);
 			
 			for (int slice = 0; slice < roi; slice++) {
 				int pos = pix * roi + slice;
