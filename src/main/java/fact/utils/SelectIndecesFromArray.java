@@ -23,19 +23,12 @@ public class SelectIndecesFromArray implements Processor{
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, key, Serializable.class)){
-			throw new RuntimeException("Key wasnt valid");
-		}
+		EventUtils.mapContainsKeys(getClass(), input, key, indices);
+
 		Serializable value = input.get(key);
 
 		int[] indexArray = null;
-		if(EventUtils.isKeyValid(input, indices, int[].class)){
-			indexArray = (int[]) input.get(indices);
-		} else if(EventUtils.isKeyValid(input, indices, Integer[].class)) {
-			indexArray = EventUtils.toIntArray((Integer[]) input.get(indices));
-		} else {
-			throw new RuntimeException("indices wasnt valid");
-		}
+		indexArray = (int[]) input.get(indices);
 		
 		double[] sAr = new double[indexArray.length];
 		

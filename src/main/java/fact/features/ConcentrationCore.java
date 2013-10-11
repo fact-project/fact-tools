@@ -14,88 +14,65 @@ import fact.viewer.ui.DefaultPixelMapping;
 
 
 public class ConcentrationCore implements Processor{
-
+	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
+	
 	@Override
 	public Data process(Data input)
 	{
 
-		if(!EventUtils.isKeyValid(input, cogX, Double.class))
-		{
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, cogY, Double.class))
-		{
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, delta, Double.class))
-		{
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, photonCharge, double[].class))
-		{
-			return null;
-		}		
-		if(!EventUtils.isKeyValid(input, showerPixel, int[].class))
-		{
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, length, Double.class))
-		{
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, width, Double.class))
-		{
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, size, Double.class))
-		{
-			return null;
-		}
+		EventUtils.mapContainsKeys(getClass(), input, cogX,cogY,delta,photonCharge,showerPixel,length,width,size);
 		
-		Double cogx = (Double) input.get(cogX);
-		Double cogy = (Double) input.get(cogY);
-		Double d = (Double) input.get(delta);
-		double [] photonChargeArray = (double[]) input.get(photonCharge);
-		int [] showerPixelArray = (int[]) input.get(showerPixel);
-		Double l = (Double) input.get(length);
-		Double w = (Double) input.get(width);
-		Double hillasSize = (Double) input.get(size);
-		
-		double c = Math.cos(d);
-		double s = Math.sin(d);
-		
-		double concCore = 0;
-		
-		for(int pix : showerPixelArray)
-		{
+		try{
+			Double cogx = (Double) input.get(cogX);
+			Double cogy = (Double) input.get(cogY);
+			Double d = (Double) input.get(delta);
+			double [] photonChargeArray = (double[]) input.get(photonCharge);
+			int [] showerPixelArray = (int[]) input.get(showerPixel);
+			Double l = (Double) input.get(length);
+			Double w = (Double) input.get(width);
+			Double hillasSize = (Double) input.get(size);
 			
-			double px = DefaultPixelMapping.getPosX(pix);
-			double py = DefaultPixelMapping.getPosY(pix);
+			double c = Math.cos(d);
+			double s = Math.sin(d);
 			
-			// short names adapted from mars code (change when understood)
+			double concCore = 0;
+			
+			for(int pix : showerPixelArray)
+			{
+				
+				double px = DefaultPixelMapping.getPosX(pix);
+				double py = DefaultPixelMapping.getPosY(pix);
+				
+				// short names adapted from mars code (change when understood)
 
-			double dx = px - cogx;
-			double dy = py - cogy;
-			
-			double dist0 = dx*dx + dy*dy;
-			
-			double dzx =  c * dx + s * dy;
-			double dzy = -s * dx + c * dy;
-			
-			double rl = 1/(l * l);
-			double rw = 1/(w * w);
-			double dz = pixelRadius * pixelRadius / 4;
+				double dx = px - cogx;
+				double dy = py - cogy;
+				
+				double dist0 = dx*dx + dy*dy;
+				
+				double dzx =  c * dx + s * dy;
+				double dzy = -s * dx + c * dy;
+				
+				double rl = 1/(l * l);
+				double rw = 1/(w * w);
+				double dz = pixelRadius * pixelRadius / 4;
 
-			double tana = dzy * dzy / (dzx * dzx);
-			double distr = (1+tana)/(rl + tana*rw);
+				double tana = dzy * dzy / (dzx * dzx);
+				double distr = (1+tana)/(rl + tana*rw);
+				
+				if (distr>dist0-dz || dzx==0)
+					 concCore += photonChargeArray[pix];
+				
+			}
+			concCore /= hillasSize;
+			input.put(outputKey, concCore);
+			return input;
 			
-			if (distr>dist0-dz || dzx==0)
-				 concCore += photonChargeArray[pix];
-			
+		} catch (ClassCastException e){
+			log.error("Could not cast the values to the right types");
+			throw e;
 		}
-		concCore /= hillasSize;
-		input.put(outputKey, concCore);
-		return input;
+
 	}
 	
 	public String getCogX() {
@@ -185,5 +162,4 @@ public class ConcentrationCore implements Processor{
 	
 	final private double pixelRadius = Constants.PIXEL_SIZE;
 	
-	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 }

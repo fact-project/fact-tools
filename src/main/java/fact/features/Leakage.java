@@ -17,13 +17,7 @@ public class Leakage implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		
-		if(!(	EventUtils.isKeyValid(input, shower, int[].class)
-				&& EventUtils.isKeyValid(input, weights, double[].class)
-				)){
-			log.error("invalid key");
-			return null;
-		}
+		EventUtils.mapContainsKeys(getClass(), input, shower, weights);
 	
 		int[] 	showerPixel = (int[])input.get(shower);
 		double[] photonCharge = (double[]) input.get(weights);

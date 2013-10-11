@@ -21,14 +21,8 @@ public class Size implements Processor {
 	@Override
 	public Data process(Data input) {
 
-		if(!EventUtils.isKeyValid(input, showerKey, int[].class)){
-			return null;
-		}
+		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
 		
-		if(!EventUtils.isKeyValid(input, photonChargeKey, double[].class)){
-			return null;
-		}
-
 		int[] shower 	= (int[])input.get(showerKey);
 		double[] charge 	= (double[])input.get(photonChargeKey);
 		
