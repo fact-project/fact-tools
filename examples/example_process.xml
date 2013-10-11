@@ -16,7 +16,7 @@
 <!-- <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" /> -->
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${sample}"  />
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
@@ -51,8 +51,11 @@
 			<fact.utils.SelectIndecesFromArray key="pos" indices="shower" outputKey="showerPos" />
 			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
 			
-			<stream.io.CsvWriter keys="chargeMean,showerPhotonChargeMean,posMean,showerPositionMean,size,length,width" url="file:${outfile}" />
-
+			<fact.image.monitors.HistogramTest key="showerPositionMean" binWidth="1" logAxis="false" />
+			
+<!-- 			<stream.io.CsvWriter keys="chargeMean,showerPhotonChargeMean,posMean,showerPositionMean,size,length,width" url="file:${outfile}" /> -->
+			        <fact.image.ShowImage/>
+			
 			<stream.monitor.DataRate every="100" />
 	</process>
 		
