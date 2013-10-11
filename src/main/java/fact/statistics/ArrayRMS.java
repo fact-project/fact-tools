@@ -22,8 +22,7 @@ public class ArrayRMS implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, key, Serializable.class)) return null;
-		
+		EventUtils.isKeyValid(getClass(), input, key, Double[].class);
 		Serializable data = input.get(key);
 		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(EventUtils.toDoubleArray(data));
 		

@@ -22,13 +22,17 @@ public class ArrayMean implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, key, Serializable.class)) return null;
+		if(input.containsKey(key)){
+			Serializable data = input.get(key);
+			DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(EventUtils.toDoubleArray(data));
+			
+			input.put(outputKey , descriptiveStatistics.getMean());
+			return input;
+		} else {
+			throw new RuntimeException("Key not found in event. "  + key  );
+		}
 		
-		Serializable data = input.get(key);
-		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(EventUtils.toDoubleArray(data));
 		
-		input.put(outputKey , descriptiveStatistics.getMean());
-		return input;
 	}
 
 	
