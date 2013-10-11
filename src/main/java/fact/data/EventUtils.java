@@ -180,7 +180,9 @@ public class EventUtils {
 			return null;
 		}
 	}
-	
+//	public static void mapContainsKeysWithTypes(Class<?> caller, Data item, Class<?>[] types,    String... keys ){
+//		
+//	}
 	public static void mapContainsKeys(Class<?> caller, Data item,  String... keys ){
 		ArrayList<String> e = new ArrayList<String>();
 		boolean isValid = true;
@@ -200,26 +202,20 @@ public class EventUtils {
 		}
 	}
 	
-	public static boolean isKeyValid(Data item, String key, Class<?> cl){
+	public static void isKeyValid(Class<?> caller, Data item, String key, Class<?> cl){
 		if(key == null || key.equals("")){
 			log.error("Key was empty");
-			return false;
 		}
 		if(!item.containsKey(key)){
 			log.error("Data does not contain the key " + key);
-			return false;
+			throw new RuntimeException("Did not find key "+  key + "  in the event. For processor:  " + caller.getName());
 		}
 		try{
-			Object value  = cl.cast( item.get(key));
-			if(value ==  null){
-				log.error("The value with the key" + key  + " is null");
-				return false;
-			}
+			cl.cast( item.get(key));
 		} catch (ClassCastException e){
-			log.error("The value for the key " + key + " cannot be cast to " + cl.getSimpleName());
-			return false;
+			log.error("The value for the key " + key + " cannot be cast to " + cl.getSimpleName() + " for processor: " + caller.getName());
+			throw e;
 		}
-		return true;
 	}
 	
 }
