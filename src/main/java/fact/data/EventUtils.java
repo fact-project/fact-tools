@@ -181,6 +181,25 @@ public class EventUtils {
 		}
 	}
 	
+	public static void mapContainsKeys(Class<?> caller, Data item,  String... keys ){
+		ArrayList<String> e = new ArrayList<String>();
+		boolean isValid = true;
+		for(String key : keys){
+			if(!item.containsKey(key)){
+				isValid = false;
+				e.add(key);
+			}
+		}
+		if(!isValid){
+			StringBuilder b = new StringBuilder();
+			for(String er: e){
+				b.append(er);
+				b.append("\n");
+			}
+			throw new RuntimeException("Missing keys for processor " + caller.getSimpleName() + ":  " +b.toString() );
+		}
+	}
+	
 	public static boolean isKeyValid(Data item, String key, Class<?> cl){
 		if(key == null || key.equals("")){
 			log.error("Key was empty");
