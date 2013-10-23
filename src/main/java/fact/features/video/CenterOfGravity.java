@@ -62,6 +62,7 @@ public class CenterOfGravity implements Processor
 		cogVelocityX = new double[sliceCount - 1];
 		cogVelocityY = new double[sliceCount - 1];
 		cogVelocity = new double[sliceCount - 1];
+		cogVelocityError = new double[sliceCount - 1];
 		
 		size = new double[sliceCount];
 		
@@ -109,9 +110,16 @@ public class CenterOfGravity implements Processor
 		    // Calculate velocities on the fly
 			if (slice > 0)
 			{
-				cogVelocityX[slice - 1] = (cogx[slice] - cogx[slice-1]) / 0.5f;
-				cogVelocityY[slice - 1] = (cogy[slice] - cogy[slice-1]) / 0.5f;
-				cogVelocity[slice -1] = (float) Math.sqrt(cogVelocityX[slice-1]*cogVelocityX[slice-1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]);
+				cogVelocityX[slice - 1] = (cogx[slice] - cogx[slice - 1]) / 0.5f;
+				cogVelocityY[slice - 1] = (cogy[slice] - cogy[slice - 1]) / 0.5f;
+				cogVelocity[slice - 1] = (double) Math.sqrt(cogVelocityX[slice - 1]*cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]);
+				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogx[slice] * varcogx[slice] + varcogx[slice - 1] * varcogx[slice - 1]);
+				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogy[slice] * varcogy[slice] + varcogy[slice - 1] * varcogy[slice - 1]);
+				cogVelocityError[slice - 1] = Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
+														cogVelocityXError[slice - 1] * cogVelocityXError[slice - 1] +
+														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
+														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
+														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
 			}
 		}
 		
@@ -126,6 +134,7 @@ public class CenterOfGravity implements Processor
 		input.put(outputKey + "_VelY", cogVelocityY);
 		
 		input.put(outputKey + "_Vel", cogVelocity);
+		input.put(outputKey + "_VelErr", cogVelocityError);
 		
 		return input;
 	}
@@ -190,10 +199,13 @@ public class CenterOfGravity implements Processor
 	private double[] covcog = null;
 
 	// Velocity of COG of showerPixel
-	private double[] cogVelocityX;
-	private double[] cogVelocityY;
-	private double[] cogVelocity;
-	
+	private double[] cogVelocityX = null;
+	private double[] cogVelocityY = null;
+	private double[] cogVelocity = null;
+
+	private double[] cogVelocityXError = null;
+	private double[] cogVelocityYError = null;
+	private double[] cogVelocityError = null;
 	
 	private String outputKey;
 	
