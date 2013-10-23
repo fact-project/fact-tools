@@ -6,14 +6,28 @@ import java.util.LinkedList;
 
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
-
+import fact.data.EventUtils;
+/**
+ * This processor gathers all start and stopcells from the \"limit\" {@link #getLimit()} previous events. 
+ * To identify a jump at a certain position it looks at the mean value of all pixels and checks the value 
+ * to the left and to the right of the given position and calculates the difference. {@link #jumpHeight(int slice, int roi ,int  offset,  float[] data)  jumpHeight}
+ * If this \"jump\" is higher than the threshold {@link #getThreshold()} its going to be corrected.
+ *  
+ *  <b>Disclaimer!</b> This should be tested further. One observation I made is that a higher value for \"limit\" 
+ *  seems to produce worse results.
+ * 
+ * @author bruegge
+ */
 public class AverageJumpRemoval implements Processor{
-
+	static Logger log = LoggerFactory.getLogger(AverageJumpRemoval.class);
+	
 	LinkedList<short[]> previousStartCells = new LinkedList<short[]>();
 	LinkedList<short[]> previousStopCells = new LinkedList<short[]>();
 
@@ -33,11 +47,18 @@ public class AverageJumpRemoval implements Processor{
 	@Override
 	public Data process(Data input) {
 
+		EventUtils.mapContainsKeys(this.getClass(), input, "UnixTimeUTC",key, "NROI");
+		int[] eventTime;
+		double[] data;
+		Integer length;
 		//save the time differnce betwwen the current and the last event nad put it in hte map
-		int[] eventTime = (int[]) input.get("UnixTimeUTC");
-		if(eventTime == null){
-			Log.error("The key \"UnixTimeUTC \" was not found in the event.");
-			return null;
+		try{
+			eventTime = (int[]) input.get("UnixTimeUTC");
+			data = (double[]) input.get(key);
+			length = (Integer) input.get("NROI");
+		} catch (ClassCastException e){
+			log.error("Could not cast types." );
+			throw e;
 		}
 
 		long  time = ((long)eventTime[0])*1000000  + ( ((long)eventTime[1]) ) ; 
@@ -47,9 +68,7 @@ public class AverageJumpRemoval implements Processor{
 
 
 		//check rois and wether the cutslice operator wrote the right labels into the map
-		float[] data = (float[]) input.get(key);
 		int roi = data.length/Constants.NUMBEROFPIXEL;
-		int length = (Integer) input.get("NROI");
 		int start = 0;
 		int end = 300;
 		if(input.containsKey("@start" + key) && input.containsKey("@end" + key)){
@@ -69,7 +88,7 @@ public class AverageJumpRemoval implements Processor{
 		}
 
 
-		float[] result = new float[data.length];
+		double[] result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
 
 		Color co = Color.decode(color);

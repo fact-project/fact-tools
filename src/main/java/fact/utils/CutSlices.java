@@ -52,13 +52,14 @@ public class CutSlices implements Processor {
 					System.arraycopy(original, pix * oldRoi + start,
 							result, pix * newRoi, newRoi);
 				}
+				log.debug("Old array length: " + original.length + " new array length: " + result.length);
 				data.put(outputKey, result);
 				data.put("@start" + key, start);
 				data.put("@end" + key, start);
 
 			} catch(ClassCastException e){
 				log.error("The key " + key + " does not refer to a double array." );
-				throw new RuntimeException("This is not a double[]");
+				throw e;
 			}
 		}
 		return data;

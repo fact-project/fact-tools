@@ -20,13 +20,8 @@ public class SizeInInterval implements Processor {
 	@Override
 	public Data process(Data input) {
 
-		if(!EventUtils.isKeyValid(input, showerKey, int[].class)){
-			return null;
-		}
-		if(!EventUtils.isKeyValid(input, photonChargeKey, float[].class)){
-			return null;
-		}
-
+		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
+		
 		int[] shower 	= (int[])input.get(showerKey);
 		float[] charge 	= (float[])input.get(photonChargeKey);
 		

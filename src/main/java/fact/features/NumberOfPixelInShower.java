@@ -14,9 +14,7 @@ public class NumberOfPixelInShower implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, showerKey, int[].class)){
-			return null;
-		}
+		EventUtils.isKeyValid(getClass(),input, showerKey, int[].class);
 	
 		int[] shower = (int[]) input.get(showerKey);
 	    input.put(outputKey, shower.length);

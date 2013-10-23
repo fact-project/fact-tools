@@ -22,28 +22,23 @@ public class HillasDistance implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		if(!(	EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)
-				&& EventUtils.isKeyValid(input, sourcePosition, double[].class)
-				)){
-			log.error("invalid key");
-			return null;
-		}
-		
+		EventUtils.mapContainsKeys(getClass(), input, distribution, sourcePosition);
+
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 		double[] source  = (double[]) input.get(sourcePosition);
-		
+
 		double x = source[0];
 		double y = source[1];
 
 		input.put(outputKey, 
 				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
-		        + (dist.getCenterX() - x) * (dist.getCenterX() - x) )
-		        );
+						+ (dist.getCenterX() - x) * (dist.getCenterX() - x) )
+				);
 		return input;
 	}
 
-	
-	
+
+
 	public String getDistribution() {
 		return distribution;
 	}

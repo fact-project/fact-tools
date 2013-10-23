@@ -41,17 +41,16 @@ public class PhotonCharge implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, positions, int[].class)){
-			log.error("Position data not found in data map.");
-			throw new RuntimeException("Position data not found in data map.");
+		EventUtils.mapContainsKeys(getClass(), input, positions, key);
+		int[] posArray;
+		double[] data;
+		try{
+			posArray = (int[]) input.get(positions);
+			data = (double[]) input.get(key);
+		} catch (ClassCastException e){
+			log.error("Could not cast types." );
+			throw e;
 		}
-		int[] posArray = (int[]) input.get(positions);
-		
-		if(!EventUtils.isKeyValid(input, key, double[].class)){
-			log.error("Key to data not found in data map.");
-			throw new RuntimeException();
-		}
-		double[] data = (double[]) input.get(key);
 		
 		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];

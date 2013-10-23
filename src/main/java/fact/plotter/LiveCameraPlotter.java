@@ -1,4 +1,4 @@
-package fact.image.monitors;
+package fact.plotter;
 
 import java.awt.BorderLayout;
 import java.util.LinkedHashMap;
@@ -15,7 +15,7 @@ import stream.plotter.DataVisualizer;
 import fact.viewer.ui.MapView;
 
 public class LiveCameraPlotter extends DataVisualizer  {
-	static Logger log = LoggerFactory.getLogger(AverageBarPlotter.class);
+	static Logger log = LoggerFactory.getLogger(LiveCameraPlotter.class);
 	JFrame frame;
 	LinkedHashMap<String, double[]> valueMap = new LinkedHashMap<String , double[]>();
 	//this map contains counters that count the number of vales that have arrived for every key

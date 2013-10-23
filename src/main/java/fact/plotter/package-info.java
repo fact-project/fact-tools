@@ -8,5 +8,4 @@
 * Most plotters in this package extend the__DataVisualizer__class from the Streams-Framework and rely on the __JFreeChart__ library for graphical output.
 * </PRE>
 */
-@Deprecated
-package fact.image.monitors;
+package fact.plotter;

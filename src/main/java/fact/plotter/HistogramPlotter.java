@@ -1,4 +1,4 @@
-package fact.image.monitors;
+package fact.plotter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,30 +26,29 @@ import fact.data.EventUtils;
 
 /**
  * 
- * This plotter takes an int[] and interprets its values as a histogram. Meaning every entry in the array is a dimensionless counter for something.
- * 
+ * This plotter class needs only two parameters. The binWidth and the key to the data.
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class HistogramTest extends DataVisualizer {
-	static Logger log = LoggerFactory.getLogger(HistogramTest.class);
+public class HistogramPlotter extends DataVisualizer {
+	static Logger log = LoggerFactory.getLogger(HistogramPlotter.class);
 	JFrame frame;
 
 	private boolean keepOpen = true;
 	private String key;
 
 	private double binWidth = 0.5f;
-	
+
 	private boolean logAxis = false;
 
 	private SimpleHistogramDataset dataset;
-	private String title;
+	private String title = "Histogram";
 	private String color = "#666699";
 	private JFreeChart chart;
-	private int counter = 0;
+	private long counter = 0;
 
-	public HistogramTest() {
+	public HistogramPlotter() {
 		width = 690;
 		height = 460;
 	}
@@ -59,35 +58,35 @@ public class HistogramTest extends DataVisualizer {
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
-		
-	    dataset = new SimpleHistogramDataset(key);
-	   
-	    chart = ChartFactory.createHistogram(
-	              "Histogram",
-	              key,
-	              "#",
-	              dataset,
-	              PlotOrientation.VERTICAL,
-	              true,
-	              true,
-	              false
-	          );
 
-	    chart.setBackgroundPaint(new Color(230,230,230));
-	    XYPlot xyplot = (XYPlot)chart.getPlot();
+		dataset = new SimpleHistogramDataset(key);
+
+		chart = ChartFactory.createHistogram(
+				title,
+				key,
+				"#",
+				dataset,
+				PlotOrientation.VERTICAL,
+				true,
+				true,
+				false
+				);
+
+		chart.setBackgroundPaint(new Color(230,230,230));
+		XYPlot xyplot = (XYPlot)chart.getPlot();
 		if(logAxis)
 			xyplot.setRangeAxis(new LogarithmicAxis("#"));
 
 		chart.setTitle(title);
-	    xyplot.setForegroundAlpha(0.7F);
-	    xyplot.setBackgroundPaint(Color.WHITE);
-	    xyplot.setDomainGridlinePaint(new Color(150,150,150));
-	    xyplot.setRangeGridlinePaint(new Color(150,150,150));
-	    XYBarRenderer xybarrenderer = (XYBarRenderer)xyplot.getRenderer();
-	    xybarrenderer.setShadowVisible(false);
-	    xybarrenderer.setBarPainter(new StandardXYBarPainter());
-//	    xybarrenderer.setDrawBarOutline(false);
-	    
+		xyplot.setForegroundAlpha(0.7F);
+		xyplot.setBackgroundPaint(Color.WHITE);
+		xyplot.setDomainGridlinePaint(new Color(150,150,150));
+		xyplot.setRangeGridlinePaint(new Color(150,150,150));
+		XYBarRenderer xybarrenderer = (XYBarRenderer)xyplot.getRenderer();
+		xybarrenderer.setShadowVisible(false);
+		xybarrenderer.setBarPainter(new StandardXYBarPainter());
+		//	    xybarrenderer.setDrawBarOutline(false);
+
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
@@ -98,40 +97,46 @@ public class HistogramTest extends DataVisualizer {
 
 	@Override
 	public Data processMatchingData(Data data) {
-		if(getKey()==null){
-			log.warn("No keys specified for HistogramPLotter");
-			return null;
+//		EventUtils.isKeyValid(getClass(), data, key, Double.class);
+		double v = 0;
+		if(data.containsKey(key)){
+			v = EventUtils.valueToDouble(data.get(key));
+		} else {
+			throw new RuntimeException("Key not found in event. "  + key  );
 		}
-
-		if(  EventUtils.isKeyValid(data, key, Double.class)){
-			double v = (Double) data.get(key);
+		if(Double.isNaN(v)){
+			log.warn("This doesnt handle NaNs very well.");
+		}
+		try{
+			dataset.addObservation(v);
+			chart.setTitle(title + " " + key + "    " + counter++ + " entries");
+		} catch(RuntimeException e ) {
+			//log.debug("RuntimeException while trying to add observation. Probably a missing bin for the value. Trying to create a new bin");
+			SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth, true, false);
 			try{
-				dataset.addObservation(v);
-				chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
-			} catch(RuntimeException e ) {
-				
-				SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth, false, false);
 				dataset.addBin(bin);
 				dataset.addObservation(v);
 				chart.setTitle("Histogram " + key + "    " + counter++ + " entries");
+			} catch (Exception ee){
+				log.warn("Overlapping bin");
 			}
-		} 
+		}
 		//else if ( EventUtils.isKeyValid(data, key, Double.class) ) {
-			//dataset.addObservation(((Double) data.get(key)).floatValue());
+		//dataset.addObservation(((Double) data.get(key)).floatValue());
 		//}
-		
+
 		//dataset.addObservations(EventUtils.toDoubleArray(data.get(key)));
-//		try{
-//			if (data.containsKey(key)) {
-//				int[] hist = (int[]) data.get(key);
-//				binSize = max/(hist.length);
-//				fillDataSet(hist);
-//				xyplot.getDomainAxis().setRange(min - binSize, max + binSize);
-//			}
-//		} catch (ClassCastException e){
-//			log.error("Key did not refer to an int array");
-//			return null;
-//		}
+		//		try{
+		//			if (data.containsKey(key)) {
+		//				int[] hist = (int[]) data.get(key);
+		//				binSize = max/(hist.length);
+		//				fillDataSet(hist);
+		//				xyplot.getDomainAxis().setRange(min - binSize, max + binSize);
+		//			}
+		//		} catch (ClassCastException e){
+		//			log.error("Key did not refer to an int array");
+		//			return null;
+		//		}
 		return data;
 	}
 
@@ -168,11 +173,12 @@ public class HistogramTest extends DataVisualizer {
 	}
 
 
-	
+
 
 	public boolean isLogAxis() {
 		return logAxis;
 	}
+	@Parameter(required = false, description = "Flag to indicate wether the y-Axis should be in logarithmic units")
 	public void setLogAxis(boolean logAxis) {
 		this.logAxis = logAxis;
 	}
