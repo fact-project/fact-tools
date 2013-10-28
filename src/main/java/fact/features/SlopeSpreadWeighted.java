@@ -13,7 +13,7 @@ import fact.viewer.ui.DefaultPixelMapping;
 
 public class SlopeSpreadWeighted implements Processor
 {
-
+	@Override
 	public Data process(Data input)
 	{
 	    
@@ -122,7 +122,7 @@ public class SlopeSpreadWeighted implements Processor
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(required = true, defaultValue = "extHillas", description = "Key prefix for output values.")
+	@Parameter(required = true, defaultValue = "SlopeSpreadWeighted", description = "Key prefix for output values.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
