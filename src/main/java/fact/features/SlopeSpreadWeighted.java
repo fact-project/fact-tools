@@ -7,6 +7,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
+import fact.data.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
 
 
@@ -15,9 +16,15 @@ public class SlopeSpreadWeighted implements Processor
 
 	public Data process(Data input)
 	{
-	    mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
-	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
+	    // load input out of hashmap
+		EventUtils.mapContainsKeys(getClass(), input, showerPixel, photonCharge, arrivalTime, hillasDelta);
+	    
+		showerPixelArray = (int[]) input.get(showerPixel);
+		photonChargeArray = (double[]) input.get(photonCharge);
+		arrivalTimeArray = (double[]) input.get(arrivalTime);
+		hillasDeltaValue = (Double) input.get(hillasDelta);
+		
 	    // input values
 	    int num = showerPixelArray.length;
 	    double[] x = new double[num]; // x position rotated by delta
@@ -68,12 +75,58 @@ public class SlopeSpreadWeighted implements Processor
 	    	return input;
 	    }
 	    
+	    input.put(outputKey + "_slopeSpread", slopeSpread);
+	    input.put(outputKey + "_slopeSpreadWeighted", slopeSpreadWeighted);	    
+	    input.put(outputKey + "_timeSpread", timeSpread);
+	    input.put(outputKey + "_timeSpreadWeighted", timeSpreadWeighted);
+	    input.put(outputKey + "_slopeTrans", slopeTrans);
 		return input;
 	}
 
-	private float[] mpGeomXCoord;
-	private float[] mpGeomYCoord;
+	public String getShowerPixel() {
+		return showerPixel;
+	}
 	
+	@Parameter(required = true, defaultValue = "showerPixel", description = "Key of array containing showerpixel chids.")
+	public void setShowerPixel(String showerPixel) {
+		this.showerPixel = showerPixel;
+	}
+
+	public String getArrivalTime() {
+		return arrivalTime;
+	}
+	
+	@Parameter(required = true, defaultValue = "arrivalTime", description = "Key of array containing extracted arrivaltimes for each pixel.")
+	public void setArrivalTime(String arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+	public String getPhotonCharge() {
+		return photonCharge;
+	}
+	
+	@Parameter(required = true, defaultValue = "photoncharge", description = "Key of array containing the extracted photoncharge for each pixel.")
+	public void setPhotonCharge(String photonCharge) {
+		this.photonCharge = photonCharge;
+	}
+
+	public String getHillasDelta() {
+		return hillasDelta;
+	}
+	
+	@Parameter(required = true, defaultValue = "Hillas_delta", description = "Key of the extracted Hillas_delta angle (Double value).")
+	public void setHillasDelta(String hillasDelta) {
+		this.hillasDelta = hillasDelta;
+	}
+	
+	public String getOutputKey() {
+		return outputKey;
+	}
+	@Parameter(required = true, defaultValue = "extHillas", description = "Key prefix for output values.")
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
 	private String showerPixel;
 	private int[] showerPixelArray; // chids
 	private String arrivalTime;
@@ -82,6 +135,8 @@ public class SlopeSpreadWeighted implements Processor
 	private double[] photonChargeArray;
 	private String hillasDelta;
 	private Double hillasDeltaValue;
+	
+	private String outputKey;
 	
 	/**
 	 * Sum up array
