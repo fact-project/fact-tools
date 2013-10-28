@@ -66,6 +66,11 @@ public class CenterOfGravity implements Processor
 		
 		size = new double[sliceCount];
 		
+		double minimalVelocity; // minimal velocity of all slices
+		double maximalVelocity; // maximal velocity of all slices
+		double bestVelocity; // velocity with minimal "error"
+		double bestVelocityError; // the corresponding "error"
+		
 		// Baseline correction
 		eventBaseline = 0.0f;
 		for(int pix : showerPixelArray)
