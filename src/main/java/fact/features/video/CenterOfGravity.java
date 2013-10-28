@@ -71,6 +71,9 @@ public class CenterOfGravity implements Processor
 		double bestVelocity; // velocity with minimal "error"
 		double bestVelocityError; // the corresponding "error"
 		
+		// not sure with this yet...
+		// double arrivalTimeVelocity; // velocity at extracted arrivaltime
+		
 		// Baseline correction
 		eventBaseline = 0.0f;
 		for(int pix : showerPixelArray)
