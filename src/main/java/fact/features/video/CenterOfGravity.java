@@ -8,6 +8,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
+import fact.data.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
 
 
@@ -25,6 +26,8 @@ public class CenterOfGravity implements Processor
 	    mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
 	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
+	    // check keys
+		EventUtils.mapContainsKeys(getClass(), input, showerPixel, dataCalibrated);
 		/// get input
 		try
 		{
@@ -66,13 +69,14 @@ public class CenterOfGravity implements Processor
 		
 		size = new double[sliceCount];
 		
-		double minimalVelocity; // minimal velocity of all slices
-		double maximalVelocity; // maximal velocity of all slices
-		double bestVelocity; // velocity with minimal "error"
-		double bestVelocityError; // the corresponding "error"
+		double minimalVelocity = Double.MAX_VALUE; // minimal velocity of all slices
+		int minimalVelocityId = 0;
+		double maximalVelocity = Double.MIN_VALUE; // maximal velocity of all slices
+		int maximalVelocityId = 0;
+		double bestVelocity = 0; // velocity with minimal "error"
+		int bestVelocityId = 0;
+		double bestVelocityError = Double.MAX_VALUE; // the corresponding "error"
 		
-		// not sure with this yet...
-		// double arrivalTimeVelocity; // velocity at extracted arrivaltime
 		
 		// Baseline correction
 		eventBaseline = 0.0f;
@@ -95,8 +99,8 @@ public class CenterOfGravity implements Processor
 			// Calculate COGs
 			for(int pix : showerPixelArray)
 			{
-				
-				size[slice] += dataCalibratedArray[pix * sliceCount + slice] + eventBaseline ;
+				//TODO insert rotate by hillas_delta switch
+				size[slice] += dataCalibratedArray[pix * sliceCount + slice] + eventBaseline;
 				cogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * mpGeomXCoord[pix];
 				cogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * mpGeomYCoord[pix];
 				
@@ -115,6 +119,8 @@ public class CenterOfGravity implements Processor
 			varcogy[slice] /= size[slice];
 			covcog[slice] /= size[slice];
 
+			
+			
 		    // Calculate velocities on the fly
 			if (slice > 0)
 			{
@@ -128,8 +134,27 @@ public class CenterOfGravity implements Processor
 														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
 														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
 														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
+			
+				if (cogVelocity[slice - 1] < minimalVelocity)
+				{
+					minimalVelocity = cogVelocity[slice - 1];
+					minimalVelocityId = slice - 1;
+				}
+				if(cogVelocity[slice - 1] > maximalVelocity)
+				{
+					maximalVelocity = cogVelocity[slice - 1];
+					maximalVelocityId = slice - 1;
+				}
+				if(cogVelocityError[slice - 1] < bestVelocityError)
+				{
+					bestVelocityError = cogVelocityError[slice - 1];
+					bestVelocity = cogVelocity[slice - 1];
+					bestVelocityId = slice - 1;
+				}
+			
 			}
 		}
+		
 		
 		input.put(outputKey + "_X", cogx);
 		input.put(outputKey + "_Y", cogy);
@@ -144,6 +169,16 @@ public class CenterOfGravity implements Processor
 		input.put(outputKey + "_Vel", cogVelocity);
 		input.put(outputKey + "_VelErr", cogVelocityError);
 		
+		input.put(outputKey + "_MinVel", minimalVelocity);
+		input.put(outputKey + "_MinVelId", minimalVelocityId);
+		
+		input.put(outputKey + "_MaxVel", maximalVelocity);
+		input.put(outputKey + "_MaxVelId", maximalVelocityId);
+		
+		input.put(outputKey + "_BestVel", bestVelocity);
+		input.put(outputKey + "_BestVelError", bestVelocityError);
+		input.put(outputKey + "_BestVelId", bestVelocityId);
+		
 		return input;
 	}
 
@@ -151,7 +186,7 @@ public class CenterOfGravity implements Processor
 		return showerPixel;
 	}
 	
-	@Parameter(required = true, defaultValue = "showerPixel", description = "Key to the array of showerpixel Chids.")
+	@Parameter(required = true, defaultValue = "showerPixel", description = "Key to the array of showerpixel chids.")
 	public void setShowerPixel(String showerPixel) {
 		this.showerPixel = showerPixel;
 	}

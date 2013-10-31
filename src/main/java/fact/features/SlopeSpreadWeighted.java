@@ -80,6 +80,7 @@ public class SlopeSpreadWeighted implements Processor
 	    input.put(outputKey + "_timeSpread", timeSpread);
 	    input.put(outputKey + "_timeSpreadWeighted", timeSpreadWeighted);
 	    input.put(outputKey + "_slopeTrans", slopeTrans);
+	    input.put(outputKey + "_slopeLong", slopeLong);
 		return input;
 	}
 
