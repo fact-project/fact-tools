@@ -16,31 +16,48 @@
 <!-- <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" /> -->
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${sample}"  />
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}"  />
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
 			<Skip condition="%{data.TriggerType} != 4" />
 	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
-            <fact.utils.CutSlices  start="22" end="220"/>
+            <fact.utils.CutSlices  start="22" end="220" outputKey="DataCalibrated"/>
             <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/>
             
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
-            <fact.features.RisingEdge key="DataCalibrated" outputKey="pos" />
+            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
+            <fact.features.RisingEdge key="DataCalibrated" outputKey="risingedge"/>
+            
+            
+            <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+	        <fact.features.PhotonCharge key="DataCalibrated"  positions="risingedge" outputKey="photoncharge" color="#FF0F0F"/>
+	        <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
+	            
+	        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
+	
+	        <stream.flow.Skip condition="%{data.shower} == null" />
+	        
+	        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+            
+			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+<!--             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="position" /> -->
+<!--             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="showerTime" keyPositions="position" timeThreshold="20" /> -->
+               
+<!-- 			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" /> -->
+	
+<!-- 		<fact.processors.parfact.RemoveSpikesMars /> -->
+<!-- 		<fact.processors.RemoveJumps key="DataCalibrated" outputKey="jumpsRemoved" /> -->
+<!-- 		<fact.processors.parfact.CalculatePhotonCharge key="smooth" outputKey="s" /> -->
+<!-- 		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="c" /> -->
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+<!-- 		<fact.statistics.CreateHistogram key="risingedge" min="0" max="197" numberOfBins="198" outputKey="risingH"/> -->
+<!-- 		<fact.statistics.CreateHistogram key="position" min="0" max="197" numberOfBins="198" outputKey="positionH"/> -->
 
-            <fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" positions="pos" color="#FF0F0F"/>
-            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="pos" timeThreshold="30"  minNumberOfPixel="2"/>
-			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
-			
-			<fact.features.HillasLength distribution="dist" outputKey="length" />
-			<fact.features.HillasWidth distribution="dist" outputKey="width" />
-			<fact.features.HillasConcentration shower="shower" weights="photoncharge" outputKey="concentration" />
-			<fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="size" />
-
-            <fact.statistics.ArrayMean key="pos" outputKey="posMean" />
+            <fact.statistics.ArrayMean key="risingedge" outputKey="posMean" />
 			<fact.statistics.ArrayMean key="photoncharge" outputKey="chargeMean" />
 <!-- 			<fact.image.monitors.HistogramTest key="chargeMean" binWidth="0.05" logAxis="true" /> -->
 <!-- 			<fact.image.monitors.HistogramTest key="posMean" binWidth="1" logAxis="false" /> -->
@@ -48,11 +65,15 @@
 			<fact.utils.SelectIndecesFromArray key="photoncharge" indices="shower" outputKey="showerPhoton" />
 			<fact.statistics.ArrayMean key="showerPhoton" outputKey="showerPhotonChargeMean" />
 			
-			<fact.utils.SelectIndecesFromArray key="pos" indices="shower" outputKey="showerPos" />
+			<fact.utils.SelectIndecesFromArray key="risingedge" indices="shower" outputKey="showerPos" />
 			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
 			
-			<stream.io.CsvWriter keys="chargeMean,showerPhotonChargeMean,posMean,showerPositionMean,size,length,width" url="file:${outfile}" />
-
+			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" />
+			<fact.plotter.ShowerCameraPlotter key="DataCalibrated" showerKey="shower" />
+			<fact.plotter.LiveCameraPlotter key="DataCalibrated"  />
+<!-- 			<stream.io.CsvWriter keys="chargeMean,showerPhotonChargeMean,posMean,showerPositionMean,size,length,width" url="file:${outfile}" /> -->
+<!-- 			        <fact.image.ShowImage/> -->
+			
 			<stream.monitor.DataRate every="100" />
 	</process>
 		

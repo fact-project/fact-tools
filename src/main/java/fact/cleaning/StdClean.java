@@ -23,8 +23,8 @@ import fact.utils.ExFit;
  */
 public class StdClean implements Processor{
 	static Logger log = LoggerFactory.getLogger(StdClean.class);
-	private float[] comp = null;
-	private double showerThreshold = 0.5f;
+	private double[] comp = null;
+	private double showerThreshold = 0.5;
 	static ArrayList<Integer> showerPixel  = new ArrayList<Integer>();
 	private String inKey = Constants.KEY_EXFIT;
 	private String output, key;
@@ -78,7 +78,7 @@ public class StdClean implements Processor{
 			Serializable inValue = input.get(inKey);
 			if (inValue != null && inValue.getClass().isArray()
 					&& inValue.getClass().getComponentType().equals(float.class)) {
-				comp = new float[((float[]) inValue).length];
+				comp = new double[((double[]) inValue).length];
 			}
 		} else {
 			//key doesnt exist in map
@@ -88,7 +88,7 @@ public class StdClean implements Processor{
 
 		if (value != null && value.getClass().isArray()
 				&& value.getClass().getComponentType().equals(float.class)) {
-			return processSeries((float[])value);
+			return processSeries((double[])value);
 		}
 		//in case value in Map is of the wrong type to do this calculation
 		else
@@ -100,7 +100,7 @@ public class StdClean implements Processor{
 	}
 
 
-	public ArrayList<ArrayList<Integer>> processSeries(float[] data) {
+	public ArrayList<ArrayList<Integer>> processSeries(double[] data) {
 
 		comp = new ExFit().processSeries(data);
 		data = new SliceNormalization().processSeries(data);
@@ -110,7 +110,7 @@ public class StdClean implements Processor{
 		//List that stores all the ShowerPixel
 		showerPixel.clear();
 		int roi = data.length / Constants.NUMBEROFPIXEL;
-		float difference = 0.0f;
+		double difference = 0.0f;
 		//foreach pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 							
@@ -134,7 +134,7 @@ public class StdClean implements Processor{
 	}
 
 
-	public ArrayList<ArrayList<Integer>> processSeries(float[] series, double t) {
+	public ArrayList<ArrayList<Integer>> processSeries(double[] series, double t) {
 		showerThreshold = t;
 		return processSeries(series);
 	}

@@ -106,11 +106,11 @@ public class CameraPlotter extends DataVisualizer  {
 				Serializable val = data.get(key);
 				Class<?> clazz = val.getClass().getComponentType();
 				if(clazz.equals(float.class)||clazz.equals(double.class)||clazz.equals(int.class)){
-					float[] valArray = EventUtils.toFloatArray(val);
+					double[] valArray = EventUtils.toDoubleArray(val);
 					if(valArray.length == Constants.NUMBEROFPIXEL){
 						if(showAverage){
 							onStat.updateValues(key, EventUtils.toDoubleArray(valArray));
-							mapView.setData(EventUtils.toFloatArray(onStat.getValueMap().get(key+"_avg")));
+							mapView.setData(EventUtils.toDoubleArray(onStat.getValueMap().get(key+"_avg")));
 						}
 						else
 						{

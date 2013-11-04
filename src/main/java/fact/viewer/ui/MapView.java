@@ -92,7 +92,7 @@ public class MapView extends JPanel {
 							sel = (String) sel.subSequence(0, sel.length()
 									- " Static Map".length());
 						}
-						cameraMap.setData((float[]) EventUtils.toFloatArray(event.get(sel)));
+						cameraMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
 					}
 				}
 			});
@@ -165,12 +165,12 @@ public class MapView extends JPanel {
 				int length = 0;
 				Serializable val = event.get(key);
 				if (val.getClass().isArray()) {
-					if (val.getClass().getComponentType() == float.class) {
-						length = ((float[]) (event.get(key))).length;
+					if (val.getClass().getComponentType() == double.class) {
+						length = ((double[]) (event.get(key))).length;
 						if(showerChids != null){
-							cameraMap.setData(setIds(showerChids,(float[]) (event.get(key))));
+							cameraMap.setData(setIds(showerChids,(double[]) (event.get(key))));
 						} else {
-							cameraMap.setData((float[]) (event.get(key)));
+							cameraMap.setData((double[]) (event.get(key)));
 						}
 					} 
 				}
@@ -189,7 +189,7 @@ public class MapView extends JPanel {
 		scale.setMin(cameraMap.getMinValue());
 		scale.repaint();
 	}
-	public float[] setIds(int[] chids, float[] values){
+	public double[] setIds(int[] chids, double[] values){
 		int roi = values.length/Constants.NUMBEROFPIXEL;
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
 			if(!EventUtils.arrayContains(chids, pix)){
@@ -203,7 +203,7 @@ public class MapView extends JPanel {
 	}
 
 
-	public void setData(float[] valArray){
+	public void setData(double[] valArray){
 		cameraMap.setData(valArray);
 		scale.setMax(cameraMap.getMaxValue());
 		scale.setMin(cameraMap.getMinValue());

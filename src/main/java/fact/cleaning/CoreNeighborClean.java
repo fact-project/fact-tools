@@ -31,12 +31,12 @@ public class CoreNeighborClean implements StatefulProcessor{
 	private String keyPositions = null;
 	private String outputKey;
 	private  PixelSet corePixelSet;
-	private  float corePixelThreshold = 0.0f;
-	private  float neighborPixelThreshold = 0.0f;
-	private  float timeThreshold = 0.0f; 
+	private  double corePixelThreshold = 0.0;
+	private  double neighborPixelThreshold = 0.0;
+	private  double timeThreshold = 0.0; 
 	private int minNumberOfPixel = 0;
 	
-	float[] photonCharge = new float[Constants.NUMBEROFPIXEL];
+	double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
 	
 	@Override
 	public void resetState() throws Exception {
@@ -64,7 +64,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 	@Override
 	public Data process(Data input) {
 		try{
-			photonCharge= (float[]) input.get(key);
+			photonCharge= (double[]) input.get(key);
 			if(photonCharge == null){
 				log.error("No weights found in event. Aborting.");
 				throw new RuntimeException("No weights found in event. Aborting.");
@@ -177,7 +177,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 		for(int i = 0; i < level2.length; i++){
 			l2.add(new Pixel(level2[i]));
 		}
-
+		if(showerPixelArray.length > 0){
 			input.put(outputKey+"_level1", level1);
 			input.put(outputKey+"_level1" +"_"+Constants.PIXELSET, l1);
 			input.put(outputKey+"_level2", level2);
@@ -186,7 +186,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 			input.put(outputKey+"_level3" +"_"+Constants.PIXELSET, l3);
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
-			
+		}
 //			input.put(outputKey+"_numCorePixel", numCorePixel);
 		return input;
 	}
@@ -195,7 +195,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 	/*
 	 * Getter and Setter
 	 */
-	public float getCorePixelThreshold() {
+	public double getCorePixelThreshold() {
 		return corePixelThreshold;
 	}
 	@Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have to be identified as a CorePixel", defaultValue = "5.0")
@@ -203,7 +203,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 		this.corePixelThreshold = corePixelThreshold;
 	}
 
-	public float getNeighborPixelThreshold() {
+	public double getNeighborPixelThreshold() {
 		return neighborPixelThreshold;
 	}
 	@Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have thats adjacent to a previously identified corePixel", defaultValue = "2.0")
@@ -243,12 +243,12 @@ public class CoreNeighborClean implements StatefulProcessor{
 	}
 
 
-	public float getTimeThreshold() {
+	public double getTimeThreshold() {
 		return timeThreshold;
 	}
 
 
-	public void setTimeThreshold(float timeThreshold) {
+	public void setTimeThreshold(double timeThreshold) {
 		this.timeThreshold = timeThreshold;
 	}
 }

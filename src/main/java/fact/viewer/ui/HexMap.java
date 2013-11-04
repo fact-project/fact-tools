@@ -68,9 +68,9 @@ public class HexMap extends JPanel implements PixelMap {
 
 	List<Overlay> overlays = new ArrayList<Overlay>();
 	
-	private float minValue, maxValue;
+	private double minValue, maxValue;
 	private int roi;
-	public float[][] sliceValues = new float[1440][300];
+	public double[][] sliceValues = new double[1440][300];
 //	float[][] transformed = new float[1440][1];
 	double[] average = new double[300];
 	int currentSlice;
@@ -251,25 +251,25 @@ public class HexMap extends JPanel implements PixelMap {
 	
 	
 	
-	public void setData(float[] slices) {
+	public void setData(double[] slices) {
 		
 		if (slices == null) {
 			log.error("No data found in event!");
 			return;
 		}
-		minValue = Float.MAX_VALUE;
-		maxValue = Float.MIN_VALUE;
+		minValue = Double.MAX_VALUE;
+		maxValue = Double.MIN_VALUE;
 
 		roi = slices.length / Constants.NUMBEROFPIXEL;
 		average = new double[roi];
-		sliceValues = new float[Constants.NUMBEROFPIXEL][roi];
-		float[][] values = defaultPixelMapping.sortPixels(slices);
+		sliceValues = new double[Constants.NUMBEROFPIXEL][roi];
+		double[][] values = defaultPixelMapping.sortPixels(slices);
 
 
 		for (int row = 0; row < sliceValues.length && row < values.length; row++) {
 			for (int s = 0; s < sliceValues[row].length && s < values[row].length; s++) {
 				sliceValues[row][s] = values[row][s];
-				if (!Float.isNaN(sliceValues[row][s])) {
+				if (!Double.isNaN(sliceValues[row][s])) {
 					minValue = Math.min(minValue, sliceValues[row][s]);
 					maxValue = Math.max(maxValue, sliceValues[row][s]);
 				}
@@ -482,7 +482,7 @@ public class HexMap extends JPanel implements PixelMap {
 		return tiles[i][j];
 	}
 
-	public float getMinValue() {
+	public double getMinValue() {
 		return minValue;
 	}
 
@@ -490,7 +490,7 @@ public class HexMap extends JPanel implements PixelMap {
 		this.minValue = minValue;
 	}
 
-	public float getMaxValue() {
+	public double getMaxValue() {
 		return maxValue;
 	}
 

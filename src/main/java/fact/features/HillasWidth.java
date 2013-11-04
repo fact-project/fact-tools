@@ -9,8 +9,6 @@ import fact.data.EventUtils;
 import fact.statistics.PixelDistribution2D;
 
 /**
- * blavsdföldsfsdlfs fsdfsd  
- *  sdfsdfds
  * <PRE format="md" >
  * Hallo ich bin mardown __Fett__
  * </PRE>
@@ -27,12 +25,10 @@ public class HillasWidth implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)){
-			return null;
-		}
+		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-		float width = (float) Math.sqrt(dist.getEigenVarianceX());
+		double width = (double) Math.sqrt(dist.getEigenVarianceX());
 	    input.put(outputKey, width);
 		
 	    return input;

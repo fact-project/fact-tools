@@ -27,6 +27,9 @@ public class CutSlices implements Processor {
 
 	String[] keys = new String[] { "DataCalibrated" };
 
+	private String outputKey;
+	
+
 
 
 	/**
@@ -38,74 +41,65 @@ public class CutSlices implements Processor {
 		for (String key : keys) {
 
 			try{
-				float[] original = (float[]) data.get(key);
+				double[] original = (double[]) data.get(key);
 				int rows = elements;
 				
 				int oldRoi = original.length / rows;
 				int newRoi = (end - start);
 
-				float[] result = new float[newRoi * rows];
+				double[] result = new double[newRoi * rows];
 				for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 					System.arraycopy(original, pix * oldRoi + start,
 							result, pix * newRoi, newRoi);
 				}
-				data.put(key, result);
+				log.debug("Old array length: " + original.length + " new array length: " + result.length);
+				data.put(outputKey, result);
 				data.put("@start" + key, start);
 				data.put("@end" + key, start);
 
 			} catch(ClassCastException e){
-				log.error("The key " + key + " does not refer to a float array." );
+				log.error("The key " + key + " does not refer to a double array." );
+				throw e;
 			}
 		}
 		return data;
 	}
 
 	
-	/**
-	 * @return the start
-	 */
 	public Integer getStart() {
 		return start;
 	}
 
-	/**
-	 * @param start
-	 *            the start to set
-	 */
 	@Parameter(name = "start", defaultValue = "0", required = false)
 	public void setStart(Integer start) {
 		this.start = start;
 	}
 
-	/**
-	 * @return the end
-	 */
 	public Integer getEnd() {
 		return end;
 	}
 
-	/**
-	 * @param end
-	 *            the end to set
-	 */
 	@Parameter(name = "end", defaultValue = "300", required = false)
 	public void setEnd(Integer end) {
 		this.end = Math.max(start + 1, end);
 	}
 
-	/**
-	 * @return the keys
-	 */
 	public String[] getKeys() {
 		return keys;
 	}
 
-	/**
-	 * @param keys
-	 *            the keys to set
-	 */
 	@Parameter(name = "keys", defaultValue = "Data", values = { "Data" }, required = false)
 	public void setKeys(String[] keys) {
 		this.keys = keys;
+	}
+	
+	
+
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 }

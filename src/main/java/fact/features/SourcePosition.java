@@ -29,10 +29,10 @@ public class SourcePosition implements StatefulProcessor {
 
 	Data slowData = null;
 	private String outputKey = "sourcePosition";
-	private String physicalSource = "crab";
+	private String physicalSource = null;
 
-	double	sourceRightAscension = 0;
-	double	sourceDeclination = 0;    
+	Double	sourceRightAscension = null;
+	Double	sourceDeclination = null;    
 
 	//position of the Telescope
 	static final double mLongitude                  = -17.890701389;
@@ -52,7 +52,7 @@ public class SourcePosition implements StatefulProcessor {
 
 	@Override
 	public void finish() throws Exception {
-		// TODO Auto-generated method stub
+
 	}
 	/**
 	 * In the init method we read the complete TRACKING_POSITION file and save the values in the locList.
@@ -63,12 +63,15 @@ public class SourcePosition implements StatefulProcessor {
 	 * 
 	 * The correct conversion would be: 
 	 * mjd  =  timestamp/86400.0 +  2440587.5d
-	 * for some effing reason. To get the correct coordinates we have to do it like this:
+	 * for some effing reason. To get the correct coordinates we have to do it like this because we start the day 12 hours later
 	 * mjd  =  timestamp/86400.0 +  2440587.0d
 	 * Thats an offset of half a day.
 	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
+		if( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null) {
+			log.error("physicalsource or sourceRightAscension and sourceDeclination isnt set. aborting. Possible choices for physicalSource are: crab, mrk421, mrk501");
+		}
 		if(trackingUrl == null && x !=  null && y != null){
 			log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
 			
@@ -107,19 +110,6 @@ public class SourcePosition implements StatefulProcessor {
 			}
 		}
 
-		//check the physicalSource parameter from the user
-		if(sourceRightAscension == 0 || sourceDeclination == 0 ) {
-			if(physicalSource.toLowerCase().equals("crab")){
-				sourceIsCrab();
-				log.info("Using the crab nebula as source");
-			} else if (physicalSource.toLowerCase().equals("mrk421")){
-				sourceIsMrk421();
-				log.info("Using the mrk421 as source");
-			} else {
-				sourceIsCrab();
-				log.warn("physicalsource or sourceRightAscension and sourceDeclination isnt set. Using the crab nebula as source");
-			}
-		}
 	}
 	@Override
 	public void resetState() throws Exception {
@@ -137,6 +127,8 @@ public class SourcePosition implements StatefulProcessor {
 	 * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by comparing the times. We use the point closest in time to the current dataitem.
 	 * 
 	 * @see fact.data.FactProcessor#process(stream.Data)
+	 * @return data. The dataItem containing the calculated sourcePostion as a float[] of length 2. {x,y} . 
+	 * 				 Also the deviation between the calculated pointing and the onw written in the .fits TRACKING file.  
 	 */
 	@Override
 	public Data process(Data data) {
@@ -144,7 +136,7 @@ public class SourcePosition implements StatefulProcessor {
 			//add circle overlay to map
 			data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay(x, y) );
 			//add source position to dataitem
-			float[] source = {x, y};
+			double[] source = {x, y};
 //			System.out.println("x: "+  source[0] + " y: " +source[1] );
 			data.put(outputKey, source);
 			return data;
@@ -192,13 +184,13 @@ public class SourcePosition implements StatefulProcessor {
 		//add circle overlay to map
 		data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
 		//add source position to dataitem
-		float[] source = {(float) sourcePosition[0], (float) sourcePosition[1]};
+		double[] source = {(double) sourcePosition[0], (double) sourcePosition[1]};
 //		System.out.println("x: "+  source[0] + " y: " +source[1] );
 		data.put(outputKey, source);
 		//add deviation between the calculated point az,dz and the az,dz in the file
-		float[] deviation = {(float) (pointingAzDe[0] - point[3]), (float) ( pointingAzDe[1] - point[4]) };
+		double[] deviation = {(double) (pointingAzDe[0] - point[3]), (double) ( pointingAzDe[1] - point[4]) };
 		data.put(outputKey+"pointingDeviation", deviation);
-		data.put("test", source[0]);
+		log.debug ("Pointing deviation: " + deviation);
 		log.debug( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ; 
 		return data;
 	}
@@ -214,6 +206,12 @@ public class SourcePosition implements StatefulProcessor {
 		sourceRightAscension       = (11.0 + 4.0/60 + 27.0/3600) / 24.0 * 360.0;
 		sourceDeclination          = 38.0 + 12.0/60 + 32.0/3600;
 	}
+	
+	void sourceIsMrk501()
+	{
+		sourceRightAscension       = (16.0 + 53.0/60 + 52.2/3600) / 24.0 * 360.0;
+		sourceDeclination          = 39.0 + 45.0/60 + 37.0/3600;
+	}
 
 	void setRaDec(double ra, double dec)
 	{
@@ -222,10 +220,10 @@ public class SourcePosition implements StatefulProcessor {
 	}
 	/**
 	 * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension, declination and the time in gmst format.
-	 * @param ra
+	 * @param ra 
 	 * @param dec
 	 * @param gmst the Eventtime of the current event in gmst format
-	 * @return an array of length 2 containing {azimuth, zenith};
+	 * @return an array of length 2 containing {azimuth, zenith}, not null;
 	 */
 	double[] getAzZd(double ra,double dec, double gmst){
 		double phi              =  ra / 180.0 * Math.PI;
@@ -311,6 +309,7 @@ public class SourcePosition implements StatefulProcessor {
 	public String getOutputKey() {
 		return outputKey;
 	}
+	@Parameter(description = "The key to the sourcepos array that will be written to the map.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
@@ -333,18 +332,18 @@ public class SourcePosition implements StatefulProcessor {
 	}
 
 
-	public double getSourceDeclination() {	
+	public Double getSourceDeclination() {	
 		return sourceDeclination;	
 	}
-	public void setSourceDeclination(double sourceDeclination) {
+	public void setSourceDeclination(Double sourceDeclination) {
 		this.sourceDeclination = sourceDeclination;	
 	}
 
 	
-	public double getSourceRightAscension() {	
+	public Double getSourceRightAscension() {	
 		return sourceRightAscension; 
 	}
-	public void setSourceRightAscension(double sourceRightAscension) {	
+	public void setSourceRightAscension(Double sourceRightAscension) {	
 		this.sourceRightAscension = sourceRightAscension; 
 	}
 	
@@ -352,9 +351,21 @@ public class SourcePosition implements StatefulProcessor {
 	public String getPhysicalSource() {
 		return physicalSource;
 	}
+	@Parameter(description = "A string with the name of the source. So far this supports mrk421, crab, and mrk501. This is convinience so you dont have to use {@code setSourceRightAscension} and  {@code setSourceDeclination} ")
 	public void setPhysicalSource(String physicalSource) {
 		this.physicalSource = physicalSource;
+		if(physicalSource.toLowerCase().equals("crab")){
+			sourceIsCrab();
+			log.info("Using the crab nebula as source");
+		} else if (physicalSource.toLowerCase().equals("mrk421")){
+			sourceIsMrk421();
+			log.info("Using the mrk421 as source");
+		} else if (physicalSource.toLowerCase().equals("mrk501")){
+			sourceIsMrk421();
+			log.info("Using the mrk421 as source");
+		} 
 	}
+	
 	public Float getX() {
 		return x;
 	}

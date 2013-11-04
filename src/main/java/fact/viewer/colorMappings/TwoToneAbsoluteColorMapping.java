@@ -37,8 +37,8 @@ public class TwoToneAbsoluteColorMapping
 	 * @see fact.viewer.colorMappings.ColorMapping#map(java.lang.Double)
 	 */
 	@Override
-	public Color map(float value, float minValue, float maxValue) {
-		if(Float.isNaN(value)){
+	public Color map(double value, double minValue, double maxValue) {
+		if(Double.isNaN(value)){
 			value = 0.0f;
 		}
 		if(value >= maxValue){

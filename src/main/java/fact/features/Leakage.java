@@ -17,22 +17,17 @@ public class Leakage implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		
-		if(!(	EventUtils.isKeyValid(input, shower, int[].class)
-				&& EventUtils.isKeyValid(input, weights, float[].class)
-				)){
-			return null;
-		}
+		EventUtils.mapContainsKeys(getClass(), input, shower, weights);
 	
 		int[] 	showerPixel = (int[])input.get(shower);
-		float[] photonCharge = (float[]) input.get(weights);
+		double[] photonCharge = (double[]) input.get(weights);
 		
 		
-		float size = 0;
-		for(float s: photonCharge) {size += s;} 
+		double size = 0;
+		for(double s: photonCharge) {size += s;} 
 	
-	    float leakageBorder          = 0;
-	    float leakageSecondBorder    = 0;
+	    double leakageBorder          = 0;
+	    double leakageSecondBorder    = 0;
 
 	    for (int pix: showerPixel)
 	    {

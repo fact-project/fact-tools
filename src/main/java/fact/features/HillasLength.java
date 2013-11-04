@@ -16,13 +16,11 @@ public class HillasLength implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		if(!EventUtils.isKeyValid(input, distribution, PixelDistribution2D.class)){
-			return null;
-		}
+		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 
-		float width = (float) Math.sqrt(dist.getEigenVarianceY());
+		double width = (double) Math.sqrt(dist.getEigenVarianceY());
 	    input.put(outputKey, width);
 		
 	    return input;

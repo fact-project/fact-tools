@@ -17,15 +17,15 @@ import fact.utils.SimpleFactEventProcessor;
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
-public class ExponentialSmoothing extends SimpleFactEventProcessor<float[],float[]> {
+public class ExponentialSmoothing extends SimpleFactEventProcessor<double[],double[]> {
 	static Logger log = LoggerFactory.getLogger(ExponentialSmoothing.class);
 	
-	float alpha = 0.5f;
+	double alpha = 0.5f;
 	
 	@Override
-	public float[] processSeries(float[] data) {
+	public double[] processSeries(double[] data) {
 			int roi = data.length / Constants.NUMBEROFPIXEL;
-			float[] smoothedData= new float[data.length];
+			double[] smoothedData= new double[data.length];
 			//foreach pixel
 			for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 				//beginn with startvalue 
@@ -43,11 +43,11 @@ public class ExponentialSmoothing extends SimpleFactEventProcessor<float[],float
 	/*
 	 * Getter and Setter
 	 */
-	public float getAlpha() {
+	public double getAlpha() {
 		return alpha;
 	}
 	@Parameter (required = false, description = "This value changes the amount of smoothing that will take place. If alpha equals 1 the values remain unchanged.  See http://en.wikipedia.org/wiki/Exponential_smoothing", min = 0.0 , max = 1.0)
-	public void setAlpha(float alpha) {
+	public void setAlpha(double alpha) {
 		this.alpha = alpha;
 	}
 

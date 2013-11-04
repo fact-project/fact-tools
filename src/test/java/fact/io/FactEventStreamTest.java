@@ -67,7 +67,8 @@ public class FactEventStreamTest {
 	@Test
 	public void testRead() throws Exception {
 
-		SourceURL url = new SourceURL("classpath:/sample.fits.gz");
+		URL u =  FitsStreamTest.class.getResource("/sample.fits.gz");
+		SourceURL url = new SourceURL(u);
 		log.info("Reading FITS events from {}", url);
 		FitsStream fits = new FitsStream(url);
 
