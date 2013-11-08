@@ -11,14 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fact.image.overlays.PixelSet;
-
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import stream.AbstractProcessor;
-import stream.ProcessContext;
 import stream.Data;
+import stream.ProcessContext;
 import stream.io.JSONStream;
+import fact.image.overlays.PixelSet;
 
 /**
  * @author chris

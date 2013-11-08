@@ -22,6 +22,10 @@ public class HillasDistance implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
+		if(!input.containsKey(distribution)){
+			log.info("No shower in evernt. Not calculating distance");
+			return input;
+		}
 		EventUtils.mapContainsKeys(getClass(), input, distribution, sourcePosition);
 
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);

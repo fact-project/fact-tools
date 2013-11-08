@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.io.SourceURL;
-
 import fact.cleaning.CoreNeighborClean;
-import fact.features.SourcePosition;
-import fact.features.PhotonCharge;
 import fact.features.MaxAmplitudePosition;
+import fact.features.PhotonCharge;
+import fact.features.SourcePosition;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
@@ -58,6 +57,7 @@ public class FactAnalysisTest {
 
 			PhotonCharge c = new PhotonCharge();
 			c.setKey("test");
+			c.setPositions(pP.getOutputKey());
 			c.setOutputKey("photonCharge");
 
 			CoreNeighborClean clean = new CoreNeighborClean();

@@ -128,7 +128,7 @@ public class FitsStream extends AbstractStream {
 					String numberString = value.replaceAll("\\D+", "").trim();
 					numberOfElements = Integer.parseInt(numberString);
 				} catch (NumberFormatException e) {
-					log.info("Couldnt parse the number of TFORM elements in the header. Assuming a value of 1.");
+					log.debug("Couldnt parse the number of TFORM elements in the header. Assuming a value of 1.");
 					numberOfElements = 1;
 				}
 

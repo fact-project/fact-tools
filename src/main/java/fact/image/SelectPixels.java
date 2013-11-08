@@ -3,9 +3,9 @@
  */
 package fact.image;
 
-import fact.image.overlays.PixelSet;
-import stream.Processor;
 import stream.Data;
+import stream.Processor;
+import fact.image.overlays.PixelSet;
 
 /**
  * @author chris

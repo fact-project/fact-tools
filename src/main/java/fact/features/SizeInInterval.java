@@ -1,8 +1,8 @@
 package fact.features;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
+import fact.EventUtils;
 /**
  * Sum up all the weights for pixel between the max and min values.
  * The output of this processor is the sum of the pixel weights in the shower array iff the weight is > min and < max.

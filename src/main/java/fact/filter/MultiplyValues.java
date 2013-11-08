@@ -3,10 +3,9 @@ package fact.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.annotations.Parameter;
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
-
-import stream.annotations.Parameter;
 
 /**
  * This operator simply multiplies all values by the given factor.

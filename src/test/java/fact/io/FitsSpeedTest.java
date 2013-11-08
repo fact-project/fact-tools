@@ -17,8 +17,6 @@ import stream.Data;
 import stream.ProcessorList;
 import stream.io.SourceURL;
 import stream.runtime.ProcessContextImpl;
-import fact.features.PhotonCharge;
-import fact.features.MaxAmplitude;
 import fact.filter.DrsCalibration;
 
 /**

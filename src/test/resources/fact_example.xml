@@ -17,11 +17,14 @@
 -->
             
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
-            <fact.features.PhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge"/>
+            <fact.features.PhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photoncharge"/>
             
-            <fact.cleaning.CoreNeighborClean key="photonCharge" CorePixelThreshold="5.0" neighborPixelThreshold="2.0" outputKey="showerPixel" />
+			<fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="AmplitudePositions" timeThreshold="30"  minNumberOfPixel="2"/>
             <fact.features.SourcePosition url="${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
 <!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
-            <fact.io.RootASCIIWriter keys="EventNum,TriggerType,Hillas_Alpha,Hillas_Size,Hillas_Area" url="${outfile}" />
+    <stream.flow.Skip condition="%{data.shower} == null" />
+	        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
+			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+            <fact.io.RootASCIIWriter keys="EventNum,TriggerType,alpha" url="${outfile}" />
 		</process>
 </container>

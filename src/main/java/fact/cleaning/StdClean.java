@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.Data;
 import fact.Constants;
 import fact.EventUtils;
 import fact.filter.SliceNormalization;

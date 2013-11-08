@@ -1,4 +1,4 @@
-package fact.image.monitors;
+package fact.plotter;
 
 import java.awt.BorderLayout;
 import java.io.Serializable;
@@ -24,8 +24,8 @@ import fact.image.OnlineStatistics;
  * @author bruegge
  * 
  */
-public class AverageBarPlotter extends DataVisualizer {
-	static Logger log = LoggerFactory.getLogger(AverageBarPlotter.class);
+public class BarPlotter extends DataVisualizer {
+	static Logger log = LoggerFactory.getLogger(BarPlotter.class);
 	private BarPlotPanel histPanel;
 	JFrame frame;
 
@@ -62,7 +62,7 @@ public class AverageBarPlotter extends DataVisualizer {
 		this.drawErrors = drawErrors;
 	}
 
-	public AverageBarPlotter() {
+	public BarPlotter() {
 		width = 690;
 		height = 460;
 		// this.setHistory(1440);
@@ -123,7 +123,8 @@ public class AverageBarPlotter extends DataVisualizer {
 					}
 				}
 			} else {
-				log.info("The key " + key + " does not exist in the Event");
+				log.error("The key " + key + " does not exist in the Event");
+				throw new RuntimeException("Key not found in event. "  + key);
 			}
 			// keyCounter++;
 			// keyNumber++;

@@ -1,14 +1,9 @@
 package fact.features;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Constants;
-import fact.data.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
+import fact.EventUtils;
 
 public class CosDeltaAlpha implements Processor{
 

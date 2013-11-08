@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import stream.AbstractProcessor;
 import stream.Data;
-
 import fact.FactViewer;
 
 /**

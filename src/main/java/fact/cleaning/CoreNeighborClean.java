@@ -70,7 +70,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 				throw new RuntimeException("No weights found in event. Aborting.");
 			}
 		} catch(ClassCastException e){
-			log.error("Could cast the key: " + key + "to a float[]");
+			log.error("Could cast the key: " + key + "to a double[]");
 		}
 		
 
@@ -122,7 +122,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 			int[] positions = (int[]) input.get(keyPositions);
 			if (positions == null){
 				log.error("The key " + keyPositions + "  was not found in the data");
-				return null;
+				throw new RuntimeException("The key " + keyPositions + "  was not found in the data");
 			}
 			//calculate the median value of the arrival times in the shower
 			int[] showerArrivals = new int[showerPixelArray.length];

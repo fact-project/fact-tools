@@ -212,7 +212,9 @@ public class FeatureTests {
 			//not all events contain shower pixel. We still want to guarantee that hillas parameter will be written iff showerpixel exist 
 			//also check that at least one item contained a shower. This should be the case even for our small test file.
 			int showerCount = 0;
+			int itemCount = 0;
 			while (item != null) {
+				itemCount++;
 				Data checkedItem = item.createCopy();
 				//check if we have showerPixel. Just loop over the complete process and check for the output of the cleaning method.
 				for (Entry<Processor, Pair<String, Class<?>>> entry : typeMap.entrySet()) {
@@ -248,9 +250,9 @@ public class FeatureTests {
 				item = stream.read();
 			}
 			if(showerCount < 1){
-				fail("No whoer at all found in the test data. this cannot happen.");
+				fail("No shower at all found in the test data. this cannot happen.");
 			}
-			System.out.println("Number of showers fund in testdata: " + showerCount );
+			System.out.println("Number of showers fund in testdata: " + showerCount + " number of events: " + itemCount );
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Could not read stream");

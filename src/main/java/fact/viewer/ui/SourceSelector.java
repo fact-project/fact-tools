@@ -12,10 +12,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import fact.Constants;
+import fact.EventUtils;
 
 public class SourceSelector extends JPanel {
 	static Logger log = LoggerFactory.getLogger(SourceSelector.class);
@@ -28,7 +31,7 @@ public class SourceSelector extends JPanel {
 		setBackground(Color.WHITE);
 		this.cW = cW;
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		
+
 	}
 
 	public void setEvent(Data event) {
@@ -37,16 +40,22 @@ public class SourceSelector extends JPanel {
 			return;
 		}
 		for (final String key : event.keySet()) {
-			Serializable value = event.get(key);
+			final Serializable value = event.get(key);
 			if (value == null) {
 				log.info("Key " + key + " is null. Not showing in List.");
 				return;
 			}
-			if (value.getClass().isArray()
-					&& value.getClass().getComponentType().equals(float.class)) {
+			if((value.getClass().isArray() && EventUtils.toDoubleArray(value) != null && EventUtils.toDoubleArray(value).length > Constants.NUMBEROFPIXEL) 	
+					|| 
+					(value.getClass().isArray() && value.getClass().getComponentType().equals(IntervalMarker.class)) ) {
 				if (!checkboxes.containsKey(key)) {
 					final JCheckBox box = new JCheckBox(key);
-					box.setBackground(Color.WHITE);
+					Color c = cW.getMatchingColorFromKey(key, event);
+					if(c != null){
+						box.setForeground(c);
+					} else {
+						box.setForeground(Color.BLACK);
+					}
 					box.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(ItemEvent arg0) {
@@ -59,7 +68,6 @@ public class SourceSelector extends JPanel {
 							cW.updateGraph();
 						}
 					});
-
 					// deselect per default
 					box.setSelected(false);
 					// makes it visible
@@ -68,14 +76,7 @@ public class SourceSelector extends JPanel {
 					checkboxes.put(key, box);
 					// add it to the drawn panel. subject to change!
 					add(box);
-					//
-
-				} else {
-					// checkbox already there
-
-				}
-				// over.put(key, (Overlay) value);
-				// checkboxes.get(key).setEnabled(true);
+				} 
 			}
 		}
 		// check for keys that dont exist anymore in the current event and

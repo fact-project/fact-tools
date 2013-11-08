@@ -48,7 +48,8 @@ public class ExportBinaryAction extends ExportAction {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 
 				BinaryFactWriter writer = new BinaryFactWriter();
-				writer.setFile(jfc.getSelectedFile().getAbsolutePath());
+//				writer.setFile(jfc.getSelectedFile().getAbsolutePath());
+				writer.setUrl(jfc.getSelectedFile().getAbsolutePath());
 				writer.process(viewer.getEvent());
 				writer.finish();
 			}

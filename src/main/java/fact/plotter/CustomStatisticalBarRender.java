@@ -1,4 +1,4 @@
-package fact.image.monitors;
+package fact.plotter;
 
 import java.awt.Color;
 import java.awt.Paint;
