@@ -1,4 +1,4 @@
-package fact.image.monitors;
+package fact.plotter;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
@@ -15,6 +15,7 @@ import org.jfree.ui.ApplicationFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.data.EventUtils;
 import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
@@ -36,7 +37,7 @@ public class ScatterPlotter extends DataVisualizer {
 	private String yValue = "";
 	
 	private String title = "Default Title";
-	private String color = "#F0D0E0";
+	private String color = "#2A2EE0";
 
 	private boolean keepOpen = true;
 
@@ -83,16 +84,24 @@ public class ScatterPlotter extends DataVisualizer {
 	@Override
 	public Data processMatchingData(Data data) {
 		if (data.containsKey(xValue) && data.containsKey(yValue)) {
-			try{
-				x = (Float) data.get(xValue);
-			} catch(ClassCastException e){
-				x = ((Integer) data.get(xValue)).doubleValue();
+			if(data.containsKey(xValue)){
+				x = EventUtils.valueToDouble(data.get(xValue));
+			} else {
+				throw new RuntimeException("Key not found in event. "  + xValue);
 			}
-			try{
-				y = (Float) data.get(yValue);
-			} catch (ClassCastException e){
-				y = ((Integer) data.get(yValue)).doubleValue();
+			if(Double.isNaN(x)){
+				log.warn("This doesnt handle NaNs very well.");
 			}
+			
+			if(data.containsKey(yValue)){
+				y = EventUtils.valueToDouble(data.get(yValue));
+			} else {
+				throw new RuntimeException("Key not found in event. "  + xValue);
+			}
+			if(Double.isNaN(y)){
+				log.warn("This doesnt handle NaNs very well.");
+			}
+			
 		} else {
 			log.info("The key " + xValue +  "  or " + yValue + " does not exist in the Event");
 		}

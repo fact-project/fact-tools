@@ -1,4 +1,4 @@
-package fact.image.monitors;
+package fact.image;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
