@@ -1,6 +1,5 @@
 package fact.viewer.ui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -8,12 +7,6 @@ import java.awt.event.WindowEvent;
 import java.util.Set;
 
 import javax.swing.JFrame;
-
-import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.plot.ValueMarker;
-import org.jfree.ui.Layer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import stream.Data;
 
@@ -23,18 +16,34 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import fact.Constants;
 import fact.FactViewer;
+import fact.processors.FactEvent;
 
 public class ChartWindow {
 
 	short selectIndex = 0;
-	private int slice = 0;
+	private int slice;
 	// private CameraPixelMap camMap;
 	Data event;
 	FactViewer mainWindow;
 	private SimplePlotPanel plotPanel;
 	private SourceSelector sL;
-	private Set<Integer> selectedPixelSet;
-	static Logger log = LoggerFactory.getLogger(ChartWindow.class);
+	private Set<Integer> set;
+
+	public Set<Integer> getSet() {
+		return set;
+	}
+
+	public void setSet(Set<Integer> set) {
+		this.set = set;
+	}
+
+	public SimplePlotPanel getPlotPanel() {
+		return plotPanel;
+	}
+
+	public void setPlotPanel(SimplePlotPanel plotPanel) {
+		this.plotPanel = plotPanel;
+	}
 
 	/**
 	 * @param m
@@ -48,9 +57,9 @@ public class ChartWindow {
 		frame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("pref:grow"),
 				ColumnSpec.decode("pref:grow"),},
-				new RowSpec[] {
+			new RowSpec[] {
 				RowSpec.decode("max(445px;min):grow"),}));
-
+	
 		// frame.setResizable(false);
 
 		plotPanel = new SimplePlotPanel();
@@ -60,7 +69,7 @@ public class ChartWindow {
 		sL = new SourceSelector(event, this);
 		sL.setAlignmentX(Component.CENTER_ALIGNMENT);
 		sL.setAlignmentY(Component.TOP_ALIGNMENT);
-		sL.setPreferredSize(new Dimension(170,
+		sL.setPreferredSize(new Dimension(100,
 				plotPanel.getPreferredSize().height));
 		frame.getContentPane().add(sL, "2, 1, fill, fill");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -83,111 +92,52 @@ public class ChartWindow {
 
 	// just redraw some shiiiit
 	public void updateGraph() {
-		updateGraph(event, selectedPixelSet);
-	}
-
-	/**
-	 * @param event
-	 * @param selectedPixelSet
-	 */
-	public void updateGraph(Data event, Set<Integer> setP) {
-		selectedPixelSet = setP;
-		if (event != null) {
-			plotPanel.clearSeries();
-			plotPanel.getPlot().clearDomainMarkers();
-			for (String key : sL.getSelectedKeys()) {
-				try{
-					IntervalMarker[] m = (IntervalMarker[]) event.get(key);
-					addMarkerToPlot(event, selectedPixelSet, key, m);
-				} catch(ClassCastException  e){
-					addSeriesToPlot(event, selectedPixelSet, key, null);
-				}
-			}
-			plotPanel.setSlice(slice);
-		}
-	}
-	
-	private void addMarkerToPlot(Data event, Set<Integer> set,
-			String key, IntervalMarker[] m) {
-
-		if (!set.isEmpty()) {
-			for (int id : set) {
-				id = DefaultPixelMapping.getChidFromSoftId(id);
-				if(m != null && m[id] != null){
-					plotPanel.getPlot().addDomainMarker(m[id], Layer.BACKGROUND);
-				}
-			}
-		} else {
-			int id = 0;
-			if(m != null && m[id] != null){
-				plotPanel.getPlot().addDomainMarker(m[id], Layer.BACKGROUND);
-			}
-		}
-		
+		updateGraph(event, set);
 	}
 
 	/**
 	 * @param event
 	 * @param set
 	 */
-	private void addSeriesToPlot(Data event, Set<Integer> set, String key, IntervalMarker[] m) {
-		Color color = getMatchingColorFromKey(key, event);
+	public void updateGraph(Data event, Set<Integer> setP) {
+		set = setP;
+		if (event != null) {
+			plotPanel.clearSeries();
+				for (String key : sL.getSelectedKeys()) {
+					addSeriesToPlot(event, set, key);
+				}
+		}
+	}
+
+	/**
+	 * @param event
+	 * @param set
+	 */
+	private void addSeriesToPlot(Data event, Set<Integer> set, String key) {
 		if (!set.isEmpty()) {
 			for (int id : set) {
-				id = DefaultPixelMapping.getChidFromSoftId(id);
+				/**
+				 * TODO: why get hId??
+				 */
+				id = FactEvent.PIXEL_MAPPING.getChidID(id);
 				float[] data = (float[]) event.get(key);
 				int roi = data.length / Constants.NUMBEROFPIXEL;
-				plotPanel.addSeries(key + "-" + id, color, data, roi * id, (roi * id)
+				plotPanel.addSeries(key + "-" + id, data, roi * id, (roi * id)
 						+ roi);
+
 			}
 		} else {
 			int id = 0;
 			float[] data = (float[]) event.get(key);
 			int roi = data.length / Constants.NUMBEROFPIXEL;
-			plotPanel.addSeries(key + "-" + id, color, data, roi * id, (roi * id)
+			plotPanel.addSeries(key + "-" + id, data, roi * id, (roi * id)
 					+ roi);
 		}
-	}
-	
-	public Color getMatchingColorFromKey(String key, Data event) {
-//		Data event = FactViewer.getInstance().getEvent();
-		// remove pixelnumber from name
-		key = key.replaceAll("-(\\d){1,4}", "");
-		String colorKey = "@" + Constants.KEY_COLOR + "_" + key;
-
-		if (event.containsKey(colorKey)) {
-			try{
-				return Color.decode((String) event.get(colorKey));
-			} catch (NumberFormatException e){
-				log.error("Could not parse the Color String. " +  (String) event.get(colorKey) + " is not a valid color String of the form \" #HHHHHH \". " );
-			}
-		}
-
-		return null;
 	}
 
 	public void setSlice(int i) {
 		slice = i;
-//		plotPanel.setSlice(slice);
-		plotPanel.getPlot().clearDomainMarkers(2);
-		plotPanel.getPlot().addDomainMarker(2, new ValueMarker(i), Layer.FOREGROUND);
-	}
-
-
-	public Set<Integer> getSet() {
-		return selectedPixelSet;
-	}
-
-	public void setSet(Set<Integer> set) {
-		this.selectedPixelSet = set;
-	}
-
-	public SimplePlotPanel getPlotPanel() {
-		return plotPanel;
-	}
-
-	public void setPlotPanel(SimplePlotPanel plotPanel) {
-		this.plotPanel = plotPanel;
+		plotPanel.setSlice(slice);
 	}
 
 }

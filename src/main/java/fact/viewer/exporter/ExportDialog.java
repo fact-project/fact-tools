@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import fact.FactViewer;
-import fact.utils.CutSlices;
+import fact.processors.CutSlices;
 import fact.viewer.ui.FileInputPanel;
 import fact.viewer.ui.OkCancelDialog;
 import fact.viewer.ui.SliceInputPanel;

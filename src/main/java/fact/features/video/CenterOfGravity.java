@@ -8,6 +8,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
+import fact.data.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
 
 
@@ -25,6 +26,8 @@ public class CenterOfGravity implements Processor
 	    mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
 	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
+	    // check keys
+		EventUtils.mapContainsKeys(getClass(), input, showerPixel, dataCalibrated);
 		/// get input
 		try
 		{
@@ -62,8 +65,18 @@ public class CenterOfGravity implements Processor
 		cogVelocityX = new double[sliceCount - 1];
 		cogVelocityY = new double[sliceCount - 1];
 		cogVelocity = new double[sliceCount - 1];
+		cogVelocityError = new double[sliceCount - 1];
 		
 		size = new double[sliceCount];
+		
+		double minimalVelocity = Double.MAX_VALUE; // minimal velocity of all slices
+		int minimalVelocityId = 0;
+		double maximalVelocity = Double.MIN_VALUE; // maximal velocity of all slices
+		int maximalVelocityId = 0;
+		double bestVelocity = 0; // velocity with minimal "error"
+		int bestVelocityId = 0;
+		double bestVelocityError = Double.MAX_VALUE; // the corresponding "error"
+		
 		
 		// Baseline correction
 		eventBaseline = 0.0f;
@@ -86,8 +99,8 @@ public class CenterOfGravity implements Processor
 			// Calculate COGs
 			for(int pix : showerPixelArray)
 			{
-				
-				size[slice] += dataCalibratedArray[pix * sliceCount + slice] + eventBaseline ;
+				//TODO insert rotate by hillas_delta switch
+				size[slice] += dataCalibratedArray[pix * sliceCount + slice] + eventBaseline;
 				cogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * mpGeomXCoord[pix];
 				cogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * mpGeomYCoord[pix];
 				
@@ -106,14 +119,42 @@ public class CenterOfGravity implements Processor
 			varcogy[slice] /= size[slice];
 			covcog[slice] /= size[slice];
 
+			
+			
 		    // Calculate velocities on the fly
 			if (slice > 0)
 			{
-				cogVelocityX[slice - 1] = (cogx[slice] - cogx[slice-1]) / 0.5f;
-				cogVelocityY[slice - 1] = (cogy[slice] - cogy[slice-1]) / 0.5f;
-				cogVelocity[slice -1] = (float) Math.sqrt(cogVelocityX[slice-1]*cogVelocityX[slice-1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]);
+				cogVelocityX[slice - 1] = (cogx[slice] - cogx[slice - 1]) / 0.5f;
+				cogVelocityY[slice - 1] = (cogy[slice] - cogy[slice - 1]) / 0.5f;
+				cogVelocity[slice - 1] = (double) Math.sqrt(cogVelocityX[slice - 1]*cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]);
+				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogx[slice] * varcogx[slice] + varcogx[slice - 1] * varcogx[slice - 1]);
+				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogy[slice] * varcogy[slice] + varcogy[slice - 1] * varcogy[slice - 1]);
+				cogVelocityError[slice - 1] = Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
+														cogVelocityXError[slice - 1] * cogVelocityXError[slice - 1] +
+														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
+														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
+														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
+			
+				if (cogVelocity[slice - 1] < minimalVelocity)
+				{
+					minimalVelocity = cogVelocity[slice - 1];
+					minimalVelocityId = slice - 1;
+				}
+				if(cogVelocity[slice - 1] > maximalVelocity)
+				{
+					maximalVelocity = cogVelocity[slice - 1];
+					maximalVelocityId = slice - 1;
+				}
+				if(cogVelocityError[slice - 1] < bestVelocityError)
+				{
+					bestVelocityError = cogVelocityError[slice - 1];
+					bestVelocity = cogVelocity[slice - 1];
+					bestVelocityId = slice - 1;
+				}
+			
 			}
 		}
+		
 		
 		input.put(outputKey + "_X", cogx);
 		input.put(outputKey + "_Y", cogy);
@@ -126,6 +167,17 @@ public class CenterOfGravity implements Processor
 		input.put(outputKey + "_VelY", cogVelocityY);
 		
 		input.put(outputKey + "_Vel", cogVelocity);
+		input.put(outputKey + "_VelErr", cogVelocityError);
+		
+		input.put(outputKey + "_MinVel", minimalVelocity);
+		input.put(outputKey + "_MinVelId", minimalVelocityId);
+		
+		input.put(outputKey + "_MaxVel", maximalVelocity);
+		input.put(outputKey + "_MaxVelId", maximalVelocityId);
+		
+		input.put(outputKey + "_BestVel", bestVelocity);
+		input.put(outputKey + "_BestVelError", bestVelocityError);
+		input.put(outputKey + "_BestVelId", bestVelocityId);
 		
 		return input;
 	}
@@ -134,7 +186,7 @@ public class CenterOfGravity implements Processor
 		return showerPixel;
 	}
 	
-	@Parameter(required = true, defaultValue = "showerPixel", description = "Key to the array of showerpixel Chids.")
+	@Parameter(required = true, defaultValue = "showerPixel", description = "Key to the array of showerpixel chids.")
 	public void setShowerPixel(String showerPixel) {
 		this.showerPixel = showerPixel;
 	}
@@ -190,10 +242,13 @@ public class CenterOfGravity implements Processor
 	private double[] covcog = null;
 
 	// Velocity of COG of showerPixel
-	private double[] cogVelocityX;
-	private double[] cogVelocityY;
-	private double[] cogVelocity;
-	
+	private double[] cogVelocityX = null;
+	private double[] cogVelocityY = null;
+	private double[] cogVelocity = null;
+
+	private double[] cogVelocityXError = null;
+	private double[] cogVelocityYError = null;
+	private double[] cogVelocityError = null;
 	
 	private String outputKey;
 	
