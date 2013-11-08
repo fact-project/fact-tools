@@ -29,6 +29,7 @@
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
+	        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
             <fact.features.RisingEdge key="DataCalibrated" outputKey="risingedge"/>
             
@@ -53,7 +54,6 @@
 <!-- 		<fact.processors.RemoveJumps key="DataCalibrated" outputKey="jumpsRemoved" /> -->
 <!-- 		<fact.processors.parfact.CalculatePhotonCharge key="smooth" outputKey="s" /> -->
 <!-- 		<fact.processors.parfact.CalculatePhotonCharge key="DataCalibrated" outputKey="c" /> -->
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 <!-- 		<fact.statistics.CreateHistogram key="risingedge" min="0" max="197" numberOfBins="198" outputKey="risingH"/> -->
 <!-- 		<fact.statistics.CreateHistogram key="position" min="0" max="197" numberOfBins="198" outputKey="positionH"/> -->
 
@@ -68,11 +68,11 @@
 			<fact.utils.SelectIndecesFromArray key="risingedge" indices="shower" outputKey="showerPos" />
 			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
 			
-			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" />
-			<fact.plotter.ShowerCameraPlotter key="DataCalibrated" showerKey="shower" />
-			<fact.plotter.LiveCameraPlotter key="DataCalibrated"  />
+<!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
+<!-- 			<fact.plotter.ShowerCameraPlotter key="DataCalibrated" showerKey="shower" /> -->
+<!-- 			<fact.plotter.LiveCameraPlotter key="DataCalibrated"  /> -->
 <!-- 			<stream.io.CsvWriter keys="chargeMean,showerPhotonChargeMean,posMean,showerPositionMean,size,length,width" url="file:${outfile}" /> -->
-<!-- 			        <fact.image.ShowImage/> -->
+			        <fact.image.ShowImage/>
 			
 			<stream.monitor.DataRate every="100" />
 	</process>

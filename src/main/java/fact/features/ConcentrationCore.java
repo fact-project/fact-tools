@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
 
 

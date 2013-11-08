@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.statistics.PixelDistribution2D;
 /**
  * Quite simply the distance between the CoG of the shower and the calculated source position.

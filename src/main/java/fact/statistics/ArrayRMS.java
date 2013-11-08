@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.data.EventUtils;
+import fact.EventUtils;
 
 /**
  * This operator calculates the rms of the array specified by the key

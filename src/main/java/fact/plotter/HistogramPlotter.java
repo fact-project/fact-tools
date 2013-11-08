@@ -22,7 +22,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
-import fact.data.EventUtils;
+import fact.EventUtils;
 
 /**
  * 

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.viewer.ui;
 
@@ -17,8 +17,8 @@ import javax.swing.JPopupMenu;
 
 import stream.Data;
 import fact.Constants;
+import fact.EventUtils;
 import fact.FactViewer;
-import fact.data.EventUtils;
 import fact.viewer.actions.ChangeColorMap;
 
 public class MapView extends JPanel {
@@ -28,14 +28,14 @@ public class MapView extends JPanel {
 	JComboBox comboBox;
 	short selectIndex = 0;
 	private int slice;
-	private CameraPixelMap cameraMap;
+	private CameraPixelMap cameraPixelMap;
 
 	public CameraPixelMap getCamMap() {
-		return cameraMap;
+		return cameraPixelMap;
 	}
 
 	public void setCamMap(CameraPixelMap camMap) {
-		this.cameraMap = camMap;
+		this.cameraPixelMap = camMap;
 	}
 
 	Data event;
@@ -44,7 +44,7 @@ public class MapView extends JPanel {
 	boolean live = false;
 	boolean sourceSelection = false;
 	private String key="Data";
-	
+
 	private int[] showerChids;
 	public int[] getShowerChids() {
 		return showerChids;
@@ -68,40 +68,42 @@ public class MapView extends JPanel {
 		 * Add cameraPixelMap, scalePanel and set some Layout stuff:
 		 */
 		this.setLayout(new BorderLayout(0, 0));
-		cameraMap = new CameraPixelMap(5.0d);
-		cameraMap.setSelectable(false);
-		cameraMap.setBackground(Color.BLACK);
-		this.add(cameraMap, BorderLayout.CENTER);
-		scale = new ScalePanel(cameraMap.getColorMapping(), cameraMap.getMinValue(), cameraMap.getMaxValue());
-		scale.setBackground(cameraMap.getBackground());
+		cameraPixelMap = new CameraPixelMap(5.0d);
+		cameraPixelMap.setSelectable(false);
+		cameraPixelMap.setBackground(Color.BLACK);
+		this.add(cameraPixelMap, BorderLayout.CENTER);
+		scale = new ScalePanel(cameraPixelMap.getColorMapping(), cameraPixelMap.getMinValue(), cameraPixelMap.getMaxValue());
+		scale.setBackground(cameraPixelMap.getBackground());
 		this.add(scale, BorderLayout.EAST);
 		if(sourceSelection){
 			comboBox = new JComboBox();
 			this.add(comboBox, BorderLayout.NORTH);
 			/**
 			 * Add the right Strings to the combox and add actionlisteners
-			 * 
+			 *
 			 */
 			comboBox.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					if (arg0.getSource() == comboBox && comboBox.getItemCount()!=0 ) {
-						String sel = (String) comboBox.getSelectedItem();
-						if (sel.endsWith(" Static Map")) {
-							sel = (String) sel.subSequence(0, sel.length()
-									- " Static Map".length());
-						}
-						cameraMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
-					}
+					System.out.println("Hallo!");
+//					if (arg0.getSource() == comboBox && comboBox.getItemCount()!=0 ) {
+//						String sel = (String) comboBox.getSelectedItem();
+//						if (sel.endsWith(" Static Map")) {
+//							sel = (String) sel.subSequence(0, sel.length()
+//									- " Static Map".length());
+//						}
+//						System.out.println("------------" + sel);
+//						cameraPixelMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
+//					}
 				}
 			});
 		}
 		this.revalidate();
-		
+
 		JPopupMenu popupMenu = new JPopupMenu("Title");
-		ChangeColorMap cmAction = new ChangeColorMap(cameraMap, scale);
-		
+		ChangeColorMap cmAction = new ChangeColorMap(cameraPixelMap, scale);
+
 	    JMenuItem colorMapMenuItem1 = new JMenuItem("TwoToneAbsolute");
 	    colorMapMenuItem1.addActionListener(cmAction);
 	    popupMenu.add(colorMapMenuItem1);
@@ -109,17 +111,17 @@ public class MapView extends JPanel {
 	    JMenuItem colorMapMenuItem2 = new JMenuItem("NeutralColor");
 	    popupMenu.add(colorMapMenuItem2);
 	    colorMapMenuItem2.addActionListener(cmAction);
-	    
+
 	    JMenuItem colorMapMenuItem3 = new JMenuItem("GrayScale");
 	    popupMenu.add(colorMapMenuItem3);
 	    colorMapMenuItem3.addActionListener(cmAction);
-	    
-	    
-		cameraMap.setComponentPopupMenu(popupMenu);
-		
+
+
+		cameraPixelMap.setComponentPopupMenu(popupMenu);
+
 	}
-	
-	
+
+
 
 	public void setEvent(Data event) {
 		this.event = event;
@@ -128,7 +130,7 @@ public class MapView extends JPanel {
 			currentSelection = (String)comboBox.getSelectedItem();
 			comboBox.removeAllItems();
 		}
-		
+
 		if(sourceSelection)
 		{
 			if (event == null) {
@@ -155,7 +157,7 @@ public class MapView extends JPanel {
 						}
 				}
 			}
-			cameraMap.setEvent(event);
+			cameraPixelMap.setEvent(event);
 			if(currentSelection != null){
 				comboBox.setSelectedItem(currentSelection);
 			}
@@ -168,11 +170,11 @@ public class MapView extends JPanel {
 					if (val.getClass().getComponentType() == double.class) {
 						length = ((double[]) (event.get(key))).length;
 						if(showerChids != null){
-							cameraMap.setData(setIds(showerChids,(double[]) (event.get(key))));
+							cameraPixelMap.setData(setIds(showerChids,(double[]) (event.get(key))));
 						} else {
-							cameraMap.setData((double[]) (event.get(key)));
+							cameraPixelMap.setData((double[]) (event.get(key)));
 						}
-					} 
+					}
 				}
 				for (int i = 0; i < length/Constants.NUMBEROFPIXEL; i++ ){
 					try {
@@ -185,8 +187,8 @@ public class MapView extends JPanel {
 				}
 			}
 		}
-		scale.setMax(cameraMap.getMaxValue());
-		scale.setMin(cameraMap.getMinValue());
+		scale.setMax(cameraPixelMap.getMaxValue());
+		scale.setMin(cameraPixelMap.getMinValue());
 		scale.repaint();
 	}
 	public double[] setIds(int[] chids, double[] values){
@@ -204,19 +206,19 @@ public class MapView extends JPanel {
 
 
 	public void setData(double[] valArray){
-		cameraMap.setData(valArray);
-		scale.setMax(cameraMap.getMaxValue());
-		scale.setMin(cameraMap.getMinValue());
+		cameraPixelMap.setData(valArray);
+		scale.setMax(cameraPixelMap.getMaxValue());
+		scale.setMin(cameraPixelMap.getMinValue());
 		scale.repaint();
 	}
 	public void setSlice(int i) {
 		slice = i;
-		cameraMap.setCurrentSlice(slice);
+		cameraPixelMap.setCurrentSlice(slice);
 
 	}
 
 	public void setActiveOverlayKeys(Set<String> selectedKeys) {
-		cameraMap.setActiveOverlayKeys(selectedKeys);
+		cameraPixelMap.setActiveOverlayKeys(selectedKeys);
 	}
 
 }

@@ -11,7 +11,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 

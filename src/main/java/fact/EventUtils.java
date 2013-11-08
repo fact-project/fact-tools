@@ -1,4 +1,4 @@
-package fact.data;
+package fact;
 
 import java.io.Serializable;
 import java.util.ArrayList;

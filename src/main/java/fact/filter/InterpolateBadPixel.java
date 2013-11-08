@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.utils.SimpleFactEventProcessor;
 import fact.viewer.ui.DefaultPixelMapping;
 
@@ -23,6 +23,14 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 //	private int crazy[] = {863,868,297};
 //	private int bad[] = {927,80,873};
 	
+	//returns true if the specified array is anywhere in the array
+	public static boolean arrayContains(int[] ar, int value) {
+		for(int i = 0; i < ar.length; i++){
+			if(ar[i] == value) return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public double[] processSeries(double[] series) {
 		int roi = series.length / Constants.NUMBEROFPIXEL;
@@ -31,7 +39,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 			nData = new double[series.length];
 			for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
 				//if were looking at a badPixel
-				if(EventUtils.arrayContains(badChIds, pix)){
+				if(arrayContains(badChIds, pix)){
 					int[] currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
 //					log.debug("interpolating pix number: " + pix);
 					//iterate over all slices

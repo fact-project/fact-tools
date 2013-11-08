@@ -11,7 +11,7 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
 import fact.viewer.ui.DefaultPixelMapping;

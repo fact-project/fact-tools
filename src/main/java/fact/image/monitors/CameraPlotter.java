@@ -14,7 +14,7 @@ import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.image.OnlineStatistics;
 import fact.viewer.ui.MapView;
 

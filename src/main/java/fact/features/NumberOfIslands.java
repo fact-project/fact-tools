@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.utils.SimpleFactEventProcessor;
 /**
  * If key refers to an int[] of showerpixel. this will calculate the number of islands

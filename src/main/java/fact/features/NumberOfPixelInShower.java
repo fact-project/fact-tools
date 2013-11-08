@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.data.EventUtils;
+import fact.EventUtils;
 
 public class NumberOfPixelInShower implements Processor {
 	static Logger log = LoggerFactory.getLogger(NumberOfPixelInShower.class);

@@ -13,7 +13,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 /**
  * This processor gathers all start and stopcells from the \"limit\" {@link #getLimit()} previous events. 
  * To identify a jump at a certain position it looks at the mean value of all pixels and checks the value 

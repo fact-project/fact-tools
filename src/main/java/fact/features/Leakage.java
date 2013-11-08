@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public class Leakage implements Processor {

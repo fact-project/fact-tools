@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
-import fact.data.EventUtils;
+import fact.EventUtils;
 
 
 /**

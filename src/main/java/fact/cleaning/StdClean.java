@@ -10,7 +10,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.Data;
 import fact.Constants;
-import fact.data.EventUtils;
+import fact.EventUtils;
 import fact.filter.SliceNormalization;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;

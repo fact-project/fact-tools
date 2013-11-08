@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import stream.Data;
 import stream.Processor;
-import fact.data.EventUtils;
+import fact.EventUtils;
 
 /**
  * This processors takes an array and an array of indices. It puts all values with the given indeces into a new array. That means the new Array is of the same length as the indices array.
