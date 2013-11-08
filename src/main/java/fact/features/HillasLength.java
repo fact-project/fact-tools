@@ -16,6 +16,10 @@ public class HillasLength implements Processor {
 	
 	@Override
 	public Data process(Data input) {
+		if(!input.containsKey(distribution)){
+			log.info("No shower in evernt. Not calculating length");
+			return input;
+		}
 		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
