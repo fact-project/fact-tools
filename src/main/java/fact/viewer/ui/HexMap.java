@@ -285,14 +285,17 @@ public class HexMap extends JPanel implements PixelMap {
 			average[i] = average[i] / sliceValues.length;
 		}
 
-		log.debug("Slices loaded.");
+//		log.debug("Slices loaded.");
 		setCurrentSlice(currentSlice);
-		repaint();
+//		repaint();
 	}
 	
 	public void setCurrentSlice(int i) {
 		log.debug("Selecting slice: {}", i);
 		if (i >= 0 && i < sliceValues[0].length) {
+			if(i < sliceValues[0].length){
+				i = sliceValues[0].length -1 ;
+			}
 			currentSlice = i;
 			for (int p = 0; p < sliceValues.length; p++) {
 				if (getCellById(p) != null)

@@ -60,7 +60,7 @@ public class MapView extends JPanel {
 		this.key = key;
 	}
 
-	public MapView(FactViewer m, boolean live, boolean sourceSelection) {
+	public MapView(FactViewer m, boolean live,  boolean sourceSelection) {
 		this.sourceSelection = sourceSelection;
 		this.live = live;
 		mainWindow = m;
@@ -86,16 +86,15 @@ public class MapView extends JPanel {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					System.out.println("Hallo!");
-//					if (arg0.getSource() == comboBox && comboBox.getItemCount()!=0 ) {
-//						String sel = (String) comboBox.getSelectedItem();
-//						if (sel.endsWith(" Static Map")) {
-//							sel = (String) sel.subSequence(0, sel.length()
-//									- " Static Map".length());
-//						}
+					if (arg0.getSource() == comboBox && comboBox.getItemCount()!=0 ) {
+						String sel = (String) comboBox.getSelectedItem();
+						if (sel.endsWith(" Static Map")) {
+							sel = (String) sel.subSequence(0, sel.length()
+									- " Static Map".length());
+						}
 //						System.out.println("------------" + sel);
-//						cameraPixelMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
-//					}
+						cameraPixelMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
+					}
 				}
 			});
 		}
