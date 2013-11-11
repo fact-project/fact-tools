@@ -32,7 +32,7 @@ public class HillasWidth implements Processor {
 		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-		double width = (double) Math.sqrt(dist.getEigenVarianceX());
+		double width =  Math.sqrt(dist.getEigenVarianceX());
 	    input.put(outputKey, width);
 		
 	    return input;

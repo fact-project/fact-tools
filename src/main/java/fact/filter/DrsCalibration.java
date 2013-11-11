@@ -137,7 +137,7 @@ public class DrsCalibration implements Processor {
 		
 		
 		double[] rawfloatData = new double[rawData.length];
-//		System.arraycopy(rawData, 0, rawfloatData, 0, rawData.length);
+//		System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
 		for (int i = 0; i < rawData.length; i++) {
 			rawfloatData[i] = rawData[i];
 		}

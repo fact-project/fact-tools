@@ -36,7 +36,7 @@ public class OnlineAverage implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		if(output == null || output ==""){		
+		if(output == null || output.equals("")){		
 			input.put(key+"_avg", (processEvent(input, key))[0]);
 			if(calcStd){
 				input.put(key+"_std", onStat.getValueMap().get(key+"_std"));
@@ -97,10 +97,4 @@ public class OnlineAverage implements Processor {
 	public void setKey(String key) {
 		this.key = key;
 	}
-
-
-
-
-
-
 }

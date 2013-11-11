@@ -29,7 +29,7 @@ import fact.Constants;
 public class RootASCIIWriter extends CsvWriter {
 
 	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);
-	String[] keys = {"DataCalibrated"};
+//	String[] keys = {"DataCalibrated"};
 	CsvWriter writer = null;
 	private boolean writeTreeDescriptor = true;
 
@@ -53,7 +53,10 @@ public class RootASCIIWriter extends CsvWriter {
 	@Override
 	public Data process(Data data) {
 		try {
-
+			if(keys == null){
+				log.error("No keys specified");
+				throw new RuntimeException("You have to specify the keys to write");
+			}
 			if(writeTreeDescriptor){
 				writeTreeDescriptor = false;
 				Data headerItem = DataFactory.create();
@@ -178,19 +181,6 @@ public class RootASCIIWriter extends CsvWriter {
 		return headerString;
 	}
 
-	/**
-	 * @return the key
-	 */
-	public String[] getKeys() {
-		return keys;
-	}
-	/**
-	 * @param key
-	 *            the key to set
-	 */
-	public void setKeys(String[] keys) {
-		this.keys = keys;
-	}
 
 
 

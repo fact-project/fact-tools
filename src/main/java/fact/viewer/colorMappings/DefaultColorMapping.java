@@ -17,7 +17,7 @@ public class DefaultColorMapping
 	implements ColorMapping 
 {
 	static Logger log = LoggerFactory.getLogger( DefaultColorMapping.class );
-	double scale = 1.0f;
+	double scale = 1.0d;
 	double minValue, maxValue;
 	public DefaultColorMapping(){
 	}

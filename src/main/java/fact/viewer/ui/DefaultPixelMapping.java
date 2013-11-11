@@ -150,11 +150,11 @@ public class DefaultPixelMapping implements PixelMapping {
 		}
 		x = x/9.5f;
 		y = y/9.5f;
-		double ix =  (x /Math.sin(60* (Math.PI/180)));
+		float ix =  (float) (x /Math.sin(60* (Math.PI/180)));
 		ix =  Math.round(ix);
-		double iy = y;
+		float iy = y;
 		if(ix % 2 == 0){
-			iy = y-0.5;
+			iy = y-0.5f;
 		}
 		iy = -Math.round(iy);
 		

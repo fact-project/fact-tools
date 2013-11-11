@@ -25,7 +25,7 @@ public class OnlineStatistics {
 		int counter = 1;
 		if(counterMap.containsKey(key))
 		{
-			counter = (Integer) counterMap.get(key);
+			counter = counterMap.get(key);
 		}
 		//check if avg and std array already exists
 		//The  avg array holds the average of the value. Its being updated for every event.

@@ -178,12 +178,12 @@ public class CoreNeighborClean implements StatefulProcessor{
 			l2.add(new Pixel(level2[i]));
 		}
 		if(showerPixelArray.length > 0){
-			input.put(outputKey+"_level1", level1);
-			input.put(outputKey+"_level1" +"_"+Constants.PIXELSET, l1);
-			input.put(outputKey+"_level2", level2);
-			input.put(outputKey+"_level2" +"_"+Constants.PIXELSET, l2);
-			input.put(outputKey+"_level3", level3);
-			input.put(outputKey+"_level3" +"_"+Constants.PIXELSET, l3);
+//			input.put(outputKey+"_level1", level1);
+//			input.put(outputKey+"_level1" +"_"+Constants.PIXELSET, l1);
+//			input.put(outputKey+"_level2", level2);
+//			input.put(outputKey+"_level2" +"_"+Constants.PIXELSET, l2);
+//			input.put(outputKey+"_level3", level3);
+//			input.put(outputKey+"_level3" +"_"+Constants.PIXELSET, l3);
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"_"+Constants.PIXELSET, corePixelSet);
 		}

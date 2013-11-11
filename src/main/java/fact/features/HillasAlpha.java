@@ -48,7 +48,7 @@ public class HillasAlpha implements Processor {
 	
 	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
 	
-	    alpha                  = (double) (dist.getAngle() - auxiliary_angle);
+	    alpha                  =  (dist.getAngle() - auxiliary_angle);
 	
 	    if (alpha > 90)
 	    {

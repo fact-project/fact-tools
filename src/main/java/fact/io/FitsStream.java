@@ -344,9 +344,10 @@ public class FitsStream extends AbstractStream {
 		}
 
 		byte[] header = new byte[pos];
-		for (int i = 0; i < header.length; i++) {
-			header[i] = data[i];
-		}
+		System.arraycopy(data, 0, header, 0, header.length);
+//		for (int i = 0; i < header.length; i++) {
+//			header[i] = data[i];
+//		}
 
 		if (read % 2880 != 0) {
 			throw new IOException("Failed to read header: " + 2880
@@ -372,9 +373,10 @@ public class FitsStream extends AbstractStream {
 			String[] lines = new String[headerData.length / 80];
 			for (int i = 0; i < lines.length; i++) {
 				byte[] bytes = new byte[80];
-				for (int j = 0; j < bytes.length; j++) {
-					bytes[j] = headerData[i * bytes.length + j];
-				}
+//				for (int j = 0; j < bytes.length; j++) {
+//					bytes[j] = headerData[i * bytes.length + j];
+//				}
+				System.arraycopy(headerData, i*bytes.length, bytes, 0, bytes.length);
 				try {
 					lines[i] = new String(bytes, "US-ASCII");
 				} catch (UnsupportedEncodingException e) {
