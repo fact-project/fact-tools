@@ -69,7 +69,7 @@ public class EventInfoWindow {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				mainWindow.getEvWList().remove(this);
+				mainWindow.getEvWList().remove(EventInfoWindow.this);
 			}
 		});
 		frame.pack();

@@ -13,6 +13,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -315,8 +316,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 							ios.close();
 							// selectSlice( slice );
 
-						} catch (Exception e) {
-
+						} catch (IOException e) {
+							log.error("Could not save gif. Io Error");
 						}
 
 						finish();

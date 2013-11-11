@@ -58,7 +58,7 @@ public class ChartWindow {
 		plotPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 		plotPanel.setBorder(null);
 		frame.getContentPane().add(plotPanel, "1, 1, fill, fill");
-		sL = new SourceSelector(event, this);
+		sL = new SourceSelector(this);
 		sL.setAlignmentX(Component.CENTER_ALIGNMENT);
 		sL.setAlignmentY(Component.TOP_ALIGNMENT);
 		sL.setPreferredSize(new Dimension(170,
@@ -68,7 +68,7 @@ public class ChartWindow {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				mainWindow.getChartWindowList().remove(this);
+				mainWindow.getChartWindowList().remove(ChartWindow.this);
 			}
 		});
 		frame.pack();

@@ -3,6 +3,7 @@ package fact.features;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,7 +191,7 @@ public class SourcePosition implements StatefulProcessor {
 		//add deviation between the calculated point az,dz and the az,dz in the file
 		double[] deviation = {(double) (pointingAzDe[0] - point[3]), (double) ( pointingAzDe[1] - point[4]) };
 		data.put(outputKey+"pointingDeviation", deviation);
-		log.debug ("Pointing deviation: " + deviation);
+		log.debug ("Pointing deviation: " + Arrays.toString(deviation));
 		log.debug( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ; 
 		return data;
 	}

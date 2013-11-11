@@ -27,7 +27,7 @@ public class SourceSelector extends JPanel {
 	private ChartWindow cW;
 	private ArrayList<String> selectedKeys = new ArrayList<String>();
 
-	public SourceSelector(Data event, ChartWindow cW) {
+	public SourceSelector(ChartWindow cW) {
 		setBackground(Color.WHITE);
 		this.cW = cW;
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));

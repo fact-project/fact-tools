@@ -30,15 +30,8 @@ public class SourceOverlay implements Overlay, Serializable {
 
 	protected double width;
 
-	protected double radius;
-
-	public SourceOverlay(float sX, float sY, Shape shape) {
-
-	}
-
 	public SourceOverlay(Point2D p) {
 		this.point = p;
-
 	}
 
 	public SourceOverlay(double mSourceX, double mSourceY) {
@@ -47,20 +40,16 @@ public class SourceOverlay implements Overlay, Serializable {
 
 	@Override
 	public void paint(Graphics g, HexTile[][] cells) {
-		Double radius;
 		if (camMap != null) {
-			radius = camMap.cellRadius;
-		} else {
-			radius = 7.0;
-			System.out.println("cammap = mnull radious = " + radius);
+//			camMap.cellRadius;
+		
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setColor(color);
+			g2.setStroke(stroke);
+			Point p = camMap.getPixelCoordsFromRealCoords(point.getX(), point.getY());
+			shape = new Ellipse2D.Double(p.x, p.y, 10.0, 10);
+			g2.draw(shape);
 		}
-
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setColor(color);
-		g2.setStroke(stroke);
-		Point p = camMap.getPixelCoordsFromRealCoords(point.getX(), point.getY());
-		shape = new Ellipse2D.Double(p.x, p.y, 10.0, 10);
-		g2.draw(shape);
 		// g2.setColor(Color.WHITE);
 		// ((Graphics2D) g2).draw(new Line2D.Double(0.0, 0.0, 200.0, 200.0));
 		//
