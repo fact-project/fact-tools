@@ -15,6 +15,7 @@ import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
 import fact.EventUtils;
 import fact.image.OnlineStatistics;
+import fact.plotter.ui.BarPlotPanel;
 
 /**
  * This class can plot a bar graph with errorBars by calculating the mean and

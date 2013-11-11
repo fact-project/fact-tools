@@ -1,21 +1,20 @@
-package fact.plotter;
+package fact.plotter.ui;
 
 import java.awt.Color;
 import java.awt.Paint;
 
-import org.jfree.chart.renderer.category.StatisticalBarRenderer;
-
+import org.jfree.chart.renderer.category.BarRenderer;
 /**
  * shamelessly stolen from http://javabeanz.wordpress.com/2007/07/04/creating-barcharts-with-custom-colours-using-jfreechart/
  * @author bruegge
  *
  */
-public class CustomStatisticalBarRender extends StatisticalBarRenderer {
+public class CustomBarRender extends BarRenderer {
 	private static final long serialVersionUID = -1781361840471596081L;
 
 	 private Paint[] colors;
 
-	 public CustomStatisticalBarRender() 
+	 public CustomBarRender() 
 	 { 
 	    this.colors = new Paint[] {Color.red, Color.blue, Color.green, 
 	      Color.yellow, Color.orange, Color.cyan, 

@@ -1,4 +1,4 @@
-package fact.plotter;
+package fact.plotter.ui;
 
 import java.awt.BorderLayout;
 
