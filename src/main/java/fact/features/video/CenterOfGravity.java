@@ -65,8 +65,9 @@ public class CenterOfGravity implements Processor
 		cogVelocityX = new double[sliceCount - 1];
 		cogVelocityY = new double[sliceCount - 1];
 		cogVelocity = new double[sliceCount - 1];
+		cogVelocityXError = new double[sliceCount - 1];
+		cogVelocityYError = new double[sliceCount - 1];
 		cogVelocityError = new double[sliceCount - 1];
-		
 		size = new double[sliceCount];
 		
 		double minimalVelocity = Double.MAX_VALUE; // minimal velocity of all slices
@@ -129,12 +130,17 @@ public class CenterOfGravity implements Processor
 				cogVelocity[slice - 1] = (double) Math.sqrt(cogVelocityX[slice - 1]*cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]);
 				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogx[slice] * varcogx[slice] + varcogx[slice - 1] * varcogx[slice - 1]);
 				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogy[slice] * varcogy[slice] + varcogy[slice - 1] * varcogy[slice - 1]);
-				cogVelocityError[slice - 1] = Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
+				// here i will define a better quality parameter
+				cogVelocityError[slice - 1] = varcogx[slice - 1]*varcogx[slice - 1]+varcogy[slice - 1]*varcogy[slice - 1];
+						//Math.exp(-(varcogx[slice]*varcogx[slice] + varcogy[slice]*varcogy[slice] + 
+						//varcogx[slice-1]*varcogx[slice-1] + varcogy[slice-1]*varcogy[slice-1]));
+						/*
+						 * Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
 														cogVelocityXError[slice - 1] * cogVelocityXError[slice - 1] +
 														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
 														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
 														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
-			
+			*/
 				if (cogVelocity[slice - 1] < minimalVelocity)
 				{
 					minimalVelocity = cogVelocity[slice - 1];

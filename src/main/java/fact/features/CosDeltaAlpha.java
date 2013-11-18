@@ -27,6 +27,7 @@ public class CosDeltaAlpha implements Processor{
 		sourcePositionArray = (double[]) input.get(sourcePosition);
 		cogXValue = (Double) input.get(cogX);
 		cogYValue = (Double) input.get(cogY);
+		hillasDeltaValue = (Double) input.get(hillasDelta);
 		
 		double sx,sy,dist;
 		sx = cogXValue - sourcePositionArray[0];
@@ -39,7 +40,8 @@ public class CosDeltaAlpha implements Processor{
 		double s = Math.sin(hillasDeltaValue);
 		double c = Math.cos(hillasDeltaValue);
 		
-	    double arg2 = c*sx + s*sy;          // [mm]
+	    double arg2 = c*sx + s*sy; // mm
+						
 	     if (arg2 == 0)
 	         return input;
 
