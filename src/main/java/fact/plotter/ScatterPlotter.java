@@ -87,7 +87,7 @@ public class ScatterPlotter extends DataVisualizer {
 			if(data.containsKey(xValue)){
 				x = EventUtils.valueToDouble(data.get(xValue));
 			} else {
-				throw new RuntimeException("Key not found in event. "  + xValue);
+				throw new RuntimeException("Key for xValue not found in event. "  + xValue);
 			}
 			if(Double.isNaN(x)){
 				log.warn("This doesnt handle NaNs very well.");
@@ -96,7 +96,7 @@ public class ScatterPlotter extends DataVisualizer {
 			if(data.containsKey(yValue)){
 				y = EventUtils.valueToDouble(data.get(yValue));
 			} else {
-				throw new RuntimeException("Key not found in event. "  + xValue);
+				throw new RuntimeException("Key for yValue not found in event. "  + yValue);
 			}
 			if(Double.isNaN(y)){
 				log.warn("This doesnt handle NaNs very well.");
