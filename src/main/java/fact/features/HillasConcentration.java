@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
 
 public class HillasConcentration implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasConcentration.class);
