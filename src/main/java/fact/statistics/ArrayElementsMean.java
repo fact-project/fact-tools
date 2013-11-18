@@ -11,6 +11,7 @@ import fact.EventUtils;
 
 /**
  * This operator calculates the mean value of each element in the array and puts out another array which holds the mean value for each element.
+ * The output array is of the same length as the input array. Which means that the input array in each event has to be of the same length.
  * 
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
