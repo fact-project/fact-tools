@@ -22,15 +22,16 @@ FITS data file and applies the DRS calibration:
 
      <container>
 
-        <Stream id="fact-data" class="fact.io.FactEventStream"
+        <Stream id="fact-data" class="fact.io.FitsStream"
                 url="file:///tmp/fact-data.fits.gz" />
 
 
         <Process input="fact-data">
           
-            <fact.io.DrsCalibration file="file:///tmp/fact.drs.fits.gz" />
+            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+                                          key="data" outputKey="DataCalibrated"/>
         
-            <fact.data.MaxAmplitude />
+            <fact.features.MaxAmplitude key="DataCalibrated" outputKey="maxAmplitude"/>
             
         </Process>
 
@@ -41,66 +42,11 @@ obtained from previous pedestal runs. This data is read from `fact.drs.fits.gz`.
 Afer this calibration step, the keys `Data` and `DataCalibrated` are available
 in the data item.
 
-The `MaxAmplitude` processor is by default applied to the keys `Data` and
-`DataCalibrated`. It computes a float array of 1440 float values over the
-time slices of each pixel and stores this array as `amplitude(Data)` and
-`amplitude(DataCalibrated)`.
+The `MaxAmplitude` processor is applied to the key `DataCalibrated` as specified by the parameter in the `experiment.xml`.
+It computes a double array of 1440 double values over the
+time slices of each pixel and stores this array as `maxAmplitude`.
 
 
-### Exporting Calibrated Data
-
-Another simple example can be given by a process that reads FACT data from
-a FITS file, applies the DRS calibration and writes out the `DataCalibrated`
-part, i.e. the calibrated data, into a file in binary form.
-
-     <container>
-
-        <stream id="fact-data" class="fact.io.FactEventStream"
-                url="file:///tmp/fact-data.fits.gz" />
-
-
-        <process input="fact-data">
-          
-            <fact.io.DrsCalibration file="file:///tmp/fact.drs.fits.gz" />
-
-            <fact.io.BinaryFactWriter key="DataCalibrated"
-                                      file="calibrated-events.dat" />
-            
-        </process>
-
-     </container>
-
-
-
-### Simple Plots
-
-A very simple processors is provided by `ExtractPixel`, which can be used
-to extract the slices of a single pixel into a float array that will be separately
-stored in the data item:
-
-
-      ...
-      
-      <stream id="fact-data" ... />
-      
-      <process input="fact-data">
-         
-         <fact.io.ExtractPixel chid="430" name="pixel_430"/>
-
-      </process> 
-      ...
-
-Using the plot processors, we can now plot this pixel against other properties contained
-in the event data items, e.g. the event number stored in `eventNum`.
-      
-
-      <process input="fact-data">
-         
-         <fact.io.ExtractPixel chid="430" name="pixel_430" />
-         
-         <stream.plotter.Plotter x-axis="eventNum" y-axis="pixel_430" output="pixel_430.plot.dat" />
-      
-      </process>
 
 
 Event Data Items

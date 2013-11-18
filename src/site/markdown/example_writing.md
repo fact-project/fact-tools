@@ -1,0 +1,93 @@
+Writing Data
+============
+Its often necessary to write all the things you calculated to some sort of file. This allows ou to further analyze your data with whatever 
+software you like. There are a couple of processors in the fact.io package which provide some basic file writing to .csv files or similar.
+
+
+
+
+### Writing complete Events to a File
+
+A simple example can be given by a process that reads FACT data from
+a FITS file, applies the DRS calibration and writes out the `DataCalibrated`
+part, i.e. the calibrated data, into a file in binary form.
+
+     <container>
+
+        <stream id="fact-data" class="fact.io.FactEventStream"
+                url="file:///tmp/fact-data.fits.gz" />
+
+
+        <process input="fact-data">
+          
+            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+                                          key="data" outputKey="DataCalibrated"/>
+
+            <fact.io.BinaryFactWriter key="DataCalibrated"
+                                      file="calibrated-events.dat" />
+            
+        </process>
+
+     </container>
+
+
+### Writing keys to a file
+
+While this might not seem very useful heres another example. Here we write out a calculated feature for each event in the data stream. 
+Lets say we use the `MaxAmplitude` processor to calculate the maximum amplitude for each pixel in each event.
+You're probably interested in the mean value of `MaxAmplitude` for each event (i.e.  you want the average over all 1440 pixel in each event).
+To calculate the mean from an array you can use the `ArrayMean` processor in the fact.statistics package. The following example for a simple
+.xml file does just that and writes the result to a file called `output.csv`
+
+     <container>
+
+        <Stream id="fact-data" class="fact.io.FitsStream"
+                url="file:///tmp/fact-data.fits.gz" />
+
+
+        <Process input="fact-data">
+          
+            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+                                          key="data" outputKey="DataCalibrated"/>
+        
+            <fact.features.MaxAmplitude key="DataCalibrated" outputKey="maxAmplitude"/>
+
+            <fact.statistics.ArrayMean key="maxAmplitude" outputKey="maxAmplitudeMean" />
+            
+            <stream.io.CsvWriter keys="maxAmplitudeMean" url="file:///tmp/output.csv" />
+        </Process>
+     </container>
+
+Heres the output in the output.csv file:
+
+    E5b-Mac-mini-002:~ kaibrugge$ cat /tmp/output.csv
+        maxAmplitudeMean
+        17.614393739392597
+        14.588448515241033
+        22.169573771009336
+        14.296095578926428
+        21.037508170910385
+        125.59263993996835
+        16.84055010006866
+        15.485890265286749
+    ...
+
+Since you probably want to write out something to connect these number to events, you could also write out the event number of each event like so:
+    
+    <-- No spaces between keys--/>    
+    <stream.io.CsvWriter keys="EventNum,maxAmplitudeMean" url="file:///tmp/output.csv" />
+
+
+The output in the file will look accordingly:
+
+    E5b-Mac-mini-002:~ kaibrugge$ cat /tmp/output.csv
+        EventNum,maxAmplitudeMean
+        71,17.614393739392597
+        74,14.588448515241033
+        75,22.169573771009336
+        76,14.296095578926428
+        77,21.037508170910385
+        78,125.59263993996835
+        80,16.84055010006866
+        81,15.485890265286749
+      ...

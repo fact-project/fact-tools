@@ -25,8 +25,9 @@
 		<item name="Fact Viewer" href="viewer.html" />
 		<item name="Building" href="build.html"/>
 
-                <item name="Examples" href="examples.html">
-                     <item name="Examples" href="processor.html" />
+                <item name="Usage Examples" href="examples.html">
+                     <item name="Writing Data" href="example_writing.html" />
+                     <item name="Plotting Data" href="example_plots.html" />
                 </item>
 	</menu>
 	

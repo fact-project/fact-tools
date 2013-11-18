@@ -10,7 +10,7 @@ The following picture shows a screenshot of the FactViewer:
    <img src="images/fact-viewer-screen1.png" style="width:700px;" />
 </div>
 
-More features are to follow.
+More features to follow.
     
 ## Download of the Viewer
 
