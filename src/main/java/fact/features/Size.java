@@ -4,7 +4,8 @@ import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
 /**
- * Calculate the feature called Size. A physicist would call this the number of Photons in a shower. This basicly sums up all weights that belong to a shower.
+ * Calculate the feature called Size. A physicist would call this the number of Photons in a shower. 
+ * This basicly sums up all weights that belong to a shower.
  * In short size is the sum of the photonCharge of all showerPixel. 
  * @author kaibrugge
  *
@@ -20,7 +21,7 @@ public class Size implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-
+		
 		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);

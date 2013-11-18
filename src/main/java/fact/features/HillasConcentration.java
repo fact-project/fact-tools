@@ -17,7 +17,7 @@ public class HillasConcentration implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, shower, weights);
+//		EventUtils.mapContainsKeys(getClass(), input, shower, weights);
 	
 		int[] 	showerPixel;
 		double[] photonCharge;
@@ -27,6 +27,10 @@ public class HillasConcentration implements Processor {
 		} catch (ClassCastException e){
 			log.error("Could  not cast the keys to the right types");
 			throw e;
+		}
+		if(showerPixel == null || showerPixel.length == 0){
+			log.warn("No shower in event. not calculating conenctration");
+			return input;
 		}
 
 		
