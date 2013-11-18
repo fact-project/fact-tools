@@ -23,9 +23,9 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		{
 			cogXValue = (Float) input.get(cogX);
 			cogYValue = (Float) input.get(cogY);
-			hillasSizeValue = (Float) input.get(hillasSize);
+			hillasSizeValue = (Double) input.get(hillasSize);
 			
-			photonChargeArray = (float[]) input.get(photonCharge);
+			photonChargeArray = (double[]) input.get(photonCharge);
 		}
 		catch (ClassCastException e)
 		{
@@ -42,8 +42,8 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		int[] neighbors = DefaultPixelMapping.getNeighborsFromChid(cogChId);
 		
 		// mindist1 < mindist2
-		float mindist1 = Float.MAX_VALUE;
-		float mindist2 = Float.MAX_VALUE;
+		double mindist1 = Float.MAX_VALUE;
+		double mindist2 = Float.MAX_VALUE;
 		
 		int minChId1 = cogChId;
 		int minChId2 = cogChId;
@@ -53,7 +53,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		{
 			float x = DefaultPixelMapping.getGeomX(pix);
 			float y = DefaultPixelMapping.getGeomY(pix);
-			float dist = (cogXValue - x) * (cogXValue - x) + (cogYValue - y) * (cogYValue - y);
+			double dist = (cogXValue - x) * (cogXValue - x) + (cogYValue - y) * (cogYValue - y);
 			
 			if(dist < mindist1)
 			{
@@ -68,7 +68,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 			}
 		}
 		
-		float conc = photonChargeArray[cogChId] + photonChargeArray[minChId1] + photonChargeArray[minChId2];
+		double conc = photonChargeArray[cogChId] + photonChargeArray[minChId1] + photonChargeArray[minChId2];
 		conc /= hillasSizeValue;
 		input.put(outputKey, conc);
 		
@@ -119,9 +119,9 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	
 	private Float cogXValue = null;
 	private Float cogYValue = null;
-	private Float hillasSizeValue = null;
+	private Double hillasSizeValue = null;
 	
-	private float[] photonChargeArray = null;
+	private double[] photonChargeArray = null;
 	
 	private String photonCharge;
 	private String cogX;

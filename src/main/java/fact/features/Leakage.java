@@ -13,7 +13,7 @@ public class Leakage implements Processor {
 
 	private String shower = null;
 	private String weights = null;
-	private String outputKey = "HillasConcentration";
+	private String outputKey = "HillasLeakage";
 
 	@Override
 	public Data process(Data input) {

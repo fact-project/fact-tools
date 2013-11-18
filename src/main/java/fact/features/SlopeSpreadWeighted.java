@@ -18,7 +18,13 @@ public class SlopeSpreadWeighted implements Processor
 	    
 		showerPixelArray = (int[]) input.get(showerPixel);
 		photonChargeArray = (double[]) input.get(photonCharge);
-		arrivalTimeArray = (double[]) input.get(arrivalTime);
+		
+		arrivalTimeArray = new double[photonChargeArray.length];
+		int[] arrivalPos = (int[]) input.get(arrivalTime);
+		for(int i = 0; i < arrivalPos.length; i++)
+		{
+			arrivalTimeArray[i] = (double) arrivalPos[i];
+		}
 		hillasDeltaValue = (Double) input.get(hillasDelta);
 		
 	    // input values
