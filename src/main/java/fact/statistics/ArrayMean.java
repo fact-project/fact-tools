@@ -11,7 +11,7 @@ import stream.Processor;
 import fact.EventUtils;
 
 /**
- * This operator calculates the mean value of hte values in of the array specified by the key
+ * This operator calculates the mean value of the values in of the array specified by the key.
  * 
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
@@ -27,12 +27,12 @@ public class ArrayMean implements Processor {
 			DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(EventUtils.toDoubleArray(data));
 			
 			input.put(outputKey , descriptiveStatistics.getMean());
+			input.put(outputKey+ "_deviation" , descriptiveStatistics.getStandardDeviation());
+			input.put(outputKey+ "_N" , descriptiveStatistics.getN());
 			return input;
 		} else {
 			throw new RuntimeException("Key not found in event. "  + key  );
 		}
-		
-		
 	}
 
 	

@@ -7,8 +7,9 @@ import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
 
 /**
- * This Processor calculates the Standarddeviation of the slices in each pixel. It uses the Average Processor to calculate the average value ina pixel. 
- * 
+ * <PRE format="md">
+ * This Processor calculates the deviation of **the slices** in each pixel. It uses the Average Processor to calculate the average value in a pixel. 
+ * </PRE>
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
 public abstract class StdDeviation extends SimpleFactEventProcessor<double[], double[]> {

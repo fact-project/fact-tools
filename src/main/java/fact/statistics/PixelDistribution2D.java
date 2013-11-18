@@ -2,6 +2,16 @@ package fact.statistics;
 
 import java.io.Serializable;
 
+/**
+ * <PRE format="md">
+ * At the moment this is simply a container class holding some useful information about a shower. 
+ * A shower can be described as a 2 dimensional distribution with weights. By transforming the camera coordinates 
+ * into the eigenspace of the distribution (ie. you basicly rotate the shower) you can easily calculate the parameters
+ * also known as **Hillas Parameter** 
+ * 
+ * @author kaibrugge
+ *
+ */
 public class PixelDistribution2D implements Serializable {
 	private static final long serialVersionUID = 3815070753769798637L;
 	//	Double variance_x = null;
