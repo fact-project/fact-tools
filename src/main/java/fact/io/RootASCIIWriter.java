@@ -18,18 +18,16 @@ import fact.Constants;
 
 /**
  * <p>
- * This class writes out FACT events in CSV format. The format for each event is
- * exactly 1440 * ROI double values. By default the data is expected to be
- * contained in the &quot;Data&quot; property of the input.
+ * This class writes out the data referred to by the "keys" attribute in the xml in a format thats hopefully readable by root.
+ * So far you can only write out Number types and strings. That should be enough. 
  * </p>
  * 
- * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
+ * @author Kai;
  * 
  */
 public class RootASCIIWriter extends CsvWriter {
 
 	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);
-//	String[] keys = {"DataCalibrated"};
 	CsvWriter writer = null;
 	private boolean writeTreeDescriptor = true;
 
@@ -38,6 +36,7 @@ public class RootASCIIWriter extends CsvWriter {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 		setSeparator(" ");
+//		writeHeader(null);
 		if (writer == null) {
 			//File outFile = new File(file);
 			log.debug("Creating new output-stream to '{}'", url);
