@@ -27,7 +27,7 @@ public class CamWindow {
 		 * Add cameraPixelMap, scalePanel and set some Layout stuff:
 		 */
 		JFrame frame = new JFrame();
-		mapPanel = new MapView(m, false, true);
+		mapPanel = new MapView(m, false, true, 5.0d);
 		mapPanel.getPreferredSize();
 
 		/**
