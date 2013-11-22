@@ -64,7 +64,7 @@ public class ScatterPlotter extends DataVisualizer {
 		plot.setRenderer(renderer);
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(640, 480));
-		final ApplicationFrame frame = new ApplicationFrame("Title");
+		final ApplicationFrame frame = new ApplicationFrame(title);
 		frame.setContentPane(chartPanel);
 		frame.pack();
 		frame.setVisible(true);
@@ -170,7 +170,7 @@ public class ScatterPlotter extends DataVisualizer {
 	public String getTitle() {
 		return title;
 	}
-	@Parameter(required = true, description = "Title String of the plot", defaultValue = "true")
+	@Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
 	public void setTitle(String title) {
 		this.title = title;
 	}
