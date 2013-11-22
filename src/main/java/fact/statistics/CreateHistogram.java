@@ -13,7 +13,7 @@ import fact.EventUtils;
 
 /**
  * Takes a float[] and returns an int[]
- *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
 public class CreateHistogram implements StatefulProcessor {
