@@ -11,7 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>0.9.12</streams.version>
+		<streams.version>0.9.13</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.0.14</version>
+			<version>1.0.15</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
 		<dependency>
