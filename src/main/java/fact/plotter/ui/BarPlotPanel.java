@@ -41,8 +41,8 @@ public class BarPlotPanel extends JPanel {
 //		}
 	}
 	
-	public BarPlotPanel(boolean drawError){
-		JFreeChart freeChart = ChartFactory.createBarChart("Test", "selected Keys", "Mean ", dataset, PlotOrientation.VERTICAL, false, false,false);
+	public BarPlotPanel(boolean drawError, String title){
+		JFreeChart freeChart = ChartFactory.createBarChart(title, "selected Keys", "Mean ", dataset, PlotOrientation.VERTICAL, false, false,false);
 		plot = freeChart.getCategoryPlot();
 
 		if(drawError)

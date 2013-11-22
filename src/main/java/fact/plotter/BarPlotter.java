@@ -31,37 +31,12 @@ public class BarPlotter extends DataVisualizer {
 	JFrame frame;
 
 	private boolean keepOpen = true;
-
-	public boolean isKeepOpen() {
-		return keepOpen;
-	}
-
-	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
-	public void setKeepOpen(boolean keepOpen) {
-		this.keepOpen = keepOpen;
-	}
-
-	private String[] keys;
-
-	public String[] getKeys() {
-		return keys;
-	}
-
-	@Parameter(required = false, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
-	public void setKeys(String[] keys) {
-		this.keys = keys;
-	}
-
 	private boolean drawErrors = true;
-
-	public boolean isDrawErrors() {
-		return drawErrors;
-	}
-
-	@Parameter(required = true, description = "Flag to toggle drawing of Errorbars in plot.")
-	public void setDrawErrors(boolean drawErrors) {
-		this.drawErrors = drawErrors;
-	}
+	private String[] keys;
+	private String title = "Default Title";
+	
+	
+	
 
 	public BarPlotter() {
 		width = 690;
@@ -76,12 +51,13 @@ public class BarPlotter extends DataVisualizer {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 		onStat = new OnlineStatistics();
-		histPanel = new BarPlotPanel(drawErrors);
+		histPanel = new BarPlotPanel(drawErrors, title);
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(histPanel, BorderLayout.CENTER);
 		frame.setSize(width, height);
 		frame.setVisible(true);
+//		frame.setTitle(title);
 		if(keys==null){
 			log.error("The keys paramter was null. Did you set it in the .xml file?");
 		}
@@ -90,9 +66,6 @@ public class BarPlotter extends DataVisualizer {
 	@Override
 	public Data processMatchingData(Data data) {
 		DefaultStatisticalCategoryDataset dataset = new DefaultStatisticalCategoryDataset();
-		// each value will be set to a different index so the bars can have
-		// custom colors.
-		// int keyNumber = 0;
 		
 		for (String key : getKeys()) {
 
@@ -127,8 +100,6 @@ public class BarPlotter extends DataVisualizer {
 				log.error("The key " + key + " does not exist in the Event");
 				throw new RuntimeException("Key not found in event. "  + key);
 			}
-			// keyCounter++;
-			// keyNumber++;
 		}
 		histPanel.setDataset(dataset);
 		histPanel.getPreferredSize();
@@ -145,5 +116,43 @@ public class BarPlotter extends DataVisualizer {
 		} else {
 			log.debug("Keeping plot frame visible...");
 		}
+	}
+	
+	
+	public boolean isKeepOpen() {
+		return keepOpen;
+	}
+
+	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
+	public void setKeepOpen(boolean keepOpen) {
+		this.keepOpen = keepOpen;
+	}
+
+
+	public String[] getKeys() {
+		return keys;
+	}
+
+	@Parameter(required = false, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
+	public void setKeys(String[] keys) {
+		this.keys = keys;
+	}
+
+
+	public boolean isDrawErrors() {
+		return drawErrors;
+	}
+
+	@Parameter(required = true, description = "Flag to toggle drawing of Errorbars in plot.")
+	public void setDrawErrors(boolean drawErrors) {
+		this.drawErrors = drawErrors;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+	@Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }
