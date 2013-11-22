@@ -46,21 +46,9 @@ public class MapView extends JPanel {
 	private String key="Data";
 
 	private int[] showerChids;
-	public int[] getShowerChids() {
-		return showerChids;
-	}
-	public void setShowerChids(int[] showerChids) {
-		this.showerChids = showerChids;
-	}
 
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public MapView(FactViewer m, boolean live,  boolean sourceSelection) {
+	
+	public MapView(FactViewer m, boolean live,  boolean sourceSelection, double pixelSize) {
 		this.sourceSelection = sourceSelection;
 		this.live = live;
 		mainWindow = m;
@@ -68,7 +56,7 @@ public class MapView extends JPanel {
 		 * Add cameraPixelMap, scalePanel and set some Layout stuff:
 		 */
 		this.setLayout(new BorderLayout(0, 0));
-		cameraPixelMap = new CameraPixelMap(5.0d);
+		cameraPixelMap = new CameraPixelMap(pixelSize);
 		cameraPixelMap.setSelectable(false);
 		cameraPixelMap.setBackground(Color.BLACK);
 		this.add(cameraPixelMap, BorderLayout.CENTER);
@@ -219,5 +207,20 @@ public class MapView extends JPanel {
 	public void setActiveOverlayKeys(Set<String> selectedKeys) {
 		cameraPixelMap.setActiveOverlayKeys(selectedKeys);
 	}
+	
+	public int[] getShowerChids() {
+		return showerChids;
+	}
+	public void setShowerChids(int[] showerChids) {
+		this.showerChids = showerChids;
+	}
 
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	
 }

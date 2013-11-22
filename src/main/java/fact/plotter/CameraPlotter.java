@@ -29,48 +29,28 @@ public class CameraPlotter extends DataVisualizer  {
 	LinkedHashMap<String, double[]> valueMap = new LinkedHashMap<String , double[]>();
 	//this map contains counters that count the number of vales that have arrived for every key
 	LinkedHashMap<String, Integer> counterMap = new LinkedHashMap<String, Integer>();
+	
+	
 	private boolean keepOpen = true;
-	public boolean isKeepOpen() {
-		return keepOpen;
-	}
-	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
-	public void setKeepOpen(boolean keepOpen) {
-		this.keepOpen = keepOpen;
-	}
-
 	private String key;
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	private Double panelSize = 6.0;
-	public Double getPanelSize() {
-		return panelSize;
-	}
-	@Parameter(required = false, description = "Size of the camera Pixel being drawn", defaultValue="6.0")
-	public void setPanelSize(Double panelSize) {
-		this.panelSize = panelSize;
-	}
+	private Double pixelSize = 6.0;
+	
+	private String title ="Default Title";
 
 	private OnlineStatistics onStat;
 	private MapView mapView;
 	
-	public CameraPlotter(){
-		
-	}
 	
 	@Override
 	public void init(ProcessContext ctx) throws Exception{
 		super.init(ctx);
-		mapView = new MapView(null, false, false);
+		mapView = new MapView(null, false, false, pixelSize);
 		onStat = new OnlineStatistics();
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(mapView, BorderLayout.CENTER);
 		frame.setSize(mapView.getPreferredSize());
+		frame.setTitle(title);
 		frame.setVisible(true);
 	}
 	
@@ -101,5 +81,38 @@ public class CameraPlotter extends DataVisualizer  {
 			}
 		return data;
 	}
+	
+	public boolean isKeepOpen() {
+		return keepOpen;
+	}
+	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
+	public void setKeepOpen(boolean keepOpen) {
+		this.keepOpen = keepOpen;
+	}
+
+
+	public Double getPixelSize() {
+		return pixelSize;
+	}
+	@Parameter(required = false, description = "Size of the camera Pixel being drawn", defaultValue="6.0")
+	public void setPixelSize(Double panelSize) {
+		this.pixelSize = panelSize;
+	}
+	
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	@Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	
 }

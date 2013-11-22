@@ -56,7 +56,7 @@ public class LiveCameraPlotter extends DataVisualizer  {
 	@Override
 	public void init(ProcessContext ctx) throws Exception{
 		super.init(ctx);
-		mapView = new MapView(null, true, false);
+		mapView = new MapView(null, true, false, 6.0d);
 		mapView.setKey(key);
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
