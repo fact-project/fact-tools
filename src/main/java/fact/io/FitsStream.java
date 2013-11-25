@@ -43,6 +43,10 @@ public class FitsStream extends AbstractStream {
 	public FitsStream(SourceURL url) {
 		super(url);
 	}
+	
+	public FitsStream() {
+		super();
+	}
 
 	/**
 	 * This consists of 3 steps 1. Get the size of the fits header. A header
@@ -54,6 +58,7 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public void init() throws Exception {
+		super.init();
 		File f = new File(this.url.getFile());
 		if (!f.canRead()){
 			log.error("Cannot read file. Wrong path? ");
