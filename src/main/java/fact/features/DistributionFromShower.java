@@ -221,8 +221,8 @@ public Data process(Data input) {
     input.put("M4Trans", 		distMoment_yy[3] );
     input.put("COGx", 			cogX );
     input.put("COGy", 			cogY );
-    input.put("Width", Math.sqrt(eigenValue1/size) );
-	input.put("Length", Math.sqrt(eigenValue2/size) );
+    input.put("Length", Math.sqrt(eigenValue1/size) );
+	input.put("Width", Math.sqrt(eigenValue2/size) );
     input.put("Delta", delta );
     
     input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
