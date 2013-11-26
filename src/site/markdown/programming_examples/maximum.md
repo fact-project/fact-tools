@@ -1,14 +1,4 @@
-Programming Examples
-=================
-
-Even though most of the important processors for working with FACT data are already included, 
-chances are you want to write your own. Working with the [streams-api](http://www.jwall.org/streams/stream-api/) 
-allows easy implementation of new methods to analyze the data. For an example on how to write a processor
-see [here](http://www.jwall.org/streams/stream-api/processor.html)
-We'll take a quick look at a example specifically for FACT data with a few common pitfalls you might
-run into.
-
-###Find the maximum slice
+##Find the maximum slice
 
 This processor simply iterates over all slices in each pixel and stores the maximum amplitude.
 At first we need to get the actual telescope data from the input. The data is stored in one large 

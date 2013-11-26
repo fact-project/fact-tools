@@ -8,3 +8,5 @@ to [download.jwall.org](http://download.jwall.org/fact-tools/):
 <div style="margin: auto; text-align: center;">
     <a href="http://download.jwall.org/fact-tools/">http://download.jwall.org/fact-tools/</a>
 </div>
+
+The source code is available through a public [repository](source-repository.html).

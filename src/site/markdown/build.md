@@ -15,8 +15,8 @@ or installed on Ubuntu systems using apt-get:
 Building the FACT Tools
 -----------------------
 
-Building the *fact-tools* is straight forward: Simply checkout the
-fact-tools code and enter the directory. By running the `mvn` command,
+Building the *fact-tools* is straight forward: Simply [checkout the
+fact-tools code](source-repository.html) and enter the directory. By running the `mvn` command,
 Maven will take care of the build:
 
      # cd fact-tools

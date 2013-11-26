@@ -36,7 +36,13 @@
 
     </item>
 
-    <item name="Programming Examples" href="programming_example.html"/>
+    <item name="Programming Examples" href="programming_examples/programming_example.html">
+          <item name="Finding the maximum" href="programming_examples/maximum.html" />
+          <item name="Passing parameters from the .xml" href="programming_examples/parameter.html" />
+          <item name="Log output" href="programming_examples/logging.html" />
+    </item>
+
+    <item name="Further Resources" href="resources.html" />
 	</menu>
 	
 	<menu name="Download" >
