@@ -68,7 +68,8 @@
 			<id>fact-site</id>
 			<!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
 			<!-- <url>scp://bockerma@kirmes.cs.uni-dortmund.de:/home/bockerma/public_html/fact-analysis/</url> -->
-			<url>scp://kirmes.cs.uni-dortmund.de:/var/www/FACT</url>
+			<!-- <url>scp://kirmes.cs.uni-dortmund.de:/var/www/FACT</url> -->
+			<url>scp://kirmes.cs.uni-dortmund.de:/home/share/projekte/FACT/website/</url>
 		</site>
 	</distributionManagement>
 

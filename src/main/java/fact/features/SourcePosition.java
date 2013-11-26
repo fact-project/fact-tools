@@ -93,7 +93,7 @@ public class SourcePosition implements StatefulProcessor {
 	
 					pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
 					pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
-	
+
 					locList.add(pointRaDec);
 					slowData = stream.readNext();
 				}
@@ -167,6 +167,9 @@ public class SourcePosition implements StatefulProcessor {
 			if(Math.abs(mjd-t) < Math.abs(mjd -t1) ){
 				point = locList.get(timeIndex);
 			} else {
+				log.warn("End of TRACKING file reached. Source position might be wrong");
+				point = locList.get(timeIndex-1);
+			
 				point = locList.get(timeIndex+1);
 			}
 		} else {
