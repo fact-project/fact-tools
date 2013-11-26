@@ -24,8 +24,8 @@ public class HillasLength implements Processor {
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 
-		double width = Math.sqrt(dist.getEigenVarianceY());
-	    input.put(outputKey, width);
+		double length = Math.sqrt(dist.getEigenVarianceX());
+	    input.put(outputKey, length);
 		
 	    return input;
 	}
