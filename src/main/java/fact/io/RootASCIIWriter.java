@@ -26,9 +26,7 @@ import fact.Constants;
 public class RootASCIIWriter extends CsvWriter {
 
 	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);
-	//	CsvWriter writer = null;
 	private boolean writeTreeDescriptor = true;
-
 
 
 	@Override
@@ -60,6 +58,10 @@ public class RootASCIIWriter extends CsvWriter {
 				log.error("Could not create the TreeDescriptionHeader. Wrong Datatypes");
 			}
 		}
+		if(containsNanOrInfs(data)){
+			return data;
+		}
+		
 		Data item  = DataFactory.create();
 		for(int i = 0; i < keys.length; i++){
 			Serializable value = null;
@@ -81,12 +83,19 @@ public class RootASCIIWriter extends CsvWriter {
 				else if(type == float.class){
 					float[] s = ((float[]) value);
 					for(int k = 0; k < s.length; k++){
+						if(s[k] == Float.NaN || s[k] == Float.NEGATIVE_INFINITY || s[k] == Float.POSITIVE_INFINITY ){
+							return data;
+						}
 						item.put(keys[i] + "_" + k, s[k]);
 					}
 				}
 				else if(type == double.class){
 					double[] s = ((double[]) value);
 					for(int k = 0; k < s.length; k++){
+						//check for nans or infs and gtfo
+						if(s[k] == Double.NaN || s[k] == Double.NEGATIVE_INFINITY || s[k] == Double.POSITIVE_INFINITY ){
+							return data;
+						}
 						item.put(keys[i] + "_" + k, s[k]);
 					}
 				}
@@ -108,7 +117,8 @@ public class RootASCIIWriter extends CsvWriter {
 		}
 
 		//this will be a dirty hack to have the superclass iterate over the whole keyset in the dataitem
-		//intstead of taking the keys specified by the user
+		//intstead of taking the keys specified by the user. since we created a whole new data item only containing the 
+		// wanted keys this will output only the right keys
 		keys= null;
 		super.process(item);
 		keys = tempKeys;
@@ -164,7 +174,15 @@ public class RootASCIIWriter extends CsvWriter {
 		return headerString;
 	}
 
-
+	private boolean  containsNanOrInfs(Data item){
+		for(String key : keys){
+			String repr = item.get(key).toString();
+			if(repr.toLowerCase().equals("inf") ||repr.toLowerCase().equals("nan")){
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 	public boolean isWriteTreeDescriptor() {
