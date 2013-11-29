@@ -4,9 +4,7 @@
 package fact.io;
 
 import java.io.Serializable;
-import java.net.URL;
 
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +26,16 @@ import fact.Constants;
 public class RootASCIIWriter extends CsvWriter {
 
 	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);
-	CsvWriter writer = null;
+	//	CsvWriter writer = null;
 	private boolean writeTreeDescriptor = true;
+
 
 
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 		setSeparator(" ");
-//		writeHeader(null);
-		if (writer == null) {
-			//File outFile = new File(file);
-			log.debug("Creating new output-stream to '{}'", url);
-			url = new URL(urlString);
-			writer = new CsvWriter(url);
-			writer.setSeparator(" ");
-		}
+		setHeader(false);
 	}
 
 	/**
@@ -51,84 +43,76 @@ public class RootASCIIWriter extends CsvWriter {
 	 */
 	@Override
 	public Data process(Data data) {
-		try {
-			if(keys == null){
-				log.error("No keys specified");
-				throw new RuntimeException("You have to specify the keys to write");
-			}
-			if(writeTreeDescriptor){
-				writeTreeDescriptor = false;
-				Data headerItem = DataFactory.create();
-				try{
-					headerItem.put("rootheader", generateHeaderString(data) );
-					writer.process(headerItem);
-				} catch(ClassCastException e ){
-					Log.error("Could not create the TreeDescriptionHeader. Wrong Datatypes");
-				}
-			}
-			//			List<Data> pixels = EventExpander.expand(data, 1440, key, 0, 300);
-			Data item  = DataFactory.create();
-			for(int i = 0; i < keys.length; i++){
-				Serializable value = null;
-				if(data.containsKey(keys[i])){
-					value = data.get(keys[i]);
-				} else {
-					log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
-					return null;
-				}
-				//Check if value is of the right type
-				if (value.getClass().isArray()) {
-					Class<?> type = value.getClass().getComponentType();
-					if(value instanceof Number[]){
-						Number[] s = (Number[]) value;
-						for(int k = 0; k < s.length; k++){
-							item.put(keys[i] + "_" + k, s[k]);
-						}
-					}
-					else if(type == float.class){
-						float[] s = ((float[]) value);
-						for(int k = 0; k < s.length; k++){
-							item.put(keys[i] + "_" + k, s[k]);
-						}
-					}
-					else if(type == double.class){
-						double[] s = ((double[]) value);
-						for(int k = 0; k < s.length; k++){
-							item.put(keys[i] + "_" + k, s[k]);
-						}
-					}
-					else if(type == int.class){
-						int[] s = ((int[]) value);
-						for(int k = 0; k < s.length; k++){
-							item.put(keys[i] + "_" + k, s[k]);
-						}
-					}
-					else if(type == String.class){
-						String[] s = ((String[]) value);
-						for(int k = 0; k < s.length; k++){
-							item.put(keys[i] + "_" + k, s[k]);
-						}
-					}
-				} else {
-					item.put(keys[i],value.toString());
-				}
-			}
-			writer.process(item);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to write file: "
-					+ e.getMessage());
+		String[] tempKeys = keys;
+		if(keys == null){
+			log.error("No keys specified");
+			throw new RuntimeException("You have to specify the keys to write");
 		}
-		return data;
-	}
+		if(writeTreeDescriptor){
+			writeTreeDescriptor = false;
+			Data headerItem = DataFactory.create();
+			try{
+				headerItem.put("rootheader", generateHeaderString(data) );
+				keys = null;
+				super.process(headerItem);
+				keys = tempKeys;
+			} catch(ClassCastException e ){
+				log.error("Could not create the TreeDescriptionHeader. Wrong Datatypes");
+			}
+		}
+		Data item  = DataFactory.create();
+		for(int i = 0; i < keys.length; i++){
+			Serializable value = null;
+			if(data.containsKey(keys[i])){
+				value = data.get(keys[i]);
+			} else {
+				log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
+				return null;
+			}
+			//Check if value is of the right type
+			if (value.getClass().isArray()) {
+				Class<?> type = value.getClass().getComponentType();
+				if(value instanceof Number[]){
+					Number[] s = (Number[]) value;
+					for(int k = 0; k < s.length; k++){
+						item.put(keys[i] + "_" + k, s[k]);
+					}
+				}
+				else if(type == float.class){
+					float[] s = ((float[]) value);
+					for(int k = 0; k < s.length; k++){
+						item.put(keys[i] + "_" + k, s[k]);
+					}
+				}
+				else if(type == double.class){
+					double[] s = ((double[]) value);
+					for(int k = 0; k < s.length; k++){
+						item.put(keys[i] + "_" + k, s[k]);
+					}
+				}
+				else if(type == int.class){
+					int[] s = ((int[]) value);
+					for(int k = 0; k < s.length; k++){
+						item.put(keys[i] + "_" + k, s[k]);
+					}
+				}
+				else if(type == String.class){
+					String[] s = ((String[]) value);
+					for(int k = 0; k < s.length; k++){
+						item.put(keys[i] + "_" + k, s[k]);
+					}
+				}
+			} else {
+				item.put(keys[i],value.toString());
+			}
+		}
 
-	/**
-	 * @see stream.io.CsvWriter#close()
-	 */
-	@Override
-	public void finish() throws Exception {
-		if(writer != null){
-			writer.finish();
-		}
+		//this will be a dirty hack to have the superclass iterate over the whole keyset in the dataitem
+		//intstead of taking the keys specified by the user
+		keys= null;
+		super.process(item);
+		keys = tempKeys;
+		return data;
 	}
 
 	private String generateHeaderString(Data data) throws ClassCastException{
@@ -149,7 +133,7 @@ public class RootASCIIWriter extends CsvWriter {
 						headerString += key+"[" + ((Double[]) v).length + "]/"+"D" ;
 					}
 					else if(type == double.class){
-						headerString += key+"[" + ((float[]) v).length + "]/"+"D" ;
+						headerString += key+"[" + ((double[]) v).length + "]/"+"D" ;
 					}
 					else if(type == Integer.class){
 						headerString += key+"[" + ((Integer[]) v).length + "]/"+"I" ;
