@@ -1,0 +1,57 @@
+<container>
+
+<!-- Pfade zu den fits files. -->
+<!-- <property name="data" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/11/20130111_060.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/11/20130111_044.drs.fits.gz" /> -->
+<!-- <property name="data" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/03/31/20130331_053.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/03/31/20130331_033.drs.fits.gz" /> -->
+<property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timemarkertests/20130331_053.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timemarkertests/20130331_033.drs.fits.gz" />
+<property name="timeDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/calibconstants.csv" />
+<property name="outfile" value="/home/fabian/output.csv" />
+
+
+	<!-- Name des Streams und pfad zu dem Daten-File -->
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" limit="1000"/>
+	
+	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
+	<process input="fact" copies="1">
+		<!-- <Skip condition="%{data.TriggerType} != 4" /> -->
+	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
+              <fact.filter.DrsTimeCalibration url="file:${timeDRS}" outputKey="times"/>  
+            <!-- <fact.utils.CutSlices start="250" end="300" outputKey="DataCalibrated"/> -->
+ <!--            <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
+            <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/> -->
+<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
+
+            <fact.features.FindTimeMarker key="DataCalibrated" timeOffsetKey="times" outputKey="tm"/>
+
+            <!-- <fact.statistics.CreateHistogram key="tm_risingEdges" min="0" max="100" numberOfBins="51" outputKey="feH"/> -->
+            <!-- <fact.plotter.HistogramPlotter key="feH" max="100"/> -->
+            <fact.plotter.BarPlotter keys="tm_risingEdges" title="tm_risingEdges"/>
+            <fact.plotter.BarPlotter keys="tm_fallingEdges" title="tm_fallingEdges"/>
+            <fact.plotter.BarPlotter keys="tm_durations" title="tm_durations"/>
+            <fact.plotter.BarPlotter keys="tm_maxHeights" title="tm_maxHeights"/>
+            <fact.plotter.BarPlotter keys="tm_integrals" title="tm_integrals"/>
+            <fact.plotter.BarPlotter keys="tm_averageHeights" title="tm_averageHeights"/>
+            <fact.plotter.BarPlotter keys="tm_offsetRis" title="tm_offsetRis"/>
+            <fact.plotter.BarPlotter keys="tm_offsetFal" title="tm_offsetFal"/>
+            <fact.plotter.BarPlotter keys="times" title="times"/>
+            <!-- <PrintData /> -->
+            
+            <!-- <fact.image.ShowImage/> -->
+
+            <!-- <fact.io.RootASCIIWriter keys="EventNum,tm_risingEdges,tm_fallingEdges,tm_durations,tm_maxHeights,tm_integrals,tm_averageHeights"  url="file:${outfile}" /> -->
+            <!-- <fact.io.RootASCIIWriter keys="EventNum,@source"  url="file:${outfile}" /> -->
+            <!-- <stream.io.CsvWriter keys="EventNum,@source"  url="file:${outfile}" /> -->
+            <!-- <stream.io.CsvWriter keys="EventNum,feH,tm_risingEdges[],tm_fallingEdges,tm_durations,tm_maxHeights,tm_integrals,tm_averageHeights"  url="file:${outfile}" /> -->
+            
+
+
+	</process>
+		
+		
+		
+</container>
+
