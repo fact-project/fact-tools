@@ -119,7 +119,10 @@ public class CenterOfGravity implements Processor
 			varcogx[slice] /= size[slice];
 			varcogy[slice] /= size[slice];
 			covcog[slice] /= size[slice];
-
+			
+			varcogx[slice] = Math.sqrt(varcogx[slice]);
+			varcogy[slice] = Math.sqrt(varcogy[slice]);
+			covcog[slice] = Math.sqrt(covcog[slice]);
 			
 			
 		    // Calculate velocities on the fly
