@@ -167,8 +167,9 @@ public class SourcePosition implements StatefulProcessor {
 			if(Math.abs(mjd-t) < Math.abs(mjd -t1) ){
 				point = locList.get(timeIndex);
 			} else {
-				log.warn("End of TRACKING file reached. Source position might be wrong");
-				point = locList.get(timeIndex-1);
+				// Seems i have inserted this by accident... Please check if i commented out the right line.
+				//log.warn("End of TRACKING file reached. Source position might be wrong");
+				//point = locList.get(timeIndex-1);
 			
 				point = locList.get(timeIndex+1);
 			}

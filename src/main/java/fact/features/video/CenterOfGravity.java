@@ -119,7 +119,10 @@ public class CenterOfGravity implements Processor
 			varcogx[slice] /= size[slice];
 			varcogy[slice] /= size[slice];
 			covcog[slice] /= size[slice];
-
+			
+			varcogx[slice] = Math.sqrt(varcogx[slice]);
+			varcogy[slice] = Math.sqrt(varcogy[slice]);
+			covcog[slice] = Math.sqrt(covcog[slice]);
 			
 			
 		    // Calculate velocities on the fly
@@ -129,17 +132,18 @@ public class CenterOfGravity implements Processor
 				cogVelocityY[slice - 1] = (cogy[slice] - cogy[slice - 1]) / 0.5f;
 				cogVelocity[slice - 1] = (double) Math.sqrt(cogVelocityX[slice - 1]*cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]);
 				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogx[slice] * varcogx[slice] + varcogx[slice - 1] * varcogx[slice - 1]);
-				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogy[slice] * varcogy[slice] + varcogy[slice - 1] * varcogy[slice - 1]);
+				cogVelocityYError[slice - 1] = 2.0 * (double) Math.sqrt(varcogy[slice] * varcogy[slice] + varcogy[slice - 1] * varcogy[slice - 1]);
 				// here i will define a better quality parameter
-				cogVelocityError[slice - 1] = varcogx[slice - 1]*varcogx[slice - 1]+varcogy[slice - 1]*varcogy[slice - 1];
-						//Math.exp(-(varcogx[slice]*varcogx[slice] + varcogy[slice]*varcogy[slice] + 
-						//varcogx[slice-1]*varcogx[slice-1] + varcogy[slice-1]*varcogy[slice-1]));
-						/*
-						 * Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
+				cogVelocityError[slice - 1] = Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
 														cogVelocityXError[slice - 1] * cogVelocityXError[slice - 1] +
 														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
 														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
 														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
+				// This one works quite well...   :    varcogx[slice - 1]*varcogx[slice - 1]+varcogy[slice - 1]*varcogy[slice - 1];
+						//Math.exp(-(varcogx[slice]*varcogx[slice] + varcogy[slice]*varcogy[slice] + 
+						//varcogx[slice-1]*varcogx[slice-1] + varcogy[slice-1]*varcogy[slice-1]));
+						/*
+						 * 
 			*/
 				if (cogVelocity[slice - 1] < minimalVelocity)
 				{
