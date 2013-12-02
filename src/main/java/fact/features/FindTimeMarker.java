@@ -13,9 +13,10 @@ public class FindTimeMarker implements Processor {
 	
 	private String key = null;
 	private String outputkey = null;
-	int[] posRisingEdges = null;
-	int[] posFallingEdges = null;
-	int[] durations = null;
+	private String timeOffsetKey = null;
+	double[] posRisingEdges = null;
+	double[] posFallingEdges = null;
+	double[] durations = null;
 	double[] maxHeights = null;
 	double[] integrals = null;
 	double[] averageHeights = null;
@@ -29,14 +30,23 @@ public class FindTimeMarker implements Processor {
 			log.error("Could not cast types." );
 			throw e;
 		}
+		double[] timeOffsets;
+		try{
+			timeOffsets = (double[]) input.get(timeOffsetKey);
+		} catch (ClassCastException e){
+			log.error("Could not cast types." );
+			throw e;
+		}
 		int numberTimeMarker = 160;
 		
-		posRisingEdges = new int[numberTimeMarker];
-		posFallingEdges = new int[numberTimeMarker];
-		durations = new int[numberTimeMarker];
+		posRisingEdges = new double[numberTimeMarker];
+		posFallingEdges = new double[numberTimeMarker];
+		durations = new double[numberTimeMarker];
 		maxHeights = new double[numberTimeMarker];
 		integrals = new double[numberTimeMarker];
 		averageHeights = new double[numberTimeMarker];
+		double[] offsetsRis = new double[numberTimeMarker];
+		double[] offsetsFal = new double[numberTimeMarker];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		
 		for(int timemarker = 0 ; timemarker < numberTimeMarker; timemarker++){
@@ -48,6 +58,8 @@ public class FindTimeMarker implements Processor {
 			double slope = 0;
 			double integral = 0;
 			int sl = 1;
+			
+			sl = roi - 51;
 			
 			for(; sl < roi && posRisingEdge == 0 ; sl++){
 				slope = data[pos+sl] - data[pos+sl-1];
@@ -73,12 +85,20 @@ public class FindTimeMarker implements Processor {
 			{
 				log.warn("Falling Edge not found");
 			}
-			posRisingEdges[timemarker] = posRisingEdge;
-			posFallingEdges[timemarker] = posFallingEdge;
+			posRisingEdges[timemarker] = (double)posRisingEdge;
+			posFallingEdges[timemarker] = (double)posFallingEdge;
+			if (timeOffsets != null){
+				posRisingEdges[timemarker] += timeOffsets[timemarker*roi + posRisingEdge];
+				posFallingEdges[timemarker] += timeOffsets[timemarker*roi + posFallingEdge];
+				offsetsRis[timemarker] = timeOffsets[timemarker*roi + posRisingEdge];
+				offsetsFal[timemarker] = timeOffsets[timemarker*roi + posFallingEdge];
+//				log.info(""+offsetsFal[timemarker]);
+			}
 			durations[timemarker] = posFallingEdge - posRisingEdge;
 			maxHeights[timemarker] = maxHeight;
 			integrals[timemarker] = integral;
 			averageHeights[timemarker] = integral / durations[timemarker];
+			
 			
 		}
 		
@@ -88,6 +108,8 @@ public class FindTimeMarker implements Processor {
 		input.put(outputkey + "_maxHeights", maxHeights);
 		input.put(outputkey + "_integrals", integrals);
 		input.put(outputkey + "_averageHeights", averageHeights);
+		input.put(outputkey + "_offsetRis", offsetsRis);
+		input.put(outputkey + "_offsetFal", offsetsFal);
 		
 		return input;
 	}
@@ -108,27 +130,27 @@ public class FindTimeMarker implements Processor {
 		this.outputkey = outputkey;
 	}
 
-	public int[] getPosRisingEdges() {
+	public double[] getPosRisingEdges() {
 		return posRisingEdges;
 	}
 
-	public void setPosRisingEdges(int[] posRisingEdges) {
+	public void setPosRisingEdges(double[] posRisingEdges) {
 		this.posRisingEdges = posRisingEdges;
 	}
 
-	public int[] getPosFallingEdges() {
+	public double[] getPosFallingEdges() {
 		return posFallingEdges;
 	}
 
-	public void setPosFallingEdges(int[] posFallingEdges) {
+	public void setPosFallingEdges(double[] posFallingEdges) {
 		this.posFallingEdges = posFallingEdges;
 	}
 
-	public int[] getDurations() {
+	public double[] getDurations() {
 		return durations;
 	}
 
-	public void setDurations(int[] durations) {
+	public void setDurations(double[] durations) {
 		this.durations = durations;
 	}
 
@@ -154,6 +176,14 @@ public class FindTimeMarker implements Processor {
 
 	public void setAverageHeights(double[] averageHeights) {
 		this.averageHeights = averageHeights;
+	}
+
+	public String getTimeOffsetKey() {
+		return timeOffsetKey;
+	}
+
+	public void setTimeOffsetKey(String timeOffsetKey) {
+		this.timeOffsetKey = timeOffsetKey;
 	}
 
 }
