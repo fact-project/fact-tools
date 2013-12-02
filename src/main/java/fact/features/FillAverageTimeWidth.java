@@ -42,7 +42,7 @@ public class FillAverageTimeWidth implements Processor {
 			double last_zero_crossing = -1;
 			double last_weight = 0;
 			
-			for(int sl=0 ; sl < roi ; sl++){
+			for(int sl=0 ; sl < roi - 1 ; sl++){
 				// Search for zero crossing on rising edges:
 				// To do, make sure, that this is really a zero crossing of our signal, not a small fluctuation,
 				// maybe we check the calculated length, or use a filter 
@@ -91,11 +91,10 @@ public class FillAverageTimeWidth implements Processor {
 		}
 		double[] timeOffsets = new double[numberTimeMarker*numberOfSlices];
 		for(int timemarker=0 ; timemarker < numberTimeMarker ; timemarker++){
-			timeOffsets[timemarker*roi] = averageTimeWidth[timemarker*roi] - wholeAverageTimeWidth[timemarker];
+			timeOffsets[timemarker*roi] = averageTimeWidth[timemarker*roi] / wholeAverageTimeWidth[timemarker] - 1;
 			for (int sl = 1 ; sl < numberOfSlices ; sl++){
 				timeOffsets[timemarker*roi+sl] = timeOffsets[timemarker*roi+sl-1] 
-						+ averageTimeWidth[timemarker*roi+sl]
-						- wholeAverageTimeWidth[timemarker];
+						+ averageTimeWidth[timemarker*roi+sl] / wholeAverageTimeWidth[timemarker] - 1;
 			}
 		}
 //		for (int sl = 0 ; sl < numberOfSlices ; sl++){
