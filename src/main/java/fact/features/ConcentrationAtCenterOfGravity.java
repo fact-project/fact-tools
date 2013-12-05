@@ -113,8 +113,6 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		this.hillasSize = hillasSize;
 	}
 
-
-
 	static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
 	
 	private Float cogXValue = null;
