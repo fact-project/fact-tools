@@ -37,7 +37,7 @@
             <fact.plotter.BarPlotter keys="tm_averageHeights" title="tm_averageHeights"/>
             <fact.plotter.BarPlotter keys="tm_offsetRis" title="tm_offsetRis"/>
             <fact.plotter.BarPlotter keys="tm_offsetFal" title="tm_offsetFal"/>
-            <fact.plotter.BarPlotter keys="times" title="times"/>
+            <!-- <fact.plotter.BarPlotter keys="times" title="times"/> -->
             <!-- <PrintData /> -->
             
             <!-- <fact.image.ShowImage/> -->
