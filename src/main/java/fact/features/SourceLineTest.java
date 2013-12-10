@@ -71,12 +71,12 @@ public class SourceLineTest implements Processor{
 		cogY /= size;
 		cogT /= size;
 		
-		cogSourceAngle = Math.atan((cogY - sourcePositionArray[1]) / (cogX - sourcePositionArray[0]));
+		cogSourceAngle = Math.atan2((cogY - sourcePositionArray[1]) / (cogX - sourcePositionArray[0]));
 		
 		// Calculate values for reconstruction
 		for(int chid : showerPixelArray)
 		{
-			double pixelSourceAngle = Math.atan((mpGeomYCoord[chid] - sourcePositionArray[1])/(mpGeomXCoord[chid] - sourcePositionArray[0]));
+			double pixelSourceAngle = Math.atan2((mpGeomYCoord[chid] - sourcePositionArray[1])/(mpGeomXCoord[chid] - sourcePositionArray[0]));
 			double pixelSourceDist       = (mpGeomYCoord[chid] - sourcePositionArray[1]) / Math.sin(pixelSourceAngle);
 			
 			projPrimary = Math.cos(pixelSourceAngle - cogSourceAngle) * pixelSourceDist;
