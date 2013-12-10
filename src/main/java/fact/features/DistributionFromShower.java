@@ -216,7 +216,7 @@ public Data process(Data input) {
     input.put("varianceLong",	eigenVarianceX );
     input.put("varianceTrans", 	eigenVarianceY );
     input.put("M3Long",			distMoment_xx[2] );
-    input.put("M3trans", 		distMoment_yy[2] );
+    input.put("M3Trans", 		distMoment_yy[2] );
     input.put("M4Long", 		distMoment_xx[3] );
     input.put("M4Trans", 		distMoment_yy[3] );
     input.put("COGx", 			cogX );

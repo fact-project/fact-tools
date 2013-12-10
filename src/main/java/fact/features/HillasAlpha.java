@@ -46,17 +46,17 @@ public class HillasAlpha implements Processor {
 		double alpha = 0.0;
 	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
-	    auxiliary_angle         = auxiliary_angle / Math.PI * 180;
+	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;
 	
 	    alpha                  =  (dist.getAngle() - auxiliary_angle);
 	
-	    if (alpha > 90)
+	    if (alpha > Math.PI / 2)
 	    {
-	        alpha              = alpha - 180;
+	        alpha              = alpha - Math.PI;
 	    }
-	    if (alpha < -90)
+	    if (alpha < -Math.PI / 2)
 	    {
-	        alpha              = 180 + alpha;
+	        alpha              = Math.PI + alpha;
 	    }
 	    input.put(outputKey, alpha);
 		return input;

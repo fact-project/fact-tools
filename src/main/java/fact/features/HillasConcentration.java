@@ -11,8 +11,7 @@ public class HillasConcentration implements Processor {
 
 	private String shower = null;
 	private String weights = null;
-	private String outputKeyConcentration = "HillasConcentration";
-	private String outputKeyConcentration2 = "HillasConcentration2";
+	private String outputKey = null;
 
 	@Override
 	public Data process(Data input) {
@@ -36,9 +35,12 @@ public class HillasConcentration implements Processor {
 		//concentration according to F.Temme
 		double max_photon_charge                 = 0;
 		double second_max_photon_charge          = 0;
+
+		double size = 0;
 		
 		for (int pix : showerPixel)
 		{
+			size += photonCharge[pix];
 			if (photonCharge[pix] > max_photon_charge)
 			{
 				second_max_photon_charge        = max_photon_charge;
@@ -50,11 +52,9 @@ public class HillasConcentration implements Processor {
 			}
 
 		}
-		double size = 0;
-		for(double s: photonCharge) size += s; 
 		
-		input.put(outputKeyConcentration , max_photon_charge / size);
-		input.put(outputKeyConcentration2 , (max_photon_charge + second_max_photon_charge) / size);
+		input.put(outputKey+"_onePixel" , max_photon_charge / size);
+		input.put(outputKey+"_twoPixel" , (max_photon_charge + second_max_photon_charge) / size);
 		return input;
 	}
 
@@ -73,9 +73,12 @@ public class HillasConcentration implements Processor {
 	}
 
 	public String getOutputKey() {
-		return outputKeyConcentration;
+		return outputKey;
 	}
+
 	public void setOutputKey(String outputKey) {
-		this.outputKeyConcentration = outputKey;
+		this.outputKey = outputKey;
 	}
+
+	
 }

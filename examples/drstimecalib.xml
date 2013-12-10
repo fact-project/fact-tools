@@ -3,13 +3,15 @@
 <!-- Pfade zu den fits files. -->
 <!-- <property name="data" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/11/20130111_060.fits.gz" />
 <property name="dataDRS" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/11/20130111_044.drs.fits.gz" /> -->
-<property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130328_009.fits.gz" />
-<property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130328_007.drs.fits.gz" />
-<property name="outfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/calibconstants.csv" />
+<!-- <property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130328_009.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130328_007.drs.fits.gz" /> -->
+<property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_020.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_018.drs.fits.gz" />
+<property name="outfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_020_constants.csv" />
 
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" limit="1"/>
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" limit="1000"/>
 	
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
