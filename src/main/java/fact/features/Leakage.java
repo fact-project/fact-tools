@@ -24,13 +24,13 @@ public class Leakage implements Processor {
 		
 		
 		double size = 0;
-		for(double s: photonCharge) {size += s;} 
 	
 	    double leakageBorder          = 0;
 	    double leakageSecondBorder    = 0;
 
 	    for (int pix: showerPixel)
 	    {
+	    	size += photonCharge[pix];
 	        if (isBorderPixel(pix) )
 	        {
 	            leakageBorder          += photonCharge[pix];

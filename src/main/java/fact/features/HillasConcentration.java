@@ -35,9 +35,12 @@ public class HillasConcentration implements Processor {
 		//concentration according to F.Temme
 		double max_photon_charge                 = 0;
 		double second_max_photon_charge          = 0;
+
+		double size = 0;
 		
 		for (int pix : showerPixel)
 		{
+			size += photonCharge[pix];
 			if (photonCharge[pix] > max_photon_charge)
 			{
 				second_max_photon_charge        = max_photon_charge;
@@ -49,8 +52,6 @@ public class HillasConcentration implements Processor {
 			}
 
 		}
-		double size = 0;
-		for(double s: photonCharge) size += s; 
 		
 		input.put(outputKey+"_onePixel" , max_photon_charge / size);
 		input.put(outputKey+"_twoPixel" , (max_photon_charge + second_max_photon_charge) / size);
