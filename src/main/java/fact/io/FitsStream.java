@@ -178,6 +178,7 @@ public class FitsStream extends AbstractStream {
 	 */
 	@Override
 	public Data readNext() throws Exception {
+//		FactEvent item = new FactEvent();
 		Data item = DataFactory.create(headerItem);
 //		Data item = headerItem;
 		try {
