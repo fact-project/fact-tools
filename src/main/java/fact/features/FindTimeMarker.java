@@ -1,7 +1,6 @@
 package fact.features;
 
 import fact.Constants;
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
