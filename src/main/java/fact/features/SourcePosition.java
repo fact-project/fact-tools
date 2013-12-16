@@ -70,8 +70,9 @@ public class SourcePosition implements StatefulProcessor {
 	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
-		if( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null) {
+		if( ( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null ) || (x ==  null && y == null) ) {
 			log.error("physicalsource or sourceRightAscension and sourceDeclination isnt set. aborting. Possible choices for physicalSource are: crab, mrk421, mrk501");
+			throw new RuntimeException("Wrong parameter. You need to specifiy some more information. Like x,y dummy values or a name of a physical source");
 		}
 		if(trackingUrl == null && x !=  null && y != null){
 			log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
