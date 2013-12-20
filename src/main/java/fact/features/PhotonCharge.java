@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
 import fact.EventUtils;
@@ -24,7 +26,7 @@ import fact.EventUtils;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
-public class PhotonCharge implements Processor {
+public class PhotonCharge implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	private double[] photonCharge = null;
 
@@ -36,12 +38,37 @@ public class PhotonCharge implements Processor {
 
 	private String positions = null;
 
-	private String key = "DataCalibrated";
-	private String outputKey = key;
+	private String key = null;
+	private String outputKey = null;
+	
+
+	@Override
+	public void init(ProcessContext context) throws Exception {
+		if(outputKey == null){
+			throw new RuntimeException("No outputKey specified");
+		}
+		if(key == null){
+			throw new RuntimeException("No key specified");
+		}
+		if(positions == null){
+			throw new RuntimeException("No positions specified. This processors needs an array of ints as input for positions");
+		}
+	}
+
+
+	@Override
+	public void resetState() throws Exception {
+	}
+
+
+	@Override
+	public void finish() throws Exception {
+	}
+	
 
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, positions, key);
+		
 		int[] posArray;
 		double[] data;
 		try{
@@ -125,7 +152,7 @@ public class PhotonCharge implements Processor {
 	public String getPositions() {
 		return positions;
 	}
-	@Parameter(required = false, description = "The positions from which to integrate.", defaultValue = "positions")
+	@Parameter(required = true, description = "The positions from which to integrate.")
 	public void setPositions(String positions) {
 		this.positions = positions;
 	}
@@ -166,5 +193,7 @@ public class PhotonCharge implements Processor {
 	public void setAlpha(int alpha) {
 		this.alpha = alpha;
 	}
+
+
 
 }
