@@ -44,10 +44,22 @@ public class SourcePositionParameterTest {
 	}
 
 	@Test
+	public void testInvalidPhysicalSourceParameter() throws Exception{
+		thrown.expect(RuntimeException.class);
+		thrown.expectMessage("physicalSource unknown");
+		SourcePosition poser = new SourcePosition();
+		poser.setUrl(driveURL);
+		poser.setPhysicalSource("blabla not exisitng source");
+		poser.setOutputKey(outputKey);
+		poser.init(null);
+		poser.process(item);
+	}
+
+	@Test
 	public void testMissingOutputKey() throws Exception{
 		thrown.expect(RuntimeException.class);
 		thrown.expectMessage("outputKey");
-		
+
 		//start it with a missing parameter. forget outputkey
 		SourcePosition poser = new SourcePosition();
 		poser.setUrl(driveURL);
