@@ -369,8 +369,8 @@ public class SourcePosition implements StatefulProcessor {
 			sourceIsMrk421();
 			log.info("Using the mrk421 as source");
 		} else if (physicalSource.toLowerCase().equals("mrk501")){
-			sourceIsMrk421();
-			log.info("Using the mrk421 as source");
+			sourceIsMrk501();
+			log.info("Using the mrk501 as source");
 		} else {
 			throw new RuntimeException("physicalSource unknown. Provide the parameters sourceRightAscension and  sourceDeclination instead");
 		}
