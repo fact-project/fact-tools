@@ -29,7 +29,7 @@ public class SourcePosition implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
 	Data slowData = null;
-	private String outputKey = "sourcePosition";
+	private String outputKey = null;
 	private String physicalSource = null;
 
 	Double	sourceRightAscension = null;
@@ -70,12 +70,15 @@ public class SourcePosition implements StatefulProcessor {
 	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
-		if( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null) {
-			log.error("physicalsource or sourceRightAscension and sourceDeclination isnt set. aborting. Possible choices for physicalSource are: crab, mrk421, mrk501");
+		if(outputKey == null){
+			throw new RuntimeException("No outputKey specified");
+		}
+		if( ( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null ) || ( (x ==  null || y == null) && trackingUrl == null) ) {
+			log.error("physicalSource or sourceRightAscension and sourceDeclination isnt set. aborting. Possible choices for physicalSource are: crab, mrk421, mrk501");
+			throw new RuntimeException("Wrong parameter. You need to specifiy some more information. Like x,y dummy values or a name of a physicalSource");
 		}
 		if(trackingUrl == null && x !=  null && y != null){
 			log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
-			
 		} else {
 			FitsStream stream = new FitsStream(trackingUrl);
 			try {
@@ -366,9 +369,11 @@ public class SourcePosition implements StatefulProcessor {
 			sourceIsMrk421();
 			log.info("Using the mrk421 as source");
 		} else if (physicalSource.toLowerCase().equals("mrk501")){
-			sourceIsMrk421();
-			log.info("Using the mrk421 as source");
-		} 
+			sourceIsMrk501();
+			log.info("Using the mrk501 as source");
+		} else {
+			throw new RuntimeException("physicalSource unknown. Provide the parameters sourceRightAscension and  sourceDeclination instead");
+		}
 	}
 	
 	public Float getX() {

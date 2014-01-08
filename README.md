@@ -30,6 +30,9 @@ This will automatically download the required libraries defined as dependencies
 in the project definition and will create a final bundled Jar file that
 includes all required classes.
 
+A buildbot is running at [drone.io](https://drone.io/bitbucket.org/cbockermann/fact-tools) to provide some continuous integration service.
+
+
 
 Running the *fact-tools*
 ------------------------
