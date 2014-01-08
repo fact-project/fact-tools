@@ -73,7 +73,7 @@ public class SourcePosition implements StatefulProcessor {
 		if(outputKey == null){
 			throw new RuntimeException("No outputKey specified");
 		}
-		if( ( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null ) || ( (x ==  null || y == null) && trackingUrl == null) ) {
+		if( ( ( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null ) || trackingUrl == null) && (x ==  null || y == null) ) {
 			log.error("physicalSource or sourceRightAscension and sourceDeclination isnt set. aborting. Possible choices for physicalSource are: crab, mrk421, mrk501");
 			throw new RuntimeException("Wrong parameter. You need to specifiy some more information. Like x,y dummy values or a name of a physicalSource");
 		}
