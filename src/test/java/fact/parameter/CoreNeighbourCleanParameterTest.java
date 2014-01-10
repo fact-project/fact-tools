@@ -66,20 +66,20 @@ public class CoreNeighbourCleanParameterTest {
 		poser.init(null);
 		poser.process(item);
 	}
-	
-	@Test
-	public void testMissingPositions() throws Exception{
-		thrown.expect(RuntimeException.class);
-		thrown.expectMessage("Missing");
-
-		//start it with a missing parameter. forget positions
-		CoreNeighborClean poser = new CoreNeighborClean();
-		poser.setKey(key);
-//		poser.setKeyPositions(positions);
-		poser.setOutputKey(outputKey);
-		poser.init(null);
-		poser.process(item);
-	}
+	//TODO: optional for now
+//	@Test
+//	public void testMissingPositions() throws Exception{
+//		thrown.expect(RuntimeException.class);
+//		thrown.expectMessage("Missing");
+//
+//		//start it with a missing parameter. forget positions
+//		CoreNeighborClean poser = new CoreNeighborClean();
+//		poser.setKey(key);
+////		poser.setKeyPositions(positions);
+//		poser.setOutputKey(outputKey);
+//		poser.init(null);
+//		poser.process(item);
+//	}
 
 	@Test
 	public void testValidParameter() throws Exception{

@@ -68,7 +68,8 @@ public class CoreNeighborClean implements StatefulProcessor{
 	@Override
 	public Data process(Data input) {
 		try{
-			EventUtils.mapContainsKeys(getClass(), input, key, keyPositions);
+			//EventUtils.mapContainsKeys(getClass(), input, key, keyPositions);
+			EventUtils.mapContainsKeys(getClass(), input, key);
 			photonCharge= (double[]) input.get(key);
 			if(photonCharge == null){
 				log.error("No weights found in event. Aborting.");
