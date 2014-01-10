@@ -62,6 +62,7 @@ public class FactAnalysisTest {
 
 			CoreNeighborClean clean = new CoreNeighborClean();
 			clean.setKey("photonCharge");
+			clean.setKeyPositions("positions");
 			clean.setOutputKey("shower");
 
 			URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
