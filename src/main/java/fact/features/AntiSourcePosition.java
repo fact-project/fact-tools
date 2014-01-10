@@ -5,10 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.Constants;
 import fact.image.overlays.SourceOverlay;
 
-
+//TODO: Documentation!?
 
 public class AntiSourcePosition implements Processor {
 	static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
@@ -22,9 +21,9 @@ public class AntiSourcePosition implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		if(!input.containsKey(sourcePositionKey)){
-			log.warn("No source position in data item. Can not calculate anti source position!");
-			return input;
+		if(sourcePositionKey != null && !input.containsKey(sourcePositionKey)){
+			log.error("No source position in data item. Can not calculate anti source position!");
+			throw new RuntimeException("Missing parameter. Enter valid sourcePositionKey");
 		}
 		double[] source  = (double[]) input.get(sourcePositionKey);
 		
@@ -37,7 +36,6 @@ public class AntiSourcePosition implements Processor {
 		input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
 		
 		input.put(outputKey, antisource);
-		// TODO Auto-generated method stub
 		return input;
 	}
 
