@@ -5,14 +5,14 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.EventUtils;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
-import fact.EventUtils;
 
 
 /**
- * Takes a float[] and returns an int[]
+ * Takes a float[] and returns an int[]
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
