@@ -1,4 +1,4 @@
-package fact.features;
+package fact.parameter;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.features.SourcePosition;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 /**

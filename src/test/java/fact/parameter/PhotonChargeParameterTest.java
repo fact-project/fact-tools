@@ -1,4 +1,4 @@
-package fact.features;
+package fact.parameter;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -12,6 +12,8 @@ import org.junit.rules.ExpectedException;
 
 import stream.Data;
 import stream.io.SourceURL;
+import fact.features.MaxAmplitudePosition;
+import fact.features.PhotonCharge;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
@@ -88,7 +90,19 @@ public class PhotonChargeParameterTest {
 	}
 
 
+	@Test
+	public void testNullPositions() throws Exception{
+		thrown.expect(RuntimeException.class);
+		thrown.expectMessage("positions");
 
+		//start it with a missing parameter. forget outputkey
+		PhotonCharge poser = new PhotonCharge();
+		poser.setKey(key);
+		poser.setPositions(null);
+		poser.setOutputKey(outputKey);
+		poser.init(null);
+		poser.process(item);
+	}
 
 
 	@Before
