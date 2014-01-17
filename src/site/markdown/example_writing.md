@@ -72,7 +72,7 @@ Heres the output in the output.csv file:
         15.485890265286749
     ...
 
-Since you probably want to write out something to connect these number to events, you could also write out the event number of each event like so:
+Since you probably want to write out something to connect these numbers to events, you could also write out the event number of each event like so:
     
     <-- No spaces between keys--/>    
     <stream.io.CsvWriter keys="EventNum,maxAmplitudeMean" url="file:///tmp/output.csv" />
@@ -91,3 +91,30 @@ The output in the file will look accordingly:
         80,16.84055010006866
         81,15.485890265286749
       ...
+
+Now let's play pretend and say you want to write an object of a custom class to your output file. All the stream.io.CsvWriter does is call the `toString()` method of the
+java object its trying to print.  You're set as long as you override the `toString()` method yourself. 
+Theres is one catch however. If you want to write out an array to the file the output will look a little something like this:
+
+    E5b-Mac-mini-002:~ kaibrugge$ cat /tmp/output.csv
+		positionArray
+		[I@3acafb56
+		[I@786c730
+		[I@45d6a56e
+		[I@207f5580
+		[I@75982fc1
+		[I@5a676437
+		[I@6855a338
+		[I@4e4ee70b
+		[I@1e22ab57
+      ...
+
+Thats because the `toString()` function of Javas internal Array class does not print the whole contents of the array but simply
+returns what you could consider the Java equivalent of a C pointer. A workaround would be to use the fact.io.RootASCIIWriter processor
+which can handle arrays with primitive types. Its usage is similar to the CsvWriter.
+
+    <-- No spaces between keys--/>    
+    <fact.io.RootASCIIWriter keys="positionArray" url="file:///tmp/output.csv" />
+
+	
+	  
