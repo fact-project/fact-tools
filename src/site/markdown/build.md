@@ -11,6 +11,13 @@ or installed on Ubuntu systems using apt-get:
      # sudo apt-get install maven2
 
 
+CI for the FACT Tools
+-----------------------
+Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [drone.IO project site](https://drone.io/bitbucket.org/cbockermann/fact-tools) 
+
+
+![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)
+
 
 Building the FACT Tools
 -----------------------
