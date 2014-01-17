@@ -30,7 +30,16 @@ This will automatically download the required libraries defined as dependencies
 in the project definition and will create a final bundled Jar file that
 includes all required classes.
 
-A buildbot is running at [drone.io](https://drone.io/bitbucket.org/cbockermann/fact-tools) to provide some continuous integration service.
+Continous Integration
+-------------------------
+
+A buildbot is running at [drone.io](https://drone.io/bitbucket.org/cbockermann/fact-tools) to provide some continuous integration services.
+The [Website](http://www.isdc.unige.ch/fact/)  will also be rebuild automatically. So any changes to the *src/site/* directory will 
+be visible on the web after a few minutes. At the moment a complete build takes about 10 to 15 minutes.
+
+[![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)](https://drone.io/bitbucket.org/cbockermann/fact-tools/latest)
+
+
 
 
 
