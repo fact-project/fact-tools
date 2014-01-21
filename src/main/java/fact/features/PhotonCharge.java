@@ -9,11 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.EventUtils;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 
