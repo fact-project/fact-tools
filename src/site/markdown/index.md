@@ -13,3 +13,6 @@ and has been watching various gamma ray sources since then.
 
 One of the central components of the *fact-tools* is the [FACT viewer](viewer.html) application. This tool provides a simple
 interactive visualization component for FACT data.
+
+
+![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)

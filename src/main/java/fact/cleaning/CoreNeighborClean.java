@@ -59,11 +59,17 @@ public class CoreNeighborClean implements StatefulProcessor{
 			log.warn("minNumberOfPixel not set using 2 as default ");
 			minNumberOfPixel = 2;
 		}
+		if(outputKey == null){
+			log.error("Missing outputKey Aborting.");
+			throw new RuntimeException("Missing parameters. Aborting.");
+		}
 	}
 	
 	@Override
 	public Data process(Data input) {
 		try{
+			//EventUtils.mapContainsKeys(getClass(), input, key, keyPositions);
+			EventUtils.mapContainsKeys(getClass(), input, key);
 			photonCharge= (double[]) input.get(key);
 			if(photonCharge == null){
 				log.error("No weights found in event. Aborting.");
@@ -165,18 +171,18 @@ public class CoreNeighborClean implements StatefulProcessor{
 			corePixelSet.add(new Pixel(showerPixelArray[i]));
 		}
 		
-		PixelSet l1 = new PixelSet();
-		for(int i = 0; i < level1.length; i++){
-			l1.add(new Pixel(level1[i]));
-		}
-		PixelSet l3 = new PixelSet();
-		for(int i = 0; i < level3.length; i++){
-			l3.add(new Pixel(level3[i]));
-		}
-		PixelSet l2 = new PixelSet();
-		for(int i = 0; i < level2.length; i++){
-			l2.add(new Pixel(level2[i]));
-		}
+//		PixelSet l1 = new PixelSet();
+//		for(int i = 0; i < level1.length; i++){
+//			l1.add(new Pixel(level1[i]));
+//		}
+//		PixelSet l3 = new PixelSet();
+//		for(int i = 0; i < level3.length; i++){
+//			l3.add(new Pixel(level3[i]));
+//		}
+//		PixelSet l2 = new PixelSet();
+//		for(int i = 0; i < level2.length; i++){
+//			l2.add(new Pixel(level2[i]));
+//		}
 		if(showerPixelArray.length > 0){
 //			input.put(outputKey+"_level1", level1);
 //			input.put(outputKey+"_level1" +"_"+Constants.PIXELSET, l1);

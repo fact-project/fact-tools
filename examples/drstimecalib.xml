@@ -5,9 +5,13 @@
 <property name="dataDRS" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/11/20130111_044.drs.fits.gz" /> -->
 <!-- <property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130328_009.fits.gz" />
 <property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130328_007.drs.fits.gz" /> -->
-<property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_020.fits.gz" />
-<property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_018.drs.fits.gz" />
-<property name="outfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_020_constants.csv" />
+<!-- <property name="data" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_020.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130104_018.drs.fits.gz" /> -->
+<property name="data" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/06/02/20130602_014.fits.gz" />
+<property name="dataDRS" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/06/02/20130602_012.drs.fits.gz" />
+
+
+<property name="outfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/timedrscalibtest/20130602_014_constants.csv" />
 
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->

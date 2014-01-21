@@ -144,7 +144,7 @@ public Data process(Data input) {
     //this will be written in radians.
     double x = eig.getEigenvector(0).getEntry(0);
     double y = eig.getEigenvector(0).getEntry(1);
-    double delta = Math.atan2(y,x);
+    double delta = Math.atan(y/x);
 //    System.out.println("angle of eigenvectors in radians: " + delta + " in degrees: " + delta*180/Math.PI);
 //    System.out.println("--------");
     

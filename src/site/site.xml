@@ -27,11 +27,11 @@
 
     <item name="Usage Examples" href="examples.html">
          <item name="Writing Data" href="example_writing.html" />
-         <item name="Plotting Data" href="example_plots.html" >
-            <item name="Scatter Plots" href="scatter_plot.html" />
-            <item name="Bar Plots" href="bar_plot.html" />
-            <item name="Histogram Plots" href="histogram_plot.html" />
-            <item name="Camera Image Plots" href="camera_plot.html" />
+         <item name="Plotting Data" href="plotting/example_plots.html" >
+            <item name="Scatter Plots" href="plotting/scatter_plot.html" />
+            <item name="Bar Plots" href="plotting/bar_plot.html" />
+            <item name="Histogram Plots" href="plotting/histogram_plot.html" />
+            <item name="Camera Image Plots" href="plotting/camera_plot.html" />
          </item>
 
     </item>

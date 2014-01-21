@@ -186,8 +186,11 @@ public class EventUtils {
 	public static void mapContainsKeys(Class<?> caller, Data item,  String... keys ){
 		ArrayList<String> e = new ArrayList<String>();
 		boolean isValid = true;
+		if(keys == null){
+			isValid = false;
+		}
 		for(String key : keys){
-			if(!item.containsKey(key)){
+			if(key == null || !item.containsKey(key)){
 				isValid = false;
 				e.add(key);
 			}
