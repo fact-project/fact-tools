@@ -12,7 +12,6 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.data.DataFactory;
 import stream.io.CsvWriter;
-import fact.Constants;
 
 /**
  * <p>
@@ -33,7 +32,7 @@ public class RootASCIIWriter extends CsvWriter {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 		setSeparator(" ");
-		setHeader(false);
+//		setHeader(false);
 	}
 
 	/**
@@ -68,7 +67,7 @@ public class RootASCIIWriter extends CsvWriter {
 			if(data.containsKey(keys[i])){
 				value = data.get(keys[i]);
 			} else {
-				log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
+//				log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
 				return null;
 			}
 			//Check if value is of the right type
