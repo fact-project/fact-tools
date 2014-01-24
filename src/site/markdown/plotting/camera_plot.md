@@ -23,5 +23,5 @@ This is quite useful if you want to see the distribution of your feature in the 
 This will be the result. The parameter pixelSize specifies the size of one pixel. A larger number means a larger window.
 
 <div style="text-align: center;">
-   <img src="images/camera_plot.png" style="width:400px;" />
+   <img src="../images/camera_plot.png" style="width:400px;" />
 </div>

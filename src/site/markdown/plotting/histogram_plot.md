@@ -26,5 +26,5 @@ During the processing the number of entries in the histogram will be updated and
 
 
 <div style="text-align: center;">
-   <img src="images/histogram_plot.png" style="width:550px;" />
+   <img src="../images/histogram_plot.png" style="width:550px;" />
 </div>

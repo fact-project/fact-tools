@@ -32,5 +32,5 @@ During the processing a new window will pop up which is being filled with points
 
 
 <div style="text-align: center;">
-   <img src="images/scatterplot.png" style="width:550px;" />
+   <img src="../images/scatterplot.png" style="width:550px;" />
 </div>
