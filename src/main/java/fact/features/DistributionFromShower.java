@@ -2,8 +2,6 @@ package fact.features;
 
 import java.awt.Color;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
