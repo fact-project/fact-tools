@@ -17,7 +17,7 @@ More features to follow.
 The current version of the FactViewer is `0.3.1-SNAPSHOT`. It can be found
 as a standalone Java archive at:
 <div style="text-align: center;">
-   <a href="http://download.jwall.org/fact-tools/fact-tools-0.3.1-SNAPSHOT.jar">http://download.jwall.org/fact-tools/fact-tools-0.3.1-SNAPSHOT.jar</a>
+   <a href="./binaries">Latest Binaries</a>
 </div>
     
 ## Running the Viewer
@@ -25,7 +25,7 @@ as a standalone Java archive at:
 The viewer is provided as a standalone JAR archive that can be
 executed with Java right away:
 
-     # java -cp fact-tools-0.3.1-SNAPSHOT.jar fact.FactViewer
+     # java -cp fact-tools-{VERSION}.jar fact.FactViewer
      
 The exact name of the JAR archive may change according to the version.
 For instructions to build the viewer from source, see the build section
@@ -35,7 +35,7 @@ In order to view DRS calibrated data within the viewer, it needs to
 be started with the FITS data file and the FITS DRS file as arguments,
 for example:
 
-     # java -cp fact-tools-0.3.1-SNAPSHOT.jar fact.FactViewer 20111126_042.fits.gz 20111126_034.drs.fits.gz
+     # java -cp fact-tools-{VERSION}.jar fact.FactViewer 20111126_042.fits.gz 20111126_034.drs.fits.gz
 
 
 ### Using the Viewer
