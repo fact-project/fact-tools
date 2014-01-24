@@ -34,6 +34,10 @@ public class DrsCalibrationTest {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * starts a drs calibration and checks wether the resulting array is of the same array
+	 * as the input array.
+	 */
 	@Test
 	public void drsCalibProcessor() {
 
@@ -59,7 +63,7 @@ public class DrsCalibrationTest {
 						fail("drxCalibration is not working. the result array doesnt have the smae lenght as the original array");
 					}
 				} catch(ClassCastException e){
-					fail("Failed to cast items to float[]");
+					fail("Failed to cast items to double[]");
 				}
 				item = stream.read();
 			}
