@@ -17,10 +17,20 @@ public class HillasAlpha implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasAlpha.class);
 	private String distribution = null;
 	private String sourcePosition = null;
-	private String outputKey = "alpha";
+	private String outputKey = null;
 	
 	@Override
 	public Data process(Data input) {
+		
+		if(distribution == null){
+			throw new RuntimeException("Missing parameter: distribution");
+		}
+		if(sourcePosition == null){
+			throw new RuntimeException("Missing parameter: sourcePosition");
+		}
+		if(outputKey == null){
+			throw new RuntimeException("Missing parameter: outputKey");
+		}
 		PixelDistribution2D dist;
 		try{
 			dist = (PixelDistribution2D) input.get(distribution);
@@ -32,12 +42,13 @@ public class HillasAlpha implements Processor {
 			log.error("distribution is not of type PixelDistribution2D. Aborting");
 			return null;
 		}
+
+
 		double[] source = null;
 		try{
 			source  = (double[]) input.get(sourcePosition);
 			if(source ==  null){
-				log.info("No sourcePosition found in this event. Not calculating alpha");
-				return input;
+				throw new RuntimeException("This event didnt have a sourceposition. Eventnumber: " + input.get("EventNum"));
 			}
 		} catch (ClassCastException e){
 			log.error("wrong types" + e.toString());
