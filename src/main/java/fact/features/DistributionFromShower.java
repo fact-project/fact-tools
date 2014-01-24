@@ -2,6 +2,8 @@ package fact.features;
 
 import java.awt.Color;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -43,7 +45,7 @@ private double[] wheightsArray;
 private int[] showerPixel;
 
 //hte in and outputkeys
-private String outputKey ="Hillas_";
+private String outputKey =null;
 private String key = null;
 
 
@@ -59,9 +61,16 @@ public void init(ProcessContext context) throws Exception {
 @Override
 public Data process(Data input) {
 	//get the required stuff from the map
-	//in case the map doesn't contain a shower return the original input. 
+	//in case the map doesn't contain a shower return the original input.
+	
+	if(outputKey == null){
+		throw new RuntimeException("Missing parameter: outputKey");
+	}
 
 	try{
+		if(key == null){
+			throw new RuntimeException("Missing parameter. Key");
+		}
 		showerPixel= (int[]) input.get(key);
 		if(showerPixel ==  null){
 			log.info("No showerpixel in this event. Not calculating Ellipse");
@@ -73,12 +82,7 @@ public Data process(Data input) {
 	}
 
 	if(weights == null){
-		log.info("Wheights were null. Setting all weights to 1");
-
-		wheightsArray = new double[Constants.NUMBEROFPIXEL];
-		for(int i = 0; i < wheightsArray.length; i++){
-			wheightsArray[i] = 1.0f;
-		}
+		throw new RuntimeException("Missing parameter: wheights");
 	} else {
 		try{
 			wheightsArray = (double[]) input.get(weights);

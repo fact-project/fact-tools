@@ -13,6 +13,7 @@ import org.junit.rules.ExpectedException;
 import stream.Data;
 import stream.io.SourceURL;
 import fact.cleaning.CoreNeighborClean;
+import fact.features.DistributionFromShower;
 import fact.features.MaxAmplitudePosition;
 import fact.features.PhotonCharge;
 import fact.filter.DrsCalibration;
@@ -23,7 +24,7 @@ import fact.io.FitsStreamTest;
  * @author bruegge
  *
  */
-public class CoreNeighbourCleanParameterTest {
+public class DistributionFromShowerTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -31,10 +32,10 @@ public class CoreNeighbourCleanParameterTest {
 	FitsStream stream;
 	Data item;
 	final String key = "calib";
-	final String outputKey = "cleanedEvent";
-	final String positions = "positions";
+	final String shower="shower";
+	final String wheights = "charge";
 
-	final String charge = "charge";
+	final String outputKey = "dist";
 
 	@Test
 	public void testMissingOutputKey() throws Exception{
@@ -42,10 +43,23 @@ public class CoreNeighbourCleanParameterTest {
 		thrown.expectMessage("Missing");
 
 		//start it with a missing parameter. forget outputkey
-		CoreNeighborClean poser = new CoreNeighborClean();
-		poser.setKey(key);
-		poser.setKeyPositions(positions);
+		DistributionFromShower poser = new DistributionFromShower();
+		poser.setKey(shower);
+		poser.setWeights(wheights);
 //		poser.setOutputKey(outputKey);
+		poser.init(null);
+		poser.process(item);
+	}
+	
+	@Test
+	public void testMissinWheights() throws Exception{
+		thrown.expect(RuntimeException.class);
+		thrown.expectMessage("Missing");
+
+		DistributionFromShower poser = new DistributionFromShower();
+		poser.setKey(shower);
+		//poser.setWeights(wheights);
+		poser.setOutputKey(outputKey);
 		poser.init(null);
 		poser.process(item);
 	}
@@ -55,36 +69,22 @@ public class CoreNeighbourCleanParameterTest {
 		thrown.expect(RuntimeException.class);
 		thrown.expectMessage("Missing");
 
-		//start it with a missing parameter. forget outputkey
-		CoreNeighborClean poser = new CoreNeighborClean();
-//		poser.setKey(key);
-		poser.setKeyPositions(positions);
+		DistributionFromShower poser = new DistributionFromShower();
+		//poser.setKey(shower);
+		poser.setWeights(wheights);
 		poser.setOutputKey(outputKey);
 		poser.init(null);
 		poser.process(item);
 	}
-	//TODO: optional for now
-//	@Test
-//	public void testMissingPositions() throws Exception{
-//		thrown.expect(RuntimeException.class);
-//		thrown.expectMessage("Missing");
-//
-//		//start it with a missing parameter. forget positions
-//		CoreNeighborClean poser = new CoreNeighborClean();
-//		poser.setKey(key);
-////		poser.setKeyPositions(positions);
-//		poser.setOutputKey(outputKey);
-//		poser.init(null);
-//		poser.process(item);
-//	}
+
 
 	@Test
 	public void testValidParameter() throws Exception{
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
-		CoreNeighborClean poser = new CoreNeighborClean();
-		poser.setKey(key);
-		poser.setKeyPositions(positions);
+		DistributionFromShower poser = new DistributionFromShower();
+		poser.setKey(shower);
+		poser.setWeights(wheights);
 		poser.setOutputKey(outputKey);
 		poser.init(null);
 		poser.process(item);
@@ -119,16 +119,23 @@ public class CoreNeighbourCleanParameterTest {
 		
 		MaxAmplitudePosition pP = new MaxAmplitudePosition();
 		pP.setKey(key);
-		pP.setOutputKey(positions);
+		pP.setOutputKey("positions");
 		pP.process(item);
 		
 		PhotonCharge pC = new PhotonCharge();
 		pC.setKey(key);
-		pC.setOutputKey(charge);
-		pC.setPositions(positions);
+		pC.setOutputKey("charge");
+		pC.setPositions("positions");
 		pC.init(null);
 		pC.process(item);
 		
+		
+		CoreNeighborClean poser = new CoreNeighborClean();
+		poser.setKey(key);
+		poser.setKeyPositions("positions");
+		poser.setOutputKey(shower);
+		poser.init(null);
+		poser.process(item);
 	}
 
 }
