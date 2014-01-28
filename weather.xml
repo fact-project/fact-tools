@@ -1,7 +1,7 @@
 <container>
 
 	<stream id="input" class="stream.io.DataObjectStream"
-                url="tcp://129.217.160.65:16000" />
+                url="/dev/usb/hiddev0" />
 
         <process input="input">
 		<fact.weather.ParseWeatherMessage prefix="weather:" />

@@ -117,9 +117,11 @@ public class SourceLineTest implements Processor{
 		
 		sourceLineTestValue /= recoWsum;
 		
-		sourceLineTestValue *= (hillasLengthValue / hillasWidthValue);
+		//@Todo add alpha*alpha here
+		double weightedSourceLineTestValue *= ( hillasWidthValue / hillasLengthValue ); 
 		
 		input.put(outputKey + "_sourceLineTestValue", sourceLineTestValue);
+		input.put(outputKey + "_WeightedSourceLineTestValue", weightedSourceLineTestValue);
 		input.put(outputKey + "_meanShowerVelocity", meanShowerVelocity);
 		
 		return input;
