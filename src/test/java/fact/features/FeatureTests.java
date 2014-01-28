@@ -49,8 +49,10 @@ public class FeatureTests {
 		p = new Pair<String, Class<?>>(maxAmp.getOutputKey(), double[].class );
 		typeMap.put(maxAmp, p);
 		
-		RisingEdge rE = new RisingEdge();
-		rE.setKey("test");
+		RisingEdgeForPositions rE = new RisingEdgeForPositions();
+//		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+		rE.setDatakey("test");
+		rE.setAmplitudePositionsKey("positions");
 		rE.setOutputKey("risingEdge");
 		p = new Pair<String, Class<?>>(rE.getOutputKey(), int[].class );
 		typeMap.put(rE, p);
@@ -92,8 +94,16 @@ public class FeatureTests {
 		p = new Pair<String, Class<?>>(cut.getOutputKey(), double[].class );
 		typeMap.put(cut, p);
 		
-		RisingEdge rE = new RisingEdge();
-		rE.setKey(cut.getOutputKey());
+		MaxAmplitudePosition pP = new MaxAmplitudePosition();
+		pP.setKey("DataCalibrated");
+		pP.setOutputKey("positions");
+		p = new Pair<String, Class<?>>(pP.getOutputKey(), int[].class );
+		typeMap.put(pP, p);
+		
+		RisingEdgeForPositions rE = new RisingEdgeForPositions();
+//		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+		rE.setDatakey("DataCalibrated");
+		rE.setAmplitudePositionsKey("positions");
 		rE.setOutputKey("risingEdge");
 		p = new Pair<String, Class<?>>(rE.getOutputKey(), int[].class );
 		typeMap.put(rE, p);
