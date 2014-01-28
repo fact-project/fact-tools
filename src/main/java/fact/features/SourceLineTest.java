@@ -118,7 +118,7 @@ public class SourceLineTest implements Processor{
 		sourceLineTestValue /= recoWsum;
 		
 		//@Todo add alpha*alpha here
-		double weightedSourceLineTestValue *= ( hillasWidthValue / hillasLengthValue ); 
+		double weightedSourceLineTestValue = sourceLineTestValue * ( hillasWidthValue / hillasLengthValue ); 
 		
 		input.put(outputKey + "_sourceLineTestValue", sourceLineTestValue);
 		input.put(outputKey + "_WeightedSourceLineTestValue", weightedSourceLineTestValue);
