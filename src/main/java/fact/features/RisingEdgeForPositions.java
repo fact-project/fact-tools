@@ -12,12 +12,12 @@ import fact.Constants;
 
 /**
  * 
- * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ * @author Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  * 
  */
 public class RisingEdgeForPositions implements Processor {
 
-	static Logger log = LoggerFactory.getLogger(RisingEdge.class);
+	static Logger log = LoggerFactory.getLogger(RisingEdgeForPositions.class);
 	
 	private int searchWindowLeft = 25;
 	
@@ -88,12 +88,12 @@ public class RisingEdgeForPositions implements Processor {
 	}
 
 
-	public String getOutputkey() {
+	public String getOutputKey() {
 		return outputkey;
 	}
 
 
-	public void setOutputkey(String outputkey) {
+	public void setOutputKey(String outputkey) {
 		this.outputkey = outputkey;
 	}
 
