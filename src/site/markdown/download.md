@@ -6,7 +6,7 @@ continuous integration server at [drone.io](https://drone.io/bitbucket.org/cbock
 here:
 
 <div style="margin: auto; text-align: center;">
-    <a href="./binaries">Latest Fact-Tools binary/</a>
+    <a href="fact-tools_latest.jar">latest Fact-Tools binary/</a>
 </div>
 
 The source code is available through a public [repository](source-repository.html).
