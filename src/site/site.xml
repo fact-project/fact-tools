@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="fact-analysis">
+<project name="Fact Tools">
   <bannerLeft>
-    <name>streams</name>
+    <name>tu logo</name>
     <src>http://www-ai.cs.uni-dortmund.de/ci/Medienpool/Seitenbilder/logo_tu.png</src>
     <href>http://www.uni-dortmund.de/</href>
   </bannerLeft>
   
   <bannerRight>
-    <name></name>
+    <name>ls8 logo</name>
     <src>http://www-ai.cs.uni-dortmund.de/header-bg-topLeft.png</src>
     <href></href>
   </bannerRight>
@@ -20,29 +20,31 @@
 	<menu ref="parent">
 	</menu>
 
-	<menu name="Documentation">
+	<menu name="General">
 		<item name="Overview" href="index.html"/>
 		<item name="Fact Viewer" href="viewer.html" />
 		<item name="Building" href="build.html"/>
-
-    <item name="Usage Examples" href="examples.html">
-         <item name="Writing Data" href="example_writing.html" />
-         <item name="Plotting Data" href="plotting/example_plots.html" >
-            <item name="Scatter Plots" href="plotting/scatter_plot.html" />
-            <item name="Bar Plots" href="plotting/bar_plot.html" />
-            <item name="Histogram Plots" href="plotting/histogram_plot.html" />
-            <item name="Camera Image Plots" href="plotting/camera_plot.html" />
-         </item>
-
-    </item>
-
-    <item name="Programming Examples" href="programming_examples/programming_example.html">
-          <item name="Finding the maximum" href="programming_examples/maximum.html" />
-          <item name="Passing parameters from the .xml" href="programming_examples/parameter.html" />
-          <item name="Log output" href="programming_examples/logging.html" />
-    </item>
-
-    <item name="Further Resources" href="resources.html" />
+	</menu>
+	
+	<menu name="Documentation">
+	    <item name="Usage Examples" href="examples.html">
+	         <item name="Writing Data" href="example_writing.html" />
+	         <item name="Plotting Data" href="plotting/example_plots.html" collapse="true" >
+	            <item name="Scatter Plots" href="plotting/scatter_plot.html" />
+	            <item name="Bar Plots" href="plotting/bar_plot.html" />
+	            <item name="Histogram Plots" href="plotting/histogram_plot.html" />
+	            <item name="Camera Image Plots" href="plotting/camera_plot.html" />
+	         </item>
+	
+	    </item>
+	
+	    <item name="Programming Examples" href="programming_examples/programming_example.html" collapse="true">
+	          <item name="Finding the maximum" href="programming_examples/maximum.html" />
+	          <item name="Passing parameters from the .xml" href="programming_examples/parameter.html" />
+	          <item name="Log output" href="programming_examples/logging.html" />
+	    </item>
+	
+	    <item name="Further Resources" href="resources.html" />
 	</menu>
 	
 	<menu name="Download" >
