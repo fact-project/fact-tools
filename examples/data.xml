@@ -69,7 +69,7 @@
             <!-- Error  <fact.features.ConcentrationAtCenterOfGravity photonCharge="photoncharge" cogX="COGx" cogY="COGy" hillasSize="Size" outputKey="concCOG" /> -->
             <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
             <fact.features.SlopeSpreadWeighted showerPixel="shower" arrivaltime="arrivalTime" photonCharge="photoncharge" hillasDelta="Delta" outputKey="SlopeSpreadWeighted" />
-            <fact.features.SourceLineTest photonCharge="photoncharge" hillasLength="HillasLength" hillasWidth="HillasWidth" arrivalTime="arrivalTime" showerPixel="shower" sourcePosition="sourcePosition" outputKey="SourceLineTest" />
+            <fact.features.SourceLineTest photonCharge="photoncharge" arrivalTime="arrivalTime" showerPixel="shower" sourcePosition="sourcePosition" outputKey="SourceLineTest" />
             <fact.features.NaiveShowerLineFit showerPixel="shower" hillasDelta="Delta" outputKey="SLF" />
             <fact.statistics.ArrayMean key="photoncharge" outputKey="photonchargeMean" />
             <fact.statistics.ArrayMean key="arrivalTime" outputKey="arrivalTimeMean" />

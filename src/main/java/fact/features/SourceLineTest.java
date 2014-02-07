@@ -17,7 +17,7 @@ public class SourceLineTest implements Processor{
 	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
 	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 		//Test for keys.
-		EventUtils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition, hillasWidth, hillasLength);
+		EventUtils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
 		arrivalTimeArray = new double[photonChargeArray.length];
@@ -27,11 +27,7 @@ public class SourceLineTest implements Processor{
 			arrivalTimeArray[i] = (double) arrivalPos[i];
 		}
 		showerPixelArray = (int[]) input.get(showerPixel);
-		sourcePositionArray = (double[]) input.get(sourcePosition);
-		
-		hillasLengthValue = (Double) input.get(hillasLength);
-		hillasWidthValue = (Double) input.get(hillasWidth);
-		
+		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		
 		double cogT = 0;
 		double size = 0;
@@ -117,11 +113,8 @@ public class SourceLineTest implements Processor{
 		
 		sourceLineTestValue /= recoWsum;
 		
-		//@Todo add alpha*alpha here
-		double weightedSourceLineTestValue = sourceLineTestValue * ( hillasWidthValue / hillasLengthValue ); 
 		
 		input.put(outputKey + "_sourceLineTestValue", sourceLineTestValue);
-		input.put(outputKey + "_WeightedSourceLineTestValue", weightedSourceLineTestValue);
 		input.put(outputKey + "_meanShowerVelocity", meanShowerVelocity);
 		
 		return input;
@@ -165,33 +158,11 @@ public class SourceLineTest implements Processor{
 	}
 
 
-	public String getHillasWidth() {
-		return hillasWidth;
-	}
-
-	@Parameter(required = true, defaultValue = "HillasWidth", description = "Key to Hillas Width.")
-	public void setHillasWidth(String hillasWidth) {
-		this.hillasWidth = hillasWidth;
-	}
-
-
-	public String getHillasLength() {
-		return hillasLength;
-	}
-
-
-	@Parameter(required = true, defaultValue = "HillasLength", description = "Key to Hillas Length.")
-	public void setHillasLength(String hillasLength) {
-		this.hillasLength = hillasLength;
-	}
-
 
 	private double[] arrivalTimeArray = null;
 	private double[] photonChargeArray = null;
 	private int[] showerPixelArray = null;
 	private double[] sourcePositionArray = null;
-	private Double hillasLengthValue = null;
-	private Double hillasWidthValue = null;
 	
 	private String photonCharge;
 	//consider the error of the arrival time later...
@@ -199,8 +170,6 @@ public class SourceLineTest implements Processor{
 	private String showerPixel;
 	private String sourcePosition;
 	private String outputKey;
-	private String hillasWidth;
-	private String hillasLength;
 	
 	
 }
