@@ -9,7 +9,7 @@ import fact.viewer.ui.DefaultPixelMapping;
 public class SourceLineTest implements Processor{
 
 	/**
-	 * This function calculates the "RhodeParameter" described in Parfact with adjustments(later) and proper(hopefully) weighting 
+	 * This function calculates the Source line test suggested by W. Rhode with some adjustments(later) and proper(hopefully) weighting 
 	 */
 	@Override
 	public Data process(Data input)
@@ -20,12 +20,20 @@ public class SourceLineTest implements Processor{
 		EventUtils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
+		
+		
 		arrivalTimeArray = new double[photonChargeArray.length];
 		int[] arrivalPos = (int[]) input.get(arrivalTime);
+		// Convert to double
+
 		for(int i = 0; i < arrivalPos.length; i++)
 		{
+			
 			arrivalTimeArray[i] = (double) arrivalPos[i];
+			
 		}
+		
+		
 		showerPixelArray = (int[]) input.get(showerPixel);
 		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		
@@ -52,9 +60,15 @@ public class SourceLineTest implements Processor{
 		double recoWsum = photonChargeArray.length;
 		
 		// output variables
-		double sourceLineTestValue = 0;
-		double meanShowerVelocity = 0;
+		double sourceLineTestValueProjected = 0;
+		double sourceLineTestValueSorted = 0;
+		
+		double meanShowerVelocityProjected = 0;
 
+		double tf1 = Double.MAX_VALUE, tf2 = Double.MAX_VALUE, tf3 = Double.MAX_VALUE; // First three times
+		double tl1 = Double.MIN_VALUE, tl2 = Double.MIN_VALUE, tl3 = Double.MIN_VALUE; // Last three times
+		int id_tf1 = -1, id_tf2 = -1, id_tf3 = -1; // Corresponding ids
+		int id_tl1 = -1, id_tl2 = -1, id_tl3 = -1;
 		
 		for(int chid : showerPixelArray)
 		{
@@ -62,7 +76,67 @@ public class SourceLineTest implements Processor{
 			cogX += mpGeomXCoord[chid] * photonChargeArray[chid];
 			cogY += mpGeomYCoord[chid] * photonChargeArray[chid];
 			size += photonChargeArray[chid];
+			
+			double t = arrivalTimeArray[chid]; // tf1 < tf2 < tf3 // tl1 > tl2 > tl3
+
+			
+			if (t < tf1)
+			{
+				tf3 = tf2;
+				tf2 = tf1;
+				tf1 = t;
+				id_tf3 = id_tf2;
+				id_tf2 = id_tf1;
+				id_tf1 = chid;
+			}
+			else if (t < tf2)
+			{
+				tf3 = tf2;
+				tf2 = t;
+				id_tf3 = id_tf2;
+				id_tf2 = chid;
+			}
+			else if (t < tf3)
+			{
+				tf3 = t;
+				id_tf3 = chid;
+			}
+			
+			if (t > tl1)
+			{
+				tl3 = tl2;
+				tl2 = tl1;
+				tl1 = t;
+				id_tl3 = id_tl2;
+				id_tl2 = id_tl1;
+				id_tl1 = chid;
+			}
+			else if (t > tl2)
+			{
+				tl3 = tl2;
+				tl2 = t;
+				id_tl3 = id_tl2;
+				id_tl2 = chid;
+			}
+			else if (t > tl3)
+			{
+				tl3 = t;
+				id_tl3 = chid;
+			}
+			
 		}
+		
+		double f_time = (tf1 + tf2 + tf3) / 3.0;
+		double l_time = (tl1 + tl2 + tl3) / 3.0;
+		
+		double f_x = (mpGeomXCoord[id_tf1] + mpGeomXCoord[id_tf2] + mpGeomXCoord[id_tf3]) / 3.0;
+		double f_y = (mpGeomYCoord[id_tf1] + mpGeomYCoord[id_tf2] + mpGeomYCoord[id_tf3]) / 3.0;
+		
+		double l_x = (mpGeomXCoord[id_tl1] + mpGeomXCoord[id_tl2] + mpGeomXCoord[id_tl3]) / 3.0;
+		double l_y = (mpGeomYCoord[id_tl1] + mpGeomYCoord[id_tl2] + mpGeomYCoord[id_tl3]) / 3.0;
+		
+		double meanShowerVelocitySorted = Math.sqrt((f_x - l_x)*(f_x - l_x) + (f_y - l_y) * (f_y - l_y)) / (l_time - f_time);
+		
 		cogX /= size;
 		cogY /= size;
 		cogT /= size;
@@ -97,25 +171,42 @@ public class SourceLineTest implements Processor{
 				timeMax = arrivalTimeArray[chid];
 			}
 		}
-		meanShowerVelocity = (projPrimaryMax - projPrimaryMin) / (timeMax - timeMin);
+		meanShowerVelocityProjected = (projPrimaryMax - projPrimaryMin) / (timeMax - timeMin);
 		
 		recoWsum = 0;
 		for(int chid : showerPixelArray)
 		{
+			 recoW[chid] = 1.0; // consider arrival time error later
+		     
+			 // Calculate with projected velocity
 			 double dt = arrivalTimeArray[chid] - cogT;
-		     double dx = dt * meanShowerVelocity;
+		     double dx = dt * meanShowerVelocityProjected;
 		     recoX[chid] = cogX + dx * Math.cos(cogSourceAngle);
 		     recoY[chid] = cogY + dx * Math.sin(cogSourceAngle);
-		     recoW[chid] = 1.0; // consider arrival time error later
+		     
+		     sourceLineTestValueProjected += recoW[chid] * Math.sqrt((recoX[chid] - mpGeomXCoord[chid]) * (recoX[chid] - mpGeomXCoord[chid]) + (recoY[chid] - mpGeomYCoord[chid]) * (recoY[chid] - mpGeomYCoord[chid]));
+		     
+		     // Calculate with sorted velocity
+			 dt = arrivalTimeArray[chid] - cogT;
+		     dx = dt * meanShowerVelocitySorted;
+		     recoX[chid] = cogX + dx * Math.cos(cogSourceAngle);
+		     recoY[chid] = cogY + dx * Math.sin(cogSourceAngle);
+		     
+		     sourceLineTestValueSorted += recoW[chid] * Math.sqrt((recoX[chid] - mpGeomXCoord[chid]) * (recoX[chid] - mpGeomXCoord[chid]) + (recoY[chid] - mpGeomYCoord[chid]) * (recoY[chid] - mpGeomYCoord[chid]));
+		     
+		     
 		     recoWsum += recoW[chid];
-		     sourceLineTestValue += recoW[chid] * Math.sqrt((recoX[chid] - mpGeomXCoord[chid]) * (recoX[chid] - mpGeomXCoord[chid]) + (recoY[chid] - mpGeomYCoord[chid]) * (recoY[chid] - mpGeomYCoord[chid]));
 		}
 		
-		sourceLineTestValue /= recoWsum;
+		sourceLineTestValueProjected /= recoWsum;
+		sourceLineTestValueSorted /= recoWsum;
 		
 		
-		input.put(outputKey + "_sourceLineTestValue", sourceLineTestValue);
-		input.put(outputKey + "_meanShowerVelocity", meanShowerVelocity);
+		input.put(outputKey + "_sourceLineTestValueProjected", sourceLineTestValueProjected);
+		input.put(outputKey + "_sourceLineTestValueSorted", sourceLineTestValueSorted);
+		input.put(outputKey + "_meanShowerVelocityProjected", meanShowerVelocityProjected);
+		input.put(outputKey + "_meanShowerVelocitySorted", meanShowerVelocitySorted);
+		
 		
 		return input;
 	}
