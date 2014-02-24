@@ -10,19 +10,18 @@ import stream.ProcessorException;
 import stream.annotations.Parameter;
 import fact.Constants;
 import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 
-
+//TODO write unit test
 public class ArrayTimeCorrection implements Processor{
 
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, "NROI", kernel, dataCalibrated, timesOffset);
+		EventUtils.mapContainsKeys(getClass(), input,  kernel, dataCalibrated, timesOffset);
 		
 		try{
-			roi = (Integer) input.get("NROI");
 			dataCalibratedArray = (double[]) input.get(dataCalibrated);
+			roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
 			timesOffsetArray = (double[]) input.get(timesOffset);
 			String kernelStr = (String) input.get(kernel);
 			if(kernelStr == "linear")

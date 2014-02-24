@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
+import fact.EventUtils;
 
 public class FillAverageTimeWidth implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
@@ -21,6 +22,8 @@ public class FillAverageTimeWidth implements Processor {
 	private double[] weights = new double[numberTimeMarker*numberOfSlices];
 	@Override
 	public Data process(Data input) {
+		
+		EventUtils.mapContainsKeys(getClass(), input, key, "StartCellData");
 		double[] data;
 		try{
 			data = (double[]) input.get(key);
@@ -51,7 +54,7 @@ public class FillAverageTimeWidth implements Processor {
 					// this is also the weight which we use for the bin in which the zero crossing is happening:
 					double weight = data[pos+sl] / (data[pos+sl] - data[pos+sl+1]);
 					if (last_zero_crossing >= 0){
-						double length = sl + weight - last_zero_crossing;
+						double length = (double) sl + weight - last_zero_crossing;
 //						System.out.println(length);
 						// now update the averageTimeWidthArray for the bins between the last zero crossing
 						// and the current zero crossing.
@@ -77,7 +80,7 @@ public class FillAverageTimeWidth implements Processor {
 						weights[cell] += weight;
 						averageTimeWidth[cell] /= weights[cell];
 					}
-					last_zero_crossing = sl + weight;
+					last_zero_crossing = (double) sl + weight;
 					last_weight = weight;
 				}
 			}
