@@ -26,6 +26,9 @@ public class ArrayTimeCorrection implements Processor{
 			String kernelStr = (String) input.get(kernel);
 			if(kernelStr == "linear")
 				tcKernel = new LinearTimeCorrectionKernel();
+			else
+				throw new ProcessorException("Right now there is just the linear kernel.");
+				
 		}catch(Exception e)
 		{
 			throw new ProcessorException(e.getMessage() + " or something went terribly wrong in ArrayTimeCorrection. The keys were not readable.");

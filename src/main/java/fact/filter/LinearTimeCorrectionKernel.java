@@ -16,7 +16,7 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 	public double interpolate(double t) {
 		
 		int id = getIndex(t);
-		if (id < times.length)
+		if (id < numPoints)
 		{
 			// check left border
 			if(id == 0 && times[0] > t)
@@ -32,7 +32,7 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 			return (v1 - v0) * s + v0;
 		}else // check right border
 		{
-			return values[times.length - 1];
+			return values[numPoints - 1];
 		}
 		
 	}
