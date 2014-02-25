@@ -63,7 +63,7 @@ public class ArrayTimeCorrection implements Processor{
 	public String getKernel() {
 		return kernel;
 	}
-	@Parameter(required = false, description = "The kernel, that is use for rebinning.", defaultValue = "linear")
+	@Parameter(required = true, description = "The kernel, that is use for rebinning.", defaultValue = "linear")
 	public void setKernel(String kernel) {
 		this.kernel = kernel;
 	}
