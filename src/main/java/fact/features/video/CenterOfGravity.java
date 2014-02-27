@@ -139,12 +139,7 @@ public class CenterOfGravity implements Processor
 														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
 														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
 														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
-				// This one works quite well...   :    varcogx[slice - 1]*varcogx[slice - 1]+varcogy[slice - 1]*varcogy[slice - 1];
-						//Math.exp(-(varcogx[slice]*varcogx[slice] + varcogy[slice]*varcogy[slice] + 
-						//varcogx[slice-1]*varcogx[slice-1] + varcogy[slice-1]*varcogy[slice-1]));
-						/*
-						 * 
-			*/
+
 				if (cogVelocity[slice - 1] < minimalVelocity)
 				{
 					minimalVelocity = cogVelocity[slice - 1];
