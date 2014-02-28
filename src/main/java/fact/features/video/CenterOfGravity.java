@@ -134,12 +134,26 @@ public class CenterOfGravity implements Processor
 				cogVelocityXError[slice - 1] = 2.0 * (double) Math.sqrt(varcogx[slice] * varcogx[slice] + varcogx[slice - 1] * varcogx[slice - 1]);
 				cogVelocityYError[slice - 1] = 2.0 * (double) Math.sqrt(varcogy[slice] * varcogy[slice] + varcogy[slice - 1] * varcogy[slice - 1]);
 				// here i will define a better quality parameter
-				cogVelocityError[slice - 1] = Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
+				/*cogVelocityError[slice - 1] = Math.sqrt((cogVelocityX[slice - 1] * cogVelocityX[slice - 1] *
 														cogVelocityXError[slice - 1] * cogVelocityXError[slice - 1] +
 														cogVelocityY[slice - 1] * cogVelocityY[slice - 1] *
 														cogVelocityYError[slice - 1] * cogVelocityYError[slice - 1] ) / 
 														(cogVelocityX[slice - 1] * cogVelocityX[slice - 1] + cogVelocityY[slice - 1] * cogVelocityY[slice - 1]) );
-
+				 */
+				// common term
+				double ct = 1.0 / Math.sqrt(Math.pow(cogx[slice] + cogx[slice-1],2.0) + Math.pow(cogy[slice] + cogy[slice-1],2.0));
+				double ct2 = Math.pow(ct,2.0);
+				double xdiff2 = Math.pow(cogx[slice]- cogx[slice - 1], 2.0);
+				double ydiff2 = Math.pow(cogy[slice]- cogy[slice - 1], 2.0);
+				double f13 = ct2 * (cogx[slice]- cogx[slice - 1]) * (cogy[slice]- cogy[slice - 1]) * covcog[slice];
+				double f24 = ct2 * (cogx[slice]- cogx[slice - 1]) * (cogy[slice]- cogy[slice - 1]) * covcog[slice - 1];
+				cogVelocityError[slice-1] = Math.sqrt(ct2*varcogx[slice]*varcogx[slice]*xdiff2 + 
+						ct2*varcogx[slice - 1]*varcogx[slice - 1]*xdiff2 +
+						ct2*varcogy[slice]*varcogy[slice]*ydiff2 + 
+						ct2*varcogy[slice - 1]*varcogy[slice - 1]*ydiff2 + 
+						2 * f13 + 2 * f24
+						);
+				
 				if (cogVelocity[slice - 1] < minimalVelocity)
 				{
 					minimalVelocity = cogVelocity[slice - 1];
