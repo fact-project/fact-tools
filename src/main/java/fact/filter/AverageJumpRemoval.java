@@ -233,7 +233,7 @@ public class AverageJumpRemoval implements Processor{
 	/**
 	 * returns the jumpheight in the data array at position c per series!  
 	 * 
-	 * @param c the position in the data array at which to calculate the jumpheight. 
+	 * @param slice the position in the data array at which to calculate the jumpheight.
 	 * @param data the array containgin the series
 	 * @return the jumpheight
 	 */

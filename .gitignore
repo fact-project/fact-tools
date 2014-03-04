@@ -9,3 +9,6 @@ docs.out
 docs.log
 docs.toc
 docs.idx
+
+#intellij stuff
+.idea/
