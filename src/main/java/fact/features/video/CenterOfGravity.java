@@ -47,6 +47,30 @@ public class CenterOfGravity implements Processor
 		
 		if (showerPixelArray.length < numberOfShowerPixelThreshold)
 		{
+			input.put(outputKey + "_X", null);
+			input.put(outputKey + "_Y", null);
+			
+			input.put(outputKey + "_VarX", null);
+			input.put(outputKey + "_VarY", null);
+			input.put(outputKey + "_CovXY" , null);
+
+			input.put(outputKey + "_VelX", null);
+			input.put(outputKey + "_VelY", null);
+			
+			input.put(outputKey + "_Vel", null);
+			input.put(outputKey + "_VelErr", null);
+			
+			input.put(outputKey + "_MinVel", Double.NaN);
+			input.put(outputKey + "_MinVelId", Double.NaN);
+			input.put(outputKey + "_MinVelError", Double.NaN);
+			
+			input.put(outputKey + "_MaxVel", Double.NaN);
+			input.put(outputKey + "_MaxVelId", Double.NaN);
+			input.put(outputKey + "_MaxVelError", Double.NaN);
+			
+			input.put(outputKey + "_BestVel", Double.NaN);
+			input.put(outputKey + "_BestVelError", Double.NaN);
+			input.put(outputKey + "_BestVelId", Double.NaN);
 			return input;
 		}
 		
@@ -190,9 +214,11 @@ public class CenterOfGravity implements Processor
 		
 		input.put(outputKey + "_MinVel", minimalVelocity);
 		input.put(outputKey + "_MinVelId", minimalVelocityId);
+		input.put(outputKey + "_MinVelError", cogVelocityError[minimalVelocityId]);
 		
 		input.put(outputKey + "_MaxVel", maximalVelocity);
 		input.put(outputKey + "_MaxVelId", maximalVelocityId);
+		input.put(outputKey + "_MaxVelError", cogVelocityError[maximalVelocityId]);
 		
 		input.put(outputKey + "_BestVel", bestVelocity);
 		input.put(outputKey + "_BestVelError", bestVelocityError);

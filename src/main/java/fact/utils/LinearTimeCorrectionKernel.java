@@ -1,7 +1,16 @@
-package fact.filter;
+package fact.utils;
 
+/**
+ * This class does an linear interpolation of input points.
+ * @author jan
+ *
+ */
 public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
-
+	
+	private int numPoints = 0;
+	private double[] times = null;
+	private double[] values = null;
+	
 	@Override
 	public void fit(double[] realTime, double[] value) {
 		numPoints = realTime.length;
@@ -16,7 +25,7 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 	public double interpolate(double t) {
 		
 		int id = getIndex(t);
-		if (id < numPoints)
+		if (id < numPoints - 1)
 		{
 			// check left border
 			if(id == 0 && times[0] > t)
@@ -44,16 +53,12 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 	 */
 	private int getIndex(double t) {
 		int id = 0;
-		while(id < numPoints){
-			if(times[id] > t)
-				break;
+		while(id < numPoints - 1 && times[id + 1] < t){
 			id++;
 		}
 		return id;
 	}
 	
-	private int numPoints = 0;
-	private double[] times = null;
-	private double[] values = null;
+
 	
 }
