@@ -31,11 +31,10 @@
 
 	        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
-            <fact.features.RisingEdge key="DataCalibrated" outputKey="risingedge"/>
-            
+
             
             <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
-	        <fact.features.PhotonCharge key="DataCalibrated"  positions="risingedge" outputKey="photoncharge" color="#FF0F0F"/>
+	        <fact.features.PhotonCharge key="DataCalibrated"  positions="position" outputKey="photoncharge" color="#FF0F0F"/>
 	        <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
 	            
 	        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
@@ -45,20 +44,21 @@
 	        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
             
 			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+            <fact.features.Size showerKey="shower" />
 
 
-            <fact.statistics.ArrayMean key="risingedge" outputKey="posMean" />
+            <fact.statistics.ArrayMean key="position" outputKey="posMean" />
 			<fact.statistics.ArrayMean key="photoncharge" outputKey="chargeMean" />
 			<fact.utils.SelectIndecesFromArray key="photoncharge" indices="shower" outputKey="showerPhoton" />
 			<fact.statistics.ArrayMean key="showerPhoton" outputKey="showerPhotonChargeMean" />
 			
-			<fact.utils.SelectIndecesFromArray key="risingedge" indices="shower" outputKey="showerPos" />
+			<fact.utils.SelectIndecesFromArray key="position" indices="shower" outputKey="showerPos" />
 			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
 
 <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
 <!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
 <!-- 			<fact.plotter.BarPlotter keys="posMean,showerPositionMean" /> -->
-			        <fact.image.ShowImage/>
+			        <!--<fact.image.ShowImage/>-->
 <!-- 			<fact.plotter.CameraPlotter key="risingedge" /> -->
 <!-- 			<fact.plotter.CameraPlotter key="photoncharge" /> -->
 

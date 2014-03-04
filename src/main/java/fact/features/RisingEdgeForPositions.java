@@ -3,6 +3,7 @@
  */
 package fact.features;
 
+import fact.EventUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,9 @@ public class RisingEdgeForPositions implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		int[] positions =  new int[Constants.NUMBEROFPIXEL];
+        EventUtils.mapContainsKeys(getClass(), input, datakey, amplitudePositionsKey);
+
+        int[] positions =  new int[Constants.NUMBEROFPIXEL];
 		
 		double[] data = (double[]) input.get(datakey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
