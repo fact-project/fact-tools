@@ -21,11 +21,8 @@
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
         <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
-        <fact.utils.CutSlices start="22" end="220" outputKey="DataCalibrated"/>
 
-
-        <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="0" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <!-- <fact.features.RisingEdge key="DataCalibrated" outputKey="arrivalTime"/> -->
+        <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
         <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
         <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
@@ -70,13 +67,12 @@
             <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
             <fact.features.SlopeSpreadWeighted showerPixel="shower" arrivaltime="arrivalTime" photonCharge="photoncharge" hillasDelta="Delta" outputKey="SlopeSpreadWeighted" />
             <fact.features.SourceLineTest photonCharge="photoncharge" arrivalTime="arrivalTime" showerPixel="shower" sourcePosition="sourcePosition" outputKey="SourceLineTest" />
-            <fact.features.NaiveShowerLineFit showerPixel="shower" hillasDelta="Delta" outputKey="SLF" />
             <fact.statistics.ArrayMean key="photoncharge" outputKey="photonchargeMean" />
             <fact.statistics.ArrayMean key="arrivalTime" outputKey="arrivalTimeMean" />
             
-            <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,MMcEvt.fFirstTarget,MMcEvt.fPhotElfromShower,CorsikaEvtHeader.fFirstInteractionHeight,MCorsikaEvtHeader.fMomentumX,MCorsikaEvtHeader.fMomentumY,MCorsikaEvtHeader.fMomentumZ,SLF_SlopeRelErr,SLF_Intercept,SLF_Slope,SLF_InterceptStdErr,SLF_SlopeStdErr,SLF_RSquare,SLF_RegressionSumSquares,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,varianceLong,varianceTrans,M3Long,M3Trans,M4Long,M4Trans,COGx,COGy,Width,Length,Size,Delta,HillasAlpha,Concentration_onePixel,Concentration_twoPixel,HillasDistance,HillasLength,HillasWidth,Leakage,Leakage2,ConcCore,CosDeltaAlpha,numIslands,numPixelInShower,SlopeSpreadWeighted_slopeLong,SlopeSpreadWeighted_slopeSpread,SlopeSpreadWeighted_slopeSpreadWeighted,SlopeSpreadWeighted_slopeTrans,SlopeSpreadWeighted_timeSpread,SlopeSpreadWeighted_timeSpreadWeighted,SourceLineTest_meanShowerVelocity,SourceLineTest_sourceLineTestValue,photonchargeMean,photonchargeMean_deviation,arrivalTimeMean,arrivalTimeMean_deviation"/> -->
-            <fact.image.ShowImage/>
-            <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,SLF_SlopeRelErr,SLF_Intercept,SLF_Slope,SLF_InterceptStdErr,SLF_SlopeStdErr,SLF_RSquare,SLF_RegressionSumSquares,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,varianceLong,varianceTrans,M3Long,M3Trans,M4Long,M4Trans,COGx,COGy,Width,Length,Size,Delta,Alpha,Distance,Alpha_Off_1,Distance_Off_1,Alpha_Off_2,Distance_Off_2,Alpha_Off_3,Distance_Off_3,Alpha_Off_4,Distance_Off_4,Alpha_Off_5,Distance_Off_5,Concentration_onePixel,Concentration_twoPixel,HillasLength,HillasWidth,Leakage,Leakage2,ConcCore,CosDeltaAlpha,numIslands,numPixelInShower,SlopeSpreadWeighted_slopeLong,SlopeSpreadWeighted_slopeSpread,SlopeSpreadWeighted_slopeSpreadWeighted,SlopeSpreadWeighted_slopeTrans,SlopeSpreadWeighted_timeSpread,SlopeSpreadWeighted_timeSpreadWeighted,SourceLineTest_meanShowerVelocity,SourceLineTest_sourceLineTestValue,photonchargeMean,photonchargeMean_deviation,arrivalTimeMean,arrivalTimeMean_deviation,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,antiSourcePosition_4,antiSourcePosition_5"/>
+
+            <!-- <fact.image.ShowImage/> -->
+            <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,varianceLong,varianceTrans,M3Long,M3Trans,M4Long,M4Trans,COGx,COGy,Width,Length,Size,Delta,Alpha,Distance,Alpha_Off_1,Distance_Off_1,Alpha_Off_2,Distance_Off_2,Alpha_Off_3,Distance_Off_3,Alpha_Off_4,Distance_Off_4,Alpha_Off_5,Distance_Off_5,Concentration_onePixel,Concentration_twoPixel,HillasLength,HillasWidth,Leakage,Leakage2,ConcCore,CosDeltaAlpha,numIslands,numPixelInShower,SlopeSpreadWeighted_slopeLong,SlopeSpreadWeighted_slopeSpread,SlopeSpreadWeighted_slopeSpreadWeighted,SlopeSpreadWeighted_slopeTrans,SlopeSpreadWeighted_timeSpread,SlopeSpreadWeighted_timeSpreadWeighted,SourceLineTest_meanShowerVelocityProjected,SourceLineTest_meanShowerVelocitySorted,SourceLineTest_sourceLineTestValueSorted,SourceLineTest_sourceLineTestValueProjected,photonchargeMean,photonchargeMean_deviation,arrivalTimeMean,arrivalTimeMean_deviation,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,antiSourcePosition_4,antiSourcePosition_5"/>
 
 
     </process>
