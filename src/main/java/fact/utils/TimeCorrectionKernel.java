@@ -1,4 +1,4 @@
-package fact.filter;
+package fact.utils;
 
 /**
  * This interface is for time correction of the data array. The time distance from slice to slice varies

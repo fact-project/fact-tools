@@ -10,6 +10,8 @@ import stream.ProcessorException;
 import stream.annotations.Parameter;
 import fact.Constants;
 import fact.EventUtils;
+import fact.utils.LinearTimeCorrectionKernel;
+import fact.utils.TimeCorrectionKernel;
 
 //TODO write unit test
 public class ArrayTimeCorrection implements Processor{

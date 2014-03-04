@@ -190,9 +190,11 @@ public class CenterOfGravity implements Processor
 		
 		input.put(outputKey + "_MinVel", minimalVelocity);
 		input.put(outputKey + "_MinVelId", minimalVelocityId);
+		input.put(outputKey + "_MinVelError", cogVelocityError[minimalVelocityId]);
 		
 		input.put(outputKey + "_MaxVel", maximalVelocity);
 		input.put(outputKey + "_MaxVelId", maximalVelocityId);
+		input.put(outputKey + "_MaxVelError", cogVelocityError[maximalVelocityId]);
 		
 		input.put(outputKey + "_BestVel", bestVelocity);
 		input.put(outputKey + "_BestVelError", bestVelocityError);
