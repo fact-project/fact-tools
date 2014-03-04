@@ -28,7 +28,7 @@ public class PhotonChargeParameterTest extends ParameterTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	final String key = "calib";
-	final String outputKey = "photoncharge";
+	final String outputKey = "photonchargeoutput";
 	final String positions = "positions";
 
 	@Test

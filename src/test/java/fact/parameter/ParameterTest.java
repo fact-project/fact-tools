@@ -32,6 +32,9 @@ public class ParameterTest  {
 	final String distribution = "dist";
 	final String sourcePosition="pos";
 	final String key = "calib";
+    final String photonCharge = "photoncharge";
+    final String positions = "positions";
+    final String shower = "shower";
 
 
 
@@ -58,27 +61,27 @@ public class ParameterTest  {
 
         MaxAmplitudePosition pP = new MaxAmplitudePosition();
         pP.setKey(key);
-        pP.setOutputKey("positions");
+        pP.setOutputKey(positions);
         pP.process(item);
 
         PhotonCharge pC = new PhotonCharge();
         pC.setKey(key);
-        pC.setOutputKey("charge");
-        pC.setPositions("positions");
+        pC.setOutputKey(photonCharge);
+        pC.setPositions(positions);
         pC.init(null);
         pC.process(item);
 
 
         CoreNeighborClean poser = new CoreNeighborClean();
         poser.setKey(key);
-        poser.setKeyPositions("positions");
-        poser.setOutputKey("shower");
+        poser.setKeyPositions(positions);
+        poser.setOutputKey(shower);
         poser.init(null);
         poser.process(item);
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setKey("shower");
-        dist.setWeights("charge");
+        dist.setKey(shower);
+        dist.setWeights(photonCharge);
         dist.setOutputKey(distribution);
         dist.init(null);
         dist.process(item);

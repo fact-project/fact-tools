@@ -30,7 +30,6 @@ public class DistributionFromShowerTest extends ParameterTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	final String shower="shower";
-	final String wheights = "charge";
 
 	final String outputKey = "distribution";
 
@@ -42,7 +41,7 @@ public class DistributionFromShowerTest extends ParameterTest {
 		//start it with a missing parameter. forget outputkey
 		DistributionFromShower poser = new DistributionFromShower();
 		poser.setKey(shower);
-		poser.setWeights(wheights);
+		poser.setWeights(photonCharge);
 //		poser.setOutputKey(outputKey);
 		poser.init(null);
 		poser.process(item);
@@ -68,7 +67,7 @@ public class DistributionFromShowerTest extends ParameterTest {
 
 		DistributionFromShower poser = new DistributionFromShower();
 		//poser.setKey(shower);
-		poser.setWeights(wheights);
+		poser.setWeights(photonCharge);
 		poser.setOutputKey(outputKey);
 		poser.init(null);
 		poser.process(item);
@@ -81,7 +80,7 @@ public class DistributionFromShowerTest extends ParameterTest {
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
 		DistributionFromShower poser = new DistributionFromShower();
 		poser.setKey(shower);
-		poser.setWeights(wheights);
+		poser.setWeights(photonCharge);
 		poser.setOutputKey(outputKey);
 		poser.init(null);
 		poser.process(item);
