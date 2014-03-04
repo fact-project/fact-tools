@@ -37,6 +37,16 @@ public class SourceLineTest implements Processor{
 		showerPixelArray = (int[]) input.get(showerPixel);
 		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		
+		if (showerPixelArray.length < 6)
+		{
+			input.put(outputKey + "_sourceLineTestValueProjected", Double.NaN);
+			input.put(outputKey + "_sourceLineTestValueSorted", Double.NaN);
+			input.put(outputKey + "_meanShowerVelocityProjected", Double.NaN);
+			input.put(outputKey + "_meanShowerVelocitySorted", Double.NaN);
+			return input;
+		}
+			
+		
 		double cogT = 0;
 		double size = 0;
 		double cogX = 0,cogY = 0;
@@ -69,6 +79,8 @@ public class SourceLineTest implements Processor{
 		double tl1 = Double.MIN_VALUE, tl2 = Double.MIN_VALUE, tl3 = Double.MIN_VALUE; // Last three times
 		int id_tf1 = -1, id_tf2 = -1, id_tf3 = -1; // Corresponding ids
 		int id_tl1 = -1, id_tl2 = -1, id_tl3 = -1;
+		
+		
 		
 		for(int chid : showerPixelArray)
 		{

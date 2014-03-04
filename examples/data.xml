@@ -1,10 +1,10 @@
 <container>
 
     <!-- Pfade zu den fits files. -->
-    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/03/14/20130314_026.fits.gz" />
-    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/03/14/20130314_007.drs.fits.gz" />
-    <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/03/14/20130314.DRIVE_CONTROL_TRACKING_POSITION.fits" />
-    <property name="outfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testoutput/20130314_026.csv" />
+	<property name="infile" value="/home/jan/Dokumente/Master/testdata/20130102_060.fits.gz" />
+	<property name="drsfile" value="/home/jan/Dokumente/Master/testdata/20130102_056.drs.fits.gz" />
+	<property name="drivefile" value="/home/jan/Dokumente/Master/testdata/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+	<property name="outfile" value="/home/jan/Dokumente/Master/testdata/processed_data_0102.csv" />
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="5.0" />
     <property name="neighbor_threshold" value="2.0"/>
@@ -71,7 +71,7 @@
             <fact.statistics.ArrayMean key="arrivalTime" outputKey="arrivalTimeMean" />
             
 
-            <!-- <fact.image.ShowImage/> -->
+            <!--<fact.image.ShowImage/>-->
             <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,varianceLong,varianceTrans,M3Long,M3Trans,M4Long,M4Trans,COGx,COGy,Width,Length,Size,Delta,Alpha,Distance,Alpha_Off_1,Distance_Off_1,Alpha_Off_2,Distance_Off_2,Alpha_Off_3,Distance_Off_3,Alpha_Off_4,Distance_Off_4,Alpha_Off_5,Distance_Off_5,Concentration_onePixel,Concentration_twoPixel,HillasLength,HillasWidth,Leakage,Leakage2,ConcCore,CosDeltaAlpha,numIslands,numPixelInShower,SlopeSpreadWeighted_slopeLong,SlopeSpreadWeighted_slopeSpread,SlopeSpreadWeighted_slopeSpreadWeighted,SlopeSpreadWeighted_slopeTrans,SlopeSpreadWeighted_timeSpread,SlopeSpreadWeighted_timeSpreadWeighted,SourceLineTest_meanShowerVelocityProjected,SourceLineTest_meanShowerVelocitySorted,SourceLineTest_sourceLineTestValueSorted,SourceLineTest_sourceLineTestValueProjected,photonchargeMean,photonchargeMean_deviation,arrivalTimeMean,arrivalTimeMean_deviation,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,antiSourcePosition_4,antiSourcePosition_5"/>
 
 
