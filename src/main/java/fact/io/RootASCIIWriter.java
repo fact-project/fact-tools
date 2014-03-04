@@ -32,11 +32,11 @@ public class RootASCIIWriter extends CsvWriter {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 		setSeparator(" ");
-//		setHeader(false);
+		setHeader(false);
 	}
 
 	/**
-	 * @see stream.DataProcessor#process(stream.Data)
+	 * @see stream.Processor#process(stream.Data)
 	 */
 	@Override
 	public Data process(Data data) {
@@ -49,7 +49,7 @@ public class RootASCIIWriter extends CsvWriter {
 			writeTreeDescriptor = false;
 			Data headerItem = DataFactory.create();
 			try{
-				headerItem.put("rootheader", generateHeaderString(data) );
+				headerItem.put(" \n ", generateHeaderString(data) );
 				keys = null;
 				super.process(headerItem);
 				keys = tempKeys;
@@ -175,11 +175,13 @@ public class RootASCIIWriter extends CsvWriter {
 
 	private boolean  containsNanOrInfs(Data item){
 		for(String key : keys){
-			String repr = item.get(key).toString();
-			if(repr.toLowerCase().equals("inf") ||repr.toLowerCase().equals("nan")){
-				return true;
-			}
-		}
+            if(item.get(key) != null){
+			    String repr = item.get(key).toString();
+                if(repr.toLowerCase().equals("inf") ||repr.toLowerCase().equals("nan")){
+                    return true;
+                }
+            }
+        }
 		return false;
 	}
 
