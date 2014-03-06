@@ -20,13 +20,11 @@ import fact.io.FitsStreamTest;
  * @author bruegge
  *
  */
-public class SourcePositionParameterTest {
+public class SourcePositionParameterTest extends ParameterTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	FitsStream stream;
-	Data item;
 	final String outputKey = "pos";
 	URL driveURL = SourcePositionParameterTest.class.getResource("/drive_file.fits");
 
@@ -82,25 +80,4 @@ public class SourcePositionParameterTest {
 		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
 		item.remove(outputKey);
 	}
-
-
-
-
-
-	@Before
-	public void setUp() {
-		URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
-		SourceURL url = new SourceURL(dataUrl);
-
-		stream = new FitsStream(url);
-
-		try {
-			stream.init();
-			item = stream.read();
-		} catch (Exception e) {
-			fail("could not start stream with test file");
-			e.printStackTrace();
-		}
-	}
-
 }

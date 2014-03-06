@@ -27,7 +27,7 @@ import fact.viewer.ui.DefaultPixelMapping;
 
 public class CoreNeighborClean implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
-	private String key = "photoncharge";
+	private String key = null;
 	private String keyPositions = null;
 	private String outputKey;
 	private  PixelSet corePixelSet;
