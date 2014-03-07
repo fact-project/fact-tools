@@ -7,6 +7,9 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+/**
+ * This processor calculates the per patch voltage integral for trigger simulation.
+ */
 
 public class PerPatchVoltageIntegral implements Processor {
 
