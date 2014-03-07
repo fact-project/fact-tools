@@ -9,7 +9,7 @@ import fact.viewer.ui.DefaultPixelMapping;
 public class SourceLineTest implements Processor{
 
 	/**
-	 * This function calculates the Source line test suggested by W. Rhode with some adjustments(later) and proper(hopefully) weighting 
+	 * This function calculates the source line test (after an idea by W. Rhode).
 	 */
 	@Override
 	public Data process(Data input)

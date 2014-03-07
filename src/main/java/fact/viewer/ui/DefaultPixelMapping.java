@@ -327,5 +327,9 @@ public class DefaultPixelMapping implements PixelMapping {
 		return chid2posYmm;
 	}
 	
+	public static int getPatch(int chid) {
+		return chid / 9;
+	}
+	
 	
 }
