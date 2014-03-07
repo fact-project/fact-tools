@@ -87,7 +87,7 @@ public class FillAverageTimeWidth implements Processor {
 		}
 		double[] wholeAverageTimeWidth = new double[numberTimeMarker];
 		for(int timemarker=0 ; timemarker < numberTimeMarker ; timemarker++){
-			for (int sl = 1 ; sl < numberOfSlices ; sl++){
+			for (int sl = 0 ; sl < numberOfSlices ; sl++){
 				wholeAverageTimeWidth[timemarker] += averageTimeWidth[timemarker*roi+sl];
 			}
 			wholeAverageTimeWidth[timemarker] /= numberOfSlices;
