@@ -26,7 +26,7 @@ public class ArrayTimeCorrection implements Processor{
 			roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
 			timesOffsetArray = (double[]) input.get(timesOffset);
 			String kernelStr = (String) input.get(kernel);
-			if(kernelStr == "linear")
+			if(kernelStr.equalsIgnoreCase("linear"))
 				tcKernel = new LinearTimeCorrectionKernel();
 			else
 				throw new ProcessorException("Right now there is just the linear kernel.");

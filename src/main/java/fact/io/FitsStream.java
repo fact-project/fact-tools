@@ -157,10 +157,10 @@ public class FitsStream extends AbstractStream {
 						headerItem.put(key, v);
 					} catch (NumberFormatException ef){
 						if(value.equals("f") || value.equals("F")){
-							Boolean b = new Boolean(false);
+							Boolean b = Boolean.FALSE;
 							headerItem.put(key, b);
 						} else if (value.equals("t") || value.equals("T")){
-							Boolean b = new Boolean(true);
+							Boolean b = Boolean.TRUE;
 							headerItem.put(key, b);
 						} else {
 							headerItem.put(key, value);

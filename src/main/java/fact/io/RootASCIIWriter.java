@@ -125,7 +125,7 @@ public class RootASCIIWriter extends CsvWriter {
 	}
 
 	private String generateHeaderString(Data data) throws ClassCastException{
-		String headerString = new String();
+		String headerString = "";
 		for(String key: keys){
 			if (data.containsKey(key)){
 				Serializable v = data.get(key);
