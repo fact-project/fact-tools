@@ -32,13 +32,10 @@ public class DrsCalibration implements Processor {
 	// conversion factor:
 	// the input values are 12-bit short values representing measurements of
 	// voltage
-	final static float dconv = 2000 / 4096.0f;
 
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 	//	String drsFile = null;
-	String fileName = "";
-	String filePath = "";
 	private String color;
 
 	private String outputKey = "DataCalibrated";
@@ -47,16 +44,12 @@ public class DrsCalibration implements Processor {
 	Data drsData = null;
 
 
-	String pathToAuxfiles = "/home/mackaiver/FactTest/aux/";
-
 	float[] drsBaselineMean;
 	float[] drsBaselineRms;
 	float[] drsGainMean;
 	float[] drsGainRms;
 	float[] drsTriggerOffsetMean;
 	float[] drsTriggerOffsetRms;
-	float[] drsTriggerOffsetTMMean;
-	float[] drsTriggerOffsetTMRms;
 
 	// The following keys are required to exist in the DRS data
 	final static String[] drsKeys = new String[] { "RunNumberBaseline",
@@ -73,7 +66,7 @@ public class DrsCalibration implements Processor {
 	 * That item/row in turn is expected to contain a set of variables, e.g. the
 	 * BaselineMean, BaselineRms,...
 	 * 
-	 * @param in
+	 * @param in sourceurl to be loaded
 	 */
 	protected void loadDrsData(SourceURL  in) {
 		try {
@@ -117,16 +110,14 @@ public class DrsCalibration implements Processor {
 	}
 
 	/**
-	 * @see fact.data.FactProcessor#process(stream.Data)
+	 * @see stream.Processor#process(stream.Data)
 	 */
 	@Override
 	public Data process(Data data) {
 		if (this.drsData == null){
 			//file not loaded yet. try to lookup path in map.
-			log.warn("No url to drs file specified. trying to find one automaticly");
-			String directory = (String)data.get("@directory");
-			int run = (Integer)data.get("@run");
-			setDrsFile(directory, run);
+			log.error("No url to drs file specified.");
+            throw new RuntimeException("No DRS File found");
 		}
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
@@ -288,12 +279,6 @@ public class DrsCalibration implements Processor {
 	public void setColor(String color) {
 		this.color = color;
 	}
-	public String getPathToAuxfiles() {
-		return pathToAuxfiles;
-	}
-	public void setPathToAuxfiles(String pathToAuxfiles) {
-		this.pathToAuxfiles = pathToAuxfiles;
-	}
 
 	public String getOutputKey() {
 		return outputKey;
@@ -326,29 +311,6 @@ public class DrsCalibration implements Processor {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
-
-
-	private void setDrsFile(String directoryPath, int run) {
-		String drsDirectory = pathToAuxfiles+directoryPath;
-		File directory = new File(drsDirectory);
-		File[] fList = directory.listFiles(new drsFileFilter());
-		int currentRun = 0;
-		File drsFile = null;
-		for (File file : fList){
-			currentRun = Integer.parseInt(((file.getName().split("[_/.]"))[1]));
-			if (currentRun <= run){
-				drsFile = file;
-			}
-		}
-
-		try {
-			loadDrsData(new SourceURL(drsFile.getAbsolutePath()));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-
 }
 class drsFileFilter implements FilenameFilter
 {
