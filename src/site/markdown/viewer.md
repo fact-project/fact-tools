@@ -1,4 +1,5 @@
-# The FACT Viewer
+The FACT Viewer
+--------------
 
 The largest component of the FACT tools is the standalone viewer for
 inspecting FACT data files. Currently the viewer supports reading and
