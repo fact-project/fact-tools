@@ -48,7 +48,7 @@
 	</menu>
 	
 	<menu name="Download" >
-		<item name="Download from jwall.org" href="download.html"/>
+		<item name="Download" href="download.html"/>
 	</menu>
 
 	<menu ref="reports"/>

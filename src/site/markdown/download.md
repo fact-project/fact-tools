@@ -9,4 +9,4 @@ here:
     <a href="fact-tools_latest.jar">latest Fact-Tools binary/</a>
 </div>
 
-The source code is available through a public [repository](source-repository.html).
+The source code is available through a public Bitbucket [repository](source-repository.html).
