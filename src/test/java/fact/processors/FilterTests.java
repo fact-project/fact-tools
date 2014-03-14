@@ -20,7 +20,6 @@ import fact.filter.MovingAverage;
 import fact.filter.MultiplyValues;
 import fact.filter.SliceNormalization;
 import fact.io.FitsStream;
-import fact.utils.ExFit;
 import fact.utils.SimpleFactEventProcessor;
 
 
@@ -45,7 +44,6 @@ public class FilterTests {
 			pList.add(new ExponentialSmoothing());
 			pList.add(new InterpolateBadPixel());
 			pList.add(new MultiplyValues());
-			pList.add(new ExFit());
 			pList.add(new MotionDiff());
 			pList.add(new SliceNormalization());
 			
