@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import fact.Constants;
+import stream.annotations.Parameter;
 
 /**
  * 
@@ -21,9 +22,12 @@ public class RisingEdgeForPositions implements Processor {
 	static Logger log = LoggerFactory.getLogger(RisingEdgeForPositions.class);
 	
 	private int searchWindowLeft = 25;
-	
+
+    @Parameter(required = true)
 	private String datakey = null;
+    @Parameter(required = true)
 	private String outputkey = null;
+    @Parameter(required = true)
 	private String amplitudePositionsKey = null;
 	//
 
