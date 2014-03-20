@@ -49,7 +49,7 @@ public class RisingEdgeForPositions implements Processor {
 			/// temp. Variables
 			double           current_slope   = 0;
 			double           max_slope       = 0;
-			/// @todo remove magic numbers for the search window
+			//Todo: remove magic numbers for the search window
 			int             search_window_left  = posMaxAmp - searchWindowLeft;
 			if (search_window_left < 10)
 			{
