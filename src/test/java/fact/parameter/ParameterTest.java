@@ -75,7 +75,6 @@ public class ParameterTest  {
         poser.setKey(key);
         poser.setKeyPositions(positions);
         poser.setOutputKey(shower);
-        poser.init(null);
         poser.process(item);
 
         DistributionFromShower dist = new DistributionFromShower();

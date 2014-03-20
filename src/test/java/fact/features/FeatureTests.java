@@ -130,7 +130,6 @@ public class FeatureTests {
 		core.setKey(charge.getOutputKey());
 		core.setKeyPositions(rE.getOutputKey());
 		core.setOutputKey(cleaningOutput);
-		core.init(null);
 		p = new Pair<String, Class<?>>(core.getOutputKey(), int[].class );
 		typeMap.put(core, p);
 		
