@@ -81,7 +81,7 @@ public class MapView extends JPanel {
 									- " Static Map".length());
 						}
 //						System.out.println("------------" + sel);
-						cameraPixelMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
+						cameraPixelMap.setData(EventUtils.toDoubleArray(event.get(sel)));
 					}
 				}
 			});

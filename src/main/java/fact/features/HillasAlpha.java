@@ -55,6 +55,7 @@ public class HillasAlpha implements Processor {
 		}
 
 		double alpha = 0.0;
+        //TODO: this might throw an NPE for source[1]
 	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
 	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;

@@ -168,9 +168,9 @@ public class SlopeSpreadWeighted implements Processor
 	 * @param a
 	 * @param b
 	 * @return double array containing a[i] * b[i]
-	 * @throws Exception 
+	 * @throws ArrayStoreException
 	 */
-	private double[] arrayMultiplication(double[] a, double[] b) throws Exception
+	private double[] arrayMultiplication(double[] a, double[] b) throws ArrayStoreException
 	{
 		if (a == null || b == null)
 		{

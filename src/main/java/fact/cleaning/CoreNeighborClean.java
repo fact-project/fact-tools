@@ -167,9 +167,9 @@ public class CoreNeighborClean implements StatefulProcessor{
 		}
 		
 		corePixelSet = new PixelSet();
-		for(int i = 0; i < showerPixelArray.length; i++){
-			corePixelSet.add(new Pixel(showerPixelArray[i]));
-		}
+        for (int aShowerPixelArray : showerPixelArray) {
+            corePixelSet.add(new Pixel(aShowerPixelArray));
+        }
 		
 //		PixelSet l1 = new PixelSet();
 //		for(int i = 0; i < level1.length; i++){

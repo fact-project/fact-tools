@@ -62,58 +62,54 @@ public class RootASCIIWriter extends CsvWriter {
 		}
 		
 		Data item  = DataFactory.create();
-		for(int i = 0; i < keys.length; i++){
-			Serializable value = null;
-			if(data.containsKey(keys[i])){
-				value = data.get(keys[i]);
-			} else {
+        for (String key : keys) {
+            Serializable value;
+            if (data.containsKey(key)) {
+                value = data.get(key);
+            } else {
 //				log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
-				return null;
-			}
-			//Check if value is of the right type
-			if (value.getClass().isArray()) {
-				Class<?> type = value.getClass().getComponentType();
-				if(value instanceof Number[]){
-					Number[] s = (Number[]) value;
-					for(int k = 0; k < s.length; k++){
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == float.class){
-					float[] s = ((float[]) value);
-					for(int k = 0; k < s.length; k++){
-						if(s[k] == Float.NaN || s[k] == Float.NEGATIVE_INFINITY || s[k] == Float.POSITIVE_INFINITY ){
-							return data;
-						}
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == double.class){
-					double[] s = ((double[]) value);
-					for(int k = 0; k < s.length; k++){
-						//check for nans or infs and gtfo
-						if(s[k] == Double.NaN || s[k] == Double.NEGATIVE_INFINITY || s[k] == Double.POSITIVE_INFINITY ){
-							return data;
-						}
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == int.class){
-					int[] s = ((int[]) value);
-					for(int k = 0; k < s.length; k++){
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == String.class){
-					String[] s = ((String[]) value);
-					for(int k = 0; k < s.length; k++){
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-			} else {
-				item.put(keys[i],value.toString());
-			}
-		}
+                return null;
+            }
+            //Check if value is of the right type
+            if (value.getClass().isArray()) {
+                Class<?> type = value.getClass().getComponentType();
+                if (value instanceof Number[]) {
+                    Number[] s = (Number[]) value;
+                    for (int k = 0; k < s.length; k++) {
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == float.class) {
+                    float[] s = ((float[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        if (s[k] == Float.NaN || s[k] == Float.NEGATIVE_INFINITY || s[k] == Float.POSITIVE_INFINITY) {
+                            return data;
+                        }
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == double.class) {
+                    double[] s = ((double[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        //check for nans or infs and gtfo
+                        if (s[k] == Double.NaN || s[k] == Double.NEGATIVE_INFINITY || s[k] == Double.POSITIVE_INFINITY) {
+                            return data;
+                        }
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == int.class) {
+                    int[] s = ((int[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == String.class) {
+                    String[] s = ((String[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        item.put(key + "_" + k, s[k]);
+                    }
+                }
+            } else {
+                item.put(key, value.toString());
+            }
+        }
 
 		//this will be a dirty hack to have the superclass iterate over the whole keyset in the dataitem
 		//intstead of taking the keys specified by the user. since we created a whole new data item only containing the 
