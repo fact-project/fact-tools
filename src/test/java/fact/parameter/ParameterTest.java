@@ -68,7 +68,6 @@ public class ParameterTest  {
         pC.setKey(key);
         pC.setOutputKey(photonCharge);
         pC.setPositions(positions);
-        pC.init(null);
         pC.process(item);
 
 
