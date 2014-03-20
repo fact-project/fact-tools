@@ -6,11 +6,13 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
+import stream.annotations.Parameter;
 
 public class NumberOfPixelInShower implements Processor {
 	static Logger log = LoggerFactory.getLogger(NumberOfPixelInShower.class);
-	private String showerKey = "shower";
-	private String outputKey = "numUsedPixel";
+    @Parameter(required = true)
+	private String showerKey;
+	private String outputKey;
 	
 	@Override
 	public Data process(Data input) {
