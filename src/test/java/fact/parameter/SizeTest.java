@@ -20,8 +20,6 @@ public class SizeTest extends ParameterTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	final String distribution = "dist";
-	final String sourcePosition="pos";
 	final String outputKey = "sizeoutput";
 
 
