@@ -19,7 +19,7 @@ public class HillasWidth implements Processor {
 	@Override
 	public Data process(Data input) {
 		if(!input.containsKey(distribution)){
-			log.info("No shower in evernt. Not calculating width");
+			log.info("No shower in event. Not calculating width");
 			return input;
 		}
 		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
