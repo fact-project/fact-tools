@@ -78,10 +78,9 @@ public class ParameterTest  {
         poser.process(item);
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setKey(shower);
+        dist.setPixel(shower);
         dist.setWeights(photonCharge);
         dist.setOutputKey(distribution);
-        dist.init(null);
         dist.process(item);
 
         URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");

@@ -38,10 +38,9 @@ public class DistributionFromShowerTest extends ParameterTest {
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
 		DistributionFromShower poser = new DistributionFromShower();
-		poser.setKey(shower);
+		poser.setPixel(shower);
 		poser.setWeights(photonCharge);
 		poser.setOutputKey(outputKey);
-		poser.init(null);
 		poser.process(item);
 		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);

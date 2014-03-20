@@ -138,7 +138,6 @@ public class FeatureTests {
 		dist.setPixel(core.getOutputKey());
 		dist.setWeights(charge.getOutputKey());
 		dist.setOutputKey("distribution");
-		dist.init(null);
 		p = new Pair<String, Class<?>>(dist.getOutputKey(), PixelDistribution2D.class );
 		typeMap.put(dist, p);
 		
