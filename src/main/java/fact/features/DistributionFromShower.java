@@ -21,6 +21,17 @@ import fact.viewer.ui.DefaultPixelMapping;
 
 
 public class DistributionFromShower implements StatefulProcessor {
+
+    @Parameter(required = true)
+    private String weights =  null;
+    @Parameter(required = true)
+    private String pixel =  null;
+
+    //hte in and outputkeys
+    @Parameter(required = true)
+    private String outputKey =null;
+    @Parameter(required = true)
+    private String key = null;
 	
 	private float[] mpGeomXCoord;
 	private float[] mpGeomYCoord;
@@ -37,14 +48,11 @@ public class DistributionFromShower implements StatefulProcessor {
 static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
 
 //what do we need to calculate the ellipse?
-private String weights =  null;
-private String pixel =  null;
+
 private double[] wheightsArray;
 private int[] showerPixel;
 
-//hte in and outputkeys
-private String outputKey =null;
-private String key = null;
+
 
 
 @Override
@@ -60,15 +68,7 @@ public void init(ProcessContext context) throws Exception {
 public Data process(Data input) {
 	//get the required stuff from the map
 	//in case the map doesn't contain a shower return the original input.
-	
-	if(outputKey == null){
-		throw new RuntimeException("Missing parameter: outputKey");
-	}
-
 	try{
-		if(key == null){
-			throw new RuntimeException("Missing parameter. Key");
-		}
 		showerPixel= (int[]) input.get(key);
 		if(showerPixel ==  null){
 			log.info("No showerpixel in this event. Not calculating Ellipse");
@@ -79,21 +79,17 @@ public Data process(Data input) {
 		return null;
 	}
 
-	if(weights == null){
-		throw new RuntimeException("Missing parameter: wheights");
-	} else {
-		try{
-			wheightsArray = (double[]) input.get(weights);
-			if(wheightsArray ==  null){
-				log.error("The values for weight were not found in the map. Aborting");
-				return null;
-			}
-		} catch (ClassCastException e){
-			log.error("Wheights is not of type double[]. Aborting");
-			return null;
-		}
-	}
-	
+    try{
+        wheightsArray = (double[]) input.get(weights);
+        if(wheightsArray ==  null){
+            log.error("The values for weight were not found in the map. Aborting");
+            return null;
+        }
+    } catch (ClassCastException e){
+        log.error("Wheights is not of type double[]. Aborting");
+        return null;
+    }
+
 	
 	
 	//calculate the "size" of the shower
