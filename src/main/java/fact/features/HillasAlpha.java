@@ -21,16 +21,6 @@ public class HillasAlpha implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		
-		if(distribution == null){
-			throw new RuntimeException("Missing parameter: distribution");
-		}
-		if(sourcePosition == null){
-			throw new RuntimeException("Missing parameter: sourcePosition");
-		}
-		if(outputKey == null){
-			throw new RuntimeException("Missing parameter: outputKey");
-		}
 		PixelDistribution2D dist;
 		try{
 			dist = (PixelDistribution2D) input.get(distribution);
