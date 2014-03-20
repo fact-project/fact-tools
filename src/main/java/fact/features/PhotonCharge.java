@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessContext;
+import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
@@ -24,44 +25,25 @@ import fact.Constants;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
-public class PhotonCharge implements StatefulProcessor {
+public class PhotonCharge implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	private double[] photonCharge = null;
 
 	private String color = "#00F0F0";
 
 	private	double average = 0.0;
-	private double integralGain = 244.0f;
-	private int alpha = 64;
 
-	private String positions = null;
+    @Parameter(required = false, description = "Value for the integral Gain. This is a measured Constant.", defaultValue = "244.0")
+    private double integralGain = 244.0f;
+    @Parameter(required = true, description = "The positions from which to integrate.")
+    private String positions = null;
 
+    private int alpha = 64;
+
+    @Parameter(required = true)
 	private String key = null;
-	private String outputKey = null;
-	
-
-	@Override
-	public void init(ProcessContext context) throws Exception {
-		if(outputKey == null){
-			throw new RuntimeException("No outputKey specified");
-		}
-		if(key == null){
-			throw new RuntimeException("No key specified");
-		}
-		if(positions == null){
-			throw new RuntimeException("No positions specified. This processors needs an array of ints as input for positions");
-		}
-	}
-
-
-	@Override
-	public void resetState() throws Exception {
-	}
-
-
-	@Override
-	public void finish() throws Exception {
-	}
+    @Parameter(required = true)
+    private String outputKey = null;
 	
 
 	@Override
@@ -69,14 +51,9 @@ public class PhotonCharge implements StatefulProcessor {
 		
 		int[] posArray;
 		double[] data;
-		try{
-			posArray = (int[]) input.get(positions);
-			data = (double[]) input.get(key);
-		} catch (ClassCastException e){
-			log.error("Could not cast types." );
-			throw e;
-		}
-		
+		posArray = (int[]) input.get(positions);
+		data = (double[]) input.get(key);
+
 		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		photonCharge = new double[Constants.NUMBEROFPIXEL];
@@ -141,7 +118,6 @@ public class PhotonCharge implements StatefulProcessor {
 	public double getIntegralGain() {
 		return integralGain;
 	}
-	@Parameter(required = false, description = "Value for the integral Gain. This is a measured Constant.", defaultValue = "244.0")
 	public void setIntegralGain(float integralGain) {
 		this.integralGain = integralGain;
 	}
@@ -150,7 +126,6 @@ public class PhotonCharge implements StatefulProcessor {
 	public String getPositions() {
 		return positions;
 	}
-	@Parameter(required = true, description = "The positions from which to integrate.")
 	public void setPositions(String positions) {
 		this.positions = positions;
 	}
