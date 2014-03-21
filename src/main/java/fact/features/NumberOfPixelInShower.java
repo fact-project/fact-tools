@@ -12,6 +12,7 @@ public class NumberOfPixelInShower implements Processor {
 	static Logger log = LoggerFactory.getLogger(NumberOfPixelInShower.class);
     @Parameter(required = true)
 	private String showerKey;
+    @Parameter(required = true)
 	private String outputKey;
 	
 	@Override
