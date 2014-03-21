@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
+import stream.Data;
+import stream.Processor;
+import stream.annotations.Parameter;
 
 /**
  * This processor simply calculates the position of the maximum value for all time slices in each Pixel.
@@ -16,20 +19,28 @@ import fact.utils.SimpleFactEventProcessor;
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class MaxAmplitudePosition extends SimpleFactEventProcessor<double[], int[]> {
+public class MaxAmplitudePosition implements Processor {
 	static Logger log = LoggerFactory.getLogger(MaxAmplitudePosition.class);
+
+    @Parameter(required = true)
+    private String key;
+    @Parameter(required = true)
+    private String outputKey;
+
 	private float minValue= -3000;
 	private float maxValue = 3000;
 	
-	private int searchWindowLeft = -10;
+	private int searchWindowLeft = 0;
 	private int searchWindowRight = 30000;
 
 
 	@Override
-	public int[] processSeries(double[] data) {
-		int[] positions =  new int[Constants.NUMBEROFPIXEL];
-		int roi = data.length / Constants.NUMBEROFPIXEL;
-		
+	public Data process(Data input) {
+        double[] data = (double[]) input.get(key);
+        int roi = data.length / Constants.NUMBEROFPIXEL;
+
+        int[] positions =  new int[Constants.NUMBEROFPIXEL];
+
 		if (searchWindowLeft < 0){
 			searchWindowLeft = 0;
 		}
@@ -54,7 +65,8 @@ public class MaxAmplitudePosition extends SimpleFactEventProcessor<double[], int
 			}
 			positions[pix] = position;  
 		}
-		return positions;
+        input.put(outputKey, positions);
+		return input;
 	}
 
 
@@ -95,6 +107,23 @@ public class MaxAmplitudePosition extends SimpleFactEventProcessor<double[], int
 	public void setSearchWindowRight(int searchWindowRight) {
 		this.searchWindowRight = searchWindowRight;
 	}
+
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getOutputKey() {
+        return outputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 	
 
 }
