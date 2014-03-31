@@ -49,7 +49,7 @@ import fact.viewer.colorMappings.ColorMapping;
 public class CameraPixelMap extends HexMap implements MouseListener,
 		MouseMotionListener {
 	/** The unique class ID */
-	private static final long serialVersionUID = 4003306850236739854L;
+	private static final long serialVersionUID = 4003306850236739854L;	
 
 	static Logger log = LoggerFactory.getLogger(CameraPixelMap.class);
 	final static SimpleDateFormat fmt = new SimpleDateFormat(
@@ -87,6 +87,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	private CellHighlighter cellHighlighter;
 	private HexTile nCell;
 	private HexTile oldCell;
+	
+	private snakeDraw SnakePoly;
 
 	public CameraPixelMap(Double radius) {
 		super(45, 41, radius);
@@ -103,6 +105,21 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		cellHighlighter = new CellHighlighter(this);
 		this.addOverlay(cellHighlighter);
 		// this.setLayout(Border)
+		
+		SnakePoly = new snakeDraw();
+		SnakePoly.setRadius(radius, 0);
+		
+		float x = 0;		
+		float y = 0;
+		for(int i=0; i<6; i++)
+		{
+			x += this.cellBySoftId[0].polygon.xpoints[i];			
+			y += this.cellBySoftId[2].polygon.ypoints[i];
+		}		
+		x = x / 6.0f;		
+		y = y / 6.0f;
+	
+		SnakePoly.setOffset(x + 1, y + 1);
 	}
 
 	public void addSelectionListener(SelectionListener l) {
@@ -160,8 +177,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			HexTile cell = addCell(id, x, y);
 			cell.setId(id);
 			item = stream.readNext();
-		}
-
+		}				
+		
 		log.debug(" x range is {}, {}", minX, maxX);
 		log.debug(" y range is {}, {}", minY, maxY);
 	}
@@ -349,7 +366,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		this.setCurrentSlice(slice);
 		// double[] values = getValuesInSlice( slice );
 		// paintTiles( g, values, colorMap );
-		this.paint(g);
+		this.paint(g);		
 
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		DecimalFormat df = new DecimalFormat("000");
@@ -452,7 +469,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		oldCell = nCell;
+		oldCell = nCell;		
 		nCell = getCell(arg0.getPoint());
 		if (nCell != oldCell && nCell != null) {
 			// this.x = cell.getGeoX();
@@ -585,6 +602,11 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 				o.setCamMap(this);
 				o.paint(this.getGraphics(), tiles);
 			}
+			
+			double[] x = {-1,-1,1,1};//(double[]) event.get("SnakeX");
+			double[] y = {-1,1,1,-1};//(double[]) event.get("SnakeY");			
+			SnakePoly.setShape(x, y);
+			
 			this.repaint();
 		}
 	}
@@ -595,6 +617,12 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	
+	public void paint(Graphics g) 
+	{		
+		super.paint(g);
+		SnakePoly.paint(g);
 	}
 	
 }
