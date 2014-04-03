@@ -12,6 +12,12 @@ public class StdForce extends ImageForce
 	}
 	
 	
+	public StdForce(double[] data, double centerX, double centerY) 
+	{
+		super(data, (float) centerX, (float) centerY);
+	}
+
+
 	@Override
 	public double forceX(double x, double y) 
 	{

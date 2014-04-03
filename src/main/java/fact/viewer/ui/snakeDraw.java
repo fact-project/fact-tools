@@ -40,7 +40,7 @@ public class snakeDraw extends Component
 	{
 		if(poly == null || poly.npoints <= 0) return;
 		
-		System.out.println("PaintSnake");
+		//System.out.println("PaintSnake");
 		
 		Color tmp = g.getColor();
 		
@@ -63,7 +63,7 @@ public class snakeDraw extends Component
 	
 	public void setOffset(double x, double y)
 	{
-		System.out.println("Offset " + x + " " + y);
+		//System.out.println("Offset " + x + " " + y);
 		this.offsetX = x;
 		this.offsetY = y;
 	}

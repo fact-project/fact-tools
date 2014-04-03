@@ -1,6 +1,8 @@
 package fact.cleaning.snake;
 
 
+import java.util.Arrays;
+
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -10,7 +12,11 @@ import fact.EventUtils;
 import fact.cleaning.CoreNeighborClean;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
+import fact.statistics.PixelDistribution2D;
 import fact.viewer.ui.DefaultPixelMapping;
+
+
+
 
 
 
@@ -30,7 +36,7 @@ import fact.EventUtils;
 import fact.cleaning.snake.ImageForce;
 import fact.cleaning.snake.StdForce;
 
-public class snake implements StatefulProcessor
+public class snakeSingle implements StatefulProcessor
 {
 	private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	
@@ -39,9 +45,8 @@ public class snake implements StatefulProcessor
 	private RealMatrix[] matrix;
 	
 	private String pixelDataName = null;
-	private String startPointNameX = null;
-	private String startPointNameY = null;
-	
+	private String distribution = null;	
+
 	private double alpha = 0.3;
 	private double beta = 0.3;
 	private double dt = 0.05;
@@ -53,8 +58,8 @@ public class snake implements StatefulProcessor
 	private int NumberOfVertices = 6;
 	
 	
-	private float centerX = 0;
-	private float centerY = 0;
+	private double centerX = 0;
+	private double centerY = 0;
 	
 	//////////////////////////////////////////////////////////////////////////////
 	
@@ -122,22 +127,22 @@ public class snake implements StatefulProcessor
 	}
 	
 	private void step(ImageForce f)
-	{		
+	{				
 		for(int i=0; i<NumberOfVertices; i++)
 		{	
-			double x = vecX.getEntry(0,i);
-			double y = vecX.getEntry(0,i);			
+			double x = vecX.getEntry(i,0);
+			double y = vecY.getEntry(i,0);			
 
 			vecX.setEntry(i, 0, x + (dt * f.forceX(x, y)) );
 			vecY.setEntry(i, 0, y + (dt * f.forceY(x, y)) );		
 		}		
 
-		RealMatrix EigenMat = matrix[NumberOfVertices];
+		RealMatrix EigenMat = matrix[NumberOfVertices-1];
 
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
 
-		splitLines(4.0);
+		splitLines(7.0);
 		
 	}
 	//////////////////////////////////////////////////////////////////////////////
@@ -169,23 +174,49 @@ public class snake implements StatefulProcessor
 				throw new RuntimeException("No weights found in event. Aborting.");
 			}
 			
-			centerX = (Float) input.get(startPointNameX);
-			centerY = (Float) input.get(startPointNameY);
+			PixelDistribution2D dist;
+			dist = (PixelDistribution2D) input.get(distribution);
+			
+			centerX = dist.getCenterX() / 9.5;
+			centerY = dist.getCenterY() / 9.5;
 		} 
 		catch(ClassCastException e)
 		{
 			log.error("Could cast the key: " + pixelDataName + "to a double[]");
-		}		
+		}				
 		
-		ImageForce force = new StdForce(photonCharge,centerX,centerY);
+		NumberOfVertices = 6;
+		vecX = new Array2DRowRealMatrix(6,1);
+		vecY = new Array2DRowRealMatrix(6,1);
 		
+		for (int i = 0; i < 6; i++)
+		{
+			float a = (float) (centerX + 2.0 * Math.sin(i*3.1415 / 3.0));
+			float b = (float) (centerY + 2.0 * Math.cos(i*3.1415 / 3.0));
+
+			vecX.setEntry(i, 0, a);
+			vecY.setEntry(i, 0, b);
+		}						
 		
+		double[] data = new double[Constants.NUMBEROFPIXEL];
+		for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
+		{
+			data[i] = 10 * photonCharge[i];
+		}
+		ImageForce force = new StdForce(data, (float) centerX, (float) centerY);		
+	
 		for(int i=0; i<200; i++)
 		{
+			System.out.println("X: " + Arrays.toString(vecX.getColumn(0)));
+			System.out.println("Y: " + Arrays.toString(vecY.getColumn(0)) + "\n");
+			
 			step(force);
-		}
+		}		
 		
-		return null;
+		input.put("snake_X", vecX.getColumn(0));
+		input.put("snake_Y", vecY.getColumn(0));
+		
+		return input;
 	}
 
 	@Override
@@ -197,7 +228,7 @@ public class snake implements StatefulProcessor
 	@Override
 	public void resetState() throws Exception 
 	{
-	// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub	
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -211,25 +242,12 @@ public class snake implements StatefulProcessor
 	{
 		this.pixelDataName = pixelDataName;
 	}
-
-	public String getStartPointX() 
-	{
-		return startPointNameX;
-	}
-
-	public void setStartPointX(String startPoint) 
-	{
-		this.startPointNameX = startPoint;
-	}
 	
-	public String getStartPointY() 
-	{
-		return startPointNameY;
+	public String getDistribution() {
+		return distribution;
 	}
 
-	public void setStartPointY(String startPoint) 
-	{
-		this.startPointNameY = startPoint;
+	public void setDistribution(String distribution) {
+		this.distribution = distribution;
 	}
-	
 }

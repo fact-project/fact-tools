@@ -34,6 +34,7 @@ import javax.swing.ImageIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.colt.Arrays;
 import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
@@ -603,10 +604,13 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 				o.paint(this.getGraphics(), tiles);
 			}
 			
-			double[] x = {-1,-1,1,1};//(double[]) event.get("SnakeX");
-			double[] y = {-1,1,1,-1};//(double[]) event.get("SnakeY");			
+			double[] x = (double[]) event.get("snake_X");
+			double[] y = (double[]) event.get("snake_Y");		
+			
 			SnakePoly.setShape(x, y);
 			
+			System.out.println("X: " + Arrays.toString(x));
+			System.out.println("Y: " + Arrays.toString(y));
 			this.repaint();
 		}
 	}
