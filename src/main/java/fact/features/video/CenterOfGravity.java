@@ -144,11 +144,6 @@ public class CenterOfGravity implements Processor
 			varcogy[slice] /= size[slice];
 			covcog[slice] /= size[slice];
 			
-			varcogx[slice] = Math.sqrt(varcogx[slice]);
-			varcogy[slice] = Math.sqrt(varcogy[slice]);
-			covcog[slice] = Math.sqrt(covcog[slice]);
-			
-			
 		    // Calculate velocities on the fly
 			if (slice > 0)
 			{
@@ -171,10 +166,10 @@ public class CenterOfGravity implements Processor
 				double ydiff2 = Math.pow(cogy[slice]- cogy[slice - 1], 2.0);
 				double f13 = ct2 * (cogx[slice]- cogx[slice - 1]) * (cogy[slice]- cogy[slice - 1]) * covcog[slice];
 				double f24 = ct2 * (cogx[slice]- cogx[slice - 1]) * (cogy[slice]- cogy[slice - 1]) * covcog[slice - 1];
-				cogVelocityError[slice-1] = Math.sqrt(ct2*varcogx[slice]*varcogx[slice]*xdiff2 + 
-						ct2*varcogx[slice - 1]*varcogx[slice - 1]*xdiff2 +
-						ct2*varcogy[slice]*varcogy[slice]*ydiff2 + 
-						ct2*varcogy[slice - 1]*varcogy[slice - 1]*ydiff2 + 
+				cogVelocityError[slice-1] = Math.sqrt(ct2*varcogx[slice]*xdiff2 + 
+						ct2*varcogx[slice - 1]*xdiff2 +
+						ct2*varcogy[slice]*ydiff2 + 
+						ct2*varcogy[slice - 1]*ydiff2 + 
 						2 * f13 + 2 * f24
 						);
 				
