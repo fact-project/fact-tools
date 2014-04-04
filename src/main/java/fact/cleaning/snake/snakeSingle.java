@@ -142,7 +142,7 @@ public class snakeSingle implements StatefulProcessor
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
 
-		splitLines(7.0);
+		splitLines(361.0);	// 2 Pixel lang
 		
 	}
 	//////////////////////////////////////////////////////////////////////////////
@@ -177,8 +177,10 @@ public class snakeSingle implements StatefulProcessor
 			PixelDistribution2D dist;
 			dist = (PixelDistribution2D) input.get(distribution);
 			
-			centerX = dist.getCenterX() / 9.5;
-			centerY = dist.getCenterY() / 9.5;
+			centerX = dist.getCenterX();
+			centerY = dist.getCenterY();			
+			
+			//System.out.println("Center Chid: " + DefaultPixelMapping.geomToChid((float) centerX, (float) centerY));	
 		} 
 		catch(ClassCastException e)
 		{
@@ -191,8 +193,8 @@ public class snakeSingle implements StatefulProcessor
 		
 		for (int i = 0; i < 6; i++)
 		{
-			float a = (float) (centerX + 2.0 * Math.sin(i*3.1415 / 3.0));
-			float b = (float) (centerY + 2.0 * Math.cos(i*3.1415 / 3.0));
+			float a = (float) (centerX + 15.0 * Math.sin(i*3.1415 / 3.0));
+			float b = (float) (centerY + 15.0 * Math.cos(i*3.1415 / 3.0));
 
 			vecX.setEntry(i, 0, a);
 			vecY.setEntry(i, 0, b);
@@ -205,13 +207,18 @@ public class snakeSingle implements StatefulProcessor
 		}
 		ImageForce force = new StdForce(data, (float) centerX, (float) centerY);		
 	
+		double[][] xBuf = new double[200][];
+		double[][] yBuf = new double[200][];
+		
 		for(int i=0; i<200; i++)
-		{
-			System.out.println("X: " + Arrays.toString(vecX.getColumn(0)));
-			System.out.println("Y: " + Arrays.toString(vecY.getColumn(0)) + "\n");
-			
+		{			
 			step(force);
+			xBuf[i] = vecX.getColumn(0);
+			yBuf[i] = vecY.getColumn(0);
 		}		
+		
+		input.put("snake_X_Prog", xBuf);
+		input.put("snake_Y_Prog", yBuf);
 		
 		input.put("snake_X", vecX.getColumn(0));
 		input.put("snake_Y", vecY.getColumn(0));

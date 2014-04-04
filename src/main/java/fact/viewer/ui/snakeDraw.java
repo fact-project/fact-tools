@@ -10,42 +10,54 @@ public class snakeDraw extends Component
 {	
 	private static final long serialVersionUID = 123456789L;
 
-	private Polygon poly;
+	private Polygon[] poly;
 	
-	private double scale = 1.0;
+	private double scaleX = 1.0;
+	private double scaleY = 1.0;
 	private double offsetX = 0.0;
 	private double offsetY = 0.0;
 	
-	// X, Y in Pixelunits
-	public void setShape(double [] x, double[] y)
+	private int frame = 0;
+	
+	
+	// [frame][points] in mm
+	public void setShape(double [][] x, double[][] y)
 	{
-		if(x.length != y.length || x == null || y == null) 
-		{
-			poly = new Polygon();
+		frame = 0;
+		if(x == null || y == null || x.length != y.length) 
+		{			
+			poly = new Polygon[0];
+			poly[0] = new Polygon();
 			return;
 		}		
 		
-		poly = new Polygon();
-		
-		for(int i=0; i<x.length;  i++)
+		poly = new Polygon[x.length];
+		for(int f=0; f < x.length; f++)
 		{
-			int cx = (int) (x[i] * scale + offsetX);
-			int cy = (int) (y[i] * scale + offsetY);		
+			poly[f] = new Polygon();
+			for(int i=0; i<x[f].length;  i++)
+			{
+				int cx = (int) (x[f][i] * scaleX + offsetX);
+				int cy = (int) (y[f][i] * scaleY + offsetY);		
 			
-			poly.addPoint(cx, cy);
+			
+				poly[f].addPoint(cx, cy);
+			}
 		}
 	}
 	
 	public void paint(Graphics g) 
 	{
-		if(poly == null || poly.npoints <= 0) return;
+		if(poly == null) return;
+		if(frame < 0 || frame >= poly.length ) return;
+		if(poly[frame].npoints <= 0) return;
 		
 		//System.out.println("PaintSnake");
 		
 		Color tmp = g.getColor();
 		
 		g.setColor(Color.RED);
-		g.drawPolygon(poly);	  
+		g.drawPolygon(poly[frame]);	  
 		
 		g.setColor(tmp);
 	}
@@ -53,12 +65,14 @@ public class snakeDraw extends Component
 	
 	public Polygon getPoly()
 	{
-		return this.poly;
+		return this.poly[frame];
 	}
 	
 	public void setRadius(double radius, double offset)
 	{
-		this.scale = (radius / 2.0) + offset;
+		//this.scale = 9.5 / radius  + offset;
+		this.scaleX = 11.547 / 9.5;  // = 10 / (cos(30°)*9.5)
+		this.scaleY = - 12.0 / 9.5;	 // = 
 	}
 	
 	public void setOffset(double x, double y)
@@ -66,6 +80,25 @@ public class snakeDraw extends Component
 		//System.out.println("Offset " + x + " " + y);
 		this.offsetX = x;
 		this.offsetY = y;
+	}	
+	
+	public void addFrame()
+	{
+		frame = frame + 4;
+		if(frame >= poly.length)
+		{
+			frame = 0;
+		}
+		System.out.println(frame);
 	}
 	
+	public void subFrame()
+	{
+		frame = frame - 4;
+		if(frame < 0)
+		{
+			frame = poly.length - 1;
+		}
+		System.out.println(frame);
+	}
 }

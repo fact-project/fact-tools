@@ -21,7 +21,8 @@ public class StdForce extends ImageForce
 	@Override
 	public double forceX(double x, double y) 
 	{
-		int chid = DefaultPixelMapping.geomToChid((float) x * 9.5f, (float) y * 9.5f);		
+		int chid = DefaultPixelMapping.geomToChid((float) x, (float) y);			
+		
 		if (chid == -1) return 0;
 
 		double grad = gradX(chid);
@@ -44,7 +45,7 @@ public class StdForce extends ImageForce
 	@Override
 	public double forceY(double x, double y) 
 	{
-		int chid = DefaultPixelMapping.geomToChid((float) x * 9.5f, (float) y * 9.5f);		
+		int chid = DefaultPixelMapping.geomToChid((float) x, (float) y );		
 		if (chid == -1) return 0;
 
 		double grad = gradY(chid);
