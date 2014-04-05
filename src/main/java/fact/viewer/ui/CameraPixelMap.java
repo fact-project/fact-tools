@@ -627,8 +627,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			double[][] x = (double[][]) event.get("snake_X_Prog");
 			double[][] y = (double[][]) event.get("snake_Y_Prog");		
 			
-			SnakePoly.setShape(x, y);		
-			
+			SnakePoly.setShape(x, y);				
 			this.repaint();
 		}
 	}

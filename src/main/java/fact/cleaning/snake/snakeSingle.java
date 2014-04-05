@@ -46,9 +46,14 @@ public class snakeSingle implements StatefulProcessor
 	
 	private String pixelDataName = null;
 	private String distribution = null;	
+	private String showerCenterX = null;
+	private String showerCenterY = null;
+	private String mean = null;
 
-	private double alpha = 0.3;
-	private double beta = 0.3;
+	
+
+	private double alpha = 0.08;
+	private double beta = 0.08;
 	private double dt = 0.05;
 	private double ds2 = 1.0;
 	
@@ -166,7 +171,7 @@ public class snakeSingle implements StatefulProcessor
 	{
 		try
 		{			
-			EventUtils.mapContainsKeys(getClass(), input, pixelDataName);
+			EventUtils.mapContainsKeys(getClass(), input, pixelDataName, mean);
 			photonCharge= (double[]) input.get(pixelDataName);
 			if(photonCharge == null)
 			{
@@ -174,17 +179,29 @@ public class snakeSingle implements StatefulProcessor
 				throw new RuntimeException("No weights found in event. Aborting.");
 			}
 			
-			PixelDistribution2D dist;
-			dist = (PixelDistribution2D) input.get(distribution);
+			if(distribution != null)
+			{
+				PixelDistribution2D dist;
+				dist = (PixelDistribution2D) input.get(distribution);
 			
-			centerX = dist.getCenterX();
-			centerY = dist.getCenterY();			
+				centerX = dist.getCenterX();
+				centerY = dist.getCenterY();
+			}
+			else if(showerCenterX != null && showerCenterY != null)
+			{
+				centerX = (Double) input.get(showerCenterX);
+				centerY = (Double) input.get(showerCenterY);
+			}
+			else
+			{
+				throw new RuntimeException("No center parameter set!");
+			}
 			
-			//System.out.println("Center Chid: " + DefaultPixelMapping.geomToChid((float) centerX, (float) centerY));	
+				
 		} 
 		catch(ClassCastException e)
 		{
-			log.error("Could cast the key: " + pixelDataName + "to a double[]");
+			log.error("CastError");
 		}				
 		
 		NumberOfVertices = 6;
@@ -205,7 +222,11 @@ public class snakeSingle implements StatefulProcessor
 		{
 			data[i] = 10 * photonCharge[i];
 		}
-		ImageForce force = new StdForce(data, (float) centerX, (float) centerY);		
+		
+		ImageForce force = new StdForce(data, (float) centerX, (float) centerY);	
+		force.setMedian((Double) input.get(mean));
+		
+		System.out.println(force.median);
 	
 		double[][] xBuf = new double[200][];
 		double[][] yBuf = new double[200][];
@@ -257,4 +278,31 @@ public class snakeSingle implements StatefulProcessor
 	public void setDistribution(String distribution) {
 		this.distribution = distribution;
 	}
+	
+	public String getMean() {
+		return mean;
+	}
+
+	public void setMean(String mean) {
+		this.mean = mean;
+	}
+
+	public String getShowerCenterX() {
+		return showerCenterX;
+	}
+
+	public void setShowerCenterX(String showerCenterX) {
+		this.showerCenterX = showerCenterX;
+	}
+
+	public String getShowerCenterY() {
+		return showerCenterY;
+	}
+
+	public void setShowerCenterY(String showerCenterY) {
+		this.showerCenterY = showerCenterY;
+	}
+	
+	
+	
 }

@@ -29,7 +29,7 @@ public class StdForce extends ImageForce
 
 		// Externe Kraft zur mitte	-> Domsche Rücktreib Kraft!				
 
-		double exForce = data[chid] - (median * 5.0);
+		double exForce = data[chid] - (median * 3.0);
 		exForce = exForce * ((center.getX() - x) < 0 ? 1.0 : -2.8);
 
 
@@ -39,7 +39,7 @@ public class StdForce extends ImageForce
 		exForce = exForce * (sinValue>0.0 ? sinValue : (-sinValue));
 		//				
 
-		return (grad / 410.0) + (exForce / 97.0);		
+		return (grad / 410.0) + (exForce / 80.0);		
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class StdForce extends ImageForce
 
 		// Externe Kraft zur mitte
 
-		double exForce = data[chid] - (median * 5.0);
+		double exForce = data[chid] - (median * 3.0);
 		exForce = exForce * ((center.getY() - y) < 0 ? 1.0 : -2.8);
 
 		double winkel = Math.atan((y - center.getY()) / (x - center.getX()));
@@ -61,7 +61,7 @@ public class StdForce extends ImageForce
 		exForce = exForce * (sinValue>0.0 ? sinValue : (-sinValue));
 		//				
 
-		return (grad / 410.0) + (exForce / 97.0);
+		return (grad / 410.0) + (exForce / 80.0);
 	}
 
 }

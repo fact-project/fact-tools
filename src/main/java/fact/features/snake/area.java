@@ -7,17 +7,21 @@ import stream.Processor;
 public class area  implements Processor
 {
 	String outputKey = null;	
+	
+	String snakeX = null;
+	String snakeY = null;
 
 	@Override
 	public Data process(Data input) 
 	{
 		if(outputKey == null){
 			throw new RuntimeException("Missing parameter: outputKey");
-		}
+		}	
 		
-		EventUtils.mapContainsKeys(getClass(), input, "snake_X", "snake_Y");		
-		double[] x = (double[]) input.get("snake_X");
-		double[] y = (double[]) input.get("snake_Y");
+		
+		EventUtils.mapContainsKeys(getClass(), input, snakeX, snakeY);		
+		double[] x = (double[]) input.get(snakeX);
+		double[] y = (double[]) input.get(snakeY);
 		
 		int border = x.length-1;
 
@@ -47,5 +51,23 @@ public class area  implements Processor
 	public void setOutkey(String outkey) {
 		this.outputKey = outkey;
 	}
+
+	public String getSnakeX() {
+		return snakeX;
+	}
+
+	public void setSnakeX(String snakeX) {
+		this.snakeX = snakeX;
+	}
+
+	public String getSnakeY() {
+		return snakeY;
+	}
+
+	public void setSnakeY(String snakeY) {
+		this.snakeY = snakeY;
+	}
+	
+	
 	
 }
