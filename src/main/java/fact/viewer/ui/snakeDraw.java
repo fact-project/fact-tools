@@ -75,9 +75,17 @@ public class snakeDraw extends Component
 	
 	public void setRadius(double radius, double offset)
 	{
+		System.out.println(radius);
+		
+		double aphoterm2 = 2* radius * Math.cos(Math.toRadians(180/6));
+		
+		// 9.5mm Kante - Kante
 		//this.scale = 9.5 / radius  + offset;
-		this.scaleX = 11.547 / 9.5;  // = 10 / (cos(30°)*9.5)
-		this.scaleY = - 12.0 / 9.5;	 // = 
+		//this.scaleX = 11.547 / 9.5;  // = 10 / (cos(30°)*9.5)
+		
+		this.scaleX = (aphoterm2*Math.cos(Math.toRadians(30)) - 0.5 ) / (Math.cos(Math.toRadians(30))*9.5);	//Irgendwas stimmt noch nicht ganz!  
+		this.scaleY = - (aphoterm2) / 9.5;
+		//this.scaleY = - 12.0 / 9.5;	 // = 
 	}
 	
 	public void setOffset(double x, double y)

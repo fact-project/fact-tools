@@ -52,9 +52,9 @@ public class snakeSingle implements StatefulProcessor
 
 	
 
-	private double alpha = 0.08;
-	private double beta = 0.08;
-	private double dt = 0.05;
+	private double alpha = 0.10;
+	private double beta = 0.03;
+	private double dt = 0.1;
 	private double ds2 = 1.0;
 	
 	private RealMatrix vecX;
@@ -65,6 +65,8 @@ public class snakeSingle implements StatefulProcessor
 	
 	private double centerX = 0;
 	private double centerY = 0;
+	
+	final int NIteration = 500;
 	
 	//////////////////////////////////////////////////////////////////////////////
 	
@@ -93,7 +95,7 @@ public class snakeSingle implements StatefulProcessor
 	
 	private void splitLines(double maxDist)
 	{
-		if(NumberOfVertices > 40)
+		if(NumberOfVertices > 50)
 		{
 			return;
 		}
@@ -147,7 +149,7 @@ public class snakeSingle implements StatefulProcessor
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
 
-		splitLines(250.0);	// 2 Pixel lang
+		splitLines(220.0);	// 2 Pixel lang
 		
 	}
 	//////////////////////////////////////////////////////////////////////////////
@@ -169,7 +171,7 @@ public class snakeSingle implements StatefulProcessor
 	{
 		try
 		{			
-			EventUtils.mapContainsKeys(getClass(), input, pixelDataName, mean);
+			EventUtils.mapContainsKeys(getClass(), input, pixelDataName);
 			photonCharge= (double[]) input.get(pixelDataName);
 			if(photonCharge == null)
 			{
@@ -222,14 +224,17 @@ public class snakeSingle implements StatefulProcessor
 		}
 		
 		ImageForce force = new StdForce(data, (float) centerX, (float) centerY);	
-		force.setMedian((Double) input.get(mean));
+		if(mean == null) 
+			force.setMedian(0.7);
+		else
+			force.setMedian((Double) input.get(mean));
 		
 		System.out.println(force.median);
 	
-		double[][] xBuf = new double[200][];
-		double[][] yBuf = new double[200][];
+		double[][] xBuf = new double[NIteration][];
+		double[][] yBuf = new double[NIteration][];
 		
-		for(int i=0; i<200; i++)
+		for(int i=0; i<NIteration; i++)
 		{			
 			step(force);
 			xBuf[i] = vecX.getColumn(0);
