@@ -5,6 +5,11 @@ import java.nio.ByteOrder;
 
 import stream.util.parser.ParseException;
 
+/**
+ * This class encapsulates the catalog describing the position and sizes of the table entries.
+ * 
+ * @author Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
+ */
 public class Catalog {
 	private int numTiles;
 	private int numCols; 
@@ -13,16 +18,27 @@ public class Catalog {
 	private long[] tileOffsetList;
 	private long[] tileSizeList;
 
+	/**
+	 * Load the catalog of the position and sizes of the table entries.
+	 * 
+	 * @param input The catalog data to read.
+	 * @param numTiles The number of tiles in the table.
+	 * @param numCols The number of columns in the table.
+	 * @throws ParseException Thrown when the catalog is broken.
+	 */
 	Catalog(byte[] input, int numTiles, int numCols) throws ParseException {
 		this.numTiles = numTiles;
 		this.numCols = numCols;
 		ByteBuffer buffer = ByteUtil.wrap(input);
 		buffer.order(ByteOrder.BIG_ENDIAN);
 		
+		if ( input.length != (2*numTiles*numCols) )
+			throw new ParseException("The catalog has to many or not enough entries.");
 		this.offsetList = new long[numTiles][numCols];
 		this.sizeList   = new long[numTiles][numCols];
 		this.tileOffsetList = new long[numTiles];
 		this.tileSizeList   = new long[numTiles];
+
 		for (int i=0; i<this.numTiles; i++) {
 			for (int j=0; j<this.numCols; j++) {
 				this.sizeList[i][j]  = buffer.getLong();
