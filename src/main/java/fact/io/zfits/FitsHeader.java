@@ -102,7 +102,7 @@ public class FitsHeader {
 		return true;
 	}
 
-	public <T> boolean check(String key, ValueType expectedType, String expectedValue) throws ParseException {
+	public boolean check(String key, ValueType expectedType, String expectedValue) throws ParseException {
 		//if (!expectedType.getTypeClass().isInstance(expectedValue))
 		//	throw new ParseException("The expectedValue is not of type: "+expectedType.toString());
 		FitsHeaderEntry entry = this.keyMap.get(key);
@@ -113,6 +113,30 @@ public class FitsHeader {
 		if (!entry.getValue().equals(expectedValue))
 			return false;
 		return true;
+	}
+	
+	public void checkThrow(String key) throws ParseException {
+		FitsHeaderEntry entry = this.keyMap.get(key);
+		if (entry == null)
+			throw new ParseException("Missing header entry: '"+key+"'");
+	}
+
+	public void checkThrow(String key, ValueType expectedType) throws ParseException {
+		FitsHeaderEntry entry = this.keyMap.get(key);
+		if (entry == null)
+			throw new ParseException("Missing header entry: '"+key+"'");
+		if (entry.getType()!=expectedType)
+			throw new ParseException("Header entry: '"+key+"' got the wrong type: "+entry.getType().toString());
+	}
+
+	public void checkThrow(String key, ValueType expectedType, String expectedValue) throws ParseException {
+		FitsHeaderEntry entry = this.keyMap.get(key);
+		if (entry == null)
+			throw new ParseException("Missing header entry: '"+key+"'");
+		if (entry.getType()!=expectedType)
+			throw new ParseException("Header entry: '"+key+"' got the wrong type: "+entry.getType().toString());
+		if (!entry.getValue().equals(expectedValue))
+			throw new ParseException("Header entry: '"+key+"' got the wrong value: "+entry.getValue()+", expected: "+expectedValue);
 	}
 	
 	public String getKeyValue(String key) {
@@ -129,7 +153,7 @@ public class FitsHeader {
 		return entry.getValue();
 	}
 
-	public <N> N getKeyValue(String key, Class<N> type) {
+	/*public <N> N getKeyValue(String key, Class<N> type) {
 		return this.keyMap.get(key).getValue(type);
 	}
 	
@@ -138,7 +162,7 @@ public class FitsHeader {
 		if (entry==null)
 			return missingKeyValue;
 		return entry.getValue(type);
-	}
+	}*/
 	
 	public String toString() {
 		String s = "Entries: "+this.keyMap.size()+"\n";
