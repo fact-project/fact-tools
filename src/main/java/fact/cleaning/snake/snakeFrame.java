@@ -12,7 +12,15 @@ import fact.EventUtils;
 import fact.cleaning.CoreNeighborClean;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
+import fact.statistics.PixelDistribution2D;
 import fact.viewer.ui.DefaultPixelMapping;
+
+
+
+
+
+
+
 
 
 
@@ -21,7 +29,6 @@ import fact.viewer.ui.DefaultPixelMapping;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,17 +40,21 @@ import fact.cleaning.snake.StdForce;
 
 public class snakeFrame implements StatefulProcessor
 {
-	private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
+private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	
-	private double[] pixelArrayData = null;
+	private double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
 	
 	private RealMatrix[] matrix;
 	
-	private String pixelDataName = null;
-	private String startPointName = null;
+	private String pixelDataName = null;	
+	private String showerCenterX = null;
+	private String showerCenterY = null;
+	private String mean = null;
+
 	
-	private double alpha = 0.3;
-	private double beta = 0.3;
+
+	private double alpha = 0.08;
+	private double beta = 0.08;
 	private double dt = 0.05;
 	private double ds2 = 1.0;
 	
@@ -53,8 +64,8 @@ public class snakeFrame implements StatefulProcessor
 	private int NumberOfVertices = 6;
 	
 	
-	private double[] centerX = null;
-	private double[] centerY = null;
+	private double centerX[] = null;
+	private double centerY[] = null;
 	
 	//////////////////////////////////////////////////////////////////////////////
 	
@@ -122,11 +133,11 @@ public class snakeFrame implements StatefulProcessor
 	}
 	
 	private void step(ImageForce f)
-	{		
+	{				
 		for(int i=0; i<NumberOfVertices; i++)
 		{	
 			double x = vecX.getEntry(i,0);
-			double y = vecX.getEntry(i,0);			
+			double y = vecY.getEntry(i,0);			
 
 			vecX.setEntry(i, 0, x + (dt * f.forceX(x, y)) );
 			vecY.setEntry(i, 0, y + (dt * f.forceY(x, y)) );		
@@ -137,7 +148,7 @@ public class snakeFrame implements StatefulProcessor
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
 
-		splitLines(4.0);
+		splitLines(250.0);	// 2 Pixel lang
 		
 	}
 	//////////////////////////////////////////////////////////////////////////////
@@ -161,47 +172,83 @@ public class snakeFrame implements StatefulProcessor
 	{
 		try
 		{			
-			EventUtils.mapContainsKeys(getClass(), input, pixelDataName);
-			pixelArrayData= (double[]) input.get(pixelDataName);
-			if(pixelArrayData == null)
+			EventUtils.mapContainsKeys(getClass(), input, pixelDataName, mean);
+			photonCharge= (double[]) input.get(pixelDataName);
+			if(photonCharge == null)
 			{
 				log.error("No weights found in event. Aborting.");
 				throw new RuntimeException("No weights found in event. Aborting.");
 			}
 			
-			centerX = (double[]) input.get(startPointName + "_X");
-			centerY = (double[]) input.get(startPointName + "_Y");
+			if(showerCenterX != null && showerCenterY != null)
+			{
+				centerX = (double[]) input.get(showerCenterX);
+				centerY = (double[]) input.get(showerCenterY);
+			}
+			else
+			{
+				throw new RuntimeException("No center parameter set!");
+			}
+			
+				
 		} 
 		catch(ClassCastException e)
 		{
-			log.error("Could cast the key: " + pixelDataName + "to a double[]");
-		}		
+			log.error("CastError");
+		}	
 		
-		for(int frame = 0; frame <300; frame++)
+		double[][][] tmpSaveX = new double[photonCharge.length / Constants.NUMBEROFPIXEL][][];
+		double[][][] tmpSaveY = new double[photonCharge.length / Constants.NUMBEROFPIXEL][][];
+		
+		for(int frame = 0; frame < photonCharge.length / Constants.NUMBEROFPIXEL; frame++)
 		{
+			NumberOfVertices = 6;
+			vecX = new Array2DRowRealMatrix(6,1);
+			vecY = new Array2DRowRealMatrix(6,1);
+			
 			for (int i = 0; i < 6; i++)
 			{
-				float a = (float) (centerX[frame] + 2.0 * Math.sin(i*3.1415 / 3.0));
-				float b = (float) (centerY[frame] + 2.0 * Math.cos(i*3.1415 / 3.0));
+				float a = (float) (centerX[frame] + 15.0 * Math.sin(i*3.1415 / 3.0));
+				float b = (float) (centerY[frame] + 15.0 * Math.cos(i*3.1415 / 3.0));
 
 				vecX.setEntry(i, 0, a);
 				vecY.setEntry(i, 0, b);
 			}		
 			
-			double[] data = Arrays.copyOfRange(pixelArrayData, Constants.NUMBEROFPIXEL * frame, Constants.NUMBEROFPIXEL * frame + Constants.NUMBEROFPIXEL);
-			ImageForce force = new StdForce(data, (float) centerX[frame], (float) centerY[frame]);		
-		
-			for(int i=0; i<200; i++)
+			
+			
+			
+			double[] data = new double[Constants.NUMBEROFPIXEL];
+			for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 			{
-				step(force);
+				data[i + Constants.NUMBEROFPIXEL*frame] = 10 * photonCharge[i];
 			}
 			
-			input.put("snake_X_"+frame, vecX.getRow(0));
-			input.put("snake_Y_"+frame, vecY.getRow(0));
+			ImageForce force = new StdForce(data, (float) centerX[frame], (float) centerY[frame]);	
+			force.setMedian((Double) input.get(mean));
+		
+			System.out.println(force.median);
+			
+			double[][] xBuf = new double[200][];
+			double[][] yBuf = new double[200][];
+			
+			for(int i=0; i<200; i++)
+			{			
+				step(force);
+				xBuf[i] = vecX.getColumn(0);
+				yBuf[i] = vecY.getColumn(0);
+			}									
+			
+			tmpSaveX[frame] = xBuf;
+			tmpSaveX[frame] = yBuf;			
 		}
 		
-		System.out.println("Snake Beendet für Event: " + input.get("EventNum"));
+		input.put("snake_X_Prog", tmpSaveX);
+		input.put("snake_Y_Prog", tmpSaveX);
 		
+		input.put("snake_X", vecX.getColumn(0));
+		input.put("snake_Y", vecY.getColumn(0));
+			
 		return input;
 	}
 
@@ -227,16 +274,30 @@ public class snakeFrame implements StatefulProcessor
 	public void setPixelDataName(String pixelDataName) 
 	{
 		this.pixelDataName = pixelDataName;
-	}
-
-	public String getStartPoint() 
-	{
-		return startPointName;
-	}
-
-	public void setStartPoint(String startPoint) 
-	{
-		this.startPointName = startPoint;
 	}	
+	
+	public String getMean() {
+		return mean;
+	}
+
+	public void setMean(String mean) {
+		this.mean = mean;
+	}
+
+	public String getShowerCenterX() {
+		return showerCenterX;
+	}
+
+	public void setShowerCenterX(String showerCenterX) {
+		this.showerCenterX = showerCenterX;
+	}
+
+	public String getShowerCenterY() {
+		return showerCenterY;
+	}
+
+	public void setShowerCenterY(String showerCenterY) {
+		this.showerCenterY = showerCenterY;
+	}
 	
 }

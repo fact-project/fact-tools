@@ -92,6 +92,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	private HexTile oldCell;
 	
 	private snakeDraw SnakePoly;
+	private double[][][] snakeX;
+	private double[][][] snakeY;
 
 	public CameraPixelMap(Double radius) {
 		super(45, 41, radius);
@@ -624,10 +626,10 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 				o.paint(this.getGraphics(), tiles);
 			}
 			
-			double[][] x = (double[][]) event.get("snake_X_Prog");
-			double[][] y = (double[][]) event.get("snake_Y_Prog");		
+			snakeX = (double[][][]) event.get("snake_X_Prog");
+			snakeY = (double[][][]) event.get("snake_Y_Prog");			
+			SnakePoly.update();
 			
-			SnakePoly.setShape(x, y);				
 			this.repaint();
 		}
 	}
@@ -643,6 +645,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	public void paint(Graphics g) 
 	{		
 		super.paint(g);
+		if(snakeX != null)
+			SnakePoly.setShape(snakeX[currentSlice], snakeY[currentSlice]);
 		SnakePoly.paint(g);
 	}	
 	

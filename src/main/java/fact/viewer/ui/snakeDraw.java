@@ -22,8 +22,7 @@ public class snakeDraw extends Component
 	
 	// [frame][points] in mm
 	public void setShape(double [][] x, double[][] y)
-	{
-		frame = 0;
+	{		
 		if(x == null || y == null || x.length != y.length) 
 		{			
 			poly = new Polygon[0];
@@ -44,6 +43,12 @@ public class snakeDraw extends Component
 				poly[f].addPoint(cx, cy);
 			}
 		}
+	}
+	
+	public void update()
+	{
+		frame = 0;
+		poly = null;
 	}
 	
 	public void paint(Graphics g) 

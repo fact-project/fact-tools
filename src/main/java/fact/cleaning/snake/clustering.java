@@ -18,7 +18,9 @@ public class clustering implements StatefulProcessor
 	private String dataString = null;	
 	private String FirstThreshold = null;	
 	private String SecondThreshold = null;	
-	private String cluster = null;
+	
+	private String clusterOut = null;
+	private String clusterSize = null;
 	
 	
 	private double schwelle1;
@@ -35,6 +37,15 @@ public class clustering implements StatefulProcessor
 		if(SecondThreshold == null)
 		{
 			throw new RuntimeException("No 2 threshold set");
+		}
+		
+		if(clusterOut == null)
+		{
+			throw new RuntimeException("No cluster key set!");
+		}
+		if(clusterSize == null)
+		{
+			throw new RuntimeException("No clusterSize key set!");
 		}
 	
 		schwelle1 = Double.parseDouble(FirstThreshold);
@@ -58,12 +69,7 @@ public class clustering implements StatefulProcessor
 	
 	@Override
 	public Data process(Data input) 
-	{
-		if(cluster == null)
-		{
-			throw new RuntimeException("No Output Set!");
-		}
-		
+	{		
 		EventUtils.mapContainsKeys(getClass(), input, dataString);	
 		
 		double[] pixelData = (double[]) input.get(dataString);
@@ -72,6 +78,9 @@ public class clustering implements StatefulProcessor
 		int frames = pixelData.length / Constants.NUMBEROFPIXEL;
 		int label = 0;		
 		
+		int[] out = new int[Constants.NUMBEROFPIXEL];
+		out[0] = Constants.NUMBEROFPIXEL;
+		
 		for(int f=0; f<frames; f++)
 		{
 			for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
@@ -79,10 +88,18 @@ public class clustering implements StatefulProcessor
 				int size = testAndMark(cluster, pixelData, f*Constants.NUMBEROFPIXEL,
 								i, label);
 				
-				if(size > 0) label++;
+				if(size > 0)
+				{
+					out[label] = size;
+					out[0] = out[0] - size;
+					label++;
+				}
 			}
 			
-		}			
+		}		
+		
+		input.put(clusterSize, out);
+		input.put(clusterOut, cluster);
 			
 		return input;
 	}		

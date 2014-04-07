@@ -147,7 +147,7 @@ public class snakeSingle implements StatefulProcessor
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
 
-		splitLines(361.0);	// 2 Pixel lang
+		splitLines(250.0);	// 2 Pixel lang
 		
 	}
 	//////////////////////////////////////////////////////////////////////////////
@@ -155,9 +155,7 @@ public class snakeSingle implements StatefulProcessor
 	@Override
 	public void init(ProcessContext context) throws Exception 
 	{
-		matrix = new Array2DRowRealMatrix[50];
-		vecX = new Array2DRowRealMatrix(6,1);
-		vecY = new Array2DRowRealMatrix(6,1);
+		matrix = new Array2DRowRealMatrix[50];		
 		
 		for(int i=0; i < 50; i++)
 		{
@@ -238,8 +236,16 @@ public class snakeSingle implements StatefulProcessor
 			yBuf[i] = vecY.getColumn(0);
 		}		
 		
-		input.put("snake_X_Prog", xBuf);
-		input.put("snake_Y_Prog", yBuf);
+		double[][][] tmpX = new double[300][][];
+		double[][][] tmpY = new double[300][][];
+		for(int i=0; i<300; i++)
+		{
+			tmpX[i] = xBuf;
+			tmpY[i] = yBuf;
+		}
+		
+		input.put("snake_X_Prog", tmpX);
+		input.put("snake_Y_Prog", tmpY);
 		
 		input.put("snake_X", vecX.getColumn(0));
 		input.put("snake_Y", vecY.getColumn(0));
