@@ -99,6 +99,7 @@ public class CutSlices implements Processor {
 	public String getOutputKey() {
 		return outputKey;
 	}
+	@Parameter(name = "outputKey", defaultValue = "DataCalibrated", required = false)
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}

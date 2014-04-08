@@ -32,8 +32,9 @@ public class Catalog {
 		ByteBuffer buffer = ByteUtil.wrap(input);
 		buffer.order(ByteOrder.BIG_ENDIAN);
 		
-		if ( input.length != (2*numTiles*numCols) )
-			throw new ParseException("The catalog has to many or not enough entries.");
+		int expectedCatalogSize = 2*numTiles*numCols*8;
+		//if ( input.length !=  expectedCatalogSize)
+		//	throw new ParseException("The catalog has : "+input.length+" bytes, this is to many or not enough entries. Expected: "+expectedCatalogSize+" bytes.");
 		this.offsetList = new long[numTiles][numCols];
 		this.sizeList   = new long[numTiles][numCols];
 		this.tileOffsetList = new long[numTiles];

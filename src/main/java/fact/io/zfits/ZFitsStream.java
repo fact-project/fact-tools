@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.io.zfits.FitsHeader.ValueType;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
@@ -39,7 +41,7 @@ public class ZFitsStream extends AbstractStream {
 	private Data headerItem = DataFactory.create();
 	private String tableName = "Events";
 	
-	private FitsTable fitsTable = null;
+	private ZFitsTable fitsTable = null;
 	private Catalog   catalog   = null;
 	
 	private TileHeader currentTileHeader = null;
@@ -62,6 +64,8 @@ public class ZFitsStream extends AbstractStream {
 			this.currentRowInTile  = 0;
 		}
 		
+		log.info("Num Rows: {}", this.currentTileHeader.getNumRows());
+
 		//read the desired columns
 		for (int colIndex=0; colIndex<this.fitsTable.getNumCols(); colIndex++) {
 			//log.info("Read column number {}", colIndex);
@@ -75,7 +79,7 @@ public class ZFitsStream extends AbstractStream {
 			//get the decoded data
 			data = blockHeader.decode();
 			//insert it into the item with the correct format
-			FitsTable.FitsTableColumn columnInfo = this.fitsTable.getColumns(colIndex);
+			ZFitsTable.FitsTableColumn columnInfo = this.fitsTable.getColumns(colIndex);
 			ByteBuffer buffer = null;
 			switch (columnInfo.getType()) {
 			case BOOLEAN:
@@ -161,7 +165,6 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case STRING:
-				break;
 			default:
 				throw new ParseException("The type of a column is wrong, or could not be read.");
 			}
@@ -187,6 +190,7 @@ public class ZFitsStream extends AbstractStream {
 	@Override
 	public void init() throws Exception {
 		super.init();
+		log.info("Read file: {}", this.url.getFile());
 		File f = new File(this.url.getFile());
 		if (!f.canRead()){
 			log.error("Cannot read file. Wrong path? ");
@@ -210,19 +214,28 @@ public class ZFitsStream extends AbstractStream {
 			// read the header
 			FitsHeader header = new FitsHeader(block);
 			String extName = header.getKeyValue("EXTNAME");
-			// read the Table
-			this.fitsTable = new FitsTable(header);
-			log.info("EXTNAME: {}", extName);
+
+			BinTable table = null;
+			if (header.getKeyValue("ZTABLE", "F").equals("F")) {
+				table = new BinTable(header);
+			} else {
+				table = new ZFitsTable(header);
+			}
+
 			if (!extName.trim().equals(this.tableName)) {
 				// it is not the desired table so skip it entirely
 				//log.info("Pos: 0x{}", Long.toHexString(fileInputStream.getChannel().position()));
-				log.info("Skiping: {} bytes.",this.fitsTable.getTableTotalSize());
-				long num = this.dataStream.skipBytes((int)this.fitsTable.getTableTotalSize());
+				log.info("Skiping: {} bytes.", table.getTableTotalSize());
+				long num = this.dataStream.skipBytes((int)table.getTableTotalSize());
 				log.info("Skipped: {} bytes.", num);
 				continue;
 			}
+			// read the Table
+			this.fitsTable = (ZFitsTable)table;
+			log.info("NumTiles: {}", this.fitsTable.getNumTiles());
+			log.info("EXTNAME: {}", extName);
 			// create headerItem
-			// add all key value pairs which are not the column information
+			// add all key value pairs which are not the column information TODO finish extracting column information
 			for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : header.getKeyMap().entrySet()) {
 				String key   = entry.getKey();
 				String value = entry.getValue().getValue();
@@ -237,7 +250,7 @@ public class ZFitsStream extends AbstractStream {
 					this.headerItem.put(key, Float.parseFloat(value));
 					break;
 				case INT:
-					this.headerItem.put(key, Integer.parseInt(value));
+					this.headerItem.put(key, Long.parseLong(value));
 					break;
 				case STRING:
 					this.headerItem.put(key, value);
@@ -247,8 +260,9 @@ public class ZFitsStream extends AbstractStream {
 				}
 			}
 			this.headerItem.put("@source", this.url.getProtocol() + ":" + this.url.getPath());
-			
+
 			// read the catalog
+			log.info("Catalog Size: {} bytes", this.fitsTable.getFixTableSize());
 			byte[] fixTable = new byte[(int)this.fitsTable.getFixTableSize()];
 			int numBytes = this.dataStream.read(fixTable);
 			if (numBytes!=this.fitsTable.getFixTableSize())

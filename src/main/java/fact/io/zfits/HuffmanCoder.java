@@ -1,7 +1,6 @@
 package fact.io.zfits;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -18,6 +17,7 @@ public class HuffmanCoder {
 			super(message);
 		}
 	}
+
 	public static class DecodingException extends Exception {
 		private static final long serialVersionUID = 8266085144654408994L;
 
@@ -26,6 +26,11 @@ public class HuffmanCoder {
 		}
 	}
 
+	/**
+	 * Class to create a huffman tree for a short[] array and encoding it
+	 * 
+	 * @author Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
+	 */
 	public static class Encoder {
 		public class TreeNode {
 			private short symbol = 0;
@@ -94,10 +99,10 @@ public class HuffmanCoder {
 			public int numBits;
 		}
 		private Code[] symbol2Code = null;
-		private int codeTableSize = 4; // 4 for the int(numTableEntries);
+		private int codeTableSize = 8; // 8 for the long(numTableEntries);
 		private int numCodeTableEntries = 0;
 
-		private void createSymbolArray(TreeNode node) throws EncodingException {
+		private void createCodeTable(TreeNode node) throws EncodingException {
 			if (this.symbol2Code == null) {
 				this.symbol2Code = new Code[1<<16];
 			}
@@ -121,20 +126,25 @@ public class HuffmanCoder {
 			}
 		}
 
-		public Encoder(ByteBuffer buffer) throws EncodingException {
-			buffer.order(ByteOrder.LITTLE_ENDIAN);
-			if (buffer.capacity()==0) {
+		/**
+		 * Create the Huffman encoder, by creating the Huffman tree and the symbolarray
+		 * 
+		 * @param buffer The input Buffer (Has to be created from a short array)
+		 * @throws EncodingException
+		 */
+		public Encoder(short[] input) throws EncodingException {
+			if (input.length==0) {
 				throw new EncodingException("The given buffer is empty");
 			}
-			int[] countSymbols = new int[1 << 16]; // FIXME check if set zero
-			int numOfShorts = buffer.capacity()/2;
-			if (buffer.capacity()%2==1)
-				throw new EncodingException("Buffer is not even to 2");
+			// count the amount of the occurrences of the symbols 
+			int[] countSymbols = new int[1 << 16];
+			int numOfShorts = input.length;
 			for (int i = 0; i < numOfShorts; i++) {
-				int index = buffer.getShort() & 0x0000FFFF;
+				int index = input[i] & 0x0000FFFF;
 				countSymbols[index]++;
 			}
 
+			//create the huffman tree
 			PriorityQueue<TreeNode> frequencySortedSymbols = new PriorityQueue<TreeNode>(
 					numOfShorts, new TreeNodeSorter());
 			for (int i = 0; i < 1<<16; i++) {
@@ -152,10 +162,12 @@ public class HuffmanCoder {
 			}
 
 			this.huffmanTree = frequencySortedSymbols.poll();
-			createSymbolArray(this.huffmanTree);
+			//create the codeTable from the Huffman tree
+			createCodeTable(this.huffmanTree);
 		}
 		
-		public String codeTableString() {
+		// prints the codeTable as 
+		public String codeTableAsString() {
 			String s = "Entries: "+this.numCodeTableEntries+"\n";
 			for (int i=0; i<this.symbol2Code.length; i++) {
 				Code c = this.symbol2Code[i];
@@ -166,66 +178,66 @@ public class HuffmanCoder {
 			return s;
 		}
 
-		public ByteBuffer createCodeTable() {
+		public byte[] createCodeTable() {
 			byte[] data = new byte[this.codeTableSize];
 			ByteBuffer output = ByteUtil.wrap(data);
-			output.putInt(this.numCodeTableEntries);
+			output.putLong(this.numCodeTableEntries);
 
-			int j = 4;
 			for (int i=0; i<(1<<16); i++) {
 				if (this.symbol2Code[i]==null) { // symbol does not exist ignore 
 					continue;
 				}
 				// write symbol
 				output.putShort((short)i);
-				j+=2;
 				// write number bits
 				output.put((byte)(this.symbol2Code[i].numBits));
-				j+=1;
 				// write bits 
 				if (this.symbol2Code[i].numBits<9) { // write one byte
 					output.put((byte)this.symbol2Code[i].bits);
-					j+=1;
 				} else if (this.symbol2Code[i].numBits<17) { //write two bytes
 					output.putShort((short)this.symbol2Code[i].bits);
-					j+=2;
 				} else if (this.symbol2Code[i].numBits<25) { //write three bytes
 					output.put((byte)this.symbol2Code[i].bits);
 					output.put((byte)(this.symbol2Code[i].bits>>8));
 					output.put((byte)(this.symbol2Code[i].bits>>16));
-					j+=3;
 				} else { //write four bytes
 					output.putInt(this.symbol2Code[i].bits);
-					j+=4;
 				}
 			}
-			return output;
+			return output.array();
 		}
-		public byte[] encode(ByteBuffer input) {
-			ByteBuffer output = ByteUtil.create(input.capacity());
-			int inputSizeShort = input.capacity()/2;
-			//TODO fix uneven input %2
+		
+		/**
+		 * Encodes the input with the CodeTable
+		 * 
+		 * @param input The data to compress
+		 * @return The encoded array
+		 */
+		public byte[] encode(short[] input) {
+			ByteBuffer outputBuffer = ByteUtil.create(input.length);
+			int inputSizeShort = input.length;
 			long buffer = 0;
 			int curBit = 0;
 			for (int i=0; i<inputSizeShort; i++) {
-				int index = input.getShort()&0x0000FFFF;
+				int index = input[i]&0x0000FFFF;
 				Code code = this.symbol2Code[index];
 
 				buffer = buffer | (code.bits<<curBit); // insert bits into buffer
 				curBit += code.numBits;
 				while (curBit > 8) {
 					//we have a full byte write it away
-					output.put((byte)(buffer&0xFF));
+					outputBuffer.put((byte)(buffer&0xFF));
 					buffer = buffer>>8;
 					curBit -= 8;
 				}
 			}
 			if (curBit!=0) {
-				output.put((byte)(buffer&0xFF));
+				outputBuffer.put((byte)(buffer&0xFF));
 			}
-			byte[] ret = new byte[output.position()];
-			output.rewind();
-			output.get(ret);
+			// get the array
+			byte[] ret = new byte[outputBuffer.position()];
+			outputBuffer.rewind();
+			outputBuffer.get(ret);
 			return ret;
 		}
 	}
@@ -299,10 +311,10 @@ public class HuffmanCoder {
 
 		Decoder(ByteBuffer buffer) throws DecodingException {
 			// first 4 bytes are the number of entries
-			int numEntries = (int)buffer.getLong();//TODO was int
+			long numEntries = (int)buffer.getLong();
 			//log.info("Decoding HuffmanTree, {} entries", numEntries);
 			// read all entries and create the decoding tree 
-			for (int i = 0; i < numEntries; i++) {
+			for (long i = 0; i < numEntries; i++) {
 				// first two bytes are the symbole
 				short symbol = buffer.getShort();
 
@@ -315,7 +327,6 @@ public class HuffmanCoder {
 				int numBytes = (((int) numBits) + 7) / 8;
 
 				if (numBytes > 4) {
-					//FIXME System.out.println("Bits: '"+numBits+"'");
 					throw new DecodingException("Number of bytes in a single symbol is bigger then 4 bytes.");
 				}
 
@@ -330,7 +341,7 @@ public class HuffmanCoder {
 			}
 		}
 
-		public ByteBuffer decode(ByteBuffer buffer, long sizeDecoded) {
+		public byte[] decode(ByteBuffer buffer, long sizeDecoded) {
 			//log.info("decoding to {} bytes ", sizeDecoded);
 			//ByteBuffer buffer = ByteBuffer.wrap(inputData);
 			ByteBuffer outputBuffer = ByteUtil.create(sizeDecoded);
@@ -370,24 +381,8 @@ public class HuffmanCoder {
 					bufferPosition++;
 				}
 			}
-			return outputBuffer;
+			return outputBuffer.array();
 		}
-	}
-
-	private Decoder decoder = null;
-	private ByteBuffer result = null;
-
-	HuffmanCoder(ByteBuffer buffer) throws DecodingException {
-		// first four bytes is the size of the decompressed data
-		int dataSize = buffer.getInt();
-
-		this.decoder = new Decoder(buffer);
-
-		this.result = this.decoder.decode(buffer, dataSize);
-	}
-
-	public ByteBuffer getResult() {
-		return this.result;
 	}
 	
 	public static byte[] uncompressData(byte[] input) throws DecodingException {
@@ -398,17 +393,18 @@ public class HuffmanCoder {
 		long dataSize = buffer.getLong()*2; //size is stored in num of shorts
 		//log.info("Decompressed data size is {} bytes.", dataSize);
 		Decoder decoder = new Decoder(buffer);
-		return decoder.decode(buffer, dataSize).array();
+		return decoder.decode(buffer, dataSize);
 	}
 
-	public static byte[] compressData(byte[] input) throws EncodingException {
-		Encoder encoder = new Encoder(ByteUtil.wrap(input));
-		ByteBuffer codeTable = encoder.createCodeTable();
-		byte[] encodedData = encoder.encode(ByteUtil.wrap(input));
+	public static byte[] compressData(short[] input) throws EncodingException {
+		Encoder encoder = new Encoder(input);
+		byte[] codeTable = encoder.createCodeTable();
+		byte[] encodedData = encoder.encode(input);
 
-		ByteBuffer tmp = ByteUtil.wrap(new byte[codeTable.capacity()+encodedData.length+4]);
-		tmp.putInt(input.length);
-		tmp.put(codeTable.array());
+		ByteBuffer tmp = ByteUtil.wrap(new byte[codeTable.length+encodedData.length+8+4]);
+		tmp.putInt(encodedData.length);
+		tmp.putLong(input.length);
+		tmp.put(codeTable);
 		tmp.put(encodedData);
 		return tmp.array();
 	}

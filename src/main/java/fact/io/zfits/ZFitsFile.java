@@ -1,13 +1,18 @@
 package fact.io.zfits;
 
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import stream.util.parser.ParseException;
+import fact.io.zfits.HuffmanCoder.DecodingException;
 import fact.io.zfits.TileHeader.FitsFileException;
 
 public class ZFitsFile {
@@ -112,7 +117,7 @@ public class ZFitsFile {
 			if (block.get(0).startsWith("XTENSION")) {
 				FitsHeader header = new FitsHeader(block);
 				System.out.println(header.toString());
-				FitsTable table = new FitsTable(header);
+				ZFitsTable table = new ZFitsTable(header);
 				System.out.println(table.getTableTotalSize());
 				/*if (numTable==0) {
 					this.input.skip(table.getTableTotalSize());
@@ -150,6 +155,22 @@ public class ZFitsFile {
 						input.read(data);
 						BlockHeader blockHeader = new BlockHeader(data);
 						System.out.println(blockHeader.toString());
+						//FileOutputStream fos = new FileOutputStream(new File("/home/tarrox/physik/fact/byte.dat"));
+						//BufferedOutputStream bos = new BufferedOutputStream(fos);
+						//bos.write(blockHeader.data);
+						byte[] output = null;
+						try {
+							 output = blockHeader.decode();
+						} catch (DecodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						ByteBuffer outputBuffer = ByteUtil.wrap(output);
+						System.out.println();
+						for (int g=0; g<1474560; g++) {
+							System.out.println(g+":"+outputBuffer.getShort());
+						}
+						return;
 					}
 					//this.input.skip(catalog.getTileSize(i));
 				}
@@ -169,3 +190,4 @@ public class ZFitsFile {
 		}
 	}
 }
+

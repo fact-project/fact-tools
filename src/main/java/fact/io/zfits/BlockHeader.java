@@ -1,6 +1,7 @@
 package fact.io.zfits;
 
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.NoSuchElementException;
 
 import stream.util.parser.ParseException;
@@ -52,7 +53,7 @@ public class BlockHeader {
 	private int numProzessors; //should be unsigned char but we don't have it so let it be int
 	private BlockHeader.Prozessor[] prozessors;
 	
-	private byte[] data;
+	public byte[] data;
 	
 	public BlockHeader (byte[] input) throws ParseException {
 		if (input.length < (8+1+1))
@@ -83,15 +84,13 @@ public class BlockHeader {
 		}
 		return s;
 	}
-	
+
 	public void unSmoothing() {
 		ByteBuffer buffer = ByteUtil.wrap(data);
-		long size = buffer.capacity();
-		for (int i=2; i<size; i++) {
-			byte tmp = (byte)(buffer.get(i) + (buffer.get(i-1)+buffer.get(i-2))/2);
-			buffer.put(i, tmp);
+		ShortBuffer shortBuffer = buffer.asShortBuffer();
+		for (int i=2; i<shortBuffer.capacity(); i++) {
+			shortBuffer.put(i, (short)(shortBuffer.get(i) + (short)(shortBuffer.get(i-1)+shortBuffer.get(i-2))/2));
 		}
-		this.data = buffer.array();
 	}
 
 	public void unHuffman() throws DecodingException {

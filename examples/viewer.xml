@@ -1,8 +1,8 @@
 <container>
 
     <!-- Pfade zu den fits files. -->
-    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_060.fits.gz" />
-    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_056.drs.fits.gz" />
+	<property name="infile" value="/home/tarrox/physik/fact/data/20130331_013.fits.gz" />
+	<property name="drsfile" value="/home/tarrox/physik/fact/data/20130331_007.drs.fits.gz" />
     <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="5.0" />
@@ -17,25 +17,28 @@
 
     <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
     <process id="2" input="fact">
-        <stream.flow.Skip condition="%{data.EventNum} &lt; 1510" />
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
-        <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
+        <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 1510" />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
+        
+		<!--<fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+        -->
+
+		<!--<fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
 
         <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
         <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
         <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
-        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
+        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>-->
 
 
-        <fact.features.SourcePosition outputKey="sourcePosition" url="file:${drivefile}" physicalSource="${sourcename}" />
+        <!--<fact.features.SourcePosition outputKey="sourcePosition" url="file:${drivefile}" physicalSource="${sourcename}" />
         <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="1" outputKey="antiSourcePosition_1"/>
         <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="2" outputKey="antiSourcePosition_2"/>
         <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="3" outputKey="antiSourcePosition_3"/>
         <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="4" outputKey="antiSourcePosition_4"/>
         <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="5" outputKey="antiSourcePosition_5"/>
-
+		-->
 		<!-- <stream.flow.Skip condition="%{data.shower} == null" />
         <fact.features.Size showerKey="shower" photonchargeKey="photoncharge" outputKey="Size" />    -->    
         <!-- <stream.flow.Skip condition="%{data.Size} &lt; 100" /> -->

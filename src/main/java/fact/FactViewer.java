@@ -9,13 +9,17 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -24,6 +28,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
@@ -124,11 +129,8 @@ public class FactViewer extends JFrame {
 		return viewer;
 	}
 
-	private FactViewer() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle("Fact Tool");
-		// eventPanel = new FactViewerPanel();
-		JMenuBar menu = new JMenuBar();
+	private JMenu createFileMenu() {
+		//create File entries
 		JMenu file = new JMenu("File");
 		JMenuItem open = new JMenuItem("Open file");
 		open.addActionListener(new ActionListener() {
@@ -146,16 +148,46 @@ public class FactViewer extends JFrame {
 				}
 			}
 		});
-		file.add(open);
-
-		open = new JMenuItem("Quit");
-		open.addActionListener(new ActionListener() {
+		JMenuItem close = new JMenuItem("Close");
+		close.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
 		file.add(open);
-		menu.add(file);
+		file.add(close);
+		return file;
+	}
+	private JMenuBar createMenuBar() {
+		JMenuBar menuBar = new JMenuBar();
+		
+		menuBar.add(createFileMenu());
+		return menuBar;
+	}
+
+	private FactViewer() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Fact Tool");
+		// eventPanel = new FactViewerPanel();
+		JMenuBar menu = createMenuBar();
+
+		
+	    Action leftAction = new AbstractAction() {
+			private static final long serialVersionUID = 5665137270046512452L;
+			public void actionPerformed(ActionEvent e) {
+	            selectSlice(navigation.getSliceSlider().getValue()-1);
+	         }
+	    };
+	    Action rightAction = new AbstractAction() {
+			private static final long serialVersionUID = 5665137270046512452L;
+			public void actionPerformed(ActionEvent e) {
+	            selectSlice(navigation.getSliceSlider().getValue()+1);
+	         }
+	    };
+	    this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "LEFT");
+	    this.getRootPane().getActionMap().put("LEFT", leftAction);
+	    this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "RIGHT");
+	    this.getRootPane().getActionMap().put("RIGHT", rightAction);
 //		
 //		JMenu exportMenu = new JMenu("Export");
 //		
