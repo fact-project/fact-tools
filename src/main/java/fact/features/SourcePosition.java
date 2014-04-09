@@ -308,7 +308,14 @@ public class SourcePosition implements StatefulProcessor {
 		y_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
 		z_rot   =  Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
 		double[] r ={ x_rot * (-mDistance) / z_rot ,y_rot * (-mDistance) / z_rot };
-		return r;
+		double[] r_out = {0,0};
+		
+		// Hacky rotation by 90deg cause something is wrong in the calculation of the source position
+		// seems to be rotated by 270deg counterclockwise (so a rotation by 90deg clockwise is needed)
+		r_out[0] = r[0]*Math.cos(-Math.PI/2.0) - r[1]*Math.sin(-Math.PI/2.0);
+		r_out[1] = r[0]*Math.sin(-Math.PI/2.0) + r[1]*Math.cos(-Math.PI/2.0);;
+		
+		return r_out;
 	}
 
 
