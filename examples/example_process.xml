@@ -55,7 +55,8 @@
 			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
 
 <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
-<!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
+
+            <!--<fact.plotter.HistogramPlotter key="Delta" binWidth="0.025" logAxis="false" />-->
 <!-- 			<fact.plotter.BarPlotter keys="posMean,showerPositionMean" /> -->
 			        <fact.image.ShowImage/>
 <!-- 			<fact.plotter.CameraPlotter key="risingedge" /> -->
