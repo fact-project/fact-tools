@@ -49,26 +49,35 @@ public class MaxAmplitudePosition implements Processor {
 		}
 		//foreach pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			//initiate maxValue and postion
-			double tempMaxValue = 0;
-			int position = 0;
-			//iterate over all slices
-			for (int slice = searchWindowLeft; slice < searchWindowRight; slice++) {
-				int pos = pix * roi + slice;
-				//temp save the current value
-				double value = data[pos];
-				//update maxvalue and position if current value exceeds old value and is still below the threshold set by the user
-				if( value > tempMaxValue && value <= maxValue && value >= minValue ){
-					tempMaxValue = value;
-					position = slice;
-				}
-			}
-			positions[pix] = position;  
+			positions[pix] = findMaximumPosition(pix, roi, data);
 		}
         input.put(outputKey, positions);
 		return input;
 	}
 
+    /**
+     * finds the position of the highest value in the array. If the maximum value is not unique the last position will be used
+     * @param pix Pixel to check
+     * @param roi Basically the number of slices in one event
+     * @param data the array which to check
+     * @return
+     */
+    public int findMaximumPosition(int pix, int roi, double[] data){
+        double tempMaxValue = 0;
+        int position = 0;
+        //iterate over all slices
+        for (int slice = searchWindowLeft; slice < searchWindowRight; slice++) {
+            int pos = pix * roi + slice;
+            //temp save the current value
+            double value = data[pos];
+            //update maxvalue and position if current value exceeds old value and is still below the threshold set by the user
+            if( value > tempMaxValue && value <= maxValue && value >= minValue ){
+                tempMaxValue = value;
+                position = slice;
+            }
+        }
+        return position;
+    }
 
 	/*
 	 * Getter and Setter
