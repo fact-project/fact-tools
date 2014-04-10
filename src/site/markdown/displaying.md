@@ -10,11 +10,13 @@ By clicking Window -> Graph Window in the FactViewer you can see the slices of s
 The Graph Window will try to display all float or double arrays with the right size. That means it has to be dividable
 by the number of pixels in the camera. This allows for quick comparisons and sanity checks of transformed data.
 
+
+## Coloring a time interval
+
 <div style="text-align: center;">
    <img src="images/graph_window_marker.png" style="width:400px;" />
 </div>
 
-## Coloring a time interval
 
 Some processors try to find some point in time or a certain time interval in the time series by some criteria.
 Since it can be useful to actually see what your algorithm is doing you can set the background color for a time interval

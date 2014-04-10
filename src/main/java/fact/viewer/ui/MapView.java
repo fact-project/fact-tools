@@ -26,7 +26,6 @@ public class MapView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	/** The unique class ID */
 	JComboBox comboBox;
-	short selectIndex = 0;
 	private int slice;
 	private CameraPixelMap cameraPixelMap;
 
@@ -80,8 +79,7 @@ public class MapView extends JPanel {
 							sel = (String) sel.subSequence(0, sel.length()
 									- " Static Map".length());
 						}
-//						System.out.println("------------" + sel);
-						cameraPixelMap.setData((double[]) EventUtils.toDoubleArray(event.get(sel)));
+						cameraPixelMap.setData(EventUtils.toDoubleArray(event.get(sel)));
 						
 						scale.setMax(cameraPixelMap.getMaxValue());
 						scale.setMin(cameraPixelMap.getMinValue());

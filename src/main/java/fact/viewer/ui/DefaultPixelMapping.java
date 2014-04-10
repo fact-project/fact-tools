@@ -142,8 +142,13 @@ public class DefaultPixelMapping implements PixelMapping {
 		log.trace(" x range is {}, {}", minX, maxX);
 		log.trace(" y range is {}, {}", minY, maxY);
 	}
-	
-	//get the pixel under the following x,y  values which are given in millimeters
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return
+     */
 	public static int geomToChid(float x, float y){
 		if(!init){
 			init();

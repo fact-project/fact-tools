@@ -13,10 +13,13 @@ import fact.Constants;
 
 public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(SimpleFactEventProcessor.class);
-	
-	protected String key = "DataCalibrated";
+
+    @Parameter(required =  true, description = "The data elements to apply the filter on, i.e. the name of the pixels array (double).")
+    protected String key;
+    @Parameter(required = true, description = "The name of the result array that will be written to the stream.")
 	protected String outputKey;
-	private String color;
+    @Parameter(required = false, description = "RGB/Hex description String for the color that will be drawn in the FactViewer GraphWindow")
+    private String color;
 	
 	
 	@Override
@@ -24,23 +27,23 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 
 			if(!input.containsKey(key)){
 				//key doesn't exist in map. return.
-				log.error(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
+				log.error("Key not found "  + key + ",  " + this.getClass().getSimpleName() );
 				throw new RuntimeException("Key not found");
-//				return null;
 			}
 			//if outputkey is not defined just overwrite the old data
-			if(outputKey == null || outputKey.equals("")){
-				outputKey = key;
+			if(outputKey.equals("")){
+				log.error("outputKey in xml was empty.");
+                throw new RuntimeException();
 			}
-			
+
 			try{
 				@SuppressWarnings("unchecked")
 				TInput value =  (TInput) input.get(key);
 				input.put(outputKey, process(value, input));
 			} catch (ClassCastException e){
 				//in case value in Map is of the wrong type to do this calculation
-				log.error(Constants.EXPECT_ARRAY_F + key + ",  " + this.getClass().getSimpleName() );
-				return null;
+				log.error("Wrong type in map for key. " + key + ",  " + this.getClass().getSimpleName() );
+                throw new RuntimeException("Wrong type in map for key. " + key + ",  " + this.getClass().getSimpleName());
 			}
 			//add color value if set
 			if(color !=  null && !color.equals("")){
@@ -70,7 +73,6 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 	public String getKey() {
 		return key;
 	}
-	@Parameter(description = "The data elements to apply the filter on, i.e. the name of the pixels array (floats).")
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -80,17 +82,14 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(description = "The name of the result array that will be written to the stream.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 	
 	
-	//brownish
 	public String getColor() {
 		return color;
 	}
-	@Parameter(required = false, description = "RGB/Hex description String for the color that will be drawn in the FactViewer ChartPanel")
 	public void setColor(String color) {
 		this.color = color;
 	}

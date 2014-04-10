@@ -119,11 +119,11 @@ public class EventUtils {
 		}
 	}
 
-	//returns true if the specified array is anywhere in the array
+	//returns true if the specified value is anywhere in the array
 	public static boolean arrayContains(int[] ar, int value) {
-		for(int i = 0; i < ar.length; i++){
-			if(ar[i] == value) return true;
-		}
+        for (int anAr : ar) {
+            return anAr == value;
+        }
 		return false;
 	}
 
@@ -154,20 +154,7 @@ public class EventUtils {
 		return 0;
 	}
 
-	public static float[] toFloatArray(Serializable arr) {
-		if(arr.getClass().isArray()){
-			Class<?> clazz = arr.getClass().getComponentType();
-			if(clazz.equals(float.class)){
-				return ((float[])arr);
-			} else if(clazz.equals(double.class)){
-				return doubleToFloatArray((double[])arr);
-			} else if(clazz.equals(int.class)){
-				return intToFloatArray((int[])arr);
-			}
-		}
-		return null;
-	}
-	
+
 	public static float[] intToFloatArray(int[] ar) {
 		// return toDoubleArray(ar)
 		if (ar != null) {

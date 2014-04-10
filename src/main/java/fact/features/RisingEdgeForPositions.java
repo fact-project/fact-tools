@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import fact.Constants;
+import stream.annotations.Parameter;
 
 /**
  * 
@@ -21,9 +22,12 @@ public class RisingEdgeForPositions implements Processor {
 	static Logger log = LoggerFactory.getLogger(RisingEdgeForPositions.class);
 	
 	private int searchWindowLeft = 25;
-	
+
+    @Parameter(required = true)
 	private String datakey = null;
+    @Parameter(required = true)
 	private String outputkey = null;
+    @Parameter(required = true)
 	private String amplitudePositionsKey = null;
 	//
 
@@ -49,7 +53,7 @@ public class RisingEdgeForPositions implements Processor {
 			/// temp. Variables
 			double           current_slope   = 0;
 			double           max_slope       = 0;
-			/// @todo remove magic numbers for the search window
+			//Todo: remove magic numbers for the search window
 			int             search_window_left  = posMaxAmp - searchWindowLeft;
 			if (search_window_left < 10)
 			{

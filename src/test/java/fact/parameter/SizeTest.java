@@ -20,47 +20,7 @@ public class SizeTest extends ParameterTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	final String distribution = "dist";
-	final String sourcePosition="pos";
 	final String outputKey = "sizeoutput";
-
-	@Test
-	public void testMissingOutputKey() throws Exception{
-		thrown.expect(RuntimeException.class);
-		thrown.expectMessage("Missing parameter: outputKey");
-
-		//start it with a missing parameter. forget outputkey
-		Size poser = new Size();
-		poser.setPhotonChargeKey(photonCharge);
-		poser.setShowerKey(shower);
-//		poser.setOutputKey(outputKey);
-		poser.process(item);
-	}
-	
-	
-	@Test
-	public void testMissingShower() throws Exception{
-		thrown.expect(RuntimeException.class);
-		thrown.expectMessage("Missing parameter: shower");
-
-		Size poser = new Size();
-        poser.setPhotonChargeKey(photonCharge);
-//        poser.setShowerKey(shower);
-		poser.setOutputKey(outputKey);
-		poser.process(item);
-	}
-
-    @Test
-    public void testMissingPhotonChargeKey() throws Exception{
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Missing parameter: photonChargeKey");
-
-        Size poser = new Size();
-//        poser.setPhotonChargeKey(photonCharge);
-        poser.setShowerKey(shower);
-        poser.setOutputKey(outputKey);
-        poser.process(item);
-    }
 
 
 	@Test

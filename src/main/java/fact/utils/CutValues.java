@@ -16,13 +16,13 @@ import fact.Constants;
 public class CutValues implements Processor {
 		static Logger log = LoggerFactory.getLogger(CutValues.class);
 
-		
-		String[] keys = new String[] { Constants.DEFAULT_KEY };
+		@Parameter(required = true)
+		private String[] keys;
 		private Float minValue = null;
 		private Float maxValue = null;
 
 		/**
-		 * @see stream.DataProcessor#process(stream.Data)
+		 * @see stream.Processor#process(stream.Data)
 		 */
 		@Override
 		public Data process(Data event) {
@@ -30,8 +30,8 @@ public class CutValues implements Processor {
 			for (String key : keys) {
 		
 				if( event.get(key) == null){
-					log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
-					return null;
+					log.error("Key not found in event " + key + ",  " + this.getClass().getSimpleName() );
+                    throw new RuntimeException();
 				}
 				
 				float[] data = (float[]) event.get(key);
