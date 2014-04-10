@@ -37,7 +37,7 @@ public class SourceLineTest implements Processor{
 		showerPixelArray = (int[]) input.get(showerPixel);
 		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		
-		if (showerPixelArray.length < 6)
+		if (showerPixelArray.length < 4)
 		{
 			input.put(outputKey + "_sourceLineTestValueProjected", Double.NaN);
 			input.put(outputKey + "_sourceLineTestValueSorted", Double.NaN);
