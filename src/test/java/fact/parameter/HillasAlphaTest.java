@@ -45,7 +45,7 @@ public class HillasAlphaTest extends ParameterTest {
 		poser.setSourcePosition(sourcePosition);
 		poser.setOutputKey(outputKey);
 		poser.process(item);
-		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
+		assertTrue("Expected output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);
 	}
 }

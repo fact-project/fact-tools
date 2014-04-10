@@ -33,22 +33,6 @@ public class CoreNeighbourCleanParameterTest extends ParameterTest {
 	final String positions = "positions";
 
 
-
-	//TODO: optional for now
-//	@Test
-//	public void testMissingPositions() throws Exception{
-//		thrown.expect(RuntimeException.class);
-//		thrown.expectMessage("Missing");
-//
-//		//start it with a missing parameter. forget positions
-//		CoreNeighborClean poser = new CoreNeighborClean();
-//		poser.setKey(key);
-////		poser.setKeyPositions(positions);
-//		poser.setOutputKey(outputKey);
-//		poser.init(null);
-//		poser.process(item);
-//	}
-
 	@Test
 	public void testValidParameter() throws Exception{
 //		//start processor with the correct parameter
