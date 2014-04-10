@@ -51,10 +51,12 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	private String showerCenterY = null;
 	private String mean = null;
 
+	private String SnakeOutX = null;
+	private String SnakeOutY = null;
 	
 
-	private double alpha = 0.08;
-	private double beta = 0.08;
+	private double alpha = 0.12;
+	private double beta = 0.07;
 	private double dt = 0.05;
 	private double ds2 = 1.0;
 	
@@ -170,6 +172,12 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	@Override
 	public Data process(Data input) 
 	{
+		if(SnakeOutX == null || SnakeOutY == null)
+		{
+			SnakeOutX = "snake_X";
+			SnakeOutY = "snake_Y";
+		}
+		
 		try
 		{			
 			EventUtils.mapContainsKeys(getClass(), input, pixelDataName, mean);
@@ -246,8 +254,8 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 		input.put("snake_X_Prog", tmpSaveX);
 		input.put("snake_Y_Prog", tmpSaveX);
 		
-		input.put("snake_X", vecX.getColumn(0));
-		input.put("snake_Y", vecY.getColumn(0));
+		input.put(SnakeOutX, vecX.getColumn(0));
+		input.put(SnakeOutY, vecY.getColumn(0));
 			
 		return input;
 	}

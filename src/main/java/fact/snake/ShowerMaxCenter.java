@@ -1,4 +1,4 @@
-package fact.features.snake;
+package fact.snake;
 
 import fact.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;

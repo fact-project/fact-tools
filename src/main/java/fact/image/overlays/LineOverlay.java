@@ -44,7 +44,7 @@ public class LineOverlay implements Overlay, Serializable {
 			Point pStart = camMap.getPixelCoordsFromRealCoords(startX, -startY);
 			Point pEnd = camMap.getPixelCoordsFromRealCoords(startX + 100, -startY);
 			shape = new Line2D.Double(pStart, pEnd); 				
-//			AffineTransform af = g2.getTransform();
+			AffineTransform af = g2.getTransform();
 			AffineTransform newTrans = new AffineTransform();
 			newTrans.translate(pStart.x,pStart.y);
 //			newTrans.translate(p.x, p.y);
@@ -56,7 +56,7 @@ public class LineOverlay implements Overlay, Serializable {
 
 			g2.setTransform(newTrans);
 			g2.draw(shape);
-//			g2.setTransform(af);
+			g2.setTransform(af);
 //			g2.setColor(Color.BLUE);
 //			g2.fill(new Rectangle2D.Double(p.x, p.y, 10, 10));
 		}

@@ -10,21 +10,98 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.util.MathUtils;
 import org.apache.commons.math3.linear.DecompositionSolver;
 
+import fact.Constants;
 import fact.EventUtils;
+import fact.image.overlays.EllipseOverlay;
 import stream.Data;
 import stream.Processor;
 
-/*
+
 public class fitEllipse  implements Processor
 {
-	String outkey;	
+	private String outkeyAlpha = null;	
+	private String outkeyCenterX = null;	
+	private String outkeyCenterY = null;	
+	private String outkeyMinor = null;	
+	private String outkeyMajor = null;	
+	
+	private String snakeX = null;
+	private String snakeY = null;
+	
+	
+	private double centerX = 0;
+	private double centerY = 0;
+	
+	private double major = 0;
+	private double minor = 0;
+	
+	private double angle = 0;
 
-	@Override
-	public Data process(Data input) 
+	void calcParams(double[] data)
 	{
-		EventUtils.mapContainsKeys(getClass(), input, "snake_X", "snake_Y");		
-		double[] x = (double[]) input.get("snake_X");
-		double[] y = (double[]) input.get("snake_Y");
+		double a = data[0];
+		double b = data[1] / 2.0;
+		double c = data[2];
+		double d = data[3] / 2.0;
+		double f = data[4] / 2.0;
+		double g = data[5];
+
+		double num = b*b-a*c;
+
+		double x0 = (c*d-b*f) / num;
+		double y0 = (a*f-b*d) / num;
+
+			
+		double up = 2*(a*f*f+c*d*d+g*b*b-2*b*d*f-a*c*g);
+
+		double down1 = (b*b-a*c) * (Math.sqrt( ((a-c)*(a-c)) + (4*b*b) ) - (a+c));
+		double down2 = (b*b-a*c) * ((-Math.sqrt( ((a-c)*(a-c)) + (4*b*b) )) - (a+c));		
+
+		double res1 = Math.sqrt(up/down1);
+		double res2 = Math.sqrt(up/down2);
+
+		double alpha = 0;
+
+		if(b == 0 && a<c)
+		{
+			alpha = 0;
+		}
+		else if(b == 0 && a>c)
+		{
+			alpha = 0.5 * 3.1415926;
+		}
+		else if(b != 0 && Math.abs(a)<Math.abs(c))
+		{
+			alpha = 0.5 * Math.atan((2.0 * b)/(a-c));	// counterclockwise angle of rotation from the x-axis to the major axis
+		}
+		else if(b != 0 && Math.abs(a)>Math.abs(c))
+		{			
+			alpha = 0.5 * Math.atan((2.0 * b)/(a-c)) + (0.5 * 3.1415926);
+		}
+		
+
+		centerX = x0;
+		centerY = y0;
+
+		major = (res1 < res2) ? res2 : res1;
+		minor = (res1 < res2) ? res1 : res2;
+
+		angle = alpha;
+	}
+	
+	
+	@Override
+	public Data process(Data input) 	//http://autotrace.sourceforge.net/WSCG98.pdf
+	{
+		if(outkeyAlpha == null) throw new RuntimeException("Missing parameter: outkeyAlpha");
+		if(outkeyCenterX == null) throw new RuntimeException("Missing parameter: outkeyCenterX");
+		if(outkeyCenterY == null) throw new RuntimeException("Missing parameter: outkeyCenterY");
+		if(outkeyMinor == null) throw new RuntimeException("Missing parameter: outkeyMinor");
+		if(outkeyMajor == null) throw new RuntimeException("Missing parameter: outkeyMajor");
+		
+		EventUtils.mapContainsKeys(getClass(), input, snakeX, snakeY);		
+		double[] x = (double[]) input.get(snakeX);
+		double[] y = (double[]) input.get(snakeY);
 		
 		int size = x.length;
 		
@@ -78,49 +155,142 @@ public class fitEllipse  implements Processor
 	
 		EigenDecomposition eigenSys = new EigenDecomposition(M);
 		
+		Complex[] eigenVal = new Complex[3];
+		RealMatrix[] eigenVec = new RealMatrix[3];
 		
-
+		for(int i=0; i<3; i++)
+		{
+			eigenVal[i] = Complex.valueOf(eigenSys.getRealEigenvalue(i), eigenSys.getImagEigenvalue(i));
+			
+			eigenVec[i] = new Array2DRowRealMatrix(3,1);
+			
+			for(int j=0;j<3;j++)
+			{
+				eigenVec[i].setEntry(j,0, eigenSys.getEigenvector(i).getEntry(j)); 
+			}
+			
+		}
+		
 		//Eigen::MatrixXcd eigenVector = eigenSys.eigenvectors();
 		//Eigen::MatrixXcd eigenValue  = eigenSys.eigenvalues();
 
 		RealMatrix a1 = new Array2DRowRealMatrix(3,1);
 
-		RealVector[] eigenVec = new RealVector[3];
-		eigenVec[0] = eigenSys.getEigenvector(0);
-		eigenVec[1] = eigenSys.getEigenvector(1);
-		eigenVec[2] = eigenSys.getEigenvector(2);
+		//RealVector[] eigenVec = new RealVector[3];
+		//eigenVec[0] = eigenSys.getEigenvector(0);
+		//eigenVec[1] = eigenSys.getEigenvector(1);
+		//eigenVec[2] = eigenSys.getEigenvector(2);
 		
 		for(int i = 0; i< 3; i++)
 		{
-			double cond = 4.0*(eigenVec[0].getEntry(0)*eigenVec[0].getEntry(2)) - eigenVec[0].getEntry(1)*eigenVec[0].getEntry(1);			
+			double cond = 4.0 * (eigenVec[i].getEntry(0, 0)*eigenVec[i].getEntry(2, 0)) - ( eigenVec[i].getEntry(1, 0) * eigenVec[i].getEntry(1, 0) );			
 
 			if(cond > 0)
 			{				
-				for(int j=0; j<eigenVec[i].getDimension(); j++)
+				for(int j=0; j<3; j++)
 				{					
-					a1.setEntry(j, 0, eigenVector[i].getEntry(j));
+					a1.setEntry(j, 0, eigenVec[i].getEntry(j,0) );
 				}			
 			}
 		}
 
-		Eigen::Vector3d a2 = T * a1;
+		RealMatrix a2 = T .multiply(a1);
 
-		m_parameter[0] = a1[0];
-		m_parameter[1] = a1[1];
-		m_parameter[2] = a1[2];
-		m_parameter[3] = a2[0];
-		m_parameter[4] = a2[1];
-		m_parameter[5] = a2[2]; 
+		double[] parameter = new double[6];
+		
+		parameter[0] = a1.getEntry(0, 0);
+		parameter[1] = a1.getEntry(1, 0);
+		parameter[2] = a1.getEntry(2, 0);
+		parameter[3] = a2.getEntry(0, 0);
+		parameter[4] = a2.getEntry(1, 0);
+		parameter[5] = a2.getEntry(2, 0);
+		
+		calcParams(parameter);
+		
+		
+		input.put(outkeyAlpha, angle);
+		input.put(outkeyCenterX, centerX);
+		input.put(outkeyCenterY, centerY);
+		input.put(outkeyMajor, major);
+		input.put(outkeyMinor, minor);
+		
+		// Ellipse ist denke ich kaputt
+		// input.put(Constants.ELLIPSE_OVERLAY, new EllipseOverlay(centerX, centerY, major, minor, 1, angle));
+		
 		
 		return input;
 	}
 
-	public String getOutkey() {
-		return outkey;
+
+	public String getOutkeyAlpha() {
+		return outkeyAlpha;
 	}
 
-	public void setOutkey(String outkey) {
-		this.outkey = outkey;
+
+	public void setOutkeyAlpha(String outkeyAlpha) {
+		this.outkeyAlpha = outkeyAlpha;
 	}
+
+
+	public String getOutkeyCenterX() {
+		return outkeyCenterX;
+	}
+
+
+	public void setOutkeyCenterX(String outkeyCenterX) {
+		this.outkeyCenterX = outkeyCenterX;
+	}
+
+
+	public String getOutkeyCenterY() {
+		return outkeyCenterY;
+	}
+
+
+	public void setOutkeyCenterY(String outkeyCenterY) {
+		this.outkeyCenterY = outkeyCenterY;
+	}
+
+
+	public String getOutkeyMinor() {
+		return outkeyMinor;
+	}
+
+
+	public void setOutkeyMinor(String outkeyMinor) {
+		this.outkeyMinor = outkeyMinor;
+	}
+
+
+	public String getOutkeyMajor() {
+		return outkeyMajor;
+	}
+
+
+	public void setOutkeyMajor(String outkeyMajor) {
+		this.outkeyMajor = outkeyMajor;
+	}
+
+
+	public String getSnakeX() {
+		return snakeX;
+	}
+
+
+	public void setSnakeX(String snakeX) {
+		this.snakeX = snakeX;
+	}
+
+
+	public String getSnakeY() {
+		return snakeY;
+	}
+
+
+	public void setSnakeY(String snakeY) {
+		this.snakeY = snakeY;
+	}
+
 	
-}*/
+	
+}

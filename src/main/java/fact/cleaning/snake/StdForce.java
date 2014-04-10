@@ -29,7 +29,7 @@ public class StdForce extends ImageForce
 
 		// Externe Kraft zur mitte		
 		
-		double exForce = data[chid] - (median * 10.0);
+		double exForce = data[chid] - (median * 16.0);	// Data wurde vorher verzehnfacht!
 		exForce = exForce * ((center.getX() - x) < 0 ? 1.0 : -2.0);
 
 		double skal = 10.0 / Math.abs(center.getX() - x);		
@@ -54,7 +54,7 @@ public class StdForce extends ImageForce
 
 		// Externe Kraft zur mitte
 
-		double exForce = data[chid] - (median * 10.0);
+		double exForce = data[chid] - (median * 16.0);
 		exForce = exForce * ((center.getY() - y) < 0 ? 1.0 : -2.0);
 		
 		double skal = 10.0 / Math.abs(center.getX() - x);		

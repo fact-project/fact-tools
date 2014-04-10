@@ -4,16 +4,24 @@ import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
-public class snakeLength  implements Processor
+public class Length  implements Processor
 {
 	String outkey;	
+	
+	String snakeX = null;
+	String snakeY = null;
 
 	@Override
 	public Data process(Data input) 
 	{
-		EventUtils.mapContainsKeys(getClass(), input, "snake_X", "snake_Y");		
-		double[] x = (double[]) input.get("snake_X");
-		double[] y = (double[]) input.get("snake_Y");
+		if(outkey == null){
+			throw new RuntimeException("Missing parameter: outkey");
+		}
+		
+		
+		EventUtils.mapContainsKeys(getClass(), input, snakeX, snakeY);		
+		double[] x = (double[]) input.get(snakeX);
+		double[] y = (double[]) input.get(snakeY);
 		
 		if (x.length < 3) input.put(outkey, 0);
 
@@ -36,6 +44,22 @@ public class snakeLength  implements Processor
 		input.put(outkey, Math.abs(erg));
 		
 		return input;
+	}
+
+	public String getSnakeX() {
+		return snakeX;
+	}
+
+	public void setSnakeX(String snakeX) {
+		this.snakeX = snakeX;
+	}
+
+	public String getSnakeY() {
+		return snakeY;
+	}
+
+	public void setSnakeY(String snakeY) {
+		this.snakeY = snakeY;
 	}
 
 	public String getOutkey() {

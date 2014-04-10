@@ -4,7 +4,7 @@ import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
-public class area  implements Processor
+public class Area  implements Processor
 {
 	String outputKey = null;	
 	

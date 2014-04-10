@@ -1,4 +1,4 @@
-package fact.features.snake;
+package fact.snake;
 
 import fact.Constants;
 import fact.viewer.ui.DefaultPixelMapping;
