@@ -25,9 +25,7 @@ public class MaxAmplitude implements Processor{
     @Parameter(required = true)
     private String outputKey;
 
-	private float minValue= -3000;
-	private float maxValue = 3000;	
-	
+
     @Override
     public Data process(Data input) {
         double[] data = (double[]) input.get(key);
@@ -35,38 +33,33 @@ public class MaxAmplitude implements Processor{
 
         //for all pixel find the maximum value
         double[] max = new double[Constants.NUMBEROFPIXEL];
+
         for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-            //initiate maxValue and postion
-            double tempMaxValue = 0;
-            //iterate over all slices
-            for (int slice = 0; slice < roi; slice++) {
-                int pos = pix * roi + slice;
-                double value = data[pos];
-                if (value > tempMaxValue && value <= maxValue && value >= minValue) {
-                    tempMaxValue = value;
-                }
-            }
-            max[pix] = tempMaxValue;
+            max[pix] = maximum(roi, pix, data);
         }
+
         input.put(outputKey, max);
         return input;
     }
 
-    // Getter and Setter//
-    public float getMinValue() {
-        return minValue;
+    /**
+     * find the maximum value in the array. searchs in the window from pix * roi + slice to pix * roi + (slice + roi -1)
+     * @param roi
+     * @param pix pixel to be checked
+     * @param data the array to be checked
+     * @return
+     */
+    public double maximum(int roi, int pix, double[] data){
+        double tempMaxValue = 0;
+        for (int slice = 0; slice < roi; slice++) {
+            int pos = pix * roi + slice;
+            double value = data[pos];
+            if (value > tempMaxValue) {
+                tempMaxValue = value;
+            }
+        }
+        return tempMaxValue;
     }
-    public void setMinValue(float minValue) {
-        this.minValue = minValue;
-    }
-
-    public float getMaxValue() {
-        return maxValue;
-    }
-    public void setMaxValue(float maxValue) {
-        this.maxValue = maxValue;
-    }
-
 
     public String getKey() {
         return key;
