@@ -70,7 +70,7 @@ public class CoreNeighborClean implements StatefulProcessor{
 		try{
 			//EventUtils.mapContainsKeys(getClass(), input, key, keyPositions);
 			EventUtils.mapContainsKeys(getClass(), input, key);
-			photonCharge= (double[]) input.get(key);
+			photonCharge= EventUtils.toDoubleArray(input.get(key));
 			if(photonCharge == null){
 				log.error("No weights found in event. Aborting.");
 				throw new RuntimeException("No weights found in event. Aborting.");
@@ -125,13 +125,13 @@ public class CoreNeighborClean implements StatefulProcessor{
 		//do a "timeMedianClean" in case the timethrshold is set 
 		if(timeThreshold > 0 && keyPositions != null && showerPixelArray.length != 0){
 			
-			int[] positions = (int[]) input.get(keyPositions);
+			double[] positions = EventUtils.toDoubleArray(input.get(keyPositions));
 			if (positions == null){
 				log.error("The key " + keyPositions + "  was not found in the data");
 				throw new RuntimeException("The key " + keyPositions + "  was not found in the data");
 			}
 			//calculate the median value of the arrival times in the shower
-			int[] showerArrivals = new int[showerPixelArray.length];
+			double[] showerArrivals = new double[showerPixelArray.length];
 			int i = 0;
 			for (int pixel : showerPixelArray){
 				showerArrivals[i] = positions[pixel];
