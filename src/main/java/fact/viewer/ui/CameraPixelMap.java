@@ -86,7 +86,6 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 
 	private CellHighlighter cellHighlighter;
 	private HexTile nCell;
-	private HexTile oldCell;
 
 	public CameraPixelMap(Double radius) {
 		super(45, 41, radius);
@@ -108,20 +107,6 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	public void addSelectionListener(SelectionListener l) {
 		selectionListener.add(l);
 	}
-
-//	public void selectOriginal() {
-//		for (int i = 0; i < vals.length; i++) {
-//			getCell(i).setColor(colorMap.map(vals[i][currentSlice], minValue, maxValue));
-//		}
-//		repaint();
-//	}
-//
-//	public void transform(Transformation tfn) {
-//		for (int i = 0; i < vals.length; i++) {
-//			getCell(i).setColor(colorMap.map(tfn.transform(vals[i]), minValue, maxValue));
-//		}
-//		repaint();
-//	}
 
 	public void loadCells(String map) throws Exception {
 
@@ -385,8 +370,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	}
 
 	/**
-	 * @see fact.viewer.ui.HexMap#mouseClicked(java.awt.event.MouseEvent)
-	 */
+     */
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// super.mouseClicked(arg0);
@@ -452,7 +436,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		oldCell = nCell;
+		HexTile oldCell = nCell;
 		nCell = getCell(arg0.getPoint());
 		if (nCell != oldCell && nCell != null) {
 			// this.x = cell.getGeoX();

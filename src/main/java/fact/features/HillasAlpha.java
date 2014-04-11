@@ -21,16 +21,6 @@ public class HillasAlpha implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		
-		if(distribution == null){
-			throw new RuntimeException("Missing parameter: distribution");
-		}
-		if(sourcePosition == null){
-			throw new RuntimeException("Missing parameter: sourcePosition");
-		}
-		if(outputKey == null){
-			throw new RuntimeException("Missing parameter: outputKey");
-		}
 		PixelDistribution2D dist;
 		try{
 			dist = (PixelDistribution2D) input.get(distribution);
@@ -55,6 +45,7 @@ public class HillasAlpha implements Processor {
 		}
 
 		double alpha = 0.0;
+        //TODO: this might throw an NPE for source[1]
 	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
 	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;

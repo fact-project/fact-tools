@@ -23,20 +23,15 @@ import stream.io.SourceURL;
 
 public class FitsStream extends AbstractStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
-	final static int blockSize = 2880;
-	final static int lineLength = 80;
 
-	int roi = 300;
 	int numberOfPixel = 1440;
 	private DataInputStream dataStream;
-	private BufferedInputStream bStream;
 	private int[] lengthArray;
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
 //	private String filename;
 
-	protected int eventBytes;
 	private int bufferSize = 8*1024;
 	//	private FileChannel inChannel;
 
@@ -64,7 +59,7 @@ public class FitsStream extends AbstractStream {
 			log.error("Cannot read file. Wrong path? ");
 			throw new FileNotFoundException("Cannot read file");
 		}
-		bStream = new BufferedInputStream(getInputStream(), bufferSize );
+        BufferedInputStream bStream = new BufferedInputStream(getInputStream(), bufferSize );
 		dataStream = new DataInputStream(bStream);
 		//		inChannel = fileStream.getChannel();
 
@@ -104,8 +99,8 @@ public class FitsStream extends AbstractStream {
 			int cs = line.indexOf("/", eq);
 
 			String key = line.substring(0, eq);
-			String val = null;
-			String comment = null;
+			String val;
+			String comment;
 			if (cs > 0) {
 				val = line.substring(eq + 1, cs);
 				comment = line.substring(cs + 1);
@@ -157,11 +152,9 @@ public class FitsStream extends AbstractStream {
 						headerItem.put(key, v);
 					} catch (NumberFormatException ef){
 						if(value.equals("f") || value.equals("F")){
-							Boolean b = Boolean.FALSE;
-							headerItem.put(key, b);
+							headerItem.put(key, false);
 						} else if (value.equals("t") || value.equals("T")){
-							Boolean b = Boolean.TRUE;
-							headerItem.put(key, b);
+							headerItem.put(key, true);
 						} else {
 							headerItem.put(key, value);
 						}
@@ -206,8 +199,8 @@ public class FitsStream extends AbstractStream {
 						// save all the floats into a float buffer. to save n
 						// floats we need 4*n bytes
 						byte[] el = new byte[4 * numberOfElements];
-						dataStream.read(el);
-						//						bStream.read(el);
+                        dataStream.read(el);
+                        //						bStream.read(el);
 						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
 						float[] ar = new float[numberOfElements];
 						sBuf.get(ar);
@@ -260,21 +253,13 @@ public class FitsStream extends AbstractStream {
 						boolean[] el = new boolean[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
 							byte b = dataStream.readByte();
-							if(b == '0'){
-								el[i] = false; 
-							} else {
-								el[i] = true;
-							}
+                            el[i] = (b != '0');
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
-						boolean b = false;
+						boolean b;
 						byte c = dataStream.readByte();
-						if(c == 0){
-							b = false; 
-						} else {
-							b = true;
-						}
+                        b = (c != 0);
 						item.put(nameArray[n], b);
 					}
 				}

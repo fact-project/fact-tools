@@ -1,18 +1,18 @@
 <container>
 
 <!-- Pfade zu den fits files. -->
-<!-- <property name="data" value="/home/bruegge/FactTest/20120209_061.fits" /> -->
-<!-- <property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" /> -->
-<!-- <property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" /> -->
+ <property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />
+ <property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />
+ <property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />
 <!-- <property name="sample" value="/home/bruegge/FactTest/sample.fits.gz" /> -->
 <property name="sampleDRS" value="/home/bruegge/FactTest/test.drs.fits.gz" />
 <property name="outfile" value="/home/bruegge/FactTest/output.csv" />
 <!-- <property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" /> -->
 <!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" /> -->
 
-<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
-<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
-<property name="drive_file" value="/Users/kaibrugge/FactTest/20130104.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+<!--<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />-->
+<!--<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />-->
+<!--<property name="drive_file" value="/Users/kaibrugge/FactTest/20130104.DRIVE_CONTROL_TRACKING_POSITION.fits" />-->
 <!-- <property name="outfile" value="/Users/kaibrugge/FactTest/test.txt" /> -->
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
@@ -25,40 +25,40 @@
             <fact.utils.CutSlices  start="22" end="220" outputKey="DataCalibrated"/>
             <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/>
-            
+
             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
 	        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
             <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
 
-            
+
             <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
 	        <fact.features.PhotonCharge key="DataCalibrated"  positions="position" outputKey="photoncharge" color="#FF0F0F"/>
 	        <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
-	            
+
 	        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
-	
+
 	    <stream.flow.Skip condition="%{data.shower} == null" />
-	        
+
 	        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
-            
+
 			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
-            <fact.features.Size showerKey="shower" />
+            <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputkey="size"/>
 
 
             <fact.statistics.ArrayMean key="position" outputKey="posMean" />
 			<fact.statistics.ArrayMean key="photoncharge" outputKey="chargeMean" />
 			<fact.utils.SelectIndecesFromArray key="photoncharge" indices="shower" outputKey="showerPhoton" />
 			<fact.statistics.ArrayMean key="showerPhoton" outputKey="showerPhotonChargeMean" />
-			
+
 			<fact.utils.SelectIndecesFromArray key="position" indices="shower" outputKey="showerPos" />
 			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
 
 <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
 <!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
 <!-- 			<fact.plotter.BarPlotter keys="posMean,showerPositionMean" /> -->
-			        <!--<fact.image.ShowImage/>-->
+			        <fact.image.ShowImage/>
 <!-- 			<fact.plotter.CameraPlotter key="risingedge" /> -->
 <!-- 			<fact.plotter.CameraPlotter key="photoncharge" /> -->
 

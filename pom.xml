@@ -11,7 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>0.9.14</streams.version>
+		<streams.version>0.9.16</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
@@ -34,7 +34,7 @@
 		</developer>
 		<developer>
 			<name>Kai Brügge</name>
-			<email></email>
+			<email>kai.bruegge@tu-dortmund.de</email>
 			<organization>Informatik LS8, TU-Dortmund</organization>
 			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>

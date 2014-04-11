@@ -107,13 +107,6 @@ public class EventInfo extends JEditorPane {
 		strB.append(Constants.KEY_TRIGGER_TYPE + ": "
 				+ event.get(Constants.KEY_TRIGGER_TYPE));
 		strB.append("<br />");
-		if (event.containsKey(Constants.SOURCE_POS_X)) {
-			strB.append("<br />");
-			strB.append("<h2>Source Position:  </h2>");
-			strB.append(event.get(Constants.SOURCE_POS_X) + ", "
-					+ event.get(Constants.SOURCE_POS_Y));
-			strB.append("<br />");
-		}
 
 		strB.append("<br />");
 		for (String str : eventInfos) {

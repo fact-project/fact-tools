@@ -108,7 +108,7 @@ public class HistogramPlotter extends DataVisualizer {
 			log.warn("This doesnt handle NaNs very well.");
 		}
 		try{
-			dataset.addObservation(v);
+            dataset.addObservation(v);
 			chart.setTitle(title + " " + key + "    " + counter++ + " entries");
 		} catch(RuntimeException e ) {
 			//log.debug("RuntimeException while trying to add observation. Probably a missing bin for the value. Trying to create a new bin");

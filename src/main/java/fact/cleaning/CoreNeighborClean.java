@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessContext;
+import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
@@ -25,52 +26,35 @@ import fact.viewer.ui.DefaultPixelMapping;
  *
  */
 
-public class CoreNeighborClean implements StatefulProcessor{
+public class CoreNeighborClean implements Processor{
 	static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
-	private String key = null;
-	private String keyPositions = null;
+
+    @Parameter(required = true)
+	private String key;
+    @Parameter(required = true)
+	private String keyPositions;
+    @Parameter(required = true)
 	private String outputKey;
-	private  PixelSet corePixelSet;
-	private  double corePixelThreshold = 0.0;
-	private  double neighborPixelThreshold = 0.0;
-	private  double timeThreshold = 0.0; 
-	private int minNumberOfPixel = 0;
+    @Parameter(required = true)
+	private  double corePixelThreshold;
+    @Parameter(required = true)
+	private  double neighborPixelThreshold;
+    @Parameter(required = true)
+	private  double timeThreshold;
+    @Parameter(required = true)
+	private int minNumberOfPixel;
+
+
+    private  PixelSet corePixelSet;
 	
 	double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
-	
-	@Override
-	public void resetState() throws Exception {
-	}
-	@Override
-	public void finish() throws Exception {
-	}
 
-	@Override
-	public void init(ProcessContext context) throws Exception {
-		if(corePixelThreshold == 0){
-			log.warn("corePixelThrtshold not set using 5.0 as default ");
-			corePixelThreshold = 5.0f;
-		}
-		if(neighborPixelThreshold == 0){
-			log.warn("neighbourPixelThtschold not set using 2.0 as default ");
-			neighborPixelThreshold = 2.0f;
-		}
-		if(minNumberOfPixel == 0){
-			log.warn("minNumberOfPixel not set using 2 as default ");
-			minNumberOfPixel = 2;
-		}
-		if(outputKey == null){
-			log.error("Missing outputKey Aborting.");
-			throw new RuntimeException("Missing parameters. Aborting.");
-		}
-	}
-	
 	@Override
 	public Data process(Data input) {
 		try{
 			//EventUtils.mapContainsKeys(getClass(), input, key, keyPositions);
 			EventUtils.mapContainsKeys(getClass(), input, key);
-			photonCharge= (double[]) input.get(key);
+			photonCharge= EventUtils.toDoubleArray(input.get(key));
 			if(photonCharge == null){
 				log.error("No weights found in event. Aborting.");
 				throw new RuntimeException("No weights found in event. Aborting.");
@@ -125,13 +109,13 @@ public class CoreNeighborClean implements StatefulProcessor{
 		//do a "timeMedianClean" in case the timethrshold is set 
 		if(timeThreshold > 0 && keyPositions != null && showerPixelArray.length != 0){
 			
-			int[] positions = (int[]) input.get(keyPositions);
+			double[] positions = EventUtils.toDoubleArray(input.get(keyPositions));
 			if (positions == null){
 				log.error("The key " + keyPositions + "  was not found in the data");
 				throw new RuntimeException("The key " + keyPositions + "  was not found in the data");
 			}
 			//calculate the median value of the arrival times in the shower
-			int[] showerArrivals = new int[showerPixelArray.length];
+			double[] showerArrivals = new double[showerPixelArray.length];
 			int i = 0;
 			for (int pixel : showerPixelArray){
 				showerArrivals[i] = positions[pixel];
@@ -167,9 +151,9 @@ public class CoreNeighborClean implements StatefulProcessor{
 		}
 		
 		corePixelSet = new PixelSet();
-		for(int i = 0; i < showerPixelArray.length; i++){
-			corePixelSet.add(new Pixel(showerPixelArray[i]));
-		}
+        for (int aShowerPixelArray : showerPixelArray) {
+            corePixelSet.add(new Pixel(aShowerPixelArray));
+        }
 		
 //		PixelSet l1 = new PixelSet();
 //		for(int i = 0; i < level1.length; i++){

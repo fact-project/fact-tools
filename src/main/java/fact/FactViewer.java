@@ -15,20 +15,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
+
+import javax.swing.*;
+
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
@@ -78,7 +67,6 @@ public class FactViewer extends JFrame {
 	Data event;
 	AbstractStream stream;
 	Integer eventNumber = 0;
-	File calibrationFile = null;
 
 	// key for the Data currently displayed in the mainwindow. This should
 	// usually be either Data or DataCalibratred
@@ -86,7 +74,6 @@ public class FactViewer extends JFrame {
 	// DrsCalibration drsCalibration = new DrsCalibration();
 
 	// ProcessorList preprocessing = new ProcessorList();
-	Set<Integer> selectedPixel;
 	private CameraPixelMap camMap;
 
 	public CameraPixelMap getCamMap() {
@@ -108,17 +95,11 @@ public class FactViewer extends JFrame {
 		return over;
 	}
 
-	public void setOverPanel(OverlayPanel over) {
-		this.over = over;
-	}
 
 	public ArrayList<ChartWindow> getChartWindowList() {
 		return chartWindowList;
 	}
 
-	public void setChartWindowList(ArrayList<ChartWindow> chartWindowList) {
-		this.chartWindowList = chartWindowList;
-	}
 
 	public static FactViewer getInstance() {
 
@@ -129,8 +110,11 @@ public class FactViewer extends JFrame {
 		return viewer;
 	}
 
-	private JMenu createFileMenu() {
-		//create File entries
+	private FactViewer() {
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setTitle("Fact Tool");
+		// eventPanel = new FactViewerPanel();
+		JMenuBar menu = new JMenuBar();
 		JMenu file = new JMenu("File");
 		JMenuItem open = new JMenuItem("Open file");
 		open.addActionListener(new ActionListener() {
@@ -290,9 +274,6 @@ public class FactViewer extends JFrame {
 		// JCheckBoxMenuItem("Show Event Information");
 		// mnWindows.add(chckbxmntmShowEventInformation);
 
-		JCheckBoxMenuItem chckbxmntmShoweditComments = new JCheckBoxMenuItem(
-				"Show/Edit Comments");
-		mnWindows.add(chckbxmntmShoweditComments);
 
 		navigation.getNextButton().setEnabled(stream != null);
 		navigation.getNextButton().addActionListener(new ActionListener() {
@@ -438,12 +419,6 @@ public class FactViewer extends JFrame {
 
 			Data event = stream.readNext();
 
-			// event = cut.process( event );
-			// event = preprocessing.process(event);
-
-			// ClusterPixels clusterer = new ClusterPixels();
-			// event = clusterer.process( event );
-
 			if (event != null) {
 				eventNumber++;
 				setEvent(event);
@@ -463,6 +438,7 @@ public class FactViewer extends JFrame {
 	 */
 
 	public void setEvent(Data event) {
+        String defaultKey = "data";
 		if (event != null) {
 			this.event = event;
 
@@ -488,13 +464,12 @@ public class FactViewer extends JFrame {
 				chartPanel.addSeries("Avg-" + Constants.DEFAULT_KEY_CALIBRATED,
 						camMap.getSliceAverages());
 
-			} else if (event.keySet().contains(Constants.DEFAULT_KEY)) {
+			} else if (event.keySet().contains(defaultKey)) {
 				double[] array;
 				try{
-					double[] rawData = (double[]) event.get(Constants.DEFAULT_KEY);
-					array = rawData;
+					array = (double[]) event.get(defaultKey);
 				} catch (ClassCastException e){
-					short[] rawshortData = (short[]) event.get(Constants.DEFAULT_KEY);
+					short[] rawshortData = (short[]) event.get(defaultKey);
 					double[] rawfloatData = new double[rawshortData.length];
 					for (int i = 0; i < rawshortData.length; i++) {
 						rawfloatData[i] = rawshortData[i];
@@ -505,7 +480,7 @@ public class FactViewer extends JFrame {
 				camMap.setData(array);
 				roi = array.length/ Constants.NUMBEROFPIXEL;
 				// also add average of all pixels to chartpanel
-				chartPanel.addSeries("Avg-" + Constants.DEFAULT_KEY,
+				chartPanel.addSeries("Avg-" + defaultKey,
 						camMap.getSliceAverages());
 			} 
 			navigation.setRoi(roi);
@@ -568,20 +543,10 @@ public class FactViewer extends JFrame {
 	 */
 	public static void main(String[] args) throws Exception {
 		FactViewer viewer = FactViewer.getInstance();
-		// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		viewer.setMinimumSize(new Dimension(900, 700));
-		// viewer.setSize((int)(screenSize.width * 0.5f),
-		// (int)(screenSize.height *0.5f) );
 		File file = null;
 		if (args.length > 0) {
 			file = new File(args[0]);
-		}
-
-		if (args.length > 1) {
-			File f = new File(args[1]);
-			if (f.canRead()) {
-				// viewer.setCalibrationFile(f);
-			}
 		}
 
 		if (file != null && file.canRead()) {
@@ -594,16 +559,10 @@ public class FactViewer extends JFrame {
 		return currentKey;
 	}
 
-	public void setCurrentKey(String currentKey) {
-		this.currentKey = currentKey;
-	}
 
 	public ArrayList<EventInfoWindow> getEvWList() {
 		return evWList;
 	}
 
-	public void setEvWList(ArrayList<EventInfoWindow> evWList) {
-		this.evWList = evWList;
-	}
 
 }

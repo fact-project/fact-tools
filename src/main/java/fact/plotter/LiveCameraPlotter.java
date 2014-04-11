@@ -49,10 +49,7 @@ public class LiveCameraPlotter extends DataVisualizer  {
 
 	private MapView mapView;
 	
-	public LiveCameraPlotter(){
-		
-	}
-	
+
 	@Override
 	public void init(ProcessContext ctx) throws Exception{
 		super.init(ctx);

@@ -7,17 +7,19 @@ import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
 import fact.statistics.PixelDistribution2D;
+import stream.annotations.Parameter;
 
 public class HillasWidth implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasWidth.class);
-	private String distribution = null;
-	private String sourcePosition = null;
-	private String outputKey = "alpha";
+    @Parameter(required = true)
+	private String distribution;
+    @Parameter(required = true)
+	private String outputKey;
 	
 	@Override
 	public Data process(Data input) {
 		if(!input.containsKey(distribution)){
-			log.info("No shower in evernt. Not calculating width");
+			log.info("No shower in event. Not calculating width");
 			return input;
 		}
 		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
@@ -36,13 +38,6 @@ public class HillasWidth implements Processor {
 	}
 	public void setDistribution(String distribution) {
 		this.distribution = distribution;
-	}
-
-	public String getSourcePosition() {
-		return sourcePosition;
-	}
-	public void setSourcePosition(String sourcePosition) {
-		this.sourcePosition = sourcePosition;
 	}
 
 	public String getOutputKey() {

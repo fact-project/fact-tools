@@ -7,6 +7,8 @@ import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
 import fact.statistics.PixelDistribution2D;
+import stream.annotations.Parameter;
+
 /**
  * Quite simply the distance between the CoG of the shower and the calculated source position.
  * @author kaibrugge
@@ -14,9 +16,12 @@ import fact.statistics.PixelDistribution2D;
  */
 public class HillasDistance implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasDistance.class);
-	private String distribution = null;
-	private String sourcePosition = null;
-	private String outputKey = "distance";
+    @Parameter(required = true)
+	private String distribution;
+    @Parameter(required = true)
+	private String sourcePosition;
+    @Parameter(required = true)
+	private String outputKey;
 	/**
 	 * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid 
 	 */
