@@ -29,10 +29,10 @@ public class Catalog {
 	Catalog(byte[] input, int numTiles, int numCols) throws ParseException {
 		this.numTiles = numTiles;
 		this.numCols = numCols;
-		ByteBuffer buffer = ByteUtil.wrap(input);
+		ByteBuffer buffer = ZFitsUtil.wrap(input);
 		buffer.order(ByteOrder.BIG_ENDIAN);
 		
-		int expectedCatalogSize = 2*numTiles*numCols*8;
+		//int expectedCatalogSize = 2*numTiles*numCols*8;
 		//if ( input.length !=  expectedCatalogSize)
 		//	throw new ParseException("The catalog has : "+input.length+" bytes, this is to many or not enough entries. Expected: "+expectedCatalogSize+" bytes.");
 		this.offsetList = new long[numTiles][numCols];
@@ -40,6 +40,7 @@ public class Catalog {
 		this.tileOffsetList = new long[numTiles];
 		this.tileSizeList   = new long[numTiles];
 
+		//load the catalog
 		for (int i=0; i<this.numTiles; i++) {
 			for (int j=0; j<this.numCols; j++) {
 				this.sizeList[i][j]  = buffer.getLong();
