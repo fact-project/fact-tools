@@ -18,7 +18,7 @@ import stream.Data;
 import stream.Processor;
 
 
-public class fitEllipse  implements Processor
+public class FitEllipse  implements Processor
 {
 	private String outkeyAlpha = null;	
 	private String outkeyCenterX = null;	
@@ -28,6 +28,8 @@ public class fitEllipse  implements Processor
 	
 	private String snakeX = null;
 	private String snakeY = null;
+	
+	private String drawEllipse = null;
 	
 	
 	private double centerX = 0;
@@ -215,24 +217,27 @@ public class fitEllipse  implements Processor
 		input.put(outkeyMajor, major);
 		input.put(outkeyMinor, minor);
 		
-		// Ellipse ist denke ich kaputt
-		SnakeDraw sn = new SnakeDraw();
-		double[][] ellipseX = new double[1][360];
-		double[][] ellipseY = new double[1][360];
 		
-		for(int i=0; i<360;i++)
-		{			
-			double tmpAng = (i / 180.0) * 3.1415926;
+		if(drawEllipse != null)
+		{
+			SnakeDraw sn = new SnakeDraw();
+			double[][] ellipseX = new double[1][360];
+			double[][] ellipseY = new double[1][360];
+		
+			for(int i=0; i<360;i++)
+			{			
+				double tmpAng = (i / 180.0) * 3.1415926;
 
-			ellipseX[0][i]= major*Math.cos(tmpAng)*Math.cos(angle) - minor*Math.sin(tmpAng)*Math.sin(angle);
-			ellipseY[0][i]= minor*Math.cos(angle)*Math.sin(tmpAng) + major*Math.cos(tmpAng)*Math.sin(angle);				
+				ellipseX[0][i]= major*Math.cos(tmpAng)*Math.cos(angle) - minor*Math.sin(tmpAng)*Math.sin(angle);
+				ellipseY[0][i]= minor*Math.cos(angle)*Math.sin(tmpAng) + major*Math.cos(tmpAng)*Math.sin(angle);				
 
-			ellipseX[0][i] = ellipseX[0][i] + centerX;
-			ellipseY[0][i] = ellipseY[0][i] + centerY; 			
+				ellipseX[0][i] = ellipseX[0][i] + centerX;
+				ellipseY[0][i] = ellipseY[0][i] + centerY; 			
+			}
+			sn.setShape(ellipseX, ellipseY);
+		
+			input.put(Constants.SNAKE_ELLIPSE_OVERLAY, sn);
 		}
-		sn.setShape(ellipseX, ellipseY);
-		
-		input.put(Constants.SNAKE_ELLIPSE_OVERLAY, sn);
 		
 		
 		return input;
@@ -307,6 +312,18 @@ public class fitEllipse  implements Processor
 	public void setSnakeY(String snakeY) {
 		this.snakeY = snakeY;
 	}
+
+
+	public String getDrawEllipse() {
+		return drawEllipse;
+	}
+
+
+	public void setDrawEllipse(String drawEllipse) {
+		this.drawEllipse = drawEllipse;
+	}
+	
+	
 
 	
 	

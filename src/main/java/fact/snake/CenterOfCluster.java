@@ -3,6 +3,9 @@ package fact.snake;
 import java.util.List;
 import java.util.Map;
 
+import fact.Constants;
+import fact.EventUtils;
+import fact.viewer.ui.DefaultPixelMapping;
 import stream.Context;
 import stream.Data;
 import stream.Process;
@@ -12,7 +15,8 @@ import stream.io.Source;
 
 public class CenterOfCluster implements Processor
 {
-	private String cluster = null;	
+	private String clusterOut = null;
+	private String clusterSize = null;	
 	private String number = null;
 	
 	@Override
@@ -24,19 +28,30 @@ public class CenterOfCluster implements Processor
 			clN = Integer.parseInt(number);
 		}
 		
-		if(cluster == null)
-		{
-			throw new RuntimeException("Key \"cluster\" not set");
-		}
+		EventUtils.mapContainsKeys(getClass(), input, clusterOut, clusterSize);	
 		
-		int[] clus = (int[]) input.get(cluster);
+		int[] clustSize = (int[]) input.get(clusterSize);
+		int[] clustMap = (int[]) input.get(clusterOut);
 		
-		if(clus[clN] == 0) 
+		if(clustSize[clN] == 0) 
 		{
 			return input;
 		}
 		
+		double x = 0;
+		double y = 0;
+				
+		for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
+		{
+			if(clustMap[i] == clN)
+			{
+				x += DefaultPixelMapping.getPosX(i);
+				y += DefaultPixelMapping.getPosY(i);
+			}
+		}
 		
+		x = x / clustSize[clN];
+		y = y / clustSize[clN];
 		
 		
 		return input;

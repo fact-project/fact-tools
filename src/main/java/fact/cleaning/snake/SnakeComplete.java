@@ -38,7 +38,7 @@ import fact.EventUtils;
 import fact.cleaning.snake.ImageForce;
 import fact.cleaning.snake.StdForce;
 
-public class snakeFrame implements StatefulProcessor
+public class SnakeComplete implements StatefulProcessor
 {
 private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	
@@ -235,7 +235,7 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 			ImageForce force = new StdForce(data, (float) centerX[frame], (float) centerY[frame]);	
 			force.setMedian((Double) input.get(mean));
 		
-			System.out.println(force.median);
+			//System.out.println(force.median);
 			
 			double[][] xBuf = new double[200][];
 			double[][] yBuf = new double[200][];

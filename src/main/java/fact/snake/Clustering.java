@@ -1,4 +1,4 @@
-package fact.cleaning.snake;
+package fact.snake;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +13,7 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import fact.viewer.ui.DefaultPixelMapping;
 
-public class clustering implements StatefulProcessor
+public class Clustering implements StatefulProcessor
 {
 	private String dataString = null;	
 	private String FirstThreshold = null;	
@@ -56,14 +56,12 @@ public class clustering implements StatefulProcessor
 	@Override
 	public void resetState() throws Exception 
 	{
-		// TODO Auto-generated method stub
-		
+				
 	}
 
 	@Override
 	public void finish() throws Exception 
 	{
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -94,8 +92,7 @@ public class clustering implements StatefulProcessor
 					out[0] = out[0] - size;
 					label++;
 				}
-			}
-			
+			}			
 		}		
 		
 		input.put(clusterSize, out);

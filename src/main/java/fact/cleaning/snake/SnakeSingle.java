@@ -21,6 +21,8 @@ import fact.viewer.ui.DefaultPixelMapping;
 
 
 
+import fact.viewer.ui.SnakeDraw;
+
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 // import org.apache.commons.math3.linear.ArrayRealVector;
 // import org.apache.commons.math3.linear.BlockRealMatrix;
@@ -36,7 +38,7 @@ import fact.EventUtils;
 import fact.cleaning.snake.ImageForce;
 import fact.cleaning.snake.StdForce;
 
-public class snakeSingle implements StatefulProcessor
+public class SnakeSingle implements StatefulProcessor
 {
 	private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	
@@ -50,7 +52,7 @@ public class snakeSingle implements StatefulProcessor
 	private String showerCenterY = null;
 	private String mean = null;
 
-	
+	private String drawSnake = null;
 
 	private double alpha = 0.10;
 	private double beta = 0.03;
@@ -229,31 +231,44 @@ public class snakeSingle implements StatefulProcessor
 		else
 			force.setMedian((Double) input.get(mean));
 		
-		System.out.println(force.median);
+		//System.out.println(force.median);
 	
-		double[][] xBuf = new double[NIteration][];
-		double[][] yBuf = new double[NIteration][];
-		
-		for(int i=0; i<NIteration; i++)
-		{			
-			step(force);
-			xBuf[i] = vecX.getColumn(0);
-			yBuf[i] = vecY.getColumn(0);
-		}		
-		
-		double[][][] tmpX = new double[300][][];
-		double[][][] tmpY = new double[300][][];
-		for(int i=0; i<300; i++)
+		if(drawSnake != null)
 		{
-			tmpX[i] = xBuf;
-			tmpY[i] = yBuf;
+			double[][] xBuf = new double[NIteration][];
+			double[][] yBuf = new double[NIteration][];
+		
+			for(int i=0; i<NIteration; i++)
+			{			
+				step(force);
+				xBuf[i] = vecX.getColumn(0);
+				yBuf[i] = vecY.getColumn(0);
+			}		
+		
+			double[][][] tmpX = new double[300][][];
+			double[][][] tmpY = new double[300][][];
+			for(int i=0; i<300; i++)
+			{
+				tmpX[i] = xBuf;
+				tmpY[i] = yBuf;
+			}		
+		
+			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpX);
+			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpY);
+			input.put("snake_X", vecX.getColumn(0));
+			input.put("snake_Y", vecY.getColumn(0));
+			
 		}
-		
-		input.put("snake_X_Prog", tmpX);
-		input.put("snake_Y_Prog", tmpY);
-		
-		input.put("snake_X", vecX.getColumn(0));
-		input.put("snake_Y", vecY.getColumn(0));
+		else
+		{		
+			for(int i=0; i<NIteration; i++)
+			{			
+				step(force);
+			}
+			
+			input.put("snake_X", vecX.getColumn(0));
+			input.put("snake_Y", vecY.getColumn(0));
+		}
 		
 		return input;
 	}
@@ -312,6 +327,14 @@ public class snakeSingle implements StatefulProcessor
 
 	public void setShowerCenterY(String showerCenterY) {
 		this.showerCenterY = showerCenterY;
+	}
+
+	public String getDrawSnake() {
+		return drawSnake;
+	}
+
+	public void setDrawSnake(String drawSnake) {
+		this.drawSnake = drawSnake;
 	}
 	
 	

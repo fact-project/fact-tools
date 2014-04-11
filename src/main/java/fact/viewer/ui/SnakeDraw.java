@@ -105,7 +105,7 @@ public class SnakeDraw extends Component
 	
 	public void setRadius(double radius, double offset)
 	{
-		System.out.println(radius);
+		//System.out.println(radius);
 		
 		this.radius = radius;
 		
@@ -129,22 +129,26 @@ public class SnakeDraw extends Component
 	
 	public void addFrame()
 	{
+		if(poly == null) return;
+		
 		frame = frame + 4;
 		if(frame >= poly.length)
 		{
 			frame = 0;
 		}
-		System.out.println(frame);
+		//System.out.println(frame);
 	}
 	
 	public void subFrame()
 	{
+		if(poly == null) return;
+		
 		frame = frame - 4;
 		if(frame < 0)
 		{
 			frame = poly.length - 1;
 		}
-		System.out.println(frame);
+		//System.out.println(frame);
 	}
 	
 	public void updateShape()
@@ -163,9 +167,17 @@ public class SnakeDraw extends Component
 	
 	public void copyPoly(SnakeDraw p)
 	{
-		this.poly = p.poly;
-		
-		x = p.x.clone();
-		y = p.y.clone();		
+		if(p==null)
+		{
+			this.poly = null;
+			x = null;
+			y = null;
+		}
+		else
+		{
+			this.poly = p.poly;		
+			x = p.x.clone();
+			y = p.y.clone();		
+		}
 	}
 }
