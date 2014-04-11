@@ -4,20 +4,15 @@ package fact.io.zfits;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.io.zfits.FitsHeader.ValueType;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
@@ -40,47 +35,31 @@ public class ZFitsStream extends AbstractStream {
 	private DataInputStream dataStream;
 	private Data headerItem = DataFactory.create();
 	private String tableName = "Events";
-	
+	private ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
+
 	private ZFitsTable fitsTable = null;
-	private Catalog   catalog   = null;
 	
-	private TileHeader currentTileHeader = null;
-	private int currentRowInTile = 0;
-	private int currentTile = 0;
+	private TableReader tableReader = null;
 
 	@Override
 	public Data readNext() throws Exception {
 		Data item = DataFactory.create(headerItem);
 		
-		//Read the next TileHeader if necessary
-		if (this.currentTile==this.fitsTable.getNumTiles()) {
-			//we finished reading all data
+		if (this.tableReader == null)
+			throw new NullPointerException("Didn't initialize the reader, should never happen.");
+		//get the next row of data if zero we finished
+		byte[][] dataRow = this.tableReader.readNextRow();
+		if (dataRow == null)
 			return null;
-		}
-		if (currentTileHeader==null) {
-			byte[] data = new byte[TileHeader.getTileHeaderSize()];
-			this.dataStream.read(data);
-			this.currentTileHeader = new TileHeader(data);
-			this.currentRowInTile  = 0;
-		}
-		
-		log.info("Num Rows: {}", this.currentTileHeader.getNumRows());
 
 		//read the desired columns
 		for (int colIndex=0; colIndex<this.fitsTable.getNumCols(); colIndex++) {
-			//log.info("Read column number {}", colIndex);
-			byte[] data = new byte[(int)catalog.getColumnSize(currentTile, colIndex)];
-			if (data.length==0) {
-				//ignore the column nothing in here
-				continue;
-			}
-			this.dataStream.read(data);
-			BlockHeader blockHeader = new BlockHeader(data);
-			//get the decoded data
-			data = blockHeader.decode();
+			byte[] data = dataRow[colIndex];
+
 			//insert it into the item with the correct format
-			ZFitsTable.FitsTableColumn columnInfo = this.fitsTable.getColumns(colIndex);
-			ByteBuffer buffer = null;
+			FitsTableColumn columnInfo = this.fitsTable.getColumns(colIndex);
+			ByteBuffer buffer = ZFitsUtil.wrap(data);
+			buffer.order(this.byteOrder);
 			switch (columnInfo.getType()) {
 			case BOOLEAN:
 				if (columnInfo.getNumEntries()==1) {
@@ -105,7 +84,6 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case SHORT:
-				buffer = ByteUtil.wrap(data);
 				if (columnInfo.getNumEntries()==1) {
 					short b = buffer.getShort();
 					item.put(columnInfo.getId(), b);
@@ -117,7 +95,6 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case INT:
-				buffer = ByteUtil.wrap(data);
 				if (columnInfo.getNumEntries()==1) {
 					int b = buffer.getInt();
 					item.put(columnInfo.getId(), b);
@@ -129,7 +106,6 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case LONG:
-				buffer = ByteUtil.wrap(data);
 				if (columnInfo.getNumEntries()==1) {
 					long b = buffer.getLong();
 					item.put(columnInfo.getId(), b);
@@ -141,7 +117,6 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case DOUBLE:
-				buffer = ByteUtil.wrap(data);
 				if (columnInfo.getNumEntries()==1) {
 					double b = buffer.getDouble();
 					item.put(columnInfo.getId(), b);
@@ -153,7 +128,6 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case FLOAT:
-				buffer = ByteUtil.wrap(data);
 				if (columnInfo.getNumEntries()==1) {
 					float b = buffer.getFloat();
 					item.put(columnInfo.getId(), b);
@@ -165,15 +139,12 @@ public class ZFitsStream extends AbstractStream {
 				}
 				break;
 			case STRING:
+				String s = new String(buffer.array());
+				item.put(columnInfo.getId(), s);
+				break;
 			default:
 				throw new ParseException("The type of a column is wrong, or could not be read.");
 			}
-		}
-		//check if the current tile is finished
-		this.currentRowInTile++;
-		if (this.currentRowInTile == this.currentTileHeader.getNumRows()) {
-			this.currentTileHeader = null;
-			this.currentTile++;
 		}
 		log.debug(item.toString());
 		return item;
@@ -202,43 +173,38 @@ public class ZFitsStream extends AbstractStream {
 		//this.dataStream = new DataInputStream(fileInputStream);
 		// read first block and check if the first line starts with 'SIMPLE'
 		// if not it is not a zfits file
-		List<String> block = ZFitsFile.readBlock(this.dataStream);
+		List<String> block = ZFitsUtil.readBlock(this.dataStream);
 		block.get(0).startsWith("SIMPLE");
 		log.debug("Read First Header");
 		//skip to the desired table
 		log.info("Looking for table '{}'", this.tableName);
 		while(true) {
-			block = ZFitsFile.readBlock(this.dataStream);
+			block = ZFitsUtil.readBlock(this.dataStream);
 			if (block==null)
 				throw new NullPointerException("No table found or the given tableName is missing. Searching for: '"+this.tableName+"'");
 			// read the header
 			FitsHeader header = new FitsHeader(block);
-			String extName = header.getKeyValue("EXTNAME");
 
-			BinTable table = null;
-			if (header.getKeyValue("ZTABLE", "F").equals("F")) {
-				table = new BinTable(header);
-			} else {
-				table = new ZFitsTable(header);
-			}
+			//read the table
+			this.fitsTable = new ZFitsTable(header);
 
-			if (!extName.trim().equals(this.tableName)) {
+			log.info("Found table {}", this.fitsTable.getTableName());
+			if (!this.fitsTable.getTableName().equals(this.tableName)) {
 				// it is not the desired table so skip it entirely
-				//log.info("Pos: 0x{}", Long.toHexString(fileInputStream.getChannel().position()));
-				log.info("Skiping: {} bytes.", table.getTableTotalSize());
-				long num = this.dataStream.skipBytes((int)table.getTableTotalSize());
-				log.info("Skipped: {} bytes.", num);
+				long num = this.dataStream.skipBytes((int)this.fitsTable.getTableTotalSize());
+				if (num!=(int)this.fitsTable.getTableTotalSize())
+					throw new RuntimeException("Couldn't skip the table, maybe file is corrupted.");
 				continue;
 			}
-			// read the Table
-			this.fitsTable = (ZFitsTable)table;
-			log.info("NumTiles: {}", this.fitsTable.getNumTiles());
-			log.info("EXTNAME: {}", extName);
+			log.info("EXTNAME: {}", this.fitsTable.getTableName());
 			// create headerItem
 			// add all key value pairs which are not the column information TODO finish extracting column information
 			for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : header.getKeyMap().entrySet()) {
 				String key   = entry.getKey();
 				String value = entry.getValue().getValue();
+				//ignore several information about the coloumns
+				if (key.startsWith("TFORM") || key.startsWith("ZFORM") || key.startsWith("TTYPE") || key.startsWith("ZCTYP"))
+					continue;
 				switch(entry.getValue().getType()) {
 				case BOOLEAN:
 					if (value.equals("T"))
@@ -250,7 +216,7 @@ public class ZFitsStream extends AbstractStream {
 					this.headerItem.put(key, Float.parseFloat(value));
 					break;
 				case INT:
-					this.headerItem.put(key, Long.parseLong(value));
+					this.headerItem.put(key, Integer.parseInt(value));
 					break;
 				case STRING:
 					this.headerItem.put(key, value);
@@ -260,15 +226,15 @@ public class ZFitsStream extends AbstractStream {
 				}
 			}
 			this.headerItem.put("@source", this.url.getProtocol() + ":" + this.url.getPath());
+			
+			//create the reader
+			this.tableReader = BinTableReader.createTableReader(this.fitsTable, this.dataStream);
 
-			// read the catalog
-			log.info("Catalog Size: {} bytes", this.fitsTable.getFixTableSize());
-			byte[] fixTable = new byte[(int)this.fitsTable.getFixTableSize()];
-			int numBytes = this.dataStream.read(fixTable);
-			if (numBytes!=this.fitsTable.getFixTableSize())
-				throw new ParseException("Could not read full heap");
-			this.catalog = new Catalog(fixTable, this.fitsTable.getNumTiles(), this.fitsTable.getNumCols());
-
+			if (this.fitsTable.getCommpressed()) {
+				this.byteOrder = ByteOrder.LITTLE_ENDIAN;
+			} else {
+				this.byteOrder = ByteOrder.BIG_ENDIAN;
+			}
 			break;
 		}
 	}
