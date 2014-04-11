@@ -129,7 +129,7 @@ public class SnakeDraw extends Component
 	
 	public void addFrame()
 	{
-		if(poly == null) return;
+		if(poly == null){frame =0; return;}
 		
 		frame = frame + 4;
 		if(frame >= poly.length)
@@ -141,7 +141,7 @@ public class SnakeDraw extends Component
 	
 	public void subFrame()
 	{
-		if(poly == null) return;
+		if(poly == null){frame =0; return;}
 		
 		frame = frame - 4;
 		if(frame < 0)
@@ -152,9 +152,7 @@ public class SnakeDraw extends Component
 	}
 	
 	public void updateShape()
-	{		
-		if(poly == null) return;
-		
+	{				
 		for(int f=0; f<poly.length; f++)
 		{
 			for(int i=0; i<poly[f].npoints; i++)
@@ -172,12 +170,14 @@ public class SnakeDraw extends Component
 			this.poly = null;
 			x = null;
 			y = null;
+			frame = 0;
 		}
 		else
 		{
 			this.poly = p.poly;		
 			x = p.x.clone();
-			y = p.y.clone();		
+			y = p.y.clone();	
+			frame = 0;
 		}
 	}
 }

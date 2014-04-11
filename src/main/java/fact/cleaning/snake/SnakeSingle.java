@@ -254,13 +254,13 @@ public class SnakeSingle implements StatefulProcessor
 			}		
 		
 			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpX);
-			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpY);
+			input.put(Constants.KEY_SNAKE_VIEWER_Y, tmpY);
 			input.put("snake_X", vecX.getColumn(0));
 			input.put("snake_Y", vecY.getColumn(0));
 			
 		}
 		else
-		{		
+		{				
 			for(int i=0; i<NIteration; i++)
 			{			
 				step(force);

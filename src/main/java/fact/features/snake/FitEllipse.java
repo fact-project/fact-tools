@@ -121,17 +121,11 @@ public class FitEllipse  implements Processor
 			D2.setEntry(i, 1, y[i]) ;
 			D2.setEntry(i, 2, 1) ;
 		}
-		//std::cout<<"D1: \n"<<D1<<std::endl<<std::endl;	
-		//std::cout<<"D2: \n"<<D2<<std::endl<<std::endl;
-
-
+		
 		RealMatrix S1 = D1.transpose().multiply(D1);
 		RealMatrix S2 = D1.transpose().multiply(D2);
 		RealMatrix S3 = D2.transpose().multiply(D2);
-
-		//std::cout<<"S1: \n"<<S1<<std::endl<<std::endl;
-		//std::cout<<"S2: \n"<<S2<<std::endl<<std::endl;
-		//std::cout<<"S3: \n"<<S3<<std::endl<<std::endl;
+		
 
 		RealMatrix tmp = new QRDecomposition(S3).getSolver().getInverse();
 		
@@ -150,11 +144,11 @@ public class FitEllipse  implements Processor
 		C1.setEntry(2, 1, 0);
 		C1.setEntry(2, 2, 0);
 
-		//std::cout<<"C1: \n"<<C1<<std::endl<<std::endl;
+		
 
 		M = C1.multiply(M);
 
-		//DecompositionSolver eigenSys = new QRDecomposition(M).getSolver();	
+			
 	
 		EigenDecomposition eigenSys = new EigenDecomposition(M);
 		
@@ -174,15 +168,11 @@ public class FitEllipse  implements Processor
 			
 		}
 		
-		//Eigen::MatrixXcd eigenVector = eigenSys.eigenvectors();
-		//Eigen::MatrixXcd eigenValue  = eigenSys.eigenvalues();
+		
 
 		RealMatrix a1 = new Array2DRowRealMatrix(3,1);
 
-		//RealVector[] eigenVec = new RealVector[3];
-		//eigenVec[0] = eigenSys.getEigenvector(0);
-		//eigenVec[1] = eigenSys.getEigenvector(1);
-		//eigenVec[2] = eigenSys.getEigenvector(2);
+		
 		
 		for(int i = 0; i< 3; i++)
 		{
