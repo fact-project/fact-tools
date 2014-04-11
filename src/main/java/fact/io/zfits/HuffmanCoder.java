@@ -7,6 +7,10 @@ import java.util.PriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class encupsulates the Huffmancoder and decoder.
+ * @author Michael Bulinski
+ */
 public class HuffmanCoder {
 	static Logger log = LoggerFactory.getLogger(HuffmanCoder.class);
 
@@ -166,7 +170,10 @@ public class HuffmanCoder {
 			createCodeTable(this.huffmanTree);
 		}
 		
-		// prints the codeTable as 
+		/**
+		 * Returns the codeTable as a string
+		 * @return
+		 */
 		public String codeTableAsString() {
 			String s = "Entries: "+this.numCodeTableEntries+"\n";
 			for (int i=0; i<this.symbol2Code.length; i++) {
@@ -178,9 +185,19 @@ public class HuffmanCoder {
 			return s;
 		}
 
+		/**
+		 * Creates the codeTable and returns it as and byte array.
+		 * Format:
+		 *    write NumOfCodeTableEntries (long 8 bytes)
+		 *    for i in range(NumOfCodeTableEntries):
+		 *       write entry[i].symbol (short 2 bytes)
+		 *       write entry[i].numBits (byte 1 bytes)
+		 *       write entry[i].code (byte[] (numbits/8 bytes)
+		 * @return The codeTable as an byte array.
+		 */
 		public byte[] createCodeTable() {
 			byte[] data = new byte[this.codeTableSize];
-			ByteBuffer output = ByteUtil.wrap(data);
+			ByteBuffer output = ZFitsUtil.wrap(data);
 			output.putLong(this.numCodeTableEntries);
 
 			for (int i=0; i<(1<<16); i++) {
@@ -208,13 +225,13 @@ public class HuffmanCoder {
 		}
 		
 		/**
-		 * Encodes the input with the CodeTable
+		 * Encodes the input with the CodeTable.
 		 * 
 		 * @param input The data to compress
-		 * @return The encoded array
+		 * @return The encoded array as a byte array (without codeTable only data)
 		 */
 		public byte[] encode(short[] input) {
-			ByteBuffer outputBuffer = ByteUtil.create(input.length);
+			ByteBuffer outputBuffer = ZFitsUtil.create(input.length);
 			int inputSizeShort = input.length;
 			long buffer = 0;
 			int curBit = 0;
@@ -242,6 +259,10 @@ public class HuffmanCoder {
 		}
 	}
 
+	/**
+	 * Class for Decoding an Huffman encoding given by {@link HuffmanCoder.Encoder}.
+	 * @author Michael Bulinski
+	 */
 	public static class Decoder {
 		private class SymbolEntry {
 			public short symbol;
@@ -309,9 +330,16 @@ public class HuffmanCoder {
 
 		private SymbolTree tree = new SymbolTree();
 
+		/**
+		 * Reads the code-table from the buffer and creates the decoding-array.
+		 * The format is described in {@link HuffmanCoder.Encoder#createCodeTable()}.
+		 * @param buffer The buffer to decode. Starts with the codeTable.
+		 * @throws DecodingException Thrown if the buffer can't be decoded.
+		 */
 		Decoder(ByteBuffer buffer) throws DecodingException {
 			// first 4 bytes are the number of entries
 			long numEntries = (int)buffer.getLong();
+			//System.out.println("entries: "+Long.toHexString(numEntries));
 			//log.info("Decoding HuffmanTree, {} entries", numEntries);
 			// read all entries and create the decoding tree 
 			for (long i = 0; i < numEntries; i++) {
@@ -335,16 +363,22 @@ public class HuffmanCoder {
 				byte[] tmp = new byte[4];
 				buffer.get(tmp, 0, numBytes);
 				// convert byte array to an int
-				int bits = ByteUtil.wrap(tmp).getInt();
+				int bits = ZFitsUtil.wrap(tmp).getInt();
 				//log.info("Sym: '{}', '{}', '{}', '{}'", symbol, numBits, numBytes, String.format("%"+numBits+"s", Integer.toBinaryString(bits)).replace(' ', '0'));
 				tree.insertSymbol(symbol, numBits, bits);
 			}
 		}
 
+		/**
+		 * Decodes the buffer and returns the decoded byte-array of size sizeDecoded.
+		 * @param buffer The buffer pointing to the encoded data.
+		 * @param sizeDecoded The size of the decoded array.
+		 * @return The decoded byte array.
+		 */
 		public byte[] decode(ByteBuffer buffer, long sizeDecoded) {
 			//log.info("decoding to {} bytes ", sizeDecoded);
 			//ByteBuffer buffer = ByteBuffer.wrap(inputData);
-			ByteBuffer outputBuffer = ByteUtil.create(sizeDecoded);
+			ByteBuffer outputBuffer = ZFitsUtil.create(sizeDecoded);
 			int curBit = 0;
 			int bufferPosition = buffer.position();
 			SymbolTree curTree = this.tree;
@@ -385,24 +419,39 @@ public class HuffmanCoder {
 		}
 	}
 	
+	/**
+	 * Reads a encoded data and decompresses it.
+	 * Format is described in {@link HuffmanCoder#compressData(short[])}.
+	 * @param input The compressed data to decompress.
+	 * @return The decompressed data.
+	 * @throws DecodingException
+	 */
 	public static byte[] uncompressData(byte[] input) throws DecodingException {
-		ByteBuffer buffer = ByteUtil.wrap(input);
-		// first four bytes is the size of the decompressed data
-		//load data fast
-		buffer.getInt();
+		ByteBuffer buffer = ZFitsUtil.wrap(input);
+		// first 8 bytes is the size of the decompressed data
 		long dataSize = buffer.getLong()*2; //size is stored in num of shorts
-		//log.info("Decompressed data size is {} bytes.", dataSize);
+		//log.info("Decompressed data size is 0x{} bytes.", Long.toHexString(dataSize/2));
 		Decoder decoder = new Decoder(buffer);
 		return decoder.decode(buffer, dataSize);
 	}
 
+	/**
+	 * Compress the data
+	 * Format:
+	 *    write sizeOfInput in number of shorts (long 8 bytes)
+	 *    write codeTable
+	 *    write encodedData
+	 * @param input
+	 * @return The compressed Data with codeTable and everything.
+	 * @throws EncodingException
+	 */
 	public static byte[] compressData(short[] input) throws EncodingException {
 		Encoder encoder = new Encoder(input);
 		byte[] codeTable = encoder.createCodeTable();
 		byte[] encodedData = encoder.encode(input);
 
-		ByteBuffer tmp = ByteUtil.wrap(new byte[codeTable.length+encodedData.length+8+4]);
-		tmp.putInt(encodedData.length);
+		ByteBuffer tmp = ZFitsUtil.wrap(new byte[codeTable.length+encodedData.length+8+4]);
+		//tmp.putInt(encodedData.length);
 		tmp.putLong(input.length);
 		tmp.put(codeTable);
 		tmp.put(encodedData);
