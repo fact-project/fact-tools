@@ -13,6 +13,7 @@ import org.apache.commons.math3.linear.DecompositionSolver;
 import fact.Constants;
 import fact.EventUtils;
 import fact.image.overlays.EllipseOverlay;
+import fact.viewer.ui.SnakeDraw;
 import stream.Data;
 import stream.Processor;
 
@@ -215,7 +216,23 @@ public class fitEllipse  implements Processor
 		input.put(outkeyMinor, minor);
 		
 		// Ellipse ist denke ich kaputt
-		// input.put(Constants.ELLIPSE_OVERLAY, new EllipseOverlay(centerX, centerY, major, minor, 1, angle));
+		SnakeDraw sn = new SnakeDraw();
+		double[][] ellipseX = new double[1][360];
+		double[][] ellipseY = new double[1][360];
+		
+		for(int i=0; i<360;i++)
+		{			
+			double tmpAng = (i / 180.0) * 3.1415926;
+
+			ellipseX[0][i]= major*Math.cos(tmpAng)*Math.cos(angle) - minor*Math.sin(tmpAng)*Math.sin(angle);
+			ellipseY[0][i]= minor*Math.cos(angle)*Math.sin(tmpAng) + major*Math.cos(tmpAng)*Math.sin(angle);				
+
+			ellipseX[0][i] = ellipseX[0][i] + centerX;
+			ellipseY[0][i] = ellipseY[0][i] + centerY; 			
+		}
+		sn.setShape(ellipseX, ellipseY);
+		
+		input.put(Constants.SNAKE_ELLIPSE_OVERLAY, sn);
 		
 		
 		return input;

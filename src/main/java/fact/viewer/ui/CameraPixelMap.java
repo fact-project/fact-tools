@@ -40,6 +40,7 @@ import cern.colt.Arrays;
 import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
+import fact.Constants;
 import fact.FactViewer;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
@@ -90,9 +91,10 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	private CellHighlighter cellHighlighter;
 	private HexTile nCell;
 	
-	private snakeDraw SnakePoly;
+	private SnakeDraw SnakePoly;
 	private double[][][] snakeX;
 	private double[][][] snakeY;
+	private SnakeDraw SnakeEllipse = null;
 
 	public CameraPixelMap(Double radius) {
 		super(45, 41, radius);
@@ -111,9 +113,11 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		this.addOverlay(cellHighlighter);
 		// this.setLayout(Border)
 		
-		SnakePoly = new snakeDraw();
+		SnakePoly = new SnakeDraw();
 		SnakePoly.setRadius(radius, 0);
-		
+		SnakeEllipse = new SnakeDraw();
+		SnakeEllipse.setRadius(radius, 0);
+
 		float x = 0;		
 		float y = 0;
 		for(int i=0; i<6; i++)
@@ -125,6 +129,12 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		y = y / 6.0f;	
 	
 		SnakePoly.setOffset(x + 1, y + 1);
+		SnakeEllipse.setOffset(x + 1, y + 1);
+		
+		SnakePoly.setCol(255, 0, 0);
+		SnakePoly.setThickness(3.0f);
+		SnakeEllipse.setCol(50,150,100);
+		SnakeEllipse.setThickness(1.5f);
 	}
 
 	public void addSelectionListener(SelectionListener l) {
@@ -610,9 +620,12 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 				o.paint(this.getGraphics(), tiles);
 			}
 			
-			snakeX = (double[][][]) event.get("snake_X_Prog");
-			snakeY = (double[][][]) event.get("snake_Y_Prog");			
+			snakeX = (double[][][]) event.get(Constants.KEY_SNAKE_VIEWER_X);
+			snakeY = (double[][][]) event.get(Constants.KEY_SNAKE_VIEWER_Y);			
 			SnakePoly.update();
+			
+			SnakeEllipse.copyPoly((SnakeDraw) event.get(Constants.SNAKE_ELLIPSE_OVERLAY));
+			SnakeEllipse.updateShape();
 			
 			this.repaint();
 		}
@@ -629,9 +642,11 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	public void paint(Graphics g) 
 	{		
 		super.paint(g);
-		if(snakeX != null)
+		if(snakeX != null && snakeY != null)
 			SnakePoly.setShape(snakeX[currentSlice], snakeY[currentSlice]);
+		
 		SnakePoly.paint(g);
+		SnakeEllipse.paint(g);
 	}	
 	
 }

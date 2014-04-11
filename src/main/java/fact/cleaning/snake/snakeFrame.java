@@ -248,11 +248,11 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 			}									
 			
 			tmpSaveX[frame] = xBuf;
-			tmpSaveX[frame] = yBuf;			
+			tmpSaveY[frame] = yBuf;			
 		}
 		
-		input.put("snake_X_Prog", tmpSaveX);
-		input.put("snake_Y_Prog", tmpSaveX);
+		input.put(Constants.KEY_SNAKE_VIEWER_X, tmpSaveX);
+		input.put(Constants.KEY_SNAKE_VIEWER_Y, tmpSaveY);
 		
 		input.put(SnakeOutX, vecX.getColumn(0));
 		input.put(SnakeOutY, vecY.getColumn(0));

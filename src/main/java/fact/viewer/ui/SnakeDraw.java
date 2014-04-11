@@ -1,12 +1,16 @@
 package fact.viewer.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Stroke;
+import java.util.Arrays;
 
 
-public class snakeDraw extends Component
+public class SnakeDraw extends Component
 {	
 	private static final long serialVersionUID = 123456789L;
 
@@ -19,10 +23,31 @@ public class snakeDraw extends Component
 	
 	private int frame = 0;
 	
+	private double[][] x = null;
+	private double[][] y = null;
+	
+	double radius = 0;
+	
+	private Color col;
+	
+	float thickness = 0.5f;
+	
+	public void setThickness(float f)
+	{
+		thickness = f;
+	}
+	
+	public void setCol(int r, int g, int b)
+	{
+		col = new Color(r, g, b);
+	}
 	
 	// [frame][points] in mm
 	public void setShape(double [][] x, double[][] y)
 	{		
+		this.x = x;
+		this.y = y;
+		
 		if(x == null || y == null || x.length != y.length) 
 		{			
 			poly = new Polygon[0];
@@ -59,12 +84,17 @@ public class snakeDraw extends Component
 		
 		//System.out.println("PaintSnake");
 		
-		Color tmp = g.getColor();
+		Color tmpC = g.getColor();		
+		Stroke tmpS = ((Graphics2D) g).getStroke();
 		
-		g.setColor(Color.RED);
-		g.drawPolygon(poly[frame]);	  
 		
-		g.setColor(tmp);
+		g.setColor(col);	
+		((Graphics2D) g).setStroke(new BasicStroke(thickness));
+		g.drawPolygon(poly[frame]);	  	
+		
+		
+		g.setColor(tmpC);
+		((Graphics2D) g).setStroke(tmpS);
 	}
 	
 	
@@ -76,6 +106,8 @@ public class snakeDraw extends Component
 	public void setRadius(double radius, double offset)
 	{
 		System.out.println(radius);
+		
+		this.radius = radius;
 		
 		double aphoterm2 = 2* radius * Math.cos(Math.toRadians(180/6));
 		
@@ -113,5 +145,27 @@ public class snakeDraw extends Component
 			frame = poly.length - 1;
 		}
 		System.out.println(frame);
+	}
+	
+	public void updateShape()
+	{		
+		if(poly == null) return;
+		
+		for(int f=0; f<poly.length; f++)
+		{
+			for(int i=0; i<poly[f].npoints; i++)
+			{
+				poly[f].xpoints[i] = (int) (x[f][i] * scaleX + offsetX);				
+				poly[f].ypoints[i] = (int) (y[f][i] * scaleY + offsetY);
+			}
+		}
+	}
+	
+	public void copyPoly(SnakeDraw p)
+	{
+		this.poly = p.poly;
+		
+		x = p.x.clone();
+		y = p.y.clone();		
 	}
 }
