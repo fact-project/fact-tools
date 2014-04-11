@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import stream.util.parser.ParseException;
 
+/**
+ * A class containing the information about the fitsheader.
+ * 
+ * @author Michael Bulinski
+ */
 public class FitsHeader {
 	static Logger log = LoggerFactory.getLogger(FitsHeader.class);
 
@@ -27,6 +32,10 @@ public class FitsHeader {
 			return this.typeClass;
 		}
 	}
+	/**
+	 * Entry of a card in the fits header
+	 * @author Michael Bulinski
+	 */
 	public static class FitsHeaderEntry {
 		private ValueType type;
 		private String value;
@@ -48,20 +57,35 @@ public class FitsHeader {
 	
 	private Map<String, FitsHeaderEntry> keyMap = null;
 
+	/**
+	 * Returns the header entries. The keys of the map are the keys of the header and the values are the corresponding values of the entry.
+	 * @return The header entries of the fits header. 
+	 */
 	public Map<String, FitsHeaderEntry> getKeyMap() {
 		return this.keyMap;
 	}
+
+	/**
+	 * Parse the blocks of a fits header.
+	 * @param block The block given as strings with 80 characters width.
+	 * @throws ParseExceptionThrown if the given block is not a fits header or has errors.
+	 */
 	public FitsHeader(List<String> block) throws ParseException {
-		log.info("Block size: "+block.size());
+		//log.info("Block size: "+block.size());
 		keyMap = new HashMap<String, FitsHeaderEntry>();
 		for (String line : block) {
 			ValueType type = ValueType.NONE;
 			line = line.trim();
 			if (line.startsWith("COMMENT")) { //ignore comment only lines
 				continue;
+			} else if (line.startsWith("HISTORY")) { //ignore history lines
+				continue;
 			}
 			//get the key and everything else
 			String[] tmp = line.split("=", 2);
+			if (tmp.length != 2) {
+				throw new ParseException("The card does not contain a key value pair: '"+line+"'");
+			}
 			String key = tmp[0].trim(); //key
 			line = tmp[1].trim(); //everything else
 			//split the value and the comment from everything else
@@ -81,7 +105,7 @@ public class FitsHeader {
 				} else if (value.matches("\\d+")) {
 					type = ValueType.INT;
 				} else {
-					throw new ParseException("Unknown value while parsing tableheads: "+value);
+					throw new ParseException("Unknown value while parsing tableheads: '"+value+"'");
 				}
 			}
 			
@@ -89,10 +113,21 @@ public class FitsHeader {
 		}
 	}
 	
+	/**
+	 * Checks if the key is present in the header
+	 * @param key The key to check.
+	 * @return True if the key is present.
+	 */
 	public boolean check(String key) {
 		return this.keyMap.containsKey(key);
 	}
 
+	/**
+	 * Checks if the key is present in the header and is of the expected type.
+	 * @param key The key to check.
+	 * @param expectedType The expected type.
+	 * @return True if the key is present and of the expected type.
+	 */
 	public boolean check(String key, ValueType expectedType) {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry == null)
@@ -102,9 +137,14 @@ public class FitsHeader {
 		return true;
 	}
 
-	public boolean check(String key, ValueType expectedType, String expectedValue) throws ParseException {
-		//if (!expectedType.getTypeClass().isInstance(expectedValue))
-		//	throw new ParseException("The expectedValue is not of type: "+expectedType.toString());
+	/**
+	 * Checks if the key is present in the header and is of the expected type and has the expected value.
+	 * @param key The key to check.
+	 * @param expectedType The expected type.
+	 * @param expectedValue The expected value given in the string representation.
+	 * @return True if the key is present and of the expected type and value.
+	 */
+	public boolean check(String key, ValueType expectedType, String expectedValue) {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry == null)
 			return false;
@@ -115,12 +155,23 @@ public class FitsHeader {
 		return true;
 	}
 	
+	/**
+	 * Works just like {@link FitsHeader.check(key)} but throws a Exception instead of returning an boolean.
+	 * @param key The key to check.
+	 * @throws ParseException Thrown if the key is missing.
+	 */
 	public void checkThrow(String key) throws ParseException {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry == null)
 			throw new ParseException("Missing header entry: '"+key+"'");
 	}
 
+	/**
+	 * Works just like {@link FitsHeader.check(key, expectedType)} but throws a Exception instead of returning an boolean.
+	 * @param key The key to check.
+	 * @param expectedType The expected type of the value.
+	 * @throws ParseException Thrown if the key is missing or not of the expected type.
+	 */
 	public void checkThrow(String key, ValueType expectedType) throws ParseException {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry == null)
@@ -129,6 +180,13 @@ public class FitsHeader {
 			throw new ParseException("Header entry: '"+key+"' got the wrong type: "+entry.getType().toString());
 	}
 
+	/**
+	 * Works just like {@link FitsHeader.check(key, expectedType, expectedValue)} but throws a Exception instead of returning an boolean.
+	 * @param key The key to check.
+	 * @param expectedType The expected type of the value.
+	 * @param expectedValue The expected value given in string representation.
+	 * @throws ParseException Thrown if the key is missing or not of the expected type or value.
+	 */
 	public void checkThrow(String key, ValueType expectedType, String expectedValue) throws ParseException {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry == null)
@@ -139,6 +197,12 @@ public class FitsHeader {
 			throw new ParseException("Header entry: '"+key+"' got the wrong value: "+entry.getValue()+", expected: "+expectedValue);
 	}
 	
+	/**
+	 * Returns the value of a given key.
+	 * @param key The key to get the value from.
+	 * @return The value of the key.
+	 * @throws NullPointerException Thrown if the key is not in the header.
+	 */
 	public String getKeyValue(String key) {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry==null)
@@ -146,6 +210,12 @@ public class FitsHeader {
 		return entry.getValue();
 	}
 	
+	/**
+	 * Returns the value of a given key. If the key is missing returns to value of missingKeyValue.
+	 * @param key The key to get the value from.
+	 * @param missingKeyValue The value to give if the key is missing.
+	 * @return The value of the key or the missingKeyValue. See description.
+	 */
 	public String getKeyValue(String key, String missingKeyValue) {
 		FitsHeaderEntry entry = this.keyMap.get(key);
 		if (entry==null)
@@ -164,6 +234,10 @@ public class FitsHeader {
 		return entry.getValue(type);
 	}*/
 	
+	/**
+	 * Returns a String representation of the header. 
+	 * @return The header as a string.
+	 */
 	public String toString() {
 		String s = "Entries: "+this.keyMap.size()+"\n";
 		for(String key : this.keyMap.keySet()){
