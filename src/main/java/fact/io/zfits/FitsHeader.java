@@ -17,6 +17,9 @@ import stream.util.parser.ParseException;
 public class FitsHeader {
 	static Logger log = LoggerFactory.getLogger(FitsHeader.class);
 
+	/**
+	 * The posible Valuetypes of the values in the fits header.
+	 */
 	public static enum ValueType {
 		NONE(null),
 		STRING(String.class),
