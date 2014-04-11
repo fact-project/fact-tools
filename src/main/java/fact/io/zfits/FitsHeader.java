@@ -166,7 +166,7 @@ public class FitsHeader {
 	}
 	
 	/**
-	 * Works just like {@link FitsHeader.check(key)} but throws a Exception instead of returning an boolean.
+	 * Works just like {@link FitsHeader#check(String)} but throws a Exception instead of returning an boolean.
 	 * @param key The key to check.
 	 * @throws ParseException Thrown if the key is missing.
 	 */
@@ -177,7 +177,7 @@ public class FitsHeader {
 	}
 
 	/**
-	 * Works just like {@link FitsHeader.check(key, expectedType)} but throws a Exception instead of returning an boolean.
+	 * Works just like {@link FitsHeader#check(String, ValueType)} but throws a Exception instead of returning an boolean.
 	 * @param key The key to check.
 	 * @param expectedType The expected type of the value.
 	 * @throws ParseException Thrown if the key is missing or not of the expected type.
@@ -191,7 +191,7 @@ public class FitsHeader {
 	}
 
 	/**
-	 * Works just like {@link FitsHeader.check(key, expectedType, expectedValue)} but throws a Exception instead of returning an boolean.
+	 * Works just like {@link FitsHeader#check(String, ValueType, String)} but throws a Exception instead of returning an boolean.
 	 * @param key The key to check.
 	 * @param expectedType The expected type of the value.
 	 * @param expectedValue The expected value given in string representation.
