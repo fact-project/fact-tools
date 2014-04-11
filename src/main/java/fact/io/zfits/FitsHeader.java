@@ -78,12 +78,16 @@ public class FitsHeader {
 		keyMap = new HashMap<String, FitsHeaderEntry>();
 		for (String line : block) {
 			ValueType type = ValueType.NONE;
-			line = line.trim();
+			
 			if (line.startsWith("COMMENT")) { //ignore comment only lines
 				continue;
 			} else if (line.startsWith("HISTORY")) { //ignore history lines
 				continue;
+			} else if (line.startsWith("        ")) { //ignore comment only lines
+				continue;
 			}
+			
+			line = line.trim();
 			//get the key and everything else
 			String[] tmp = line.split("=", 2);
 			if (tmp.length != 2) {
@@ -91,13 +95,16 @@ public class FitsHeader {
 			}
 			String key = tmp[0].trim(); //key
 			line = tmp[1].trim(); //everything else
+			
 			//split the value and the comment from everything else
 			tmp = line.split("/", 2);
+			if (tmp.length==2) {
+				//String comment = tmp[1].trim(); //comment
+			}
 			String value = tmp[0].trim();
-			//String comment = tmp[1].trim(); //comment
 			
-			//check if we found an String
-			if (value.startsWith("'")) {
+			//check the type of the value
+			if (value.startsWith("'")) { //we found a String
 				value = value.replaceAll("'", "");
 				type = ValueType.STRING;
 			} else {
@@ -225,17 +232,6 @@ public class FitsHeader {
 			return missingKeyValue;
 		return entry.getValue();
 	}
-
-	/*public <N> N getKeyValue(String key, Class<N> type) {
-		return this.keyMap.get(key).getValue(type);
-	}
-	
-	public <N> N getKeyValue(String key, Class<N> type, N missingKeyValue) {
-		FitsHeaderEntry entry = this.keyMap.get(key);
-		if (entry==null)
-			return missingKeyValue;
-		return entry.getValue(type);
-	}*/
 	
 	/**
 	 * Returns a String representation of the header. 
