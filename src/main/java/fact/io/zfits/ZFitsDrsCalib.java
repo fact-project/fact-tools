@@ -6,7 +6,6 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.io.FitsStream;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -32,20 +31,22 @@ public class ZFitsDrsCalib implements Processor {
 		if (!input.containsKey("NROI"))
 			log.warn("No ROI in the input data");
 		else
-			numSlices = (Integer)input.get("NROI");
+			numSlices = ((Integer)input.get("NROI")).intValue();
 		
 		int numChannel= 1440;
 		if (!input.containsKey("NPIX"))
 			log.warn("No NPIX in the input data");
 		else
-			numChannel = (Integer)input.get("NPIX");
+			numChannel = ((Integer)input.get("NPIX")).intValue();
 		
+		//System.out.println("0: "+data[0]);
 		try {
 			applyDrsOffsetCalib(numSlices, numChannel, data, startCellData, this.calibData);
 		} catch (IllegalArgumentException e) {
 			log.error("Couldn't Calibrate Reason: "+e.getMessage());
 			return null;
 		}
+		//System.out.println("0: "+data[0]);
 		/*double[] floatData = new double[data.length];
 		for (int i=0; i<floatData.length; i++) {
 			floatData[i] = (float)data[i];
@@ -89,17 +90,17 @@ public class ZFitsDrsCalib implements Processor {
 	}
 
 	public void initDrsCellOffset(SourceURL url) throws Exception {
-		/*ZFitsStream drsStream = new ZFitsStream(url);
-		drsStream.setTableName("ZDrsCellOffsets");
-		drsStream.init();
-		Data item = drsStream.read();*/
 		log.info("Load DrsOffset");
-		FitsStream drsStream = new FitsStream(url);
+		ZFitsStream drsStream = new ZFitsStream(url);
+		drsStream.setTableName("ZDrsCellOffsets");
 		drsStream.init();
 		Data item = drsStream.read();
 		if (!item.containsKey("OffsetCalibration"))
 			throw new NullPointerException("Missing OffsetCalibration");
 		this.calibData = (short[])item.get("OffsetCalibration");
+		//System.out.println("0: "+this.calibData[0]);
+		//System.out.println("1: "+this.calibData[1]);
+		//System.out.println("2: "+this.calibData[2]);
 		if (this.calibData==null)
 			throw new NullPointerException("Should not happen");
 		log.info("Loaded");
@@ -107,6 +108,7 @@ public class ZFitsDrsCalib implements Processor {
 
 	@Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
 	public void setUrl(URL url) {
+		log.info("Init DrsCellOffset Calibration");
 		try {
 			initDrsCellOffset(new SourceURL(url));
 		} catch (Exception e) {
