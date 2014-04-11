@@ -50,15 +50,24 @@ public class BlockHeader {
 	}
 	private long size;
 	private BlockHeader.Ordering ordering;
+	private int numRows = 1;
+	private FitsTableColumn columnInfo;
 	private int numProzessors; //should be unsigned char but we don't have it so let it be int
 	private BlockHeader.Prozessor[] prozessors;
 	
 	public byte[] data;
 	
+	public BlockHeader (byte[] input, int numRows, FitsTableColumn columnInfo) throws ParseException {
+		this(input);
+		this.numRows = numRows;
+		this.columnInfo = columnInfo;
+	}
+
+	@Deprecated
 	public BlockHeader (byte[] input) throws ParseException {
 		if (input.length < (8+1+1))
 			throw new ParseException("Block Header is to small, given: "+input.length);
-		ByteBuffer buffer = ByteUtil.wrap(input);
+		ByteBuffer buffer = ZFitsUtil.wrap(input);
 
 		this.size = buffer.getLong();
 		this.ordering = Ordering.getOrderingFormCharacter((char)buffer.get());
@@ -69,7 +78,7 @@ public class BlockHeader {
 			this.prozessors[i] = Prozessor.getProzesserFromId(buffer.getShort());
 		}
 		//read the data into buffer and make it the buffer
-		ByteBuffer dataBuffer = ByteUtil.create(buffer.remaining());
+		ByteBuffer dataBuffer = ZFitsUtil.create(buffer.remaining());
 		buffer.get(dataBuffer.array());
 		this.data = dataBuffer.array();
 	}
@@ -86,7 +95,7 @@ public class BlockHeader {
 	}
 
 	public void unSmoothing() {
-		ByteBuffer buffer = ByteUtil.wrap(data);
+		ByteBuffer buffer = ZFitsUtil.wrap(this.data);
 		ShortBuffer shortBuffer = buffer.asShortBuffer();
 		for (int i=2; i<shortBuffer.capacity(); i++) {
 			shortBuffer.put(i, (short)(shortBuffer.get(i) + (short)(shortBuffer.get(i-1)+shortBuffer.get(i-2))/2));
@@ -94,7 +103,46 @@ public class BlockHeader {
 	}
 
 	public void unHuffman() throws DecodingException {
-		this.data = HuffmanCoder.uncompressData(this.data);
+		//read the compressed Sizes
+		int compressedSizes[] = new int[this.numRows];
+		ByteBuffer buffer = ZFitsUtil.wrap(this.data);
+		for (int i=0; i<this.numRows; i++) {
+			compressedSizes[i] = buffer.getInt();
+			//System.out.println(i+": "+Integer.toHexString(compressedSizes[i]));
+		}
+		byte[] result = new byte[0];
+		for (int i=0; i<this.numRows; i++) {
+			byte[] compressedData = new byte[compressedSizes[i]];
+			buffer.get(compressedData);
+			byte[] decoded = HuffmanCoder.uncompressData(compressedData);
+			byte[] tmp = new byte[result.length+decoded.length];
+			System.arraycopy(result,  0, tmp, 0,             result.length);
+			System.arraycopy(decoded, 0, tmp, result.length, decoded.length);
+			result = tmp;
+		}
+		this.data = result;
+	}
+
+	public byte[] getDataRow(int numRow) {
+		if (numRow>numRows)
+			throw new IndexOutOfBoundsException();
+		byte[] ret = new byte[this.columnInfo.getColumnSize()];
+		ByteBuffer buffer = ZFitsUtil.wrap(this.data);
+
+		switch (this.ordering) {
+		case COLUMN:
+			for(int i=0; i<this.columnInfo.getNumEntries();i++) {
+				buffer.position(numRow*this.columnInfo.getEntrySize()+i*this.columnInfo.getColumnSize());
+				buffer.get(ret, i*this.columnInfo.getEntrySize(), this.columnInfo.getEntrySize());
+			}
+			break;
+		case ROW:
+			buffer.position(numRow*this.columnInfo.getColumnSize());
+			buffer.get(ret);
+			break;
+		}
+		
+		return ret;
 	}
 
 	public byte[] decode() throws DecodingException {
