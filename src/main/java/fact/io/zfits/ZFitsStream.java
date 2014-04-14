@@ -168,74 +168,48 @@ public class ZFitsStream extends AbstractStream {
 			throw new FileNotFoundException("Cannot read file");
 		}
 		this.dataStream = new DataInputStream(new BufferedInputStream(getInputStream(), bufferSize ));
+
+		this.fitsTable = ZFitsUtil.skipToTable(this.dataStream, this.tableName);
 		
-		//FileInputStream fileInputStream = new FileInputStream(f);
-		//this.dataStream = new DataInputStream(fileInputStream);
-		// read first block and check if the first line starts with 'SIMPLE'
-		// if not it is not a zfits file
-		List<String> block = ZFitsUtil.readBlock(this.dataStream);
-		block.get(0).startsWith("SIMPLE");
-		log.debug("Read First Header");
-		//skip to the desired table
-		log.info("Looking for table '{}'", this.tableName);
-		while(true) {
-			block = ZFitsUtil.readBlock(this.dataStream);
-			if (block==null)
-				throw new NullPointerException("No table found or the given tableName is missing. Searching for: '"+this.tableName+"'");
-			// read the header
-			FitsHeader header = new FitsHeader(block);
-
-			//read the table
-			this.fitsTable = new ZFitsTable(header);
-
-			log.info("Found table {}", this.fitsTable.getTableName());
-			if (!this.fitsTable.getTableName().equals(this.tableName)) {
-				// it is not the desired table so skip it entirely
-				long num = this.dataStream.skipBytes((int)this.fitsTable.getTableTotalSize());
-				if (num!=(int)this.fitsTable.getTableTotalSize())
-					throw new RuntimeException("Couldn't skip the table, maybe file is corrupted.");
+		// create headerItem
+		// add all key value pairs which are not the column information TODO finish extracting column information
+		for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : this.fitsTable.getFitsHeader().getKeyMap().entrySet()) {
+			String key   = entry.getKey();
+			String value = entry.getValue().getValue();
+			//ignore several information about the coloumns
+			if (key.startsWith("TFORM") || key.startsWith("ZFORM") || key.startsWith("TTYPE") || key.startsWith("ZCTYP")
+					|| key.startsWith("PCOUNT"))
 				continue;
+			switch(entry.getValue().getType()) {
+			case BOOLEAN:
+				if (value.equals("T"))
+					this.headerItem.put(key, Boolean.TRUE);
+				else
+					this.headerItem.put(key, Boolean.FALSE);						
+				break;
+			case FLOAT:
+				this.headerItem.put(key, Float.parseFloat(value));
+				break;
+			case INT:
+				this.headerItem.put(key, Integer.parseInt(value));
+				break;
+			case STRING:
+				this.headerItem.put(key, value);
+				break;
+			default:
+				break;
 			}
-			log.info("EXTNAME: {}", this.fitsTable.getTableName());
-			// create headerItem
-			// add all key value pairs which are not the column information TODO finish extracting column information
-			for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : header.getKeyMap().entrySet()) {
-				String key   = entry.getKey();
-				String value = entry.getValue().getValue();
-				//ignore several information about the coloumns
-				if (key.startsWith("TFORM") || key.startsWith("ZFORM") || key.startsWith("TTYPE") || key.startsWith("ZCTYP"))
-					continue;
-				switch(entry.getValue().getType()) {
-				case BOOLEAN:
-					if (value.equals("T"))
-						this.headerItem.put(key, Boolean.TRUE);
-					else
-						this.headerItem.put(key, Boolean.FALSE);						
-					break;
-				case FLOAT:
-					this.headerItem.put(key, Float.parseFloat(value));
-					break;
-				case INT:
-					this.headerItem.put(key, Integer.parseInt(value));
-					break;
-				case STRING:
-					this.headerItem.put(key, value);
-					break;
-				default:
-					break;
-				}
-			}
-			this.headerItem.put("@source", this.url.getProtocol() + ":" + this.url.getPath());
+		}
+		//insert filename
+		this.headerItem.put("@source", this.url.getProtocol() + ":" + this.url.getPath());
 			
-			//create the reader
-			this.tableReader = BinTableReader.createTableReader(this.fitsTable, this.dataStream);
+		//create the reader
+		this.tableReader = BinTableReader.createTableReader(this.fitsTable, this.dataStream);
 
-			if (this.fitsTable.getCommpressed()) {
-				this.byteOrder = ByteOrder.LITTLE_ENDIAN;
-			} else {
-				this.byteOrder = ByteOrder.BIG_ENDIAN;
-			}
-			break;
+		if (this.fitsTable.getCommpressed()) {
+			this.byteOrder = ByteOrder.LITTLE_ENDIAN;
+		} else {
+			this.byteOrder = ByteOrder.BIG_ENDIAN;
 		}
 	}
 	
