@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import stream.util.parser.ParseException;
+
 /**
  * A class containing several different util function for ZFitsFile reading. 
  * @author Michael Bulinski
@@ -91,6 +93,42 @@ public class ZFitsUtil {
 			}
 		}
 		return block;
+	}
+	
+	/**
+	 * Reads the headers until the BINTABLE header with the name tableName is found.
+	 *  
+	 * @param input The InputStream pointing to the first header.
+	 * @param tableName The tablename to look for
+	 * @return The parsed ZFitsTable from the found header.
+	 * 
+	 * @throws ParseException
+	 * @throws IOException
+	 */
+	public static ZFitsTable skipToTable(DataInputStream input, String tableName) throws ParseException, IOException {
+		ZFitsTable fitsTable = null;
+		while(true) {
+			List<String> block = ZFitsUtil.readBlock(input);
+			if (block==null)
+				throw new NullPointerException("No table found or the given tableName is missing. Searching for: '"+tableName+"'");
+			if (!block.get(0).startsWith("XTENSION")) {
+				continue;
+			}
+			// read the header
+			FitsHeader header = new FitsHeader(block);
+
+			//read the table
+			fitsTable = new ZFitsTable(header);
+
+			if (!fitsTable.getTableName().equals(tableName)) {
+				// it is not the desired table so skip it entirely
+				long num = input.skipBytes((int)fitsTable.getTableTotalSize());
+				if (num!=(int)fitsTable.getTableTotalSize())
+					throw new RuntimeException("Couldn't skip the table, maybe file is corrupted.");
+				continue;
+			}
+			return fitsTable;
+		}
 	}
 
 	public static ByteBuffer wrapBig(byte[] data) {
