@@ -185,4 +185,8 @@ public class ZFitsTable {
 	public boolean getCommpressed() {
 		return this.isCompressed;
 	}
+	
+	public FitsHeader getFitsHeader() {
+		return this.header;
+	}
 }
