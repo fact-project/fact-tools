@@ -2,14 +2,17 @@ package fact.cleaning.snake;
 
 import java.awt.geom.Point2D;
 
+import cern.colt.Arrays;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public abstract class ImageForce 
 {
 	protected double[] data = null;
 	
+	// center of shower (precleaning)
 	protected Point2D center = null;
 	
+	// image intensity median
 	double median = 1;
 	
 	protected ImageForce(double[] data, float centerX, float centerY)
@@ -19,6 +22,8 @@ public abstract class ImageForce
 		this.data = data;
 	}
 	
+	// Gradient in X-Richtung
+	// Linearkombination  -> Siehe BScArbeit Dominik Baack
 	protected double gradX(int chid)
 	{
 		int[] neighbor = DefaultPixelMapping.getNeighborsFromChid(chid);		
@@ -27,33 +32,34 @@ public abstract class ImageForce
 			if(neighbor[i] == -1)
 				return 0;
 		}
+		System.out.println(Arrays.toString(neighbor));
 		
-		float  b = (float) data[neighbor[0]];
-		float  t = (float) data[neighbor[1]];		
-		float lt = 0;
-		float lb = 0;
-		float rt = 0;
-		float rb = 0;		
+		float  bot = (float) data[neighbor[0]];
+		float  top = (float) data[neighbor[1]];		
+		float leftTop = 0;
+		float leftBot = 0;
+		float rightTop = 0;
+		float rightBot = 0;		
 		
 		if(DefaultPixelMapping.getGeomX(chid) % 2 == 0)
 		{
-			lt = (float) data[neighbor[2]];
-			rt = (float) data[neighbor[4]];
+			leftTop = (float) data[neighbor[2]];
+			rightTop = (float) data[neighbor[4]];
 			
-			lb = (float) data[neighbor[3]];
-			rb = (float) data[neighbor[5]];
+			leftBot = (float) data[neighbor[3]];
+			rightBot = (float) data[neighbor[5]];
 		}
 		else
 		{
-			lt = (float) data[neighbor[3]];
-			rt = (float) data[neighbor[5]];
+			leftTop = (float) data[neighbor[3]];
+			rightTop = (float) data[neighbor[5]];
 			
-			lb = (float) data[neighbor[2]];
-			rb = (float) data[neighbor[4]];
+			leftBot = (float) data[neighbor[2]];
+			rightBot = (float) data[neighbor[4]];
 		}
 		
-		double erg1 = (2.0*rt + 1.0*rb + 1.0*t) - (2.0*lb + 1.0*b + 1.0*lt);
-		double erg2 = (2.0*rb + 1.0*rt + 1.0*b) - (2.0*lt + 1.0*t + 1.0*lb);
+		double erg1 = (2.0*rightTop + 1.0*rightBot + 1.0*top) - (2.0*leftBot + 1.0*bot + 1.0*leftTop);
+		double erg2 = (2.0*rightBot + 1.0*rightTop + 1.0*bot) - (2.0*leftTop + 1.0*top + 1.0*leftBot);
 		
 		return (erg1 + erg2)/2.0;
 	}
@@ -67,33 +73,33 @@ public abstract class ImageForce
 				return 0;
 		}
 		
-		float  b = (float) data[neighbor[0]];
-		float  t = (float) data[neighbor[1]];		
-		float lt = 0;
-		float lb = 0;
-		float rt = 0;
-		float rb = 0;		
+		float  bot = (float) data[neighbor[0]];
+		float  top = (float) data[neighbor[1]];		
+		float leftTop = 0;
+		float leftBot = 0;
+		float rightTop = 0;
+		float rightBot = 0;		
 		
 		if(DefaultPixelMapping.getGeomX(chid) % 2 == 0)
 		{
-			lt = (float) data[neighbor[2]];
-			rt = (float) data[neighbor[4]];
+			leftTop = (float) data[neighbor[2]];
+			rightTop = (float) data[neighbor[4]];
 			
-			lb = (float) data[neighbor[3]];
-			rb = (float) data[neighbor[5]];
+			leftBot = (float) data[neighbor[3]];
+			rightBot = (float) data[neighbor[5]];
 		}
 		else
 		{
-			lt = (float) data[neighbor[3]];
-			rt = (float) data[neighbor[5]];
+			leftTop = (float) data[neighbor[3]];
+			rightTop = (float) data[neighbor[5]];
 			
-			lb = (float) data[neighbor[2]];
-			rb = (float) data[neighbor[4]];
+			leftBot = (float) data[neighbor[2]];
+			rightBot = (float) data[neighbor[4]];
 		}
 		
-		double erg = (2*t + 1*lt + 1*rt) - (2*b + 1*lb + 1*rb);		
+		double erg = (2*top + 1*leftTop + 1*rightTop) - (2*bot + 1*leftBot + 1*rightBot);		
 		
-		return erg;
+		return -erg;
 	}
 	
 	
