@@ -11,40 +11,50 @@ import fact.EventUtils;
 import fact.utils.RemappingKeys;
 
 public class PhotonchargeEvaluate implements Processor {
-	static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
+	static Logger log = LoggerFactory.getLogger(PhotonchargeEvaluate.class);
 	
 	String photonchargeKey= null;
+	String arrivalTimeKey = null;
 	String mcCherenkovWeightKey = null;
+	String mcCherenkovArrTimeMeanKey = null;
 	String mcNoiseWeightKey = null;
-	String outputKey = null;
-	int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
-	int integrationWindow = 30;
+	String outputKeyPhotonCharge = null;
+	String outputKeyArrivalTime = null;
+//	int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
+//	int integrationWindow = 30;
 	
 	double[] photoncharge = null;
+	double[] arrivalTime = null;
 	double[] cherenkovWeight = null;
+	double[] cherenkovArrTimeMean = null;
 	double[] noiseWeight = null;
 	
-	double[] qualityFactor = new double[Constants.NUMBEROFPIXEL];
-//	double[] qualityFactor = new double[30];
+	double[] qualityFactorPhotoncharge = new double[Constants.NUMBEROFPIXEL];
+	double[] qualityFactorArrivalTime = new double[Constants.NUMBEROFPIXEL];
 
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(PhotonchargeEvaluate.class, input, photonchargeKey,mcCherenkovWeightKey,mcNoiseWeightKey);
+		EventUtils.mapContainsKeys(PhotonchargeEvaluate.class, input, photonchargeKey,mcCherenkovWeightKey,mcNoiseWeightKey,mcCherenkovArrTimeMeanKey,arrivalTimeKey);
 		
 		photoncharge = EventUtils.toDoubleArray(input.get(photonchargeKey));
+		arrivalTime = EventUtils.toDoubleArray(input.get(arrivalTimeKey));
 		cherenkovWeight = EventUtils.toDoubleArray(input.get(mcCherenkovWeightKey));
+		cherenkovArrTimeMean = EventUtils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
 		noiseWeight = EventUtils.toDoubleArray(input.get(mcNoiseWeightKey));
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
-//		for (int px = 0 ; px < 30 ; px++)
 		{
-//			log.info("Pixel: " + px + " PhCh: " + photoncharge[px] + " ChWe: "+ cherenkovWeight[px] + " NoWe_perWin: " + noiseWeight[px]* integrationWindow / NumberOfSimulatedSlices);
-			double current_truth = cherenkovWeight[px] + noiseWeight[px] * integrationWindow / NumberOfSimulatedSlices;
-			qualityFactor[px] = photoncharge[px] - current_truth / photoncharge[px];
+			qualityFactorPhotoncharge[px] = (photoncharge[px] - cherenkovWeight[px]) / photoncharge[px];
+			if (cherenkovWeight[px] > 2.0)
+			{
+				System.out.println("Quality: " + qualityFactorPhotoncharge[px] + " phCh: " + photoncharge[px] + " mcphCh: " + cherenkovWeight[px]);
+			}
+			qualityFactorArrivalTime[px] = (arrivalTime[px] - cherenkovArrTimeMean[px]) / arrivalTime[px];
 		}
 		
-		input.put(outputKey, qualityFactor);
+		input.put(outputKeyPhotonCharge, qualityFactorPhotoncharge);
+		input.put(outputKeyArrivalTime, qualityFactorArrivalTime);
 
 		// TODO Auto-generated method stub
 		return input;
@@ -74,28 +84,36 @@ public class PhotonchargeEvaluate implements Processor {
 		this.mcNoiseWeightKey = mcNoiseWeightKey;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
+	public String getArrivalTimeKey() {
+		return arrivalTimeKey;
 	}
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
+	public void setArrivalTimeKey(String arrivalTimeKey) {
+		this.arrivalTimeKey = arrivalTimeKey;
 	}
 
-	public int getNumberOfSimulatedSlices() {
-		return NumberOfSimulatedSlices;
+	public String getMcCherenkovArrTimeMeanKey() {
+		return mcCherenkovArrTimeMeanKey;
 	}
 
-	public void setNumberOfSimulatedSlices(int numberOfSimulatedSlices) {
-		NumberOfSimulatedSlices = numberOfSimulatedSlices;
+	public void setMcCherenkovArrTimeMeanKey(String mcCherenkovArrTimeMeanKey) {
+		this.mcCherenkovArrTimeMeanKey = mcCherenkovArrTimeMeanKey;
 	}
 
-	public int getIntegrationWindow() {
-		return integrationWindow;
+	public String getOutputKeyPhotonCharge() {
+		return outputKeyPhotonCharge;
 	}
 
-	public void setIntegrationWindow(int integrationWindow) {
-		this.integrationWindow = integrationWindow;
+	public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
+		this.outputKeyPhotonCharge = outputKeyPhotonCharge;
+	}
+
+	public String getOutputKeyArrivalTime() {
+		return outputKeyArrivalTime;
+	}
+
+	public void setOutputKeyArrivalTime(String outputKeyArrivalTime) {
+		this.outputKeyArrivalTime = outputKeyArrivalTime;
 	}
 
 }
