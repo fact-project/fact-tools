@@ -27,17 +27,28 @@ public class Size implements Processor {
 		
 		int[] shower 	= (int[])input.get(showerKey);
 		double[] charge 	= (double[])input.get(photonChargeKey);
-		
-		double size = 0;
-		for (int i = 0; i < shower.length; i++){
-			size += charge[shower[i]];
-		}
+
+        double size = calculateSize(shower, charge);
 		input.put(outputKey, size);
 		return input;
 	}
-	
 
-	public String getOutputKey() {
+    /**
+     *Get the size of the shower.
+     * @param shower the array containing the chids of the pixels which are marked as showers
+     * @param weight some sort of weight for each pixel. Should have 1440 entries
+     * @return the weighted sum of the showerpixels
+     */
+    public double calculateSize(int[] shower, double[] weight) {
+        double size = 0;
+        for (int i = 0; i < shower.length; i++){
+            size += weight[shower[i]];
+        }
+        return size;
+    }
+
+
+    public String getOutputKey() {
 		return outputKey;
 	}
 	public void setOutputKey(String outputKey) {
