@@ -41,12 +41,11 @@ public class PixelMappingTest {
 		l = Arrays.asList(nS2h);
 		for(int p : n){
 			if(!l.contains(p)){
-				fail("Pixelmapping did not deliver the correct neighbours for hardid with softid 1080");
+				fail("Pixelmapping did not deliver the correct neighbours for softid 1080");
 			}
 		}
 		
-		
-		
+
 		for (int id = 0; id < 1440; ++id){
 			if (DefaultPixelMapping.getNeighborsFromChid(id).length != 6){
 				fail("map did not return the right array for chid " + id);
@@ -59,8 +58,8 @@ public class PixelMappingTest {
 	@Test
 	public void testKoordinateToChid() {
 		// -180,999 .... 180,999
-		float[] xs = {120.513f, 12.22f,-80.324f};
-		float[] ys = {80.113f, 102.22f,-5.324f};
+		float[] xs = {120.513f, 12.22f,-80.324f, -120.6f, -6.93f  * 9.5f};
+		float[] ys = {80.113f, 102.22f,-5.324f, 20.5f,3.49f  * 9.5f };
 //		float x = -6.93f  * 9.5f;
 //		float y = 3.5f  * 9.5f;
 		
@@ -71,8 +70,8 @@ public class PixelMappingTest {
 			double lowestDistance = 100000.0d;
 			for (int chid = 0 ; chid < Constants.NUMBEROFPIXEL ; chid++ )
 			{
-				float xChid = DefaultPixelMapping.getPosX(chid);
-				float yChid = DefaultPixelMapping.getPosY(chid);
+				float xChid = DefaultPixelMapping.getPosXinMM(chid);
+				float yChid = DefaultPixelMapping.getPosYinMM(chid);
 				double distance = Math.sqrt( (xChid-x)*(xChid-x) + (yChid-y)*(yChid-y) );
 				if (distance < lowestDistance)
 				{
@@ -80,13 +79,15 @@ public class PixelMappingTest {
 					lowestDistance = distance;
 				}
 			}
-			assertEquals("Fail: x,y : " + x + ", " + y,nearestChid, DefaultPixelMapping.geomToChid(x, y));
+			assertEquals("Fail: x,y : " + x + ", " + y,nearestChid, DefaultPixelMapping.coordinatesToChid(x, y));
 		}
 //		System.out.println("x and y of nearest chid: " + DefaultPixelMapping.getGeomX(nearestChid) + "  " + DefaultPixelMapping.getGeomY(nearestChid) + "           x and y given: " + x + " " + y);
 	}
-	
-	
-	
+
+
+    /**
+     * Test some hardcoded coordinate that I looked up on the poster
+     */
 	@Test
 	public void testGeoToChid(){
 		//check inside camera bounds
@@ -94,22 +95,22 @@ public class PixelMappingTest {
 		float y = 3.5f  * 9.5f;
 		int chid =  DefaultPixelMapping.getChidFromSoftId(191);
 		//911
-		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
+		assertEquals(chid, DefaultPixelMapping.coordinatesToChid(x, y));
 		
 		x = -19.05f * 9.5f;
 		y = 5.5f * 9.5f;
 		chid =  DefaultPixelMapping.getChidFromSoftId(1393);
-		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
+		assertEquals(chid, DefaultPixelMapping.coordinatesToChid(x, y));
 		
 		x = -19.06f  * 9.5f;
 		y = 5.6f  * 9.5f;
 		chid =  DefaultPixelMapping.getChidFromSoftId(1393);
-		assertEquals(chid, DefaultPixelMapping.geomToChid(x, y));
+		assertEquals(chid, DefaultPixelMapping.coordinatesToChid(x, y));
 		
 		//outside camera bounds
 		x = -30.06f * 9.5f;
 		y = 9.6f * 9.5f;
-		assertEquals(-1, DefaultPixelMapping.geomToChid(x, y));
+		assertEquals(-1, DefaultPixelMapping.coordinatesToChid(x, y));
 	}
 	
 	
