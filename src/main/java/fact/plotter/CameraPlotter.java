@@ -30,11 +30,15 @@ public class CameraPlotter extends DataVisualizer  {
 	//this map contains counters that count the number of vales that have arrived for every key
 	LinkedHashMap<String, Integer> counterMap = new LinkedHashMap<String, Integer>();
 	
-	
-	private boolean keepOpen = true;
+	@Parameter(required = true)
 	private String key;
-	private Double pixelSize = 6.0;
-	
+
+    @Parameter
+    private boolean keepOpen = true;
+    @Parameter(description = "Size of the camerapixels in the plot", defaultValue = "6.0")
+    private Double pixelSize = 6.0;
+
+    @Parameter(description = "Title of the plot")
 	private String title ="Default Title";
 
 	private OnlineStatistics onStat;
@@ -59,7 +63,7 @@ public class CameraPlotter extends DataVisualizer  {
 			//check wether data contains the key, item is of the right type and array has the right length to be plotted  into camera picture
 			if(!data.containsKey(key)){
 				//key doesnt exist in map
-				log.info(Constants.ERROR_WRONG_KEY + key + ",  " + this.getClass().getSimpleName() );
+				log.error("Key not found " + key + ",  " + this.getClass().getSimpleName() );
 				throw new RuntimeException("The key " + key + " does not exist in the item");
 			}
 			if (data.get(key).getClass().isArray())

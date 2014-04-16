@@ -37,33 +37,6 @@ public class HillasAlphaTest extends ParameterTest {
 	final String outputKey = "alpha";
 
 	@Test
-	public void testMissingOutputKey() throws Exception{
-		thrown.expect(RuntimeException.class);
-		thrown.expectMessage("Missing parameter: outputKey");
-
-		//start it with a missing parameter. forget outputkey
-		HillasAlpha poser = new HillasAlpha();
-		poser.setDistribution(distribution);
-		poser.setSourcePosition(sourcePosition);
-//		poser.setOutputKey(outputKey);
-		poser.process(item);
-	}
-	
-	
-	@Test
-	public void testMissingDistribution() throws Exception{
-		thrown.expect(RuntimeException.class);
-		thrown.expectMessage("Missing parameter: distribution");
-
-		HillasAlpha poser = new HillasAlpha();
-		//poser.setDistribution(distribution);
-		poser.setSourcePosition(sourcePosition);
-		poser.setOutputKey(outputKey);
-		poser.process(item);
-	}
-
-
-	@Test
 	public void testValidParameter() throws Exception{
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
@@ -72,7 +45,7 @@ public class HillasAlphaTest extends ParameterTest {
 		poser.setSourcePosition(sourcePosition);
 		poser.setOutputKey(outputKey);
 		poser.process(item);
-		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
+		assertTrue("Expected output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);
 	}
 }

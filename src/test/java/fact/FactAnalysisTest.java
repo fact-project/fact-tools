@@ -1,4 +1,4 @@
-package fact.processors;
+package fact;
 
 import static org.junit.Assert.fail;
 

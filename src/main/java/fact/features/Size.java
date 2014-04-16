@@ -21,15 +21,6 @@ public class Size implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-        if(outputKey == null){
-            throw new RuntimeException("Missing parameter: outputKey");
-        }
-        if(photonChargeKey == null){
-            throw new RuntimeException("Missing parameter: photonChargeKey");
-        }
-        if(showerKey == null){
-            throw new RuntimeException("Missing parameter: showerKey");
-        }
 		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);

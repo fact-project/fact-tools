@@ -68,7 +68,6 @@ public class ParameterTest  {
         pC.setKey(key);
         pC.setOutputKey(photonCharge);
         pC.setPositions(positions);
-        pC.init(null);
         pC.process(item);
 
 
@@ -76,14 +75,12 @@ public class ParameterTest  {
         poser.setKey(key);
         poser.setKeyPositions(positions);
         poser.setOutputKey(shower);
-        poser.init(null);
         poser.process(item);
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setKey(shower);
+        dist.setPixel(shower);
         dist.setWeights(photonCharge);
         dist.setOutputKey(distribution);
-        dist.init(null);
         dist.process(item);
 
         URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
