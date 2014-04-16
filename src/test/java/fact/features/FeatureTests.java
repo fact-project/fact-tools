@@ -51,7 +51,7 @@ public class FeatureTests {
 		
 		RisingEdgeForPositions rE = new RisingEdgeForPositions();
 //		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-		rE.setDatakey("test");
+		rE.setDataKey("test");
 		rE.setAmplitudePositionsKey("positions");
 		rE.setOutputKey("risingEdge");
 		p = new Pair<String, Class<?>>(rE.getOutputKey(), int[].class );
@@ -102,7 +102,7 @@ public class FeatureTests {
 		
 		RisingEdgeForPositions rE = new RisingEdgeForPositions();
 //		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-		rE.setDatakey("DataCalibrated");
+		rE.setDataKey("DataCalibrated");
 		rE.setAmplitudePositionsKey("positions");
 		rE.setOutputKey("risingEdge");
 		p = new Pair<String, Class<?>>(rE.getOutputKey(), int[].class );
