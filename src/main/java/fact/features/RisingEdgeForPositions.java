@@ -24,9 +24,9 @@ public class RisingEdgeForPositions implements Processor {
 	private int searchWindowLeft = 25;
 
     @Parameter(required = true)
-	private String datakey = null;
+	private String dataKey = null;
     @Parameter(required = true)
-	private String outputkey = null;
+	private String outputKey = null;
     @Parameter(required = true)
 	private String amplitudePositionsKey = null;
 	//
@@ -34,11 +34,11 @@ public class RisingEdgeForPositions implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-        EventUtils.mapContainsKeys(getClass(), input, datakey, amplitudePositionsKey);
+        EventUtils.mapContainsKeys(getClass(), input, dataKey, amplitudePositionsKey);
 
         int[] positions =  new int[Constants.NUMBEROFPIXEL];
 		
-		double[] data = (double[]) input.get(datakey);		
+		double[] data = (double[]) input.get(dataKey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -78,31 +78,41 @@ public class RisingEdgeForPositions implements Processor {
 			}
 			positions[pix] = arrivalPos;
 		}
-		input.put(outputkey, positions);
+		input.put(outputKey, positions);
 		
 		return input;
 		
 	}
 
 
-	public String getDatakey() {
-		return datakey;
+
+
+	public String getDataKey() {
+		return dataKey;
 	}
 
 
-	public void setDatakey(String datakey) {
-		this.datakey = datakey;
+
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
 	}
+
+
 
 
 	public String getOutputKey() {
-		return outputkey;
+		return outputKey;
 	}
 
 
-	public void setOutputKey(String outputkey) {
-		this.outputkey = outputkey;
+
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
+
+
 
 
 	public String getAmplitudePositionsKey() {
