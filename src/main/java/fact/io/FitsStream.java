@@ -56,8 +56,8 @@ public class FitsStream extends AbstractStream {
 		super.init();
 		File f = new File(this.url.getFile());
 		if (!f.canRead()){
-			log.error("Cannot read file. Wrong path? ");
-			throw new FileNotFoundException("Cannot read file");
+			log.error("Cannot read file. Wrong path? " + f.getAbsolutePath());
+			throw new FileNotFoundException("Cannot read file " + f.getAbsolutePath());
 		}
         BufferedInputStream bStream = new BufferedInputStream(getInputStream(), bufferSize );
 		dataStream = new DataInputStream(bStream);
