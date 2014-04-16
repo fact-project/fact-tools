@@ -50,8 +50,8 @@ public class MyonHoughTransform implements Processor {
 		// Get X and Y Positions of the Pixel that survived Cleaning
 		
 		for(int i=0; i<ring.length; i++){
-			xPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosX(ring[i]);
-			yPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosY(ring[i]);
+			xPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(ring[i]);
+			yPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(ring[i]);
 		}
 		
 		// Hough-vote-Matrix erzeugen:
