@@ -56,4 +56,28 @@ public class PreviousStartCells implements Processor {
 		return input;
 	}
 
+	public String getStartCellKey() {
+		return startCellKey;
+	}
+
+	public void setStartCellKey(String startCellKey) {
+		this.startCellKey = startCellKey;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+	public int getLimitEvents() {
+		return limitEvents;
+	}
+
+	public void setLimitEvents(int limitEvents) {
+		this.limitEvents = limitEvents;
+	}
+
 }
