@@ -39,8 +39,8 @@ public class ConcentrationCore implements Processor{
 			for(int pix : showerPixelArray)
 			{
 				
-				double px = DefaultPixelMapping.getPosX(pix);
-				double py = DefaultPixelMapping.getPosY(pix);
+				double px = DefaultPixelMapping.getPosXinMM(pix);
+				double py = DefaultPixelMapping.getPosYinMM(pix);
 				
 				// short names adapted from mars code (change when understood)
 

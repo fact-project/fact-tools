@@ -144,12 +144,12 @@ public class DefaultPixelMapping implements PixelMapping {
 	}
 
     /**
-     *
-     * @param x
-     * @param y
-     * @return
+     * Takes x and y coordinates in millimeters and returns the chid of the pixel underneath that point
+     * @param x x-coordinate in MM
+     * @param y y coordinate in MM
+     * @return the chid under the point x,y
      */
-	public static int geomToChid(float x, float y){
+	public static int coordinatesToChid(float x, float y){
 		if(!init){
 			init();
 		}
@@ -179,7 +179,7 @@ public class DefaultPixelMapping implements PixelMapping {
 	}
 
 	/**
-	 * @see fact.viewer.ui.PixelMapping#sortPixels(short[], short[])
+	 * @see fact.viewer.ui.PixelMapping#sortPixels(double[])
 	 */
 	@Override
 	public double[][] sortPixels(double[] data) {
@@ -252,8 +252,6 @@ public class DefaultPixelMapping implements PixelMapping {
 	public static double[] rotate(int chid , double phi){
 		double x =  getGeomX(chid)*Math.cos(phi) - getGeomY(chid) * Math.sin(phi) ;
 		double y =  getGeomX(chid)*Math.sin(phi) + getGeomY(chid) * Math.cos(phi) ;
-//		System.out.println("rotating  x old: " + getGeomX(chid) + "    new x :" + x );
-//		System.out.println("rotating  y old: " + getGeomY(chid) + "    new y :" + y );
 		double[] c = {x,y};
 		return c;
 	}
@@ -271,17 +269,23 @@ public class DefaultPixelMapping implements PixelMapping {
 		}
 		return chId2softId[chid];
 	}
-/**
- * 
- * @param chid
- * @return the geometric X value. This is the abstract position shifted by 22 pixelunits.
- */
+
+    /**
+     * Takes a chid and returns the geometric x-coordinate. (0,0) being the camera center
+     * @param chid
+     * @return the geometric x -coordinate
+     */
 	public static int getGeomX(Integer chid) {
 		if(!init){
 			init();
 		}
 		return chid2geomXmm[chid];
 	}
+    /**
+     * Takes a chid and returns the geometric y-coordinate. (0,0) being the camera center
+     * @param chid
+     * @return the geometric y -coordinate
+     */
 	public static int getGeomY(Integer chid) {
 		if(!init){
 			init();
@@ -295,13 +299,13 @@ public class DefaultPixelMapping implements PixelMapping {
 	 * @param chid
 	 * @return the x coordinate of the pixel in mm. As seen from the camera coordinate system
 	 */
-	public static float getPosX(Integer chid) {
+	public static float getPosXinMM(Integer chid) {
 		if(!init){
 			init();
 		}
 		return chid2posXmm[chid];
 	}
-	public static float getPosY(Integer chid) {
+	public static float getPosYinMM(Integer chid) {
 		if(!init){
 			init();
 		}

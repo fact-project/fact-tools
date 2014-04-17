@@ -35,13 +35,13 @@ public class CoreNeighborClean implements Processor{
 	private String keyPositions;
     @Parameter(required = true)
 	private String outputKey;
-    @Parameter(required = true)
+	@Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have to be identified as a CorePixel", defaultValue = "5.0")
 	private  double corePixelThreshold;
-    @Parameter(required = true)
+	@Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have thats adjacent to a previously identified corePixel", defaultValue = "2.0")
 	private  double neighborPixelThreshold;
     @Parameter(required = true)
 	private  double timeThreshold;
-    @Parameter(required = true)
+    @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours are even considered for NeighbourCorePixel. If Size is smaller than minSize the Pixels will be discarded", defaultValue = "2.0")
 	private int minNumberOfPixel;
 
 
@@ -188,7 +188,6 @@ public class CoreNeighborClean implements Processor{
 	public double getCorePixelThreshold() {
 		return corePixelThreshold;
 	}
-	@Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have to be identified as a CorePixel", defaultValue = "5.0")
 	public void setCorePixelThreshold(float corePixelThreshold) {
 		this.corePixelThreshold = corePixelThreshold;
 	}
@@ -196,7 +195,7 @@ public class CoreNeighborClean implements Processor{
 	public double getNeighborPixelThreshold() {
 		return neighborPixelThreshold;
 	}
-	@Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have thats adjacent to a previously identified corePixel", defaultValue = "2.0")
+	
 	public void setNeighborPixelThreshold(float neighborPixelThreshold) {
 		this.neighborPixelThreshold = neighborPixelThreshold;
 	}
@@ -204,7 +203,7 @@ public class CoreNeighborClean implements Processor{
 	public int getMinNumberOfPixel() {
 		return minNumberOfPixel;
 	}
-	@Parameter(required = false, description = "Number of Pixels a patch of CorePixel must have before its Neighbours are even considered for NeighbourCorePixel. If Size is smaller than minSize the Pixels will be discarded", defaultValue = "2.0")
+	
 	public void setMinNumberOfPixel(int minSize) {
 		this.minNumberOfPixel = minSize;
 	}

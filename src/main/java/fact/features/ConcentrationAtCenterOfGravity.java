@@ -38,7 +38,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		}
 		
 		// Assuming the correctness of function geomToChid !
-		int cogChId = DefaultPixelMapping.geomToChid(cogXValue, cogYValue);
+		int cogChId = DefaultPixelMapping.coordinatesToChid(cogXValue, cogYValue);
 		int[] neighbors = DefaultPixelMapping.getNeighborsFromChid(cogChId);
 		
 		// mindist1 < mindist2

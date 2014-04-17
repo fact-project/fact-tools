@@ -194,6 +194,7 @@ public class SourcePosition implements StatefulProcessor {
 		//add source position to dataitem
 		double[] source = {sourcePosition[0], sourcePosition[1]};
 //		System.out.println("x: "+  source[0] + " y: " +source[1] );
+//		log.info("SourcePosition for key: "+ outputKey + ":\t(" + source[0] + "," + source[1] + ")");
 		data.put(outputKey, source);
 		//add deviation between the calculated point az,dz and the az,dz in the file
 		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
@@ -308,14 +309,14 @@ public class SourcePosition implements StatefulProcessor {
 		y_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
 		z_rot   =  Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
 		double[] r ={ x_rot * (-mDistance) / z_rot ,y_rot * (-mDistance) / z_rot };
-		double[] r_out = {0,0};
+//		double[] r_out = {0,0};
 		
 		// Hacky rotation by 90deg cause something is wrong in the calculation of the source position
 		// seems to be rotated by 270deg counterclockwise (so a rotation by 90deg clockwise is needed)
 //		r_out[0] = r[0]*Math.cos(-Math.PI/2.0) - r[1]*Math.sin(-Math.PI/2.0);
 //		r_out[1] = r[0]*Math.sin(-Math.PI/2.0) + r[1]*Math.cos(-Math.PI/2.0);;
 		
-		return r_out;
+		return r;
 	}
 
 
