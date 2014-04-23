@@ -2,9 +2,14 @@ package fact.features;
 
 import stream.Data;
 import stream.Processor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+import fact.Constants;
+import fact.image.Pixel;
+import fact.image.overlays.PixelSet;
 
 
 
@@ -13,17 +18,23 @@ public class MyonHoughTransform implements Processor {
 	private String peaknessKey;
 	private String distanceKey;
 	private String ringKey;
-	//private String photonChargeKey;
+	private String bestCircleKey;
+	private String photonChargeKey;
+	private String showRingKey;
+	private String percentageKey;
+	private String octantsHitKey;
+
 	
-	private double min_radius = 80; //minimal radius in mm
-	private double max_radius = 120; //maximal radius in mm
+	private double min_radius = 70; //minimal radius in mm
+	private double max_radius = 130; //maximal radius in mm
 	private double min_x = -300; //minimal center X in mm
 	private double max_x = 300; //maximal center X in mm
 	private double min_y = -300; //minimal center y in mm
 	private double max_y = 300; //maximal center y in mm
-	private int res_r = 10;
+	private int res_r = 18;
 	private int res_x = 60;
 	private int res_y = 60;
+	
 	
 	
 	
@@ -34,14 +45,8 @@ public class MyonHoughTransform implements Processor {
 		
 				
 		int[] ring = (int[]) input.get(ringKey);
-		
-		if (ring.length<20){
-			log.info(String.valueOf(ring.length));
-			input.put(distanceKey, "None");
-			input.put(peaknessKey, "None");
-			return input;
-		}
-		
+		double[] photonCharge = (double[]) input.get(photonChargeKey);
+				
 		//double[] charge = (double[]) input.get(photonchargeKey);
 		
 		double[] xPositions = new double[ring.length];
@@ -86,20 +91,20 @@ public class MyonHoughTransform implements Processor {
 		int[] highest_pos = {0, 0, 0};
 		int[] second_highest_pos = {0, 0, 0};
 		int[] third_highest_pos = {0, 0, 0};
-		
-		
+		double distance;
+				
 		for (int r = 0; r < circle_radius.length; r++){
 			for (int x = 0; x < circle_x.length; x++){
 				for (int y = 0; y < circle_y.length; y++){
 					for(int pix = 0; pix < ring.length; pix++){
-						double distance = Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0);
+						distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
 						if(Math.abs(distance - circle_radius[r]) < 1.1 * fact.Constants.PIXEL_SIZE ){
-							HoughMatrix[r][x][y] += 1;
+							HoughMatrix[r][x][y] += photonCharge[ring[pix]];
 						}
-						stats.addValue(HoughMatrix[r][x][y]);
-						if (HoughMatrix[r][x][y] !=0){
-							NoneZeroElems += 1;
-						}
+					}
+					stats.addValue(HoughMatrix[r][x][y]);
+					if (HoughMatrix[r][x][y] !=0){
+						NoneZeroElems += 1;
 					}
 					if (HoughMatrix[r][x][y] > HoughMatrix[highest_pos[0]][highest_pos[1]][highest_pos[2]]){
 						third_highest_pos[0] = second_highest_pos[0];
@@ -112,11 +117,16 @@ public class MyonHoughTransform implements Processor {
 						highest_pos[1] = x;
 						highest_pos[2] = y;
 					}
+					
 				}
 			}
 		}
 		
-		//log.info("HoughTransform durchgefügt");
+		
+		
+		
+		
+        //log.info("HoughTransform durchgefügt");
 		
 		
 
@@ -124,16 +134,16 @@ public class MyonHoughTransform implements Processor {
 		
 		
 		double radius_1 = circle_radius[highest_pos[0]];
-		double center_y_1 = circle_x[highest_pos[1]];
-		double center_x_1 = circle_y[highest_pos[2]];
-		
+		double center_x_1 = circle_x[highest_pos[1]];
+		double center_y_1 = circle_y[highest_pos[2]];
+				
 		double radius_2 = circle_radius[second_highest_pos[0]];
-		double center_y_2 = circle_x[second_highest_pos[1]];
-		double center_x_2 = circle_y[second_highest_pos[2]];
+		double center_x_2 = circle_x[second_highest_pos[1]];
+		double center_y_2 = circle_y[second_highest_pos[2]];
 		
 		double radius_3 = circle_radius[third_highest_pos[0]];
-		double center_y_3 = circle_x[third_highest_pos[1]];
-		double center_x_3 = circle_y[third_highest_pos[2]];
+		double center_x_3 = circle_x[third_highest_pos[1]];
+		double center_y_3 = circle_y[third_highest_pos[2]];
 		
 		double ParamDistance1 = Math.sqrt(Math.pow(radius_1 - radius_2, 2) + Math.pow(center_x_1 - center_x_2, 2) + Math.pow(center_y_1 - center_y_2 , 2));
 		double ParamDistance2 = Math.sqrt(Math.pow(radius_1 - radius_3, 2) + Math.pow(center_x_1 - center_x_3, 2) + Math.pow(center_y_1 - center_y_3 , 2));
@@ -147,8 +157,87 @@ public class MyonHoughTransform implements Processor {
 		
 		peakness = HoughMaximum/(HoughSum/NoneZeroElems);
 		
+		double phi=0;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		double percentage;
+		double onRingPixel=0;
+		int octantsHit=0;
+		boolean[] octants = {false,false,false,false,false,false,false,false};
+		
+		
+		for (int pix=0; pix<ring.length;pix++){
+			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
+			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
+				onRingPixel+=1;
+				phi = Math.atan2(xPositions[pix], yPositions[pix]);
+				for(int i=0; i<8; i++){
+					if(phi>i*Math.PI/4 && phi<(i+1)*Math.PI/4){
+						octants[i]=true;
+					}
+				}
+			}
+		}
+		
+		for(int i=0; i<8; i++){
+			if(octants[i]){
+				octantsHit+=1;
+			}
+		}
+		
+		
+		
+		
+		input.put(octantsHitKey, octantsHit);
+		
+		percentage = onRingPixel/ring.length;
+		
+		input.put(percentageKey, percentage);
+		
+		if (showRingKey.equals("true")){
+			double PixelPosX;
+			double PixelPosY;
+			double distance1;
+			double distance2;
+			double distance3;
+			PixelSet bestCirclePixelSet = new PixelSet();
+			PixelSet secondBestCirclePixelSet = new PixelSet();
+			PixelSet thirdBestCirclePixelSet = new PixelSet();
+			
+			for (int pix=0; pix<Constants.NUMBEROFPIXEL; pix++){
+				PixelPosX = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(pix);
+				PixelPosY = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(pix);
+				distance1 = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
+				distance2 = Math.sqrt(Math.pow((PixelPosX - center_x_2), 2.0) + Math.pow((PixelPosY - center_y_2), 2.0));
+				distance3 = Math.sqrt(Math.pow((PixelPosX - center_x_3), 2.0) + Math.pow((PixelPosY - center_y_3), 2.0));
+				if(Math.abs(distance1 - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE ){
+					bestCirclePixelSet.add(new Pixel(pix));
+				}
+				if(Math.abs(distance2 - radius_2) < 1.1 * fact.Constants.PIXEL_SIZE ){
+					secondBestCirclePixelSet.add(new Pixel(pix));
+				}
+				if(Math.abs(distance3 - radius_3) < 1.1 * fact.Constants.PIXEL_SIZE ){
+					thirdBestCirclePixelSet.add(new Pixel(pix));
+				}
+			}
+			input.put(bestCircleKey, bestCirclePixelSet);
+			input.put("second"+bestCircleKey, secondBestCirclePixelSet);
+			input.put("third"+bestCircleKey, thirdBestCirclePixelSet);
+		}
+		
 		input.put(peaknessKey, peakness);
 		input.put(distanceKey, ParamDistanceSum);
+		
 		
 		return input;
 	
@@ -167,16 +256,48 @@ public class MyonHoughTransform implements Processor {
 	public void setPeaknessKey(String peaknessKey) {
 		this.peaknessKey = peaknessKey;
 	}
+	public String getBestCircleKey() {
+		return bestCircleKey;
+	}
+	public void setBestCircleKey(String bestCircleKey) {
+		this.bestCircleKey = bestCircleKey;
+	}
 	public String getRingKey() {
 		return ringKey;
 	}
 	public void setRingKey(String ringKey) {
 		this.ringKey = ringKey;
 	}
-//	public String getPhotonChargeKey() {
-//		return photonChargeKey;
-//	}
-//	public void setPhotonChargeKey(String photonChargeKey) {
-//		this.photonChargeKey = photonChargeKey;
-//	}
+	public String getShowRingKey() {
+		return showRingKey;
+	}
+	public void setShowRingKey(String showRingKey) {
+		this.showRingKey = showRingKey;
+	}
+	public String getPhotonChargeKey() {
+		return photonChargeKey;
+	}
+	public void setPhotonChargeKey(String photonChargeKey) {
+		this.photonChargeKey = photonChargeKey;
+	}
+
+
+	public String getPercentageKey() {
+		return percentageKey;
+	}
+
+
+	public void setPercentageKey(String percentageKey) {
+		this.percentageKey = percentageKey;
+	}
+
+
+	public String getoctantsHitKey() {
+		return octantsHitKey;
+	}
+
+
+	public void setoctantsHitKey(String octantsHitKey) {
+		this.octantsHitKey = octantsHitKey;
+	}
 }
