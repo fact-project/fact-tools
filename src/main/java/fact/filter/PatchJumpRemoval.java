@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -47,6 +48,8 @@ public class PatchJumpRemoval implements Processor {
 		LinkedList<short[]> previousStopCells = (LinkedList<short[]>) input.get(prevStartAndStopCellKey+"_stop");
 		
 		boolean stopLoop = false;
+		
+		log.info("Events in previousStartCells before JumpRemoval: " + previousStartCells.size());
 
 		// Loop over all previous Events
 		int prevEvent=1;
@@ -58,6 +61,7 @@ public class PatchJumpRemoval implements Processor {
 			// we only want to go on when at least one pixel was corrected (so the jumpheight is larger than the jumpLimit) or
 			// previous start and stop cells aren't in the ROI
 			stopLoop = true;
+			boolean printedLogMessage=false;
 			
 			// Correct Jumps for each patch individual
 			for (int patch=0 ; patch < numberPatches ; patch++)
@@ -73,14 +77,20 @@ public class PatchJumpRemoval implements Processor {
 					for (int px = 0 ; px < 8 ; px++)
 					{
 						int pixel = 9*patch + px;
-						averJumpHeight+=data[pixel*roi+pos+1]-data[pixel*roi+pos];
+						averJumpHeight+=result[pixel*roi+pos+1]-result[pixel*roi+pos];
 					}
 					averJumpHeight /= 8; 
 //					System.out.println("Patch: " + patch + " averJumpheight: " + averJumpHeight);
 
 					if (averJumpHeight>jumpLimit)
 					{
-//						System.out.println("Substract Startjump, result vorher: " + result[9*patch]);
+						if (printedLogMessage == false)
+						{
+							int pixel = 9*patch;
+							log.info("Jump at StartCell, prevEvent: " + prevEvent + " pos: " + pos + " height: " + averJumpHeight);
+							log.info("Pixel: " + pixel + " SoftID: " + DefaultPixelMapping.getSoftwareID(pixel) + " geom: (" + DefaultPixelMapping.getGeomX(pixel) + "," + DefaultPixelMapping.getGeomY(pixel) + ")");
+							printedLogMessage = true;
+						}
 						stopLoop = false;
 						for (int px = 0 ; px < 9 ; px++)
 						{
@@ -107,18 +117,25 @@ public class PatchJumpRemoval implements Processor {
 					for (int px = 0 ; px < 8 ; px++)
 					{
 						int pixel = 9*patch + px;
-						averJumpHeight+=(data[pixel*roi+pos+1]-data[pixel*roi+pos]);
+						averJumpHeight+=(result[pixel*roi+pos+1]-result[pixel*roi+pos]);
 					}
 					averJumpHeight /= 8; 
 //					System.out.println("Patch: " + patch + " averJumpheight: " + averJumpHeight);
 					if ((-averJumpHeight)>jumpLimit)
 					{
+						if (printedLogMessage == false)
+						{
+							int pixel = 9*patch;
+							log.info("Jump at StopCell, prevEvent: " + prevEvent + " pos: " + pos + " height: " + averJumpHeight);
+							log.info("Pixel: " + pixel + " SoftID: " + DefaultPixelMapping.getSoftwareID(pixel) + " geom: (" + DefaultPixelMapping.getGeomX(pixel) + "," + DefaultPixelMapping.getGeomY(pixel) + ")");
+							printedLogMessage = true;
+						}
 						stopLoop = false;
 //						System.out.println("Substract Stopjump, result vorher: " + result[9*patch]);
 						for (int px = 0 ; px < 9 ; px++)
 						{
 							int pixel = 9*patch + px;
-							for (int slice=0 ; slice < (int)pos ; slice++)
+							for (int slice=0 ; slice <= (int)pos ; slice++)
 							{
 								result[pixel*roi+slice] += averJumpHeight;
 							}
@@ -132,12 +149,14 @@ public class PatchJumpRemoval implements Processor {
 				}
 			}
 		}
-		// If we stopped the for loop cause stopLoop was true, we want to remove the remaining previousStartCells
-//		while ((prevEvent+1) < previousStartCells.size())
-//		{
-//			previousStartCells.removeLast();
-//			previousStopCells.removeLast();
-//		}
+//		 If we stopped the for loop cause stopLoop was true, we want to remove the remaining previousStartCells
+		while ((prevEvent+1) < previousStartCells.size())
+		{
+			log.info("Remove Event nr. " + prevEvent + " from previousStartCells");
+			previousStartCells.removeLast();
+			previousStopCells.removeLast();
+		}
+		log.info("Events in previousStartCells after JumpRemoval: " + previousStartCells.size());
 		
 		input.put(outputKey, result);
 		input.put(prevStartAndStopCellKey +"_start", previousStartCells);
