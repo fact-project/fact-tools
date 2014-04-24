@@ -1,0 +1,63 @@
+﻿<container>
+
+    <!-- Pfade zu den fits files. -->
+	<property name="infile" value="20130102_060.fits.gz" />
+	<property name="drsfile" value="20130102_056.drs.fits.gz" />
+	<property name="drivefile" value="20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+	<property name="outfile" value="processed_data_0102.csv" />
+    <property name="sourcename" value="crab" />
+    <property name="core_threshold" value="5.0" />
+    <property name="neighbor_threshold" value="2.0"/>
+    <property name="time_threshold" value="30.0" />
+    <property name="min_number_of_pixel" value="2" />
+    <property name="integral_gain" value="242.0" />
+
+
+    <!-- Name des Streams und pfad zu dem Daten-File -->
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="100"/>
+
+    <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser geh�rt -->
+    <process id="2" input="fact">		
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+        <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
+		<fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/>
+		
+		<fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+				
+        <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition" />
+        <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" OutputKey="arrivalTime" />
+        <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
+
+        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
+				
+        <Skip condition="%{data.shower} == null" />    
+
+			
+			<!-- Snake auf PhotonCharge: -->
+								
+			<fact.snake.MedianWithoutShower InputArray="photoncharge" Shower="shower" Output="Mean" />
+			<fact.snake.ShowerMaxCenter  Shower="shower" Weight="photoncharge" OutX="snakeStartX" OutY="snakeStartY" />			
+        
+			<!-- DrawSnake="" -->
+			<fact.cleaning.snake.SnakeSingle DrawSnake="" PixelDataName="photoncharge" ShowerCenterX="snakeStartX" ShowerCenterY="snakeStartY" SnakeOutX="snake_X" SnakeOutY="snake_Y" Mean="Mean"/>	
+
+			<fact.features.snake.Area SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeArea" />
+			<fact.features.snake.Length SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeLength" />
+			<fact.features.snake.IntegratePolygonSingle pixelData="photoncharge" PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeInt" />
+			<fact.features.snake.InnerEnergy SnakeX="snake_X" SnakeY="snake_Y" Outkey="InnerEnergy" />
+			
+			<!-- drawEllipse="" -->
+			<fact.features.snake.FitEllipse DrawEllipse="" SnakeX="snake_X" SnakeY="snake_Y" OutkeyAlpha="SnakeEllipseAlpha" OutkeyMajor="SnakeEllipseMajor" OutkeyMinor="SnakeEllipseMinor" OutkeyCenterX="SnakeEllipseX" OutkeyCenterY="SnakeEllipseY" />
+			
+			<fact.image.ShowImage/>
+			
+		
+           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum"/> -->
+			
+
+    </process>
+
+
+</container>
