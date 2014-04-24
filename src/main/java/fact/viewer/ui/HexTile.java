@@ -33,6 +33,8 @@ public class HexTile extends Tile {
 	Point location = null;
 	Map<String,String> info = new HashMap<String,String>();
 	
+	public Point center;
+	
 	private HexTile( Double radius ){
 		super();
 		
@@ -72,7 +74,7 @@ public class HexTile extends Tile {
 			//xOff = - ( width - s );
 		}
 		
-		Point center = new Point( cx, cy );
+		center = new Point( cx, cy );
 		log.debug( "    center is: {}, {}", cx, cy );
 		
 		for( int i = 0; i < 6; i++ ){

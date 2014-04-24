@@ -285,7 +285,7 @@ public class HexMap extends JPanel implements PixelMap {
 		for (int i = 0; i < average.length; i++) {
 			average[i] = average[i] / sliceValues.length;
 		}
-
+		
 //		log.debug("Slices loaded.");
 		setCurrentSlice(currentSlice);
 //		repaint();

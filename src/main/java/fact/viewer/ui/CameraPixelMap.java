@@ -10,6 +10,8 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,9 +36,11 @@ import javax.swing.ImageIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.colt.Arrays;
 import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
+import fact.Constants;
 import fact.FactViewer;
 import fact.image.overlays.Overlay;
 import fact.viewer.SelectionListener;
@@ -47,9 +51,9 @@ import fact.viewer.colorMappings.ColorMapping;
  * 
  */
 public class CameraPixelMap extends HexMap implements MouseListener,
-		MouseMotionListener {
+		MouseMotionListener,MouseWheelListener  {
 	/** The unique class ID */
-	private static final long serialVersionUID = 4003306850236739854L;
+	private static final long serialVersionUID = 4003306850236739854L;	
 
 	static Logger log = LoggerFactory.getLogger(CameraPixelMap.class);
 	final static SimpleDateFormat fmt = new SimpleDateFormat(
@@ -86,6 +90,11 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 
 	private CellHighlighter cellHighlighter;
 	private HexTile nCell;
+	
+	private SnakeDraw SnakePoly;
+	private double[][][] snakeX;
+	private double[][][] snakeY;
+	private SnakeDraw SnakeEllipse = null;
 
 	public CameraPixelMap(Double radius) {
 		super(45, 41, radius);
@@ -99,9 +108,33 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		}
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addMouseWheelListener(this);
 		cellHighlighter = new CellHighlighter(this);
 		this.addOverlay(cellHighlighter);
 		// this.setLayout(Border)
+		
+		SnakePoly = new SnakeDraw();
+		SnakePoly.setRadius(radius, 0);
+		SnakeEllipse = new SnakeDraw();
+		SnakeEllipse.setRadius(radius, 0);
+
+		float x = 0;		
+		float y = 0;
+		for(int i=0; i<6; i++)
+		{
+			x += this.cellBySoftId[0].polygon.xpoints[i];			
+			y += this.cellBySoftId[6].polygon.ypoints[i];
+		}		
+		x = x / 6.0f;		
+		y = y / 6.0f;	
+	
+		SnakePoly.setOffset(x + 1, y + 1);
+		SnakeEllipse.setOffset(x + 1, y + 1);
+		
+		SnakePoly.setCol(255, 0, 0);
+		SnakePoly.setThickness(3.0f);
+		SnakeEllipse.setCol(50,150,100);
+		SnakeEllipse.setThickness(1.5f);
 	}
 
 	public void addSelectionListener(SelectionListener l) {
@@ -145,8 +178,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 			HexTile cell = addCell(id, x, y);
 			cell.setId(id);
 			item = stream.readNext();
-		}
-
+		}				
+		
 		log.debug(" x range is {}, {}", minX, maxX);
 		log.debug(" y range is {}, {}", minY, maxY);
 	}
@@ -334,7 +367,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		this.setCurrentSlice(slice);
 		// double[] values = getValuesInSlice( slice );
 		// paintTiles( g, values, colorMap );
-		this.paint(g);
+		this.paint(g);		
 
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		DecimalFormat df = new DecimalFormat("000");
@@ -370,7 +403,7 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	}
 
 	/**
-     */
+	 */
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// super.mouseClicked(arg0);
@@ -379,8 +412,8 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 
 			for (HexTile cell : cellBySoftId) {
 				if (cell.polygon.contains(arg0.getPoint())) {
-					log.info("HexTile {} selected", cell.getId());
-
+					log.info("HexTile {} selected", cell.getId());					
+					
 					selectedCell = cell.getId();
 					boolean selected = isSelected(cell);
 					boolean ctrlDown = arg0.isControlDown();
@@ -440,9 +473,12 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 		nCell = getCell(arg0.getPoint());
 		if (nCell != oldCell && nCell != null) {
 			// this.x = cell.getGeoX();
-			// this.y = cell.getGeoY();
+			// this.y = cell.getGeoY();			
 			repaint();
 			cellHighlighter.highlight(nCell.getGeoX(), nCell.getGeoY());
+			
+			//System.out.println("Mouse Chid: " + DefaultPixelMapping.getChidFromSoftId(nCell.getId()) + " Pos:" + nCell.center); //<<<<<<<<<<<<<<<<<<<<<<<<<<
+			
 			// log.debug("Cell is at {}, {}", x, y);
 			cellHighlighter.paint(getGraphics(), tiles);
 			if (arg0.isShiftDown()) {
@@ -487,6 +523,20 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent arg0) 
+	{
+		if(arg0.getWheelRotation() > 0)
+		{
+			SnakePoly.addFrame();
+		}
+		else
+		{
+			SnakePoly.subFrame();
+		}
+		this.repaint();
 	}
 
 	/*
@@ -569,6 +619,14 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 				o.setCamMap(this);
 				o.paint(this.getGraphics(), tiles);
 			}
+			
+			snakeX = (double[][][]) event.get(Constants.KEY_SNAKE_VIEWER_X);
+			snakeY = (double[][][]) event.get(Constants.KEY_SNAKE_VIEWER_Y);			
+			SnakePoly.update();
+			
+			SnakeEllipse.copyPoly((SnakeDraw) event.get(Constants.SNAKE_ELLIPSE_OVERLAY));
+			SnakeEllipse.updateShape();
+			
 			this.repaint();
 		}
 	}
@@ -580,5 +638,15 @@ public class CameraPixelMap extends HexMap implements MouseListener,
 	public void setDate(Date date) {
 		this.date = date;
 	}
+	
+	public void paint(Graphics g) 
+	{		
+		super.paint(g);
+		if(snakeX != null && snakeY != null)
+			SnakePoly.setShape(snakeX[currentSlice], snakeY[currentSlice]);
+		
+		SnakePoly.paint(g);
+		SnakeEllipse.paint(g);
+	}	
 	
 }
