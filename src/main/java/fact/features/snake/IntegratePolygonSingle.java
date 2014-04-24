@@ -49,7 +49,7 @@ public class IntegratePolygonSingle implements Processor
 		double erg = 0;
 		for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 		{
-			if(poly.contains(DefaultPixelMapping.getPosX(i), DefaultPixelMapping.getPosY(i)) )
+			if(poly.contains(DefaultPixelMapping.getPosXinMM(i), DefaultPixelMapping.getPosYinMM(i)) )
 			{
 				erg += data[f*Constants.NUMBEROFPIXEL + i];
 			}			

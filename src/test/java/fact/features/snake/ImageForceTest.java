@@ -55,15 +55,12 @@ public class ImageForceTest extends ImageForce
 	public void testGradient()
 	{
 		int center1 = DefaultPixelMapping.getChidFromSoftId(0);	
-		int center2 = DefaultPixelMapping.getChidFromSoftId(5);
-		
+
 		// Test 1 Spalte:																  // R - L = m // (rt) | (rb)
 		assertTrue("X-Gradient 1 wird nicht richtig berechnet!", gradX(center1) == 1890); // (1700-53) | (2303 - 170)
 		assertTrue("Y-Gradient 1 wird nicht richtig berechnet!", gradY(center1) == -486); // (530 - 1016) // T - B   
 				
-		// Test 2 Spalte:
-		assertTrue("X-Gradient 2 wird nicht richtig berechnet!", gradX(center2) == -63); // 
-		assertTrue("Y-Gradient 2 wird nicht richtig berechnet!", gradY(center2) == -63); // 
+
 					
 	}
 

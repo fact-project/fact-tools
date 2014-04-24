@@ -45,8 +45,8 @@ public class CenterOfCluster implements Processor
 		{
 			if(clustMap[i] == clN)
 			{
-				x += DefaultPixelMapping.getPosX(i);
-				y += DefaultPixelMapping.getPosY(i);
+				x += DefaultPixelMapping.getPosXinMM(i);
+				y += DefaultPixelMapping.getPosYinMM(i);
 			}
 		}
 		

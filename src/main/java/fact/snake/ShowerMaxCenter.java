@@ -36,8 +36,8 @@ public class ShowerMaxCenter implements Processor
 		
 		for(int i=0; i<show.length; i++)
 		{
-			ergX += DefaultPixelMapping.getPosX(show[i]) * 0.5 * wei[show[i]];
-			ergY += DefaultPixelMapping.getPosY(show[i]) * 0.5 * wei[show[i]];
+			ergX += DefaultPixelMapping.getPosXinMM(show[i]) * 0.5 * wei[show[i]];
+			ergY += DefaultPixelMapping.getPosYinMM(show[i]) * 0.5 * wei[show[i]];
 			
 			w += wei[show[i]] * 0.5; 
 		}

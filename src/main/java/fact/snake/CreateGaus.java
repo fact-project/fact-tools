@@ -29,8 +29,8 @@ public class CreateGaus implements Processor
 		{
 			for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 			{
-				double x = DefaultPixelMapping.getPosX(i);
-				double y = DefaultPixelMapping.getPosY(i);
+				double x = DefaultPixelMapping.getPosXinMM(i);
+				double y = DefaultPixelMapping.getPosYinMM(i);
 				
 				double AmpMod = Amp * Math.exp(- (((frame-timeMax)*(frame-timeMax))/(2.0*16.0)));
 
