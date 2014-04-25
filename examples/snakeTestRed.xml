@@ -27,7 +27,7 @@
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 				
         <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition" />
-        <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" OutputKey="arrivalTime" />
+        <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime" />
         <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
         <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
