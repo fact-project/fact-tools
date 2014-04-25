@@ -89,7 +89,15 @@ public class FitEllipse  implements Processor
 		major = (res1 < res2) ? res2 : res1;
 		minor = (res1 < res2) ? res1 : res2;
 
-		angle = alpha;
+		if(alpha <= 0)
+		{
+			angle = Math.PI + alpha;
+		}
+		else
+		{
+			angle = alpha;
+		}
+		
 	}
 	
 	

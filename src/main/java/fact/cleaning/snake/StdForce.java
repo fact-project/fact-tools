@@ -21,7 +21,7 @@ public class StdForce extends ImageForce
 	@Override
 	public double forceX(double x, double y) 
 	{
-		int chid = DefaultPixelMapping.coordinatesToChid((float) x, (float) y);
+		int chid = DefaultPixelMapping.coordinatesToChid((float) x, (float) y );
 		
 		if (chid == -1) return 0;
 
@@ -32,13 +32,8 @@ public class StdForce extends ImageForce
 		double exForce = data[chid] - (median * 16.0);	// Data wurde vorher verzehnfacht!
 		exForce = exForce * ((center.getX() - x) < 0 ? 1.0 : -2.0);
 
-		double skal = 10.0 / Math.abs(center.getX() - x);		
-		//exForce = skal * exForce;
-
-		//double winkel = Math.atan((y - center.getY()) / (x - center.getX()));
-
-		//double sinValue = Math.sin(winkel);
-		//exForce = exForce * (sinValue>0.0 ? sinValue : (-sinValue));
+		//double skal = 10.0 / Math.abs(center.getX() - x);		
+		
 				
 
 		return (grad / 180.0) + (exForce / 69.0);		
@@ -47,18 +42,20 @@ public class StdForce extends ImageForce
 	@Override
 	public double forceY(double x, double y) 
 	{
-		int chid = DefaultPixelMapping.coordinatesToChid((float) x, (float) y );
+
+		int chid = DefaultPixelMapping.coordinatesToChid((float) x, (float) y );		
+
 		if (chid == -1) return 0;
 
-		double grad = gradY(chid);
+		double grad = -gradY(chid);
 
 		// Externe Kraft zur mitte
 
 		double exForce = data[chid] - (median * 16.0);
 		exForce = exForce * ((center.getY() - y) < 0 ? 1.0 : -2.0);
 		
-		double skal = 10.0 / Math.abs(center.getX() - x);		
-		//exForce = skal * exForce;
+		//double skal = 10.0 / Math.abs(center.getX() - x);		
+		
 
 		double winkel = Math.atan((y - center.getY()) / (x - center.getX()));
 

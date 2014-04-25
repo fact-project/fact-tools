@@ -31,8 +31,7 @@ public abstract class ImageForce
 		{
 			if(neighbor[i] == -1)
 				return 0;
-		}
-		System.out.println(Arrays.toString(neighbor));
+		}		
 		
 		float  bot = (float) data[neighbor[0]];
 		float  top = (float) data[neighbor[1]];		
