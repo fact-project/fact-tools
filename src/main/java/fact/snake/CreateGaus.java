@@ -14,8 +14,7 @@ public class CreateGaus implements Processor
 	{
 		double sigmaX = 20.0;
 		double sigmaY = 20.0;
-		double Amp = 15;
-		double base = 0.007;
+		double Amp = 15;		
 		
 		double x0 = 0;
 		double y0 = 0;

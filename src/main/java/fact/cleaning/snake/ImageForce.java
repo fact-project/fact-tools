@@ -2,7 +2,6 @@ package fact.cleaning.snake;
 
 import java.awt.geom.Point2D;
 
-import cern.colt.Arrays;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public abstract class ImageForce 

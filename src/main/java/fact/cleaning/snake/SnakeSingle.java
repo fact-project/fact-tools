@@ -1,42 +1,26 @@
 package fact.cleaning.snake;
 
 
-import java.util.Arrays;
 
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
-import stream.annotations.Parameter;
 import fact.Constants;
 import fact.EventUtils;
 import fact.cleaning.CoreNeighborClean;
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
 import fact.statistics.PixelDistribution2D;
-import fact.viewer.ui.DefaultPixelMapping;
-
-
-
-
-
-
-
-import fact.viewer.ui.SnakeDraw;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-// import org.apache.commons.math3.linear.ArrayRealVector;
-// import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
-//import org.apache.commons.math3.linear.RealVector;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.EventUtils;
-
-
 import fact.cleaning.snake.ImageForce;
 import fact.cleaning.snake.StdForce;
+
+
 
 public class SnakeSingle implements StatefulProcessor
 {

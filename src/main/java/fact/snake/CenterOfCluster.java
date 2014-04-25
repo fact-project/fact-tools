@@ -1,17 +1,13 @@
 package fact.snake;
 
-import java.util.List;
-import java.util.Map;
 
 import fact.Constants;
 import fact.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
-import stream.Context;
+
 import stream.Data;
-import stream.Process;
 import stream.Processor;
-import stream.io.Sink;
-import stream.io.Source;
+
 
 public class CenterOfCluster implements Processor
 {

@@ -1,11 +1,5 @@
 package fact.snake;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.management.RuntimeErrorException;
-
 import fact.Constants;
 import fact.EventUtils;
 import stream.Data;
