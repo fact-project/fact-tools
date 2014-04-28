@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.cli.MissingArgumentException;
+import org.bouncycastle.i18n.MissingEntryException;
+
 import stream.util.parser.ParseException;
 
 /**
@@ -104,8 +107,9 @@ public class ZFitsUtil {
 	 * 
 	 * @throws ParseException
 	 * @throws IOException
+	 * @throws MissingArgumentException 
 	 */
-	public static ZFitsTable skipToTable(DataInputStream input, String tableName) throws ParseException, IOException {
+	public static ZFitsTable skipToTable(DataInputStream input, String tableName) throws ParseException, IOException, MissingArgumentException {
 		ZFitsTable fitsTable = null;
 		while(true) {
 			List<String> block = ZFitsUtil.readBlock(input);
@@ -124,7 +128,7 @@ public class ZFitsUtil {
 				// it is not the desired table so skip it entirely
 				long num = input.skipBytes((int)fitsTable.getTableTotalSize());
 				if (num!=(int)fitsTable.getTableTotalSize())
-					throw new RuntimeException("Couldn't skip the table, maybe file is corrupted.");
+					throw new MissingArgumentException("Couldn't skip the table, maybe file is corrupted or table is missing. Name: "+tableName);
 				continue;
 			}
 			return fitsTable;

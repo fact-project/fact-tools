@@ -10,6 +10,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,6 +172,7 @@ public class ZFitsStream extends AbstractStream {
 
 		this.fitsTable = ZFitsUtil.skipToTable(this.dataStream, this.tableName);
 		
+	
 		// create headerItem
 		// add all key value pairs which are not the column information TODO finish extracting column information
 		for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : this.fitsTable.getFitsHeader().getKeyMap().entrySet()) {

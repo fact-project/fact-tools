@@ -182,10 +182,18 @@ public class ZFitsTable {
 		return this.columns.get(index);
 	}
 	
+	/**
+	 * Return if the BINTABLE is a zfits table or not.
+	 * @return True if zfits table.
+	 */
 	public boolean getCommpressed() {
 		return this.isCompressed;
 	}
 	
+	/**
+	 * Returns the fits header which was used to create this table.
+	 * @return The corresponding fits header.
+	 */
 	public FitsHeader getFitsHeader() {
 		return this.header;
 	}
