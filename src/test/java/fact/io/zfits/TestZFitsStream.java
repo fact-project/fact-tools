@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.io.FitsStream;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -39,13 +40,20 @@ public class TestZFitsStream {
 	}
 	
 	public void testDrsCalib() throws Exception {
-		URL u =  TestZFitsStream.class.getResource(zfits);
-		ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+		URL uZfits =  TestZFitsStream.class.getResource(zfits);
+		URL ufits =  TestZFitsStream.class.getResource(fits);
+
+		ZFitsStream stream = new ZFitsStream(new SourceURL(uZfits));
 		stream.setTableName("Events");
 		stream.init();
 		
 		ZFitsDrsCalib drsCalib = new ZFitsDrsCalib();
+		drsCalib.setUrl(uZfits);
 		
+		//FitsStream fitsStream = new FitsStream(new SourceURL(ufits));
+		//fitsStream.init();
+		
+		//TestFz testfz = new TestFz();
 	}
 
 	public void testReadFits() {
