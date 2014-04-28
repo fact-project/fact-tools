@@ -231,12 +231,12 @@ public class HuffmanCoder {
 		 * @return The encoded array as a byte array (without codeTable only data)
 		 */
 		public byte[] encode(short[] input) {
-			ByteBuffer outputBuffer = ZFitsUtil.create(input.length);
+			ByteBuffer outputBuffer = ZFitsUtil.create(input.length*2);
 			int inputSizeShort = input.length;
 			long buffer = 0;
 			int curBit = 0;
 			for (int i=0; i<inputSizeShort; i++) {
-				int index = input[i]&0x0000FFFF;
+				int index = input[i]&0x0000FFFF; //convert to int bitwise not logical
 				Code code = this.symbol2Code[index];
 
 				buffer = buffer | (code.bits<<curBit); // insert bits into buffer
