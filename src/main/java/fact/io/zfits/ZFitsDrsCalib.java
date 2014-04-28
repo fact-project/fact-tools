@@ -3,9 +3,11 @@ package fact.io.zfits;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -16,14 +18,18 @@ public class ZFitsDrsCalib implements Processor {
 
 	private short[] calibData;
 
-	private String outputKey = "Data";
+	@Parameter(name = "outputKey", defaultValue = "DataCalibrated", required=true)
+	private String outputKey;
+
+	@Parameter(name = "optional", defaultValue = "false", required=false,
+			description="If the file is a normal Fits File ignore the drs calibration of the zfits format.")
+	private boolean optional = false;
 
 	@Override
 	public Data process(Data input) {
-		if (!input.containsKey("Data") || !input.containsKey("StartCellData")) {
-			log.error("Can't calibrate data missing 'Data' or 'StartCellData'");
-			return null;
-		}
+		if (optional)
+			return input;
+		EventUtils.mapContainsKeys(getClass(), input, "Data", "StartCellData");
 		short[] data = ((short[])input.get("Data")).clone();
 		short[] startCellData = (short[])input.get("StartCellData");
 		
@@ -84,7 +90,6 @@ public class ZFitsDrsCalib implements Processor {
 		return outputKey;
 	}
 
-	@Parameter(name = "outputKey", defaultValue = "DataCalibrated", required = false)
 	public void setOutputKey(String outputKey) {
 		this.outputKey  = outputKey;
 	}
@@ -93,7 +98,13 @@ public class ZFitsDrsCalib implements Processor {
 		log.info("Load DrsOffset");
 		ZFitsStream drsStream = new ZFitsStream(url);
 		drsStream.setTableName("ZDrsCellOffsets");
-		drsStream.init();
+		try{
+			drsStream.init();
+		} catch (MissingArgumentException e) {
+			if (this.optional)
+				return;
+			throw e;
+		}
 		Data item = drsStream.read();
 		if (!item.containsKey("OffsetCalibration"))
 			throw new NullPointerException("Missing OffsetCalibration");
