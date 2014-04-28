@@ -45,12 +45,8 @@ public class PhotonchargeEvaluate implements Processor {
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
-			qualityFactorPhotoncharge[px] = (photoncharge[px] - cherenkovWeight[px]) / photoncharge[px];
-			if (cherenkovWeight[px] > 2.0)
-			{
-				System.out.println("Quality: " + qualityFactorPhotoncharge[px] + " phCh: " + photoncharge[px] + " mcphCh: " + cherenkovWeight[px]);
-			}
-			qualityFactorArrivalTime[px] = (arrivalTime[px] - cherenkovArrTimeMean[px]) / arrivalTime[px];
+			qualityFactorPhotoncharge[px] = photoncharge[px] / cherenkovWeight[px];
+			qualityFactorArrivalTime[px] = arrivalTime[px] / cherenkovArrTimeMean[px];
 		}
 		
 		input.put(outputKeyPhotonCharge, qualityFactorPhotoncharge);

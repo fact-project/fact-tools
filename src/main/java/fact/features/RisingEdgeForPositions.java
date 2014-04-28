@@ -25,8 +25,11 @@ public class RisingEdgeForPositions implements Processor {
 
     @Parameter(required = true)
 	private String dataKey = null;
+
     @Parameter(required = true)
 	private String outputKey = null;
+
+    
     @Parameter(required = true)
 	private String amplitudePositionsKey = null;
 	//

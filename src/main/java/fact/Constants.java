@@ -12,6 +12,10 @@ public class Constants {
 	public static final String KEY_COLOR = "DrawColor";
 	public static final String ELLIPSE_OVERLAY = "ellipse_overlay";
 	
+	public static final String KEY_SNAKE_VIEWER_X = "snake_X_Prog";
+	public static final String KEY_SNAKE_VIEWER_Y = "snake_Y_Prog";
+	public static final String SNAKE_ELLIPSE_OVERLAY = "snake_ellipse_overlay";
+	
 	
 
 	//number of pixels
