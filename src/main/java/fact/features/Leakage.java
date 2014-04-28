@@ -7,13 +7,17 @@ import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
+import stream.annotations.Parameter;
 
 public class Leakage implements Processor {
 	static Logger log = LoggerFactory.getLogger(Leakage.class);
 
-	private String shower = null;
-	private String weights = null;
-	private String outputKey = "HillasLeakage";
+    @Parameter(required = true)
+	private String shower;
+    @Parameter(required = true)
+	private String weights;
+    @Parameter(required = true)
+	private String outputKey;
 
 	@Override
 	public Data process(Data input) {

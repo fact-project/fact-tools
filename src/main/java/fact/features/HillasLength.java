@@ -7,21 +7,23 @@ import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
 import fact.statistics.PixelDistribution2D;
+import stream.annotations.Parameter;
 
 public class HillasLength implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasLength.class);
-	private String distribution = null;
-	private String outputKey = "length";
+
+    @Parameter(required = true)
+	private String distribution;
+    @Parameter(required = true)
+	private String outputKey;
 	
 	
 	@Override
 	public Data process(Data input) {
 		if(!input.containsKey(distribution)){
-			log.info("No shower in evernt. Not calculating length");
+			log.info("No shower in event. Not calculating length");
 			return input;
 		}
-		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
-	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 
 		double length = Math.sqrt(dist.getEigenVarianceX());

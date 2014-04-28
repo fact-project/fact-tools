@@ -51,7 +51,7 @@ public class FeatureTests {
 		
 		RisingEdgeForPositions rE = new RisingEdgeForPositions();
 //		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-		rE.setDatakey("test");
+		rE.setDataKey("test");
 		rE.setAmplitudePositionsKey("positions");
 		rE.setOutputKey("risingEdge");
 		p = new Pair<String, Class<?>>(rE.getOutputKey(), int[].class );
@@ -102,7 +102,7 @@ public class FeatureTests {
 		
 		RisingEdgeForPositions rE = new RisingEdgeForPositions();
 //		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-		rE.setDatakey("DataCalibrated");
+		rE.setDataKey("DataCalibrated");
 		rE.setAmplitudePositionsKey("positions");
 		rE.setOutputKey("risingEdge");
 		p = new Pair<String, Class<?>>(rE.getOutputKey(), int[].class );
@@ -130,7 +130,6 @@ public class FeatureTests {
 		core.setKey(charge.getOutputKey());
 		core.setKeyPositions(rE.getOutputKey());
 		core.setOutputKey(cleaningOutput);
-		core.init(null);
 		p = new Pair<String, Class<?>>(core.getOutputKey(), int[].class );
 		typeMap.put(core, p);
 		
@@ -139,7 +138,6 @@ public class FeatureTests {
 		dist.setPixel(core.getOutputKey());
 		dist.setWeights(charge.getOutputKey());
 		dist.setOutputKey("distribution");
-		dist.init(null);
 		p = new Pair<String, Class<?>>(dist.getOutputKey(), PixelDistribution2D.class );
 		typeMap.put(dist, p);
 		

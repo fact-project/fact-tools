@@ -1,0 +1,54 @@
+<container>
+
+<!-- <property name="data" value="/home/max_noethe/fact-daten/MonteCarlo/00000003.027_D_MonteCarlo054_Events.fits.gz" />  -->
+<!-- <property name="dataDRS" value="/home/max_noethe/fact-daten/test300samples2.drs.fits.gz" /> -->
+<!-- <property name="data" value="/media/MaxExterne/fact-daten/Daten/20120714_020.fits.gz" />  -->
+<!-- <property name="dataDRS" value="/media/MaxExterne/fact-daten/Daten/20120714_016.drs.fits.gz" /> -->
+<property name="data" value="/home/max_noethe/fact-daten/20121218_108.fits.gz" /> 
+<property name="dataDRS" value="/home/max_noethe/fact-daten/20121218_095.drs.fits.gz" />
+
+<!-- <property name="outfile" value="/home/max_noethe/fact-daten/20120714_20_Run1.csv" /> -->
+<!-- <property name="outfileCut" value="/home/max_noethe/fact-daten/20120714_20_Run1_Cut.csv" /> -->
+<!-- <property name="outfilePhotonCharge" value="/home/max_noethe/fact-daten/photonCharge_20120714_20_Run1.csv" /> -->
+<property name="outfile" value="/home/max_noethe/fact-daten/datentest.csv" />
+<property name="outfileCut" value="/home/max_noethe/fact-daten/datentest_Cut.csv" />
+<property name="outfilePhotonCharge" value="/home/max_noethe/fact-daten/datentest_photonCharge.csv" />
+
+    <stream id="fact" class="fact.io.FitsStream" 
+            url="file:${data}" />
+            
+        <process  input="fact" copies="1">
+        
+<!-- 			<Skip condition="%{data.EventNum} &lt; 32"/> -->
+        	<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+<!--        		<fact.utils.Remapping key="Data" outputKey="Data" /> -->
+            <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated"/>  
+            <fact.utils.CutSlices key="DataCalibrated" start="22" end="220" outputKey="DataCalibrated"/>
+            <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+                
+            <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
+<!--          	<fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" />   -->
+
+            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
+            <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="AmplitudePositions" outputKey="ArrivalTime"/>
+            <fact.features.PhotonCharge key="DataCalibrated" positions="ArrivalTime" outputKey="photonCharge" />
+            <fact.cleaning.CoreNeighborClean key="photonCharge" keyPositions="ArrivalTime" timeThreshold="30" minNumberOfPixel="2" corePixelThreshold="4.0" neighborPixelThreshold="2.0" outputKey="ringPixel" />
+			<Skip condition="%{data.ringPixel}==null"/>
+			<fact.features.NumberOfPixelInShower showerKey="ringPixel" outputKey="numPixelInRing" />
+			<Skip condition="%{data.numPixelInRing} &lt; 20" />
+
+<!-- 			<fact.features.Size showerKey="ringPixel" photonChargeKey="photonCharge" outputKey="size" /> -->		
+			<fact.features.MyonHoughTransform showRingKey="false" ringKey="ringPixel" octantsHitKey="octantsHit" photonChargeKey="photonCharge" bestRadiusKey="bestRadius" bestXKey="bestX" bestYKey="bestY" distanceKey="houghDistance" peaknessKey="houghPeakness" percentageKey="houghPercentage" bestCircleKey="bestCircle" />
+<!-- 			<fact.io.PrintKeysOnConsole keys="octantsHit"/> -->
+			<stream.io.CsvWriter url="file:${outfile}" keys="houghPeakness,houghDistance,octantsHit,houghPercentage,EventNum"/>
+			
+			<Skip condition="%{data.houghDistance} &gt; 120" />
+			<Skip condition="%{data.houghPeakness} &lt; 6.5" />
+			<Skip condition="%{data.houghPercentage} &lt; 0.5" />
+			<stream.io.CsvWriter url="file:${outfileCut}" keys="houghPeakness,houghDistance,octantsHit,houghPercentage,EventNum"/>
+			<fact.io.RootASCIIWriter url="file:${outfilePhotonCharge}" keys="photonCharge"/>
+<!-- 			<PrintData/> -->
+<!--  			<fact.image.ShowImage/>  -->
+		</process>
+</container>

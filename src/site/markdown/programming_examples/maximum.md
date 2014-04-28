@@ -48,7 +48,7 @@ object.
 
 
 We use two loops here to exemplify how to iterate over each pixel separately
-event hough this could easily be accomplished in a single loop. Another way to make this a bit quicker 
+event though this could easily be accomplished in a single loop. Another way to make this a bit quicker
 would be to store the maximum amplitude in a primitive double and then cast it to a `Double` before storing
 it in the map. 
 You can read [this](http://stackoverflow.com/questions/5199359/why-do-people-still-use-primitive-types-in-java) discussion on the primitive vs Numbers in the Java programming language. 

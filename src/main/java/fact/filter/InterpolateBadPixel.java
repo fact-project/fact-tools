@@ -34,7 +34,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 	@Override
 	public double[] processSeries(double[] series) {
 		int roi = series.length / Constants.NUMBEROFPIXEL;
-		//copy the whole data intzo a new array. 
+		//copy the whole data intzo a new array.
 		if(outputKey != null && !outputKey.equals("")) {	
 			nData = new double[series.length];
 			for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
@@ -98,7 +98,8 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 	public int[] getBadChidIds() {
 		return badChIds;
 	}
-	@Parameter(required = true, description = "A List of ChIds for Pixels that are considered defect", defaultValue="The softIds Taken from https://www.fact-project.org/logbook/misc.php?page=known_problems")
+	@Parameter(required = true, description = "A List of ChIds for Pixels that are considered defect",
+            defaultValue="The softIds Taken from https://www.fact-project.org/logbook/misc.php?page=known_problems")
 	public void setBadChidIds(String[] badChIdStrings) {
 		try{
 			int i=0;

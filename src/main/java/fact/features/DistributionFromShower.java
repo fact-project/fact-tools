@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessContext;
+import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
@@ -20,56 +21,43 @@ import fact.statistics.PixelDistribution2D;
 import fact.viewer.ui.DefaultPixelMapping;
 
 
-public class DistributionFromShower implements StatefulProcessor {
+public class DistributionFromShower implements Processor {
+
+    @Parameter(required = true)
+    private String weights =  null;
+    @Parameter(required = true, description = "The key to the showerPixel. That is some sort of int[] containing pixel chids.  ")
+
+    private String pixel =  null;
+
+    //hte in and outputkeys
+    @Parameter(required = true)
+    private String outputKey =null;
+
+	private float[] mpGeomXCoord = DefaultPixelMapping.getGeomXArray();
+	private float[] mpGeomYCoord = DefaultPixelMapping.getGeomYArray();
 	
-	private float[] mpGeomXCoord;
-	private float[] mpGeomYCoord;
-	
-	private float[] mpEigenGeomXCoord;
-	private float[] mpEigenGeomYCoord;
-
-//	private float[] photonCharge;
-	public float mCenterOfGravityX;
-	public float mCenterOfGravityY;
-
-	
-// A logger
-static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
-
-//what do we need to calculate the ellipse?
-private String weights =  null;
-private String pixel =  null;
-private double[] wheightsArray;
-private int[] showerPixel;
-
-//hte in and outputkeys
-private String outputKey =null;
-private String key = null;
+	private float[] mpEigenGeomXCoord = DefaultPixelMapping.getGeomXArray();
+	private float[] mpEigenGeomYCoord = DefaultPixelMapping.getGeomYArray();
 
 
-@Override
-public void init(ProcessContext context) throws Exception {
-    mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
-    mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
-    if(key == null && pixel != null){
-    	key = pixel;
-    }
-}
+    // A logger
+    static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
+
+    //what do we need to calculate the ellipse?
+
+    private double[] wheightsArray;
+    private int[] showerPixel;
+
+
+
+
 
 @Override
 public Data process(Data input) {
 	//get the required stuff from the map
 	//in case the map doesn't contain a shower return the original input.
-	
-	if(outputKey == null){
-		throw new RuntimeException("Missing parameter: outputKey");
-	}
-
 	try{
-		if(key == null){
-			throw new RuntimeException("Missing parameter. Key");
-		}
-		showerPixel= (int[]) input.get(key);
+		showerPixel= (int[]) input.get(pixel);
 		if(showerPixel ==  null){
 			log.info("No showerpixel in this event. Not calculating Ellipse");
 			return input;
@@ -79,21 +67,17 @@ public Data process(Data input) {
 		return null;
 	}
 
-	if(weights == null){
-		throw new RuntimeException("Missing parameter: wheights");
-	} else {
-		try{
-			wheightsArray = (double[]) input.get(weights);
-			if(wheightsArray ==  null){
-				log.error("The values for weight were not found in the map. Aborting");
-				return null;
-			}
-		} catch (ClassCastException e){
-			log.error("Wheights is not of type double[]. Aborting");
-			return null;
-		}
-	}
-	
+    try{
+        wheightsArray = (double[]) input.get(weights);
+        if(wheightsArray ==  null){
+            log.error("The values for weight were not found in the map. Aborting");
+            return null;
+        }
+    } catch (ClassCastException e){
+        log.error("Wheights is not of type double[]. Aborting");
+        return null;
+    }
+
 	
 	
 	//calculate the "size" of the shower
@@ -106,8 +90,8 @@ public Data process(Data input) {
 	//find wheighted center of the shower. assuming we have no islands this works.
     for (int pix: showerPixel)
     {
-        cogX            += wheightsArray[pix] * mpGeomXCoord[pix];
-        cogY            += wheightsArray[pix] * mpGeomYCoord[pix];
+        cogX            += wheightsArray[pix] * DefaultPixelMapping.getGeomXArray()[pix];
+        cogY            += wheightsArray[pix] * DefaultPixelMapping.getGeomYArray()[pix];
     }
     //divide the center coordinates by size. I'm not sure if this is correct. I checked it. It is.
     cogX                /= size;
@@ -251,31 +235,11 @@ public void setWeights(String wheights) {
 public String getPixel() {
 	return pixel;
 }
-@Parameter(required = true, description = "The key to the showerPixel. That is some sort of int[] containing pixel chids.  ", defaultValue = "MaxAmplitudePositons")
 public void setPixel(String pixel) {
 	this.pixel = pixel;
 }
 
 
-
-
-@Override
-public void resetState() throws Exception {
-	// TODO Auto-generated method stub
-}
-@Override
-public void finish() throws Exception {
-	// TODO Auto-generated method stub
-}
-
-
-public String getKey() {
-	return key;
-}
-@Parameter(required = false, description = "This is just an alias for the \"Pixel\" key")
-public void setKey(String key) {
-	this.key = key;
-}
 
 public String getOutputKey() {
 	return outputKey;

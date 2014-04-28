@@ -1,0 +1,19 @@
+<container>
+	<!--<property name="infile" value="/home/tarrox/physik/fact/fact-tools/src/test/resources/zfits_test.fz" />-->
+	<property name="infile" value="/home/tarrox/physik/fact/data/20130331_013.fits.fz" />
+	<property name="infile2" value="/home/tarrox/physik/fact/data/20130331_013.fits.gz" />
+	<property name="drsfile" value="/home/tarrox/physik/fact/data/20130331_007.drs.fits.gz" />
+	
+	<!-- Name des Streams und pfad zu dem Daten-File -->
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/>
+	<process id="2" input="fact">
+		<fact.io.zfits.ZFitsDrsCalib url="file:${infile}" outputKey="DataCal" />
+		
+		<!--<fact.io.zfits.TestFz url="file:${infile2}" />-->
+		<fact.filter.DrsCalibration url="file:${drsfile}" key="DataCalib"  outputKey="DataCalibrated" color="#000000"/>
+		
+		<fact.utils.CutSlices keys="DataCalibrated" start="4"/>
+		
+		<fact.image.ShowImage/>
+	</process>
+</container>

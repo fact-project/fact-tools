@@ -23,6 +23,7 @@ import javax.imageio.metadata.IIOMetadataNode;
 import javax.swing.Action;
 import javax.swing.JPanel;
 
+import fact.viewer.colorMappings.GrayScaleColorMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class HexMap extends JPanel implements PixelMap {
 	public Double cellRadius;
 	Color borderColor = Color.BLACK; // Color.BLUE;
 	
-	ColorMapping colorMap = new NeutralColorMapping();
+	ColorMapping colorMap = new GrayScaleColorMapping();
 	HexTile cellBySoftId[] = new HexTile[1440];
 	
 	List<SelectionListener> selectionListener = new ArrayList<SelectionListener>();

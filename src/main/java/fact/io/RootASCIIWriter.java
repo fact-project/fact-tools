@@ -8,6 +8,7 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.EventUtils;
 import stream.Data;
 import stream.ProcessContext;
 import stream.data.DataFactory;
@@ -62,58 +63,54 @@ public class RootASCIIWriter extends CsvWriter {
 		}
 		
 		Data item  = DataFactory.create();
-		for(int i = 0; i < keys.length; i++){
-			Serializable value = null;
-			if(data.containsKey(keys[i])){
-				value = data.get(keys[i]);
-			} else {
+        for (String key : keys) {
+            Serializable value;
+            if (data.containsKey(key)) {
+                value = data.get(key);
+            } else {
 //				log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
-				return null;
-			}
-			//Check if value is of the right type
-			if (value.getClass().isArray()) {
-				Class<?> type = value.getClass().getComponentType();
-				if(value instanceof Number[]){
-					Number[] s = (Number[]) value;
-					for(int k = 0; k < s.length; k++){
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == float.class){
-					float[] s = ((float[]) value);
-					for(int k = 0; k < s.length; k++){
-						if(s[k] == Float.NaN || s[k] == Float.NEGATIVE_INFINITY || s[k] == Float.POSITIVE_INFINITY ){
-							return data;
-						}
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == double.class){
-					double[] s = ((double[]) value);
-					for(int k = 0; k < s.length; k++){
-						//check for nans or infs and gtfo
-						if(s[k] == Double.NaN || s[k] == Double.NEGATIVE_INFINITY || s[k] == Double.POSITIVE_INFINITY ){
-							return data;
-						}
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == int.class){
-					int[] s = ((int[]) value);
-					for(int k = 0; k < s.length; k++){
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-				else if(type == String.class){
-					String[] s = ((String[]) value);
-					for(int k = 0; k < s.length; k++){
-						item.put(keys[i] + "_" + k, s[k]);
-					}
-				}
-			} else {
-				item.put(keys[i],value.toString());
-			}
-		}
+                return null;
+            }
+            //Check if value is of the right type
+            if (value.getClass().isArray()) {
+                Class<?> type = value.getClass().getComponentType();
+                if (value instanceof Number[]) {
+                    Number[] s = (Number[]) value;
+                    for (int k = 0; k < s.length; k++) {
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == float.class) {
+                    float[] s = ((float[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        if (s[k] == Float.NaN || s[k] == Float.NEGATIVE_INFINITY || s[k] == Float.POSITIVE_INFINITY) {
+                            return data;
+                        }
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == double.class) {
+                    double[] s = ((double[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        //check for nans or infs and gtfo
+                        if (s[k] == Double.NaN || s[k] == Double.NEGATIVE_INFINITY || s[k] == Double.POSITIVE_INFINITY) {
+                            return data;
+                        }
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == int.class) {
+                    int[] s = ((int[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        item.put(key + "_" + k, s[k]);
+                    }
+                } else if (type == String.class) {
+                    String[] s = ((String[]) value);
+                    for (int k = 0; k < s.length; k++) {
+                        item.put(key + "_" + k, s[k]);
+                    }
+                }
+            } else {
+                item.put(key, value.toString());
+            }
+        }
 
 		//this will be a dirty hack to have the superclass iterate over the whole keyset in the dataitem
 		//intstead of taking the keys specified by the user. since we created a whole new data item only containing the 
@@ -125,10 +122,14 @@ public class RootASCIIWriter extends CsvWriter {
 	}
 
 	private String generateHeaderString(Data data) throws ClassCastException{
+		EventUtils.mapContainsKeys(getClass(), data, keys);
+
 		String headerString = "";
 		for(String key: keys){
 			if (data.containsKey(key)){
 				Serializable v = data.get(key);
+				if (v==null)
+					throw new NullPointerException("Key value is null, keyname: '"+key+"'");
 				Class<? extends Serializable> valueType = v.getClass();
 				if(valueType.isArray()){
 					Class<?> type = v.getClass().getComponentType();
@@ -165,6 +166,11 @@ public class RootASCIIWriter extends CsvWriter {
 				} else if(valueType.isAssignableFrom(String.class)){
 					headerString += key+"/"+"C";
 				}
+			} else {
+				System.out.println("Keys:");
+				for (String s : data.keySet())
+					System.out.println("\t"+s);
+				throw new NullPointerException("Key: '"+key+"' is missing in the dataset");
 			}
 			headerString += ":";
 		}

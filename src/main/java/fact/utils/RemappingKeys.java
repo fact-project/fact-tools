@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import fact.Constants;
 import fact.viewer.ui.DefaultPixelMapping;
 
+import fact.EventUtils;
+
 
 
 public class RemappingKeys implements Processor {

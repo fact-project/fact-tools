@@ -13,16 +13,13 @@ import stream.annotations.Parameter;
  *
  */
 public class PerPatchArrivalTimeDistribution implements Processor {
-
-	double [] arrivalTimeArray = null;
-	double [] perPatchMean = null;
-	double [] perPatchVariance = null;
 	
-	String key = "";
+	String key;
 	public String getKey() {
 		return key;
 	}
-	@Parameter(required = true, description="Key to an arrivaltime array.",defaultValue="arrivalTime")
+
+	@Parameter(required=true, description="Key to an arrivaltime array.", defaultValue="arrivalTime")
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -30,21 +27,23 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(required = true, description = "Outputkey", defaultValue = "perPatchArrivalTime")
+
+	@Parameter(required = true, description = "Outputkey", defaultValue="perPatchArrivalTime")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
-	String outputKey = "";
+	String outputKey;
 
 	@Override
 	public Data process(Data input) {
 		
 		EventUtils.mapContainsKeys(getClass(), input, key);
 		
-		try{
-		perPatchMean = new double[160];
-		perPatchVariance = new double[160];
+		double[] arrivalTimeArray = EventUtils.toDoubleArray(input.get(key));
+		//try{
+		double[] perPatchMean = new double[160];
+		double[] perPatchVariance = new double[160];
 
 		int patch = 0;
 		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++)
@@ -60,12 +59,12 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 
 		input.put(outputKey + "_mean", perPatchMean);
 		input.put(outputKey + "_var", perPatchVariance);
-		}catch(Exception e)
+		/*}catch(Exception e)
 		{
 			input.put(outputKey + "_mean", null);
 			input.put(outputKey + "_var", null);
 			return input;
-		}
+		}*/
 		
 		return input;
 	}

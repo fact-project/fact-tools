@@ -1,0 +1,11 @@
+[1] 1201.1340v1 - 'A Tiled-Table Convention for Compressing FITS Binary Tables'
+[2] Binary table extension to FITS
+[3] http://archive.stsci.edu/fits/users_guide - FITS User Guide
+
+* MAYBE: Variable length array are discribed as '1QB' but shoud be described as '1PB' (default proposition by ([1] 2.B) and ([2] 5.11 and 6.A) , '1QB' should be ok but i don't know where it is in the documentation.)
+* JAVA: ZTILELEN is not read. TODO do it and check against it maybe. Now it only uses the number of rows in the tile headers as an information about the amount of rows in the tiles.
+* JAVA: TODO maybe implement ZCTYPn with other algorithms. Now only supports 'FACT'.
+* GENERAL: add ZCTYPn FACT to standard [1]
+* ALL: ZUNITn should contain the SI-unit () and not the datatype.
+* INFO: COMPRESSED TABLES in the 'FACT' compression sheme are stored in little endian, uncompressed std bintables in big endian, as described in ([2] 5.x)
+* ALL: TTYPEn should be '2K' to describe the catalog in the right format.

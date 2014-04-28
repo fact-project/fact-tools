@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import fact.Constants;
+import stream.annotations.Parameter;
 
 /**
  * 
@@ -21,20 +22,26 @@ public class RisingEdgeForPositions implements Processor {
 	static Logger log = LoggerFactory.getLogger(RisingEdgeForPositions.class);
 	
 	private int searchWindowLeft = 25;
-	
-	private String datakey = null;
-	private String outputkey = null;
+
+    @Parameter(required = true)
+	private String dataKey = null;
+
+    @Parameter(required = true)
+	private String outputKey = null;
+
+    
+    @Parameter(required = true)
 	private String amplitudePositionsKey = null;
 	//
 
 	
 	@Override
 	public Data process(Data input) {
-        EventUtils.mapContainsKeys(getClass(), input, datakey, amplitudePositionsKey);
+        EventUtils.mapContainsKeys(getClass(), input, dataKey, amplitudePositionsKey);
 
         int[] positions =  new int[Constants.NUMBEROFPIXEL];
 		
-		double[] data = (double[]) input.get(datakey);		
+		double[] data = (double[]) input.get(dataKey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -49,7 +56,7 @@ public class RisingEdgeForPositions implements Processor {
 			/// temp. Variables
 			double           current_slope   = 0;
 			double           max_slope       = 0;
-			/// @todo remove magic numbers for the search window
+			//Todo: remove magic numbers for the search window
 			int             search_window_left  = posMaxAmp - searchWindowLeft;
 			if (search_window_left < 10)
 			{
@@ -74,31 +81,41 @@ public class RisingEdgeForPositions implements Processor {
 			}
 			positions[pix] = arrivalPos;
 		}
-		input.put(outputkey, positions);
+		input.put(outputKey, positions);
 		
 		return input;
 		
 	}
 
 
-	public String getDatakey() {
-		return datakey;
+
+
+	public String getDataKey() {
+		return dataKey;
 	}
 
 
-	public void setDatakey(String datakey) {
-		this.datakey = datakey;
+
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
 	}
+
+
 
 
 	public String getOutputKey() {
-		return outputkey;
+		return outputKey;
 	}
 
 
-	public void setOutputKey(String outputkey) {
-		this.outputkey = outputkey;
+
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
+
+
 
 
 	public String getAmplitudePositionsKey() {

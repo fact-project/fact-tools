@@ -3,48 +3,52 @@ package fact.features;
 import stream.Data;
 import stream.Processor;
 import fact.EventUtils;
+import stream.annotations.Parameter;
+
 /**
  * Calculate the feature called Size. A physicist would call this the number of Photons in a shower. 
- * This basicly sums up all weights that belong to a shower.
+ * This basically sums up all weights that belong to a shower.
  * In short size is the sum of the photonCharge of all showerPixel. 
  * @author kaibrugge
  *
  */
 public class Size implements Processor {
 
+    @Parameter(required = true)
 	private String showerKey;
+    @Parameter(required = true)
 	private String photonChargeKey;
+    @Parameter(required = true)
 	private String outputKey;
-	/**
-	 * This checks for the type and existence of the two input keys showerKey and photonChargeKey
-	 * @return the input map with {@code double size} added with the key {@code outputKey}, this method will return null if the input keys are not valid.
-	 */
+
 	@Override
 	public Data process(Data input) {
-        if(outputKey == null){
-            throw new RuntimeException("Missing parameter: outputKey");
-        }
-        if(photonChargeKey == null){
-            throw new RuntimeException("Missing parameter: photonChargeKey");
-        }
-        if(showerKey == null){
-            throw new RuntimeException("Missing parameter: showerKey");
-        }
 		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);
 		double[] charge 	= (double[])input.get(photonChargeKey);
-		
-		double size = 0;
-		for (int i = 0; i < shower.length; i++){
-			size += charge[shower[i]];
-		}
+
+        double size = calculateSize(shower, charge);
 		input.put(outputKey, size);
 		return input;
 	}
-	
 
-	public String getOutputKey() {
+    /**
+     *Get the size of the shower.
+     * @param shower the array containing the chids of the pixels which are marked as showers
+     * @param weight some sort of weight for each pixel. Should have 1440 entries
+     * @return the weighted sum of the showerpixels
+     */
+    public double calculateSize(int[] shower, double[] weight) {
+        double size = 0;
+        for (int i = 0; i < shower.length; i++){
+            size += weight[shower[i]];
+        }
+        return size;
+    }
+
+
+    public String getOutputKey() {
 		return outputKey;
 	}
 	public void setOutputKey(String outputKey) {

@@ -6,13 +6,18 @@ import stream.Processor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.annotations.Parameter;
 
 public class FindTimeMarker implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
-	
+
+    @Parameter(required = true)
 	private String key = null;
+    @Parameter(required = true)
 	private String outputkey = null;
+    @Parameter(required = true)
 	private String timeOffsetKey = null;
+
 	double[] posRisingEdges = null;
 	double[] posFallingEdges = null;
 	double[] durations = null;

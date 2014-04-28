@@ -5,18 +5,21 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class HillasConcentration implements Processor {
 	static Logger log = LoggerFactory.getLogger(HillasConcentration.class);
 
-	private String shower = null;
-	private String weights = null;
-	private String outputKey = null;
+    @Parameter(required = true)
+	private String shower;
+    @Parameter(required = true)
+	private String weights;
+    @Parameter(required = true)
+	private String outputKey;
 
 	@Override
 	public Data process(Data input) {
-//		EventUtils.mapContainsKeys(getClass(), input, shower, weights);
-	
+
 		int[] 	showerPixel;
 		double[] photonCharge;
 		try{
