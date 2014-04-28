@@ -28,7 +28,7 @@ public class PrintKeysOnConsole implements Processor {
 		return keys;
 	}
 
-	public void setKey(String[] keys) {
+	public void setKeys(String[] keys) {
 		this.keys = keys;
 	}
 

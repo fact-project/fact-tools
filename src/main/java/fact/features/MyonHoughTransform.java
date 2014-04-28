@@ -11,19 +11,44 @@ import fact.Constants;
 import fact.image.Pixel;
 import fact.image.overlays.PixelSet;
 
+/**
+ * This processor delivers several features that can be used to seperate muon rings from
+ * other data using the Hough Transform for circles.
+ * 
+ * @author MaxNoe
+ * 
+ */
 
 
 public class MyonHoughTransform implements Processor {
 	
-	private String peaknessKey;
+	// OutputKeys
+	
+	// Peakness is a measure for how sharp the best circle is in parameter space
+	private String peaknessKey; 
+	//Distance is the Euklidian Distance between the three best circles in parameter space
 	private String distanceKey;
-	private String ringKey;
+	// Pixelset for the FactViewer, only returned when showRingKey=true
 	private String bestCircleKey;
-	private String photonChargeKey;
-	private String showRingKey;
-	private String percentageKey;
+	// X-Value of the center of the best circle
+	private String bestXKey;
+	// Y-Value of the center of the best circle
+	private String bestYKey;
+	// Radius of the best Circle
+	private String bestRadiusKey;
+	// Number of octants of the best circle in which are HitPixels
 	private String octantsHitKey;
+	// Number of HitPixels on best Ring/ Total number of HitPixels
+	private String percentageKey;
+	
+	//InputKeys
+	private String ringKey; 
+	private String photonChargeKey;
+	//If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
+	private String showRingKey;
+	
 
+	// Defining the parameterspace in which we look for circles:
 	
 	private double min_radius = 70; //minimal radius in mm
 	private double max_radius = 130; //maximal radius in mm
@@ -31,11 +56,11 @@ public class MyonHoughTransform implements Processor {
 	private double max_x = 300; //maximal center X in mm
 	private double min_y = -300; //minimal center y in mm
 	private double max_y = 300; //maximal center y in mm
+
+	// resolution
 	private int res_r = 18;
 	private int res_x = 60;
 	private int res_y = 60;
-	
-	
 	
 	
 	final Logger log = LoggerFactory.getLogger(MyonHoughTransform.class);	
@@ -47,8 +72,6 @@ public class MyonHoughTransform implements Processor {
 		int[] ring = (int[]) input.get(ringKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 				
-		//double[] charge = (double[]) input.get(photonchargeKey);
-		
 		double[] xPositions = new double[ring.length];
 		double[] yPositions = new double[ring.length];
 		
@@ -59,11 +82,11 @@ public class MyonHoughTransform implements Processor {
 			yPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(ring[i]);
 		}
 		
-		// Hough-vote-Matrix erzeugen:
+		// generate Hough-Voting-Matrix n:
 		
 		int[][][] HoughMatrix = new int[res_r+1][res_x+1][res_y+1];
 		
-		//log.info("HoughMatrixErzeugt");
+		//Fill the parameter space
 		
 		double[] circle_radius = new double[res_r+1];
 		double[] circle_x = new double[res_x+1];
@@ -79,8 +102,6 @@ public class MyonHoughTransform implements Processor {
 			circle_y[i] = (max_y - min_y) * i/res_y + min_y;
 		}
 		
-		//log.info("Parameter-Arrays befüllt");
-		
 		// HoughTransform:
 		
 		double peakness = 0;
@@ -88,6 +109,7 @@ public class MyonHoughTransform implements Processor {
 		
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		
+		//Position in parameter space of the three best circles
 		int[] highest_pos = {0, 0, 0};
 		int[] second_highest_pos = {0, 0, 0};
 		int[] third_highest_pos = {0, 0, 0};
@@ -122,20 +144,16 @@ public class MyonHoughTransform implements Processor {
 			}
 		}
 		
-		
-		
-		
-		
-        //log.info("HoughTransform durchgefügt");
-		
-		
 
-		//log.info("Suche nach Maxima durchgeführt");
-		
+		// Calculate the Features 
 		
 		double radius_1 = circle_radius[highest_pos[0]];
 		double center_x_1 = circle_x[highest_pos[1]];
 		double center_y_1 = circle_y[highest_pos[2]];
+		
+		input.put(bestRadiusKey, radius_1);
+		input.put(bestXKey, center_x_1);
+		input.put(bestYKey, center_y_1);
 				
 		double radius_2 = circle_radius[second_highest_pos[0]];
 		double center_x_2 = circle_x[second_highest_pos[1]];
@@ -156,22 +174,13 @@ public class MyonHoughTransform implements Processor {
 		double HoughSum = stats.getSum();
 		
 		peakness = HoughMaximum/(HoughSum/NoneZeroElems);
-		
-		double phi=0;
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		input.put(peaknessKey, peakness);
+		input.put(distanceKey, ParamDistanceSum);
+	
+
 		double percentage;
 		double onRingPixel=0;
+		double phi=0;
 		int octantsHit=0;
 		boolean[] octants = {false,false,false,false,false,false,false,false};
 		
@@ -180,9 +189,9 @@ public class MyonHoughTransform implements Processor {
 			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
 			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
 				onRingPixel+=1;
-				phi = Math.atan2(xPositions[pix], yPositions[pix]);
+				phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
 				for(int i=0; i<8; i++){
-					if(phi>i*Math.PI/4 && phi<(i+1)*Math.PI/4){
+					if(phi>i*Math.PI/4 - Math.PI && phi<=(i+1)*Math.PI/4 - Math.PI ){
 						octants[i]=true;
 					}
 				}
@@ -195,14 +204,14 @@ public class MyonHoughTransform implements Processor {
 			}
 		}
 		
-		
-		
-		
 		input.put(octantsHitKey, octantsHit);
 		
 		percentage = onRingPixel/ring.length;
 		
 		input.put(percentageKey, percentage);
+		
+
+		// Creating the Pixelsets for the Viewer
 		
 		if (showRingKey.equals("true")){
 			double PixelPosX;
@@ -234,9 +243,6 @@ public class MyonHoughTransform implements Processor {
 			input.put("second"+bestCircleKey, secondBestCirclePixelSet);
 			input.put("third"+bestCircleKey, thirdBestCirclePixelSet);
 		}
-		
-		input.put(peaknessKey, peakness);
-		input.put(distanceKey, ParamDistanceSum);
 		
 		
 		return input;
