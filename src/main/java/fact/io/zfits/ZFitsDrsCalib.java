@@ -141,7 +141,7 @@ public class ZFitsDrsCalib implements Processor {
 		}
 	}
 
-	public boolean isOptional() {
+	public boolean getOptional() {
 		return optional;
 	}
 
