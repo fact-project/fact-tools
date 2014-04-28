@@ -44,8 +44,6 @@ public class AreaTest
 			
 			double erg = (Double) item.get("out");
 			
-			System.out.println(erg);
-			
 			assertTrue("Fläche falsch berechnet!", erg == 4.0);
 			
 
