@@ -14,10 +14,16 @@ import stream.io.SourceURL;
 public class TestZFitsStream {
 	static Logger log = LoggerFactory.getLogger(TestZFitsStream.class);
 
+	private final String zfits = "/zfits_test.fz";
+	private final String fits = "/fits_test.gz";
+
+
 	@Test
-	public void test() throws Exception {
-		URL u =  TestZFitsStream.class.getResource("/zfits_test.fz");
+	//read all entries
+	public void testReadZFits() throws Exception {
+		URL u =  TestZFitsStream.class.getResource(zfits);
 		ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+		stream.setTableName("Events");
 		stream.init();
 		
 		log.info("Item number {}", 0);
@@ -30,5 +36,23 @@ public class TestZFitsStream {
 			log.info("Item number {}", i++);
 			item = stream.read();
 		}
+	}
+	
+	public void testDrsCalib() throws Exception {
+		URL u =  TestZFitsStream.class.getResource(zfits);
+		ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+		stream.setTableName("Events");
+		stream.init();
+		
+		ZFitsDrsCalib drsCalib = new ZFitsDrsCalib();
+		
+	}
+
+	public void testReadFits() {
+		
+	}
+	
+	public void testZFitsVsFits() {
+		
 	}
 }
