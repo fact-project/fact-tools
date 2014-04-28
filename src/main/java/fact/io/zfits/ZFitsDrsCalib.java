@@ -140,4 +140,12 @@ public class ZFitsDrsCalib implements Processor {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
+
+	public boolean isOptional() {
+		return optional;
+	}
+
+	public void setOptional(boolean optional) {
+		this.optional = optional;
+	}
 }
