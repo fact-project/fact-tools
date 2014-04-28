@@ -22,12 +22,15 @@ public class PreviousStartCells implements Processor {
 	
 	LinkedList<short[]> previousStartCells = new LinkedList<short[]>();
 	LinkedList<short[]> previousStopCells = new LinkedList<short[]>();
+	LinkedList<int[]> previousUnixTimes = new LinkedList<int[]>();
 
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
 		
-		EventUtils.mapContainsKeys(this.getClass(), input, startCellKey,"NROI");
+		EventUtils.mapContainsKeys(this.getClass(), input, startCellKey,"NROI","UnixTimeUTC");
+		
+		int[] eventTime = (int[]) input.get("UnixTimeUTC");
 		
 		short[] startCellArray = (short[])input.get(startCellKey);
 		short[] stopCellArray = new short[startCellArray.length];
@@ -40,6 +43,7 @@ public class PreviousStartCells implements Processor {
 		
 		previousStartCells.addFirst(startCellArray);
 		previousStopCells.addFirst(stopCellArray);
+		previousUnixTimes.addFirst(eventTime);
 		
 		if (previousStartCells.size() > limitEvents)
 		{
@@ -49,10 +53,15 @@ public class PreviousStartCells implements Processor {
 		{
 			previousStopCells.removeLast();
 		}
+		if (previousUnixTimes.size() > limitEvents)
+		{
+			previousUnixTimes.removeLast();
+		}
 		
 		
 		input.put(outputKey +"_start", previousStartCells);
 		input.put(outputKey +"_stop", previousStopCells);
+		input.put(outputKey+"_time", previousUnixTimes);
 		return input;
 	}
 
