@@ -1,6 +1,7 @@
 package fact.features;
 
 import stream.Data;
+import java.util.ArrayList;
 import stream.Processor;
 
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ public class MyonHoughTransform implements Processor {
 	private String octantsHitKey;
 	// Number of HitPixels on best Ring/ Total number of HitPixels
 	private String percentageKey;
+	// Pixel Chids of the best Ring
+	private String bestRingPixelKey;
 	
 	//InputKeys
 	private String ringKey; 
@@ -184,11 +187,14 @@ public class MyonHoughTransform implements Processor {
 		int octantsHit=0;
 		boolean[] octants = {false,false,false,false,false,false,false,false};
 		
+		ArrayList<Integer> bestRingPixelList = new ArrayList<Integer>();
+		
 		
 		for (int pix=0; pix<ring.length;pix++){
 			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
 			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
 				onRingPixel+=1;
+				bestRingPixelList.add(pix);
 				phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
 				for(int i=0; i<8; i++){
 					if(phi>i*Math.PI/4 - Math.PI && phi<=(i+1)*Math.PI/4 - Math.PI ){
@@ -198,6 +204,11 @@ public class MyonHoughTransform implements Processor {
 			}
 		}
 		
+		Integer[] bestRingPixel = new Integer[bestRingPixelList.size()];
+		
+		bestRingPixel = bestRingPixelList.toArray(bestRingPixel);
+		
+		input.put(bestRingPixelKey, bestRingPixel);		
 		for(int i=0; i<8; i++){
 			if(octants[i]){
 				octantsHit+=1;
@@ -305,5 +316,15 @@ public class MyonHoughTransform implements Processor {
 
 	public void setoctantsHitKey(String octantsHitKey) {
 		this.octantsHitKey = octantsHitKey;
+	}
+
+
+	public String getBestRingPixelKey() {
+		return bestRingPixelKey;
+	}
+
+
+	public void setBestRingPixelKey(String bestRingPixelKey) {
+		this.bestRingPixelKey = bestRingPixelKey;
 	}
 }
