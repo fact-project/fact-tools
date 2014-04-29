@@ -4,7 +4,7 @@ import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
-public class Area  implements Processor
+public class PolygonArea  implements Processor
 {
 	String outputKey = null;	
 	
@@ -14,7 +14,8 @@ public class Area  implements Processor
 	@Override
 	public Data process(Data input) 
 	{
-		if(outputKey == null){
+		if(outputKey == null)
+		{
 			throw new RuntimeException("Missing parameter: outputKey");
 		}	
 		
@@ -23,21 +24,14 @@ public class Area  implements Processor
 		double[] x = (double[]) input.get(snakeX);
 		double[] y = (double[]) input.get(snakeY);
 		
-		int border = x.length-1;
-
+		final int N = x.length;
+		
 		float erg = 0;
-
-		//Oberer Rand
-		erg += ( x[0] * ( x[border] - x [1]) );
-
-
-		for(int i=1; i<border-1; i++)
-		{
-			erg += ( y[i] * ( x[i-1] - x [i+1]) );
-		}
-
-		//Unterer Rand
-		erg += ( y[border] * ( x[border-1] - x [0]) );
+		
+		for(int i=0; i < N; i++)
+		{			
+			erg += (y[i] + y[(i+1) % N]) * (x[i] - x[(i+1) % N]);
+		}				
 
 		input.put(outputKey, Math.abs(0.5 * erg));
 		

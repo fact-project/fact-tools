@@ -12,15 +12,10 @@ import stream.annotations.Parameter;
  */
 
 public class PerPatchVoltageIntegral implements Processor {
-
-	private double[] dataCalibratedArray = null;
-	private String key = "";
-	
-	
 	public String getKey() {
 		return key;
 	}
-	@Parameter(required = true, defaultValue = "dataCalibrated", description = "The input key")
+	
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -29,22 +24,23 @@ public class PerPatchVoltageIntegral implements Processor {
 		return outputKey;
 	}
 
-	@Parameter(required = true, defaultValue = "perPatchVoltageIntegral", description = "The output key")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
-	private String outputKey = "";
-	private double[] perPatchVoltageIntegral = null;
-	private int roi = 0;
+	@Parameter(required = true, defaultValue = "dataCalibrated", description = "The input key")
+	private String key = "";
+
+	@Parameter(required = true, defaultValue = "perPatchVoltageIntegral", description = "The output key")
+	private String outputKey;
 	
 	@Override
 	public Data process(Data input) {
 		
 		EventUtils.mapContainsKeys(getClass(), input, key);
-		dataCalibratedArray = (double[]) input.get(key);
-		roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
-		perPatchVoltageIntegral = new double[160];
+		double[] dataCalibratedArray = (double[]) input.get(key);
+		int roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
+		double[] perPatchVoltageIntegral = new double[160];
 		
 		int patch = 0;
 

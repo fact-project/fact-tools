@@ -23,13 +23,11 @@ import fact.cleaning.snake.StdForce;
 
 
 
-public class SnakeComplete implements StatefulProcessor
+public class SnakeComplete extends Snake implements StatefulProcessor
 {
-private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
+	private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);	
 	
-	private double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
-	
-	private RealMatrix[] matrix;
+	private String drawSnake = null;
 	
 	private String pixelDataName = null;	
 	private String showerCenterX = null;
@@ -37,121 +35,23 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	private String mean = null;
 
 	private String SnakeOutX = null;
-	private String SnakeOutY = null;
-	
-
-	private double alpha = 0.12;
-	private double beta = 0.07;
-	private double dt = 0.05;
-	private double ds2 = 1.0;
-	
-	private RealMatrix vecX;
-	private RealMatrix vecY;
-	
-	private int NumberOfVertices = 6;
-	
+	private String SnakeOutY = null;	
 	
 	private double centerX[] = null;
 	private double centerY[] = null;
 	
+	private double[] photonCharge = null;
+	final int NIteration = 500;
+	
 	//////////////////////////////////////////////////////////////////////////////
 	
-	private void calcMatrix(int count)
-	{
-		final double a = alpha * dt / ds2;
-		final double b = beta * dt / ds2;
-
-		final double r = 1.0 + 2.0 * a + 6.0*b;
-		final double p = b;
-		final double q = -a - 4.0*b;						
-			
-		for(int i=0; i < count; i++)
-		{			
-			matrix[count-1].setEntry(i, i, r);
-			
-			matrix[count-1].setEntry((i + 1) % count, i, q);
-			matrix[count-1].setEntry((i + 2) % count, i, p);
-
-			matrix[count-1].setEntry(((i - 1) + count) % count, i, q);
-			matrix[count-1].setEntry(((i - 2) + count) % count, i, p);			
-		}
-			
-		matrix[count-1] = new LUDecomposition(matrix[count-1]).getSolver().getInverse();
-	}
 	
-	private void splitLines(double maxDist)
-	{
-		if(NumberOfVertices > 40)
-		{
-			return;
-		}
-
-		for(int i=0; i<NumberOfVertices; i++)
-		{
-			double distX = vecX.getEntry((i+1) % NumberOfVertices, 0) - vecX.getEntry(i, 0);
-			double distY = vecY.getEntry((i+1) % NumberOfVertices, 0) - vecY.getEntry(i, 0);
-
-			if(distX*distX + distY*distY > maxDist)
-			{
-				NumberOfVertices++;
-				RealMatrix newVecX = new Array2DRowRealMatrix(NumberOfVertices,1);
-				RealMatrix newVecY = new Array2DRowRealMatrix(NumberOfVertices,1);				
-
-				for(int j=0; j<=i; j++)
-				{
-					newVecX.setEntry(j, 0, vecX.getEntry(j, 0));
-					newVecY.setEntry(j, 0, vecY.getEntry(j, 0));					
-				}
-
-				newVecX.setEntry(i+1, 0, vecX.getEntry(i, 0) + (distX/2.0));				
-				newVecY.setEntry(i+1, 0, vecY.getEntry(i, 0) + (distY/2.0));
-			
-
-				for(int j = i+1; j < (NumberOfVertices-1); j++)
-				{
-					newVecX.setEntry(j+1, 0, vecX.getEntry(j, 0));					
-					newVecY.setEntry(j+1, 0, vecY.getEntry(j, 0));					
-				}
-
-				vecX = newVecX;
-				vecY = newVecY;					
-			}
-		}
-	}
-	
-	private void step(ImageForce f)
-	{				
-		for(int i=0; i<NumberOfVertices; i++)
-		{	
-			double x = vecX.getEntry(i,0);
-			double y = vecY.getEntry(i,0);			
-
-			vecX.setEntry(i, 0, x + (dt * f.forceX(x, y)) );
-			vecY.setEntry(i, 0, y + (dt * f.forceY(x, y)) );		
-		}		
-
-		RealMatrix EigenMat = matrix[NumberOfVertices-1];
-
-		vecX = EigenMat.multiply(vecX);
-		vecY = EigenMat.multiply(vecY);
-
-		splitLines(250.0);	// 2 Pixel lang
-		
-	}
 	//////////////////////////////////////////////////////////////////////////////
 	
 	@Override
 	public void init(ProcessContext context) throws Exception 
 	{
-		matrix = new Array2DRowRealMatrix[50];
-		vecX = new Array2DRowRealMatrix(6,1);
-		vecY = new Array2DRowRealMatrix(6,1);
-		
-		for(int i=0; i < 50; i++)
-		{
-			matrix[i] = new Array2DRowRealMatrix(i+1, i+1);			
-			calcMatrix(i+1);
-		}		
+		this.initMatrix();
 	}
 	
 	@Override
@@ -166,7 +66,7 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 		try
 		{			
 			EventUtils.mapContainsKeys(getClass(), input, pixelDataName, mean);
-			photonCharge= (double[]) input.get(pixelDataName);
+			photonCharge = (double[]) input.get(pixelDataName);
 			if(photonCharge == null)
 			{
 				log.error("No weights found in event. Aborting.");
@@ -190,57 +90,74 @@ private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 			log.error("CastError");
 		}	
 		
-		double[][][] tmpSaveX = new double[photonCharge.length / Constants.NUMBEROFPIXEL][][];
-		double[][][] tmpSaveY = new double[photonCharge.length / Constants.NUMBEROFPIXEL][][];
 		
-		for(int frame = 0; frame < photonCharge.length / Constants.NUMBEROFPIXEL; frame++)
+		
+		double[][][] tmpSaveX = null;
+		double[][][] tmpSaveY = null;
+		
+		int numberOfFrames = photonCharge.length / Constants.NUMBEROFPIXEL;
+		if(drawSnake != null)
 		{
-			NumberOfVertices = 6;
-			vecX = new Array2DRowRealMatrix(6,1);
-			vecY = new Array2DRowRealMatrix(6,1);
-			
-			for (int i = 0; i < 6; i++)
-			{
-				float a = (float) (centerX[frame] + 15.0 * Math.sin(i*3.1415 / 3.0));
-				float b = (float) (centerY[frame] + 15.0 * Math.cos(i*3.1415 / 3.0));
+			//Aufbau: [FRAME][ITERATION][PUNKT]
+			tmpSaveX = new double[numberOfFrames][][];
+			tmpSaveY = new double[numberOfFrames][][];
+		}
 
-				vecX.setEntry(i, 0, a);
-				vecY.setEntry(i, 0, b);
-			}		
+		double[][] snakeXBuffer = new double[numberOfFrames][];
+		double[][] snakeYBuffer= new double[numberOfFrames][];
+		
+		
+		for(int frame = 0; frame < numberOfFrames; frame++)
+		{
 			
-			
+			this.initStartPos(centerX[frame], centerY[frame], 15.0, 6);			
 			
 			
 			double[] data = new double[Constants.NUMBEROFPIXEL];
 			for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 			{
-				data[i + Constants.NUMBEROFPIXEL*frame] = 10 * photonCharge[i];
+				data[i + Constants.NUMBEROFPIXEL*frame] = photonCharge[i];
 			}
 			
 			ImageForce force = new StdForce(data, (float) centerX[frame], (float) centerY[frame]);	
 			force.setMedian((Double) input.get(mean));
 		
-			//System.out.println(force.median);
 			
-			double[][] xBuf = new double[200][];
-			double[][] yBuf = new double[200][];
+			if(drawSnake != null)
+			{
+				double[][] xBuf = new double[NIteration][];
+				double[][] yBuf = new double[NIteration][];
+				
+				for(int i=0; i<NIteration; i++)
+				{			
+					step(force);
+					xBuf[i] = this.getSnakeX();
+					yBuf[i] = this.getSnakeY();
+				}									
+								
+				tmpSaveX[frame] = xBuf;
+				tmpSaveY[frame] = yBuf;					
+			}
+			else
+			{				
+				for(int i=0; i<NIteration; i++)
+				{			
+					step(force);
+				}					
+			}				
 			
-			for(int i=0; i<200; i++)
-			{			
-				step(force);
-				xBuf[i] = vecX.getColumn(0);
-				yBuf[i] = vecY.getColumn(0);
-			}									
-			
-			tmpSaveX[frame] = xBuf;
-			tmpSaveY[frame] = yBuf;			
+			snakeXBuffer[frame] = this.getSnakeX();
+			snakeYBuffer[frame] = this.getSnakeY();			
 		}
 		
-		input.put(Constants.KEY_SNAKE_VIEWER_X, tmpSaveX);
-		input.put(Constants.KEY_SNAKE_VIEWER_Y, tmpSaveY);
+		if(drawSnake != null)
+		{		
+			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpSaveX);
+			input.put(Constants.KEY_SNAKE_VIEWER_Y, tmpSaveY);				
+		}		
 		
-		input.put(SnakeOutX, vecX.getColumn(0));
-		input.put(SnakeOutY, vecY.getColumn(0));
+		input.put(SnakeOutX, snakeXBuffer);
+		input.put(SnakeOutY, snakeYBuffer);
 			
 		return input;
 	}

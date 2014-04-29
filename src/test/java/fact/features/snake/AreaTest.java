@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import stream.Data;
 import stream.io.SourceURL;
-import fact.features.snake.Area;
+import fact.features.snake.PolygonArea;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 
@@ -33,7 +33,7 @@ public class AreaTest
 			item.put("x", x);
 			item.put("y", y);
 			
-			Area area = new Area();
+			PolygonArea area = new PolygonArea();
 			area.setSnakeX("x");
 			area.setSnakeY("y");
 			area.setOutkey("out");
@@ -44,7 +44,7 @@ public class AreaTest
 			
 			double erg = (Double) item.get("out");
 			
-			//assertTrue("Fläche falsch berechnet!", erg == 4.0);
+			assertTrue("Fläche falsch berechnet!", erg == 4.0);
 			
 
 		} 

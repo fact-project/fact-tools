@@ -1,0 +1,54 @@
+<container>
+
+    <!-- Pfade zu den fits files. -->
+    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_060.fits.gz" />
+    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_056.drs.fits.gz" />
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/ceresTriggerTest/new_trigger/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/00000003.910_D_MonteCarlo016_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/test_run/52911/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/test_run_rev17391/52911/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/muon_martina_4_psf_3_0_v2/54027/00000003.027_D_MonteCarlo054_Events.fits.gz" /> -->
+    <!-- <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples.drs.fits" /> -->
+    <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <property name="outfile" value="/home/fabian/jumpStudyPixel.csv" />
+    <property name="outfile2" value="/home/fabian/jumpStudyPatch.csv" />
+    <property name="sourcename" value="crab" />
+    <property name="core_threshold" value="5.0" />
+    <property name="neighbor_threshold" value="2.0"/>
+    <property name="time_threshold" value="30.0" />
+    <property name="min_number_of_pixel" value="2" />
+    <property name="integral_gain" value="242.0" />
+
+
+    <!-- Name des Streams und pfad zu dem Daten-File -->
+    <!-- <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="6"/> -->
+    
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+
+    <process id="2" input="fact">
+        <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>
+<!--         <fact.features.CreateFakeStartCells outputKey="FStartCells" />
+        <fact.utils.PreviousStartCells startCellKey="FStartCells" outputKey="prevEvents" limitEvents="10"/> -->
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" /> 
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+<!--         <fact.features.PatchAverage key="DataCalibrated" outputKey="DataPatches" />
+        <fact.features.Derivation key="DataPatches" outputKey="DataPatchesDeriv" />
+        <fact.features.Derivation key="DataPatchesDeriv" outputKey="DataPatchesDerivDeriv" /> -->
+        <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataPatchJumpRemoval" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" spikeLimit="7.0"/>
+        <!-- <fact.features.JumpStudy outputKey="j"/> -->
+        
+        <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,j0_deltaT,j0_jumpsPixel,j0_jumpsPatch,j0_derivDerivPixel,j0_derivDerivPatch,j1_deltaT,j1_jumpsPixel,j1_jumpsPatch,j1_derivDerivPixel,j1_derivDerivPatch,j2_deltaT,j2_jumpsPixel,j2_jumpsPatch,j2_derivDerivPixel,j2_derivDerivPatch"/> -->
+        <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,j0_deltaT,j0_jumpCameraOne,j0_jumpCameraSome,j0_jumpsPixel,j1_deltaT,j1_jumpCameraOne,j1_jumpCameraSome,j1_jumpsPixel,j2_deltaT,j2_jumpCameraOne,j2_jumpCameraSome,j2_jumpsPixel"/> -->
+        <!-- <fact.io.RootASCIIWriter url="file:${outfile2}" keys="EventNum,j0_deltaT,j0_jumpCameraOne,j0_jumpCameraSome,j0_jumpsPatch,j1_deltaT,j1_jumpCameraOne,j1_jumpCameraSome,j1_jumpsPatch,j2_deltaT,j2_jumpCameraOne,j2_jumpCameraSome,j2_jumpsPatch"/> -->
+        
+		<!-- <stream.flow.Skip condition="%{data.j_heighestPatchJump} &lt; 20" /> -->
+		
+		<!-- <fact.io.PrintKeysOnConsole keys="j_heighestPatchJump,j_patchOfHeighestJump,j0_jumpCameraOne" /> -->
+            
+        <fact.image.ShowImage/>
+
+
+    </process>
+
+
+</container>
