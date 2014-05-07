@@ -21,7 +21,7 @@ import fact.image.overlays.PixelSet;
  */
 
 
-public class MyonHoughTransform implements Processor {
+public class MuonHoughTransform implements Processor {
 	
 	// OutputKeys
 	
@@ -48,7 +48,7 @@ public class MyonHoughTransform implements Processor {
 	private String ringKey; 
 	private String photonChargeKey;
 	//If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
-	private String showRingKey;
+	private boolean showRingKey;
 	
 
 	// Defining the parameterspace in which we look for circles:
@@ -66,7 +66,7 @@ public class MyonHoughTransform implements Processor {
 	private int res_y = 60;
 	
 	
-	final Logger log = LoggerFactory.getLogger(MyonHoughTransform.class);	
+	final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);	
 	
 	@Override
 	public Data process(Data input) {
@@ -149,6 +149,8 @@ public class MyonHoughTransform implements Processor {
 		
 
 		// Calculate the Features 
+
+		// Hough-Distance and Peakness
 		
 		double radius_1 = circle_radius[highest_pos[0]];
 		double center_x_1 = circle_x[highest_pos[1]];
@@ -171,7 +173,6 @@ public class MyonHoughTransform implements Processor {
 		double ParamDistance3 = Math.sqrt(Math.pow(radius_3 - radius_2, 2) + Math.pow(center_x_3 - center_x_2, 2) + Math.pow(center_y_3 - center_y_2 , 2));
 		
 		
-		
 		double ParamDistanceSum = ParamDistance1 + ParamDistance2 + ParamDistance3; 
 		double HoughMaximum = stats.getMax();
 		double HoughSum = stats.getSum();
@@ -179,7 +180,34 @@ public class MyonHoughTransform implements Processor {
 		peakness = HoughMaximum/(HoughSum/NoneZeroElems);
 		input.put(peaknessKey, peakness);
 		input.put(distanceKey, ParamDistanceSum);
-	
+
+		
+		// Pixels belonging to the best ring:
+		
+		ArrayList<Integer> bestRingPixelList = new ArrayList<Integer>();
+		
+		double PixelPosX;
+		double PixelPosY;		
+		
+		for(int pix=0; pix<fact.Constants.NUMBEROFPIXEL; pix++){
+			PixelPosX = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(pix);
+			PixelPosY = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(pix);
+			distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
+			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
+				bestRingPixelList.add(pix);		
+			}
+		}
+		
+		int[] bestRingPixel = new int[bestRingPixelList.size()];
+		
+		for(int i=0; i < bestRingPixelList.size(); i++){
+			bestRingPixel[i] = bestRingPixelList.get(i);
+		}
+		
+		input.put(bestRingPixelKey, bestRingPixel);
+		
+		
+		// percentage and octantshit
 
 		double percentage;
 		double onRingPixel=0;
@@ -187,14 +215,11 @@ public class MyonHoughTransform implements Processor {
 		int octantsHit=0;
 		boolean[] octants = {false,false,false,false,false,false,false,false};
 		
-		ArrayList<Integer> bestRingPixelList = new ArrayList<Integer>();
-		
-		
 		for (int pix=0; pix<ring.length;pix++){
 			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
 			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
 				onRingPixel+=1;
-				bestRingPixelList.add(pix);
+				
 				phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
 				for(int i=0; i<8; i++){
 					if(phi>i*Math.PI/4 - Math.PI && phi<=(i+1)*Math.PI/4 - Math.PI ){
@@ -202,13 +227,9 @@ public class MyonHoughTransform implements Processor {
 					}
 				}
 			}
-		}
+		}		
+				
 		
-		Integer[] bestRingPixel = new Integer[bestRingPixelList.size()];
-		
-		bestRingPixel = bestRingPixelList.toArray(bestRingPixel);
-		
-		input.put(bestRingPixelKey, bestRingPixel);		
 		for(int i=0; i<8; i++){
 			if(octants[i]){
 				octantsHit+=1;
@@ -224,9 +245,7 @@ public class MyonHoughTransform implements Processor {
 
 		// Creating the Pixelsets for the Viewer
 		
-		if (showRingKey.equals("true")){
-			double PixelPosX;
-			double PixelPosY;
+		if (showRingKey){
 			double distance1;
 			double distance2;
 			double distance3;
@@ -285,12 +304,6 @@ public class MyonHoughTransform implements Processor {
 	public void setRingKey(String ringKey) {
 		this.ringKey = ringKey;
 	}
-	public String getShowRingKey() {
-		return showRingKey;
-	}
-	public void setShowRingKey(String showRingKey) {
-		this.showRingKey = showRingKey;
-	}
 	public String getPhotonChargeKey() {
 		return photonChargeKey;
 	}
@@ -326,5 +339,15 @@ public class MyonHoughTransform implements Processor {
 
 	public void setBestRingPixelKey(String bestRingPixelKey) {
 		this.bestRingPixelKey = bestRingPixelKey;
+	}
+
+
+	public boolean isShowRingKey() {
+		return showRingKey;
+	}
+
+
+	public void setShowRingKey(boolean showRingKey) {
+		this.showRingKey = showRingKey;
 	}
 }

@@ -40,14 +40,12 @@ public class KeyInShowerDistribution implements Processor {
 		
 		meanKey /= (double)showerKey.length;
 		
-		log.info("mean = " + String.valueOf(meanKey));
 		
 		for(int i=0; i<showerPixel.length; i++){
 			stdDevKey += Math.pow(showerKey[i] - meanKey, 2);
 		}
 		
 		stdDevKey = Math.sqrt(1/(double)(showerKey.length -1) * stdDevKey);
-		log.info("StdDev = " + String.valueOf(stdDevKey));
 		input.put(outputKey, keyData);
 		input.put(outputKey+"Mean", meanKey);
 		input.put(outputKey+"StdDev", stdDevKey);

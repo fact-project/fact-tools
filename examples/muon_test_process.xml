@@ -31,41 +31,44 @@
             <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="AmplitudePositions" outputKey="ArrivalTime"/>
             <fact.features.PhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge" />
 
-            <fact.cleaning.CoreNeighborClean key="photonCharge" keyPositions="ArrivalTime" timeThreshold="30" minNumberOfPixel="2" corePixelThreshold="6.0" neighborPixelThreshold="3.0" outputKey="cleanPixel" />
+            <fact.cleaning.CoreNeighborClean key="photonCharge" keyPositions="ArrivalTime" timeThreshold="15" minNumberOfPixel="2" 
+            									corePixelThreshold="4.0" neighborPixelThreshold="2.0" outputKey="cleanPixel" />
 
 			<Skip condition="%{data.cleanPixel}==null"/>
 			<fact.features.NumberOfPixelInShower showerKey="cleanPixel" outputKey="numPixelInRing" />
-			<Skip condition="%{data.numPixelInRing} &lt; 10" />
+			<Skip condition="%{data.numPixelInRing} &lt; 15" />
 
-			<fact.features.Leakage shower="cleanPixel" weights="photonCharge" outputKey="Leakage" />
-			<fact.features.DistributionFromShower pixel="cleanPixel" weights="photonCharge" outputKey="Distribution" />
-			<fact.features.Size showerKey="cleanPixel" photonChargeKey="photonCharge" outputKey="Size" />
-
-			<fact.features.HillasConcentration weights="photonCharge" shower="cleanPixel" outputKey="Concentration" />
-			<fact.features.HillasLength distribution="Distribution" outputKey="Length"/>
-			<fact.features.HillasWidth distribution="Distribution" outputKey="Width"/>
-
-			<fact.features.NumberOfIslands key="cleanPixel" outputKey="NumIslands" />
-			
-			<fact.features.MyonHoughTransform showRingKey="false" ringKey="cleanPixel" photonChargeKey="photonCharge" 
+		
+			<fact.features.MuonHoughTransform showRingKey="true" bestCircleKey="bestRing" ringKey="cleanPixel" photonChargeKey="photonCharge" 
 											octantsHitKey="octantsHit"  bestRadiusKey="bestRadius" bestXKey="bestX" 
 											bestYKey="bestY" bestRingPixelKey="bestRingPixel" distanceKey="houghDistance" 
 											peaknessKey="houghPeakness"	percentageKey="houghPercentage" />
+			
+			<fact.cleaning.MuonRingClean ringPixelKey="bestRingPixel" photonChargekey="photonCharge" arrivalTimeKey="ArrivalTime" photonChargeThreshold="2" timeThreshold="20" outputKey="cleanRingPixel"/>
 
-			<fact.statistics.KeyInShowerDistribution key="ArrivalTime" showerPixelKey="bestRingPixel" outputKey="RingArrivalTime" />
-			<fact.statistics.KeyInShowerDistribution key="ArrivalTime" showerPixelKey="cleanPixel" outputKey="cleanArrivalTime" />
+			<fact.features.Leakage shower="cleanPixel" weights="photonCharge" outputKey="Leakage" />
+<!-- 			<fact.features.DistributionFromShower pixel="cleanPixel" weights="photonCharge" outputKey="Distribution" /> -->
+			<fact.features.Size showerKey="cleanRingPixel" photonChargeKey="photonCharge" outputKey="Size" />
+
+<!-- 			<fact.features.HillasConcentration weights="photonCharge" shower="cleanPixel" outputKey="Concentration" /> -->
+<!-- 			<fact.features.HillasLength distribution="Distribution" outputKey="Length"/> -->
+<!-- 			<fact.features.HillasWidth distribution="Distribution" outputKey="Width"/> -->
+
+<!-- 			<fact.features.NumberOfIslands key="cleanPixel" outputKey="NumIslands" /> -->
+
+			<fact.statistics.KeyInShowerDistribution key="ArrivalTime" showerPixelKey="cleanRingPixel" outputKey="RingArrivalTime" />
+<!-- 			<fact.statistics.KeyInShowerDistribution key="ArrivalTime" showerPixelKey="cleanPixel" outputKey="cleanArrivalTime" /> -->
+			<fact.features.NumberOfPixelInShower showerKey="cleanRingPixel" outputKey="numPixelInRing" />
 			
-			<fact.io.PrintKeysOnConsole keys="RingArrivalTimeMean,RingArrivalTimeStdDev"/>
-			<stream.io.CsvWriter url="file:${outfile}" keys="houghPeakness,houghDistance,octantsHit,houghPercentage,Size,Leakage,Leakage2,NumIslands,Width,Length,numPixelInRing,Concentration_onePixel,Concentration_twoPixel,RingArrivalTimeMean,RingArrivalTimeStdDev,cleanArrivalTimeMean,cleanArrivalTimeStdDev,EventNum"/>
-			
-			<fact.image.ShowImage/>
-			<Skip condition="%{data.houghDistance} &gt; 120" />
-			<Skip condition="%{data.houghPeakness} &lt; 5.5" />
+<!-- 			<fact.io.PrintKeysOnConsole keys="RingArrivalTimeMean,RingArrivalTimeStdDev"/> -->
+			<stream.io.CsvWriter url="file:${outfile}" keys="houghPeakness,houghDistance,houghPercentage,octantsHit,Size,Leakage,Leakage2,numPixelInRing,RingArrivalTimeMean,RingArrivalTimeStdDev,EventNum"/>
+			<Skip condition="%{data.houghDistance} &gt; 100" />
+			<Skip condition="%{data.houghPeakness} &lt; 7" />
 			<Skip condition="%{data.houghPercentage} &lt; 0.5" />
 			<Skip condition="%{data.Leakage} &gt; 0.05" />
-			<stream.io.CsvWriter url="file:${outfileCut}" keys="houghPeakness,houghDistance,octantsHit,houghPercentage,Size,Leakage,Leakage2,NumIslands,Width,Length,numPixelInRing,Concentration_onePixel,Concentration_twoPixel,RingArrivalTimeMean,RingArrivalTimeStdDev,cleanArrivalTimeMean,cleanArrivalTimeStdDevEventNum"/>
+			<fact.io.PrintKeysOnConsole keys="RingArrivalTimeMean,RingArrivalTimeStdDev"/>
+			<stream.io.CsvWriter url="file:${outfileCut}" keys="houghPeakness,houghDistance,houghPercentage,octantsHit,Size,Leakage,Leakage2,numPixelInRing,RingArrivalTimeMean,RingArrivalTimeStdDev,EventNum" />
 			<fact.io.RootASCIIWriter url="file:${outfilePhotonCharge}" keys="photonCharge"/>
-<!-- 			<PrintData/> -->
- 			 
+<!--  			<fact.image.ShowImage/> -->
 		</process>
 </container>
