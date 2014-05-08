@@ -191,21 +191,21 @@ public class PatchJumpRemoval implements Processor {
 					stopLoop = false;
 				}
 			}
-			input.put(outputJumpsKey+prevEvent+"Jumps", averJumpHeights);
-			input.put(outputJumpsKey+prevEvent+"Time", deltaT);
-//			input.put(outputJumpsKey+prevEvent+"Spikes", pixelWithSpikes);
-//			input.put(outputJumpsKey+prevEvent+"SignalFlanks", pixelWithSignalFlanks);
-//			input.put(outputJumpsKey+prevEvent+"Ringing", pixelWithRinging);
-			input.put(outputJumpsKey+prevEvent+"JumpsSet", pixelWithCorrectedJumps);
-			if (pixelWithWrongTimeDepend.size() > 0)
-			{
-				input.put(outputJumpsKey+prevEvent+"TimeSet", pixelWithWrongTimeDepend);
-			}
-			input.put(outputJumpsKey+prevEvent+"Marker", posMarker);
-			input.put(outputJumpsKey+prevEvent+"patchAverage", patchAverageCamera);
-			input.put(outputJumpsKey+prevEvent+"patchAverageDeriv", patchAverageDerivCamera);
-			input.put(outputJumpsKey+prevEvent+"fftResults", fftResults);
-			input.put("@"+Constants.KEY_COLOR + "_" +outputJumpsKey+prevEvent+"fftResults", "#0ACF1B");
+//			input.put(outputJumpsKey+prevEvent+"Jumps", averJumpHeights);
+//			input.put(outputJumpsKey+prevEvent+"Time", deltaT);
+////			input.put(outputJumpsKey+prevEvent+"Spikes", pixelWithSpikes);
+////			input.put(outputJumpsKey+prevEvent+"SignalFlanks", pixelWithSignalFlanks);
+////			input.put(outputJumpsKey+prevEvent+"Ringing", pixelWithRinging);
+//			input.put(outputJumpsKey+prevEvent+"JumpsSet", pixelWithCorrectedJumps);
+//			if (pixelWithWrongTimeDepend.size() > 0)
+//			{
+//				input.put(outputJumpsKey+prevEvent+"TimeSet", pixelWithWrongTimeDepend);
+//			}
+//			input.put(outputJumpsKey+prevEvent+"Marker", posMarker);
+//			input.put(outputJumpsKey+prevEvent+"patchAverage", patchAverageCamera);
+//			input.put(outputJumpsKey+prevEvent+"patchAverageDeriv", patchAverageDerivCamera);
+//			input.put(outputJumpsKey+prevEvent+"fftResults", fftResults);
+//			input.put("@"+Constants.KEY_COLOR + "_" +outputJumpsKey+prevEvent+"fftResults", "#0ACF1B");
 		}
 //		log.info("prevEvent: " + prevEvent);
 		input.put(outputKey,result);
@@ -371,7 +371,7 @@ public class PatchJumpRemoval implements Processor {
 		
 		double predictedJumpHeight = constant*Math.pow(deltaT, tau);
 		
-		log.info("Patch: " + patch + "deltaT: " + deltaT + " predJumpHeight: " + predictedJumpHeight + " averJumpHeight: " + averJumpHeights[patch]);
+//		log.info("Patch: " + patch + "deltaT: " + deltaT + " predJumpHeight: " + predictedJumpHeight + " averJumpHeight: " + averJumpHeights[patch]);
 		
 		if (Math.abs(averJumpHeights[patch]) > timeDependLimit * predictedJumpHeight)
 		{
