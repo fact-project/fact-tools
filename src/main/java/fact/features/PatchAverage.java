@@ -14,6 +14,8 @@ public class PatchAverage implements Processor {
 	String key=null;
 	String outputKey=null;
 	
+	String color = null;
+	
 	int numberOfPatches = Constants.NUMBEROFPIXEL / 9;
 	@Override
 	public Data process(Data input) {
@@ -43,6 +45,7 @@ public class PatchAverage implements Processor {
 			}
 		}
 		input.put(outputKey,result);
+		input.put("@"+Constants.KEY_COLOR + "_" +outputKey,color);
 		
 		return input;
 	}
@@ -63,6 +66,12 @@ public class PatchAverage implements Processor {
 	}
 	public void setNumberOfPatches(int numberOfPatches) {
 		this.numberOfPatches = numberOfPatches;
+	}
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
 	}
 
 }
