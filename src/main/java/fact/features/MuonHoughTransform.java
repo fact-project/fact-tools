@@ -350,4 +350,34 @@ public class MuonHoughTransform implements Processor {
 	public void setShowRingKey(boolean showRingKey) {
 		this.showRingKey = showRingKey;
 	}
+
+
+	public String getBestXKey() {
+		return bestXKey;
+	}
+
+
+	public void setBestXKey(String bestXKey) {
+		this.bestXKey = bestXKey;
+	}
+
+
+	public String getBestYKey() {
+		return bestYKey;
+	}
+
+
+	public void setBestYKey(String bestYKey) {
+		this.bestYKey = bestYKey;
+	}
+
+
+	public String getBestRadiusKey() {
+		return bestRadiusKey;
+	}
+
+
+	public void setBestRadiusKey(String bestRadiusKey) {
+		this.bestRadiusKey = bestRadiusKey;
+	}
 }
