@@ -192,7 +192,7 @@ public class PatchJumpRemoval implements Processor {
 				}
 			}
 			input.put(outputJumpsKey+prevEvent+"Jumps", averJumpHeights);
-//			input.put(outputJumpsKey+prevEvent+"Time", deltaT);
+			input.put(outputJumpsKey+prevEvent+"Time", deltaT);
 ////			input.put(outputJumpsKey+prevEvent+"Spikes", pixelWithSpikes);
 ////			input.put(outputJumpsKey+prevEvent+"SignalFlanks", pixelWithSignalFlanks);
 ////			input.put(outputJumpsKey+prevEvent+"Ringing", pixelWithRinging);
