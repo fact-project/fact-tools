@@ -16,18 +16,17 @@
             
         <process  input="fact" copies="1">
         
-<!-- 			<Skip condition="%{data.EventNum} &lt; 32"/> -->
+			<fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         	<stream.flow.Skip condition="%{data.TriggerType} != 4" />
        		<fact.utils.Remapping key="Data" outputKey="Data" />
             <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated"/>  
-<!--             <fact.utils.CutSlices key="DataCalibrated" start="22" end="220" outputKey="DataCalibrated"/> -->
-<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
-<!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
+            <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        	<fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />	
+            <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
                 
-<!--             <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" /> -->
-<!--          	<fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" />   -->
 
-            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
+            <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="AmplitudePositions" />
             <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="AmplitudePositions" outputKey="ArrivalTime"/>
             <fact.features.PhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge" />
 
