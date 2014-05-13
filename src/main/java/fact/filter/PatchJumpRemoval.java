@@ -191,7 +191,7 @@ public class PatchJumpRemoval implements Processor {
 					stopLoop = false;
 				}
 			}
-//			input.put(outputJumpsKey+prevEvent+"Jumps", averJumpHeights);
+			input.put(outputJumpsKey+prevEvent+"Jumps", averJumpHeights);
 //			input.put(outputJumpsKey+prevEvent+"Time", deltaT);
 ////			input.put(outputJumpsKey+prevEvent+"Spikes", pixelWithSpikes);
 ////			input.put(outputJumpsKey+prevEvent+"SignalFlanks", pixelWithSignalFlanks);
@@ -380,6 +380,7 @@ public class PatchJumpRemoval implements Processor {
 			{
 				pixelWithWrongTimeDepend.add(new Pixel(patch*9+px));
 			}
+			averJumpHeights[patch] = 0;
 		}
 		
 		return timeDependIsCorrect;
