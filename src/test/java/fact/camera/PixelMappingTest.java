@@ -58,8 +58,8 @@ public class PixelMappingTest {
 	@Test
 	public void testKoordinateToChid() {
 		// -180,999 .... 180,999
-		float[] xs = {120.513f, 12.22f,-80.324f, -120.6f, -6.93f  * 9.5f};
-		float[] ys = {80.113f, 102.22f,-5.324f, 20.5f,3.49f  * 9.5f };
+		float[] xs = {120.513f, 12.22f,-80.324f, -120.6f, -6.93f  * 9.5f, 0.49f*9.5f};
+		float[] ys = {80.113f, 102.22f,-5.324f, 20.5f,3.49f  * 9.5f , 0.65f*9.5f};
 //		float x = -6.93f  * 9.5f;
 //		float y = 3.5f  * 9.5f;
 		
@@ -78,7 +78,7 @@ public class PixelMappingTest {
 					nearestChid = chid;
 					lowestDistance = distance;
 				}
-			}
+			}			
 			assertEquals("Fail: x,y : " + x + ", " + y,nearestChid, DefaultPixelMapping.coordinatesToChid(x, y));
 		}
 //		System.out.println("x and y of nearest chid: " + DefaultPixelMapping.getGeomX(nearestChid) + "  " + DefaultPixelMapping.getGeomY(nearestChid) + "           x and y given: " + x + " " + y);
