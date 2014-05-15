@@ -44,6 +44,8 @@ public class MuonHoughTransform implements Processor {
 	// Pixel Chids of the best Ring
 	private String bestRingPixelKey;
 	
+	private String houghMatrixKey;
+	
 	//InputKeys
 	private String ringKey; 
 	private String photonChargeKey;
@@ -53,20 +55,21 @@ public class MuonHoughTransform implements Processor {
 
 	// Defining the parameterspace in which we look for circles:
 	
-	private double min_radius = 70; //minimal radius in mm
-	private double max_radius = 130; //maximal radius in mm
+	private double min_radius = 40; //minimal radius in mm
+	private double max_radius = 120; //maximal radius in mm
 	private double min_x = -300; //minimal center X in mm
 	private double max_x = 300; //maximal center X in mm
 	private double min_y = -300; //minimal center y in mm
 	private double max_y = 300; //maximal center y in mm
 
 	// resolution
-	private int res_r = 18;
+	private int res_r = 24;
 	private int res_x = 60;
 	private int res_y = 60;
 	
 	
 	final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);	
+	
 	
 	@Override
 	public Data process(Data input) {
@@ -87,7 +90,7 @@ public class MuonHoughTransform implements Processor {
 		
 		// generate Hough-Voting-Matrix n:
 		
-		int[][][] HoughMatrix = new int[res_r+1][res_x+1][res_y+1];
+		double[][][] HoughMatrix = new double[res_r+1][res_x+1][res_y+1];
 		
 		//Fill the parameter space
 		
@@ -249,6 +252,15 @@ public class MuonHoughTransform implements Processor {
 			double distance1;
 			double distance2;
 			double distance3;
+			double[][] HoughMatrix2dProjection = new double[circle_x.length][circle_y.length];
+			for(int x=0; x<circle_x.length; x++){
+				for(int y=0; y<circle_y.length; y++){
+					HoughMatrix2dProjection[x][y] = HoughMatrix[highest_pos[0]][x][y];
+				}
+			}
+			
+			input.put(houghMatrixKey, HoughMatrix2dProjection);
+			
 			PixelSet bestCirclePixelSet = new PixelSet();
 			PixelSet secondBestCirclePixelSet = new PixelSet();
 			PixelSet thirdBestCirclePixelSet = new PixelSet();
@@ -379,5 +391,15 @@ public class MuonHoughTransform implements Processor {
 
 	public void setBestRadiusKey(String bestRadiusKey) {
 		this.bestRadiusKey = bestRadiusKey;
+	}
+
+
+	public String getHoughMatrixKey() {
+		return houghMatrixKey;
+	}
+
+
+	public void setHoughMatrixKey(String houghMatrixKey) {
+		this.houghMatrixKey = houghMatrixKey;
 	}
 }
