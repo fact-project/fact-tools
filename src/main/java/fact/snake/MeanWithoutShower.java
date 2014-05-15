@@ -4,7 +4,7 @@ import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
-public class MedianWithoutShower implements Processor
+public class MeanWithoutShower implements Processor
 {
 
 	String inputArray = null;
