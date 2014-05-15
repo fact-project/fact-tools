@@ -56,7 +56,12 @@ public class Snake
 	}
 	
 	protected void step(ImageForce f)
-	{				
+	{		
+		if(NumberOfVertices > (_MAX_VERTICES-1))
+		{
+			return;
+		}
+		
 		for(int i=0; i<NumberOfVertices; i++)
 		{	
 			double x = vecX.getEntry(i,0);
