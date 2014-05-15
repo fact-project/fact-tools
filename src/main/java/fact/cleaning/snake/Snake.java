@@ -6,6 +6,8 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 public class Snake 
 {	
+	final int _MAX_VERTICES = 50;
+	
 	RealMatrix[] matrix;	
 	
 	private double alpha = 0.10;
@@ -26,9 +28,9 @@ public class Snake
 	
 	public void initMatrix()
 	{
-		matrix = new Array2DRowRealMatrix[50];		
+		matrix = new Array2DRowRealMatrix[_MAX_VERTICES];		
 		
-		for(int i=0; i < 50; i++)
+		for(int i=0; i < _MAX_VERTICES; i++)
 		{
 			matrix[i] = new Array2DRowRealMatrix(i+1, i+1);			
 			calcMatrix(i+1);
@@ -99,7 +101,7 @@ public class Snake
 	
 	protected void splitLines(double maxDist)
 	{
-		if(NumberOfVertices > 50)
+		if(NumberOfVertices > (_MAX_VERTICES-1))
 		{
 			return;
 		}
