@@ -15,6 +15,7 @@ public class IntegratePolygonSingle implements Processor
 	private String polygonY = null;
 	
 	private String outkey = null;
+	private String outNumberOfPixel = null;
 	
 	private String frame = null;
 	private int f = 0;
@@ -22,10 +23,8 @@ public class IntegratePolygonSingle implements Processor
 	@Override
 	public Data process(Data input) 
 	{
-		if(outkey == null)
-		{
-			throw new RuntimeException("Key \"outkey\" not set");
-		}
+		if(outkey == null)	throw new RuntimeException("Key \"outkey\" not set");		
+		if(outNumberOfPixel == null) throw new RuntimeException("Key \"outNumberOfPixel\" not set");
 		
 		EventUtils.mapContainsKeys(getClass(), input, pixelData, polygonX, polygonY);
 		
@@ -45,6 +44,7 @@ public class IntegratePolygonSingle implements Processor
 			poly.addPoint( (int) polyX[i], (int) polyY[i]);
 		}
 		
+		int numberOfPolygons = 0;
 		
 		double erg = 0;
 		for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
@@ -52,10 +52,13 @@ public class IntegratePolygonSingle implements Processor
 			if(poly.contains(DefaultPixelMapping.getPosXinMM(i), DefaultPixelMapping.getPosYinMM(i)) )
 			{
 				erg += data[f*Constants.NUMBEROFPIXEL + i];
+				
+				numberOfPolygons++;
 			}			
 		}
 		
-		input.put(outkey, erg);		
+		input.put(outkey, erg);	
+		input.put(outNumberOfPixel, numberOfPolygons);
 		
 		return input;
 	}
@@ -98,6 +101,14 @@ public class IntegratePolygonSingle implements Processor
 
 	public void setFrame(String frame) {
 		this.frame = frame;
+	}
+
+	public String getOutNumberOfPixel() {
+		return outNumberOfPixel;
+	}
+
+	public void setOutNumberOfPixel(String outNumberOfPixel) {
+		this.outNumberOfPixel = outNumberOfPixel;
 	}
 	
 	

@@ -34,6 +34,10 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 	private String mean = null;
 	
 	
+	private String SnakeOutX = null;
+	private String SnakeOutY = null;
+	private String numberOfVerticesOut = null;
+	
 	private double centerX = 0;
 	private double centerY = 0;
 	
@@ -55,6 +59,11 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 	@Override
 	public Data process(Data input) 
 	{
+		if(SnakeOutX == null) throw new RuntimeException("Missing parameter: SnakeOutX");
+		if(SnakeOutY == null) throw new RuntimeException("Missing parameter: SnakeOutY");
+		if(numberOfVerticesOut == null) throw new RuntimeException("Missing parameter: numberOfVerticesOut");
+		
+		
 		try
 		{			
 			EventUtils.mapContainsKeys(getClass(), input, pixelDataName);
@@ -129,8 +138,8 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 		
 			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpX);
 			input.put(Constants.KEY_SNAKE_VIEWER_Y, tmpY);
-			input.put("snake_X", this.getSnakeX());
-			input.put("snake_Y", this.getSnakeY());
+			input.put(SnakeOutX, this.getSnakeX());
+			input.put(SnakeOutY, this.getSnakeY());
 			
 		}
 		else
@@ -140,9 +149,10 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 				step(force);
 			}
 			
-			input.put("snake_X", this.getSnakeX());
-			input.put("snake_Y", this.getSnakeY());
+			input.put(SnakeOutX, this.getSnakeX());
+			input.put(SnakeOutY, this.getSnakeY());
 		}
+		input.put(numberOfVerticesOut, this.getNumberOfVertices());
 		
 		return input;
 	}
@@ -161,13 +171,11 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 	
 	///////////////////////////////////////////////////////////////////////////////////
 
-	public String getPixelDataName() 
-	{
+	public String getPixelDataName(){
 		return pixelDataName;
 	}
 
-	public void setPixelDataName(String pixelDataName) 
-	{
+	public void setPixelDataName(String pixelDataName) {
 		this.pixelDataName = pixelDataName;
 	}
 	
@@ -210,6 +218,32 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 	public void setDrawSnake(String drawSnake) {
 		this.drawSnake = drawSnake;
 	}
+
+	
+	public String getSnakeOutX() {
+		return SnakeOutX;
+	}
+
+	public void setSnakeOutX(String snakeOutX) {
+		SnakeOutX = snakeOutX;
+	}
+
+	public String getSnakeOutY() {
+		return SnakeOutY;
+	}
+
+	public void setSnakeOutY(String snakeOutY) {
+		SnakeOutY = snakeOutY;
+	}
+
+	public String getNumberOfVerticesOut() {
+		return numberOfVerticesOut;
+	}
+
+	public void setNumberOfVerticesOut(String numberOfVerticesOut) {
+		this.numberOfVerticesOut = numberOfVerticesOut;
+	}
+	
 	
 	
 	

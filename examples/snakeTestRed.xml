@@ -37,24 +37,24 @@
 			
 			<!-- Snake auf PhotonCharge: -->
 								
-			<fact.snake.MedianWithoutShower InputArray="photoncharge" Shower="shower" Output="Mean" />
+			<fact.snake.MeanWithoutShower InputArray="photoncharge" Shower="shower" Output="Mean" />
 			<fact.snake.ShowerMaxCenter  Shower="shower" Weight="photoncharge" OutX="snakeStartX" OutY="snakeStartY" />			
         
 			<!-- DrawSnake="" -->
-			<fact.cleaning.snake.SnakeSingle DrawSnake="" PixelDataName="photoncharge" ShowerCenterX="snakeStartX" ShowerCenterY="snakeStartY" SnakeOutX="snake_X" SnakeOutY="snake_Y" Mean="Mean"/>	
+			<fact.cleaning.snake.SnakeSingle PixelDataName="photoncharge" ShowerCenterX="snakeStartX" ShowerCenterY="snakeStartY" SnakeOutX="snake_X" SnakeOutY="snake_Y" Mean="Mean" NumberOfVerticesOut="NumberOfVertices"/>	
 
-			<fact.features.snake.Area SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeArea" />
+			<fact.features.snake.PolygonArea SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeArea" />
 			<fact.features.snake.Length SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeLength" />
-			<fact.features.snake.IntegratePolygonSingle pixelData="photoncharge" PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeInt" />
+			<fact.features.snake.IntegratePolygonSingle pixelData="photoncharge" PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeInt" OutNumberOfPixel="PixelInSnake"/>
 			<fact.features.snake.InnerEnergy SnakeX="snake_X" SnakeY="snake_Y" Outkey="InnerEnergy" />
 			
 			<!-- drawEllipse="" -->
-			<fact.features.snake.FitEllipse DrawEllipse="" SnakeX="snake_X" SnakeY="snake_Y" OutkeyAlpha="SnakeEllipseAlpha" OutkeyMajor="SnakeEllipseMajor" OutkeyMinor="SnakeEllipseMinor" OutkeyCenterX="SnakeEllipseX" OutkeyCenterY="SnakeEllipseY" />
+			<fact.features.snake.FitEllipse SnakeX="snake_X" SnakeY="snake_Y" OutkeyAlpha="SnakeEllipseAlpha" OutkeyMajor="SnakeEllipseMajor" OutkeyMinor="SnakeEllipseMinor" OutkeyCenterX="SnakeEllipseX" OutkeyCenterY="SnakeEllipseY" />
 			
 			<fact.image.ShowImage/>
 			
 		
-           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum"/> -->
+           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum, NumberOfVertices, SnakeArea, SnakeLength, SnakeInt, PixelInSnake, InnerEnergy, SnakeEllipseAlpha, SnakeEllipseMajor, SnakeEllipseMinor, SnakeEllipseX, SnakeEllipseY"/> -->
 			
 
     </process>

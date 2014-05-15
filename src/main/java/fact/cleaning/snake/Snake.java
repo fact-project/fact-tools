@@ -57,11 +57,6 @@ public class Snake
 	
 	protected void step(ImageForce f)
 	{		
-		if(NumberOfVertices > (_MAX_VERTICES-1))
-		{
-			return;
-		}
-		
 		for(int i=0; i<NumberOfVertices; i++)
 		{	
 			double x = vecX.getEntry(i,0);
@@ -106,7 +101,7 @@ public class Snake
 	
 	protected void splitLines(double maxDist)
 	{
-		if(NumberOfVertices > (_MAX_VERTICES-1))
+		if(NumberOfVertices >= (_MAX_VERTICES-1))
 		{
 			return;
 		}
@@ -192,5 +187,10 @@ public class Snake
 	public double[] getSnakeY()
 	{
 		return vecY.getColumn(0);
+	}
+	
+	public int getNumberOfVertices()
+	{
+		return NumberOfVertices;
 	}
 }
