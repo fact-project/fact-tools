@@ -115,23 +115,37 @@ public class RemoveSpikes implements Processor {
 			}
 		}
 		
-		Object[] sSpikePixel = singleSpikePixel.toArray();
-		Object[] sSpikeSlice = singleSpikeSlice.toArray();
-		Object[] sSpikeHeight = singleSpikeHeight.toArray();
+		int[] sSpikePixel = new int[singleSpikePixel.size()];
+		int[] sSpikeSlice = new int[singleSpikePixel.size()];
+		double[] sSpikeHeight = new double[singleSpikePixel.size()];
+		for (int i = 0 ; i < singleSpikePixel.size() ; i++){
+			sSpikePixel[i] = singleSpikePixel.get(i);
+			sSpikeSlice[i] = singleSpikeSlice.get(i);
+			sSpikeHeight[i] = singleSpikeHeight.get(i);
+		}
 		
-		Object[] dSpikePixel = doubleSpikePixel.toArray();
-		Object[] dSpikeSlice = doubleSpikeSlice.toArray();
-		Object[] dSpikeHeight = doubleSpikeHeight.toArray();
-		Object[] dSpikeTopSlope = doubleSpikeTopSlope.toArray();
+		int[] dSpikePixel = new int[doubleSpikePixel.size()];
+		int[] dSpikeSlice = new int[doubleSpikePixel.size()];
+		double[] dSpikeHeight = new double[doubleSpikePixel.size()];
+		double[] dSpikeTopSlope = new double[doubleSpikePixel.size()];
+		for (int i = 0 ; i < doubleSpikePixel.size() ; i++){
+			dSpikePixel[i] = doubleSpikePixel.get(i);
+			dSpikeSlice[i] = doubleSpikeSlice.get(i);
+			dSpikeHeight[i] = doubleSpikeHeight.get(i);
+			dSpikeTopSlope[i] = doubleSpikeTopSlope.get(i);
+		}
+		
 			
 		input.put(outputSpikesKey + "sPixel",sSpikePixel);
 		input.put(outputSpikesKey + "sSlices",sSpikeSlice);
 		input.put(outputSpikesKey + "sHeights",sSpikeHeight);
+		input.put(outputSpikesKey + "singleLen",sSpikePixel.length);
 		
 		input.put(outputSpikesKey + "dPixel",dSpikePixel);
 		input.put(outputSpikesKey + "dSlices",dSpikeSlice);
 		input.put(outputSpikesKey + "dHeights",dSpikeHeight);
 		input.put(outputSpikesKey + "dTopSlope",dSpikeTopSlope);
+		input.put(outputSpikesKey + "doubleLen",dSpikePixel.length);
 		
 		input.put(outputSpikesKey + "sSet",singleSpikesSet);
 		input.put(outputSpikesKey + "dSet",doubleSpikesSet);

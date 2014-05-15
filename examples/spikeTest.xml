@@ -7,6 +7,8 @@
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
+    <!-- <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="100"/> -->
+    
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
 
     <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
@@ -19,9 +21,9 @@
                 
         <fact.filter.RemoveSpikes dataKey="DataCalibrated" outputKey="SpikesRemoved" color="#E6172F" leftBorder="6" spikeLimit="20" topSlope="16" outputSpikesKey="Sp"/>
         
-        <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="photoncharge,McCherPhotWeight"/> -->
+        <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,SpsingleLen,SpsPixel,SpsSlices,SpsHeights,SpdoubleLen,SpdPixel,SpdSlices,SpdHeights,SpdTopSlope"/>
             
-        <fact.image.ShowImage/>
+        <!-- <fact.image.ShowImage/> -->
 
 
     </process>
