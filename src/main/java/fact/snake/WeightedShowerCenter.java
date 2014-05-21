@@ -5,24 +5,19 @@ import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 
-public class ShowerMaxCenter implements Processor
+public class WeightedShowerCenter implements Processor
 {
-	String shower = null;
-	String weight = null;
-	String outX = null;
-	String outY = null;
+	private String shower = null;
+	private String weight = null;
+	private String outkeyX = null;
+	private String outkeyY = null;
 	
 	
 	@Override
 	public Data process(Data input) 
 	{
-		if(outX == null){
-			throw new RuntimeException("Missing parameter: outX");
-		}
-		if(outY == null){
-			throw new RuntimeException("Missing parameter: outY");
-		}
-		
+		if(outkeyX == null) throw new RuntimeException("Key \"outkeyX\" not set");
+		if(outkeyY == null) throw new RuntimeException("Key \"outkeyY\" not set");		
 		
 		EventUtils.mapContainsKeys(getClass(), input, shower, weight);
 		
@@ -45,8 +40,8 @@ public class ShowerMaxCenter implements Processor
 		ergX = ergX / w;
 		ergY = ergY / w;
 		
-		input.put(outX, ergX);
-		input.put(outY, ergY);
+		input.put(outkeyX, ergX);
+		input.put(outkeyY, ergY);
 		
 		return input;
 	}
@@ -72,24 +67,27 @@ public class ShowerMaxCenter implements Processor
 	}
 
 
-	public String getOutX() {
-		return outX;
+	public String getOutkeyX() {
+		return outkeyX;
 	}
 
 
-	public void setOutX(String outX) {
-		this.outX = outX;
+	public void setOutkeyX(String outkeyX) {
+		this.outkeyX = outkeyX;
 	}
 
 
-	public String getOutY() {
-		return outY;
+	public String getOutkeyY() {
+		return outkeyY;
 	}
 
 
-	public void setOutY(String outY) {
-		this.outY = outY;
+	public void setOutkeyY(String outkeyY) {
+		this.outkeyY = outkeyY;
 	}
+
+
+	
 
 	
 	
