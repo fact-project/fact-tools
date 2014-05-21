@@ -6,23 +6,21 @@ import stream.Processor;
 
 public class PolygonArea  implements Processor
 {
-	String outputKey = null;	
+	private String outkey = null;	
 	
-	String snakeX = null;
-	String snakeY = null;
+	private String polygonX = null;
+	private String polygonY = null;
 
 	@Override
 	public Data process(Data input) 
 	{
-		if(outputKey == null)
-		{
-			throw new RuntimeException("Missing parameter: outputKey");
-		}	
+		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");		
+		
+		EventUtils.mapContainsKeys(getClass(), input, polygonX, polygonY);		
 		
 		
-		EventUtils.mapContainsKeys(getClass(), input, snakeX, snakeY);		
-		double[] x = (double[]) input.get(snakeX);
-		double[] y = (double[]) input.get(snakeY);
+		double[] x = (double[]) input.get(polygonX);
+		double[] y = (double[]) input.get(polygonY);
 		
 		final int N = x.length;
 		
@@ -33,35 +31,34 @@ public class PolygonArea  implements Processor
 			erg += (y[i] + y[(i+1) % N]) * (x[i] - x[(i+1) % N]);
 		}				
 
-		input.put(outputKey, Math.abs(0.5 * erg));
+		input.put(outkey, Math.abs(0.5 * erg));
 		
 		return input;
 	}
 
 	public String getOutkey() {
-		return outputKey;
+		return outkey;
 	}
 
 	public void setOutkey(String outkey) {
-		this.outputKey = outkey;
+		this.outkey = outkey;
 	}
 
-	public String getSnakeX() {
-		return snakeX;
+	public String getPolygonX() {
+		return polygonX;
 	}
 
-	public void setSnakeX(String snakeX) {
-		this.snakeX = snakeX;
+	public void setPolygonX(String polygonX) {
+		this.polygonX = polygonX;
 	}
 
-	public String getSnakeY() {
-		return snakeY;
+	public String getPolygonY() {
+		return polygonY;
 	}
 
-	public void setSnakeY(String snakeY) {
-		this.snakeY = snakeY;
+	public void setPolygonY(String polygonY) {
+		this.polygonY = polygonY;
 	}
-	
 	
 	
 }

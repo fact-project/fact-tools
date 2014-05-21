@@ -7,17 +7,20 @@ import stream.Processor;
 public class MeanWithoutShower implements Processor
 {
 
-	String inputArray = null;
-	String shower = null;
-	String output = null;
+	private String key = null;
+	private String shower = null;
+	private String outkey = null;
 	
 	
 	@Override
 	public Data process(Data input) 
 	{
-		EventUtils.mapContainsKeys(getClass(), input, inputArray, shower);
+		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");
+		
+		EventUtils.mapContainsKeys(getClass(), input, key, shower);
+		
 
-		double[] arr = ((double[]) input.get(inputArray)).clone();		
+		double[] arr = ((double[]) input.get(key)).clone();		
 	
 		int[] sho = (int[]) input.get(shower);
 		
@@ -34,19 +37,19 @@ public class MeanWithoutShower implements Processor
 		
 		erg = erg / (arr.length - sho.length);
 		
-		input.put(output, erg);
+		input.put(outkey, erg);
 		
 		return input;
 	}
 
-	
-	public String getInputArray() {
-		return inputArray;
+
+	public String getKey() {
+		return key;
 	}
 
 
-	public void setInputArray(String inputArray) {
-		this.inputArray = inputArray;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 
@@ -60,13 +63,15 @@ public class MeanWithoutShower implements Processor
 	}
 
 
-	public String getOutput() {
-		return output;
+	public String getOutkey() {
+		return outkey;
 	}
 
 
-	public void setOutput(String output) {
-		this.output = output;
+	public void setOutkey(String outkey) {
+		this.outkey = outkey;
 	}
+
+	
 	
 }

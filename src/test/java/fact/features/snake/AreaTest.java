@@ -34,8 +34,8 @@ public class AreaTest
 			item.put("y", y);
 			
 			PolygonArea area = new PolygonArea();
-			area.setSnakeX("x");
-			area.setSnakeY("y");
+			area.setPolygonX("x");
+			area.setPolygonY("y");
 			area.setOutkey("out");
 			
 			area.process(item);

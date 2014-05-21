@@ -1,24 +1,29 @@
 package fact.snake;
 
 import fact.Constants;
+import fact.EventUtils;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 
 public class CreateGaus implements Processor
 {
-	String key = null;
+	private double sigmaX = 20.0;
+	private double sigmaY = 20.0;
+	private double Amp = 15;		
+	
+	private double x0 = 0;
+	private double y0 = 0;
+	
+	
+	private String outkey = null;
 
 	@Override
 	public Data process(Data input) 
 	{
-		double sigmaX = 20.0;
-		double sigmaY = 20.0;
-		double Amp = 15;		
+		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");		
 		
-		double x0 = 0;
-		double y0 = 0;
-		
+			
 		int NumberOfSlices = 1;
 		int timeMax = 0;
 		
@@ -38,17 +43,39 @@ public class CreateGaus implements Processor
 			}
 		}
 		
-		input.put(key, erg);
+		input.put(outkey, erg);
 		return input;
 	}
 
-	
-	public String getKey() {
-		return key;
+	public String getOutkey() {
+		return outkey;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setOutkey(String outkey) {
+		this.outkey = outkey;
 	}
+
+	protected void setSigmaX(double sigmaX) {
+		this.sigmaX = sigmaX;
+	}
+
+	protected void setSigmaY(double sigmaY) {
+		this.sigmaY = sigmaY;
+	}
+
+	protected void setAmp(double amp) {
+		Amp = amp;
+	}
+
+	protected void setX0(double x0) {
+		this.x0 = x0;
+	}
+
+	protected void setY0(double y0) {
+		this.y0 = y0;
+	}
+
+	
+
 	
 }
