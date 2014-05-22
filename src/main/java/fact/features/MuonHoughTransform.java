@@ -57,14 +57,14 @@ public class MuonHoughTransform implements Processor {
 	// Defining the parameterspace in which we look for circles:
 	
 	private double min_radius = 40; //minimal radius in mm
-	private double max_radius = 120; //maximal  -->radius in mm
+	private double max_radius = 110; //maximal  -->radius in mm
 	private double min_x = -300; //minimal center X in mm
 	private double max_x = 300; //maximal center X in mm
 	private double min_y = -300; //minimal center y in mm
 	private double max_y = 300; //maximal center y in mm
 
 	// resolution
-	private int res_r = 24;
+	private int res_r = 21;
 	private int res_x = 60;
 	private int res_y = 60;
 	
