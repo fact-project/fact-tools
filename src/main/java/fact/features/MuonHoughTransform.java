@@ -44,7 +44,8 @@ public class MuonHoughTransform implements Processor {
 	// Pixel Chids of the best Ring
 	private String bestRingPixelKey;
 	
-	private String houghMatrixKey;
+	//if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
+	private boolean showMatrixKey;
 	
 	//InputKeys
 	private String ringKey; 
@@ -56,7 +57,7 @@ public class MuonHoughTransform implements Processor {
 	// Defining the parameterspace in which we look for circles:
 	
 	private double min_radius = 40; //minimal radius in mm
-	private double max_radius = 120; //maximal radius in mm
+	private double max_radius = 120; //maximal  -->radius in mm
 	private double min_x = -300; //minimal center X in mm
 	private double max_x = 300; //maximal center X in mm
 	private double min_y = -300; //minimal center y in mm
@@ -126,7 +127,7 @@ public class MuonHoughTransform implements Processor {
 				for (int y = 0; y < circle_y.length; y++){
 					for(int pix = 0; pix < ring.length; pix++){
 						distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
-						if(Math.abs(distance - circle_radius[r]) < 1.1 * fact.Constants.PIXEL_SIZE ){
+						if(Math.abs(distance - circle_radius[r]) <= fact.Constants.PIXEL_SIZE ){
 							HoughMatrix[r][x][y] += photonCharge[ring[pix]];
 						}
 					}
@@ -196,7 +197,7 @@ public class MuonHoughTransform implements Processor {
 			PixelPosX = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(pix);
 			PixelPosY = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(pix);
 			distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
-			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
+			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
 				bestRingPixelList.add(pix);		
 			}
 		}
@@ -220,7 +221,7 @@ public class MuonHoughTransform implements Processor {
 		
 		for (int pix=0; pix<ring.length;pix++){
 			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
-			if(Math.abs(distance - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE){
+			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
 				onRingPixel+=1;
 				
 				phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
@@ -247,19 +248,20 @@ public class MuonHoughTransform implements Processor {
 		
 
 		// Creating the Pixelsets for the Viewer
+		if(showMatrixKey){
+			for(int x=0; x<circle_x.length; x++){
+				for(int y=0; y<circle_y.length; y++){
+					System.out.print(String.valueOf(HoughMatrix[highest_pos[0]][x][y])+" ");
+				}
+				System.out.print("\n");
+			}
+		}
+		
 		
 		if (showRingKey){
 			double distance1;
 			double distance2;
 			double distance3;
-			double[][] HoughMatrix2dProjection = new double[circle_x.length][circle_y.length];
-			for(int x=0; x<circle_x.length; x++){
-				for(int y=0; y<circle_y.length; y++){
-					HoughMatrix2dProjection[x][y] = HoughMatrix[highest_pos[0]][x][y];
-				}
-			}
-			
-			input.put(houghMatrixKey, HoughMatrix2dProjection);
 			
 			PixelSet bestCirclePixelSet = new PixelSet();
 			PixelSet secondBestCirclePixelSet = new PixelSet();
@@ -271,13 +273,13 @@ public class MuonHoughTransform implements Processor {
 				distance1 = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
 				distance2 = Math.sqrt(Math.pow((PixelPosX - center_x_2), 2.0) + Math.pow((PixelPosY - center_y_2), 2.0));
 				distance3 = Math.sqrt(Math.pow((PixelPosX - center_x_3), 2.0) + Math.pow((PixelPosY - center_y_3), 2.0));
-				if(Math.abs(distance1 - radius_1) < 1.1 * fact.Constants.PIXEL_SIZE ){
+				if(Math.abs(distance1 - radius_1) <= fact.Constants.PIXEL_SIZE ){
 					bestCirclePixelSet.add(new Pixel(pix));
 				}
-				if(Math.abs(distance2 - radius_2) < 1.1 * fact.Constants.PIXEL_SIZE ){
+				if(Math.abs(distance2 - radius_2) <= fact.Constants.PIXEL_SIZE ){
 					secondBestCirclePixelSet.add(new Pixel(pix));
 				}
-				if(Math.abs(distance3 - radius_3) < 1.1 * fact.Constants.PIXEL_SIZE ){
+				if(Math.abs(distance3 - radius_3) <= fact.Constants.PIXEL_SIZE ){
 					thirdBestCirclePixelSet.add(new Pixel(pix));
 				}
 			}
@@ -394,12 +396,14 @@ public class MuonHoughTransform implements Processor {
 	}
 
 
-	public String getHoughMatrixKey() {
-		return houghMatrixKey;
+	public boolean isShowMatrixKey() {
+		return showMatrixKey;
 	}
 
 
-	public void setHoughMatrixKey(String houghMatrixKey) {
-		this.houghMatrixKey = houghMatrixKey;
+	public void setShowMatrixKey(boolean showMatrixKey) {
+		this.showMatrixKey = showMatrixKey;
 	}
+
+
 }
