@@ -3,7 +3,6 @@ package fact.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +20,17 @@ public class RemoveSpikes implements Processor {
 	@Parameter(required=true)
 	String dataKey = null;
 	@Parameter(required=true)
+	String startCellKey = null;
+	@Parameter(required=true)
 	String outputKey = null;
 	@Parameter(required=true)
 	double spikeLimit;
 	@Parameter(required=true)
-	double topSlope;
+	double topSlopeLimit;
 	@Parameter(required=true)
 	String outputSpikesKey = null;
+	@Parameter(required=true)
+	int maxSpikeLength = 2;
 	
 	String color = null;
 	
@@ -35,125 +38,132 @@ public class RemoveSpikes implements Processor {
 	
 	int leftBorder = 10;
 	
-	PixelSet singleSpikesSet;
-	PixelSet doubleSpikesSet;
-	IntervalMarker[] singleSpikes;
-	IntervalMarker[] doubleSpikes;
-
-	List<Integer> singleSpikePixel;
-	List<Integer> singleSpikeSlice;
-	List<Double> singleSpikeHeight;
-
-	List<Integer> doubleSpikePixel;
-	List<Integer> doubleSpikeSlice;
-	List<Double> doubleSpikeHeight;
-	List<Double> doubleSpikeTopSlope;
+	double[] result = null;
 	
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		EventUtils.mapContainsKeys(getClass(), input, dataKey);
+		EventUtils.mapContainsKeys(getClass(), input, dataKey, startCellKey);
 		
 		double[] data = (double[]) input.get(dataKey);
-		double[] result = new double[data.length];
-		
+		result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
 		
 		roi = (Integer) input.get("NROI");
 		
-		singleSpikes = new IntervalMarker[Constants.NUMBEROFPIXEL];
-		doubleSpikes = new IntervalMarker[Constants.NUMBEROFPIXEL];
-		singleSpikesSet = new PixelSet();
-		doubleSpikesSet = new PixelSet();
+		short[] startCells = (short[]) input.get(startCellKey);
 		
-		singleSpikePixel = new ArrayList<Integer>();
-		singleSpikeSlice = new ArrayList<Integer>();
-		singleSpikeHeight = new ArrayList<Double>();
-		
-		doubleSpikePixel = new ArrayList<Integer>();
-		doubleSpikeSlice = new ArrayList<Integer>();
-		doubleSpikeHeight = new ArrayList<Double>();
-		doubleSpikeTopSlope = new ArrayList<Double>();
-		
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+		for (int spikeLength = 1 ; spikeLength <= maxSpikeLength ; spikeLength++)
 		{
-			for (int sl = leftBorder ; sl < roi-2 ; sl++)
+			
+			List<Integer> spPixel = new ArrayList<Integer>();
+			List<Integer> spLogSlice = new ArrayList<Integer>();
+			List<Integer> spPhysSpike = new ArrayList<Integer>();
+			List<Double> spHeight = new ArrayList<Double>();
+			List<Double> spTopSlope = new ArrayList<Double>();
+			
+			PixelSet spikesSet = new PixelSet();
+			
+			for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 			{
-				int slice = px*roi+sl;
-				// Check for a jump up:
-				if (result[slice] - result[slice-1] > spikeLimit)
+				int rightBorder = roi - spikeLength;
+				// we want to skip the timemarker signal in the spike removal
+				if (px%9 == 8)
 				{
-					// Check for a jump down:
-					if (result[slice+1] - result[slice] < -spikeLimit)
+					rightBorder = 260;	
+				}
+				for (int sl = leftBorder ; sl < rightBorder ; sl++)
+				{
+					int slice = px*roi+sl;
+					boolean isSpike = true;
+					double averTopSlope = 0;
+					double averTopValues = 0;
+					// Check for a jump up:
+					if (result[slice] - result[slice-1] > spikeLimit)
 					{
-						// Single Spike
-						double spikeHeight = result[slice] - (result[slice-1] + result[slice+1] ) / 2.0; 
-						result[slice] = (result[slice-1] + result[slice+1] ) / 2.0;
-						singleSpikesSet.add(new Pixel(px));
-						singleSpikePixel.add(px);
-						singleSpikeSlice.add(sl);
-						singleSpikeHeight.add(spikeHeight);
-					}
-					// Check for a small Step (with a maximum slope of topSlope:
-					else if (Math.abs(result[slice+1] - result[slice]) < topSlope)
-					{
-						// Check for a jump down:
-						if (result[slice+2] - result[slice+1] < -spikeLimit)
+						averTopValues += result[slice];
+						for (int topSlice = 1 ; topSlice < spikeLength && isSpike == true ; topSlice++)
 						{
-							// Double Spike
-							double spikeHeight = (result[slice] + result[slice+1] ) / 2.0 - (result[slice-1] + result[slice+2] ) / 2.0;
-							doubleSpikesSet.add(new Pixel(px));
-							doubleSpikePixel.add(px);
-							doubleSpikeSlice.add(sl);
-							doubleSpikeHeight.add(spikeHeight);
-							doubleSpikeTopSlope.add((result[slice+1] - result[slice]));
-							result[slice] = (result[slice-1] + result[slice+2] ) / 2.0;
-							result[slice+1] = (result[slice-1] + result[slice+2] ) / 2.0;
+							// Check for small steps (with a maximum slope of topSlope):
+							if (Math.abs(result[slice+topSlice] - result[slice+topSlice-1]) >= topSlopeLimit)
+							{
+								isSpike = false;
+							}
+							else
+							{
+								averTopSlope += result[slice+topSlice] - result[slice+topSlice-1];
+								averTopValues += result[slice+topSlice];
+							}
+						}
+						if (isSpike == true)
+						{
+							if (result[slice+spikeLength] - result[slice+spikeLength-1] < -spikeLimit)
+							{
+								if (spikeLength > 1)
+								{
+									averTopSlope /= (spikeLength-1);
+									averTopValues /= spikeLength;
+								}
+								double spikeHeight = CorrectSpike(slice, spikeLength, averTopValues);
+								spikesSet.add(new Pixel(px));
+								spPixel.add(px);
+								spLogSlice.add(sl);
+								spPhysSpike.add((sl+startCells[px])%1024);
+								spHeight.add(spikeHeight);
+								spTopSlope.add(averTopSlope);
+							}
 						}
 					}
 				}
 			}
-		}
-		
-		int[] sSpikePixel = new int[singleSpikePixel.size()];
-		int[] sSpikeSlice = new int[singleSpikePixel.size()];
-		double[] sSpikeHeight = new double[singleSpikePixel.size()];
-		for (int i = 0 ; i < singleSpikePixel.size() ; i++){
-			sSpikePixel[i] = singleSpikePixel.get(i);
-			sSpikeSlice[i] = singleSpikeSlice.get(i);
-			sSpikeHeight[i] = singleSpikeHeight.get(i);
-		}
-		
-		int[] dSpikePixel = new int[doubleSpikePixel.size()];
-		int[] dSpikeSlice = new int[doubleSpikePixel.size()];
-		double[] dSpikeHeight = new double[doubleSpikePixel.size()];
-		double[] dSpikeTopSlope = new double[doubleSpikePixel.size()];
-		for (int i = 0 ; i < doubleSpikePixel.size() ; i++){
-			dSpikePixel[i] = doubleSpikePixel.get(i);
-			dSpikeSlice[i] = doubleSpikeSlice.get(i);
-			dSpikeHeight[i] = doubleSpikeHeight.get(i);
-			dSpikeTopSlope[i] = doubleSpikeTopSlope.get(i);
-		}
-		
+						
 			
-		input.put(outputSpikesKey + "sPixel",sSpikePixel);
-		input.put(outputSpikesKey + "sSlices",sSpikeSlice);
-		input.put(outputSpikesKey + "sHeights",sSpikeHeight);
-		input.put(outputSpikesKey + "singleLen",sSpikePixel.length);
+			int[] spPixelArr = new int[spPixel.size()];
+			int[] spLogSliceArr = new int[spLogSlice.size()];
+			int[] spPhysSliceArr = new int[spPhysSpike.size()];
+			double[] spHeightArr = new double[spHeight.size()];
+			double[] spTopSlopeArr = new double[spTopSlope.size()];
+			for (int i = 0 ; i < spPixel.size() ; i++)
+			{
+				spPixelArr[i] = spPixel.get(i);
+				spLogSliceArr[i] = spLogSlice.get(i);
+				spPhysSliceArr[i] = spPhysSpike.get(i);
+				spHeightArr[i] = spHeight.get(i);
+				spTopSlopeArr[i] = spTopSlope.get(i);
+			}
+			
+
+			input.put(outputSpikesKey + "N"+spikeLength,spPixelArr.length);
+			input.put(outputSpikesKey + "Pixel"+spikeLength,spPixelArr);
+			input.put(outputSpikesKey + "LogSlices"+spikeLength,spLogSliceArr);
+			input.put(outputSpikesKey + "PhysSlices"+spikeLength,spPhysSliceArr);
+			input.put(outputSpikesKey + "Heights"+spikeLength,spHeightArr);
+			input.put(outputSpikesKey + "TopSlope"+spikeLength,spTopSlopeArr);
+			
+			input.put(outputSpikesKey + "Set"+spikeLength,spikesSet);
 		
-		input.put(outputSpikesKey + "dPixel",dSpikePixel);
-		input.put(outputSpikesKey + "dSlices",dSpikeSlice);
-		input.put(outputSpikesKey + "dHeights",dSpikeHeight);
-		input.put(outputSpikesKey + "dTopSlope",dSpikeTopSlope);
-		input.put(outputSpikesKey + "doubleLen",dSpikePixel.length);
-		
-		input.put(outputSpikesKey + "sSet",singleSpikesSet);
-		input.put(outputSpikesKey + "dSet",doubleSpikesSet);
+		}
 		
 		input.put(outputKey,result);
 		input.put("@"+Constants.KEY_COLOR + "_" +outputKey,color);
 		
 		return input;
+	}
+
+	private double CorrectSpike(int pos, int spikeLength,double averTopValues)
+	{
+		double spikeHeight = 0;
+		
+		double averBaseValues = (result[pos-1] + result[pos+spikeLength])/2.0;
+		
+		spikeHeight = averTopValues - averBaseValues;
+		
+		for (int sl = 0 ; sl < spikeLength ; sl++)
+		{
+			result[pos+sl] -= spikeHeight;
+		}
+		
+		return spikeHeight;
 	}
 
 	public String getDataKey() {
@@ -162,6 +172,14 @@ public class RemoveSpikes implements Processor {
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
+	}
+
+	public String getStartCellKey() {
+		return startCellKey;
+	}
+
+	public void setStartCellKey(String startCellKey) {
+		this.startCellKey = startCellKey;
 	}
 
 	public String getOutputKey() {
@@ -180,12 +198,12 @@ public class RemoveSpikes implements Processor {
 		this.spikeLimit = spikeLimit;
 	}
 
-	public double getTopSlope() {
-		return topSlope;
+	public double getTopSlopeLimit() {
+		return topSlopeLimit;
 	}
 
-	public void setTopSlope(double topSlope) {
-		this.topSlope = topSlope;
+	public void setTopSlopeLimit(double topSlopeLimit) {
+		this.topSlopeLimit = topSlopeLimit;
 	}
 
 	public String getOutputSpikesKey() {
@@ -194,6 +212,14 @@ public class RemoveSpikes implements Processor {
 
 	public void setOutputSpikesKey(String outputSpikesKey) {
 		this.outputSpikesKey = outputSpikesKey;
+	}
+
+	public int getMaxSpikeLength() {
+		return maxSpikeLength;
+	}
+
+	public void setMaxSpikeLength(int maxSpikeLength) {
+		this.maxSpikeLength = maxSpikeLength;
 	}
 
 	public String getColor() {
@@ -209,11 +235,7 @@ public class RemoveSpikes implements Processor {
 	}
 
 	public void setLeftBorder(int leftBorder) {
-		if (leftBorder < 2)
-		{
-			throw new RuntimeException("leftBorder smaller than 2: " + leftBorder + " this does not make sense!");
-		}
 		this.leftBorder = leftBorder;
 	}
-
+	
 }
