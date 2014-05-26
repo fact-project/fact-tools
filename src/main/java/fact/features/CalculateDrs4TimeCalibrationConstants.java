@@ -15,7 +15,7 @@ import fact.EventUtils;
 
 
 public class CalculateDrs4TimeCalibrationConstants implements Processor {
-	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
+	static Logger log = LoggerFactory.getLogger(CalculateDrs4TimeCalibrationConstants.class);
 	
 	private int number_of_patches = 160;
 	private int number_of_slices = 1024;
@@ -24,21 +24,20 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
 	private String key;
 	@Parameter(required=true, description="")
 	private String outputKey;
-    	
-	private double[] wi   = new double[1440*number_of_slices];
-	private double[] wli  = new double[1440*number_of_slices];
-	private double[] s_n  = new double[1440*number_of_slices];
-	private double[] time_offsets = new double[1440*number_of_slices];
+	
+	double[] wi   = new double[1440*number_of_slices];
+	double[] wli  = new double[1440*number_of_slices];
+	double[] s_n  = new double[1440*number_of_slices];
+	double[] time_offsets = new double[1440*number_of_slices];
     
 	/**
 	 * Just a way of keeping the process() method small:
-	 * @param input
+	 * @param input : Data hash-map we look for 
 	 * @return
 	 */
 	private double[] retrieve_data(Data input){
-        
-        EventUtils.mapContainsKeys(getClass(), input, key, "StartCellData");
-        double[] data = null;
+		EventUtils.mapContainsKeys(getClass(), input, key, "StartCellData");
+		double[] data = null;
 		try{
 			data = (double[]) input.get(key);
 		} catch (ClassCastException e){
@@ -48,11 +47,9 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
 		if (data==null){
 			log.error("Couldn't get key: " + key);
 		}
-        
-        return data;
-    }
-    
- 
+		return data;
+	}
+
     /** 
      * Find rising edge zero crossings in data[start:start+length]
      * 
@@ -61,7 +58,7 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
      * @param length : number of time slices to consider in search.
      * @return linear interpolated zero crossing positions relative to start.
      */
-    private ArrayList<Double> find_zero_crossings(double[] data, int start, int length){
+    ArrayList<Double> find_zero_crossings(double[] data, int start, int length){
 
     	ArrayList<Double> lzc = new ArrayList<Double>();
     	// lzc: List of Zero Crossings
@@ -69,7 +66,7 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
         // Find all zero crossings, with a rising edge
         // We iterate here over time slices, so the loop variable is called: sl
         for(int sl=0 ; sl < length-1 ; sl++){
-            if (data[start+sl] < 0 && data[start+sl+1] > 0){
+            if (data[start+sl] <= 0 && data[start+sl+1] > 0){
                 double weight = data[start+sl] / (data[start+sl] - data[start+sl+1]);
                 lzc.add( sl + weight);
             }
@@ -78,31 +75,30 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     }
     
     /**
-     * We need to dertermine the w_i and the wl_i:
+     * We need to determine the w_i and the wl_i:
      * $$ w_i = \sum_{k=0}^{N_k} w_ki $$
      * 
      * and
      * $$ wl_i = \sum_{k=0}^{N_k} w_ki \cdot l_k $$
      * 
-     *  where l_k is nothing else than the apparent width of a calibration period.
+     * where l_k is nothing else than the apparent width of a calibration period.
+     * wi and wli act as accumulators over the entire life of this processor.
      * 
      * @param lzc List of zero crossings
      * @param patch_id	just the patch id of the patch for which lzc is valid
      * @param sc start cell for the current patch
      */
-    private void calculate_wi_wli(ArrayList<Double> lzc, int patch_id, int sc){
+    void calculate_wi_wli(ArrayList<Double> lzc, int patch_id, int sc){
         // now we iterate over this list of zero-crossing:
         //  each pair of two crossings, forms a period of the calibration signal.
         // The measured length (in slices) of this period, will be associated with the 
         // physical cells of the DRS4 chip. Therefor we need the startcell
         // to convert slices into physical cell ids.
-        
-    	Double[] l = lzc.toArray(new Double[lzc.size()]);
     	
-        for (int period_id=0; period_id<l.length-1; period_id++){
+        for (int period_id=0; period_id<lzc.size()-1; period_id++){
 
-            double left = l[period_id];
-            double right = l[period_id+1];
+            double left = lzc.get(period_id);
+            double right = lzc.get(period_id+1);
 
             double l_k = right - left;
             
@@ -133,11 +129,22 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     }
     
     /**
-     * s_n is defined as 
+     * This method operates on the two internal pseudo 2D double arrays: wi and wli
      * 
-     * @param patch_id
+     * s_n is defined as:
+     * 		s_n = (sum_{i=0}^{n} wl_i)/(sum_{i=0}^{n} w_i)
+     * 		n=0...1023
+     * 
+     * s_1023 can be understood as the mean period of the calibration
+     * signal, as it is measured by the ditiector.
+     * 
+     * 
+     * the time_offset of the n-th cell (o_n) is defined as:
+     * o_n = (n+1) * (1.- s_1023/s_n)
+     * 
+     * @param patch_id : index of camera patch the time_offset should be calculated for.
      */
-    private void calculate_s_n_and_time_offsets( int patch_id){			
+    void calculate_s_n_and_time_offsets( int patch_id){			
 		double cumsum_wi  = 0.;
 		double cumsum_wli = 0.;
 		for(int n=0; n < number_of_slices; n++)
@@ -157,6 +164,16 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     }
     
 	@Override
+	/**
+	 * In a loop over all camera patches the methods:
+	 * 	* find_zero_crossings
+	 *  * calculate_wi_wli
+	 *  * calculate_s_n_and_time_offsets
+	 *  
+	 * are being called for each Data instance.
+	 * 
+	 * 
+	 */
 	public Data process(Data input) {
         
 		double[] data = retrieve_data(input);
@@ -173,11 +190,8 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
             calculate_s_n_and_time_offsets(chid);
         }
 		
-		
 		input.put(outputKey, time_offsets);
-		input.put("sum_of_wi", wi);
-		input.put("sum_of_wli", wli);
-		input.put("s_n", s_n);
+
 		return input;
 	}
 
