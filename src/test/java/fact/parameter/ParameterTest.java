@@ -65,10 +65,13 @@ public class ParameterTest  {
         pP.process(item);
 
         PhotonCharge pC = new PhotonCharge();
-        pC.setKey(key);
+        pC.setDataKey(key);
         pC.setOutputKey(photonCharge);
+		pC.setUrl(FitsStreamTest.class.getResource("/defaultIntegralGains.csv"));
+		pC.setRangeSearchWindow(25);
         pC.setPositions(positions);
         pC.process(item);
+        
 
 
         CoreNeighborClean poser = new CoreNeighborClean();

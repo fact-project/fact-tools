@@ -58,9 +58,11 @@ public class FeatureTests {
 		typeMap.put(rE, p);
 		
 		PhotonCharge c = new PhotonCharge();
-		c.setKey("test");
-		c.setOutputKey("photonCharge");
+		c.setDataKey("test");
 		c.setPositions(rE.getOutputKey());
+		c.setUrl(FitsStreamTest.class.getResource("/defaultIntegralGains.csv"));
+		c.setRangeSearchWindow(25);
+		c.setOutputKey("photonCharge");
 		p = new Pair<String, Class<?>>(c.getOutputKey(), double[].class );
 		typeMap.put(c, p);
 		
@@ -109,9 +111,11 @@ public class FeatureTests {
 		typeMap.put(rE, p);
 		
 		PhotonCharge charge = new PhotonCharge();
-		charge.setKey(cut.getOutputKey());
-		charge.setOutputKey("photonCharge");
+		charge.setDataKey(cut.getOutputKey());
 		charge.setPositions(rE.getOutputKey());
+		charge.setUrl(FitsStreamTest.class.getResource("/defaultIntegralGains.csv"));
+		charge.setRangeSearchWindow(25);
+		charge.setOutputKey("photonCharge");
 		p = new Pair<String, Class<?>>(charge.getOutputKey(), double[].class );
 		typeMap.put(charge, p);
 		
