@@ -25,16 +25,11 @@ public class RisingEdgeForPositions implements Processor {
 
     @Parameter(required = true)
 	private String dataKey = null;
-
     @Parameter(required = true)
 	private String outputKey = null;
-
-    
     @Parameter(required = true)
 	private String amplitudePositionsKey = null;
-	//
 
-	
 	@Override
 	public Data process(Data input) {
         EventUtils.mapContainsKeys(getClass(), input, dataKey, amplitudePositionsKey);
@@ -48,15 +43,10 @@ public class RisingEdgeForPositions implements Processor {
 		
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			int posMaxAmp = amplitudePositions[pix];
-			/**
-			 * original c++ code by F.Temme with some modifications
-			 * one-liner comments by F.Temme  
-			 */
 	
-			/// temp. Variables
+			// temp. Variables
 			double           current_slope   = 0;
 			double           max_slope       = 0;
-			//Todo: remove magic numbers for the search window
 			int             search_window_left  = posMaxAmp - searchWindowLeft;
 			if (search_window_left < 10)
 			{
@@ -64,7 +54,8 @@ public class RisingEdgeForPositions implements Processor {
 			}
 			int             search_window_right = posMaxAmp;
 			int arrivalPos = 0;
-			/// Loop over all timeslices of given Window
+			// Loop over all timeslices of given window
+			// check for the largest derivation over 5 slices
 			for( int slice = search_window_left; slice < search_window_right; slice++)
 			{
 				int pos = pix * roi + slice;
@@ -75,8 +66,8 @@ public class RisingEdgeForPositions implements Processor {
 				}
 				if (current_slope > max_slope)
 				{
-					max_slope       = current_slope;
-					arrivalPos             = slice;
+					max_slope = current_slope;
+					arrivalPos = slice;
 				}
 			}
 			positions[pix] = arrivalPos;
@@ -87,47 +78,30 @@ public class RisingEdgeForPositions implements Processor {
 		
 	}
 
-
-
-
 	public String getDataKey() {
 		return dataKey;
 	}
-
-
-
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-
-
-
 	public String getOutputKey() {
 		return outputKey;
 	}
 
-
-
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
-
-
-
-
+	
 	public String getAmplitudePositionsKey() {
 		return amplitudePositionsKey;
 	}
 
-
 	public void setAmplitudePositionsKey(String amplitudePositionsKey) {
 		this.amplitudePositionsKey = amplitudePositionsKey;
 	}
-
-
+	
 	public int getSearchWindowLeft() {
 		return searchWindowLeft;
 	}

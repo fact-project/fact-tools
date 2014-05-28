@@ -32,9 +32,9 @@ public class PhotonCharge implements Processor {
     
     @Parameter(required = true)
 	private String dataKey = null;
-    @Parameter(required = true, description = "The positions around which the integral is calculated.")
+    @Parameter(required = true, description = "The positions around which the integral is calculated.",defaultValue="DataCalibrated")
     private String positions = null;
-    @Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",defaultValue="src/main/resources/defaultIntegralGains.csv")
+    @Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
     private URL url = null;
     @Parameter(required = true, description = "The range before the maxAmplitude where the half height is searched", defaultValue ="25")
     private int rangeSearchWindow = 25;
@@ -45,7 +45,6 @@ public class PhotonCharge implements Processor {
 	
     Data integralGainData = null;
     private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
-    
     
 	private String color = "#00F0F0";
     private int alpha = 64;
@@ -66,9 +65,7 @@ public class PhotonCharge implements Processor {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		// for each pixel
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
-			/**
-			 * watch out. index can get out of bounds!
-			 */
+			
 			int pos = pix*roi;
 			int positionOfMaximum = posArray[pix];
 			int positionOfHalfMaximumValue = 0;
@@ -77,11 +74,11 @@ public class PhotonCharge implements Processor {
 			{
 				leftBorder = 0;
 			}
-			// in an area of [amplitudePositon-25,amplitudePosition] search for the position,
+			// in an area of ]amplitudePositon-25,amplitudePosition] search for the position,
 			// behind the last time where data[pos] is < 0.5 of the original maxAmplitude
 			for (int sl = positionOfMaximum ; sl > leftBorder ; sl--)
 			{
-				positionOfHalfMaximumValue        = sl;
+				positionOfHalfMaximumValue = sl;
 
 				if (data[pos + sl-1] < data[pos + positionOfMaximum] / 2  && data[pos + sl] >= data[pos + positionOfMaximum] / 2)
 				{
@@ -90,7 +87,7 @@ public class PhotonCharge implements Processor {
 			}
 
 			// Calculate the integral over 30 slices and divide it by the calibration Gain (stored in integralGains[pix])
-			float integral              = 0;
+			float integral = 0;
 			if(positionOfHalfMaximumValue + 30 < roi ){
 				for (int sl = positionOfHalfMaximumValue ; sl < positionOfHalfMaximumValue + 30 ; sl++){  
 					integral += data[sl + (pix*roi)];
