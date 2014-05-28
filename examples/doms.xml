@@ -6,7 +6,7 @@
 -->
     
 <!--     <property name="infile" value="/home/dneise/fact/drs_time_calibration_test_data/peak.fits.gz" /> -->
-    <property name="infile" value="/home/dneise/fact/drs_time_calibration_test_data/cosine.fits.gz" />
+    <property name="infile" value="/home/dneise/fact/drs_time_calibration_test_data/peak.fits.gz" />
     <property name="drsfile" value="/home/dneise/fact/drs_time_calibration_test_data/drs_amplitude_calib_fake_for_time_calib.fits.gz" />
 
     
