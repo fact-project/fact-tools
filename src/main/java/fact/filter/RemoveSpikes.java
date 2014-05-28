@@ -31,7 +31,7 @@ public class RemoveSpikes implements Processor {
 	String outputSpikesKey = null;
 	@Parameter(required=true)
 	int maxSpikeLength = 2;
-	
+	@Parameter(required=true)
 	String color = null;
 	
 	int roi;
