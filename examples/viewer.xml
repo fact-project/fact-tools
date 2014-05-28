@@ -1,9 +1,9 @@
 <container>
 
     <!-- Pfade zu den fits files. -->
-    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_060.fits.gz" />
-    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_056.drs.fits.gz" />
-    <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
+	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="5.0" />
     <property name="neighbor_threshold" value="2.0"/>
