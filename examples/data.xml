@@ -66,21 +66,32 @@
 		           <fact.features.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Alpha_Off_5" />
 		           <fact.features.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Distance_Off_5" />
 		
-		           <fact.features.HillasConcentration weights="photoncharge" shower="shower" outputKey="Concentration" />
-		           <fact.features.HillasLength distribution="showerDistribution" outputKey="HillasLength" />
-		           <fact.features.HillasWidth distribution="showerDistribution" outputKey="HillasWidth" />
-		           <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
-		           <fact.features.ConcentrationCore cogx="COGx" cogy="COGy" showerPixel="shower" photoncharge="photoncharge" size="Size" width="Width" length="Length" delta="Delta" outputKey="ConcCore" />
-		           <fact.features.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
-		           
-		           <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
-		           <fact.features.SlopeSpreadWeighted showerPixel="shower" arrivaltime="arrivalTime" photonCharge="photoncharge" hillasDelta="Delta" outputKey="SlopeSpreadWeighted" />
-		           <fact.features.SourceLineTest photonCharge="photoncharge" arrivalTime="arrivalTime" showerPixel="shower" sourcePosition="sourcePosition" outputKey="SourceLineTest" />
-		           <fact.statistics.ArrayMean key="photoncharge" outputKey="photonchargeMean" />
-		           <fact.statistics.ArrayMean key="arrivalTime" outputKey="arrivalTimeMean" />
-		           
-		           <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,varianceLong,varianceTrans,M3Long,M3Trans,M4Long,M4Trans,COGx,COGy,Width,Length,Size,Delta,Alpha,Distance,Alpha_Off_1,Distance_Off_1,Alpha_Off_2,Distance_Off_2,Alpha_Off_3,Distance_Off_3,Alpha_Off_4,Distance_Off_4,Alpha_Off_5,Distance_Off_5,Concentration_onePixel,Concentration_twoPixel,HillasLength,HillasWidth,Leakage,Leakage2,ConcCore,CosDeltaAlpha,numIslands,numPixelInShower,SlopeSpreadWeighted_slopeLong,SlopeSpreadWeighted_slopeSpread,SlopeSpreadWeighted_slopeSpreadWeighted,SlopeSpreadWeighted_slopeTrans,SlopeSpreadWeighted_timeSpread,SlopeSpreadWeighted_timeSpreadWeighted,SourceLineTest_meanShowerVelocityProjected,SourceLineTest_meanShowerVelocitySorted,SourceLineTest_sourceLineTestValueSorted,SourceLineTest_sourceLineTestValueProjected,photonchargeMean,photonchargeMean_deviation,arrivalTimeMean,arrivalTimeMean_deviation,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,antiSourcePosition_4,antiSourcePosition_5"/>
-		           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,Size,Length,Width"/> -->
+		            <fact.features.HillasConcentration weights="photoncharge" shower="shower" outputKey="Concentration" />
+            <fact.features.HillasLength distribution="showerDistribution" outputKey="HillasLength" />
+            <fact.features.HillasWidth distribution="showerDistribution" outputKey="HillasWidth" />
+            <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
+            <fact.features.ConcentrationCore cogx="COGx" cogy="COGy" showerPixel="shower" photoncharge="photoncharge" size="Size" width="Width" length="Length" delta="Delta" outputKey="ConcCore" />
+            <fact.features.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
+            <!-- Error  <fact.features.ConcentrationAtCenterOfGravity photonCharge="photoncharge" cogX="COGx" cogY="COGy" hillasSize="Size" outputKey="concCOG" /> -->
+            <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
+            <fact.features.SlopeSpreadWeighted showerPixel="shower" arrivaltime="arrivalTime" photonCharge="photoncharge" hillasDelta="Delta" outputKey="SlopeSpreadWeighted" />
+            <fact.features.SourceLineTest photonCharge="photoncharge" arrivalTime="arrivalTime" showerPixel="shower" sourcePosition="sourcePosition" outputKey="SourceLineTest" />
+            <fact.statistics.ArrayMean key="photoncharge" outputKey="photonchargeMean" />
+            <fact.statistics.ArrayMean key="arrivalTime" outputKey="arrivalTimeMean" />
+
+            <fact.snake.MeanWithoutShower key="photoncharge" shower="shower" outkey="MeanWithoutShower" />
+            <fact.snake.WeightedShowerCenter  Shower="shower" Weight="photoncharge" OutkeyX="snakeStartX" OutkeyY="snakeStartY" />     
+            <fact.cleaning.snake.SnakeSingle DrawSnake="" PixelDataName="photoncharge" ShowerCenterX="snakeStartX" ShowerCenterY="snakeStartY" SnakeOutX="snake_X" SnakeOutY="snake_Y" Mean="MeanWithoutShower" numberOfVerticesOut="NumberOfVertices"/>    
+
+            <fact.features.snake.PolygonArea PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeArea" />
+            <fact.features.snake.PolygonLength PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeLength" />
+            <fact.features.snake.PolygonCenter PolygonX="snake_X" PolygonY="snake_Y" OutkeyX="PolygonCenterX" OutkeyY="PolygonCenterY"/>
+            <fact.features.snake.PolygonIntegrate Key="photoncharge" PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeInt" OutkeyNumberOfPixel="PixelInSnake" OutkeyPixelList="shower_snake"/>
+            <fact.features.snake.InnerEnergy SnakeX="snake_X" SnakeY="snake_Y" Outkey="InnerEnergy" />
+            
+            <fact.features.snake.FitEllipse DrawEllipse="" SnakeX="snake_X" SnakeY="snake_Y" OutkeyAlpha="SnakeEllipseAlpha" OutkeyMajor="SnakeEllipseMajor" OutkeyMinor="SnakeEllipseMinor" OutkeyCenterX="SnakeEllipseX" OutkeyCenterY="SnakeEllipseY" />
+            
+            <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,varianceLong,varianceTrans,M3Long,M3Trans,M4Long,M4Trans,COGx,COGy,Width,Length,Size,Delta,Alpha,Distance,Alpha_Off_1,Distance_Off_1,Alpha_Off_2,Distance_Off_2,Alpha_Off_3,Distance_Off_3,Concentration_onePixel,Concentration_twoPixel,HillasLength,HillasWidth,Leakage,Leakage2,ConcCore,CosDeltaAlpha,numIslands,numPixelInShower,SlopeSpreadWeighted_slopeLong,SlopeSpreadWeighted_slopeSpread,SlopeSpreadWeighted_slopeSpreadWeighted,SlopeSpreadWeighted_slopeTrans,SlopeSpreadWeighted_timeSpread,SlopeSpreadWeighted_timeSpreadWeighted,SourceLineTest_meanShowerVelocityProjected,SourceLineTest_meanShowerVelocitySorted,SourceLineTest_sourceLineTestValueSorted,SourceLineTest_sourceLineTestValueProjected,photonchargeMean,photonchargeMean_deviation,arrivalTimeMean,arrivalTimeMean_deviation,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,MeanWithoutShower,snakeStartX,snakeStartY,SnakeArea,SnakeLength,SnakeInt,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY"/>
 
 
     </process>
