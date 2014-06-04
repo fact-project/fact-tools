@@ -87,7 +87,7 @@ public Data process(Data input) {
     }
 	double cogX = 0;
 	double cogY = 0;
-	//find wheighted center of the shower. assuming we have no islands this works.
+	//find weighted center of the shower pixels.
     for (int pix: showerPixel)
     {
         cogX            += wheightsArray[pix] * DefaultPixelMapping.getGeomXArray()[pix];
