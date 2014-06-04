@@ -54,12 +54,12 @@
 			
 			
 			
-			<fact.io.PrintKeysOnConsole keys="EventNum,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY"/>
+			<fact.io.PrintKeysOnConsole keys="EventNum,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY"/>
 
 			<fact.image.ShowImage/>
 			
 		
-           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum, NumberOfVertices, SnakeArea, SnakeLength, SnakeInt, InnerEnergy, SnakeEllipseAlpha, SnakeEllipseMajor, SnakeEllipseMinor, SnakeEllipseX, SnakeEllipseY"/> -->
+           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY"/> -->
 			
 
     </process>
