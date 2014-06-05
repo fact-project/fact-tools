@@ -150,17 +150,17 @@ public class DefaultPixelMapping implements PixelMapping {
      * @param y y coordinate in MM
      * @return the chid under the point x,y
      */
-	public static int coordinatesToChid(float xOrig, float yOrig){
+	public static int coordinatesToChid(double xOrig, double yOrig){
 		if(!init){
 			init();
 		}
-		float x = xOrig/9.5f;
-		float y = yOrig/9.5f;
-		float ix =  (float) (x /Math.sin(60* (Math.PI/180)));
+		double x = xOrig/9.5d;
+		double y = yOrig/9.5d;
+		double ix =  (double) (x /Math.sin(60* (Math.PI/180)));
 		ix =  Math.round(ix);
-		float iy = y;
+		double iy = y;
 		if(ix % 2 == 0){
-			iy = y-0.5f;
+			iy = y-0.5d;
 		}
 		iy = -Math.round(iy);
 		
@@ -184,7 +184,7 @@ public class DefaultPixelMapping implements PixelMapping {
 		return coordinatesToChidBruteForce(xOrig, yOrig, neighbours);
 	}
 
-	private static int coordinatesToChidBruteForce(float x, float y, int[] chidList)
+	private static int coordinatesToChidBruteForce(double x, double y, int[] chidList)
 	{
 		if(!init){
 			init();
