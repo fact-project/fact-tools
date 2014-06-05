@@ -31,8 +31,10 @@ public class RemoveSpikes implements Processor {
 	String outputSpikesKey = null;
 	@Parameter(required=true)
 	int maxSpikeLength = 2;
-	
+	@Parameter(required=true)
 	String color = null;
+	@Parameter(required=false)
+	boolean showSpikes = false;
 	
 	int roi;
 	
@@ -139,8 +141,11 @@ public class RemoveSpikes implements Processor {
 			input.put(outputSpikesKey + "PhysSlices"+spikeLength,spPhysSliceArr);
 			input.put(outputSpikesKey + "Heights"+spikeLength,spHeightArr);
 			input.put(outputSpikesKey + "TopSlope"+spikeLength,spTopSlopeArr);
-			
-			input.put(outputSpikesKey + "Set"+spikeLength,spikesSet);
+
+			if (showSpikes == true)
+			{			
+				input.put(outputSpikesKey + "Set"+spikeLength,spikesSet);
+			}
 		
 		}
 		
@@ -236,6 +241,14 @@ public class RemoveSpikes implements Processor {
 
 	public void setLeftBorder(int leftBorder) {
 		this.leftBorder = leftBorder;
+	}
+
+	public boolean isShowSpikes() {
+		return showSpikes;
+	}
+
+	public void setShowSpikes(boolean showSpikes) {
+		this.showSpikes = showSpikes;
 	}
 	
 }

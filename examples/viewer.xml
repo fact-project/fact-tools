@@ -1,9 +1,9 @@
 <container>
 
     <!-- Pfade zu den fits files. -->
-    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_060.fits.gz" />
-    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_056.drs.fits.gz" />
-    <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
+	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="5.0" />
     <property name="neighbor_threshold" value="2.0"/>
@@ -15,22 +15,27 @@
     <!-- Name des Streams und pfad zu dem Daten-File -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
 
-    <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
+    <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
     <process id="2" input="fact">
         <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
         <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
-        <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
+        <fact.filter.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
         <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
         <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
         <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-        <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
+        <fact.features.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:src/main/resources/defaultIntegralGains.csv" rangeSearchWindow="25" color="#FF0F0F"/>
+        
+        <fact.features.SourcePosition outputKey="Cetatauri" url="file:${drivefile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" />
 
-        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
+        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime"
+           corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
+           timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" 
+           showDifferentCleaningSets="false" starPositionKeys="Cetatauri" starRadiusInCamera="11.0"/>
 
 
         <fact.features.SourcePosition outputKey="sourcePosition" url="file:${drivefile}" physicalSource="${sourcename}" />

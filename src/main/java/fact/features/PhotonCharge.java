@@ -2,78 +2,83 @@
 package fact.features;
 
 import java.awt.Color;
+import java.net.URL;
 
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
-import stream.ProcessContext;
 import stream.Processor;
-import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.io.CsvStream;
+import stream.io.SourceURL;
 import fact.Constants;
+import fact.EventUtils;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 
  * 1. 	Use the MaxAmplitude Processor to find the maximum Value in the slices.</br>
- * 2.	In the area between amplitudePosition...amplitudePositon-25 search for the position having 0.5 of the original maxAmplitude.</br>
- * 3.	Now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.</br>
- * 4. 	Divide the sum by the integralGain and save the result.</br>
+ * 2.	In an area of [amplitudePositon-25,amplitudePosition] search for the position, behind the last time where data[pos] is < 0.5 of the original maxAmplitude</br>
+ * 3.	Calculate the integral over 30 slices </br>
+ * 4. 	Divide the sum by the integralGain of the corresponding pixel and save the result.</br>
  * 
  * Treatment of edge Cases is currently very arbitrary since Pixels with these values should not be considered as showerPixels anyways.
- * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  *
  */
 public class PhotonCharge implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
-	private double[] photonCharge = null;
-
-	private String color = "#00F0F0";
-
-	private	double average = 0.0;
-
-    @Parameter(required = false, description = "Value for the integral Gain. This is a measured Constant.", defaultValue = "244.0")
-    private double integralGain = 244.0f;
-    @Parameter(required = true, description = "The positions from which to integrate.")
-    private String positions = null;
-
-    private int alpha = 64;
-
+    
     @Parameter(required = true)
-	private String key = null;
+	private String dataKey = null;
+    @Parameter(required = true, description = "The positions around which the integral is calculated.",defaultValue="DataCalibrated")
+    private String positions = null;
+    @Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
+    private URL url = null;
+    @Parameter(required = true, description = "The range before the maxAmplitude where the half height is searched", defaultValue ="25")
+    private int rangeSearchWindow = 25;
     @Parameter(required = true)
     private String outputKey = null;
+    
+	private double[] photonCharge = null;
+	
+    Data integralGainData = null;
+    private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
+    
+	private String color = "#00F0F0";
+    private int alpha = 64;
 	
 
 	@Override
 	public Data process(Data input) {
 		
+		EventUtils.mapContainsKeys(getClass(), input, dataKey,positions);
+		
 		int[] posArray;
 		double[] data;
 		posArray = (int[]) input.get(positions);
-		data = (double[]) input.get(key);
+		data = (double[]) input.get(dataKey);
 
-		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		photonCharge = new double[Constants.NUMBEROFPIXEL];
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		// for each pixel
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
-
-			/**
-			 * watch out. index can get out of bounds!
-			 */
+			
 			int pos = pix*roi;
-			int positionOfMaximum                 = posArray[pix];
-			int positionOfHalfMaximumValue            = 0;
-			if(positionOfMaximum <=25){
-				positionOfMaximum=25;
-			}
-			//in an area of amplitudePosition...amplitudePositon-25 search for the postion having 0.5of the original maxAmplitude
-			for (int sl = positionOfMaximum ; sl > positionOfMaximum - 25 ; sl--)
+			int positionOfMaximum = posArray[pix];
+			int positionOfHalfMaximumValue = 0;
+			int leftBorder = positionOfMaximum - rangeSearchWindow;
+			if (leftBorder < 0)
 			{
-				positionOfHalfMaximumValue        = sl;
+				leftBorder = 0;
+			}
+			// in an area of ]amplitudePositon-25,amplitudePosition] search for the position,
+			// behind the last time where data[pos] is < 0.5 of the original maxAmplitude
+			for (int sl = positionOfMaximum ; sl > leftBorder ; sl--)
+			{
+				positionOfHalfMaximumValue = sl;
 
 				if (data[pos + sl-1] < data[pos + positionOfMaximum] / 2  && data[pos + sl] >= data[pos + positionOfMaximum] / 2)
 				{
@@ -81,9 +86,8 @@ public class PhotonCharge implements Processor {
 				}
 			}
 
-			float integral              = 0;
-			//and now for some reason sum up all slices between half_max_pos and  half_max_pos + 30.
-			//watch out for right margin of array here
+			// Calculate the integral over 30 slices and divide it by the calibration Gain (stored in integralGains[pix])
+			float integral = 0;
 			if(positionOfHalfMaximumValue + 30 < roi ){
 				for (int sl = positionOfHalfMaximumValue ; sl < positionOfHalfMaximumValue + 30 ; sl++){  
 					integral += data[sl + (pix*roi)];
@@ -92,16 +96,14 @@ public class PhotonCharge implements Processor {
 			else {
 				integral = 0;
 			}			    
-			photonCharge[pix] = integral/integralGain;
-			average += photonCharge[pix];
+			photonCharge[pix] = integral/integralGains[pix];
+			
 			Color c = Color.decode(color);
 			int r = c.getRed();
 			int g = c.getGreen();
 			int b = c.getBlue();
-
 			m[pix] = new IntervalMarker(positionOfHalfMaximumValue, positionOfHalfMaximumValue + 30, new Color(r,g,b, alpha));
 		}
-		average = average/Constants.NUMBEROFPIXEL;
 
 		//add color value if set
 		input.put(outputKey+"Marker", m);
@@ -115,11 +117,23 @@ public class PhotonCharge implements Processor {
 
 	/*Getters and Setters */
 
-	public double getIntegralGain() {
-		return integralGain;
+	public String getDataKey() {
+		return dataKey;
 	}
-	public void setIntegralGain(float integralGain) {
-		this.integralGain = integralGain;
+
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
+	}
+
+
+	public int getRangeSearchWindow() {
+		return rangeSearchWindow;
+	}
+
+
+	public void setRangeSearchWindow(int rangeSearchWindow) {
+		this.rangeSearchWindow = rangeSearchWindow;
 	}
 
 
@@ -131,17 +145,6 @@ public class PhotonCharge implements Processor {
 	}
 
 	
-	
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-
-
 	public String getOutputKey() {
 		return outputKey;
 	}
@@ -166,7 +169,40 @@ public class PhotonCharge implements Processor {
 	public void setAlpha(int alpha) {
 		this.alpha = alpha;
 	}
+	
+	public void setUrl(URL url) {
+		try {
+			loadIntegralGainFile(new SourceURL(url));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+		this.url = url;
+	}
 
+
+	public URL getUrl() {
+		return url;
+	}
+
+
+	private void loadIntegralGainFile(SourceURL inputUrl) {
+		try {
+			CsvStream stream = new CsvStream(inputUrl, " ");
+			stream.setHeader(false);
+			stream.init();
+			integralGainData = stream.readNext();
+			
+			for (int i = 0 ; i < Constants.NUMBEROFPIXEL ; i++){
+				String key = "column:" + (i);
+				this.integralGains[i] = (Double) integralGainData.get(key);
+			}
+			
+		} catch (Exception e) {
+			log.error("Failed to load integral Gain data: {}", e.getMessage());
+			e.printStackTrace();
+		}
+		
+	}
 
 
 }
