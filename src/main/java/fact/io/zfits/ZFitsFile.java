@@ -30,9 +30,9 @@ public class ZFitsFile {
 			}
 			if (block.get(0).startsWith("XTENSION")) {
 				FitsHeader header = new FitsHeader(block);
-				System.out.println(header.toString());
+				System.out.println("XTENSION header: \n"+header.toString());
 				ZFitsTable table = new ZFitsTable(header);
-				System.out.println(table.getTableTotalSize());
+				System.out.println("TotalSize: "+table.getTableTotalSize());
 				/*if (numTable==0) {
 					this.input.skip(table.getTableTotalSize());
 					numTable++;
@@ -41,10 +41,10 @@ public class ZFitsFile {
 				//System.out.println("Start: "+Long.toHexString(fileInputStream.getChannel().position()));
 				if (table.getCommpressed()) {
 					//read catalog
-					byte[] fixTable = new byte[(int)table.getFixTableSize()];
-					System.out.println("FixTableSize: "+table.getFixTableSize());
+					byte[] fixTable = new byte[(int)table.getHeapSize()];
+					System.out.println("FixTableSize: "+table.getHeapSize());
 					int numBytes = this.input.read(fixTable);
-					if (numBytes!=table.getFixTableSize())
+					if (numBytes!=table.getHeapSize())
 						throw new ParseException("Could not read full heap");
 
 					Catalog catalog = new Catalog(fixTable, table.getNumTiles(), table.getNumCols());
@@ -83,8 +83,8 @@ public class ZFitsFile {
 					}
 					//System.out.println("Data Count: "+table.getHeapSize());
 					//System.out.println("Data End: "+Long.toHexString(fileInputStream.getChannel().position()));
-					//System.out.println("Position: "+Long.toHexString(fileInputStream.getChannel().position()));
-					//System.out.println("Padding: "+table.getPaddingSize());
+					System.out.println("Position: "+Long.toHexString(fileInputStream.getChannel().position()));
+					System.out.println("Padding: "+table.getPaddingSize());
 					//System.out.println("TotalSize: "+table.getTableTotalSize());
 					//System.out.println("Sum: "+(table.getFixTableSize()+table.getHeapSize()));
 					long skipped = this.input.skip(table.getPaddingSize());
@@ -96,6 +96,10 @@ public class ZFitsFile {
 					this.input.skip(table.getTableTotalSize());
 				}
 			} else {
+				System.out.println(block.size());
+				for (String entry : block) {
+					System.out.println("'"+entry+"'");
+				}
 				throw new ParseException("Unknown block: '"+block.get(0)+"'");
 			}
 		}
