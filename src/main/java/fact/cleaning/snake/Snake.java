@@ -66,10 +66,12 @@ public class Snake
 			vecY.setEntry(i, 0, y + (dt * f.forceY(x, y)) );		
 		}		
 
+		
 		RealMatrix EigenMat = matrix[NumberOfVertices-1];
-
+			
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
+				
 
 		splitLines(220.0);	// 2 Pixel lang
 		
@@ -101,13 +103,13 @@ public class Snake
 	
 	protected void splitLines(double maxDist)
 	{
-		if(NumberOfVertices >= (_MAX_VERTICES-1))
-		{
-			return;
-		}
-
 		for(int i=0; i<NumberOfVertices; i++)
 		{
+			if(NumberOfVertices >= (_MAX_VERTICES-1))
+			{
+				return;
+			}
+			
 			double distX = vecX.getEntry((i+1) % NumberOfVertices, 0) - vecX.getEntry(i, 0);
 			double distY = vecY.getEntry((i+1) % NumberOfVertices, 0) - vecY.getEntry(i, 0);
 
