@@ -73,18 +73,18 @@ public class TimeOverThreshold implements Processor {
 			
 			int timeOverThreshold = 0;
 			int firstSliceOverThresh = 0;
-			for (int sl = positionOfMaximum - slicesBeforeMaximum ; 
+			for (int sl = skipNFirstSlices ; 
 					sl < positionOfMaximum + slicesAfterMaximum ; sl++)
 			{	
-				int currentPos = pos + sl-1;
 				if (sl < 0){
-					sl = 0;
+					continue;
 				}
-				
+						
 				if (sl > roi){
-					timeOverThreshold = 0;
 					break;
 				}
+
+				int currentPos = pos + sl-1;	
 				
 				if (data[currentPos] > threshold){
 					timeOverThreshold++;
