@@ -93,21 +93,24 @@ public class TimeOverThreshold implements Processor {
 					}
 				}
 				
-				if (data[currentPos] < threshold && currentPos > positionOfMaximum){
-					break;
+				if (currentPos > pos + roi-1 && data[currentPos + 1] <= threshold){
+					sl = positionOfMaximum + slicesAfterMaximum;
 				}
 				
 			}
 			timeOverThresholdArray[pix] = timeOverThreshold;
-			m[pix] = new IntervalMarker(firstSliceOverThresh, firstSliceOverThresh + timeOverThreshold, new Color(r,g,b, alpha));
+			m[pix] = new IntervalMarker(firstSliceOverThresh-1, firstSliceOverThresh-1 + timeOverThreshold, new Color(r,g,b, alpha));
 		}
+		//add processors threshold
+		input.put("TOT_Threshold", threshold);
+				
 		//add times over threshold
 		input.put(outputkey, timeOverThresholdArray);
 		
 		//add color value if set
 		input.put(outputkey+"Marker", m);
 		if(color !=  null && !color.equals("")){
-			input.put("@" + Constants.KEY_COLOR + "_"+outputkey+"Marker", color);
+			input.put("@" + Constants.KEY_COLOR + "_"+outputkey, color);
 		}
 		
 		return input;
