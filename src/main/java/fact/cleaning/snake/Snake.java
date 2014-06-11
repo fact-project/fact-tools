@@ -101,7 +101,7 @@ public class Snake
 	
 	protected void splitLines(double maxDist)
 	{
-		if(NumberOfVertices >= (_MAX_VERTICES-1))
+		if(NumberOfVertices >= (_MAX_VERTICES))
 		{
 			return;
 		}
