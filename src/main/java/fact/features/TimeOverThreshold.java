@@ -27,7 +27,7 @@ public class TimeOverThreshold implements Processor {
 	private int skipNFirstSlices = 40;
 	private int slicesAfterMaximum 	= 100;
 	
-	private String color = "#00F0F0";
+	private String color = "#33CC33";
 	private int alpha = 64;
 	
 	private String key = null;
