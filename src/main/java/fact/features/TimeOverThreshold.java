@@ -36,7 +36,7 @@ public class TimeOverThreshold implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		double[] timeOverThresholdArray =  new double[Constants.NUMBEROFPIXEL];
+		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
 		
 		double[] data;
 		try{
