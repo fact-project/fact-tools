@@ -61,6 +61,9 @@ public class BlockHeader {
 		this(input);
 		this.numRows = numRows;
 		this.columnInfo = columnInfo;
+//		if (data.length != columnInfo.getEntrySize()*this.numRows) {
+//			throw new ParseException("Size of the Block should be: "+columnInfo.getEntrySize()*this.numRows+", but is: "+data.length);
+//		}
 	}
 
 	@Deprecated
@@ -132,7 +135,7 @@ public class BlockHeader {
 		switch (this.ordering) {
 		case COLUMN:
 			for(int i=0; i<this.columnInfo.getNumEntries();i++) {
-				buffer.position(numRow*this.columnInfo.getEntrySize()+i*this.columnInfo.getColumnSize());
+				buffer.position(numRow*this.columnInfo.getEntrySize()+i*this.columnInfo.getEntrySize()*this.numRows);
 				buffer.get(ret, i*this.columnInfo.getEntrySize(), this.columnInfo.getEntrySize());
 			}
 			break;
