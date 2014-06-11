@@ -124,12 +124,12 @@ public class TimeOverThreshold implements Processor {
 		this.threshold = threshold;
 	}
 
-	public int getSlicesBeforeMaximum() {
-		return slicesBeforeMaximum;
+	public int getSkipNFirstSlices() {
+		return skipNFirstSlices;
 	}
 
-	public void setSlicesBeforeMaximum(int slicesBeforeMaximum) {
-		this.slicesBeforeMaximum = slicesBeforeMaximum;
+	public void setSkipNFirstSlices(int skipNFirstSlices) {
+		this.skipNFirstSlices = skipNFirstSlices;
 	}
 
 	public int getSlicesAfterMaximum() {
