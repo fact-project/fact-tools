@@ -37,9 +37,11 @@ public class PhotonChargeParameterTest extends ParameterTest {
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
 		PhotonCharge poser = new PhotonCharge();
-		poser.setKey(key);
+		poser.setDataKey(key);
 		poser.setPositions(positions);
 		poser.setOutputKey(outputKey);
+		poser.setUrl(FitsStreamTest.class.getResource("/defaultIntegralGains.csv"));
+		poser.setRangeSearchWindow(25);
 		poser.process(item);
 		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);

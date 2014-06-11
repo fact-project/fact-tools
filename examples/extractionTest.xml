@@ -1,7 +1,8 @@
 <container>
 
     <!-- Pfade zu den fits files. -->
-    <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/ceresTriggerTest/new_trigger/00000003.911_D_MonteCarlo052_Events.fits" />
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/ceresTriggerTest/new_trigger/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/00000003.909_D_MonteCarlo017_Events.fits" />
     <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples.drs.fits" />
     <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
     <property name="outfile" value="/home/fabian/cherOutputtest.csv" />
@@ -20,24 +21,24 @@
     <process id="2" input="fact">
         <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 1510" /> -->
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 4" /> -->
-        <fact.utils.Remapping key="Data" />
+        <fact.utils.Remapping key="Data" outputKey="Data" />
         <fact.utils.RemappingKeys keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax" />
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
         <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
 
         <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputkey="arrivalTime"/>
         <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
         <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 
         <fact.cleaning.CoreNeighborClean key="McCherPhotWeight" outputKey="truth" keyPositions="McCherArrTimeMean" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 
-		<fact.features.evaluate.PhotonchargeEvaluate photonchargeKey="photoncharge" mcCherenkovWeightKey="McCherPhotWeight" mcNoiseWeightKey="McNoisePhotWeight" outputKey="qualityFactor"/>
+		<fact.features.evaluate.PhotonchargeEvaluate photonchargeKey="photoncharge" arrivalTimeKey="arrivalTime" mcCherenkovWeightKey="McCherPhotWeight" mcCherenkovArrTimeMeanKey="McCherArrTimeMean" mcNoiseWeightKey="McNoisePhotWeight" outputKeyPhotonCharge="qualityFactorPhCh" outputKeyArrivalTime="qualityFactorArrTi"/>
             
-        <fact.io.RootASCIIWriter url="file:${outfile}" keys="qualityFactor"/>
+        <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="qualityFactorPhCh,qualityFactorArrTi"/> -->
         
-        <!-- <fact.image.ShowImage/> -->
+        <fact.image.ShowImage/>
 
 
     </process>

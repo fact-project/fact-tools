@@ -61,9 +61,9 @@ public class InnerEnergy implements Processor
 		
 		erg /= 2.0*dim;
 		
-		System.out.println(erg);
+//		System.out.println(erg);
 		
-		input.put(outkey, 0);				
+		input.put(outkey, erg);				
 		return input;
 	}
 

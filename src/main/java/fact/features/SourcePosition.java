@@ -151,7 +151,7 @@ public class SourcePosition implements StatefulProcessor {
 			log.error("The key \"UnixTimeUTC \" was not found in the event.");
 			return null;
 		}
-		long  timestamp = ((long)eventTime[0])  + ( ((long)eventTime[1])/1000000) ; 
+		double  timestamp = ((double)eventTime[0])  + ( ((double)eventTime[1])/1000000) ;
 		double mjd  =  ((double) timestamp)/86400.0 +  40587.0d+2400000.0; // usually  + 0.5 here
 		double gmst =  mjdToGmst(mjd);
 		double[] point = null;
@@ -190,11 +190,9 @@ public class SourcePosition implements StatefulProcessor {
 		double[] sourcePosition =  getSourcePosition(pointingAzDe[0], pointingAzDe[1], sourceAzDe[0], sourceAzDe[1]);
 
 		//add circle overlay to map
-		data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
+		data.put(outputKey+"Overlay", new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
 		//add source position to dataitem
 		double[] source = {sourcePosition[0], sourcePosition[1]};
-//		System.out.println("x: "+  source[0] + " y: " +source[1] );
-//		log.info("SourcePosition for key: "+ outputKey + ":\t(" + source[0] + "," + source[1] + ")");
 		data.put(outputKey, source);
 		//add deviation between the calculated point az,dz and the az,dz in the file
 		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
@@ -245,10 +243,6 @@ public class SourcePosition implements StatefulProcessor {
 		double phi_rot_angle    = gmst + (mLongitude / 180.0 * Math.PI);
 		double theta_rot_angle  = (mLatitude - 90) / 180.0 * Math.PI;
 
-		//		    double m_xx             = -cos(theta_rot_angle) *Math.cos(phi_rot_angle);
-		//		    double m_xy             = -cos(theta_rot_angle) *Math.sin(phi_rot_angle);
-		//		    double m_xz             = -sin(theta_rot_angle);
-
 		double m_yx             = -Math.sin(phi_rot_angle);
 		double m_yy             =  Math.cos(phi_rot_angle);
 
@@ -291,7 +285,7 @@ public class SourcePosition implements StatefulProcessor {
 		return gmst;
 	}
 
-	private double[] getSourcePosition(double pointingAz, double pointingZe, double sourceAz, double sourceZe)
+	public double[] getSourcePosition(double pointingAz, double pointingZe, double sourceAz, double sourceZe)
 	{
 
 		double az     = pointingAz / 180 * Math.PI;
@@ -304,17 +298,11 @@ public class SourcePosition implements StatefulProcessor {
 		double x_rot        = 0;
 		double y_rot        = 0;
 		double z_rot        = 0;
-
-		x_rot   =  Math.sin(-az)*x + Math.cos(-az)*y;
-		y_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
-		z_rot   =  Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
-		double[] r ={ x_rot * (-mDistance) / z_rot ,y_rot * (-mDistance) / z_rot };
-//		double[] r_out = {0,0};
 		
-		// Hacky rotation by 90deg cause something is wrong in the calculation of the source position
-		// seems to be rotated by 270deg counterclockwise (so a rotation by 90deg clockwise is needed)
-//		r_out[0] = r[0]*Math.cos(-Math.PI/2.0) - r[1]*Math.sin(-Math.PI/2.0);
-//		r_out[1] = r[0]*Math.sin(-Math.PI/2.0) + r[1]*Math.cos(-Math.PI/2.0);;
+		x_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
+		y_rot   = Math.sin(-az)*x + Math.cos(-az)*y;
+		z_rot   = Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
+		double[] r ={ x_rot * (-mDistance) / z_rot ,y_rot * (-mDistance) / z_rot };
 		
 		return r;
 	}

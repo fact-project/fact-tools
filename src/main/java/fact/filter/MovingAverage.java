@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.annotations.Description;
+//import stream.annotations.Parameter;
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
 
@@ -16,6 +17,7 @@ import fact.utils.SimpleFactEventProcessor;
 public class MovingAverage extends SimpleFactEventProcessor<double[],  double[]> {
 	
 	static Logger log = LoggerFactory.getLogger(MovingAverage.class);
+
 
 	private int length = 5;
 
@@ -31,44 +33,60 @@ public class MovingAverage extends SimpleFactEventProcessor<double[],  double[]>
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 
-
-		// for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			int start = pix*roi;
-			int end = pix*roi + (roi-1);
-			
+		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			double sum = 0;
-			//iterate over window to get sma
-			for(int i = 0; i < pivot ; ++i){
-				sum += data[i];
-			}
-			sum  = sum + (pivot*data[pix*roi]);
-			result[0] = sum /(2*pivot);
-			
-			
-			for (int slice = 1; slice < roi; slice++) {
+			for(int slice = 0; slice <= pivot; slice++){
 				int pos = pix * roi + slice;
-				//if the window is beyond the edge of the array I repeat the last value
-				if(pos + pivot > end ){
-					result[pos] = result[pos-1] + (data[end] - data[pos-pivot])/length;
-				} else if(pos - pivot < start ){
-					result[pos] = result[pos-1] + (data[pos+pivot] - data[start])/length;
-				} else{
-					result[pos] = result[pos-1] + (data[pos+pivot] - data[pos-pivot])/length;
-				}
+					
+				for(int slice1 = 0; slice1 <= slice+pivot; slice1++){
+						int pos1 = pix*roi + slice1;
+						sum += data[pos1];
+					}
+				
+				double average = sum/(pivot+slice);
+				result[pos]=average;
 			}
+			
+			for(int slice = pivot; slice <= (roi - 1) - pivot; slice++){
+				sum = 0;
+				int pos = pix * roi + slice;
+				int start = slice - pivot;
+				int end = slice + pivot;
+				
+				for(int i = start; i <= end; i++){
+					int pos1 = pix*roi + i;
+					sum += data[pos1];
+				}		
+				
+				double average = sum/length;
+				result[pos]=average;
+			}
+					
+			for(int slice = roi - pivot; slice < roi; slice++){
+				sum = 0;
+				int pos = pix*roi + slice;
+				
+				for(int slice1 = roi - pivot; slice1 < roi; slice1++){
+					int pos1 = pix*roi + slice1;
+					sum += data[pos1];
+				}
+				
+				double average = sum/(roi-slice);
+				result[pos]=average;
+			}
+		
 		}
 		return result;
 	}
-
-	
+		
 	
 	/* Getter and Setter*/
-	
+
 	public int getLength() {
 		return length;
 	}
 	public void setLength(int length) {
 		this.length = length;
 	}
+
 }

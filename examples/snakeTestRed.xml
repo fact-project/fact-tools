@@ -1,10 +1,11 @@
 ﻿<container>
 
     <!-- Pfade zu den fits files. -->
-	<property name="infile" value="20130102_060.fits.gz" />
-	<property name="drsfile" value="20130102_056.drs.fits.gz" />
-	<property name="drivefile" value="20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
-	<property name="outfile" value="processed_data_0102.csv" />
+	<property name="infile" value="20121017_145.fits.gz" />
+	<property name="drsfile" value="20121017_135.drs.fits.gz" />
+	<property name="drivefile" value="20121017.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+	<property name="outfileSnake" value="/home/$USER/ftSnaketest.csv" />
+	
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="5.0" />
     <property name="neighbor_threshold" value="2.0"/>
@@ -35,26 +36,30 @@
         <Skip condition="%{data.shower} == null" />    
 
 			
-			<!-- Snake auf PhotonCharge: -->
+			<!-- Snake with PhotonCharge: -->
+			<!-- Bei DrawSnake und DrawEllipse handelt es sich um Ausgaben für den Viewer, diese sollten (wenn nicht gebraucht) entfernt werden-->
 								
-			<fact.snake.MedianWithoutShower InputArray="photoncharge" Shower="shower" Output="Mean" />
-			<fact.snake.ShowerMaxCenter  Shower="shower" Weight="photoncharge" OutX="snakeStartX" OutY="snakeStartY" />			
-        
-			<!-- DrawSnake="" -->
-			<fact.cleaning.snake.SnakeSingle DrawSnake="" PixelDataName="photoncharge" ShowerCenterX="snakeStartX" ShowerCenterY="snakeStartY" SnakeOutX="snake_X" SnakeOutY="snake_Y" Mean="Mean"/>	
+			<fact.snake.MeanWithoutShower Key="photoncharge" Shower="shower" Outkey="MeanWithoutShower" />
+			<fact.snake.WeightedShowerCenter  Shower="shower" Weight="photoncharge" OutkeyX="snakeStartX" OutkeyY="snakeStartY" />        
+			
+			<fact.cleaning.snake.SnakeSingle DrawSnake="" PixelDataName="photoncharge" ShowerCenterX="snakeStartX" ShowerCenterY="snakeStartY" SnakeOutX="snake_X" SnakeOutY="snake_Y" Mean="MeanWithoutShower"  NumberOfVerticesOut="NumberOfVertices"/>	
 
-			<fact.features.snake.Area SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeArea" />
-			<fact.features.snake.Length SnakeX="snake_X" SnakeY="snake_Y" Outkey="SnakeLength" />
-			<fact.features.snake.IntegratePolygonSingle pixelData="photoncharge" PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeInt" />
+			<fact.features.snake.PolygonArea PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeArea" />
+			<fact.features.snake.PolygonLength PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeLength" />
+			<fact.features.snake.PolygonCenter PolygonX="snake_X" PolygonY="snake_Y" OutkeyX="PolygonCenterX" OutkeyY="PolygonCenterY"/>
+			<fact.features.snake.PolygonIntegrate Key="photoncharge" PolygonX="snake_X" PolygonY="snake_Y" Outkey="SnakeInt" OutkeyNumberOfPixel="PixelInSnake" OutkeyPixelList="shower_snake"/>
 			<fact.features.snake.InnerEnergy SnakeX="snake_X" SnakeY="snake_Y" Outkey="InnerEnergy" />
 			
-			<!-- drawEllipse="" -->
 			<fact.features.snake.FitEllipse DrawEllipse="" SnakeX="snake_X" SnakeY="snake_Y" OutkeyAlpha="SnakeEllipseAlpha" OutkeyMajor="SnakeEllipseMajor" OutkeyMinor="SnakeEllipseMinor" OutkeyCenterX="SnakeEllipseX" OutkeyCenterY="SnakeEllipseY" />
 			
+			
+			
+			<fact.io.PrintKeysOnConsole keys="EventNum,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY"/>
+
 			<fact.image.ShowImage/>
 			
 		
-           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum"/> -->
+           <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY"/> -->
 			
 
     </process>
