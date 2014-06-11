@@ -23,9 +23,9 @@ import stream.Processor;
 public class TimeOverThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	
-	private double threshold 		= 0;
-	private int slicesBeforeMaximum = 25;
-	private int slicesAfterMaximum 	= 50;
+	private double threshold 		= 50;
+	private int skipNFirstSlices = 40;
+	private int slicesAfterMaximum 	= 100;
 	
 	private String color = "#00F0F0";
 	private int alpha = 64;
