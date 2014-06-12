@@ -199,6 +199,13 @@ public class CoreNeighborClean implements Processor{
 	private ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition) {
 		
 		int chidOfPixelOfStar = DefaultPixelMapping.coordinatesToChid(starPosition[0], starPosition[1]);
+		
+		if (chidOfPixelOfStar == -1)
+		{
+			log.debug("Star not in camera window. No star islands are removed");
+			return showerPixel;
+		}
+		
 		List<Integer> starChidList = new ArrayList<Integer>();
 		
 		starChidList.add(chidOfPixelOfStar);

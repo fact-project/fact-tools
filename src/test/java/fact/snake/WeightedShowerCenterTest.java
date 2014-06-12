@@ -12,7 +12,6 @@ import stream.Data;
 import stream.io.SourceURL;
 import fact.Constants;
 import fact.snake.WeightedShowerCenter;
-import fact.snake.CreateGaus;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 
@@ -35,7 +34,7 @@ public class WeightedShowerCenterTest extends CreateGaus
 			this.setX0(-22);
 			this.setY0(45);
 			
-			this.setOutkey("gaus");			
+			this.setOutputKey("gaus");			
 			this.process(item);
 			
 			int[] shower = new int[1440];
