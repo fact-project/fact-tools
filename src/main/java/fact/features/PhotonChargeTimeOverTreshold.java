@@ -68,7 +68,7 @@ public class PhotonChargeTimeOverTreshold implements Processor {
 		                    };
 
 		    double charge =par[2] * threshold + par[3];
-//		    charge += (par[0] * threshold + par[1]) * timeOverThresholdArray[pix];
+		    charge += (par[0] * threshold + par[1]) * timeOverThresholdArray[pix];
 		    charge = Math.exp(charge);
 		    
 		    chargeFromThresholdArray[pix] = charge + 40;
