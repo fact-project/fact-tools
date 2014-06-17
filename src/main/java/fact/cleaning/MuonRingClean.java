@@ -40,7 +40,7 @@ public class MuonRingClean implements Processor {
 		}
 
 		
-		if(timeThreshold>0){
+		if(timeThreshold>0 && cleanRingList.size()>14){
 			double median;
 		
 			int[] arrivalTimeForMedian = new int[cleanRingList.size()];

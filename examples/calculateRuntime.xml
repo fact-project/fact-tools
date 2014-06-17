@@ -1,0 +1,12 @@
+<container>
+	<property name="infile" value="/home/max_noethe/phido/fhgfs/groups/app/fact/raw/2014/05/30/20140530_011.fits.fz" />
+	<property name="outfile" value="/home/max_noethe/fact-daten/runtimes/test.csv" />
+	<!-- Name des Streams und pfad zu dem Daten-File -->
+	
+
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}" limit="1"/>
+	<process id="2" input="fact">
+		<fact.features.CalculateRuntime outputkey="runtime"/>
+		<stream.io.CsvWriter url="file:${outfile}" keys="runtime" />
+		</process>
+</container>

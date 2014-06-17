@@ -16,12 +16,12 @@ public class CreateGaus implements Processor
 	private double y0 = 0;
 	
 	
-	private String outkey = null;
+	private String outputKey = null;
 
 	@Override
 	public Data process(Data input) 
 	{
-		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");		
+		if(outputKey == null) throw new RuntimeException("Key \"outkey\" not set");		
 		
 			
 		int NumberOfSlices = 1;
@@ -43,16 +43,16 @@ public class CreateGaus implements Processor
 			}
 		}
 		
-		input.put(outkey, erg);
+		input.put(outputKey, erg);
 		return input;
 	}
 
-	public String getOutkey() {
-		return outkey;
+	public String getOutputKey() {
+		return outputKey;
 	}
 
-	public void setOutkey(String outkey) {
-		this.outkey = outkey;
+	public void setOutputKey(String outkey) {
+		this.outputKey = outkey;
 	}
 
 	protected void setSigmaX(double sigmaX) {
@@ -76,6 +76,21 @@ public class CreateGaus implements Processor
 	}
 
 	
-
+	public void setSigmaX(String sigmaX)
+	{
+		this.sigmaX = Float.parseFloat(sigmaX);
+	}
+	public void setSigmaY(String sigmaY)
+	{
+		this.sigmaY = Float.parseFloat(sigmaY);
+	}
+	public void setX(String X)
+	{
+		this.x0 = Float.parseFloat(X);
+	}
+	public void setY(String Y)
+	{
+		this.y0 = Float.parseFloat(Y);
+	}
 	
 }

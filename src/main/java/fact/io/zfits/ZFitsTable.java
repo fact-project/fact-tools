@@ -120,12 +120,12 @@ public class ZFitsTable {
 	}
 
 	public long getHeapDifferenz() {
-		long diff = getFixTableSize();
+		long diff = getHeapSize();
 		diff -= Long.parseLong(this.header.getKeyValue("THEAP", "0"));
 		return diff;
 	}
 	
-	public long getFixTableSize() {
+	public long getHeapSize() {
 		if (!this.isCompressed) {
 			return this.numRows*this.bytesPerRow;
 		}
@@ -143,17 +143,17 @@ public class ZFitsTable {
 		return 0;
 	}
 
-	public long getHeapSize() {
+	public long getSpezialAreaSize() {
 		return Long.parseLong(header.getKeyValue("PCOUNT", "0"));
 	}
 
 	public long getPaddingSize() {
 		long size = 0;
 		// get offset of special data area from start of main table            
-		size += this.getFixTableSize();
+		//size += this.getHeapSize();
 		
         // and special data area size
-        size += this.getHeapSize();
+        size += this.getSpezialAreaSize();
         
         // spezial gap from somewhere
         //size += getSpezialGap();
@@ -166,10 +166,10 @@ public class ZFitsTable {
 	public long getTableTotalSize() {
 		long size = 0;
 		// get size of fixed table data area          
-		size += this.getFixTableSize();
+		size += this.getHeapSize();
 		
         // and heap data area size
-        size += this.getHeapSize();
+        size += this.getSpezialAreaSize();
         
         // spezial gap from somewhere
         //size += this.getSpezialGap();

@@ -34,9 +34,9 @@ public class ZFitsTableReader implements TableReader {
 		this.inputStream = inputStream;
 		//read Catalog
 		// read the catalog
-		byte[] fixTable = new byte[(int)this.table.getFixTableSize()];
+		byte[] fixTable = new byte[(int)this.table.getHeapSize()];
 		int numBytes = this.inputStream.read(fixTable);
-		if (numBytes!=this.table.getFixTableSize())
+		if (numBytes!=this.table.getHeapSize())
 			throw new ParseException("Could not read full heap");
 		this.catalog = new Catalog(fixTable, this.table.getNumTiles(), this.table.getNumCols());
 	}
@@ -78,6 +78,7 @@ public class ZFitsTableReader implements TableReader {
 
 		byte[][] output = new byte[this.table.getNumRows()][];
 
+		log.info("Current Row in Tile: {}", this.currentRowInTile);
 		//read the desired columns
 		for (int colIndex=0; colIndex<this.table.getNumCols(); colIndex++) {
 			//log.info("Load Col: "+colIndex);

@@ -25,7 +25,9 @@ public class KeyInShowerDistribution implements Processor {
 		int[] showerPixel = (int[]) input.get(showerPixelKey);
 		
 		if(showerPixel.length<=1){
-			log.error("No Sample Standard Deviation defined for sample.length<2");
+			log.info("No Sample Standard Deviation defined for sample.length<2, filling up with -1");
+			input.put(outputKey+"Mean", -1);
+			input.put(outputKey+"StdDev", -1);
 			return input;
 		}
 		
