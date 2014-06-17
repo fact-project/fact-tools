@@ -21,22 +21,21 @@ import stream.annotations.Parameter;
 import stream.io.CsvWriter;
 
 /**
- * <p>
- * Adapted from Dominik's writer - outputs a file containing a nested list
- * </p>
+ * outputs a file containing a nested list
  * 
- * @author Dominik Neise &lt;dominik.neise@udo.edu&gt;
- * @editor Katie Gray
+ * @author Katie Gray &lt;kathryn.gray@tu-dortmund.de&gt;
  * 
  */
+
 @Description(group = "Data Stream.Output", text = "")
 public class CreateNestedListFile extends CsvWriter {
 	static Logger log = LoggerFactory.getLogger(CreateNestedListFile.class);
 	PrintStream outputStream;
 	
-	@Parameter(required=true, description="ArrayList<Double>[] sizes of pulses for all events for a single pixel", defaultValue="sizes")
+	@Parameter(required=true, description="ArrayList<Double>[] -  matrix of size NUMBEROFPIXEL containing lists of data for all pixels")
 	private String PixPulseSizeKey;
     ArrayList<Integer>[] PixPulseSize = null;
+    	//Pulse size was specific to my use, but this file will work with whatever measurement in the form of a matrix of lists.
     
     @Parameter(required=true)
     private String urlString;
@@ -54,6 +53,7 @@ public class CreateNestedListFile extends CsvWriter {
 		}
 	}
 	
+	//the function which creates a string from the array
 	String Change_to_String( ArrayList<Integer>[] array) {
 		String info = Arrays.toString(array);
 		return info;
@@ -62,17 +62,16 @@ public class CreateNestedListFile extends CsvWriter {
 	
 	@Override
 	public Data process(Data data) {
-		
 		PixPulseSize = (ArrayList<Integer>[]) data.get(PixPulseSizeKey);
 		outputStream.println( Change_to_String(PixPulseSize) );
-		System.out.println(PixPulseSize);	
 		return data;
 	}
+	
+	
+	
 
-
-	/**
-	 * @see stream.io.CsvWriter#close()
-	 */
+	//Getters and Setters
+	
 	@Override
 	public void finish() throws Exception {
 		outputStream.close();
