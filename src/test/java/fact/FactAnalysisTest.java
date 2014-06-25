@@ -32,8 +32,9 @@ public class FactAnalysisTest {
 			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
 			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
 			URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
+			URL integralGainsUrl = FitsStreamTest.class.getResource("/defaultIntegralGains.csv");
 			URL outFile = FitsStreamTest.class.getResource("/outFileAscii.txt");
-			String[] args = {url.toString(), "-Ddata="+dataUrl.toString(), "-DdataDRS="+drsUrl.toString(), "-Ddrive_file="+driveURL.toString(), "-Doutfile="+outFile.toString()};
+			String[] args = {url.toString(), "-Ddata="+dataUrl.toString(), "-DdataDRS="+drsUrl.toString(), "-Ddrive_file="+driveURL.toString(),"-DintegralGainsFile="+integralGainsUrl.toString(), "-Doutfile="+outFile.toString()};
 			stream.run.main(args);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -56,8 +57,10 @@ public class FactAnalysisTest {
 			pP.setOutputKey("positions");
 
 			PhotonCharge c = new PhotonCharge();
-			c.setKey("test");
+			c.setDataKey("test");
 			c.setPositions(pP.getOutputKey());
+			c.setUrl(FitsStreamTest.class.getResource("/defaultIntegralGains.csv"));
+			c.setRangeSearchWindow(25);
 			c.setOutputKey("photonCharge");
 
 			CoreNeighborClean clean = new CoreNeighborClean();

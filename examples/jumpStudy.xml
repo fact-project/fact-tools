@@ -1,0 +1,113 @@
+<container>
+
+    <!-- Pfade zu den fits files. -->
+    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_060.fits.gz" />
+    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_056.drs.fits.gz" />
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/ceresTriggerTest/new_trigger/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/00000003.910_D_MonteCarlo016_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/test_run/52911/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/test_run_rev17391/52911/00000003.911_D_MonteCarlo052_Events.fits" /> -->
+    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/muon_martina_4_psf_3_0_v2/54027/00000003.027_D_MonteCarlo054_Events.fits.gz" /> -->
+    <!-- <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples.drs.fits" /> -->
+    <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <property name="outfile" value="/home/fabian/jumpStudyPatchReal.csv" />
+    <property name="sourcename" value="crab" />
+    <property name="core_threshold" value="5.0" />
+    <property name="neighbor_threshold" value="2.0"/>
+    <property name="time_threshold" value="30.0" />
+    <property name="min_number_of_pixel" value="2" />
+    <property name="integral_gain" value="242.0" />
+
+
+    <!-- Name des Streams und pfad zu dem Daten-File -->
+    <!-- <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="100"/> -->
+    
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+
+    <process id="2" input="fact">
+        <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+<!--         <fact.features.CreateFakeStartCells outputKey="FStartCells" />
+        <fact.utils.PreviousStartCells startCellKey="FStartCells" outputKey="prevEvents" limitEvents="5"/> -->
+        <stream.flow.Skip condition="%{data.EventNum} &lt; 17" />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" /> 
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+        <fact.features.PatchAverage key="DataCalibrated" outputKey="DataPatches" color="#000000" />
+        
+        <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataRemoved" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="4.0" spikeLimit="7.0" freqAmplLimit="0.4" leftBorder="10" signalFlankLimit="0.63" lengthForFFT="32" lengthAfterPosForFFT="10" ringingPeriode="11" freqCompAmplLimit="2.0" leftRingingFreq="0.18" rightRingingFreq="0.22" timeDependLimit="10"/>
+        <fact.features.PatchAverage key="DataRemoved" outputKey="DataPatchesRemoved" color="#E6172F" />
+        <!-- <fact.features.PatchAverage key="DataPatchJumpRemoval" outputKey="RemovedPatches" color="#E6172F" /> -->
+        
+				
+<!-- 		<If condition="%{data.j1Jumps} != null" >
+			<fact.statistics.ArrayStatistics key="j1Jumps" outputKey="j1Jumps" />
+			<If condition="%{data.j1JumpsMax} &gt; 25" >
+				<fact.io.PrintKeysOnConsole keys="EventNum,j1JumpsMax,j1JumpsMaxPos,j1JumpsMean,j1JumpsRms,j1Time" />
+	            <fact.image.ShowImage/>
+			</If>
+		</If>
+		<If condition="%{data.j2Jumps} != null" >
+			<fact.statistics.ArrayStatistics key="j2Jumps" outputKey="j2Jumps" />
+			<If condition="%{data.j2JumpsMax} &gt; 25" >
+				<fact.io.PrintKeysOnConsole keys="EventNum,j2JumpsMax,j2JumpsMaxPos,j2JumpsMean,j2JumpsRms,j2Time" />
+	            <fact.image.ShowImage/>
+			</If>
+		</If>
+		<If condition="%{data.j3Jumps} != null" >
+			<fact.statistics.ArrayStatistics key="j3Jumps" outputKey="j3Jumps" />
+			<If condition="%{data.j3JumpsMax} &gt; 25" >
+				<fact.io.PrintKeysOnConsole keys="EventNum,j3JumpsMax,j3JumpsMaxPos,j3JumpsMean,j3JumpsRms,j3Time" />
+	            <fact.image.ShowImage/>
+			</If>
+		</If>
+		<If condition="%{data.j4Jumps} != null" >
+			<fact.statistics.ArrayStatistics key="j4Jumps" outputKey="j4Jumps" />
+			<If condition="%{data.j4JumpsMax} &gt; 25" >
+				<fact.io.PrintKeysOnConsole keys="EventNum,j4JumpsMax,j4JumpsMaxPos,j4JumpsMean,j4JumpsRms,j4Time" />
+	            <fact.image.ShowImage/>
+			</If>
+		</If> -->
+		
+		<If condition="%{data.j1TimeSet} != null" >
+			<fact.image.ShowImage/>
+		</If>
+		<If condition="%{data.j2TimeSet} != null" >
+			<fact.image.ShowImage/>
+		</If>
+		<If condition="%{data.j3TimeSet} != null" >
+			<fact.image.ShowImage/>
+		</If>
+		<If condition="%{data.j4TimeSet} != null" >
+			<fact.image.ShowImage/>
+		</If>
+		
+<!-- 		<If condition="%{data.j1hSignalFlank} &gt; 50" >
+			<fact.image.ShowImage/>
+		</If>
+		<If condition="%{data.j2hSignalFlank} &gt; 50" >
+			<fact.image.ShowImage/>
+		</If>
+		<If condition="%{data.j3hSignalFlank} &gt; 50" >
+			<fact.image.ShowImage/>
+		</If>
+		<If condition="%{data.j4hSignalFlank} &gt; 50" >
+			<fact.image.ShowImage/>
+		</If> -->
+        
+        <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,j1Time,j1Jumps,j2Time,j2Jumps,j3Time,j3Jumps,j4Time,j4Jumps"/> -->
+   
+		<!-- <fact.io.PrintKeysOnConsole keys="j1JumpsMax,j1JumpsMaxPos,j1JumpsMean,j1JumpsRms" /> -->
+            
+        <fact.image.ShowImage/>
+
+
+<!-- <fact.features.Derivation key="DataPatches" outputKey="DataPatchesDeriv" />
+        <fact.features.Derivation key="DataPatchesDeriv" outputKey="DataPatchesDerivDeriv" /> -->
+        <!-- <fact.statistics.FastFourierTrafo key="DataCalibrated" outputKey="FFT" lengthForFFT="512" /> -->
+<!--         <fact.statistics.FastFourierTrafo key="DataPatches" outputKey="FFTPatches" lengthForFFT="256" />
+        <fact.statistics.SlidingFastFourierTrafo key="DataPatches" outputKey="SlidingFFTPatches" lengthForFFT="128" stepSize="64"/> -->
+
+
+    </process>
+
+
+</container>

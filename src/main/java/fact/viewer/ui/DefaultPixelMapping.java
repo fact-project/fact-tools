@@ -8,6 +8,7 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.colt.Arrays;
 import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
@@ -149,35 +150,65 @@ public class DefaultPixelMapping implements PixelMapping {
      * @param y y coordinate in MM
      * @return the chid under the point x,y
      */
-	public static int coordinatesToChid(float x, float y){
+	public static int coordinatesToChid(double xOrig, double yOrig){
 		if(!init){
 			init();
 		}
-		x = x/9.5f;
-		y = y/9.5f;
-		float ix =  (float) (x /Math.sin(60* (Math.PI/180)));
+		double x = xOrig/9.5d;
+		double y = yOrig/9.5d;
+		double ix =  (double) (x /Math.sin(60* (Math.PI/180)));
 		ix =  Math.round(ix);
-		float iy = y;
+		double iy = y;
 		if(ix % 2 == 0){
-			iy = y-0.5f;
+			iy = y-0.5d;
 		}
 		iy = -Math.round(iy);
 		
-		int chid = 0;
+		int squareChid = 0;
 		for(float kx : chid2geomXmm){
 			if(kx == ix ){
-				if(chid2geomYmm[chid] == iy){
+				if(chid2geomYmm[squareChid] == iy){
 					break;
 				}
 			}
-			chid++;
+			squareChid++;
 		}
-		if(chid == 1440){
+		if(squareChid == 1440){
 			return -1;
 		}
-		return chid;
+		
+		int[] neighbours = {neighboursFromChId[squareChid][0], neighboursFromChId[squareChid][1], neighboursFromChId[squareChid][2], 
+				neighboursFromChId[squareChid][3], neighboursFromChId[squareChid][4], neighboursFromChId[squareChid][5], squareChid};
+		
+		
+		return coordinatesToChidBruteForce(xOrig, yOrig, neighbours);
 	}
 
+	private static int coordinatesToChidBruteForce(double x, double y, int[] chidList)
+	{
+		if(!init){
+			init();
+		}
+		int nearestChid = -1;
+		double lowestDistance = 100000.0d;
+		for (int chid : chidList)
+		{
+			if(chid < 0) continue;
+			
+			float xChid = DefaultPixelMapping.getPosXinMM(chid); 
+			float yChid = DefaultPixelMapping.getPosYinMM(chid);
+			double distance = Math.sqrt( (xChid-x)*(xChid-x) + (yChid-y)*(yChid-y) );
+			if (distance < lowestDistance)
+			{
+				nearestChid = chid;
+				lowestDistance = distance;
+			}
+		}	
+		
+		return nearestChid;
+	}
+		
+		
 	/**
 	 * @see fact.viewer.ui.PixelMapping#sortPixels(double[])
 	 */

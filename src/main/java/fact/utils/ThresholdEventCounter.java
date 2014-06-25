@@ -2,13 +2,13 @@ package fact.utils;
 
 
 public class ThresholdEventCounter extends
-		SimpleFactEventProcessor<float[], Long> {
+		SimpleFactEventProcessor<double[], Long> {
 
-	private float maxValue = 2048;
+	private double maxValue = 5;    
 	private long counter = 0;
 	
 	@Override
-	public Long processSeries(float[] data) {
+	public Long processSeries(double[] data) {
 		
 		for(int t = 0; t < data.length; ++t){
 			if(data[t] > maxValue){

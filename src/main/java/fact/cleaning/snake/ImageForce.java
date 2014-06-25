@@ -2,7 +2,6 @@ package fact.cleaning.snake;
 
 import java.awt.geom.Point2D;
 
-import cern.colt.Arrays;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public abstract class ImageForce 
@@ -31,8 +30,7 @@ public abstract class ImageForce
 		{
 			if(neighbor[i] == -1)
 				return 0;
-		}
-		System.out.println(Arrays.toString(neighbor));
+		}		
 		
 		float  bot = (float) data[neighbor[0]];
 		float  top = (float) data[neighbor[1]];		

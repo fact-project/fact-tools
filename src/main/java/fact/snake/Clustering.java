@@ -1,16 +1,14 @@
 package fact.snake;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import javax.management.RuntimeErrorException;
 
 import fact.Constants;
 import fact.EventUtils;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+import fact.image.Pixel;
+import fact.image.overlays.PixelSet;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public class Clustering implements StatefulProcessor
@@ -19,12 +17,18 @@ public class Clustering implements StatefulProcessor
 	private String FirstThreshold = null;	
 	private String SecondThreshold = null;	
 	
-	private String clusterOut = null;
+	private String clusterMarks = null;
 	private String clusterSize = null;
+	
+	private String startFrame = "0";
+	private String endFrame = "300";
 	
 	
 	private double schwelle1;
 	private double schwelle2;
+	
+	private int start = 0;
+	private int end = 0;
 	
 	
 	@Override
@@ -39,7 +43,7 @@ public class Clustering implements StatefulProcessor
 			throw new RuntimeException("No 2 threshold set");
 		}
 		
-		if(clusterOut == null)
+		if(clusterMarks == null)
 		{
 			throw new RuntimeException("No cluster key set!");
 		}
@@ -51,6 +55,8 @@ public class Clustering implements StatefulProcessor
 		schwelle1 = Double.parseDouble(FirstThreshold);
 		schwelle2 = Double.parseDouble(SecondThreshold);
 		
+		start = Integer.parseInt(startFrame);
+		end = Integer.parseInt(endFrame);		
 	}
 	
 	@Override
@@ -68,42 +74,67 @@ public class Clustering implements StatefulProcessor
 	@Override
 	public Data process(Data input) 
 	{		
-		EventUtils.mapContainsKeys(getClass(), input, dataString);	
-		
+		EventUtils.mapContainsKeys(getClass(), input, dataString);			
 		double[] pixelData = (double[]) input.get(dataString);
-		int[] cluster = new int[pixelData.length];
 		
 		int frames = pixelData.length / Constants.NUMBEROFPIXEL;
-		int label = 0;		
 		
-		int[] out = new int[Constants.NUMBEROFPIXEL];
-		out[0] = Constants.NUMBEROFPIXEL;
+		int[] cluster = new int[pixelData.length];		
+		int[] clusLabelSize = new int[pixelData.length];			//Cluster Siz
 		
 		for(int f=0; f<frames; f++)
 		{
+			clusLabelSize[f*Constants.NUMBEROFPIXEL] = Constants.NUMBEROFPIXEL;		
+		}
+		
+		for(int f=start; f<end; f++)
+		{			
+			int label = 1;	
+			
 			for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 			{							
-				int size = testAndMark(cluster, pixelData, f*Constants.NUMBEROFPIXEL,
-								i, label);
-				
+				int size = testAndMark(cluster, pixelData, f*Constants.NUMBEROFPIXEL, i, label);
+			
 				if(size > 0)
-				{
-					out[label] = size;
-					out[0] = out[0] - size;
+				{					
+					clusLabelSize[label + f*Constants.NUMBEROFPIXEL] = size;
+					clusLabelSize[f*Constants.NUMBEROFPIXEL] = clusLabelSize[f*Constants.NUMBEROFPIXEL] - size;
 					label++;
-				}
-			}			
-		}		
+				}				
+			}				
+		}	
 		
-		input.put(clusterSize, out);
-		input.put(clusterOut, cluster);
+		for(int x = 5; x<20; x++)
+		{
+			PixelSet corePixelSet = new PixelSet();
+	        for (int i=1440*(5*x); i<1440*(5*(x+1)); i++) 
+	        {
+	        	int chid = i%1440;
+	        	
+	        	if(cluster[i] != 0 && clusLabelSize[ cluster[i] + (i - chid)] > 2)
+	        	{    	        		
+	        		corePixelSet.add(new Pixel(chid));	        		
+	        	}
+	        }	
+	        
+	        input.put(clusterMarks + x +"_"+Constants.PIXELSET, corePixelSet);
+		}
+					
+        
+        
+        
+		input.put(clusterSize, clusLabelSize);
+		input.put(clusterMarks, cluster);
+		
+		
 			
 		return input;
 	}		
 	
 	private int testAndMark(int[] cluster, double[] data, int offset, int pixel, int label)
-	{
-		int pos = pixel + offset;		
+	{				
+		int pos = pixel + offset;			
+				
 		if(cluster[pos] > 0) return 0;
 		
 		if(data[pos] > schwelle1)
@@ -119,7 +150,7 @@ public class Clustering implements StatefulProcessor
 			}			
 			
 			if(count > 4)
-			{
+			{							
 				cluster[pos] = label;
 				int size = 0;
 				
@@ -132,8 +163,70 @@ public class Clustering implements StatefulProcessor
 				
 				return 1 + size;
 			}
+			else
+			{
+				return 0;
+			}
+			
 		}		
 		return 0;
+	}
+	
+	
+	public String getDataString() {
+		return dataString;
+	}
+
+	public void setDataString(String dataString) {
+		this.dataString = dataString;
+	}
+
+	public String getFirstThreshold() {
+		return FirstThreshold;
+	}
+
+	public void setFirstThreshold(String firstThreshold) {
+		FirstThreshold = firstThreshold;
+	}
+
+	public String getSecondThreshold() {
+		return SecondThreshold;
+	}
+
+	public void setSecondThreshold(String secondThreshold) {
+		SecondThreshold = secondThreshold;
+	}
+
+	public String getClusterMarks() {
+		return clusterMarks;
+	}
+
+	public void setClusterMarks(String clusterMarks) {
+		this.clusterMarks = clusterMarks;
+	}
+
+	public String getClusterSize() {
+		return clusterSize;
+	}
+
+	public void setClusterSize(String clusterSize) {
+		this.clusterSize = clusterSize;
+	}
+
+	public String getStartFrame() {
+		return startFrame;
+	}
+
+	public void setStartFrame(String startFrame) {
+		this.startFrame = startFrame;
+	}
+
+	public String getEndFrame() {
+		return endFrame;
+	}
+
+	public void setEndFrame(String endFrame) {
+		this.endFrame = endFrame;
 	}
 	
 	

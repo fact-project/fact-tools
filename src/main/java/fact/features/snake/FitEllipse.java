@@ -2,17 +2,13 @@ package fact.features.snake;
 
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.QRDecomposition;
-import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.linear.DecompositionSolver;
 
 import fact.Constants;
 import fact.EventUtils;
-import fact.image.overlays.EllipseOverlay;
+
 import fact.viewer.ui.SnakeDraw;
 import stream.Data;
 import stream.Processor;
@@ -89,7 +85,15 @@ public class FitEllipse  implements Processor
 		major = (res1 < res2) ? res2 : res1;
 		minor = (res1 < res2) ? res1 : res2;
 
-		angle = alpha;
+		if(alpha <= 0)
+		{
+			angle = Math.PI + alpha;
+		}
+		else
+		{
+			angle = alpha;
+		}
+		
 	}
 	
 	
