@@ -208,6 +208,22 @@ public class EventUtils {
 		}
 	}
 	
+	public static double[] rotatePointInShowerSystem(double x,double y,double cogx,double cogy,double delta)
+	{
+		double xtr = x;
+		double ytr = y;
+		double[] result = {0,0};
+		
+		// translate the coord., so that the COG is in the center
+		xtr -= cogx;
+		ytr -= cogy;
+		
+		result[0] = xtr*Math.cos(delta) - ytr*Math.sin(delta);
+		result[1] = xtr*Math.sin(delta) + ytr*Math.cos(delta);
+		
+		return result;
+	}
+	
 	/**
 	 * Sum up array
 	 * @param a
