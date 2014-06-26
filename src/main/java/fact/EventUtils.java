@@ -208,4 +208,58 @@ public class EventUtils {
 		}
 	}
 	
+	/**
+	 * Sum up array
+	 * @param a
+	 * @return
+	 */
+	public static Double arraySum(double[] a)
+	{
+		if(a == null)
+			return 0.0;
+		if(a.length == 0)
+			return 0.0;
+		
+		double ret = 0.0;
+		
+		for(int i = 0; i < a.length; i++)
+		{
+			ret += a[i];
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * Elementwise multiplication of arrays
+	 * @param a
+	 * @param b
+	 * @return double array containing a[i] * b[i]
+	 * @throws ArrayStoreException
+	 */
+	public static double[] arrayMultiplication(double[] a, double[] b) throws ArrayStoreException
+	{
+		if (a == null || b == null)
+		{
+			return null;
+		}
+		if (a.length != b.length)
+		{
+			throw new ArrayStoreException("Array sizes do not match.");
+		}
+		if(a.length == 0)
+		{
+			throw new ArrayStoreException("Array of length zero.");
+		}
+		
+		double[] ret = new double[a.length];
+		
+		for(int i = 0; i < ret.length; i++)
+		{
+			ret[i] = a[i] * b[i];
+		}
+		
+		return ret;
+	}
+	
 }
