@@ -28,12 +28,15 @@
 
         <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
         <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-        <fact.features.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:src/main/resources/defaultIntegralGains.csv" rangeSearchWindow="25" color="#FF0F0F"/>
+        <fact.features.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:src/main/resources/gain_sorted_20131127.csv" rangeSearchWindow="25" color="#FF0F0F"/>
+       
+        
+        <fact.features.SourcePosition outputKey="Cetatauri" url="file:${drivefile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" />
 
         <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime"
            corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
            timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" 
-           showDifferentCleaningSets="true"/>
+           showDifferentCleaningSets="false"/>
            
         <Skip condition="%{data.shower} == null" />
         
@@ -42,11 +45,9 @@
             <Skip condition="%{data.numPixelInShower} &lt; 5" />
 
 		           <fact.features.SourcePosition outputKey="sourcePosition" url="file:${drivefile}" physicalSource="${sourcename}" />
-		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="1" outputKey="antiSourcePosition_1"/>
-		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="2" outputKey="antiSourcePosition_2"/>
-		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="3" outputKey="antiSourcePosition_3"/>
-		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="4" outputKey="antiSourcePosition_4"/>
-		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="5" outputKey="antiSourcePosition_5"/>
+		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="1" outputKey="antiSourcePosition_1"/>
+		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="2" outputKey="antiSourcePosition_2"/>
+		           <fact.features.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="3" outputKey="antiSourcePosition_3"/>
 		
 		           <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />       
 		           <fact.features.video.CenterOfGravity datacalibrated="DataCalibrated" showerpixel="shower" outputKey="videoCog"/>
@@ -61,10 +62,6 @@
 		           <fact.features.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Distance_Off_2" />
 		           <fact.features.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Alpha_Off_3" />
 		           <fact.features.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Distance_Off_3" />
-		           <fact.features.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_4" outputKey="Alpha_Off_4" />
-		           <fact.features.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_4" outputKey="Distance_Off_4" />
-		           <fact.features.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Alpha_Off_5" />
-		           <fact.features.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Distance_Off_5" />
 		
 		            <fact.features.HillasConcentration weights="photoncharge" shower="shower" outputKey="Concentration" />
             <fact.features.HillasLength distribution="showerDistribution" outputKey="HillasLength" />
