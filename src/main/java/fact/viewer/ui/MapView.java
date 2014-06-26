@@ -80,6 +80,10 @@ public class MapView extends JPanel {
 									- " Static Map".length());
 						}
 						cameraPixelMap.setData(EventUtils.toDoubleArray(event.get(sel)));
+						
+						scale.setMax(cameraPixelMap.getMaxValue());
+						scale.setMin(cameraPixelMap.getMinValue());
+						scale.repaint();
 					}
 				}
 			});

@@ -62,56 +62,67 @@ public class TimeOverThreshold implements Processor {
 		int b = c.getBlue();
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
+		int numPixelAboveThreshold = 0;
 		
+		//Loop over pixels
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			int pos = pix*roi;
 			int positionOfMaximum = posArray[pix];
-
-//			if(positionOfMaximum <=25){
-//				positionOfMaximum=25;
-//			}
+			
+			//Check if maximum is above threshold otherwise skip the pixel
+			if (data[pos + positionOfMaximum] < threshold){
+				continue;
+			}
+			numPixelAboveThreshold++;
 			
 			int timeOverThreshold = 0;
 			int firstSliceOverThresh = 0;
-			for (int sl = skipNFirstSlices ; 
-					sl < positionOfMaximum + slicesAfterMaximum ; sl++)
-			{	
-				if (sl < 0){
-					continue;
-				}
-						
-				if (sl > roi){
+			int lastSliceOverThresh  = 0;
+			
+			//Loop over slices before Maximum and sum up those above threshold
+			for (int sl = positionOfMaximum ; 
+					sl > 0 ; sl--)
+			{					
+				if (data[pos + sl] < threshold){
+					firstSliceOverThresh = sl+1;
+					break;
+				}		
+				
+				timeOverThreshold++;
+			}
+			
+			//Loop over slices after Maximum and sum up those above threshold
+			for (int sl = positionOfMaximum + 1 ; 
+					sl < pos + roi ; sl++)
+			{			
+				if (data[pos + sl] < threshold){
+					lastSliceOverThresh = sl-1;
 					break;
 				}
-
-				int currentPos = pos + sl-1;	
 				
-				if (data[currentPos] > threshold){
-					timeOverThreshold++;
-					if (firstSliceOverThresh == 0){
-						firstSliceOverThresh = sl;
-					}
-				}
-				
-				if (currentPos > pos + roi-1 && data[currentPos + 1] <= threshold){
-					sl = positionOfMaximum + slicesAfterMaximum;
-				}
-				
+				timeOverThreshold++;
 			}
+
+
 			timeOverThresholdArray[pix] = timeOverThreshold;
-			m[pix] = new IntervalMarker(firstSliceOverThresh-1, firstSliceOverThresh-1 + timeOverThreshold, new Color(r,g,b, alpha));
+			m[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh, new Color(r,g,b, alpha));	
 		}
-		//add processors threshold
+		
+		//add processors threshold to the DataItem
 		input.put("TOT_Threshold", threshold);
+		
+		//add number of pixel above this threshold to the DataItem
+		input.put("#PixelAboveThreshold", numPixelAboveThreshold); 
 				
-		//add times over threshold
+		//add times over threshold to the DataItem
 		input.put(outputkey, timeOverThresholdArray);
+		input.put(outputkey+"Marker", m);
 		
 		//add color value if set
-		input.put(outputkey+"Marker", m);
 		if(color !=  null && !color.equals("")){
 			input.put("@" + Constants.KEY_COLOR + "_"+outputkey, color);
 		}
+
 		
 		return input;
 	}
