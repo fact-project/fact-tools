@@ -1,14 +1,13 @@
 package fact.statistics;
 
-import java.io.Serializable;
-
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.EventUtils;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+
+import java.io.Serializable;
 
 
 /**
@@ -35,13 +34,13 @@ public class CreateHistogram implements StatefulProcessor {
 	@Override
 	public Data process(Data input) {
 		if ( key != null && !input.containsKey(key)){
-			log.error("Key "  + key + " not found in map");
+			log.error("Key "  + key + " not found in getColorFromValue");
 			return null;
 		}
 		Serializable data = input.get(key);
 		double[] dataArray;
 		if(data.getClass().isArray()){
-			dataArray = EventUtils.toDoubleArray(data);
+			dataArray = Utils.toDoubleArray(data);
 			for(double f: dataArray){
 				int index = 0;
 				if(f < min){
@@ -56,7 +55,7 @@ public class CreateHistogram implements StatefulProcessor {
 				bin[index]++;
 			}
 		} else {
-			Double d = EventUtils.valueToDouble(data);
+			Double d = Utils.valueToDouble(data);
 			int index= (int)( (d.doubleValue()/max)*numberOfBins + 1);
 			bin[index]++;
 		}

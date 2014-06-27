@@ -1,10 +1,10 @@
 package fact.features;
 
+import fact.Utils;
+import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 
 
 public class SlopeSpreadWeighted implements Processor
@@ -14,7 +14,7 @@ public class SlopeSpreadWeighted implements Processor
 	{
 	    
 	    // load input out of hashmap
-		EventUtils.mapContainsKeys(getClass(), input, showerPixel, photonCharge, arrivalTime, hillasDelta);
+		Utils.mapContainsKeys(getClass(), input, showerPixel, photonCharge, arrivalTime, hillasDelta);
 	    
 		showerPixelArray = (int[]) input.get(showerPixel);
 		photonChargeArray = (double[]) input.get(photonCharge);

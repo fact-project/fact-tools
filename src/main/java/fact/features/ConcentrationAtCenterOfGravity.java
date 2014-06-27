@@ -1,18 +1,19 @@
 package fact.features;
 
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
+import fact.viewer.ui.DefaultPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.viewer.ui.DefaultPixelMapping;
 
 
 
 public class ConcentrationAtCenterOfGravity implements Processor
 {
-	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	/**
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
 	 */
@@ -33,26 +34,26 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		}
 		if(photonChargeArray == null || cogXValue == null || cogYValue == null)
 		{
-			log.error("Map does not conatin the right values for the keys");
+			log.error("Map does not contain the right values for the keys");
 			return null;
 		}
 		
 		// Assuming the correctness of function geomToChid !
-		int cogChId = DefaultPixelMapping.coordinatesToChid(cogXValue, cogYValue);
-		int[] neighbors = DefaultPixelMapping.getNeighborsFromChid(cogChId);
+		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogXValue, cogYValue);
+		FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(cogPixel);
 		
 		// mindist1 < mindist2
 		double mindist1 = Float.MAX_VALUE;
 		double mindist2 = Float.MAX_VALUE;
 		
-		int minChId1 = cogChId;
-		int minChId2 = cogChId;
+		FactCameraPixel minChId1 = cogPixel;
+		FactCameraPixel minChId2 = cogPixel;
 		
 		// search for the two nearest neighbors
-		for (int pix : neighbors)
+		for (FactCameraPixel pix : neighbors)
 		{
-			float x = DefaultPixelMapping.getGeomX(pix);
-			float y = DefaultPixelMapping.getGeomY(pix);
+			double x = pix.getXPositionInMM();
+			double y = pix.getYPositionInMM();
 			double dist = (cogXValue - x) * (cogXValue - x) + (cogYValue - y) * (cogYValue - y);
 			
 			if(dist < mindist1)
@@ -68,7 +69,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 			}
 		}
 		
-		double conc = photonChargeArray[cogChId] + photonChargeArray[minChId1] + photonChargeArray[minChId2];
+		double conc = photonChargeArray[cogPixel.id] + photonChargeArray[minChId1.id] + photonChargeArray[minChId2.id];
 		conc /= hillasSizeValue;
 		input.put(outputKey, conc);
 		

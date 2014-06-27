@@ -3,12 +3,11 @@
  */
 package fact.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.annotations.Parameter;
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.annotations.Parameter;
 
 /**
  * Supposedly removes all spikes in the data.

@@ -1,8 +1,8 @@
 package fact.features;
 
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
 import stream.annotations.Parameter;
 
 /**
@@ -23,7 +23,7 @@ public class Size implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
+		Utils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);
 		double[] charge 	= (double[])input.get(photonChargeKey);

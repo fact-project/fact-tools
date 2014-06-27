@@ -1,7 +1,6 @@
 package fact.features;
 
-import java.net.URL;
-
+import fact.mapping.FactPixelMapping;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,6 +11,7 @@ import fact.viewer.ui.DefaultPixelMapping;
 public class SourcePositionTest {
 	
 	private SourcePosition sourcePosition;
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Before
 	public void setup()
@@ -19,7 +19,14 @@ public class SourcePositionTest {
 		sourcePosition = new SourcePosition();
 		sourcePosition.setOutputKey("test");
 	}
-	
+
+    /**
+     *
+     * For some known az, dec coordinates for Ceta Tauri calculate the corresponding sourceposition
+     * in the camera and compare that to the position of the pixels which are known to show the image of ceta tauri
+     *
+     * @throws Exception
+     */
 	@Test
 	public void testCetaTauri() throws Exception
 	{
@@ -31,8 +38,8 @@ public class SourcePositionTest {
 		
 		for (int i = 0 ; i < 3 ; i++)
 		{
-			C_T_coord[0] += DefaultPixelMapping.getPosXinMM(C_T_chids[i]);
-			C_T_coord[1] += DefaultPixelMapping.getPosYinMM(C_T_chids[i]);
+			C_T_coord[0] += pixelMap.getPixelFromId(C_T_chids[i]).getXPositionInMM();
+			C_T_coord[1] += pixelMap.getPixelFromId(C_T_chids[i]).getYPositionInMM();
 		}
 		
 		C_T_coord[0] /= 3;

@@ -1,12 +1,11 @@
 package fact.utils;
 
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Constants;
 
 /**
  * This operator simply cuts all values below and above the min and maxValue.

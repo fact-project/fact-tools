@@ -1,21 +1,19 @@
 package fact.plotter;
 
-import java.awt.BorderLayout;
-import java.io.Serializable;
-
-import javax.swing.JFrame;
-
+import fact.Utils;
+import fact.image.OnlineStatistics;
+import fact.plotter.ui.BarPlotPanel;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
-import fact.EventUtils;
-import fact.image.OnlineStatistics;
-import fact.plotter.ui.BarPlotPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.Serializable;
 
 /**
  * This class can plot a bar graph with errorBars by calculating the mean and
@@ -76,7 +74,7 @@ public class BarPlotter extends DataVisualizer {
 						|| val.getClass().equals(double.class)
 						|| val.getClass().equals(int.class)
 						|| val instanceof Number) {
-					double[] a = { EventUtils.valueToDouble(val) };
+					double[] a = { Utils.valueToDouble(val) };
 					onStat.updateValues(key, a);
 					dataset.add(onStat.getValueMap().get(key + "_avg")[0],
 							onStat.getValueMap().get(key + "_stdErr")[0], "",
@@ -85,7 +83,7 @@ public class BarPlotter extends DataVisualizer {
 					Class<?> clazz = val.getClass().getComponentType();
 					if (clazz.equals(float.class) || clazz.equals(double.class)
 							|| clazz.equals(int.class)) {
-						double[] valArray = EventUtils.toDoubleArray(val);
+						double[] valArray = Utils.toDoubleArray(val);
 						onStat.updateValues(key, valArray);
 						for (int i = 0; i < onStat.getValueMap().get(
 								key + "_avg").length; i++) {

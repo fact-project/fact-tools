@@ -3,11 +3,10 @@ package fact.cleaning;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
 import stream.Data;
 import stream.Processor;
 
@@ -30,12 +29,12 @@ public class MuonRingClean implements Processor {
 		int[] arrivalTime = (int[]) input.get(arrivalTimeKey);
 		
 		ArrayList<Integer> cleanRingList = new ArrayList<Integer>();
-		PixelSet cleanPixelSet = new PixelSet();		
+		PixelSetOverlay cleanPixelSet = new PixelSetOverlay();
 		
 		for(int i=0; i<ringPixel.length; i++){
 			if(photonCharge[ringPixel[i]] >= photonChargeThreshold){ 
 				cleanRingList.add(ringPixel[i]);
-				cleanPixelSet.add(new Pixel(ringPixel[i]));
+				cleanPixelSet.addById(ringPixel[i]);
 			}
 		}
 
@@ -63,7 +62,7 @@ public class MuonRingClean implements Processor {
 			for(int i=0; i<cleanRingList.size(); i++){
 				if(Math.abs(median - arrivalTime[cleanRingList.get(i)]) <= timeThreshold){
 					timeCleanRingList.add(cleanRingList.get(i));
-					cleanPixelSet.add(new Pixel(cleanRingList.get(i)));
+					cleanPixelSet.addById(cleanRingList.get(i));
 				}
 			}
 			

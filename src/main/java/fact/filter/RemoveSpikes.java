@@ -3,13 +3,12 @@ package fact.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
 import fact.EventUtils;
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -64,7 +63,7 @@ public class RemoveSpikes implements Processor {
 			List<Double> spHeight = new ArrayList<Double>();
 			List<Double> spTopSlope = new ArrayList<Double>();
 			
-			PixelSet spikesSet = new PixelSet();
+			PixelSetOverlay spikesSet = new PixelSetOverlay();
 			
 			for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 			{
@@ -107,7 +106,7 @@ public class RemoveSpikes implements Processor {
 									averTopValues /= spikeLength;
 								}
 								double spikeHeight = CorrectSpike(slice, spikeLength, averTopValues);
-								spikesSet.add(new Pixel(px));
+								spikesSet.addById(px);
 								spPixel.add(px);
 								spLogSlice.add(sl);
 								spPhysSpike.add((sl+startCells[px])%1024);

@@ -1,11 +1,11 @@
 package fact.utils;
 
-import java.util.Arrays;
-
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.util.Arrays;
 
 public class SortDoubleArray implements Processor {
 	public String key = "";
@@ -14,7 +14,7 @@ public class SortDoubleArray implements Processor {
 	@Override
 	public Data process(Data input) {
 		try{
-		EventUtils.mapContainsKeys(getClass(), input, key);
+		Utils.mapContainsKeys(getClass(), input, key);
 		double [] array = (double[]) input.get(key);
 		Arrays.sort(array);
 		input.put(outputKey, array);

@@ -1,13 +1,12 @@
 package fact.statistics;
 
-import java.io.Serializable;
-
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
+
+import java.io.Serializable;
 
 /**
  * This operator calculates the mean value of each element in the array and puts out another array which holds the mean value for each element.
@@ -27,7 +26,7 @@ public class ArrayElementsMean implements Processor {
 		if(input.containsKey(key)){
 			try{
 				Serializable data = input.get(key);
-				double[] vals = EventUtils.toDoubleArray(data);
+				double[] vals = Utils.toDoubleArray(data);
 				//save the result in an array with the same length as the given array.
 				if(result == null){
 					result = new double[vals.length];

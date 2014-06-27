@@ -3,11 +3,10 @@
  */
 package fact.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fact.Constants;
 import fact.features.MaxAmplitude;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This processor counts the number of Pixels in each event that have a value > maxValue.  

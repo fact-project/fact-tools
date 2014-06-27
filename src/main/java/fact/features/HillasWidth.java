@@ -1,12 +1,11 @@
 package fact.features;
 
+import fact.Utils;
+import fact.statistics.PixelDistribution2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
-import fact.statistics.PixelDistribution2D;
 import stream.annotations.Parameter;
 
 public class HillasWidth implements Processor {
@@ -22,7 +21,7 @@ public class HillasWidth implements Processor {
 			log.info("No shower in event. Not calculating width");
 			return input;
 		}
-		EventUtils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
+		Utils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 		double width =  Math.sqrt(dist.getEigenVarianceY());

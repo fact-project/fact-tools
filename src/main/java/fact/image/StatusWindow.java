@@ -1,40 +1,21 @@
 package fact.image;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.plotter.DataVisualizer;
 import stream.plotter.PlotPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 /**
- * <PRE format="md">
- * This opens up a small window containing some information about the currently running stream like number of items per second or the names of the keys in the item.
- * ![Alt text](/status_window.jpg)
- * ![Alt text](/images/status_window.jpg)
- * ![Alt text](/images/status_window)
- * ![Alt text](status_window)
- * ![Alt text](src/main/resources/images/status_window.jpg)
- * ![Alt text](/home/bruegge/Documents/workspace/fact/src/main/resources/images/status_window.jpg)
- * 
- * </PRE>
- * <img src="images/status_window.jpg">
- * <img src="status_window.jpg">
- * <img src="./status_window.jpg">
- * <img src="/home/bruegge/Documents/workspace/fact/src/main/resources/images/status_window.jpg">
- * 
+ * This opens up a small window containing some information about the currently running stream like number of items
+ * per second or the names of the keys in the item.
+ *
  * @author bruegge
  *
  */
@@ -93,7 +74,7 @@ public class StatusWindow extends DataVisualizer {
 		rateLabel = new JLabel(" ");
 		panel.add(rateLabel);
 		
-		eventCountInfoLabel = new JLabel("Number of processed Events");
+		eventCountInfoLabel = new JLabel("Number of processed events");
 		panel.add(eventCountInfoLabel);
 		
 		eventCounterLabel = new JLabel(" ");

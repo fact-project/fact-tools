@@ -1,9 +1,8 @@
 package fact.plotter.ui;
 
-import java.awt.Color;
-import java.awt.Paint;
-
 import org.jfree.chart.renderer.category.StatisticalBarRenderer;
+
+import java.awt.*;
 
 /**
  * shamelessly stolen from http://javabeanz.wordpress.com/2007/07/04/creating-barcharts-with-custom-colours-using-jfreechart/

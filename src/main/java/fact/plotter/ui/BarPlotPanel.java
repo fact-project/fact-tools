@@ -1,9 +1,5 @@
 package fact.plotter.ui;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -15,8 +11,10 @@ import org.jfree.chart.renderer.category.StatisticalBarRenderer;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.plotter.PlotPanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class BarPlotPanel extends JPanel {
 	private static final long serialVersionUID = -135743189148617433L;

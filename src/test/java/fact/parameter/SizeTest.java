@@ -1,12 +1,9 @@
 package fact.parameter;
 
-import fact.features.HillasAlpha;
 import fact.features.Size;
-import fact.io.FitsStream;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import stream.Data;
 
 import static org.junit.Assert.assertTrue;
 

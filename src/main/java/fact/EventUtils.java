@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

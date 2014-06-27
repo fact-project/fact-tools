@@ -1,15 +1,14 @@
 package fact.features.video;
 
 
+import fact.Constants;
+import fact.Utils;
+import fact.viewer.ui.DefaultPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Constants;
-import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 
 
 public class CenterOfGravity implements Processor
@@ -27,7 +26,7 @@ public class CenterOfGravity implements Processor
 	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
 	    // check keys
-		EventUtils.mapContainsKeys(getClass(), input, showerPixel, dataCalibrated);
+		Utils.mapContainsKeys(getClass(), input, showerPixel, dataCalibrated);
 		/// get input
 		try
 		{

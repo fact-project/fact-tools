@@ -4,11 +4,10 @@ import java.util.Arrays;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public class Clustering implements StatefulProcessor
@@ -106,14 +105,14 @@ public class Clustering implements StatefulProcessor
 		
 		for(int x = 5; x<20; x++)
 		{
-			PixelSet corePixelSet = new PixelSet();
+			PixelSetOverlay corePixelSet = new PixelSetOverlay();
 	        for (int i=1440*(5*x); i<1440*(5*(x+1)); i++) 
 	        {
 	        	int chid = i%1440;
 	        	
 	        	if(cluster[i] != 0 && clusLabelSize[ cluster[i] + (i - chid)] > 2)
 	        	{    	        		
-	        		corePixelSet.add(new Pixel(chid));	        		
+	        		corePixelSet.addById(chid);
 	        	}
 	        }	
 	        

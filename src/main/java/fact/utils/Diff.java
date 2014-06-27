@@ -3,7 +3,6 @@ package fact.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Description;
@@ -26,7 +25,7 @@ public class Diff implements Processor {
 	public Data process(Data input) {
 		
 		if(!(input.containsKey(keyA) && input.containsKey(keyB))){
-			log.error("map does not contain the right keys");
+			log.error("getColorFromValue does not contain the right keys");
 			return null;
 		}
 		if(keyA == null || keyB == null){
@@ -51,7 +50,7 @@ public class Diff implements Processor {
 			input.put(outputKey, result);
 
 		} catch(ClassCastException e){
-			log.error("Could not cast the keys in the map to double arrays");
+			log.error("Could not cast the keys in the getColorFromValue to double arrays");
 			throw new RuntimeException("Cannot cast to double array");
 		} catch(ArrayIndexOutOfBoundsException e){
 			log.error("Index out of bounds. The keyA has to refer to an array of length <= the lenght of array from keyB");

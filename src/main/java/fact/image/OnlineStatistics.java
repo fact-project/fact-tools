@@ -4,14 +4,14 @@ import java.util.LinkedHashMap;
 
 public class OnlineStatistics {
 
-	//this map contains the values needed to calculate the updated average and variance in case a new dataitem arrives
+	//this getColorFromValue contains the values needed to calculate the updated average and variance in case a new dataitem arrives
 	//this needs to be accessible from the outside so the caller can write whatever data they want to the stream
 	private LinkedHashMap<String, double[]> valueMap = new LinkedHashMap<String , double[]>();
 	public LinkedHashMap<String, double[]> getValueMap() {	return valueMap; }
 	public void setValueMap(LinkedHashMap<String, double[]> valueMap) {	this.valueMap = valueMap;	}
 
 
-	//this map contains counters that count the number of vales that have arrived for every key
+	//this getColorFromValue contains counters that count the number of vales that have arrived for every key
 	private LinkedHashMap<String, Integer> counterMap = new LinkedHashMap<String, Integer>();
 	
 	

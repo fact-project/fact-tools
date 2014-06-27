@@ -1,19 +1,18 @@
 package fact.filter;
 
-import java.awt.Color;
-import java.util.HashSet;
-import java.util.LinkedList;
-
+import fact.Constants;
+import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Constants;
-import fact.EventUtils;
+
+import java.awt.*;
+import java.util.HashSet;
+import java.util.LinkedList;
 /**
  * This processor gathers all start and stopcells from the \"limit\" {@link #getLimit()} previous events. 
  * To identify a jump at a certain position it looks at the mean value of all pixels and checks the value 
@@ -47,11 +46,11 @@ public class AverageJumpRemoval implements Processor{
 	@Override
 	public Data process(Data input) {
 
-		EventUtils.mapContainsKeys(this.getClass(), input, "UnixTimeUTC",key, "NROI");
+		Utils.mapContainsKeys(this.getClass(), input, "UnixTimeUTC", key, "NROI");
 		int[] eventTime;
 		double[] data;
 		Integer length;
-		//save the time differnce betwwen the current and the last event nad put it in hte map
+		//save the time differnce betwwen the current and the last event nad put it in hte getColorFromValue
 		try{
 			eventTime = (int[]) input.get("UnixTimeUTC");
 			data = (double[]) input.get(key);
@@ -67,7 +66,7 @@ public class AverageJumpRemoval implements Processor{
 		input.put("deltaT", deltaT.doubleValue());
 
 
-		//check rois and wether the cutslice operator wrote the right labels into the map
+		//check rois and wether the cutslice operator wrote the right labels into the getColorFromValue
 		int roi = data.length/Constants.NUMBEROFPIXEL;
 		int start = 0;
 		int end = 300;

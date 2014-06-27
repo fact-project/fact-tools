@@ -1,12 +1,13 @@
 package fact.features;
 
+import fact.Utils;
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
+import fact.viewer.ui.DefaultPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 import stream.annotations.Parameter;
 
 public class Leakage implements Processor {
@@ -19,9 +20,11 @@ public class Leakage implements Processor {
     @Parameter(required = true)
 	private String outputKey;
 
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, shower, weights);
+		Utils.mapContainsKeys(getClass(), input, shower, weights);
 	
 		int[] 	showerPixel = (int[])input.get(shower);
 		double[] photonCharge = (double[]) input.get(weights);
@@ -58,20 +61,16 @@ public class Leakage implements Processor {
 	
 	//this is of course not the most efficient solution
 	boolean isSecondBorderPixel(int pix){
-		for(int nPix: DefaultPixelMapping.getNeighborsFromChid(pix))
+		for(FactCameraPixel nPix: pixelMap.getNeighboursFromID(pix))
 		{
-			if(isBorderPixel(nPix)){
+			if(isBorderPixel(nPix.id)){
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	boolean isBorderPixel(int pix){
-		for(int i : DefaultPixelMapping.getNeighborsFromChid(pix)){
-			if(i == -1) return true;
-		}
-		return false;
+        return pixelMap.getNeighboursFromID(pix).length < 6;
 	}
 
 	

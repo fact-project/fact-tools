@@ -1,8 +1,5 @@
 package fact.viewer.ui;
 
-import fact.io.FitsStreamTest;
-import org.junit.Test;
-
 import java.net.URL;
 
 import static org.junit.Assert.fail;
@@ -13,11 +10,11 @@ import static org.junit.Assert.fail;
 public class ViewerManualTest {
 
     public static void main(String[] args){
-        drsCalibXML();
+        viewerXML();
     }
 
     //this cant be called during an automated unitest cause it needs some user input to exit
-    public static void drsCalibXML() {
+    public static void viewerXML() {
 
         try {
             URL url = ViewerManualTest.class.getResource("/viewertest.xml");
@@ -26,8 +23,9 @@ public class ViewerManualTest {
             String[] args = {url.toString(), "-Dinput="+dataUrl.toString(), "-DdrsInput="+drsUrl.toString()};
             stream.run.main(args);
         } catch (Exception e) {
-            fail("Could not run the ./drsTest.xml");
+            System.out.println(e.getMessage());
             e.printStackTrace();
+            fail("Could not run the ./viewertest.xml");
         }
     }
 }

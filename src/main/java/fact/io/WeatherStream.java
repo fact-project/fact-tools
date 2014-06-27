@@ -3,19 +3,18 @@
  */
 package fact.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.data.DataFactory;
+import stream.io.SourceURL;
+
 import java.io.EOFException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.data.DataFactory;
-import stream.io.SourceURL;
 
 /**
  * @author chris

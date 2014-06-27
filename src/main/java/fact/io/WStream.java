@@ -3,9 +3,9 @@
  */
 package fact.io;
 
-import java.io.InputStream;
-
 import stream.io.SourceURL;
+
+import java.io.InputStream;
 
 /**
  * @author chris

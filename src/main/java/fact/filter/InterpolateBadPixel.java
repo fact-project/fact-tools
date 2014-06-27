@@ -1,13 +1,14 @@
 package fact.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.annotations.Parameter;
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
 import fact.utils.SimpleFactEventProcessor;
 import fact.viewer.ui.DefaultPixelMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.annotations.Parameter;
 
 /**
  * 
@@ -22,6 +23,8 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 //	private int twins[] = {1093,1094,527,528,721,722};
 //	private int crazy[] = {863,868,297};
 //	private int bad[] = {927,80,873};
+
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	//returns true if the specified array is anywhere in the array
 	public static boolean arrayContains(int[] ar, int value) {
@@ -40,17 +43,17 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 			for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++){
 				//if were looking at a badPixel
 				if(arrayContains(badChIds, pix)){
-					int[] currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
+					FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
 //					log.debug("interpolating pix number: " + pix);
 					//iterate over all slices
 					for (int slice = 0; slice < roi; slice++) {
 						int pos = pix * roi + slice;
 						double avg = 0.0f; 
 						int numNeighbours = 0;
-						for(int nPix: currentNeighbors){
+						for(FactCameraPixel nPix: currentNeighbors){
 							//if neighbour exists
-							if (nPix != -1 && !EventUtils.arrayContains(badChIds,  nPix) ){
-								avg += series[nPix*roi + slice];
+							if (!Utils.arrayContains(badChIds, nPix.chid) ){
+								avg += series[nPix.chid*roi + slice];
 								numNeighbours++;
 							}
 						}
@@ -79,7 +82,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 				int numNeighbours = 0;
 				for(int nPix: currentNeighbors){
 					//if neighbour exists
-					if (nPix != -1 && !EventUtils.arrayContains(badChIds,  nPix) ){
+					if (nPix != -1 && !Utils.arrayContains(badChIds, nPix) ){
 						avg += series[nPix*roi + slice];
 						numNeighbours++;
 					}

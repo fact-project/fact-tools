@@ -48,7 +48,7 @@ public class PerPatchVoltageIntegral implements Processor {
 		{
 			for(int slice = 0; slice < roi; slice++)
 			{
-				patch = DefaultPixelMapping.getPatch(chid);
+				patch = chid/9;
 				perPatchVoltageIntegral[patch] += 0.5 * dataCalibratedArray[chid * roi + slice]; // 0.5 ns per slice
 			}
 		}

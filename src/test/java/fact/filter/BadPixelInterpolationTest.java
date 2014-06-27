@@ -1,18 +1,17 @@
 package fact.filter;
 
-import static org.junit.Assert.fail;
+import fact.io.FitsStream;
+import fact.utils.SimpleFactEventProcessor;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.io.SourceURL;
 
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.io.SourceURL;
-import fact.io.FitsStream;
-import fact.utils.SimpleFactEventProcessor;
+import static org.junit.Assert.fail;
 
 
 public class BadPixelInterpolationTest {
@@ -33,7 +32,6 @@ public class BadPixelInterpolationTest {
 			ArrayList<SimpleFactEventProcessor<double[], double[]>> pList = new ArrayList<SimpleFactEventProcessor<double[], double[]>>();
 			pList.add(new FirFilter());
 			pList.add(new MovingAverage());
-			pList.add(new ExponentialSmoothing());
 			pList.add(new InterpolateBadPixel());
 			pList.add(new MultiplyValues());
 			pList.add(new MotionDiff());

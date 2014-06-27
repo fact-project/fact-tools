@@ -1,15 +1,14 @@
 package fact.utils;
 
-import java.io.Serializable;
-
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import fact.Constants;
+
+import java.io.Serializable;
 
 public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOutput extends Serializable> implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(SimpleFactEventProcessor.class);
@@ -26,12 +25,12 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 	public Data process(Data input) {
 
 			if(!input.containsKey(key)){
-				//key doesn't exist in map. return.
+				//key doesn't exist in getColorFromValue. return.
 				log.error("Key not found "  + key + ",  " + this.getClass().getSimpleName() );
 				throw new RuntimeException("Key not found");
 			}
 			//if outputkey is not defined just overwrite the old data
-			if(outputKey.equals("")){
+			if(outputKey == null || outputKey.equals("")){
 				log.error("outputKey in xml was empty.");
                 throw new RuntimeException();
 			}
@@ -42,8 +41,8 @@ public abstract class SimpleFactEventProcessor<TInput extends Serializable, TOut
 				input.put(outputKey, process(value, input));
 			} catch (ClassCastException e){
 				//in case value in Map is of the wrong type to do this calculation
-				log.error("Wrong type in map for key. " + key + ",  " + this.getClass().getSimpleName() );
-                throw new RuntimeException("Wrong type in map for key. " + key + ",  " + this.getClass().getSimpleName());
+				log.error("Wrong type in getColorFromValue for key. " + key + ",  " + this.getClass().getSimpleName() );
+                throw new RuntimeException("Wrong type in getColorFromValue for key. " + key + ",  " + this.getClass().getSimpleName());
 			}
 			//add color value if set
 			if(color !=  null && !color.equals("")){

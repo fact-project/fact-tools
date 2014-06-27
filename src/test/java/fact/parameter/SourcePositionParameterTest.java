@@ -1,20 +1,13 @@
 package fact.parameter;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.net.URL;
-
-import org.junit.Before;
+import fact.features.SourcePosition;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import stream.Data;
-import stream.io.SourceURL;
-import fact.features.SourcePosition;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import java.net.URL;
+
+import static org.junit.Assert.assertTrue;
 /**
  * 
  * @author bruegge

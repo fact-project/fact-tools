@@ -8,7 +8,6 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.ProcessContext;
 import stream.data.DataFactory;
@@ -122,14 +121,12 @@ public class RootASCIIWriter extends CsvWriter {
 	}
 
 	private String generateHeaderString(Data data) throws ClassCastException{
-		EventUtils.mapContainsKeys(getClass(), data, keys);
-
 		String headerString = "";
 		for(String key: keys){
 			if (data.containsKey(key)){
 				Serializable v = data.get(key);
 				if (v==null)
-					throw new NullPointerException("Key value is null, keyname: '"+key+"'");
+					throw new RuntimeException("Key value is null, keyname: '"+key+"'");
 				Class<? extends Serializable> valueType = v.getClass();
 				if(valueType.isArray()){
 					Class<?> type = v.getClass().getComponentType();
@@ -166,11 +163,6 @@ public class RootASCIIWriter extends CsvWriter {
 				} else if(valueType.isAssignableFrom(String.class)){
 					headerString += key+"/"+"C";
 				}
-			} else {
-				System.out.println("Keys:");
-				for (String s : data.keySet())
-					System.out.println("\t"+s);
-				throw new NullPointerException("Key: '"+key+"' is missing in the dataset");
 			}
 			headerString += ":";
 		}

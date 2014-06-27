@@ -4,6 +4,7 @@ import java.awt.Polygon;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -17,12 +18,13 @@ public class PolygonIntegrate implements Processor
 	private String outkey = null;				// Summe aller Pixel deren Mittelpunkt innerhalb der Snake liegt
 	private String outkeyNumberOfPixel = null;		// Anzahl an Pixel die Innerhalb der Snake liegen
 	private String outkeyPixelList = null;			// Liste an Pixeln die Innerhalb der Snake liegen
-	
-	
-	
 
-	
-	@Override
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
+
+
+
+    @Override
 	public Data process(Data input) 
 	{
 		if(outkey == null)	throw new RuntimeException("Key \"outkey\" not set");		
@@ -49,7 +51,7 @@ public class PolygonIntegrate implements Processor
 		double erg = 0;
 		for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 		{
-			if(poly.contains(DefaultPixelMapping.getPosXinMM(i), DefaultPixelMapping.getPosYinMM(i)) )	// Prüfe ob Pixel im Poly/Snake liegt
+			if(poly.contains(pixelMap.getPixelFromId(i).getXPositionInMM(), pixelMap.getPixelFromId(i).getYPositionInMM()))	// Prüfe ob Pixel im Poly/Snake liegt
 			{
 				erg += data[i];
 				

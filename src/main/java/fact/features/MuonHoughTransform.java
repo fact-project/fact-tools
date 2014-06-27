@@ -1,5 +1,8 @@
 package fact.features;
 
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
+import fact.mapping.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import java.util.ArrayList;
 import stream.Processor;
@@ -9,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import fact.Constants;
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
+
+
 
 /**
  * This processor delivers several features that can be used to seperate muon rings from
@@ -71,7 +74,9 @@ public class MuonHoughTransform implements Processor {
 	
 	final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);	
 	
-	
+
+    FactPixelMapping m = FactPixelMapping.getInstance();
+
 	@Override
 	public Data process(Data input) {
 		
@@ -85,8 +90,8 @@ public class MuonHoughTransform implements Processor {
 		// Get X and Y Positions of the Pixel that survived Cleaning
 		
 		for(int i=0; i<ring.length; i++){
-			xPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(ring[i]);
-			yPositions[i] = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(ring[i]);
+			xPositions[i] = m.getPixelFromId(ring[i]).getXPositionInMM();
+			yPositions[i] = m.getPixelFromId(ring[i]).getYPositionInMM();
 		}
 		
 		// generate Hough-Voting-Matrix n:
@@ -194,8 +199,9 @@ public class MuonHoughTransform implements Processor {
 		double PixelPosY;		
 		
 		for(int pix=0; pix<fact.Constants.NUMBEROFPIXEL; pix++){
-			PixelPosX = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(pix);
-			PixelPosY = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(pix);
+            FactCameraPixel p  = m.getPixelFromId(pix);
+			PixelPosX = p.getXPositionInMM();
+			PixelPosY = p.getYPositionInMM();
 			distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
 			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
 				bestRingPixelList.add(pix);		
@@ -263,24 +269,25 @@ public class MuonHoughTransform implements Processor {
 			double distance2;
 			double distance3;
 			
-			PixelSet bestCirclePixelSet = new PixelSet();
-			PixelSet secondBestCirclePixelSet = new PixelSet();
-			PixelSet thirdBestCirclePixelSet = new PixelSet();
+			PixelSetOverlay bestCirclePixelSet =       new PixelSetOverlay();
+            PixelSetOverlay secondBestCirclePixelSet = new PixelSetOverlay();
+            PixelSetOverlay thirdBestCirclePixelSet =  new PixelSetOverlay();
 			
 			for (int pix=0; pix<Constants.NUMBEROFPIXEL; pix++){
-				PixelPosX = fact.viewer.ui.DefaultPixelMapping.getPosXinMM(pix);
-				PixelPosY = fact.viewer.ui.DefaultPixelMapping.getPosYinMM(pix);
+                FactCameraPixel p  = m.getPixelFromId(pix);
+                PixelPosX = p.getXPositionInMM();
+                PixelPosY = p.getYPositionInMM();
 				distance1 = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
 				distance2 = Math.sqrt(Math.pow((PixelPosX - center_x_2), 2.0) + Math.pow((PixelPosY - center_y_2), 2.0));
 				distance3 = Math.sqrt(Math.pow((PixelPosX - center_x_3), 2.0) + Math.pow((PixelPosY - center_y_3), 2.0));
 				if(Math.abs(distance1 - radius_1) <= fact.Constants.PIXEL_SIZE ){
-					bestCirclePixelSet.add(new Pixel(pix));
+					bestCirclePixelSet.addById(pix);
 				}
 				if(Math.abs(distance2 - radius_2) <= fact.Constants.PIXEL_SIZE ){
-					secondBestCirclePixelSet.add(new Pixel(pix));
+					secondBestCirclePixelSet.addById(pix);
 				}
 				if(Math.abs(distance3 - radius_3) <= fact.Constants.PIXEL_SIZE ){
-					thirdBestCirclePixelSet.add(new Pixel(pix));
+					thirdBestCirclePixelSet.addById(pix);
 				}
 			}
 			input.put(bestCircleKey, bestCirclePixelSet);

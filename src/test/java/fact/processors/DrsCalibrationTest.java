@@ -1,18 +1,17 @@
 package fact.processors;
 
-import static org.junit.Assert.fail;
-
-import java.net.URL;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.io.SourceURL;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.io.SourceURL;
+
+import java.net.URL;
+
+import static org.junit.Assert.fail;
 
 
 public class DrsCalibrationTest {

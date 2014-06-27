@@ -1,13 +1,11 @@
 package fact.features;
 
-import stream.Data;
-import stream.Processor;
-
+import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
-import fact.EventUtils;
+import stream.Data;
+import stream.Processor;
 
 public class FillAverageTimeWidth implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
@@ -23,7 +21,7 @@ public class FillAverageTimeWidth implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, key, "StartCellData");
+		Utils.mapContainsKeys(getClass(), input, key, "StartCellData");
 		double[] data;
 		try{
 			data = (double[]) input.get(key);

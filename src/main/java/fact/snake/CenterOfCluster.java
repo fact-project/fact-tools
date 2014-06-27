@@ -5,11 +5,15 @@ import java.util.Arrays;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 
-
+/**
+ *
+ *
+ */
 public class CenterOfCluster implements Processor
 {
 	private String clusterMarks = null;
@@ -18,7 +22,10 @@ public class CenterOfCluster implements Processor
 	
 	private String clusterCenterX = null;
 	private String clusterCenterY = null;
-	
+
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
+
 	@Override
 	public Data process(Data input) 
 	{		
@@ -68,8 +75,8 @@ public class CenterOfCluster implements Processor
 				{
 					if(clustMap[i + offset] == clN)
 					{
-						x += DefaultPixelMapping.getPosXinMM(i);
-						y += DefaultPixelMapping.getPosYinMM(i);
+						x += pixelMap.getPixelFromId(i).getXPositionInMM();
+						y += pixelMap.getPixelFromId(i).getYPositionInMM();
 					}
 				}
 				

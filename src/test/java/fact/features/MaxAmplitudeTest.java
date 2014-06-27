@@ -1,21 +1,14 @@
 package fact.features;
 
-import fact.cleaning.CoreNeighborClean;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-import fact.statistics.PixelDistribution2D;
-import fact.utils.CutSlices;
-import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;
-import stream.Processor;
 import stream.io.SourceURL;
 
 import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;

@@ -3,17 +3,16 @@
  */
 package fact.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.io.SourceURL;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.io.SourceURL;
 
 /**
  * @author chris

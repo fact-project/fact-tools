@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
 import stream.annotations.Parameter;
 
 public class NumberOfPixelInShower implements Processor {

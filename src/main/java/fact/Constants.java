@@ -1,7 +1,7 @@
 package fact;
 
 public class Constants {
-	//key strings for the map
+	//key strings for the getColorFromValue
 	public static final String DEFAULT_KEY_CALIBRATED = "DataCalibrated";
 
 	public static final String KEY_EVENT_NUM = "EventNum";

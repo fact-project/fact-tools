@@ -1,17 +1,17 @@
 package fact.features;
 
+import fact.Utils;
+import fact.viewer.ui.DefaultPixelMapping;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 
 public class NaiveShowerLineFit implements Processor {
 	@Override
 	public Data process(Data input)
 	{
-		EventUtils.mapContainsKeys(getClass(), input, showerPixel, hillasDelta);
+		Utils.mapContainsKeys(getClass(), input, showerPixel, hillasDelta);
 		showerPixelArray = (int[]) input.get(showerPixel);
 		hillasDeltaValue = (Double) input.get(hillasDelta);
 		SimpleRegression reg = new SimpleRegression();

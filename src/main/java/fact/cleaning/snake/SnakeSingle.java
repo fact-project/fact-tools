@@ -25,7 +25,6 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 {
 	private static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
 	
-	private String drawSnake = null;
 
 	private String pixelDataName = null;
 	private String distribution = null;	
@@ -111,47 +110,20 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 		
 		
 		ImageForce force = new StdForce(data, (float) centerX, (float) centerY);	
-		if(mean == null) 
+
+        if(mean == null)
 			force.setMedian(0.7);
 		else
 			force.setMedian((Double) input.get(mean));		
 	
-		if(drawSnake != null)
-		{
-			double[][] xBuf = new double[NIteration][];
-			double[][] yBuf = new double[NIteration][];
-		
-			for(int i=0; i<NIteration; i++)
-			{			
-				step(force);
-				xBuf[i] = this.getSnakeX();
-				yBuf[i] = this.getSnakeY();
-			}		
-		
-			double[][][] tmpX = new double[300][][];
-			double[][][] tmpY = new double[300][][];
-			for(int i=0; i<300; i++)
-			{
-				tmpX[i] = xBuf;
-				tmpY[i] = yBuf;
-			}		
-		
-			input.put(Constants.KEY_SNAKE_VIEWER_X, tmpX);
-			input.put(Constants.KEY_SNAKE_VIEWER_Y, tmpY);
-			input.put(SnakeOutX, this.getSnakeX());
-			input.put(SnakeOutY, this.getSnakeY());
-			
-		}
-		else
-		{				
-			for(int i=0; i<NIteration; i++)
-			{			
-				step(force);
-			}
-			
-			input.put(SnakeOutX, this.getSnakeX());
-			input.put(SnakeOutY, this.getSnakeY());
-		}
+        for(int i=0; i<NIteration; i++)
+        {
+            step(force);
+        }
+
+        input.put(SnakeOutX, this.getSnakeX());
+        input.put(SnakeOutY, this.getSnakeY());
+
 		input.put(numberOfVerticesOut, this.getNumberOfVertices());
 		
 		return input;
@@ -211,15 +183,6 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 		this.showerCenterY = showerCenterY;
 	}
 
-	public String getDrawSnake() {
-		return drawSnake;
-	}
-
-	public void setDrawSnake(String drawSnake) {
-		this.drawSnake = drawSnake;
-	}
-
-	
 	public String getSnakeOutX() {
 		return SnakeOutX;
 	}

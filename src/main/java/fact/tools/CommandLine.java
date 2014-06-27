@@ -3,12 +3,11 @@
  */
 package fact.tools;
 
+import org.jfree.util.Log;
+import stream.runtime.ProcessContainer;
+
 import java.io.File;
 import java.io.IOException;
-
-import org.jfree.util.Log;
-
-import stream.runtime.ProcessContainer;
 
 /**
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;

@@ -1,20 +1,21 @@
 package fact.parameter;
 
 import fact.cleaning.CoreNeighborClean;
-import fact.features.*;
+import fact.features.DistributionFromShower;
+import fact.features.MaxAmplitudePosition;
+import fact.features.PhotonCharge;
+import fact.features.SourcePosition;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import stream.Data;
 import stream.io.SourceURL;
 
 import java.net.URL;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**

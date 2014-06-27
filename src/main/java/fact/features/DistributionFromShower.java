@@ -1,24 +1,15 @@
 package fact.features;
 
-import java.awt.Color;
-
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.EigenDecomposition;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.ProcessContext;
-import stream.Processor;
-import stream.StatefulProcessor;
-import stream.annotations.Parameter;
-import fact.Constants;
-import fact.image.overlays.LineOverlay;
 import fact.statistics.PixelDistribution2D;
 import fact.viewer.ui.DefaultPixelMapping;
+import org.apache.commons.math3.linear.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.Processor;
+import stream.annotations.Parameter;
+
+import java.awt.*;
 
 
 public class DistributionFromShower implements Processor {
@@ -54,8 +45,8 @@ public class DistributionFromShower implements Processor {
 
 @Override
 public Data process(Data input) {
-	//get the required stuff from the map
-	//in case the map doesn't contain a shower return the original input.
+	//get the required stuff from the getColorFromValue
+	//in case the getColorFromValue doesn't contain a shower return the original input.
 	try{
 		showerPixel= (int[]) input.get(pixel);
 		if(showerPixel ==  null){
@@ -70,7 +61,7 @@ public Data process(Data input) {
     try{
         wheightsArray = (double[]) input.get(weights);
         if(wheightsArray ==  null){
-            log.error("The values for weight were not found in the map. Aborting");
+            log.error("The values for weight were not found in the getColorFromValue. Aborting");
             return null;
         }
     } catch (ClassCastException e){
@@ -211,7 +202,7 @@ public Data process(Data input) {
 	input.put("Width", Math.sqrt(eigenValue2/size) );
     input.put("Delta", delta );
     
-    input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
+    //input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
     
 	//look at what i found
 	//V=cov(x,y);

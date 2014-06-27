@@ -1,10 +1,6 @@
 package fact.plotter;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-
-import javax.swing.JFrame;
-
+import fact.Utils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -17,12 +13,13 @@ import org.jfree.data.statistics.SimpleHistogramBin;
 import org.jfree.data.statistics.SimpleHistogramDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
-import fact.EventUtils;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * 
@@ -97,10 +94,10 @@ public class HistogramPlotter extends DataVisualizer {
 
 	@Override
 	public Data processMatchingData(Data data) {
-//		EventUtils.isKeyValid(getClass(), data, key, Double.class);
+//		Utils.isKeyValid(getClass(), data, key, Double.class);
 		double v = 0;
 		if(data.containsKey(key)){
-			v = EventUtils.valueToDouble(data.get(key));
+			v = Utils.valueToDouble(data.get(key));
 		} else {
 			throw new RuntimeException("Key not found in event. "  + key  );
 		}
@@ -121,11 +118,11 @@ public class HistogramPlotter extends DataVisualizer {
 				log.warn("Overlapping bin");
 			}
 		}
-		//else if ( EventUtils.isKeyValid(data, key, Double.class) ) {
+		//else if ( Utils.isKeyValid(data, key, Double.class) ) {
 		//dataset.addObservation(((Double) data.get(key)).floatValue());
 		//}
 
-		//dataset.addObservations(EventUtils.toDoubleArray(data.get(key)));
+		//dataset.addObservations(Utils.toDoubleArray(data.get(key)));
 		//		try{
 		//			if (data.containsKey(key)) {
 		//				int[] hist = (int[]) data.get(key);

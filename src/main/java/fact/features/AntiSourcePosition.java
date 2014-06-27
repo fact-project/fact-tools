@@ -2,10 +2,8 @@ package fact.features;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.image.overlays.SourceOverlay;
 
 //TODO: Documentation!?
 
@@ -33,7 +31,7 @@ public class AntiSourcePosition implements Processor {
 		antisource[0] = source[0] * Math.cos(rotAngle) - source[1] * Math.sin(rotAngle);
 		antisource[1] = source[0] * Math.sin(rotAngle) + source[1] * Math.cos(rotAngle);
 		
-		input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
+		//input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
 		
 		input.put(outputKey, antisource);
 		return input;

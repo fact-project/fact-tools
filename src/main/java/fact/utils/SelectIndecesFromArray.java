@@ -3,11 +3,11 @@
  */
 package fact.utils;
 
-import java.io.Serializable;
-
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
+
+import java.io.Serializable;
 
 /**
  * This processors takes an array and an array of indices. It puts all values with the given indeces into a new array. That means the new Array is of the same length as the indices array.
@@ -23,7 +23,7 @@ public class SelectIndecesFromArray implements Processor{
 	
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, key, indices);
+		Utils.mapContainsKeys(getClass(), input, key, indices);
 
 		Serializable value = input.get(key);
 
@@ -33,7 +33,7 @@ public class SelectIndecesFromArray implements Processor{
 		double[] sAr = new double[indexArray.length];
 		
 		if(value.getClass().isArray()){
-			double[] arr = EventUtils.toDoubleArray(value);
+			double[] arr = Utils.toDoubleArray(value);
 //			System.out.println("arr.length: " + arr.length);
 			int i = 0;
 			for(int pix : indexArray){

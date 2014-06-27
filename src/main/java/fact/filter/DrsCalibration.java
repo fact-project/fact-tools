@@ -3,20 +3,19 @@
  */
 package fact.filter;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import fact.Constants;
+import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import fact.Constants;
-import fact.io.FitsStream;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * <p>
@@ -115,7 +114,7 @@ public class DrsCalibration implements Processor {
 	@Override
 	public Data process(Data data) {
 		if (this.drsData == null){
-			//file not loaded yet. try to lookup path in map.
+			//file not loaded yet. try to lookup path in getColorFromValue.
 			log.error("No url to drs file specified.");
             throw new RuntimeException("No DRS File found");
 		}

@@ -1,8 +1,8 @@
 package fact.features;
 
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
 /**
  * Sum up all the weights for pixel between the max and min values.
  * The output of this processor is the sum of the pixel weights in the shower array iff the weight is > min and < max.
@@ -20,7 +20,7 @@ public class SizeInInterval implements Processor {
 	@Override
 	public Data process(Data input) {
 
-		EventUtils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
+		Utils.mapContainsKeys(getClass(), input, showerKey, photonChargeKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);
 		float[] charge 	= (float[])input.get(photonChargeKey);

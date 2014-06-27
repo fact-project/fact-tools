@@ -43,7 +43,7 @@ public class MaxAmplitude implements Processor{
     }
 
     /**
-     * find the maximum value in the array. searchs in the window from pix * roi + slice to pix * roi + (slice + roi -1)
+     * Find the maximum value in the array. searchs in the window from pix * roi + slice to pix * roi + (slice + roi -1)
      * @param roi
      * @param pix pixel to be checked
      * @param data the array to be checked

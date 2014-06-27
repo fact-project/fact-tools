@@ -1,6 +1,7 @@
 package fact.snake;
 
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -11,9 +12,11 @@ public class WeightedShowerCenter implements Processor
 	private String weight = null;
 	private String outkeyX = null;
 	private String outkeyY = null;
-	
-	
-	@Override
+
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
+
+    @Override
 	public Data process(Data input) 
 	{
 		if(outkeyX == null) throw new RuntimeException("Key \"outkeyX\" not set");
@@ -31,8 +34,8 @@ public class WeightedShowerCenter implements Processor
 		
 		for(int i=0; i<show.length; i++)
 		{
-			ergX += DefaultPixelMapping.getPosXinMM(show[i]) * 0.5 * wei[show[i]];
-			ergY += DefaultPixelMapping.getPosYinMM(show[i]) * 0.5 * wei[show[i]];
+			ergX += pixelMap.getPixelFromId(show[i]).getXPositionInMM() * 0.5 * wei[show[i]];
+			ergY += pixelMap.getPixelFromId(show[i]).getYPositionInMM() * 0.5 * wei[show[i]];
 			
 			w += wei[show[i]] * 0.5; 
 		}

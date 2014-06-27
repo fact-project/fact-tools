@@ -3,11 +3,9 @@
  */
 package fact.features;
 
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
-import fact.utils.SimpleFactEventProcessor;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

@@ -1,9 +1,9 @@
 package fact.features;
 
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.EventUtils;
 
 public class CosDeltaAlpha implements Processor{
 
@@ -23,7 +23,7 @@ public class CosDeltaAlpha implements Processor{
 
 		double cosDeltaAlpha = 0;
 		
-		EventUtils.mapContainsKeys(getClass(), input, sourcePosition, cogX, cogY, hillasDelta);
+		Utils.mapContainsKeys(getClass(), input, sourcePosition, cogX, cogY, hillasDelta);
 		sourcePositionArray = (double[]) input.get(sourcePosition);
 		cogXValue = (Double) input.get(cogX);
 		cogYValue = (Double) input.get(cogY);

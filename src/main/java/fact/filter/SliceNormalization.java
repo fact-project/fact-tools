@@ -3,11 +3,10 @@
  */
 package fact.filter;
 
+import fact.utils.SimpleFactEventProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.annotations.Description;
-import fact.utils.SimpleFactEventProcessor;
 
 /**
  * Normalizes all values in a pixel. That means only  0 < value < 1 are should be output.  

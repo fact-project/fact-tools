@@ -1,8 +1,6 @@
 package fact.plotter;
 
-import java.awt.Color;
-import java.awt.geom.Rectangle2D;
-
+import fact.Utils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -14,12 +12,13 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 import stream.plotter.DataVisualizer;
-import fact.EventUtils;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * 
@@ -85,7 +84,7 @@ public class ScatterPlotter extends DataVisualizer {
 	public Data processMatchingData(Data data) {
 		if (data.containsKey(xValue) && data.containsKey(yValue)) {
 			if(data.containsKey(xValue)){
-				x = EventUtils.valueToDouble(data.get(xValue));
+				x = Utils.valueToDouble(data.get(xValue));
 			} else {
 				throw new RuntimeException("Key for xValue not found in event. "  + xValue);
 			}
@@ -94,7 +93,7 @@ public class ScatterPlotter extends DataVisualizer {
 			}
 			
 			if(data.containsKey(yValue)){
-				y = EventUtils.valueToDouble(data.get(yValue));
+				y = Utils.valueToDouble(data.get(yValue));
 			} else {
 				throw new RuntimeException("Key for yValue not found in event. "  + yValue);
 			}

@@ -20,12 +20,7 @@ public class Snake
 	
 	private int NumberOfVertices = 6;
 	
-	
-	Snake()
-	{
-			
-	}
-	
+
 	public void initMatrix()
 	{
 		matrix = new Array2DRowRealMatrix[_MAX_VERTICES];		

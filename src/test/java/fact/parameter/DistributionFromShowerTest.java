@@ -1,24 +1,11 @@
 package fact.parameter;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.net.URL;
-
-import org.junit.Before;
+import fact.features.DistributionFromShower;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import stream.Data;
-import stream.io.SourceURL;
-import fact.cleaning.CoreNeighborClean;
-import fact.features.DistributionFromShower;
-import fact.features.MaxAmplitudePosition;
-import fact.features.PhotonCharge;
-import fact.filter.DrsCalibration;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import static org.junit.Assert.assertTrue;
 /**
  * 
  * @author bruegge

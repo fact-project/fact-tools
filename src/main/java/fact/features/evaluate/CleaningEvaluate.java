@@ -1,19 +1,14 @@
 package fact.features.evaluate;
 
-import java.util.ArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fact.Constants;
-import fact.EventUtils;
-import fact.utils.RemappingKeys;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
+import java.util.ArrayList;
+
 public class CleaningEvaluate implements Processor {
-	static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
-	
+
 	String showerKey = null;
 	String mcCherenkovWeightKey = null;
 	String mcNoiseWeightKey = null;
@@ -26,11 +21,11 @@ public class CleaningEvaluate implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, showerKey,mcCherenkovWeightKey,mcNoiseWeightKey);
+		Utils.mapContainsKeys(getClass(), input, showerKey, mcCherenkovWeightKey, mcNoiseWeightKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);
-		double[] cherenkovWeight = EventUtils.toDoubleArray(input.get(mcCherenkovWeightKey));
-		double[] noiseWeight = EventUtils.toDoubleArray(input.get(mcNoiseWeightKey));
+		double[] cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));
+		double[] noiseWeight = Utils.toDoubleArray(input.get(mcNoiseWeightKey));
 		
 		ArrayList<Integer> correctIdentifiedShowerPixel = new ArrayList<Integer>();
 		ArrayList<Integer> wrongIdentifiedShowerPixel = new ArrayList<Integer>();

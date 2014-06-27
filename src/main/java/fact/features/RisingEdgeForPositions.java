@@ -3,13 +3,12 @@
  */
 package fact.features;
 
-import fact.EventUtils;
+import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.Constants;
 import stream.annotations.Parameter;
 
 /**
@@ -32,7 +31,7 @@ public class RisingEdgeForPositions implements Processor {
 
 	@Override
 	public Data process(Data input) {
-        EventUtils.mapContainsKeys(getClass(), input, dataKey, amplitudePositionsKey);
+        Utils.mapContainsKeys(getClass(), input, dataKey, amplitudePositionsKey);
 
         int[] positions =  new int[Constants.NUMBEROFPIXEL];
 		

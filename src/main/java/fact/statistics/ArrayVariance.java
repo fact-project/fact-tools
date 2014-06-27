@@ -1,14 +1,13 @@
 package fact.statistics;
 
-import java.io.Serializable;
-
+import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
+
+import java.io.Serializable;
 
 /**
  * This operator calculates the rms of the array specified by the key
@@ -22,9 +21,9 @@ public class ArrayVariance implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		EventUtils.isKeyValid(getClass(), input, key, Double[].class);		
+		Utils.isKeyValid(getClass(), input, key, Double[].class);
 		Serializable data = input.get(key);
-		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(EventUtils.toDoubleArray(data));
+		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.toDoubleArray(data));
 		
 		//get the sqrt of the sum of squares. Lets call it RMS. Cause we can.
 		input.put(outputKey , descriptiveStatistics.getVariance());

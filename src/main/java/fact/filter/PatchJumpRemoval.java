@@ -2,6 +2,7 @@ package fact.filter;
 
 import java.util.LinkedList;
 
+import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -12,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import fact.Constants;
 import fact.EventUtils;
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -60,12 +59,12 @@ public class PatchJumpRemoval implements Processor {
 	double[] result = null;
 	double[] averJumpHeights = null;
 	int roi = 300;
-	
-	PixelSet pixelWithSpikes;
-	PixelSet pixelWithSignalFlanks;
-	PixelSet pixelWithRinging;
-	PixelSet pixelWithCorrectedJumps;
-	PixelSet pixelWithWrongTimeDepend;
+
+    PixelSetOverlay pixelWithSpikes;
+    PixelSetOverlay pixelWithSignalFlanks;
+    PixelSetOverlay pixelWithRinging;
+	PixelSetOverlay pixelWithCorrectedJumps;
+	PixelSetOverlay pixelWithWrongTimeDepend;
 	
 	double[] fftResults = null;
 	
@@ -116,11 +115,11 @@ public class PatchJumpRemoval implements Processor {
 			// previous start and stop cells aren't in the ROI
 			stopLoop = true;
 			
-			pixelWithSpikes = new PixelSet();
-			pixelWithSignalFlanks = new PixelSet();
-			pixelWithRinging = new PixelSet();
-			pixelWithCorrectedJumps = new PixelSet();
-			pixelWithWrongTimeDepend = new PixelSet();
+			pixelWithSpikes = new PixelSetOverlay();
+			pixelWithSignalFlanks = new PixelSetOverlay();
+			pixelWithRinging = new PixelSetOverlay();
+			pixelWithCorrectedJumps = new PixelSetOverlay();
+			pixelWithWrongTimeDepend = new PixelSetOverlay();
 			
 			averJumpHeights = new double[numberPatches];
 			
@@ -241,7 +240,7 @@ public class PatchJumpRemoval implements Processor {
 						result[pixel*roi+pos-1] = correctionValue;
 						result[pixel*roi+pos] = correctionValue;
 //						log.info("Found Double Spike before Jump: pixel: " + pixel + " correct to " + correctionValue);
-						pixelWithSpikes.add(new Pixel(pixel));
+						pixelWithSpikes.addById(pixel);
 					}
 //				}
 			}
@@ -265,7 +264,7 @@ public class PatchJumpRemoval implements Processor {
 						// and correct pos+1 with the average of the following two slices:
 						result[pixel*roi+pos+1] = correctionValue;
 //						log.info("Found Double Spike On Jump: pixel: " + pixel + " correct to " + correctionValue);
-						pixelWithSpikes.add(new Pixel(pixel));
+						pixelWithSpikes.addById(pixel);
 					}
 //				}
 			}
@@ -287,7 +286,7 @@ public class PatchJumpRemoval implements Processor {
 						result[pixel*roi+pos+1] = correctionValue;
 						result[pixel*roi+pos+2] = correctionValue;
 //						log.info("Found Double Spike after Jump: pixel: " + pixel + " correct to " + correctionValue);
-						pixelWithSpikes.add(new Pixel(pixel));
+						pixelWithSpikes.addById(pixel);
 					}
 //				}
 			}
@@ -306,7 +305,7 @@ public class PatchJumpRemoval implements Processor {
 					double correctionValue = (result[pixel*roi+pos-2] + result[pixel*roi+pos-1]) / 2.0;
 					result[pixel*roi+pos] = correctionValue;
 //					log.info("Found Single Spike befor Jump: pixel: " + pixel + " correct to " + correctionValue);
-					pixelWithSpikes.add(new Pixel(pixel));
+					pixelWithSpikes.addById(pixel);
 				}
 			}
 			
@@ -322,7 +321,7 @@ public class PatchJumpRemoval implements Processor {
 					double correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 					result[pixel*roi+pos+1] = correctionValue;
 //					log.info("Found Single Spike after Jump: pixel: " + pixel + " correct to " + correctionValue);
-					pixelWithSpikes.add(new Pixel(pixel));
+					pixelWithSpikes.addById(pixel);
 				}
 			}
 		}
@@ -378,7 +377,7 @@ public class PatchJumpRemoval implements Processor {
 			timeDependIsCorrect = false;
 			for (int px = 0 ; px < 9 ; px++)
 			{
-				pixelWithWrongTimeDepend.add(new Pixel(patch*9+px));
+				pixelWithWrongTimeDepend.addById(patch*9+px);
 			}
 			averJumpHeights[patch] = 0;
 		}
@@ -431,7 +430,7 @@ public class PatchJumpRemoval implements Processor {
 			noSignalFlank = false;
 			for (int px = 0 ; px < 9 ; px++)
 			{
-				pixelWithSignalFlanks.add(new Pixel(patch*9+px));
+				pixelWithSignalFlanks.addById(patch*9+px);
 			}
 			averJumpHeights[patch] = 0;
 		}
@@ -528,7 +527,7 @@ public class PatchJumpRemoval implements Processor {
 			averJumpHeights[patch] -= averRingingDerviation;
 			for (int px = 0 ; px < 9 ; px++)
 			{
-				pixelWithRinging.add(new Pixel(patch*9+px));
+				pixelWithRinging.addById(patch*9+px);
 			}
 
 //			log.info("Ringing found, pixel: " + patch*9 +  " freqAmpl: " + ringingFreqAmpl + " compAmpl: " + comparisonFreqAmpl);
@@ -554,7 +553,7 @@ public class PatchJumpRemoval implements Processor {
 		
 		for (int px = 0 ; px < 9 ; px++)
 		{
-			pixelWithCorrectedJumps.add(new Pixel(patch*9+px));
+			pixelWithCorrectedJumps.addById(patch*9+px);
 		}
 		
 		if (isStartCell == false)

@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
+import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
-import stream.ProcessContext;
 import stream.Processor;
-import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import fact.Constants;
 import fact.EventUtils;
-import fact.image.Pixel;
-import fact.image.overlays.PixelSet;
 import fact.viewer.ui.DefaultPixelMapping;
 /**
  *CoreNeighborClean. Identifies showerPixel in the image array.
@@ -52,14 +51,16 @@ public class CoreNeighborClean implements Processor{
     private boolean showDifferentCleaningSets = false;
 
 
-    private  PixelSet cleanedPixelSet;
+    private PixelSetOverlay cleanedPixelSet;
 	
 	double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
 	
 	double[] positions = new double[Constants.NUMBEROFPIXEL];
+
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 
-	private PixelSet starSet;
+	private PixelSetOverlay starSet;
 
 
 	@Override
@@ -89,7 +90,7 @@ public class CoreNeighborClean implements Processor{
 		showerPixel.toArray(level2);
 		
 		Integer[] level2a = null;
-		starSet = new PixelSet();
+		starSet = new PixelSetOverlay();
 		if (starPositionKeys != null)
 		{
 			for (String starPositionKey : starPositionKeys)
@@ -135,17 +136,17 @@ public class CoreNeighborClean implements Processor{
 		if (showDifferentCleaningSets == true){
 			if (level1.length > 0)
 			{
-	    		PixelSet l1 = new PixelSet();
+	    		PixelSetOverlay l1 = new PixelSetOverlay();
 	    		for(int i = 0; i < level1.length; i++){
-	    			l1.add(new Pixel(level1[i]));
+	    			l1.addById(level1[i]);
 	    		}
 	    		input.put(outputKey+"Level1Set", l1);
 			}
 			if (level2.length > 0)
 			{
-	    		PixelSet l2 = new PixelSet();
+                PixelSetOverlay l2 = new PixelSetOverlay();
 	    		for(int i = 0; i < level2.length; i++){
-	    			l2.add(new Pixel(level2[i]));
+	    			l2.addById(level2[i]);
 	    		}
 	    		input.put(outputKey+"Level2Set", l2);
 			}
@@ -153,9 +154,9 @@ public class CoreNeighborClean implements Processor{
 			{
 				if (level2a.length > 0)
 				{
-		    		PixelSet l2a = new PixelSet();
+                    PixelSetOverlay l2a = new PixelSetOverlay();
 		    		for(int i = 0; i < level2a.length; i++){
-		    			l2a.add(new Pixel(level2a[i]));
+		    			l2a.addById(level2a[i]);
 		    		}
 		    		input.put(outputKey+"Level2aSet", l2a);
 					input.put("Starset", starSet);
@@ -163,9 +164,9 @@ public class CoreNeighborClean implements Processor{
 			}
 			if (level3.length > 0)
 			{
-	    		PixelSet l3 = new PixelSet();
+                PixelSetOverlay l3 = new PixelSetOverlay();
 	    		for(int i = 0; i < level3.length; i++){
-	    			l3.add(new Pixel(level3[i]));
+	    			l3.addById(level3[i]);
 	    		}
 	    		input.put(outputKey+"Level3Set", l3);
 			}
@@ -173,9 +174,9 @@ public class CoreNeighborClean implements Processor{
 			{
 				if (level4.length > 0)
 				{
-		    		PixelSet l4 = new PixelSet();
+                    PixelSetOverlay l4 = new PixelSetOverlay();
 		    		for(int i = 0; i < level4.length; i++){
-		    			l4.add(new Pixel(level4[i]));
+		    			l4.addById(level4[i]);
 		    		}
 		    		input.put(outputKey+"Level4Set", l4);
 				}
@@ -185,9 +186,9 @@ public class CoreNeighborClean implements Processor{
 		
 		if(showerPixelArray.length > 0){
 
-			cleanedPixelSet = new PixelSet();
+			cleanedPixelSet = new PixelSetOverlay();
 	        for (int aShowerPixelArray : showerPixelArray) {
-	        	cleanedPixelSet.add(new Pixel(aShowerPixelArray));
+	        	cleanedPixelSet.addById(aShowerPixelArray);
 	        }
 	        
 			input.put(outputKey, showerPixelArray);
@@ -198,8 +199,8 @@ public class CoreNeighborClean implements Processor{
 	
 	private ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition) {
 		
-		int chidOfPixelOfStar = DefaultPixelMapping.coordinatesToChid(starPosition[0], starPosition[1]);
-		
+		int chidOfPixelOfStar = pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]).chid;
+
 		if (chidOfPixelOfStar == -1)
 		{
 			log.debug("Star not in camera window. No star islands are removed");
@@ -210,18 +211,15 @@ public class CoreNeighborClean implements Processor{
 		
 		starChidList.add(chidOfPixelOfStar);
 
-		starSet.add(new Pixel(chidOfPixelOfStar));
+		starSet.addById(chidOfPixelOfStar);
 		
-		for (int px: DefaultPixelMapping.getNeighborsFromChid(chidOfPixelOfStar))
+		for (FactCameraPixel px: pixelMap.getNeighboursFromID(chidOfPixelOfStar))
 		{
-			if (px != -1)
-			{
-				if (calculateDistance(px, starPosition[0], starPosition[1]) < starRadiusInCamera)
+				if (calculateDistance(px.id, starPosition[0], starPosition[1]) < starRadiusInCamera)
 				{
-					starSet.add(new Pixel(px));
-					starChidList.add(px);
+					starSet.add(px);
+					starChidList.add(px.id);
 				}
-			}
 		}
 		
 		ArrayList<ArrayList<Integer>> listOfLists = EventUtils.breadthFirstSearch(showerPixel);
@@ -237,8 +235,8 @@ public class CoreNeighborClean implements Processor{
 	
 	private double calculateDistance(int chid,double x,double y)
 	{
-		double xdist = DefaultPixelMapping.getPosXinMM(chid) - x;
-		double ydist = DefaultPixelMapping.getPosYinMM(chid) - y;
+		double xdist = pixelMap.getPixelFromId(chid).getXPositionInMM() - x;
+		double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
 		
 		return Math.sqrt((xdist*xdist)+(ydist*ydist));
 	}
@@ -278,10 +276,10 @@ public class CoreNeighborClean implements Processor{
 	{
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		for (int pix: list){
-			int[] currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
-			for (int nPix:currentNeighbors){
-				if(nPix != -1    && photonCharge[nPix] > neighborPixelThreshold && !newList.contains(nPix)){
-					newList.add(nPix);
+			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
+			for (FactCameraPixel nPix:currentNeighbors){
+				if(photonCharge[nPix.id] > neighborPixelThreshold && !newList.contains(nPix.id)){
+					newList.add(nPix.id);
 				}
 			}
 		}

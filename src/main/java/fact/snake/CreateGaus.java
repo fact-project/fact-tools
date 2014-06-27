@@ -2,6 +2,7 @@ package fact.snake;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -14,9 +15,10 @@ public class CreateGaus implements Processor
 	
 	private double x0 = 0;
 	private double y0 = 0;
-	
-	
-	private String outputKey = null;
+
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
+    private String outputKey = null;
 
 	@Override
 	public Data process(Data input) 
@@ -33,8 +35,8 @@ public class CreateGaus implements Processor
 		{
 			for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
 			{
-				double x = DefaultPixelMapping.getPosXinMM(i);
-				double y = DefaultPixelMapping.getPosYinMM(i);
+				double x = pixelMap.getPixelFromId(i).getXPositionInMM();;
+				double y = pixelMap.getPixelFromId(i).getYPositionInMM();;
 				
 				double AmpMod = Amp * Math.exp(- (((frame-timeMax)*(frame-timeMax))/(2.0*16.0)));
 

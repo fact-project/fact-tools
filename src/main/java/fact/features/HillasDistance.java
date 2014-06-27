@@ -1,12 +1,11 @@
 package fact.features;
 
+import fact.Utils;
+import fact.statistics.PixelDistribution2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
-import fact.statistics.PixelDistribution2D;
 import stream.annotations.Parameter;
 
 /**
@@ -31,7 +30,7 @@ public class HillasDistance implements Processor {
 			log.info("No shower in evernt. Not calculating distance");
 			return input;
 		}
-		EventUtils.mapContainsKeys(getClass(), input, distribution, sourcePosition);
+		Utils.mapContainsKeys(getClass(), input, distribution, sourcePosition);
 
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 		double[] source  = (double[]) input.get(sourcePosition);

@@ -1,15 +1,16 @@
 package fact.features;
 
 
+import fact.Constants;
+import fact.Utils;
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
+import fact.viewer.ui.DefaultPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Constants;
-import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 
 
 public class ConcentrationCore implements Processor{
@@ -19,7 +20,7 @@ public class ConcentrationCore implements Processor{
 	public Data process(Data input)
 	{
 
-		EventUtils.mapContainsKeys(getClass(), input, cogX,cogY,delta,photonCharge,showerPixel,length,width,size);
+		Utils.mapContainsKeys(getClass(), input, cogX, cogY, delta, photonCharge, showerPixel, length, width, size);
 		
 		try{
 			Double cogx = (Double) input.get(cogX);
@@ -38,9 +39,9 @@ public class ConcentrationCore implements Processor{
 			
 			for(int pix : showerPixelArray)
 			{
-				
-				double px = DefaultPixelMapping.getPosXinMM(pix);
-				double py = DefaultPixelMapping.getPosYinMM(pix);
+                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix);
+				double px = p.getXPositionInMM();
+				double py = p.getYPositionInMM();
 				
 				// short names adapted from mars code (change when understood)
 

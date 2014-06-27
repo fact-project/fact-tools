@@ -1,14 +1,13 @@
 package fact.statistics;
 
-import java.io.Serializable;
-
+import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.EventUtils;
+
+import java.io.Serializable;
 
 /**
  * This operator calculates the mean value of the values in of the array specified by the key.
@@ -24,7 +23,7 @@ public class ArrayMean implements Processor {
 	public Data process(Data input) {
 		if(input.containsKey(key)){
 			Serializable data = input.get(key);
-			DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(EventUtils.toDoubleArray(data));
+			DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.toDoubleArray(data));
 			
 			input.put(outputKey , descriptiveStatistics.getMean());
 			input.put(outputKey+ "_deviation" , descriptiveStatistics.getStandardDeviation());

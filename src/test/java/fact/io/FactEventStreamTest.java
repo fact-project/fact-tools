@@ -3,6 +3,14 @@
  */
 package fact.io;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.io.SourceURL;
+
 import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.net.URL;
@@ -10,15 +18,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.io.SourceURL;
 
 /**
  * @author chris

@@ -1,10 +1,10 @@
 package fact.features;
 
+import fact.Utils;
+import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.EventUtils;
-import fact.viewer.ui.DefaultPixelMapping;
 
 public class SourceLineTest implements Processor{
 
@@ -17,7 +17,7 @@ public class SourceLineTest implements Processor{
 	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
 	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 		//Test for keys.
-		EventUtils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition);
+		Utils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
 		

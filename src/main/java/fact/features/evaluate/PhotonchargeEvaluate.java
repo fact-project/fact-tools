@@ -1,14 +1,11 @@
 package fact.features.evaluate;
 
+import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import stream.annotations.Parameter;
-import fact.Constants;
-import fact.EventUtils;
-import fact.utils.RemappingKeys;
 
 public class PhotonchargeEvaluate implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonchargeEvaluate.class);
@@ -35,13 +32,13 @@ public class PhotonchargeEvaluate implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(PhotonchargeEvaluate.class, input, photonchargeKey,mcCherenkovWeightKey,mcNoiseWeightKey,mcCherenkovArrTimeMeanKey,arrivalTimeKey);
+		Utils.mapContainsKeys(PhotonchargeEvaluate.class, input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
 		
-		photoncharge = EventUtils.toDoubleArray(input.get(photonchargeKey));
-		arrivalTime = EventUtils.toDoubleArray(input.get(arrivalTimeKey));
-		cherenkovWeight = EventUtils.toDoubleArray(input.get(mcCherenkovWeightKey));
-		cherenkovArrTimeMean = EventUtils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
-		noiseWeight = EventUtils.toDoubleArray(input.get(mcNoiseWeightKey));
+		photoncharge = Utils.toDoubleArray(input.get(photonchargeKey));
+		arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));
+		cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));
+		cherenkovArrTimeMean = Utils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
+		noiseWeight = Utils.toDoubleArray(input.get(mcNoiseWeightKey));
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{

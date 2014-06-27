@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.EventUtils;
+import fact.Utils;
 import fact.utils.SimpleFactEventProcessor;
 /**
  * If key refers to an int[] of showerpixel. this will calculate the number of islands
@@ -12,7 +12,7 @@ public class NumberOfIslands extends SimpleFactEventProcessor<int[], Integer> {
 	
 	@Override
 	public Integer processSeries(int[] data) {
-		return EventUtils.breadthFirstSearch(EventUtils.arrayToList(data)).size();
+		return Utils.breadthFirstSearch(Utils.arrayToList(data)).size();
 	}
 	
 	

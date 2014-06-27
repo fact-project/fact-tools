@@ -1,24 +1,23 @@
 package fact.features;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
-import org.apache.commons.math3.util.Pair;
-import org.junit.Test;
-
-import stream.Data;
-import stream.Processor;
-import stream.io.SourceURL;
 import fact.cleaning.CoreNeighborClean;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import fact.statistics.PixelDistribution2D;
 import fact.utils.CutSlices;
+import org.apache.commons.math3.util.Pair;
+import org.junit.Test;
+import stream.Data;
+import stream.Processor;
+import stream.io.SourceURL;
+
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FeatureTests {
 	
@@ -209,7 +208,7 @@ public class FeatureTests {
 			fail("Could not read stream");
 		}
 	}
-	
+
 	@Test
 	public void testHillasFeatures(){
 		try {
@@ -221,7 +220,7 @@ public class FeatureTests {
 			stream.init();
 			Data item = stream.read();
 
-			//not all events contain shower pixel. We still want to guarantee that hillas parameter will be written iff showerpixel exist 
+			//not all events contain shower pixel. We still want to guarantee that hillas parameter will be written iff showerpixel exist
 			//also check that at least one item contained a shower. This should be the case even for our small test file.
 			int showerCount = 0;
 			int itemCount = 0;
@@ -244,7 +243,7 @@ public class FeatureTests {
 						Class<?> outputClass = entry.getValue().getSecond();
 						processor.process(checkedItem);
 						assertTrue("Processor " + entry.getKey().getClass().getSimpleName() + " did not write data to the item", checkedItem.containsKey(outputKey));
-						
+
 						try{
 //							System.out.println("value: " + checkedItem.get(outputKey).toString());
 							outputClass.cast(checkedItem.get(outputKey));

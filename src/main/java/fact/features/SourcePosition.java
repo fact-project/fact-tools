@@ -14,7 +14,6 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import fact.Constants;
-import fact.image.overlays.SourceOverlay;
 import fact.io.FitsStream;
 
 /**
@@ -130,15 +129,12 @@ public class SourcePosition implements StatefulProcessor {
 	 * Eventhough the numbers are small enough to NOT make a difference anyways.
 	 * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by comparing the times. We use the point closest in time to the current dataitem.
 	 * 
-	 * @see fact.data.FactProcessor#process(stream.Data)
-	 * @return data. The dataItem containing the calculated sourcePostion as a float[] of length 2. {x,y} . 
+	 * @return data. The dataItem containing the calculated sourcePostion as a float[] of length 2. {x,y} .
 	 * 				 Also the deviation between the calculated pointing and the onw written in the .fits TRACKING file.  
 	 */
 	@Override
 	public Data process(Data data) {
 		if(x != null && y !=  null && trackingUrl == null){
-			//add circle overlay to map
-			data.put(Constants.KEY_SOURCE_POSITION_OVERLAY, new SourceOverlay(x, y) );
 			//add source position to dataitem
 			double[] source = {x, y};
 //			System.out.println("x: "+  source[0] + " y: " +source[1] );
@@ -189,8 +185,6 @@ public class SourcePosition implements StatefulProcessor {
 		double[] sourceAzDe = getAzZd(sourceRightAscension, sourceDeclination, gmst);
 		double[] sourcePosition =  getSourcePosition(pointingAzDe[0], pointingAzDe[1], sourceAzDe[0], sourceAzDe[1]);
 
-		//add circle overlay to map
-		data.put(outputKey+"Overlay", new SourceOverlay((float) sourcePosition[0], (float) sourcePosition[1]) );
 		//add source position to dataitem
 		double[] source = {sourcePosition[0], sourcePosition[1]};
 		data.put(outputKey, source);

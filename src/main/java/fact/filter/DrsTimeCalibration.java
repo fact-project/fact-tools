@@ -1,15 +1,14 @@
 package fact.filter;
 
-import java.net.URL;
-
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import fact.Constants;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
+
+import java.net.URL;
 
 public class DrsTimeCalibration implements Processor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);

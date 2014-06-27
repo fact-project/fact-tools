@@ -1,17 +1,14 @@
 package fact.filter;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import fact.Constants;
+import fact.Utils;
+import fact.utils.LinearTimeCorrectionKernel;
+import fact.utils.TimeCorrectionKernel;
 import stream.Data;
 import stream.Processor;
 import stream.ProcessorException;
 import stream.annotations.Parameter;
-import fact.Constants;
-import fact.EventUtils;
-import fact.utils.LinearTimeCorrectionKernel;
-import fact.utils.TimeCorrectionKernel;
 
 //TODO write unit test
 public class ArrayTimeCorrection implements Processor{
@@ -19,7 +16,7 @@ public class ArrayTimeCorrection implements Processor{
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input,  kernel, dataCalibrated, timesOffset);
+		Utils.mapContainsKeys(getClass(), input, kernel, dataCalibrated, timesOffset);
 		
 		try{
 			dataCalibratedArray = (double[]) input.get(dataCalibrated);

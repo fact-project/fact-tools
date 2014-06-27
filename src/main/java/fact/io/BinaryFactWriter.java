@@ -3,21 +3,16 @@
  */
 package fact.io;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.net.URL;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Description;
 import stream.io.CsvWriter;
+
+import java.io.*;
+import java.lang.reflect.Array;
+import java.net.URL;
 
 /**
  * <p>
@@ -86,7 +81,7 @@ public class BinaryFactWriter extends CsvWriter {
 				}
 	
 			} catch(NullPointerException e){
-				throw new RuntimeException("Value from map with the key + " + key + " was null: "
+				throw new RuntimeException("Value from getColorFromValue with the key + " + key + " was null: "
 						+ e.getMessage());
 			} catch (Exception e) {
 				throw new RuntimeException("Failed to write file: "

@@ -1,7 +1,5 @@
 package fact.features;
 
-import fact.viewer.ui.DefaultPixelMapping;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

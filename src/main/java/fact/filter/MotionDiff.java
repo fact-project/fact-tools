@@ -1,12 +1,11 @@
 package fact.filter;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.annotations.Description;
 import fact.Constants;
 import fact.utils.SimpleFactEventProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.annotations.Description;
 /**
  * This operator calculates the difference between data[i] and data[i+offset] for each pixel in each event and stores the result as a float array named outputKey. <\br>
  * if i+offset is greater or smaller the current window the first respectively the last value will be repeated. 

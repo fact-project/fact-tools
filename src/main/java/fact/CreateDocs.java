@@ -3,11 +3,11 @@
  */
 package fact;
 
-import java.io.File;
-
 import stream.doc.DocGenerator;
 import stream.doc.DocTree;
 import stream.util.URLUtilities;
+
+import java.io.File;
 
 /**
  * @author chris
