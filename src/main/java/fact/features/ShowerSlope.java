@@ -1,6 +1,7 @@
 package fact.features;
 
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -21,6 +22,8 @@ public class ShowerSlope implements Processor {
 	private double cogx;
 	private double cogy;
 	private double delta;
+	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	@Override
 	public Data process(Data input) {
@@ -47,8 +50,8 @@ public class ShowerSlope implements Processor {
 		for (int i = 0 ; i < n ; i++)
 		{
 			int chid = shower[i];
-			double xcoord = DefaultPixelMapping.getPosXinMM(chid);
-			double ycoord = DefaultPixelMapping.getPosYinMM(chid);
+			double xcoord = pixelMap.getPixelFromId(chid).getXPositionInMM();
+			double ycoord = pixelMap.getPixelFromId(chid).getYPositionInMM();
 			double[] rotPixels = EventUtils.rotatePointInShowerSystem(xcoord, ycoord,cogx, cogy, delta);
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];

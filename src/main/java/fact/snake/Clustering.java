@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
 import fact.mapping.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.ProcessContext;
@@ -28,6 +30,8 @@ public class Clustering implements StatefulProcessor
 	
 	private int start = 0;
 	private int end = 0;
+	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	
 	@Override
@@ -138,7 +142,13 @@ public class Clustering implements StatefulProcessor
 		
 		if(data[pos] > schwelle1)
 		{			
-			int[] nei =  DefaultPixelMapping.getNeighborsFromChid(pixel);			
+			FactCameraPixel[] neiPixel = pixelMap.getNeighboursFromID(pixel);
+			int[] nei =  new int[neiPixel.length];	
+			for (int i=0; i<nei.length; i++)
+			{
+				nei[i] = neiPixel[i].chid;
+			}
+			
 			int count = 0;
 			
 			for(int i=0; i<nei.length; i++)

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -47,6 +48,8 @@ public class TimeGradientExtraction implements Processor {
 	
 	private double[] data = null;
 	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	
 	
 	@Override
 	public Data process(Data input) {
@@ -68,8 +71,8 @@ public class TimeGradientExtraction implements Processor {
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
-			double posx = DefaultPixelMapping.getPosXinMM(px);
-			double posy = DefaultPixelMapping.getPosYinMM(px);
+			double posx = pixelMap.getPixelFromId(px).getXPositionInMM();
+			double posy = pixelMap.getPixelFromId(px).getYPositionInMM();
 			int predictedTime = CalculatePredictedTime(px,posx,posy);
 			int leftBorder = predictedTime - searchWindowSize / 2;
 			int rightBorder = predictedTime + searchWindowSize / 2;

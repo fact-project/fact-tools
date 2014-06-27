@@ -1,10 +1,15 @@
 package fact.features;
 
+import fact.Constants;
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
 import fact.statistics.PixelDistribution2D;
 import fact.viewer.ui.DefaultPixelMapping;
+
 import org.apache.commons.math3.linear.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -23,13 +28,11 @@ public class DistributionFromShower implements Processor {
     //hte in and outputkeys
     @Parameter(required = true)
     private String outputKey =null;
-
-	private float[] mpGeomXCoord = DefaultPixelMapping.getGeomXArray();
-	private float[] mpGeomYCoord = DefaultPixelMapping.getGeomYArray();
+    
+    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
-	private float[] mpEigenGeomXCoord = DefaultPixelMapping.getGeomXArray();
-	private float[] mpEigenGeomYCoord = DefaultPixelMapping.getGeomYArray();
-
+	private float[] mpEigenGeomXCoord = null;
+	private float[] mpEigenGeomYCoord = null;
 
     // A logger
     static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
@@ -81,8 +84,8 @@ public Data process(Data input) {
 	//find weighted center of the shower pixels.
     for (int pix: showerPixel)
     {
-        cogX            += wheightsArray[pix] * DefaultPixelMapping.getGeomXArray()[pix];
-        cogY            += wheightsArray[pix] * DefaultPixelMapping.getGeomYArray()[pix];
+        cogX            += wheightsArray[pix] * pixelMap.getPixelFromId(pix).getXPositionInMM();
+        cogY            += wheightsArray[pix] * pixelMap.getPixelFromId(pix).getYPositionInMM();
     }
     //divide the center coordinates by size. I'm not sure if this is correct. I checked it. It is.
     cogX                /= size;
@@ -96,9 +99,11 @@ public Data process(Data input) {
     
     for (int pix: showerPixel )
     {
-        variance_xx            += wheightsArray[pix] * (mpGeomXCoord[pix] - cogX) * (mpGeomXCoord[pix] - cogX);
-        variance_yy            += wheightsArray[pix] * (mpGeomYCoord[pix] - cogY) * (mpGeomYCoord[pix] - cogY);
-        covariance_xy          += wheightsArray[pix] * (mpGeomXCoord[pix] - cogX) * (mpGeomYCoord[pix] - cogY);
+    	double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
+    	double posy = pixelMap.getPixelFromId(pix).getYPositionInMM();
+        variance_xx            += wheightsArray[pix] * (posx - cogX) * (posx - cogX);
+        variance_yy            += wheightsArray[pix] * (posy - cogY) * (posy - cogY);
+        covariance_xy          += wheightsArray[pix] * (posx - cogX) * (posy - cogY);
     }
 	
     //create a covariance matrix
@@ -136,14 +141,16 @@ public Data process(Data input) {
     RealMatrix rotZ = MatrixUtils.createRealMatrix(rotMatrixZ);
     
     //allocate variables for rotated coordinates    
-    mpEigenGeomXCoord = new float[mpGeomXCoord.length];
-    mpEigenGeomYCoord = new float[mpGeomXCoord.length];
+    mpEigenGeomXCoord = new float[Constants.NUMBEROFPIXEL];
+    mpEigenGeomYCoord = new float[Constants.NUMBEROFPIXEL];
 
     //Loop over pixel in Order to calculate the rotated coordinates
     for (int pix: showerPixel )
     {
+    	double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
+    	double posy = pixelMap.getPixelFromId(pix).getYPositionInMM();
     	// set pixel coordinates to be a vector
-    	RealVector pixCoordinates 		= new ArrayRealVector(new double[] {mpGeomXCoord[pix], mpGeomYCoord[pix]}, false );
+    	RealVector pixCoordinates 		= new ArrayRealVector(new double[] {posx, posy}, false );
     	
     	// rotate coordinates vector in a system parallel to the cartesic camera coordinates
     	RealVector eigenPixCoordinates 	= rotZ.operate(pixCoordinates);

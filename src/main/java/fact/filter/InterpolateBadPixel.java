@@ -72,7 +72,7 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 			return nData;
 		}
 		for (int pix: badChIds) {
-			int[] currentNeighbors = DefaultPixelMapping.getNeighborsFromChid(pix);
+			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
 			
 			//iterate over all slices
 			for (int slice = 0; slice < roi; slice++) {
@@ -80,10 +80,10 @@ public class InterpolateBadPixel extends SimpleFactEventProcessor<double[], doub
 				//temp save the current value
 				double avg = 0.0f; 
 				int numNeighbours = 0;
-				for(int nPix: currentNeighbors){
+				for(FactCameraPixel nPix: currentNeighbors){
 					//if neighbour exists
-					if (nPix != -1 && !Utils.arrayContains(badChIds, nPix) ){
-						avg += series[nPix*roi + slice];
+					if (!Utils.arrayContains(badChIds, nPix.id) ){
+						avg += series[nPix.id*roi + slice];
 						numNeighbours++;
 					}
 				}

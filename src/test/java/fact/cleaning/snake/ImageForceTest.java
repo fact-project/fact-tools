@@ -2,11 +2,12 @@ package fact.cleaning.snake;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
-
 import fact.cleaning.snake.ImageForce;
 
 public class ImageForceTest extends ImageForce
@@ -24,6 +25,7 @@ public class ImageForceTest extends ImageForce
      \___/
 
  */
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	public ImageForceTest()
 	{
@@ -36,17 +38,17 @@ public class ImageForceTest extends ImageForce
 		double[] testData = new double[1440];
 		
 		// siehe FACTmapV5.txt -> Resources
-		testData[ DefaultPixelMapping.getChidFromSoftId( 0)] =     1; // Center 	 ( 4)		
-		testData[ DefaultPixelMapping.getChidFromSoftId( 1)] =     3; // Bot		 ( 5)		
-		testData[ DefaultPixelMapping.getChidFromSoftId( 2)] =    10; // leftBot	 ( 2)		
-		testData[ DefaultPixelMapping.getChidFromSoftId( 3)] =    30; // leftTop	 ( 1)		
-		testData[ DefaultPixelMapping.getChidFromSoftId( 4)] =   100; // top		 ( 3)		
-		testData[ DefaultPixelMapping.getChidFromSoftId( 5)] =   300; // rightTop  	 ( 7)		
-		testData[ DefaultPixelMapping.getChidFromSoftId( 6)] =  1000; // rightBot	 ( 6)
+		testData[ pixelMap.getChidFromSoftID( 0)] =     1; // Center 	 ( 4)		
+		testData[ pixelMap.getChidFromSoftID( 1)] =     3; // Bot		 ( 5)		
+		testData[ pixelMap.getChidFromSoftID( 2)] =    10; // leftBot	 ( 2)		
+		testData[ pixelMap.getChidFromSoftID( 3)] =    30; // leftTop	 ( 1)		
+		testData[ pixelMap.getChidFromSoftID( 4)] =   100; // top		 ( 3)		
+		testData[ pixelMap.getChidFromSoftID( 5)] =   300; // rightTop  	 ( 7)		
+		testData[ pixelMap.getChidFromSoftID( 6)] =  1000; // rightBot	 ( 6)
 		
-		testData[ DefaultPixelMapping.getChidFromSoftId(15)] =  3000; // top2	  	 ( 8)
-		testData[ DefaultPixelMapping.getChidFromSoftId(16)] = 10000; // rightTop2   ( 9)
-		testData[ DefaultPixelMapping.getChidFromSoftId(17)] = 30000; // rightBot2   (10)
+		testData[ pixelMap.getChidFromSoftID(15)] =  3000; // top2	  	 ( 8)
+		testData[ pixelMap.getChidFromSoftID(16)] = 10000; // rightTop2   ( 9)
+		testData[ pixelMap.getChidFromSoftID(17)] = 30000; // rightBot2   (10)
 		
 		data = testData;
 	}
@@ -54,9 +56,14 @@ public class ImageForceTest extends ImageForce
 	@Test
 	public void testGradient()
 	{
-		int center1 = DefaultPixelMapping.getChidFromSoftId(0);	
-		int center2 = DefaultPixelMapping.getChidFromSoftId(5);
+		int center1a = DefaultPixelMapping.getChidFromSoftId(0);	
+		int center2a = DefaultPixelMapping.getChidFromSoftId(5);
+		int center1 = pixelMap.getChidFromSoftID(0);	
+		int center2 = pixelMap.getChidFromSoftID(5);
 		
+		System.out.println(center1a +" "+ center1 + " " + center2a + " " + center2);
+		
+		System.out.println("grad(center1): "+gradX(center1));
 		// Test 1 Spalte:																  // R - L = m // (rt) | (rb)
 		assertTrue("X-Gradient 1 wird nicht richtig berechnet!", gradX(center1) == 1890); // (1700-53) | (2303 - 170)
 		assertTrue("Y-Gradient 1 wird nicht richtig berechnet!", gradY(center1) == -486); // (530 - 1016) // T - B   

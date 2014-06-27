@@ -49,12 +49,13 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 		int patch = 0;
 		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++)
 		{
-			patch = DefaultPixelMapping.getPatch(chid);
+
+			patch = (int) chid/9;
 			perPatchMean[patch] += arrivalTimeArray[chid] / 9.0;
 		}
 		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++)
 		{
-			patch = DefaultPixelMapping.getPatch(chid);
+			patch = chid/9;
 			perPatchVariance[patch] += (arrivalTimeArray[chid] - perPatchMean[patch]) * (arrivalTimeArray[chid] - perPatchMean[patch]) / 8.0;
 		}
 

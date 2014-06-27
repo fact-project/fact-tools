@@ -5,6 +5,7 @@ import java.util.List;
 
 import fact.Constants;
 import fact.EventUtils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -26,6 +27,8 @@ public class ProbabilityClean implements Processor {
 	private double cogx;
 	private double cogy;
 	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	
 	@Override
 	public Data process(Data input) {
 		EventUtils.mapContainsKeys(getClass(), input, photonChargeKey, deltaKey);
@@ -41,8 +44,8 @@ public class ProbabilityClean implements Processor {
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
-			double xpos = DefaultPixelMapping.getPosXinMM(px);
-			double ypos = DefaultPixelMapping.getPosYinMM(px);
+			double xpos = pixelMap.getPixelFromId(px).getXPositionInMM();
+			double ypos = pixelMap.getPixelFromId(px).getYPositionInMM();
 			double weight = photoncharge[px] / CalculateDistance(px,xpos,ypos);
 			
 			if (weight > probabilityThreshold)

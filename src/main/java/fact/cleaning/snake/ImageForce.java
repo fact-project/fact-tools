@@ -2,6 +2,8 @@ package fact.cleaning.snake;
 
 import java.awt.geom.Point2D;
 
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 
 public abstract class ImageForce 
@@ -14,6 +16,8 @@ public abstract class ImageForce
 	// image intensity median
 	double median = 1;
 	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	
 	protected ImageForce(double[] data, float centerX, float centerY)
 	{
 		this.center = new Point2D.Float(centerX, centerY); 
@@ -25,11 +29,16 @@ public abstract class ImageForce
 	// Linearkombination  -> Siehe BScArbeit Dominik Baack
 	protected double gradX(int chid)
 	{
-		int[] neighbor = DefaultPixelMapping.getNeighborsFromChid(chid);		
+		FactCameraPixel[] neighborPixel = pixelMap.getNeighboursFromID(chid);
+		if (neighborPixel.length < 6)
+		{
+			return 0;
+		}
+		
+		int[] neighbor = new int[6];		
 		for(int i=0; i<6; i++)
 		{
-			if(neighbor[i] == -1)
-				return 0;
+			neighbor[i] = neighborPixel[i].chid;
 		}		
 		
 		float  bot = (float) data[neighbor[0]];
@@ -39,7 +48,7 @@ public abstract class ImageForce
 		float rightTop = 0;
 		float rightBot = 0;		
 		
-		if(DefaultPixelMapping.getGeomX(chid) % 2 == 0)
+		if(pixelMap.getPixelFromId(chid).geometricX % 2 == 0)
 		{
 			leftTop = (float) data[neighbor[2]];
 			rightTop = (float) data[neighbor[4]];
@@ -64,11 +73,16 @@ public abstract class ImageForce
 	
 	protected double gradY(int chid)
 	{		
-		int[] neighbor = DefaultPixelMapping.getNeighborsFromChid(chid);		
+		FactCameraPixel[] neighborPixel = pixelMap.getNeighboursFromID(chid);
+		if (neighborPixel.length < 6)
+		{
+			return 0;
+		}
+		
+		int[] neighbor = new int[6];		
 		for(int i=0; i<6; i++)
 		{
-			if(neighbor[i] == -1)
-				return 0;
+			neighbor[i] = neighborPixel[i].chid;
 		}
 		
 		float  bot = (float) data[neighbor[0]];
@@ -78,7 +92,7 @@ public abstract class ImageForce
 		float rightTop = 0;
 		float rightBot = 0;		
 		
-		if(DefaultPixelMapping.getGeomX(chid) % 2 == 0)
+		if(pixelMap.getPixelFromId(chid).geometricX % 2 == 0)
 		{
 			leftTop = (float) data[neighbor[2]];
 			rightTop = (float) data[neighbor[4]];

@@ -3,9 +3,12 @@ package fact.features.video;
 
 import fact.Constants;
 import fact.Utils;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -13,6 +16,9 @@ import stream.annotations.Parameter;
 
 public class CenterOfGravity implements Processor
 {
+	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	
 	/**
 	 * This function calculates the center of gravity for every slice. It uses only shower pixel.
 	 * It also calculates the variance and covariance of the center of gravity.
@@ -22,8 +28,8 @@ public class CenterOfGravity implements Processor
 	public Data process(Data input)
 	{
 		/// init helper and utils
-	    mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
-	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
+//	    mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
+//	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
 	    // check keys
 		Utils.mapContainsKeys(getClass(), input, showerPixel, dataCalibrated);
@@ -124,9 +130,11 @@ public class CenterOfGravity implements Processor
 			for(int pix : showerPixelArray)
 			{
 				//TODO insert rotate by hillas_delta switch
+				double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
+				double posy = pixelMap.getPixelFromId(pix).getXPositionInMM();
 				size[slice] += dataCalibratedArray[pix * sliceCount + slice] + eventBaseline;
-				cogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * mpGeomXCoord[pix];
-				cogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * mpGeomYCoord[pix];
+				cogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * posx;
+				cogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * posy;
 				
 			}
 			cogx[slice] /= size[slice];
@@ -135,9 +143,11 @@ public class CenterOfGravity implements Processor
 			// Calculate variance and covariance
 		    for (int pix: showerPixelArray )
 		    {
-		        varcogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (mpGeomXCoord[pix] - cogx[slice]) * (mpGeomXCoord[pix] - cogx[slice]);
-		        varcogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (mpGeomYCoord[pix] - cogy[slice]) * (mpGeomYCoord[pix] - cogy[slice]);
-		        covcog[slice]  += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (mpGeomXCoord[pix] - cogx[slice]) * (mpGeomYCoord[pix] - cogy[slice]);
+		    	double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
+				double posy = pixelMap.getPixelFromId(pix).getXPositionInMM();
+		        varcogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posx - cogx[slice]);
+		        varcogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (posy - cogy[slice]) * (posy - cogy[slice]);
+		        covcog[slice]  += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posy - cogy[slice]);
 		    }
 			varcogx[slice] /= size[slice];
 			varcogy[slice] /= size[slice];
@@ -266,8 +276,6 @@ public class CenterOfGravity implements Processor
 	private double[] dataCalibratedArray = null;
 	
 	// Helper and utilities
-	private float[] mpGeomXCoord;
-	private float[] mpGeomYCoord;
 	private double[] size;
 	private double eventBaseline;
 

@@ -6,6 +6,8 @@ import java.util.List;
 
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
+import fact.mapping.ui.components.cameradisplay.PixelMapDisplay;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,8 @@ import fact.viewer.ui.DefaultPixelMapping;
  */
 public class EventUtils {
 	static Logger log = LoggerFactory.getLogger(EventUtils.class);
+	
+	
 	
 	/**
 	 * Finds all unconnected sets of pixel in the showerPixel List and returns a
@@ -34,6 +38,8 @@ public class EventUtils {
 			List<Integer> showerPixel) {
 		ArrayList<ArrayList<Integer>> listOfLists = new ArrayList<ArrayList<Integer>>();
 		ArrayList<Integer> marked = new ArrayList<Integer>();
+		FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+		
 		for (int pix : showerPixel) {
 			if (!marked.contains(pix)) {
 				// start BFS
@@ -43,11 +49,11 @@ public class EventUtils {
 				// cannot use the enhanced for loop here.
 				for (int index = 0; index < q.size() && !q.isEmpty(); index++) {
 					// add neighbours to q
-					for (int i : DefaultPixelMapping.getNeighborsFromChid(q
-							.get(index))) {
-						if (showerPixel.contains(i) && !marked.contains(i)) {
-							q.add(i);
-							marked.add(i);
+					FactCameraPixel[] neighbors = pixelMap.getNeighboursFromID(q.get(index));
+					for (FactCameraPixel i : neighbors) {
+						if (showerPixel.contains(i.id) && !marked.contains(i.id)) {
+							q.add(i.id);
+							marked.add(i.id);
 						}
 					}
 				}

@@ -1,12 +1,16 @@
 package fact.features;
 
 import fact.Utils;
+import fact.mapping.FactCameraPixel;
+import fact.mapping.FactPixelMapping;
 import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
 public class SourceLineTest implements Processor{
+	
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	/**
 	 * This function calculates the source line test (after an idea by W. Rhode).
@@ -14,8 +18,8 @@ public class SourceLineTest implements Processor{
 	@Override
 	public Data process(Data input)
 	{
-	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
-	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
+//	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
+//	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 		//Test for keys.
 		Utils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition);
 		
@@ -85,8 +89,8 @@ public class SourceLineTest implements Processor{
 		for(int chid : showerPixelArray)
 		{
 			cogT += arrivalTimeArray[chid] * photonChargeArray[chid];
-			cogX += mpGeomXCoord[chid] * photonChargeArray[chid];
-			cogY += mpGeomYCoord[chid] * photonChargeArray[chid];
+			cogX += pixelMap.getPixelFromId(chid).getXPositionInMM() * photonChargeArray[chid];
+			cogY += pixelMap.getPixelFromId(chid).getYPositionInMM() * photonChargeArray[chid];
 			size += photonChargeArray[chid];
 			
 			double t = arrivalTimeArray[chid]; // tf1 < tf2 < tf3 // tl1 > tl2 > tl3
@@ -141,11 +145,25 @@ public class SourceLineTest implements Processor{
 		double f_time = (tf1 + tf2 + tf3) / 3.0;
 		double l_time = (tl1 + tl2 + tl3) / 3.0;
 		
-		double f_x = (mpGeomXCoord[id_tf1] + mpGeomXCoord[id_tf2] + mpGeomXCoord[id_tf3]) / 3.0;
-		double f_y = (mpGeomYCoord[id_tf1] + mpGeomYCoord[id_tf2] + mpGeomYCoord[id_tf3]) / 3.0;
+		double tf1_x = pixelMap.getPixelFromId(id_tf1).getXPositionInMM();
+		double tf1_y = pixelMap.getPixelFromId(id_tf1).getXPositionInMM();
+		double tf2_x = pixelMap.getPixelFromId(id_tf2).getXPositionInMM();
+		double tf2_y = pixelMap.getPixelFromId(id_tf2).getXPositionInMM();
+		double tf3_x = pixelMap.getPixelFromId(id_tf3).getXPositionInMM();
+		double tf3_y = pixelMap.getPixelFromId(id_tf3).getXPositionInMM();
 		
-		double l_x = (mpGeomXCoord[id_tl1] + mpGeomXCoord[id_tl2] + mpGeomXCoord[id_tl3]) / 3.0;
-		double l_y = (mpGeomYCoord[id_tl1] + mpGeomYCoord[id_tl2] + mpGeomYCoord[id_tl3]) / 3.0;
+		double f_x = (tf1_x + tf2_x + tf3_x) / 3.0;
+		double f_y = (tf1_y + tf2_y + tf3_y) / 3.0;
+		
+		double tl1_x = pixelMap.getPixelFromId(id_tl1).getXPositionInMM();
+		double tl1_y = pixelMap.getPixelFromId(id_tl1).getXPositionInMM();
+		double tl2_x = pixelMap.getPixelFromId(id_tl2).getXPositionInMM();
+		double tl2_y = pixelMap.getPixelFromId(id_tl2).getXPositionInMM();
+		double tl3_x = pixelMap.getPixelFromId(id_tl3).getXPositionInMM();
+		double tl3_y = pixelMap.getPixelFromId(id_tl3).getXPositionInMM();
+		
+		double l_x = (tl1_x + tl2_x + tl3_x) / 3.0;
+		double l_y = (tl1_y + tl2_y + tl3_y) / 3.0;
 		
 		double meanShowerVelocitySorted = Math.sqrt((f_x - l_x)*(f_x - l_x) + (f_y - l_y) * (f_y - l_y)) / (l_time - f_time);
 		
@@ -158,8 +176,11 @@ public class SourceLineTest implements Processor{
 		// Calculate values for reconstruction
 		for(int chid : showerPixelArray)
 		{
-			double pixelSourceAngle = Math.atan2((mpGeomYCoord[chid] - sourcePositionArray[1]), (mpGeomXCoord[chid] - sourcePositionArray[0]));
-			double pixelSourceDist       = (mpGeomYCoord[chid] - sourcePositionArray[1]) / Math.sin(pixelSourceAngle);
+			double posx = pixelMap.getPixelFromId(chid).getXPositionInMM();
+			double posy = pixelMap.getPixelFromId(chid).getYPositionInMM();
+			
+			double pixelSourceAngle = Math.atan2((posy - sourcePositionArray[1]), (posx - sourcePositionArray[0]));
+			double pixelSourceDist       = (posy - sourcePositionArray[1]) / Math.sin(pixelSourceAngle);
 			
 			projPrimary = Math.cos(pixelSourceAngle - cogSourceAngle) * pixelSourceDist;
 			
@@ -196,7 +217,10 @@ public class SourceLineTest implements Processor{
 		     recoX[chid] = cogX + dx * Math.cos(cogSourceAngle);
 		     recoY[chid] = cogY + dx * Math.sin(cogSourceAngle);
 		     
-		     sourceLineTestValueProjected += recoW[chid] * Math.sqrt((recoX[chid] - mpGeomXCoord[chid]) * (recoX[chid] - mpGeomXCoord[chid]) + (recoY[chid] - mpGeomYCoord[chid]) * (recoY[chid] - mpGeomYCoord[chid]));
+		     double posx = pixelMap.getPixelFromId(chid).getXPositionInMM();
+			 double posy = pixelMap.getPixelFromId(chid).getYPositionInMM();
+		     
+		     sourceLineTestValueProjected += recoW[chid] * Math.sqrt((recoX[chid] - posx) * (recoX[chid] - posx) + (recoY[chid] - posy) * (recoY[chid] - posy));
 		     
 		     // Calculate with sorted velocity
 			 dt = arrivalTimeArray[chid] - cogT;
@@ -204,7 +228,7 @@ public class SourceLineTest implements Processor{
 		     recoX[chid] = cogX + dx * Math.cos(cogSourceAngle);
 		     recoY[chid] = cogY + dx * Math.sin(cogSourceAngle);
 		     
-		     sourceLineTestValueSorted += recoW[chid] * Math.sqrt((recoX[chid] - mpGeomXCoord[chid]) * (recoX[chid] - mpGeomXCoord[chid]) + (recoY[chid] - mpGeomYCoord[chid]) * (recoY[chid] - mpGeomYCoord[chid]));
+		     sourceLineTestValueSorted += recoW[chid] * Math.sqrt((recoX[chid] - posx) * (recoX[chid] - posx) + (recoY[chid] - posy) * (recoY[chid] - posy));
 		     
 		     
 		     recoWsum += recoW[chid];
