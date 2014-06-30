@@ -1,6 +1,7 @@
 package fact.parameter;
 
-import fact.features.HillasAlpha;
+import fact.features.source.HillasAlpha;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

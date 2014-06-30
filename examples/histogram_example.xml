@@ -24,7 +24,7 @@
 <!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="DataCalibrated_stopJumpHeight" title="StopCell Jumps" color="#006600"/> -->
 <!-- 			<fact.image.monitors.ScatterPlotter xValue="deltaT"  yValue="heightEnd"/> -->
 <!--             <Skip condition="%{data.EventNum} &lt; 60" /> -->
-<!-- 	        <fact.features.MaxAmplitude key="DataCalibrated" outputKey="max" /> -->
+<!-- 	        <fact.extraction.MaxAmplitude key="DataCalibrated" outputKey="max" /> -->
 <!-- 			<fact.extraction.PhotonCharge key="DataCalibrated" outputKey="c" /> -->
 <!-- 			<fact.statistics.CreateHistogram key="max" min="0" max="400" numberOfBins="25" outputKey="maxH"/> -->
 <!-- 			<fact.statistics.CreateHistogram key="c"  min="0" max="400" numberOfBins="25" outputKey="cH"/> -->

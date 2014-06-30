@@ -1,4 +1,4 @@
-package fact.features;
+package fact.features.source;
 
 import java.net.MalformedURLException;
 import java.net.URL;

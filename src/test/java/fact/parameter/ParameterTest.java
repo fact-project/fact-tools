@@ -4,7 +4,7 @@ import fact.cleaning.CoreNeighborClean;
 import fact.extraction.MaxAmplitudePosition;
 import fact.extraction.PhotonCharge;
 import fact.features.DistributionFromShower;
-import fact.features.SourcePosition;
+import fact.features.source.SourcePosition;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;

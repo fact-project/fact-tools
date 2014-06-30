@@ -33,7 +33,7 @@
             <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
 
 
-            <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+            <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
 	        <fact.extraction.PhotonCharge key="DataCalibrated"  positions="position" outputKey="photoncharge" color="#FF0F0F"/>
 	        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
 
@@ -43,7 +43,7 @@
 
 	        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
 
-			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+			<fact.features.source.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
             <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputkey="size"/>
 
 

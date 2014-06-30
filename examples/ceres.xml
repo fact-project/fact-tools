@@ -32,7 +32,7 @@
             <fact.statistics.ArrayMean key="arrivalTime_level1" outputKey="arrivalTimeMean_level1" />
             <fact.statistics.ArrayVariance key="arrivalTime" outputKey="arrivalTimeVariance" />
             
-            <fact.features.SourcePosition outputKey="sourcePosition" X="0.0" Y="0.0"/>
+            <fact.features.source.SourcePosition outputKey="sourcePosition" X="0.0" Y="0.0"/>
 			
 <!--             <fact.features.HillasParameter pixels="shower" photonEquivalent="photoncharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
 			<stream.monitor.DataRate every="100" />
@@ -42,8 +42,8 @@
 
 			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
 			
-			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
-			<fact.features.HillasDistance distribution="dist" sourcePosition="sourcePosition" outputKey="distance" />
+			<fact.features.source.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+			<fact.features.source.HillasDistance distribution="dist" sourcePosition="sourcePosition" outputKey="distance" />
 			<fact.features.HillasLength distribution="dist" outputKey="length" />
 			<fact.features.HillasWidth distribution="dist" outputKey="width" />
 			<fact.features.HillasConcentration shower="shower" weights="photoncharge" outputKey="concentration" />

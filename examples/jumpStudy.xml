@@ -100,8 +100,8 @@
         <fact.image.ShowImage/>
 
 
-<!-- <fact.features.Derivation key="DataPatches" outputKey="DataPatchesDeriv" />
-        <fact.features.Derivation key="DataPatchesDeriv" outputKey="DataPatchesDerivDeriv" /> -->
+<!-- <fact.statistics.Derivation key="DataPatches" outputKey="DataPatchesDeriv" />
+        <fact.statistics.Derivation key="DataPatchesDeriv" outputKey="DataPatchesDerivDeriv" /> -->
         <!-- <fact.statistics.FastFourierTrafo key="DataCalibrated" outputKey="FFT" lengthForFFT="512" /> -->
 <!--         <fact.statistics.FastFourierTrafo key="DataPatches" outputKey="FFTPatches" lengthForFFT="256" />
         <fact.statistics.SlidingFastFourierTrafo key="DataPatches" outputKey="SlidingFFTPatches" lengthForFFT="128" stepSize="64"/> -->

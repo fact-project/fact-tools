@@ -20,11 +20,11 @@
             <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="AmplitudePositions" url="${integralGainsFile}" rangeSearchWindow="25" outputKey="photoncharge"/>
             
 			<fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" neighborPixelThreshold="2" corePixelThreshold="5" keyPositions="AmplitudePositions" timeThreshold="30"  minNumberOfPixel="2"/>
-            <fact.features.SourcePosition url="${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+            <fact.features.source.SourcePosition url="${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
 <!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
     <stream.flow.Skip condition="%{data.shower} == null" />
 	        <fact.features.DistributionFromShower weights="photoncharge" pixel="shower"  outputKey="dist" />
-			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+			<fact.features.source.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,alpha" url="${outfile}" />
 		</process>
 </container>

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fact.features;
+package fact.extraction;
 
 import java.awt.Color;
 
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.extraction.PhotonCharge;
 import stream.Data;
 import stream.Processor;
 
