@@ -1,44 +1,60 @@
 package fact.features;
 
+import fact.EventUtils;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
 
-
+/**
+ * 
+ * @author Fabian Temme
+ *
+ */
 public class ConcentrationAtCenterOfGravity implements Processor
 {
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	
+	static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
+	
+	@Parameter(required = true, defaultValue = "photonCharge", description = "Key of the array of photoncharge.")
+	private String photonChargeKey = null;
+	@Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
+	private String cogxKey = null;
+	@Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
+	private String cogyKey = null;
+	@Parameter(required = true, defaultValue  = "Size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
+	private String sizeKey = null;
+	@Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
+	private String outputKey = null;
+	
+	private double cogx;
+	private double cogy;
+	private double size;
+	
+	private double[] photonCharge = null;
+	
+
 	/**
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
 	 */
 	@Override
 	public Data process(Data input)
 	{
-		try
-		{
-			cogXValue = (Float) input.get(cogX);
-			cogYValue = (Float) input.get(cogY);
-			hillasSizeValue = (Double) input.get(hillasSize);
-			
-			photonChargeArray = (double[]) input.get(photonCharge);
-		}
-		catch (ClassCastException e)
-		{
-			log.error("wrong types" + e.toString());
-		}
-		if(photonChargeArray == null || cogXValue == null || cogYValue == null)
-		{
-			log.error("Map does not contain the right values for the keys");
-			return null;
-		}
+		EventUtils.mapContainsKeys(getClass(), input, cogxKey, cogyKey, sizeKey, photonChargeKey);
 		
-		// Assuming the correctness of function geomToChid !
-		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogXValue, cogYValue);
+		cogx = (Double) input.get(cogxKey);
+		cogy = (Double) input.get(cogyKey);
+		size = (Double) input.get(sizeKey);
+		
+		photonCharge = (double[]) input.get(photonChargeKey);
+		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(cogPixel);
 		
 		// mindist1 < mindist2
@@ -53,7 +69,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		{
 			double x = pix.getXPositionInMM();
 			double y = pix.getYPositionInMM();
-			double dist = (cogXValue - x) * (cogXValue - x) + (cogYValue - y) * (cogYValue - y);
+			double dist = (cogx - x) * (cogx - x) + (cogy - y) * (cogy - y);
 			
 			if(dist < mindist1)
 			{
@@ -68,63 +84,62 @@ public class ConcentrationAtCenterOfGravity implements Processor
 			}
 		}
 		
-		double conc = photonChargeArray[cogPixel.id] + photonChargeArray[minChId1.id] + photonChargeArray[minChId2.id];
-		conc /= hillasSizeValue;
+		double conc = photonCharge[cogPixel.id] + photonCharge[minChId1.id] + photonCharge[minChId2.id];
+		conc /= size;
 		input.put(outputKey, conc);
 		
 		return input;
 	}
-	
-	
 
-	public String getPhotonCharge() {
-		return photonCharge;
+
+	public String getPhotonChargeKey() {
+		return photonChargeKey;
 	}
-	@Parameter(required = true, defaultValue = "photoncharge", description = "Key of the array of photoncharge.")
-	public void setPhotonCharge(String photonCharge) {
-		this.photonCharge = photonCharge;
+
+
+	public void setPhotonChargeKey(String photonChargeKey) {
+		this.photonChargeKey = photonChargeKey;
 	}
-	public String getCogX() {
-		return cogX;
+
+
+	public String getCogxKey() {
+		return cogxKey;
 	}
-	@Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
-	public void setCogX(String cogX) {
-		this.cogX = cogX;
+
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
 	}
-	public String getCogY() {
-		return cogY;
+
+
+	public String getCogyKey() {
+		return cogyKey;
 	}
-	@Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
-	public void setCogY(String cogY) {
-		this.cogY = cogY;
+
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
 	}
+
+
+	public String getSizeKey() {
+		return sizeKey;
+	}
+
+
+	public void setSizeKey(String sizeKey) {
+		this.sizeKey = sizeKey;
+	}
+
+
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
+
+
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
-	public String getHillasSize() {
-		return hillasSize;
-	}
-	@Parameter(required = true, defaultValue  = "Hillas_size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
-	public void setHillasSize(String hillasSize) {
-		this.hillasSize = hillasSize;
-	}
-
-	static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
 	
-	private Float cogXValue = null;
-	private Float cogYValue = null;
-	private Double hillasSizeValue = null;
-	
-	private double[] photonChargeArray = null;
-	
-	private String photonCharge;
-	private String cogX;
-	private String cogY;
-	private String hillasSize;
-	private String outputKey;
 	
 }
