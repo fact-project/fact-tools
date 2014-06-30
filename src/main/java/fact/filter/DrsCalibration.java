@@ -122,7 +122,8 @@ public class DrsCalibration implements Processor {
 		short[] rawData = (short[]) data.get(key);
 		if(rawData == null){
 			log.error(" data .fits file did not contain the value for the key " + key + ". cannot apply drscalibration");
-			return null;
+            throw new RuntimeException(" data .fits file did not contain the value for the key \" + key + \". " +
+                    "cannot apply drscalibration)");
 		}
 		
 		
