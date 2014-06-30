@@ -16,7 +16,7 @@
 
 
 
-            <fact.image.ShowViewer key="DataCalibrated"/>
+            <fact.ShowViewer key="DataCalibrated"/>
 		</process>
 </container>
 

@@ -1,7 +1,7 @@
 /**
  *
  */
-package fact.image;
+package fact;
 
 import fact.mapping.ui.Viewer;
 import org.slf4j.Logger;
