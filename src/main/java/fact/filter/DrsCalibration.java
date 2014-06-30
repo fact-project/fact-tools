@@ -317,10 +317,4 @@ public class DrsCalibration implements Processor {
 		}
 	}
 }
-class drsFileFilter implements FilenameFilter
-{
-	public boolean accept( File f, String s )
-	{
-		return s.toLowerCase().contains( "drs" );
-	}
-}
+
