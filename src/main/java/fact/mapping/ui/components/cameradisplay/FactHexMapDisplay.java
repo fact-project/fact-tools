@@ -218,7 +218,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             //translate to center of canvas
             g2.translate(xOffset, yOffset);
             //rotate 90 degrees counter clockwise
-            //g2.rotate(-Math.PI/2);
+            g2.rotate(-Math.PI/2);
             //and draw tiles
             for (Tile tile : tiles) {
                 CameraPixel p = tile.getCameraPixel();
@@ -242,7 +242,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             }
 
             //undo the rotation
-            //g2.rotate(Math.PI/2);
+            g2.rotate(Math.PI/2);
             //to draw the grid translate back
             g2.translate(-xOffset, -yOffset);
 
