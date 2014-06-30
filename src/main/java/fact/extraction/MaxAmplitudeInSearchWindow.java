@@ -1,7 +1,7 @@
 package fact.extraction;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -32,7 +32,7 @@ public class MaxAmplitudeInSearchWindow implements Processor {
 			throw new RuntimeException("searchWindowLeft is equal or larger than searchWindowRight: "+searchWindowLeft+" >= "+searchWindowRight);
 		}
 		
-		EventUtils.mapContainsKeys(getClass(), input, dataKey);
+		Utils.mapContainsKeys(getClass(), input, dataKey);
 		
 		double[] data = (double[]) input.get(dataKey);
 		

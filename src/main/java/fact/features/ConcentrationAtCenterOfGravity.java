@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.EventUtils;
+import fact.Utils;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
 
@@ -47,7 +47,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	@Override
 	public Data process(Data input)
 	{
-		EventUtils.mapContainsKeys(getClass(), input, cogxKey, cogyKey, sizeKey, photonChargeKey);
+		Utils.mapContainsKeys(getClass(), input, cogxKey, cogyKey, sizeKey, photonChargeKey);
 		
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
