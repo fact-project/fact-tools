@@ -72,10 +72,12 @@ public class Utils {
      *            the list to search in
      * @return A list of lists.
      */
-    public static ArrayList<ArrayList<Integer>> breadthFirstSearch(	List<Integer> showerPixel) {
-        ArrayList<ArrayList<Integer>> listOfLists = new ArrayList<ArrayList<Integer>>();
-        FactPixelMapping pm = FactPixelMapping.getInstance();
-        ArrayList<Integer> marked = new ArrayList<Integer>();
+    public static ArrayList<ArrayList<Integer>> breadthFirstSearch(
+            List<Integer> showerPixel) {
+        ArrayList<ArrayList<Integer>> listOfLists = new ArrayList<>();
+        ArrayList<Integer> marked = new ArrayList<>();
+        FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
         for (int pix : showerPixel) {
             if (!marked.contains(pix)) {
                 // start BFS
@@ -85,9 +87,9 @@ public class Utils {
                 // cannot use the enhanced for loop here.
                 for (int index = 0; index < q.size() && !q.isEmpty(); index++) {
                     // add neighbours to q
-                    for (FactCameraPixel i : pm.getNeighboursFromID(q
-                            .get(index))) {
-                        if (showerPixel.contains(i) && !marked.contains(i)) {
+                    FactCameraPixel[] neighbors = pixelMap.getNeighboursFromID(q.get(index));
+                    for (FactCameraPixel i : neighbors) {
+                        if (showerPixel.contains(i.id) && !marked.contains(i.id)) {
                             q.add(i.id);
                             marked.add(i.id);
                         }
