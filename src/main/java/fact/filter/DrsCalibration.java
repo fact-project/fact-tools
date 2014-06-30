@@ -273,7 +273,7 @@ public class DrsCalibration implements Processor {
 
 	//-----------getter setter---------------------
 
-	@Parameter(required=true, description="data array to be calibrated", defaultValue="Data")
+	@Parameter(required=false, description="data array to be calibrated", defaultValue="Data")
 	public void setKey(String key) {
 		this.key = key;
 	}
