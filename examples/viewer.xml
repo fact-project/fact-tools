@@ -48,9 +48,9 @@
 		<!-- <stream.flow.Skip condition="%{data.shower} == null" />
         <fact.features.Size showerKey="shower" photonchargeKey="photoncharge" outputKey="Size" />    -->    
         <!-- <stream.flow.Skip condition="%{data.Size} &lt; 100" /> -->
-        
-                    
-        <fact.image.ShowImage/>
+
+
+        <fact.ShowViewer key="DataCalibrated"/>
 
 
     </process>
