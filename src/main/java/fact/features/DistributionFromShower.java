@@ -4,7 +4,6 @@ import fact.Constants;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
 import fact.statistics.PixelDistribution2D;
-import fact.viewer.ui.DefaultPixelMapping;
 
 import org.apache.commons.math3.linear.*;
 import org.slf4j.Logger;

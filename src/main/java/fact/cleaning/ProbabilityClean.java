@@ -6,7 +6,6 @@ import java.util.List;
 import fact.Constants;
 import fact.EventUtils;
 import fact.mapping.FactPixelMapping;
-import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 

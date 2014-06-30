@@ -3,7 +3,6 @@ package fact.features;
 import fact.Utils;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
-import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

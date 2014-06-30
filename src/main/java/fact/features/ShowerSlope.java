@@ -2,7 +2,6 @@ package fact.features;
 
 import fact.EventUtils;
 import fact.mapping.FactPixelMapping;
-import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 

@@ -5,7 +5,6 @@ import java.awt.Polygon;
 import fact.Constants;
 import fact.EventUtils;
 import fact.mapping.FactPixelMapping;
-import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 
