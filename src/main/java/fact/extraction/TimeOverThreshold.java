@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -42,7 +42,7 @@ public class TimeOverThreshold implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, dataKey, positionsKey);
+		Utils.mapContainsKeys(getClass(), input, dataKey, positionsKey);
 		
 		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
 		

@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
@@ -38,7 +38,7 @@ public class PhotonChargeTimeOverThreshold implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, timeOverThresholdKey,thresholdKey);
+		Utils.mapContainsKeys(getClass(), input, timeOverThresholdKey,thresholdKey);
 		
 		
 		double[] chargeFromThresholdArray =  new double[Constants.NUMBEROFPIXEL];

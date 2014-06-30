@@ -1,7 +1,7 @@
 package fact.extraction;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -33,7 +33,7 @@ public class HandleSaturation implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input ,dataKey,maxAmplitudesKey,photonChargeKey,timeOverThresholdChargeKey,arrivalTimeKey);
+		Utils.mapContainsKeys(getClass(), input ,dataKey,maxAmplitudesKey,photonChargeKey,timeOverThresholdChargeKey,arrivalTimeKey);
 		
 		double[] maxAmplitudes = (double[]) input.get(maxAmplitudesKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
