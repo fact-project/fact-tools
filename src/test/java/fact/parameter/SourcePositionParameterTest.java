@@ -19,7 +19,7 @@ public class SourcePositionParameterTest extends ParameterTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	final String outputKey = "pos";
-	URL driveURL = SourcePositionParameterTest.class.getResource("/drive_file.fits");
+	URL driveURL = SourcePositionParameterTest.class.getResource("/testDriveFile.fits");
 
 
 	@Test

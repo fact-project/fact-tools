@@ -29,7 +29,7 @@ public class FeatureTests {
 		typeMap.clear();
 		
 		
-		URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
 		pr.setUrl(drsUrl.toString());
 		pr.setOutputKey("test");
@@ -65,7 +65,7 @@ public class FeatureTests {
 		p = new Pair<String, Class<?>>(c.getOutputKey(), double[].class );
 		typeMap.put(c, p);
 		
-		URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
+		URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
 		SourcePosition poser = new SourcePosition();
 		poser.setUrl(driveURL);
 		poser.setPhysicalSource("crab");
@@ -79,7 +79,7 @@ public class FeatureTests {
 	private void setupHillasProcessors() throws Exception{
 		typeMap.clear();
 		
-		URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
 		pr.setUrl(drsUrl.toString());
 		pr.setOutputKey("DataCalibrated");
@@ -118,7 +118,7 @@ public class FeatureTests {
 		p = new Pair<String, Class<?>>(charge.getOutputKey(), double[].class );
 		typeMap.put(charge, p);
 		
-		URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
+		URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
 		SourcePosition poser = new SourcePosition();
 		poser.setUrl(driveURL);
 		poser.setPhysicalSource("crab");
@@ -181,7 +181,7 @@ public class FeatureTests {
 
 		try {
 			setupProcessors();
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 
 			FitsStream stream = new FitsStream(url);
@@ -213,7 +213,7 @@ public class FeatureTests {
 	public void testHillasFeatures(){
 		try {
 			setupHillasProcessors();
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 
 			FitsStream stream = new FitsStream(url);

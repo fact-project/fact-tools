@@ -25,7 +25,7 @@ public class FitsStreamTest {
 	public void testFitsStream() {
 
 		try {
-			URL u =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();
@@ -47,7 +47,7 @@ public class FitsStreamTest {
 	public void testFitsKeys() {
 
 		try {
-			URL u =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();
@@ -70,7 +70,7 @@ public class FitsStreamTest {
 	@Test
 	public void testDRSKeys(){
 		try {
-			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			URL u =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();
@@ -101,7 +101,7 @@ public class FitsStreamTest {
 	@Test
 	public void testDrsTypes(){
 		try{
-			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			URL u =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();
@@ -132,7 +132,7 @@ public class FitsStreamTest {
 	@Test
 	public void testDriveFile(){
 		try{
-			URL u =  FitsStreamTest.class.getResource("/drive_file.fits");
+			URL u =  FitsStreamTest.class.getResource("/testDriveFile.fits");
 			SourceURL url = new SourceURL(u);
 			FitsStream stream = new FitsStream(url);
 			stream.init();

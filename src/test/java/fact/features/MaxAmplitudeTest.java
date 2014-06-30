@@ -23,7 +23,7 @@ public class MaxAmplitudeTest {
     @Before
 	public void setup() throws Exception{
 
-		URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
 		pr.setUrl(drsUrl.toString());
 		pr.setOutputKey("test");
@@ -40,7 +40,7 @@ public class MaxAmplitudeTest {
 	public void dataTypes() {
 
 		try {
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			FitsStream stream = new FitsStream(url);
 			stream.init();

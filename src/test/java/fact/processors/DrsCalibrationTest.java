@@ -24,8 +24,8 @@ public class DrsCalibrationTest {
 
 		try {
 			URL url = DrsCalibrationTest.class.getResource("/drsTest.xml");
-			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			String[] args = {url.toString(), "-Dinput="+dataUrl.toString(), "-DdrsInput="+drsUrl.toString()};
 			stream.run.main(args);
 		} catch (Exception e) {
@@ -41,11 +41,11 @@ public class DrsCalibrationTest {
 	public void drsCalibProcessor() {
 
 		try {
-			URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 			DrsCalibration pr = new DrsCalibration();
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test");
-			URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			
 			FitsStream stream = new FitsStream(url);

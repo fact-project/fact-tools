@@ -36,7 +36,6 @@ public class TestZFitsStream {
 			item = stream.read();
 		}
 	}
-	
 	public void testDrsCalib() throws Exception {
 		URL uZfits =  TestZFitsStream.class.getResource(zfits);
 		URL ufits =  TestZFitsStream.class.getResource(fits);

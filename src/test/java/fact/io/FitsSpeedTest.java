@@ -33,13 +33,13 @@ public class FitsSpeedTest {
 		int limit = 100;
 
 		try {
-			SourceURL url = new SourceURL(FitsStreamTest.class.getResource("/sample.fits.gz"));
+			SourceURL url = new SourceURL(FitsStreamTest.class.getResource("/testDataFile.fits.gz"));
 			FitsStream stream = new FitsStream(url);
 			stream.init();
 
 			ProcessorList preprocess = new ProcessorList();
 			DrsCalibration drs = new DrsCalibration();
-			URL u =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+			URL u =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 			drs.setUrl(u);
 			preprocess.add(drs);
 //			preprocess.add(new PhotonCharge());

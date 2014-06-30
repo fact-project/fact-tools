@@ -18,8 +18,8 @@ public class ViewerManualTest {
 
         try {
             URL url = ViewerManualTest.class.getResource("/viewertest.xml");
-            URL drsUrl =  ViewerManualTest.class.getResource("/test.drs.fits.gz");
-            URL dataUrl =  ViewerManualTest.class.getResource("/sample.fits.gz");
+            URL drsUrl =  ViewerManualTest.class.getResource("/testDrsFile.drs.fits.gz");
+            URL dataUrl =  ViewerManualTest.class.getResource("/testDataFile.fits.gz");
             String[] args = {url.toString(), "-Dinput="+dataUrl.toString(), "-DdrsInput="+drsUrl.toString()};
             stream.run.main(args);
         } catch (Exception e) {

@@ -25,7 +25,7 @@ public class FilterTests {
 
 		try {
 			
-			URL drsUrl =  FilterTests.class.getResource("/test.drs.fits.gz");
+			URL drsUrl =  FilterTests.class.getResource("/testDrsFile.drs.fits.gz");
 			DrsCalibration pr = new DrsCalibration();
 			pr.setUrl(drsUrl.toString());
 			pr.setOutputKey("test0");
@@ -35,7 +35,6 @@ public class FilterTests {
 			pList.add(new MovingAverage());
 			pList.add(new InterpolateBadPixel());
 			pList.add(new MultiplyValues());
-			pList.add(new MotionDiff());
 			pList.add(new SliceNormalization());
 			
 			int i = 0;
@@ -44,7 +43,7 @@ public class FilterTests {
 				filter.setOutputKey("test"+(i+1));
 			}
 			
-			URL dataUrl =  FilterTests.class.getResource("/sample.fits.gz");
+			URL dataUrl =  FilterTests.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
 			
 			FitsStream stream = new FitsStream(url);

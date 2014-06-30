@@ -41,7 +41,7 @@ public class ParameterTest  {
 
     @Before
     public void setUp() throws Exception {
-        URL dataUrl =  FitsStreamTest.class.getResource("/sample.fits.gz");
+        URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
         SourceURL url = new SourceURL(dataUrl);
 
         stream = new FitsStream(url);
@@ -54,7 +54,7 @@ public class ParameterTest  {
             e.printStackTrace();
         }
 
-        URL drsUrl =  FitsStreamTest.class.getResource("/test.drs.fits.gz");
+        URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         DrsCalibration pr = new DrsCalibration();
         pr.setUrl(drsUrl.toString());
         pr.setOutputKey(key);
@@ -87,7 +87,7 @@ public class ParameterTest  {
         dist.setOutputKey(distribution);
         dist.process(item);
 
-        URL driveURL = FitsStreamTest.class.getResource("/drive_file.fits");
+        URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
         SourcePosition pos = new SourcePosition();
         pos.setUrl(driveURL);
         pos.setPhysicalSource("crab");
