@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
+import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 /**
  * This feature is supposed to give the number of slices above a given Threshold, 
@@ -23,36 +25,29 @@ import stream.Processor;
 public class TimeOverThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	
-	private double threshold 		= 50;
-	private int skipNFirstSlices = 40;
-	private int slicesAfterMaximum 	= 100;
+	@Parameter(required = true)
+	private String dataKey = null;
+	@Parameter(required = true)
+	private String positionsKey = null;
+	@Parameter(required = true)
+	private double threshold = 50;
+	@Parameter(required = true)
+	private String thresholdOutputKey = null;
+	@Parameter(required = true)
+	private String outputKey = null;
 	
 	private String color = "#33CC33";
 	private int alpha = 64;
-	
-	private String key = null;
-	private String outputkey = null;
-	private String positions = null;
-	
+		
 	@Override
 	public Data process(Data input) {
+		
+		EventUtils.mapContainsKeys(getClass(), input, dataKey, positionsKey);
+		
 		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
 		
-		double[] data;
-		try{
-			data 	 = (double[]) input.get(key);
-		} catch (ClassCastException e){
-			log.error("Could not cast types." );
-			throw e;
-		}
-		
-		int[] posArray;
-		try{
-			posArray = (int[]) input.get(positions);
-		} catch (ClassCastException e){
-			log.error("Could not cast types." );
-			throw e;
-		}
+		double[] data 	 = (double[]) input.get(dataKey);
+		int[] posArray = (int[]) input.get(positionsKey);
 		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		
@@ -109,21 +104,20 @@ public class TimeOverThreshold implements Processor {
 		}
 		
 		//add processors threshold to the DataItem
-		input.put("TOT_Threshold", threshold);
+		input.put(thresholdOutputKey, threshold);
 		
 		//add number of pixel above this threshold to the DataItem
-		input.put("#PixelAboveThreshold", numPixelAboveThreshold); 
+		input.put(outputKey+"_numPixel", numPixelAboveThreshold); 
 				
 		//add times over threshold to the DataItem
-		input.put(outputkey, timeOverThresholdArray);
-		input.put(outputkey+"Marker", m);
+		input.put(outputKey, timeOverThresholdArray);
+		input.put(outputKey+"Marker", m);
 		
 		//add color value if set
 		if(color !=  null && !color.equals("")){
-			input.put("@" + Constants.KEY_COLOR + "_"+outputkey, color);
+			input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
 		}
 
-		
 		return input;
 	}
 
@@ -133,22 +127,6 @@ public class TimeOverThreshold implements Processor {
 
 	public void setThreshold(double threshold) {
 		this.threshold = threshold;
-	}
-
-	public int getSkipNFirstSlices() {
-		return skipNFirstSlices;
-	}
-
-	public void setSkipNFirstSlices(int skipNFirstSlices) {
-		this.skipNFirstSlices = skipNFirstSlices;
-	}
-
-	public int getSlicesAfterMaximum() {
-		return slicesAfterMaximum;
-	}
-
-	public void setSlicesAfterMaximum(int slicesAfterMaximum) {
-		this.slicesAfterMaximum = slicesAfterMaximum;
 	}
 
 	public String getColor() {
@@ -167,28 +145,30 @@ public class TimeOverThreshold implements Processor {
 		this.alpha = alpha;
 	}
 
-	public String getKey() {
-		return key;
+	public String getDataKey() {
+		return dataKey;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
 	}
 
-	public String getOutputkey() {
-		return outputkey;
+	public String getOutputKey() {
+		return outputKey;
 	}
 
-	public void setOutputkey(String outputkey) {
-		this.outputkey = outputkey;
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 
-	public String getPositions() {
-		return positions;
+	public String getPositionsKey() {
+		return positionsKey;
 	}
 
-	public void setPositions(String positions) {
-		this.positions = positions;
+	public void setPositionsKey(String positionsKey) {
+		this.positionsKey = positionsKey;
 	}
+	
+	
 
 }

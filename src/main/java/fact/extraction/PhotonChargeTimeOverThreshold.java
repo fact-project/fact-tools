@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
+import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
@@ -22,28 +23,35 @@ import stream.Processor;
  * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a> 
  *
  */
-public class PhotonChargeTimeOverTreshold implements Processor {
+public class PhotonChargeTimeOverThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	
-	private double threshold = 0;
-	private String key = null;
+
+	private String timeOverThresholdKey = null;
+	private String thresholdKey = null;
 	private String outputkey = null;
+	
+	private double threshold = 0;
 
 	/* (non-Javadoc)
 	 * @see stream.Processor#process(stream.Data)
 	 */
 	@Override
 	public Data process(Data input) {
+		EventUtils.mapContainsKeys(getClass(), input, timeOverThresholdKey,thresholdKey);
+		
+		
 		double[] chargeFromThresholdArray =  new double[Constants.NUMBEROFPIXEL];
 		
 		
-		int[] timeOverThresholdArray;
-		try{
-			timeOverThresholdArray 	 = (int[]) input.get(key);
-		} catch (ClassCastException e){
-			log.error("Could not cast types." );
-			throw e;
+		int[] timeOverThresholdArray 	 = (int[]) input.get(timeOverThresholdKey);
+		threshold = (Double) input.get(thresholdKey);
+		
+		if (threshold != 1500)
+		{
+			throw new RuntimeException("Currently only threshold equal 1500 mV supported");
 		}
+		
 		
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			
@@ -51,9 +59,6 @@ public class PhotonChargeTimeOverTreshold implements Processor {
 					
 			// validate parameters
 		    if(timeOverThresholdArray[pix] <= 0){
-		    	continue;
-		    }
-		    if(threshold == 0){
 		    	continue;
 		    }
 
@@ -80,14 +85,6 @@ public class PhotonChargeTimeOverTreshold implements Processor {
 		return input;
 	}
 
-	public double getThreshold() {
-		return threshold;
-	}
-
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
-
 	public String getOutputkey() {
 		return outputkey;
 	}
@@ -96,12 +93,23 @@ public class PhotonChargeTimeOverTreshold implements Processor {
 		this.outputkey = outputkey;
 	}
 
-	public String getKey() {
-		return key;
+	public String getTimeOverThresholdKey() {
+		return timeOverThresholdKey;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setTimeOverThresholdKey(String timeOverThresholdKey) {
+		this.timeOverThresholdKey = timeOverThresholdKey;
 	}
+
+	public String getThresholdKey() {
+		return thresholdKey;
+	}
+
+	public void setThresholdKey(String thresholdKey) {
+		this.thresholdKey = thresholdKey;
+	}
+	
+	
+
 
 }
