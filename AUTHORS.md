@@ -9,7 +9,7 @@ The following people have contributed to the *fact-tools* project:
  * Jens Buss
  * Dominik Neise
  * Jan Freiwald 
- * Max Nöthe
+ * Maximilian Nöthe
  * Katie Gray
  * Michael Bulinski
  * Dominik Baack

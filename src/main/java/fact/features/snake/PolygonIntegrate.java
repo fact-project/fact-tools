@@ -3,7 +3,7 @@ package fact.features.snake;
 import java.awt.Polygon;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import fact.mapping.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -30,7 +30,7 @@ public class PolygonIntegrate implements Processor
 		if(outkeyNumberOfPixel == null) throw new RuntimeException("Key \"outkeyNumberOfPixel\" not set");
 		if(outkeyPixelList == null) throw new RuntimeException("Key \"outkeyPixelList\" not set");
 		
-		EventUtils.mapContainsKeys(getClass(), input, key, polygonX, polygonY);
+		Utils.mapContainsKeys(getClass(), input, key, polygonX, polygonY);
 		
 					
 		double[] data  = (double[]) input.get(key);

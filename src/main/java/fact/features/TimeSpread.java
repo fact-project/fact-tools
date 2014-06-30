@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
@@ -18,7 +18,7 @@ public class TimeSpread implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, arrivalTimeKey, weightsKey, showerKey);
+		Utils.mapContainsKeys(getClass(), input, arrivalTimeKey, weightsKey, showerKey);
 		
 		arrivalTime = (double[]) input.get(arrivalTimeKey);
 		weights = (double[]) input.get(weightsKey);
@@ -39,15 +39,15 @@ public class TimeSpread implements Processor {
 		}
 		
 		// Sum over the time array:
-		double sumt = EventUtils.arraySum(t);
+		double sumt = Utils.arraySum(t);
 		// Sum over the weight array:
-		double sumw = EventUtils.arraySum(w);
+		double sumw = Utils.arraySum(w);
 		// Sum over the weighted time array:
-		double sumwt = EventUtils.arraySum(EventUtils.arrayMultiplication(w, t));
+		double sumwt = Utils.arraySum(Utils.arrayMultiplication(w, t));
 		// Sum over the element wise multiplication of t and t:
-		double sumtt = EventUtils.arraySum(EventUtils.arrayMultiplication(t, t));
+		double sumtt = Utils.arraySum(Utils.arrayMultiplication(t, t));
 		// Sum over the element wise multiplication of t and t, weighted:
-		double sumwtt = EventUtils.arraySum(EventUtils.arrayMultiplication(w, EventUtils.arrayMultiplication(t, t)));
+		double sumwtt = Utils.arraySum(Utils.arrayMultiplication(w, Utils.arrayMultiplication(t, t)));
 		
 		
 		double timespread = Math.sqrt( sumtt / n - Math.pow(sumt/n,2));

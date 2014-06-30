@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -36,7 +36,7 @@ public class PerPatchVoltageIntegral implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, key);
+		Utils.mapContainsKeys(getClass(), input, key);
 		double[] dataCalibratedArray = (double[]) input.get(key);
 		int roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
 		double[] perPatchVoltageIntegral = new double[160];

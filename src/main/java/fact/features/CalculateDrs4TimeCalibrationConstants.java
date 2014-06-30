@@ -1,17 +1,14 @@
 package fact.features;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
-import fact.EventUtils;
 
 
 public class CalculateDrs4TimeCalibrationConstants implements Processor {
@@ -36,7 +33,7 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
 	 * @return
 	 */
 	private double[] retrieve_data(Data input){
-		EventUtils.mapContainsKeys(getClass(), input, key, "StartCellData");
+		Utils.mapContainsKeys(getClass(), input, key, "StartCellData");
 		double[] data = null;
 		try{
 			data = (double[]) input.get(key);

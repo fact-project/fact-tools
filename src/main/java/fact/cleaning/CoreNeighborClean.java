@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fact.Utils;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
 import fact.mapping.ui.overlays.PixelSetOverlay;
@@ -14,7 +15,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import fact.Constants;
-import fact.EventUtils;
+
 /**
  *CoreNeighborClean. Identifies showerPixel in the image array.
  *	 Cleaning in three Steps:
@@ -64,11 +65,11 @@ public class CoreNeighborClean implements Processor{
 
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, key,keyPositions);
+		Utils.mapContainsKeys(getClass(), input, key, keyPositions);
 		
 			
-		photonCharge= EventUtils.toDoubleArray(input.get(key));
-		positions = EventUtils.toDoubleArray(input.get(keyPositions));
+		photonCharge= Utils.toDoubleArray(input.get(key));
+		positions = Utils.toDoubleArray(input.get(keyPositions));
 		
 		ArrayList<Integer> showerPixel= new ArrayList<Integer>();
 		// Add all pixel with a weight > corePixelThreshold
@@ -94,7 +95,7 @@ public class CoreNeighborClean implements Processor{
 		{
 			for (String starPositionKey : starPositionKeys)
 			{
-				EventUtils.mapContainsKeys(getClass(), input,starPositionKey);
+				Utils.mapContainsKeys(getClass(), input, starPositionKey);
 				double[] starPosition = (double[]) input.get(starPositionKey);
 				showerPixel = removeStarIslands(showerPixel,starPosition);
 				level2a = new Integer[showerPixel.size()];
@@ -221,7 +222,7 @@ public class CoreNeighborClean implements Processor{
 				}
 		}
 		
-		ArrayList<ArrayList<Integer>> listOfLists = EventUtils.breadthFirstSearch(showerPixel);
+		ArrayList<ArrayList<Integer>> listOfLists = Utils.breadthFirstSearch(showerPixel);
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		for (ArrayList<Integer> l: listOfLists){
 			if ((l.size() <= starChidList.size() && starChidList.containsAll(l)) == false)
@@ -261,7 +262,7 @@ public class CoreNeighborClean implements Processor{
 
 	private ArrayList<Integer> removeSmallCluster(ArrayList<Integer> list)
 	{
-		ArrayList<ArrayList<Integer>> listOfLists = EventUtils.breadthFirstSearch(list);
+		ArrayList<ArrayList<Integer>> listOfLists = Utils.breadthFirstSearch(list);
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		for (ArrayList<Integer> l: listOfLists){
 			if(l.size() >= minNumberOfPixel){

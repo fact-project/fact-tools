@@ -2,6 +2,7 @@ package fact.filter;
 
 import java.util.LinkedList;
 
+import fact.Utils;
 import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -73,7 +73,7 @@ public class PatchJumpRemoval implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		EventUtils.mapContainsKeys(this.getClass(), input, dataKey,prevEventsKey+"_start",prevEventsKey+"_stop","NROI",startCellKey);
+		Utils.mapContainsKeys(this.getClass(), input, dataKey, prevEventsKey + "_start", prevEventsKey + "_stop", "NROI", startCellKey);
 	
 		int[] currentTime = (int[]) input.get("UnixTimeUTC");
 		

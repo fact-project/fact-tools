@@ -3,12 +3,12 @@ package fact.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import fact.Utils;
 import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -44,7 +44,7 @@ public class RemoveSpikes implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		EventUtils.mapContainsKeys(getClass(), input, dataKey, startCellKey);
+		Utils.mapContainsKeys(getClass(), input, dataKey, startCellKey);
 		
 		double[] data = (double[]) input.get(dataKey);
 		result = new double[data.length];

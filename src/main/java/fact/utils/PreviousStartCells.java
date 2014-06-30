@@ -2,10 +2,10 @@ package fact.utils;
 
 import java.util.LinkedList;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -28,7 +28,7 @@ public class PreviousStartCells implements Processor {
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
 		
-		EventUtils.mapContainsKeys(this.getClass(), input, startCellKey,"NROI","UnixTimeUTC");
+		Utils.mapContainsKeys(this.getClass(), input, startCellKey, "NROI", "UnixTimeUTC");
 		
 		int[] eventTime = (int[]) input.get("UnixTimeUTC");
 		

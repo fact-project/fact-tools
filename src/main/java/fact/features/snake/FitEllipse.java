@@ -1,12 +1,11 @@
 package fact.features.snake;
 
+import fact.Utils;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.QRDecomposition;
-
-import fact.EventUtils;
 
 import stream.Data;
 import stream.Processor;
@@ -102,7 +101,7 @@ public class FitEllipse  implements Processor
 		if(outkeyMinor == null) throw new RuntimeException("Missing parameter: outkeyMinor");
 		if(outkeyMajor == null) throw new RuntimeException("Missing parameter: outkeyMajor");
 		
-		EventUtils.mapContainsKeys(getClass(), input, snakeX, snakeY);		
+		Utils.mapContainsKeys(getClass(), input, snakeX, snakeY);
 		double[] x = (double[]) input.get(snakeX);
 		double[] y = (double[]) input.get(snakeY);
 		

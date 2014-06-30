@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.EventUtils;
+import fact.Utils;
 import fact.mapping.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -26,7 +26,7 @@ public class ShowerSlope implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
+		Utils.mapContainsKeys(getClass(), input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
 		
 		photonCharge = (double[]) input.get(photonChargeKey);
 		arrivalTime = (double[]) input.get(arrivalTimeKey);
@@ -51,7 +51,7 @@ public class ShowerSlope implements Processor {
 			int chid = shower[i];
 			double xcoord = pixelMap.getPixelFromId(chid).getXPositionInMM();
 			double ycoord = pixelMap.getPixelFromId(chid).getYPositionInMM();
-			double[] rotPixels = EventUtils.rotatePointInShowerSystem(xcoord, ycoord,cogx, cogy, delta);
+			double[] rotPixels = Utils.rotatePointInShowerSystem(xcoord, ycoord, cogx, cogy, delta);
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];
 			t[i] = arrivalTime[chid];
@@ -59,19 +59,19 @@ public class ShowerSlope implements Processor {
 		}
 		
 		// Calculate several element wise multiplication
-		double [] xt = EventUtils.arrayMultiplication(x, t);
-		double [] yt = EventUtils.arrayMultiplication(y, t);
-		double [] xx = EventUtils.arrayMultiplication(x, x);
-		double [] yy = EventUtils.arrayMultiplication(y, y);
+		double [] xt = Utils.arrayMultiplication(x, t);
+		double [] yt = Utils.arrayMultiplication(y, t);
+		double [] xx = Utils.arrayMultiplication(x, x);
+		double [] yy = Utils.arrayMultiplication(y, y);
 
 		// Calculate several sums of arrays
-		double sumx = EventUtils.arraySum(x);
-		double sumy = EventUtils.arraySum(y);
-		double sumt = EventUtils.arraySum(t);
-		double sumxt = EventUtils.arraySum(xt);
-		double sumyt = EventUtils.arraySum(yt);
-		double sumxx = EventUtils.arraySum(xx);
-		double sumyy = EventUtils.arraySum(yy);
+		double sumx = Utils.arraySum(x);
+		double sumy = Utils.arraySum(y);
+		double sumt = Utils.arraySum(t);
+		double sumxt = Utils.arraySum(xt);
+		double sumyt = Utils.arraySum(yt);
+		double sumxx = Utils.arraySum(xx);
+		double sumyy = Utils.arraySum(yy);
 		
 		double slopeLong  = (n*sumxt-sumt*sumx) / (n*sumxx - sumx*sumx);
 		double slopeTrans = (n*sumyt-sumt*sumy) / (n*sumyy - sumy*sumy);
@@ -83,13 +83,13 @@ public class ShowerSlope implements Processor {
 		{
 			b[i] = t[i] - slopeLong*x[i];
 		}
-		double [] bb = EventUtils.arrayMultiplication(b, b);
+		double [] bb = Utils.arrayMultiplication(b, b);
 		
-		double sumw = EventUtils.arraySum(w);
-		double sumb = EventUtils.arraySum(b);
-		double sumbb = EventUtils.arraySum(bb);
-		double sumwb = EventUtils.arraySum(EventUtils.arrayMultiplication(w, b));
-		double sumwbb = EventUtils.arraySum(EventUtils.arrayMultiplication(w, bb));
+		double sumw = Utils.arraySum(w);
+		double sumb = Utils.arraySum(b);
+		double sumbb = Utils.arraySum(bb);
+		double sumwb = Utils.arraySum(Utils.arrayMultiplication(w, b));
+		double sumwbb = Utils.arraySum(Utils.arrayMultiplication(w, bb));
 		
 		double slopeSpread = Math.sqrt(sumbb/n - Math.pow(sumb/n, 2));
 		double slopeSpreadWeighted = Math.sqrt(sumwbb/sumw - Math.pow(sumwb/sumw, 2));

@@ -1,9 +1,9 @@
 package fact.statistics;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
@@ -21,7 +21,7 @@ public class KeyInShowerDistribution implements Processor {
 		final Logger log = LoggerFactory.getLogger(ArrayMean.class);
 			
 		Serializable serialData = input.get(Key);
-		double[] keyData = EventUtils.toDoubleArray(serialData);
+		double[] keyData = Utils.toDoubleArray(serialData);
 		int[] showerPixel = (int[]) input.get(showerPixelKey);
 		
 		if(showerPixel.length<=1){

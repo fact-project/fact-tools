@@ -2,11 +2,10 @@ package fact.utils;
 
 import static org.junit.Assert.*;
 
+import fact.Utils;
 import org.junit.Test;
 
-import fact.EventUtils;
-
-public class EventUtilsTest {
+public class UtilsTest {
 
 	@Test
 	public void testPointToShowerCoord(){
@@ -19,7 +18,7 @@ public class EventUtilsTest {
 		pointRot[0] = Math.cos(-15.0/180.0*Math.PI)*10.0/Math.cos(30.0/180.0*Math.PI);
 		pointRot[1] = Math.sin(-15.0/180.0*Math.PI)*10.0/Math.cos(30.0/180.0*Math.PI);
 		
-		double[] result = EventUtils.rotatePointInShowerSystem(x, y, cogx, cogy, delta);
+		double[] result = Utils.rotatePointInShowerSystem(x, y, cogx, cogy, delta);
 		
 		double diff = Math.abs( Math.sqrt( Math.pow(pointRot[0]-result[0],2) + Math.pow(pointRot[1]-result[1],2) ) );
 		

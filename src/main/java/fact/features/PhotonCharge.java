@@ -4,6 +4,7 @@ package fact.features;
 import java.awt.Color;
 import java.net.URL;
 
+import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,6 @@ import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
 import fact.Constants;
-import fact.EventUtils;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 
@@ -53,7 +53,7 @@ public class PhotonCharge implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, dataKey,positions);
+		Utils.mapContainsKeys(getClass(), input, dataKey, positions);
 		
 		int[] posArray;
 		double[] data;

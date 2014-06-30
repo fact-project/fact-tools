@@ -1,9 +1,9 @@
 package fact.statistics;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
@@ -15,9 +15,9 @@ public class ArrayStatistics implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		EventUtils.mapContainsKeys(this.getClass(), input,key);
+		Utils.mapContainsKeys(this.getClass(), input, key);
 		
-		double[] data = EventUtils.toDoubleArray(input.get(key));
+		double[] data = Utils.toDoubleArray(input.get(key));
 		
 		int n = data.length;
 		

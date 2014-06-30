@@ -3,11 +3,11 @@ package fact.io.zfits;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import fact.Utils;
 import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -29,7 +29,7 @@ public class ZFitsDrsCalib implements Processor {
 	public Data process(Data input) {
 		if (optional)
 			return input;
-		EventUtils.mapContainsKeys(getClass(), input, "Data", "StartCellData");
+		Utils.mapContainsKeys(getClass(), input, "Data", "StartCellData");
 		short[] data = ((short[])input.get("Data")).clone();
 		short[] startCellData = (short[])input.get("StartCellData");
 		

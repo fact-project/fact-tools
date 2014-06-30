@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fact.Constants;
-import fact.EventUtils;
+import fact.Utils;
 import fact.mapping.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -30,7 +30,7 @@ public class ProbabilityClean implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		EventUtils.mapContainsKeys(getClass(), input, photonChargeKey, deltaKey);
+		Utils.mapContainsKeys(getClass(), input, photonChargeKey, deltaKey);
 		
 		photoncharge = (double[]) input.get(photonChargeKey);
 		

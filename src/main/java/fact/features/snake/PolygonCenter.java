@@ -1,6 +1,6 @@
 package fact.features.snake;
 
-import fact.EventUtils;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
@@ -17,7 +17,7 @@ public class PolygonCenter implements Processor
 		if(outkeyX == null) throw new RuntimeException("Key \"outkeyX\" not set");	
 		if(outkeyY == null) throw new RuntimeException("Key \"outkeyY\" not set");	
 		
-		EventUtils.mapContainsKeys(getClass(), input, polygonX, polygonY);		
+		Utils.mapContainsKeys(getClass(), input, polygonX, polygonY);
 		
 		
 		double[] x = (double[]) input.get(polygonX);

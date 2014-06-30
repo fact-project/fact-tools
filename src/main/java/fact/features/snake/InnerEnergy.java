@@ -1,10 +1,10 @@
 package fact.features.snake;
 
+import fact.Utils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
@@ -20,7 +20,7 @@ public class InnerEnergy implements Processor
 	{
 		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");
 		
-		EventUtils.mapContainsKeys(getClass(), input, snakeX, snakeY);	
+		Utils.mapContainsKeys(getClass(), input, snakeX, snakeY);
 		
 		double[] x = (double[]) input.get(snakeX);
 		double[] y = (double[]) input.get(snakeY);

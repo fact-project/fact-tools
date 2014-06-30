@@ -1,5 +1,6 @@
 package fact.statistics;
 
+import fact.Utils;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 
@@ -27,7 +27,7 @@ public class SlidingFastFourierTrafo implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		EventUtils.mapContainsKeys(this.getClass(), input,key);
+		Utils.mapContainsKeys(this.getClass(), input, key);
 		
 		double[] data = (double[])input.get(key);
 		int roi = data.length / Constants.NUMBEROFPIXEL;

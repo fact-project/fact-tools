@@ -2,11 +2,11 @@ package fact.features;
 
 import java.net.URL;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
 import fact.mapping.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -53,7 +53,7 @@ public class TimeGradientExtraction implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		EventUtils.mapContainsKeys(getClass(), input, deltaKey,cogxKey,cogyKey,dataKey);
+		Utils.mapContainsKeys(getClass(), input, deltaKey, cogxKey, cogyKey, dataKey);
 		
 		data = (double[]) input.get(dataKey);
 		

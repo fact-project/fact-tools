@@ -2,11 +2,11 @@ package fact.filter;
 
 import java.util.LinkedList;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Constants;
-import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -28,7 +28,7 @@ public class JumpRemoval implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		EventUtils.mapContainsKeys(this.getClass(), input, dataKey,prevStartAndStopCellKey+"_start",prevStartAndStopCellKey+"_stop","NROI",startCellKey);
+		Utils.mapContainsKeys(this.getClass(), input, dataKey, prevStartAndStopCellKey + "_start", prevStartAndStopCellKey + "_stop", "NROI", startCellKey);
 		
 		int roi = (Integer) input.get("NROI");
 		short[] currentStartCells = (short[]) input.get(startCellKey);

@@ -1,7 +1,6 @@
 package fact.features;
 
 import fact.Constants;
-import fact.EventUtils;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -40,7 +39,7 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 		
 		Utils.mapContainsKeys(getClass(), input, key);
 		
-		double[] arrivalTimeArray = EventUtils.toDoubleArray(input.get(key));
+		double[] arrivalTimeArray = Utils.toDoubleArray(input.get(key));
 		//try{
 		double[] perPatchMean = new double[160];
 		double[] perPatchVariance = new double[160];
