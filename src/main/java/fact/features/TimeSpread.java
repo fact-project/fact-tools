@@ -3,12 +3,17 @@ package fact.features;
 import fact.EventUtils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class TimeSpread implements Processor {
 	
+	@Parameter(required = true)
 	private String arrivalTimeKey = null;
+	@Parameter(required = true)
 	private String weightsKey = null;
+	@Parameter(required = true)
 	private String showerKey = null;
+	@Parameter(required = true)
 	private String outputKey = null;
 	
 	private double[] arrivalTime = null;
@@ -57,6 +62,38 @@ public class TimeSpread implements Processor {
 		input.put(outputKey+"_weighted", weightedTimespread);
 		
 		return input;
+	}
+
+	public String getArrivalTimeKey() {
+		return arrivalTimeKey;
+	}
+
+	public void setArrivalTimeKey(String arrivalTimeKey) {
+		this.arrivalTimeKey = arrivalTimeKey;
+	}
+
+	public String getWeightsKey() {
+		return weightsKey;
+	}
+
+	public void setWeightsKey(String weightsKey) {
+		this.weightsKey = weightsKey;
+	}
+
+	public String getShowerKey() {
+		return showerKey;
+	}
+
+	public void setShowerKey(String showerKey) {
+		this.showerKey = showerKey;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 
 }

@@ -4,15 +4,23 @@ import fact.EventUtils;
 import fact.mapping.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class ShowerSlope implements Processor {
 
+	@Parameter(required = true)
 	private String photonChargeKey = null;
+	@Parameter(required = true)
 	private String arrivalTimeKey = null;
+	@Parameter(required = true)
 	private String showerKey = null;
+	@Parameter(required = true)
 	private String cogxKey = null;
+	@Parameter(required = true)
 	private String cogyKey = null;
+	@Parameter(required = true)
 	private String deltaKey = null;
+	@Parameter(required = true)
 	private String outputKey = null;
 	
 	private double[] photonCharge = null;
@@ -99,6 +107,62 @@ public class ShowerSlope implements Processor {
 		input.put(outputKey+"_spread", slopeSpread);
 		input.put(outputKey+"_spread_weighted", slopeSpreadWeighted);
 		return input;
+	}
+
+	public String getPhotonChargeKey() {
+		return photonChargeKey;
+	}
+
+	public void setPhotonChargeKey(String photonChargeKey) {
+		this.photonChargeKey = photonChargeKey;
+	}
+
+	public String getArrivalTimeKey() {
+		return arrivalTimeKey;
+	}
+
+	public void setArrivalTimeKey(String arrivalTimeKey) {
+		this.arrivalTimeKey = arrivalTimeKey;
+	}
+
+	public String getShowerKey() {
+		return showerKey;
+	}
+
+	public void setShowerKey(String showerKey) {
+		this.showerKey = showerKey;
+	}
+
+	public String getCogxKey() {
+		return cogxKey;
+	}
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
+	}
+
+	public String getCogyKey() {
+		return cogyKey;
+	}
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
+	}
+
+	public String getDeltaKey() {
+		return deltaKey;
+	}
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 	
 
