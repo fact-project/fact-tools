@@ -1,6 +1,7 @@
 package fact.parameter;
 
-import fact.features.SourcePosition;
+import fact.features.source.SourcePosition;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

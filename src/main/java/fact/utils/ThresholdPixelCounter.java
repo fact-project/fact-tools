@@ -4,7 +4,8 @@
 package fact.utils;
 
 import fact.Constants;
-import fact.features.MaxAmplitude;
+import fact.extraction.MaxAmplitude;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

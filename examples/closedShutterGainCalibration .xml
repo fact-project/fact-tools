@@ -16,14 +16,14 @@
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
-        <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
         <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
-        <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
              <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmoothed" />
             
              <fact.utils.CutValues key="DataSmoothed" outputKey="DataAboveThreshold" minValue="5.0" />   
-         <!--      <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>  -->     
+         <!--      <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>  -->     
              
              
 <!--             <fact.processors.CutSlices  start="22" end="220"/> -->

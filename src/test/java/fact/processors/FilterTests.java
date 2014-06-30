@@ -1,11 +1,14 @@
 package fact.processors;
 
+import fact.datacorrection.InterpolateBadPixel;
 import fact.filter.*;
 import fact.io.FitsStream;
 import fact.utils.SimpleFactEventProcessor;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.io.SourceURL;
 

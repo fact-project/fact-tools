@@ -1,4 +1,4 @@
-package fact.features;
+package fact.features.source;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -226,7 +226,7 @@ public class SourcePosition implements StatefulProcessor {
 	 * @param gmst the Eventtime of the current event in gmst format
 	 * @return an array of length 2 containing {azimuth, zenith}, not null;
 	 */
-	double[] getAzZd(double ra,double dec, double gmst){
+	public double[] getAzZd(double ra,double dec, double gmst){
 		double phi              =  ra / 180.0 * Math.PI;
 		double theta            =  (90 - dec) / 180.0 * Math.PI;
 

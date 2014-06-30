@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fact.features;
+package fact.extraction;
 
 import java.awt.Color;
 

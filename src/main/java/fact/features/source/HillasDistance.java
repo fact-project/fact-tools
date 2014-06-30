@@ -1,4 +1,4 @@
-package fact.features;
+package fact.features.source;
 
 import fact.Utils;
 import fact.statistics.PixelDistribution2D;

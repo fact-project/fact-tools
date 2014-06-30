@@ -1,6 +1,8 @@
 package fact.features;
 
+import fact.features.source.SourcePosition;
 import fact.mapping.FactPixelMapping;
+
 import org.junit.Before;
 import org.junit.Test;
 

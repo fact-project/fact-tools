@@ -1,4 +1,4 @@
-package fact.features;
+package fact.extraction;
 
 import java.net.URL;
 

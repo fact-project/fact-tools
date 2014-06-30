@@ -26,16 +26,16 @@
             <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/>
 
-            <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
 	        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
+            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="position"/>
 
 
-            <fact.features.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
-	        <fact.features.PhotonCharge key="DataCalibrated"  positions="position" outputKey="photoncharge" color="#FF0F0F"/>
-	        <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
+            <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+	        <fact.extraction.PhotonCharge key="DataCalibrated"  positions="position" outputKey="photoncharge" color="#FF0F0F"/>
+	        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
 
 	        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
 
@@ -43,7 +43,7 @@
 
 	        <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
 
-			<fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+			<fact.features.source.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
             <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputkey="size"/>
 
 

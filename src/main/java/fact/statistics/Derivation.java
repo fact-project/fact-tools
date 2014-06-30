@@ -1,4 +1,4 @@
-package fact.features;
+package fact.statistics;
 
 import fact.Utils;
 import org.slf4j.Logger;

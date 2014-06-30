@@ -26,9 +26,9 @@
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
         <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
 
-        <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputkey="arrivalTime"/>
-        <fact.features.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
+        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputkey="arrivalTime"/>
+        <fact.extraction.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
         <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 

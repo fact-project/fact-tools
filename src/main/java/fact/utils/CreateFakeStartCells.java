@@ -1,4 +1,4 @@
-package fact.features;
+package fact.utils;
 
 import java.util.Random;
 
