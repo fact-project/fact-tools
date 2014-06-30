@@ -3,7 +3,6 @@ package fact.features;
 import fact.Constants;
 import fact.EventUtils;
 import fact.Utils;
-import fact.viewer.ui.DefaultPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

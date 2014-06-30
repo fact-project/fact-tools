@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 import fact.Constants;
-import fact.viewer.ui.DefaultPixelMapping;
 
 public class SourcePositionTest {
 	
