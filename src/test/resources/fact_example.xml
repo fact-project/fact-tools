@@ -8,7 +8,7 @@
         <process input="fact">
             <fact.filter.DrsCalibration url="${dataDRS}" key="data"  outputKey="DataCalibrated"/>
             <fact.utils.CutSlices  start="22" end="220"/>
-            <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
                 
             <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
@@ -16,8 +16,8 @@
             <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" />
 -->
             
-            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
-            <fact.features.PhotonCharge dataKey="DataCalibrated" positions="AmplitudePositions" url="${integralGainsFile}" rangeSearchWindow="25" outputKey="photoncharge"/>
+            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
+            <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="AmplitudePositions" url="${integralGainsFile}" rangeSearchWindow="25" outputKey="photoncharge"/>
             
 			<fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" neighborPixelThreshold="2" corePixelThreshold="5" keyPositions="AmplitudePositions" timeThreshold="30"  minNumberOfPixel="2"/>
             <fact.features.SourcePosition url="${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>

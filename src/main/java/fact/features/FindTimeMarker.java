@@ -1,8 +1,11 @@
 package fact.features;
 
 import fact.Constants;
+import fact.extraction.PhotonCharge;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
