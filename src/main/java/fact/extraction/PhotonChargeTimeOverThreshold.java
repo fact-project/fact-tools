@@ -23,7 +23,7 @@ import stream.Processor;
  * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a> 
  *
  */
-public class PhotonChargeTimeOverTreshold implements Processor {
+public class PhotonChargeTimeOverThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 	
 
