@@ -11,9 +11,19 @@
 
             <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
             <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated"  amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-            <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25" url="file:src/main/resources/gain_sorted_20131127.csv" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="9.5" color="#FF0F0F"/>
-            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2" keyPositions="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
+            <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
+                                          url="file:src/main/resources/gain_sorted_20131127.csv" positions="maxAmplitudePosition"
+                                          outputKey="photoncharge" color="#FF0F0F"/>
 
+            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
+                                             keyPositions="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
+
+            <fact.features.source.SourcePosition outputKey="Cetatauri" url="${driveFile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" />
+
+            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower_test" keyPositions="maxAmplitudePosition"
+                                             corePixelThreshold="5" neighborPixelThreshold="2"
+                                             timeThreshold="30"  minNumberOfPixel="2"
+                                             showDifferentCleaningSets="true" starPositionKeys="Cetatauri" starRadiusInCamera="11.0"/>
 
 
             <fact.ShowViewer key="DataCalibrated"/>
