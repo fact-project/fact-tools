@@ -17,8 +17,8 @@
 	<process id="2" input="ceres">
 			<fact.utils.Remapping key="Data" />
 	        <fact.filter.DrsCalibration url="file:${ceresDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
-			<fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
-            <fact.features.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
+			<fact.extraction.PhotonCharge key="DataCalibrated" outputKey="photoncharge" color="#FF0F0F"/>
+            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="arrivalTime"/>
             
 
             
@@ -70,7 +70,7 @@
 <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
 <!-- 	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>   -->
 <!--             <fact.utils.CutSlices  start="22" end="220"/> -->
-<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
+<!--             <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
 <!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
 <!-- 	        <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/> -->
 <!--             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/> -->

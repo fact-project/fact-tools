@@ -22,7 +22,7 @@
             <!-- <fact.utils.CutSlices start="250" end="300" outputKey="DataCalibrated"/> -->
  <!--            <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/> -->
-<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+<!--             <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
 
             <fact.features.FindTimeMarker key="DataCalibrated" timeOffsetKey="times" outputKey="tm"/>

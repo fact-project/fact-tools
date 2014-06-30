@@ -23,15 +23,15 @@
         	<stream.flow.Skip condition="%{data.EventNum} != 33" />
        		<fact.utils.Remapping key="Data" outputKey="Data" />
             <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated"/>  
-<!--             <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
+<!--             <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
 <!--         	<fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />	 -->
-<!--             <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
+<!--             <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" -->
 <!--                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" /> -->
                 
 
-            <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="AmplitudePositions" />
-            <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="AmplitudePositions" outputKey="ArrivalTime"/>
-            <fact.features.PhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge" />
+            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="AmplitudePositions" />
+            <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="AmplitudePositions" outputKey="ArrivalTime"/>
+            <fact.extraction.PhotonCharge key="DataCalibrated" positions="AmplitudePositions" outputKey="photonCharge" />
 
             <fact.cleaning.CoreNeighborClean key="photonCharge" keyPositions="ArrivalTime" timeThreshold="15" minNumberOfPixel="2" 
             									corePixelThreshold="4.0" neighborPixelThreshold="2.0" outputKey="cleanPixel" />

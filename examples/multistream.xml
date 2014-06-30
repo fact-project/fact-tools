@@ -17,12 +17,12 @@
             <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
 <!--             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/> -->
             
-            <fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
             <fact.features.RisingEdge key="DataCalibrated" outputKey="pos" />
 
-            <fact.features.PhotonCharge key="DataCalibrated" outputKey="photoncharge" positions="pos" color="#FF0F0F"/>
+            <fact.extraction.PhotonCharge key="DataCalibrated" outputKey="photoncharge" positions="pos" color="#FF0F0F"/>
             <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="pos" timeThreshold="30"  minNumberOfPixel="2"/>
          <stream.flow.Skip condition="%{data.shower} == null" />
 			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />

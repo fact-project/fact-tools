@@ -26,14 +26,14 @@
 
     <process id="2" input="fact">
         <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
-<!--         <fact.features.CreateFakeStartCells outputKey="FStartCells" />
+<!--         <fact.utils.CreateFakeStartCells outputKey="FStartCells" />
         <fact.utils.PreviousStartCells startCellKey="FStartCells" outputKey="prevEvents" limitEvents="5"/> -->
         <stream.flow.Skip condition="%{data.EventNum} &lt; 17" />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" /> 
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
         <fact.features.PatchAverage key="DataCalibrated" outputKey="DataPatches" color="#000000" />
         
-        <fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataRemoved" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="4.0" spikeLimit="7.0" freqAmplLimit="0.4" leftBorder="10" signalFlankLimit="0.63" lengthForFFT="32" lengthAfterPosForFFT="10" ringingPeriode="11" freqCompAmplLimit="2.0" leftRingingFreq="0.18" rightRingingFreq="0.22" timeDependLimit="10"/>
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataRemoved" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="4.0" spikeLimit="7.0" freqAmplLimit="0.4" leftBorder="10" signalFlankLimit="0.63" lengthForFFT="32" lengthAfterPosForFFT="10" ringingPeriode="11" freqCompAmplLimit="2.0" leftRingingFreq="0.18" rightRingingFreq="0.22" timeDependLimit="10"/>
         <fact.features.PatchAverage key="DataRemoved" outputKey="DataPatchesRemoved" color="#E6172F" />
         <!-- <fact.features.PatchAverage key="DataPatchJumpRemoval" outputKey="RemovedPatches" color="#E6172F" /> -->
         
