@@ -19,15 +19,16 @@ public class FactHexTile extends Tile {
 
     static Logger log = LoggerFactory.getLogger( FactHexTile.class );
 
-	private Double height;
-	private Double width;
+	private double height;
+	private double width;
     private double radius;
     private FactCameraPixel pixel;
-	public FactHexTile(FactCameraPixel p, Double radius){
+
+    public FactHexTile(FactCameraPixel p, double radius){
         this.pixel = p;
         this.radius = radius;
-        this.width =radius* Math.sqrt(3);
-        this.height = 2.0d * radius + 3;
+        this.width =radius * 2;
+        this.height = radius * Math.sqrt(3);
         this.position = this.getPosition();
         this.polygon = this.getPolygon();
     }
@@ -37,28 +38,27 @@ public class FactHexTile extends Tile {
         return this.pixel;
     }
 
-    @Override
-	public Point getPosition(){
+    //@Override
+	private Point getPosition(){
         if(this.position == null) {
             int posX = this.pixel.geometricX;
             int posY = this.pixel.geometricY;
 
             //intentional precision loss
-            int s = (int)  (3 * (radius / 2.0d)  + 0.5);
-            int cy = (int) (posY * width);
+            int cx = posX * (int)(width*0.75);
+            int cy = posY * (int)height;
 
-            int cx =  posX * s;
             this.position = new Point( cx, cy );
-
         }
         return this.position;
 	}
 
     @Override
     public Polygon getPolygon() {
+        double[] alphas = { 0.0 , 1.0471975511965976,  2.0943951023931953,
+                            3.141592653589793, 4.1887902047863905,  5.235987755982988};
         if(this.polygon == null) {
-            Double xOff = 0.0d;
-            Double yOff = 0.0d;
+            double yOff = 0.0d;
 
             if (this.pixel.geometricX % 2 == 0) {
                 yOff = -0.5 * this.height;
@@ -66,15 +66,16 @@ public class FactHexTile extends Tile {
 
             Polygon polygon = new Polygon();
             for (int i = 0; i < 6; i++) {
-                Double alpha = (Math.PI / 3.0d) * i; /// (new Double( i ));
-                //if you get switch cos and sin in the following statements you will get the edge of the hexagon
-                //on the bottom. In this display we want the pointy thing on the bottom
-                Double x = this.radius * Math.cos(alpha);
-                Double y = this.radius * Math.sin(alpha);
+                double alpha = alphas[i]; /// (new Double( i ));
+                //if you get switch cos and sin in the following statements you will rotate the hexagon by 90 degrees
+                //In this case we want the flat edge on the bottom. Note that the whole thing is later
+                //rotated by 90 degree in the viewer. So in the display the pointy thing will actually be on the
+                //bottom
+                double x = this.radius * 0.8 * Math.cos(alpha);
+                double y = this.radius * 0.8 * Math.sin(alpha);
 
-                int px =  (this.position.x + x.intValue() + xOff.intValue());
-                int py =  (this.position.y + y.intValue() + yOff.intValue());
-
+                int px = (int) Math.round(this.position.x + x);
+                int py = (int) Math.round(this.position.y + y + yOff);
                 polygon.addPoint(px, py);
             }
             this.polygon = polygon;

@@ -44,13 +44,14 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 	FactHexTile tiles[];
 
 	// initialize the hexagonal grid.
-	Double cellHeight;
-	Double cellWidth;
-    Integer canvasWidth, canvasHeight = null;
+	double cellHeight;
+	double cellWidth;
+    int canvasWidth;
+    int canvasHeight;
 
     int rows = 0, cols = 0;
 
-	public Double cellRadius;
+	double cellRadius;
 
 	Set<CameraPixel> selectedPixels = new LinkedHashSet<CameraPixel>();
 
@@ -79,7 +80,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
      * @param pixelMapping the mapping which describes this geometry
      * @param radius the radius of the circle the hexagon should fit into
      */
-	public FactHexMapDisplay(FactPixelMapping pixelMapping, Double radius, int canvasWidth, int canvasHeight) {
+	public FactHexMapDisplay(FactPixelMapping pixelMapping, double radius, int canvasWidth, int canvasHeight) {
 
         Bus.eventBus.register(this);
 
@@ -211,8 +212,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
             //draw a grid with lines every 25 pixel in a dark grey color
             g2.setStroke(new BasicStroke(1.0f));
-            g2.setColor(Color.DARK_GRAY);
-            drawGrid(g2, 25);
+            //g2.setColor(Color.DARK_GRAY);
+            //drawGrid(g2, 25);
 
             //now draw the actual camera pixel
             //translate to center of canvas
@@ -231,7 +232,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
                 if(selectedPixels.contains(p)){
                     tile.setBorderColor(Color.RED);
                 } else {
-                    tile.setBorderColor(Color.BLACK);
+                    tile.setBorderColor(Color.DARK_GRAY);
                 }
                 tile.paint(g);
             }
@@ -247,11 +248,13 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             g2.translate(-xOffset, -yOffset);
 
             //draw cross across screen to indicate center ofcomponent
-            //Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
-            //g2.draw(line);
+            g2.setColor(Color.WHITE);
+            Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
+            g2.draw(line);
 
-            //line = new Line2D.Double(getWidth(),0,0,getHeight());
-            //g2.draw(line);
+            line = new Line2D.Double(getWidth(),0,0,getHeight());
+            g2.draw(line);
+
 
             g2.translate(this.canvasWidth - 40, 0);
             paintScale(g2, 40);

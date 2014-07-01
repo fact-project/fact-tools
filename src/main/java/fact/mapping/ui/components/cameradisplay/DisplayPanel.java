@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
  * Created by kaibrugge on 02.06.14.
  */
 public class DisplayPanel extends JPanel implements EventObserver{
-    final FactHexMapDisplay hexmap = new FactHexMapDisplay(FactPixelMapping.getInstance(), 7.0, 600, 530);
+    final FactHexMapDisplay hexmap = new FactHexMapDisplay(FactPixelMapping.getInstance(), 7, 600, 530);
     final CameraOverlayKeySelector selector = new CameraOverlayKeySelector();
 
 

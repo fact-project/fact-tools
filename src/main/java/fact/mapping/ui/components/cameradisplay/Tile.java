@@ -40,7 +40,7 @@ public abstract class Tile extends Component {
 
 
     //Calculates the center position from the abstract pixel coordinates according to the geometry of the tile
-	public abstract Point getPosition();
+	//private abstract Point getPosition();
 
     public abstract Polygon getPolygon();
 
