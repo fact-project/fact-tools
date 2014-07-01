@@ -23,6 +23,9 @@ public class CameraOverlayKeySelector extends KeySelector {
     @Override
     public Set<SeriesKeySelectorItem> filterItems(Data item) {
         Set<SeriesKeySelectorItem> newItems = new HashSet<>();
+        for (SeriesKeySelectorItem selectorItem: newItems){
+            selectorItem.setPreferredSize(new Dimension(500, 20));
+        }
         for  (String key: item.keySet()){
             try {
                 CameraMapOverlay b = (CameraMapOverlay) item.get(key);

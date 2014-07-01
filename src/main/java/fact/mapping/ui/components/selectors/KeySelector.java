@@ -16,8 +16,8 @@ import java.util.Set;
  */
 public abstract class KeySelector extends JPanel implements EventObserver{
 
-    private final JPanel keySelectionContentPanel = new JPanel();;
-    private final JScrollPane keyScrollPane = new JScrollPane(keySelectionContentPanel);;
+    private final JPanel keySelectionContentPanel = new JPanel();
+    private final JScrollPane keyScrollPane = new JScrollPane(keySelectionContentPanel);
 
     private Set<SeriesKeySelectorItem> items = new HashSet<>();
     protected Set<SeriesKeySelectorItem> selectedItems = new HashSet<>();
@@ -28,17 +28,15 @@ public abstract class KeySelector extends JPanel implements EventObserver{
         Bus.eventBus.register(this);
 
         setLayout(new BorderLayout());
-        setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
         keySelectionContentPanel.setLayout(new BoxLayout(keySelectionContentPanel, BoxLayout.Y_AXIS));
 
-
-        keyScrollPane.setPreferredSize(new Dimension(270, 230));
+        //keyScrollPane.setPreferredSize(new Dimension(270, 230));
         //keyScrollPane.setPreferredSize(new Dimension(270, 240));
         keyScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        keyScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-
-        add(keyScrollPane, BorderLayout.NORTH);
+        //keyScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        //keyScrollPane.setBackground(Color.WHITE);
+        add(keyScrollPane, BorderLayout.WEST);
     }
     @Override
     public void setPreferredSize(Dimension preferredSize){

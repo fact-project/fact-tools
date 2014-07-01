@@ -42,7 +42,7 @@ public class Viewer extends JFrame {
     final DisplayPanel mapDisplay = new DisplayPanel();
     final StreamNavigationPanel navigation = new StreamNavigationPanel();
     final MainPlotPanel chartPanel = new MainPlotPanel(550, 350, true);
-    final EventInfoPanel eventInfoPanel = new EventInfoPanel(550, 350);
+    final EventInfoPanel eventInfoPanel = new EventInfoPanel(620, 350);
 
 
     private String defaultKey;

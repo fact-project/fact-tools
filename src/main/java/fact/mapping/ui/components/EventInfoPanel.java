@@ -10,6 +10,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 import fact.mapping.CameraPixel;
+import fact.mapping.FactCameraPixel;
 import fact.mapping.ui.Bus;
 import fact.mapping.ui.EventObserver;
 import fact.mapping.ui.PixelSelectionObserver;
@@ -42,8 +43,9 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
     @Subscribe
     public void handlePixelSelectionChange(Set<CameraPixel> selectedPixel) {
         model.clear();
-        for (CameraPixel p : selectedPixel){
-            String m = "Chid: " + p.id + " Coordinates " + p.geometricX + ", " + p.geometricY;
+        for (CameraPixel sp : selectedPixel){
+            FactCameraPixel p = (FactCameraPixel) sp;
+            String m = "Chid: " + p.id + "  SoftId: " + p.softid  + "    Coordinates: " + p.getXPositionInMM() + ", " + p.getYPositionInMM();
             model.addElement(m);
         }
     }
