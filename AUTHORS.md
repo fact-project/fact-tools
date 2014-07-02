@@ -4,8 +4,8 @@ Authors
 The following people have contributed to the *fact-tools* project:
 
  * Christian Bockermann
- * Kai Bruegge
- * Fabian Temme
+ * Kai Bruegge <kai.bruegge@tu-dortmund.de>
+ * Fabian Temme <fabian.temme@tu-dortmund.de>
  * Jens Buss
  * Dominik Neise
  * Jan Freiwald 
