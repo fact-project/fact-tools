@@ -83,9 +83,9 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
 
         Bus.eventBus.register(this);
 
-        this.setPreferredSize(new Dimension(width, height));
+        this.setPreferredSize(new Dimension(width , height));
         JPanel contentPanel = new JPanel();
-        contentPanel.setPreferredSize(getPreferredSize());
+        contentPanel.setPreferredSize(new Dimension(width -12 , height-5));
         //define some padding using an empty border
         roiField.setEditable(false);
         timeField.setEditable(false);
@@ -103,7 +103,7 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
                 ColumnSpec.decode("left:pref:grow"),
                 ColumnSpec.decode("pref"),
 
-                ColumnSpec.decode("fill:pref:grow"),
+                ColumnSpec.decode("fill:100px:grow"),
                 ColumnSpec.decode("pref"),
 
                 ColumnSpec.decode("right:pref:grow"),
