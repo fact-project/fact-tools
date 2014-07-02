@@ -6,6 +6,7 @@ import fact.mapping.ui.events.OverlaySelectionChangedEvent;
 import fact.mapping.ui.overlays.CameraMapOverlay;
 import stream.Data;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.HashSet;

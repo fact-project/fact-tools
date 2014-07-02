@@ -150,7 +150,6 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         frame.getContentPane().add(n);
         frame.pack();
         frame.setVisible(true);
-
     }
 
 

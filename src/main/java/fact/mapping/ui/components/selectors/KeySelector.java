@@ -49,7 +49,6 @@ public abstract class KeySelector extends JPanel implements EventObserver{
     public void handleEventChange(Pair<Data, String> itemKeyPair){
 
         Set<SeriesKeySelectorItem> newItems = filterItems(itemKeyPair.getFirst());
-
         //keep old items selected
         selectedItems.retainAll(newItems);
         //keep old items on the display and add new ones. This is a cut and a union
@@ -58,6 +57,7 @@ public abstract class KeySelector extends JPanel implements EventObserver{
 
         keySelectionContentPanel.removeAll();
         for(SeriesKeySelectorItem k : items){
+            k.setAlignmentX(Component.LEFT_ALIGNMENT);
             keySelectionContentPanel.add(k);
         }
     }
@@ -85,3 +85,5 @@ public abstract class KeySelector extends JPanel implements EventObserver{
     public abstract Set<SeriesKeySelectorItem> filterItems(Data item);
 
 }
+
+
