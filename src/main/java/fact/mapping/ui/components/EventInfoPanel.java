@@ -23,6 +23,9 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
+ * Part of the viewer main window.
+ * This shows some general information about the currently analyzed file and some more specific
+ * information for all the selected pixels. So far the pixel information is a bit crude.
  *
  * @author Kai
  * 
@@ -95,14 +98,11 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         runIDField.setEnabled(false);
         timeField.setEnabled(false);
 
-       // overLayPane.setPreferredSize(new Dimension(getWidth(), 150));
-
-
         // set layout of the main window
         FormLayout layout = new FormLayout(new ColumnSpec[] {
                 ColumnSpec.decode("left:pref:grow"),
                 ColumnSpec.decode("pref"),
-
+                //apparently setting this to 100px does what i want. I have no idea why
                 ColumnSpec.decode("fill:100px:grow"),
                 ColumnSpec.decode("pref"),
 
@@ -131,9 +131,6 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         builder.addSeparator("Selection Information", cc.xywh(1,3,6,1));
         builder.add(new JLabel(("Pixel IDs")), cc.xy(1,4));
         builder.add(new JScrollPane(pixIDList), cc.xywh(2,4,5, 1));
-
-
-
 
         contentPanel.add(builder.getPanel());
         add(contentPanel);
