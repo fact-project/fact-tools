@@ -12,6 +12,7 @@ import fact.mapping.ui.Bus;
 import fact.mapping.ui.EventObserver;
 import fact.mapping.ui.components.cameradisplay.colormapping.GrayScaleColorMapping;
 import fact.mapping.ui.components.cameradisplay.colormapping.NeutralColorMapping;
+import fact.mapping.ui.components.cameradisplay.colormapping.RainbowColorMapping;
 import fact.mapping.ui.components.cameradisplay.colormapping.TwoToneAbsoluteColorMapping;
 import fact.mapping.ui.components.selectors.CameraOverlayKeySelector;
 import fact.mapping.ui.events.OverlaySelectionChangedEvent;
@@ -24,6 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
+ * This panel contains the hexmap with the overlay selector below it. The colorbar is part of the hexmap.
+ *
  * Created by kaibrugge on 02.06.14.
  */
 public class DisplayPanel extends JPanel implements EventObserver{

@@ -25,6 +25,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -32,7 +33,7 @@ import java.util.Set;
 
 /**
  * This implements a PixelMap to draw a grid of hexagons as seen in the camera of the fact telescope
- * The hexagons are equally spaced and sized. Orientated with one edge on the bottom
+ * The hexagons are equally spaced and sized. Orientated with one edge on the bottom. Also has a colorbar next to it.
  *
  */
 public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceObserver, MouseListener {
@@ -71,6 +72,9 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     final private FactPixelMapping pixelMapping;
     private ArrayList<CameraMapOverlay> overlays = new ArrayList<>();
     private Set<Pair<String, Color>> overlayKeys = new HashSet<>();
+
+    //formater to display doubles nicely
+    DecimalFormat fmt = new DecimalFormat("#.##");
 
     //a default key
     public String defaultKey;
@@ -273,11 +277,17 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             Color c = this.colormap.getColorFromValue(value, minValueInData, maxValueInData);
             g2.setColor( c );
             g2.drawLine(20, this.getHeight() - i, width, this.getHeight() - i);
+            //draw a number next to the colorbar each 64 pixel
+            if(i > 0 && (i % 70) == 0){
+                g2.setColor(Color.GRAY);
+                g2.drawString(fmt.format(value), -25, this.getHeight() - i);
+            }
         }
         //now draw some numbers next to it
-        g2.setColor(Color.GRAY);
-        g2.drawString(Double.toString(minValueInData), -25, this.getHeight() - 5);
-        g2.drawString(Double.toString(maxValueInData), -25,  10);
+        g2.setColor(Color.WHITE);
+        g2.drawString(fmt.format(minValueInData), -25, this.getHeight() - 5);
+        g2.drawString(fmt.format(maxValueInData), -25,  10);
+
     }
 
 
