@@ -1,8 +1,11 @@
 package fact.features;
 
 import stream.Data;
+
 import java.util.ArrayList;
+
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,32 +29,46 @@ public class MuonHoughTransform implements Processor {
 	// OutputKeys
 	
 	// Peakness is a measure for how sharp the best circle is in parameter space
+	@Parameter(required = true, description = "outputkey for the hough peakness")
 	private String peaknessKey; 
 	//Distance is the Euklidian Distance between the three best circles in parameter space
+	@Parameter(required = true, description = "outputkey for the hough distance")
 	private String distanceKey;
-	// Pixelset for the FactViewer, only returned when showRingKey=true
-	private String bestCircleKey;
-	// X-Value of the center of the best circle
-	private String bestXKey;
-	// Y-Value of the center of the best circle
-	private String bestYKey;
-	// Radius of the best Circle
-	private String bestRadiusKey;
 	// Number of octants of the best circle in which are HitPixels
+	@Parameter(required = true, description = "outputkey for the octantsHit parameter")
 	private String octantsHitKey;
 	// Number of HitPixels on best Ring/ Total number of HitPixels
 	private String percentageKey;
+	// Pixelset for the FactViewer, only returned when showRingKey=true
+	@Parameter(required = true, description = "outputkey for the hough pixelset of the best Ring")
+	private String bestCircleKey;
+	// X-Value of the center of the best circle
+	@Parameter(required = true, description = "outputkey for x coordinate of the middlepoint of the best ring")
+	private String bestXKey;
+	// Y-Value of the center of the best circle
+	@Parameter(required = true, description = "outputkey for y coordinate of the middlepoint of the best ring")
+	private String bestYKey;
+	// Radius of the best Circle
+	@Parameter(required = true, description = "outputkey for the radius of the best ring")
+	private String bestRadiusKey;
+	@Parameter(required = true, description = "outputkey for pixel chids on the best ring")
 	// Pixel Chids of the best Ring
 	private String bestRingPixelKey;
 	
-	//if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
-	private boolean showMatrixKey;
+	
 	
 	//InputKeys
+	@Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
 	private String ringKey; 
+	
+	@Parameter(required = true, description = "PhotonCharge")
 	private String photonChargeKey;
 	//If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
+	@Parameter(required = false, description = "if this key is true, the three best rings will be shown in the viewer", defaultValue="false")
 	private boolean showRingKey;
+	//if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
+	@Parameter(required = false, description = "if this key is true, the Hough Accumulator at the bestR will be printetd on the terminal", defaultValue="false")
+	private boolean showMatrixKey;
 	
 
 	// Defining the parameterspace in which we look for circles:
