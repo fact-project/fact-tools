@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.cli.MissingArgumentException;
-import org.bouncycastle.i18n.MissingEntryException;
 
 import stream.util.parser.ParseException;
 
