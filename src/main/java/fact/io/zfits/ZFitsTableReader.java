@@ -78,7 +78,7 @@ public class ZFitsTableReader implements TableReader {
 
 		byte[][] output = new byte[this.table.getNumRows()][];
 
-		log.info("Current Row in Tile: {}", this.currentRowInTile);
+		//log.info("Current Row in Tile: {}", this.currentRowInTile);
 		//read the desired columns
 		for (int colIndex=0; colIndex<this.table.getNumCols(); colIndex++) {
 			//log.info("Load Col: "+colIndex);
