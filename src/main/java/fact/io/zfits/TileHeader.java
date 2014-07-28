@@ -2,6 +2,9 @@ package fact.io.zfits;
 
 import java.nio.ByteBuffer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import stream.util.parser.ParseException;
 
 /**
@@ -9,6 +12,8 @@ import stream.util.parser.ParseException;
  * @author Michael Bulinski
  */
 public class TileHeader {
+	static Logger log = LoggerFactory.getLogger(TileHeader.class);
+
 	private byte[] id = new byte[4]; // should be always 'TILE'
 	private int    numRows; //number of rows pooled in this tile
 	private long   size; //the size of the data following this tile (data of the tile)
@@ -25,8 +30,11 @@ public class TileHeader {
 	public TileHeader(byte[] input) throws ParseException {
 		ByteBuffer buffer = ZFitsUtil.wrap(input);
 		buffer.get(id);
-		if (!new String(id).equals("TILE")) {
-			throw new ParseException("Id of the TileHeader is wrong, got: '"+new String(id)+"'");
+		String ids = new String(id);
+		if (!ids.equals("TILE")) {
+			log.info("Id of the TileHeader is wrong, got: '"+ids+"'");
+			//should actually be the line below, but because of stuff we don't throw an error and ignore it
+			//throw new ParseException("Id of the TileHeader is wrong, got: '"+ids+"'");
 		}
 		this.numRows = buffer.getInt(); 
 		this.size    = buffer.getLong();

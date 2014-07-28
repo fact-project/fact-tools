@@ -25,11 +25,9 @@ public class MaxAmplitudePosition implements Processor {
     @Parameter(required = true)
     private String outputKey;
 
-	private float minValue= -3000;
-	private float maxValue = 3000;
-	
-	private int searchWindowLeft = 0;
-	private int searchWindowRight = 30000;
+
+	private Integer searchWindowLeft = null;
+	private Integer searchWindowRight =  null;
 
 
 	@Override
@@ -39,10 +37,10 @@ public class MaxAmplitudePosition implements Processor {
 
         int[] positions =  new int[Constants.NUMBEROFPIXEL];
 
-		if (searchWindowLeft < 0){
+		if (searchWindowLeft == null || searchWindowLeft < 0){
 			searchWindowLeft = 0;
 		}
-		if (searchWindowRight > roi){
+		if (searchWindowRight == null || searchWindowRight > roi){
 			searchWindowRight = roi;
 		}
 		//foreach pixel
@@ -54,22 +52,23 @@ public class MaxAmplitudePosition implements Processor {
 	}
 
     /**
-     * finds the position of the highest value in the array. If the maximum value is not unique the last position will be used
+     * finds the position of the highest value in the array. If the maximum value is not unique the first position will be used
      * @param pix Pixel to check
      * @param roi Basically the number of slices in one event
      * @param data the array which to check
      * @return
      */
     public int findMaximumPosition(int pix, int roi, double[] data){
-        double tempMaxValue = 0;
+        //the first value we find is the current maximum
+        double tempMaxValue = data[pix*roi];
         int position = 0;
         //iterate over all slices
         for (int slice = searchWindowLeft; slice < searchWindowRight; slice++) {
             int pos = pix * roi + slice;
             //temp save the current value
             double value = data[pos];
-            //update maxvalue and position if current value exceeds old value and is still below the threshold set by the user
-            if( value > tempMaxValue && value <= maxValue && value >= minValue ){
+            //update maxvalue and position if current value exceeds old value
+            if( value > tempMaxValue){
                 tempMaxValue = value;
                 position = slice;
             }
@@ -81,19 +80,6 @@ public class MaxAmplitudePosition implements Processor {
 	 * Getter and Setter
 	 */
 	
-	public float getMinValue() {
-		return minValue;
-	}
-	public void setMinValue(float minValue) {
-		this.minValue = minValue;
-	}
-	
-	public float getMaxValue() {
-		return maxValue;
-	}
-	public void setMaxValue(float maxValue) {
-		this.maxValue = maxValue;
-	}
 
 
 	public int getSearchWindowLeft() {
