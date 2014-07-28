@@ -19,6 +19,7 @@ public class CameraOverlayKeySelector extends KeySelector {
     @Override
     public void selectionUpdate() {
         Bus.eventBus.post(new OverlaySelectionChangedEvent(getSelectedItemPairs()));
+
     }
 
     @Override

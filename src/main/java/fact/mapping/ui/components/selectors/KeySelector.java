@@ -12,6 +12,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * A KeySelector is a JPanel which lays out KeySelectorItems. It keeps track of which KeySelectorItems are selected
+ * in the selectedItems HashSet. In case a new Event (DataItem) will be shown in the viewer, this class will call
+ * the abstract filterItems(Data item) method.
+ *
+ * The filterItems(Data item) should return a Set<KeySelectorItem> which will be shown in the JPanel
+ *
+ *
+ *
  * Created by kaibrugge on 15.05.14.
  */
 public abstract class KeySelector extends JPanel implements EventObserver{

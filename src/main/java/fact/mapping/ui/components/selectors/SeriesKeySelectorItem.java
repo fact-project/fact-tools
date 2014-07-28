@@ -60,13 +60,14 @@ public class SeriesKeySelectorItem extends JPanel  {
             }
         });
 
-
+        //If you click to select a new color this will be automatically activate the checkbox.
         colorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 color = JColorChooser.showDialog(null, "Choose color", Color.DARK_GRAY);
                 colorButton.setForeground(color);
                 selector.addSelected(SeriesKeySelectorItem.this);
+                checkBox.setEnabled(true);
             }
         });
         add(checkBox, BorderLayout.WEST);
