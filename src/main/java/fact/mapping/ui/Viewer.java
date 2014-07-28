@@ -52,6 +52,10 @@ public class Viewer extends JFrame {
         defaultKey = key;
         chartPanel.setDefaultEntry(defaultKey, Color.red);
     }
+    //set plotrange in the plotpanel
+    public void setRange(Integer[] range){
+        chartPanel.setRange(range[0], range[1]);
+    }
 
     private Data item;
 

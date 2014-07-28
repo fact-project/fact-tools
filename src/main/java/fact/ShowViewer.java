@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+import stream.annotations.Parameter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,6 +28,7 @@ public class ShowViewer implements StatefulProcessor {
     /**
      * The key for the data to  be displayed on the screen
      */
+    @Parameter(required = true)
     private String key;
     public String getKey() {
         return key;
@@ -34,6 +36,18 @@ public class ShowViewer implements StatefulProcessor {
     public void setKey(String key) {
         this.key = key;
     }
+
+
+    @Parameter(required = false, description = "The default plot range in the main viewer")
+    private Integer[] range;
+    public void setRange(Integer[] range) {
+        if(range.length != 2){
+            throw new RuntimeException("The plotrange has to consist of two numbers");
+        }
+        this.range = range;
+    }
+
+
 
 
     @Override
@@ -60,6 +74,9 @@ public class ShowViewer implements StatefulProcessor {
 				if (viewer == null) {
 					viewer = Viewer.getInstance();
                     viewer.setDefaultKey(key);
+                    if (range != null){
+                        viewer.setRange(range);
+                    }
 					viewer.getNextButton().setEnabled(true);
 					viewer.getNextButton().addActionListener(
 							new ActionListener() {

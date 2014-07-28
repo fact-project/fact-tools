@@ -51,17 +51,18 @@ public class MainPlotPanel extends JPanel implements EventObserver, SliceObserve
     private int roi = 300;
 
     private Set<Pair<String, Color>> itemsToPlot = new HashSet<>();
+
     private Set<Pair<String, Color>> markerToPlot = new HashSet<>();
     private int currentSlice = 0;
-
     private Pair<String, Color> defaultPair;
 
     public void setDefaultEntry(String key, Color c){
         defaultPair = Pair.create(key, c);
     }
 
-
-
+    public void setRange(int min, int max){
+        plot.getDomainAxis().setRange(min , max);
+    }
 
     public MainPlotPanel(int width, int height, boolean showAverage) {
 
@@ -76,6 +77,7 @@ public class MainPlotPanel extends JPanel implements EventObserver, SliceObserve
          */
         plot.setDomainPannable(true);
         plot.setRangePannable(true);
+
 
         //draw the dashed line showing the current slice
         addSliceMarker();

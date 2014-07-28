@@ -172,45 +172,6 @@ public class PixelMappingTest {
                 m.getChidFromSoftID(softid) == chid);
     }
 
-    /**
-     * Tests the mapping of camera coordinates in millimeter to actual pixels.
-     * We start with some handcrafted coordinates in MM. For each coordinate we find the nearest pixel by
-     * iterating over all pixels and calculating the distance
-     */
-	@Test
-	public void testKoordinateToChid() {
-        FactPixelMapping m  = FactPixelMapping.getInstance();
-
-		// -180,999 .... 180,999
-		double[] xs = {120.513, 12.22 ,-80.324 , -120.6, -6.93  * 9.5, 100.0 , 10.50*9.5 , -11.26*9.5};
-		double[] ys = {80.113 , 102.22,-5.324  , 20.5  , 3.49  * 9.5 , 100.4 , 11*9.5    , 6.0 *9.5  };
-
-		for (int i = 0; i < xs.length; i++){
-			double x = xs[i];
-			double y = ys[i];
-			int nearestChid = -1;
-			double lowestDistance = 100000.0d;
-			for (int chid = 0 ; chid < m.getNumberOfPixel() ; chid++ )
-			{
-				FactCameraPixel p = (FactCameraPixel) m.getPixelFromId(chid);
-				double yChid = p.posY *9.5;
-                double xChid = p.posX *9.5;
-				double distance = Math.sqrt( (xChid-x)*(xChid-x) + (yChid-y)*(yChid-y) );
-				if (distance <= lowestDistance)
-				{
-					nearestChid = chid;
-					lowestDistance = distance;
-                }
-			}
-            if(m.getPixelBelowCoordinatesInMM(x, y) !=  null) {
-                assertEquals("Map did not return the right pixel for coordinates: " + x + ", " + y,
-                        nearestChid, m.getPixelBelowCoordinatesInMM(x, y).chid);
-            } else {
-                fail("No pixel returned for coordinates: " + x + ", " + y);
-            }
-		}
-	}
-
 
     /**
      * writes a file called 'matrix.txt' which can be plotted by matplotlib like this:
@@ -297,4 +258,46 @@ public class PixelMappingTest {
                 m.getPixelBelowCoordinatesInMM(x, y) == null);
 
 	}
+
+    /**
+     * Similar to the test above. Just moar. And moar is better!
+     * Tests the mapping of camera coordinates in millimeter to actual pixels.
+     * We start with some handcrafted coordinates in MM. For each coordinate we find the nearest pixel by
+     * iterating over all pixels and calculating the distance
+     */
+    @Test
+    public void testKoordinateToChid() {
+        FactPixelMapping m  = FactPixelMapping.getInstance();
+
+        // -180,999 .... 180,999
+        double[] xs = {120.513, 12.22 ,-80.324 , -120.6, -6.93  * 9.5, 100.0 , 10.50*9.5 , -11.26*9.5};
+        double[] ys = {80.113 , 102.22,-5.324  , 20.5  , 3.49  * 9.5 , 100.4 , 11*9.5    , 6.0 *9.5  };
+
+        for (int i = 0; i < xs.length; i++){
+            double x = xs[i];
+            double y = ys[i];
+            int nearestChid = -1;
+            double lowestDistance = 100000.0d;
+            for (int chid = 0 ; chid < m.getNumberOfPixel() ; chid++ )
+            {
+                FactCameraPixel p = (FactCameraPixel) m.getPixelFromId(chid);
+                double yChid = p.posY *9.5;
+                double xChid = p.posX *9.5;
+                double distance = Math.sqrt( (xChid-x)*(xChid-x) + (yChid-y)*(yChid-y) );
+                if (distance <= lowestDistance)
+                {
+                    nearestChid = chid;
+                    lowestDistance = distance;
+                }
+            }
+            if(m.getPixelBelowCoordinatesInMM(x, y) !=  null) {
+                assertEquals("Map did not return the right pixel for coordinates: " + x + ", " + y,
+                        nearestChid, m.getPixelBelowCoordinatesInMM(x, y).chid);
+            } else {
+                fail("No pixel returned for coordinates: " + x + ", " + y);
+            }
+        }
+    }
+
+
 }

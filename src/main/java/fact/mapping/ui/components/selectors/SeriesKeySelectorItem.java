@@ -67,7 +67,7 @@ public class SeriesKeySelectorItem extends JPanel  {
                 color = JColorChooser.showDialog(null, "Choose color", Color.DARK_GRAY);
                 colorButton.setForeground(color);
                 selector.addSelected(SeriesKeySelectorItem.this);
-                checkBox.setEnabled(true);
+                checkBox.setSelected(true);
             }
         });
         add(checkBox, BorderLayout.WEST);
