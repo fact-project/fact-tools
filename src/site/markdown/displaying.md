@@ -1,5 +1,16 @@
-Displaying stuff in the viewer
-------------------
+##Calling the viewer
+
+To show the Gui you have to call the `fact.ShowViewer` Processor. Just like you'd call any other Processor.
+It requires the `key=<some_key>` parameter to know what data to display. It takes the optional `range="min,max"` 
+parameter which specifies the default plot range of the main window.
+
+    
+    <fact.ShowViewer key="DataCalibrated" range="25,250"/>
+
+
+
+##Displaying stuff in the viewer
+
 
 By clicking Window -> Graph Window in the FactViewer you can see the slices of selected pixels in the Camera.
 
