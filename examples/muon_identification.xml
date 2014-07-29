@@ -1,0 +1,73 @@
+<container>
+
+	<!--  Event 64 should be a muon ring -->
+	<property name="data" value="/home/max_noethe/phido/fhgfs/groups/app/fact/raw/2013/02/05/20130205_060.fits.gz" /> 
+	<property name="drsfile" value="/home/max_noethe/phido/fhgfs/groups/app/fact/raw/2013/02/05/20130205_053.drs.fits.gz" />
+
+    <stream id="fact" class="fact.io.FitsStream" url="file:${data}" />
+            
+    <process  input="fact"> 
+			
+			<fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+        	<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        	<stream.flow.Skip condition="%{data.EventNum} &lt; 60" />
+
+            <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+        	
+        	<fact.filter.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" 
+        								  outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" 
+        								  jumpLimit="2.0" />
+        								  
+        	<fact.filter.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" 
+        							  leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" 
+        							  outputSpikesKey="Sp" color="#000000" />
+        							  
+        	<fact.filter.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                							 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+            
+            <fact.features.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" 
+                                                outputKey="maxAmplitudePosition"/>
+            <fact.features.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" 
+                                                  outputKey="arrivalTime"/>
+        	<fact.features.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photonCharge" 
+        								url="file:src/main/resources/defaultIntegralGains.csv" rangeSearchWindow="25" 
+        								color="#FF0F0F"/>
+                 
+			<fact.cleaning.CoreNeighborClean key="photonCharge" outputKey="cleanPixel" keyPositions="arrivalTime"
+           									 corePixelThreshold="4.0" neighborPixelThreshold="2.0"
+                                             timeThreshold="15"  minNumberOfPixel="2" showDifferentCleaningSets="false"/>
+         
+
+            <Skip condition="%{data.cleanPixel}==null"/>
+			<fact.features.NumberOfPixelInShower showerKey="cleanPixel" outputKey="numPixelInCleanPixel" />
+			<Skip condition="%{data.numPixelInCleanPixel} &lt; 15" />
+			
+			<fact.features.Leakage shower="cleanPixel" weights="photonCharge" outputKey="Leakage" />
+			<Skip condition="%{data.Leakage} &gt; 0.05" />
+
+		
+			<fact.features.MuonHoughTransform showRingKey="true"  showMatrixKey="false" bestCircleKey="bestRing" ringKey="cleanPixel" 
+			                                  photonChargeKey="photonCharge" octantsHitKey="octantsHit" bestRadiusKey="bestRadius" 
+			                                  bestXKey="bestX" bestYKey="bestY" bestRingPixelKey="bestRingPixel" 
+			                                  distanceKey="houghDistance" peaknessKey="houghPeakness" percentageKey="houghPercentage" />
+			
+			<fact.cleaning.MuonRingClean ringPixelKey="bestRingPixel" photonChargekey="photonCharge" arrivalTimeKey="arrivalTime" photonChargeThreshold="2" timeThreshold="10" outputKey="cleanRingPixel2"/>
+			<fact.cleaning.MuonRingClean ringPixelKey="bestRingPixel" photonChargekey="photonCharge" arrivalTimeKey="arrivalTime" photonChargeThreshold="6" timeThreshold="10" outputKey="cleanRingPixel6"/>
+
+			
+			<fact.statistics.KeyInShowerDistribution key="arrivalTime" showerPixelKey="cleanRingPixel2" outputKey="RingArrivalTime2" />
+			<fact.statistics.KeyInShowerDistribution key="arrivalTime" showerPixelKey="cleanRingPixel6" outputKey="RingArrivalTime6" />
+				
+				
+<!-- 			Cuts: -->
+			
+			<Skip condition="%{data.houghDistance} &gt; 100" />
+			<Skip condition="%{data.houghPeakness} &lt; 7" />
+			<Skip condition="%{data.houghPercentage} &lt; 0.7" />
+			<Skip condition="%{data.octantsHit} &lt; 5" />
+			
+			<fact.io.PrintKeysOnConsole keys="houghPeakness,houghDistance,houghPercentage,octantsHit"/>
+			<fact.image.ShowImage/> 
+			
+		</process>
+</container>

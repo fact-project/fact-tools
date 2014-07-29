@@ -57,9 +57,15 @@ public class MaxAmplitudePositionTest {
 
     @Test
     public void maximum() {
-        double[] mock = {0.0, 0.1, 0.2, 0.3, -0.3, -0.4 ,-0.5 , 128.0, -128.0, 4123.0, 4123.00001, 4123.00001, 1230,12};
-        maxAmpPos.setSearchWindowRight(mock.length);
-        int pos = maxAmpPos.findMaximumPosition(mock.length, 0, mock);
-        assertTrue("Position should be array element 11 +1 ", pos == 12 );
+        double[] mockNegatives = {-12.0, -11.1, -0.2, -0.2};
+        maxAmpPos.setSearchWindowRight(mockNegatives.length);
+        maxAmpPos.setSearchWindowLeft(0);
+        int pos = maxAmpPos.findMaximumPosition(0, mockNegatives.length, mockNegatives);
+        assertTrue("Position should be array element 2 ", pos == 2 );
+
+        double[] mockPositives = {0.2, 0.3, 0.4, 120, 120, 120, 119.999};
+        pos = maxAmpPos.findMaximumPosition(0, mockPositives.length, mockPositives);
+        assertTrue("Position should be array element 3 ", pos == 3 );
+
     }
 }

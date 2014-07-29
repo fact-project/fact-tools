@@ -101,7 +101,7 @@ public class BlockHeader {
 		ByteBuffer buffer = ZFitsUtil.wrap(this.data);
 		ShortBuffer shortBuffer = buffer.asShortBuffer();
 		for (int i=2; i<shortBuffer.capacity(); i++) {
-			shortBuffer.put(i, (short)(shortBuffer.get(i) + (short)(shortBuffer.get(i-1)+shortBuffer.get(i-2))/2));
+			shortBuffer.put(i, (short)(shortBuffer.get(i) + (short)((shortBuffer.get(i-1)+shortBuffer.get(i-2))/2)));
 		}
 	}
 
