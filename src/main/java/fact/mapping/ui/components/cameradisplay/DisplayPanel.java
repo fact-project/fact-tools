@@ -18,10 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -73,10 +78,16 @@ public class DisplayPanel extends JPanel implements EventObserver{
 
         //--------action listeners for menus and buttons----------
 
-        //actionlistener for colormap context menu.
-        ActionListener colorMapMenuListener = new ActionListener() {
+        //actionlistener for context menu.
+        ActionListener contextMenuListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //export to .png
+                if(e.getActionCommand().equalsIgnoreCase("Export to .png")){
+                    exportPNG();
+                    return;
+                }
+                //select the colormap
                 for(Class<? extends ColorMapping> mapClass: colorMapClasses){
                     if(e.getActionCommand().equals(mapClass.getSimpleName())){
                         try {
@@ -98,9 +109,14 @@ public class DisplayPanel extends JPanel implements EventObserver{
         JPopupMenu popupMenu = new JPopupMenu("Color Mapping");
         for (Class<? extends ColorMapping> map : colorMapClasses){
             JMenuItem colorMapMenuItem1 = new JMenuItem(map.getSimpleName());
-            colorMapMenuItem1.addActionListener(colorMapMenuListener);
+            colorMapMenuItem1.addActionListener(contextMenuListener);
             popupMenu.add(colorMapMenuItem1);
         }
+        //Add the menu item to export the file to .png
+        popupMenu.addSeparator();
+        JMenuItem exportItem = new JMenuItem("Export to .png");
+        exportItem.addActionListener(contextMenuListener);
+        popupMenu.add(exportItem);
 
         hexmap.setComponentPopupMenu(popupMenu);
         selector.setPreferredSize(new Dimension(600, 120));
@@ -125,5 +141,38 @@ public class DisplayPanel extends JPanel implements EventObserver{
         //builder.add(overlaySelector, cc.xywh(1,4,6,1));
         add(builder.getPanel());
 
+    }
+
+    /**
+     *This method shows a jfilechooser to save the current hexmap image as a png file.
+     */
+    private void exportPNG(){
+        //draw stuff again
+        BufferedImage bi = new BufferedImage(this.getSize().width, this.getSize().height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        hexmap.paint(g);
+        g.dispose();
+
+        //open a file chooser for png files
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                ".png Images", ".png");
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(filter);
+        int ret = chooser.showSaveDialog(null);
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            //if there isn't already the .png extension, add it.
+            File f = chooser.getSelectedFile();
+            if(!f.getAbsolutePath().endsWith(".png")){
+                f = new File(f + ".png");
+            }
+            //now write the file
+            try {
+                ImageIO.write(bi, "png", f);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error("Couldn't write image. Is the path writable?");
+            }
+        }
     }
 }
