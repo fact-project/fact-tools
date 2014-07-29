@@ -80,7 +80,6 @@ public class ArrivalTimeFromSlope implements Processor {
 		
         input.put(outputKey, arrivalTimes);
         input.put(visualizeKey, visualizePositions);
-        input.put(visualizePulsePeakskey);
         input.put(baselineKey, baselineValues);
 //        System.out.println(Arrays.toString(baselineValues));
 		
