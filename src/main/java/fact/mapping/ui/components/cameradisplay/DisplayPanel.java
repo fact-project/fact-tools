@@ -9,7 +9,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import fact.mapping.FactPixelMapping;
 import fact.mapping.ui.Bus;
 import fact.mapping.ui.EventObserver;
-import fact.mapping.ui.components.cameradisplay.colormapping.*;
+import fact.mapping.ui.colormapping.*;
 import fact.mapping.ui.components.selectors.CameraOverlayKeySelector;
 import fact.mapping.ui.events.OverlaySelectionChangedEvent;
 import org.apache.commons.math3.util.Pair;

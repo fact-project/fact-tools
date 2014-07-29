@@ -9,9 +9,8 @@ import fact.mapping.CameraPixel;
 import fact.mapping.FactPixelMapping;
 import fact.mapping.PixelMapping;
 import fact.mapping.ui.*;
-import fact.mapping.ui.components.cameradisplay.colormapping.ColorMapping;
-import fact.mapping.ui.components.cameradisplay.colormapping.GrayScaleColorMapping;
-import fact.mapping.ui.components.selectors.SeriesKeySelectorItem;
+import fact.mapping.ui.colormapping.ColorMapping;
+import fact.mapping.ui.colormapping.GrayScaleColorMapping;
 import fact.mapping.ui.events.SliceChangedEvent;
 import fact.mapping.ui.overlays.CameraMapOverlay;
 import org.apache.commons.math3.util.Pair;
@@ -253,12 +252,14 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             g2.translate(-xOffset, -yOffset);
 
             //draw cross across screen to indicate center ofcomponent
+            /*
             g2.setColor(Color.WHITE);
             Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
             g2.draw(line);
 
             line = new Line2D.Double(getWidth(),0,0,getHeight());
             g2.draw(line);
+            */
 
 
             g2.translate(this.canvasWidth - 40, 0);

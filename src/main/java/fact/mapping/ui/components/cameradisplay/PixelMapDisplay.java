@@ -1,7 +1,7 @@
 package fact.mapping.ui.components.cameradisplay;
 
 import fact.mapping.PixelMapping;
-import fact.mapping.ui.components.cameradisplay.colormapping.ColorMapping;
+import fact.mapping.ui.colormapping.ColorMapping;
 
 public interface PixelMapDisplay {
 

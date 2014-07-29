@@ -69,6 +69,7 @@ public abstract class Tile extends Component {
 		g.setColor(fillColor);
 
         FactCameraPixel pixel = (FactCameraPixel) this.getCameraPixel();
+        /*
         if(pixel.softid == 0){
             g.setColor(Color.RED);
         }
@@ -78,6 +79,7 @@ public abstract class Tile extends Component {
         if(pixel.softid == 1410){
             g.setColor(Color.YELLOW);
         }
+        */
 
 		g.fillPolygon(p);
         g.setColor(c);
