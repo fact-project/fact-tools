@@ -33,9 +33,9 @@ public class CreateNestedListFile extends CsvWriter {
 	PrintStream outputStream;
 	
 	@Parameter(required=true, description="ArrayList<Double>[] -  matrix of size NUMBEROFPIXEL containing lists of data for all pixels")
-	private String PixPulseSizeKey;
-    ArrayList<Integer>[] PixPulseSize = null;
-    	//Pulse size was specific to my use, but this file will work with whatever measurement in the form of a matrix of lists.
+	private String DataOutputKey;
+    ArrayList<Integer>[] DataOutput = null;
+    	// this process will work with any measurement in the form of a matrix of arraylists.
     
     @Parameter(required=true)
     private String urlString;
@@ -56,14 +56,15 @@ public class CreateNestedListFile extends CsvWriter {
 	//the function which creates a string from the array
 	String Change_to_String( ArrayList<Integer>[] array) {
 		String info = Arrays.toString(array);
-		return info;
+//		System.out.println(info);
+		return info;		
 	}
 	
 	
 	@Override
 	public Data process(Data data) {
-		PixPulseSize = (ArrayList<Integer>[]) data.get(PixPulseSizeKey);
-		outputStream.println( Change_to_String(PixPulseSize) );
+		DataOutput = (ArrayList<Integer>[]) data.get(DataOutputKey);
+		outputStream.println( Change_to_String(DataOutput) );
 		return data;
 	}
 	
@@ -77,15 +78,14 @@ public class CreateNestedListFile extends CsvWriter {
 		outputStream.close();
 	}
 
-	public String getPixPulseSizeKey() {
-		return PixPulseSizeKey;
+
+	public String getDataOutputKey() {
+		return DataOutputKey;
 	}
 
-
-	public void setPixPulseSizeKey(String pixPulseSizeKey) {
-		PixPulseSizeKey = pixPulseSizeKey;
+	public void setDataOutputKey(String dataOutputKey) {
+		DataOutputKey = dataOutputKey;
 	}
-
 
 	public String getUrlString() {
 		return urlString;
