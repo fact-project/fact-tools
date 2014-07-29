@@ -31,7 +31,7 @@ be added/removed to/from the current selection. Some information like
 the Id and the coordinates of the selected Pixels will be displayed next to the camera view.
 
 By right-clicking the camera image you can select between different color
-schemes for displaying the hexagons.
+schemes or export the camera image as a .png file.
 
 
 
