@@ -18,4 +18,8 @@ interactive visualization component for FACT data.
 ####Programming
 For a quick overview for creating your own custom processors see the [Programming Section](programming_examples/programming_example.html)
 
+
+####Downloading 
+You can download the latest FACT tools binary build from the stable branch in the [Downloads section](download.html)
+
 ![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)

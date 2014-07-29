@@ -1,4 +1,4 @@
-##Parameter and Annotations
+#Parameter and Annotations
 
 You can easily pass parameters from the xml file to a processor without much overhead.
 Using the usual [JavaBeans convention](http://en.wikipedia.org/wiki/JavaBeans#JavaBean_conventions) you simply
@@ -38,7 +38,8 @@ Here's a short example demonstrating how to pass a parameter ( in this case a fl
 
 		}
 
-The usual convention here is to put the getter and setter methods as last members in the class. The correspnding line in the .xml file would look like this:
+The usual convention here is to put the getter and setter methods as last members in the class. The corresponding line
+in the .xml file would look like this:
 
 		<fact.somePackage.SomeProcessor someValue="3.141452234" />
 

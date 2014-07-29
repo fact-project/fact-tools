@@ -28,7 +28,6 @@
 	
 	<menu name="Documentation">
 	    <item name="Usage Examples" href="examples.html">
-             <item name="The Viewer" href="displaying.html" />
 	         <item name="Writing Data" href="example_writing.html" />
 	         <item name="Plotting Data" href="plotting/example_plots.html" collapse="true" >
 	            <item name="Scatter Plots" href="plotting/scatter_plot.html" />
@@ -39,10 +38,12 @@
 	
 	    </item>
 	
-	    <item name="Programming Examples" href="programming_examples/programming_example.html" collapse="true">
-	          <item name="Finding the maximum" href="programming_examples/maximum.html" />
-	          <item name="Passing parameters from the .xml" href="programming_examples/parameter.html" />
-	          <item name="Log output" href="programming_examples/logging.html" />
+	    <item name="Programming Examples" href="programming_examples/programming_example.html" collapse="false">
+                <item name="Displaying data in the Viewer" href="programming_examples/displaying.html" />
+                <item name="Creating custom color maps" href="programming_examples/colormaps.html" />
+                <item name="Finding the maximum" href="programming_examples/maximum.html" />
+	            <item name="Passing parameters from the .xml" href="programming_examples/parameter.html" />
+	            <item name="Log output" href="programming_examples/logging.html" />
 	    </item>
 	
 	    <item name="Further Resources" href="resources.html" />

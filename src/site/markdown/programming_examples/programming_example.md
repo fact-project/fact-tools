@@ -4,9 +4,8 @@ Programming Examples
 Even though most of the important processors for working with FACT data are already included, 
 chances are you want to write your own. Working with the [streams-api](http://www.jwall.org/streams/stream-api/) 
 allows easy implementation of new methods to analyze the data. For an example on how to write a processor
-see [here](http://www.jwall.org/streams/stream-api/processor.html)
-We'll take a quick look at a example specifically for FACT data with a few common pitfalls you might
-run into.
+see [here](http://www.jwall.org/streams/stream-api/processor.html).
+Below is a short example/template for a simple processor.
 
         package fact.features;
 

@@ -15,7 +15,7 @@ parameter which specifies the default plot range of the main window.
 By clicking Window -> Graph Window in the FactViewer you can see the slices of selected pixels in the Camera.
 
 <div style="text-align: center;">
-   <img src="images/graph_window_multiple.png" style="width:400px;" />
+   <img src="../images/graph_window_multiple.png" style="width:400px;" />
 </div>
 
 The Graph Window will try to display all float or double arrays with the right size. That means it has to be dividable
@@ -25,7 +25,7 @@ by the number of pixels in the camera. This allows for quick comparisons and san
 ## Coloring a time interval
 
 <div style="text-align: center;">
-   <img src="images/graph_window_marker.png" style="width:400px;" />
+   <img src="../images/graph_window_marker.png" style="width:400px;" />
 </div>
 
 

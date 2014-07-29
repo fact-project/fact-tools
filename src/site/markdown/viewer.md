@@ -3,41 +3,35 @@ The FACT Viewer
 
 The largest component of the FACT tools is the standalone viewer for
 inspecting FACT data files. Currently the viewer supports reading and
-displaying FACT data events as well as exporting these events to
-animated GIF files.
+displaying FACT data events.
 
 The following picture shows a screenshot of the FactViewer:
 
-<div style="text-align: center;">
+<div id="textimg">
    <img src="images/fact-viewer-screen1.png" style="width:700px;" />
 </div>
 
 
-More features to follow.
+For more information on how you can display your specific data in the viewer see the
+[progamming examples](programming_examples/displaying.html) about the viewer.
     
 
 ## Running the Viewer
 
-The viewer part of the fact-tools .jar but it can be executed as a standalone program by Java:
+The viewer part of the fact-tools .jar but it can be called just like any other Processor by calling
 
-     # java -cp fact-tools-{VERSION}.jar fact.FactViewer <path_to_fits>
-     
-The exact name of the JAR archive may change according to the version.
-For instructions to build the viewer from source, see the build section.
+    <fact.ShowViewer key="DataCalibrated" range="25,250"/>
 
 
 ## Using the Viewer
 
 Using the viewer is rather simple. Pixels on the camera hex map
-can be selected by mouse click. By holding the Ctrl-Key, pixels can
-be added/removed to/from the current selection.
+can be selected by mouse click. By holding the Shift-Key, pixels can
+be added/removed to/from the current selection. Some information like 
+the Id and the coordinates of the selected Pixels will be displayed next to the camera view.
 
-When holding the Shift-Key and hovering over the time chart, the
-corresponding slice of the event is displayed in the camera map.
+By right-clicking the camera image you can select between different color
+schemes for displaying the hexagons.
 
 
-#### Creating animated GIFs
 
-All the export functions (to GIF, to PNG) are accessible by
-right-clicking the camera hex map. This will bring up a context
-menu with the list of available export commands.

@@ -39,17 +39,7 @@ Running the FACT Tools
 ----------------------
 
 The *fact-tools* package that has been assembled by the Maven commands
-as described above essentially contains two important components:
-
-  1. The `FactViwer` application
-  2. The *streams* framework with FACT processors.
-
-The *FactViewer* is intended to inspect and display FITS files that
-provide FACT data. The *FactViewer* can be started by running:
-
-    # java -cp target/fact-tools-VERSION.jar fact.FactViewer
-
-
+can be used just like the *streams* framework.
 The *streams* framework is intended to run XML process configurations
 that have previously been defined. These XML process definitions may
 contain data-preprocessing steps, image cleaning operators and multiple

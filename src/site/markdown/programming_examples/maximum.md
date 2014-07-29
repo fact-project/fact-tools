@@ -1,4 +1,4 @@
-##Find the maximum slice
+#Find the maximum slice
 
 This processor simply iterates over all slices in each pixel and stores the maximum amplitude.
 At first we need to get the actual telescope data from the input. The data is stored in one large 
@@ -51,5 +51,6 @@ We use two loops here to exemplify how to iterate over each pixel separately
 event though this could easily be accomplished in a single loop. Another way to make this a bit quicker
 would be to store the maximum amplitude in a primitive double and then cast it to a `Double` before storing
 it in the map. 
-You can read [this](http://stackoverflow.com/questions/5199359/why-do-people-still-use-primitive-types-in-java) discussion on the primitive vs Numbers in the Java programming language. 
-    
+You can read [this](http://stackoverflow.com/questions/5199359/why-do-people-still-use-primitive-types-in-java) 
+discussion on the primitive types vs Number Objects in the Java programming language. 
+
