@@ -8,6 +8,7 @@ import stream.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -75,7 +76,7 @@ public class Utils {
     public static ArrayList<ArrayList<Integer>> breadthFirstSearch(
             List<Integer> showerPixel) {
         ArrayList<ArrayList<Integer>> listOfLists = new ArrayList<>();
-        ArrayList<Integer> marked = new ArrayList<>();
+        HashSet<Integer> marked = new HashSet<>();
         FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
         for (int pix : showerPixel) {
