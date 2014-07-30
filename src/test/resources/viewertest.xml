@@ -25,8 +25,8 @@
                                              timeThreshold="30"  minNumberOfPixel="2"
                                              showDifferentCleaningSets="true" starPositionKeys="Cetatauri" starRadiusInCamera="11.0"/>
 
-
-            <fact.ShowViewer key="DataCalibrated" range="25,250"/>
+            <fact.io.JSONWriter keys="shower" url="file:src/main/resources/test.json"/>
+            <!--<fact.ShowViewer key="DataCalibrated" range="25,250"/>-->
 		</process>
 </container>
 
