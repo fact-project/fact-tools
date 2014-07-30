@@ -36,7 +36,6 @@ public class FilterTests {
 			ArrayList<SimpleFactEventProcessor<double[], double[]>> pList = new ArrayList<SimpleFactEventProcessor<double[], double[]>>();
 			pList.add(new FirFilter());
 			pList.add(new MovingAverage());
-			pList.add(new InterpolateBadPixel());
 			pList.add(new MultiplyValues());
 			pList.add(new SliceNormalization());
 			
