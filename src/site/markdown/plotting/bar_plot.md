@@ -35,32 +35,8 @@ Its often useful to compare accumulated values using a bar plot. A bar plot can 
 During the processing a new window will pop up containing four bars. Thats one for each key. Each processed event will update the plot.
 
 
-<div style="text-align: center;">
+<div id="textimg">
    <img src="../images/single_bar_plot.png" style="width:550px;" />
-</div>
-
-The BarPlotter can also draw arrays for each event. If you pass an array that stays the same length for each event then each array item will get its own little bar in the plot. The following process gives a simple example. 
-
-
-      ...
-      
-      <stream id="fact-data" ... />
-      
-      <process input="fact-data">
-         ...
-         <!-- photoncharge for the whole camera. This array will have 1440 entries -->
-         <fact.features.PhotonCharge key="DataCalibrated"  positions="risingedge" outputKey="photoncharge" />
-
-         <fact.plotter.BarPlotter title="Nice bar!" keys="photoncharge" />
-
-
-      </process> 
-
-
-
-
-<div style="text-align: center;">
-   <img src="../images/array_bar_plot.png" style="width:550px;" />
 </div>
 
 
