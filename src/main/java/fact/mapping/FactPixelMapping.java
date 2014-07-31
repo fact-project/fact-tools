@@ -42,6 +42,7 @@ public class FactPixelMapping implements PixelMapping {
 
 
     private static FactPixelMapping mapping;
+
     public static FactPixelMapping getInstance() {
         if (mapping ==  null){
             URL map = FactPixelMapping.class.getResource("/pixel-map.csv");
@@ -221,4 +222,5 @@ public class FactPixelMapping implements PixelMapping {
     public int getSoftIDFromChid(int chid){
         return chId2softId[chid];
     }
+
 }

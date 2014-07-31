@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This is overlay can draws borders around the pixels passed to it via constructor or the add methods.
+ * This is overlay can draw borders around the pixels passed to it via constructor or the add methods.
  */
 public class PixelSetOverlay implements CameraMapOverlay, Serializable {
     Set<CameraPixel> set = new HashSet<>();

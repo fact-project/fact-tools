@@ -80,14 +80,13 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     /**
      * A Hexagon in this case is defined by the passed radius. The radius of the circle that fits into the hexagon
      * can be calculated by sqrt(3)/2 * (outter radius)
-     * @param pixelMapping the mapping which describes this geometry
      * @param radius the radius of the circle the hexagon should fit into
      */
-	public FactHexMapDisplay(FactPixelMapping pixelMapping, double radius, int canvasWidth, int canvasHeight) {
+	public FactHexMapDisplay(double radius, int canvasWidth, int canvasHeight) {
 
         Bus.eventBus.register(this);
 
-        this.pixelMapping = pixelMapping;
+        this.pixelMapping = FactPixelMapping.getInstance();
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
 		this.cellRadius = radius;
@@ -98,7 +97,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
 		tiles = new FactHexTile[pixelMapping.getNumberOfPixel()];
         for (int i = 0; i < tiles.length; i++){
-            FactHexTile t = new FactHexTile((fact.mapping.FactCameraPixel) pixelMapping.getPixelFromId(i), radius);
+            FactHexTile t = new FactHexTile(pixelMapping.getPixelFromId(i), radius);
             tiles[i] = t;
         }
 
@@ -215,8 +214,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
             //draw a grid with lines every 25 pixel in a dark grey color
             g2.setStroke(new BasicStroke(1.0f));
-            //g2.setColor(Color.DARK_GRAY);
-            //drawGrid(g2, 25);
+            g2.setColor(Color.DARK_GRAY);
+            drawGrid(g2, 25);
 
             //now draw the actual camera pixel
             //translate to center of canvas
@@ -245,21 +244,21 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             for(CameraMapOverlay o:overlays){
                 o.paint(g2, this);
             }
-
+            g2.setStroke(new BasicStroke(1.0f));
+            g2.setColor(Color.WHITE);
             //undo the rotation
             g2.rotate(Math.PI/2);
             //to draw the grid translate back
             g2.translate(-xOffset, -yOffset);
 
             //draw cross across screen to indicate center ofcomponent
-            /*
-            g2.setColor(Color.WHITE);
+
             Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
             g2.draw(line);
 
             line = new Line2D.Double(getWidth(),0,0,getHeight());
             g2.draw(line);
-            */
+
 
 
             g2.translate(this.canvasWidth - 40, 0);

@@ -3,6 +3,7 @@ package fact.features;
 import fact.Constants;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
+import fact.mapping.ui.overlays.EllipseOverlay;
 import fact.statistics.PixelDistribution2D;
 
 import org.apache.commons.math3.linear.*;
@@ -207,6 +208,7 @@ public Data process(Data input) {
     input.put("Length", Math.sqrt(eigenValue1/size) );
 	input.put("Width", Math.sqrt(eigenValue2/size) );
     input.put("Delta", delta );
+    input.put("BLABAL", new EllipseOverlay(cogX , cogY, Math.sqrt(eigenValue2/size) , Math.sqrt(eigenValue1/size)  , delta));
     
     //input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
     

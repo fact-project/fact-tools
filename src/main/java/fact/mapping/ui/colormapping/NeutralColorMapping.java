@@ -1,4 +1,4 @@
-package fact.mapping.ui.colormapping;equals
+package fact.mapping.ui.colormapping;
 
 import java.awt.*;
 

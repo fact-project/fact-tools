@@ -22,6 +22,7 @@ public class MaxAmplitudePosition implements Processor {
 
     @Parameter(required = true)
     private String key;
+
     @Parameter(required = true)
     private String outputKey;
 
@@ -98,6 +99,10 @@ public class MaxAmplitudePosition implements Processor {
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }
-	
+    public String getOutputKey() {
+        return outputKey;
+    }
+
+
 
 }
