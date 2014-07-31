@@ -3,16 +3,12 @@ package fact.io;
 import com.google.gson.Gson;
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Writes a file containing a hopefully valid JSON String on each line.
@@ -40,7 +36,7 @@ public class JSONWriter implements StatefulProcessor {
     private String[] keys;
 
     @Parameter(required = true)
-    private String url;
+    private URL url;
 
     private Gson gson = new Gson();
     private StringBuffer b = new StringBuffer();
@@ -77,21 +73,16 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        URL url = new URL(getUrl());
         bw= new BufferedWriter(new FileWriter(new File(url.getFile())));
     }
 
     @Override
-    public void resetState() throws Exception {
-
-    }
+    public void resetState() throws Exception {}
 
     @Override
     public void finish() throws Exception {
         bw.close();
     }
-
-
 
 
     public String[] getKeys() {
@@ -102,11 +93,11 @@ public class JSONWriter implements StatefulProcessor {
     }
 
 
-    public String getUrl() {
+    public URL getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(URL url) {
         this.url = url;
     }
 
