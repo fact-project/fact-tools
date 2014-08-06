@@ -44,14 +44,11 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public Data process(Data data) {
-        //b = new StringBuffer();
         Data item = DataFactory.create();
 
         String[] evKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
-//
         for(String key : evKeys) {
             if (data.containsKey(key)) {
-                System.out.println("Putting key in there!");
                 item.put(key, data.get(key));
             }
         }
