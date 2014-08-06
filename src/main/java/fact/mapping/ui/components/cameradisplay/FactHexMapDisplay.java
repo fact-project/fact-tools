@@ -44,14 +44,11 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 	FactHexTile tiles[];
 
 	// initialize the hexagonal grid.
-	double cellHeight;
-	double cellWidth;
     int canvasWidth;
     int canvasHeight;
 
     int rows = 0, cols = 0;
 
-	double cellRadius;
 
 	Set<CameraPixel> selectedPixels = new LinkedHashSet<CameraPixel>();
 
@@ -89,9 +86,6 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
         this.pixelMapping = FactPixelMapping.getInstance();
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
-		this.cellRadius = radius;
-		this.cellHeight = radius* Math.sqrt(3);
-		this.cellWidth  = 2 * radius;
         this.rows = pixelMapping.getNumberRows();
         this.cols = pixelMapping.getNumberCols();
 
