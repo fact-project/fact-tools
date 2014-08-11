@@ -68,6 +68,8 @@ public abstract class KeySelector extends JPanel implements EventObserver{
             k.setAlignmentX(Component.LEFT_ALIGNMENT);
             keySelectionContentPanel.add(k);
         }
+        keySelectionContentPanel.revalidate();
+        keySelectionContentPanel.repaint();
     }
 
     public Set<Pair<String, Color>> getSelectedItemPairs(){
