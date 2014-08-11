@@ -28,10 +28,4 @@ public interface PixelMapDisplay {
      */
     public Tile[] getTiles();
 
-    /**
-     * 
-     */
-    public PixelMapping getPixelMapping();
-
-
 }

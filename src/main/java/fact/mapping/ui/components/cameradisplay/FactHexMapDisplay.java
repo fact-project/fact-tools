@@ -40,8 +40,9 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 	private static final long serialVersionUID = -4015808725138908874L;
 
 	static Logger log = LoggerFactory.getLogger(FactHexMapDisplay.class);
+    private final double radius;
 
-	FactHexTile tiles[];
+    FactHexTile tiles[];
 
 	// initialize the hexagonal grid.
     int canvasWidth;
@@ -58,7 +59,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     //the data and key which to display a a hexmap
     private Data dataItem;
 
-    // store the smallest and largest value in the data. We need this to map vales to colors in the display
+    // store the smallest and largest value in the data. We need this to map values to colors in the display
     private double minValueInData;
     private double maxValueInData;
 
@@ -83,6 +84,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
         Bus.eventBus.register(this);
 
+        this.radius = radius;
         this.pixelMapping = FactPixelMapping.getInstance();
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
@@ -102,12 +104,6 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     public Tile[] getTiles() {
         return tiles;
     }
-
-    @Override
-    public PixelMapping getPixelMapping() {
-        return pixelMapping;
-    }
-
 
     @Override
     @Subscribe
@@ -400,5 +396,9 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     @Override
     public int getNumberOfTiles() {
         return tiles.length;
+    }
+
+    public double getTileRadiusInPixels() {
+        return radius;
     }
 }
