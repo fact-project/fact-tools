@@ -1,8 +1,7 @@
 package fact.plotter;
 
-import fact.Utils;
-import fact.image.OnlineStatistics;
 import fact.plotter.ui.BarPlotPanel;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +12,11 @@ import stream.plotter.DataVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serializable;
+import java.util.HashMap;
 
 /**
  * This class can plot a bar graph with errorBars by calculating the mean and
- * standarddeviation for a each key and event. If one of the keys refer to an
- * array. The same calculation will be done for every item in the array.
+ * standarddeviation for a each key and event. The key has to refer to something which can be represented by a Double.
  * 
  * @author bruegge
  * 
@@ -27,11 +25,19 @@ public class BarPlotter extends DataVisualizer {
 	static Logger log = LoggerFactory.getLogger(BarPlotter.class);
 	private BarPlotPanel histPanel;
 	JFrame frame;
-
+    @Parameter(required = false, description = "Flag indicates whether the window stays open after the process has finished", defaultValue = "true")
 	private boolean keepOpen = true;
-	private boolean drawErrors = true;
-	private String[] keys;
+
+    @Parameter(required = false, description = "Flag to toggle drawing of Errorbars in plot.")
+    private boolean drawErrors = true;
+
+    @Parameter(required = false, description = "The attributes/features to be plotted")
+    private String[] keys;
+
+    @Parameter(required = false, description = "Title String of the plot", defaultValue = "Default Title")
 	private String title = "Default Title";
+
+    private HashMap<String, SummaryStatistics> summaryStatisticsHashMap = new HashMap<>();
 	
 	
 	
@@ -39,22 +45,21 @@ public class BarPlotter extends DataVisualizer {
 	public BarPlotter() {
 		width = 690;
 		height = 460;
-		// this.setHistory(1440);
-		// prevDataItem = DataFactory.create();
 	}
 
-	OnlineStatistics onStat = null;
 
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
-		onStat = new OnlineStatistics();
 		histPanel = new BarPlotPanel(drawErrors, title);
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(histPanel, BorderLayout.CENTER);
 		frame.setSize(width, height);
 		frame.setVisible(true);
+        for(String key: keys){
+            summaryStatisticsHashMap.put(key, new SummaryStatistics());
+        }
 //		frame.setTitle(title);
 		if(keys==null){
 			log.error("The keys paramter was null. Did you set it in the .xml file?");
@@ -65,38 +70,16 @@ public class BarPlotter extends DataVisualizer {
 	public Data processMatchingData(Data data) {
 		DefaultStatisticalCategoryDataset dataset = new DefaultStatisticalCategoryDataset();
 		
-		for (String key : getKeys()) {
+		for (String key : keys) {
 
 			if (data.containsKey(key)) {
-				Serializable val = data.get(key);
-				// in case the "key" describes a single value per event
-				if (val.getClass().equals(float.class)
-						|| val.getClass().equals(double.class)
-						|| val.getClass().equals(int.class)
-						|| val instanceof Number) {
-					double[] a = { Utils.valueToDouble(val) };
-					onStat.updateValues(key, a);
-					dataset.add(onStat.getValueMap().get(key + "_avg")[0],
-							onStat.getValueMap().get(key + "_stdErr")[0], "",
-							key);
-				} else if (val.getClass().isArray()) {
-					Class<?> clazz = val.getClass().getComponentType();
-					if (clazz.equals(float.class) || clazz.equals(double.class)
-							|| clazz.equals(int.class)) {
-						double[] valArray = Utils.toDoubleArray(val);
-						onStat.updateValues(key, valArray);
-						for (int i = 0; i < onStat.getValueMap().get(
-								key + "_avg").length; i++) {
-							dataset.add(
-									onStat.getValueMap().get(key + "_avg")[i],
-									onStat.getValueMap().get(key + "_stdErr")[i],
-									key + i, key);
-						}
-					}
-				}
+				String val = data.get(key).toString();
+                double d = Double.parseDouble(val);
+                SummaryStatistics ss = summaryStatisticsHashMap.get(key);
+                ss.addValue(d);
+				dataset.add(ss.getMean(), ss.getStandardDeviation(), " ", key);
 			} else {
-				log.error("The key " + key + " does not exist in the Event");
-				throw new RuntimeException("Key not found in event. "  + key);
+				log.warn("The key " + key + " does not exist in the Event");
 			}
 		}
 		histPanel.setDataset(dataset);
@@ -117,39 +100,20 @@ public class BarPlotter extends DataVisualizer {
 	}
 	
 	
-	public boolean isKeepOpen() {
-		return keepOpen;
-	}
 
-	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
+
 	public void setKeepOpen(boolean keepOpen) {
 		this.keepOpen = keepOpen;
 	}
 
-
-	public String[] getKeys() {
-		return keys;
-	}
-
-	@Parameter(required = false, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
 	public void setKeys(String[] keys) {
 		this.keys = keys;
 	}
 
-
-	public boolean isDrawErrors() {
-		return drawErrors;
-	}
-
-	@Parameter(required = true, description = "Flag to toggle drawing of Errorbars in plot.")
 	public void setDrawErrors(boolean drawErrors) {
 		this.drawErrors = drawErrors;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-	@Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
 	public void setTitle(String title) {
 		this.title = title;
 	}

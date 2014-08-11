@@ -38,7 +38,7 @@ public class DisplayPanel extends JPanel implements EventObserver{
 
     static Logger log = LoggerFactory.getLogger(DisplayPanel.class);
 
-    final FactHexMapDisplay hexmap = new FactHexMapDisplay(FactPixelMapping.getInstance(), 7, 600, 530);
+    final FactHexMapDisplay hexmap = new FactHexMapDisplay(7, 600, 530);
     final CameraOverlayKeySelector selector = new CameraOverlayKeySelector();
     private final Set<Class<? extends ColorMapping>> colorMapClasses;
 

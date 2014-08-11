@@ -47,7 +47,7 @@ public class StatusWindow extends DataVisualizer {
 	}
 
 	/**
-	 * @wbp.parser.entryPoint
+     *
 	 */
 	@Override
 	public void init(ProcessContext ctx) throws Exception {

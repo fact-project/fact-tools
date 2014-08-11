@@ -8,7 +8,7 @@
             <fact.filter.ExponentialSmoothing key="DataCalibrated" outputKey="smoothedData1" alpha="0.1"/>
             <fact.filter.ExponentialSmoothing key="DataCalibrated" outputKey="smoothedData2" alpha="0.2"/>
             <fact.filter.ExponentialSmoothing key="DataCalibrated" outputKey="smoothedData9" alpha="0.9"/>
-
+            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated" outputKey="DataCalibrated"/>
             <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
             <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated"  amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
             <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
@@ -19,14 +19,12 @@
                                              keyPositions="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
 
             <fact.features.source.SourcePosition outputKey="Cetatauri" url="${driveFile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" />
-
-            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower_test" keyPositions="maxAmplitudePosition"
-                                             corePixelThreshold="5" neighborPixelThreshold="2"
-                                             timeThreshold="30"  minNumberOfPixel="2"
-                                             showDifferentCleaningSets="true" starPositionKeys="Cetatauri" starRadiusInCamera="11.0"/>
-
-
+            <fact.features.DistributionFromShower weights="photoncharge" pixel="shower" outputKey="dist" />
             <fact.ShowViewer key="DataCalibrated" range="25,250"/>
+            <!--<fact.statistics.ArrayMean key="photoncharge" outputKey="pMean" />-->
+            <!--<fact.statistics.ArrayMean key="arrivalTime" outputKey="aMean" />-->
+            <!--<fact.plotter.BarPlotter keys="pMean,aMean" />-->
 		</process>
+
 </container>
 

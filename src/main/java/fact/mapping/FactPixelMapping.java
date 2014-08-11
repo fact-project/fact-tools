@@ -42,6 +42,7 @@ public class FactPixelMapping implements PixelMapping {
 
 
     private static FactPixelMapping mapping;
+
     public static FactPixelMapping getInstance() {
         if (mapping ==  null){
             URL map = FactPixelMapping.class.getResource("/pixel-map.csv");
@@ -92,44 +93,6 @@ public class FactPixelMapping implements PixelMapping {
         double cube_z = axial_r;
         double cube_y = -cube_x-cube_z;
 
-
-
-        //double q = 2.0/3.0 * xCoordinate / d;
-        //double r = (1.0/3.0*Math.sqrt(3) * yCoordinate - 1.0/3.0 * xCoordinate) / d;
-        //now convert to cube coordinates
-        //because x + y + z = 0
-/*
-        double q = xCoordinate / 0.86602540378;
-        int qd = (int) Math.round(q);
-        double offset = 0;
-        if ((qd & 1) == 0){
-            offset = 0.5;
-        }
-        double r = -(yCoordinate - offset);
-        int rd = (int) Math.round(r);
-
-        FactCameraPixel p = getPixelFromOffsetCoordinates(qd , rd);
-        if (p == null){
-            //System.out.println("p is null. radius:  " + (xCoordinate*xCoordinate + yCoordinate*yCoordinate));
-            return null;
-        }
-        FactCameraPixel[] n = getNeighboursForPixel(p);
-        double mindist = Math.pow(p.posX -xCoordinate, 2) + Math.pow(p.posY - yCoordinate, 2);
-        for (FactCameraPixel np : n){
-            double dist = Math.pow(np.posX -xCoordinate, 2) + Math.pow(np.posY - yCoordinate, 2);
-            if (dist < mindist){
-                mindist = dist;
-                p = np;
-            }
-        }
-        return p;
-
-        double x = q;
-        double z = r;
-        double y = -x - z;
-
-
-*/
 
         //now round maybe violating the constraint
         int rx = (int) Math.round(cube_x);
@@ -259,4 +222,5 @@ public class FactPixelMapping implements PixelMapping {
     public int getSoftIDFromChid(int chid){
         return chId2softId[chid];
     }
+
 }

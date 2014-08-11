@@ -22,6 +22,7 @@ public class MaxAmplitudePosition implements Processor {
 
     @Parameter(required = true)
     private String key;
+
     @Parameter(required = true)
     private String outputKey;
 
@@ -79,28 +80,13 @@ public class MaxAmplitudePosition implements Processor {
 	/*
 	 * Getter and Setter
 	 */
-	
-
-
-	public int getSearchWindowLeft() {
-		return searchWindowLeft;
-	}
-
-
 	public void setSearchWindowLeft(int searchWindowLeft) {
 		this.searchWindowLeft = searchWindowLeft;
 	}
 
-
-	public int getSearchWindowRight() {
-		return searchWindowRight;
-	}
-
-
 	public void setSearchWindowRight(int searchWindowRight) {
 		this.searchWindowRight = searchWindowRight;
 	}
-
 
     public String getKey() {
         return key;
@@ -110,13 +96,13 @@ public class MaxAmplitudePosition implements Processor {
         this.key = key;
     }
 
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
     public String getOutputKey() {
         return outputKey;
     }
 
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-	
+
 
 }

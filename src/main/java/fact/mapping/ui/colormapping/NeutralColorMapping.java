@@ -26,23 +26,23 @@ public class NeutralColorMapping  implements ColorMapping{
 
 
     @Override
-    public Color getColorFromValue(double v, double minValue, double maxValue) {
-        Double value = new Double(v);
-        if(value.equals(Double.NaN)){
+    public Color getColorFromValue(double value, double minValue, double maxValue) {
+
+        if(value == Double.NaN){
             value = neutralValue;
         }
 
         //log.info( "Scaling {} with {}", v, scale );
-        if (v >= neutralValue){
+        if (value >= neutralValue){
             //getColorFromValue to positive color
-            value = (double) Math.abs( v/(maxValue-neutralValue) );
+            value =  Math.abs( value/(maxValue-neutralValue) );
             float hue = (float) (neutralHsbVals[0] + (maxHsbVals[0] - neutralHsbVals[0])*value);
             float sat = (float) (neutralHsbVals[1] + (maxHsbVals[1] - neutralHsbVals[1])*value);
             float bri = (float) (neutralHsbVals[2] + (maxHsbVals[2] - neutralHsbVals[2])*value);
             return Color.getHSBColor(hue, sat, bri);
         } else {
             //getColorFromValue to negative color
-            value = (double) Math.abs( v/(neutralValue-minValue) );
+            value = Math.abs( value/(neutralValue-minValue) );
             float hue = (float) (neutralHsbVals[0] + (minHsbVals[0] - neutralHsbVals[0])*value);
             float sat = (float) (neutralHsbVals[1] + (minHsbVals[1] - neutralHsbVals[1])*value);
             float bri = (float) (neutralHsbVals[2] + (minHsbVals[2] - neutralHsbVals[2])*value);

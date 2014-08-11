@@ -35,7 +35,7 @@ public class SerializedEventStream extends AbstractStream {
 	String id;
 
 	/**
-	 * @param url
+	 * @param file
 	 * @throws Exception
 	 */
 	public SerializedEventStream(File file) throws Exception {

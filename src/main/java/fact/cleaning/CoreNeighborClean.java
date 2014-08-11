@@ -7,6 +7,7 @@ import java.util.List;
 import fact.Utils;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
+import fact.mapping.ui.overlays.EllipseOverlay;
 import fact.mapping.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,6 +195,7 @@ public class CoreNeighborClean implements Processor{
 			input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"Set", cleanedPixelSet);
 		}
+
 		return input;
 	}
 	
