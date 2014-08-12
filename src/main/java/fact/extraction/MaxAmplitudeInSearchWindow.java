@@ -32,7 +32,7 @@ public class MaxAmplitudeInSearchWindow implements Processor {
 			throw new RuntimeException("searchWindowLeft is equal or larger than searchWindowRight: "+searchWindowLeft+" >= "+searchWindowRight);
 		}
 		
-		Utils.mapContainsKeys(getClass(), input, dataKey);
+		Utils.mapContainsKeys(input, dataKey);
 		
 		double[] data = (double[]) input.get(dataKey);
 		

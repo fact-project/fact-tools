@@ -53,7 +53,7 @@ public class TimeGradientExtraction implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, deltaKey, cogxKey, cogyKey, dataKey);
+		Utils.mapContainsKeys(input, deltaKey, cogxKey, cogyKey, dataKey);
 		
 		data = (double[]) input.get(dataKey);
 		

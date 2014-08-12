@@ -15,7 +15,7 @@ public class Derivation implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		Utils.mapContainsKeys(this.getClass(), input, key);
+		Utils.mapContainsKeys( input, key);
 		
 		double[] data = (double[])input.get(key);
 		double[] result = new double[data.length];

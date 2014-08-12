@@ -21,7 +21,7 @@ public class ArrayVariance implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(getClass(), input, key, Double[].class);
+		Utils.isKeyValid( input, key, Double[].class);
 		Serializable data = input.get(key);
 		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.toDoubleArray(data));
 		

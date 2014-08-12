@@ -29,7 +29,7 @@ public class ZFitsDrsCalib implements Processor {
 	public Data process(Data input) {
 		if (optional)
 			return input;
-		Utils.mapContainsKeys(getClass(), input, "Data", "StartCellData");
+		Utils.mapContainsKeys( input, "Data", "StartCellData");
 		short[] data = ((short[])input.get("Data")).clone();
 		short[] startCellData = (short[])input.get("StartCellData");
 		

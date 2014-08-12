@@ -24,12 +24,12 @@ import java.util.ArrayList;
 public class FactPixelMapping implements PixelMapping {
 
     //store each pixel by its 'geometric' or axial coordinate.
-    private FactCameraPixel[][] offsetCoordinates = new FactCameraPixel[45][40];
-    private FactCameraPixel[] pixelArray = new FactCameraPixel[1440];
-    private int[] chId2softId = new int[1440];
-    private int[] software2chId = new int[1440];
+    private final FactCameraPixel[][] offsetCoordinates = new FactCameraPixel[45][40];
+    public final FactCameraPixel[] pixelArray = new FactCameraPixel[1440];
+    private final int[] chId2softId = new int[1440];
+    private final int[] software2chId = new int[1440];
 
-    private int[][][] neighbourOffsets = {
+    private final int[][][] neighbourOffsets = {
             {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}}, //uneven
             {{1, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}}  //pixel with a even x coordinate
     };

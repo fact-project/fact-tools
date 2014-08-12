@@ -30,7 +30,7 @@ public class HillasDistance implements Processor {
 			log.info("No shower in evernt. Not calculating distance");
 			return input;
 		}
-		Utils.mapContainsKeys(getClass(), input, distribution, sourcePosition);
+		Utils.mapContainsKeys( input, distribution, sourcePosition);
 
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 		double[] source  = (double[]) input.get(sourcePosition);

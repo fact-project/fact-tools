@@ -30,7 +30,7 @@ public class ProbabilityClean implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, photonChargeKey, deltaKey);
+		Utils.mapContainsKeys(input, photonChargeKey, deltaKey);
 		
 		photoncharge = (double[]) input.get(photonChargeKey);
 		

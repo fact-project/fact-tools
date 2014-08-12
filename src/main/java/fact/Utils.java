@@ -177,9 +177,18 @@ public class Utils {
         return 0;
     }
 
+    /**
+     * This is a helper method which checks if all the keys provided are in the data item. If one of the keys is not
+     * in the item a RuntimeException will be thrown containing a message detailing which processor is causing
+     * the error
+     * @param item
+     * @param keys
+     */
+    public static void mapContainsKeys(Data item,  String... keys ){
+        StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
+        String caller = traceElement.getClassName();
 
-    public static void mapContainsKeys(Class<?> caller, Data item,  String... keys ){
-        ArrayList<String> e = new ArrayList<String>();
+        ArrayList<String> e = new ArrayList<>();
         boolean isValid = true;
         if(keys == null){
             isValid = false;
@@ -196,22 +205,32 @@ public class Utils {
                 b.append(er);
                 b.append("\n");
             }
-            throw new RuntimeException("Missing keys for processor " + caller.getSimpleName() + ":  " +b.toString() );
+            throw new RuntimeException("Missing keys for processor " + caller + ":  " +b.toString() );
         }
     }
 
-    public static void isKeyValid(Class<?> caller, Data item, String key, Class<?> cl){
+    /**
+     * This method tries to find the key in the data item and tries to cast them into the type given by the
+     * type parameter. If it fails it will throw a RuntimeException with a message containing information
+     * about the error.
+     * @param item
+     * @param key
+     * @param type
+     */
+    public static void isKeyValid(Data item, String key, Class<?> type){
+        StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
+        String caller = traceElement.getClassName();
         if(key == null || key.equals("")){
             log.error("Key was empty");
         }
         if(!item.containsKey(key)){
             log.error("Data does not contain the key " + key);
-            throw new RuntimeException("Did not find key "+  key + "  in the event. For processor:  " + caller.getName());
+            throw new RuntimeException("Did not find key "+  key + "  in the event. For processor:  " + caller);
         }
         try{
-            cl.cast( item.get(key));
+            type.cast(item.get(key));
         } catch (ClassCastException e){
-            log.error("The value for the key " + key + " cannot be cast to " + cl.getSimpleName() + " for processor: " + caller.getName());
+            log.error("The value for the key " + key + " cannot be cast to " + type.getSimpleName() + " for processor: " + caller);
             throw e;
         }
     }

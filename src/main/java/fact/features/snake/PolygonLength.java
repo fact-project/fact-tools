@@ -16,7 +16,7 @@ public class PolygonLength  implements Processor
 	{
 		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");		
 		
-		Utils.mapContainsKeys(getClass(), input, polygonX, polygonY);
+		Utils.mapContainsKeys( input, polygonX, polygonY);
 		
 		
 		double[] x = (double[]) input.get(polygonX);

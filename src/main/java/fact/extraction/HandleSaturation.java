@@ -33,7 +33,7 @@ public class HandleSaturation implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input ,dataKey,maxAmplitudesKey,photonChargeKey,timeOverThresholdChargeKey,arrivalTimeKey);
+		Utils.mapContainsKeys(input ,dataKey,maxAmplitudesKey,photonChargeKey,timeOverThresholdChargeKey,arrivalTimeKey);
 		
 		double[] maxAmplitudes = (double[]) input.get(maxAmplitudesKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);

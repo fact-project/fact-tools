@@ -36,7 +36,7 @@ public class PerPatchVoltageIntegral implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, key);
+		Utils.mapContainsKeys( input, key);
 		double[] dataCalibratedArray = (double[]) input.get(key);
 		int roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
 		double[] perPatchVoltageIntegral = new double[160];

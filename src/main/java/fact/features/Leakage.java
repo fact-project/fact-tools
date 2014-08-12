@@ -23,7 +23,7 @@ public class Leakage implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, shower, weights);
+		Utils.mapContainsKeys( input, shower, weights);
 	
 		int[] 	showerPixel = (int[])input.get(shower);
 		double[] photonCharge = (double[]) input.get(weights);

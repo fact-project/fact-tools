@@ -24,7 +24,7 @@ public class FillAverageTimeWidth implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, key, "StartCellData");
+		Utils.mapContainsKeys( input, key, "StartCellData");
 		double[] data;
 		try{
 			data = (double[]) input.get(key);

@@ -46,7 +46,7 @@ public class AverageJumpRemoval implements Processor{
 	@Override
 	public Data process(Data input) {
 
-		Utils.mapContainsKeys(this.getClass(), input, "UnixTimeUTC", key, "NROI");
+		Utils.mapContainsKeys(input, "UnixTimeUTC", key, "NROI");
 		int[] eventTime;
 		double[] data;
 		Integer length;

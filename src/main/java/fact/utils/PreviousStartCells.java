@@ -28,7 +28,7 @@ public class PreviousStartCells implements Processor {
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
 		
-		Utils.mapContainsKeys(this.getClass(), input, startCellKey, "NROI", "UnixTimeUTC");
+		Utils.mapContainsKeys( input, startCellKey, "NROI", "UnixTimeUTC");
 		
 		int[] eventTime = (int[]) input.get("UnixTimeUTC");
 		

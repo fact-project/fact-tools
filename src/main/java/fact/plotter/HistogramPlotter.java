@@ -94,7 +94,7 @@ public class HistogramPlotter extends DataVisualizer {
 
 	@Override
 	public Data processMatchingData(Data data) {
-//		Utils.isKeyValid(getClass(), data, key, Double.class);
+//		Utils.isKeyValid( data, key, Double.class);
 		double v = 0;
 		if(data.containsKey(key)){
 			v = Utils.valueToDouble(data.get(key));

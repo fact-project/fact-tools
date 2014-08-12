@@ -23,7 +23,7 @@ public class TimeSpread implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, arrivalTimeKey, weightsKey, showerKey);
+		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, showerKey);
 		
 		arrivalTime = (double[]) input.get(arrivalTimeKey);
 		weights = (double[]) input.get(weightsKey);

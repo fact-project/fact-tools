@@ -37,7 +37,7 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, key);
+		Utils.mapContainsKeys( input, key);
 		
 		double[] arrivalTimeArray = Utils.toDoubleArray(input.get(key));
 		//try{

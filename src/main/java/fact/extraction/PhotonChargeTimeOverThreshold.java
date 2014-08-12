@@ -38,7 +38,7 @@ public class PhotonChargeTimeOverThreshold implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, timeOverThresholdKey,thresholdKey);
+		Utils.mapContainsKeys(input, timeOverThresholdKey,thresholdKey);
 		
 		
 		double[] chargeFromThresholdArray =  new double[Constants.NUMBEROFPIXEL];

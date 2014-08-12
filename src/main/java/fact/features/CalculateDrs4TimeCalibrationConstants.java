@@ -33,7 +33,7 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
 	 * @return
 	 */
 	private double[] retrieve_data(Data input){
-		Utils.mapContainsKeys(getClass(), input, key, "StartCellData");
+		Utils.mapContainsKeys( input, key, "StartCellData");
 		double[] data = null;
 		try{
 			data = (double[]) input.get(key);

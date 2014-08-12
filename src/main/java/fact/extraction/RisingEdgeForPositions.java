@@ -31,7 +31,7 @@ public class RisingEdgeForPositions implements Processor {
 
 	@Override
 	public Data process(Data input) {
-        Utils.mapContainsKeys(getClass(), input, dataKey, amplitudePositionsKey);
+        Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
         int[] positions =  new int[Constants.NUMBEROFPIXEL];
 		

@@ -14,7 +14,7 @@ public class SortDoubleArray implements Processor {
 	@Override
 	public Data process(Data input) {
 		try{
-		Utils.mapContainsKeys(getClass(), input, key);
+		Utils.mapContainsKeys( input, key);
 		double [] array = (double[]) input.get(key);
 		Arrays.sort(array);
 		input.put(outputKey, array);

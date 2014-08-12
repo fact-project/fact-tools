@@ -34,7 +34,7 @@ public class ShowerSlope implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
+		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
 		
 		photonCharge = (double[]) input.get(photonChargeKey);
 		arrivalTime = (double[]) input.get(arrivalTimeKey);

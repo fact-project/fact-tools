@@ -101,7 +101,7 @@ public class FitEllipse  implements Processor
 		if(outkeyMinor == null) throw new RuntimeException("Missing parameter: outkeyMinor");
 		if(outkeyMajor == null) throw new RuntimeException("Missing parameter: outkeyMajor");
 		
-		Utils.mapContainsKeys(getClass(), input, snakeX, snakeY);
+		Utils.mapContainsKeys( input, snakeX, snakeY);
 		double[] x = (double[]) input.get(snakeX);
 		double[] y = (double[]) input.get(snakeY);
 		

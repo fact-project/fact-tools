@@ -23,7 +23,7 @@ public class CosDeltaAlpha implements Processor{
 
 		double cosDeltaAlpha = 0;
 		
-		Utils.mapContainsKeys(getClass(), input, sourcePosition, cogX, cogY, hillasDelta);
+		Utils.mapContainsKeys( input, sourcePosition, cogX, cogY, hillasDelta);
 		sourcePositionArray = (double[]) input.get(sourcePosition);
 		cogXValue = (Double) input.get(cogX);
 		cogYValue = (Double) input.get(cogY);

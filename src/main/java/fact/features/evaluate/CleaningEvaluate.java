@@ -21,7 +21,7 @@ public class CleaningEvaluate implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, showerKey, mcCherenkovWeightKey, mcNoiseWeightKey);
+		Utils.mapContainsKeys( input, showerKey, mcCherenkovWeightKey, mcNoiseWeightKey);
 		
 		int[] shower 	= (int[])input.get(showerKey);
 		double[] cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));

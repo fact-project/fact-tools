@@ -23,7 +23,7 @@ public class SelectIndecesFromArray implements Processor{
 	
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, key, indices);
+		Utils.mapContainsKeys( input, key, indices);
 
 		Serializable value = input.get(key);
 

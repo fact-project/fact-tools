@@ -21,7 +21,7 @@ public class HillasWidth implements Processor {
 			log.info("No shower in event. Not calculating width");
 			return input;
 		}
-		Utils.isKeyValid(getClass(), input, distribution, PixelDistribution2D.class);
+		Utils.isKeyValid(input, distribution, PixelDistribution2D.class);
 	
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 		double width =  Math.sqrt(dist.getEigenVarianceY());

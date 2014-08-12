@@ -31,7 +31,7 @@ public class CenterOfGravity implements Processor
 //	    mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 	    
 	    // check keys
-		Utils.mapContainsKeys(getClass(), input, showerPixel, dataCalibrated);
+		Utils.mapContainsKeys( input, showerPixel, dataCalibrated);
 		/// get input
 		try
 		{

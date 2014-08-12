@@ -66,7 +66,7 @@ public class CoreNeighborClean implements Processor{
 
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(getClass(), input, key, keyPositions);
+		Utils.mapContainsKeys( input, key, keyPositions);
 		
 			
 		photonCharge= Utils.toDoubleArray(input.get(key));
@@ -96,7 +96,7 @@ public class CoreNeighborClean implements Processor{
 		{
 			for (String starPositionKey : starPositionKeys)
 			{
-				Utils.mapContainsKeys(getClass(), input, starPositionKey);
+				Utils.mapContainsKeys(input, starPositionKey);
 				double[] starPosition = (double[]) input.get(starPositionKey);
 				showerPixel = removeStarIslands(showerPixel,starPosition);
 				level2a = new Integer[showerPixel.size()];

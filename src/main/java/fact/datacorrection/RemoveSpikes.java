@@ -44,7 +44,7 @@ public class RemoveSpikes implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		Utils.mapContainsKeys(getClass(), input, dataKey, startCellKey);
+		Utils.mapContainsKeys(input, dataKey, startCellKey);
 		
 		double[] data = (double[]) input.get(dataKey);
 		result = new double[data.length];

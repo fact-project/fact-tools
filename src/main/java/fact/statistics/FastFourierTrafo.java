@@ -34,7 +34,7 @@ public class FastFourierTrafo implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		Utils.mapContainsKeys(this.getClass(), input, key);
+		Utils.mapContainsKeys( input, key);
 		
 		log.info("exclution range: [" + excludeFreqBinsMin + "," + excludeFreqBinsMax + "]");
 		

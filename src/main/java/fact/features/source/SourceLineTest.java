@@ -20,7 +20,7 @@ public class SourceLineTest implements Processor{
 //	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
 //	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 		//Test for keys.
-		Utils.mapContainsKeys(getClass(), input, photonCharge, arrivalTime, showerPixel, sourcePosition);
+		Utils.mapContainsKeys( input, photonCharge, arrivalTime, showerPixel, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
 		

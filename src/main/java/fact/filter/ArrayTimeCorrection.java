@@ -16,7 +16,7 @@ public class ArrayTimeCorrection implements Processor{
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, kernel, dataCalibrated, timesOffset);
+		Utils.mapContainsKeys( input, kernel, dataCalibrated, timesOffset);
 		
 		try{
 			dataCalibratedArray = (double[]) input.get(dataCalibrated);

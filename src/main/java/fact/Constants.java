@@ -1,20 +1,9 @@
 package fact;
 
 public class Constants {
-	//key strings for the getColorFromValue
-	public static final String DEFAULT_KEY_CALIBRATED = "DataCalibrated";
 
-	public static final String KEY_EVENT_NUM = "EventNum";
-	public static final String KEY_TRIGGER_TYPE = "TriggerType";
-	public static final String PIXELSET = "pixelset";
-
-	public static final String KEY_SOURCE_POSITION_OVERLAY= "sourcePositionOverlay" ;
 	public static final String KEY_COLOR = "DrawColor";
-	public static final String ELLIPSE_OVERLAY = "ellipse_overlay";
-	
-	public static final String KEY_SNAKE_VIEWER_X = "snake_X_Prog";
-	public static final String KEY_SNAKE_VIEWER_Y = "snake_Y_Prog";
-	public static final String SNAKE_ELLIPSE_OVERLAY = "snake_ellipse_overlay";
+
 	
 	
 

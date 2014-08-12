@@ -53,7 +53,7 @@ public class PhotonCharge implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, dataKey, positions);
+		Utils.mapContainsKeys(input, dataKey, positions);
 		
 		int[] posArray;
 		double[] data;

@@ -19,7 +19,7 @@ public class ConcentrationCore implements Processor{
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys(getClass(), input, cogX, cogY, delta, photonCharge, showerPixel, length, width, size);
+		Utils.mapContainsKeys( input, cogX, cogY, delta, photonCharge, showerPixel, length, width, size);
 		
 		try{
 			Double cogx = (Double) input.get(cogX);

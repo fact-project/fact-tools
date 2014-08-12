@@ -42,7 +42,7 @@ public class TimeOverThreshold implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(getClass(), input, dataKey, positionsKey);
+		Utils.mapContainsKeys(input, dataKey, positionsKey);
 		
 		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
 		

@@ -20,7 +20,7 @@ public class InnerEnergy implements Processor
 	{
 		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");
 		
-		Utils.mapContainsKeys(getClass(), input, snakeX, snakeY);
+		Utils.mapContainsKeys( input, snakeX, snakeY);
 		
 		double[] x = (double[]) input.get(snakeX);
 		double[] y = (double[]) input.get(snakeY);

@@ -32,7 +32,7 @@ public class PhotonchargeEvaluate implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(PhotonchargeEvaluate.class, input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
+		Utils.mapContainsKeys(input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
 		
 		photoncharge = Utils.toDoubleArray(input.get(photonchargeKey));
 		arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));

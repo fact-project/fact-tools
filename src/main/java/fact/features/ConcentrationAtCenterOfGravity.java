@@ -47,7 +47,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	@Override
 	public Data process(Data input)
 	{
-		Utils.mapContainsKeys(getClass(), input, cogxKey, cogyKey, sizeKey, photonChargeKey);
+		Utils.mapContainsKeys( input, cogxKey, cogyKey, sizeKey, photonChargeKey);
 		
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);

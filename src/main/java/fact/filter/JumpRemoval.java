@@ -28,7 +28,7 @@ public class JumpRemoval implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		Utils.mapContainsKeys(this.getClass(), input, dataKey, prevStartAndStopCellKey + "_start", prevStartAndStopCellKey + "_stop", "NROI", startCellKey);
+		Utils.mapContainsKeys(input, dataKey, prevStartAndStopCellKey + "_start", prevStartAndStopCellKey + "_stop", "NROI", startCellKey);
 		
 		int roi = (Integer) input.get("NROI");
 		short[] currentStartCells = (short[]) input.get(startCellKey);

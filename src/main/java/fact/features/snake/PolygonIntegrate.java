@@ -30,7 +30,7 @@ public class PolygonIntegrate implements Processor
 		if(outkeyNumberOfPixel == null) throw new RuntimeException("Key \"outkeyNumberOfPixel\" not set");
 		if(outkeyPixelList == null) throw new RuntimeException("Key \"outkeyPixelList\" not set");
 		
-		Utils.mapContainsKeys(getClass(), input, key, polygonX, polygonY);
+		Utils.mapContainsKeys( input, key, polygonX, polygonY);
 		
 					
 		double[] data  = (double[]) input.get(key);

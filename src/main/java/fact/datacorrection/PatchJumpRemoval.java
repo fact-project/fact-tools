@@ -73,7 +73,7 @@ public class PatchJumpRemoval implements Processor {
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
-		Utils.mapContainsKeys(this.getClass(), input, dataKey, prevEventsKey + "_start", prevEventsKey + "_stop", "NROI", startCellKey);
+		Utils.mapContainsKeys(input, dataKey, prevEventsKey + "_start", prevEventsKey + "_stop", "NROI", startCellKey);
 	
 		int[] currentTime = (int[]) input.get("UnixTimeUTC");
 		
