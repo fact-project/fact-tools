@@ -1,6 +1,6 @@
 #Find the maximum slice
 
-This processor simply iterates over all slices in each pixel and stores the maximum amplitude.
+This processor simply iterates over all slices in each pixel and stores the maximum amplitude of all pixels.
 At first we need to get the actual telescope data from the input. The data is stored in one large 
 1D array of constant length. 
 Once the maximum is found we put it back into the input. Now heres the catch. Since you can only store things of 
@@ -54,3 +54,12 @@ it in the map.
 You can read [this](http://stackoverflow.com/questions/5199359/why-do-people-still-use-primitive-types-in-java) 
 discussion on the primitive types vs Number Objects in the Java programming language. 
 
+If you don't worry about runtime and memory consumption you can also iterate over the pixel data by using
+the methods provided by the FactPixelMap singelton.
+            
+            int roi = data.length / Constants.NUMBEROFPIXEL; 
+            for (FactCameraPixel p : map.pixelArray){
+                double[] pixelData = p.getPixelData(data, roi);
+            }
+ 
+This creates a copy of the data for the specified pixel. 
