@@ -34,8 +34,6 @@ public class FilterTests {
 			pr.setOutputKey("test0");
 			
 			ArrayList<SimpleFactEventProcessor<double[], double[]>> pList = new ArrayList<SimpleFactEventProcessor<double[], double[]>>();
-			pList.add(new FirFilter());
-			pList.add(new MovingAverage());
 			pList.add(new MultiplyValues());
 			pList.add(new SliceNormalization());
 			
