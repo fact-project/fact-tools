@@ -185,9 +185,6 @@ public class Utils {
      * @param keys
      */
     public static void mapContainsKeys(Data item,  String... keys ){
-        StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
-        String caller = traceElement.getClassName();
-
         ArrayList<String> e = new ArrayList<>();
         boolean isValid = true;
         if(keys == null){
@@ -205,6 +202,8 @@ public class Utils {
                 b.append(er);
                 b.append("\n");
             }
+            StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
+            String caller = traceElement.getClassName();
             throw new RuntimeException("Missing keys for processor " + caller + ":  " +b.toString() );
         }
     }
@@ -218,18 +217,21 @@ public class Utils {
      * @param type
      */
     public static void isKeyValid(Data item, String key, Class<?> type){
-        StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
-        String caller = traceElement.getClassName();
+
         if(key == null || key.equals("")){
             log.error("Key was empty");
         }
         if(!item.containsKey(key)){
             log.error("Data does not contain the key " + key);
+            StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
+            String caller = traceElement.getClassName();
             throw new RuntimeException("Did not find key "+  key + "  in the event. For processor:  " + caller);
         }
         try{
             type.cast(item.get(key));
         } catch (ClassCastException e){
+            StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
+            String caller = traceElement.getClassName();
             log.error("The value for the key " + key + " cannot be cast to " + type.getSimpleName() + " for processor: " + caller);
             throw e;
         }
