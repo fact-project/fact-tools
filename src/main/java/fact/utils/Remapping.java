@@ -4,9 +4,13 @@
 package fact.utils;
 
 import fact.Constants;
+import fact.Utils;
 import fact.mapping.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.Processor;
+import stream.annotations.Parameter;
 
 /**
  * This processors changes the order of the pixels in the data from SoftId to Chid
@@ -14,17 +18,42 @@ import org.slf4j.LoggerFactory;
  * @author kai
  * 
  */
-public class Remapping extends SimpleFactEventProcessor<short[], short[]>{
+public class Remapping implements Processor{
 	static Logger log = LoggerFactory.getLogger(Remapping.class);
+
+    @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
+    private String key;
+
+    @Parameter(required = true)
+    private String outputKey;
+
 	@Override
-	public short[] processSeries(short[] data) {
-		int roi = data.length / Constants.NUMBEROFPIXEL;
-		//copy the whole data into a new array.
-		short[] remapped = new short[data.length];
-		for(int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++){
-			int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
-			System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
-		}
-		return remapped;
-	}
+    public Data process(Data input) {
+        Utils.isKeyValid(input, key, short[].class);
+
+        short[] data = (short[]) input.get(key);
+
+        short[] remapped = new short[data.length];
+        remapFromSoftIdToChid(data, remapped);
+
+        input.put(outputKey, remapped);
+        return input;
+    }
+
+    public void remapFromSoftIdToChid(short[] data, short[] remapped) {
+        int roi = data.length/ Constants.NUMBEROFPIXEL;
+        for(int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++){
+            int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
+            System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
+        }
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+
+    public void setOutputKey(String outputkey) {
+        this.outputKey = outputkey;
+    }
 }
