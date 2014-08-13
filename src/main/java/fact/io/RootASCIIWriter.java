@@ -3,15 +3,14 @@
  */
 package fact.io;
 
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.data.DataFactory;
 import stream.io.CsvWriter;
+
+import java.io.Serializable;
 
 /**
  * <p>

@@ -1,20 +1,19 @@
 
 package fact.extraction;
 
-import java.awt.Color;
-import java.net.URL;
-
+import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
-import fact.Constants;
+
+import java.awt.*;
+import java.net.URL;
 
 /**
  * This processor Calculates PhotonCharge by doing the following: 

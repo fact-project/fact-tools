@@ -1,17 +1,16 @@
 package fact.io.zfits;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import fact.Utils;
 import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ZFitsDrsCalib implements Processor {
 	static Logger log = LoggerFactory.getLogger(ZFitsDrsCalib.class);

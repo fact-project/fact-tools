@@ -3,15 +3,14 @@
  */
 package fact.features;
 
-import java.util.ArrayList;
-
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.util.ArrayList;
 
 /**
  * Finds pulse arrival time by searching the 25 slices prior to the maximum and taking the time slice where the amplitude is equal to or just larger than 1/2 the max. 

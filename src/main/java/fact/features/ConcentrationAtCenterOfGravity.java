@@ -1,12 +1,10 @@
 package fact.features;
 
 import fact.Utils;
-import fact.mapping.FactCameraPixel;
-import fact.mapping.FactPixelMapping;
-
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

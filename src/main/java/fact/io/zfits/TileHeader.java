@@ -1,11 +1,10 @@
 package fact.io.zfits;
 
-import java.nio.ByteBuffer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.util.parser.ParseException;
+
+import java.nio.ByteBuffer;
 
 /**
  * Class representing a TileHeader.

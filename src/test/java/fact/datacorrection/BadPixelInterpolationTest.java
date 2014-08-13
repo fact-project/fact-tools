@@ -1,6 +1,6 @@
 package fact.datacorrection;
 
-import fact.mapping.FactPixelMapping;
+import fact.hexmap.FactPixelMapping;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

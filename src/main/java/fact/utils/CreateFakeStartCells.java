@@ -1,10 +1,10 @@
 package fact.utils;
 
-import java.util.Random;
-
 import fact.Constants;
 import stream.Data;
 import stream.Processor;
+
+import java.util.Random;
 
 public class CreateFakeStartCells implements Processor {
 

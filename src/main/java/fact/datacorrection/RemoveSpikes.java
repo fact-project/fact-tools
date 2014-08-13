@@ -1,17 +1,16 @@
 package fact.datacorrection;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import fact.Constants;
 import fact.Utils;
-import fact.mapping.ui.overlays.PixelSetOverlay;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RemoveSpikes implements Processor {
 	static Logger log = LoggerFactory.getLogger(RemoveSpikes.class);

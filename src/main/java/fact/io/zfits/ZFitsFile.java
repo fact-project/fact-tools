@@ -1,12 +1,12 @@
 package fact.io.zfits;
 
+import fact.io.zfits.HuffmanCoder.DecodingException;
+import stream.util.parser.ParseException;
+
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-
-import stream.util.parser.ParseException;
-import fact.io.zfits.HuffmanCoder.DecodingException;
 
 public class ZFitsFile {
 	private DataInputStream input = null;

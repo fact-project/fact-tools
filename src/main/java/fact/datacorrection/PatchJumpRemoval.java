@@ -1,9 +1,8 @@
 package fact.datacorrection;
 
-import java.util.LinkedList;
-
+import fact.Constants;
 import fact.Utils;
-import fact.mapping.ui.overlays.PixelSetOverlay;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -11,11 +10,11 @@ import org.apache.commons.math3.transform.TransformType;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.util.LinkedList;
 
 public class PatchJumpRemoval implements Processor {
 	static Logger log = LoggerFactory.getLogger(PatchJumpRemoval.class);

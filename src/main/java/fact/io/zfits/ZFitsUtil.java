@@ -1,5 +1,8 @@
 package fact.io.zfits;
 
+import org.apache.commons.cli.MissingArgumentException;
+import stream.util.parser.ParseException;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -7,10 +10,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import org.apache.commons.cli.MissingArgumentException;
-
-import stream.util.parser.ParseException;
 
 /**
  * A class containing several different util function for ZFitsFile reading. 

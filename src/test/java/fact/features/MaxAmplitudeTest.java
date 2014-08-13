@@ -4,10 +4,8 @@ import fact.extraction.MaxAmplitude;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import stream.Data;
 import stream.io.SourceURL;
 

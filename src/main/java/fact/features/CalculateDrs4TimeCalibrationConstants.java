@@ -1,14 +1,13 @@
 package fact.features;
 
-import java.util.ArrayList;
-
 import fact.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
 
 
 public class CalculateDrs4TimeCalibrationConstants implements Processor {

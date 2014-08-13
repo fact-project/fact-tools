@@ -1,13 +1,13 @@
 package fact.cleaning;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fact.Constants;
 import fact.Utils;
-import fact.mapping.FactPixelMapping;
+import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProbabilityClean implements Processor {
 

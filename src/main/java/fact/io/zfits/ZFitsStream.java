@@ -1,25 +1,22 @@
 package fact.io.zfits;
 
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
 import stream.util.parser.ParseException;
+
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Map;
 
 public class ZFitsStream extends AbstractStream {
 	public class ZFitsStreamException extends Exception {

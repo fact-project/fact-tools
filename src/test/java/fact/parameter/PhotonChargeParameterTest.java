@@ -2,7 +2,6 @@ package fact.parameter;
 
 import fact.extraction.PhotonCharge;
 import fact.io.FitsStreamTest;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

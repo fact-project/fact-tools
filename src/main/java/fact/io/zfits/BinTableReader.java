@@ -1,9 +1,9 @@
 package fact.io.zfits;
 
+import stream.util.parser.ParseException;
+
 import java.io.DataInputStream;
 import java.io.IOException;
-
-import stream.util.parser.ParseException;
 
 //TODO create as Interface
 public class BinTableReader implements TableReader {

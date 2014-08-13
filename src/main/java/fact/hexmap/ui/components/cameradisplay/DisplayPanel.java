@@ -8,7 +8,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.EventObserver;
-import fact.hexmap.ui.colormapping.*;
+import fact.hexmap.ui.colormapping.ColorMapping;
 import fact.hexmap.ui.components.selectors.CameraOverlayKeySelector;
 import fact.hexmap.ui.events.OverlaySelectionChangedEvent;
 import org.apache.commons.math3.util.Pair;

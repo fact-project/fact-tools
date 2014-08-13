@@ -3,17 +3,16 @@
  */
 package fact.extraction;
 
-import java.awt.Color;
-
+import fact.Constants;
+import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
-import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.awt.*;
 
 /**
  * This feature is supposed to give the number of slices above a given Threshold, 

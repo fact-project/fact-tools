@@ -1,20 +1,15 @@
 package fact.features;
 
 import fact.Constants;
-import fact.mapping.FactCameraPixel;
-import fact.mapping.FactPixelMapping;
-import fact.mapping.ui.overlays.EllipseOverlay;
+import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.EllipseOverlay;
 import fact.statistics.PixelDistribution2D;
-
 import org.apache.commons.math3.linear.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.awt.*;
 
 
 public class DistributionFromShower implements Processor {

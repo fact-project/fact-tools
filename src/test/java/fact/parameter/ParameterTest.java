@@ -8,11 +8,9 @@ import fact.features.source.SourcePosition;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-
 import stream.Data;
 import stream.io.SourceURL;
 

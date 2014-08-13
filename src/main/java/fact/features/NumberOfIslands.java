@@ -5,8 +5,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Arrays;
-
 /**
  * If key refers to an int[] of showerpixel. this will calculate the number of islands
  * @author kaibrugge

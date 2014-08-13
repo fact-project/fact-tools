@@ -1,13 +1,13 @@
 package fact.io.zfits;
 
+import fact.io.zfits.FitsHeader.ValueType;
+import fact.io.zfits.ZFitsUtil.DataType;
+import stream.util.parser.ParseException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import stream.util.parser.ParseException;
-import fact.io.zfits.FitsHeader.ValueType;
-import fact.io.zfits.ZFitsUtil.DataType;
 
 public class ZFitsTable {
 	private Map<String, FitsTableColumn> id2ColumnMap = new HashMap<String, FitsTableColumn>();

@@ -1,13 +1,12 @@
 package fact.features;
 
+import fact.Constants;
 import fact.features.source.SourcePosition;
-import fact.mapping.FactPixelMapping;
-
+import fact.hexmap.FactPixelMapping;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import fact.Constants;
 
 public class SourcePositionTest {
 	

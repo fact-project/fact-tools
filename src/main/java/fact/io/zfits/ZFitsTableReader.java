@@ -1,13 +1,12 @@
 package fact.io.zfits;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-
+import fact.io.zfits.HuffmanCoder.DecodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.io.zfits.HuffmanCoder.DecodingException;
 import stream.util.parser.ParseException;
+
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class ZFitsTableReader implements TableReader {
 	static Logger log = LoggerFactory.getLogger(ZFitsTableReader.class);

@@ -12,8 +12,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
 

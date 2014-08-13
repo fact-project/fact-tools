@@ -1,14 +1,13 @@
 package fact.utils;
 
-import java.util.LinkedList;
-
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.util.LinkedList;
 
 public class PreviousStartCells implements Processor {
 	static Logger log = LoggerFactory.getLogger(PreviousStartCells.class);

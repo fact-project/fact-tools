@@ -1,9 +1,9 @@
 package fact.io.zfits;
 
+import stream.util.parser.ParseException;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import stream.util.parser.ParseException;
 
 /**
  * This class encapsulates the catalog describing the position and sizes of the table entries.

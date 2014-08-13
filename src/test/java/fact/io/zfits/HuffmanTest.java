@@ -1,16 +1,12 @@
 package fact.io.zfits;
 
-import static org.junit.Assert.*;
-
-import java.util.Random;
-
+import fact.io.zfits.HuffmanCoder.DecodingException;
+import fact.io.zfits.HuffmanCoder.EncodingException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.io.zfits.HuffmanCoder;
-import fact.io.zfits.HuffmanCoder.DecodingException;
-import fact.io.zfits.HuffmanCoder.EncodingException;
+import static org.junit.Assert.assertEquals;
 
 public class HuffmanTest {
 	static Logger log = LoggerFactory.getLogger(HuffmanTest.class);

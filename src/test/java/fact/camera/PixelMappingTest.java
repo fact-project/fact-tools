@@ -1,17 +1,15 @@
 package fact.camera;
 
-import fact.mapping.CameraPixel;
-import fact.mapping.FactCameraPixel;
-import fact.mapping.FactPixelMapping;
+import fact.hexmap.CameraPixel;
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 
 public class PixelMappingTest {

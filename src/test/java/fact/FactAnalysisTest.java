@@ -1,19 +1,8 @@
 package fact;
 
-import fact.cleaning.CoreNeighborClean;
-import fact.extraction.MaxAmplitudePosition;
-import fact.extraction.PhotonCharge;
-import fact.features.source.SourcePosition;
-import fact.filter.DrsCalibration;
-import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import stream.Data;
-import stream.io.SourceURL;
 
 import java.net.URL;
 

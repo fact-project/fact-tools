@@ -3,16 +3,14 @@
  */
 package fact.features;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.util.ArrayList;
 
 /**
  * Finds the integral of pulses by defining the specific baseline for each pulse to account for negative signal

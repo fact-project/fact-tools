@@ -1,11 +1,11 @@
 package fact.io.zfits;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class encupsulates the Huffmancoder and decoder.

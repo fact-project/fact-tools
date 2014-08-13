@@ -1,15 +1,11 @@
 package fact.io.zfits;
 
-import static org.junit.Assert.*;
-
-import java.net.URL;
-
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.io.SourceURL;
+
+import java.net.URL;
 
 public class TestZFitsStream {
 	static Logger log = LoggerFactory.getLogger(TestZFitsStream.class);

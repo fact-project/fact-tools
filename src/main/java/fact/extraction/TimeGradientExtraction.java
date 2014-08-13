@@ -1,18 +1,17 @@
 package fact.extraction;
 
-import java.net.URL;
-
+import fact.Constants;
 import fact.Utils;
+import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Constants;
-import fact.mapping.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
+
+import java.net.URL;
 
 public class TimeGradientExtraction implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);

@@ -1,13 +1,12 @@
 package fact.io.zfits;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.util.parser.ParseException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.util.parser.ParseException;
 
 /**
  * A class containing the information about the fitsheader.

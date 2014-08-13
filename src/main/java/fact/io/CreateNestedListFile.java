@@ -4,21 +4,20 @@
 package fact.io;
 
 
-import java.io.PrintStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Description;
 import stream.annotations.Parameter;
 import stream.io.CsvWriter;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * outputs a file containing a nested list

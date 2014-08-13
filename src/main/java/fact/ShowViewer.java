@@ -3,7 +3,7 @@
  */
 package fact;
 
-import fact.mapping.ui.Viewer;
+import fact.hexmap.ui.Viewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;

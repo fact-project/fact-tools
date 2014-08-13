@@ -1,5 +1,6 @@
 package fact.statistics;
 
+import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
@@ -7,9 +8,6 @@ import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-import fact.Constants;
 import stream.Data;
 import stream.Processor;
 

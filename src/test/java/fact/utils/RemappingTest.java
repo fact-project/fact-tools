@@ -1,14 +1,9 @@
 package fact.utils;
 
-import fact.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Created by kaibrugge on 12.08.14.

@@ -1,12 +1,12 @@
 package fact.features.snake;
 
-import java.awt.Polygon;
-
 import fact.Constants;
 import fact.Utils;
-import fact.mapping.FactPixelMapping;
+import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
+
+import java.awt.*;
 
 public class PolygonIntegrate implements Processor
 {

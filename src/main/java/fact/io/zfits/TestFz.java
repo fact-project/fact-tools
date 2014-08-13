@@ -1,15 +1,14 @@
 package fact.io.zfits;
 
-import java.net.URL;
-
+import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.io.FitsStream;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+
+import java.net.URL;
 
 public class TestFz implements Processor {
 	static Logger log = LoggerFactory.getLogger(TestFz.class);

@@ -1,20 +1,17 @@
 package fact.features;
 
-import fact.mapping.FactCameraPixel;
-import fact.mapping.FactPixelMapping;
-import fact.mapping.ui.overlays.PixelSetOverlay;
+import fact.Constants;
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
-
-import java.util.ArrayList;
-
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
-import fact.Constants;
+import java.util.ArrayList;
 
 
 

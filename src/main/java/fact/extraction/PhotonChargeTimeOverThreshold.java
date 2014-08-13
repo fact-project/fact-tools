@@ -3,14 +3,10 @@
  */
 package fact.extraction;
 
-import java.awt.Color;
-
-import org.jfree.chart.plot.IntervalMarker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fact.Constants;
 import fact.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 

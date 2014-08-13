@@ -1,20 +1,18 @@
 package fact.features.source;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import fact.Constants;
-import fact.io.FitsStream;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look directly at the source but somewhere close by.

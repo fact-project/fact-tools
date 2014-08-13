@@ -1,11 +1,11 @@
 package fact.io.zfits;
 
+import fact.io.zfits.HuffmanCoder.DecodingException;
+import stream.util.parser.ParseException;
+
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.NoSuchElementException;
-
-import stream.util.parser.ParseException;
-import fact.io.zfits.HuffmanCoder.DecodingException;
 
 public class BlockHeader {
 	enum Prozessor {
