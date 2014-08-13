@@ -155,7 +155,7 @@ public class HistogramPlotter extends DataVisualizer {
 		return keepOpen;
 	}
 
-	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
+	@Parameter(required = false, description = "Flag indicates whether the window stays open after the process has finished", defaultValue = "true")
 	public void setKeepOpen(boolean keepOpen) {
 		this.keepOpen = keepOpen;
 	}

@@ -33,7 +33,6 @@
 	            <item name="Scatter Plots" href="plotting/scatter_plot.html" />
 	            <item name="Bar Plots" href="plotting/bar_plot.html" />
 	            <item name="Histogram Plots" href="plotting/histogram_plot.html" />
-	            <item name="Camera Image Plots" href="plotting/camera_plot.html" />
 	         </item>
 	
 	    </item>
