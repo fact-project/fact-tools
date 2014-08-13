@@ -1,14 +1,12 @@
 The FACT Viewer
 --------------
 
-The largest component of the FACT tools is the standalone viewer for
-inspecting FACT data files. Currently the viewer supports reading and
-displaying FACT data events.
-
+One of the most important components of the FACT tools is the Graphical User Interface simply called the viewer.
+It allows you to get a quick overview of the data in each event.
 The following picture shows a screenshot of the FactViewer:
 
 <div id="textimg">
-   <img src="images/fact-viewer-screen1.png" style="width:700px;" />
+   <img src="images/fact-viewer-screenshot.png" style="width:700px;" />
 </div>
 
 
