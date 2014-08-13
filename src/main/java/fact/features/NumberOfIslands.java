@@ -1,7 +1,6 @@
 package fact.features;
 
 import fact.Utils;
-import fact.utils.SimpleFactEventProcessor;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

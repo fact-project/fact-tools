@@ -4,7 +4,6 @@ import fact.Constants;
 import fact.Utils;
 import fact.mapping.FactCameraPixel;
 import fact.mapping.FactPixelMapping;
-import fact.utils.SimpleFactEventProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -39,7 +38,7 @@ public class InterpolateBadPixel implements Processor {
 
 	@Override
 	public Data process(Data item) {
-
+        Utils.isKeyValid(item, key, double[].class);
         double[] data = (double[]) item.get(key);
         if(!key.equals(outputKey)){
             double[] newdata = new double[data.length];

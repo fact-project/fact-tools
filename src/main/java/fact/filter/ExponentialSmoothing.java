@@ -1,7 +1,7 @@
 package fact.filter;
 
 import fact.Constants;
-import fact.utils.SimpleFactEventProcessor;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -21,8 +21,10 @@ import stream.annotations.Parameter;
 public class ExponentialSmoothing implements Processor {
 	static Logger log = LoggerFactory.getLogger(ExponentialSmoothing.class);
 
-    @Parameter (required = true, description = "This value changes the amount of smoothing that will take place. If alpha equals 1 the values remain unchanged.  See http://en.wikipedia.org/wiki/Exponential_smoothing", min = 0.0 , max = 1.0)
-    double alpha = 0.5f;
+    @Parameter (required = true, description = "This value changes the amount of smoothing that will take place. " +
+            "If alpha equals 1 the values remain unchanged.  " +
+            "See http://en.wikipedia.org/wiki/Exponential_smoothing", min = 0.0 , max = 1.0, defaultValue = "0.5")
+    double alpha = 0.5;
 
     @Parameter (required = true, description = "The key to the double array to smooth")
     String key;
@@ -32,6 +34,7 @@ public class ExponentialSmoothing implements Processor {
 	
 	@Override
 	public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
         double[] data = (double[]) item.get(key);
 
         int roi = data.length / Constants.NUMBEROFPIXEL;
