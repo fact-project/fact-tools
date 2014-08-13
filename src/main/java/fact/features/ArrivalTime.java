@@ -31,6 +31,8 @@ public class ArrivalTime implements Processor {
     @Parameter(required = true)
     private String maxAmpPositionKey;
     	//positions of max pulse amplitude
+    @Parameter(required = false)
+    private String visualizeKey;
 
 
 	@Override
@@ -39,12 +41,19 @@ public class ArrivalTime implements Processor {
 		ArrayList[] maxAmpPositions = (ArrayList[]) input.get(maxAmpPositionKey);
         int roi = data.length / Constants.NUMBEROFPIXEL;
         ArrayList[] arrivalTimes =  new ArrayList[Constants.NUMBEROFPIXEL];
+        int[] visualizePositions = new int[data.length];
+    	//zero for all positions except where an arrival time is found
+        
+        for(int i = 0; i < data.length; i++){
+        	visualizePositions[i] = 0;
+        }
         
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions);
+			arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
 		}
         input.put(outputKey, arrivalTimes);
+        input.put(visualizeKey, visualizePositions);
  //   	System.out.println(Arrays.toString(arrivalTimes));
 
 
@@ -58,7 +67,7 @@ public class ArrivalTime implements Processor {
      * @return
      */
 	
-    public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions){
+    public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions, int[] visualizePositions){
       
 		ArrayList<Integer> positions = new ArrayList<Integer>();
 
@@ -68,18 +77,21 @@ public class ArrivalTime implements Processor {
                   int Position = 0;
                   int end = (Integer) maxAmpPositions[pix].get(i);
                   int endPos = pix * roi + end;
-                  for(int slice = end - 25; slice < end; slice++){
+                  for(int slice = end; slice > end - 25; slice--){
         			   int pos = pix * roi + slice;
         			   if(end - 25 < 0) {continue;}
         	           double value = data[pos];
         	           if(slice > 0 && slice + 80 < roi && end - slice < 15){  
-        	        	   if(value >= data[endPos]/2){
+        	        	   if(value <= data[endPos]/2){
         	        		   Position = slice;
         	        		   break;
         	        	   }
         	           }
                   }
-                  if(Position != 0) {positions.add(Position);}
+                  if(Position != 0) {
+                	  positions.add(Position);
+                	  visualizePositions[pix*roi+Position] = 15;
+                }
         	}
         }
 
@@ -114,6 +126,14 @@ public class ArrivalTime implements Processor {
 
 	public void setmaxAmpPositionKey(String maxAmpPositionKey) {
 		this.maxAmpPositionKey = maxAmpPositionKey;
+	}
+
+	public String getVisualizeKey() {
+		return visualizeKey;
+	}
+
+	public void setVisualizeKey(String visualizeKey) {
+		this.visualizeKey = visualizeKey;
 	}
 
 }
