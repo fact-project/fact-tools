@@ -25,9 +25,9 @@
             <!--<fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/>-->
 
 
-	        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" />
-            <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+	    <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" />
+        <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
         <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="125"/>
         <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
                                           url="file:src/main/resources/gain_sorted_20131127.csv" positions="maxAmplitudePosition"
@@ -36,9 +36,12 @@
         <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
                                          keyPositions="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
 
-        <fact.features.DistributionFromShower weights="photoncharge" pixel="shower" outputKey="dist" />
-        <stream.flow.Skip condition="%{data.EventNum} &lt; 55" />
+        <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->
         <stream.flow.Skip condition="%{data.shower} == null" />
+        <fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>
+        <fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>
+        <fact.features.NumberOfIslands key="shower" outputKey="islands" />
+        <fact.features.DistributionFromShower weights="photoncharge" pixel="shower" outputKey="dist" />
         <fact.ShowViewer key="DataCalibrated" range="25,250"/>
 
 <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
