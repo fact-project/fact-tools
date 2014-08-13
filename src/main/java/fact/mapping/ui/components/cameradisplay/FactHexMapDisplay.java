@@ -224,7 +224,6 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
                 if(selectedPixels.contains(p)){
                     tile.setBorderColor(Color.RED);
                 } else {
-
                     tile.setBorderColor(Color.BLACK);
                 }
                 tile.paint(g);

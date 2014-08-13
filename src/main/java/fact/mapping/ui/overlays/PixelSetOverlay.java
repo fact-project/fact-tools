@@ -18,7 +18,7 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
     Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
-    public PixelSetOverlay(Set<CameraPixel> set ){
+    public PixelSetOverlay(Set<CameraPixel> set){
         this.set = set;
     }
 
@@ -40,7 +40,11 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
     public void paint(Graphics2D g2, FactHexMapDisplay map) {
         for (Tile t : map.getTiles()){
             if(set.contains(t.getCameraPixel())){
-                t.setBorderColor(this.c);
+                if (t.getBorderColor() != Color.BLACK){
+                    t.setBorderColor(Color.YELLOW);
+                } else {
+                    t.setBorderColor(this.c);
+                }
                 t.paint(g2);
             }
         }
