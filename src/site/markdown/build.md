@@ -3,7 +3,8 @@ Building the FACT Tools
 
 The fact-tools are structured as a simple *Maven* module within the
 fact-analysis project. Therefore, for building the tools, you have to
-have the Apache Maven build-tool installed.
+have the Apache Maven build-tool installed. The following steps require 
+a Java JDK/JRE with a version greater than 1.7.
 
 Apache *Maven* can be downloaded from [maven.apache.org](http://maven.apache.org)
 or installed on Ubuntu systems using apt-get:
@@ -15,6 +16,7 @@ Continous Integration services are provided by Drone.IO. You can check the statu
 
 
 ![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)
+
 
 
 Building the FACT Tools
