@@ -205,7 +205,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             //draw a grid with lines every 25 pixel in a dark grey color
             g2.setStroke(new BasicStroke(1.0f));
             g2.setColor(Color.DARK_GRAY);
-            drawGrid(g2, 25);
+            //drawGrid(g2, 25);
 
             //now draw the actual camera pixel
             //translate to center of canvas
@@ -242,11 +242,11 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
             //draw cross across screen to indicate center ofcomponent
 
-            Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
-            g2.draw(line);
-
-            line = new Line2D.Double(getWidth(),0,0,getHeight());
-            g2.draw(line);
+//            Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
+//            g2.draw(line);
+//
+//            line = new Line2D.Double(getWidth(),0,0,getHeight());
+//            g2.draw(line);
 
 
 

@@ -203,7 +203,7 @@ public Data process(Data input) {
     input.put("Length", Math.sqrt(eigenValue1/size) );
 	input.put("Width", Math.sqrt(eigenValue2/size) );
     input.put("Delta", delta );
-    input.put("BLABAL", new EllipseOverlay(cogX , cogY, Math.sqrt(eigenValue2/size) , Math.sqrt(eigenValue1/size)  , delta));
+    input.put("Ellipse", new EllipseOverlay(cogX , cogY, Math.sqrt(eigenValue2/size) , Math.sqrt(eigenValue1/size)  , delta));
     
     //input.put(Constants.ELLIPSE_OVERLAY, new LineOverlay(cogX, cogY, delta, Color.green));
     
