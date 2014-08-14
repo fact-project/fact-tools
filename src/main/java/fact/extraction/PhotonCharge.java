@@ -45,7 +45,6 @@ public class PhotonCharge implements Processor {
     Data integralGainData = null;
     private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
     
-	private String color = "#00F0F0";
     private int alpha = 64;
 	
 
@@ -97,18 +96,11 @@ public class PhotonCharge implements Processor {
 			}			    
 			photonCharge[pix] = integral/integralGains[pix];
 			
-			Color c = Color.decode(color);
-			int r = c.getRed();
-			int g = c.getGreen();
-			int b = c.getBlue();
-			m[pix] = new IntervalMarker(positionOfHalfMaximumValue, positionOfHalfMaximumValue + 30, new Color(r,g,b, alpha));
+			m[pix] = new IntervalMarker(positionOfHalfMaximumValue, positionOfHalfMaximumValue + 30);
 		}
 
 		//add color value if set
 		input.put(outputKey+"Marker", m);
-		if(color !=  null && !color.equals("")){
-			input.put("@" + Constants.KEY_COLOR + "_"+outputKey+"Marker", color);
-		}		
 		input.put(outputKey, photonCharge);
 		return input;
 	}
@@ -126,19 +118,11 @@ public class PhotonCharge implements Processor {
 	}
 
 
-	public int getRangeSearchWindow() {
-		return rangeSearchWindow;
-	}
-
-
 	public void setRangeSearchWindow(int rangeSearchWindow) {
 		this.rangeSearchWindow = rangeSearchWindow;
 	}
 
 
-	public String getPositions() {
-		return positions;
-	}
 	public void setPositions(String positions) {
 		this.positions = positions;
 	}
@@ -149,16 +133,6 @@ public class PhotonCharge implements Processor {
 	}
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
-	}
-
-
-	public String getColor() {
-		return color;
-	}
-
-
-	public void setColor(String color) {
-		this.color = color;
 	}
 
 

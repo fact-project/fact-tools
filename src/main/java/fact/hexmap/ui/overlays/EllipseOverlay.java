@@ -24,6 +24,8 @@ public class EllipseOverlay implements CameraMapOverlay, Serializable {
     public EllipseOverlay(double cogX, double cogY, double width, double height, double angle){
         this.cogX = cogX;
         this.cogY = cogY;
+        //we mulitply by 4 since the width and height attribute refer to the semimajor axis or however you call that
+        //and we want to have 2 sigma of all pixels in the ellipse we multiply by two again.
         this.ellipse_height = height*4;
         this.ellipse_width = width*4;
         this.angle = angle;
