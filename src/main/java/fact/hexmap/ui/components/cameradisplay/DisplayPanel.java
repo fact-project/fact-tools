@@ -82,7 +82,8 @@ public class DisplayPanel extends JPanel implements EventObserver{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(e.getActionCommand().equalsIgnoreCase("Patch selection")){
-                    hexmap.setPatchSelectionMode(true);
+                    AbstractButton b = (AbstractButton) e.getSource();
+                    hexmap.setPatchSelectionMode(b.isSelected());
                 }
                 //export to .png
                 if(e.getActionCommand().equalsIgnoreCase("Export to .png")){

@@ -26,10 +26,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This implements a PixelMap to draw a grid of hexagons as seen in the camera of the fact telescope
@@ -52,7 +49,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     int rows = 0, cols = 0;
 
 
-	Set<CameraPixel> selectedPixels = new LinkedHashSet<CameraPixel>();
+	Set<FactCameraPixel> selectedPixels = new LinkedHashSet<FactCameraPixel>();
 
 	public double[][] sliceValues = new double[1440][1024];
 	int currentSlice = 0;
@@ -285,8 +282,6 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
 
 
-
-
     @Override
     public void mouseClicked(MouseEvent arg0) {
         if (arg0.getButton() == MouseEvent.BUTTON1) {
@@ -297,39 +292,58 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
             AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.PI/2);
             rotateInstance.transform(p, p);
 
+            // In case we want to select wholes patches at a time we save the id of all selected patches in here
             Set<Integer> selectedPatches = new HashSet<>();
 
              for (Tile cell : tiles) {
                 if (cell.contains(p)) {
                     FactCameraPixel selectedPixel = (FactCameraPixel) cell.getCameraPixel();
+
+                    //getting the patch by dividing chid by 9 since there are 1440/9 = 160 patches
+                    Integer patch = selectedPixel.chid/9;
+
                     boolean shiftDown = arg0.isShiftDown();
 
+                    //in case shift is being pressed and we clicked a pixel thats already been selected we
+                    // have to remove it
                     if (shiftDown && selectedPixels.contains(selectedPixel)) {
                         selectedPixels.remove(selectedPixel);
-                        selectedPatches.remove(selectedPixel.patch);
+                        //in case we are in patchselection mode we have to unselected the patch belongin to
+                        //pixel clicked
+                        selectedPatches.remove(patch);
+                        if(patchSelectionMode) {
+                            Iterator<FactCameraPixel> it = selectedPixels.iterator();
+                            while (it.hasNext()) {
+                                FactCameraPixel pt = it.next();
+                                if (pt.chid / 9 == patch) {
+                                    it.remove();
+                                }
+                            }
+                        }
                     } else {
                         if (!shiftDown) {
                             selectedPixels.clear();
                             selectedPatches.clear();
                         }
                         selectedPixels.add(selectedPixel);
-                        selectedPatches.add(selectedPixel.patch);
+                        selectedPatches.add(patch);
                     }
-                    Bus.eventBus.post(selectedPixels);
-                    this.repaint();
                     break;
                 }
-            }
+             }
+            //in patch selectionmode add all the pixels with the right patchid to the selectionset
             if(patchSelectionMode){
                 for(Tile cell : tiles){
                     FactCameraPixel pixel = (FactCameraPixel) cell.getCameraPixel();
-                    System.out.println(pixel.patch);
-                    if(selectedPatches.contains(pixel.patch)){
+                    Integer patch =pixel.chid/9;
+                    if(selectedPatches.contains(patch)){
                         selectedPixels.add(pixel);
                     }
                 }
             }
         }
+        this.repaint();
+        Bus.eventBus.post(selectedPixels);
 
     }
 
