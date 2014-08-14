@@ -17,6 +17,7 @@ import stream.annotations.Parameter;
  * 
  * 
  */
+@Deprecated
 public class CutSlices implements Processor {
 	static Logger log = LoggerFactory.getLogger(CutSlices.class);
 
