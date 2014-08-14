@@ -81,6 +81,9 @@ public class DisplayPanel extends JPanel implements EventObserver{
         ActionListener contextMenuListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(e.getActionCommand().equalsIgnoreCase("Patch selection")){
+                    hexmap.setPatchSelectionMode(true);
+                }
                 //export to .png
                 if(e.getActionCommand().equalsIgnoreCase("Export to .png")){
                     exportPNG();
@@ -116,6 +119,11 @@ public class DisplayPanel extends JPanel implements EventObserver{
         JMenuItem exportItem = new JMenuItem("Export to .png");
         exportItem.addActionListener(contextMenuListener);
         popupMenu.add(exportItem);
+
+        popupMenu.addSeparator();
+        JCheckBoxMenuItem patchSelectionMenuItem = new JCheckBoxMenuItem("Patch selection");
+        patchSelectionMenuItem.addActionListener(contextMenuListener);
+        popupMenu.add(patchSelectionMenuItem);
 
         hexmap.setComponentPopupMenu(popupMenu);
         selector.setPreferredSize(new Dimension(600, 120));

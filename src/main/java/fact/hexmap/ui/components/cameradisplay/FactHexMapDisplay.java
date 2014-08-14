@@ -6,6 +6,7 @@ package fact.hexmap.ui.components.cameradisplay;
 import com.google.common.eventbus.Subscribe;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
+import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.SliceObserver;
@@ -75,6 +76,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
     //a default key
     public String defaultKey;
+    private boolean patchSelectionMode;
+
     /**
      * A Hexagon in this case is defined by the passed radius. The radius of the circle that fits into the hexagon
      * can be calculated by sqrt(3)/2 * (outter radius)
@@ -287,30 +290,43 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
     @Override
     public void mouseClicked(MouseEvent arg0) {
         if (arg0.getButton() == MouseEvent.BUTTON1) {
-            for (Tile cell : tiles) {
-                //since we transformed the geometry while painting the polygons above we now have to transform
-                // the coordinates of the mouse pointer.
-                Point p = arg0.getPoint();
-                p.translate(-getWidth()/2, -getHeight()/2);
-                AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.PI/2);
-                rotateInstance.transform(p, p);
+            //since we transformed the geometry while painting the polygons above we now have to transform
+            // the coordinates of the mouse pointer.
+            Point p = arg0.getPoint();
+            p.translate(-getWidth()/2, -getHeight()/2);
+            AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.PI/2);
+            rotateInstance.transform(p, p);
 
+            Set<Integer> selectedPatches = new HashSet<>();
 
+             for (Tile cell : tiles) {
                 if (cell.contains(p)) {
-                    CameraPixel selectedPixel = cell.getCameraPixel();
+                    FactCameraPixel selectedPixel = (FactCameraPixel) cell.getCameraPixel();
                     boolean shiftDown = arg0.isShiftDown();
 
                     if (shiftDown && selectedPixels.contains(selectedPixel)) {
                         selectedPixels.remove(selectedPixel);
+                        selectedPatches.remove(selectedPixel.patch);
                     } else {
                         if (!shiftDown) {
                             selectedPixels.clear();
+                            selectedPatches.clear();
                         }
                         selectedPixels.add(selectedPixel);
+                        selectedPatches.add(selectedPixel.patch);
                     }
                     Bus.eventBus.post(selectedPixels);
                     this.repaint();
-                    return;
+                    break;
+                }
+            }
+            if(patchSelectionMode){
+                for(Tile cell : tiles){
+                    FactCameraPixel pixel = (FactCameraPixel) cell.getCameraPixel();
+                    System.out.println(pixel.patch);
+                    if(selectedPatches.contains(pixel.patch)){
+                        selectedPixels.add(pixel);
+                    }
                 }
             }
         }
@@ -399,5 +415,13 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay, SliceO
 
     public double getTileRadiusInPixels() {
         return radius;
+    }
+
+    public void setPatchSelectionMode(boolean patchSelectionMode) {
+        this.patchSelectionMode = patchSelectionMode;
+    }
+
+    public boolean isPatchSelectionMode() {
+        return patchSelectionMode;
     }
 }
