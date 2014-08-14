@@ -11,6 +11,8 @@ parameter which specifies the default plot range of the main window.
 
 ##Displaying stuff in the viewer
 
+Each time an event is passed to the viewer it will search the data item for data it can display. That means
+overlays for the camera display and arrays for the plot window.
 
 By clicking Window -> Graph Window in the FactViewer you can see the slices of selected pixels in the Camera.
 
@@ -18,8 +20,25 @@ By clicking Window -> Graph Window in the FactViewer you can see the slices of s
    <img src="../images/graph_window_multiple.png" style="width:400px;" />
 </div>
 
-The Graph Window will try to display all float or double arrays with the right size. That means it has to be dividable
-by the number of pixels in the camera. This allows for quick comparisons and sanity checks of transformed data.
+The Graph Window will try to display all double arrays with the right size. That means it has to be dividable
+by the number of pixels in the camera. If you want to display your data in this window simply add an 
+array of the right length to the data item in your processor. 
+
+        public class MyAwesomeProcessor implements Processor {
+                  @Override
+                  public Data process(Data input) {
+                    ...
+                    double[] myAwesomeData = new double[1440*300]
+                    ... do something with data
+                    input.put("MyAwesomeData", myAwesomeData);
+                    return input;
+                  }
+        }
+        
+        
+This allows for quick comparisons and sanity checks of transformed data. You can select the color to display
+by clicking on the button next your data in the plot window. For more information on colormaps see 
+[Colormaps](colormaps.html)
 
 
 ## Coloring a time interval
