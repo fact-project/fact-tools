@@ -99,8 +99,8 @@ public class PhotonCharge implements Processor {
 			m[pix] = new IntervalMarker(positionOfHalfMaximumValue, positionOfHalfMaximumValue + 30);
 		}
 
-		//add color value if set
 		input.put(outputKey+"Marker", m);
+        input.put("@photoncharge", photonCharge);
 		input.put(outputKey, photonCharge);
 		return input;
 	}

@@ -29,6 +29,7 @@ public class Size implements Processor {
 		double[] charge 	= (double[])input.get(photonChargeKey);
 
         double size = calculateSize(shower, charge);
+        input.put("@size", size);
 		input.put(outputKey, size);
 		return input;
 	}
