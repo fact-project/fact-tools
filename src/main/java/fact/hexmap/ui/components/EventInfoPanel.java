@@ -124,7 +124,7 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         //get size if its in the map
         if (item.get("@size") != null){
             try{
-                double size = (double) item.get("@size");
+                Double size = (Double) item.get("@size");
                 sizeField.setText("" + size);
                 sizeField.setEnabled(true);
             } catch (ClassCastException e){
@@ -138,8 +138,8 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         //get width and length if they are in the map
         if (item.get("@width") != null && item.get("@length") != null){
             try{
-                double width = (double) item.get("@width");
-                double length = (double) item.get("@length");
+                Double width = (Double) item.get("@width");
+                Double length = (Double) item.get("@length");
                 widthField.setText("" + width );
                 widthField.setEnabled(true);
 
