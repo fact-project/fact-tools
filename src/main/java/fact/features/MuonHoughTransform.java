@@ -59,7 +59,7 @@ public class MuonHoughTransform implements Processor {
 	
 	//InputKeys
 	@Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
-	private String ringKey; 
+	private String pixelKey; 
 	
 	@Parameter(required = true, description = "PhotonCharge")
 	private String photonChargeKey;
@@ -95,17 +95,17 @@ public class MuonHoughTransform implements Processor {
 	public Data process(Data input) {
 		
 				
-		int[] ring = (int[]) input.get(ringKey);
+		int[] pixel = (int[]) input.get(pixelKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 				
-		double[] xPositions = new double[ring.length];
-		double[] yPositions = new double[ring.length];
+		double[] xPositions = new double[pixel.length];
+		double[] yPositions = new double[pixel.length];
 		
 		// Get X and Y Positions of the Pixel that survived Cleaning
 		
-		for(int i=0; i<ring.length; i++){
-			xPositions[i] = m.getPixelFromId(ring[i]).getXPositionInMM();
-			yPositions[i] = m.getPixelFromId(ring[i]).getYPositionInMM();
+		for(int i=0; i<pixel.length; i++){
+			xPositions[i] = m.getPixelFromId(pixel[i]).getXPositionInMM();
+			yPositions[i] = m.getPixelFromId(pixel[i]).getYPositionInMM();
 		}
 		
 		// generate Hough-Voting-Matrix n:
@@ -144,10 +144,10 @@ public class MuonHoughTransform implements Processor {
 		for (int r = 0; r < circle_radius.length; r++){
 			for (int x = 0; x < circle_x.length; x++){
 				for (int y = 0; y < circle_y.length; y++){
-					for(int pix = 0; pix < ring.length; pix++){
+					for(int pix = 0; pix < pixel.length; pix++){
 						distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
 						if(Math.abs(distance - circle_radius[r]) <= fact.Constants.PIXEL_SIZE ){
-							HoughMatrix[r][x][y] += photonCharge[ring[pix]];
+							HoughMatrix[r][x][y] += photonCharge[pixel[pix]];
 						}
 					}
 					stats.addValue(HoughMatrix[r][x][y]);
@@ -239,7 +239,7 @@ public class MuonHoughTransform implements Processor {
 		int octantsHit=0;
 		boolean[] octants = {false,false,false,false,false,false,false,false};
 		
-		for (int pix=0; pix<ring.length;pix++){
+		for (int pix=0; pix<pixel.length;pix++){
 			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
 			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
 				onRingPixel+=1;
@@ -262,7 +262,7 @@ public class MuonHoughTransform implements Processor {
 		
 		input.put(octantsHitKey, octantsHit);
 		
-		percentage = onRingPixel/ring.length;
+		percentage = onRingPixel/pixel.length;
 		
 		input.put(percentageKey, percentage);
 		
@@ -333,11 +333,11 @@ public class MuonHoughTransform implements Processor {
 	public void setBestCircleKey(String bestCircleKey) {
 		this.bestCircleKey = bestCircleKey;
 	}
-	public String getRingKey() {
-		return ringKey;
+	public String getPixelKey() {
+		return pixelKey;
 	}
-	public void setRingKey(String ringKey) {
-		this.ringKey = ringKey;
+	public void setPixelKey(String pixelKey) {
+		this.pixelKey = pixelKey;
 	}
 	public String getPhotonChargeKey() {
 		return photonChargeKey;
