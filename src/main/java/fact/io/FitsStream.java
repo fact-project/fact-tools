@@ -349,7 +349,7 @@ public class FitsStream extends AbstractStream {
             dataStream.reset();
             long skipped =  dataStream.skip(blockSize);
             if (skipped != byteCounter){
-                log.error("Error while reading block. EOF?");
+                log.debug("Error while reading block. EOF?");
             }
 
 		} catch (EOFException e) {
