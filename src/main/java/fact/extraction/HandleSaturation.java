@@ -6,6 +6,10 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+/**
+ * TODO: This is a work in progress.
+ * @author Fabian Temme
+ */
 public class HandleSaturation implements Processor {
 
 	@Parameter(required=true)
@@ -60,7 +64,6 @@ public class HandleSaturation implements Processor {
 		input.put(outputKeyArrivalTime, resultArrivalTimes);
 		input.put(outputKeyPhotonCharge, resultPhotonCharge);
 		
-		// TODO Auto-generated method stub
 		return input;
 	}
 

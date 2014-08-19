@@ -4,6 +4,7 @@
 package fact.extraction;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -33,6 +34,7 @@ public class MaxAmplitudePosition implements Processor {
 
 	@Override
 	public Data process(Data input) {
+        Utils.isKeyValid(input, key, double[].class);
         double[] data = (double[]) input.get(key);
         int roi = data.length / Constants.NUMBEROFPIXEL;
 

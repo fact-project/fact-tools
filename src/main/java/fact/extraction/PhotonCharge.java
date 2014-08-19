@@ -21,7 +21,8 @@ import java.net.URL;
  * 2.	In an area of [amplitudePositon-25,amplitudePosition] search for the position, behind the last time where data[pos] is < 0.5 of the original maxAmplitude</br>
  * 3.	Calculate the integral over 30 slices </br>
  * 4. 	Divide the sum by the integralGain of the corresponding pixel and save the result.</br>
- * 
+ *
+ * TODO: Refactor to single units for calculating each step separately
  * Treatment of edge Cases is currently very arbitrary since Pixels with these values should not be considered as showerPixels anyways.
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  *
@@ -31,11 +32,14 @@ public class PhotonCharge implements Processor {
     
     @Parameter(required = true)
 	private String dataKey = null;
-    @Parameter(required = true, description = "The positions around which the integral is calculated.",defaultValue="DataCalibrated")
+    @Parameter(required = true, description = "The positions around which the integral is calculated.",
+            defaultValue="DataCalibrated")
     private String positions = null;
-    @Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
+    @Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",
+            defaultValue="file:src/main/resources/defaultIntegralGains.csv")
     private URL url = null;
-    @Parameter(required = true, description = "The range before the maxAmplitude where the half height is searched", defaultValue ="25")
+    @Parameter(required = true, description = "The range before the maxAmplitude where the half height is searched",
+            defaultValue ="25")
     private int rangeSearchWindow = 25;
     @Parameter(required = true)
     private String outputKey = null;
@@ -46,7 +50,6 @@ public class PhotonCharge implements Processor {
     private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
     
     private int alpha = 64;
-	
 
 	@Override
 	public Data process(Data input) {
