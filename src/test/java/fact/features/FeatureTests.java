@@ -49,12 +49,6 @@ public class FeatureTests {
 		p = new Pair<String, Class<?>>(pP.getOutputKey(), int[].class );
 		typeMap.put(pP, p);
 		
-		MaxAmplitude maxAmp = new MaxAmplitude();
-		maxAmp.setKey("test");
-		maxAmp.setOutputKey("maxAmps");
-		p = new Pair<String, Class<?>>(maxAmp.getOutputKey(), double[].class );
-		typeMap.put(maxAmp, p);
-		
 		RisingEdgeForPositions rE = new RisingEdgeForPositions();
 //		 <fact.features.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
 		rE.setDataKey("test");
