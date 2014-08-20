@@ -23,10 +23,11 @@ public class ZFitsDrsCalib implements Processor {
 	@Parameter(name = "optional", defaultValue = "false", required=false,
 			description="If the file is a normal Fits File ignore the drs calibration of the zfits format.")
 	private boolean optional = false;
+	private boolean skipProzess = false;
 
 	@Override
 	public Data process(Data input) {
-		if (optional)
+		if (this.skipProzess)
 			return input;
 		Utils.mapContainsKeys( input, "Data", "StartCellData");
 		short[] data = ((short[])input.get("Data")).clone();
@@ -100,17 +101,16 @@ public class ZFitsDrsCalib implements Processor {
 		try{
 			drsStream.init();
 		} catch (MissingArgumentException e) {
-			if (this.optional)
+			if (this.optional) {
+				this.skipProzess = true;
 				return;
+			}
 			throw e;
 		}
 		Data item = drsStream.read();
 		if (!item.containsKey("OffsetCalibration"))
 			throw new NullPointerException("Missing OffsetCalibration");
 		this.calibData = (short[])item.get("OffsetCalibration");
-		//System.out.println("0: "+this.calibData[0]);
-		//System.out.println("1: "+this.calibData[1]);
-		//System.out.println("2: "+this.calibData[2]);
 		if (this.calibData==null)
 			throw new NullPointerException("Should not happen");
 		log.info("Loaded");
