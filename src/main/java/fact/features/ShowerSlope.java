@@ -59,7 +59,7 @@ public class ShowerSlope implements Processor {
 			int chid = shower[i];
 			double xcoord = pixelMap.getPixelFromId(chid).getXPositionInMM();
 			double ycoord = pixelMap.getPixelFromId(chid).getYPositionInMM();
-			double[] rotPixels = Utils.rotatePointInShowerSystem(xcoord, ycoord, cogx, cogy, delta);
+			double[] rotPixels = Utils.rotateAndTranslatePointInShowerSystem(xcoord, ycoord, cogx, cogy, delta);
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];
 			t[i] = arrivalTime[chid];

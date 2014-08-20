@@ -12,6 +12,12 @@ import stream.annotations.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tries to remove the artefact called 'Spike' from the data for different spike lengths. We know that there exist
+ *  spikes with length 4.
+ *
+ *  @author Fabian Temme
+ */
 public class RemoveSpikes implements Processor {
 	static Logger log = LoggerFactory.getLogger(RemoveSpikes.class);
 
@@ -25,12 +31,10 @@ public class RemoveSpikes implements Processor {
 	double spikeLimit;
 	@Parameter(required=true)
 	double topSlopeLimit;
-	@Parameter(required=true)
+	@Parameter(required=false)
 	String outputSpikesKey = null;
-	@Parameter(required=true)
+	@Parameter(required=true, defaultValue = "2")
 	int maxSpikeLength = 2;
-	@Parameter(required=true)
-	String color = null;
 	@Parameter(required=false)
 	boolean showSpikes = false;
 	
@@ -42,7 +46,6 @@ public class RemoveSpikes implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		// TODO Auto-generated method stub
 		Utils.mapContainsKeys(input, dataKey, startCellKey);
 		
 		double[] data = (double[]) input.get(dataKey);
@@ -148,8 +151,7 @@ public class RemoveSpikes implements Processor {
 		}
 		
 		input.put(outputKey,result);
-		input.put("@"+Constants.KEY_COLOR + "_" +outputKey,color);
-		
+
 		return input;
 	}
 
@@ -223,14 +225,6 @@ public class RemoveSpikes implements Processor {
 
 	public void setMaxSpikeLength(int maxSpikeLength) {
 		this.maxSpikeLength = maxSpikeLength;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
 	}
 
 	public int getLeftBorder() {

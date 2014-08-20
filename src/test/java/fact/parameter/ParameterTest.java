@@ -82,8 +82,8 @@ public class ParameterTest  {
         poser.process(item);
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setPixel(shower);
-        dist.setWeights(photonCharge);
+        dist.setShowerKey(shower);
+        dist.setWeightsKey(photonCharge);
         dist.setOutputKey(distribution);
         dist.process(item);
 

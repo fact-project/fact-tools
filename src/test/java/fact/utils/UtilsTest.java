@@ -18,7 +18,7 @@ public class UtilsTest {
 		pointRot[0] = Math.cos(-15.0/180.0*Math.PI)*10.0/Math.cos(30.0/180.0*Math.PI);
 		pointRot[1] = Math.sin(-15.0/180.0*Math.PI)*10.0/Math.cos(30.0/180.0*Math.PI);
 		
-		double[] result = Utils.rotatePointInShowerSystem(x, y, cogx, cogy, delta);
+		double[] result = Utils.rotateAndTranslatePointInShowerSystem(x, y, cogx, cogy, delta);
 		
 		double diff = Math.abs( Math.sqrt( Math.pow(pointRot[0]-result[0],2) + Math.pow(pointRot[1]-result[1],2) ) );
 		

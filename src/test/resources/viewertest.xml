@@ -19,7 +19,7 @@
                                              keyPositions="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
 
             <fact.features.source.SourcePosition outputKey="Cetatauri" url="${driveFile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" />
-            <fact.features.DistributionFromShower weights="photoncharge" pixel="shower" outputKey="dist" />
+            <fact.features.DistributionFromShower weights="photoncharge" showerKey="shower" outputKey="dist" />
             <fact.ShowViewer key="DataCalibrated" range="25,250"/>
             <!--<fact.statistics.ArrayMean key="photoncharge" outputKey="pMean" />-->
             <!--<fact.statistics.ArrayMean key="arrivalTime" outputKey="aMean" />-->

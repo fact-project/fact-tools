@@ -13,6 +13,11 @@ import stream.io.SourceURL;
 
 import java.net.URL;
 
+/**
+ * This should replace the classical photoncharge processor sooner or later.
+ * TODO: WIP
+ * @author Fabian Temme
+ */
 public class TimeGradientExtraction implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);
 

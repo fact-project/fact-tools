@@ -9,6 +9,9 @@ import stream.annotations.Parameter;
 
 import java.util.LinkedList;
 
+/**
+ * TODO: Refactor previous startcell stuff to be put into a container class
+ */
 public class PreviousStartCells implements Processor {
 	static Logger log = LoggerFactory.getLogger(PreviousStartCells.class);
 	

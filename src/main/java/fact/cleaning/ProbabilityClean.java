@@ -9,6 +9,11 @@ import stream.Processor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Wolfgangs idea after previous cleaning make a new cleaning depending on the distance to showeraxis.
+ * TODO: find thresholds and check code. unit test?
+ * @author Fabian Temme
+ */
 public class ProbabilityClean implements Processor {
 
 	private String photonChargeKey = null;
