@@ -117,7 +117,6 @@ public class ZFitsDrsCalib implements Processor {
 		log.info("Loaded");
 	}
 
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
 	public void setUrl(URL url) {
 		log.info("Init DrsCellOffset Calibration");
 		try {
