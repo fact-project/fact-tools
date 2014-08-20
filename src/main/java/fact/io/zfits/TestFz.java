@@ -27,7 +27,7 @@ public class TestFz implements Processor {
 			throw new RuntimeException();
 		}
 
-		short[] data = ((short[])input.get("DataCal")).clone();
+		short[] data = ((short[])input.get("DataZCal")).clone();
 		short[] dataCompare = ((short[])inputCompare.get("Data")).clone();
 		short[] startCellData = (short[])input.get("StartCellData");
 		short[] startCellDataCompare = (short[])inputCompare.get("StartCellData");
@@ -43,7 +43,7 @@ public class TestFz implements Processor {
 		if (numChannel!=numChannelCompare) {
 			throw new RuntimeException("Channel number are diffrent. Event: "+this.currentEvent);
 		}
-		
+
 		//check startData
 		for (int i=0; i<numChannel; i++) {
 			if (startCellData[i]!=startCellDataCompare[i]) {
@@ -56,7 +56,7 @@ public class TestFz implements Processor {
 			for (int j=0; j<numSlices; j++) {
 				int index = i*numSlices+j;
 				if (data[index]!=dataCompare[index]) {
-					log.error("Event: {}, Cell: {}, slice {}, is wrong, got {} expected {}", this.currentEvent, i, j, data[index], dataCompare[index]);
+					log.error("Event: {}, Cell: {}, slice {}, is wrong, got {} expected {}, startCell: {}", this.currentEvent, i, j, data[index], dataCompare[index], startCellData[i]);
 					throw new RuntimeException();
 				}
 			}
