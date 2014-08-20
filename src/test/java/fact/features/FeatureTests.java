@@ -137,8 +137,8 @@ public class FeatureTests {
 		
 		//to test the hillas stuff we need some cleaned pixel. set the output to the final String we set globaly
 		CoreNeighborClean core = new CoreNeighborClean();
-		core.setKey(charge.getOutputKey());
-		core.setKeyPositions(rE.getOutputKey());
+		core.setPhotonChargeKey(charge.getOutputKey());
+		core.setArrivalTimeKey(rE.getOutputKey());
 		core.setOutputKey(cleaningOutput);
 		p = new Pair<String, Class<?>>(core.getOutputKey(), int[].class );
 		typeMap.put(core, p);
