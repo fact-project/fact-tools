@@ -25,9 +25,9 @@
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
 
     <process id="2" input="fact">
-        <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+        <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
 <!--         <fact.utils.CreateFakeStartCells outputKey="FStartCells" />
-        <fact.utils.PreviousStartCells startCellKey="FStartCells" outputKey="prevEvents" limitEvents="5"/> -->
+        <fact.utils.PreviousEventInfo startCellKey="FStartCells" outputKey="prevEvents" limitEvents="5"/> -->
         <stream.flow.Skip condition="%{data.EventNum} &lt; 17" />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" /> 
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>

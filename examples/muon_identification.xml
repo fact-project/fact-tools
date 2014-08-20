@@ -12,7 +12,7 @@
     <stream id="fact" class="fact.io.FitsStream" url="file:${data}" />
             
     <process  input="fact"> 
-    	<fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+    	<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
 <!--         <stream.data.PrintData /> -->
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         
