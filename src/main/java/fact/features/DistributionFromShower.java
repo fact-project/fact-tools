@@ -1,11 +1,11 @@
 package fact.features;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 import fact.statistics.PixelDistribution2D;
 import org.apache.commons.math3.linear.*;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -50,8 +50,8 @@ public Data process(Data input) {
     double[] wheightsArray = (double[]) input.get(weightsKey);
 
 	double size = 0;
-    for(double w : wheightsArray){
-        size += w;
+    for(int pix : showerPixel){
+        size += wheightsArray[pix];
     }
 
 
@@ -92,17 +92,16 @@ public Data process(Data input) {
         double posx = pixelMap.getPixelFromId(showerPixel[i]).getXPositionInMM();
         double posy = pixelMap.getPixelFromId(showerPixel[i]).getYPositionInMM();
         //rotate
-        double[] c = Utils.rotatePointInShowerSystem(posx, posy, cog[0], cog[1], delta);
+        double[] c = Utils.rotateAndTranslatePointInShowerSystem(posx, posy, cog[0], cog[1], delta);
         // fill array of new showerKey coordinates
         longitudinalCoords[i]			= c[0];
         transversalCoords[i]			= c[1];
     }
+    double m3Long = calculateSkewness(0, longitudinalCoords, wheightsArray);
+    double m3Trans = calculateSkewness(0, transversalCoords, wheightsArray);
 
-    double m3Long = calculateSkewness(cog[0], longitudinalCoords, wheightsArray);
-    double m3Trans = calculateSkewness(cog[1], transversalCoords, wheightsArray);
-
-    double m4Long = calculateKurtosis(cog[0], longitudinalCoords, wheightsArray);
-    double m4Trans = calculateKurtosis(cog[1], transversalCoords, wheightsArray);
+    double m4Long = calculateKurtosis(0, longitudinalCoords, wheightsArray);
+    double m4Trans = calculateKurtosis(0, transversalCoords, wheightsArray);
 
 
     PixelDistribution2D dist = new PixelDistribution2D(covarianceMatrix.getEntry(0, 0), covarianceMatrix.getEntry(1,1),
