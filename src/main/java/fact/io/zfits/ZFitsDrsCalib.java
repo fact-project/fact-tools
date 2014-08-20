@@ -16,19 +16,25 @@ public class ZFitsDrsCalib implements Processor {
 	static Logger log = LoggerFactory.getLogger(ZFitsDrsCalib.class);
 
 	private short[] calibData;
+	
+	private URL url = null;
+	private boolean startup = false;
 
 	@Parameter(name = "outputKey", defaultValue = "DataCalibrated", required=true)
 	private String outputKey;
 
-	@Parameter(name = "optional", defaultValue = "false", required=false,
-			description="If the file is a normal Fits File ignore the drs calibration of the zfits format.")
 	private boolean optional = false;
 	private boolean skipProzess = false;
 
 	@Override
 	public Data process(Data input) {
-		if (this.skipProzess)
+		init();
+		if (this.skipProzess) {
+			short[] data = ((short[])input.get("Data")).clone();
+			input.put(outputKey, data);
 			return input;
+		}
+			
 		Utils.mapContainsKeys( input, "Data", "StartCellData");
 		short[] data = ((short[])input.get("Data")).clone();
 		short[] startCellData = (short[])input.get("StartCellData");
@@ -101,6 +107,7 @@ public class ZFitsDrsCalib implements Processor {
 		try{
 			drsStream.init();
 		} catch (MissingArgumentException e) {
+			log.info("No DrsTable found, optional:'"+this.optional+"'");
 			if (this.optional) {
 				this.skipProzess = true;
 				log.info("Found Normal fits-file, skipping prozessor activated");
@@ -117,20 +124,13 @@ public class ZFitsDrsCalib implements Processor {
 		log.info("Loaded");
 	}
 
-	public void setUrl(URL url) {
+	public void init() {
+		if (this.startup)
+			return;
+		this.startup = true;
 		log.info("Init DrsCellOffset Calibration");
 		try {
-			initDrsCellOffset(new SourceURL(url));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats)")
-	public void setUrl(String urlString) {
-		try {
-			URL url = new URL(urlString);
-			initDrsCellOffset(new SourceURL(url));
+			initDrsCellOffset(new SourceURL(this.url));
 		} catch (MalformedURLException e){
 			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
 			throw new RuntimeException("Cant open drsFile");
@@ -140,10 +140,21 @@ public class ZFitsDrsCalib implements Processor {
 		}
 	}
 
+	public void setUrl(URL url) {
+		this.url = url;
+	}
+
+	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats)")
+	public void setUrl(String urlString) throws MalformedURLException {
+		this.url = new URL(urlString);
+	}
+
 	public boolean getOptional() {
 		return optional;
 	}
 
+	@Parameter(name = "optional", defaultValue = "false", required=true,
+			description="If the file is a normal Fits File ignore the drs calibration of the zfits format.")
 	public void setOptional(boolean optional) {
 		this.optional = optional;
 	}
