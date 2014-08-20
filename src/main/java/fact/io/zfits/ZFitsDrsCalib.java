@@ -103,6 +103,7 @@ public class ZFitsDrsCalib implements Processor {
 		} catch (MissingArgumentException e) {
 			if (this.optional) {
 				this.skipProzess = true;
+				log.info("Found Normal fits-file, skipping prozessor activated");
 				return;
 			}
 			throw e;
