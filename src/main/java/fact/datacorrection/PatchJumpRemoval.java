@@ -90,7 +90,6 @@ public class PatchJumpRemoval implements Processor {
 		int numberPatches = Constants.NUMBEROFPIXEL / 9;
 		
 
-		jumpInfos = new JumpInfos(Constants.NUMBEROFPIXEL, numberPatches, roi);
 				
 		boolean stopLoop = false;
 		
@@ -103,6 +102,7 @@ public class PatchJumpRemoval implements Processor {
 			int[] currPrevTime = prevEventInfo.getPrevUnixTimeCells(prevEvent);
 									
 			double deltaT = (double)(currentTime[0]-currPrevTime[0])*1000.0+(double)(currentTime[1]-currPrevTime[1])/1000.0;
+			jumpInfos = new JumpInfos(Constants.NUMBEROFPIXEL, numberPatches, roi);
 			
 			// we only want to go on when at least one pixel was corrected (so the jumpheight is larger than the jumpLimit) or
 			// previous start and stop cells aren't in the ROI
