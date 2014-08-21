@@ -87,46 +87,50 @@ public class CoreNeighborClean implements Processor{
 			addLevelToDataItem(showerPixel, outputKey + "_level3", input);
 		}
 		
-		showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,timeThreshold);
-		if (showDifferentCleaningSets == true)
+		if (showerPixel.size() != 0)
 		{
-			addLevelToDataItem(showerPixel, outputKey + "_level4", input);
-		}
-		
-		showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
-		if (showDifferentCleaningSets == true)
-		{
-			addLevelToDataItem(showerPixel, outputKey + "_level5", input);
-		}
-				
-		if (starPositionKeys != null)
-		{
-			PixelSetOverlay starSet = new PixelSetOverlay();
-			for (String starPositionKey : starPositionKeys)
+			showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,timeThreshold);
+			if (showDifferentCleaningSets == true)
 			{
-				Utils.isKeyValid(input, starPositionKey, double[].class);
-				double[] starPosition = (double[]) input.get(starPositionKey);
-				
-				showerPixel = removeStarIslands(showerPixel,starPosition,starSet,starRadiusInCamera);
-				if (showDifferentCleaningSets == true)
+				addLevelToDataItem(showerPixel, outputKey + "_level4", input);
+			}
+			
+			showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
+			if (showDifferentCleaningSets == true)
+			{
+				addLevelToDataItem(showerPixel, outputKey + "_level5", input);
+			}
+					
+			if (starPositionKeys != null)
+			{
+				PixelSetOverlay starSet = new PixelSetOverlay();
+				for (String starPositionKey : starPositionKeys)
 				{
-					addLevelToDataItem(showerPixel, outputKey + "_level6", input);
-					input.put("Starset", starSet);
+					Utils.isKeyValid(input, starPositionKey, double[].class);
+					double[] starPosition = (double[]) input.get(starPositionKey);
+					
+					showerPixel = removeStarIslands(showerPixel,starPosition,starSet,starRadiusInCamera);
+					if (showDifferentCleaningSets == true)
+					{
+						addLevelToDataItem(showerPixel, outputKey + "_level6", input);
+						input.put("Starset", starSet);
+					}
 				}
 			}
-		}
+				
+			Integer[] showerPixelArray = new Integer[showerPixel.size()];
+			showerPixel.toArray(showerPixelArray);
 			
-		Integer[] showerPixelArray = (Integer[]) showerPixel.toArray();
-		
-		if(showerPixelArray.length > 0){
-
-			cleanedPixelSet = new PixelSetOverlay();
-	        for (int aShowerPixelArray : showerPixelArray) {
-	        	cleanedPixelSet.addById(aShowerPixelArray);
-	        }
-	        
-			input.put(outputKey, showerPixelArray);
-			input.put(outputKey+"Set", cleanedPixelSet);
+			if(showerPixelArray.length > 0){
+	
+				cleanedPixelSet = new PixelSetOverlay();
+		        for (int aShowerPixelArray : showerPixelArray) {
+		        	cleanedPixelSet.addById(aShowerPixelArray);
+		        }
+		        
+				input.put(outputKey, showerPixelArray);
+				input.put(outputKey+"Set", cleanedPixelSet);
+			}
 		}
 
 		return input;
@@ -288,7 +292,8 @@ public class CoreNeighborClean implements Processor{
 	}
 	
 	private void addLevelToDataItem(ArrayList<Integer> showerPixel,String name,Data input){
-		Integer[] level = (Integer[]) showerPixel.toArray();
+		Integer[] level = new Integer[showerPixel.size()];
+		showerPixel.toArray(level);
 		
 		if (level.length > 0)
 		{

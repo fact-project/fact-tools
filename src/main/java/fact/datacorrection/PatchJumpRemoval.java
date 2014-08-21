@@ -71,10 +71,10 @@ public class PatchJumpRemoval implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.isKeyValid(input, dataKey, short[].class);
+		Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, prevEventsKey, PreviousEventInfoContainer.class);
 		Utils.isKeyValid(input, startCellKey, short[].class);
-		Utils.isKeyValid(input, "NROI", int.class);
+		Utils.isKeyValid(input, "NROI", Integer.class);
 		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
 		
 		// Get variables out of data item

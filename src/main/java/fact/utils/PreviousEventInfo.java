@@ -28,7 +28,7 @@ public class PreviousEventInfo implements Processor {
 	public Data process(Data input) {
 		
 		Utils.isKeyValid(input, startCellKey, short[].class);
-		Utils.isKeyValid(input, "NROI", int.class);
+		Utils.isKeyValid(input, "NROI", Integer.class);
 		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
 				
 		int[] eventTime = (int[]) input.get("UnixTimeUTC");

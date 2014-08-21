@@ -160,10 +160,10 @@ public class FitsStream extends AbstractStream {
 		}
 
         if ( headerItem.get("NAXIS1") != null ){
-            blockSize = (int) headerItem.get("NAXIS1");
+            blockSize = (Integer) headerItem.get("NAXIS1");
         }
         if (headerItem.get("NPIX") != null){
-            numberOfPixel = (int) headerItem.get("NPIX");
+            numberOfPixel = (Integer) headerItem.get("NPIX");
         }
 
         long skipped = dataStream.skip(headerLength);
