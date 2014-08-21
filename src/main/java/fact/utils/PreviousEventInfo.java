@@ -1,19 +1,18 @@
 package fact.utils;
 
 import fact.Utils;
+import fact.container.PreviousEventInfoContainer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.LinkedList;
 
-/**
- * TODO: Refactor previous startcell stuff to be put into a container class
- */
-public class PreviousStartCells implements Processor {
-	static Logger log = LoggerFactory.getLogger(PreviousStartCells.class);
+public class PreviousEventInfo implements Processor {
+	static Logger log = LoggerFactory.getLogger(PreviousEventInfo.class);
 	
 	@Parameter(required=true)
 	String startCellKey = null;
@@ -22,48 +21,35 @@ public class PreviousStartCells implements Processor {
 	
 	int limitEvents=20;
 	
-	LinkedList<short[]> previousStartCells = new LinkedList<short[]>();
-	LinkedList<short[]> previousStopCells = new LinkedList<short[]>();
-	LinkedList<int[]> previousUnixTimes = new LinkedList<int[]>();
+	PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();
+	
 
 	@Override
 	public Data process(Data input) {
-		// TODO Auto-generated method stub
 		
-		Utils.mapContainsKeys( input, startCellKey, "NROI", "UnixTimeUTC");
-		
+		Utils.isKeyValid(input, startCellKey, short[].class);
+		Utils.isKeyValid(input, "NROI", Integer.class);
+		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
+				
 		int[] eventTime = (int[]) input.get("UnixTimeUTC");
-		
 		short[] startCellArray = (short[])input.get(startCellKey);
-		short[] stopCellArray = new short[startCellArray.length];
 		int length = (Integer) input.get("NROI");
+		
+		short[] stopCellArray = new short[startCellArray.length];
 		//calculate the stopcellArray for the current event
 		for (int i = 0; i < startCellArray.length; ++i){
 			//there are 1024 capacitors in the ringbuffer
 			stopCellArray[i] = (short) ((startCellArray[i] + length)% 1024);
 		}
 		
-		previousStartCells.addFirst(startCellArray);
-		previousStopCells.addFirst(stopCellArray);
-		previousUnixTimes.addFirst(eventTime);
+		previousEventInfo.addNewInfo(startCellArray, stopCellArray, eventTime);
 		
-		if (previousStartCells.size() > limitEvents)
+		if (previousEventInfo.getListSize() > limitEvents)
 		{
-			previousStartCells.removeLast();
-		}
-		if (previousStopCells.size() > limitEvents)
-		{
-			previousStopCells.removeLast();
-		}
-		if (previousUnixTimes.size() > limitEvents)
-		{
-			previousUnixTimes.removeLast();
+			previousEventInfo.removeLastInfo();
 		}
 		
-		
-		input.put(outputKey +"_start", previousStartCells);
-		input.put(outputKey +"_stop", previousStopCells);
-		input.put(outputKey+"_time", previousUnixTimes);
+		input.put(outputKey, previousEventInfo);
 		return input;
 	}
 

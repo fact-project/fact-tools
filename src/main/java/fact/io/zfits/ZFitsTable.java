@@ -175,7 +175,7 @@ public class ZFitsTable {
         //size += this.getSpezialGap();
 
         // necessary to answer with padding %2880
-        return ((size+2871)/2880)*2880;
+        return ((size+2879)/2880)*2880;
 	}
 	
 	public FitsTableColumn getColumns(int index) {

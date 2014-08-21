@@ -5,8 +5,10 @@ import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -74,11 +76,35 @@ public class CoreNeighborClean implements Processor{
 			addLevelToDataItem(showerPixel, outputKey + "_level1", input);
 		}
 		
+<<<<<<< HEAD
+		// Add all neighboring pixels of the core pixels,
+		// with a weight > neighborPixelThreshold to the showerpixellist
+		showerPixel.addAll(addNeighboringPixels(showerPixel));
+		Integer[] level3 = new Integer[showerPixel.size()];
+		showerPixel.toArray(level3);
+		Integer[] level4 = null;
+		// do a "timeMedianClean" in case the timeThreshold is set 
+		if(timeThreshold > 0 && keyPositions != null && showerPixel.size() != 0){
+			showerPixel = applyTimeMedianCleaning(showerPixel);
+			level4 = new Integer[showerPixel.size()];
+			showerPixel.toArray(level4);
+			showerPixel = removeSmallCluster(showerPixel);
+			if (starPositionKeys != null)
+			{
+				for (String starPositionKey : starPositionKeys)
+				{
+					double[] starPosition = (double[]) input.get(starPositionKey);
+					showerPixel = removeStarIslands(showerPixel,starPosition);
+				}
+			}
+		}	
+=======
 		showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level2", input);
 		}
+>>>>>>> 4c05e0f58ed8286874f42feb638c7a2e2b057991
 		
 		showerPixel = addNeighboringPixels(showerPixel, photonCharge);
 		if (showDifferentCleaningSets == true)
@@ -130,6 +156,20 @@ public class CoreNeighborClean implements Processor{
 				input.put(outputKey, showerPixelArray);
 				input.put(outputKey+"Set", cleanedPixelSet);
 			}
+<<<<<<< HEAD
+        }
+		
+		
+		if(showerPixelArray.length > 0){
+
+			cleanedPixelSet = new PixelSetOverlay();
+	        for (int aShowerPixelArray : showerPixelArray) {
+	        	cleanedPixelSet.addById(aShowerPixelArray);
+	        }
+            input.put(outputKey, showerPixelArray);
+			input.put(outputKey+"Set", cleanedPixelSet);
+=======
+>>>>>>> 4c05e0f58ed8286874f42feb638c7a2e2b057991
 		}
 
 		return input;

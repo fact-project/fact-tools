@@ -76,8 +76,8 @@ public class ParameterTest  {
 
 
         CoreNeighborClean poser = new CoreNeighborClean();
-        poser.setKey(key);
-        poser.setKeyPositions(positions);
+        poser.setPhotonChargeKey(photonCharge);
+        poser.setArrivalTimeKey(positions);
         poser.setOutputKey(shower);
         poser.process(item);
 

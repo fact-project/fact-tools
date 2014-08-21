@@ -1,6 +1,8 @@
 package fact.io.zfits;
 
 import org.apache.commons.cli.MissingArgumentException;
+import org.jfree.util.Log;
+
 import stream.util.parser.ParseException;
 
 import java.io.DataInputStream;
@@ -109,6 +111,7 @@ public class ZFitsUtil {
 	 */
 	public static ZFitsTable skipToTable(DataInputStream input, String tableName) throws ParseException, IOException, MissingArgumentException {
 		ZFitsTable fitsTable = null;
+		//System.out.println("Searching for: "+tableName);
 		while(true) {
 			List<String> block = ZFitsUtil.readBlock(input);
 			if (block==null)
@@ -122,9 +125,12 @@ public class ZFitsUtil {
 			//read the table
 			fitsTable = new ZFitsTable(header);
 
+			System.out.println("Found table: "+fitsTable.getTableName());
 			if (!fitsTable.getTableName().equals(tableName)) {
 				// it is not the desired table so skip it entirely
-				long num = input.skipBytes((int)fitsTable.getTableTotalSize());
+				//System.out.println("Skipping: "+fitsTable.getTableTotalSize());
+				long num = input.skip(fitsTable.getTableTotalSize());
+				//System.out.println("Num: "+num);
 				if (num!=(int)fitsTable.getTableTotalSize())
 					throw new MissingArgumentException("Couldn't skip the table, maybe file is corrupted or table is missing. Name: "+tableName);
 				continue;

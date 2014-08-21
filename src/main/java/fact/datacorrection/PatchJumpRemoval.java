@@ -2,7 +2,10 @@ package fact.datacorrection;
 
 import fact.Constants;
 import fact.Utils;
+import fact.container.JumpInfos;
+import fact.container.PreviousEventInfoContainer;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
+
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -10,6 +13,7 @@ import org.apache.commons.math3.transform.TransformType;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -35,8 +39,6 @@ public class PatchJumpRemoval implements Processor {
 	@Parameter(required=true)
 	String startCellKey=null;
 	@Parameter(required=true)
-	String color=null;
-	@Parameter(required=true)
 	double jumpLimit=5.0;
 	
 	int leftBorder = 10;
@@ -60,79 +62,55 @@ public class PatchJumpRemoval implements Processor {
 	double constant = 14.454;
 	double timeDependLimit = 10;
 	
-	double[] result = null;
-	double[] averJumpHeights = null;
 	int roi = 300;
-
-    PixelSetOverlay pixelWithSpikes;
-    PixelSetOverlay pixelWithSignalFlanks;
-    PixelSetOverlay pixelWithRinging;
-	PixelSetOverlay pixelWithCorrectedJumps;
-	PixelSetOverlay pixelWithWrongTimeDepend;
 	
-	double[] fftResults = null;
+	boolean addJumpInfos = false;
 	
-	IntervalMarker[] posMarker;
+	JumpInfos jumpInfos;
 	
 	@Override
 	public Data process(Data input) {
-		// TODO Auto-generated method stub
-		Utils.mapContainsKeys(input, dataKey, prevEventsKey + "_start", prevEventsKey + "_stop", "NROI", startCellKey);
-	
-		int[] currentTime = (int[]) input.get("UnixTimeUTC");
 		
+		Utils.isKeyValid(input, dataKey, double[].class);
+		Utils.isKeyValid(input, prevEventsKey, PreviousEventInfoContainer.class);
+		Utils.isKeyValid(input, startCellKey, short[].class);
+		Utils.isKeyValid(input, "NROI", Integer.class);
+		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
+		
+		// Get variables out of data item
+		int[] currentTime = (int[]) input.get("UnixTimeUTC");
 		roi = (Integer) input.get("NROI");
 		short[] currentStartCells = (short[]) input.get(startCellKey);
 		double[] data = (double[]) input.get(dataKey);
+		PreviousEventInfoContainer prevEventInfo = (PreviousEventInfoContainer) input.get(prevEventsKey);
 		
-		result = new double[data.length];
+		double[] result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
+		
 		int numberPatches = Constants.NUMBEROFPIXEL / 9;
 		
-		@SuppressWarnings("unchecked")
-		LinkedList<short[]> previousStartCells = (LinkedList<short[]>) input.get(prevEventsKey+"_start");
-		@SuppressWarnings("unchecked")
-		LinkedList<short[]> previousStopCells = (LinkedList<short[]>) input.get(prevEventsKey+"_stop");
-		@SuppressWarnings("unchecked")
-		LinkedList<int[]> previousTimes = (LinkedList<int[]>) input.get(prevEventsKey+"_time");
-		
+
+		jumpInfos = new JumpInfos();
+				
 		boolean stopLoop = false;
 		
-//		log.info("Events in previousStartCells before JumpRemoval: " + previousStartCells.size());
-
 		// Loop over all previous Events
-		int prevEvent=1; // we start at 1, cause the startcells of the current Event are already filled in the previousStartCells list
-		for ( ; prevEvent < previousStartCells.size() && stopLoop == false ; prevEvent++)
+		int prevEvent=1; // we start at 1, cause the startcells of the current Event are already filled in the prevEventInfo
+		for ( ; prevEvent < prevEventInfo.getListSize() && stopLoop == false ; prevEvent++)
 		{
-			short[] currPrevStartCells = previousStartCells.get(prevEvent);
-			short[] currPrevStopCells = previousStopCells.get(prevEvent);
-			int[] currPrevTime = previousTimes.get(prevEvent);
-			
-			posMarker = new IntervalMarker[Constants.NUMBEROFPIXEL];
-			
-			double[] patchAverageCamera = new double[data.length];
-			double[] patchAverageDerivCamera = new double[data.length];
-			
+			short[] currPrevStartCells = prevEventInfo.getPrevStartCells(prevEvent);
+			short[] currPrevStopCells = prevEventInfo.getPrevStoppCells(prevEvent);
+			int[] currPrevTime = prevEventInfo.getPrevUnixTimeCells(prevEvent);
+									
 			double deltaT = (double)(currentTime[0]-currPrevTime[0])*1000.0+(double)(currentTime[1]-currPrevTime[1])/1000.0;
 			
 			// we only want to go on when at least one pixel was corrected (so the jumpheight is larger than the jumpLimit) or
 			// previous start and stop cells aren't in the ROI
 			stopLoop = true;
 			
-			pixelWithSpikes = new PixelSetOverlay();
-			pixelWithSignalFlanks = new PixelSetOverlay();
-			pixelWithRinging = new PixelSetOverlay();
-			pixelWithCorrectedJumps = new PixelSetOverlay();
-			pixelWithWrongTimeDepend = new PixelSetOverlay();
-			
-			averJumpHeights = new double[numberPatches];
-			
-			fftResults = new double[data.length];
-			
 			// Correct Jumps for each patch individual
 			for (int patch=0 ; patch < numberPatches ; patch++)
 			{
-				averJumpHeights[patch] = 0;
 				boolean isStartCell=true;
 				boolean posInROI=false;
 				short pos = (short) ((currPrevStartCells[patch*9] - currentStartCells[patch*9] + 1024 + 2)%1024);
@@ -152,38 +130,28 @@ public class PatchJumpRemoval implements Processor {
 				}
 				if (posInROI == true)
 				{
-					HandleSpike(patch, pos);
+					result = HandleSpike(patch, pos, result, jumpInfos);
 					
 					// create patch voltage average array and patch voltage derivation array:
 					double[] patchAverage = new double[roi];
 					double[] patchDerivationAverage = new double[roi];
-					CreatePatchAverage(patch, patchAverage, patchDerivationAverage);
+					CreatePatchAverage(patch, patchAverage, patchDerivationAverage, result);
 					
-					for (int sl = 0 ; sl < roi ; sl++)
+					double jumpHeight = CheckForJump(patch,pos,patchDerivationAverage,isStartCell);
+					if (jumpHeight > 0)
 					{
-						for (int px = 0 ; px < 9 ; px++)
-						{
-							int pixel = patch*9+px;
-							patchAverageCamera[pixel*roi+sl] = patchAverage[sl];
-							patchAverageDerivCamera[pixel*roi+sl] = patchDerivationAverage[sl];
-						}
-					}
-					
-					boolean isJump=false;
-					isJump = CheckForJump(patch,pos,patchDerivationAverage,isStartCell);
-					if (isJump == true)
-					{
-						isJump = CheckForSignalFlank(patch, pos, patchDerivationAverage,isStartCell);
+						boolean isJump=false;
+						isJump = CheckForSignalFlank(patch, pos, patchDerivationAverage,isStartCell, jumpHeight);
 						if (isJump == true)
 						{
-							isJump = CheckForRingingFFT(patch,pos,patchAverage,patchDerivationAverage);
-								if (isJump == true)
+							jumpHeight = CheckForRingingFFT(patch,pos,patchAverage,patchDerivationAverage,jumpHeight,jumpInfos);
+								if (jumpHeight > 0)
 								{
-								isJump = CheckForTimeDependency(patch, deltaT);
+								isJump = CheckForTimeDependency(patch, deltaT,jumpHeight,jumpInfos);
 								if (isJump == true)
 								{
 									stopLoop = false;
-									CorrectJump(patch, pos, isStartCell);
+									result = CorrectJump(patch, pos, isStartCell, result, jumpHeight);
 								}
 							}
 						}
@@ -194,48 +162,30 @@ public class PatchJumpRemoval implements Processor {
 					stopLoop = false;
 				}
 			}
-			input.put(outputJumpsKey+prevEvent+"Jumps", averJumpHeights);
-			input.put(outputJumpsKey+prevEvent+"Time", deltaT);
-////			input.put(outputJumpsKey+prevEvent+"Spikes", pixelWithSpikes);
-////			input.put(outputJumpsKey+prevEvent+"SignalFlanks", pixelWithSignalFlanks);
-////			input.put(outputJumpsKey+prevEvent+"Ringing", pixelWithRinging);
-//			input.put(outputJumpsKey+prevEvent+"JumpsSet", pixelWithCorrectedJumps);
-//			if (pixelWithWrongTimeDepend.size() > 0)
-//			{
-//				input.put(outputJumpsKey+prevEvent+"TimeSet", pixelWithWrongTimeDepend);
-//			}
-//			input.put(outputJumpsKey+prevEvent+"Marker", posMarker);
-//			input.put(outputJumpsKey+prevEvent+"patchAverage", patchAverageCamera);
-//			input.put(outputJumpsKey+prevEvent+"patchAverageDeriv", patchAverageDerivCamera);
-//			input.put(outputJumpsKey+prevEvent+"fftResults", fftResults);
-//			input.put("@"+Constants.KEY_COLOR + "_" +outputJumpsKey+prevEvent+"fftResults", "#0ACF1B");
+
 		}
-//		log.info("prevEvent: " + prevEvent);
 		input.put(outputKey,result);
-		input.put("@"+Constants.KEY_COLOR + "_" +outputKey,color);
 		
 		return input;
 		
 	}
 	
-	// Checks if there are spikes directly in front of the jump and/or after the jump.
-	// Correct this jump if necessary
-	public void HandleSpike(int patch,int pos){
+	/**
+	 * Checks if there are spikes directly in front of the jump and/or after the jump. Correct this jump if necessary
+	 * @param patch
+	 * @param pos
+	 * @return 
+	 */
+	public double[] HandleSpike(int patch, int pos, double[] result, JumpInfos jumpInfo){
 		
 		for (int px = 0 ; px < 8 ; px++)
 		{
-			int pixel = patch*9+px;
-			
-			posMarker[pixel] = new IntervalMarker(pos,pos+1);
-			
+			int pixel = patch*9+px;	
 			// Check for a double spike in front of the jump
 			// properties of a double spike: large jump up, small step, large jump down
 			double diff = result[pixel*roi+pos-1] - result[pixel*roi+pos-2];
 			if (diff > spikeLimit)
 			{
-//				double diff2 = result[pixel*roi+pos] - result[pixel*roi+pos-1];
-//				if (Math.abs(diff2) < spikeLimit*0.3)
-//				{
 					double diff3 = result[pixel*roi+pos+1] - result[pixel*roi+pos];
 					if (-diff3 > spikeLimit)
 					{
@@ -243,45 +193,37 @@ public class PatchJumpRemoval implements Processor {
 						double correctionValue = (result[pixel*roi+pos-3] + result[pixel*roi+pos-2]) / 2.0;
 						result[pixel*roi+pos-1] = correctionValue;
 						result[pixel*roi+pos] = correctionValue;
-//						log.info("Found Double Spike before Jump: pixel: " + pixel + " correct to " + correctionValue);
-						pixelWithSpikes.addById(pixel);
+						if (addJumpInfos == true)
+						{
+							jumpInfo.pixelWithSpikes.addById(pixel);
+						}
 					}
-//				}
 			}
-			
 			// Check for a double spike on the jump
 			// properties of a double spike: large jump up, small step, large jump down
 			diff = result[pixel*roi+pos] - result[pixel*roi+pos-1];
 			if (diff > spikeLimit)
 			{
-//				double diff2 = result[pixel*roi+pos+1] - result[pixel*roi+pos];
-//				if (Math.abs(diff2) < spikeLimit*0.3)
-//				{
 					double diff3 = result[pixel*roi+pos+2] - result[pixel*roi+pos+1];
 					if (-diff3 > spikeLimit)
 					{
 						// double spike in slices pos and pos+1 found, correct pos with the average of the previous two slices:
 						double correctionValue = (result[pixel*roi+pos-2] + result[pixel*roi+pos-1]) / 2.0;
 						result[pixel*roi+pos] = correctionValue;
-//						log.info("Found Double Spike On Jump: pixel: " + pixel + " correct to " + correctionValue);
 						correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 						// and correct pos+1 with the average of the following two slices:
 						result[pixel*roi+pos+1] = correctionValue;
-//						log.info("Found Double Spike On Jump: pixel: " + pixel + " correct to " + correctionValue);
-						pixelWithSpikes.addById(pixel);
+						if (addJumpInfos == true)
+						{
+							jumpInfo.pixelWithSpikes.addById(pixel);
+						}
 					}
-//				}
 			}
-			
-			
 			// Check for a double spike after the jump
 			// properties of a double spike: large jump up, small step, large jump down
 			diff = result[pixel*roi+pos+1] - result[pixel*roi+pos];
 			if (diff > spikeLimit)
 			{
-//				double diff2 = result[pixel*roi+pos+2] - result[pixel*roi+pos+1];
-//				if (Math.abs(diff2) < spikeLimit*0.3)
-//				{
 					double diff3 = result[pixel*roi+pos+3] - result[pixel*roi+pos+2];
 					if (-diff3 > spikeLimit)
 					{
@@ -289,14 +231,12 @@ public class PatchJumpRemoval implements Processor {
 						double correctionValue = (result[pixel*roi+pos+3] + result[pixel*roi+pos+4]) / 2.0;
 						result[pixel*roi+pos+1] = correctionValue;
 						result[pixel*roi+pos+2] = correctionValue;
-//						log.info("Found Double Spike after Jump: pixel: " + pixel + " correct to " + correctionValue);
-						pixelWithSpikes.addById(pixel);
+						if (addJumpInfos == true)
+						{
+							jumpInfo.pixelWithSpikes.addById(pixel);
+						}
 					}
-//				}
-			}
-			
-
-			
+			}			
 			// Check for a single spike in front of the jump
 			// properties of a single spike: large jump up, large jump down
 			diff = result[pixel*roi+pos] - result[pixel*roi+pos-1];
@@ -308,11 +248,12 @@ public class PatchJumpRemoval implements Processor {
 					// single spike in slices pos found, correct it with the average of the previous two slices:
 					double correctionValue = (result[pixel*roi+pos-2] + result[pixel*roi+pos-1]) / 2.0;
 					result[pixel*roi+pos] = correctionValue;
-//					log.info("Found Single Spike befor Jump: pixel: " + pixel + " correct to " + correctionValue);
-					pixelWithSpikes.addById(pixel);
+					if (addJumpInfos == true)
+					{
+						jumpInfo.pixelWithSpikes.addById(pixel);
+					}
 				}
 			}
-			
 			// Check for a single spike in front of the jump
 			// properties of a single spike: large jump up, large jump down
 			diff = result[pixel*roi+pos+1] - result[pixel*roi+pos];
@@ -324,16 +265,26 @@ public class PatchJumpRemoval implements Processor {
 					// single spike in slices pos+1 found, correct it with the average of the following two slices:
 					double correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 					result[pixel*roi+pos+1] = correctionValue;
-//					log.info("Found Single Spike after Jump: pixel: " + pixel + " correct to " + correctionValue);
-					pixelWithSpikes.addById(pixel);
+					if (addJumpInfos == true)
+					{
+						jumpInfo.pixelWithSpikes.addById(pixel);
+					}
 				}
 			}
 		}
+		
+		return result;
 	}
 	
-	// Calculates the average of the result data array for a given patch. Also calulates the derivation of this patch average.
-	// The timemarker channels are excluded from the averaging
-	public void CreatePatchAverage(int patch, double[] patchAverage,double[] patchDerivationAverage){
+	// 
+	/**
+	 * Calculates the average of the result data array for a given patch. Also calulates the derivation of this patch average. 
+	 * The timemarker channels are excluded from the averaging
+	 * @param patch
+	 * @param patchAverage
+	 * @param patchDerivationAverage
+	 */
+	public void CreatePatchAverage(int patch, double[] patchAverage,double[] patchDerivationAverage, double[] result){
 		for (int sl=0 ; sl < roi ; sl++)
 		{
 			for (int px=0 ; px < 8 ; px++)
@@ -349,10 +300,16 @@ public class PatchJumpRemoval implements Processor {
 		}
 	}
 	
-	// Checks if there is a jump from the slices pos to pos+1
-	public boolean CheckForJump(int patch,int pos,double[] derivation,boolean isStartCell){
-		boolean isJump = false;
-		averJumpHeights[patch] = 0;
+	/**
+	 * Checks if there is a jump from the slices pos to pos+1
+	 * @param patch
+	 * @param pos
+	 * @param derivation
+	 * @param isStartCell
+	 * @return
+	 */
+	public double CheckForJump(int patch,int pos,double[] derivation,boolean isStartCell){
+		double jumpHeight = 0;
 		
 		double derivAtJump = derivation[pos+1];
 		
@@ -363,95 +320,106 @@ public class PatchJumpRemoval implements Processor {
 		
 		if (derivAtJump > jumpLimit)
 		{
-				isJump = true;
-				averJumpHeights[patch] = derivation[pos+1];
+			jumpHeight = derivation[pos+1];
 		}
-		return isJump;
+		return jumpHeight;
 	}
 	
-	public boolean CheckForTimeDependency(int patch, double deltaT){
+	/**
+	 * Checks if the jumpHeight is in the range of the predicted jumpHeight, depending on deltaT
+	 * @param patch
+	 * @param deltaT
+	 * @param jumpHeight
+	 * @param jumpInfos
+	 * @return
+	 */
+	public boolean CheckForTimeDependency(int patch, double deltaT,double jumpHeight,JumpInfos jumpInfos){
 		boolean timeDependIsCorrect = true;
 		
 		double predictedJumpHeight = constant*Math.pow(deltaT, tau);
 		
-//		log.info("Patch: " + patch + "deltaT: " + deltaT + " predJumpHeight: " + predictedJumpHeight + " averJumpHeight: " + averJumpHeights[patch]);
-		
-		if (Math.abs(averJumpHeights[patch]) > timeDependLimit * predictedJumpHeight)
+		if (Math.abs(jumpHeight) > timeDependLimit * predictedJumpHeight)
 		{
 			timeDependIsCorrect = false;
-			for (int px = 0 ; px < 9 ; px++)
+			if (addJumpInfos == true)
 			{
-				pixelWithWrongTimeDepend.addById(patch*9+px);
+				for (int px = 0 ; px < 9 ; px++)
+				{
+					jumpInfos.pixelWithWrongTimeDepend.addById(patch*9+px);
+				}
 			}
-			averJumpHeights[patch] = 0;
+			jumpHeight = 0;
 		}
 		
 		return timeDependIsCorrect;
 	}
 	
-	// Checks if the detected jumps comes from a photon signal flank 
-	public boolean CheckForSignalFlank(int patch, int pos, double[] derivation, boolean isStartCell){
+	/**
+	 * Checks if the detected jumps comes from a photon signal flank 
+	 * @param patch
+	 * @param pos
+	 * @param derivation
+	 * @param isStartCell
+	 * @return
+	 */
+	public boolean CheckForSignalFlank(int patch, int pos, double[] derivation, boolean isStartCell, double jumpHeight){
 		boolean noSignalFlank = true;
 		
 		// Calculate the average derivation over 3 slices before and 3 slices after the jump
-//		double averDerivBeforeJump = 0;
-//		double averDerivAfterJump = 0;
 		double averDerivAroundJump = 0;
 		
 		int counter = 0;
 		for (int sl = pos ; sl > pos-2 && sl > leftBorder ; sl--)
 		{
-//			averDerivBeforeJump += derivation[sl];
 			averDerivAroundJump += derivation[sl];
 			counter += 1;
 		}
-//		averDerivBeforeJump /= counter;
-		
-//		counter = 0;
 		for (int sl = pos+2 ; sl < pos+4 && sl < roi ; sl++)
 		{
-//			averDerivAfterJump += derivation[sl];
 			averDerivAroundJump += derivation[sl];
 			counter += 1;
 		}
-//		averDerivAfterJump /= counter;
 		averDerivAroundJump /= counter;
 		
 		// If we have a stop cell, we only want to check if we have a falling flank. Therefore we multiply with -1, to have positive derivations.
 		if (isStartCell == false)
 		{
-//			averDerivBeforeJump *= -1;
-//			averDerivAfterJump *= -1;
 			averDerivAroundJump *= -1;
 		}
 		
 		// if either the average derivation before or after the jump is at the same level of the jump height we have a signal flank not a jump
-//		if (averDerivBeforeJump > signalFlankLimit*Math.abs(averJumpHeights[patch]) || averDerivAfterJump > signalFlankLimit*Math.abs(averJumpHeights[patch]))
-		if (averDerivAroundJump > signalFlankLimit*Math.abs(averJumpHeights[patch]))
+		if (averDerivAroundJump > signalFlankLimit*Math.abs(jumpHeight))
 		{
-//			log.info("Flank found: patch: "+patch*9+" pos: "+pos+" averDerivBeforeJump: "+averDerivBeforeJump+" averJumpHeights: "+averJumpHeights[patch]+" averDerivAfterJump: "+averDerivAfterJump);
-//			log.info("Flank found: patch: "+patch*9+" pos: "+pos+" averDerivAroundJump: "+averDerivAroundJump+" averJumpHeights: "+averJumpHeights[patch]);
 			noSignalFlank = false;
-			for (int px = 0 ; px < 9 ; px++)
+			if (addJumpInfos == true)
 			{
-				pixelWithSignalFlanks.addById(patch*9+px);
+				for (int px = 0 ; px < 9 ; px++)
+				{
+					jumpInfos.pixelWithSignalFlanks.addById(patch*9+px);
+				}
 			}
-			averJumpHeights[patch] = 0;
+			jumpHeight = 0;
 		}
 		
 		return noSignalFlank;
 	}
 	
-	// First check if there is a significant ringing in the dataArray, by performing a FFT on the dataArray, and checking the amplitude of the
-	// frequency bins between 0.18 GHz and 0.22 GHz.
-	// If there is ringing, reduce the jumpHeight by the average of the derivation one period of the ringing before and one period after the jump.
-	// Return false if the resulting jumpHeight is smaller than the jumpLimit, and true if it is higher or no ringing was found.
-	public boolean CheckForRingingFFT(int patch, int pos,double[] dataArray, double[] derivation){
-		boolean noRinging = true;
-		
+	// 
+	/**
+	 * First check if there is a significant ringing in the dataArray, by performing a FFT on the dataArray, 
+	 * and checking the amplitude of the frequency bins between 0.18 GHz and 0.22 GHz. If there is ringing, 
+	 * reduce the jumpHeight by the average of the derivation one period of the ringing before and one period 
+	 * after the jump. Return false if the resulting jumpHeight is smaller than the jumpLimit, and true if it is 
+	 * higher or no ringing was found.
+	 * @param patch
+	 * @param pos
+	 * @param dataArray
+	 * @param derivation
+	 * @return
+	 */
+	public double CheckForRingingFFT(int patch, int pos,double[] dataArray, double[] derivation, double jumpHeight, JumpInfos jumpInfos){
 		FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
 	
-		
 		// we perform a FFT on 32 slices of the data array. This 32 slices have to be between ]leftBorder,roi[
 		// if they are not in this region, the slices are shifted.
 		int right = pos + lengthAfterPosForFFT;
@@ -496,14 +464,17 @@ public class PatchJumpRemoval implements Processor {
 		}
 		ringingFreqAmpl /= (freqBorderBinRight - freqBorderBinLeft + 1);
 		
-		// this is only for getting the results of the FFT in the viewer
-		for (int sl=0 ; sl <= lengthForFFT/2 ; sl++)
+		if (addJumpInfos == true)
 		{
-			double real = fftResult[sl].getReal();
-			double imag = fftResult[sl].getImaginary();
-			for (int px = 0 ; px < 9 ; px++)
+			// this is only for getting the results of the FFT in the viewer
+			for (int sl=0 ; sl <= lengthForFFT/2 ; sl++)
 			{
-				fftResults[(patch*9+px)*roi+sl+left] = Math.sqrt(real*real+imag*imag);
+				double real = fftResult[sl].getReal();
+				double imag = fftResult[sl].getImaginary();
+				for (int px = 0 ; px < 9 ; px++)
+				{
+					jumpInfos.fftResults[(patch*9+px)*roi+sl+left] = Math.sqrt(real*real+imag*imag);
+				}
 			}
 		}
 		
@@ -528,36 +499,46 @@ public class PatchJumpRemoval implements Processor {
 			}
 			averRingingDerviation /= counter;
 			
-			averJumpHeights[patch] -= averRingingDerviation;
-			for (int px = 0 ; px < 9 ; px++)
+			jumpHeight -= averRingingDerviation;
+			if (addJumpInfos == true)
 			{
-				pixelWithRinging.addById(patch*9+px);
+				for (int px = 0 ; px < 9 ; px++)
+				{
+					jumpInfos.pixelWithRinging.addById(patch*9+px);
+				}
 			}
 
-//			log.info("Ringing found, pixel: " + patch*9 +  " freqAmpl: " + ringingFreqAmpl + " compAmpl: " + comparisonFreqAmpl);
-//			log.info("FreqBins: (" + freqBorderBinLeft + "," + freqBorderBinRight + ")");
-//			log.info("Reduced jump Height from: " + (averJumpHeights[patch]+averRingingDerviation) + " to " + averJumpHeights[patch] + " (jumplimit is: " + jumpLimit + ")");
-			if (Math.abs(averJumpHeights[patch]) < jumpLimit)
+			if (Math.abs(jumpHeight) < jumpLimit)
 			{
-				averJumpHeights[patch] = 0;
-				noRinging = false;
+				jumpHeight = 0;
 			}
 		}
-		return noRinging;
+		return jumpHeight;
 	}
 	
-	// Correct the data array for a jump. In case of a jump at a previous start cells, all slices beginning with pos+1 are reduced
-	// about the jump height, in case of a jump at a previous stopp cell, all slices up to pos are reduced about the jump height.
-
-	public void CorrectJump(int patch,int pos,boolean isStartCell){
+	/**
+	 * Correct the data array for a jump. In case of a jump at a previous start cells, 
+	 * all slices beginning with pos+1 are reduced about the jump height, in case of a 
+	 * jump at a previous stopp cell, all slices up to pos are reduced about the jump height.
+	 * @param patch
+	 * @param pos
+	 * @param isStartCell
+	 * @param result
+	 * @param jumpHeight
+	 * @return
+	 */
+	public double[] CorrectJump(int patch,int pos,boolean isStartCell, double[] result, double jumpHeight){
 		int leftBorder = pos+1;
 		int rightBorder = roi;
 		
-		double jumpHeight = Math.abs(averJumpHeights[patch]);
+		double jumpheight = Math.abs(jumpHeight);
 		
-		for (int px = 0 ; px < 9 ; px++)
+		if (addJumpInfos == true)
 		{
-			pixelWithCorrectedJumps.addById(patch*9+px);
+			for (int px = 0 ; px < 9 ; px++)
+			{
+				jumpInfos.pixelWithCorrectedJumps.addById(patch*9+px);
+			}
 		}
 		
 		if (isStartCell == false)
@@ -571,11 +552,11 @@ public class PatchJumpRemoval implements Processor {
 			int pixel = 9*patch + px;
 			for (int slice=leftBorder ; slice < rightBorder ; slice++)
 			{
-				result[pixel*roi+slice] -= jumpHeight;
+				result[pixel*roi+slice] -= jumpheight;
 			}
 		}
+		return result;
 	}
-	
 
 	public String getDataKey() {
 		return dataKey;
@@ -695,14 +676,6 @@ public class PatchJumpRemoval implements Processor {
 
 	public void setFreqAmplLimit(double freqAmplLimit) {
 		this.freqAmplLimit = freqAmplLimit;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
 	}
 
 	public double getTau() {

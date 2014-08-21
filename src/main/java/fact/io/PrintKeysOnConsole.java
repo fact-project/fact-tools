@@ -13,12 +13,13 @@ public class PrintKeysOnConsole implements Processor {
 	public Data process(Data input) {
 		final Logger log = LoggerFactory.getLogger(BinaryFactWriter.class);
 		
+		String output = "\n";
 		for(String key : keys)
 		{
-			String output = String.valueOf(input.get(key));
-			log.info(key + " = " + output);
+			output += "\t" + key + " = " + String.valueOf(input.get(key)) + "\n";
+			
 		}
-		
+		log.info(output);
 		
 		return input;
 	}

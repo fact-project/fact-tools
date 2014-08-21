@@ -168,7 +168,7 @@ public class ZFitsStream extends AbstractStream {
 		this.dataStream = new DataInputStream(new BufferedInputStream(getInputStream(), bufferSize ));
 
 		this.fitsTable = ZFitsUtil.skipToTable(this.dataStream, this.tableName);
-		
+		log.info("Found Table");
 	
 		// create headerItem
 		// add all key value pairs which are not the column information TODO finish extracting column information
