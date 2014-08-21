@@ -13,6 +13,7 @@ import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -107,7 +108,6 @@ public class CoreNeighborClean implements Processor{
 		showerPixel.addAll(addNeighboringPixels(showerPixel));
 		Integer[] level3 = new Integer[showerPixel.size()];
 		showerPixel.toArray(level3);
-		
 		Integer[] level4 = null;
 		// do a "timeMedianClean" in case the timeThreshold is set 
 		if(timeThreshold > 0 && keyPositions != null && showerPixel.size() != 0){
@@ -115,7 +115,6 @@ public class CoreNeighborClean implements Processor{
 			level4 = new Integer[showerPixel.size()];
 			showerPixel.toArray(level4);
 			showerPixel = removeSmallCluster(showerPixel);
-			
 			if (starPositionKeys != null)
 			{
 				for (String starPositionKey : starPositionKeys)
@@ -189,8 +188,7 @@ public class CoreNeighborClean implements Processor{
 	        for (int aShowerPixelArray : showerPixelArray) {
 	        	cleanedPixelSet.addById(aShowerPixelArray);
 	        }
-	        
-			input.put(outputKey, showerPixelArray);
+            input.put(outputKey, showerPixelArray);
 			input.put(outputKey+"Set", cleanedPixelSet);
 		}
 
