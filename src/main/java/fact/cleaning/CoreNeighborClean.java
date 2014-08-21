@@ -13,7 +13,6 @@ import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -31,18 +30,30 @@ public class CoreNeighborClean implements Processor{
 
     @Parameter(required = true)
 	private String photonChargeKey;
+
     @Parameter(required = true)
 	private String arrivalTimeKey;
+
     @Parameter(required = true)
 	private String outputKey;
-	@Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have to be identified as a CorePixel", defaultValue = "5.0")
+
+    @Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have to be " +
+            "identified as a CorePixel")
 	private  double corePixelThreshold;
-	@Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have thats adjacent to a previously identified corePixel", defaultValue = "2.0")
+
+    @Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have that is adjacent to a " +
+            "previously identified corePixel")
 	private  double neighborPixelThreshold;
+
     @Parameter(required = true)
 	private  double timeThreshold;
-    @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours are even considered for NeighbourCorePixel. If Size is smaller than minSize the Pixels will be discarded", defaultValue = "2.0")
+
+    @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
+            " are even considered for NeighbourCorePixel. " +
+            " If Size is smaller than minSize the Pixels will be discarded.")
 	private int minNumberOfPixel;
+
+
     @Parameter(required = false)
     private String[] starPositionKeys = null;
     @Parameter(required = false)
@@ -50,25 +61,21 @@ public class CoreNeighborClean implements Processor{
     
     private boolean showDifferentCleaningSets = false;
 
-
     private PixelSetOverlay cleanedPixelSet;
 	
-
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-	
-
 
 	@Override
 	public Data process(Data input) {
 		Utils.isKeyValid(input, arrivalTimeKey, int[].class);
 		Utils.isKeyValid(input, photonChargeKey, double[].class);		
 			
-		double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));
+		double[] photonCharge = (double[]) input.get(photonChargeKey);
 		double[] arrivalTimes = Utils.toDoubleArray(input.get(arrivalTimeKey));
 		
-		ArrayList<Integer> showerPixel= new ArrayList<Integer>();
+		ArrayList<Integer> showerPixel= new ArrayList<>();
 		
-		showerPixel = AddCorePixel(showerPixel,photonCharge,corePixelThreshold);
+		showerPixel = addCorePixel(showerPixel, photonCharge, corePixelThreshold);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level1", input);
@@ -85,52 +92,52 @@ public class CoreNeighborClean implements Processor{
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level3", input);
 		}
-		
-		if (showerPixel.size() != 0)
-		{
-			showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,timeThreshold);
-			if (showDifferentCleaningSets == true)
-			{
-				addLevelToDataItem(showerPixel, outputKey + "_level4", input);
-			}
-			
-			showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
-			if (showDifferentCleaningSets == true)
-			{
-				addLevelToDataItem(showerPixel, outputKey + "_level5", input);
-			}
-					
-			if (starPositionKeys != null)
-			{
-				PixelSetOverlay starSet = new PixelSetOverlay();
-				for (String starPositionKey : starPositionKeys)
-				{
-					Utils.isKeyValid(input, starPositionKey, double[].class);
-					double[] starPosition = (double[]) input.get(starPositionKey);
-					
-					showerPixel = removeStarIslands(showerPixel,starPosition,starSet,starRadiusInCamera);
-					if (showDifferentCleaningSets == true)
-					{
-						addLevelToDataItem(showerPixel, outputKey + "_level6", input);
-						input.put("Starset", starSet);
-					}
-				}
-			}
-				
-			Integer[] showerPixelArray = new Integer[showerPixel.size()];
-			showerPixel.toArray(showerPixelArray);
-			
-			if(showerPixelArray.length > 0){
-	
-				cleanedPixelSet = new PixelSetOverlay();
-		        for (int aShowerPixelArray : showerPixelArray) {
-		        	cleanedPixelSet.addById(aShowerPixelArray);
-		        }
-		        
-				input.put(outputKey, showerPixelArray);
-				input.put(outputKey+"Set", cleanedPixelSet);
-			}
-		}
+
+        //in case we have no showerpixels. We wont get any new ones in the steps below. And also it would crash.
+        if(showerPixel.size() == 0){
+            return input;
+        }
+
+        showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,timeThreshold);
+        if (showDifferentCleaningSets == true)
+        {
+            addLevelToDataItem(showerPixel, outputKey + "_level4", input);
+        }
+
+        showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
+        if (showDifferentCleaningSets == true)
+        {
+            addLevelToDataItem(showerPixel, outputKey + "_level5", input);
+        }
+
+        if (starPositionKeys != null)
+        {
+            PixelSetOverlay starSet = new PixelSetOverlay();
+            for (String starPositionKey : starPositionKeys)
+            {
+                Utils.isKeyValid(input, starPositionKey, double[].class);
+                double[] starPosition = (double[]) input.get(starPositionKey);
+
+                showerPixel = removeStarIslands(showerPixel,starPosition,starSet,starRadiusInCamera);
+                if (showDifferentCleaningSets == true)
+                {
+                    addLevelToDataItem(showerPixel, outputKey + "_level6", input);
+                    input.put("Starset", starSet);
+                }
+            }
+        }
+
+        int[] showerPixelArray = new int[showerPixel.size()];
+        if(showerPixelArray.length > 0){
+
+            cleanedPixelSet = new PixelSetOverlay();
+            for (int i = 0; i < showerPixel.size(); i++) {
+                cleanedPixelSet.addById(showerPixel.get(i));
+                showerPixelArray[i] =  showerPixel.get(i);
+            }
+            input.put(outputKey, showerPixelArray);
+            input.put(outputKey+"Set", cleanedPixelSet);
+        }
 
 		return input;
 	}
@@ -142,7 +149,7 @@ public class CoreNeighborClean implements Processor{
 	 * @param corePixelThreshold
 	 * @return
 	 */
-	public ArrayList<Integer> AddCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold) {
+	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold) {
 		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++)
 		{ 
 			if (photonCharge[pix] > corePixelThreshold){
@@ -161,7 +168,7 @@ public class CoreNeighborClean implements Processor{
 	public ArrayList<Integer> removeSmallCluster(ArrayList<Integer> list, int minNumberOfPixel)
 	{
 		ArrayList<ArrayList<Integer>> listOfLists = Utils.breadthFirstSearch(list);
-		ArrayList<Integer> newList = new ArrayList<Integer>();
+		ArrayList<Integer> newList = new ArrayList<>();
 		for (ArrayList<Integer> l: listOfLists){
 			if(l.size() >= minNumberOfPixel){
 				newList.addAll(l);
@@ -176,9 +183,9 @@ public class CoreNeighborClean implements Processor{
 	 * @param photonCharge
 	 * @return 
 	 */
-	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel,double[] photonCharge)
+	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel, double[] photonCharge)
 	{
-		ArrayList<Integer> newList = new ArrayList<Integer>();
+		ArrayList<Integer> newList = new ArrayList<>();
 		for (int pix: showerPixel){
 			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
 			for (FactCameraPixel nPix:currentNeighbors){
@@ -200,16 +207,14 @@ public class CoreNeighborClean implements Processor{
 	 * @return
 	 */
 	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition, PixelSetOverlay starSet, double starRadiusInCamera) {
-		
-		int chidOfPixelOfStar = pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]).chid;
 
-		if (chidOfPixelOfStar == -1)
-		{
+        FactCameraPixel pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
+        if (pixel == null){
 			log.debug("Star not in camera window. No star islands are removed");
 			return showerPixel;
-		}
-		
-		List<Integer> starChidList = new ArrayList<Integer>();
+        }
+        int chidOfPixelOfStar = pixel.chid;
+		List<Integer> starChidList = new ArrayList<>();
 		
 		starChidList.add(chidOfPixelOfStar);
 
@@ -269,7 +274,7 @@ public class CoreNeighborClean implements Processor{
 	 * @param y
 	 * @return
 	 */
-	private double calculateDistance(int chid,double x,double y)
+	private double calculateDistance(int chid, double x, double y)
 	{
 		double xdist = pixelMap.getPixelFromId(chid).getXPositionInMM() - x;
 		double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
@@ -290,7 +295,7 @@ public class CoreNeighborClean implements Processor{
 		return median;
 	}
 	
-	private void addLevelToDataItem(ArrayList<Integer> showerPixel,String name,Data input){
+	private void addLevelToDataItem(ArrayList<Integer> showerPixel, String name, Data input){
 		Integer[] level = new Integer[showerPixel.size()];
 		showerPixel.toArray(level);
 		

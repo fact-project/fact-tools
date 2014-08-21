@@ -79,6 +79,10 @@ public class ParameterTest  {
         poser.setPhotonChargeKey(photonCharge);
         poser.setArrivalTimeKey(positions);
         poser.setOutputKey(shower);
+        poser.setCorePixelThreshold(1);
+        poser.setNeighborPixelThreshold(0.1);
+        poser.setMinNumberOfPixel(1);
+        poser.setTimeThreshold(40);
         poser.process(item);
 
         DistributionFromShower dist = new DistributionFromShower();
