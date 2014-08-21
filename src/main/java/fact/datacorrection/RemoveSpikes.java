@@ -34,7 +34,7 @@ public class RemoveSpikes implements Processor {
 	double spikeLimit;
 	@Parameter(required=true)
 	double topSlopeLimit;
-	@Parameter(required=false)
+	@Parameter(required=false,description = "useful for spike studies")
 	String outputSpikesKey = null;
 	@Parameter(required=true, defaultValue = "2")
 	int maxSpikeLength = 2;

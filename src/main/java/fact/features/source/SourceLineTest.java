@@ -25,7 +25,7 @@ public class SourceLineTest implements Processor{
 		
 		
 		arrivalTimeArray = new double[photonChargeArray.length];
-		int[] arrivalPos = (int[]) input.get(arrivalTime);
+		double[] arrivalPos = Utils.toDoubleArray(input.get(arrivalTime));
 		// Convert to double
 
 		for(int i = 0; i < arrivalPos.length; i++)

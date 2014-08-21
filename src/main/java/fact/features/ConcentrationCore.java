@@ -15,21 +15,41 @@ import stream.annotations.Parameter;
 public class ConcentrationCore implements Processor{
 	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 	
-	@Override
+	@Parameter(required=true)
+	private String outputKey;
+	@Parameter(required = true, description  = "Key of the Center of Gravity X (by Distribution from shower)")
+	private String cogxKey;
+	@Parameter(required = true, description  = "Key of the Center of Gravity Y (by Distribution from shower)")
+	private String cogyKey;
+	@Parameter(required = true, description  = "Key of the delta angle")
+	private String deltaKey;
+	@Parameter(required = true, description  = "Key of the sizeKey")
+	private String sizeKey;
+	@Parameter(required = true, description  = "Key of the photoncharge array")
+	private String photonChargeKey;
+	@Parameter(required = true, description  = "Key of the shower pixel array")
+	private String showerPixelKey;
+	@Parameter(required = true, description  = "Key of the shower width")
+	private String widthKey;
+	@Parameter(required = true, description  = "Key of the shower lengthKey")
+	private String lengthKey;
+	
+	final private double pixelRadius = Constants.PIXEL_SIZE;
+	
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys( input, cogX, cogY, delta, photonCharge, showerPixel, length, width, size);
+		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, showerPixelKey, lengthKey, widthKey, sizeKey);
 		
 		try{
-			Double cogx = (Double) input.get(cogX);
-			Double cogy = (Double) input.get(cogY);
-			Double d = (Double) input.get(delta);
-			double [] photonChargeArray = (double[]) input.get(photonCharge);
-			int [] showerPixelArray = (int[]) input.get(showerPixel);
-			Double l = (Double) input.get(length);
-			Double w = (Double) input.get(width);
-			Double hillasSize = (Double) input.get(size);
+			Double cogx = (Double) input.get(cogxKey);
+			Double cogy = (Double) input.get(cogyKey);
+			Double d = (Double) input.get(deltaKey);
+			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
+			int [] showerPixelArray = (int[]) input.get(showerPixelKey);
+			Double l = (Double) input.get(lengthKey);
+			Double w = (Double) input.get(widthKey);
+			Double size = (Double) input.get(sizeKey);
 			
 			double c = Math.cos(d);
 			double s = Math.sin(d);
@@ -63,7 +83,7 @@ public class ConcentrationCore implements Processor{
 					 concCore += photonChargeArray[pix];
 				
 			}
-			concCore /= hillasSize;
+			concCore /= size;
 			input.put(outputKey, concCore);
 			return input;
 			
@@ -73,92 +93,79 @@ public class ConcentrationCore implements Processor{
 		}
 
 	}
-	
-	public String getCogX() {
-		return cogX;
-	}
-	@Parameter(required = true, defaultValue = "COGx", description  = "Key of the Center of Gravity X (by Distribution from shower)")
-	public void setCogX(String cogX) {
-		this.cogX = cogX;
-	}
-	public String getCogY() {
-		return cogY;
-	}
 
-	@Parameter(required = true, defaultValue = "COGy", description  = "Key of the Center of Gravity Y (by Distribution from shower)")
-	public void setCogY(String cogY) {
-		this.cogY = cogY;
-	}
-	public String getDelta() {
-		return delta;
-	}
-
-	@Parameter(required = true, defaultValue = "Hillas_Delta", description  = "Key of the Hillas delta angle")
-	public void setDelta(String delta) {
-		this.delta = delta;
-	}
-	public String getSize() {
-		return size;
-	}
-
-	@Parameter(required = true, defaultValue = "Hillas_Size", description  = "Key of the Hillas size")
-	public void setSize(String size) {
-		this.size = size;
-	}
-	public String getPhotonCharge() {
-		return photonCharge;
-	}
-
-	@Parameter(required = true, defaultValue = "photoncharge", description  = "Key of the photoncharge array")
-	public void setPhotonCharge(String photonCharge) {
-		this.photonCharge = photonCharge;
-	}
-	public String getShowerPixel() {
-		return showerPixel;
-	}
-
-	@Parameter(required = true, defaultValue = "showerPixel", description  = "Key of the shower pixel array")
-	public void setShowerPixel(String showerPixel) {
-		this.showerPixel = showerPixel;
-	}
-	
-	public String getWidth() {
-		return width;
-	}
-
-	@Parameter(required = true, defaultValue = "Hillas_width", description  = "Key of the shower width")
-	public void setWidth(String width) {
-		this.width = width;
-	}
-
-	public String getLength() {
-		return length;
-	}
-	
-	@Parameter(required = true, defaultValue = "Hillas_length", description  = "Key of the shower length")
-	public void setLength(String length) {
-		this.length = length;
-	}
-	
 	public String getOutputKey() {
 		return outputKey;
 	}
 
-	@Parameter(required = true, defaultValue = "concCore", description  = "Key of the output value")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
-	private String outputKey;
-	private String cogX;
-	private String cogY;
-	private String delta;
-	private String size;
-	private String photonCharge;
-	private String showerPixel;
-	private String width;
-	private String length;
+	public String getCogxKey() {
+		return cogxKey;
+	}
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
+	}
+
+	public String getCogyKey() {
+		return cogyKey;
+	}
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
+	}
+
+	public String getDeltaKey() {
+		return deltaKey;
+	}
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
+	}
+
+	public String getSizeKey() {
+		return sizeKey;
+	}
+
+	public void setSizeKey(String sizeKey) {
+		this.sizeKey = sizeKey;
+	}
+
+	public String getPhotonChargeKey() {
+		return photonChargeKey;
+	}
+
+	public void setPhotonChargeKey(String photonChargeKey) {
+		this.photonChargeKey = photonChargeKey;
+	}
+
+	public String getShowerPixelKey() {
+		return showerPixelKey;
+	}
+
+	public void setShowerPixelKey(String showerPixelKey) {
+		this.showerPixelKey = showerPixelKey;
+	}
+
+	public String getWidthKey() {
+		return widthKey;
+	}
+
+	public void setWidthKey(String widthKey) {
+		this.widthKey = widthKey;
+	}
+
+	public String getLengthKey() {
+		return lengthKey;
+	}
+
+	public void setLengthKey(String lengthKey) {
+		this.lengthKey = lengthKey;
+	}
 	
-	final private double pixelRadius = Constants.PIXEL_SIZE;
+
 	
 }
