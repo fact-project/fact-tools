@@ -11,7 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>0.9.18</streams.version>
+		<streams.version>[0.9.18,)</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
@@ -95,12 +95,12 @@
 			<version>1.2</version>
 		</dependency>
 
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>17.0</version>
-        </dependency>
-
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>17.0</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
@@ -137,24 +137,26 @@
 			<version>1.6.0</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.9-RC2</version>
-        </dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.9-RC2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
-        </dependency>
-
-		<!-- <dependency> <groupId>ant</groupId> <artifactId>ant</artifactId> <version>1.7.0</version> 
-			</dependency> -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jwall</groupId>
+			<artifactId>streams-dashboard</artifactId>
+			<version>[0.1.4-SNAPSHOT,)</version>
 		</dependency>
 	</dependencies>
 

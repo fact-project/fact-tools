@@ -1,0 +1,21 @@
+<container xmlns:ui="http://www.jwall.org/streams/dashboard.xsd">
+
+    <service id="dashboard" class="fact.demo.FACTDashboard" 
+           size="1280,800" location="0,0">
+        
+	    <fact.demo.widgets.Camera id="camera" title="Camera" ui:location="400,300" ui:size="260,270"/>
+	    
+    </service>
+    
+    
+    
+    <stream id="data" class="fact.io.FitsStream" url="file:/Users/chris/Downloads/20111126_042.fits" limit="100"/>
+    
+    <process input="data">
+        
+        <PrintData />
+        <fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />
+
+    </process>
+    
+</container>
