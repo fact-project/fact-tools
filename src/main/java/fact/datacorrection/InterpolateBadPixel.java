@@ -19,11 +19,10 @@ import stream.annotations.Parameter;
 public class InterpolateBadPixel implements Processor {
 	static Logger log = LoggerFactory.getLogger(InterpolateBadPixel.class);
 	private double[] nData;
+
     @Parameter(required = false, description = "A List of ChIds for Pixels that are considered defect",
             defaultValue="The softIds Taken from https://www.fact-project.org/logbook/misc.php?page=known_problems")
 	private Integer[] badChIds =  {863,868,297,927,80,873,1093,1094,527,528,721,722};
-
-
 
     @Parameter(required = true, description = "The data to work on")
     private String key;

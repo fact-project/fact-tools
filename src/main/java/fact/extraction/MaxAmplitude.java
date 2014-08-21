@@ -4,6 +4,7 @@
 package fact.extraction;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -13,7 +14,7 @@ import stream.annotations.Parameter;
 /**
  * This processor simply calculates the maximum value for all time slices in each Pixel. 
  * The output is a double array with an entry for each Pixel.
- * 
+ * TODO: REfactor to only search inside a window
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
@@ -28,6 +29,7 @@ public class MaxAmplitude implements Processor{
 
     @Override
     public Data process(Data input) {
+        Utils.isKeyValid(input, key, double[].class);
         double[] data = (double[]) input.get(key);
         int roi = data.length / Constants.NUMBEROFPIXEL;
 
@@ -61,16 +63,9 @@ public class MaxAmplitude implements Processor{
         return tempMaxValue;
     }
 
-    public String getKey() {
-        return key;
-    }
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
     }
 
     public void setOutputKey(String outputKey) {

@@ -238,7 +238,7 @@ public class Utils {
     }
 
 
-    public static double[] rotatePointInShowerSystem(double x,double y,double cogx,double cogy,double delta)
+    public static double[] rotateAndTranslatePointInShowerSystem(double x, double y, double cogx, double cogy, double delta)
     {
         double xtr = x;
         double ytr = y;

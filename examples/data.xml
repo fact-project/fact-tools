@@ -51,7 +51,7 @@
 		
 		           <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />       
 		           <!-- <fact.features.video.CenterOfGravity datacalibrated="DataCalibrated" showerpixel="shower" outputKey="videoCog"/> -->
-		           <fact.features.DistributionFromShower weights="photoncharge" pixel="shower" outputKey="showerDistribution" />
+		           <fact.features.DistributionFromShower weights="photoncharge" showerKey="shower" outputKey="showerDistribution" />
 		
 		           <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Alpha" />
 		           <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Distance" />

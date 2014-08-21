@@ -20,6 +20,11 @@ import stream.annotations.Parameter;
 
 import java.util.LinkedList;
 
+/**
+ * Removes artificial effects called "jumps" on a per patch basis.
+ * TODO: Refactor previous startcell stuff to be put into a container class
+ * @author Fabian Temme
+ */
 public class PatchJumpRemoval implements Processor {
 	static Logger log = LoggerFactory.getLogger(PatchJumpRemoval.class);
 	
@@ -27,7 +32,7 @@ public class PatchJumpRemoval implements Processor {
 	String dataKey=null;
 	@Parameter(required=true)
 	String outputKey=null;
-	@Parameter(required=true)
+	@Parameter(required=false, description = "Useful for jump studies")
 	String outputJumpsKey=null;
 	@Parameter(required=true)
 	String prevEventsKey=null;
