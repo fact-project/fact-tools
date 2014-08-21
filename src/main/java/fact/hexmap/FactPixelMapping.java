@@ -71,7 +71,14 @@ public class FactPixelMapping implements PixelMapping {
         return 40;
     }
 
-
+    /**
+     * Get the FactCameraPixel sitting below the coordinates passed to the method.
+     * The center of the coordinate system in the camera is the center of the camera.
+     *
+     * @param xCoordinate
+     * @param yCoordinate
+     * @return The pixel below the point or NULL if the pixels does not exist.
+     */
     public FactCameraPixel getPixelBelowCoordinatesInMM(double xCoordinate, double yCoordinate){
         //get some pixel near the point provided
         //in pixel units
