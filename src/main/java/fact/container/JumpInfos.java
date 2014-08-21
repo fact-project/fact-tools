@@ -27,6 +27,12 @@ public class JumpInfos implements Serializable {
 		averJumpHeights = new double[numberOfPatches];
 		posMarker = new IntervalMarker[numberOfPixel];
 		fftResults = new double[numberOfPixel*roi];
+		
+		pixelWithSpikes = new PixelSetOverlay();
+		pixelWithSignalFlanks = new PixelSetOverlay();
+		pixelWithRinging = new PixelSetOverlay();
+		pixelWithCorrectedJumps = new PixelSetOverlay();
+		pixelWithWrongTimeDepend = new PixelSetOverlay();
 	}
 	
 	public void addPixelWithSpikes(int pixel){

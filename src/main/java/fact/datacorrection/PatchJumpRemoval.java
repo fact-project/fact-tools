@@ -556,6 +556,22 @@ public class PatchJumpRemoval implements Processor {
 		return result;
 	}
 
+	public double getFreqCompAmplLimit() {
+		return freqCompAmplLimit;
+	}
+
+	public void setFreqCompAmplLimit(double freqCompAmplLimit) {
+		this.freqCompAmplLimit = freqCompAmplLimit;
+	}
+
+	public boolean isAddJumpInfos() {
+		return addJumpInfos;
+	}
+
+	public void setAddJumpInfos(boolean addJumpInfos) {
+		this.addJumpInfos = addJumpInfos;
+	}
+
 	public String getDataKey() {
 		return dataKey;
 	}
