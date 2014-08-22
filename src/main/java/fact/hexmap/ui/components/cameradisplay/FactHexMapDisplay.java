@@ -218,6 +218,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	// The paint method.
 	public void paint(Graphics g) {
+		super.paint(g);
 		g.setColor(this.getBackground());
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		int xOffset = getWidth() / 2 + offsetX;
@@ -259,9 +260,9 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			for (CameraMapOverlay o : overlays) {
 				o.paint(g2, this);
 			}
-			g2.setStroke(new BasicStroke(1.0f));
-			g2.setColor(Color.WHITE);
-			// undo the rotation
+			// g2.setStroke(new BasicStroke(1.0f));
+			// g2.setColor(Color.WHITE);
+			// // undo the rotation
 			g2.rotate(Math.PI / 2);
 			// to draw the grid translate back
 			g2.translate(-xOffset, -yOffset);

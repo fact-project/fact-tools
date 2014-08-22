@@ -3,18 +3,12 @@
  */
 package fact.demo.widgets;
 
-import java.awt.Color;
-
-import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.util.Time;
 import streams.dashboard.Widget;
-import fact.hexmap.ui.colormapping.NeutralColorMapping;
-import fact.hexmap.ui.colormapping.RainbowColorMapping;
-import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
-import fact.hexmap.ui.events.SliceChangedEvent;
 
 /**
  * @author chris
@@ -23,23 +17,52 @@ import fact.hexmap.ui.events.SliceChangedEvent;
 public class Camera extends Widget {
 
 	/** The unique class ID */
-	private static final long serialVersionUID = -429802545013541790L;
+	private static final long serialVersionUID = 1262313429564896384L;
 
 	static Logger log = LoggerFactory.getLogger(Camera.class);
 
-	final FactHexMapDisplay cameraPanel;
+	final HexMap hexMap = new HexMap();
+	Double radius = 3.5d;
+	Time delay = new Time(10L);
 
 	public Camera() {
-		setTitle("Camera");
-		cameraPanel = new FactHexMapDisplay(3.5, 320, 480, false);
-		cameraPanel.setOffsetY(-120);
-		cameraPanel.setOffsetX(-30);
-		cameraPanel.setBackground(new Color(0xff, 0x0, 0x0, 0x0));
-		cameraPanel.setIncludeScale(false);
-		cameraPanel.setColorMap(new RainbowColorMapping());
-		cameraPanel.setColorMap(new NeutralColorMapping());
-		this.setContent(cameraPanel);
-		this.setSize(480, 480);
+		setContent(hexMap);
+	}
+
+	/**
+	 * @return the radius
+	 */
+	public Double getRadius() {
+		return radius;
+	}
+
+	/**
+	 * @param radius
+	 *            the radius to set
+	 */
+	public void setRadius(Double radius) {
+		if (radius > 1.0) {
+			log.info("Setting radius to {}", radius);
+			this.radius = radius;
+			this.hexMap.setRadius(radius);
+		}
+	}
+
+	/**
+	 * @return the delay
+	 */
+	public Time getDelay() {
+		return delay;
+	}
+
+	/**
+	 * @param delay
+	 *            the delay to set
+	 */
+	public void setDelay(Time delay) {
+		if (delay.asMillis() > 0) {
+			this.delay = delay;
+		}
 	}
 
 	/**
@@ -47,35 +70,29 @@ public class Camera extends Widget {
 	 */
 	@Override
 	public Data process(Data input) {
-		log.info("Would need to display event from {}", input);
 
-		if (input.containsKey("EventNum")) {
-			setTitle("Camera - Event " + input.get("EventNum"));
-		}
+		setTitle("Camera - Event " + input.get("EventNum"));
 
 		short[] data = (short[]) input.get("Data");
 		double[] dd = new double[data.length];
 		for (int i = 0; i < data.length; i++) {
 			dd[i] = data[i];
 		}
-		input.put("DataDouble", dd);
-		cameraPanel.handleEventChange(new Pair<Data, String>(input,
-				"DataDouble"));
 
-		int slices = dd.length / 1440;
-		for (int s = 0; s < slices; s += 2) {
-			cameraPanel.handleSliceChangeEvent(new SliceChangedEvent(s));
-			this.validate();
-			sleep(10);
+		synchronized (hexMap) {
+			hexMap.setData(dd);
+
+			hexMap.play(delay.asMillis());
+
+			while (hexMap.isPlaying()) {
+				try {
+					hexMap.wait(250L);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		return input;
-	}
-
-	public void sleep(long ms) {
-		try {
-			Thread.sleep(ms);
-		} catch (Exception e) {
-		}
 	}
 }
