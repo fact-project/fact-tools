@@ -11,7 +11,7 @@ public class PrintKeysOnConsole implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		final Logger log = LoggerFactory.getLogger(BinaryFactWriter.class);
+		final Logger log = LoggerFactory.getLogger(PrintKeysOnConsole.class);
 		
 		String output = "\n";
 		for(String key : keys)

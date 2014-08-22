@@ -1,8 +1,10 @@
 package fact.features.source;
 
-import fact.statistics.PixelDistribution2D;
+import fact.container.PixelDistribution2D;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 /**

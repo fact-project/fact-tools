@@ -13,7 +13,7 @@
             url="file:${data}" />
             
         <process input="fact">
-        <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+        <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
 <!--         <stream.flow.Skip condition="%{data.TriggerType} != 4" /> -->
         <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  

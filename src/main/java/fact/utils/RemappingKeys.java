@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import fact.Constants;
 import fact.hexmap.FactPixelMapping;
-import fact.Utils;
 
 
 

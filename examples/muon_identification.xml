@@ -6,7 +6,6 @@
 	
 	<property name="outfile" value="/home/max_noethe/fact-daten/test/test.json" />
 	
-    
     <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${data}"/>
 	<process input="fact">
 		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
