@@ -1,7 +1,7 @@
 <container>
 
 	<!--  Event 64 should be a muon ring -->
-	<property name="data" value="/home/max_noethe/phido/fhgfs/groups/app/fact/raw/2013/08/02/20130801_079.fits.gz" /> 
+	<property name="data" value="/home/max_noethe/phido/fhgfs/groups/app/fact/raw/2013/02/05/20130205_060.fits.gz" /> 
 	<property name="drsfile" value="/home/max_noethe/phido/fhgfs/groups/app/fact/raw/2013/02/05/20130205_053.drs.fits.gz" />
 	
 	<property name="outfile" value="/home/max_noethe/fact-daten/test/test.json" />
@@ -25,7 +25,7 @@
         									  prevEventsKey="prevEvents"
         									  startCellKey="StartCellData"
         									  jumpLimit="2.0" />
-        									  
+        
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated"
         								  outputKey="DataCalibrated"
         								  startCellKey="StartCellData"
@@ -70,10 +70,10 @@
 			<Skip condition="%{data.numPixelInCleanPixel} &lt; 15" />
 			
 			<fact.features.Leakage shower="cleanPixel" weights="photonCharge" outputKey="Leakage" />
-			<Skip condition="%{data.Leakage} &gt; 0.05" />
-
-		
-			<fact.features.MuonHoughTransform showRingKey="true"  
+			<Skip condition="%{data.Leakage} &gt; 0.1" />
+			
+			
+			<fact.features.MuonHoughTransform showRingKey="false"  
 											  showMatrixKey="false"
 											  photonChargeKey="photonCharge"
 											  peaknessKey="houghPeakness"
@@ -88,20 +88,17 @@
 			                                  bestXKey="bestX"
 			                                  bestYKey="bestY" />
 			
-<!-- 			Cuts: -->
-<!-- 			<fact.io.PrintKeysOnConsole keys="houghPeakness,houghDistance,houghPercentage,octantsHit"/> -->
-<!-- 			<fact.ShowViewer key="photonCharge" range="25,250"/>  -->
 			<fact.io.PrintKeysOnConsole keys="EventNum,houghPeakness,houghDistance,houghCleaningPercentage,houghRingPercentage,octantsHit"/>
+			
+<!-- 			Cuts: -->											  
 			<Skip condition="%{data.houghDistance} &gt; 100" />
-			<Skip condition="%{data.houghPeakness} &lt; 5" />
+			<Skip condition="%{data.houghPeakness} &lt; 7" />
 			<Skip condition="%{data.houghCleaningPercentage} &lt; 0.7" />
-<!-- 			<Skip condition="%{data.octantsHit} &lt; 5" /> -->
+<!-- 			<Skip condition="%{data.houghRingPercentage} &lt; 0.22" /> -->
+			<Skip condition="%{data.octantsHit} &lt; 5" />
 
 			
-			<fact.ShowViewer key="photonCharge" range="25,250"/> 
-			
-			
-			
+<!-- 			<fact.ShowViewer key="photonCharge" range="25,250"/>  -->
 			<fact.io.JSONWriter url="file:${outfile}" keys="houghPeakness,houghDistance,houghCleaningPercentage,houghRingPercentage,octantsHit,bestR,bestX,bestY,NIGHT,RUNID,EventNum,photonCharge,arrivalTime,bestRingPixel" />
 		</process>
 </container>

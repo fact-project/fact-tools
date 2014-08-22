@@ -248,7 +248,7 @@ public class MuonHoughTransform implements Processor {
 					onRingPixel+=1;
 					
 					phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
-					octants[(int) (phi/(Math.PI/4))] = true;
+					octants[(int) (((phi+Math.PI)/(Math.PI/4)))%8] = true;
 				}
 			}
 			
