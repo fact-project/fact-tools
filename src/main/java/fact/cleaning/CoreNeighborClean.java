@@ -45,7 +45,8 @@ public class CoreNeighborClean implements Processor{
             "previously identified corePixel")
 	private  double neighborPixelThreshold;
 
-    @Parameter(required = true)
+    @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" + 
+    		", which a pixel is alound to have after cleaning")
 	private  double timeThreshold;
 
     @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
@@ -56,7 +57,7 @@ public class CoreNeighborClean implements Processor{
 
     @Parameter(required = false)
     private String[] starPositionKeys = null;
-    @Parameter(required = false)
+    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
 	private double starRadiusInCamera = Constants.PIXEL_SIZE;
     
     private boolean showDifferentCleaningSets = false;
@@ -67,7 +68,7 @@ public class CoreNeighborClean implements Processor{
 
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(input, arrivalTimeKey, int[].class);
+		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 		Utils.isKeyValid(input, photonChargeKey, double[].class);		
 			
 		double[] photonCharge = (double[]) input.get(photonChargeKey);

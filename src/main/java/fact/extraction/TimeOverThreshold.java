@@ -22,7 +22,7 @@ import java.awt.*;
  *
  */
 public class TimeOverThreshold implements Processor {
-	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
+	static Logger log = LoggerFactory.getLogger(TimeOverThreshold.class);
 	
 	@Parameter(required = true)
 	private String dataKey = null;
@@ -33,33 +33,30 @@ public class TimeOverThreshold implements Processor {
 	@Parameter(required = true)
 	private String thresholdOutputKey = null;
 	@Parameter(required = true)
+	private String firstSliceOverThresholdOutputKey = null;
+	@Parameter(required = true)
 	private String outputKey = null;
-	
-	private String color = "#33CC33";
-	private int alpha = 64;
-		
-	@Override
+
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(input, dataKey, positionsKey);
-		
+		Utils.isKeyValid(input, dataKey, double[].class);
+		Utils.isKeyValid(input, positionsKey, int[].class);
+				
 		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
+		int[] firstSliceOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
 		
 		double[] data 	 = (double[]) input.get(dataKey);
 		int[] posArray = (int[]) input.get(positionsKey);
 		
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
-		
-		Color c = Color.decode(color);
-		int r = c.getRed();
-		int g = c.getGreen();
-		int b = c.getBlue();
-		
+			
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		int numPixelAboveThreshold = 0;
 		
 		//Loop over pixels
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+			firstSliceOverThresholdArray[pix] = 0;
+			
 			int pos = pix*roi;
 			int positionOfMaximum = posArray[pix];
 			
@@ -99,7 +96,8 @@ public class TimeOverThreshold implements Processor {
 
 
 			timeOverThresholdArray[pix] = timeOverThreshold;
-			m[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh, new Color(r,g,b, alpha));	
+			firstSliceOverThresholdArray[pix] = firstSliceOverThresh;
+			m[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh);	
 		}
 		
 		//add processors threshold to the DataItem
@@ -110,12 +108,9 @@ public class TimeOverThreshold implements Processor {
 				
 		//add times over threshold to the DataItem
 		input.put(outputKey, timeOverThresholdArray);
+		input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
 		input.put(outputKey+"Marker", m);
 		
-		//add color value if set
-		if(color !=  null && !color.equals("")){
-			input.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
-		}
 
 		return input;
 	}
@@ -126,22 +121,6 @@ public class TimeOverThreshold implements Processor {
 
 	public void setThreshold(double threshold) {
 		this.threshold = threshold;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
-	public int getAlpha() {
-		return alpha;
-	}
-
-	public void setAlpha(int alpha) {
-		this.alpha = alpha;
 	}
 
 	public String getDataKey() {
@@ -166,6 +145,23 @@ public class TimeOverThreshold implements Processor {
 
 	public void setPositionsKey(String positionsKey) {
 		this.positionsKey = positionsKey;
+	}
+
+	public String getThresholdOutputKey() {
+		return thresholdOutputKey;
+	}
+
+	public void setThresholdOutputKey(String thresholdOutputKey) {
+		this.thresholdOutputKey = thresholdOutputKey;
+	}
+
+	public String getFirstSliceOverThresholdOutputKey() {
+		return firstSliceOverThresholdOutputKey;
+	}
+
+	public void setFirstSliceOverThresholdOutputKey(
+			String firstSliceOverThresholdOutputKey) {
+		this.firstSliceOverThresholdOutputKey = firstSliceOverThresholdOutputKey;
 	}
 	
 	

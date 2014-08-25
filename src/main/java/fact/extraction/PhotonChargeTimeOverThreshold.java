@@ -5,10 +5,13 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 /**
  * This feature is supposed to calculate the photon charge of a SiPM pulse 
@@ -20,26 +23,24 @@ import stream.Processor;
  *
  */
 public class PhotonChargeTimeOverThreshold implements Processor {
-	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
+	static Logger log = LoggerFactory.getLogger(PhotonChargeTimeOverThreshold.class);
 	
-
+	@Parameter(required=true, description="")
 	private String timeOverThresholdKey = null;
+	@Parameter(required=true, description="")
 	private String thresholdKey = null;
-	private String outputkey = null;
+	@Parameter(required=true)
+	private String outputKey = null;
 	
 	private double threshold = 0;
 
-	/* (non-Javadoc)
-	 * @see stream.Processor#process(stream.Data)
-	 */
-	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(input, timeOverThresholdKey,thresholdKey);
-		
+		Utils.isKeyValid(input, timeOverThresholdKey, int[].class);
+		Utils.isKeyValid(input, thresholdKey, Double.class);
+				
 		
 		double[] chargeFromThresholdArray =  new double[Constants.NUMBEROFPIXEL];
-		
-		
+				
 		int[] timeOverThresholdArray 	 = (int[]) input.get(timeOverThresholdKey);
 		threshold = (Double) input.get(thresholdKey);
 		
@@ -47,8 +48,7 @@ public class PhotonChargeTimeOverThreshold implements Processor {
 		{
 			throw new RuntimeException("Currently only threshold equal 1500 mV supported");
 		}
-		
-		
+				
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			
 			chargeFromThresholdArray[pix] = 0.;
@@ -76,17 +76,17 @@ public class PhotonChargeTimeOverThreshold implements Processor {
 		}
 		
 		//add times over threshold
-		input.put(outputkey, chargeFromThresholdArray);
+		input.put(outputKey, chargeFromThresholdArray);
 		
 		return input;
 	}
 
-	public String getOutputkey() {
-		return outputkey;
+	public String getOutputKey() {
+		return outputKey;
 	}
 
-	public void setOutputkey(String outputkey) {
-		this.outputkey = outputkey;
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 
 	public String getTimeOverThresholdKey() {

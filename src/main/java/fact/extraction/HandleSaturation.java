@@ -11,53 +11,46 @@ import stream.annotations.Parameter;
  * @author Fabian Temme
  */
 public class HandleSaturation implements Processor {
-
-	@Parameter(required=true)
-	private String dataKey = null;
-	@Parameter(required=true)
-	private String maxAmplitudesKey = null;
-	@Parameter(required=true)
+	@Parameter(required=true, description="Key to the photonCharge Array, calculated by the normal processor")
 	private String photonChargeKey = null;
-	@Parameter(required=true)
-	private String timeOverThresholdChargeKey = null;
-	@Parameter(required=true)
+	@Parameter(required=true, description="Key to the photonCharge Array, calculated by the time over threshold processor")
+	private String photonChargeSaturatedKey = null;
+	@Parameter(required=true, description="Key to the arrivalTime Array, calculated by the normal processor")
 	private String arrivalTimeKey = null;
-	@Parameter(required=true)
+	@Parameter(required=true, description="Key to the arrivalTime Array, calculated by the time over threshold processor")
+	private String arrivalTimeSaturatedKey = null;
+	@Parameter(required=true, description="Limit above the time over threshold photoncharge is used [phe]. A good value is around 180")
 	private int limitForSaturatedPixel;
-	@Parameter(required=true)
-	private int leftBorder;
 	@Parameter(required=true)
 	private String outputKeyPhotonCharge = null;
 	@Parameter(required=true)
 	private String outputKeyArrivalTime = null;
 	
-	private int roi;
-	private double[] data;
 			
-	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(input ,dataKey,maxAmplitudesKey,photonChargeKey,timeOverThresholdChargeKey,arrivalTimeKey);
+		Utils.isKeyValid(input, photonChargeKey, double[].class);
+		Utils.isKeyValid(input, photonChargeSaturatedKey, double[].class);
+		Utils.isKeyValid(input, arrivalTimeKey, int[].class);
+		Utils.isKeyValid(input, arrivalTimeSaturatedKey, int[].class);
 		
-		double[] maxAmplitudes = (double[]) input.get(maxAmplitudesKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
-		double[] timeOverThresholdCharge = (double[]) input.get(timeOverThresholdChargeKey);
-		double[] arrivalTimes = (double[]) input.get(arrivalTimeKey);
+		double[] photonChargeSaturated = (double[]) input.get(photonChargeSaturatedKey);
+		double[] arrivalTime = Utils.toDoubleArray( input.get(arrivalTimeKey));
+		double[] arrivalTimeSaturated = Utils.toDoubleArray( input.get(arrivalTimeSaturatedKey));
 		
-		roi = (Integer) input.get("NROI");
-		data = (double[]) input.get(dataKey);
 		
 		double[] resultPhotonCharge = new double[photonCharge.length];
 		System.arraycopy(photonCharge, 0, resultPhotonCharge, 0, photonCharge.length);
-		double[] resultArrivalTimes = new double[arrivalTimes.length];
-		System.arraycopy(arrivalTimes, 0, resultArrivalTimes, 0, arrivalTimes.length);
+		double[] resultArrivalTimes = new double[arrivalTime.length];
+		System.arraycopy(arrivalTime, 0, resultArrivalTimes, 0, arrivalTime.length);
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
-			if (maxAmplitudes[px] > limitForSaturatedPixel)
+			if (photonCharge[px] > limitForSaturatedPixel)
 			{
-				resultArrivalTimes[px] = searchForRisingEdge(px, arrivalTimes[px]);
-				resultPhotonCharge[px] = timeOverThresholdCharge[px];
+				resultArrivalTimes[px] = arrivalTimeSaturated[px];
+				resultPhotonCharge[px] = photonChargeSaturated[px];
 			}
 		}
 		
@@ -67,21 +60,75 @@ public class HandleSaturation implements Processor {
 		return input;
 	}
 
-	private int searchForRisingEdge(int pixel,double oldMaxPos)
-	{		
-		double tempMaxDeriv = Double.MIN_VALUE;
-		int tempPos = -1;
-		for (int sl = leftBorder ; sl < oldMaxPos ; sl++)
-		{
-			int slice = pixel*roi+sl;
-			if ((data[slice+1] - data[slice]) > tempMaxDeriv)
-			{
-				tempPos = sl;
-				tempMaxDeriv = data[slice+1] - data[slice];
-			}
-		}
-		
-		return tempPos;
+
+	public String getPhotonChargeKey() {
+		return photonChargeKey;
 	}
+
+
+	public void setPhotonChargeKey(String photonChargeKey) {
+		this.photonChargeKey = photonChargeKey;
+	}
+
+
+	public String getPhotonChargeSaturatedKey() {
+		return photonChargeSaturatedKey;
+	}
+
+
+	public void setPhotonChargeSaturatedKey(String photonChargeSaturatedKey) {
+		this.photonChargeSaturatedKey = photonChargeSaturatedKey;
+	}
+
+
+	public String getArrivalTimeKey() {
+		return arrivalTimeKey;
+	}
+
+
+	public void setArrivalTimeKey(String arrivalTimeKey) {
+		this.arrivalTimeKey = arrivalTimeKey;
+	}
+
+
+	public String getArrivalTimeSaturatedKey() {
+		return arrivalTimeSaturatedKey;
+	}
+
+
+	public void setArrivalTimeSaturatedKey(String arrivalTimeSaturatedKey) {
+		this.arrivalTimeSaturatedKey = arrivalTimeSaturatedKey;
+	}
+
+
+	public int getLimitForSaturatedPixel() {
+		return limitForSaturatedPixel;
+	}
+
+
+	public void setLimitForSaturatedPixel(int limitForSaturatedPixel) {
+		this.limitForSaturatedPixel = limitForSaturatedPixel;
+	}
+
+
+	public String getOutputKeyPhotonCharge() {
+		return outputKeyPhotonCharge;
+	}
+
+
+	public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
+		this.outputKeyPhotonCharge = outputKeyPhotonCharge;
+	}
+
+
+	public String getOutputKeyArrivalTime() {
+		return outputKeyArrivalTime;
+	}
+
+
+	public void setOutputKeyArrivalTime(String outputKeyArrivalTime) {
+		this.outputKeyArrivalTime = outputKeyArrivalTime;
+	}
+	
 	
 }

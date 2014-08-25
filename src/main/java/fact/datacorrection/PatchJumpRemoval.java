@@ -90,7 +90,6 @@ public class PatchJumpRemoval implements Processor {
 		int numberPatches = Constants.NUMBEROFPIXEL / 9;
 		
 
-		jumpInfos = new JumpInfos();
 				
 		boolean stopLoop = false;
 		
@@ -103,6 +102,7 @@ public class PatchJumpRemoval implements Processor {
 			int[] currPrevTime = prevEventInfo.getPrevUnixTimeCells(prevEvent);
 									
 			double deltaT = (double)(currentTime[0]-currPrevTime[0])*1000.0+(double)(currentTime[1]-currPrevTime[1])/1000.0;
+			jumpInfos = new JumpInfos(Constants.NUMBEROFPIXEL, numberPatches, roi);
 			
 			// we only want to go on when at least one pixel was corrected (so the jumpheight is larger than the jumpLimit) or
 			// previous start and stop cells aren't in the ROI
@@ -130,7 +130,13 @@ public class PatchJumpRemoval implements Processor {
 				}
 				if (posInROI == true)
 				{
+					if (addJumpInfos == true)
+					{
+						jumpInfos.addPosMarkerForPatch(patch,pos);
+					}
 					result = HandleSpike(patch, pos, result, jumpInfos);
+					
+					
 					
 					// create patch voltage average array and patch voltage derivation array:
 					double[] patchAverage = new double[roi];
@@ -162,7 +168,10 @@ public class PatchJumpRemoval implements Processor {
 					stopLoop = false;
 				}
 			}
-
+			if (addJumpInfos == true)
+			{
+				jumpInfos.addInfosToDataItem(input, prevEvent, outputJumpsKey, deltaT);
+			}
 		}
 		input.put(outputKey,result);
 		
@@ -195,7 +204,7 @@ public class PatchJumpRemoval implements Processor {
 						result[pixel*roi+pos] = correctionValue;
 						if (addJumpInfos == true)
 						{
-							jumpInfo.pixelWithSpikes.addById(pixel);
+							jumpInfo.addPixelWithSpikes(pixel);
 						}
 					}
 			}
@@ -215,7 +224,7 @@ public class PatchJumpRemoval implements Processor {
 						result[pixel*roi+pos+1] = correctionValue;
 						if (addJumpInfos == true)
 						{
-							jumpInfo.pixelWithSpikes.addById(pixel);
+							jumpInfo.addPixelWithSpikes(pixel);
 						}
 					}
 			}
@@ -233,7 +242,7 @@ public class PatchJumpRemoval implements Processor {
 						result[pixel*roi+pos+2] = correctionValue;
 						if (addJumpInfos == true)
 						{
-							jumpInfo.pixelWithSpikes.addById(pixel);
+							jumpInfo.addPixelWithSpikes(pixel);
 						}
 					}
 			}			
@@ -250,7 +259,7 @@ public class PatchJumpRemoval implements Processor {
 					result[pixel*roi+pos] = correctionValue;
 					if (addJumpInfos == true)
 					{
-						jumpInfo.pixelWithSpikes.addById(pixel);
+						jumpInfo.addPixelWithSpikes(pixel);
 					}
 				}
 			}
@@ -267,7 +276,7 @@ public class PatchJumpRemoval implements Processor {
 					result[pixel*roi+pos+1] = correctionValue;
 					if (addJumpInfos == true)
 					{
-						jumpInfo.pixelWithSpikes.addById(pixel);
+						jumpInfo.addPixelWithSpikes(pixel);
 					}
 				}
 			}
@@ -343,10 +352,7 @@ public class PatchJumpRemoval implements Processor {
 			timeDependIsCorrect = false;
 			if (addJumpInfos == true)
 			{
-				for (int px = 0 ; px < 9 ; px++)
-				{
-					jumpInfos.pixelWithWrongTimeDepend.addById(patch*9+px);
-				}
+				jumpInfos.addPatchWithWrongTiming(patch);
 			}
 			jumpHeight = 0;
 		}
@@ -393,10 +399,7 @@ public class PatchJumpRemoval implements Processor {
 			noSignalFlank = false;
 			if (addJumpInfos == true)
 			{
-				for (int px = 0 ; px < 9 ; px++)
-				{
-					jumpInfos.pixelWithSignalFlanks.addById(patch*9+px);
-				}
+				jumpInfos.addPatchWithSignalFlanks(patch);
 			}
 			jumpHeight = 0;
 		}
@@ -502,10 +505,7 @@ public class PatchJumpRemoval implements Processor {
 			jumpHeight -= averRingingDerviation;
 			if (addJumpInfos == true)
 			{
-				for (int px = 0 ; px < 9 ; px++)
-				{
-					jumpInfos.pixelWithRinging.addById(patch*9+px);
-				}
+				jumpInfos.addPatchWithRinging(patch);
 			}
 
 			if (Math.abs(jumpHeight) < jumpLimit)
@@ -535,10 +535,8 @@ public class PatchJumpRemoval implements Processor {
 		
 		if (addJumpInfos == true)
 		{
-			for (int px = 0 ; px < 9 ; px++)
-			{
-				jumpInfos.pixelWithCorrectedJumps.addById(patch*9+px);
-			}
+			jumpInfos.addPatchWithCorrectedJumps(patch);
+			jumpInfos.averJumpHeights[patch] = jumpHeight;
 		}
 		
 		if (isStartCell == false)
@@ -556,6 +554,22 @@ public class PatchJumpRemoval implements Processor {
 			}
 		}
 		return result;
+	}
+
+	public double getFreqCompAmplLimit() {
+		return freqCompAmplLimit;
+	}
+
+	public void setFreqCompAmplLimit(double freqCompAmplLimit) {
+		this.freqCompAmplLimit = freqCompAmplLimit;
+	}
+
+	public boolean isAddJumpInfos() {
+		return addJumpInfos;
+	}
+
+	public void setAddJumpInfos(boolean addJumpInfos) {
+		this.addJumpInfos = addJumpInfos;
 	}
 
 	public String getDataKey() {
