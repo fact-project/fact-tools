@@ -1,13 +1,15 @@
 /**
  * 
  */
-package fact.demo.widgets;
+package fact.demo.ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.text.DecimalFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JPanel;
@@ -17,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.colormapping.ColorMapping;
-import fact.hexmap.ui.colormapping.NeutralColorMapping;
+import fact.hexmap.ui.colormapping.RainbowColorMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexTile;
 import fact.hexmap.ui.components.cameradisplay.Tile;
 
@@ -33,7 +35,8 @@ public class HexMap extends JPanel {
 	static Logger log = LoggerFactory.getLogger(HexMap.class);
 
 	final FactPixelMapping pixelMapping = FactPixelMapping.getInstance();
-	final ColorMapping colors = new NeutralColorMapping();
+	final ColorMapping colors = new RainbowColorMapping(); // new
+															// NeutralColorMapping();
 	final FactHexTile[] tiles = new FactHexTile[pixelMapping.getNumberOfPixel()];
 
 	int currentSlice = 0;
@@ -43,6 +46,7 @@ public class HexMap extends JPanel {
 	double maxValue = 0.0;
 
 	final AtomicBoolean playing = new AtomicBoolean(false);
+	final DecimalFormat fmt = new DecimalFormat("000");
 
 	public HexMap() {
 		setBackground(Color.white);
@@ -96,6 +100,25 @@ public class HexMap extends JPanel {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
 
+			g2.setStroke(new BasicStroke(2.0f));
+			g.setColor(Color.DARK_GRAY);
+			Double begin = 10.0;
+			Double end = getWidth() - 10.0;
+			g.drawLine(10, getHeight() - 6, getWidth() - 10, getHeight() - 6);
+
+			double slices = sliceValues[0].length;
+			double s = currentSlice;
+
+			Double pos = s * ((end - begin) / slices);
+
+			Font f = g.getFont().deriveFont(9.0f);
+			g.setFont(f);
+			g.drawString("Slice: " + fmt.format(currentSlice), getWidth() - 54,
+					getHeight() - 12);
+			g.setColor(Color.red);
+			g.drawLine(10 + pos.intValue(), getHeight(), 10 + pos.intValue(),
+					getHeight() - 8);
+
 			// draw a grid with lines every 25 pixel in a dark grey color
 			g2.setStroke(new BasicStroke(1.0f));
 			g2.setColor(Color.DARK_GRAY);
@@ -132,6 +155,7 @@ public class HexMap extends JPanel {
 			// for (CameraMapOverlay o : overlays) {
 			// o.paint(g2, this);
 			// }
+
 		}
 	}
 

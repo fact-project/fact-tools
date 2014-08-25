@@ -6,6 +6,7 @@ package fact.demo.widgets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.demo.ui.HexMap;
 import stream.Data;
 import stream.util.Time;
 import streams.dashboard.Widget;

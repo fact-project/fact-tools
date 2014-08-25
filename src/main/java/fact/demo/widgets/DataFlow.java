@@ -12,7 +12,7 @@ import stream.app.ComputeGraph;
 import stream.io.SourceURL;
 import stream.util.ApplicationBuilder;
 import streams.dashboard.Widget;
-import fact.demo.ContainerGraphPanel;
+import fact.demo.ui.ContainerGraphPanel;
 
 /**
  * @author chris
