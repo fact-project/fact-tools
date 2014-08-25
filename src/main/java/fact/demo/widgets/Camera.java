@@ -74,14 +74,10 @@ public class Camera extends Widget {
 
 		setTitle("Camera - Event " + input.get("EventNum"));
 
-		short[] data = (short[]) input.get("Data");
-		double[] dd = new double[data.length];
-		for (int i = 0; i < data.length; i++) {
-			dd[i] = data[i];
-		}
+		double[] data = (double[]) input.get("Data");
 
 		synchronized (hexMap) {
-			hexMap.setData(dd);
+			hexMap.setData(data);
 
 			hexMap.play(delay.asMillis());
 

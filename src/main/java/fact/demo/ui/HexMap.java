@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JPanel;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class HexMap extends JPanel {
 	int currentSlice = 0;
 	double[][] sliceValues = new double[pixelMapping.getNumberOfPixel()][300];
 
-	double minValue = 10000.0;
+	double minValue = 1000.0;
 	double maxValue = 0.0;
 
 	final AtomicBoolean playing = new AtomicBoolean(false);
@@ -69,20 +70,27 @@ public class HexMap extends JPanel {
 
 	public void setData(double[] data) {
 
-		int slices = data.length / 1440;
-		log.info("Data has {} slices", slices);
+//		int slices = data.length / 1440;
+//		log.info("Data has {} slices", slices);
 
-		sliceValues = new double[1440][slices];
 
-		for (int i = 0; i < data.length && i < sliceValues.length; i++) {
-			for (int slice = 0; slice < sliceValues[i].length; slice++) {
-				double val = data[i * slices + slice];
-				sliceValues[i][slice] = val;
-				minValue = Math.min(minValue, val);
-				maxValue = Math.max(maxValue, val);
-			}
-		}
-	}
+        this.sliceValues = Utils.sortPixels(data, 1440);
+        for (double[] slices : sliceValues) {
+            for (double v : slices) {
+                minValue = Math.min(minValue, v);
+                maxValue = Math.max(maxValue, v);
+            }
+        }
+
+//		for (int i = 0; i < data.length && i < sliceValues.length; i++) {
+//			for (int slice = 0; slice < sliceValues[i].length; slice++) {
+//				double val = data[i * slices + slice];
+//				sliceValues[i][slice] = val;
+//				minValue = Math.min(minValue, val);
+//				maxValue = Math.max(maxValue, val);
+//			}
+//		}
+    }
 
 	/**
 	 * @see javax.swing.JComponent#print(java.awt.Graphics)

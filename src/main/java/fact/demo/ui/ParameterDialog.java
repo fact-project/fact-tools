@@ -44,17 +44,20 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 	final ParamTable parameters = new ParamTable();
 
+    final Color  bgColor = new Color(39, 39, 34);
+    final Color  gridColor =  new Color(52, 52, 47);
+
 	public ParameterDialog(NodeComponent n) {
 		setAutoRequestFocus(true);
 		setUndecorated(true);
 
-		setBackground(new Color(39, 39, 34));
+		setBackground(bgColor);
 		content.setOpaque(true);
-		content.setBackground(new Color(39, 39, 34));
+		content.setBackground(bgColor);
 
-		buttons.setBackground(new Color(39, 39, 34));
+		buttons.setBackground(bgColor);
 		buttons.setOpaque(true);
-		this.setOpacity(0.8f);
+		this.setOpacity(0.7f);
 
 		setLayout(new BorderLayout());
 
@@ -66,16 +69,16 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 		final JTable table = new JTable(parameters);
 		table.setOpaque(true);
-		table.setBackground(new Color(39, 39, 34));
+		table.setBackground(bgColor);
 		table.setForeground(Color.WHITE);
-		table.setGridColor(new Color(79, 79, 68));
+		table.setGridColor(gridColor);
 		content.setLayout(new BorderLayout());
 
 		table.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		table.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		table.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
 
 		table.setRowHeight(24);
-		table.getTableHeader().setBackground(Color.LIGHT_GRAY);
+//		table.getTableHeader().setBackground(Color.LIGHT_GRAY);
 		table.getTableHeader().setVisible(true);
 
 		content.add(table, BorderLayout.CENTER);
@@ -85,14 +88,14 @@ public class ParameterDialog extends JDialog implements FocusListener {
 		add(content, BorderLayout.CENTER);
 		add(buttons, BorderLayout.SOUTH);
 
-		JButton close = new JButton("Close");
-		close.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
-		close.setSize(120, 22);
-		close.setMaximumSize(new Dimension(120, 18));
+//		JButton close = new JButton("Close");
+//		close.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				setVisible(false);
+//			}
+//		});
+//		close.setSize(120, 22);
+//		close.setMaximumSize(new Dimension(120, 18));
 
 		final Button cl = new Button("Close");
 		cl.addClickListener(new ClickListener() {
