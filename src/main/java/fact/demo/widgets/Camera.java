@@ -12,6 +12,10 @@ import stream.Data;
 import stream.util.Time;
 import streams.dashboard.Widget;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+
 /**
  * @author chris
  * 
@@ -31,12 +35,6 @@ public class Camera extends Widget {
 		setContent(hexMap);
 	}
 
-	/**
-	 * @return the radius
-	 */
-	public Double getRadius() {
-		return radius;
-	}
 
 	/**
 	 * @param radius
@@ -50,12 +48,6 @@ public class Camera extends Widget {
 		}
 	}
 
-	/**
-	 * @return the delay
-	 */
-	public Time getDelay() {
-		return delay;
-	}
 
 	/**
 	 * @param delay
@@ -75,9 +67,13 @@ public class Camera extends Widget {
 
 		setTitle("Camera - Event " + input.get("EventNum"));
 
-        double[] data = Utils.toDoubleArray(input.get("Data"));
-
-		synchronized (hexMap) {
+        double[] data = Utils.toDoubleArray(input.get("DataCalibrated"));
+        int[] shower =  null;
+        if (input.get("shower") != null){
+            shower = (int[]) input.get("shower");
+        }
+        synchronized (hexMap) {
+            hexMap.setShowerIds(shower);
 			hexMap.setData(data);
 
 			hexMap.play(delay.asMillis());

@@ -36,8 +36,8 @@ public class HexMap extends JPanel {
 	static Logger log = LoggerFactory.getLogger(HexMap.class);
 
 	final FactPixelMapping pixelMapping = FactPixelMapping.getInstance();
-	final ColorMapping colors = new RainbowColorMapping(); // new
-															// NeutralColorMapping();
+	final ColorMapping colors = new RainbowColorMapping();
+
 	final FactHexTile[] tiles = new FactHexTile[pixelMapping.getNumberOfPixel()];
 
 	int currentSlice = 0;
@@ -48,10 +48,10 @@ public class HexMap extends JPanel {
 
 	final AtomicBoolean playing = new AtomicBoolean(false);
 	final DecimalFormat fmt = new DecimalFormat("000");
+    private int[] showerIds;
 
-	public HexMap() {
+    public HexMap() {
 		setBackground(Color.white);
-
 		for (int i = 0; i < tiles.length; i++) {
 			FactHexTile t = new FactHexTile(pixelMapping.getPixelFromId(i), 3.5);
 			tiles[i] = t;
@@ -69,11 +69,6 @@ public class HexMap extends JPanel {
 	}
 
 	public void setData(double[] data) {
-
-//		int slices = data.length / 1440;
-//		log.info("Data has {} slices", slices);
-
-
         this.sliceValues = Utils.sortPixels(data, 1440);
         for (double[] slices : sliceValues) {
             for (double v : slices) {
@@ -81,15 +76,6 @@ public class HexMap extends JPanel {
                 maxValue = Math.max(maxValue, v);
             }
         }
-
-//		for (int i = 0; i < data.length && i < sliceValues.length; i++) {
-//			for (int slice = 0; slice < sliceValues[i].length; slice++) {
-//				double val = data[i * slices + slice];
-//				sliceValues[i][slice] = val;
-//				minValue = Math.min(minValue, val);
-//				maxValue = Math.max(maxValue, val);
-//			}
-//		}
     }
 
 	/**
@@ -101,63 +87,75 @@ public class HexMap extends JPanel {
 
 		g.setColor(this.getBackground());
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		int xOffset = getWidth() / 2 + 0;
-		int yOffset = getHeight() / 2 + 0;
-		if (g instanceof Graphics2D) {
+
+        int xOffset = getWidth() / 2;
+		int yOffset = getHeight() / 2;
+
+        if (g instanceof Graphics2D) {
+
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
-
 			g2.setStroke(new BasicStroke(2.0f));
-			g.setColor(Color.DARK_GRAY);
-			Double begin = 10.0;
+			g2.setColor(Color.DARK_GRAY);
+
+            Double begin = 10.0;
 			Double end = getWidth() - 10.0;
-			g.drawLine(10, getHeight() - 6, getWidth() - 10, getHeight() - 6);
+
+            g2.drawLine(10, getHeight() - 6, getWidth() - 10, getHeight() - 6);
 
 			double slices = sliceValues[0].length;
 			double s = currentSlice;
 
 			Double pos = s * ((end - begin) / slices);
 
-			Font f = g.getFont().deriveFont(9.0f);
-			g.setFont(f);
-			g.drawString("Slice: " + fmt.format(currentSlice), getWidth() - 54,
+			Font f = g2.getFont().deriveFont(9.0f);
+			g2.setFont(f);
+			g2.drawString("Slice: " + fmt.format(currentSlice), getWidth() - 54,
 					getHeight() - 12);
-			g.setColor(Color.red);
-			g.drawLine(10 + pos.intValue(), getHeight(), 10 + pos.intValue(),
+			g2.setColor(Color.red);
+			g2.drawLine(10 + pos.intValue(), getHeight(), 10 + pos.intValue(),
 					getHeight() - 8);
 
-			// draw a grid with lines every 25 pixel in a dark grey color
 			g2.setStroke(new BasicStroke(1.0f));
-			g2.setColor(Color.DARK_GRAY);
-			// drawGrid(g2, 25);
+            g2.setColor(Color.DARK_GRAY);
 
-			// now draw the actual camera pixel
+            // draw a grid with lines every 25 pixel in a dark grey color
+            // drawGrid(g2, 25);
+
 			// translate to center of canvas
-			g2.translate(xOffset, yOffset);
-			// rotate 90 degrees counter clockwise
-			g2.rotate(-Math.PI / 2);
-			// and draw tiles
+            g2.translate(xOffset, yOffset);
+            // rotate 90 degrees counter clockwise
+            g2.rotate(-Math.PI / 2);
 
-			for (Tile tile : tiles) {
-				// CameraPixel p = tile.getCameraPixel();
-				// int slice = currentSlice;
-				// if (currentSlice >=
-				// sliceValues[tile.getCameraPixel().id].length) {
-				// slice = sliceValues[tile.getCameraPixel().id].length - 1;
-				// }
-				// double value = sliceValues[tile.getCameraPixel().id][slice];
-				// tile.setFillColor(colors.getColorFromValue(value, minValue,
-				// maxValue));
+            //In case we have shower pixel draw the camera in gray except for the camera pixel
+            if (showerIds != null){
+                for (Tile tile : tiles) {
+                    tile.setBorderColor(Color.lightGray);
+                    tile.setFillColor(Color.lightGray);
+                    tile.paint(g);
+                }
+                for(int pix: showerIds){
+                    Tile tile = tiles[pix];
+                    double value = sliceValues[tile.getCameraPixel().id][currentSlice];
+                    Color color = colors.getColorFromValue(value, minValue,
+                            maxValue);
+                    tile.setFillColor(color);
+                    tile.setBorderColor(Color.BLACK);
+                    tile.paint(g);
+                }
+            } else {
+                //no shower so just draw all the pixels in color
+                for (Tile tile : tiles) {
+                    double value = sliceValues[tile.getCameraPixel().id][currentSlice];
+                    Color color = colors.getColorFromValue(value, minValue,
+                            maxValue);
 
-				double value = sliceValues[tile.getCameraPixel().id][currentSlice];
-				Color color = colors.getColorFromValue(value, minValue,
-						maxValue);
-
-				tile.setFillColor(color);
-				tile.setBorderColor(Color.BLACK);
-				tile.paint(g);
-			}
+                    tile.setFillColor(color);
+                    tile.setBorderColor(Color.BLACK);
+                    tile.paint(g);
+                }
+            }
 
 			// draw all overlays
 			// for (CameraMapOverlay o : overlays) {
@@ -167,12 +165,6 @@ public class HexMap extends JPanel {
 		}
 	}
 
-	/**
-	 * @return the currentSlice
-	 */
-	public int getCurrentSlice() {
-		return currentSlice;
-	}
 
 	/**
 	 * @param currentSlice
@@ -224,4 +216,8 @@ public class HexMap extends JPanel {
 	public boolean isPlaying() {
 		return playing.get();
 	}
+
+    public void setShowerIds(int[] showerIds) {
+        this.showerIds = showerIds;
+    }
 }
