@@ -7,10 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,7 +30,7 @@ import fact.demo.ui.Button.ClickListener;
  * @author chris
  * 
  */
-public class ParameterDialog extends JDialog implements FocusListener {
+public class ParameterDialog extends JDialog  {
 
 	/** The unique class ID */
 	private static final long serialVersionUID = -8520036851206364651L;
@@ -54,6 +51,7 @@ public class ParameterDialog extends JDialog implements FocusListener {
 		setBackground(bgColor);
 		content.setOpaque(true);
 		content.setBackground(bgColor);
+        content.setPreferredSize(new Dimension(200, 250));
 
 		buttons.setBackground(bgColor);
 		buttons.setOpaque(true);
@@ -78,7 +76,6 @@ public class ParameterDialog extends JDialog implements FocusListener {
 		table.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
 
 		table.setRowHeight(24);
-//		table.getTableHeader().setBackground(Color.LIGHT_GRAY);
 		table.getTableHeader().setVisible(true);
 
 		content.add(table, BorderLayout.CENTER);
@@ -87,15 +84,6 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 		add(content, BorderLayout.CENTER);
 		add(buttons, BorderLayout.SOUTH);
-
-//		JButton close = new JButton("Close");
-//		close.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				setVisible(false);
-//			}
-//		});
-//		close.setSize(120, 22);
-//		close.setMaximumSize(new Dimension(120, 18));
 
 		final Button cl = new Button("Close");
 		cl.addClickListener(new ClickListener() {
@@ -107,22 +95,17 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 		buttons.add(cl);
 
+        this.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+            }
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                ParameterDialog.this.setVisible(false);
+            }
+        });
+
 		pack(); // setSize(200, 320);
-	}
-
-	/**
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-	 */
-	@Override
-	public void focusGained(FocusEvent e) {
-	}
-
-	/**
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-	 */
-	@Override
-	public void focusLost(FocusEvent e) {
-		setVisible(false);
 	}
 
 	public class ParamTable implements TableModel {
