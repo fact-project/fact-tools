@@ -3,6 +3,7 @@
  */
 package fact.demo.widgets;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class Camera extends Widget {
 
 		setTitle("Camera - Event " + input.get("EventNum"));
 
-		double[] data = (double[]) input.get("Data");
+        double[] data = Utils.toDoubleArray(input.get("Data"));
 
 		synchronized (hexMap) {
 			hexMap.setData(data);

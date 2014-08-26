@@ -1,9 +1,10 @@
 <container xmlns:ui="http://www.jwall.org/streams/dashboard.xsd">
 
     <service id="dashboard" class="fact.demo.FACTDashboard"  size="1280,1024" location="0,0">
-	    <fact.demo.widgets.Camera id="camera" title="Camera" radius="3.5" delay="20ms" ui:location="20,80" ui:size="260,270"/>
-	    
-	    <fact.demo.widgets.DataFlow id="dataflow" title="DataFlow / Configuration" config="classpath:/fact-tools-demo.xml" ui:location="20,360" ui:size="768,300" />
+	    <fact.demo.widgets.Camera id="cameraasasdas" title="Camera" radius="3.5" delay="15ms" ui:location="20,80" ui:size="260,270"/>
+
+        <fact.demo.widgets.DataFlow id="dataflow" title="DataFlow / Configuration" config="classpath:/fact-tools-demo.xml" ui:location="20,360" ui:size="768,300" />
+
     </service>
 
     <property name="datafile" value="src/test/resources/testDataFile.fits.gz" />
@@ -16,12 +17,11 @@
     <process input="data">
         
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        
+
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="Data"/>
-        
-        <PrintData />
-        <!--<fact.ShowViewer key="DataCalibrated" />-->
         <fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />
+
+        <PrintData />
 
     </process>
     
