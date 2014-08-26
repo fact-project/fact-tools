@@ -1,10 +1,8 @@
 <container xmlns:ui="http://www.jwall.org/streams/dashboard.xsd">
 
     <service id="dashboard" class="fact.demo.FACTDashboard"  size="1280,1024" location="0,0">
-	    <fact.demo.widgets.Camera id="cameraasasdas" title="Camera" radius="3.5" delay="15ms" ui:location="20,80" ui:size="260,270"/>
-
-        <fact.demo.widgets.DataFlow id="dataflow" title="DataFlow / Configuration" config="classpath:/fact-tools-demo.xml" ui:location="20,360" ui:size="768,300" />
-
+        <fact.demo.widgets.Camera id="camera"  title="Camera" radius="3.5" delay="15ms" ui:location="20,80" ui:size="260,270"/>
+        <fact.demo.widgets.DataFlow id="dataflow" title="DataFlow / Configuration" config="classpath:/fact-tools-demo.xml" ui:location="20,360" ui:size="1168,300" />
     </service>
 
     <property name="datafile" value="src/test/resources/testDataFile.fits.gz" />
@@ -18,10 +16,24 @@
         
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="Data"/>
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
+
+
+        <!--<fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />-->
+
+        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
+                                      url="file:src/main/resources/gain_sorted_20131127.csv" positions="maxAmplitudePosition"
+                                      outputKey="photoncharge"/>
+
+        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
+                                         arrivalTimeKey="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
         <fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />
 
-        <PrintData />
+        <stream.flow.Skip condition="%{data.shower} == null" />
+        <PrintData/>
+        <!--<fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />-->
+
 
     </process>
     
