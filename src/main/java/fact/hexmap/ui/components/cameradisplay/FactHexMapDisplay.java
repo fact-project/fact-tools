@@ -91,7 +91,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private boolean drawScaleNumbers = true;
 
-	private boolean includeScale = true;
+	private boolean includeScale = false;
 
 	private int offsetX = 0;
 	private int offsetY = 0;
@@ -216,10 +216,21 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		this.repaint();
 	}
 
-	// The paint method.
+	/**
+	 * @see javax.swing.JComponent#paint(java.awt.Graphics)
+	 */
+	@Override
 	public void paint(Graphics g) {
-		super.paint(g);
+		paint(g, false);
+	}
+
+	// The paint method.
+	public void paint(Graphics g, boolean transparentBackground) {
+		// super.paint(g);
 		g.setColor(this.getBackground());
+		if (transparentBackground) {
+			g.setColor(new Color(255, 255, 255, 0));
+		}
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		int xOffset = getWidth() / 2 + offsetX;
 		int yOffset = getHeight() / 2 + offsetY;

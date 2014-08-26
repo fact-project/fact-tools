@@ -18,6 +18,7 @@ import org.w3c.dom.NodeList;
 
 import stream.Data;
 import streams.dashboard.Dashboard;
+import streams.dashboard.Widget;
 
 /**
  * @author chris
@@ -99,4 +100,26 @@ public class FACTDashboard extends Dashboard {
 	public void dataArrived(Data item) {
 		super.dataArrived(item);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see streams.dashboard.Dashboard#process(stream.Data)
+	 */
+	@Override
+	public Data process(Data item) {
+		// log.info("Processing item with {} processors", processors.size());
+		for (Widget w : processors) {
+			// log.info("Processing item with widget {}: {}", w, item);
+			if (w.handles(item)) {
+				log.debug("Handling item {} with widget {}", item, w);
+				w.process(item);
+			} else {
+				log.debug("Skipping widget {} for item {}", w, item);
+			}
+		}
+
+		return item;
+	}
+
 }

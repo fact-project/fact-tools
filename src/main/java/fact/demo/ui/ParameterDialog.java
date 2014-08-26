@@ -19,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -71,6 +72,10 @@ public class ParameterDialog extends JDialog implements FocusListener {
 		table.setGridColor(new Color(79, 79, 68));
 		content.setLayout(new BorderLayout());
 
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setDefaultRenderer(
+				new ParameterTableHeaderRenderer());
+
 		table.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		table.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
@@ -78,7 +83,7 @@ public class ParameterDialog extends JDialog implements FocusListener {
 		table.getTableHeader().setBackground(Color.LIGHT_GRAY);
 		table.getTableHeader().setVisible(true);
 
-		content.add(table, BorderLayout.CENTER);
+		content.add(new JScrollPane(table), BorderLayout.CENTER);
 
 		content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -120,6 +125,7 @@ public class ParameterDialog extends JDialog implements FocusListener {
 	@Override
 	public void focusLost(FocusEvent e) {
 		setVisible(false);
+		this.dispose();
 	}
 
 	public class ParamTable implements TableModel {

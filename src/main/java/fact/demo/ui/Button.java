@@ -25,6 +25,9 @@ public class Button extends JPanel {
 	private static final long serialVersionUID = -4543251965812149852L;
 	final static Color BACKGROUND_HIGHLIGHTED = new Color(79, 79, 68);
 	final static Color BACKGROUND = new Color(39, 39, 34);
+
+	final static Color FONT_COLOR = new Color(79, 79, 68);
+
 	String text;
 	final JLabel label;
 
