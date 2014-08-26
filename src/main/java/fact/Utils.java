@@ -140,6 +140,17 @@ public class Utils {
             return null;
         }
     }
+    private static double[] shortToDoubleArray(short[] ar) {
+        if (ar != null) {
+            double[] ret = new double[ar.length];
+            for (int i = 0; i < ar.length; i++) {
+                ret[i] = (double) ar[i];
+            }
+            return ret;
+        } else {
+            return null;
+        }
+    }
 
 
     //returns true if the specified value is anywhere in the array
@@ -159,10 +170,14 @@ public class Utils {
                 return (double[])arr;
             } else if(clazz.equals(int.class)){
                 return intToDoubleArray((int[])arr);
+            } else if(clazz.equals(short.class)){
+                return shortToDoubleArray((short[]) arr);
             }
         }
         return null;
     }
+
+
 
     public static double valueToDouble(Serializable val) {
         Class<?> clazz = val.getClass();

@@ -7,16 +7,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -34,7 +31,7 @@ import fact.demo.ui.Button.ClickListener;
  * @author chris
  * 
  */
-public class ParameterDialog extends JDialog implements FocusListener {
+public class ParameterDialog extends JDialog {
 
 	/** The unique class ID */
 	private static final long serialVersionUID = -8520036851206364651L;
@@ -45,17 +42,21 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 	final ParamTable parameters = new ParamTable();
 
+	final Color bgColor = new Color(39, 39, 34);
+	final Color gridColor = new Color(52, 52, 47);
+
 	public ParameterDialog(NodeComponent n) {
 		setAutoRequestFocus(true);
 		setUndecorated(true);
 
-		setBackground(new Color(39, 39, 34));
+		setBackground(bgColor);
 		content.setOpaque(true);
-		content.setBackground(new Color(39, 39, 34));
+		content.setBackground(bgColor);
+		content.setPreferredSize(new Dimension(200, 250));
 
-		buttons.setBackground(new Color(39, 39, 34));
+		buttons.setBackground(bgColor);
 		buttons.setOpaque(true);
-		this.setOpacity(0.8f);
+		this.setOpacity(0.7f);
 
 		setLayout(new BorderLayout());
 
@@ -67,9 +68,9 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 		final JTable table = new JTable(parameters);
 		table.setOpaque(true);
-		table.setBackground(new Color(39, 39, 34));
+		table.setBackground(bgColor);
 		table.setForeground(Color.WHITE);
-		table.setGridColor(new Color(79, 79, 68));
+		table.setGridColor(gridColor);
 		content.setLayout(new BorderLayout());
 
 		table.getTableHeader().setReorderingAllowed(false);
@@ -77,10 +78,9 @@ public class ParameterDialog extends JDialog implements FocusListener {
 				new ParameterTableHeaderRenderer());
 
 		table.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		table.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		table.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
 
 		table.setRowHeight(24);
-		table.getTableHeader().setBackground(Color.LIGHT_GRAY);
 		table.getTableHeader().setVisible(true);
 
 		content.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -89,15 +89,6 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 		add(content, BorderLayout.CENTER);
 		add(buttons, BorderLayout.SOUTH);
-
-		JButton close = new JButton("Close");
-		close.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
-		close.setSize(120, 22);
-		close.setMaximumSize(new Dimension(120, 18));
 
 		final Button cl = new Button("Close");
 		cl.addClickListener(new ClickListener() {
@@ -109,23 +100,16 @@ public class ParameterDialog extends JDialog implements FocusListener {
 
 		buttons.add(cl);
 
-		pack(); // setSize(200, 320);
-	}
+		this.addWindowFocusListener(new WindowFocusListener() {
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+			}
 
-	/**
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-	 */
-	@Override
-	public void focusGained(FocusEvent e) {
-	}
-
-	/**
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-	 */
-	@Override
-	public void focusLost(FocusEvent e) {
-		setVisible(false);
-		this.dispose();
+			@Override
+			public void windowLostFocus(WindowEvent e) {
+				ParameterDialog.this.setVisible(false);
+			}
+		});
 	}
 
 	public class ParamTable implements TableModel {

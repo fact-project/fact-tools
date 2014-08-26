@@ -3,6 +3,7 @@
  */
 package fact.demo.widgets;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +11,10 @@ import fact.demo.ui.HexMap;
 import stream.Data;
 import stream.util.Time;
 import streams.dashboard.Widget;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * @author chris
@@ -30,12 +35,6 @@ public class Camera extends Widget {
 		setContent(hexMap);
 	}
 
-	/**
-	 * @return the radius
-	 */
-	public Double getRadius() {
-		return radius;
-	}
 
 	/**
 	 * @param radius
@@ -49,12 +48,6 @@ public class Camera extends Widget {
 		}
 	}
 
-	/**
-	 * @return the delay
-	 */
-	public Time getDelay() {
-		return delay;
-	}
 
 	/**
 	 * @param delay
@@ -74,14 +67,14 @@ public class Camera extends Widget {
 
 		setTitle("Camera - Event " + input.get("EventNum"));
 
-		short[] data = (short[]) input.get("Data");
-		double[] dd = new double[data.length];
-		for (int i = 0; i < data.length; i++) {
-			dd[i] = data[i];
-		}
-
-		synchronized (hexMap) {
-			hexMap.setData(dd);
+        double[] data = Utils.toDoubleArray(input.get("DataCalibrated"));
+        int[] shower =  null;
+        if (input.get("shower") != null){
+            shower = (int[]) input.get("shower");
+        }
+        synchronized (hexMap) {
+            hexMap.setShowerIds(shower);
+			hexMap.setData(data);
 
 			hexMap.play(delay.asMillis());
 

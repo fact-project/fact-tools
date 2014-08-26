@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import fact.demo.NodeComponent;
 import stream.app.ComputeGraph;
+import stream.runtime.LifeCycle;
+import stream.util.ApplicationBuilder;
 
 /**
  * @author chris
@@ -47,7 +49,7 @@ public class ContainerGraphPanel extends JPanel {
 	final Map<Object, Point> objects = new LinkedHashMap<Object, Point>();
 	final List<NodeComponent> components = new ArrayList<NodeComponent>();
 
-	int gridX = 100;
+	int gridX = 135;
 	int gridY = 100;
 
 	public ContainerGraphPanel() {
@@ -110,9 +112,30 @@ public class ContainerGraphPanel extends JPanel {
 		log.info("Determining position of {} at level {}", root, level);
 		Set<Object> out = graph.getTargets(root);
 		Integer num = out.size();
-		log.info("Need to position {} targets from {}", num, rootPos);
+        log.info("Need to position {} targets from {}", num, rootPos);
 
-		for (Object target : out) {
+        for (Object target : out) {
+            //in case we traverse the node for the updatewidget we remove the node from the graph
+            try{
+                ApplicationBuilder.ProcessorNode n = (ApplicationBuilder.ProcessorNode) target;
+                String name = n.attributes().get("class");
+                if (name.equalsIgnoreCase("fact.demo.UpdateWidget")){
+                    //do not increase the x position
+                    Point p = new Point(rootPos.x, rootPos.y);
+                    positioning(level + 1, target, p);
+
+                    //Create new edges
+                    Set<Object> children = graph.getTargets(target);
+                    for(Object child: children){
+                        graph.add(root, child);
+                    }
+                    //remove the node for the updatewidget
+                    graph.remove(target);
+                    continue;
+                }
+            } catch(ClassCastException e){
+                //pass
+            }
 			Point p = new Point(rootPos.x + gridX, rootPos.y);
 			objects.put(target, p);
 			components.add(new NodeComponent((stream.util.Node) target, p));
@@ -158,7 +181,7 @@ public class ContainerGraphPanel extends JPanel {
 				}
 			}
 		}
-		g.setColor(old);
+		g2.setColor(old);
 		g2.setStroke(oldStroke);
 
 		// log.info("Rendering objects...");
