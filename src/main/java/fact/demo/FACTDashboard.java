@@ -113,9 +113,24 @@ public class FACTDashboard extends Dashboard {
 	 */
 	@Override
 	public Data process(Data item) {
+		final String wid;
+
+		if (item.containsKey("@widget")) {
+			wid = item.get("@widget") + "";
+		} else {
+			wid = null;
+		}
+
 		// log.info("Processing item with {} processors", processors.size());
 		for (Widget w : processors) {
 			// log.info("Processing item with widget {}: {}", w, item);
+
+			if (wid != null && !wid.equals(w.getId())) {
+				log.debug("Widget id {} not matching item @widget value '{}'",
+						w.getId(), wid);
+				continue;
+			}
+
 			if (w.handles(item)) {
 				log.debug("Handling item {} with widget {}", item, w);
 				w.process(item);

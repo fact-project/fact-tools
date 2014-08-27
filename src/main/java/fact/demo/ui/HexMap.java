@@ -14,10 +14,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JPanel;
 
-import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.colormapping.ColorMapping;
 import fact.hexmap.ui.colormapping.RainbowColorMapping;
@@ -46,11 +46,13 @@ public class HexMap extends JPanel {
 	double minValue = 1000.0;
 	double maxValue = 0.0;
 
+	boolean timeScale = true;
+
 	final AtomicBoolean playing = new AtomicBoolean(false);
 	final DecimalFormat fmt = new DecimalFormat("000");
-    private int[] showerIds;
+	private int[] showerIds;
 
-    public HexMap() {
+	public HexMap() {
 		setBackground(Color.white);
 		for (int i = 0; i < tiles.length; i++) {
 			FactHexTile t = new FactHexTile(pixelMapping.getPixelFromId(i), 3.5);
@@ -69,14 +71,14 @@ public class HexMap extends JPanel {
 	}
 
 	public void setData(double[] data) {
-        this.sliceValues = Utils.sortPixels(data, 1440);
-        for (double[] slices : sliceValues) {
-            for (double v : slices) {
-                minValue = Math.min(minValue, v);
-                maxValue = Math.max(maxValue, v);
-            }
-        }
-    }
+		this.sliceValues = Utils.sortPixels(data, 1440);
+		for (double[] slices : sliceValues) {
+			for (double v : slices) {
+				minValue = Math.min(minValue, v);
+				maxValue = Math.max(maxValue, v);
+			}
+		}
+	}
 
 	/**
 	 * @see javax.swing.JComponent#print(java.awt.Graphics)
@@ -88,83 +90,86 @@ public class HexMap extends JPanel {
 		g.setColor(this.getBackground());
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-        int xOffset = getWidth() / 2;
+		int xOffset = getWidth() / 2;
 		int yOffset = getHeight() / 2;
 
-        if (g instanceof Graphics2D) {
+		if (g instanceof Graphics2D) {
 
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
-			g2.setStroke(new BasicStroke(2.0f));
-			g2.setColor(Color.DARK_GRAY);
 
-            Double begin = 10.0;
-			Double end = getWidth() - 10.0;
+			if (timeScale) {
+				g2.setStroke(new BasicStroke(2.0f));
+				g2.setColor(Color.DARK_GRAY);
 
-            g2.drawLine(10, getHeight() - 6, getWidth() - 10, getHeight() - 6);
+				Double begin = 10.0;
+				Double end = getWidth() - 10.0;
 
-			double slices = sliceValues[0].length;
-			double s = currentSlice;
+				g2.drawLine(10, getHeight() - 6, getWidth() - 10,
+						getHeight() - 6);
 
-			Double pos = s * ((end - begin) / slices);
+				double slices = sliceValues[0].length;
+				double s = currentSlice;
 
-			Font f = g2.getFont().deriveFont(9.0f);
-			g2.setFont(f);
-			g2.drawString("Slice: " + fmt.format(currentSlice), getWidth() - 54,
-					getHeight() - 12);
-			g2.setColor(Color.red);
-			g2.drawLine(10 + pos.intValue(), getHeight(), 10 + pos.intValue(),
-					getHeight() - 8);
+				Double pos = s * ((end - begin) / slices);
+
+				Font f = g2.getFont().deriveFont(9.0f);
+				g2.setFont(f);
+				g2.drawString("Slice: " + fmt.format(currentSlice),
+						getWidth() - 54, getHeight() - 12);
+				g2.setColor(Color.red);
+				g2.drawLine(10 + pos.intValue(), getHeight(),
+						10 + pos.intValue(), getHeight() - 8);
+			}
 
 			g2.setStroke(new BasicStroke(1.0f));
-            g2.setColor(Color.DARK_GRAY);
+			g2.setColor(Color.DARK_GRAY);
 
-            // draw a grid with lines every 25 pixel in a dark grey color
-            // drawGrid(g2, 25);
+			// draw a grid with lines every 25 pixel in a dark grey color
+			// drawGrid(g2, 25);
 
 			// translate to center of canvas
-            g2.translate(xOffset, yOffset);
-            // rotate 90 degrees counter clockwise
-            g2.rotate(-Math.PI / 2);
+			g2.translate(xOffset, yOffset);
+			// rotate 90 degrees counter clockwise
+			g2.rotate(-Math.PI / 2);
 
-            //In case we have shower pixel draw the camera in gray except for the camera pixel
-            if (showerIds != null){
-                for (Tile tile : tiles) {
-                    tile.setBorderColor(Color.lightGray);
-                    tile.setFillColor(Color.lightGray);
-                    tile.paint(g);
-                }
-                for(int pix: showerIds){
-                    Tile tile = tiles[pix];
-                    double value = sliceValues[tile.getCameraPixel().id][currentSlice];
-                    Color color = colors.getColorFromValue(value, minValue,
-                            maxValue);
-                    tile.setFillColor(color);
-                    tile.setBorderColor(Color.BLACK);
-                    tile.paint(g);
-                }
-            } else {
-                //no shower so just draw all the pixels in color
-                for (Tile tile : tiles) {
-                    double value = sliceValues[tile.getCameraPixel().id][currentSlice];
-                    Color color = colors.getColorFromValue(value, minValue,
-                            maxValue);
+			// In case we have shower pixel draw the camera in gray except for
+			// the camera pixel
+			if (showerIds != null && showerIds.length > 0) {
+				for (Tile tile : tiles) {
+					tile.setBorderColor(Color.lightGray);
+					tile.setFillColor(Color.lightGray);
+					tile.paint(g);
+				}
+				for (int pix : showerIds) {
+					Tile tile = tiles[pix];
+					double value = sliceValues[tile.getCameraPixel().id][currentSlice];
+					Color color = colors.getColorFromValue(value, minValue,
+							maxValue);
+					tile.setFillColor(color);
+					tile.setBorderColor(Color.BLACK);
+					tile.paint(g);
+				}
+			} else {
+				// no shower so just draw all the pixels in color
+				for (Tile tile : tiles) {
+					double value = sliceValues[tile.getCameraPixel().id][currentSlice];
+					Color color = colors.getColorFromValue(value, minValue,
+							maxValue);
 
-                    tile.setFillColor(color);
-                    tile.setBorderColor(Color.BLACK);
-                    tile.paint(g);
-                }
-            }
+					tile.setFillColor(color);
+					tile.setBorderColor(Color.BLACK);
+					tile.paint(g);
+				}
+			}
 
 			// draw all overlays
 			// for (CameraMapOverlay o : overlays) {
 			// o.paint(g2, this);
 			// }
-
 		}
 	}
-
 
 	/**
 	 * @param currentSlice
@@ -217,7 +222,23 @@ public class HexMap extends JPanel {
 		return playing.get();
 	}
 
-    public void setShowerIds(int[] showerIds) {
-        this.showerIds = showerIds;
-    }
+	public void setShowerIds(int[] showerIds) {
+		this.showerIds = showerIds;
+	}
+
+	/**
+	 * @return the timeScale
+	 */
+	public boolean isTimeScale() {
+		return timeScale;
+	}
+
+	/**
+	 * @param timeScale
+	 *            the timeScale to set
+	 */
+	public void setTimeScale(boolean timeScale) {
+		this.timeScale = timeScale;
+	}
+
 }

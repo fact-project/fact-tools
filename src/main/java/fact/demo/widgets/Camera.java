@@ -62,19 +62,16 @@ public class Camera extends Widget {
 		setTitle("Camera - Event " + input.get("EventNum"));
 
 		double[] data = Utils.toDoubleArray(input.get("DataCalibrated"));
-		int[] shower = null;
-		if (input.get("shower") != null) {
-			shower = (int[]) input.get("shower");
-		}
+
 		synchronized (hexMap) {
-			hexMap.setShowerIds(shower);
+			// hexMap.setShowerIds(shower);
 			hexMap.setData(data);
 
 			hexMap.play(delay.asMillis());
 
 			while (hexMap.isPlaying()) {
 				try {
-					hexMap.wait(250L);
+					hexMap.wait(100L);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
