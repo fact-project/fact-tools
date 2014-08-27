@@ -3,18 +3,14 @@
  */
 package fact.demo.widgets;
 
-import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.demo.ui.HexMap;
 import stream.Data;
 import stream.util.Time;
 import streams.dashboard.Widget;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import fact.Utils;
+import fact.demo.ui.HexMap;
 
 /**
  * @author chris
@@ -35,19 +31,17 @@ public class Camera extends Widget {
 		setContent(hexMap);
 	}
 
-
 	/**
 	 * @param radius
 	 *            the radius to set
 	 */
 	public void setRadius(Double radius) {
 		if (radius > 1.0) {
-			log.info("Setting radius to {}", radius);
+			log.debug("Setting radius to {}", radius);
 			this.radius = radius;
 			this.hexMap.setRadius(radius);
 		}
 	}
-
 
 	/**
 	 * @param delay
@@ -67,13 +61,13 @@ public class Camera extends Widget {
 
 		setTitle("Camera - Event " + input.get("EventNum"));
 
-        double[] data = Utils.toDoubleArray(input.get("DataCalibrated"));
-        int[] shower =  null;
-        if (input.get("shower") != null){
-            shower = (int[]) input.get("shower");
-        }
-        synchronized (hexMap) {
-            hexMap.setShowerIds(shower);
+		double[] data = Utils.toDoubleArray(input.get("DataCalibrated"));
+		int[] shower = null;
+		if (input.get("shower") != null) {
+			shower = (int[]) input.get("shower");
+		}
+		synchronized (hexMap) {
+			hexMap.setShowerIds(shower);
 			hexMap.setData(data);
 
 			hexMap.play(delay.asMillis());

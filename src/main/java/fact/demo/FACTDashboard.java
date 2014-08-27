@@ -31,6 +31,11 @@ public class FACTDashboard extends Dashboard {
 
 	static Logger log = LoggerFactory.getLogger(FACTDashboard.class);
 
+	public FACTDashboard() {
+		super();
+		nameSpaces.add("fact.demo.widgets");
+	}
+
 	/**
 	 * @see streams.dashboard.Dashboard#createContentPane()
 	 */

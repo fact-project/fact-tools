@@ -24,9 +24,10 @@ public class Demo {
 		log.info("#");
 		log.info("#  FACT-Tools Demo");
 		log.info("#");
-		log.info("#");
 		URL url = Demo.class.getResource("/fact-tools-demo.xml");
 		log.info("#  Using process {}", url);
+		log.info("#");
+		log.info("#");
 		stream.run.main(url);
 	}
 }

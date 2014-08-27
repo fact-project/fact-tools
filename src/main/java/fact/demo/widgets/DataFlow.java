@@ -38,7 +38,7 @@ public class DataFlow extends Widget {
 
 		setContent(panel);
 
-		log.info("initializing DataFlow widget, config is at {}", config);
+		log.debug("initializing DataFlow widget, config is at {}", config);
 		ComputeGraph g = ApplicationBuilder.parseGraph(config);
 		panel.setGraph(g);
 	}

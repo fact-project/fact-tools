@@ -22,9 +22,7 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.demo.NodeComponent;
 import stream.app.ComputeGraph;
-import stream.runtime.LifeCycle;
 import stream.util.ApplicationBuilder;
 
 /**
@@ -73,7 +71,7 @@ public class ContainerGraphPanel extends JPanel {
 
 		// Map<String, Source> src = this.graph.sources();
 		Set<Object> roots = graph.getRootSources();
-		log.info("Found {} root sources", roots.size());
+		log.debug("Found {} root sources", roots.size());
 
 		int x = 40;
 		int y0 = 100;
@@ -81,7 +79,7 @@ public class ContainerGraphPanel extends JPanel {
 
 		for (Object root : roots) {
 			Point p = new Point(x, y);
-			log.info("Adding {} to coordinate {}", root, p);
+			log.debug("Adding {} to coordinate {}", root, p);
 			objects.put(root, p);
 
 			components.add(new NodeComponent((stream.util.Node) root, p));
@@ -89,14 +87,14 @@ public class ContainerGraphPanel extends JPanel {
 			positioning(0, root, p);
 
 			// Set<Object> s = graph.getTargets(root);
-			// log.info("Root {} has {} dependend objects ", root, s.size());
+			// log.debug("Root {} has {} dependend objects ", root, s.size());
 			//
 			// x += xStep;
 			//
 			// int ty = y0;
 			// for (Object o : s) {
 			// p = new Point(x, ty);
-			// log.info("Adding {} to coordinate {}", o, p);
+			// log.debug("Adding {} to coordinate {}", o, p);
 			// objects.put(o, p);
 			// // ty += yStep;
 			// }
@@ -109,33 +107,34 @@ public class ContainerGraphPanel extends JPanel {
 	}
 
 	protected void positioning(int level, Object root, Point rootPos) {
-		log.info("Determining position of {} at level {}", root, level);
+		log.debug("Determining position of {} at level {}", root, level);
 		Set<Object> out = graph.getTargets(root);
 		Integer num = out.size();
-        log.info("Need to position {} targets from {}", num, rootPos);
+		log.debug("Need to position {} targets from {}", num, rootPos);
 
-        for (Object target : out) {
-            //in case we traverse the node for the updatewidget we remove the node from the graph
-            try{
-                ApplicationBuilder.ProcessorNode n = (ApplicationBuilder.ProcessorNode) target;
-                String name = n.attributes().get("class");
-                if (name.equalsIgnoreCase("fact.demo.UpdateWidget")){
-                    //do not increase the x position
-                    Point p = new Point(rootPos.x, rootPos.y);
-                    positioning(level + 1, target, p);
+		for (Object target : out) {
+			// in case we traverse the node for the updatewidget we remove the
+			// node from the graph
+			try {
+				ApplicationBuilder.ProcessorNode n = (ApplicationBuilder.ProcessorNode) target;
+				String name = n.attributes().get("class");
+				if (name.equalsIgnoreCase("fact.demo.UpdateWidget")) {
+					// do not increase the x position
+					Point p = new Point(rootPos.x, rootPos.y);
+					positioning(level + 1, target, p);
 
-                    //Create new edges
-                    Set<Object> children = graph.getTargets(target);
-                    for(Object child: children){
-                        graph.add(root, child);
-                    }
-                    //remove the node for the updatewidget
-                    graph.remove(target);
-                    continue;
-                }
-            } catch(ClassCastException e){
-                //pass
-            }
+					// Create new edges
+					Set<Object> children = graph.getTargets(target);
+					for (Object child : children) {
+						graph.add(root, child);
+					}
+					// remove the node for the updatewidget
+					graph.remove(target);
+					continue;
+				}
+			} catch (ClassCastException e) {
+				// pass
+			}
 			Point p = new Point(rootPos.x + gridX, rootPos.y);
 			objects.put(target, p);
 			components.add(new NodeComponent((stream.util.Node) target, p));
@@ -160,11 +159,11 @@ public class ContainerGraphPanel extends JPanel {
 		Stroke oldStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 
-		// log.info("Rendering edges...");
+		// log.debug("Rendering edges...");
 		for (Object o : graph.nodes()) {
 			Point from = objects.get(o);
 			if (from == null) {
-				// log.info("No coordinates found for {}", o);
+				// log.debug("No coordinates found for {}", o);
 				continue;
 			}
 
@@ -176,7 +175,7 @@ public class ContainerGraphPanel extends JPanel {
 					if (to != null) {
 						g.drawLine(from.x, from.y, to.x, to.y);
 					} else {
-						log.info("No coordinates found for target {}", t);
+						log.debug("No coordinates found for target {}", t);
 					}
 				}
 			}
@@ -184,7 +183,7 @@ public class ContainerGraphPanel extends JPanel {
 		g2.setColor(old);
 		g2.setStroke(oldStroke);
 
-		// log.info("Rendering objects...");
+		// log.debug("Rendering objects...");
 		for (NodeComponent c : components) {
 			c.paint(g2);
 		}
