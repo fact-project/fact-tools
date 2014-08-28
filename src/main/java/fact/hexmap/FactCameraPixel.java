@@ -1,13 +1,13 @@
 package fact.hexmap;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * TODO: these might be created using a flyweight pattern. Just to save some memory
  * Created by kaibrugge on 23.04.14.
  */
-public class FactCameraPixel extends CameraPixel {
-
+public class FactCameraPixel extends CameraPixel implements Serializable {
+    private static final long serialVersionUID = 7526472295622776147L;
 
     public int chid;
     public int board;
