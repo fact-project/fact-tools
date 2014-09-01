@@ -27,11 +27,11 @@
          <stream.flow.Skip condition="%{data.shower} == null" />
 			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
 			<fact.features.source.SourcePosition x="0.0" y="0.0" sourceRightAscension="0.0" sourceDeclination="0.0" outputKey="sourcePos"/>
-			<fact.features.HillasLength distribution="dist" outputKey="length" />
-			<fact.features.HillasWidth distribution="dist" outputKey="width" />
-			<fact.features.source.HillasAlpha distribution="dist" outputKey="alpha" sourcePosition="sourcePos" />
-			<fact.features.source.HillasDistance distribution="dist" outputKey="distance" sourcePosition="sourcePos" />
-			<fact.features.HillasConcentration shower="shower" weights="photoncharge" outputKey="concentration" />
+			<fact.features.Length distribution="dist" outputKey="length" />
+			<fact.features.Width distribution="dist" outputKey="width" />
+			<fact.features.source.Alpha distribution="dist" outputKey="alpha" sourcePosition="sourcePos" />
+			<fact.features.source.Distance distribution="dist" outputKey="distance" sourcePosition="sourcePos" />
+			<fact.features.Concentration shower="shower" weights="photoncharge" outputKey="concentration" />
 			<fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="size" />
 
             <fact.statistics.ArrayMean key="pos" outputKey="posMean" />

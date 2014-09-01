@@ -1,6 +1,6 @@
 package fact.parameter;
 
-import fact.features.source.HillasAlpha;
+import fact.features.source.Alpha;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
  * @author bruegge
  *
  */
-public class HillasAlphaTest extends ParameterTest {
+public class AlphaTest extends ParameterTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -25,7 +25,7 @@ public class HillasAlphaTest extends ParameterTest {
 	public void testValidParameter() throws Exception{
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
-		HillasAlpha poser = new HillasAlpha();
+		Alpha poser = new Alpha();
 		poser.setDistribution(distribution);
 		poser.setSourcePosition(sourcePosition);
 		poser.setOutputKey(outputKey);

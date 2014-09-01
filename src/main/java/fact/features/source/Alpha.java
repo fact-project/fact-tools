@@ -14,8 +14,8 @@ import stream.Processor;
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class HillasAlpha implements Processor {
-	static Logger log = LoggerFactory.getLogger(HillasAlpha.class);
+public class Alpha implements Processor {
+	static Logger log = LoggerFactory.getLogger(Alpha.class);
 	private String distribution = null;
 	private String sourcePosition = null;
 	private String outputKey = null;
