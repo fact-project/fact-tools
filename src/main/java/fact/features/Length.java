@@ -9,8 +9,8 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-public class HillasLength implements Processor {
-	static Logger log = LoggerFactory.getLogger(HillasLength.class);
+public class Length implements Processor {
+	static Logger log = LoggerFactory.getLogger(Length.class);
 
     @Parameter(required = true)
 	private String distribution;

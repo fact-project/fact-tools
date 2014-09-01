@@ -24,7 +24,7 @@
 <!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
     <stream.flow.Skip condition="%{data.shower} == null" />
 	        <fact.features.DistributionFromShower weights="photoncharge" showerKey="shower"  outputKey="dist" />
-			<fact.features.source.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+			<fact.features.source.Alpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
             <fact.io.RootASCIIWriter keys="EventNum,TriggerType,alpha" url="${outfile}" />
 		</process>
 </container>
