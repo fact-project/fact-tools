@@ -37,4 +37,13 @@ public class CastToDoubleArray implements StatefulProcessor {
         input.put(outputKey, b);
         return input;
     }
+
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
+
 }
