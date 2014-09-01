@@ -36,13 +36,13 @@ public class HandleSaturation implements Processor {
 		
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 		double[] photonChargeSaturated = (double[]) input.get(photonChargeSaturatedKey);
-		double[] arrivalTime = Utils.toDoubleArray( input.get(arrivalTimeKey));
-		double[] arrivalTimeSaturated = Utils.toDoubleArray( input.get(arrivalTimeSaturatedKey));
+		int[] arrivalTime = (int[]) input.get(arrivalTimeKey);
+		int[] arrivalTimeSaturated = (int[]) input.get(arrivalTimeSaturatedKey);
 		
 		
 		double[] resultPhotonCharge = new double[photonCharge.length];
 		System.arraycopy(photonCharge, 0, resultPhotonCharge, 0, photonCharge.length);
-		double[] resultArrivalTimes = new double[arrivalTime.length];
+		int[] resultArrivalTimes = new int[arrivalTime.length];
 		System.arraycopy(arrivalTime, 0, resultArrivalTimes, 0, arrivalTime.length);
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
