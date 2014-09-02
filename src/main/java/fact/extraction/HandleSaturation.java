@@ -20,7 +20,7 @@ public class HandleSaturation implements Processor {
 	@Parameter(required=true, description="Key to the arrivalTime Array, calculated by the time over threshold processor")
 	private String arrivalTimeSaturatedKey = null;
 	@Parameter(required=true, description="Limit above the time over threshold photoncharge is used [phe]. A good value is around 180")
-	private int limitForSaturatedPixel;
+	private double limitForSaturatedPixel;
 	@Parameter(required=true)
 	private String outputKeyPhotonCharge = null;
 	@Parameter(required=true)
@@ -101,12 +101,12 @@ public class HandleSaturation implements Processor {
 	}
 
 
-	public int getLimitForSaturatedPixel() {
+	public double getLimitForSaturatedPixel() {
 		return limitForSaturatedPixel;
 	}
 
 
-	public void setLimitForSaturatedPixel(int limitForSaturatedPixel) {
+	public void setLimitForSaturatedPixel(double limitForSaturatedPixel) {
 		this.limitForSaturatedPixel = limitForSaturatedPixel;
 	}
 
