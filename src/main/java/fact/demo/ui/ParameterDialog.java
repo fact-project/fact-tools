@@ -47,6 +47,7 @@ public class ParameterDialog extends JDialog {
 	public ParameterDialog(NodeComponent n) {
 		setAutoRequestFocus(true);
 		setUndecorated(true);
+		setAlwaysOnTop(true);
 
 		setBackground(bgColor);
 		content.setOpaque(true);
@@ -106,9 +107,13 @@ public class ParameterDialog extends JDialog {
 
 			@Override
 			public void windowLostFocus(WindowEvent e) {
-				ParameterDialog.this.setVisible(false);
+				// ParameterDialog.this.setVisible(false);
 			}
 		});
+
+		this.pack();
+		Dimension d = this.getPreferredSize();
+		this.setPreferredSize(new Dimension(d.width + 100, d.height));
 	}
 
 	public class ParamTable implements TableModel {

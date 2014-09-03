@@ -63,10 +63,14 @@ public class NodeComponent extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				log.info("click! ({})", e);
 
-				ParameterDialog d = new ParameterDialog(c);
-				d.setLocation(new Point(e.getLocationOnScreen().x, e
-						.getLocationOnScreen().y - d.getHeight() / 2));
-				d.setVisible(true);
+				try {
+					ParameterDialog d = new ParameterDialog(c);
+					d.setLocation(new Point(e.getLocationOnScreen().x, e
+							.getLocationOnScreen().y - d.getHeight() / 2));
+					d.setVisible(true);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 
 		});

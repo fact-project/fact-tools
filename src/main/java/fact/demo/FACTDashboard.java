@@ -34,6 +34,7 @@ public class FACTDashboard extends Dashboard {
 	public FACTDashboard() {
 		super();
 		nameSpaces.add("fact.demo.widgets");
+		this.setSize(1440, 900);
 	}
 
 	/**

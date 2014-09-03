@@ -4,13 +4,15 @@
     <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
     
 
-    <service id="dashboard" class="fact.demo.FACTDashboard"  size="1280,1024" location="0,0">
+    <service id="dashboard" class="fact.demo.FACTDashboard"  size="1440,1024" location="0,0">
         
         <fact.demo.widgets.Camera id="camera"  title="Camera" radius="3.5" delay="15ms" ui:location="20,80" ui:size="260,270"/>
         
         <fact.demo.widgets.DataFlow id="dataflow" title="DataFlow / Configuration" config="classpath:/fact-tools-demo.xml" ui:location="20,360" ui:size="1168,300" />
         
         <fact.demo.widgets.CameraOverlay id="camera:shower"  title="Shower" radius="3.5" delay="15ms" ui:location="360,80" ui:size="260,270"/>
+        
+        <Table id="features" title="Extracted Features" ui:location="640,80" ui:size="500,270" />
         
     </service>
     
@@ -44,6 +46,7 @@
         <fact.demo.UpdateWidget dashboard="dashboard" widget="camera:shower" />
         
         <!--<fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />-->
+        <fact.demo.UpdateWidget dashboard="dashboard" widget="features" />
 
 
     </process>
