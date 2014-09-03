@@ -3,7 +3,7 @@
 	<groupId>edu.udo</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-	<version>0.6.0</version>
+	<version>0.6.1-SNAPSHOT</version>
 
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
@@ -44,7 +44,7 @@
 		<url>https://bitbucket.org/cbockermann/fact-tools</url>
 		<developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</developerConnection>
 		<connection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</connection>
-	  <tag>fact-tools-0.6.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<mailingLists>
