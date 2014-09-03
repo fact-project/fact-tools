@@ -1,6 +1,5 @@
 package fact.datacorrection;
 
-import fact.Constants;
 import fact.Utils;
 import fact.container.SpikeInfos;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
@@ -42,6 +41,7 @@ public class RemoveSpikes implements Processor {
 	boolean addSpikeInfo = false;
 	
 	int roi;
+	int npix;
 	
 	int leftBorder = 10;
 	
@@ -51,11 +51,13 @@ public class RemoveSpikes implements Processor {
 		Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, startCellKey, short[].class);
 		Utils.isKeyValid(input, "NROI", Integer.class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
 		
 		double[] data = (double[]) input.get(dataKey);
 		double[] result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
 		roi = (Integer) input.get("NROI");
+		npix = (Integer) input.get("NPIX");
 		short[] startCells = (short[]) input.get(startCellKey);
 		
 		for (int spikeLength = 1 ; spikeLength <= maxSpikeLength ; spikeLength++)
@@ -66,7 +68,7 @@ public class RemoveSpikes implements Processor {
 				spikeInfos = new SpikeInfos();
 			}
 			
-			for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+			for (int px = 0 ; px < npix ; px++)
 			{
 				int rightBorder = roi - spikeLength;
 				// we want to skip the timemarker signal in the spike removal

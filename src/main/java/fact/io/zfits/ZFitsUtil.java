@@ -125,12 +125,13 @@ public class ZFitsUtil {
 			//read the table
 			fitsTable = new ZFitsTable(header);
 
-			System.out.println("Found table: "+fitsTable.getTableName());
+//			System.out.println("Found table: "+fitsTable.getTableName());
 			if (!fitsTable.getTableName().equals(tableName)) {
 				// it is not the desired table so skip it entirely
-				//System.out.println("Skipping: "+fitsTable.getTableTotalSize());
+//				System.out.println("Skipping: "+fitsTable.getTableTotalSize());
+//				long num = input.skipBytes((int) fitsTable.getTableTotalSize());
 				long num = input.skip(fitsTable.getTableTotalSize());
-				//System.out.println("Num: "+num);
+//				System.out.println("Num: "+num);
 				if (num!=(int)fitsTable.getTableTotalSize())
 					throw new MissingArgumentException("Couldn't skip the table, maybe file is corrupted or table is missing. Name: "+tableName);
 				continue;
