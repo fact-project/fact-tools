@@ -237,21 +237,32 @@ public class Utils {
         }
     }
 
+    /**
+     * Transforms camera coordinates (x, y) into longitudinal and transversal ellipse coordinates (l, t).
+     * The ellipse coordinate system is defined by the center of gravity (x,y) and the angle between the major axis and
+     * the camera x-axis (delta in radians).
+     *
+     * @param x
+     * @param y
+     * @param cogX
+     * @param cogY
+     * @param delta
+     * @return an array having two elements {l, t}
+     */
+    public static double[] transformToEllipseCoordinates(double x, double y, double cogX, double cogY, double delta){
+        double translatedX = x - cogX;
+        double translatedY = y - cogY;
 
-    public static double[] rotateAndTranslatePointInShowerSystem(double x, double y, double cogx, double cogy, double delta)
-    {
-        double xtr = x;
-        double ytr = y;
-        double[] result = {0,0};
+        double dist = Math.sqrt(translatedX*translatedX + translatedY*translatedY);
 
-        // translate the coord., so that the COG is in the center
-        xtr -= cogx;
-        ytr -= cogy;
+        double beta = Math.atan2( translatedY, translatedX );
+        double alpha = (beta - delta);
 
-        result[0] = xtr*Math.cos(delta) - ytr*Math.sin(delta);
-        result[1] = xtr*Math.sin(delta) + ytr*Math.cos(delta);
+        double t = Math.sin(alpha) * dist;
+        double l = Math.cos(alpha) * dist;
+        double[] c = {l, t};
 
-        return result;
+        return c;
     }
 
     /**

@@ -5,6 +5,7 @@ import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.io.Serializable;
 
 /**
@@ -48,6 +49,7 @@ public class EllipseOverlay implements CameraMapOverlay, Serializable {
 
         Ellipse2D el = new Ellipse2D.Double( - 0.5 * ellipse_height * scalingX, - 0.5 * ellipse_width * scalingY,
                 this.ellipse_height *scalingX, this.ellipse_width * scalingY);
+
 
         double centerX = cogX*scalingX;
         double centerY = -cogY*scalingY ;
