@@ -29,12 +29,9 @@ public class MaxAmplitudePositionTest {
 		pr.setUrl(drsUrl.toString());
 		pr.setOutputKey("test");
 
-
         maxAmpPos = new MaxAmplitudePosition();
 		maxAmpPos.setKey("test");
 		maxAmpPos.setOutputKey(outputKey);
-
-		
 	}
 	
 	@Test
