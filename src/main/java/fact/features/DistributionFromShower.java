@@ -3,7 +3,6 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.LineOverlay;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 
 import org.apache.commons.math3.linear.*;
@@ -71,7 +70,7 @@ public Data process(Data input) {
     //Calculation of the showers statistical moments (Variance, Skewness, Kurtosis)
     // Rotate the shower by the angle delta in order to have the ellipse main axis in parallel to the Camera-Coordinates X-Axis
     //allocate variables for rotated coordinates
-    double []longitudinalCoords = new double[showerPixel.length];
+    double[] longitudinalCoords = new double[showerPixel.length];
     double[] transversalCoords = new double[showerPixel.length];
 
     for (int i = 0; i < showerPixel.length; i++){
@@ -86,19 +85,6 @@ public Data process(Data input) {
         transversalCoords[i]			= c[1];
     }
 
-    //find max long coords
-    double maxLongCoord = 0;
-    double minLongCoord = 0;
-    for (double l: longitudinalCoords){
-        maxLongCoord = Math.max(maxLongCoord, l);
-        minLongCoord = Math.min(minLongCoord, l);
-    }
-
-    double maxTransCoord = 0;
-    for (double l: transversalCoords){
-        maxTransCoord = Math.max(maxTransCoord, l);
-    }
-
     double m3Long = calculateMoment(3,0, longitudinalCoords, showerWeights);
     m3Long /= Math.pow(length,3);
     double m3Trans = calculateMoment(3, 0, transversalCoords, showerWeights);
@@ -108,19 +94,6 @@ public Data process(Data input) {
     m4Long /= Math.pow(length,4);
     double m4Trans = calculateMoment(4, 0, transversalCoords, showerWeights);
     m4Trans /= Math.pow(width,4);
-
-    double newLength = Math.sqrt(calculateMoment(2, 0, longitudinalCoords, showerWeights));
-    double newWidth = Math.sqrt(calculateMoment(2, 0, transversalCoords, showerWeights));
-
-    double meanLong = calculateMoment(1, 0, longitudinalCoords, showerWeights);
-    double meanTrans = calculateMoment(1, 0, transversalCoords, showerWeights);
-
-//    System.out.println("Width: " + width + " newwidth: " + newWidth);
-//    System.out.println("Length: " + length + " newlength: " + newLength);
-//    System.out.println("Mean long, trans (should be 0): " + meanLong + ", " + meanTrans);
-
-
-
 
     PixelDistribution2D dist = new PixelDistribution2D(covarianceMatrix.getEntry(0, 0), covarianceMatrix.getEntry(1,1),
             covarianceMatrix.getEntry(0,1), cog[0], cog[1], varianceLong, varianceTrans, m3Long,
@@ -140,32 +113,9 @@ public Data process(Data input) {
     input.put("Width", width );
     input.put("Delta", delta );
 
-//    double[][] rot = {   {Math.cos(delta), -Math.sin(delta)},
-//            {Math.sin(delta),Math.cos(delta) }
-//    };
-
-//    RealMatrix rotMatrix = MatrixUtils.createRealMatrix(rot);
-//    double[] a = {0 ,  20};
-//    RealVector v = MatrixUtils.createRealVector(a);
-//    RealVector cogV = MatrixUtils.createRealVector(cog);
-//    v = rotMatrix.operate(v);
-//    v = v.add(cogV);
-
-
-
-//    double[] thead = Utils.transformToEllipseCoordinates(maxLongCoord + cog[0], 0 + cog[1], cog[0], cog[1], delta );
-//    double[] ttail = Utils.transformToEllipseCoordinates(minLongCoord + cog[0], 0 + cog[1], cog[0], cog[1], delta );
-//
-//    double[] tMaxTrans = Utils.transformToEllipseCoordinates(0 + cog[0], maxTransCoord + cog[1], cog[0], cog[1], delta );
 
     double[] center = calculateCenter(showerPixel);
     input.put("Ellipse", new EllipseOverlay(center[0] , center[1], width , length  , delta));
-//    input.put("CoG", new EllipseOverlay(cog[0] , cog[1], 3 , 3  , 0));
-//    input.put("Center", new EllipseOverlay(center[0] , center[1], 3 , 3  , 0));
-//
-//    input.put("Tail", new LineOverlay(cog[0], cog[1], cog[0] + ttail[0], cog[1] + ttail[1]));
-//    input.put("Head", new LineOverlay(cog[0], cog[1], cog[0] + thead[0], cog[1] + thead[1]));
-//    input.put("MaxTrans", new LineOverlay(cog[0], cog[1], cog[0] + tMaxTrans[0], cog[1] + tMaxTrans[1]));
 
     input.put("@width", width );
     input.put("@length", length );
