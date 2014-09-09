@@ -3,7 +3,6 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.LineOverlay;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 
 import org.apache.commons.math3.linear.*;
@@ -109,11 +108,11 @@ public Data process(Data input) {
     double m4Trans = calculateMoment(4, 0, transversalCoords, showerWeights);
     m4Trans /= Math.pow(width,4);
 
-    double newLength = Math.sqrt(calculateMoment(2, 0, longitudinalCoords, showerWeights));
-    double newWidth = Math.sqrt(calculateMoment(2, 0, transversalCoords, showerWeights));
-
-    double meanLong = calculateMoment(1, 0, longitudinalCoords, showerWeights);
-    double meanTrans = calculateMoment(1, 0, transversalCoords, showerWeights);
+//    double newLength = Math.sqrt(calculateMoment(2, 0, longitudinalCoords, showerWeights));
+//    double newWidth = Math.sqrt(calculateMoment(2, 0, transversalCoords, showerWeights));
+//
+//    double meanLong = calculateMoment(1, 0, longitudinalCoords, showerWeights);
+//    double meanTrans = calculateMoment(1, 0, transversalCoords, showerWeights);
 
 //    System.out.println("Width: " + width + " newwidth: " + newWidth);
 //    System.out.println("Length: " + length + " newlength: " + newLength);
