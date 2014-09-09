@@ -16,7 +16,7 @@ public class TimeSpread implements Processor {
 	@Parameter(required = true)
 	private String outputKey = null;
 	
-	private double[] arrivalTime = null;
+	private int[] arrivalTime = null;
 	private double[] weights = null;
 	private int[] shower = null;
 
@@ -25,7 +25,7 @@ public class TimeSpread implements Processor {
 		
 		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, showerKey);
 		
-		arrivalTime = (double[]) input.get(arrivalTimeKey);
+		arrivalTime = (int[]) input.get(arrivalTimeKey);
 		weights = (double[]) input.get(weightsKey);
 		shower = (int[]) input.get(showerKey);
 		
