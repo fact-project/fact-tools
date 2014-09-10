@@ -3,6 +3,7 @@
  */
 package fact.demo;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -34,6 +35,17 @@ public class FACTDashboard extends Dashboard {
 	public FACTDashboard() {
 		super();
 		nameSpaces.add("fact.demo.widgets");
+		// this.setBackground(new Color(21, 30, 3));
+		// this.content.setBackground(new Color(21, 30, 3));
+		// this.display.setBackground(new Color(21, 30, 3));
+
+		String bgKey = this.getClass().getCanonicalName() + ".background";
+		log.info("background color key is '{}'", bgKey);
+
+		this.setBackground(colors.get(bgKey, Color.WHITE));
+		display.setBackground(colors.get(bgKey, Color.WHITE));
+		display.setBackground(colors.get(bgKey, Color.WHITE));
+
 		this.setSize(1440, 900);
 	}
 
@@ -56,16 +68,21 @@ public class FACTDashboard extends Dashboard {
 				setLayout(null);
 				logo = ImageIO.read(FACTDashboard.class
 						.getResourceAsStream("/fact-tools-logo.png"));
+				logo = ImageIO.read(FACTDashboard.class
+						.getResourceAsStream("/fact-tools-logo-trans.png"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 			try {
 				tulogo = ImageIO.read(FACTDashboard.class
-						.getResourceAsStream("/tulogo.jpg"));
+						.getResourceAsStream("/tu-logo.png"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			this.setBackground(new Color(255, 0, 0, 0));
+			this.setOpaque(true);
 		}
 
 		/**
@@ -82,7 +99,7 @@ public class FACTDashboard extends Dashboard {
 				g.drawImage(tulogo, x, 12, null);
 			}
 			if (logo != null) {
-				g.drawImage(logo, 10, 14, null);
+				g.drawImage(logo, 10, 4, null);
 			}
 		}
 	}

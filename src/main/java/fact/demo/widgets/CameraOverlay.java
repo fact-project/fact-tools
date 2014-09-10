@@ -3,6 +3,8 @@
  */
 package fact.demo.widgets;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,8 @@ public class CameraOverlay extends Widget {
 		for (int i = 0; i < data.length; i++) {
 			data[i] = 0.0;
 		}
+
+		hexMap.setBackground(new Color(21, 30, 3));
 
 		hexMap.setTimeScale(false);
 		hexMap.setData(data);

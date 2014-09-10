@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.util.Time;
+import streams.dashboard.ColorMapping;
 import streams.dashboard.Widget;
 import fact.Utils;
 import fact.demo.ui.HexMap;
@@ -29,6 +30,19 @@ public class Camera extends Widget {
 
 	public Camera() {
 		setContent(hexMap);
+		hexMap.setSliceInterval(10, 150);
+	}
+
+	/**
+	 * @see streams.dashboard.Widget#setColors(streams.dashboard.ColorMapping)
+	 */
+	@Override
+	public void setColors(ColorMapping colorMapping) {
+		super.setColors(colorMapping);
+
+		if (hexMap != null) {
+			hexMap.setBackground(getBackground());
+		}
 	}
 
 	/**

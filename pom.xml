@@ -70,10 +70,12 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 
+<!--
 		<site>
 			<id>fact-site</id>
 			<url>scp://kirmes.cs.uni-dortmund.de:/home/share/projekte/FACT/website/</url>
 		</site>
+-->
 	</distributionManagement>
 
 	<repositories>

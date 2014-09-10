@@ -3,6 +3,8 @@
  */
 package fact.demo.widgets;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public class DataFlow extends Widget {
 		log.debug("initializing DataFlow widget, config is at {}", config);
 		ComputeGraph g = ApplicationBuilder.parseGraph(config);
 		panel.setGraph(g);
+		panel.setBackground(new Color(255, 255, 255, 75));
 	}
 
 	/**

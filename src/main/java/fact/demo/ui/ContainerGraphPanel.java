@@ -68,6 +68,7 @@ public class ContainerGraphPanel extends JPanel {
 	 */
 	public void setGraph(ComputeGraph graph) {
 		this.graph = graph;
+		this.components.clear();
 
 		// Map<String, Source> src = this.graph.sources();
 		Set<Object> roots = graph.getRootSources();
@@ -159,33 +160,35 @@ public class ContainerGraphPanel extends JPanel {
 		Stroke oldStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 
-		// log.debug("Rendering edges...");
-		for (Object o : graph.nodes()) {
-			Point from = objects.get(o);
-			if (from == null) {
-				// log.debug("No coordinates found for {}", o);
-				continue;
-			}
+		if (graph != null) {
+			// log.debug("Rendering edges...");
+			for (Object o : graph.nodes()) {
+				Point from = objects.get(o);
+				if (from == null) {
+					// log.debug("No coordinates found for {}", o);
+					continue;
+				}
 
-			Set<Object> targets = graph.getTargets(o);
-			if (targets != null && !targets.isEmpty()) {
-				for (Object t : targets) {
-					Point to = objects.get(t);
+				Set<Object> targets = graph.getTargets(o);
+				if (targets != null && !targets.isEmpty()) {
+					for (Object t : targets) {
+						Point to = objects.get(t);
 
-					if (to != null) {
-						g.drawLine(from.x, from.y, to.x, to.y);
-					} else {
-						log.debug("No coordinates found for target {}", t);
+						if (to != null) {
+							g.drawLine(from.x, from.y, to.x, to.y);
+						} else {
+							log.debug("No coordinates found for target {}", t);
+						}
 					}
 				}
 			}
-		}
-		g2.setColor(old);
-		g2.setStroke(oldStroke);
+			g2.setColor(old);
+			g2.setStroke(oldStroke);
 
-		// log.debug("Rendering objects...");
-		for (NodeComponent c : components) {
-			c.paint(g2);
+			// log.debug("Rendering objects...");
+			for (NodeComponent c : components) {
+				c.paint(g2);
+			}
 		}
 	}
 

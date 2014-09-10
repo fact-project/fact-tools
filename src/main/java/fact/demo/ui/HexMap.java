@@ -48,6 +48,9 @@ public class HexMap extends JPanel {
 
 	boolean timeScale = true;
 
+	Integer fromSlice = 0;
+	Integer toSlice = 300;
+
 	final AtomicBoolean playing = new AtomicBoolean(false);
 	final DecimalFormat fmt = new DecimalFormat("000");
 	private int[] showerIds;
@@ -101,7 +104,7 @@ public class HexMap extends JPanel {
 
 			if (timeScale) {
 				g2.setStroke(new BasicStroke(2.0f));
-				g2.setColor(Color.DARK_GRAY);
+				g2.setColor(Color.WHITE);
 
 				Double begin = 10.0;
 				Double end = getWidth() - 10.0;
@@ -109,7 +112,8 @@ public class HexMap extends JPanel {
 				g2.drawLine(10, getHeight() - 6, getWidth() - 10,
 						getHeight() - 6);
 
-				double slices = sliceValues[0].length;
+				double slices = Math.min(toSlice - fromSlice,
+						sliceValues[0].length);
 				double s = currentSlice;
 
 				Double pos = s * ((end - begin) / slices);
@@ -171,6 +175,11 @@ public class HexMap extends JPanel {
 		}
 	}
 
+	public void setSliceInterval(int from, int to) {
+		this.fromSlice = from;
+		this.toSlice = to;
+	}
+
 	/**
 	 * @param currentSlice
 	 *            the currentSlice to set
@@ -189,7 +198,7 @@ public class HexMap extends JPanel {
 		Thread t = new Thread() {
 			public void run() {
 				try {
-					for (int s = 0; s < 300; s++) {
+					for (int s = fromSlice; s < toSlice; s++) {
 						setCurrentSlice(s);
 						repaint();
 						Thread.sleep(interval);
@@ -240,5 +249,4 @@ public class HexMap extends JPanel {
 	public void setTimeScale(boolean timeScale) {
 		this.timeScale = timeScale;
 	}
-
 }
