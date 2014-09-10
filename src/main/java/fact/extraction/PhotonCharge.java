@@ -35,8 +35,7 @@ public class PhotonCharge implements Processor {
     @Parameter(required = true, description = "The positions around which the integral is calculated.",
             defaultValue="DataCalibrated")
     private String positions = null;
-    @Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",
-            defaultValue="file:src/main/resources/defaultIntegralGains.csv")
+    @Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants")
     private URL url = null;
     @Parameter(required = true, description = "The range before the maxAmplitude where the half height is searched",
             defaultValue ="25")
@@ -47,7 +46,7 @@ public class PhotonCharge implements Processor {
 	private double[] photonCharge = null;
 	
     Data integralGainData = null;
-    private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
+    private double[] integralGains = null;
     
     private int alpha = 64;
 
@@ -60,6 +59,10 @@ public class PhotonCharge implements Processor {
 		double[] data;
 		posArray = (int[]) input.get(positions);
 		data = (double[]) input.get(dataKey);
+
+        if(integralGains == null ){
+            setUrl(PhotonCharge.class.getResource("/defaultIntegralGains.csv"));
+        }
 
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		photonCharge = new double[Constants.NUMBEROFPIXEL];
@@ -163,6 +166,7 @@ public class PhotonCharge implements Processor {
 
 	private void loadIntegralGainFile(SourceURL inputUrl) {
 		try {
+            this.integralGains = new double[Constants.NUMBEROFPIXEL];
 			CsvStream stream = new CsvStream(inputUrl, " ");
 			stream.setHeader(false);
 			stream.init();
