@@ -1,5 +1,6 @@
 package fact.features.source;
 
+import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +16,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look directly at the source but somewhere close by.
- *  That means the image of the source projected by the mirrors onto the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
+ *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look
+ *  directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
+ *  the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
  *  The point (0.0, 0.0) is the center of the camera.
- *  In  order to calculate the source position we need to know where the telescope is looking. This data is written by the telescope drive system into an auxilary .fits file called DRIVE_TRACKING_POSITION.
+ *  In  order to calculate the source position we need to know where the telescope is looking.
+ *  This data is written by the telescope drive system into an auxilary .fits file called DRIVE_TRACKING_POSITION.
  *  
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -114,7 +117,6 @@ public class SourcePosition implements StatefulProcessor {
 	}
 	@Override
 	public void resetState() throws Exception {
-		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -186,6 +188,7 @@ public class SourcePosition implements StatefulProcessor {
 		//add source position to dataitem
 		double[] source = {sourcePosition[0], sourcePosition[1]};
 		data.put(outputKey, source);
+        data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
 		//add deviation between the calculated point az,dz and the az,dz in the file
 		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
 		data.put(outputKey+"pointingDeviation", deviation);

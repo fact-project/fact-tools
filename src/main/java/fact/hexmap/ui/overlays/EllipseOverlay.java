@@ -13,7 +13,7 @@ import java.io.Serializable;
  * to the horizontal axis in the GUI
  * Created by bruegge on 7/31/14.
  */
-public class EllipseOverlay implements CameraMapOverlay, Serializable {
+public class EllipseOverlay implements CameraMapOverlay {
 
     private final double cogY;
     private final double cogX;
