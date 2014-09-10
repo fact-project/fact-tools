@@ -6,15 +6,17 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-public class HillasConcentration implements Processor {
-	static Logger log = LoggerFactory.getLogger(HillasConcentration.class);
+public class Concentration implements Processor {
+	static Logger log = LoggerFactory.getLogger(Concentration.class);
 
     @Parameter(required = true)
 	private String shower;
     @Parameter(required = true)
 	private String weights;
     @Parameter(required = true)
-	private String outputKey;
+	private String concOneOutputKey;
+    @Parameter(required = true)
+	private String concTwoOutputKey;
 
 	@Override
 	public Data process(Data input) {
@@ -55,8 +57,8 @@ public class HillasConcentration implements Processor {
 
 		}
 		
-		input.put(outputKey+"_onePixel" , max_photon_charge / size);
-		input.put(outputKey+"_twoPixel" , (max_photon_charge + second_max_photon_charge) / size);
+		input.put(concOneOutputKey , max_photon_charge / size);
+		input.put(concTwoOutputKey , (max_photon_charge + second_max_photon_charge) / size);
 		return input;
 	}
 
@@ -74,13 +76,22 @@ public class HillasConcentration implements Processor {
 		this.weights = weights;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
+	public String getConcOneOutputKey() {
+		return concOneOutputKey;
 	}
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
+	public void setConcOneOutputKey(String concOneOutputKey) {
+		this.concOneOutputKey = concOneOutputKey;
 	}
+
+	public String getConcTwoOutputKey() {
+		return concTwoOutputKey;
+	}
+
+	public void setConcTwoOutputKey(String concTwoOutputKey) {
+		this.concTwoOutputKey = concTwoOutputKey;
+	}
+
 
 	
 }

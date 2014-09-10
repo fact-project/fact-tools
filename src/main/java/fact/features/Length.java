@@ -1,14 +1,16 @@
 package fact.features;
 
-import fact.statistics.PixelDistribution2D;
+import fact.container.PixelDistribution2D;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-public class HillasLength implements Processor {
-	static Logger log = LoggerFactory.getLogger(HillasLength.class);
+public class Length implements Processor {
+	static Logger log = LoggerFactory.getLogger(Length.class);
 
     @Parameter(required = true)
 	private String distribution;

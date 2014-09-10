@@ -38,7 +38,9 @@ public class MuonHoughTransform implements Processor {
 	@Parameter(required = true, description = "outputkey for the octantsHit parameter")
 	private String octantsHitKey;
 	// Number of HitPixels on best Ring/ Total number of HitPixels
-	private String percentageKey;
+	private String cleaningPercentageKey;
+	// Number of HitPixels on best Ring/ Total number of Pixels in Best Ring
+	private String ringPercentageKey;
 	// Pixelset for the FactViewer, only returned when showRingKey=true
 	@Parameter(required = true, description = "outputkey for the hough pixelset of the best Ring")
 	private String bestCircleKey;
@@ -94,18 +96,17 @@ public class MuonHoughTransform implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-				
-		int[] pixel = (int[]) input.get(pixelKey);
+		int[] cleaningPixel = (int[]) input.get(pixelKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 				
-		double[] xPositions = new double[pixel.length];
-		double[] yPositions = new double[pixel.length];
+		double[] xPositions = new double[cleaningPixel.length];
+		double[] yPositions = new double[cleaningPixel.length];
 		
 		// Get X and Y Positions of the Pixel that survived Cleaning
 		
-		for(int i=0; i<pixel.length; i++){
-			xPositions[i] = m.getPixelFromId(pixel[i]).getXPositionInMM();
-			yPositions[i] = m.getPixelFromId(pixel[i]).getYPositionInMM();
+		for(int i=0; i<cleaningPixel.length; i++){
+			xPositions[i] = m.getPixelFromId(cleaningPixel[i]).getXPositionInMM();
+			yPositions[i] = m.getPixelFromId(cleaningPixel[i]).getYPositionInMM();
 		}
 		
 		// generate Hough-Voting-Matrix n:
@@ -130,7 +131,7 @@ public class MuonHoughTransform implements Processor {
 		
 		// HoughTransform:
 		
-		double peakness = 0;
+		
 		int NoneZeroElems = 0;
 		
 		DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -139,15 +140,15 @@ public class MuonHoughTransform implements Processor {
 		int[] highest_pos = {0, 0, 0};
 		int[] second_highest_pos = {0, 0, 0};
 		int[] third_highest_pos = {0, 0, 0};
-		double distance;
+		
 				
 		for (int r = 0; r < circle_radius.length; r++){
 			for (int x = 0; x < circle_x.length; x++){
 				for (int y = 0; y < circle_y.length; y++){
-					for(int pix = 0; pix < pixel.length; pix++){
-						distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
+					for(int pix = 0; pix < cleaningPixel.length; pix++){
+						double distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
 						if(Math.abs(distance - circle_radius[r]) <= fact.Constants.PIXEL_SIZE ){
-							HoughMatrix[r][x][y] += photonCharge[pixel[pix]];
+							HoughMatrix[r][x][y] += photonCharge[cleaningPixel[pix]];
 						}
 					}
 					stats.addValue(HoughMatrix[r][x][y]);
@@ -175,13 +176,14 @@ public class MuonHoughTransform implements Processor {
 
 		// Hough-Distance and Peakness
 		
+		
 		double radius_1 = circle_radius[highest_pos[0]];
 		double center_x_1 = circle_x[highest_pos[1]];
 		double center_y_1 = circle_y[highest_pos[2]];
 		
-		input.put(bestRadiusKey, radius_1);
-		input.put(bestXKey, center_x_1);
-		input.put(bestYKey, center_y_1);
+		input.put(bestRadiusKey, highest_pos[0]);
+		input.put(bestXKey, highest_pos[1]);
+		input.put(bestYKey, highest_pos[2]);
 				
 		double radius_2 = circle_radius[second_highest_pos[0]];
 		double center_x_2 = circle_x[second_highest_pos[1]];
@@ -195,12 +197,12 @@ public class MuonHoughTransform implements Processor {
 		double ParamDistance2 = Math.sqrt(Math.pow(radius_1 - radius_3, 2) + Math.pow(center_x_1 - center_x_3, 2) + Math.pow(center_y_1 - center_y_3 , 2));
 		double ParamDistance3 = Math.sqrt(Math.pow(radius_3 - radius_2, 2) + Math.pow(center_x_3 - center_x_2, 2) + Math.pow(center_y_3 - center_y_2 , 2));
 		
-		
+	
 		double ParamDistanceSum = ParamDistance1 + ParamDistance2 + ParamDistance3; 
 		double HoughMaximum = stats.getMax();
 		double HoughSum = stats.getSum();
 		
-		peakness = HoughMaximum/(HoughSum/NoneZeroElems);
+		double peakness = HoughMaximum/(HoughSum/NoneZeroElems);
 		input.put(peaknessKey, peakness);
 		input.put(distanceKey, ParamDistanceSum);
 
@@ -209,16 +211,16 @@ public class MuonHoughTransform implements Processor {
 		
 		ArrayList<Integer> bestRingPixelList = new ArrayList<Integer>();
 		
-		double PixelPosX;
-		double PixelPosY;		
+		int numPixBestRing = 0;
 		
 		for(int pix=0; pix<fact.Constants.NUMBEROFPIXEL; pix++){
             FactCameraPixel p  = m.getPixelFromId(pix);
-			PixelPosX = p.getXPositionInMM();
-			PixelPosY = p.getYPositionInMM();
-			distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
+			double PixelPosX = p.getXPositionInMM();
+			double PixelPosY = p.getYPositionInMM();
+			double distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
 			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
-				bestRingPixelList.add(pix);		
+				bestRingPixelList.add(pix);	
+				numPixBestRing += 1;
 			}
 		}
 		
@@ -233,39 +235,38 @@ public class MuonHoughTransform implements Processor {
 		
 		// percentage and octantshit
 
-		double percentage;
-		double onRingPixel=0;
-		double phi=0;
-		int octantsHit=0;
-		boolean[] octants = {false,false,false,false,false,false,false,false};
 		
-		for (int pix=0; pix<pixel.length;pix++){
-			distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
-			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
-				onRingPixel+=1;
-				
-				phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
-				for(int i=0; i<8; i++){
-					if(phi>i*Math.PI/4 - Math.PI && phi<=(i+1)*Math.PI/4 - Math.PI ){
-						octants[i]=true;
-					}
+		double onRingPixel=0;
+			double phi=0;
+			int octantsHit=0;
+			boolean[] octants = {false,false,false,false,false,false,false,false};
+			
+			for (int pix=0; pix<cleaningPixel.length;pix++)
+			{
+				double distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
+				if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
+					onRingPixel+=1;
+					
+					phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
+					octants[(int) (((phi+Math.PI)/(Math.PI/4)))%8] = true;
 				}
 			}
-		}		
-				
-		
-		for(int i=0; i<8; i++){
-			if(octants[i]){
-				octantsHit+=1;
+			
+			for(int i=0; i<8; i++)
+			{
+				if(octants[i])
+				{
+					octantsHit+=1;
+				}
 			}
-		}
 		
-		input.put(octantsHitKey, octantsHit);
+			input.put(octantsHitKey, octantsHit);
 		
-		percentage = onRingPixel/pixel.length;
-		
-		input.put(percentageKey, percentage);
-		
+
+		double cleaningPercentage = onRingPixel/cleaningPixel.length;
+		double ringPercentage = onRingPixel/numPixBestRing;
+		input.put(cleaningPercentageKey, cleaningPercentage);
+		input.put(ringPercentageKey, ringPercentage);
 
 		// Creating the Pixelsets for the Viewer
 		if(showMatrixKey){
@@ -289,8 +290,8 @@ public class MuonHoughTransform implements Processor {
 			
 			for (int pix=0; pix<Constants.NUMBEROFPIXEL; pix++){
                 FactCameraPixel p  = m.getPixelFromId(pix);
-                PixelPosX = p.getXPositionInMM();
-                PixelPosY = p.getYPositionInMM();
+                double PixelPosX = p.getXPositionInMM();
+                double PixelPosY = p.getYPositionInMM();
 				distance1 = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
 				distance2 = Math.sqrt(Math.pow((PixelPosX - center_x_2), 2.0) + Math.pow((PixelPosY - center_y_2), 2.0));
 				distance3 = Math.sqrt(Math.pow((PixelPosX - center_x_3), 2.0) + Math.pow((PixelPosY - center_y_3), 2.0));
@@ -344,16 +345,6 @@ public class MuonHoughTransform implements Processor {
 	}
 	public void setPhotonChargeKey(String photonChargeKey) {
 		this.photonChargeKey = photonChargeKey;
-	}
-
-
-	public String getPercentageKey() {
-		return percentageKey;
-	}
-
-
-	public void setPercentageKey(String percentageKey) {
-		this.percentageKey = percentageKey;
 	}
 
 
@@ -424,6 +415,26 @@ public class MuonHoughTransform implements Processor {
 
 	public void setShowMatrixKey(boolean showMatrixKey) {
 		this.showMatrixKey = showMatrixKey;
+	}
+
+
+	public String getCleaningPercentageKey() {
+		return cleaningPercentageKey;
+	}
+
+
+	public void setCleaningPercentageKey(String cleaningPercentageKey) {
+		this.cleaningPercentageKey = cleaningPercentageKey;
+	}
+
+
+	public String getRingPercentageKey() {
+		return ringPercentageKey;
+	}
+
+
+	public void setRingPercentageKey(String ringPercentageKey) {
+		this.ringPercentageKey = ringPercentageKey;
 	}
 
 

@@ -1,10 +1,12 @@
 package fact.datacorrection;
 
-import fact.Constants;
 import fact.Utils;
+import fact.container.SpikeInfos;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -31,43 +33,42 @@ public class RemoveSpikes implements Processor {
 	double spikeLimit;
 	@Parameter(required=true)
 	double topSlopeLimit;
-	@Parameter(required=false)
+	@Parameter(required=false,description = "useful for spike studies")
 	String outputSpikesKey = null;
 	@Parameter(required=true, defaultValue = "2")
 	int maxSpikeLength = 2;
 	@Parameter(required=false)
-	boolean showSpikes = false;
+	boolean addSpikeInfo = false;
 	
 	int roi;
+	int npix;
 	
 	int leftBorder = 10;
 	
-	double[] result = null;
 	
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys(input, dataKey, startCellKey);
+		Utils.isKeyValid(input, dataKey, double[].class);
+		Utils.isKeyValid(input, startCellKey, short[].class);
+		Utils.isKeyValid(input, "NROI", Integer.class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
 		
 		double[] data = (double[]) input.get(dataKey);
-		result = new double[data.length];
+		double[] result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
-		
 		roi = (Integer) input.get("NROI");
-		
+		npix = (Integer) input.get("NPIX");
 		short[] startCells = (short[]) input.get(startCellKey);
 		
 		for (int spikeLength = 1 ; spikeLength <= maxSpikeLength ; spikeLength++)
 		{
+			SpikeInfos spikeInfos = null;
+			if (addSpikeInfo == true)
+			{
+				spikeInfos = new SpikeInfos();
+			}
 			
-			List<Integer> spPixel = new ArrayList<Integer>();
-			List<Integer> spLogSlice = new ArrayList<Integer>();
-			List<Integer> spPhysSpike = new ArrayList<Integer>();
-			List<Double> spHeight = new ArrayList<Double>();
-			List<Double> spTopSlope = new ArrayList<Double>();
-			
-			PixelSetOverlay spikesSet = new PixelSetOverlay();
-			
-			for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+			for (int px = 0 ; px < npix ; px++)
 			{
 				int rightBorder = roi - spikeLength;
 				// we want to skip the timemarker signal in the spike removal
@@ -107,47 +108,22 @@ public class RemoveSpikes implements Processor {
 									averTopSlope /= (spikeLength-1);
 									averTopValues /= spikeLength;
 								}
-								double spikeHeight = CorrectSpike(slice, spikeLength, averTopValues);
-								spikesSet.addById(px);
-								spPixel.add(px);
-								spLogSlice.add(sl);
-								spPhysSpike.add((sl+startCells[px])%1024);
-								spHeight.add(spikeHeight);
-								spTopSlope.add(averTopSlope);
+								double spikeHeight = CorrectSpike(slice, spikeLength, averTopValues,result);
+								if (addSpikeInfo == true)
+								{
+									spikeInfos.addSpike(px,sl,startCells[px],spikeHeight,averTopSlope);
+								}
 							}
 						}
 					}
 				}
 			}
-						
 			
-			int[] spPixelArr = new int[spPixel.size()];
-			int[] spLogSliceArr = new int[spLogSlice.size()];
-			int[] spPhysSliceArr = new int[spPhysSpike.size()];
-			double[] spHeightArr = new double[spHeight.size()];
-			double[] spTopSlopeArr = new double[spTopSlope.size()];
-			for (int i = 0 ; i < spPixel.size() ; i++)
+			if (addSpikeInfo == true)
 			{
-				spPixelArr[i] = spPixel.get(i);
-				spLogSliceArr[i] = spLogSlice.get(i);
-				spPhysSliceArr[i] = spPhysSpike.get(i);
-				spHeightArr[i] = spHeight.get(i);
-				spTopSlopeArr[i] = spTopSlope.get(i);
+				spikeInfos.addInfosToDataItem(input,spikeLength,outputSpikesKey);
 			}
-			
-
-			input.put(outputSpikesKey + "N"+spikeLength,spPixelArr.length);
-			input.put(outputSpikesKey + "Pixel"+spikeLength,spPixelArr);
-			input.put(outputSpikesKey + "LogSlices"+spikeLength,spLogSliceArr);
-			input.put(outputSpikesKey + "PhysSlices"+spikeLength,spPhysSliceArr);
-			input.put(outputSpikesKey + "Heights"+spikeLength,spHeightArr);
-			input.put(outputSpikesKey + "TopSlope"+spikeLength,spTopSlopeArr);
-
-			if (showSpikes == true)
-			{			
-				input.put(outputSpikesKey + "Set"+spikeLength,spikesSet);
-			}
-		
+				
 		}
 		
 		input.put(outputKey,result);
@@ -155,7 +131,7 @@ public class RemoveSpikes implements Processor {
 		return input;
 	}
 
-	private double CorrectSpike(int pos, int spikeLength,double averTopValues)
+	private double CorrectSpike(int pos, int spikeLength,double averTopValues, double[] result)
 	{
 		double spikeHeight = 0;
 		
@@ -235,12 +211,13 @@ public class RemoveSpikes implements Processor {
 		this.leftBorder = leftBorder;
 	}
 
-	public boolean isShowSpikes() {
-		return showSpikes;
+	public boolean isAddSpikeInfo() {
+		return addSpikeInfo;
 	}
 
-	public void setShowSpikes(boolean showSpikes) {
-		this.showSpikes = showSpikes;
+	public void setAddSpikeInfo(boolean addSpikeInfo) {
+		this.addSpikeInfo = addSpikeInfo;
 	}
+
 	
 }

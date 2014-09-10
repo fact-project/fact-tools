@@ -1,4 +1,4 @@
-package fact.statistics;
+package fact.container;
 
 import java.io.Serializable;
 

@@ -3,16 +3,22 @@ package fact.features.source;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class Theta implements Processor {
-	
+	@Parameter(required=true)
 	private String sourcePositionKey = null;
+	@Parameter(required=true)
 	private String dispKey = null;
+	@Parameter(required=true)
 	private String cogxKey = null;
+	@Parameter(required=true)
 	private String cogyKey = null;
+	@Parameter(required=true)
 	private String deltaKey = null;
+	@Parameter(required=true)
 	private String m3longKey = null;
-	
+	@Parameter(required=true)
 	private String outputKey = null;
 	
 	private double[] sourcePosition = null;
@@ -50,6 +56,62 @@ public class Theta implements Processor {
 		result[1] = cogy + disp * Math.sin(delta) * Math.signum(m3long);
 		
 		return result;
+	}
+
+	public String getSourcePositionKey() {
+		return sourcePositionKey;
+	}
+
+	public void setSourcePositionKey(String sourcePositionKey) {
+		this.sourcePositionKey = sourcePositionKey;
+	}
+
+	public String getDispKey() {
+		return dispKey;
+	}
+
+	public void setDispKey(String dispKey) {
+		this.dispKey = dispKey;
+	}
+
+	public String getCogxKey() {
+		return cogxKey;
+	}
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
+	}
+
+	public String getCogyKey() {
+		return cogyKey;
+	}
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
+	}
+
+	public String getDeltaKey() {
+		return deltaKey;
+	}
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
+	}
+
+	public String getM3longKey() {
+		return m3longKey;
+	}
+
+	public void setM3longKey(String m3longKey) {
+		this.m3longKey = m3longKey;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
 	}
 
 }

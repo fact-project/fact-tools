@@ -44,7 +44,6 @@ public class PatchAverage implements Processor {
 			}
 		}
 		input.put(outputKey,result);
-		input.put("@"+Constants.KEY_COLOR + "_" +outputKey,color);
 		
 		return input;
 	}

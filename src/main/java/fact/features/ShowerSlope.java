@@ -24,7 +24,7 @@ public class ShowerSlope implements Processor {
 	private String outputKey = null;
 	
 	private double[] photonCharge = null;
-	private double[] arrivalTime = null;
+	private int[] arrivalTime = null;
 	private int[] shower = null;
 	private double cogx;
 	private double cogy;
@@ -37,7 +37,7 @@ public class ShowerSlope implements Processor {
 		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
 		
 		photonCharge = (double[]) input.get(photonChargeKey);
-		arrivalTime = (double[]) input.get(arrivalTimeKey);
+		arrivalTime = (int[]) input.get(arrivalTimeKey);
 		shower = (int[]) input.get(showerKey);
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
@@ -59,7 +59,7 @@ public class ShowerSlope implements Processor {
 			int chid = shower[i];
 			double xcoord = pixelMap.getPixelFromId(chid).getXPositionInMM();
 			double ycoord = pixelMap.getPixelFromId(chid).getYPositionInMM();
-			double[] rotPixels = Utils.rotateAndTranslatePointInShowerSystem(xcoord, ycoord, cogx, cogy, delta);
+			double[] rotPixels = Utils.transformToEllipseCoordinates(xcoord, ycoord, cogx, cogy, delta);
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];
 			t[i] = arrivalTime[chid];

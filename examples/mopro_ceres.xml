@@ -41,23 +41,23 @@
             <fact.features.video.CenterOfGravity datacalibrated="DataCalibrated" showerpixel="shower" outputKey="videoCog"/>
             <fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="showerDistribution" />
 
-            <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Alpha" />
-            <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Distance" />
+            <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Alpha" />
+            <fact.features.source.Distance distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Distance" />
 
-            <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_1" outputKey="Alpha_Off_1" />
-            <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_1" outputKey="Distance_Off_1" />
-            <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Alpha_Off_2" />
-            <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Distance_Off_2" />
-            <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Alpha_Off_3" />
-            <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Distance_Off_3" />
-            <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_4" outputKey="Alpha_Off_4" />
-            <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_4" outputKey="Distance_Off_4" />
-            <fact.features.source.HillasAlpha distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Alpha_Off_5" />
-            <fact.features.source.HillasDistance distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Distance_Off_5" />
+            <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_1" outputKey="Alpha_Off_1" />
+            <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_1" outputKey="Distance_Off_1" />
+            <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Alpha_Off_2" />
+            <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Distance_Off_2" />
+            <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Alpha_Off_3" />
+            <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Distance_Off_3" />
+            <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_4" outputKey="Alpha_Off_4" />
+            <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_4" outputKey="Distance_Off_4" />
+            <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Alpha_Off_5" />
+            <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_5" outputKey="Distance_Off_5" />
 
-            <fact.features.HillasConcentration weights="photoncharge" shower="shower" outputKey="Concentration" />
-            <fact.features.HillasLength distribution="showerDistribution" outputKey="HillasLength" />
-            <fact.features.HillasWidth distribution="showerDistribution" outputKey="HillasWidth" />
+            <fact.features.Concentration weights="photoncharge" shower="shower" outputKey="Concentration" />
+            <fact.features.Length distribution="showerDistribution" outputKey="HillasLength" />
+            <fact.features.Width distribution="showerDistribution" outputKey="HillasWidth" />
             <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
             <fact.features.ConcentrationCore cogx="COGx" cogy="COGy" showerPixel="shower" photoncharge="photoncharge" size="Size" width="Width" length="Length" delta="Delta" outputKey="ConcCore" />
             <fact.features.source.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
