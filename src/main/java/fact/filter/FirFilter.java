@@ -26,7 +26,7 @@ public class FirFilter implements Processor {
     static Logger log = LoggerFactory.getLogger(FirFilter.class);
 
     @Parameter(required = false, description = "Filter coefficents array. {n, n-1, n-2, ..}.", defaultValue = "{0.5f,0.2f, 0.1f}")
-    double[] coefficients = {0.5f, 0.2f, 0.1f};
+    Double[] coefficients = {0.5, 0.2, 0.1};
 
     @Parameter(required = true)
     private String key;
@@ -60,7 +60,7 @@ public class FirFilter implements Processor {
 
     }
 
-    public void setCoefficients(double[] coefficients) {
+    public void setCoefficients(Double[] coefficients) {
         this.coefficients = coefficients;
     }
 

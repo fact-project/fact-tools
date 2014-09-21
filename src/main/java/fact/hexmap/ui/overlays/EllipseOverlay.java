@@ -40,9 +40,11 @@ public class EllipseOverlay implements CameraMapOverlay {
     @Override
     public void paint(Graphics2D g2, FactHexMapDisplay map) {
         double radius = map.getTileRadiusInPixels();
+        AffineTransform oldTransform = g2.getTransform();
+        Paint oldPaint = g2.getPaint();
+        Stroke oldStroke = g2.getStroke();
         g2.setPaint(fillColor);
         g2.setStroke(new BasicStroke(2));
-        AffineTransform old = g2.getTransform();
 
         double scalingX = 0.172*radius;
         double scalingY = 0.184*radius;
@@ -58,6 +60,8 @@ public class EllipseOverlay implements CameraMapOverlay {
 
         g2.draw(el);
 
-        g2.setTransform(old);
+        g2.setStroke(oldStroke);
+        g2.setPaint(oldPaint);
+        g2.setTransform(oldTransform);
     }
 }
