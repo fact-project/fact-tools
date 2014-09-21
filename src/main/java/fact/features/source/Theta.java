@@ -1,6 +1,7 @@
 package fact.features.source;
 
 import fact.Utils;
+import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -39,11 +40,12 @@ public class Theta implements Processor {
 		m3long = (Double) input.get(m3longKey);
 		
 		double[] recPosition = CalculateRecPosition();
-		
 		double theta = Math.sqrt( Math.pow(recPosition[0]-sourcePosition[0], 2)
 								+ Math.pow(recPosition[1]-sourcePosition[1], 2) );
-		
-		input.put(outputKey, theta);
+
+        input.put("@reconstructedPostion", new SourcePositionOverlay(outputKey, recPosition));
+        input.put(outputKey + "_recPos",  recPosition);
+        input.put(outputKey, theta);
 		
 		return input;
 	}
@@ -52,8 +54,8 @@ public class Theta implements Processor {
 		
 		double[] result = new double[2];
 		
-		result[0] = cogx + disp * Math.cos(delta) * Math.signum(m3long);
-		result[1] = cogy + disp * Math.sin(delta) * Math.signum(m3long);
+		result[0] = cogx + disp * Math.cos(delta) * Math.signum(-m3long);
+		result[1] = cogy + disp * Math.sin(delta) * Math.signum(-m3long);
 		
 		return result;
 	}
