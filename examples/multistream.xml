@@ -1,52 +1,19 @@
 <container>
 
 <!-- Pfade zu den fits files. -->
-<property name="dataDRS" value="/Users/kaibrugge/FactTest/ceres.drs.fits" />
-<property name="outfile" value="/Users/kaibrugge/FactTest/multistreamtest/output" />
+<property name="folder" value="/home/mackaiver/proton" />
+<property name="output" value="/home/mackaiver/proton/out" />
+<property name="dataDRS" value="/home/mackaiver/proton/drsfile.drs.fits" />
+<property name="num_copies" value="1" />
 
-<property name="data" value="/Users/kaibrugge/FactTest/multistreamtest/" />
-	<stream id="input:${copy.id}" class="stream.io.multi.DirectoryMultiStream"
-		url="file:${data}" copies="2" suffix=".fits">
-		<stream class="fact.io.FitsStream" />
-	</stream>
-	<process input="input:${copy.id}" copies="2">
-<!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
-			<fact.utils.Remapping key="Data" />
-	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
-<!--             <fact.utils.CutSlices keys="DataCalibrated" start="22" end="220"/> -->
-            <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>
-<!--             <fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="DataCalibrated" color="#FD0404"/> -->
-            
-            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
-                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+    <property name="core_threshold" value="7.0" />
+    <property name="neighbor_threshold" value="4.0"/>
+    <property name="time_threshold" value="30.0" />
+    <property name="min_number_of_pixel" value="2" />
 
-            <fact.features.RisingEdge key="DataCalibrated" outputKey="pos" />
 
-            <fact.extraction.PhotonCharge key="DataCalibrated" outputKey="photoncharge" positions="pos" color="#FF0F0F"/>
-            <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="pos" timeThreshold="30"  minNumberOfPixel="2"/>
-         <stream.flow.Skip condition="%{data.shower} == null" />
-			<fact.features.DistributionFromShower weights="photoncharge" key="shower" outputKey="dist" />
-			<fact.features.source.SourcePosition x="0.0" y="0.0" sourceRightAscension="0.0" sourceDeclination="0.0" outputKey="sourcePos"/>
-			<fact.features.Length distribution="dist" outputKey="length" />
-			<fact.features.Width distribution="dist" outputKey="width" />
-			<fact.features.source.Alpha distribution="dist" outputKey="alpha" sourcePosition="sourcePos" />
-			<fact.features.source.Distance distribution="dist" outputKey="distance" sourcePosition="sourcePos" />
-			<fact.features.Concentration shower="shower" weights="photoncharge" outputKey="concentration" />
-			<fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="size" />
+        <include file="mc.xml" />
 
-            <fact.statistics.ArrayMean key="pos" outputKey="posMean" />
-			<fact.statistics.ArrayMean key="photoncharge" outputKey="chargeMean" />
-
-			<fact.utils.SelectIndecesFromArray key="photoncharge" indices="shower" outputKey="showerPhoton" />
-			<fact.statistics.ArrayMean key="showerPhoton" outputKey="showerPhotonChargeMean" />
-			
-			<fact.utils.SelectIndecesFromArray key="pos" indices="shower" outputKey="showerPos" />
-			<fact.statistics.ArrayMean key="showerPos" outputKey="showerPositionMean" />
-			
-			<stream.io.CsvWriter keys="chargeMean,showerPhotonChargeMean,posMean,showerPositionMean,size,length,width,alpha,distance" url="file:${outfile}_${copy.id}.csv" />
-<!-- 			<fact.image.ShowImage/> -->
-			<stream.monitor.DataRate every="100" />
-	</process>
 		
 		
 		
