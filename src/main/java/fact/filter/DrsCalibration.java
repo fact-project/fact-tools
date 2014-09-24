@@ -116,7 +116,8 @@ public class DrsCalibration implements Processor {
 	 */
 	@Override
 	public Data process(Data data) {
-        if (this.drsData == null){
+        //check if the stream is comming from another source. we might need a new drs file
+        if (this.drsData == null || !currentFilePath .equals(data.get("@source").toString()) ){
 			//file not loaded yet. try to find by magic.
             try {
                 log.info("Trying to find .drs file automatically");
@@ -126,6 +127,7 @@ public class DrsCalibration implements Processor {
                 log.error("Couldn't find correct .drs File automatically.");
                 throw new RuntimeException("Couldn't find correct .drs File automatically.");
             }
+            currentFilePath = data.get("@source").toString();
 		}
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
