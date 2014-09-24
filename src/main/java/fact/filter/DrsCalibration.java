@@ -12,8 +12,14 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * <p>
@@ -32,13 +38,12 @@ public class DrsCalibration implements Processor {
 
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	//	String drsFile = null;
-	private String color;
-
 	private String outputKey = "DataCalibrated";
 	private String key="Data";
 
-	Data drsData = null;
+    Data drsData = null;
+
+    private String currentFilePath = "";
 
 
 	float[] drsBaselineMean;
@@ -111,10 +116,17 @@ public class DrsCalibration implements Processor {
 	 */
 	@Override
 	public Data process(Data data) {
+
 		if (this.drsData == null){
-			//file not loaded yet. try to lookup path in getColorFromValue.
-			log.error("No url to drs file specified.");
-            throw new RuntimeException("No DRS File found");
+			//file not loaded yet. try to find by magic.
+            try {
+                log.info("Trying to find .drs file automatically");
+                SourceURL url = findDRSFile(data.get("@source").toString());
+                loadDrsData(url);
+            } catch (FileNotFoundException e) {
+                log.error("Couldn't find correct .drs File automatically.");
+                throw new RuntimeException("Couldn't find correct .drs File automatically.");
+            }
 		}
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
@@ -147,14 +159,50 @@ public class DrsCalibration implements Processor {
 		double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
 		data.put(outputKey, calibrated);
 
-		//add color value if set
-		if(color !=  null && !color.equals("")){
-			data.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
-		}
-
 		return data;
 	}
 
+    /**
+     * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
+     * files in the directory containing the substring "drs.fits" and having the same date as the current data
+     * fits file. The .drs file with the nearest number lower than the number of the data file will be returned.
+     * @param pathToCurrentFitsFile
+     * @return
+     * @throws FileNotFoundException
+     */
+    private SourceURL findDRSFile(String pathToCurrentFitsFile) throws FileNotFoundException {
+        try {
+            final URI uri = new URI(pathToCurrentFitsFile);
+            File currentFile = new File(uri);
+
+            String currentFileName = currentFile.getName();
+            final int fileNumber = new Integer(currentFileName.substring(9,12));
+            final int dateNumber = new Integer(currentFileName.substring(0,8));
+            File parent = currentFile.getParentFile();
+            if(parent.isDirectory()){
+                String[] drsFileNames = parent.list(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        if(name.contains("drs.fits")) {
+                            int drsFileNumber = new Integer(name.substring(9, 12));
+                            int drsDateNumber = new Integer(name.substring(0,8));
+                            if (drsDateNumber == dateNumber && drsFileNumber <= fileNumber){
+                                return true;
+                            }
+                        }
+                        return  false;
+                    }
+                });
+                Arrays.sort(drsFileNames);
+                File f = new File(parent,drsFileNames[drsFileNames.length-1]);
+                return new SourceURL(f.toURI().toURL());
+            }
+        return null;
+        } catch (Exception e) {
+//            e.printStackTrace();
+            throw new FileNotFoundException("Could not find DRS file automatically");
+        }
+    }
 
 	public double[] applyDrsCalibration(double[] data, double[] destination,
 			short[] startCellVector) {
@@ -274,13 +322,6 @@ public class DrsCalibration implements Processor {
 	@Parameter(required=false, description="data array to be calibrated", defaultValue="Data")
 	public void setKey(String key) {
 		this.key = key;
-	}
-
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
 	}
 
 	public String getOutputKey() {
