@@ -116,8 +116,7 @@ public class DrsCalibration implements Processor {
 	 */
 	@Override
 	public Data process(Data data) {
-
-		if (this.drsData == null){
+        if (this.drsData == null){
 			//file not loaded yet. try to find by magic.
             try {
                 log.info("Trying to find .drs file automatically");
@@ -166,6 +165,11 @@ public class DrsCalibration implements Processor {
      * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
      * files in the directory containing the substring "drs.fits" and having the same date as the current data
      * fits file. The .drs file with the nearest number lower than the number of the data file will be returned.
+     *
+     * The expected format of the file names is:
+     * 20130331_012.drs.fits*
+     * 20130331_013.fits*
+     *
      * @param pathToCurrentFitsFile
      * @return
      * @throws FileNotFoundException
@@ -176,6 +180,9 @@ public class DrsCalibration implements Processor {
             File currentFile = new File(uri);
 
             String currentFileName = currentFile.getName();
+            if (currentFileName.length() < 17 ){
+                throw new FileNotFoundException("filename had the wrong format");
+            }
             final int fileNumber = new Integer(currentFileName.substring(9,12));
             final int dateNumber = new Integer(currentFileName.substring(0,8));
             File parent = currentFile.getParentFile();
@@ -193,6 +200,10 @@ public class DrsCalibration implements Processor {
                         return  false;
                     }
                 });
+                if(drsFileNames == null){
+                    //IO error occurred
+                    throw new FileNotFoundException("Could not load file names from directory");
+                }
                 Arrays.sort(drsFileNames);
                 File f = new File(parent,drsFileNames[drsFileNames.length-1]);
                 return new SourceURL(f.toURI().toURL());
