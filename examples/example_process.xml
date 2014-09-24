@@ -22,19 +22,19 @@
 	<process input="fact" copies="1">
         <!--<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>-->
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-            <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" />
+            <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" />
             <!--<fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />-->
             <!--<fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>-->
             <!--<fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" />-->
 
 
 
-            <fact.filter.Interpolator key="DataCalibrated" outputKey="interpolated"/>
-            <fact.filter.FirFilter key="interpolated" outputKey="laplaceInt" coefficients="1,-2,1"/>
-            <fact.filter.FirFilter key="interpolated" outputKey="frstInt" coefficients="-0.5,0.5"/>
+            <!--<fact.filter.Interpolator key="DataCalibrated" outputKey="interpolated"/>-->
+            <!--<fact.filter.FirFilter key="interpolated" outputKey="laplaceInt" coefficients="1,-2,1"/>-->
+            <!--<fact.filter.FirFilter key="interpolated" outputKey="frstInt" coefficients="-0.5,0.5"/>-->
 
-            <fact.features.CountRoots key="interpolated" outputKey="countInt" />
-            <fact.features.CountRoots key="interpolatedderivative" outputKey="countIntDerivative" />
+            <!--<fact.features.CountRoots key="interpolated" outputKey="countInt" />-->
+            <!--<fact.features.CountRoots key="interpolatedderivative" outputKey="countIntDerivative" />-->
             <!--<fact.features.CountRoots key="interpolatedderivation" outputKey="countDeriv" />-->
 
 
@@ -57,12 +57,12 @@
                 <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
                 <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
                 <stream.flow.Skip condition="%{data.Size} &lt; 400 " />
-                    <fact.filter.GaussConvolution key="DataCalibrated" outputKey="gauss" variance="5"/>
-                    <fact.features.PixelStatistics key="gauss" outputPrefix="gauss"  searchWindow="30,160"/>
+                    <!--<fact.filter.GaussConvolution key="DataCalibrated" outputKey="gauss" variance="5"/>-->
+                    <!--<fact.features.PixelStatistics key="gauss" outputPrefix="gauss"  searchWindow="30,160"/>-->
 
-                    <fact.features.PixelStatistics key="interpolated" outputPrefix="inter_"  searchWindow="20,180"/>
+                    <!--<fact.features.PixelStatistics key="interpolated" outputPrefix="inter_"  searchWindow="20,180"/>-->
 
-                    <fact.io.ClusterWriter showerKey="shower" url="file:${outfile}" />
+                    <!--<fact.io.ClusterWriter showerKey="shower" url="file:${outfile}" />-->
 
 <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
 <!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
