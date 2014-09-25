@@ -17,69 +17,63 @@
 <property name="outfile" value="/Users/kaibrugge/FactTest/m3_test.csv" />
 <property name="drivefile" value="/Users/kaibrugge/FactTest/20130104.DRIVE_CONTROL_TRACKING_POSITION.fits" />
 
-
-    <process input="fact" copies="1">
-        <stream.monitor.DataRate every="200" />
-        <Skip condition="%{data.TriggerType} != 4" />
-        <fact.filter.DrsCalibration url="file:${dataDRS}"  outputKey="DataCalibrated" />
-        <!--<fact.filter.AverageJumpRemoval key="DataCalibrated" outputKey="JumpRemoved" color="#FD0404"/>-->
-
-
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" />
-
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25"
-                                              searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition"
-                                                outputKey="arrivalTime"/>
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition"
-                                      outputKey="photoncharge" rangeSearchWindow="25" />
-
-
-        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
-                                         corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
-                                         timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
-
-        <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->
-        <stream.flow.Skip condition="%{data.shower} == null" />
-        <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="size" />
-        <fact.features.NumberOfIslands key="shower" outputKey="num_isl" />
-        <fact.features.source.SourcePosition outputKey="sourcePosition" url="file:${drivefile}" physicalSource="${sourcename}" />
-        <!--<fact.io.PrintKeysOnConsole keys="num_isl" />-->
-        <!--<stream.flow.Skip condition="%{num_isl} &gt; 1" />-->
-        <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
-        <fact.features.M3Long showerKey="shower" weightsKey="photoncharge" distribution="dist" />
-        <stream.flow.Skip condition="%{M3Long} &gt; 1" />
-        <fact.features.Disp widthKey="Width" lengthKey="Length" c0="117.94" outputKey="Disp" />
-        <fact.features.source.Theta sourcePositionKey="sourcePosition" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="M3Long" outputKey="Theta" />
-
-        <fact.io.PrintKeysOnConsole keys="num_isl,Delta,M3Long,M3Trans,m3l,m3t,Theta" />
-        <fact.ShowViewer key="photoncharge"/>
-        <!--<fact.features.Leakage shower="shower" weights="photoncharge" outputKey="leakage" />-->
-        <!--<fact.features.TimeSpread arrivalTimeKey="arrivalTime" showerKey="shower" weightsKey="photoncharge" outputKey="TimeSpread" />-->
-        <!--<PrintData/>-->
-        <!--<fact.plotter.HistogramPlotter key="m3l" binWidth="5" logAxis="false" color="#666699" />-->
-        <!--<fact.plotter.HistogramPlotter key="M3Long" binWidth="0.025" logAxis="false" color="#FF6699" />-->
-        <!--<stream.io.CsvWriter url="file:${outfile}" keys="M3Long,M3Trans,Length,Width,size,islands,M4Long,M4Trans,leakage,leakage2,TimeSpread,m3l,m3t,num_isl"/>-->
-        <!--<fact.ShowViewer key="DataCalibrated" range="25,250"/>-->
-        <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
-        <!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
-        <!-- 			<fact.plotter.BarPlotter keys="posMean,showerPositionMean" /> -->
-        <!-- 			<fact.plotter.CameraPlotter key="risingedge" /> -->
-        <!-- 			<fact.plotter.CameraPlotter key="photoncharge" /> -->
-
-    </process>
-    <property name="sourcename" value="crab" />
-    <property name="core_threshold" value="8.0" />
-    <property name="neighbor_threshold" value="5.0"/>
-    <property name="time_threshold" value="50.0" />
-
 	<!-- Name des Streams und pfad zu dem Daten-File -->
-<property name="min_number_of_pixel" value="5" />
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" />
+	
+	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
+	<process input="fact" copies="1">
+        <!--<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>-->
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+            <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" />
+            <!--<fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />-->
+            <!--<fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>-->
+            <!--<fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" />-->
 
-    <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
-	<stream id="fact" class="stream.io.DataObjectStream"  url="file:${objectStream}"  />
 
+
+            <fact.filter.Interpolator key="DataCalibrated" outputKey="interpolated"/>
+            <fact.filter.FirFilter key="interpolated" outputKey="laplaceInt" coefficients="1,-2,1"/>
+            <fact.filter.FirFilter key="interpolated" outputKey="frstInt" coefficients="-0.5,0.5"/>
+
+            <fact.features.CountRoots key="interpolated" outputKey="countInt" />
+            <fact.features.CountRoots key="interpolatedderivative" outputKey="countIntDerivative" />
+            <!--<fact.features.CountRoots key="interpolatedderivation" outputKey="countDeriv" />-->
+
+
+
+            <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="200"/>
+            <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+            <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
+                                                  positions="arrivalTime"
+                                                  outputKey="photoncharge"/>
+
+            <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
+                                                 arrivalTimeKey="arrivalTime" timeThreshold="60"  minNumberOfPixel="2"/>
+
+            <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->
+            <stream.flow.Skip condition="%{data.shower} == null" />
+                <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>-->
+                <!--<fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>-->
+                <fact.features.NumberOfIslands key="shower" outputKey="islands" />
+                <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
+                <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
+                <stream.flow.Skip condition="%{data.Size} &lt; 400 " />
+                    <fact.filter.GaussConvolution key="DataCalibrated" outputKey="gauss" variance="5"/>
+                    <fact.features.PixelStatistics key="gauss" outputPrefix="gauss"  searchWindow="30,160"/>
+
+                    <fact.features.PixelStatistics key="interpolated" outputPrefix="inter_"  searchWindow="20,180"/>
+
+                    <fact.io.ClusterWriter showerKey="shower" url="file:${outfile}" />
+
+<!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
+<!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
+<!-- 			<fact.plotter.BarPlotter keys="posMean,showerPositionMean" /> -->
+<!-- 			<fact.plotter.CameraPlotter key="risingedge" /> -->
+<!-- 			<fact.plotter.CameraPlotter key="photoncharge" /> -->
+
+	</process>
+		
 		
 		
 </container>
