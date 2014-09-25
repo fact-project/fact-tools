@@ -1,6 +1,7 @@
 package fact.io;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
 import stream.io.Stream;
@@ -20,21 +21,22 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
     static BlockingQueue<File> files = new LinkedBlockingQueue<>();
 
-    private int  maxDepth = 3;
-    private String suffix = "Events.fits.gz";
+    @Parameter(required = false, description = "Maximum depth of folders to traverse", defaultValue = "6")
+    private int  maxDepth = 6;
+    @Parameter(required = true, description = "The suffix to filter files by. .gz for example.")
+    private String suffix;
+
+
     private AbstractStream stream;
-    private boolean needNewFile = true;
 
     public RecursiveDirectoryStream(SourceURL url) {
         super(url);
-
     }
 
     @Override
     public void init() throws Exception {
-        System.out.println("called init");
         if(!files.isEmpty()){
-            System.out.println("files allready loaded");
+            log.debug("files allready loaded");
             //file allready loaded
             return;
         }
@@ -44,8 +46,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             throw new IllegalArgumentException("Provided url does not point to a directory");
         }
 
-        walkAndAddToQueue(f,0);
-        System.out.println("NUBER OF FILE SOMFG: " + files.size());
+        walkAndAddToQueue(f, 0);
+        log.info("Loaded " + files.size() + " files for streaming.");
         //super.init();
     }
 
@@ -91,11 +93,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         return;
     }
 
-    private SourceURL createUrl(String fileName) throws Exception {
-        String urlString = url.getProtocol() + ":" + url.getPath() + "/"
-                + fileName;
-        return new SourceURL(urlString);
-    }
     @Override
     public Data readNext() throws Exception {
         if (stream == null) {
@@ -123,5 +120,14 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             }
         }
     }
+    public void setMaxDepth(int maxDepth) {
+        this.maxDepth = maxDepth;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
+
 
 }
