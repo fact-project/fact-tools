@@ -63,6 +63,7 @@
                     <!--<fact.features.PixelStatistics key="interpolated" outputPrefix="inter_"  searchWindow="20,180"/>-->
 
                     <!--<fact.io.ClusterWriter showerKey="shower" url="file:${outfile}" />-->
+                <fact.ShowViewer key="DataCalibrated" />
 
 <!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
 <!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
