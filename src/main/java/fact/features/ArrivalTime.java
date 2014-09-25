@@ -40,7 +40,7 @@ public class ArrivalTime implements Processor {
 		ArrayList[] maxAmpPositions = (ArrayList[]) input.get(maxAmpPositionKey);
         int roi = data.length / Constants.NUMBEROFPIXEL;
         ArrayList[] arrivalTimes =  new ArrayList[Constants.NUMBEROFPIXEL];
-        int[] visualizePositions = new int[data.length];
+        double[] visualizePositions = new double[data.length];
     	//zero for all positions except where an arrival time is found
         
         for(int i = 0; i < data.length; i++){
@@ -66,7 +66,7 @@ public class ArrivalTime implements Processor {
      * @return
      */
 	
-    public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions, int[] visualizePositions){
+    public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions, double[] visualizePositions){
       
 		ArrayList<Integer> positions = new ArrayList<Integer>();
 
