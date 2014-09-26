@@ -10,7 +10,6 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,27 +27,36 @@ import java.util.Arrays;
 public class SourcePosition implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
-	Data slowData = null;
+    Data slowData = null;
+    @Parameter(required = true)
 	private String outputKey = null;
+
+    //The url to the TRACKING_POSITION slow control file
+    @Parameter(required = false)
+    private SourceURL url;
+
 	private String physicalSource = null;
 
-	Double	sourceRightAscension = null;
-	Double	sourceDeclination = null;    
+    Double	sourceRightAscension = null;
 
-	//position of the Telescope
+	Double	sourceDeclination = null;
+
+    //remember the currentfile path
+    private String currentFilePath = "";
+
+
+    //position of the Telescope
 	static final double mLongitude                  = -17.890701389;
-	static final double mLatitude                   = 28.761795;
-	//Distance from earth center
+    static final double mLatitude                   = 28.761795;
+    //Distance from earth center
 	static final double mDistance                   = 4890.0;
-	//This is a counter to access the right rows in the tracking_file
+    //This is a counter to access the right rows in the tracking_file
 	int timeIndex = 0;
-	//
+    //
 	private Float x = null;
-	private Float y = null;
 
-	//The url to the TRACKING_POSITION slow control file
-	private SourceURL trackingUrl;
-	//This list will be populated with 
+	private Float y = null;
+	//This list will be populated with
 	private ArrayList<double[]> locList = new ArrayList<double[]>();
 
 	@Override
@@ -70,52 +78,44 @@ public class SourcePosition implements StatefulProcessor {
 	 */
 	@Override
 	public void init(ProcessContext arg0) throws Exception {
-		if(outputKey == null){
-			throw new RuntimeException("No outputKey specified");
-		}
-		if( ( ( (sourceRightAscension == null || sourceDeclination == null) && physicalSource == null ) || trackingUrl == null) && (x ==  null || y == null) ) {
-			log.error("physicalSource or sourceRightAscension and sourceDeclination isnt set. aborting. Possible choices for physicalSource are: crab, mrk421, mrk501");
-			throw new RuntimeException("Wrong parameter. You need to specifiy some more information. Like x,y dummy values or a name of a physicalSource");
-		}
-		if(trackingUrl == null && x !=  null && y != null){
+		if(x !=  null && y != null){
 			log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
-		} else {
-			FitsStream stream = new FitsStream(trackingUrl);
-			try {
-	
-				stream.init();
-				slowData = stream.readNext();
-				while(slowData !=  null){
-					// Eventime, Ra, Dec, Az, Zd
-					double[] pointRaDec = new double[5];
-					pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
-	
-					double ra = Double.parseDouble( slowData.get("Ra").toString());
-					pointRaDec[1] = ra/24 *360.0;
-					pointRaDec[2] = Double.parseDouble( slowData.get("Dec").toString());
-	
-					pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
-					pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
-
-					locList.add(pointRaDec);
-					slowData = stream.readNext();
-				}
-	
-				stream.close();
-			}catch (NumberFormatException e){
-				log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
-				stream.close();
-			} catch (Exception e) {
-				log.error("Failed to load data from TRACKING_POSITION file: {}", e.getMessage());
-				e.printStackTrace();
-				this.slowData = null;
-				stream.close();
-				throw new RuntimeException(e.getMessage());
-			}
 		}
-
 	}
-	@Override
+
+    public void loadTrackingfile(SourceURL driveFileUrl){
+        FitsStream stream = new FitsStream(driveFileUrl);
+        try {
+
+            stream.init();
+            slowData = stream.readNext();
+            while(slowData !=  null){
+                // Eventime, Ra, Dec, Az, Zd
+                double[] pointRaDec = new double[5];
+                pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
+
+                double ra = Double.parseDouble( slowData.get("Ra").toString());
+                pointRaDec[1] = ra/24 *360.0;
+                pointRaDec[2] = Double.parseDouble( slowData.get("Dec").toString());
+
+                pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
+                pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
+
+                locList.add(pointRaDec);
+                slowData = stream.readNext();
+            }
+
+            stream.close();
+        }catch (NumberFormatException e){
+            log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
+            throw new RuntimeException();
+        } catch (Exception e) {
+            log.error("Failed to load data from TRACKING_POSITION file: {}", e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
 	public void resetState() throws Exception {
 	}
 
@@ -134,13 +134,29 @@ public class SourcePosition implements StatefulProcessor {
 	 */
 	@Override
 	public Data process(Data data) {
-		if(x != null && y !=  null && trackingUrl == null){
+		if(x != null && y !=  null){
 			//add source position to dataitem
 			double[] source = {x, y};
 //			System.out.println("x: "+  source[0] + " y: " +source[1] );
 			data.put(outputKey, source);
 			return data;
 		}
+        if(!currentFilePath.equals(data.get("@source").toString())){
+            try {
+                if (url != null) {
+                    loadTrackingfile(url);
+                    log.info("Using drive file: " + url.toString());
+                } else {
+                    SourceURL url = (SourceURL) data.get("@driveFile");
+                    log.info("Using drive file: " + url.toString());
+                    loadTrackingfile(url);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+            currentFilePath = data.get("@source").toString();
+        }
 
 		int[] eventTime = (int[]) data.get("UnixTimeUTC");
 		if(eventTime == null){
@@ -305,51 +321,29 @@ public class SourcePosition implements StatefulProcessor {
 
 
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-	@Parameter(description = "The key to the sourcepos array that will be written to the map.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
+    public void setUrl(SourceURL url) {
+        this.url = url;
+    }
 
-	@Parameter(description = "A URL to the FITS file.")
-	public void setUrl(URL url) {
-		trackingUrl = new SourceURL(url);
-	}
-
-	@Parameter(description = "A String with a valid URL FITS file.")
-	public void setUrl(String urlString) {
-		try{
-			URL url = new URL(urlString);
-			trackingUrl = new SourceURL(url);
-		} catch (MalformedURLException e) {
-			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
-			throw new RuntimeException("Cant open drsFile");
-		}
-	}
+    public void setUrl(URL url){
+        this.url = new SourceURL(url);
+    }
 
 
-	public Double getSourceDeclination() {	
-		return sourceDeclination;	
-	}
 	public void setSourceDeclination(Double sourceDeclination) {
 		this.sourceDeclination = sourceDeclination;	
 	}
 
 	
-	public Double getSourceRightAscension() {	
-		return sourceRightAscension; 
-	}
-	public void setSourceRightAscension(Double sourceRightAscension) {	
+	public void setSourceRightAscension(Double sourceRightAscension) {
 		this.sourceRightAscension = sourceRightAscension; 
 	}
 	
 	
-	public String getPhysicalSource() {
-		return physicalSource;
-	}
 	@Parameter(description = "A string with the name of the source. So far this supports mrk421, crab, and mrk501. This is convinience so you dont have to use {@code setSourceRightAscension} and  {@code setSourceDeclination} ")
 	public void setPhysicalSource(String physicalSource) {
 		this.physicalSource = physicalSource;
