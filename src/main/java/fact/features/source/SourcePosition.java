@@ -13,16 +13,16 @@ import stream.io.SourceURL;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look
  *  directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
  *  the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
  *  The point (0.0, 0.0) is the center of the camera.
- *  In  order to calculate the source position we need to know where the telescope is looking.
+ *  In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
  *  This data is written by the telescope drive system into an auxilary .fits file called DRIVE_TRACKING_POSITION.
- *  
+ *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
 public class SourcePosition implements StatefulProcessor {
@@ -33,23 +33,94 @@ public class SourcePosition implements StatefulProcessor {
 	private String physicalSource = null;
 
 	Double	sourceRightAscension = null;
-	Double	sourceDeclination = null;    
-
-	//position of the Telescope
-	static final double mLongitude                  = -17.890701389;
-	static final double mLatitude                   = 28.761795;
-	//Distance from earth center
-	static final double mDistance                   = 4890.0;
-	//This is a counter to access the right rows in the tracking_file
-	int timeIndex = 0;
+	Double	sourceDeclination = null;
 	//
 	private Float x = null;
 	private Float y = null;
 
+    FactPointingManager pM  = new FactPointingManager();
+
 	//The url to the TRACKING_POSITION slow control file
 	private SourceURL trackingUrl;
-	//This list will be populated with 
-	private ArrayList<double[]> locList = new ArrayList<double[]>();
+	//This list will be populated with
+
+    private class TrackingPoint implements Comparable<Double>{
+        double time;
+        double dec;
+        double Az;
+        double Zd;
+        double ra;
+
+        private TrackingPoint(double time, double ra, double dec, double az, double zd) throws IllegalArgumentException{
+            if (time == 0){
+                throw new IllegalArgumentException();
+            }
+            this.time = time;
+            this.ra = ra;
+            this.dec = dec;
+            Az = az;
+            Zd = zd;
+        }
+
+        @Override
+        public int compareTo(Double o) {
+            return Double.compare(time, o);
+        }
+
+        public double distanceTo(double t){
+            return Math.abs(time - t);
+        }
+    }
+
+    private class FactPointingManager {
+        //position of the Telescope
+        public static final double mLongitude                  = -17.890701389;
+        public final double mLatitude                   = 28.761795;
+        //Distance from earth center
+        public final double mDistance                   = 4890.0;
+
+        //This list will be populated with TrackingPoints
+        private ArrayList<TrackingPoint> locList = new ArrayList<>();
+
+        public FactPointingManager(){
+
+        }
+        public void addTrackingPoint(TrackingPoint p){
+            locList.add(p);
+        }
+
+        public TrackingPoint getPoint(double currentTime) {
+
+            int index = Collections.binarySearch(locList, currentTime);
+
+            //element was found
+            if (index >= 0){
+                return locList.get(index);
+            } else {
+                int insertionPoint = -(index + 1);
+                if(insertionPoint == 0){
+                    System.out.println("Returning first in list");
+                    return locList.get(0);
+                }
+                if (index >= locList.size()){
+                    System.out.println("returnning last in list");
+                    log.warn("EventTime larger than last point in Tracking File");
+                    return locList.get(locList.size()-1);
+                }
+
+                TrackingPoint lower = locList.get(insertionPoint-1);
+                TrackingPoint higher = locList.get(insertionPoint);
+                if ( lower.distanceTo(currentTime) < higher.distanceTo(currentTime) ){
+                    System.out.println("returning lower");
+                    return lower;
+                } else {
+                    System.out.println("returning highrer");
+                    return higher;
+                }
+
+            }
+        }
+    }
 
 	@Override
 	public void finish() throws Exception {
@@ -57,12 +128,12 @@ public class SourcePosition implements StatefulProcessor {
 	}
 	/**
 	 * In the init method we read the complete TRACKING_POSITION file and save the values in the locList.
-	 * For the calculation of the appropriate sky coordinates (that is Azimuth and Zenith) we only need the values "Time", "Ra" and "Dec". 
-	 * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check. 
+	 * For the calculation of the appropriate sky coordinates (that is Azimuth and Zenith) we only need the values "Time", "Ra" and "Dec".
+	 * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check.
 	 * These values differ by what seems to be a constant amount in both Az and Zd. About 1 to 3 degrees for the files that I checked.
 	 * The time unit in the TRACKING file is in unixtime/86400.0. Its still called MJD for some reason.
-	 * 
-	 * The correct conversion would be: 
+	 *
+	 * The correct conversion would be:
 	 * mjd  =  timestamp/86400.0 +  2440587.5d
 	 * for some effing reason. To get the correct coordinates we have to do it like this because we start the day 12 hours later
 	 * mjd  =  timestamp/86400.0 +  2440587.0d
@@ -82,25 +153,27 @@ public class SourcePosition implements StatefulProcessor {
 		} else {
 			FitsStream stream = new FitsStream(trackingUrl);
 			try {
-	
+
 				stream.init();
 				slowData = stream.readNext();
 				while(slowData !=  null){
 					// Eventime, Ra, Dec, Az, Zd
-					double[] pointRaDec = new double[5];
-					pointRaDec[0] =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
-	
-					double ra = Double.parseDouble( slowData.get("Ra").toString());
-					pointRaDec[1] = ra/24 *360.0;
-					pointRaDec[2] = Double.parseDouble( slowData.get("Dec").toString());
-	
-					pointRaDec[3] = Double.parseDouble( slowData.get("Az").toString());
-					pointRaDec[4]= Double.parseDouble( slowData.get("Zd").toString());
+					double time =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.0d; //usually + 0.5
+                    System.out.println("time: " + time);
+                    double ra = Double.parseDouble( slowData.get("Ra").toString());
+					ra = ra/24 *360.0;
+					double dec = Double.parseDouble( slowData.get("Dec").toString());
 
-					locList.add(pointRaDec);
+					double az = Double.parseDouble( slowData.get("Az").toString());
+					double zd = Double.parseDouble( slowData.get("Zd").toString());
+                    try {
+                        pM.addTrackingPoint(new TrackingPoint(time, ra,dec,az,zd));
+                    } catch (IllegalArgumentException e) {
+                        log.error("Time in drive file was 0.");
+                    }
 					slowData = stream.readNext();
 				}
-	
+
 				stream.close();
 			}catch (NumberFormatException e){
 				log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
@@ -120,17 +193,17 @@ public class SourcePosition implements StatefulProcessor {
 	}
 
 	/**
-	 * Here we read the eventtime from the current dataitem and convert it to 
-	 * 1. unixtime 
+	 * Here we read the eventtime from the current dataitem and convert it to
+	 * 1. unixtime
 	 * 2. mjd
 	 * 3. gmst
 	 * The conversion steps are necessary because I stole the mjd2gmst conversion from Fabian Temme and dont know how to get gmst directly from unixtime.
-	 * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is unclear what to do with the second one. I simply used the sum of both in seconds.. 
+	 * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is unclear what to do with the second one. I simply used the sum of both in seconds..
 	 * Eventhough the numbers are small enough to NOT make a difference anyways.
 	 * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by comparing the times. We use the point closest in time to the current dataitem.
-	 * 
+	 *
 	 * @return data. The dataItem containing the calculated sourcePostion as a float[] of length 2. {x,y} .
-	 * 				 Also the deviation between the calculated pointing and the onw written in the .fits TRACKING file.  
+	 * 				 Also the deviation between the calculated pointing and the onw written in the .fits TRACKING file.
 	 */
 	@Override
 	public Data process(Data data) {
@@ -144,44 +217,16 @@ public class SourcePosition implements StatefulProcessor {
 
 		int[] eventTime = (int[]) data.get("UnixTimeUTC");
 		if(eventTime == null){
-			log.error("The key \"UnixTimeUTC \" was not found in the event.");
+			log.error("The key \"UnixTimeUTC \" was not found in the event. Ignoring event");
 			return null;
 		}
 		double  timestamp = ((double)eventTime[0])  + ( ((double)eventTime[1])/1000000) ;
-		double mjd  =  ((double) timestamp)/86400.0 +  40587.0d+2400000.0; // usually  + 0.5 here
-		double gmst =  mjdToGmst(mjd);
-		double[] point = null;
-		double t = 0;
-		double t1 = 0;
-		//check which point to use
+		double currentTime  =  (timestamp)/86400.0 +  40587.0d+2400000.0; // usually  + 0.5 here
+		double gmst =  mjdToGmst(currentTime);
 
-		if(timeIndex < locList.size()-1){
-			t = (locList.get(timeIndex))[0];
-			t1 = (locList.get(timeIndex+1))[0];
-			while(!( t < mjd && mjd < t1) && timeIndex < locList.size()-2){
-					timeIndex++;
-					t = (locList.get(timeIndex))[0];
-					t1 = (locList.get(timeIndex+1))[0];
-			}
-			if(Math.abs(mjd-t) < Math.abs(mjd -t1) ){
-				point = locList.get(timeIndex);
-			} else {
-				// Seems i have inserted this by accident... Please check if i commented out the right line.
-				//log.warn("End of TRACKING file reached. Source position might be wrong");
-				//point = locList.get(timeIndex-1);
-			
-				point = locList.get(timeIndex+1);
-			}
-		} else {
-			log.warn("End of TRACKING file reached. Source position might be wrong");
-			point = locList.get(timeIndex-1);
-		}
-
-		if (point == null){
-			log.error("Did not get the right point from the list. point was null");
-			return null;
-		}
-		double[] pointingAzDe = getAzZd(point[1], point[2], gmst);
+        TrackingPoint point = pM.getPoint(currentTime);
+       // System.out.println("distancE_: " + point.distanceTo(currentTime));
+        double[] pointingAzDe = getAzZd(point.ra, point.dec, gmst);
 		double[] sourceAzDe = getAzZd(sourceRightAscension, sourceDeclination, gmst);
 		double[] sourcePosition =  getSourcePosition(pointingAzDe[0], pointingAzDe[1], sourceAzDe[0], sourceAzDe[1]);
 
@@ -190,14 +235,15 @@ public class SourcePosition implements StatefulProcessor {
 		data.put(outputKey, source);
         data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
 		//add deviation between the calculated point az,dz and the az,dz in the file
-		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
-		data.put(outputKey+"pointingDeviation", deviation);
-		log.debug ("Pointing deviation: " + Arrays.toString(deviation));
-		log.debug( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ; 
+//		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
+//		data.put(outputKey+"pointingDeviation", deviation);
+//		log.debug ("Pointing deviation: " + Arrays.toString(deviation));
+		log.info( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ;
 		return data;
 	}
 
-	void sourceIsCrab()
+
+    void sourceIsCrab()
 	{
 		sourceRightAscension       = (5.0 + 34.0/60 + 31.97/3600) / 24.0 * 360.0;
 		sourceDeclination          = 22.0 + 0.0/60 + 52.10/3600;
@@ -208,7 +254,7 @@ public class SourcePosition implements StatefulProcessor {
 		sourceRightAscension       = (11.0 + 4.0/60 + 27.0/3600) / 24.0 * 360.0;
 		sourceDeclination          = 38.0 + 12.0/60 + 32.0/3600;
 	}
-	
+
 	void sourceIsMrk501()
 	{
 		sourceRightAscension       = (16.0 + 53.0/60 + 52.2/3600) / 24.0 * 360.0;
@@ -222,12 +268,12 @@ public class SourcePosition implements StatefulProcessor {
 	}
 	/**
 	 * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension, declination and the time in gmst format.
-	 * @param ra 
-	 * @param dec
+     * @param ra
+     * @param dec
 	 * @param gmst the Eventtime of the current event in gmst format
 	 * @return an array of length 2 containing {azimuth, zenith}, not null;
 	 */
-	public double[] getAzZd(double ra,double dec, double gmst){
+	public double[] getAzZd(double ra, double dec, double gmst){
 		double phi              =  ra / 180.0 * Math.PI;
 		double theta            =  (90 - dec) / 180.0 * Math.PI;
 
@@ -235,8 +281,8 @@ public class SourcePosition implements StatefulProcessor {
 		double y                =Math.sin(theta) *Math.sin(phi);
 		double z                =Math.cos(theta);
 
-		double phi_rot_angle    = gmst + (mLongitude / 180.0 * Math.PI);
-		double theta_rot_angle  = (mLatitude - 90) / 180.0 * Math.PI;
+		double phi_rot_angle    = gmst + (pM.mLongitude/ 180.0 * Math.PI);
+		double theta_rot_angle  = (pM.mLatitude - 90) / 180.0 * Math.PI;
 
 		double m_yx             = -Math.sin(phi_rot_angle);
 		double m_yy             =  Math.cos(phi_rot_angle);
@@ -293,12 +339,12 @@ public class SourcePosition implements StatefulProcessor {
 		double x_rot        = 0;
 		double y_rot        = 0;
 		double z_rot        = 0;
-		
+
 		x_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
 		y_rot   = Math.sin(-az)*x + Math.cos(-az)*y;
 		z_rot   = Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
-		double[] r ={ x_rot * (-mDistance) / z_rot ,y_rot * (-mDistance) / z_rot };
-		
+		double[] r ={ x_rot * (-pM.mDistance) / z_rot ,y_rot * (-pM.mDistance) / z_rot };
+
 		return r;
 	}
 
@@ -331,22 +377,22 @@ public class SourcePosition implements StatefulProcessor {
 	}
 
 
-	public Double getSourceDeclination() {	
-		return sourceDeclination;	
+	public Double getSourceDeclination() {
+		return sourceDeclination;
 	}
 	public void setSourceDeclination(Double sourceDeclination) {
-		this.sourceDeclination = sourceDeclination;	
+		this.sourceDeclination = sourceDeclination;
 	}
 
-	
-	public Double getSourceRightAscension() {	
-		return sourceRightAscension; 
+
+	public Double getSourceRightAscension() {
+		return sourceRightAscension;
 	}
-	public void setSourceRightAscension(Double sourceRightAscension) {	
-		this.sourceRightAscension = sourceRightAscension; 
+	public void setSourceRightAscension(Double sourceRightAscension) {
+		this.sourceRightAscension = sourceRightAscension;
 	}
-	
-	
+
+
 	public String getPhysicalSource() {
 		return physicalSource;
 	}
@@ -366,7 +412,7 @@ public class SourcePosition implements StatefulProcessor {
 			throw new RuntimeException("physicalSource unknown. Provide the parameters sourceRightAscension and  sourceDeclination instead");
 		}
 	}
-	
+
 	public Float getX() {
 		return x;
 	}
