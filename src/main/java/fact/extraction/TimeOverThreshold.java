@@ -5,9 +5,12 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
+
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -36,6 +39,8 @@ public class TimeOverThreshold implements Processor {
 	private String firstSliceOverThresholdOutputKey = null;
 	@Parameter(required = true)
 	private String outputKey = null;
+	
+	private PixelSetOverlay pixelSet;
 
 	public Data process(Data input) {
 		
@@ -53,6 +58,7 @@ public class TimeOverThreshold implements Processor {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		int numPixelAboveThreshold = 0;
 		
+		pixelSet = new PixelSetOverlay();
 		//Loop over pixels
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			firstSliceOverThresholdArray[pix] = 0;
@@ -64,6 +70,7 @@ public class TimeOverThreshold implements Processor {
 			if (data[pos + positionOfMaximum] < threshold){
 				continue;
 			}
+			pixelSet.addById(pix);
 			numPixelAboveThreshold++;
 			
 			int timeOverThreshold = 0;
@@ -100,6 +107,8 @@ public class TimeOverThreshold implements Processor {
 			m[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh);	
 		}
 		
+	
+		
 		//add processors threshold to the DataItem
 		input.put(thresholdOutputKey, threshold);
 		
@@ -110,6 +119,7 @@ public class TimeOverThreshold implements Processor {
 		input.put(outputKey, timeOverThresholdArray);
 		input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
 		input.put(outputKey+"Marker", m);
+		input.put(outputKey+"Set", pixelSet);
 		
 
 		return input;
