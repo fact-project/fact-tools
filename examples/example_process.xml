@@ -56,7 +56,7 @@
                 <fact.features.NumberOfIslands key="shower" outputKey="islands" />
                 <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
                 <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
-                <stream.flow.Skip condition="%{data.Size} &lt; 400 " />
+                <stream.flow.Skip condition="%{data.Size} &lt; 1400 " />
                     <!--<fact.filter.GaussConvolution key="DataCalibrated" outputKey="gauss" variance="5"/>-->
                     <!--<fact.features.PixelStatistics key="gauss" outputPrefix="gauss"  searchWindow="30,160"/>-->
 
