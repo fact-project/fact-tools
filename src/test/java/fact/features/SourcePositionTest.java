@@ -1,16 +1,26 @@
 package fact.features;
 
 import fact.Constants;
+import fact.features.source.OldSourcePosition;
 import fact.features.source.SourcePosition;
 import fact.hexmap.FactPixelMapping;
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertTrue;
 
 public class SourcePositionTest {
-	
-	private SourcePosition sourcePosition;
+    static Logger log = LoggerFactory.getLogger(SourcePositionTest.class);
+
+    private SourcePosition sourcePosition;
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Before
@@ -19,6 +29,43 @@ public class SourcePositionTest {
 		sourcePosition = new SourcePosition();
 		sourcePosition.setOutputKey("test");
 	}
+
+
+    @Test
+    public void testTimeConversion() throws ParseException {
+        //get a test date and time
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = isoFormat.parse("2014-10-01T16:34:00");
+
+        //get julian day. see http://aa.usno.navy.mil/data/docs/JulianDate.php for an online calculator
+        int unixTime = (int) (date.getTime()/1000L);
+        double jd = sourcePosition.unixTimeToJulianDay(unixTime);
+        Assert.assertEquals(2456932.1902, jd, 0.0001);
+
+
+        //convert julian day to gmst. See http://koti.mbnet.fi/jukaukor/star_altitude.html for checks.
+        double gmst = sourcePosition.julianDayToGmst(jd);
+        //convert degrees to hours
+        gmst /= Math.PI/12;
+        //should be 17 hours 15 minutes and 19.3 seconds
+        Assert.assertEquals(17.2553690, gmst, 0.000001);
+
+
+        date = isoFormat.parse("2014-10-02T00:01:00");
+        jd = sourcePosition.unixTimeToJulianDay((int) (date.getTime()/1000));
+        gmst = sourcePosition.julianDayToGmst(jd);
+        gmst /= Math.PI/12;
+        Assert.assertEquals(0.7257664, gmst, 0.000001);
+
+
+        date = isoFormat.parse("2014-10-01T23:59:59");
+        jd = sourcePosition.unixTimeToJulianDay((int) (date.getTime()/1000));
+        gmst = sourcePosition.julianDayToGmst(jd);
+        gmst /= Math.PI/12;
+        Assert.assertEquals(0.708775, gmst, 0.000001);
+
+    }
 
     /**
      *
