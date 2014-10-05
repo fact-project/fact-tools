@@ -14,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 
 /**
  *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look
@@ -23,6 +22,11 @@ import java.util.Date;
  *  The point (0.0, 0.0) is the center of the camera.
  *  In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
  *  This data is written by the telescope drive system into an auxilary .fits file called DRIVE_TRACKING_POSITION.
+ *
+ *  TODO: check what happens when a new url is being set for the tracking file. Merge changes from recursive multistream branch
+ *
+ *  TODO: The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
+ *  TODO: Plot deviation between calculated and written Az and Zd for files in whitelist
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -56,20 +60,24 @@ public class SourcePosition implements StatefulProcessor {
         //Julian Day
         double time;
         //Degrees
-        double dec;
-        double Az;
-        double Zd;
-        double ra;
+        double dec; //Command Declination
+        double ra; //Command right ascension
+        double Az; // Nominal Azimuth angle
+        double Zd; // Nominal zenith distance
+        double deviationAz; // Control deviation Az
+        double deviationZd; // Control deviation Zd
 
-        private TrackingPoint(double time, double ra, double dec, double az, double zd) throws IllegalArgumentException{
+        private TrackingPoint(double time, double ra, double dec, double az, double zd, double dAz, double dZd) throws IllegalArgumentException{
             if (time == 0){
                 throw new IllegalArgumentException();
             }
             this.time = time;
             this.ra = ra;
             this.dec = dec;
-            Az = az;
-            Zd = zd;
+            this.Az = az;
+            this.Zd = zd;
+            this.deviationAz = dAz;
+            this.deviationZd = dZd;
         }
 
         @Override
@@ -176,8 +184,10 @@ public class SourcePosition implements StatefulProcessor {
 
 					double az = Double.parseDouble( slowData.get("Az").toString());
 					double zd = Double.parseDouble( slowData.get("Zd").toString());
+                    double dAz = Double.parseDouble( slowData.get("dAz").toString());
+                    double dZd = Double.parseDouble( slowData.get("dZd").toString());
                     try {
-                        pM.addTrackingPoint(new TrackingPoint(time, ra,dec,az,zd));
+                        pM.addTrackingPoint(new TrackingPoint(time, ra,dec,az,zd, dAz, dZd));
                     } catch (IllegalArgumentException e) {
                         log.error("Time in drive file was 0.");
                     }
@@ -268,8 +278,10 @@ public class SourcePosition implements StatefulProcessor {
 		double gmst =  julianDayToGmst(julianDay);
 
         TrackingPoint point = pM.getPoint(julianDay);
-
+        //convert celestial coordinates to local coordinate system.
         double[] pointingAzDe = getAzZd(point.ra, point.dec, gmst);
+        //pointAzDz should be equal to the az dz written by the drive
+        //double dev = Math.abs(point.Az - pointingAzDe[0]);
 		double[] sourceAzDe = getAzZd(sourceRightAscension, sourceDeclination, gmst);
 		double[] sourcePosition =  getSourcePosition(pointingAzDe[0], pointingAzDe[1], sourceAzDe[0], sourceAzDe[1]);
 
