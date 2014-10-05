@@ -1,18 +1,18 @@
 <container>
 
 <!-- Pfade zu den fits files. -->
- <property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />
- <property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />
- <property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />
+ <!--<property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />-->
+ <!--<property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />-->
+ <!--<property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />-->
 <!-- <property name="sample" value="/home/bruegge/FactTest/sample.fits.gz" /> -->
 <!--<property name="sampleDRS" value="/home/bruegge/FactTest/test.drs.fits.gz" />-->
 <!--<property name="outfile" value="/home/bruegge/FactTest/output.csv" />-->
 <!-- <property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" /> -->
 <!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" /> -->
 
-<!--<property name="data" value="/home/mackaiver/Development/FactData/20131007_200.fits.gz" />-->
-<!--<property name="dataDRS" value="/home/mackaiver/Development/FactData/20131007_194.drs.fits.gz" />-->
-<!--<property name="drive_file" value="/home/mackaiver/Development/FactData/20131007.DRIVE_CONTROL_TRACKING_POSITION.fits" />-->
+<property name="data" value="/home/mackaiver/Daten/20121015_071.fits.gz" />
+<property name="dataDRS" value="/home/mackaiver/Daten/20121015_065.drs.fits.gz" />
+<property name="drive_file" value="/home/mackaiver/Daten/20121015.DRIVE_CONTROL_TRACKING_POSITION.fits" />
 <!--<property name="outfile" value="/home/mackaiver/Development/FactData/cluster/" />-->
 
 	<!-- Name des Streams und pfad zu dem Daten-File -->
@@ -35,11 +35,11 @@
 
             <!--<fact.features.CountRoots key="interpolated" outputKey="countInt" />-->
             <!--<fact.features.CountRoots key="interpolatedderivative" outputKey="countIntDerivative" />-->
-            <!--&lt;!&ndash;<fact.features.CountRoots key="interpolatedderivation" outputKey="countDeriv" />&ndash;&gt;-->
 
 
 
             <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
+        <fact.features.source.OldSourcePosition url="file:${drive_file}" outputKey="oldSourcePosition" physicalSource="crab"/>
             <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="200"/>
             <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
             <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
