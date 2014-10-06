@@ -48,7 +48,10 @@ public class SourcePosition implements StatefulProcessor {
 	private Float y = null;
 
     DrivePointManager<TrackingPoint> trackingPointManager = new DrivePointManager();
+
     DrivePointManager<SourcePoint> sourcePointManager = new DrivePointManager();
+
+    
 
 	//The url to the TRACKING_POSITION slow control file
 	private SourceURL trackingUrl;
