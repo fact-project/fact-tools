@@ -1,0 +1,48 @@
+<container>
+
+<property name="basepath" 		value="/net/phido/fhgfs/users/jbuss/analysis/saturationStudy/20140618_saturation_mc/" /> 
+<property name="outpath" 		value="/net/phido/fhgfs/users/jbuss/analysis/saturationStudy/20140618_saturation_mc/" /> 
+<!-- <property name="outpath" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/" />  -->
+<property name="infile" 		value="${basepath}00000003.001_D_MonteCarlo000_Events.fits" /> 
+<property name="drsfile" 	value="${basepath}test300samples.drs.fits" />
+<property name="outfile" 	value="${outpath}00000003extractorComparison.csv" />
+<property name="extractionTreshold" 	value="1500" />
+
+    <stream id="fact" class="fact.io.FitsStream" url="file:${infile}" />
+            
+        <process input="fact">
+       		<fact.utils.Remapping key="Data" outputKey="Data"/>   
+       		<fact.utils.RemappingKeys keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax" />    
+<!-- 			<stream.flow.Skip condition="%{data.EventNum} &gt; 50" /> -->
+<!-- 	        <fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/> -->
+	        <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
+	        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+	        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+<!-- 	        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
+<!-- 	        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" /> -->
+	        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+	                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+
+
+	        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
+	        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+    	    <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:src/main/resources/defaultIntegralGains.csv" rangeSearchWindow="25" color="#FF0F0F"/>
+	          
+             <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxAmplitudePosition" threshold="1500" thresholdOutputKey="thresholdForToT"/>
+        <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold" thresholdKey="thresholdForToT" outputKey="photonchargeSaturated"/>
+            
+		<fact.utils.SubtractDataArrays key="photonchargeSaturated" subtractedKey="photoncharge" outputKey="chargeDifference"/>
+		<fact.extraction.IdentifyPixelAboveThreshold key="photoncharge" threshold="200" outputKey="pixelAbove200Pe" />
+<!--             <fact.features.CoreNeighborClean key="photonCharge" CorePixelThreshold="5.0" neighborPixelThreshold="2.0" outputKey="showerPixel" /> -->
+<!--             <fact.features.CalcSourcePosition url="file:${drive_file}" outputKey="sourcePosition"/> -->
+<!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
+<!--             <PrintData/>  -->
+
+        <fact.ShowViewer key="DataCalibrated"/>
+<!--             <fact.io.RootASCIIWriter keys="EventNum,photoncharge,PhotonchargeToT,McCherPhotWeight,McCherPhotNumber" url="file:${outfile}" /> -->
+<!--             <fact.io.RootASCIIWriter keys="EventNum,photoncharge,PhotonchargeToT" url="file:${outpath}charge.csv" /> -->
+
+<!--  			<fact.image.monitors.StatusWindow />  -->
+
+		</process>
+</container>
