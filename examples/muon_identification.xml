@@ -8,9 +8,11 @@
 	
     <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${data}"/>
 	<process input="fact">
-		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+		
     	
-    	<fact.utils.PreviousStartCells startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+    	<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>
+		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+		
 		
 		<fact.io.zfits.ZFitsDrsCalib optional="true" url="file:${data}" outputKey="DataZCal" />
     	<fact.filter.DrsCalibration url="file:${drsfile}" key="DataZCal"  outputKey="DataCalibrated" color="#000000"/> 
@@ -54,9 +56,9 @@
         							  rangeSearchWindow="25" 
         							  color="#FF0F0F"/>
         
-        <fact.cleaning.CoreNeighborClean key="photonCharge" 
+        <fact.cleaning.CoreNeighborClean photonChargeKey="photonCharge" 
         								 outputKey="cleanPixel"
-        								 keyPositions="arrivalTime"
+        								 arrivalTimeKey="arrivalTime"
            								 corePixelThreshold="4.0"
            								 neighborPixelThreshold="2.0"
            								 timeThreshold="15"

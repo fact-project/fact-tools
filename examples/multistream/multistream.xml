@@ -1,0 +1,23 @@
+<container>
+
+<!-- Pfade zu den fits files. -->
+<property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/raw" />
+    <property name="auxfolder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/aux" />
+    <property name="whitelist" value="/Users/kaibrugge/FactTest/WhiteList.json" />
+    <property name="outfile" value="/Users/kaibrugge/FactTest/out" />
+
+    <property name="num_copies" value="1" />
+
+    <property name="core_threshold" value="7.0" />
+    <property name="neighbor_threshold" value="4.0"/>
+    <property name="time_threshold" value="30.0" />
+    <property name="min_number_of_pixel" value="2" />
+
+
+        <include file="examples/multistream/daten.xml" />
+
+		
+		
+		
+</container>
+
