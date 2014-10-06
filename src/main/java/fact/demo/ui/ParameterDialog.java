@@ -5,6 +5,7 @@ package fact.demo.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowEvent;
@@ -60,10 +61,42 @@ public class ParameterDialog extends JDialog {
 
 		setLayout(new BorderLayout());
 
+		int maxRow = 0;
+		int maxLen = 0;
+		String maxStr = null;
+		String maxKey = null;
+		int maxKeyLen = 0;
+
 		Map<String, String> attributes = n.getNode().attributes();
 		if (attributes != null) {
 			parameters.set(attributes);
 			log.info("Setting parameters: {}", attributes);
+			int row = 0;
+
+			for (String key : attributes.keySet()) {
+				String val = attributes.get(key);
+
+				if (maxStr == null) {
+					maxStr = val;
+				}
+
+				if (maxLen < val.length()) {
+					maxLen = val.length();
+					maxStr = val;
+					maxRow = row;
+				}
+
+				if (maxKey == null) {
+					maxKey = key;
+				}
+
+				if (maxKeyLen < maxKey.length()) {
+					maxKeyLen = maxKey.length();
+					maxKey = key;
+				}
+
+				row++;
+			}
 		}
 
 		final JTable table = new JTable(parameters);
@@ -83,7 +116,8 @@ public class ParameterDialog extends JDialog {
 		table.setRowHeight(24);
 		table.getTableHeader().setVisible(true);
 
-		content.add(new JScrollPane(table), BorderLayout.CENTER);
+		JScrollPane scroll = new JScrollPane(table);
+		content.add(table, BorderLayout.CENTER);
 
 		content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -111,9 +145,27 @@ public class ParameterDialog extends JDialog {
 			}
 		});
 
+		Component c = table.getDefaultRenderer(String.class)
+				.getTableCellRendererComponent(table, maxStr, false, false,
+						maxRow, 1);
+
+		int minWidth = c.getPreferredSize().width;
+		table.getColumnModel().getColumn(1)
+				.setMinWidth(c.getPreferredSize().width);
+
+		c = table.getDefaultRenderer(String.class)
+				.getTableCellRendererComponent(table, maxKey, false, false, 0,
+						0);
+		minWidth += c.getPreferredSize().width;
+		table.getColumnModel().getColumn(0)
+				.setMinWidth(c.getPreferredSize().width);
+
+		scroll.setMinimumSize(new Dimension(minWidth, getMinimumSize().height));
+		this.setMinimumSize(new Dimension(minWidth, getMinimumSize().height));
+
 		this.pack();
-		Dimension d = this.getPreferredSize();
-		this.setPreferredSize(new Dimension(d.width + 100, d.height));
+		// Dimension d = this.getPreferredSize();
+		// this.setPreferredSize(new Dimension(d.width + 100, d.height));
 	}
 
 	public class ParamTable implements TableModel {
@@ -227,6 +279,22 @@ public class ParameterDialog extends JDialog {
 		@Override
 		public void removeTableModelListener(TableModelListener l) {
 			listener.remove(l);
+		}
+
+		public String getLongestValue() {
+			int maxLen = 0;
+			String maxStr = null;
+
+			for (String key : params.keySet()) {
+				String s = params.get(key);
+
+				if (maxStr == null || maxLen < s.length()) {
+					maxStr = s;
+					maxLen = s.length();
+				}
+			}
+
+			return maxStr;
 		}
 	}
 }

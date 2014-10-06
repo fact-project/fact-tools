@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -33,6 +35,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import fact.hexmap.GifSequenceWriter;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.EventObserver;
 import fact.hexmap.ui.colormapping.ColorMapping;
@@ -102,6 +105,12 @@ public class DisplayPanel extends JPanel implements EventObserver {
 					exportPNG();
 					return;
 				}
+
+				if (e.getActionCommand().equalsIgnoreCase("Export to .gif")) {
+					exportGIF();
+					return;
+				}
+
 				// select the colormap
 				for (Class<? extends ColorMapping> mapClass : colorMapClasses) {
 					if (e.getActionCommand().equals(mapClass.getSimpleName())) {
@@ -134,6 +143,10 @@ public class DisplayPanel extends JPanel implements EventObserver {
 		JMenuItem exportItem = new JMenuItem("Export to .png");
 		exportItem.addActionListener(contextMenuListener);
 		popupMenu.add(exportItem);
+
+		JMenuItem exportGIFItem = new JMenuItem("Export to .gif");
+		exportGIFItem.addActionListener(contextMenuListener);
+		popupMenu.add(exportGIFItem);
 
 		popupMenu.addSeparator();
 		JCheckBoxMenuItem patchSelectionMenuItem = new JCheckBoxMenuItem(
@@ -195,6 +208,38 @@ public class DisplayPanel extends JPanel implements EventObserver {
 				e.printStackTrace();
 				log.error("Couldn't write image. Is the path writable?");
 			}
+		}
+	}
+
+	public void exportGIF() {
+		try {
+			ImageOutputStream output = new FileImageOutputStream(new File(
+					"/Volumes/RamDisk/shower.gif"));
+
+			GifSequenceWriter writer = new GifSequenceWriter(output,
+					BufferedImage.TYPE_INT_ARGB, 2, true);
+
+			for (int s = 25; s < 225; s++) {
+				try {
+					hexmap.currentSlice = s;
+					System.out.println("Painting slice " + s);
+					BufferedImage bi = new BufferedImage(getSize().width,
+							getSize().height, BufferedImage.TYPE_INT_ARGB);
+					Graphics g = bi.createGraphics();
+					hexmap.paint(g, true);
+					g.dispose();
+
+					writer.writeToSequence(bi);
+				} catch (Exception e) {
+					e.printStackTrace();
+					break;
+				}
+			}
+
+			writer.close();
+			output.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
