@@ -1,40 +1,48 @@
 package fact.io;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-
 public class FitsStream extends AbstractStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
 
 	int numberOfPixel;
-    int blockSize;
+	int blockSize;
 
-    private final int MAX_HEADER_BYTES = 16*2880;
+	private final int MAX_HEADER_BYTES = 16 * 2880;
 	private DataInputStream dataStream;
 	private int[] lengthArray;
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
 
-    @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
-	private int bufferSize = 8*1024;
+	@Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
+	private int bufferSize = 8 * 1024;
 
-    private int headerLength = 0;
+	private int headerLength = 0;
 
 	public FitsStream(SourceURL url) {
 		super(url);
 	}
-	
+
 	public FitsStream() {
 		super();
 	}
@@ -51,27 +59,30 @@ public class FitsStream extends AbstractStream {
 	public void init() throws Exception {
 		super.init();
 		File f = new File(this.url.getFile());
-		if (!f.canRead()){
+		if (this.url.getProtocol().toLowerCase().startsWith("file")
+				&& !f.canRead()) {
 			log.error("Cannot read file. Wrong path? " + f.getAbsolutePath());
-			throw new FileNotFoundException("Cannot read file " + f.getAbsolutePath());
+			throw new FileNotFoundException("Cannot read file "
+					+ f.getAbsolutePath());
 		}
-        BufferedInputStream bStream = new BufferedInputStream(getInputStream(), bufferSize );
+		BufferedInputStream bStream = new BufferedInputStream(url.openStream(),
+				bufferSize);
 		dataStream = new DataInputStream(bStream);
-        dataStream.mark(MAX_HEADER_BYTES);
+		dataStream.mark(MAX_HEADER_BYTES);
 
 		FitsHeader header = new FitsHeader(dataStream);
 		log.debug("Header #1 read:\n{}", header);
-        headerLength = header.getLength();
-        dataStream.reset();
-        dataStream.skip(headerLength);
+		headerLength = header.getLength();
+		dataStream.reset();
+		dataStream.skip(headerLength);
 
 		header = new FitsHeader(dataStream);
 		log.debug("Header #2 read:\n{}", header);
-        headerLength += header.getLength();
-        dataStream.reset();
+		headerLength += header.getLength();
+		dataStream.reset();
 
-        //now create a Data Item containing header information
-        int numberOfFields = 0;
+		// now create a Data Item containing header information
+		int numberOfFields = 0;
 		for (String line : header.getLines()) {
 			log.trace("Checking line: '{}'", line);
 			if (line.startsWith("TFIELDS")) {
@@ -80,7 +91,7 @@ public class FitsStream extends AbstractStream {
 			}
 		}
 		log.debug("File has {} fields.", numberOfFields);
-        if (numberOfFields == 0) {
+		if (numberOfFields == 0) {
 			throw new IOException("Fits file appears to have 0 fields");
 		}
 		typeArray = new String[numberOfFields];
@@ -136,20 +147,22 @@ public class FitsStream extends AbstractStream {
 				int index = Integer.parseInt(key.replaceAll("\\D+", "").trim());
 				nameArray[index - 1] = val.replaceAll("'", "").trim();
 				log.debug("field[{}] = {}", index - 1, nameArray[index - 1]);
+			} else if (key.startsWith("TUNIT")) {
+
 			} else {
 				String value = val.replaceAll("'", "").trim();
 				key = key.trim();
-				try{
+				try {
 					Integer v = Integer.parseInt(value);
 					headerItem.put(key, v);
-				} catch (NumberFormatException e){
-					try{
+				} catch (NumberFormatException e) {
+					try {
 						Float v = Float.parseFloat(value);
 						headerItem.put(key, v);
-					} catch (NumberFormatException ef){
-						if(value.equals("f") || value.equals("F")){
+					} catch (NumberFormatException ef) {
+						if (value.equals("f") || value.equals("F")) {
 							headerItem.put(key, false);
-						} else if (value.equals("t") || value.equals("T")){
+						} else if (value.equals("t") || value.equals("T")) {
 							headerItem.put(key, true);
 						} else {
 							headerItem.put(key, value);
@@ -159,18 +172,18 @@ public class FitsStream extends AbstractStream {
 			}
 		}
 
-        if ( headerItem.get("NAXIS1") != null ){
-            blockSize = (Integer) headerItem.get("NAXIS1");
-        }
-        if (headerItem.get("NPIX") != null){
-            numberOfPixel = (Integer) headerItem.get("NPIX");
-        }
+		if (headerItem.get("NAXIS1") != null) {
+			blockSize = (Integer) headerItem.get("NAXIS1");
+		}
+		if (headerItem.get("NPIX") != null) {
+			numberOfPixel = (Integer) headerItem.get("NPIX");
+		}
 
-        long skipped = dataStream.skip(headerLength);
-        if (skipped != headerLength){
-            log.error("Error while reading the FITS Header. Header length wrong?");
-        }
-    }
+		long skipped = dataStream.skip(headerLength);
+		if (skipped != headerLength) {
+			log.error("Error while reading the FITS Header. Header length wrong?");
+		}
+	}
 
 	/**
 	 * this parses an event from the datastream and the bytebuffer in case we
@@ -180,14 +193,14 @@ public class FitsStream extends AbstractStream {
 	@Override
 	public Data readNext() throws Exception {
 
-//		FactEvent item = new FactEvent();
+		// FactEvent item = new FactEvent();
 		Data item = DataFactory.create(headerItem);
-//		Data item = headerItem;
+		// Data item = headerItem;
 
-        try {
-            dataStream.mark(blockSize + 1);
-            long byteCounter = 0;
-            for (int n = 0; n < nameArray.length; n++) {
+		try {
+			dataStream.mark(blockSize + 1);
+			long byteCounter = 0;
+			for (int n = 0; n < nameArray.length; n++) {
 				log.debug("Reading {}", nameArray[n]);
 				// read int
 				if (typeArray[n].equals("J")) {
@@ -197,15 +210,15 @@ public class FitsStream extends AbstractStream {
 						int[] el = new int[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
 							el[i] = dataStream.readInt();
-                            byteCounter += 4;
+							byteCounter += 4;
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
-                        byteCounter += 4;
+						byteCounter += 4;
 						item.put(nameArray[n], dataStream.readInt());
 					}
 				}
-				//read float
+				// read float
 				if (typeArray[n].equals("E")) {
 					log.debug("Reading field '{}'", nameArray[n]);
 					int numberOfElements = lengthArray[n];
@@ -214,9 +227,9 @@ public class FitsStream extends AbstractStream {
 						// floats we need 4*n bytes
 						byte[] el = new byte[4 * numberOfElements];
 
-                        byteCounter += el.length;
-                        dataStream.read(el);
-                        //						bStream.read(el);
+						byteCounter += el.length;
+						dataStream.read(el);
+						// bStream.read(el);
 						FloatBuffer sBuf = ByteBuffer.wrap(el).asFloatBuffer();
 						float[] ar = new float[numberOfElements];
 						sBuf.get(ar);
@@ -224,50 +237,51 @@ public class FitsStream extends AbstractStream {
 					} else if (numberOfElements > 1) {
 						float[] el = new float[numberOfElements];
 						for (int i = 0; i < numberOfElements; i++) {
-                            byteCounter += 4;
+							byteCounter += 4;
 							el[i] = dataStream.readFloat();
 						}
 						item.put(nameArray[n], el);
-					} else if (numberOfElements == 1){
-                        byteCounter += 4;
+					} else if (numberOfElements == 1) {
+						byteCounter += 4;
 						item.put(nameArray[n], dataStream.readFloat());
 					}
 				}
 
-//				// read double
+				// // read double
 				if (typeArray[n].equals("D")) {
 					int numberOfelements = lengthArray[n];
 
 					if (numberOfelements > 1) {
 						double[] el = new double[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
-                            byteCounter += 8;
+							byteCounter += 8;
 							el[i] = dataStream.readDouble();
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
-                        byteCounter += 8;
+						byteCounter += 8;
 						item.put(nameArray[n], dataStream.readDouble());
 					}
 				}
-//
-//				// read byte
+				//
+				// // read byte
 				if (typeArray[n].equals("B")) {
 					int numberOfelements = lengthArray[n];
 
 					if (numberOfelements > 1) {
 						byte[] el = new byte[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
-                            byteCounter += 1;
+							byteCounter += 1;
 							el[i] = dataStream.readByte();
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
-                        byteCounter += 1;
+						byteCounter += 1;
 						item.put(nameArray[n], dataStream.readByte());
 					}
 				}
-				// read byte of type L. whatever that means. is it signed? see page 21 of the .fits file standard pdf
+				// read byte of type L. whatever that means. is it signed? see
+				// page 21 of the .fits file standard pdf
 				if (typeArray[n].equals("L")) {
 					int numberOfelements = lengthArray[n];
 
@@ -275,38 +289,37 @@ public class FitsStream extends AbstractStream {
 						boolean[] el = new boolean[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
 
-                            byteCounter += 1;
+							byteCounter += 1;
 							byte b = dataStream.readByte();
 
-                            el[i] = (b != '0');
+							el[i] = (b != '0');
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
 						boolean b;
-                        byteCounter += 1;
+						byteCounter += 1;
 						byte c = dataStream.readByte();
-                        b = (c != 0);
+						b = (c != 0);
 						item.put(nameArray[n], b);
 					}
 				}
 
-
-                if (typeArray[n].equals("K")){
-                    int numberOfelements = lengthArray[n];
-                    if (numberOfelements > 1) {
-                        long[] el = new long[numberOfelements];
-                        for (int i = 0; i < numberOfelements; i++) {
-                            byteCounter += 8;
-                            long b = dataStream.readLong();
-                            el[i] = b;
-                        }
-                        item.put(nameArray[n], el);
-                    } else if (numberOfelements == 1) {
-                        byteCounter += 8;
-                        long c = dataStream.readLong();
-                        item.put(nameArray[n], c);
-                    }
-                }
+				if (typeArray[n].equals("K")) {
+					int numberOfelements = lengthArray[n];
+					if (numberOfelements > 1) {
+						long[] el = new long[numberOfelements];
+						for (int i = 0; i < numberOfelements; i++) {
+							byteCounter += 8;
+							long b = dataStream.readLong();
+							el[i] = b;
+						}
+						item.put(nameArray[n], el);
+					} else if (numberOfelements == 1) {
+						byteCounter += 8;
+						long c = dataStream.readLong();
+						item.put(nameArray[n], c);
+					}
+				}
 
 				// read a short
 				if (typeArray[n].equals("I")) {
@@ -317,40 +330,40 @@ public class FitsStream extends AbstractStream {
 
 						// lets try to be even quicker
 						// to save n shorts we need 2*n bytes
-						//						byte[] el = new byte[2 * numberOfelements];
-						//						ByteBuffer byteBuffer2 = ByteBuffer.wrap(el);
-						//						inChannel.read(byteBuffer2);
-						//						bStream.read(el);
-						//						ShortBuffer sBuf = byteBuffer2.asShortBuffer();
+						// byte[] el = new byte[2 * numberOfelements];
+						// ByteBuffer byteBuffer2 = ByteBuffer.wrap(el);
+						// inChannel.read(byteBuffer2);
+						// bStream.read(el);
+						// ShortBuffer sBuf = byteBuffer2.asShortBuffer();
 						byte[] el = new byte[2 * numberOfelements];
 
-                        byteCounter += el.length;
+						byteCounter += el.length;
 						dataStream.read(el);
 
-                        ShortBuffer sBuf = ByteBuffer.wrap(el).asShortBuffer();
+						ShortBuffer sBuf = ByteBuffer.wrap(el).asShortBuffer();
 						short[] ar = new short[numberOfelements];
 						sBuf.get(ar);
 						item.put(nameArray[n], ar);
-						
+
 					} else if (numberOfelements > 1) {
 						short[] el = new short[numberOfelements];
 						for (int i = 0; i < numberOfelements; i++) {
-                            byteCounter += 2;
+							byteCounter += 2;
 							el[i] = dataStream.readShort();
 						}
 						item.put(nameArray[n], el);
 					} else if (numberOfelements == 1) {
-                        byteCounter += 2;
+						byteCounter += 2;
 						item.put(nameArray[n], dataStream.readShort());
 					}
 				}
 			}
 
-            dataStream.reset();
-            long skipped =  dataStream.skip(blockSize);
-            if (skipped != byteCounter){
-                log.debug("Error while reading block. EOF?");
-            }
+			dataStream.reset();
+			long skipped = dataStream.skip(blockSize);
+			if (skipped != byteCounter) {
+				log.debug("Error while reading block. EOF?");
+			}
 
 		} catch (EOFException e) {
 			log.info("End of file reached. " + url.getFile());
@@ -366,48 +379,51 @@ public class FitsStream extends AbstractStream {
 
 		final byte[] headerData;
 
-        public FitsHeader(InputStream in) throws IOException {
-            byte[] data = new byte[MAX_HEADER_BYTES];
-            boolean parsedHeader = false;
+		public FitsHeader(InputStream in) throws IOException {
+			byte[] data = new byte[MAX_HEADER_BYTES];
+			boolean parsedHeader = false;
 
-            int pos = 0;
-            int read = in.read(data, pos, 2880);
-            // try to find the END keyword.
-            while (read > 0) {
-                pos += read;
-                String str = (new String(data, "US-ASCII")).trim();
-                if (str.endsWith("END")) {
-                    log.debug("Found end-of-header! Header length is {}", pos);
-                    parsedHeader = true;
-                    break;
-                }
-                read = in.read(data, pos, 2880);
-            }
-            headerData = new byte[pos];
-            System.arraycopy(data, 0, headerData, 0, headerData.length);
-            if (read % 2880 != 0) {
-                throw new IOException("Failed to read header: n*" + 2880
-                        + " bytes expected, only " + pos + " bytes could be read!");
-            }
-            if (!parsedHeader){
-                throw new IOException("Failed to read header. Did not find the END keyword");
-            }
-            log.debug("Bytes in header: " + pos + " read: " + read);
-        }
+			int pos = 0;
+			int read = in.read(data, pos, 2880);
+			// try to find the END keyword.
+			while (read > 0) {
+				pos += read;
+				String str = (new String(data, "US-ASCII")).trim();
+				if (str.endsWith("END")) {
+					log.debug("Found end-of-header! Header length is {}", pos);
+					parsedHeader = true;
+					break;
+				}
+				read = in.read(data, pos, 2880);
+			}
+			headerData = new byte[pos];
+			System.arraycopy(data, 0, headerData, 0, headerData.length);
+			if (read % 2880 != 0) {
+				throw new IOException("Failed to read header: n*" + 2880
+						+ " bytes expected, only " + pos
+						+ " bytes could be read!");
+			}
+			if (!parsedHeader) {
+				throw new IOException(
+						"Failed to read header. Did not find the END keyword");
+			}
+			log.debug("Bytes in header: " + pos + " read: " + read);
+		}
 
-        public int getLength(){
-            return headerData.length;
-        }
+		public int getLength() {
+			return headerData.length;
+		}
 
 		public String[] getLines() {
 
 			String[] lines = new String[headerData.length / 80];
 			for (int i = 0; i < lines.length; i++) {
 				byte[] bytes = new byte[80];
-//				for (int j = 0; j < bytes.length; j++) {
-//					bytes[j] = headerData[i * bytes.length + j];
-//				}
-				System.arraycopy(headerData, i*bytes.length, bytes, 0, bytes.length);
+				// for (int j = 0; j < bytes.length; j++) {
+				// bytes[j] = headerData[i * bytes.length + j];
+				// }
+				System.arraycopy(headerData, i * bytes.length, bytes, 0,
+						bytes.length);
 				try {
 					lines[i] = new String(bytes, "US-ASCII");
 				} catch (UnsupportedEncodingException e) {
