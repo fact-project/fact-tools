@@ -49,7 +49,7 @@ public class FindThresholdCrossings implements Processor {
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		
 		//the graph of the array positions visually shows the positions of the crossings for an individual pixel
-	    int[] positions =  new int[data.length];
+	    double[] positions =  new double[data.length];
 	    
 	    //the array CrossPositions contains lists of positions of crossings for each pixel
 	    ArrayList[] CrossPositions = new ArrayList[Constants.NUMBEROFPIXEL];
