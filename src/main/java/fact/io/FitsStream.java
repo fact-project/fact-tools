@@ -59,12 +59,13 @@ public class FitsStream extends AbstractStream {
 	public void init() throws Exception {
 		super.init();
 		File f = new File(this.url.getFile());
-		if (!f.canRead()) {
+		if (this.url.getProtocol().toLowerCase().startsWith("file")
+				&& !f.canRead()) {
 			log.error("Cannot read file. Wrong path? " + f.getAbsolutePath());
 			throw new FileNotFoundException("Cannot read file "
 					+ f.getAbsolutePath());
 		}
-		BufferedInputStream bStream = new BufferedInputStream(getInputStream(),
+		BufferedInputStream bStream = new BufferedInputStream(url.openStream(),
 				bufferSize);
 		dataStream = new DataInputStream(bStream);
 		dataStream.mark(MAX_HEADER_BYTES);

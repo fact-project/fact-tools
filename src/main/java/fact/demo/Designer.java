@@ -24,8 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import stream.app.ComputeGraph;
-import stream.util.ApplicationBuilder;
 import stream.util.URLUtilities;
 import stream.util.XMLUtils;
 import fact.demo.ui.ContainerGraphPanel;
@@ -103,10 +101,10 @@ public class Designer extends JFrame {
 		log.info("Loading application graph from {}", url);
 
 		doc = XMLUtils.parseDocument(url.openStream());
-		ComputeGraph g = ApplicationBuilder.parseGraph(doc);
-
-		graphPanel.setGraph(g);
-		graphPanel.repaint();
+		// ComputeGraph g = ApplicationBuilder.parseGraph(doc);
+		//
+		// graphPanel.setGraph(g);
+		// graphPanel.repaint();
 	}
 
 	public void store(URL url) throws Exception {

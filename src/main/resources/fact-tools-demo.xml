@@ -1,23 +1,23 @@
 <container xmlns:ui="http://www.jwall.org/streams/dashboard.xsd">
 
-    <property name="datafile" value="src/test/resources/testDataFile.fits.gz" />
+    <property name="datafile" value="/Users/chris/Downloads/20111126_042.fits" />
     <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
     
 
     <service id="dashboard" class="fact.demo.FACTDashboard"  size="1440,1024" location="0,0">
         
-        <fact.demo.widgets.Camera id="camera"  title="Camera" radius="3.5" delay="15ms" ui:location="20,80" ui:size="260,270"/>
+        <fact.demo.widgets.Camera id="camera"  title="Camera" radius="3.5" delay="15ms" ui:location="20,110" ui:size="260,270" play="false"/>
         
-        <fact.demo.widgets.DataFlow id="dataflow" title="DataFlow / Configuration" config="classpath:/fact-tools-demo.xml" ui:location="20,360" ui:size="1168,300" />
+        <fact.demo.widgets.DataFlow id="dataflow" title="Streaming Process" config="classpath:/fact-tools-demo.xml" ui:location="110,450" ui:size="1168,300" />
         
-        <fact.demo.widgets.CameraOverlay id="camera:shower"  title="Shower" radius="3.5" delay="15ms" ui:location="360,80" ui:size="260,270"/>
+        <fact.demo.widgets.CameraOverlay id="camera:shower"  title="Shower" radius="3.5" delay="15ms" ui:location="320,110" ui:size="260,270"/>
         
-        <Table id="features" title="Extracted Features" ui:location="640,80" ui:size="500,270" />
+        <Table id="features" title="Extracted Features" keys="EventNum,COGx,COGy,Length,Width" ui:location="620,110" ui:size="800,270" />
         
     </service>
     
     
-    <stream id="data" class="fact.io.FitsStream" url="file:${datafile}" limit="100"/>
+    <stream id="data" class="fact.io.FitsStream" url="file:${datafile}"/>
     
     <process input="data">
         
@@ -27,6 +27,7 @@
 
         <fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />
         
+		<fact.ShowViewer key="DataCalibrated"/>
 
         <!--<fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />-->
 
@@ -38,6 +39,7 @@
         <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
                                          arrivalTimeKey="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
         
+        <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
         
 
         <PrintData/>

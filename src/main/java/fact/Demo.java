@@ -3,6 +3,7 @@
  */
 package fact;
 
+import java.io.File;
 import java.net.URL;
 
 import org.slf4j.Logger;
@@ -28,6 +29,24 @@ public class Demo {
 		log.info("#  Using process {}", url);
 		log.info("#");
 		log.info("#");
+
+		for (String arg : args) {
+			if (arg.endsWith(".fits")) {
+				System.setProperty("datafile", arg);
+				log.info("#  Using data from {}", arg);
+			}
+
+			if (arg.endsWith(".obj")) {
+				System.setProperty("datafile", arg);
+				log.info("#  Using data from {}", arg);
+			}
+
+			if (arg.endsWith(".xml")) {
+				url = new File(arg).toURI().toURL();
+				log.info("#  Using alternate configuration from {}", url);
+			}
+		}
+
 		stream.run.main(url);
 	}
 }
