@@ -6,11 +6,10 @@
 <property name="dataDRS" value="/home/mackaiver/proton/drsfile.drs.fits" />
 <property name="num_copies" value="1" />
 
-    <property name="core_threshold" value="7.0" />
-    <property name="neighbor_threshold" value="4.0"/>
-    <property name="time_threshold" value="30.0" />
-    <property name="min_number_of_pixel" value="2" />
-
+<property name="core_threshold" value="7.0" />
+<property name="neighbor_threshold" value="4.0"/>
+<property name="time_threshold" value="30.0" />
+<property name="min_number_of_pixel" value="2" />
 
         <include file="examples/mc.xml" />
 
