@@ -11,6 +11,12 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+/**
+ * Identify pixel with a signal above a given threshold by means of photon chrage, hand them over as list and pixel array
+ * 
+ * @author jbuss
+ *
+ */
 public class IdentifyPixelAboveThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
 	
