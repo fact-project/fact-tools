@@ -12,6 +12,7 @@
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
         <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" />
         <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab"/>
+        <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataCalibrated" />
 
         <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="125"/>
         <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
@@ -74,9 +75,10 @@
         <!--<fact.statistics.ArrayMean key="McCherPhotWeight" outputKey="McCherPhotWeightAverage" />-->
         <!--<fact.statistics.ArrayMean key="McNoisePhotWeight" outputKey="McNoisePhotWeightAverage" />-->
         <!--<PrintData/>-->
-        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="EventNum,numPixelInShower,Size,Length,Width,Disp,Timespread,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3" />
-
-        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+        <!--  <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="EventNum,numPixelInShower,Size,Length,Width,numIslands,m3l,m3t,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Disp,Timespread,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3" />-->
+        <stream.flow.Skip condition="%{data.distance} &lt; 240" />
+        <fact.ShowViewer key="DataCalibrated"/>
+        <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="EventNum,numPixelInShower,Size,Length,Width,numIslands,m3l,m3t,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,Alpha,Distance,CosDeltaAlpha,Theta,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3" />-->
 
 
     </process>
