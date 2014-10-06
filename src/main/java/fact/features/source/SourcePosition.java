@@ -1,8 +1,8 @@
 package fact.features.source;
 
-import fact.features.source.DrivePoints.DrivePointManager;
-import fact.features.source.DrivePoints.SourcePoint;
-import fact.features.source.DrivePoints.TrackingPoint;
+import fact.features.source.drivepoints.DrivePointManager;
+import fact.features.source.drivepoints.SourcePoint;
+import fact.features.source.drivepoints.TrackingPoint;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
@@ -83,10 +83,14 @@ public class SourcePosition implements StatefulProcessor {
 			FitsStream stream = new FitsStream(trackingUrl);
             stream.init();
             slowData = stream.readNext();
-            while(slowData !=  null){
-                trackingPointManager.addTrackingPoint(new TrackingPoint(slowData));
-                slowData = stream.readNext();
-            }
+                while (slowData != null) {
+                    try {
+                        trackingPointManager.addTrackingPoint(new TrackingPoint(slowData));
+                    } catch(IllegalArgumentException a){
+                        log.warn("Tracking file contains wrong values");
+                    }
+                    slowData = stream.readNext();
+                }
             stream.close();
 		}
 
@@ -172,7 +176,7 @@ public class SourcePosition implements StatefulProcessor {
 		double[] source = {sourcePosition[0], sourcePosition[1]};
 		data.put(outputKey, source);
         data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
-        System.out.println("New Sourcepos: " + source[0] + ",  " + source[1]);
+//        System.out.println("New Sourcepos: " + source[0] + ",  " + source[1]);
 		//add deviation between the calculated point az,dz and the az,dz in the file
 //		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
 //		data.put(outputKey+"pointingDeviation", deviation);

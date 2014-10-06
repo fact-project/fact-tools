@@ -1,4 +1,4 @@
-package fact.features.source.DrivePoints;
+package fact.features.source.drivepoints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class DrivePoint implements Comparable<Double>{
     //Julian Day
     double time;
 
-    public DrivePoint(Data item){
+    public DrivePoint(Data item) throws IllegalArgumentException{
         time =	Double.parseDouble(item.get("Time").toString()) + 2440587.5;
         if (time <= 2451544.5){
             throw new IllegalArgumentException("Dates before 1.1.2000 are not supported");

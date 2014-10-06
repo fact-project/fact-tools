@@ -41,6 +41,9 @@ public class DrsCalibration implements Processor {
 	private String outputKey = "DataCalibrated";
 	private String key="Data";
 
+    @Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
+    private SourceURL url = null;
+
     Data drsData = null;
 
     private String currentFilePath = "";
@@ -117,8 +120,9 @@ public class DrsCalibration implements Processor {
 	@Override
 	public Data process(Data data) {
         //check if the stream is comming from another source. we might need a new drs file
-        if (this.drsData == null || !currentFilePath .equals(data.get("@source").toString()) ){
+        if (this.url == null && !currentFilePath .equals(data.get("@source").toString()) ){
 			//file not loaded yet. try to find by magic.
+            currentFilePath = data.get("@source").toString();
             try {
                 log.info("Trying to find .drs file automatically");
                 SourceURL url = findDRSFile(data.get("@source").toString());
@@ -127,8 +131,8 @@ public class DrsCalibration implements Processor {
                 log.error("Couldn't find correct .drs File automatically.");
                 throw new RuntimeException("Couldn't find correct .drs File automatically.");
             }
-            currentFilePath = data.get("@source").toString();
 		}
+
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
 		if(rawData == null){
@@ -345,25 +349,10 @@ public class DrsCalibration implements Processor {
 		this.outputKey = outputKey;
 	}
 
-
-
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
-	public void setUrl(URL url) {
+	public void setUrl(SourceURL url) {
+        this.url = url;
 		try {
-			loadDrsData(new SourceURL(url));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats)")
-	public void setUrl(String urlString) {
-		try {
-			URL url = new URL(urlString);
-			loadDrsData(new SourceURL(url));
-		} catch (MalformedURLException e){
-			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
-			throw new RuntimeException("Cant open drsFile");
+			loadDrsData(url);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
