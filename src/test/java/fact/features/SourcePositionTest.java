@@ -1,7 +1,6 @@
 package fact.features;
 
 import fact.Constants;
-import fact.features.source.OldSourcePosition;
 import fact.features.source.SourcePosition;
 import fact.hexmap.FactPixelMapping;
 import junit.framework.Assert;

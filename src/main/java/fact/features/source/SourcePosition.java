@@ -1,5 +1,8 @@
 package fact.features.source;
 
+import fact.features.source.DrivePoints.DrivePointManager;
+import fact.features.source.DrivePoints.SourcePoint;
+import fact.features.source.DrivePoints.TrackingPoint;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
@@ -12,8 +15,6 @@ import stream.io.SourceURL;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look
@@ -34,7 +35,10 @@ public class SourcePosition implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
 	Data slowData = null;
+
+    @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
 	private String outputKey = null;
+
 	private String physicalSource = null;
 
 	Double	sourceRightAscension = null;
@@ -43,102 +47,11 @@ public class SourcePosition implements StatefulProcessor {
 	private Float x = null;
 	private Float y = null;
 
-    FactPointingManager pM  = new FactPointingManager();
+    DrivePointManager<TrackingPoint> trackingPointManager = new DrivePointManager();
+    DrivePointManager<SourcePoint> sourcePointManager = new DrivePointManager();
 
 	//The url to the TRACKING_POSITION slow control file
 	private SourceURL trackingUrl;
-
-
-    /**
-     * A TrackingPoint contains all the information from the telescopes drive at on specific point in time.
-     * We introduce an artificial order on TrackingPoints by comparing the 'time' attribute of two tracking points to
-     * each other using the canonical definition of 'earlier' and 'later'
-     * All angles in a tracking point are given in degrees.
-     * The time is given as JulianDay
-     */
-    private class TrackingPoint implements Comparable<Double>{
-        //Julian Day
-        double time;
-        //Degrees
-        double dec; //Command Declination
-        double ra; //Command right ascension
-        double Az; // Nominal Azimuth angle
-        double Zd; // Nominal zenith distance
-        double deviationAz; // Control deviation Az
-        double deviationZd; // Control deviation Zd
-
-        private TrackingPoint(double time, double ra, double dec, double az, double zd, double dAz, double dZd) throws IllegalArgumentException{
-            if (time == 0){
-                throw new IllegalArgumentException();
-            }
-            this.time = time;
-            this.ra = ra;
-            this.dec = dec;
-            this.Az = az;
-            this.Zd = zd;
-            this.deviationAz = dAz;
-            this.deviationZd = dZd;
-        }
-
-        @Override
-        public int compareTo(Double o) {
-            return Double.compare(time, o);
-        }
-
-        public double distanceTo(double t){
-            return Math.abs(time - t);
-        }
-    }
-
-    /**
-     * TODO: some sort of sanity check for the data points we add.
-     */
-    private class FactPointingManager {
-        //position of the Telescope
-        public static final double mLongitude                  = -17.890701389;
-        public final double mLatitude                   = 28.761795;
-        //Distance from earth center
-        public final double mDistance                   = 4890.0;
-
-        //This list will be populated with TrackingPoints
-        private ArrayList<TrackingPoint> locList = new ArrayList<>();
-
-        public void addTrackingPoint(TrackingPoint p){
-            locList.add(p);
-        }
-
-        public TrackingPoint getPoint(double currentTime) {
-
-            int index = Collections.binarySearch(locList, currentTime);
-
-            //element was found
-            if (index >= 0){
-                return locList.get(index);
-            } else {
-                int insertionPoint = -(index + 1);
-                if(insertionPoint == 0){
-//                    System.out.println("Returning first in list");
-                    return locList.get(0);
-                }
-                if (insertionPoint >= locList.size()){
-//                    System.out.println("returnning last in list");
-                    log.warn("EventTime larger than last point in Tracking File");
-                    return locList.get(locList.size()-1);
-                }
-
-                TrackingPoint lower = locList.get(insertionPoint-1);
-                TrackingPoint higher = locList.get(insertionPoint);
-                if ( lower.distanceTo(currentTime) < higher.distanceTo(currentTime) ){
-//                    System.out.println("returning lower");
-                    return lower;
-                } else {
-//                    System.out.println("returning highrer");
-                    return higher;
-                }
-
-            }
-        }
-    }
 
 	@Override
 	public void finish() throws Exception {
@@ -146,7 +59,8 @@ public class SourcePosition implements StatefulProcessor {
     @Override
     public void resetState() throws Exception {
     }
-	/**
+
+    /**
 	 * In the init method we read the complete TRACKING_POSITION file and save the values in the locList.
 	 * For the calculation of the appropriate sky coordinates (that is Azimuth and Zenith) we only need the values "Time", "Ra" and "Dec".
 	 * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check.
@@ -167,44 +81,13 @@ public class SourcePosition implements StatefulProcessor {
 			log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
 		} else {
 			FitsStream stream = new FitsStream(trackingUrl);
-			try {
-
-				stream.init();
-				slowData = stream.readNext();
-				while(slowData !=  null){
-					// Eventime, Ra, Dec, Az, Zd
-                    //Time in the fits file is not saved in unixtime or julian date or modified julian day.
-                    //its saved in units of unixtime(seconds)/86400(seconds). Thats a fraction of a day.
-                    //we save it as julianday by adding the usual constant
-					double time =	Double.parseDouble(slowData.get("Time").toString()) + 2440587.5;
-
-                    double ra = Double.parseDouble( slowData.get("Ra").toString());
-					ra = ra/24 *360.0;
-					double dec = Double.parseDouble( slowData.get("Dec").toString());
-
-					double az = Double.parseDouble( slowData.get("Az").toString());
-					double zd = Double.parseDouble( slowData.get("Zd").toString());
-                    double dAz = Double.parseDouble( slowData.get("dAz").toString());
-                    double dZd = Double.parseDouble( slowData.get("dZd").toString());
-                    try {
-                        pM.addTrackingPoint(new TrackingPoint(time, ra,dec,az,zd, dAz, dZd));
-                    } catch (IllegalArgumentException e) {
-                        log.error("Time in drive file was 0.");
-                    }
-					slowData = stream.readNext();
-				}
-
-				stream.close();
-			}catch (NumberFormatException e){
-				log.error("Could not parse the values from the TRACKING_POSITION file: {}", e.getMessage());
-				stream.close();
-			} catch (Exception e) {
-				log.error("Failed to load data from TRACKING_POSITION file: {}", e.getMessage());
-				e.printStackTrace();
-				this.slowData = null;
-				stream.close();
-				throw new RuntimeException(e.getMessage());
-			}
+            stream.init();
+            slowData = stream.readNext();
+            while(slowData !=  null){
+                trackingPointManager.addTrackingPoint(new TrackingPoint(slowData));
+                slowData = stream.readNext();
+            }
+            stream.close();
 		}
 
 	}
@@ -225,7 +108,7 @@ public class SourcePosition implements StatefulProcessor {
      */
     public double julianDayToGmst(double julianDay) {
 
-        if(julianDay <= 2451545.0 ){
+        if(julianDay <= 2451544.5 ){
             throw new IllegalArgumentException("Dates before 1.1.2000 are not supported");
         }
         double timeAtMidnightBefore = Math.floor(julianDay-0.5) + 0.5;
@@ -277,7 +160,7 @@ public class SourcePosition implements StatefulProcessor {
         //convert julianday to gmst
 		double gmst =  julianDayToGmst(julianDay);
 
-        TrackingPoint point = pM.getPoint(julianDay);
+        TrackingPoint point = trackingPointManager.getPoint(julianDay);
         //convert celestial coordinates to local coordinate system.
         double[] pointingAzDe = getAzZd(point.ra, point.dec, gmst);
         //pointAzDz should be equal to the az dz written by the drive
@@ -339,8 +222,8 @@ public class SourcePosition implements StatefulProcessor {
 		double y                =Math.sin(theta) *Math.sin(phi);
 		double z                =Math.cos(theta);
 
-		double phi_rot_angle    = gmst + (pM.mLongitude/ 180.0 * Math.PI);
-		double theta_rot_angle  = (pM.mLatitude - 90) / 180.0 * Math.PI;
+		double phi_rot_angle    = gmst + (trackingPointManager.mLongitude/ 180.0 * Math.PI);
+		double theta_rot_angle  = (trackingPointManager.mLatitude - 90) / 180.0 * Math.PI;
 
 		double m_yx             = -Math.sin(phi_rot_angle);
 		double m_yy             =  Math.cos(phi_rot_angle);
@@ -388,7 +271,7 @@ public class SourcePosition implements StatefulProcessor {
 		x_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
 		y_rot   = Math.sin(-az)*x + Math.cos(-az)*y;
 		z_rot   = Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
-		double[] r ={ x_rot * (-pM.mDistance) / z_rot ,y_rot * (-pM.mDistance) / z_rot };
+		double[] r ={ x_rot * (-trackingPointManager.mDistance) / z_rot ,y_rot * (-trackingPointManager.mDistance) / z_rot };
 
 		return r;
 	}
@@ -399,7 +282,6 @@ public class SourcePosition implements StatefulProcessor {
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(description = "The key to the sourcepos array that will be written to the map.")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
@@ -449,14 +331,8 @@ public class SourcePosition implements StatefulProcessor {
 		}
 	}
 
-	public Float getX() {
-		return x;
-	}
 	public void setX(Float x) {
 		this.x = x;
-	}
-	public Float getY() {
-		return y;
 	}
 	public void setY(Float y) {
 		this.y = y;
