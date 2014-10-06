@@ -1,6 +1,6 @@
 <container xmlns:ui="http://www.jwall.org/streams/dashboard.xsd">
 
-    <property name="datafile" value="/Users/chris/Downloads/20111126_042.fits" />
+    <property name="datafile" value="src/test/resources/testDataFile.fits.gz" />
     <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
     
 
