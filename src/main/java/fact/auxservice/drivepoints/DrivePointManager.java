@@ -3,6 +3,7 @@ package fact.auxservice.drivepoints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.Data;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +15,6 @@ import java.util.Collections;
  */
 public class DrivePointManager<T extends DrivePoint>{
     static Logger log = LoggerFactory.getLogger(DrivePointManager.class);
-
-    //position of the Telescope
-    public final double mLongitude                  = -17.890701389;
-    public final double mLatitude                   = 28.761795;
-    //Distance from earth center
-    public final double mDistance                   = 4890.0;
 
     //This list will be populated with DrivePoints
     private ArrayList<T> locList = new ArrayList<>();

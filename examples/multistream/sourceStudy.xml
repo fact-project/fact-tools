@@ -1,84 +1,19 @@
 
 <module>
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" />
     <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-            url="file:${folder}" listUrl="file:${whitelist}" auxFolder="file:${auxfolder}" copies="${num_copies}" suffix="fits.gz">
+            url="file:${folder}" listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
         <stream class="fact.io.FitsStream"  id="fact"/>
     </stream>
     <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
     <process input="input:${copy.id}" copies="${num_copies}">
         <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
-        <stream.monitor.DataRate every="200" />
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <stream.monitor.DataRate every="50" />
+        <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
         <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" />
-        <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab"/>
-        <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataCalibrated" />
-
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="125"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" />
-
-
-        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
-                                         corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
-                                         timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" />
-        <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->
-        <stream.flow.Skip condition="%{data.shower} == null" />
-        <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>-->
-        <!--<fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>-->
-        <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="showerDistribution" />
-        <fact.features.M3Long showerKey="shower" weightsKey="photoncharge" distribution="showerDistribution"/>
-        <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
-        <stream.flow.Skip condition="%{data.size} &lt; 25" />
-
-        <fact.features.NumberOfPixelInShower showerKey="shower" outputKey="numPixelInShower" />
-        <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
-
-        <fact.features.Concentration weights="photoncharge" shower="shower" concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel"  />
-        <fact.features.ConcentrationCore cogxKey="COGx" cogyKey="COGy" showerPixelKey="shower" photonChargeKey="photoncharge" sizeKey="Size" widthKey="Width" lengthKey="Length" deltaKey="Delta" outputKey="ConcCore" />
-        <fact.features.ConcentrationAtCenterOfGravity photonChargeKey="photoncharge" cogxKey="COGx" cogyKey="COGy" sizeKey="Size" outputKey="concCOG" />
-        <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
-
-        <fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />
-
-        <fact.features.ShowerSlope photonChargeKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="Slope" />
-
-        <!-- <fact.features.video.CenterOfGravity dataCalibrated="DataCalibrated" showerPixel="shower" outputKey="videoCog" numberOfShowerPixelThreshold = "5"/> -->
-
-        <fact.features.Disp widthKey="Width" lengthKey="Length" c0="117.94" outputKey="Disp" />
-
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="1" outputKey="antiSourcePosition_1"/>
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="2" outputKey="antiSourcePosition_2"/>
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="3" outputKey="antiSourcePosition_3"/>
-
-        <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Alpha" />
-        <fact.features.source.Distance distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Distance" />
-        <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_1" outputKey="Alpha_Off_1" />
-        <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_1" outputKey="Distance_Off_1" />
-        <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Alpha_Off_2" />
-        <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_2" outputKey="Distance_Off_2" />
-        <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Alpha_Off_3" />
-        <fact.features.source.Distance distribution="showerDistribution" sourcePosition="antiSourcePosition_3" outputKey="Distance_Off_3" />
-        <fact.features.source.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
-        <fact.features.source.CosDeltaAlpha sourcePosition="antiSourcePosition_1" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha_Off_1" />
-        <fact.features.source.CosDeltaAlpha sourcePosition="antiSourcePosition_2" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha_Off_2" />
-        <fact.features.source.CosDeltaAlpha sourcePosition="antiSourcePosition_3" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha_Off_3" />
-        <fact.features.source.Theta sourcePositionKey="sourcePosition" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta" />
-        <fact.features.source.Theta sourcePositionKey="antiSourcePosition_1" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta_Off_1" />
-        <fact.features.source.Theta sourcePositionKey="antiSourcePosition_2" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta_Off_2" />
-        <fact.features.source.Theta sourcePositionKey="antiSourcePosition_3" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta_Off_3" />
-
-        <!--<fact.io.RootASCIIWriter url="file:/home/mackaiver/proton/out_${copy.id}.csv" keys="EventNum,UnixTimeUTC,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,M3Long,M3Trans,M4Long,M4Trans,varianceLong,varianceTrans,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,SourceLineTest_sourceLineTestValueProjected,SourceLineTest_sourceLineTestValueSorted,SourceLineTest_meanShowerVelocityProjected,SourceLineTest_meanShowerVelocitySorted,SourceLineTest_Off_2_sourceLineTestValueProjected,SourceLineTest_Off_2_sourceLineTestValueSorted,SourceLineTest_Off_2_meanShowerVelocityProjected,SourceLineTest_Off_2_meanShowerVelocitySorted,SourceLineTest_Off_3_sourceLineTestValueProjected,SourceLineTest_Off_3_sourceLineTestValueSorted,SourceLineTest_Off_3_meanShowerVelocityProjected,SourceLineTest_Off_3_meanShowerVelocitySorted,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3"/>-->
-        <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="EventNum,numPixelInShower,Size,Length,Width,numIslands,m3l,m3t,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3," />-->
-        <!--<fact.io.RootASCIIWriter url="file:/home/mackaiver/proton/out_${copy.id}.csv" keys="EventNum,UnixTimeUTC,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,M3Long,M3Trans,M4Long,M4Trans,varianceLong,varianceTrans,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,SourceLineTest_sourceLineTestValueProjected,SourceLineTest_sourceLineTestValueSorted,SourceLineTest_meanShowerVelocityProjected,SourceLineTest_meanShowerVelocitySorted,SourceLineTest_Off_2_sourceLineTestValueProjected,SourceLineTest_Off_2_sourceLineTestValueSorted,SourceLineTest_Off_2_meanShowerVelocityProjected,SourceLineTest_Off_2_meanShowerVelocitySorted,SourceLineTest_Off_3_sourceLineTestValueProjected,SourceLineTest_Off_3_sourceLineTestValueSorted,SourceLineTest_Off_3_meanShowerVelocityProjected,SourceLineTest_Off_3_meanShowerVelocitySorted,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3"/>-->
-        <!--<fact.statistics.ArrayMean key="McCherPhotNumber" outputKey="McCherPhotNumberAverage" />-->
-        <!--<fact.statistics.ArrayMean key="McCherPhotWeight" outputKey="McCherPhotWeightAverage" />-->
-        <!--<fact.statistics.ArrayMean key="McNoisePhotWeight" outputKey="McNoisePhotWeightAverage" />-->
-        <!--<PrintData/>-->
-        <!--  <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="EventNum,numPixelInShower,Size,Length,Width,numIslands,m3l,m3t,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Disp,Timespread,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3" />-->
-        <stream.flow.Skip condition="%{data.distance} &lt; 240" />
-        <fact.ShowViewer key="DataCalibrated"/>
-        <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="EventNum,numPixelInShower,Size,Length,Width,numIslands,m3l,m3t,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,Alpha,Distance,CosDeltaAlpha,Theta,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3" />-->
+        <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" auxService="auxService"/>
+        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="@TimeStamp,@AzTracking,@ZdTracking,@AzTrackingDev,@ZdTrackingDev,@Name" />
 
 
     </process>

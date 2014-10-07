@@ -1,6 +1,7 @@
 package fact.io;
 
 import com.google.gson.Gson;
+import fact.auxservice.AuxFileService;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -18,7 +19,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
+ * This will automatically add @drsFile (and @driveFile if path to aux files is provided) keys to the data item.
  * Created by mackaiver on 9/21/14.
  */
 public class RecursiveDirectoryStream extends AbstractMultiStream {
@@ -30,23 +31,11 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     @Parameter(required = true, description = "The suffix to filter files by. .gz for example.")
     private String suffix;
 
-    public void setAuxFolder(SourceURL auxFolder) {
-        this.auxFolder = auxFolder;
-    }
-
-    @Parameter(required = false, description = "The path to the folder containing the auxilary fits files.")
-    private SourceURL auxFolder;
-
     private String currentFilePath = "";
-
-    public void setListUrl(SourceURL listUrl) {
-        this.listUrl = listUrl;
-    }
 
     @Parameter(required = false, description = "A file containing a json array of strings with the allowed filenames. "+
             "(excluding the possible suffix)")
     private SourceURL listUrl = null;
-
 
     private AbstractStream stream;
 
@@ -173,57 +162,10 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             currentFilePath = data.get("@source").toString();
             SourceURL drsFile = findDRSFile(currentFilePath);
             data.put("@drsFile", drsFile);
-            if (auxFolder !=  null) {
-                SourceURL trackingFile = findTrackingFile(auxFolder, getDateStringFromPath(currentFilePath));
-                data.put("@driveFile", trackingFile);
-            }
         }
     }
 
-    private String getDateStringFromPath(String path) throws URISyntaxException, FileNotFoundException {
-        final URI uri = new URI(path);
-        File currentFile = new File(uri);
 
-        String currentFileName = currentFile.getName();
-        if (currentFileName.length() < 17 ){
-            throw new FileNotFoundException("Filename had the wrong format");
-        }
-        return currentFileName.substring(0,8);
-    }
-
-    /**
-     * Goes to the folder provided by auxfolder. Then uses the datestring to select the right year, month and day
-     * @param auxFolder
-     * @param dateString
-     * @return
-     * @throws FileNotFoundException
-     * @throws MalformedURLException
-     */
-    private SourceURL findTrackingFile(SourceURL auxFolder, final String dateString) throws FileNotFoundException, MalformedURLException {
-        String year = dateString.substring(0,4);
-        String month = dateString.substring(4,6);
-        String day = dateString.substring(6,8);
-        File folder = new File(auxFolder.getFile(),year);
-        folder = new File(folder, month);
-        folder = new File(folder, day);
-        if(!folder.isDirectory() || !folder.exists()){
-            throw new FileNotFoundException("Could not build path for tracking file.");
-        }
-        String[] trackingfiles = folder.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if(name.equals(dateString + ".DRIVE_CONTROL_TRACKING_POSITION.fits")){
-                    return true;
-                }
-                return false;
-            }
-        });
-        if(trackingfiles.length != 1){
-            throw new FileNotFoundException("Could not find tracking file");
-        }
-        File driveFile = new File(folder, trackingfiles[0]);
-        return new SourceURL(driveFile.toURI().toURL());
-    }
 
     /**
      * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
@@ -286,6 +228,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         this.suffix = suffix;
     }
 
-
+    public void setListUrl(SourceURL listUrl) {
+        this.listUrl = listUrl;
+    }
 
 }

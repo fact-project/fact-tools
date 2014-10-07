@@ -7,14 +7,14 @@ import stream.Data;
  * Created by kaibrugge on 06.10.14.
  */
 public class SourcePoint extends DrivePoint {
-    String name = "";
+    public String name = "";
 
-    double raSrc;
-    double decSrc;
-    double raCmd;
-    double decCmd;
-    double wobbleOffset;
-    double wobbleAngle;
+    public double raSrc;
+    public double decSrc;
+    public double raCmd;
+    public double decCmd;
+    public double wobbleOffset;
+    public double wobbleAngle;
 
 
     public SourcePoint(Data item) throws IllegalArgumentException{
