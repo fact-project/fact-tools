@@ -91,7 +91,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private boolean drawScaleNumbers = true;
 
-	private boolean includeScale = false;
+	private boolean includeScale = true;
 
 	private int offsetX = 0;
 	private int offsetY = 0;
