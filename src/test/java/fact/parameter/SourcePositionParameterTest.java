@@ -4,6 +4,7 @@ import fact.features.source.SourcePosition;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import stream.io.SourceURL;
 
 import java.net.URL;
 
@@ -28,7 +29,7 @@ public class SourcePositionParameterTest extends ParameterTest {
 		thrown.expectMessage("physicalSource");
 		//start it with a missing parameter. forget physical position
 		SourcePosition poser = new SourcePosition();
-		poser.setUrl(driveURL);
+		poser.setUrl(new SourceURL(driveURL));
 		//		poser.setPhysicalSource("crab");
 		poser.setOutputKey(outputKey);
 		poser.init(null);
@@ -40,7 +41,7 @@ public class SourcePositionParameterTest extends ParameterTest {
 		thrown.expect(RuntimeException.class);
 		thrown.expectMessage("physicalSource unknown");
 		SourcePosition poser = new SourcePosition();
-		poser.setUrl(driveURL);
+		poser.setUrl(new SourceURL(driveURL));
 		poser.setPhysicalSource("blabla not exisitng source");
 		poser.setOutputKey(outputKey);
 		poser.init(null);
@@ -54,7 +55,7 @@ public class SourcePositionParameterTest extends ParameterTest {
 
 		//start it with a missing parameter. forget outputkey
 		SourcePosition poser = new SourcePosition();
-		poser.setUrl(driveURL);
+		poser.setUrl(new SourceURL(driveURL));
 		poser.setPhysicalSource("crab");
 		//		poser.setOutputKey(outputKey);
 		poser.init(null);
@@ -65,7 +66,7 @@ public class SourcePositionParameterTest extends ParameterTest {
 	public void testValidParameter() throws Exception{
 		//start processor with the correct parameter
 		SourcePosition poser = new SourcePosition();
-		poser.setUrl(driveURL);
+		poser.setUrl(new SourceURL(driveURL));
 		poser.setPhysicalSource("crab");
 		poser.setOutputKey(outputKey);
 		poser.init(null);

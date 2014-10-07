@@ -93,7 +93,7 @@ public class ParameterTest  {
 
         URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
         SourcePosition pos = new SourcePosition();
-        pos.setUrl(driveURL);
+        pos.setUrl(new SourceURL(driveURL));
         pos.setPhysicalSource("crab");
         pos.setOutputKey(sourcePosition);
         pos.init(null);
