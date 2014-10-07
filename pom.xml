@@ -12,7 +12,7 @@
 		<streams.scope>compile</streams.scope>
 		<streams.version>[0.9.18,)</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
-		<skipTests>true</skipTests>
+		<skipTests>false</skipTests>
 	</properties>
 
 

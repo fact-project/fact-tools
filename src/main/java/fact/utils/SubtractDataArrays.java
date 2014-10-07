@@ -13,6 +13,8 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
+ * Subtract two Pixel Arrays of the same size from each other
+ * 
  * @author jbuss
  *
  */

@@ -33,7 +33,6 @@ public class DrsCalibration implements Processor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 	//	String drsFile = null;
-	private String color;
 
 	private String outputKey = "DataCalibrated";
 	private String key="Data";
@@ -148,9 +147,6 @@ public class DrsCalibration implements Processor {
 		data.put(outputKey, calibrated);
 
 		//add color value if set
-		if(color !=  null && !color.equals("")){
-			data.put("@" + Constants.KEY_COLOR + "_"+outputKey, color);
-		}
 
 		return data;
 	}
@@ -274,13 +270,6 @@ public class DrsCalibration implements Processor {
 	@Parameter(required=false, description="data array to be calibrated", defaultValue="Data")
 	public void setKey(String key) {
 		this.key = key;
-	}
-
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
 	}
 
 	public String getOutputKey() {
