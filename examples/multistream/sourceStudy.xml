@@ -8,12 +8,12 @@
     <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
     <process input="input:${copy.id}" copies="${num_copies}">
         <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
-        <stream.monitor.DataRate every="50" />
+        <stream.monitor.DataRate every="100" />
         <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
         <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" />
         <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" auxService="auxService"/>
-        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="@TimeStamp,@AzTracking,@ZdTracking,@AzTrackingDev,@ZdTrackingDev,@Name" />
+        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="@TimeStamp,@AzTracking,@ZdTracking,@AzSourceCalc,@ZdSourceCalc,@Name" />
 
 
     </process>

@@ -175,8 +175,13 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@AzTracking", trackingPoint.Az);
             data.put("@ZdTracking", trackingPoint.Zd);
 
-            data.put("@AzTrackingDev", -(trackingPoint.Az + 180) - sourceAzZd[0]);
-            data.put("@ZdTrackingDev", -(trackingPoint.Az + 180) - sourceAzZd[1]);
+
+
+            data.put("@AzSourceCalc", sourceAzZd[0]);
+            data.put("@ZdSourceCalc", sourceAzZd[1]);
+
+//            data.put("@", sourcePoint.)
+
             data.put("@Name", sourcePoint.name);
 
 

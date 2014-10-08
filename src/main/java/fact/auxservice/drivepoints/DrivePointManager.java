@@ -43,14 +43,15 @@ public class DrivePointManager<T extends DrivePoint>{
             }
 
             T lower = locList.get(insertionPoint-1);
-            T higher = locList.get(insertionPoint);
-            if ( lower.distanceTo(currentTime) < higher.distanceTo(currentTime) ){
-//                    System.out.println("returning lower");
-                return lower;
-            } else {
-//                    System.out.println("returning highrer");
-                return higher;
-            }
+            return lower;
+//            T higher = locList.get(insertionPoint);
+//            if ( lower.distanceTo(currentTime) < higher.distanceTo(currentTime) ){
+////                    System.out.println("returning lower");
+//                return lower;
+//            } else {
+////                    System.out.println("returning highrer");
+//                return higher;
+//            }
 
         }
     }
