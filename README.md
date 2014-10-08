@@ -1,5 +1,5 @@
 fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/) 
-==========
+=============
 
 The *fact-tools* are a collection of processors and stream implementations
 for the [streams](http://www.jwall.org/streams/) framework. The tools are
@@ -53,3 +53,22 @@ process graph definition as an XML file.
 With an XML file at hand the process graph can be started by issuing
 
      # java -jar fact-tools-VERSION.jar /path/to/process.xml
+     
+     
+Versioning Scheme
+---------------
+Starting with version 0.6.5 we all solemly swear to abide to the following versioning scheme. All who fail to follow these rules will be forced
+to buy a round of alcoholic beverages for everyone else.
+
+* The master branch only contains stable versions and no SNAPSHOTS (stable in this case mean we are comfortable with publishing results and sharing the program with other people)
+* Version numbers have to look like this:  0.X.YZ(-SNAPSHOT). Where X,Y,Z are natural numbers.
+* An xml file written for version 0.X has to work for all versions 0.X.YZ
+* Major version changes i.e from 0.X to 0.Z will be tagged for release
+* For new experimental features use a feature branch. See [this tutorial](http://git-scm.com/book/en/Git-Branching-Basic-Branching-and-Merging) for more information.
+
+
+ 
+
+
+
+
