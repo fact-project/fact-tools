@@ -17,7 +17,6 @@ The license text is provided along with the sources.
 
 
 
-
 Building the *fact-tools*
 -------------------------
 
@@ -66,6 +65,10 @@ to buy a round of alcoholic beverages for everyone else.
 * Major version changes i.e from 0.X to 0.Z will be tagged for release
 * For new experimental features use a feature branch. See [this tutorial](http://git-scm.com/book/en/Git-Branching-Basic-Branching-and-Merging) for more information.
 
+You will receive weekly hugs and much respect from your fellow peers for writing unit tests and documentation. 
+Especially for adding content to our ever growing [project website](http://sfb876.tu-dortmund.de/FACT/) by editing
+the content under the src/site directory.
+  
 
  
 
