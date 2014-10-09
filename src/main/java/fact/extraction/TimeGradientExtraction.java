@@ -76,6 +76,8 @@ public class TimeGradientExtraction implements Processor {
 		{
 			double posx = pixelMap.getPixelFromId(px).getXPositionInMM();
 			double posy = pixelMap.getPixelFromId(px).getYPositionInMM();
+			double distance = Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, posx, posy);
+			
 			int predictedTime = CalculatePredictedTime(px,posx,posy);
 			int leftBorder = predictedTime - searchWindowSize / 2;
 			int rightBorder = predictedTime + searchWindowSize / 2;
@@ -83,8 +85,9 @@ public class TimeGradientExtraction implements Processor {
 			{
 				rightBorder += 1;
 			}
-			int maxPos = CalculateMaxPosition(px,leftBorder,rightBorder);
-			result[px] = CalculateIntegral(px,maxPos,leftBorder) / integralGains[px];
+			int maxPos = BasicExtraction.CalculateMaxPosition(px, leftBorder, rightBorder, roi, data);
+			int halfHeightPos = BasicExtraction.CalculatePositionHalfHeight(px, maxPos, 25, roi, data);
+			result[px] = BasicExtraction.CalculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
 		}
 		
 		
@@ -94,47 +97,6 @@ public class TimeGradientExtraction implements Processor {
 	}
 
 
-	private double CalculateIntegral(int px, int maxPos, int leftBorder) {
-		int leftIntegralBorder = maxPos;
-		
-		for (; leftIntegralBorder > leftBorder ; leftIntegralBorder--)
-		{
-			int pos = px * roi + leftIntegralBorder;
-			if (data[pos] < data[maxPos] / 2.0)
-			{
-				break;
-			}
-		}
-		
-		double integral = 0;
-		
-		for (int sl = leftIntegralBorder ; sl < leftIntegralBorder + integralSize ; sl++)
-		{
-			int pos = px*roi + sl;
-			integral += data[pos];
-		}
-		
-		return integral;
-	}
-
-
-	private int CalculateMaxPosition(int px, int leftBorder, int rightBorder) {
-		int maxPos = 0;
-		double tempMax = Double.MIN_VALUE;
-		
-		for (int sl = leftBorder ; sl < rightBorder ; sl++)
-		{
-			int pos = px * roi + sl;
-			if (data[pos] > tempMax)
-			{
-				maxPos = sl;
-				tempMax = data[pos];
-			}
-		}
-		
-		
-		return maxPos;
-	}
 
 
 	private int CalculatePredictedTime(int px, double posx, double posy) {
