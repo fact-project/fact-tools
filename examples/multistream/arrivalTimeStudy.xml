@@ -1,12 +1,4 @@
-
 <module>
-    <!--<service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" />-->
-    <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-            url="file:${folder}" copies="${num_copies}" listUrl="file:${whitelist}" suffix=".fits.gz">
-        <stream class="fact.io.FitsStream"  id="fact"/>
-    </stream>
-    <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
-    <process input="input:${copy.id}" copies="${num_copies}">
         <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
         <stream.monitor.DataRate every="100" />
         <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
@@ -21,7 +13,4 @@
 
         <!--<fact.features.source.SourcePosition outputKey="sourcePosition" x="0" y="0"/>-->
         <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="position_mean,position_variance,time_mean,time_variance" />
-
-
-    </process>
 </module>
