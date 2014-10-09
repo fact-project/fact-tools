@@ -47,7 +47,7 @@ public class SourcePoint extends DrivePoint {
 
     @Override
     public String toString(){
-        return "SourcePoint: " + name + "  time: " + time + " raSrc, decSrc: " + raSrc + ", " + decSrc + " wobble angle: " + wobbleAngle;
+        return "SourcePoint: " + name + "  time: " + time + " raSrc, decSrc: " + raSrc + ", " + decSrc + " wobble angle: " + wobbleAngle + " wobble offset: " + wobbleOffset;
     }
 
 

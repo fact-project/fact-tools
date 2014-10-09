@@ -27,13 +27,13 @@ public class AuxFileService implements FileService {
 
     File currentFile;
 
-    @Parameter(required = true, description = "The path to the folder containing the auxilary fits files.")
+    @Parameter(required = false, description = "The path to the folder containing the auxilary fits files. " +
+            "This folder should contain the usual folder structure: year/month/day/<aux_files>")
     SourceURL auxFolder;
-
-    public void setAuxFolder(SourceURL auxFolder) {
-        this.auxFolder = auxFolder;
-    }
-
+    @Parameter(required = false, description = "The path to the DRIVE_CONTROL_TRACKING_POSITION file.")
+    SourceURL trackingFile;
+    @Parameter(required = false, description = "The path to the DRIVE_CONTROL_SOURCE_POSITION file")
+    SourceURL sourceFile;
 
     public synchronized SourcePoint getDriveSourcePosition(File dataFile, double julianday){
         if(!dataFile.equals(currentFile)){
@@ -52,12 +52,21 @@ public class AuxFileService implements FileService {
 
     private void setNewFilePath(File currentPath) {
         try {
-            String dateString = getDateStringFromPath(currentPath);
-            SourceURL url = findAuxFileByName(auxFolder, dateString, "DRIVE_CONTROL_SOURCE_POSITION.fits");
-            loadPointsFromFile(url, sourcePointManager, new SourcePointFactory());
 
-            url = findAuxFileByName(auxFolder, dateString, "DRIVE_CONTROL_TRACKING_POSITION.fits");
-            loadPointsFromFile(url, trackingPointManager, new TrackingPointFactory());
+            String dateString = getDateStringFromPath(currentPath);
+
+            if(auxFolder != null) {
+                SourceURL sourcePosUrl = findAuxFileByName(auxFolder, dateString, "DRIVE_CONTROL_SOURCE_POSITION.fits");
+                SourceURL trackingUrl = findAuxFileByName(auxFolder, dateString, "DRIVE_CONTROL_TRACKING_POSITION.fits");
+                loadPointsFromFile(sourcePosUrl, sourcePointManager, new SourcePointFactory());
+                loadPointsFromFile(trackingUrl, trackingPointManager, new TrackingPointFactory());
+            } else if(sourceFile !=  null && trackingFile != null){
+                loadPointsFromFile(sourceFile, sourcePointManager, new SourcePointFactory());
+                loadPointsFromFile(trackingFile, trackingPointManager, new TrackingPointFactory());
+            } else{
+                log.error("Neither auxFolder nor filePaths are provided.");
+                throw new IllegalArgumentException("Neither auxFolder nor filePaths are provided.");
+            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -107,7 +116,8 @@ public class AuxFileService implements FileService {
         try {
             return new SourceURL(driveFile.toURI().toURL());
         } catch (MalformedURLException e) {
-            log.error("WTF is happening");
+            //TODO: Fitstream sohuld have a file constructor
+            log.error("This should never happen ");
             return null;
         }
     }
@@ -135,4 +145,17 @@ public class AuxFileService implements FileService {
     @Override
     public void reset() throws Exception {
     }
+
+    public void setTrackingFile(SourceURL trackingFile) {
+        this.trackingFile = trackingFile;
+    }
+
+    public void setSourceFile(SourceURL sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+
+    public void setAuxFolder(SourceURL auxFolder) {
+        this.auxFolder = auxFolder;
+    }
+
 }

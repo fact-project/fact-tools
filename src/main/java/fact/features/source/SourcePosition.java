@@ -10,7 +10,6 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
 import java.io.File;
 import java.util.Date;
@@ -23,8 +22,10 @@ import java.util.Date;
  *  In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
  *  This data is written by the telescope drive system into an auxilary .fits file called DRIVE_TRACKING_POSITION.
  *
- *  TODO: The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
+ *  The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
+ *
  *  TODO: Plot deviation between calculated and written Az and Zd for files in whitelist
+ *  TODO: compare sourcepositions with ganymed
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -35,23 +36,8 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
     private String outputKey = null;
 
-    //The url to the TRACKING_POSITION slow control file
-    @Parameter(required = false)
-    private SourceURL url;
-
-    //The url to the SOURCE_POSITION slow control file
-    @Parameter(required = false)
-    private SourceURL sourceUrl;
-
-    @Parameter(required = false, description = "A string with the name of the source. So far this supports mrk421, crab, and mrk501. This is convinience so you dont have to use {@code setSourceRightAscension} and  {@code setSourceDeclination} ")
-    private String physicalSource = null;
-
     @Parameter(required = true, description = "Name of the service that provides aux files")
     private AuxFileService auxService;
-
-    public void setAuxService(AuxFileService auxService) {
-        this.auxService = auxService;
-    }
 
     //position of the Telescope
     public final double mLongitude                  = -17.890701389;
@@ -59,9 +45,6 @@ public class SourcePosition implements StatefulProcessor {
     //Distance from earth center
     public final double mDistance                   = 4890.0;
 
-
-    Double	sourceRightAscension = null;
-    Double	sourceDeclination = null;
 
     private Float x = null;
     private Float y = null;
@@ -142,6 +125,7 @@ public class SourcePosition implements StatefulProcessor {
             //add source position to dataitem
             double[] source = {x, y};
 //			System.out.println("x: "+  source[0] + " y: " +source[1] );
+            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
             return data;
         }
@@ -165,25 +149,21 @@ public class SourcePosition implements StatefulProcessor {
             double[] pointingAzZd = getAzZd(trackingPoint.ra, trackingPoint.dec, gmst);
             //pointAzDz should be equal to the az dz written by the drive
             //double dev = Math.abs(point.Az - pointingAzDe[0]);
-            double[] sourceAzZd = getAzZd(sourceRightAscension, sourceDeclination, gmst);
+            double[] sourceAzZd = getAzZd(sourcePoint.raSrc, sourcePoint.decSrc, gmst);
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
 
             //add source position to dataitem
             double[] source = {sourcePosition[0], sourcePosition[1]};
             data.put(outputKey, source);
-            data.put("@TimeStamp", new Date((long)timestamp*1000L));
-            data.put("@AzTracking", trackingPoint.Az);
-            data.put("@ZdTracking", trackingPoint.Zd);
-
-
-
-            data.put("@AzSourceCalc", sourceAzZd[0]);
-            data.put("@ZdSourceCalc", sourceAzZd[1]);
-
-//            data.put("@", sourcePoint.)
-
-            data.put("@Name", sourcePoint.name);
-
+//            data.put("@TimeStamp", new Date((long)timestamp*1000L));
+//            data.put("@AzTracking", trackingPoint.Az);
+//            data.put("@ZdTracking", trackingPoint.Zd);
+//
+//            data.put("@AzPointing", pointingAzZd[0]);
+//            data.put("@ZdPointing", pointingAzZd[1]);
+//
+//            data.put("@AzSourceCalc", sourceAzZd[0]);
+//            data.put("@ZdSourceCalc", sourceAzZd[1]);
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
 
@@ -202,29 +182,6 @@ public class SourcePosition implements StatefulProcessor {
         return data;
     }
 
-    void sourceIsCrab()
-    {
-        sourceRightAscension       = (5.0 + 34.0/60 + 31.97/3600) / 24.0 * 360.0;
-        sourceDeclination          = 22.0 + 0.0/60 + 52.10/3600;
-    }
-
-    void sourceIsMrk421()
-    {
-        sourceRightAscension       = (11.0 + 4.0/60 + 27.0/3600) / 24.0 * 360.0;
-        sourceDeclination          = 38.0 + 12.0/60 + 32.0/3600;
-    }
-
-    void sourceIsMrk501()
-    {
-        sourceRightAscension       = (16.0 + 53.0/60 + 52.2/3600) / 24.0 * 360.0;
-        sourceDeclination          = 39.0 + 45.0/60 + 37.0/3600;
-    }
-
-    void setRaDec(double ra, double dec)
-    {
-        sourceRightAscension       = ra;
-        sourceDeclination          = dec;
-    }
     /**
      * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension, declination and the time in gmst format.
      * @param ra in degrees
@@ -299,43 +256,15 @@ public class SourcePosition implements StatefulProcessor {
         this.outputKey = outputKey;
     }
 
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
-    public void setSourceUrl(SourceURL url) {
-        this.sourceUrl = url;
-    }
-
-    public void setSourceDeclination(Double sourceDeclination) {
-        this.sourceDeclination = sourceDeclination;
-    }
-
-    public void setSourceRightAscension(Double sourceRightAscension) {
-        this.sourceRightAscension = sourceRightAscension;
-    }
-
-    public void setPhysicalSource(String physicalSource) {
-        this.physicalSource = physicalSource;
-        if(physicalSource.toLowerCase().equals("crab")){
-            sourceIsCrab();
-            log.info("Using the crab nebula as source");
-        } else if (physicalSource.toLowerCase().equals("mrk421")){
-            sourceIsMrk421();
-            log.info("Using the mrk421 as source");
-        } else if (physicalSource.toLowerCase().equals("mrk501")){
-            sourceIsMrk501();
-            log.info("Using the mrk501 as source");
-        } else {
-            throw new RuntimeException("physicalSource unknown. Provide the parameters sourceRightAscension and  sourceDeclination instead");
-        }
-    }
-
     public void setX(Float x) {
         this.x = x;
     }
     public void setY(Float y) {
         this.y = y;
+    }
+
+    public void setAuxService(AuxFileService auxService) {
+        this.auxService = auxService;
     }
 
 }
