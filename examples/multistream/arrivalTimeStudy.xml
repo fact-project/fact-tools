@@ -2,7 +2,7 @@
 <module>
     <!--<service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" />-->
     <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-            url="file:${folder}" listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
+            url="file:${folder}" copies="${num_copies}" listUrl="file:${whitelist}" suffix=".fits.gz">
         <stream class="fact.io.FitsStream"  id="fact"/>
     </stream>
     <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
@@ -11,10 +11,16 @@
         <stream.monitor.DataRate every="100" />
         <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
-        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" />
-        
+        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService"/>
+        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.statistics.ArrayStatistics key="arrivalTime" outputKey="time" />
+        <fact.statistics.ArrayStatistics key="maxAmplitudePosition" outputKey="position" />
+
+
+
         <!--<fact.features.source.SourcePosition outputKey="sourcePosition" x="0" y="0"/>-->
-        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="arrivalTimeMean" />
+        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="position_mean,position_variance,time_mean,time_variance" />
 
 
     </process>

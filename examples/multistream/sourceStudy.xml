@@ -1,6 +1,8 @@
 
 <module>
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" />
+
+
     <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
             url="file:${folder}" listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
         <stream class="fact.io.FitsStream"  id="fact"/>
