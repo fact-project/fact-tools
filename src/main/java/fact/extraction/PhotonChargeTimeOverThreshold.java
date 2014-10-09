@@ -43,11 +43,6 @@ public class PhotonChargeTimeOverThreshold implements Processor {
 				
 		int[] timeOverThresholdArray 	 = (int[]) input.get(timeOverThresholdKey);
 		threshold = (Double) input.get(thresholdKey);
-		
-		if (threshold != 1500)
-		{
-			throw new RuntimeException("Currently only threshold equal 1500 mV supported");
-		}
 				
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			

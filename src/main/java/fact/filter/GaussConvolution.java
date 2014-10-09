@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package fact.filter;
 
@@ -13,7 +13,7 @@ import stream.annotations.Parameter;
 
 /**
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- *
+ * 
  */
 @Description(group = "Fact Tools.Filter", text = "")
 public class GaussConvolution implements Processor {

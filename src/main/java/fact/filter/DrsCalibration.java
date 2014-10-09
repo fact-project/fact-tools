@@ -38,6 +38,8 @@ public class DrsCalibration implements Processor {
 
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
+	//	String drsFile = null;
+
 	private String outputKey = "DataCalibrated";
 	private String key="Data";
 

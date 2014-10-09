@@ -68,7 +68,7 @@ public class ParameterTest  {
         PhotonCharge pC = new PhotonCharge();
         pC.setDataKey(key);
         pC.setOutputKey(photonCharge);
-		pC.setUrl(FitsStreamTest.class.getResource("/defaultIntegralGains.csv"));
+		pC.setUrl(new SourceURL(FitsStreamTest.class.getResource("/defaultIntegralGains.csv")));
 		pC.setRangeSearchWindow(25);
         pC.setPositions(positions);
         pC.process(item);
