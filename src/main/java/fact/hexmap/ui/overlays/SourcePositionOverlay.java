@@ -55,4 +55,9 @@ public class SourcePositionOverlay implements CameraMapOverlay {
         g2.setPaint(oldPaint);
         g2.setTransform(transform);
     }
+
+	@Override
+	public int getDrawRank() {		
+		return 2;
+	}
 }
