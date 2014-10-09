@@ -25,7 +25,7 @@ public class MuonRingClean implements Processor {
 		
 		int[] ringPixel = (int[]) input.get(ringPixelKey);
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
-		int[] arrivalTime = (int[]) input.get(arrivalTimeKey);
+		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		
 		ArrayList<Integer> cleanRingList = new ArrayList<Integer>();
 		PixelSetOverlay cleanPixelSet = new PixelSetOverlay();
@@ -41,7 +41,7 @@ public class MuonRingClean implements Processor {
 		if(timeThreshold>0 && cleanRingList.size()>14){
 			double median;
 		
-			int[] arrivalTimeForMedian = new int[cleanRingList.size()];
+			double[] arrivalTimeForMedian = new double[cleanRingList.size()];
 		
 			for(int i=0; i<cleanRingList.size(); i++){
 				arrivalTimeForMedian[i] = arrivalTime[cleanRingList.get(i)];

@@ -280,6 +280,16 @@ public class Utils {
 
 		return c;
 	}
+    
+    public static double calculateDistancePointToShowerAxis(double cogx, double cogy, double delta, double x, double y){
+    	double distance = 0;
+    	
+    	double r0 = (x-cogx)*Math.cos(delta)+(y-cogy)*Math.sin(delta);
+    	
+    	distance = Math.sqrt( Math.pow(cogx-x+r0*Math.cos(delta),2)+Math.pow(cogy-y+r0*Math.sin(delta),2) );
+    	
+    	return distance;
+    }
 
 	/**
 	 * Sum up array

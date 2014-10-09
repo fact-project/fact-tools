@@ -68,11 +68,11 @@ public class CoreNeighborClean implements Processor{
 
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(input, arrivalTimeKey, int[].class);
+		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 		Utils.isKeyValid(input, photonChargeKey, double[].class);		
 			
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
-		double[] arrivalTimes = Utils.toDoubleArray(input.get(arrivalTimeKey));
+		double[] arrivalTimes = (double[]) input.get(arrivalTimeKey);
 		
 		ArrayList<Integer> showerPixel= new ArrayList<>();
 		

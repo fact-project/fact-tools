@@ -48,7 +48,7 @@ public class GaussConvolution implements Processor {
         int numSamples = (int) (4*Math.sqrt(variance) + 1);
 
         double[] data = (double[]) input.get(key);
-        int npix = (int) input.get("NPIX");
+        int npix = (Integer) input.get("NPIX");
         double[] result = new double[data.length];
         for (int i = 0; i < result.length; i++) {
             for (int m = -numSamples; m < numSamples; m++) {
