@@ -16,11 +16,20 @@ import stream.annotations.Parameter;
 public class MovingLinearFit implements Processor{
     static Logger log = LoggerFactory.getLogger(MovingLinearFit.class);
 
+    @Parameter(required = true, description = "key of data array")
     String key=null;
-    String outputKey=null;
 
-    @Parameter(required = true)
+    @Parameter(required = true, description = "key of slope array")
+    String slopeKey=null;
+
+    @Parameter(required = true, description = "key of intercept array")
+    String interceptKey=null;
+
+    @Parameter(required = true, description = "width of the window to do the linear regression", defaultValue = "10")
     int width = 10;
+
+    @Parameter(required = true, description = "scaling factor for the slope", defaultValue = "1")
+    double scale = 1;
 
     @Override
     public Data process(Data input) {
@@ -29,7 +38,8 @@ public class MovingLinearFit implements Processor{
         Utils.mapContainsKeys(input, key);
 
         double[] data = (double[])input.get(key);
-        double[] result = new double[data.length];
+        double[] slope = new double[data.length];
+        double[] intercept = new double[data.length];
 
         for (int i=1 ; i < data.length ; i++)
         {
@@ -38,10 +48,12 @@ public class MovingLinearFit implements Processor{
                 regression.addData( j, data[(i+j) % data.length]);
             }
             regression.regress();
-            result[ (i+(width/2)) % data.length ] = 10*regression.getSlope();
+            slope[ (i+(width/2)) % data.length ]     = scale*regression.getSlope();
+            intercept[ (i+(width/2)) % data.length ] = regression.getIntercept();
         }
 
-        input.put(outputKey, result);
+        input.put(slopeKey, slope);
+        input.put(interceptKey, intercept);
 
         return input;
     }
@@ -54,19 +66,35 @@ public class MovingLinearFit implements Processor{
         this.key = key;
     }
 
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
     public int getWidth() {
         return width;
     }
 
     public void setWidth(int width) {
         this.width = width;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
+    public String getSlopeKey() {
+        return slopeKey;
+    }
+
+    public void setSlopeKey(String slopeKey) {
+        this.slopeKey = slopeKey;
+    }
+
+    public String getInterceptKey() {
+        return interceptKey;
+    }
+
+    public void setInterceptKey(String interceptKey) {
+        this.interceptKey = interceptKey;
     }
 }
