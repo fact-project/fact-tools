@@ -48,7 +48,7 @@ public class TimeOverThreshold implements Processor {
 		Utils.isKeyValid(input, positionsKey, int[].class);
 				
 		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
-		int[] firstSliceOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
+		double[] firstSliceOverThresholdArray =  new double[Constants.NUMBEROFPIXEL];
 		
 		double[] data 	 = (double[]) input.get(dataKey);
 		int[] posArray = (int[]) input.get(positionsKey);
@@ -103,7 +103,7 @@ public class TimeOverThreshold implements Processor {
 
 
 			timeOverThresholdArray[pix] = timeOverThreshold;
-			firstSliceOverThresholdArray[pix] = firstSliceOverThresh;
+			firstSliceOverThresholdArray[pix] = (double) firstSliceOverThresh;
 			m[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh);	
 		}
 		

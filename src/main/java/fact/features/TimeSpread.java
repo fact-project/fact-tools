@@ -25,7 +25,7 @@ public class TimeSpread implements Processor {
 		
 		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, showerKey);
 		
-		arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));
+		arrivalTime = (double[]) input.get(arrivalTimeKey);
 		weights = (double[]) input.get(weightsKey);
 		shower = (int[]) input.get(showerKey);
 		

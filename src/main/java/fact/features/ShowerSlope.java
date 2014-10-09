@@ -24,7 +24,7 @@ public class ShowerSlope implements Processor {
 	private String outputKey = null;
 	
 	private double[] photonCharge = null;
-	private int[] arrivalTime = null;
+	private double[] arrivalTime = null;
 	private int[] shower = null;
 	private double cogx;
 	private double cogy;
@@ -37,7 +37,7 @@ public class ShowerSlope implements Processor {
 		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
 		
 		photonCharge = (double[]) input.get(photonChargeKey);
-		arrivalTime = (int[]) input.get(arrivalTimeKey);
+		arrivalTime = (double[]) input.get(arrivalTimeKey);
 		shower = (int[]) input.get(showerKey);
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);

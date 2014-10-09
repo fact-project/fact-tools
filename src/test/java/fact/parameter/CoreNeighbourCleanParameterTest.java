@@ -25,7 +25,7 @@ public class CoreNeighbourCleanParameterTest extends ParameterTest {
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
 		CoreNeighborClean poser = new CoreNeighborClean();
 		poser.setPhotonChargeKey(photonCharge);
-		poser.setArrivalTimeKey(positions);
+		poser.setArrivalTimeKey(arrivalTime);
         poser.setCorePixelThreshold(0);
         poser.setNeighborPixelThreshold(0);
         poser.setMinNumberOfPixel(0);

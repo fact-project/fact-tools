@@ -13,6 +13,7 @@ import stream.io.SourceURL;
 import fact.cleaning.CoreNeighborClean;
 import fact.extraction.MaxAmplitudePosition;
 import fact.extraction.PhotonCharge;
+import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
 import fact.filter.DrsCalibration;
@@ -38,6 +39,7 @@ public class ParameterTest {
 	final String key = "calib";
 	final String photonCharge = "photoncharge";
 	final String positions = "positions";
+	final String arrivalTime = "arrivalTime";
 	final String shower = "shower";
 
 	@Before
@@ -66,6 +68,12 @@ public class ParameterTest {
 		pP.setKey(key);
 		pP.setOutputKey(positions);
 		pP.process(item);
+		
+		RisingEdgeForPositions pR = new RisingEdgeForPositions();
+		pR.setDataKey(key);
+		pR.setAmplitudePositionsKey(positions);
+		pR.setOutputKey(arrivalTime);
+		pR.process(item);
 
 		PhotonCharge pC = new PhotonCharge();
 		pC.setDataKey(key);
@@ -78,7 +86,7 @@ public class ParameterTest {
 
 		CoreNeighborClean poser = new CoreNeighborClean();
 		poser.setPhotonChargeKey(photonCharge);
-		poser.setArrivalTimeKey(positions);
+		poser.setArrivalTimeKey(arrivalTime);
 		poser.setOutputKey(shower);
 		poser.setCorePixelThreshold(1);
 		poser.setNeighborPixelThreshold(0.1);

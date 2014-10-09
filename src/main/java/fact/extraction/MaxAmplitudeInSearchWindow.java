@@ -20,7 +20,7 @@ public class MaxAmplitudeInSearchWindow implements Processor {
 	private int searchWindowRight;
 	
 	private double[] amplitudes = new double[Constants.NUMBEROFPIXEL];
-	private double[] positions = new double[Constants.NUMBEROFPIXEL];
+	private int[] positions = new int[Constants.NUMBEROFPIXEL];
 	
 	int roi;
 	
