@@ -1,0 +1,61 @@
+<container>
+
+<!-- Closed Shutter Data: -->
+<property name="fhgfs" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
+<property name="data" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_045.fits.gz" />
+<property name="dataDRS" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_040.drs.fits.gz" />
+
+<!-- Open Shutter Data: -->
+<!-- <property name="data" value="/local/data/kgray/test/20130104_095.fits.gz" />  -->
+<!-- <property name="dataDRS" value="/local/data/kgray/test/20130104_076.drs.fits.gz" /> -->
+
+
+    <stream id="fact" class="fact.io.FitsStream" 
+            url="file:${data}" />
+            
+        <process input="fact">
+        <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+        <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
+<!--         <stream.flow.Skip condition="%{data.TriggerType} != 4" /> -->
+        <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
+        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+       
+        <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmoothedold" length="5"/>
+        <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataSmoothed" variance="1"/>
+            <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataSmoothed10" variance="10"/>
+
+
+
+<!--  For Closed Shutter Data: Threshold Extraction Method -->
+<!--         <fact.utils.CutValues key="DataSmoothed" outputKey="DataAboveThreshold" minValue="5.0" />    -->
+<!--         <fact.features.FindThresholdCrossings key="DataSmoothed" outputKey="StartPositions" visualizeOutputKey="PositionPulseCandidates" minBelow="4" minAbove="9" threshold="5.0" /> -->
+<!--         <fact.features.PulseMaxAmplitude key="DataSmoothed" outputKey="PulseMaxAmp" pulsePositionKey="StartPositions" /> -->
+<!--         <fact.features.ArrivalTime key="DataSmoothed" outputKey="ArrivalTimesAmp" maxAmpPositionKey="PulseMaxAmp" visualizeKey="halfMaxArrivalTimes"/> -->
+<!--         <fact.features.PulseSizeCalculator key="DataSmoothed" outputKey="ClosedPulseSizesAmp" arrivalTimeKey="ArrivalTimesAmp" width="30" /> -->
+
+
+<!--  For Open Shutter Data: Slope Extraction Method -->
+        <!--<fact.filter.ShapeSignal key="DataSmoothed" outputKey="DataShaped" shift="10"/>-->
+        <!--<fact.filter.MovingLinearFit key="DataShaped" slopeKey="slope5"  interceptKey="intercept5"  scale="10" width="5"/>-->
+        <!--<fact.filter.MovingLinearFit key="DataShaped" slopeKey="slope7"  interceptKey="intercept7"  scale="10" width="7"/>-->
+        <!--<fact.filter.MovingLinearFit key="DataShaped" slopeKey="slope14" interceptKey="intercept14" scale="10" width="14"/>-->
+        <!--<fact.filter.MovingLinearFit key="DataShaped" slopeKey="slope20" interceptKey="intercept20" scale="10" width="20"/>-->
+		<fact.statistics.Derivation key="DataSmoothed" outputKey="slopeKey" />
+		<fact.features.ArrivalTimeFromSlope key="DataSmoothed" outputKey="ArrivalTimesSlope" derivationKey="slopeKey" visualizeKey="slopeArrivalTimes" 
+			baselineKey="baselines" skipFirstSlices="20" skipLastSlices="120"/>
+		<fact.features.OpenShutterPulseSize key="DataSmoothed" outputKey="OpenPulseSizesSlope" arrivalTimeKey="ArrivalTimesSlope" baselineKey="baselines" width="30" />
+
+        <PrintData/>
+
+		<fact.io.JSONWriter url="file:/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/test.json" keys="OpenPulseSizesSlope,ArrivalTimesSlope,baselines"/>
+<!--         <fact.io.CreateNestedListFile DataOutputKey="OpenPulseSizesSlope" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-slope-open-pulses.txt" /> -->
+<!--         <fact.io.CreateNestedListFile DataOutputKey="ArrivalTimesSlope" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-slope-arrivalTimes.txt" /> -->
+<!--         <fact.io.CreateNestedListFile DataOutputKey="ArrivalTimesAmp" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-amp-arrivalTimes.txt" /> -->
+<!--         <fact.io.CreateNestedListFile DataOutputKey="ClosedPulseSizesAmp" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-amp-closed-pulses.txt" /> -->
+
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+
+	</process>
+</container>
