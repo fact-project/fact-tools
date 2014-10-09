@@ -1,0 +1,5 @@
+<dashboard ui:size="1280,800">
+
+    
+    <Table id="tab"/>
+</dashboard>
