@@ -91,10 +91,6 @@ public class SourcePositionTest {
 		C_T_coord[0] /= 3;
 		C_T_coord[1] /= 3;
 		
-		sourcePosition.setSourceRightAscension(C_T_rightAscension);
-		sourcePosition.setSourceDeclination(C_T_declination);
-		
-		
 		double pointingRa = 83.1375;
 		double pointingDec = 21.628055555555555;
 		double gmst = 1.1289573103059787;

@@ -91,13 +91,11 @@ public class ParameterTest  {
         dist.setOutputKey(distribution);
         dist.process(item);
 
-        URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
-        SourcePosition pos = new SourcePosition();
-        pos.setUrl(new SourceURL(driveURL));
-        pos.setPhysicalSource("crab");
-        pos.setOutputKey(sourcePosition);
-        pos.init(null);
-        pos.process(item);
+        SourcePosition position = new SourcePosition();
+        position.setOutputKey(sourcePosition);
+        position.setX(0f);
+        position.setY(0f);
+        position.process(item);
     }
 
 }
