@@ -33,7 +33,7 @@ public class RisingEdgeForPositions implements Processor {
 	public Data process(Data input) {
         Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
-        int[] positions =  new int[Constants.NUMBEROFPIXEL];
+        double[] positions =  new double[Constants.NUMBEROFPIXEL];
 		
 		double[] data = (double[]) input.get(dataKey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
@@ -69,7 +69,7 @@ public class RisingEdgeForPositions implements Processor {
 					arrivalPos = slice;
 				}
 			}
-			positions[pix] = arrivalPos;
+			positions[pix] = (double) arrivalPos;
 		}
 		input.put(outputKey, positions);
 		

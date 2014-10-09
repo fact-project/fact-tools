@@ -3,6 +3,7 @@ package fact.parameter;
 import fact.cleaning.CoreNeighborClean;
 import fact.extraction.MaxAmplitudePosition;
 import fact.extraction.PhotonCharge;
+import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
 import fact.filter.DrsCalibration;
@@ -33,9 +34,10 @@ public class ParameterTest  {
 	final String distribution = "dist";
 	final String sourcePosition="pos";
 	final String key = "calib";
-    final String photonCharge = "photoncharge";
-    final String positions = "positions";
-    final String shower = "shower";
+	final String photonCharge = "photoncharge";
+	final String positions = "positions";
+	final String arrivalTime = "arrivalTime";
+	final String shower = "shower";
 
 
 
