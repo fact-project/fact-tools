@@ -268,6 +268,37 @@ public class CoreNeighborClean implements Processor{
 		return newList;
 	}
 	
+	
+	/**
+	 * Remove pixels with less than minNumberOfNeighborPixel neighboring shower pixel, 
+	 * which arrival time differs more than the timeThreshold from the current pixel
+	 * @param showerPixel
+	 * @param arrivalTime
+	 * @param timeThreshold
+	 * @param minNumberOfNeighborPixel
+	 * @return
+	 */
+	public ArrayList<Integer> applyTimeNeighborCleaning(ArrayList<Integer> showerPixel,double[] arrivalTime, double timeThreshold, int minNumberOfNeighborPixel) {
+		
+	
+		ArrayList<Integer> newList= new ArrayList<Integer>();
+		for(int pixel: showerPixel){
+			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pixel);
+			int counter = 0;
+			double time = arrivalTime[pixel];
+			for (FactCameraPixel nPix:currentNeighbors){
+				if( Math.abs(arrivalTime[nPix.id]-time) < timeThreshold){
+					counter++;
+				}
+			}
+			if (counter >= minNumberOfNeighborPixel)
+			{
+				newList.add(pixel);
+			}
+		}		
+		return newList;
+	}
+	
 	/**
 	 * Calculates the Distance between a pixel and a given position
 	 * @param chid
