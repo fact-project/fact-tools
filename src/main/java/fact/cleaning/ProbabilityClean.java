@@ -50,7 +50,7 @@ public class ProbabilityClean implements Processor {
 		{
 			double xpos = pixelMap.getPixelFromId(px).getXPositionInMM();
 			double ypos = pixelMap.getPixelFromId(px).getYPositionInMM();
-			double weight = photoncharge[px] / CalculateDistance(px,xpos,ypos);
+			double weight = photoncharge[px] / Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, xpos, ypos);
 			
 			if (weight > probabilityThreshold)
 			{
@@ -67,11 +67,6 @@ public class ProbabilityClean implements Processor {
 		}
 		
 		return input;
-	}
-
-	private double CalculateDistance(int px, double xpos, double ypos) {
-		
-		return 1;
 	}
 
 	public String getPhotonChargeKey() {
