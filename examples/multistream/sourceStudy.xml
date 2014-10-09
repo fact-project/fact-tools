@@ -13,7 +13,7 @@
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
         <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" />
         <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" auxService="auxService"/>
-        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="@TimeStamp,@AzTracking,@ZdTracking,@AzSourceCalc,@ZdSourceCalc,@Name" />
+        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="@TimeStamp,@AzPointing,@ZdPointing,@AzTracking,@ZdTracking,@AzSourceCalc,@ZdSourceCalc,@Name" />
 
 
     </process>
