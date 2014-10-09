@@ -4,6 +4,7 @@
 package fact.filter;
 
 import fact.Constants;
+import fact.auxservice.DrsFileService;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,12 @@ public class DrsCalibration implements Processor {
 	private String outputKey = "DataCalibrated";
 	private String key="Data";
 
-    @Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
+    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
     private SourceURL url = null;
+
+    @Parameter(required = false, description = "If given will try to use the file provided by the service")
+    private DrsFileService service;
+
 
     Data drsData = null;
 
@@ -121,17 +126,17 @@ public class DrsCalibration implements Processor {
 	 */
 	@Override
 	public Data process(Data data) {
-        //check if the stream is comming from another source. we might need a new drs file
-        if (this.url == null && !currentFilePath .equals(data.get("@source").toString()) ){
+        if( this.url == null && !currentFilePath .equals(data.get("@source").toString()) ){
 			//file not loaded yet. try to find by magic.
             currentFilePath = data.get("@source").toString();
             try {
-                SourceURL url = (SourceURL) data.get("@drsFile");
+                SourceURL url = service.findDRSFile(currentFilePath);
                 log.info("Using drs file: " + url.toString());
                 loadDrsData(url);
-            } catch (ClassCastException e) {
+            } catch (FileNotFoundException e) {
                 log.error("Couldn't find correct .drs File.");
-                throw new RuntimeException("Couldn't find correct .drs File.");
+                e.printStackTrace();
+                throw new RuntimeException();
             }
 		}
 
@@ -305,5 +310,9 @@ public class DrsCalibration implements Processor {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
+
+    public void setService(DrsFileService service) {
+        this.service = service;
+    }
 }
 

@@ -1,7 +1,7 @@
 package fact.io;
 
 import com.google.gson.Gson;
-import fact.auxservice.AuxFileService;
+import fact.auxservice.DrsFileService;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -30,8 +30,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     private int  maxDepth = 6;
     @Parameter(required = true, description = "The suffix to filter files by. .gz for example.")
     private String suffix;
-
-    private String currentFilePath = "";
 
     @Parameter(required = false, description = "A file containing a json array of strings with the allowed filenames. "+
             "(excluding the possible suffix)")
@@ -66,6 +64,10 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         log.info("Loading files.");
         ArrayList<File> fileList = walkFiles(f, suffix, 0);
         for (File file: fileList){
+            if(fileNames.isEmpty()){
+                files.add(file);
+                continue;
+            }
             if(fileNames.contains(file.getName())) {
                 files.add(file);
             }
@@ -139,7 +141,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         }
         Data data = stream.read();
         if (data != null) {
-            addDrsAndtrackingFileToData(data);
             return data;
         } else {
             File f = files.poll();
@@ -150,76 +151,15 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
                 stream.setUrl(new SourceURL(f.toURI().toURL()));
                 stream.init();
                 data = stream.read();
-                addDrsAndtrackingFileToData(data);
                 log.info("Streaming file: " + stream.getUrl().toString());
                 return data;
             }
         }
     }
 
-    public void addDrsAndtrackingFileToData(Data data) throws FileNotFoundException, URISyntaxException, MalformedURLException {
-        if (currentFilePath != data.get("@source").toString()){
-            currentFilePath = data.get("@source").toString();
-            SourceURL drsFile = findDRSFile(currentFilePath);
-            data.put("@drsFile", drsFile);
-        }
-    }
 
 
 
-    /**
-     * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
-     * files in the directory containing the substring "drs.fits" and having the same date as the current data
-     * fits file. The .drs file with the nearest number lower than the number of the data file will be returned.
-     *
-     * The expected format of the file names is:
-     * 20130331_012.drs.fits*
-     * 20130331_013.fits*
-     *
-     * @param pathToCurrentFitsFile
-     * @return
-     * @throws java.io.FileNotFoundException
-     */
-    private SourceURL findDRSFile(String pathToCurrentFitsFile) throws FileNotFoundException {
-        try {
-            final URI uri = new URI(pathToCurrentFitsFile);
-            File currentFile = new File(uri);
-
-            String currentFileName = currentFile.getName();
-            if (currentFileName.length() < 17 ){
-                throw new FileNotFoundException("filename had the wrong format");
-            }
-            final int fileNumber = new Integer(currentFileName.substring(9,12));
-            final int dateNumber = new Integer(currentFileName.substring(0,8));
-            File parent = currentFile.getParentFile();
-            if(parent.isDirectory()){
-                String[] drsFileNames = parent.list(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        if(name.contains("drs.fits")) {
-                            int drsFileNumber = new Integer(name.substring(9, 12));
-                            int drsDateNumber = new Integer(name.substring(0,8));
-                            if (drsDateNumber == dateNumber && drsFileNumber <= fileNumber){
-                                return true;
-                            }
-                        }
-                        return  false;
-                    }
-                });
-                if(drsFileNames == null){
-                    //IO error occurred
-                    throw new FileNotFoundException("Could not load file names from directory");
-                }
-                Arrays.sort(drsFileNames);
-                File f = new File(parent,drsFileNames[drsFileNames.length-1]);
-                return new SourceURL(f.toURI().toURL());
-            }
-            return null;
-        } catch (Exception e) {
-//            e.printStackTrace();
-            throw new FileNotFoundException("Could not find DRS file automatically");
-        }
-    }
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }
