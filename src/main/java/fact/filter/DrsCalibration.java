@@ -9,7 +9,9 @@ import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
@@ -32,7 +34,7 @@ import java.util.Arrays;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
-public class DrsCalibration implements Processor {
+public class DrsCalibration implements StatefulProcessor {
 	// conversion factor:
 	// the input values are 12-bit short values representing measurements of
 	// voltage
@@ -48,7 +50,7 @@ public class DrsCalibration implements Processor {
     private SourceURL url = null;
 
     @Parameter(required = false, description = "If given will try to use the file provided by the service")
-    private DrsFileService service;
+    private DrsFileService drsService;
 
 
     Data drsData = null;
@@ -130,7 +132,7 @@ public class DrsCalibration implements Processor {
 			//file not loaded yet. try to find by magic.
             currentFilePath = data.get("@source").toString();
             try {
-                SourceURL url = service.findDRSFile(currentFilePath);
+                SourceURL url = drsService.findDRSFile(currentFilePath);
                 log.info("Using drs file: " + url.toString());
                 loadDrsData(url);
             } catch (FileNotFoundException e) {
@@ -304,15 +306,35 @@ public class DrsCalibration implements Processor {
 
 	public void setUrl(SourceURL url) {
         this.url = url;
-		try {
-			loadDrsData(url);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
 	}
 
-    public void setService(DrsFileService service) {
-        this.service = service;
+    public void setDrsService(DrsFileService service) {
+        this.drsService = service;
+    }
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+        if(url == null && drsService == null){
+            log.error("Url and Service are not set. You need to set one of those");
+            throw new IllegalArgumentException("Wrong parameter");
+        }
+        if (url != null) {
+            try {
+                loadDrsData(url);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
     }
 }
 
