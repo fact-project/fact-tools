@@ -14,7 +14,7 @@ import java.util.List;
  * TODO: find thresholds and check code. unit test?
  * @author Fabian Temme
  */
-public class ProbabilityClean implements Processor {
+public class ProbabilityClean extends BasicCleaning implements Processor {
 
 	private String photonChargeKey = null;
 	
