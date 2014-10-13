@@ -67,6 +67,8 @@ public class ParameterTest {
 		MaxAmplitudePosition pP = new MaxAmplitudePosition();
 		pP.setKey(key);
 		pP.setOutputKey(positions);
+		pP.setSearchWindowLeft(0);
+		pP.setSearchWindowRight(250);
 		pP.process(item);
 		
 		RisingEdgeForPositions pR = new RisingEdgeForPositions();
