@@ -14,6 +14,8 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -188,6 +190,17 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 				overlays.add(overlay);
 			}
 		}
+		
+		class customComparator implements Comparator<CameraMapOverlay> {
+		    public int compare(CameraMapOverlay object1, CameraMapOverlay object2) {            	
+		        return object1.getDrawRank() - object2.getDrawRank();
+		    }
+		}
+		// Sortierung in der richtigen Reihenfolge
+		// um ueberdeckungen zu vermeiden 
+		// von niedrig nach hoch
+		Collections.sort(overlays, new customComparator());	
+		
 		return overlays;
 	}
 

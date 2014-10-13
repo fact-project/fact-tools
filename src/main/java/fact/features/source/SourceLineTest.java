@@ -22,19 +22,8 @@ public class SourceLineTest implements Processor{
 		Utils.mapContainsKeys( input, photonCharge, arrivalTime, showerPixel, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
-		
-		
-		arrivalTimeArray = new double[photonChargeArray.length];
-		double[] arrivalPos = Utils.toDoubleArray(input.get(arrivalTime));
-		// Convert to double
-
-		for(int i = 0; i < arrivalPos.length; i++)
-		{
-			
-			arrivalTimeArray[i] = (double) arrivalPos[i];
-			
-		}
-		
+		arrivalTimeArray = (double[]) input.get(arrivalTime);
+	
 		
 		showerPixelArray = (int[]) input.get(showerPixel);
 		sourcePositionArray = (double[]) input.get(sourcePosition);		

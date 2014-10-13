@@ -52,4 +52,9 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
     public void clear() {
         set.clear();
     }
+
+	@Override
+	public int getDrawRank() {		
+		return 1;
+	}
 }
