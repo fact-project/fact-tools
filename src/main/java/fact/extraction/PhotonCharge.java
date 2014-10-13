@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.io.CsvStream;
 import stream.io.SourceURL;
 import fact.Constants;
 import fact.Utils;
@@ -29,13 +28,13 @@ import fact.Utils;
  *         &lt;fabian.temme@tu-dortmund.de&gt;
  * 
  */
-public class PhotonCharge implements Processor {
+public class PhotonCharge extends BasicExtraction implements Processor  {
 	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 
 	@Parameter(required = true)
 	private String dataKey = null;
 
-	@Parameter(required = true, description = "The positions around which the integral is calculated.", defaultValue = "DataCalibrated")
+	@Parameter(required = true, description = "The positions around which the integral is calculated.")
 	private String positions = null;
 
 	@Parameter(description = "The url to the inputfiles for the gain calibration constants")
@@ -75,36 +74,17 @@ public class PhotonCharge implements Processor {
 		// for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 
-			int pos = pix * roi;
 			int positionOfMaximum = posArray[pix];
-			int positionOfHalfMaximumValue = 0;
 			int leftBorder = positionOfMaximum - rangeSearchWindow;
 			if (leftBorder < 0) {
 				leftBorder = 0;
 			}
-			// in an area of ]amplitudePositon-25,amplitudePosition] search for
-			// the position,
-			// behind the last time where data[pos] is < 0.5 of the original
-			// maxAmplitude
-			for (int sl = positionOfMaximum; sl > leftBorder; sl--) {
-				positionOfHalfMaximumValue = sl;
-
-				if (data[pos + sl - 1] < data[pos + positionOfMaximum] / 2
-						&& data[pos + sl] >= data[pos + positionOfMaximum] / 2) {
-					break;
-				}
-			}
-
+			
+			int positionOfHalfMaximumValue = CalculatePositionHalfHeight(pix, positionOfMaximum, leftBorder, roi, data);
+			
 			// Calculate the integral over 30 slices and divide it by the
 			// calibration Gain (stored in integralGains[pix])
-			float integral = 0;
-			if (positionOfHalfMaximumValue + 30 < roi) {
-				for (int sl = positionOfHalfMaximumValue; sl < positionOfHalfMaximumValue + 30; sl++) {
-					integral += data[sl + (pix * roi)];
-				}
-			} else {
-				integral = 0;
-			}
+			double integral = CalculateIntegral(pix, positionOfHalfMaximumValue, 30, roi, data);
 			photonCharge[pix] = integral / integralGains[pix];
 
 			m[pix] = new IntervalMarker(positionOfHalfMaximumValue,
@@ -153,7 +133,7 @@ public class PhotonCharge implements Processor {
 
 	public void setUrl(SourceURL url) {
 		try {
-			loadIntegralGainFile(url);
+			integralGains = loadIntegralGainFile(url,log);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -162,26 +142,6 @@ public class PhotonCharge implements Processor {
 
 	public SourceURL getUrl() {
 		return url;
-	}
-
-	private void loadIntegralGainFile(SourceURL inputUrl) {
-		try {
-			this.integralGains = new double[Constants.NUMBEROFPIXEL];
-			CsvStream stream = new CsvStream(inputUrl, " ");
-			stream.setHeader(false);
-			stream.init();
-			integralGainData = stream.readNext();
-
-			for (int i = 0; i < Constants.NUMBEROFPIXEL; i++) {
-				String key = "column:" + (i);
-				this.integralGains[i] = (Double) integralGainData.get(key);
-			}
-
-		} catch (Exception e) {
-			log.error("Failed to load integral Gain data: {}", e.getMessage());
-			e.printStackTrace();
-		}
-
 	}
 
 }

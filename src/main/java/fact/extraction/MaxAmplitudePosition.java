@@ -27,7 +27,6 @@ public class MaxAmplitudePosition implements Processor {
     @Parameter(required = true)
     private String outputKey;
 
-
 	private Integer searchWindowLeft = null;
 	private Integer searchWindowRight =  null;
 
@@ -46,7 +45,7 @@ public class MaxAmplitudePosition implements Processor {
 		if (searchWindowRight == null || searchWindowRight > roi){
 			searchWindowRight = roi;
 		}
-		//foreach pixel
+		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			positions[pix] = findMaximumPosition(pix, roi, data);
 		}
