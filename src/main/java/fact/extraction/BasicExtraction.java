@@ -48,7 +48,18 @@ public class BasicExtraction {
 		
 		return maxPos;
 	}
-	
+
+	/**
+	 * In an area ]amplitudePositon-leftBorder,amplitudePosition] searches for the last position, where data[pos] is < 0.5 * 
+	 * maxAmplitude. Returns the following slice.
+	 * 
+	 * @param px
+	 * @param maxPos
+	 * @param leftBorder
+	 * @param roi
+	 * @param data
+	 * @return
+	 */
 	static public int CalculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data){
 		int slice = maxPos;
 		double maxHalf = data[maxPos] / 2.0;
@@ -56,7 +67,7 @@ public class BasicExtraction {
 		for (; slice > leftBorder ; slice--)
 		{
 			int pos = px * roi + slice;
-			if (data[pos] < maxHalf)
+			if (data[pos-1] < maxHalf)
 			{
 				break;
 			}
