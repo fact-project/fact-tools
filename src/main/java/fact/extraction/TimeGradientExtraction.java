@@ -18,7 +18,7 @@ import java.net.URL;
  * TODO: WIP
  * @author Fabian Temme
  */
-public class TimeGradientExtraction implements Processor {
+public class TimeGradientExtraction extends BasicExtraction implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);
 
 	private String deltaKey = null;
@@ -40,6 +40,7 @@ public class TimeGradientExtraction implements Processor {
     private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
 	
 	private int integralSize = 30;
+	private int halfMaxSearchWindowSize = 25;
 	
 	private double[] result = null;
 	
@@ -85,9 +86,9 @@ public class TimeGradientExtraction implements Processor {
 			{
 				rightBorder += 1;
 			}
-			int maxPos = BasicExtraction.CalculateMaxPosition(px, leftBorder, rightBorder, roi, data);
-			int halfHeightPos = BasicExtraction.CalculatePositionHalfHeight(px, maxPos, 25, roi, data);
-			result[px] = BasicExtraction.CalculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
+			int maxPos = CalculateMaxPosition(px, leftBorder, rightBorder, roi, data);
+			int halfHeightPos = CalculatePositionHalfHeight(px, maxPos, halfMaxSearchWindowSize, roi, data);
+			result[px] = CalculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
 		}
 		
 		
@@ -106,7 +107,7 @@ public class TimeGradientExtraction implements Processor {
 	
 	public void setUrl(URL url) {
 		try {
-			loadIntegralGainFile(new SourceURL(url));
+			integralGains = loadIntegralGainFile(new SourceURL(url),log);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -117,25 +118,6 @@ public class TimeGradientExtraction implements Processor {
 	public URL getUrl() {
 		return url;
 	}
-
-
-	private void loadIntegralGainFile(SourceURL inputUrl) {
-		try {
-			CsvStream stream = new CsvStream(inputUrl, " ");
-			stream.setHeader(false);
-			stream.init();
-			integralGainData = stream.readNext();
-			
-			for (int i = 0 ; i < Constants.NUMBEROFPIXEL ; i++){
-				String key = "column:" + (i);
-				this.integralGains[i] = (Double) integralGainData.get(key);
-			}
-			
-		} catch (Exception e) {
-			log.error("Failed to load integral Gain data: {}", e.getMessage());
-			e.printStackTrace();
-		}
 		
-	}
 
 }
