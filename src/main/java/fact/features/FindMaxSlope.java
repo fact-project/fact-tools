@@ -121,8 +121,8 @@ public class FindMaxSlope implements Processor {
         //calculate slope
         SimpleRegression regression = new SimpleRegression();
 
-        for (int j=0 ; j < slopePos + numSlices ; j++){
-            regression.addData( j, data[ (j + slopePos - numSlices) % data.length ]);
+        for (int j=0 ; j < numSlices ; j++){
+            regression.addData( j, data[ (j + slopePos - numSlices/2) % data.length ]);
         }
         regression.regress();
 
