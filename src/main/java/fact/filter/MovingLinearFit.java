@@ -25,10 +25,10 @@ public class MovingLinearFit implements Processor{
     @Parameter(required = true, description = "key of intercept array")
     String interceptKey=null;
 
-    @Parameter(required = true, description = "width of the window to do the linear regression", defaultValue = "10")
+    @Parameter(description = "width of the window to do the linear regression", defaultValue = "10")
     int width = 10;
 
-    @Parameter(required = true, description = "scaling factor for the slope", defaultValue = "1")
+    @Parameter(description = "scaling factor for the slope", defaultValue = "1")
     double scale = 1;
 
     @Override
