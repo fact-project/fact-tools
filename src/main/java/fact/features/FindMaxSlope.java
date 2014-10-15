@@ -37,11 +37,11 @@ public class FindMaxSlope implements Processor {
     int maxSearchSlice = 20;
 
     @Parameter(description = "number of slices to fit the slope", defaultValue = "1")
-    int numFitSlices = 2;
+    int numFitSlices = 8;
 
     @Override
     public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
+        Utils.mapContainsKeys(input, key, arrivalTimeKey, derivationKey );
 
         double[] data             = (double[])input.get(key);
         double[] slopesArray      = (double[])input.get(derivationKey);
