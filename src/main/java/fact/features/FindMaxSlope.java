@@ -84,7 +84,7 @@ public class FindMaxSlope implements Processor {
 
                 slopes.add( slope );
 
-                result[maxSlopePos] = 10;
+                result[maxSlopePos] = slope;
 
             }
             pulseSlopes[pix] = slopes;
