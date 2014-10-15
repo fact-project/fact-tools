@@ -1,4 +1,6 @@
+
 <module>
+
         <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
         <stream.monitor.DataRate every="100" />
         <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
@@ -8,9 +10,15 @@
         <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
         <fact.statistics.ArrayStatistics key="arrivalTime" outputKey="time" />
         <fact.statistics.ArrayStatistics key="maxAmplitudePosition" outputKey="position" />
+        <fact.features.source.SourcePosition outputKey="Cetatauri" sourceRightAscension="84.41125" sourceDeclination="21.1425" auxService="auxService" />
+        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="arrivalTime" outputKey="photoncharge" rangeSearchWindow="25" />
 
-
+        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
+                                             corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
+                                             timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" starPositionKeys="Cetatauri"
+                                             starRadiusInCamera="11.0" showDifferentCleaningSets="false"/>
 
         <!--<fact.features.source.SourcePosition outputKey="sourcePosition" x="0" y="0"/>-->
         <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_source_${copy.id}.csv" keys="position_mean,position_variance,time_mean,time_variance" />
+        <fact.ShowViewer key="DataCalibrated" />
 </module>

@@ -1,7 +1,13 @@
 <container>
 
+    <property name="core_threshold" value="6.0" />
+    <property name="neighbor_threshold" value="3.0"/>
+    <property name="time_threshold" value="40.0" />
+    <property name="min_number_of_pixel" value="4" />
+
 <!-- Pfade zu den fits files. -->
-<property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/raw" />
+    <property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/raw" />
+    <property name="auxfolder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/aux" />
     <!--<property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/simulated/ceres_2_0/proton_klaus_4_psf_3_0" />-->
 
     <!--<property name="auxfolder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/aux" />-->
@@ -11,14 +17,17 @@
 
     <property name="num_copies" value="1" />
 
-    <property name="core_threshold" value="7.0" />
-    <property name="neighbor_threshold" value="4.0"/>
-    <property name="time_threshold" value="30.0" />
-    <property name="min_number_of_pixel" value="2" />
-
         <service id="drsService" class="fact.auxservice.DrsFileService"/>
+        <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" />
 
-        <include file="examples/multistream/arrivalTimeStudy.xml" />
+        <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
+                url="file:${folder}" listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
+            <stream class="fact.io.FitsStream"  id="fact"/>
+        </stream>
+        <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
+        <process input="input:${copy.id}" copies="${num_copies}">
+            <include file="examples/multistream/arrivalTimeStudy.xml" />
+        </process>
 
 		
 		
