@@ -11,4 +11,5 @@ import java.io.Serializable;
 public interface CameraMapOverlay extends Serializable {
     public void setColor(Color c);
     public void paint(Graphics2D g2, FactHexMapDisplay map);
+    public int getDrawRank();	// Wie hoeher die Nummer je spaeter wird es gezeichnet -> hoehere Prioritaet
 }
