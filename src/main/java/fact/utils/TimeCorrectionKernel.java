@@ -13,14 +13,14 @@ public interface TimeCorrectionKernel {
 	/**
 	 * This function should calculate f(t), interpolating between data points. 
 	 * The real time and value have to be sorted after time.
-	 * @param realTime
+	 * @param realTime in ns
 	 * @param value
 	 */
 	public void fit(double[] realTime, double[] value);
 	
 	/**
 	 * This is f(t) and will be used for rebinning data
-	 * @param realtime
+	 * @param realtime in ns
 	 * @return
 	 */
 	public double interpolate(double realtime);
