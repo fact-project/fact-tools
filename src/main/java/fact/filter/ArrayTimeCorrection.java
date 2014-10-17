@@ -61,22 +61,31 @@ public class ArrayTimeCorrection implements Processor{
 		return input;
 	}
 	
-	public String getDataCalibrated() {
+	
+
+	public String getDataKey() {
 		return dataKey;
 	}
-	@Parameter(required = true, description = "dataKey", defaultValue = "dataKey")
-	public void setDataCalibrated(String dataCalibrated) {
-		this.dataKey = dataCalibrated;
+
+
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
 	}
 
-	public String getTimesOffset() {
+
+
+	public String getTimeCalibConstKey() {
 		return timeCalibConstKey;
 	}
-	
-	@Parameter(required = true, description = "The array from DrsTimeCalibration.", defaultValue = "timeOffset")
-	public void setTimesOffset(String timesOffset) {
-		this.timeCalibConstKey = timesOffset;
+
+
+
+	public void setTimeCalibConstKey(String timeCalibConstKey) {
+		this.timeCalibConstKey = timeCalibConstKey;
 	}
+
+
 
 	public String getOutputKey() {
 		return outputKey;
