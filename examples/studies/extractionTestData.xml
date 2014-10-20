@@ -1,0 +1,53 @@
+<container>
+
+    <!-- Pfade zu den fits files. -->
+    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
+    <property name="outfile" value="/home/fabian/testoutfile" />
+    
+    <!-- Name des Streams und pfad zu dem Daten-File -->
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+
+    <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream fieser gehört -->
+    <process id="2" input="fact">
+        <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataUnf" />  
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataUnf" outputKey="DataUnf" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <fact.datacorrection.RemoveSpikes dataKey="DataUnf" outputKey="DataUnf" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
+        <fact.datacorrection.InterpolateBadPixel key="DataUnf"  outputKey="DataUnf"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+p
+        <fact.extraction.MaxAmplitudePosition key="DataUnf" searchWindowLeft="25" searchWindowRight="200" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataUnf" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataUnf" positions="maxAmplitudePosition" outputKey="PC_unfiltered" url="file:src/main/resources/gain_sorted_20131127.csv" rangeSearchWindow="25" />
+        <fact.io.RootASCIIWriter url="file:${outfile}_unfiltered.txt" keys="PC_unfiltered"/>
+        
+        <fact.filter.MovingAverage key="DataUnf" outputKey="DataMovAver" length="5"/>
+        <fact.extraction.MaxAmplitudePosition key="DataMovAver" searchWindowLeft="25" searchWindowRight="200" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataMovAver" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataMovAver" positions="maxAmplitudePosition" outputKey="PC_MovAverag" url="file:src/main/resources/gain_sorted_20131127.csv" rangeSearchWindow="25" />
+        <fact.io.RootASCIIWriter url="file:${outfile}_movAver.txt" keys="PC_MovAverag"/>
+        
+        <fact.filter.ExponentialSmoothing key="DataUnf" outputKey="DataExpSmo" alpha="0.5" />
+        <fact.extraction.MaxAmplitudePosition key="DataExpSmo" searchWindowLeft="25" searchWindowRight="200" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataExpSmo" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataExpSmo" positions="maxAmplitudePosition" outputKey="PC_ExpSmo" url="file:src/main/resources/gain_sorted_20131127.csv" rangeSearchWindow="25" />
+        <fact.io.RootASCIIWriter url="file:${outfile}_expSmo.txt" keys="PC_ExpSmo"/>
+        
+        <fact.filter.GaussConvolution key="DataUnf" outputKey="DataGausConv" variance="1" />
+        <fact.extraction.MaxAmplitudePosition key="DataGausConv" searchWindowLeft="25" searchWindowRight="200" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataGausConv" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataGausConv" positions="maxAmplitudePosition" outputKey="PC_GausConv" url="file:src/main/resources/gain_sorted_20131127.csv" rangeSearchWindow="25" />
+        <fact.io.RootASCIIWriter url="file:${outfile}_gausConv.txt" keys="PC_GausConv"/>
+        
+        <fact.filter.ShapeSignal key="DataUnf" outputKey="DataShape" shift="20" factor="0.66" />
+        <fact.extraction.MaxAmplitudePosition key="DataShape" searchWindowLeft="25" searchWindowRight="200" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataShape" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataShape" positions="maxAmplitudePosition" outputKey="PC_Shape" url="file:src/main/resources/gain_sorted_20131127.csv" rangeSearchWindow="25" />
+        <fact.io.RootASCIIWriter url="file:${outfile}_shape.txt" keys="PC_Shape"/>
+
+    </process>
+
+
+</container>
