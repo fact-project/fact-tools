@@ -1,14 +1,14 @@
 <container>
 
     <!-- Pfade zu den fits files. -->
-    <!-- <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
+    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
 	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
-	<property name="drivefile" value="src/test/resources/testDriveFile.fits" /> -->
+	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
 	<!-- <property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_275.fits.fz" /> -->
-	<property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_277.fits.fz" />
+	<!-- <property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_277.fits.fz" />
 	<property name="drsfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_273.drs.fits.gz" />
 	<property name="drstimefile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_272_drs_time_calibration.fits" />
-	<property name="drivefile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+	<property name="drivefile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001.DRIVE_CONTROL_TRACKING_POSITION.fits" /> -->
 <!-- 	<property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2014/02/06/20140206_047.fits.fz" />
 	<property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2014/02/06/20140206_046.drs.fits.gz" /> -->
 	<!-- <property name="drivefile" value="src/test/resources/testDriveFile.fits" /> -->
@@ -21,18 +21,19 @@
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
-    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/>
-    <!-- <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/> -->
+    <!-- <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/> -->
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
 
     <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
     <process id="2" input="fact">
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
-        <fact.io.zfits.ZFitsDrsCalib url="file:${infile}" optional="false" outputKey="DataZCal" />
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="DataZCal"  outputKey="DataCalibrated"/>
-        <fact.filter.DrsTimeCalibration url="file:${drstimefile}" outputKey="timeCalibConst"/>
-        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataTime" />
+        <!-- <fact.io.zfits.ZFitsDrsCalib url="file:${infile}" optional="false" outputKey="DataZCal" /> 
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="DataZCal"  outputKey="DataCalibrated"/> -->
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
+        <!-- <fact.filter.DrsTimeCalibration url="file:${drstimefile}" outputKey="timeCalibConst"/>
+        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataTime" /> -->
         <!-- <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
         <!-- <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
@@ -68,7 +69,7 @@
         <fact.features.Size showerKey="shower" photonchargeKey="photoncharge" outputKey="Size" />    -->    
         <!-- <stream.flow.Skip condition="%{data.Size} &lt; 100" /> -->
 
-
+		<stream.data.PrintData />
         <fact.ShowViewer key="DataCalibrated"/>
 
 

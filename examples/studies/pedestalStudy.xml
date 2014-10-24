@@ -32,7 +32,7 @@
         <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataMovAver" length="9" />                
         <fact.statistics.TimerowFeatures dataKey="DataCalibrated" movingAverageKey="DataMovAver" outputKey="dataStat" searchWindowLeft="${search_window_left}" searchWindowRight="${search_window_right}" />
    		<fact.io.RootASCIIWriter url="file:${outfile}_dataStat.txt" keys="EventNum,dataStat_mean,dataStat_std,dataStat_skewness,dataStat_kurtosis,dataStat_median,dataStat_min,dataStat_max,dataStat_mode,dataStat_quantil25,dataStat_quantil75," />
-         <fact.statistics.FastFourierTrafo key="DataCalibrated" outputKey="fft" /> -->
+         <fact.statistics.FastFourierTrafo key="DataCalibrated" outputKey="fft" />
         
         <If condition="%{data.EventNum} &gt;= ${limit}" >
         <fact.io.RootASCIIWriter url="file:${outfile}_hist_fft.txt" keys="EventNum,dataStat_histogram,fftAverage" />

@@ -189,8 +189,21 @@ public class SourcePosition implements StatefulProcessor {
 		double[] source = {sourcePosition[0], sourcePosition[1]};
 		data.put(outputKey, source);
         data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
+        
+        
+        double nominalAz = point[3];
+        double nominalZd = point[4];
+
 		//add deviation between the calculated point az,dz and the az,dz in the file
-		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
+		double[] deviation = {(pointingAzDe[0] - nominalAz), ( pointingAzDe[1] - nominalZd) };
+		
+		data.put("pointingAz_nominal", nominalAz );
+		data.put("pointingZd_nominal", nominalZd );
+		data.put("pointingAz_calc", pointingAzDe[0] );
+		data.put("pointingZd_calc", pointingAzDe[1] );
+		data.put(outputKey+"Az_calc", sourceAzDe[0] );
+		data.put(outputKey+"Zd_calc", sourceAzDe[1] );
+		
 		data.put(outputKey+"pointingDeviation", deviation);
 		log.debug ("Pointing deviation: " + Arrays.toString(deviation));
 		log.debug( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ; 
