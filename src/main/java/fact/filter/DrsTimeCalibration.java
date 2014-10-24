@@ -26,7 +26,7 @@ public class DrsTimeCalibration implements Processor {
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
 
-	private String drsTimeKey = "COL";
+	private String drsTimeKey = "SamplingTimeDeviation";
 	
 	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
@@ -119,6 +119,14 @@ public class DrsTimeCalibration implements Processor {
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	public String getDrsTimeKey() {
+		return drsTimeKey;
+	}
+
+	public void setDrsTimeKey(String drsTimeKey) {
+		this.drsTimeKey = drsTimeKey;
 	}
 
 }
