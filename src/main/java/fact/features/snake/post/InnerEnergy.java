@@ -1,4 +1,4 @@
-package fact.features.snake;
+package fact.features.snake.post;
 
 import fact.Utils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -7,6 +7,15 @@ import org.apache.commons.math3.linear.RealMatrix;
 import stream.Data;
 import stream.Processor;
 
+/**
+ *	InnerEnergy
+ *	Bestimmt die innere Energie (2. Ableitung) der Snake
+ *	und versucht sie zu normieren
+ *	-> zweifelhafter Parameter
+ *	
+ *  @author Dominik Baack &lt;dominik.baack@udo.edu&gt;
+ *
+ */
 public class InnerEnergy implements Processor
 {
 	private String snakeX = null;

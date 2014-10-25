@@ -144,18 +144,18 @@ public class DistributionFromShower implements Processor {
 				varianceTrans, m3Long, m3Trans, m4Long, m4Trans, delta, size);
 
 		// add calculated shower parameters to data item
-		input.put(outputKey, dist);
-		input.put("varianceLong", varianceLong);
-		input.put("varianceTrans", varianceTrans);
-		input.put("M3Long", m3Long);
-		input.put("M3Trans", m3Trans);
-		input.put("M4Long", m4Long);
-		input.put("M4Trans", m4Trans);
-		input.put("COGx", cog[0]);
-		input.put("COGy", cog[1]);
-		input.put("Length", length);
-		input.put("Width", width);
-		input.put("Delta", delta);
+	    input.put(outputKey , 		dist);
+	    input.put(outputKey + "_varianceLong",	varianceLong );
+	    input.put(outputKey + "_varianceTrans", 	varianceTrans );
+	    input.put(outputKey + "_M3Long",			m3Long );
+	    input.put(outputKey + "_M3Trans", 		m3Trans );
+	    input.put(outputKey + "_M4Long", 		m4Long );
+	    input.put(outputKey + "_M4Trans", 		m4Trans );
+	    input.put(outputKey + "_COGx", 			cog[0] );
+	    input.put(outputKey + "_COGy", 			cog[1] );
+	    input.put(outputKey + "_Length", length );
+	    input.put(outputKey + "_Width", width );
+	    input.put(outputKey + "_Delta", delta );
 
 		// double[][] rot = { {Math.cos(delta), -Math.sin(delta)},
 		// {Math.sin(delta),Math.cos(delta) }

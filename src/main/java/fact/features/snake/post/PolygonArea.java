@@ -1,9 +1,16 @@
-package fact.features.snake;
+package fact.features.snake.post;
 
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
+/**
+ *	PolygonArea
+ *	Bestimmt die Flaeche eines Polygons mit der Gau{\ss}schen Trapezformel
+ *	
+ *  @author Dominik Baack &lt;dominik.baack@udo.edu&gt;
+ *
+ */
 public class PolygonArea  implements Processor
 {
 	private String outkey = null;	

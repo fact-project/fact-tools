@@ -1,25 +1,47 @@
-package fact.features.snake;
+package fact.features.snake.post;
 
 import fact.Utils;
+import fact.hexmap.ui.overlays.EllipseOverlay;
+
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.QRDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
+
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
-
+/**
+ *	FitEllipse
+ *	Least-Square-Fit einer Ellipse an den Polygonzug der Snake
+ *	Nach: http://autotrace.sourceforge.net/WSCG98.pdf
+ *	
+ *  @author Dominik Baack &lt;dominik.baack@udo.edu&gt;
+ *
+ */
 public class FitEllipse  implements Processor
 {
+	@Parameter(required = true, description = "Output: Winkel zur X-Achse")
 	private String outkeyAlpha = null;	
+	@Parameter(required = true, description = "Output: Ellipsen Center X")
 	private String outkeyCenterX = null;	
+	@Parameter(required = true, description = "Output: Ellipsen Center Y")
 	private String outkeyCenterY = null;	
+	@Parameter(required = true, description = "Output: Semi-Minor")
 	private String outkeyMinor = null;	
+	@Parameter(required = true, description = "Output: Semi-Major")
 	private String outkeyMajor = null;	
+	@Parameter(required = false, description = "UI: Should Ellipse drawn in the Viewer?")
+	private boolean drawEllipse = false;
 	
+
+	@Parameter(required = true, description = "Input: X-Koordinaten der Snake")
 	private String snakeX = null;
+	@Parameter(required = true, description = "Input: Y-Koordinaten der Snake")
 	private String snakeY = null;
+	
 	
 	
 	private double centerX = 0;
@@ -93,14 +115,10 @@ public class FitEllipse  implements Processor
 	
 	@Override
 	public Data process(Data input) 	//http://autotrace.sourceforge.net/WSCG98.pdf
-	{
-		if(outkeyAlpha == null) throw new RuntimeException("Missing parameter: outkeyAlpha");
-		if(outkeyCenterX == null) throw new RuntimeException("Missing parameter: outkeyCenterX");
-		if(outkeyCenterY == null) throw new RuntimeException("Missing parameter: outkeyCenterY");
-		if(outkeyMinor == null) throw new RuntimeException("Missing parameter: outkeyMinor");
-		if(outkeyMajor == null) throw new RuntimeException("Missing parameter: outkeyMajor");
+	{		
+		Utils.isKeyValid(input, snakeX, double[].class);
+		Utils.isKeyValid(input, snakeY, double[].class);
 		
-		Utils.mapContainsKeys( input, snakeX, snakeY);
 		double[] x = (double[]) input.get(snakeX);
 		double[] y = (double[]) input.get(snakeY);
 		
@@ -205,7 +223,11 @@ public class FitEllipse  implements Processor
 		input.put(outkeyMajor, major);
 		input.put(outkeyMinor, minor);
 		
-
+		if(drawEllipse)
+		{
+			input.put("Snake_Ellipse_Fit", new EllipseOverlay(centerX, centerY, minor/2.0, major/2.0, angle));
+		}
+		
 		return input;
 	}
 
@@ -274,9 +296,16 @@ public class FitEllipse  implements Processor
 		return snakeY;
 	}
 
-
 	public void setSnakeY(String snakeY) {
 		this.snakeY = snakeY;
+	}
+	
+	public boolean isDrawEllipse() {
+		return drawEllipse;
+	}
+
+	public void setDrawEllipse(boolean drawEllipse) {
+		this.drawEllipse = drawEllipse;
 	}
 
 }

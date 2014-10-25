@@ -5,6 +5,7 @@ package fact.hexmap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
@@ -34,6 +35,13 @@ public class FactPixelMapping implements PixelMapping {
             {{1, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}}  //pixel with a even x coordinate
     };
 
+    // up,down,topleft,topright,botleft,botright
+    // x even , x uneven
+    private final int[][][] neighbourOffsetsDirectional = {
+    		{{0, -1}, {0, +1}, {-1, -1}, {+1, -1}, {-1,  0}, {+1,  0}} , //even
+            {{0, -1}, {0, +1}, {-1,  0}, {+1,  0}, {-1, +1}, {+1, +1}}  //pixel with a uneven x coordinate
+    };
+    
     private int xOffset = 22;
     private int yOffset = 19;
 
@@ -149,6 +157,25 @@ public class FactPixelMapping implements PixelMapping {
         return l.toArray(t);
     }
 
+    /**
+     *  
+     * @param p CameraPixel
+     * @return Pixel in Order (up,down,topleft,topright,botleft,botright) with null at non existing pixel
+     */
+    public FactCameraPixel[] getNeighboursForPixelWithDirection(CameraPixel p) 
+    {
+    	 FactCameraPixel[] t = new FactCameraPixel[6];
+    	 
+        //check if x coordinate is even or not    	
+        int parity = (Math.abs(p.geometricX % 2));
+        //get the neighbour in each direction and store them in hte list
+        for (int direction = 0; direction <= 5; direction++) {
+            int[] d = neighbourOffsetsDirectional[parity][direction];
+            t[direction] = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);                
+        }       
+        return t;
+    }
+    
     /**
      * Takes a data item containing a row from the mapping file.
      *

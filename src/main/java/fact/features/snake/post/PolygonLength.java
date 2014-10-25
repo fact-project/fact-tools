@@ -1,9 +1,16 @@
-package fact.features.snake;
+package fact.features.snake.post;
 
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
+/**
+ *	PolygonLength
+ *	Bestimmt die Laenge des geschlossenen Polygonzugs in [mm]
+ *	
+ *  @author Dominik Baack &lt;dominik.baack@udo.edu&gt;
+ *
+ */
 public class PolygonLength  implements Processor
 {
 	String outkey;	

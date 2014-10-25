@@ -1,9 +1,16 @@
-package fact.features.snake;
+package fact.features.snake.post;
 
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
+/**
+ *	PolygonCenter
+ *	Bestimmt den ungewichteten Mittelpunkt des Polygonzugs
+ *	
+ *  @author Dominik Baack &lt;dominik.baack@udo.edu&gt;
+ *
+ */
 public class PolygonCenter implements Processor
 {
 	private String polygonX = null;

@@ -3,6 +3,7 @@ package fact.camera;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+
 import org.junit.Test;
 
 import java.io.File;
@@ -296,6 +297,107 @@ public class PixelMappingTest {
             }
         }
     }
+    
+    
+    /**
+     * Test the Order of the special neighbour function
+     * Even x
+     */
+    @Test
+	public void testNeighbourOrderEven()
+	{
+    	FactPixelMapping PixelMapping_ = FactPixelMapping.getInstance();		
+    	
+		FactCameraPixel core = PixelMapping_.getPixelFromId( PixelMapping_.getChidFromSoftID( 0) );
+		FactCameraPixel[] list = PixelMapping_.getNeighboursForPixelWithDirection(core);		
+		
+		System.out.println("Even");
+		System.out.println("Core: " + core.getXPositionInMM() + ", " + core.getYPositionInMM());
+		for(int i=0; i<6; i++)
+			System.out.println("Pix" + i + ": " + list[i].getXPositionInMM() + ", " + list[i].getYPositionInMM());
+		
+		boolean isUp = (core.getXPositionInMM() == list[0].getXPositionInMM()) && 				
+				(core.getYPositionInMM() < list[0].getYPositionInMM());
+		
+		boolean isDown = (core.getXPositionInMM() == list[1].getXPositionInMM()) && 
+				(core.getYPositionInMM() > list[1].getYPositionInMM());		
+		
+		boolean isTopLeft = (core.getXPositionInMM() > list[2].getXPositionInMM()) && 
+				(core.getYPositionInMM() < list[2].getYPositionInMM());
+		
+		boolean isTopRight = (core.getXPositionInMM() < list[3].getXPositionInMM()) && 
+				(core.getYPositionInMM() < list[3].getYPositionInMM());
+		
+		boolean isBotLeft = (core.getXPositionInMM() > list[4].getXPositionInMM()) && 
+				(core.getYPositionInMM() > list[4].getYPositionInMM());
+		
+		boolean isBotRight = (core.getXPositionInMM() < list[5].getXPositionInMM()) && 
+				(core.getYPositionInMM() > list[5].getYPositionInMM());		
+		
+		double[] dist = new double[6];
+		for(int i=0; i<6; i++)
+		{
+			dist[i] = Math.sqrt(Math.pow(core.getXPositionInMM() - list[i].getXPositionInMM(), 2) + Math.pow(core.getYPositionInMM() - list[i].getYPositionInMM(), 2));
+			assertEquals("Test", 9.5, dist[i], 0.05);
+		}
+		
+		assertTrue("Even: isUp", isUp);
+		assertTrue("Even: isDown", isDown);
+		assertTrue("Even: isTopLeft", isTopLeft);
+		assertTrue("Even: isTopRight", isTopRight);
+		assertTrue("Even: isBotLeft", isBotLeft);
+		assertTrue("Even: isBotRight", isBotRight);
+	}
+	
+    /**
+     * Test the Order of the special neighbour function
+     * Uneven x
+     */
+	@Test
+	public void testNeighbourOrderUneven()
+	{
+		FactPixelMapping PixelMapping_ = FactPixelMapping.getInstance();		
+		
+		FactCameraPixel core = PixelMapping_.getPixelFromId( PixelMapping_.getChidFromSoftID( 3) );
+		FactCameraPixel[] list = PixelMapping_.getNeighboursForPixelWithDirection(core);
+		
+		System.out.println("Uneven");
+		System.out.println("Core: " + core.getXPositionInMM() + ", " + core.getYPositionInMM());
+		for(int i=0; i<6; i++)
+			System.out.println("Pix" + i + ": " + list[i].getXPositionInMM() + ", " + list[i].getYPositionInMM());
+		
+		boolean isUp = (core.getXPositionInMM() == list[0].getXPositionInMM()) && 				
+				(core.getYPositionInMM() < list[0].getYPositionInMM());
+		
+		boolean isDown = (core.getXPositionInMM() == list[1].getXPositionInMM()) && 
+				(core.getYPositionInMM() > list[1].getYPositionInMM());		
+		
+		boolean isTopLeft = (core.getXPositionInMM() > list[2].getXPositionInMM()) && 
+				(core.getYPositionInMM() < list[2].getYPositionInMM());
+		
+		boolean isTopRight = (core.getXPositionInMM() < list[3].getXPositionInMM()) && 
+				(core.getYPositionInMM() < list[3].getYPositionInMM());
+		
+		boolean isBotLeft = (core.getXPositionInMM() > list[4].getXPositionInMM()) && 
+				(core.getYPositionInMM() > list[4].getYPositionInMM());
+		
+		boolean isBotRight = (core.getXPositionInMM() < list[5].getXPositionInMM()) && 
+				(core.getYPositionInMM() > list[5].getYPositionInMM());		
+		
+		double[] dist = new double[6];
+		for(int i=0; i<6; i++)
+		{
+			dist[i] = Math.sqrt(Math.pow(core.getXPositionInMM() - list[i].getXPositionInMM(), 2) + Math.pow(core.getYPositionInMM() - list[i].getYPositionInMM(), 2));
+			assertEquals("Test", 9.5, dist[i], 0.05);
+		}
+		
+		assertTrue("Even: isUp", isUp);
+		assertTrue("Even: isDown", isDown);
+		assertTrue("Even: isTopLeft", isTopLeft);
+		assertTrue("Even: isTopRight", isTopRight);
+		assertTrue("Even: isBotLeft", isBotLeft);
+		assertTrue("Even: isBotRight", isBotRight);
+	}
 
 
 }
