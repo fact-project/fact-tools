@@ -81,6 +81,7 @@ public class VideoArea implements Processor
 		
 		double max = 0;
 		int maxSlice = -1;
+		int maxNum = -1;
 		
 		for(int i=1; i<dataSmooth.length-1; i++)
 		{			
@@ -90,6 +91,7 @@ public class VideoArea implements Processor
 				{
 					max = dataSmooth[i];
 					maxSlice = index[i];
+					maxNum = i;
 				}
 			}
 		}
@@ -117,12 +119,12 @@ public class VideoArea implements Processor
 		double slope2=0;
 		int slopeCount2=0;
 		
-		for(int i=0; i<=maxSlice; i++)
+		for(int i=0; i<=maxNum; i++)
 		{
 			slope1 += diff[i];
 			slopeCount1++;
 		}
-		for(int i=maxSlice; i<diff.length; i++)
+		for(int i=maxNum; i<diff.length; i++)
 		{
 			slope2 += diff[i];
 			slopeCount2++;
