@@ -4,6 +4,7 @@ import fact.Utils;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.QRDecomposition;
@@ -164,9 +165,21 @@ public class FitEllipse  implements Processor
 
 		M = C1.multiply(M);
 
-			
-	
-		EigenDecomposition eigenSys = new EigenDecomposition(M);
+		EigenDecomposition eigenSys;
+		
+		try
+		{
+			eigenSys = new EigenDecomposition(M);
+		}
+		catch(MaxCountExceededException e)
+		{
+			input.put(outkeyAlpha, 0);
+			input.put(outkeyCenterX, 0);
+			input.put(outkeyCenterY, 0);
+			input.put(outkeyMajor, 0);
+			input.put(outkeyMinor, 0);
+			return input;
+		}
 		
 		Complex[] eigenVal = new Complex[3];
 		RealMatrix[] eigenVec = new RealMatrix[3];
