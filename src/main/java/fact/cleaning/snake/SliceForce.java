@@ -38,7 +38,7 @@ public class SliceForce extends ImageForce
 		
 		int chid = currentPixel.chid;			
 
-		double grad = gradX(chid);		
+		double grad = -gradX(chid);		
 
 		// Externe Kraft zur mitte		
 		
@@ -61,7 +61,7 @@ public class SliceForce extends ImageForce
 		
 		int chid = currentPixel.chid;		
 
-		double grad = gradY(chid);		
+		double grad = -gradY(chid);		
 
 		// Externe Kraft zur mitte
 
