@@ -136,7 +136,7 @@ public class VideoArea implements Processor
 		input.put("areaSmoothed", dataSmooth);
 		input.put("diff", diff);
 		
-		input.put(outkeyMax, index[maxSlice]);		
+		input.put(outkeyMax, index[maxNum]);		
 		input.put(outkeySlope1, slope1);
 		input.put(outkeySlope2, slope2);
 		
