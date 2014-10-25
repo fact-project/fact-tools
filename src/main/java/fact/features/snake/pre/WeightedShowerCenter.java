@@ -46,9 +46,9 @@ public class WeightedShowerCenter implements Processor
 		
 		for(int i=0; i<show.length; i++)		// +500 Verschieben der Gewichte in den ausschließlich positiven Bereich
 		{			
-			ergX += PixelMapping_.getPixelFromId(show[i]).getXPositionInMM() * (wei[show[i]]+500);
-			ergY += PixelMapping_.getPixelFromId(show[i]).getYPositionInMM() * (wei[show[i]]+500);			
-			w += (wei[show[i]]+500); 	
+			ergX += PixelMapping_.getPixelFromId(show[i]).getXPositionInMM() * (Math.abs(wei[show[i]]));
+			ergY += PixelMapping_.getPixelFromId(show[i]).getYPositionInMM() * (Math.abs(wei[show[i]]));			
+			w += Math.abs(wei[show[i]]); 	
 			
 			ergX2 += PixelMapping_.getPixelFromId(show[i]).getXPositionInMM() * Math.pow(wei[show[i]],2);
 			ergY2 += PixelMapping_.getPixelFromId(show[i]).getYPositionInMM() * Math.pow(wei[show[i]],2);			

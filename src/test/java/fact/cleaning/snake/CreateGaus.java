@@ -8,11 +8,16 @@ import stream.annotations.Parameter;
 
 public class CreateGaus implements Processor
 {
+	@Parameter(required = false, description = "SigmaX ")
 	private double sigmaX = 20.0;
+	@Parameter(required = false, description = "SigmaX ")
 	private double sigmaY = 20.0;
+	@Parameter(required = false, description = "Amplitude ")
 	private double Amp = 15;		
 	
+	@Parameter(required = false, description = "CenterX ")
 	private double x0 = 0;
+	@Parameter(required = false, description = "CenterX ")
 	private double y0 = 0;
 	
 	@Parameter(required = true, description = "Output: Name of the created image")
@@ -20,11 +25,8 @@ public class CreateGaus implements Processor
 
 	@Override
 	public Data process(Data input) 
-	{
-		if(outputKey == null) throw new RuntimeException("Key \"outkey\" not set");		
-		
-		FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();
-		
+	{		
+		FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();		
 		
 		int NumberOfSlices = 1;
 		int timeMax = 0;
@@ -57,42 +59,23 @@ public class CreateGaus implements Processor
 		this.outputKey = outkey;
 	}
 
-	protected void setSigmaX(double sigmaX) {
+	public void setSigmaX(double sigmaX) {
 		this.sigmaX = sigmaX;
 	}
 
-	protected void setSigmaY(double sigmaY) {
+	public void setSigmaY(double sigmaY) {
 		this.sigmaY = sigmaY;
 	}
 
-	protected void setAmp(double amp) {
+	public void setAmp(double amp) {
 		Amp = amp;
 	}
 
-	protected void setX0(double x0) {
+	public void setX0(double x0) {
 		this.x0 = x0;
 	}
 
-	protected void setY0(double y0) {
+	public void setY0(double y0) {
 		this.y0 = y0;
-	}
-
-	
-	public void setSigmaX(String sigmaX)
-	{
-		this.sigmaX = Float.parseFloat(sigmaX);
-	}
-	public void setSigmaY(String sigmaY)
-	{
-		this.sigmaY = Float.parseFloat(sigmaY);
-	}
-	public void setX(String X)
-	{
-		this.x0 = Float.parseFloat(X);
-	}
-	public void setY(String Y)
-	{
-		this.y0 = Float.parseFloat(Y);
-	}
-	
+	}	
 }
