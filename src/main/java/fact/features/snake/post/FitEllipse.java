@@ -173,11 +173,11 @@ public class FitEllipse  implements Processor
 		}
 		catch(MaxCountExceededException e)
 		{
-			input.put(outkeyAlpha, 0);
-			input.put(outkeyCenterX, 0);
-			input.put(outkeyCenterY, 0);
-			input.put(outkeyMajor, 0);
-			input.put(outkeyMinor, 0);
+			input.put(outkeyAlpha, 0.0);
+			input.put(outkeyCenterX, 0.0);
+			input.put(outkeyCenterY, 0.0);
+			input.put(outkeyMajor, 0.0);
+			input.put(outkeyMinor, 0.0);
 			return input;
 		}
 		
