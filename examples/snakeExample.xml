@@ -1,0 +1,143 @@
+<container>
+	
+	<property name="infile" value="src/test/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
+	<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
+	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
+	<property name="gainfile" value="src/main/resources/gain_sorted_20131127.csv" />
+
+	<!--<property name="outfile" value="output.csv" />-->
+	
+		
+	
+    <property name="sourcename" value="crab" />
+    <property name="core_threshold" value="5.0" />
+    <property name="neighbor_threshold" value="2.0"/>
+    <property name="time_threshold" value="30.0" />
+    <property name="min_number_of_pixel" value="2" />
+    
+
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="30"/>
+
+    	
+    <process id="2" input="fact">		
+		<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="20"/>
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />			
+
+		<fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" />  
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
+		<fact.filter.DrsTimeCalibration url="file:${drstimefile}" drsTimeKey="SamplingTimeDeviation" outputKey="timeCalibConst"/>
+        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />
+
+	   <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+
+        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="35" searchWindowRight="95" outputKey="maxAmplitudePosition"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:${gainfile}" rangeSearchWindow="25" />
+       
+        <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxAmplitudePosition" threshold="1500" thresholdOutputKey="thresholdForToT"/>
+        <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold" thresholdKey="thresholdForToT" outputKey="photonchargeSaturated"/>
+        
+        <fact.extraction.HandleSaturation photonChargeKey="photoncharge" photonChargeSaturatedKey="photonchargeSaturated" arrivalTimeKey="arrivalTime"
+         arrivalTimeSaturatedKey="arrivalTimeTOT" limitForSaturatedPixel="180" 
+         outputKeyPhotonCharge="photoncharge" outputKeyArrivalTime="arrivalTime" />
+        
+        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
+           corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
+           timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" 
+           starRadiusInCamera="11.0" showDifferentCleaningSets="false"/>
+           
+        <Skip condition="%{data.shower} == null" />		   
+        
+			<fact.features.NumberOfPixelInShower showerKey="shower" outputKey="numPixelInShower" />            
+            <Skip condition="%{data.numPixelInShower} &lt; 5" />
+			<Skip condition="%{data.Size} &lt; 30" />
+			<Skip condition="%{data.numIslands} &gt; 4" />
+			
+				<!-- Allgemeine Parameter: -->
+				
+				<fact.statistics.ArrayMean key="photoncharge" outputKey="photonchargeMean" />
+				<fact.statistics.ArrayMean key="arrivalTime" outputKey="arrivalTimeMean" />
+			
+				<fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />       
+				<fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" sizeKey="Size" outputKey="showerDistribution" />
+				<fact.features.Length distribution="showerDistribution" outputKey="Length" />
+				<fact.features.Width distribution="showerDistribution" outputKey="Width" />
+				<fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
+				<fact.features.Concentration weights="photoncharge" shower="shower" concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel"/>
+				<fact.features.ConcentrationCore cogxKey="showerDistribution_COGx" cogyKey="showerDistribution_COGy" showerPixelKey="shower" photonChargeKey="photoncharge" sizeKey="Size" widthKey="Width" lengthKey="Length" deltaKey="showerDistribution_Delta" outputKey="ConcCore" />
+				<fact.features.ConcentrationAtCenterOfGravity photonChargeKey="photoncharge" cogxKey="showerDistribution_COGx" cogyKey="showerDistribution_COGy" sizeKey="Size" outputKey="concCOG" />
+				<fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
+
+				<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />
+
+				<fact.features.ShowerSlope photonChargeKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" cogxKey="showerDistribution_COGx" cogyKey="showerDistribution_COGy" deltaKey="showerDistribution_Delta" outputKey="Slope" />
+							
+				<fact.features.Disp widthKey="Width" lengthKey="Length" c0="117.94" outputKey="Disp" />
+				
+				
+				
+			<!-- Snake with PhotonCharge: -->
+								
+				<fact.features.snake.pre.MeanWithoutShower key="photoncharge" shower="shower" outkey="MeanWithoutShower" />
+				<fact.features.snake.pre.WeightedShowerCenter  shower="shower" weight="photoncharge" outkeyX="snakeStartX" outkeyY="snakeStartY" />        
+			
+				<fact.cleaning.snake.SnakeSingle alpha="0.05" beta="0.02" forceName="Photoncharge"
+				drawSnake="true" pixelDataName="photoncharge" showerCenterX="snakeStartX" showerCenterY="snakeStartY"
+				snakeOutX="snake_X" snakeOutY="snake_Y" mean="MeanWithoutShower"  numberOfVerticesOut="NumberOfVertices"/>	
+
+				<fact.features.snake.post.PolygonArea polygonX="snake_X" polygonY="snake_Y" outkey="SnakeArea" />
+				<fact.features.snake.post.PolygonLength polygonX="snake_X" polygonY="snake_Y" outkey="SnakeLength" />
+				<fact.features.snake.post.PolygonCenter polygonX="snake_X" polygonY="snake_Y" outkeyX="PolygonCenterX" outkeyY="PolygonCenterY"/>
+				<fact.features.snake.post.PolygonPixelList polygonX="snake_X" polygonY="snake_Y" outkeyNumberOfPixel="PixelInSnake" outkeyPixelList="Shower_Snake"/>
+					<fact.features.Size showerKey="Shower_Snake" photonChargeKey="photoncharge" outputKey="Size_Snake" />       
+					<fact.features.DistributionFromShower showerKey="Shower_Snake" weightsKey="photoncharge" sizeKey="Size_Snake" outputKey="showerDistribution_Snake" />
+					<fact.features.Length distribution="showerDistribution_Snake" outputKey="Length_Snake" />
+					<fact.features.Width distribution="showerDistribution_Snake" outputKey="Width_Snake" />
+				
+				<fact.features.snake.post.InnerEnergy snakeX="snake_X" snakeY="snake_Y" outkey="InnerEnergy" />
+			
+				<fact.features.snake.post.FitEllipse drawEllipse="true" snakeX="snake_X" snakeY="snake_Y" outkeyAlpha="SnakeEllipseAlpha" outkeyMajor="SnakeEllipseMajor" outkeyMinor="SnakeEllipseMinor" outkeyCenterX="SnakeEllipseX" outkeyCenterY="SnakeEllipseY" />
+			
+				<fact.features.snake.post.EllipseError ellipseAlpha="SnakeEllipseAlpha" ellipseMajor="SnakeEllipseMajor" ellipseMinor="SnakeEllipseMinor" ellipseX="SnakeEllipseX" ellipseY="SnakeEllipseY" snakeX="snake_X" snakeY="snake_Y" outputKey="snakeError" />
+			
+				
+			
+				<!-- Snake auf Slice -->
+				<fact.features.snake.video.PixelFrameDataSplitter inkeyImageData="DataCalibrated" inkeysCopy="shower" outkeyImageData="Slice" outkeyIndex="SliceIndex"
+					outkeyLoop="SliceLoop" setStart="arrivalTimeMean" setFront="15" setBack="150"/>	
+				<ForEach key="SliceLoop">
+					<fact.features.snake.video.SimpleThresholdCleaning inputKey="Slice" outputKey="shower_slice" thresholdLv1="35" thresholdLv2="15" />
+					<fact.features.snake.pre.MeanWithoutShower key="Slice" shower="shower_slice" outkey="MeanWithoutShower_Slice" />
+					<fact.statistics.ArrayMean key="Slice" outputKey="SliceMean" />
+					<fact.features.snake.pre.WeightedShowerCenter  shower="shower_slice" weight="Slice" outkeyX="snakeStartX_Slice" outkeyY="snakeStartY_Slice" />
+						
+					<fact.cleaning.snake.SnakeSingle alpha="0.06" beta="0.13" drawSnake="true" forceName="Slice" pixelDataName="Slice"
+						showerCenterX="snakeStartX_Slice" showerCenterY="snakeStartY_Slice" snakeOutX="snake_X_Slice" snakeOutY="snake_Y_Slice"
+						mean="MeanWithoutShower_Slice"  numberOfVerticesOut="NumberOfVertices_Slice"/>	
+						
+					<fact.features.snake.post.PolygonArea polygonX="snake_X_Slice" polygonY="snake_Y_Slice" outkey="SnakeArea_Slice" />
+					<fact.features.snake.post.PolygonLength polygonX="snake_X_Slice" polygonY="snake_Y_Slice" outkey="SnakeLength_Slice" />
+					<fact.features.snake.post.PolygonCenter polygonX="snake_X_Slice" polygonY="snake_Y_Slice" outkeyX="PolygonCenterX_Slice" outkeyY="PolygonCenterY_Slice"/>		
+				</ForEach>			
+					
+				<fact.features.snake.video.SnakeDrawer key="SliceLoop" keyOverlay="SnakePolygonSingle_5" keySlice="SliceIndex" />
+				<fact.features.snake.video.PixelFrameDataMerge key="SliceLoop" 
+					listToMerge="SliceIndex,MeanWithoutShower_Slice,Slice,SnakeArea_Slice,SnakeLength_Slice,PolygonCenterX_Slice,PolygonCenterY_Slice" />					
+					
+				<fact.features.snake.video.VideoArea inkeyArea="SnakeArea_Slice_merged" inkeyCenterX="PolygonCenterX_Slice_merged" inkeyCenterY="PolygonCenterY_Slice_merged"
+					inkeyIndex="SliceIndex_merged" inkeySnakeX="snake_X" inkeySnakeY="snake_Y"
+					outkeyMax="max_slice" outkeySlope1="slope1" outkeySlope2="slope2"/> 
+						
+						
+						
+				<fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,UnixTimeUTC,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,showerDistribution_Delta,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,Size_Snake,Length_Snake,Width_Snake,showerDistribution_Snake_Delta,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY,snakeError,max_slice,slope1,slope2"/>
+				<!--<fact.io.PrintKeysOnConsole keys="EventNum,UnixTimeUTC,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY,snakeError"/>
+					-->			
+		
+    </process>
+
+
+</container>
