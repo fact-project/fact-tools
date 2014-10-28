@@ -108,8 +108,8 @@ public class VideoArea implements Processor
 		if(maxSlice == -1)
 		{
 			input.put(outkeyMax, 0);		
-			input.put(outkeySlope1, 0);
-			input.put(outkeySlope2, 0);
+			input.put(outkeySlope1, 0.0);
+			input.put(outkeySlope2, 0.0);
 			
 			return input;
 		}
@@ -133,8 +133,8 @@ public class VideoArea implements Processor
 		slope2 /= slopeCount2;
 		
 		
-		input.put("areaSmoothed", dataSmooth);
-		input.put("diff", diff);
+		//input.put("areaSmoothed", dataSmooth);
+		//input.put("diff", diff);
 		
 		input.put(outkeyMax, index[maxNum]);		
 		input.put(outkeySlope1, slope1);
