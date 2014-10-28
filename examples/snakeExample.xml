@@ -131,10 +131,10 @@
 					inkeyIndex="SliceIndex_merged" inkeySnakeX="snake_X" inkeySnakeY="snake_Y"
 					outkeyMax="max_slice" outkeySlope1="slope1" outkeySlope2="slope2"/> 
 						
-						
-						
+				<fact.ShowViewer key="DataCalibrated" />	
+				<!--		
 				<fact.io.RootASCIIWriter url="file:${outfile}" keys="EventNum,UnixTimeUTC,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,showerDistribution_Delta,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,Size_Snake,Length_Snake,Width_Snake,showerDistribution_Snake_Delta,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY,snakeError,max_slice,slope1,slope2"/>
-				<!--<fact.io.PrintKeysOnConsole keys="EventNum,UnixTimeUTC,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY,snakeError"/>
+				<fact.io.PrintKeysOnConsole keys="EventNum,UnixTimeUTC,videoCog_MinVel,videoCog_MinVelId,videoCog_MaxVel,videoCog_MaxVelId,videoCog_BestVel,videoCog_BestVelError,videoCog_BestVelId,videoCog_MinVelError,videoCog_MaxVelError,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,MeanWithoutShower,snakeStartX,snakeStartY,NumberOfVertices,SnakeArea,SnakeLength,PolygonCenterX,PolygonCenterY,SnakeInt,PixelInSnake,InnerEnergy,SnakeEllipseAlpha,SnakeEllipseMajor,SnakeEllipseMinor,SnakeEllipseX,SnakeEllipseY,snakeError"/>
 					-->			
 		
     </process>

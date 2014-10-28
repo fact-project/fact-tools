@@ -50,11 +50,11 @@ public class EllipseFitTest
 		
 		fe.process(item);
 		
-		double r_major = (double)item.get("major");
-		double r_minor = (double)item.get("minor");
-		double r_beta  = (double)item.get("a");
-		double r_cx    = (double)item.get("cx");
-		double r_cy    = (double)item.get("cy");
+		double r_major = (Double)item.get("major");
+		double r_minor = (Double)item.get("minor");
+		double r_beta  = (Double)item.get("a");
+		double r_cx    = (Double)item.get("cx");
+		double r_cy    = (Double)item.get("cy");
 		
 		// 4 Digit Precission
 		r_beta = (double)Math.round(r_beta * 10000) / 10000;
