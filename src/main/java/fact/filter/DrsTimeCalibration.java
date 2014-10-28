@@ -1,34 +1,42 @@
 package fact.filter;
 
 import fact.Constants;
+import fact.Utils;
+import fact.io.FitsStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
-import stream.io.CsvStream;
+import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.net.URL;
 
+
 public class DrsTimeCalibration implements Processor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 	
+	@Parameter(required=false,description="Key of the StartCellData in the data fits file",defaultValue="StartCellData")
 	private String startCellKey = "StartCellData";
+	@Parameter(required=true,description="Key of the time calibration constants (relative to the start cell of each pixel)")
 	private String outputKey = null;
 	
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
+
+	private String drsTimeKey = "SamplingTimeDeviation";
 	
 	Data drsTimeData = null;
-	
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
 	
 	@Override
 	public Data process(Data input) {
 		
+		Utils.mapContainsKeys(input, startCellKey, "NROI");
 		
-		
-		short[] startCell = (short[]) input.get("StartCellData");
+		short[] startCell = (short[]) input.get(startCellKey);
 		if (startCell==null)
 		{
 			log.info("Couldn't find StartCellData");
@@ -45,29 +53,32 @@ public class DrsTimeCalibration implements Processor {
 		}
 		
 		input.put(outputKey, relativeTimeOffsets);
-		// TODO Auto-generated method stub
 		return input;
 	}
-	
-	// executed in this.setTimeCalibConstantsFileName
-	private void loadDrsTimeCalibConstants(SourceURL inputUrl){
+		
+	protected void loadDrsTimeCalibConstants(SourceURL  in) {
 		try {
-			CsvStream stream = new CsvStream(inputUrl, " ");
-			stream.setHeader(false);
+
+			FitsStream stream = new FitsStream(in);
 			stream.init();
 			drsTimeData = stream.readNext();
+			log.debug("Read DRS Time data: {}", drsTimeData);
 			
-			for (int i = 0 ; i < numberOfSlices*numberOfTimemarker ; i++){
-				String key = "column:" + (i+1);
-				this.absoluteTimeOffsets[i] = (Double) drsTimeData.get(key);
+			if (!drsTimeData.containsKey(drsTimeKey))
+			{
+				throw new RuntimeException("Drs time data is missing key + " + drsTimeKey + "!");
 			}
-			
+			this.absoluteTimeOffsets = (double[]) drsTimeData.get(drsTimeKey);
+
 		} catch (Exception e) {
-			log.error("Failed to load time DRS data: {}", e.getMessage());
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			log.error("Failed to load DRS data: {}", e.getMessage());
+			if (log.isDebugEnabled())
+				e.printStackTrace();
+			this.absoluteTimeOffsets = null;
+
+			throw new RuntimeException(e.getMessage());
 		}
-		
 	}
 
 	public String getStartCellKey() {
@@ -108,6 +119,14 @@ public class DrsTimeCalibration implements Processor {
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	public String getDrsTimeKey() {
+		return drsTimeKey;
+	}
+
+	public void setDrsTimeKey(String drsTimeKey) {
+		this.drsTimeKey = drsTimeKey;
 	}
 
 }

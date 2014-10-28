@@ -98,8 +98,14 @@ public class CoreNeighborClean implements Processor{
         if(showerPixel.size() == 0){
             return input;
         }
+        
+        // Hacky method to increase the timeThreshold for larger showers (which could have a larger spread in the arrival times):
+        double currentTimeThreshold = timeThreshold;
+        if (showerPixel.size() > 50){
+        	currentTimeThreshold = timeThreshold*Math.log10(showerPixel.size());
+        }
 
-        showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,timeThreshold);
+        showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,currentTimeThreshold);
         if (showDifferentCleaningSets == true)
         {
             addLevelToDataItem(showerPixel, outputKey + "_level4", input);
