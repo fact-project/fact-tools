@@ -38,7 +38,7 @@ public class EllipseOverlay implements CameraMapOverlay {
     }
 
     @Override
-    public void paint(Graphics2D g2, FactHexMapDisplay map) {
+    public void paint(Graphics2D g2, FactHexMapDisplay map, int slice) {
         double radius = map.getTileRadiusInPixels();
         AffineTransform oldTransform = g2.getTransform();
         Paint oldPaint = g2.getPaint();

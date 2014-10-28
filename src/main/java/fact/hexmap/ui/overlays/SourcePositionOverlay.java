@@ -30,7 +30,7 @@ public class SourcePositionOverlay implements CameraMapOverlay {
     }
 
     @Override
-    public void paint(Graphics2D g2, FactHexMapDisplay map) {
+    public void paint(Graphics2D g2, FactHexMapDisplay map, int slice) {
         double radius = map.getTileRadiusInPixels();
         double scalingX = 0.172*radius;
         double scalingY = -0.184*radius;

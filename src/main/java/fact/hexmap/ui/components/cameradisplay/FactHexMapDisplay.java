@@ -282,7 +282,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 			// draw all overlays
 			for (CameraMapOverlay o : overlays) {
-				o.paint(g2, this);
+				o.paint(g2, this, currentSlice);
 			}
 			// g2.setStroke(new BasicStroke(1.0f));
 			// g2.setColor(Color.WHITE);
