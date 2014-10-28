@@ -36,7 +36,7 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
     }
 
     @Override
-    public void paint(Graphics2D g2, FactHexMapDisplay map) {
+    public void paint(Graphics2D g2, FactHexMapDisplay map, int slice) {
         for (Tile t : map.getTiles()){
             if(set.contains(t.getCameraPixel())){
                 if (t.getBorderColor() != Color.BLACK){

@@ -45,8 +45,9 @@ public class PolygonOverlay implements CameraMapOverlay, Serializable
     }
 
     @Override
-    public void paint(Graphics2D g2, FactHexMapDisplay map) 
+    public void paint(Graphics2D g2, FactHexMapDisplay map, int slice) 
     {
+    	this.slice = slice;
         double radius = map.getTileRadiusInPixels();
 
 		Paint oldPaint = g2.getPaint();    
@@ -74,15 +75,7 @@ public class PolygonOverlay implements CameraMapOverlay, Serializable
         g2.setPaint(oldPaint);
         g2.setTransform(old);
     }
-    
-    public int getSlice() {
-		return slice;
-	}
-
-	public void setSlice(int slice) {		
-		this.slice = slice;
-	}
-	
+    	
 	public double[][] getX() {
 		return x;
 	}
