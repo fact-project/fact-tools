@@ -155,17 +155,19 @@ public class SourcePosition implements StatefulProcessor {
             //add source position to dataitem
             double[] source = {sourcePosition[0], sourcePosition[1]};
             data.put(outputKey, source);
-//            data.put("@TimeStamp", new Date((long)timestamp*1000L));
-//            data.put("@AzTracking", trackingPoint.Az);
-//            data.put("@ZdTracking", trackingPoint.Zd);
-//
-//            data.put("@AzPointing", pointingAzZd[0]);
-//            data.put("@ZdPointing", pointingAzZd[1]);
-//
-//            data.put("@AzSourceCalc", sourceAzZd[0]);
-//            data.put("@ZdSourceCalc", sourceAzZd[1]);
+            data.put("@TimeStamp", new Date((long)timestamp*1000L));
+            data.put("@AzTracking", trackingPoint.Az);
+            data.put("@ZdTracking", trackingPoint.Zd);
+
+            data.put("@AzPointing", pointingAzZd[0]);
+            data.put("@ZdPointing", pointingAzZd[1]);
+
+            data.put("@AzSourceCalc", sourceAzZd[0]);
+            data.put("@ZdSourceCalc", sourceAzZd[1]);
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
+
+            data.put(outputKey, sourceAzZd);
 
         } catch (IllegalArgumentException e){
             log.error("Ignoring event.  " + e.getLocalizedMessage());

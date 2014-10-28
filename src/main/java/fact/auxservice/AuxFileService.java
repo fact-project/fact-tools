@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 
 /**
  * Created by kaibrugge on 07.10.14.
@@ -54,19 +55,13 @@ public class AuxFileService implements FileService {
         try {
 
             String dateString = getDateStringFromPath(currentPath);
-
             if(auxFolder != null) {
-                SourceURL sourcePosUrl = findAuxFileByName(auxFolder, dateString, "DRIVE_CONTROL_SOURCE_POSITION.fits");
-                SourceURL trackingUrl = findAuxFileByName(auxFolder, dateString, "DRIVE_CONTROL_TRACKING_POSITION.fits");
-                loadPointsFromFile(sourcePosUrl, sourcePointManager, new SourcePointFactory());
-                loadPointsFromFile(trackingUrl, trackingPointManager, new TrackingPointFactory());
-            } else if(sourceFile !=  null && trackingFile != null){
-                loadPointsFromFile(sourceFile, sourcePointManager, new SourcePointFactory());
-                loadPointsFromFile(trackingFile, trackingPointManager, new TrackingPointFactory());
-            } else{
-                log.error("Neither auxFolder nor filePaths are provided.");
-                throw new IllegalArgumentException("Neither auxFolder nor filePaths are provided.");
+                HashMap<String, SourceURL> m = findAuxFileUrls(auxFolder, dateString);
+                sourceFile = m.get("DRIVE_CONTROL_SOURCE_POSITION");
+                trackingFile = m.get("DRIVE_CONTROL_TRACKING_POSITION");
             }
+            loadPointsFromFile(sourceFile, sourcePointManager, new SourcePointFactory());
+            loadPointsFromFile(trackingFile, trackingPointManager, new TrackingPointFactory());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -89,7 +84,7 @@ public class AuxFileService implements FileService {
      * @throws java.io.FileNotFoundException
      * @throws java.net.MalformedURLException
      */
-    private SourceURL findAuxFileByName(SourceURL auxFolder,final String dateString,  final String auxFileName) throws FileNotFoundException {
+    private HashMap<String, SourceURL> findAuxFileUrls(SourceURL auxFolder, final String dateString) throws FileNotFoundException {
 
         String year = dateString.substring(0,4);
         String month = dateString.substring(4,6);
@@ -100,26 +95,26 @@ public class AuxFileService implements FileService {
         if(!folder.isDirectory() || !folder.exists()){
             throw new FileNotFoundException("Could not build path for tracking file.");
         }
-        String[] trackingfiles = folder.list(new FilenameFilter() {
+        final HashMap<String, SourceURL> m = new HashMap<>();
+        folder.list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                if(name.contains(dateString) &&  name.contains(auxFileName)){
+                if (name.contains(dateString) && name.endsWith(".fits")) {
+                    try {
+                        //get name of aux file by removing the date string (first 9 cahrachters) and the file ending
+                        String auxName = name.substring(9);
+                        auxName = auxName.substring(0, auxName.length() - 5);
+                        File f = new File(dir, name);
+                        m.put(auxName, new SourceURL(f.toURI().toURL()));
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 }
                 return false;
             }
         });
-        if(trackingfiles.length != 1){
-            throw new FileNotFoundException("Could not find tracking file");
-        }
-        File driveFile = new File(folder, trackingfiles[0]);
-        try {
-            return new SourceURL(driveFile.toURI().toURL());
-        } catch (MalformedURLException e) {
-            //TODO: Fitstream sohuld have a file constructor
-            log.error("This should never happen ");
-            return null;
-        }
+        return m;
     }
 
     public void loadPointsFromFile(SourceURL driveFileUrl, DrivePointManager mgr, AbstractDrivePointFactory factory){

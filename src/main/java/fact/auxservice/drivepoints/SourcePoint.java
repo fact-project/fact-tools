@@ -33,7 +33,7 @@ public class SourcePoint extends DrivePoint {
             wobbleAngle = Double.parseDouble(item.get("Angle").toString());
 
             name = item.get("Name").toString();
-            System.out.println(this);
+//            System.out.println(this);
 
         } catch (NumberFormatException e){
             log.error("Could not parse doubles in file");
