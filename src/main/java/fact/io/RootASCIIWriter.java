@@ -57,7 +57,9 @@ public class RootASCIIWriter extends CsvWriter {
 			}
 		}
 		if(containsNanOrInfs(data)){
-			return data;
+			System.err.println("Stream beinhaltet nan oder inf's!");
+			throw new RuntimeException("Output contains nan or inf's");
+			//return data;
 		}
 		
 		Data item  = DataFactory.create();
@@ -67,7 +69,9 @@ public class RootASCIIWriter extends CsvWriter {
                 value = data.get(key);
             } else {
 //				log.info(Constants.ERROR_WRONG_KEY + keys[i]+ ",  " + this.getClass().getSimpleName() );
-                return null;
+            	System.err.println("RootASCIIWriter: Key " + key + "nicht im Stream enthalten!");
+            	throw new RuntimeException("Key not in stream!");
+                //return null;
             }
             //Check if value is of the right type
             if (value.getClass().isArray()) {
