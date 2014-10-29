@@ -26,6 +26,9 @@ public class DistributionFromShower implements Processor {
 	@Parameter(required = true)
 	private String outputKey = null;
 
+	@Parameter(required = false)
+	private boolean drawEllipse = false;
+	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	// A logger
@@ -175,10 +178,13 @@ public class DistributionFromShower implements Processor {
 		//
 		// double[] tMaxTrans = Utils.transformToEllipseCoordinates(0 + cog[0],
 		// maxTransCoord + cog[1], cog[0], cog[1], delta );
-
-		double[] center = calculateCenter(showerPixel);
-		input.put("Ellipse", new EllipseOverlay(center[0], center[1], width,
-				length, delta));
+	    
+	    if(drawEllipse)
+	    {
+	    	double[] center = calculateCenter(showerPixel);
+	    	input.put("Ellipse", new EllipseOverlay(center[0], center[1], width,
+	    			length, delta));
+	    }
 		// input.put("CoG", new EllipseOverlay(cog[0] , cog[1], 3 , 3 , 0));
 		// input.put("Center", new EllipseOverlay(center[0] , center[1], 3 , 3 ,
 		// 0));
@@ -296,4 +302,13 @@ public class DistributionFromShower implements Processor {
 		this.outputKey = outputKey;
 	}
 
+	public boolean isDrawEllipse() {
+		return drawEllipse;
+	}
+
+	public void setDrawEllipse(boolean drawEllipse) {
+		this.drawEllipse = drawEllipse;
+	}
+
+	
 }
