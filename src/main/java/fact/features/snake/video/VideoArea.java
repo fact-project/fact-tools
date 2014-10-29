@@ -129,8 +129,19 @@ public class VideoArea implements Processor
 			slope2 += diff[i];
 			slopeCount2++;
 		}
-		slope1 /= slopeCount1;
-		slope2 /= slopeCount2;
+		
+		
+		
+		if(slopeCount1 == 0)
+			slope1 = 0;
+		else
+			slope1 /= slopeCount1;
+		
+		if(slopeCount2 == 0)
+			slope2 = 0;
+		else			
+			slope2 /= slopeCount2;
+		
 		
 		
 		//input.put("areaSmoothed", dataSmooth);

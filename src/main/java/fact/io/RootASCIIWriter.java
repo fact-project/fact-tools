@@ -56,8 +56,7 @@ public class RootASCIIWriter extends CsvWriter {
 				log.error("Could not create the TreeDescriptionHeader. Wrong Datatypes");
 			}
 		}
-		if(containsNanOrInfs(data)){
-			System.err.println("Stream beinhaltet nan oder inf's!");
+		if(containsNanOrInfs(data)){			
 			throw new RuntimeException("Output contains nan or inf's");
 			//return data;
 		}
@@ -179,6 +178,7 @@ public class RootASCIIWriter extends CsvWriter {
             if(item.get(key) != null){
 			    String repr = item.get(key).toString();
                 if(repr.toLowerCase().equals("inf") ||repr.toLowerCase().equals("nan")){
+                	System.err.println("Stream beinhaltet nan oder inf's: " + key + "!");
                     return true;
                 }
             }
