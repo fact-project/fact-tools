@@ -82,4 +82,12 @@ public class SmearOutArrivalTimes implements Processor{
     public void setStdDevOrigin(double stdDevOrigin) {
         this.stdDevOrigin = stdDevOrigin;
     }
+
+    public double getStdDevGoal() {
+        return stdDevGoal;
+    }
+
+    public void setStdDevGoal(double stdDevGoal) {
+        this.stdDevGoal = stdDevGoal;
+    }
 }
