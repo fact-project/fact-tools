@@ -57,8 +57,8 @@ public class RootASCIIWriter extends CsvWriter {
 			}
 		}
 		if(containsNanOrInfs(data)){			
-			throw new RuntimeException("Output contains nan or inf's");
-			//return data;
+			//throw new RuntimeException("Output contains nan or inf's");
+			return data;
 		}
 		
 		Data item  = DataFactory.create();
