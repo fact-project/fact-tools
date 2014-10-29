@@ -52,10 +52,18 @@ public class VideoArea implements Processor
 		double[] snakeX = (double[]) input.get(inkeySnakeX);
 		double[] snakeY = (double[]) input.get(inkeySnakeY);
 		
+		
+		if(data == null || data.length < 4)
+		{
+			input.put(outkeyMax, 0);		
+			input.put(outkeySlope1, 0.0);
+			input.put(outkeySlope2, 0.0);
+			
+			return input;
+		}
+		
 		Double[] dataSmooth = new Double[data.length];		
-		Double[] diff		= new Double[data.length];
-		
-		
+		Double[] diff		= new Double[data.length];				
 		
 		Polygon poly = new Polygon();
 		for(int i=0; i<snakeX.length; i++)

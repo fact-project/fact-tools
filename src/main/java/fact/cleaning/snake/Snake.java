@@ -1,6 +1,7 @@
 package fact.cleaning.snake;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -20,7 +21,7 @@ public class Snake
 {	
 	final int _MAX_VERTICES = 55;
 	
-	RealMatrix[] matrix;	
+	final RealMatrix[] matrix = new RealMatrix[_MAX_VERTICES];	
 	
 	//private double alpha = 0.10;
 	//private double beta = 0.06;
@@ -53,11 +54,11 @@ public class Snake
 	
 	public void initMatrix()
 	{		
-		matrix = new Array2DRowRealMatrix[_MAX_VERTICES];		
+		//matrix = new BlockRealMatrix[_MAX_VERTICES];		
 		
 		for(int i=0; i < _MAX_VERTICES; i++)
 		{
-			matrix[i] = new Array2DRowRealMatrix(i+1, i+1);			
+			matrix[i] = new BlockRealMatrix(i+1, i+1);			
 			calcMatrix(i+1);
 		}	
 	}
@@ -65,8 +66,8 @@ public class Snake
 	public void initStartPos(double centerX, double centerY, double radius, int startPointNumber)
 	{
 		NumberOfVertices = startPointNumber;
-		vecX = new Array2DRowRealMatrix(startPointNumber,1);
-		vecY = new Array2DRowRealMatrix(startPointNumber,1);
+		vecX = new BlockRealMatrix(startPointNumber,1);
+		vecY = new BlockRealMatrix(startPointNumber,1);
 		
 		for (int i = 0; i < startPointNumber; i++)
 		{
@@ -84,12 +85,12 @@ public class Snake
 	{		
 		for(int i=0; i<NumberOfVertices; i++)
 		{	
-			double x = vecX.getEntry(i,0);
-			double y = vecY.getEntry(i,0);			
+			final double x = vecX.getEntry(i,0);
+			final double y = vecY.getEntry(i,0);			
 
 			
-			double dxErg = dt * f.forceX(x, y);
-			double dyErg = dt * f.forceY(x, y);
+			final double dxErg = dt * f.forceX(x, y);
+			final double dyErg = dt * f.forceY(x, y);
 			
 			double dx = dxErg;
 			double dy = dyErg;		
@@ -105,7 +106,7 @@ public class Snake
 		}		
 
 		
-		RealMatrix EigenMat = matrix[NumberOfVertices-1];
+		final RealMatrix EigenMat = matrix[NumberOfVertices-1];
 			
 		vecX = EigenMat.multiply(vecX);
 		vecY = EigenMat.multiply(vecY);
@@ -154,8 +155,8 @@ public class Snake
 			if(distX*distX + distY*distY > maxDist)
 			{
 				NumberOfVertices++;
-				RealMatrix newVecX = new Array2DRowRealMatrix(NumberOfVertices,1);
-				RealMatrix newVecY = new Array2DRowRealMatrix(NumberOfVertices,1);				
+				final RealMatrix newVecX = new BlockRealMatrix(NumberOfVertices,1);
+				final RealMatrix newVecY = new BlockRealMatrix(NumberOfVertices,1);				
 
 				for(int j=0; j<=i; j++)
 				{
