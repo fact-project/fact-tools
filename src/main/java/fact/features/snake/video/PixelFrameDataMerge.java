@@ -36,18 +36,32 @@ public class PixelFrameDataMerge implements Processor
 			{
 				obj = new Double[items.length];
 				for(int i=0; i<items.length; i++)
-				{				
-					Utils.isKeyValid(items[i], key, Double.class);
-					obj[i] = items[i].get(key);
+				{	
+					if(items[i].containsKey(key))
+					{
+						Utils.isKeyValid(items[i], key, Double.class);
+						obj[i] = items[i].get(key);
+					}
+					else
+					{
+						obj[i] = 0.0;
+					}
 				}	
 			}
 			else if(items[0].get(key) instanceof Float)
 			{
 				obj = new Integer[items.length];
 				for(int i=0; i<items.length; i++)
-				{				
-					Utils.isKeyValid(items[i], key, Float.class);
-					obj[i] = items[i].get(key);
+				{		
+					if(items[i].containsKey(key))
+					{
+						Utils.isKeyValid(items[i], key, Float.class);
+						obj[i] = items[i].get(key);
+					}
+					else
+					{
+						obj[i] = 0.0f;
+					}
 				}	
 			}
 			else if(items[0].get(key) instanceof Integer)
@@ -55,16 +69,30 @@ public class PixelFrameDataMerge implements Processor
 				obj = new Integer[items.length];
 				for(int i=0; i<items.length; i++)
 				{				
-					Utils.isKeyValid(items[i], key, Integer.class);
-					obj[i] = items[i].get(key);
+					if(items[i].containsKey(key))
+					{
+						Utils.isKeyValid(items[i], key, Integer.class);
+						obj[i] = items[i].get(key);
+					}
+					else
+					{
+						obj[i] = 0;
+					}
 				}	
 			}
 			else
 			{
 				obj = new Serializable[items.length];
 				for(int i=0; i<items.length; i++)
-				{				
-					obj[i] = items[i].get(key);
+				{		
+					if(items[i].containsKey(key))
+					{
+						obj[i] = items[i].get(key);
+					}
+					else
+					{
+						obj[i] = null;
+					}
 				}	
 			}
 			

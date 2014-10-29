@@ -38,6 +38,7 @@ public class PolygonArea  implements Processor
 			erg += (y[i] + y[(i+1) % N]) * (x[i] - x[(i+1) % N]);
 		}				
 
+		
 		input.put(outkey, Math.abs(0.5 * erg));
 		
 		return input;

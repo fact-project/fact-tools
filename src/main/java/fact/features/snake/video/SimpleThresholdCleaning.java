@@ -16,12 +16,18 @@ public class SimpleThresholdCleaning implements Processor
 	@Parameter(required = true, description = "Output: List of Pixel over Threshold")
 	private String outputKey = null;
 	
+	@Parameter(required = true, description = "Output: Number of Pixel in Shower")
+	private String outNmbr = null;
+	
 	@Parameter(required = false, description = "Input: Threshold for main Pixel")
 	private double thresholdLv1 = 35;
 	@Parameter(required = false, description = "Input: Threshold for neighbor Pixel")
 	private double thresholdLv2 = 15;
-	
+	@Parameter(required = false, description = "Input: Threshold for Lv2 neighbor")
+	private int neighborCount = 3;
 		
+	
+	
 	@Override
 	public Data process(Data input) 
 	{
@@ -46,7 +52,7 @@ public class SimpleThresholdCleaning implements Processor
 					if(data[neighbour[j].chid] < thresholdLv2) thresholdViolationCounter++;
 				}
 				
-				if(thresholdViolationCounter <= 2)
+				if(thresholdViolationCounter <= 6 - neighborCount)
 				{
 					marks[i] = 1;
 					elementCounter++;
@@ -64,6 +70,8 @@ public class SimpleThresholdCleaning implements Processor
 				count++;
 			}
 		}
+		
+		input.put(outNmbr, elementCounter);
 		
 		input.put(outputKey, retArray);		
 		return input;
@@ -100,6 +108,24 @@ public class SimpleThresholdCleaning implements Processor
 	public void setThresholdLv2(double thresholdLv2) {
 		this.thresholdLv2 = thresholdLv2;
 	}
+
+	public int getNeighborCount() {
+		return neighborCount;
+	}
+
+	public void setNeighborCount(int neighborCount) {
+		this.neighborCount = neighborCount;
+	}
+
+	public String getOutNmbr() {
+		return outNmbr;
+	}
+
+	public void setOutNmbr(String outNmbr) {
+		this.outNmbr = outNmbr;
+	}
+	
+	
 	
 	
 }
