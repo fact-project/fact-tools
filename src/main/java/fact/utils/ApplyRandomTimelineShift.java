@@ -11,11 +11,10 @@ import stream.annotations.Parameter;
 import java.util.Random;
 
 /**
- * add random offsets to an array of arrival times. The offset is sampled from a gaussian distribution around zero
- * with a given standard deviation. The standard deviation is determined from a mean standard deviation stdDevOrigin of
- * the original (arrival time) distribution and a variance stdDevGoal, which is the mean standard deviation of the
- * desired (arrival time) distribution.
- * Created by jbuss on 28.10.14.
+ * shift each pixel's timeline by a random offsets. The offset is sampled from a gaussian distribution around zero
+ * with a given standard deviation.
+ *
+ * Created by jbuss on 30.10.14.
  */
 public class ApplyRandomTimelineShift implements Processor{
     static Logger log = LoggerFactory.getLogger(ApplyRandomTimelineShift.class);
@@ -48,7 +47,6 @@ public class ApplyRandomTimelineShift implements Processor{
 
         for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++) {
             int first = pix * roi;
-                        //Check if maximum is above threshold otherwise skip the pixel
 
             Double randomOffset =  (rand.nextGaussian()* stdDeviation);
 
