@@ -17,8 +17,8 @@ import java.util.Random;
  * desired (arrival time) distribution.
  * Created by jbuss on 28.10.14.
  */
-public class SmearOutArrivalTimes implements Processor{
-    static Logger log = LoggerFactory.getLogger(SmearOutArrivalTimes.class);
+public class ApplyRandomArrivalTimeShift implements Processor{
+    static Logger log = LoggerFactory.getLogger(ApplyRandomArrivalTimeShift.class);
 
     @Parameter(required = true, description = "key of the arrival times array")
     private String key = null;
@@ -29,13 +29,15 @@ public class SmearOutArrivalTimes implements Processor{
     @Parameter(description = "mean standard deviation of the desired (arrival time) distribution")
     private double stdDevOrigin = 0.52;
 
+    @Parameter(description = "Seed of the random number generator")
+    private long Seed = 5901;
+
     @Parameter(required = true, description = "key of the output array")
     private String outputKey = null;
 
-    Random rand = new Random();
+
     private double[] arrivalTime = null;
     private double[] newArrivalTime = null;
-
 
     @Override
     public Data process(Data input) {
@@ -45,6 +47,8 @@ public class SmearOutArrivalTimes implements Processor{
 
         arrivalTime     = (double[]) input.get(key);
         newArrivalTime  = new double[arrivalTime.length];
+
+        Random rand = new Random(Seed);
 
         for ( int i = 0; i < arrivalTime.length; i++){
             Double effStdDev = Math.sqrt(stdDevGoal * stdDevGoal - stdDevOrigin * stdDevOrigin);
@@ -89,5 +93,13 @@ public class SmearOutArrivalTimes implements Processor{
 
     public void setStdDevGoal(double stdDevGoal) {
         this.stdDevGoal = stdDevGoal;
+    }
+
+    public long getSeed() {
+        return Seed;
+    }
+
+    public void setSeed(long seed) {
+        Seed = seed;
     }
 }
