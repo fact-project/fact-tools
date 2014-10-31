@@ -18,6 +18,7 @@ public class DrsFileService implements Service {
     String currentDataFile = "";
     SourceURL currentDrsFile;
 
+    SourceURL url = null;
     /**
      * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
      * files in the directory containing the substring "drs.fits" and having the same date as the current data
@@ -32,6 +33,9 @@ public class DrsFileService implements Service {
      * @throws java.io.FileNotFoundException
      */
     public SourceURL findDRSFile(String pathToCurrentFitsFile) throws FileNotFoundException {
+        if(url != null){
+            return url;
+        }
         if(currentDataFile.equals(pathToCurrentFitsFile)){
             return currentDrsFile;
         }
@@ -80,4 +84,9 @@ public class DrsFileService implements Service {
     public void reset() throws Exception {
 
     }
+
+    public void setUrl(SourceURL url) {
+        this.url = url;
+    }
+
 }
