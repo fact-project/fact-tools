@@ -20,23 +20,24 @@ import stream.annotations.Parameter;
  * outputKey+"_" +"variance"
  */
 public class ArrayStatistics implements Processor {
-	static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
-    @Parameter(required = true, description = "Key to the array you want the information about")
-	private String key = null;
-    @Parameter(required = true, description = "The name of the data written to the stream")
-	private String outputKey = null;
 
-	@Override
-	public Data process(Data input) {
-		Utils.mapContainsKeys( input, key);
-		
-		double[] data = Utils.toDoubleArray(input.get(key));
+    static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
+    @Parameter(required = true, description = "Key to the array you want the information about")
+    private String key = null;
+    @Parameter(required = true, description = "The name of the data written to the stream")
+    private String outputKey = null;
+
+    @Override
+    public Data process(Data input) {
+        Utils.mapContainsKeys( input, key);
+
+        double[] data = Utils.toDoubleArray(input.get(key));
 
         DescriptiveStatistics s = new DescriptiveStatistics();
-		for(double value: data){
+        for(double value: data){
             s.addValue(value);
         }
-		input.put(outputKey+"_" +"mean",s.getMean());
+        input.put(outputKey+"_" +"mean",s.getMean());
         input.put(outputKey+"_" +"max",s.getMax());
         input.put(outputKey+"_" +"min",s.getMin());
         input.put(outputKey+"_" +"geommetricMean",s.getGeometricMean());
@@ -45,14 +46,16 @@ public class ArrayStatistics implements Processor {
 
 
         return input;
+
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
+
 
 }
