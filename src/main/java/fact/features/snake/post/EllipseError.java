@@ -31,7 +31,7 @@ public class EllipseError implements Processor
 	@Parameter(required = true, description = "Input: SnakeY")
 	private String snakeY = null;
 	
-	@Parameter(required = true, description = "Output: Mittlere Abweichung")
+	@Parameter(required = true, description = "Output: Abweichung von der Ellipse für jede Stützstelle")
 	private String outputKey = null;
 	
 	@Override
@@ -57,7 +57,7 @@ public class EllipseError implements Processor
 		double[] polyX = (double[]) input.get(snakeX);
 		double[] polyY = (double[]) input.get(snakeY);
 		
-		double erg = 0;
+		double erg[] = new double[polyX.length];
 		
 		for(int i=0; i<polyX.length; i++)
 		{
@@ -69,11 +69,9 @@ public class EllipseError implements Processor
 						
 			double dist = calcClose(xNew, yNew, major, minor);			
 			
-			erg += dist;
+			erg[i] = dist;
 		}
-		
-		erg /= polyX.length;
-		
+				
 		input.put(outputKey, erg);		
 		
 		return input;
