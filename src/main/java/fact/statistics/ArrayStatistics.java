@@ -18,6 +18,9 @@ import stream.annotations.Parameter;
  * outputKey+"_" +"geommetricMean"
  * outputKey+"_" +"kurtosis"
  * outputKey+"_" +"variance"
+ * outputKey+"_" +"skewness"
+ *
+ * also a subarray can be defined by a given pixelSetArray that contains the array ids that should be used for the sub array    
  */
 public class ArrayStatistics implements Processor {
     static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
