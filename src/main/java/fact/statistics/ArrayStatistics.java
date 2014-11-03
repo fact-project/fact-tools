@@ -26,14 +26,34 @@ public class ArrayStatistics implements Processor {
     @Parameter(required = true, description = "The name of the data written to the stream")
     private String outputKey = null;
 
+    @Parameter(description = "key of the")
+    private String pixelSetKey = null;
+
+    private int []      pixelArray  = null;
+
+
     @Override
     public Data process(Data input) {
         Utils.mapContainsKeys( input, key);
 
+        double[]    subset      = null;
         double[] data = Utils.toDoubleArray(input.get(key));
 
+        if (pixelSetKey == null){
+            subset = data;
+        }
+        else{
+            pixelArray  = (int[]) input.get(pixelSetKey);
+            subset = new double[pixelArray.length];
+
+            for (int i = 0; i < pixelArray.length; i++){
+                subset[i] = data[pixelArray[i]];
+            }
+        }
+
+
         DescriptiveStatistics s = new DescriptiveStatistics();
-        for(double value: data){
+        for(double value: subset){
             s.addValue(value);
         }
         input.put(outputKey+"_" +"mean",s.getMean());
@@ -42,7 +62,7 @@ public class ArrayStatistics implements Processor {
         input.put(outputKey+"_" +"geommetricMean",s.getGeometricMean());
         input.put(outputKey+"_" +"kurtosis",s.getKurtosis());
         input.put(outputKey+"_" +"variance",s.getVariance());
-
+        input.put(outputKey+"_" +"skewness",s.getSkewness());
 
         return input;
     }
@@ -55,4 +75,11 @@ public class ArrayStatistics implements Processor {
         this.outputKey = outputKey;
     }
 
+    public String getPixelSetKey() {
+        return pixelSetKey;
+    }
+
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
+    }
 }
