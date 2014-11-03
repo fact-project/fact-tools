@@ -28,8 +28,7 @@ public class ArrayStatistics implements Processor {
     private String key = null;
     @Parameter(required = true, description = "The name of the data written to the stream")
     private String outputKey = null;
-
-    @Parameter(description = "key of the")
+    @Parameter(description = "key of an array containing the IDs of a desired Subset")
     private String pixelSetKey = null;
 
     private int []      pixelArray  = null;
@@ -49,6 +48,7 @@ public class ArrayStatistics implements Processor {
             pixelArray  = (int[]) input.get(pixelSetKey);
             subset = new double[pixelArray.length];
 
+            //Loop over array containing the pixel ids of the desired subset
             for (int i = 0; i < pixelArray.length; i++){
                 subset[i] = data[pixelArray[i]];
             }
