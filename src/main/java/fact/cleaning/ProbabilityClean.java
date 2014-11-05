@@ -3,6 +3,7 @@ package fact.cleaning;
 import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 
@@ -26,6 +27,9 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 	
 	private double probabilityThreshold;
 	
+	private double distanceCoeff = 1.0;
+	private double distanceExp = -1.0;
+	
 	private double[] photoncharge = null;
 	private double delta;
 	private double cogx;
@@ -44,13 +48,14 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
 		
-		List<Integer> showerlist = new ArrayList<Integer>();
+		ArrayList<Integer> showerlist = new ArrayList<Integer>();
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
 			double xpos = pixelMap.getPixelFromId(px).getXPositionInMM();
 			double ypos = pixelMap.getPixelFromId(px).getYPositionInMM();
-			double weight = photoncharge[px] / Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, xpos, ypos);
+			double dist = Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, xpos, ypos);
+			double weight = photoncharge[px] * Math.pow(distanceCoeff*dist, distanceExp); 
 			
 			if (weight > probabilityThreshold)
 			{
@@ -58,12 +63,20 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 			}
 			
 		}
+		
+		showerlist = removeSmallCluster(showerlist,2);
+		
+		PixelSetOverlay cleanedPixelSet = new PixelSetOverlay();
 		if (showerlist.size() > 0)
 		{
 			Integer[] showerArray = new Integer[showerlist.size()];
-			showerlist.toArray(showerArray);
+			for (int i = 0; i < showerlist.size(); i++) {
+                cleanedPixelSet.addById(showerlist.get(i));
+                showerArray[i] =  showerlist.get(i);
+            }
 			
 			input.put(outputKey, showerArray);
+			input.put(outputKey+"Set", cleanedPixelSet);
 		}
 		
 		return input;
@@ -115,6 +128,22 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 
 	public void setProbabilityThreshold(double probabilityThreshold) {
 		this.probabilityThreshold = probabilityThreshold;
+	}
+
+	public double getDistanceCoeff() {
+		return distanceCoeff;
+	}
+
+	public void setDistanceCoeff(double distanceCoeff) {
+		this.distanceCoeff = distanceCoeff;
+	}
+
+	public double getDistanceExp() {
+		return distanceExp;
+	}
+
+	public void setDistanceExp(double distanceExp) {
+		this.distanceExp = distanceExp;
 	}
 
 }

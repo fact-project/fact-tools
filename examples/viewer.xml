@@ -36,25 +36,24 @@
            timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 
         <stream.flow.Skip condition="%{data.shower} == null" />
-        <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>-->
-        <!--<fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>-->
+        <fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>
+        <fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>
         <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="showerDistribution" />
         <fact.features.M3Long showerKey="shower" weightsKey="photoncharge" distribution="showerDistribution"/>
         <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
         <stream.flow.Skip condition="%{data.size} &lt; 25" />
-
-
-
-        <!-- <fact.features.source.SourcePosition outputKey="sourcePosition" url="file:${drivefile}" physicalSource="${sourcename}" />
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="1" outputKey="antiSourcePosition_1"/>
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="2" outputKey="antiSourcePosition_2"/>
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="3" outputKey="antiSourcePosition_3"/>
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="4" outputKey="antiSourcePosition_4"/>
-        <fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="5" antiSourcePositionId="5" outputKey="antiSourcePosition_5"/>
- -->
-		<!-- <stream.flow.Skip condition="%{data.shower} == null" />
-        <fact.features.Size showerKey="shower" photonchargeKey="photoncharge" outputKey="Size" />    -->    
-        <!-- <stream.flow.Skip condition="%{data.Size} &lt; 100" /> -->
+		
+		<fact.cleaning.ProbabilityClean photonChargeKey="photoncharge" outputKey="prob1"
+		deltaKey="Delta" cogxKey="COGx" cogyKey="COGy" probabilityThreshold="3"
+		distanceCoeff="1.0" distanceExp="-1" />
+		
+		<fact.cleaning.ProbabilityClean photonChargeKey="photoncharge" outputKey="prob2"
+		deltaKey="Delta" cogxKey="COGx" cogyKey="COGy" probabilityThreshold="5"
+		distanceCoeff="0.8" distanceExp="-0.5" />
+		
+		<fact.cleaning.ProbabilityClean photonChargeKey="photoncharge" outputKey="prob3"
+		deltaKey="Delta" cogxKey="COGx" cogyKey="COGy" probabilityThreshold="7"
+		distanceCoeff="0.01" distanceExp="-1" />
 
 
         <fact.ShowViewer key="DataCalibrated"/>
