@@ -45,6 +45,18 @@ public class ArrayStatistics implements Processor {
             subset = data;
         }
         else{
+        	if (!input.containsKey(pixelSetKey))
+        	{
+        		input.put(outputKey+"_" +"mean",Double.NaN);
+                input.put(outputKey+"_" +"max",Double.NaN);
+                input.put(outputKey+"_" +"min",Double.NaN);
+                input.put(outputKey+"_" +"geometricMean",Double.NaN);
+                input.put(outputKey+"_" +"kurtosis",Double.NaN);
+                input.put(outputKey+"_" +"variance",Double.NaN);
+                input.put(outputKey+"_" +"skewness",Double.NaN);
+
+                return input;
+        	}
             pixelArray  = (int[]) input.get(pixelSetKey);
             subset = new double[pixelArray.length];
 
@@ -62,7 +74,7 @@ public class ArrayStatistics implements Processor {
         input.put(outputKey+"_" +"mean",s.getMean());
         input.put(outputKey+"_" +"max",s.getMax());
         input.put(outputKey+"_" +"min",s.getMin());
-        input.put(outputKey+"_" +"geommetricMean",s.getGeometricMean());
+        input.put(outputKey+"_" +"geometricMean",s.getGeometricMean());
         input.put(outputKey+"_" +"kurtosis",s.getKurtosis());
         input.put(outputKey+"_" +"variance",s.getVariance());
         input.put(outputKey+"_" +"skewness",s.getSkewness());
