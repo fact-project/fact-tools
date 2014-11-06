@@ -9,27 +9,24 @@ import org.junit.Test;
 
 import stream.Data;
 import stream.data.DataFactory;
-import stream.io.SourceURL;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
 
-public class SnakeTest extends CreateGaus
+public class SnakeTest
 {
 	@Test
 	public void testSnake() throws Exception
 	{
-		try {			
+				
 			Data item = DataFactory.create();			
 			
+			CreateGaus gaus = new CreateGaus();			
+			gaus.setSigmaX(15);
+			gaus.setSigmaY(33);
 			
-			this.setSigmaX(15);
-			this.setSigmaY(33);
+			gaus.setX0(-22);
+			gaus.setY0(45);
 			
-			this.setX0(-22);
-			this.setY0(45);
-			
-			this.setOutputKey("gaus");			
-			this.process(item);
+			gaus.setOutputKey("gaus");			
+			gaus.process(item);
 			
 			SnakeSingle sn = new SnakeSingle();
 			
@@ -56,16 +53,19 @@ public class SnakeTest extends CreateGaus
 			
 			int nov = (Integer) item.get("numberOfVertices");
 			
-			assertTrue( 6 < nov );
+			assertTrue("Snake numberOfVertices kleiner 6", 6 < nov );
 			
-			assertTrue(item.containsKey("snakeOutX"));
-			assertTrue(item.containsKey("snakeOutY"));
-
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-			fail("Could not read stream");
-		}		
 	}
+	
+	@Test
+	public void testMatrix() throws Exception
+	{
+		Snake sn = new Snake();
+		
+		sn.initConstant(0.03, 0.01, 0.08, 1.0);
+		sn.initMatrix();
+		
+	}
+	
+	
 }

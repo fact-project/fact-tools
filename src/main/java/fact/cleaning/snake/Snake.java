@@ -1,9 +1,7 @@
 package fact.cleaning.snake;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.LUDecomposition;
-import org.apache.commons.math3.linear.RealMatrix;
+import org.jblas.DoubleMatrix;
+import org.jblas.Solve;
 
 import stream.annotations.Parameter;
 
@@ -19,9 +17,9 @@ import stream.annotations.Parameter;
  */
 public class Snake 
 {	
-	final int _MAX_VERTICES = 55;
+	private final int _MAX_VERTICES = 55;
 	
-	final RealMatrix[] matrix = new RealMatrix[_MAX_VERTICES];	
+	private final DoubleMatrix[] matrix = new DoubleMatrix[_MAX_VERTICES];	
 	
 	//private double alpha = 0.10;
 	//private double beta = 0.06;
@@ -34,8 +32,9 @@ public class Snake
 	@Parameter(required = false, description = "Constant: ds2 ")
 	private double ds2 = 1.0;
 	
-	private RealMatrix vecX;
-	private RealMatrix vecY;
+	private DoubleMatrix vecX;
+	private DoubleMatrix vecY;
+	
 	
 	private int NumberOfVertices = 6;
 	
@@ -54,11 +53,9 @@ public class Snake
 	
 	public void initMatrix()
 	{		
-		//matrix = new BlockRealMatrix[_MAX_VERTICES];		
-		
 		for(int i=0; i < _MAX_VERTICES; i++)
 		{
-			matrix[i] = new BlockRealMatrix(i+1, i+1);			
+			matrix[i] = DoubleMatrix.zeros(i+1, i+1);				
 			calcMatrix(i+1);
 		}	
 	}
@@ -66,8 +63,8 @@ public class Snake
 	public void initStartPos(double centerX, double centerY, double radius, int startPointNumber)
 	{
 		NumberOfVertices = startPointNumber;
-		vecX = new BlockRealMatrix(startPointNumber,1);
-		vecY = new BlockRealMatrix(startPointNumber,1);
+		vecX = new DoubleMatrix(startPointNumber,1);
+		vecY = new DoubleMatrix(startPointNumber,1);
 		
 		for (int i = 0; i < startPointNumber; i++)
 		{
@@ -76,8 +73,8 @@ public class Snake
 			float a = (float) (centerX + radius * Math.sin(i*3.1415 / div));
 			float b = (float) (centerY + radius * Math.cos(i*3.1415 / div));
 
-			vecX.setEntry(i, 0, a);
-			vecY.setEntry(i, 0, b);
+			vecX.data[i] = a;
+			vecY.data[i] = b;
 		}	
 	}
 	
@@ -85,8 +82,8 @@ public class Snake
 	{		
 		for(int i=0; i<NumberOfVertices; i++)
 		{	
-			final double x = vecX.getEntry(i,0);
-			final double y = vecY.getEntry(i,0);			
+			final double x = vecX.data[i];
+			final double y = vecY.data[i];			
 
 			
 			final double dxErg = dt * f.forceX(x, y);
@@ -101,15 +98,15 @@ public class Snake
 				dy = dy * 0.95;
 			}
 			
-			vecX.setEntry(i, 0, x + dx );
-			vecY.setEntry(i, 0, y + dy );		
+			vecX.data[i] = x + dx;
+			vecY.data[i] = y + dy;		
 		}		
 
 		
-		final RealMatrix EigenMat = matrix[NumberOfVertices-1];
+		final DoubleMatrix EigenMat = matrix[NumberOfVertices-1];
 			
-		vecX = EigenMat.multiply(vecX);
-		vecY = EigenMat.multiply(vecY);
+		vecX = EigenMat.mmul(vecX);
+		vecY = EigenMat.mmul(vecY);
 				
 
 		splitLines(220.0);	// 2 Pixel lang
@@ -128,16 +125,17 @@ public class Snake
 			
 		for(int i=0; i < count; i++)
 		{			
-			matrix[count-1].setEntry(i, i, r);
+			matrix[count-1].put(i, i, r);
 			
-			matrix[count-1].setEntry((i + 1) % count, i, q);
-			matrix[count-1].setEntry((i + 2) % count, i, p);
+			matrix[count-1].put((i + 1) % count, i, q);
+			matrix[count-1].put((i + 2) % count, i, p);
 
-			matrix[count-1].setEntry(((i - 1) + count) % count, i, q);
-			matrix[count-1].setEntry(((i - 2) + count) % count, i, p);			
+			matrix[count-1].put(((i - 1) + count) % count, i, q);
+			matrix[count-1].put(((i - 2) + count) % count, i, p);			
 		}
 			
-		matrix[count-1] = new LUDecomposition(matrix[count-1]).getSolver().getInverse();
+			
+		matrix[count-1] = Solve.pinv(matrix[count-1]);
 	}
 	
 	protected void splitLines(double maxDist)
@@ -149,35 +147,49 @@ public class Snake
 				return;
 			}
 			
-			double distX = vecX.getEntry((i+1) % NumberOfVertices, 0) - vecX.getEntry(i, 0);
-			double distY = vecY.getEntry((i+1) % NumberOfVertices, 0) - vecY.getEntry(i, 0);
+			double distX = vecX.data[(i+1) % NumberOfVertices] - vecX.data[i];
+			double distY = vecY.data[(i+1) % NumberOfVertices] - vecY.data[i];
 
 			if(distX*distX + distY*distY > maxDist)
 			{
 				NumberOfVertices++;
-				final RealMatrix newVecX = new BlockRealMatrix(NumberOfVertices,1);
-				final RealMatrix newVecY = new BlockRealMatrix(NumberOfVertices,1);				
+				final DoubleMatrix newVecX = new DoubleMatrix(NumberOfVertices,1);
+				final DoubleMatrix newVecY = new DoubleMatrix(NumberOfVertices,1);				
 
 				for(int j=0; j<=i; j++)
 				{
-					newVecX.setEntry(j, 0, vecX.getEntry(j, 0));
-					newVecY.setEntry(j, 0, vecY.getEntry(j, 0));					
+					newVecX.data[j] = vecX.data[j];
+					newVecY.data[j] = vecY.data[j];					
 				}
 
-				newVecX.setEntry(i+1, 0, vecX.getEntry(i, 0) + (distX/2.0));				
-				newVecY.setEntry(i+1, 0, vecY.getEntry(i, 0) + (distY/2.0));
+				newVecX.data[i+1] = vecX.data[i] + (distX/2.0);				
+				newVecY.data[i+1] = vecY.data[i] + (distY/2.0);
 			
 
 				for(int j = i+1; j < (NumberOfVertices-1); j++)
 				{
-					newVecX.setEntry(j+1, 0, vecX.getEntry(j, 0));					
-					newVecY.setEntry(j+1, 0, vecY.getEntry(j, 0));					
+					newVecX.data[j+1] = vecX.data[j];					
+					newVecY.data[j+1] = vecY.data[j];					
 				}
 
 				vecX = newVecX;
 				vecY = newVecY;					
 			}
 		}
+	}
+	
+	
+	protected double[] matVecMul(final double[][] mat, double[] vec)
+	{
+		if(mat == null || mat[0] == null) return null;
+		
+		for(int i=0; i< mat.length; i++)
+		{
+			
+		}
+		
+		
+		return vec;		
 	}
 	
 	public double getAlpha() 
@@ -222,12 +234,12 @@ public class Snake
 	
 	public double[] getSnakeX()
 	{
-		return vecX.getColumn(0);
+		return vecX.getColumn(0).data;
 	}
 	
 	public double[] getSnakeY()
 	{
-		return vecY.getColumn(0);
+		return vecY.getColumn(0).data;
 	}
 	
 	public int getNumberOfVertices()
