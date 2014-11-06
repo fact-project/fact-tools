@@ -10,7 +10,7 @@ import org.junit.Test;
 import stream.Data;
 import stream.data.DataFactory;
 
-public class SnakeTest
+public class SnakeTest extends Snake
 {
 	@Test
 	public void testSnake() throws Exception
@@ -60,10 +60,24 @@ public class SnakeTest
 	@Test
 	public void testMatrix() throws Exception
 	{
-		Snake sn = new Snake();
+		this.initConstant(0.03, 0.01, 0.08, 1.0);
+		this.initMatrix();
 		
-		sn.initConstant(0.03, 0.01, 0.08, 1.0);
-		sn.initMatrix();
+		for(int i=0; i<10; i++)
+		{
+			System.out.println("Matrix " + i + ":");
+			
+			for(int y=0; y<i+1; y++)
+			{
+				for(int x=0; x<i+1; x++)
+				{
+					System.out.print( this.getMatrix()[i].data[x+y*i] + " ");					
+				}
+				System.out.println("");
+			}
+						
+		}
+		
 		
 	}
 	

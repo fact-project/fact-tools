@@ -2,16 +2,18 @@ package fact.features.snake.video;
 
 import java.awt.Polygon;
 
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Utils;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-public class VideoSize implements Processor
+
+public class VideoArray implements Processor
 {
 
 	@Parameter(required = true, description = "Input: Area")
-	private String inkeySize = null;
+	private String inkeyArray = null;
 	@Parameter(required = true, description = "Input: Polygon center x")
 	private String inkeyCenterX = null;
 	@Parameter(required = true, description = "Input: Polygon center y")
@@ -36,7 +38,7 @@ public class VideoSize implements Processor
 	@Override
 	public Data process(Data input) 
 	{
-		Utils.isKeyValid(input, inkeySize, Double[].class);
+		Utils.isKeyValid(input, inkeyArray, Double[].class);
 		Utils.isKeyValid(input, inkeyCenterX, Double[].class);
 		Utils.isKeyValid(input, inkeyCenterY, Double[].class);
 		Utils.isKeyValid(input, inkeyIndex, Integer[].class);
@@ -44,7 +46,7 @@ public class VideoSize implements Processor
 		Utils.isKeyValid(input, inkeySnakeX, double[].class);
 		Utils.isKeyValid(input, inkeySnakeY, double[].class);
 				
-		Double[] data = (Double[]) input.get(inkeySize);
+		Double[] data = (Double[]) input.get(inkeyArray);
 		Double[] centerX =(Double[]) input.get(inkeyCenterX);
 		Double[] centerY =(Double[]) input.get(inkeyCenterY);
 		Integer[] index = (Integer[]) input.get(inkeyIndex);
@@ -91,27 +93,29 @@ public class VideoSize implements Processor
 		int maxSlice = -1;
 		int maxNum = -1;
 		
+		diff[0] = 0.0;
 		for(int i=1; i<dataSmooth.length-1; i++)
-		{			
-			if(dataSmooth[i] > max)
+		{		
+			if(poly.contains(centerX[i], centerY[i]))
 			{
-				if(poly.contains(centerX[i], centerY[i]))
+				if(dataSmooth[i] > max)
 				{
+				
 					max = dataSmooth[i];
 					maxSlice = index[i];
 					maxNum = i;
 				}
+				
+				diff[i] = dataSmooth[i+1] - dataSmooth[i-1];
 			}
-		}
+			else
+			{
+				diff[i] = diff[i-1];
+			}
 		
-		
-		diff[0] = 0.0;		
-		for(int i=1; i<dataSmooth.length-1; i++)
-		{
-			diff[i] = dataSmooth[i+1] - dataSmooth[i-1];
 		}
 		diff[dataSmooth.length-1] = 0.0;
-		
+				
 		
 		if(maxSlice == -1)
 		{
@@ -121,6 +125,25 @@ public class VideoSize implements Processor
 			
 			return input;
 		}
+		
+		
+		SimpleRegression sr1 = new SimpleRegression();
+		SimpleRegression sr2 = new SimpleRegression();
+		
+		for(int i=0; i<dataSmooth.length; i++)
+		{
+			sr1.addData(i/2.0, dataSmooth[i]);
+			sr2.addData(i/2.0, dataSmooth[i]);
+		}
+		
+		int nmbrPara1 = sr1.regress().getNumberOfParameters();
+		int nmbrPara2 = sr2.regress().getNumberOfParameters();
+		
+		System.out.println("Anzahl an Parametern: " + nmbrPara1 + ", " + nmbrPara2);
+		
+		
+		
+		
 		
 		double slope1=0;
 		int slopeCount1=0;
@@ -161,4 +184,137 @@ public class VideoSize implements Processor
 		
 		return input;
 	}
+
+
+	
+
+
+	public String getInkeyIndex() {
+		return inkeyIndex;
+	}
+
+
+
+
+
+	public void setInkeyIndex(String inkeyIndex) {
+		this.inkeyIndex = inkeyIndex;
+	}
+
+
+
+
+
+	public String getInkeyArray() {
+		return inkeyArray;
+	}
+
+
+
+
+
+	public void setInkeyArray(String inkeyArray) {
+		this.inkeyArray = inkeyArray;
+	}
+
+
+
+
+
+	public String getInkeyCenterX() {
+		return inkeyCenterX;
+	}
+
+
+
+
+
+	public void setInkeyCenterX(String inkeyCenterX) {
+		this.inkeyCenterX = inkeyCenterX;
+	}
+
+
+
+
+
+	public String getInkeyCenterY() {
+		return inkeyCenterY;
+	}
+
+
+
+
+
+	public void setInkeyCenterY(String inkeyCenterY) {
+		this.inkeyCenterY = inkeyCenterY;
+	}
+
+
+
+
+
+	public String getInkeySnakeX() {
+		return inkeySnakeX;
+	}
+
+
+
+
+
+	public void setInkeySnakeX(String inkeySnakeX) {
+		this.inkeySnakeX = inkeySnakeX;
+	}
+
+
+
+
+
+	public String getInkeySnakeY() {
+		return inkeySnakeY;
+	}
+
+
+
+
+
+	public void setInkeySnakeY(String inkeySnakeY) {
+		this.inkeySnakeY = inkeySnakeY;
+	}
+
+
+
+
+
+	public String getOutkeyMax() {
+		return outkeyMax;
+	}
+
+
+	public void setOutkeyMax(String outkeyMax) {
+		this.outkeyMax = outkeyMax;
+	}
+
+
+	public String getOutkeySlope1() {
+		return outkeySlope1;
+	}
+
+
+	public void setOutkeySlope1(String outkeySlope1) {
+		this.outkeySlope1 = outkeySlope1;
+	}
+
+
+	public String getOutkeySlope2() {
+		return outkeySlope2;
+	}
+
+
+	public void setOutkeySlope2(String outkeySlope2) {
+		this.outkeySlope2 = outkeySlope2;
+	}
+
+	
+	
+	
 }
