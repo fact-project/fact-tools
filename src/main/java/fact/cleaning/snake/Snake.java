@@ -19,7 +19,7 @@ public class Snake
 {	
 	private final int _MAX_VERTICES = 55;
 	
-	private final DoubleMatrix[] matrix = new DoubleMatrix[_MAX_VERTICES];	
+	protected final DoubleMatrix[] matrix = new DoubleMatrix[_MAX_VERTICES];	
 	
 	//private double alpha = 0.10;
 	//private double beta = 0.06;

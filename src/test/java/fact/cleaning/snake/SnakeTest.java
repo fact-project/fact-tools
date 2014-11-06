@@ -71,7 +71,7 @@ public class SnakeTest extends Snake
 			{
 				for(int x=0; x<i+1; x++)
 				{
-					System.out.print( this.getMatrix()[i].data[x+y*i] + " ");					
+					System.out.print( this.matrix[i].data[x+y*(i+1)] + " ");					
 				}
 				System.out.println("");
 			}
@@ -79,7 +79,6 @@ public class SnakeTest extends Snake
 		}
 		
 		
-	}
-	
+	}	
 	
 }
