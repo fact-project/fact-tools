@@ -47,13 +47,13 @@ public class ArrayStatistics implements Processor {
         else{
         	if (!input.containsKey(pixelSetKey))
         	{
-        		input.put(outputKey+"_" +"mean",Double.NaN);
-                input.put(outputKey+"_" +"max",Double.NaN);
-                input.put(outputKey+"_" +"min",Double.NaN);
-                input.put(outputKey+"_" +"geometricMean",Double.NaN);
-                input.put(outputKey+"_" +"kurtosis",Double.NaN);
-                input.put(outputKey+"_" +"variance",Double.NaN);
-                input.put(outputKey+"_" +"skewness",Double.NaN);
+        		input.put(outputKey+"_" +"mean",Double.NEGATIVE_INFINITY);
+                input.put(outputKey+"_" +"max",Double.NEGATIVE_INFINITY);
+                input.put(outputKey+"_" +"min",Double.NEGATIVE_INFINITY);
+                input.put(outputKey+"_" +"geometricMean",Double.NEGATIVE_INFINITY);
+                input.put(outputKey+"_" +"kurtosis",Double.NEGATIVE_INFINITY);
+                input.put(outputKey+"_" +"variance",Double.NEGATIVE_INFINITY);
+                input.put(outputKey+"_" +"skewness",Double.NEGATIVE_INFINITY);
 
                 return input;
         	}
