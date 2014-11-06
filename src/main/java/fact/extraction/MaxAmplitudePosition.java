@@ -5,8 +5,11 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+
+import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -39,6 +42,8 @@ public class MaxAmplitudePosition implements Processor {
         int roi = data.length / Constants.NUMBEROFPIXEL;
 
         int[] positions =  new int[Constants.NUMBEROFPIXEL];
+        
+        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 
 		if (searchWindowLeft == null || searchWindowLeft < 0){
 			searchWindowLeft = 0;
@@ -49,8 +54,10 @@ public class MaxAmplitudePosition implements Processor {
 		//foreach pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			positions[pix] = findMaximumPosition(pix, roi, data);
+			m[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
 		}
         input.put(outputKey, positions);
+        input.put(outputKey + "Marker", m);
 		return input;
 	}
 
@@ -63,7 +70,7 @@ public class MaxAmplitudePosition implements Processor {
      */
     public int findMaximumPosition(int pix, int roi, double[] data){
         //the first value we find is the current maximum
-        double tempMaxValue = data[pix*roi];
+        double tempMaxValue = data[pix*roi+searchWindowLeft];
         int position = 0;
         //iterate over all slices
         for (int slice = searchWindowLeft; slice < searchWindowRight; slice++) {
