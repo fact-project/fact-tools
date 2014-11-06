@@ -28,12 +28,15 @@ public class RisingEdgeForPositions implements Processor {
 	private String outputKey = null;
     @Parameter(required = true)
 	private String amplitudePositionsKey = null;
+    @Parameter(required = true)
+    private String maxSlopesKey = null;
 
 	@Override
 	public Data process(Data input) {
         Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
         double[] positions =  new double[Constants.NUMBEROFPIXEL];
+        double[] maxSlopes =  new double[Constants.NUMBEROFPIXEL];
 		
 		double[] data = (double[]) input.get(dataKey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
@@ -70,8 +73,10 @@ public class RisingEdgeForPositions implements Processor {
 				}
 			}
 			positions[pix] = (double) arrivalPos;
+            maxSlopes[pix] = (double) max_slope;
 		}
 		input.put(outputKey, positions);
+        input.put(maxSlopesKey, maxSlopes);
 		
 		return input;
 		
@@ -100,8 +105,16 @@ public class RisingEdgeForPositions implements Processor {
 	public void setAmplitudePositionsKey(String amplitudePositionsKey) {
 		this.amplitudePositionsKey = amplitudePositionsKey;
 	}
-	
-	public int getSearchWindowLeft() {
+
+    public String getMaxSlopesKey() {
+        return maxSlopesKey;
+    }
+
+    public void setMaxSlopesKey(String maxSlopesKey) {
+        this.maxSlopesKey = maxSlopesKey;
+    }
+
+    public int getSearchWindowLeft() {
 		return searchWindowLeft;
 	}
 	public void setSearchWindowLeft(int searchWindowLeft) {
