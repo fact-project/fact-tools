@@ -2,7 +2,6 @@ package fact.statistics;
 
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -47,13 +46,13 @@ public class ArrayStatistics implements Processor {
         else{
         	if (!input.containsKey(pixelSetKey))
         	{
-        		input.put(outputKey+"_" +"mean",Double.NEGATIVE_INFINITY);
-                input.put(outputKey+"_" +"max",Double.NEGATIVE_INFINITY);
-                input.put(outputKey+"_" +"min",Double.NEGATIVE_INFINITY);
-                input.put(outputKey+"_" +"geometricMean",Double.NEGATIVE_INFINITY);
-                input.put(outputKey+"_" +"kurtosis",Double.NEGATIVE_INFINITY);
-                input.put(outputKey+"_" +"variance",Double.NEGATIVE_INFINITY);
-                input.put(outputKey+"_" +"skewness",Double.NEGATIVE_INFINITY);
+        		input.put(outputKey+"_" +"mean",-Double.MAX_VALUE);
+                input.put(outputKey+"_" +"max",-Double.MAX_VALUE);
+                input.put(outputKey+"_" +"min",-Double.MAX_VALUE);
+                input.put(outputKey+"_" +"geometricMean",-Double.MAX_VALUE);
+                input.put(outputKey+"_" +"kurtosis",-Double.MAX_VALUE);
+                input.put(outputKey+"_" +"variance",-Double.MAX_VALUE);
+                input.put(outputKey+"_" +"skewness",-Double.MAX_VALUE);
 
                 return input;
         	}
