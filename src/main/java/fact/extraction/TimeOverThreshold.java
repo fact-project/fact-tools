@@ -119,8 +119,7 @@ public class TimeOverThreshold implements Processor {
 		input.put(outputKey, timeOverThresholdArray);
 		input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
 		input.put(outputKey+"Marker", m);
-		input.put(outputKey+"Set", pixelSet);
-		
+		input.put(outputKey+"SetOverlay", pixelSet);
 
 		return input;
 	}
