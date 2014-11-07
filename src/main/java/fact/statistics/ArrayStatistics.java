@@ -49,7 +49,7 @@ public class ArrayStatistics implements Processor {
         		input.put(outputKey+"_" +"mean",-Double.MAX_VALUE);
                 input.put(outputKey+"_" +"max",-Double.MAX_VALUE);
                 input.put(outputKey+"_" +"min",-Double.MAX_VALUE);
-                input.put(outputKey+"_" +"geometricMean",-Double.MAX_VALUE);
+//                input.put(outputKey+"_" +"geometricMean",-Double.MAX_VALUE);
                 input.put(outputKey+"_" +"kurtosis",-Double.MAX_VALUE);
                 input.put(outputKey+"_" +"variance",-Double.MAX_VALUE);
                 input.put(outputKey+"_" +"skewness",-Double.MAX_VALUE);
@@ -73,7 +73,7 @@ public class ArrayStatistics implements Processor {
         input.put(outputKey+"_" +"mean",s.getMean());
         input.put(outputKey+"_" +"max",s.getMax());
         input.put(outputKey+"_" +"min",s.getMin());
-        input.put(outputKey+"_" +"geometricMean",s.getGeometricMean());
+//        input.put(outputKey+"_" +"geometricMean",s.getGeometricMean());
         input.put(outputKey+"_" +"kurtosis",s.getKurtosis());
         input.put(outputKey+"_" +"variance",s.getVariance());
         input.put(outputKey+"_" +"skewness",s.getSkewness());

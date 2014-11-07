@@ -4,6 +4,7 @@
     <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
 	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
 	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
+	<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
 	<!-- <property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_275.fits.fz" /> -->
 	<!-- <property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_277.fits.fz" />
 	<property name="drsfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_273.drs.fits.gz" />
@@ -32,22 +33,23 @@
         <!-- <fact.io.zfits.ZFitsDrsCalib url="file:${infile}" optional="false" outputKey="DataZCal" /> 
         <fact.filter.DrsCalibration url="file:${drsfile}" key="DataZCal"  outputKey="DataCalibrated"/> -->
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
-        <!-- <fact.filter.DrsTimeCalibration url="file:${drstimefile}" outputKey="timeCalibConst"/>
-        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataTime" /> -->
-        <!-- <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
-        <!-- <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
+        <fact.filter.DrsTimeCalibration url="file:${drstimefile}" outputKey="timeCalibConst"/>
+        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataTime" />
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
         <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime" maxSlopesKey="maxSlopes"/>
+        <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTime" outputKey="arrivalTimeFit" range="5" maxSlopesKey="maxSlopesFit"/>
         <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" />
         
 
         <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
            corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
            timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
- -->
+
 <!--         <stream.flow.Skip condition="%{data.shower} == null" />
         <fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>
         <fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>
