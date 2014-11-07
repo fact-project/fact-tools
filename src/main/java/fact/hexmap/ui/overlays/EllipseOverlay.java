@@ -64,4 +64,9 @@ public class EllipseOverlay implements CameraMapOverlay {
         g2.setPaint(oldPaint);
         g2.setTransform(oldTransform);
     }
+
+	@Override
+	public int getDrawRank() {		
+		return 5;
+	}
 }

@@ -49,4 +49,9 @@ public class LineOverlay implements CameraMapOverlay, Serializable {
         g2.draw(el);
         g2.setStroke(new BasicStroke(1));
     }
+
+	@Override
+	public int getDrawRank() {		
+		return 3;
+	}
 }
