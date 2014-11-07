@@ -1,16 +1,11 @@
 package fact.extraction;
 
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
-import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
 import org.jfree.chart.plot.IntervalMarker;
 
 import fact.Constants;
 import fact.Utils;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 
