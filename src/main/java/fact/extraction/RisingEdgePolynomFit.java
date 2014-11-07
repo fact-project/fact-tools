@@ -10,6 +10,7 @@ import org.jfree.chart.plot.IntervalMarker;
 
 import fact.Constants;
 import fact.Utils;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 
@@ -45,13 +46,17 @@ public class RisingEdgePolynomFit implements Processor {
 		}
 		
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
-		
+				
 		for (int pix = 0 ; pix < Constants.NUMBEROFPIXEL ; pix++)
 		{
 			int pos = risingEdges[pix];
 			WeightedObservedPoints observations = new WeightedObservedPoints();
 			for (int sl=pos-range ; sl < pos+range+1 ; sl++)
 			{
+				if (sl < 0 || sl > roi)
+				{
+					break;
+				}
 				int slice = pix*roi + sl;
 				observations.add(sl,data[slice]);
 			}

@@ -53,14 +53,14 @@ public class RisingEdgeForPositions implements Processor {
 	
 			// temp. Variables
 			double           current_slope   = 0;
-			double           max_slope       = 0;
+			double           max_slope       = -Double.MAX_VALUE;
 			int             search_window_left  = posMaxAmp - searchWindowLeft;
 			if (search_window_left < 10)
 			{
 				search_window_left = 10;
 			}
 			int             search_window_right = posMaxAmp;
-			int arrivalPos = 0;
+			int arrivalPos = search_window_left;
 			// Loop over all timeslices of given window
 			// check for the largest derivation over 5 slices
 			for( int slice = search_window_left; slice < search_window_right; slice++)
