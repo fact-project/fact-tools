@@ -5,6 +5,7 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.jfree.chart.plot.IntervalMarker;
@@ -42,11 +43,9 @@ public class TimeOverThreshold implements Processor {
 	private String outputKey = null;
 	
 	private PixelSetOverlay pixelSet;
-    private ArrayList<Integer> totPixelSet;
 
 	public Data process(Data input) {
-		
-		Utils.isKeyValid(input, dataKey, double[].class);
+        Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, positionsKey, int[].class);
 				
 		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
@@ -61,7 +60,8 @@ public class TimeOverThreshold implements Processor {
 		int numPixelAboveThreshold = 0;
 		
 		pixelSet = new PixelSetOverlay();
-        totPixelSet = new ArrayList<Integer>();
+        int[] totPixelSet = null;
+
 		//Loop over pixels
 		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
 			firstSliceOverThresholdArray[pix] = 0;
@@ -74,7 +74,6 @@ public class TimeOverThreshold implements Processor {
 				continue;
 			}
 			pixelSet.addById(pix);
-            totPixelSet.add(pix);
 			numPixelAboveThreshold++;
 			
 			int timeOverThreshold = 0;
@@ -126,13 +125,9 @@ public class TimeOverThreshold implements Processor {
 		input.put(outputKey+"SetOverlay", pixelSet);
 
         //Add totPixelSet only to data item if it is not empty
-        if (totPixelSet.size() != 0){
-            totPixelSet.toArray();
-            int [] totPixels = new int[totPixelSet.size()];
-            for (int i = 0; i < totPixelSet.size(); i++){
-                totPixels[i] = totPixelSet.get(i);
-            }
-            input.put(outputKey+"Set", totPixels);
+        totPixelSet = pixelSet.toIntArray();
+        if (totPixelSet.length != 0){
+            input.put(outputKey+"Set", pixelSet.toIntArray());
         }
         return input;
 	}
