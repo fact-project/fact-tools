@@ -94,7 +94,7 @@ public class TimeOverThreshold implements Processor {
 			
 			//Loop over slices after Maximum and sum up those above threshold
 			for (int sl = positionOfMaximum + 1 ; 
-					sl < pos + roi ; sl++)
+					sl < roi ; sl++)
 			{			
 				if (data[pos + sl] < threshold){
 					lastSliceOverThresh = sl-1;
