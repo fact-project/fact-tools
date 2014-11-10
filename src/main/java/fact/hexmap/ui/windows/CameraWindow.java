@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+import fact.Utils;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.EventObserver;
 import fact.hexmap.ui.components.cameradisplay.DisplayPanel;
@@ -14,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 
 /**
  * This should be able to plot all data in form of a double array which has the same length as the N*numberofpixel.
@@ -80,7 +82,10 @@ public class CameraWindow implements EventObserver {
         keyComboBox.removeAllItems();
         for(String key : dataItem.keySet()){
             try{
-                double[] data = (double[]) dataItem.get(key);
+                double[]data = Utils.toDoubleArray(dataItem.get(key));
+                if(data == null){
+                    continue;
+                }
                 if(data.length > 0 && data.length%1440 == 0) {
                     keyComboBox.addItem(key);
                     if(key.equals(selectedKey)){

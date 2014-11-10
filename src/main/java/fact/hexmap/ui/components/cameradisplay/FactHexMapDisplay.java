@@ -173,6 +173,30 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	}
 
+	/**
+	 * Gets called when a new item is being selected
+	 * @param item
+	 * @param key
+	 */
+	private void updateMapDisplay(Data item, String key) {
+		if (item == null) {
+			log.error("Dataitem was null in cameraWindow");
+		}
+		try {
+			double[] data = Utils.toDoubleArray(item.get(key));
+			this.sliceValues = Utils.sortPixels(data, 1440);
+			for (double[] slices : sliceValues) {
+				for (double v : slices) {
+					minValueInData = Math.min(minValueInData, v);
+					maxValueInData = Math.max(maxValueInData, v);
+				}
+			}
+			this.repaint();
+		} catch (ClassCastException e) {
+			log.error("The viewer can only display data of type double[]");
+		}
+	}
+
 	public void setOverlayItemsToDisplay(Set<Pair<String, Color>> items) {
 		overlayKeys = items;
 		overlays = updateOverlays(items, dataItem);
@@ -204,24 +228,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		return overlays;
 	}
 
-	private void updateMapDisplay(Data item, String key) {
-		if (item == null) {
-			log.error("Dataitem was null in cameraWindow");
-		}
-		try {
-			double[] data = (double[]) item.get(key);
-			this.sliceValues = Utils.sortPixels(data, 1440);
-			for (double[] slices : sliceValues) {
-				for (double v : slices) {
-					minValueInData = Math.min(minValueInData, v);
-					maxValueInData = Math.max(maxValueInData, v);
-				}
-			}
-			this.repaint();
-		} catch (ClassCastException e) {
-			log.error("The viewer can only display data of type double[]");
-		}
-	}
+
 
 	@Override
 	public void setColorMap(ColorMapping m) {
