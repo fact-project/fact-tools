@@ -69,7 +69,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	public double[][] sliceValues = new double[1440][1024];
 	int currentSlice = 0;
 
-	// the data and key which to display a a hexmap
+	// the dataItem to display
 	private Data dataItem;
 
 	// store the smallest and largest value in the data. We need this to map
@@ -93,7 +93,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private boolean drawScaleNumbers = true;
 
-	private boolean includeScale = false;
+	private boolean includeScale = true;
 
 	private int offsetX = 0;
 	private int offsetY = 0;
@@ -291,7 +291,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			// to draw the grid translate back
 			g2.translate(-xOffset, -yOffset);
 
-			// draw cross across screen to indicate center ofcomponent
+			// draw cross across screen to indicate center of component
 
 			// Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
 			// g2.draw(line);
