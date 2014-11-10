@@ -51,17 +51,28 @@ public class AuxFileService implements FileService {
         return trackingPointManager.getPoint(julianday);
     }
 
+    public DrivePointManager<TrackingPoint> getTrackingPointManager(File dataFile){
+        currentFile = dataFile;
+        setNewFilePath(currentFile);
+        return trackingPointManager;
+    }
+
+    public DrivePointManager<SourcePoint> getSourcePointManager(File dataFile){
+        currentFile = dataFile;
+        setNewFilePath(currentFile);
+        return sourcePointManager;
+    }
+
     private void setNewFilePath(File currentPath) {
         try {
-
             String dateString = getDateStringFromPath(currentPath);
             if(auxFolder != null) {
                 HashMap<String, SourceURL> m = findAuxFileUrls(auxFolder, dateString);
                 sourceFile = m.get("DRIVE_CONTROL_SOURCE_POSITION");
                 trackingFile = m.get("DRIVE_CONTROL_TRACKING_POSITION");
             }
-            loadPointsFromFile(sourceFile, sourcePointManager, new SourcePointFactory());
-            loadPointsFromFile(trackingFile, trackingPointManager, new TrackingPointFactory());
+            sourcePointManager = getPointManagerFromFile(sourceFile, new SourcePointFactory());
+            trackingPointManager = getPointManagerFromFile(trackingFile, new TrackingPointFactory());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -117,7 +128,8 @@ public class AuxFileService implements FileService {
         return m;
     }
 
-    public void loadPointsFromFile(SourceURL driveFileUrl, DrivePointManager mgr, AbstractDrivePointFactory factory){
+    private DrivePointManager getPointManagerFromFile(SourceURL driveFileUrl, AbstractDrivePointFactory factory){
+        DrivePointManager mgr = new DrivePointManager();
         FitsStream stream = new FitsStream(driveFileUrl);
         try {
             stream.init();
@@ -131,6 +143,7 @@ public class AuxFileService implements FileService {
                 slowData = stream.readNext();
             }
             stream.close();
+            return mgr;
         } catch (Exception e) {
             log.error("Failed to load data from AUX file: {}", e.getMessage());
             throw new RuntimeException();
