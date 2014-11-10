@@ -1,21 +1,23 @@
 
 <module>
     <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-            url="file:${folder}" listUrl="file:${whitelist}" auxFolder="file:${auxfolder}" copies="${num_copies}" suffix="fits.gz">
+            url="file:${folder}" copies="${num_copies}" suffix="Events.fits.gz">
         <stream class="fact.io.FitsStream"  id="fact"/>
     </stream>
     <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
     <process input="input:${copy.id}" copies="${num_copies}">
         <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
-        <stream.monitor.DataRate every="200" />
-        <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>
+        <stream.monitor.DataRate every="20" />
+        <!-- <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/> -->
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService" />
+        <fact.utils.Remapping key="Data" outputKey="Data" />
 
-        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" url="file:/Users/kaibrugge/FactTest/test300samples2.drs.fits.gz" />
+
+        <!-- <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
 
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
-        <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" auxService="auxService"/>
+        <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" x="0" y="0"/>
         <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataCalibrated" />
 
         <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="125"/>
@@ -59,9 +61,9 @@
         <fact.features.source.Distance distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Distance" />
         <fact.features.source.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
         <fact.features.source.Theta sourcePositionKey="sourcePosition" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta" />
-
         <fact.io.PrintKeysOnConsole keys="@stream" />
-        <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="@TimeStamp,@AzPointing,@ZdPointing,@AzTracking,@ZdTracking,@AzSourceCalc,@ZdSourceCalc,@Name,Size,Alpha,Distance,Timespread,ConcCore,concCOG,Disp" />-->
+         <!--<PrintData/>-->
+        <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,Size,Alpha,Distance,Timespread,ConcCore,concCOG,Disp,m3l,m3t,Width,Length" />-->
 
     </process>
 </module>
