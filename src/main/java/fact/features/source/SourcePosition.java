@@ -1,6 +1,7 @@
 package fact.features.source;
 
 import fact.auxservice.AuxFileService;
+import fact.auxservice.drivepoints.DrivePointManager;
 import fact.auxservice.drivepoints.SourcePoint;
 import fact.auxservice.drivepoints.TrackingPoint;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
@@ -48,7 +49,9 @@ public class SourcePosition implements StatefulProcessor {
 
     private Float x = null;
     private Float y = null;
-
+    private File currentFile;
+    private DrivePointManager<TrackingPoint> trackingManager;
+    private DrivePointManager<SourcePoint> sourceManager;
 
     @Override
     public void finish() throws Exception {
@@ -64,8 +67,12 @@ public class SourcePosition implements StatefulProcessor {
      */
     @Override
     public void init(ProcessContext arg0) throws Exception {
+
         if(x !=  null && y != null){
             log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
+        } else if (auxService == null){
+            log.error("You have to provide fixed sourceposition coordinates X, Y or specify the auxService");
+            throw new IllegalArgumentException();
         }
     }
 
@@ -136,13 +143,18 @@ public class SourcePosition implements StatefulProcessor {
             return null;
         }
         try {
+            if(currentFile != new File(data.get("@source").toString())){
+                currentFile = new File(data.get("@source").toString());
+                trackingManager = auxService.getTrackingPointManager(currentFile);
+                sourceManager = auxService.getSourcePointManager(currentFile);
+            }
+
             int timestamp = (int) ((eventTime[0]) + (eventTime[1]) / 1000000.0);
             //convert unixtime to julianday
             double julianDay = unixTimeToJulianDay(timestamp);
             //convert julianday to gmst
             double gmst = julianDayToGmst(julianDay);
 
-            File currentFile = new File(data.get("@source").toString());
             TrackingPoint trackingPoint = auxService.getDriveTrackingPosition(currentFile, julianDay);
             SourcePoint sourcePoint = auxService.getDriveSourcePosition(currentFile, julianDay);
             //convert celestial coordinates to local coordinate system.
