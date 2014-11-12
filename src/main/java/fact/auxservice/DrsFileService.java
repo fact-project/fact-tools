@@ -18,6 +18,46 @@ public class DrsFileService implements Service {
     String currentDataFile = "";
     SourceURL currentDrsFile;
 
+    public int getFileNumberFromFile(File f) throws IllegalArgumentException {
+        String currentFileName = f.getName();
+        if (f.length() < 17 ){
+            throw new IllegalArgumentException();
+        }
+        return new Integer(currentFileName.substring(9,12));
+    }
+
+    public int getDateNumberFromFile(File f) throws IllegalArgumentException {
+        String currentFileName = f.getName();
+        if (f.length() < 17 ){
+            throw new IllegalArgumentException();
+        }
+        return new Integer(currentFileName.substring(0,8));
+    }
+
+
+    public String[] getDrsFileInFolder(File folder, File currentFile) throws FileNotFoundException{
+        final int dateNumber = getDateNumberFromFile(currentFile);
+        final int fileNumber = getFileNumberFromFile(currentFile);
+        String[] drsFileNames = folder.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                File f = new File(dir, name);
+                if(name.contains("drs.fits")) {
+                    int drsFileNumber = new Integer(name.substring(9, 12));
+                    int drsDateNumber = new Integer(name.substring(0,8));
+                    if (drsDateNumber == dateNumber && drsFileNumber <= fileNumber){
+                        return true;
+                    }
+                }
+                return  false;
+            }
+        });
+        if(drsFileNames == null){
+            //IO error occurred
+            throw new FileNotFoundException("Could not load file names from directory");
+        }
+        Arrays.sort(drsFileNames);
+    }
     /**
      * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
      * files in the directory containing the substring "drs.fits" and having the same date as the current data
@@ -38,38 +78,14 @@ public class DrsFileService implements Service {
         try {
             final URI uri = new URI(pathToCurrentFitsFile);
             File currentFile = new File(uri);
-
-            String currentFileName = currentFile.getName();
-            if (currentFileName.length() < 17 ){
-                throw new FileNotFoundException("filename had the wrong format");
-            }
-            final int fileNumber = new Integer(currentFileName.substring(9,12));
-            final int dateNumber = new Integer(currentFileName.substring(0,8));
             File parent = currentFile.getParentFile();
-            if(parent.isDirectory()){
-                String[] drsFileNames = parent.list(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        if(name.contains("drs.fits")) {
-                            int drsFileNumber = new Integer(name.substring(9, 12));
-                            int drsDateNumber = new Integer(name.substring(0,8));
-                            if (drsDateNumber == dateNumber && drsFileNumber <= fileNumber){
-                                return true;
-                            }
-                        }
-                        return  false;
-                    }
-                });
-                if(drsFileNames == null){
-                    //IO error occurred
-                    throw new FileNotFoundException("Could not load file names from directory");
-                }
-                Arrays.sort(drsFileNames);
-                File f = new File(parent,drsFileNames[drsFileNames.length-1]);
-                currentDrsFile = new SourceURL(f.toURI().toURL());
-                return currentDrsFile;
-            }
-            return null;
+
+            String[] drsFileNames = getDrsFileInFolder(parent, currentFile);
+
+            File f = new File(parent,drsFileNames[drsFileNames.length-1]);
+            currentDrsFile = new SourceURL(f.toURI().toURL());
+            return currentDrsFile;
+
         } catch (Exception e) {
 //            e.printStackTrace();
             throw new FileNotFoundException("Could not find DRS file automatically");
