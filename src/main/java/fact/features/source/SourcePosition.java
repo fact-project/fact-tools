@@ -49,9 +49,9 @@ public class SourcePosition implements StatefulProcessor {
 
     private Float x = null;
     private Float y = null;
-    private File currentFile;
     private DrivePointManager<TrackingPoint> trackingManager;
     private DrivePointManager<SourcePoint> sourceManager;
+    private File currentFile;
 
     @Override
     public void finish() throws Exception {
@@ -143,8 +143,11 @@ public class SourcePosition implements StatefulProcessor {
             return null;
         }
         try {
-            if(currentFile != new File(data.get("@source").toString())){
-                currentFile = new File(data.get("@source").toString());
+
+            File f  = new File(data.get("@source").toString());
+            if (!f.equals(currentFile)){
+                System.out.println("Requesting new aux file!");
+                currentFile = f;
                 trackingManager = auxService.getTrackingPointManager(currentFile);
                 sourceManager = auxService.getSourcePointManager(currentFile);
             }
@@ -155,8 +158,8 @@ public class SourcePosition implements StatefulProcessor {
             //convert julianday to gmst
             double gmst = julianDayToGmst(julianDay);
 
-            TrackingPoint trackingPoint = auxService.getDriveTrackingPosition(currentFile, julianDay);
-            SourcePoint sourcePoint = auxService.getDriveSourcePosition(currentFile, julianDay);
+            TrackingPoint trackingPoint = trackingManager.getPoint(julianDay);
+            SourcePoint sourcePoint = sourceManager.getPoint(julianDay);
             //convert celestial coordinates to local coordinate system.
             double[] pointingAzZd = getAzZd(trackingPoint.ra, trackingPoint.dec, gmst);
             //pointAzDz should be equal to the az dz written by the drive
@@ -185,14 +188,6 @@ public class SourcePosition implements StatefulProcessor {
             log.error("Ignoring event.  " + e.getLocalizedMessage());
             return null;
         }
-//        System.out.println("New Sourcepos: " + source[0] + ",  " + source[1]);
-        //add deviation between the calculated point az,dz and the az,dz in the file
-//		double[] deviation = {(pointingAzDe[0] - point[3]), ( pointingAzDe[1] - point[4]) };
-//		data.put(outputKey+"pointingDeviation", deviation);
-//		log.debug ("Pointing deviation: " + Arrays.toString(deviation));
-//        System.out.println("New Sourcepos: " + source[0] + ",  " + source[1]);
-
-//        log.info( "Distance from center in degrees   " +  Math.sqrt(   Math.pow(sourcePosition[0], 2) + Math.pow(sourcePosition[1], 2)   ) /9.5 * 0.11) ;
         return data;
     }
 

@@ -10,6 +10,9 @@ import java.util.Collections;
 
 
 /**
+ *
+ * This expects the data in the aux files to have ascending timestamps.
+ * All times are given as julian day
  * Created by kaibrugge on 06.10.14.
  * TODO: some sort of sanity check for the data points we add.
  */
@@ -23,6 +26,11 @@ public class DrivePointManager<T extends DrivePoint>{
         locList.add(p);
     }
 
+    /**
+     *
+     * @param currentTime tiemstamp of the current event as julian day
+     * @return the point from the aux file with the timestamp closest to the given currentTime
+     */
     public T getPoint(double currentTime) {
 
         int index = Collections.binarySearch(locList, currentTime);

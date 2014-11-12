@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+import stream.service.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,16 +18,20 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 
 /**
+ * This service should provide some data from the auxilary files for a given data file.
+ *
+ * Each datafile can have a different aux file. Given the data file we can request a PointManager for the corresponding
+ * aux file.
+ * A point manager can return rows from the aux file..
  * Created by kaibrugge on 07.10.14.
  */
-public class AuxFileService implements FileService {
+public class AuxFileService implements Service {
 
     Logger log = LoggerFactory.getLogger(AuxFileService.class);
 
     DrivePointManager<TrackingPoint> trackingPointManager = new DrivePointManager();
     DrivePointManager<SourcePoint> sourcePointManager = new DrivePointManager();
 
-    File currentFile;
 
     @Parameter(required = false, description = "The path to the folder containing the auxilary fits files. " +
             "This folder should contain the usual folder structure: year/month/day/<aux_files>")
@@ -36,30 +41,13 @@ public class AuxFileService implements FileService {
     @Parameter(required = false, description = "The path to the DRIVE_CONTROL_SOURCE_POSITION file")
     SourceURL sourceFile;
 
-    public synchronized SourcePoint getDriveSourcePosition(File dataFile, double julianday){
-        if(!dataFile.equals(currentFile)){
-            currentFile = dataFile;
-            setNewFilePath(currentFile);
-        }
-        return sourcePointManager.getPoint(julianday);
-    }
-    public synchronized TrackingPoint getDriveTrackingPosition(File dataFile, double julianday){
-        if(!dataFile.equals(currentFile)){
-            currentFile = dataFile;
-            setNewFilePath(currentFile);
-        }
-        return trackingPointManager.getPoint(julianday);
-    }
-
-    public DrivePointManager<TrackingPoint> getTrackingPointManager(File dataFile){
-        currentFile = dataFile;
-        setNewFilePath(currentFile);
+    public synchronized DrivePointManager<TrackingPoint> getTrackingPointManager(File dataFile){
+        setNewFilePath(dataFile);
         return trackingPointManager;
     }
 
-    public DrivePointManager<SourcePoint> getSourcePointManager(File dataFile){
-        currentFile = dataFile;
-        setNewFilePath(currentFile);
+    public synchronized DrivePointManager<SourcePoint> getSourcePointManager(File dataFile){
+        setNewFilePath(dataFile);
         return sourcePointManager;
     }
 
