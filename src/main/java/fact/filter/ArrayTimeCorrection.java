@@ -103,7 +103,7 @@ public class ArrayTimeCorrection implements Processor{
 	 * @return time in ns!
 	 */
 	private double getTime(int chid, int slice){
-		return 0.5 * (double) slice + 0.5 * timeCalibConst[chid * roi + slice];
+		return 0.5 * (double) (slice - timeCalibConst[chid * roi + slice]);
 	}
 	
 
