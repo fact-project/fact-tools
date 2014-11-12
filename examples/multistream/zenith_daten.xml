@@ -7,7 +7,7 @@
     <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
     <process input="input:${copy.id}" copies="${num_copies}">
         <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
-        <stream.monitor.DataRate every="200" />
+        <stream.monitor.DataRate every="100" />
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService" />
@@ -60,7 +60,7 @@
         <fact.features.source.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
         <fact.features.source.Theta sourcePositionKey="sourcePosition" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta" />
 
-        <fact.io.PrintKeysOnConsole keys="@stream" />
+        <!--<fact.io.PrintKeysOnConsole keys="@stream" />-->
         <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="@TimeStamp,@AzPointing,@ZdPointing,@AzTracking,@ZdTracking,@AzSourceCalc,@ZdSourceCalc,@Name,Size,Alpha,Distance,Timespread,ConcCore,concCOG,Disp" />-->
 
     </process>
