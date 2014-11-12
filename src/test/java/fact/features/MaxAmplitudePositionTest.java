@@ -43,6 +43,7 @@ public class MaxAmplitudePositionTest {
 			FitsStream stream = new FitsStream(url);
 			stream.init();
 			Data item = stream.read();
+            pr.init(null);
             pr.process(item);
             maxAmpPos.process(item);
             assertTrue("Item did not contain the right key for maxAmplitude", item.containsKey(outputKey));
