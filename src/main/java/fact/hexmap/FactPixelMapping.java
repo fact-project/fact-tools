@@ -162,14 +162,15 @@ public class FactPixelMapping implements PixelMapping {
      * @param p CameraPixel
      * @return Pixel in Order (up,down,topleft,topright,botleft,botright) with null at non existing pixel
      */
-    public FactCameraPixel[] getNeighboursForPixelWithDirection(CameraPixel p) 
+    public FactCameraPixel[] getNeighborsForPixelWithDirection(CameraPixel p) 
     {
     	 FactCameraPixel[] t = new FactCameraPixel[6];
     	 
         //check if x coordinate is even or not    	
         int parity = (Math.abs(p.geometricX % 2));
-        //get the neighbour in each direction and store them in hte list
-        for (int direction = 0; direction <= 5; direction++) {
+        //get the neighbor in each direction and store them in the list
+        for (int direction = 0; direction <= 5; direction++) 
+        {
             int[] d = neighbourOffsetsDirectional[parity][direction];
             t[direction] = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);                
         }       

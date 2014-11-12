@@ -41,7 +41,7 @@ public class ImageForceTest extends ImageForce
 		
 		double[] testData = new double[1440];	
 		
-		FactCameraPixel[] list = PixelMapping_.getNeighboursForPixelWithDirection(
+		FactCameraPixel[] list = PixelMapping_.getNeighborsForPixelWithDirection(
 				PixelMapping_.getPixelFromId(
 						PixelMapping_.getChidFromSoftID( 0)		)	);
 		

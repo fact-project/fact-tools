@@ -27,9 +27,12 @@ public class PolygonPixelList implements Processor
 	
 	@Parameter(required = true, description = "Anzahl an Pixel die Innerhalb der Snake liegen")
 	private String outkeyNumberOfPixel = null;
-	 @Parameter(required = true, description = "Liste an Pixeln die Innerhalb der Snake liegen")
+	@Parameter(required = true, description = "Liste an Pixeln die Innerhalb der Snake liegen")
 	private String outkeyPixelList = null;
 
+	@Parameter(required = false, description = "PixelOverlay")
+	private boolean drawOverlay = false;
+	 
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     private PixelSetOverlay cleanedPixelSet;
@@ -64,17 +67,23 @@ public class PolygonPixelList implements Processor
 		}
 		
 		int[] chids = new int[numberOfPixel];	
-		cleanedPixelSet = new PixelSetOverlay();
+		
+		if(drawOverlay)
+			cleanedPixelSet = new PixelSetOverlay();
 		
 		for(int i = 0, tmpCount=0; i<Constants.NUMBEROFPIXEL; i++)
 		{
 			if(chidInPoly[i])
 			{
 				chids[tmpCount++] = i;
-				cleanedPixelSet.addById(i);
+				
+				if(drawOverlay)
+					cleanedPixelSet.addById(i);
 			}
-		}		
-		input.put(outkeyPixelList+"Set", cleanedPixelSet);
+		}
+		
+		if(drawOverlay)
+			input.put(outkeyPixelList+"Set", cleanedPixelSet);
 		
 		input.put(outkeyNumberOfPixel, numberOfPixel);
 		input.put(outkeyPixelList, chids);
@@ -113,5 +122,17 @@ public class PolygonPixelList implements Processor
 	public void setOutkeyPixelList(String outkeyPixelList) {
 		this.outkeyPixelList = outkeyPixelList;
 	}
+
+	public boolean isDrawOverlay()
+	{
+		return drawOverlay;
+	}
+
+	public void setDrawOverlay(boolean drawOverlay)
+	{
+		this.drawOverlay = drawOverlay;
+	}
+	
+	
 	
 }

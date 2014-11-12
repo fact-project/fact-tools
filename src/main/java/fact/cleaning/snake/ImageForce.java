@@ -24,6 +24,8 @@ public abstract class ImageForce
 	// image intensity median
 	double median = 1;
 	
+	final FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();
+	
 	protected ImageForce(double[] data, float centerX, float centerY)
 	{
 		this.center = new Point2D.Float(centerX, centerY); 
@@ -32,12 +34,10 @@ public abstract class ImageForce
 	}	
 	
 	protected double gradY(int chid)
-	{
-		FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();
-		
+	{		
 		FactCameraPixel currentPixel = PixelMapping_.getPixelFromId(chid);
 		// (up,down,topleft,topright,botleft,botright)
-		FactCameraPixel[] neighbor = PixelMapping_.getNeighboursForPixelWithDirection(currentPixel);				
+		FactCameraPixel[] neighbor = PixelMapping_.getNeighborsForPixelWithDirection(currentPixel);				
 		
 		for(int i=0; i<6; i++)
 		{
@@ -45,12 +45,12 @@ public abstract class ImageForce
 				return 0;
 		}		
 		
-		float  right = (float) data[neighbor[0].chid];
-		float  left = (float) data[neighbor[1].chid];		
-		float  botRight = (float) data[neighbor[2].chid];	
-		float  topRight = (float) data[neighbor[3].chid];	
-		float  botLeft = (float) data[neighbor[4].chid];	
-		float  topLeft = (float) data[neighbor[5].chid];	
+		double  right =  data[neighbor[0].chid];
+		double  left =  data[neighbor[1].chid];		
+		double  botRight =  data[neighbor[2].chid];	
+		double  topRight =  data[neighbor[3].chid];	
+		double  botLeft = data[neighbor[4].chid];	
+		double  topLeft = data[neighbor[5].chid];	
 		
 		double erg = (2*right + 1*botRight + 1*topRight) - (2*left + 1*botLeft + 1*topLeft);
 		
@@ -61,11 +61,9 @@ public abstract class ImageForce
 	// Gradient in X-Richtung
 	// Linearkombination  -> Siehe BScArbeit Dominik Baack
 	protected double gradX(int chid)
-	{		
-		FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();
-		
+	{				
 		FactCameraPixel currentPixel = PixelMapping_.getPixelFromId(chid);
-		FactCameraPixel[] neighbor = PixelMapping_.getNeighboursForPixelWithDirection(currentPixel);				
+		FactCameraPixel[] neighbor = PixelMapping_.getNeighborsForPixelWithDirection(currentPixel);				
 		
 		for(int i=0; i<6; i++)
 		{
@@ -73,12 +71,12 @@ public abstract class ImageForce
 				return 0;
 		}		
 		
-		float  right = (float) data[neighbor[0].chid];
-		float  left = (float) data[neighbor[1].chid];		
-		float  botRight = (float) data[neighbor[2].chid];	
-		float  topRight = (float) data[neighbor[3].chid];	
-		float  botLeft = (float) data[neighbor[4].chid];	
-		float  topLeft = (float) data[neighbor[5].chid];
+		double  right = data[neighbor[0].chid];
+		double  left =  data[neighbor[1].chid];		
+		double  botRight =  data[neighbor[2].chid];	
+		double  topRight =  data[neighbor[3].chid];	
+		double  botLeft =  data[neighbor[4].chid];	
+		double  topLeft =  data[neighbor[5].chid];
 		
 		double erg1 = (2.0*topRight + 1.0*topLeft + 1.0*right) - (2.0*botLeft + 1.0*left + 1.0*botRight);
 		double erg2 = (2.0*topLeft + 1.0*topRight + 1.0*left) - (2.0*botRight + 1.0*right + 1.0*botLeft);		

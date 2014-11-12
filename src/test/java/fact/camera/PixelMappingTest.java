@@ -309,7 +309,7 @@ public class PixelMappingTest {
     	FactPixelMapping PixelMapping_ = FactPixelMapping.getInstance();		
     	
 		FactCameraPixel core = PixelMapping_.getPixelFromId( PixelMapping_.getChidFromSoftID( 0) );
-		FactCameraPixel[] list = PixelMapping_.getNeighboursForPixelWithDirection(core);		
+		FactCameraPixel[] list = PixelMapping_.getNeighborsForPixelWithDirection(core);		
 		
 		System.out.println("Even");
 		System.out.println("Core: " + core.getXPositionInMM() + ", " + core.getYPositionInMM());
@@ -359,7 +359,7 @@ public class PixelMappingTest {
 		FactPixelMapping PixelMapping_ = FactPixelMapping.getInstance();		
 		
 		FactCameraPixel core = PixelMapping_.getPixelFromId( PixelMapping_.getChidFromSoftID( 3) );
-		FactCameraPixel[] list = PixelMapping_.getNeighboursForPixelWithDirection(core);
+		FactCameraPixel[] list = PixelMapping_.getNeighborsForPixelWithDirection(core);
 		
 		System.out.println("Uneven");
 		System.out.println("Core: " + core.getXPositionInMM() + ", " + core.getYPositionInMM());

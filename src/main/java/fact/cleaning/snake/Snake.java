@@ -17,7 +17,7 @@ import stream.annotations.Parameter;
  */
 public class Snake 
 {	
-	private final int _MAX_VERTICES = 55;
+	protected final int _MAX_VERTICES = 55;
 	
 	protected final DoubleMatrix[] matrix = new DoubleMatrix[_MAX_VERTICES];	
 	
@@ -31,6 +31,9 @@ public class Snake
 	private double dt = 0.08;
 	@Parameter(required = false, description = "Constant: ds2 ")
 	private double ds2 = 1.0;
+	
+	@Parameter(required = false, description = "Constant: lineSplit ")
+	private double lineSplitLength = 220;
 	
 	private DoubleMatrix vecX;
 	private DoubleMatrix vecY;
@@ -63,8 +66,8 @@ public class Snake
 	public void initStartPos(double centerX, double centerY, double radius, int startPointNumber)
 	{
 		NumberOfVertices = startPointNumber;
-		vecX = new DoubleMatrix(startPointNumber,1);
-		vecY = new DoubleMatrix(startPointNumber,1);
+		vecX = new DoubleMatrix(startPointNumber);
+		vecY = new DoubleMatrix(startPointNumber);
 		
 		for (int i = 0; i < startPointNumber; i++)
 		{
@@ -92,24 +95,25 @@ public class Snake
 			double dx = dxErg;
 			double dy = dyErg;		
 			
-			while((dx*dx + dy*dy) > Math.max(dxErg*dxErg,dyErg*dyErg) )
+			final double tmpMax = Math.max(dxErg*dxErg,dyErg*dyErg);
+			double tmpComp = dx*dx + dy*dy;
+			
+			if( tmpComp > tmpMax )
 			{
-				dx = dx * 0.95;
-				dy = dy * 0.95;
+				dx = (dx * (tmpMax / tmpComp)) * 0.95;
+				dy = (dy * (tmpMax / tmpComp)) * 0.95;				
 			}
 			
 			vecX.data[i] = x + dx;
 			vecY.data[i] = y + dy;		
 		}		
-
 		
-		final DoubleMatrix EigenMat = matrix[NumberOfVertices-1];
-			
-		vecX = EigenMat.mmul(vecX);
-		vecY = EigenMat.mmul(vecY);
+					
+		vecX = matrix[NumberOfVertices-1].mmul(vecX);
+		vecY = matrix[NumberOfVertices-1].mmul(vecY);
 				
 
-		splitLines(220.0);	// 2 Pixel lang
+		splitLines(lineSplitLength);	// 2 Pixel lang
 		
 	}
 	
@@ -153,8 +157,8 @@ public class Snake
 			if(distX*distX + distY*distY > maxDist)
 			{
 				NumberOfVertices++;
-				final DoubleMatrix newVecX = new DoubleMatrix(NumberOfVertices,1);
-				final DoubleMatrix newVecY = new DoubleMatrix(NumberOfVertices,1);				
+				final DoubleMatrix newVecX = new DoubleMatrix(NumberOfVertices);
+				final DoubleMatrix newVecY = new DoubleMatrix(NumberOfVertices);				
 
 				for(int j=0; j<=i; j++)
 				{
@@ -246,4 +250,16 @@ public class Snake
 	{
 		return NumberOfVertices;
 	}
+
+	public double getLineSplitLength()
+	{
+		return lineSplitLength;
+	}
+
+	public void setLineSplitLength(double lineSplitLength)
+	{
+		this.lineSplitLength = lineSplitLength;
+	}
+	
+	
 }
