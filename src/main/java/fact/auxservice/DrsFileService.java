@@ -28,28 +28,36 @@ public class DrsFileService implements Service {
 
     public int getDateNumberFromFile(File f) throws IllegalArgumentException {
         String currentFileName = f.getName();
-        if (f.length() < 17 ){
+        if (currentFileName.length() < 17 ){
             throw new IllegalArgumentException();
         }
         return new Integer(currentFileName.substring(0,8));
     }
 
+    public boolean isDrsFileBelowFileNumber(File dir, String name, int dateNumber, int fileNumber) {
+        File f = new File(dir, name);
+        if(name.contains("drs.fits")) {
+            try {
+                int drsFileNumber = getFileNumberFromFile(f);
+                int drsDateNumber = getDateNumberFromFile(f);
+                if (drsDateNumber == dateNumber && drsFileNumber <= fileNumber) {
+                    return true;
+                }
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+        }
+        return  false;
+    }
 
-    public String[] getDrsFileInFolder(File folder, File currentFile) throws FileNotFoundException{
+
+    public String[] getDrsFilesInFolder(File folder, File currentFile) throws FileNotFoundException{
         final int dateNumber = getDateNumberFromFile(currentFile);
         final int fileNumber = getFileNumberFromFile(currentFile);
         String[] drsFileNames = folder.list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                File f = new File(dir, name);
-                if(name.contains("drs.fits")) {
-                    int drsFileNumber = new Integer(name.substring(9, 12));
-                    int drsDateNumber = new Integer(name.substring(0,8));
-                    if (drsDateNumber == dateNumber && drsFileNumber <= fileNumber){
-                        return true;
-                    }
-                }
-                return  false;
+                return isDrsFileBelowFileNumber(dir, name, dateNumber, fileNumber);
             }
         });
         if(drsFileNames == null){
@@ -57,6 +65,7 @@ public class DrsFileService implements Service {
             throw new FileNotFoundException("Could not load file names from directory");
         }
         Arrays.sort(drsFileNames);
+        return drsFileNames;
     }
     /**
      * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
@@ -80,7 +89,7 @@ public class DrsFileService implements Service {
             File currentFile = new File(uri);
             File parent = currentFile.getParentFile();
 
-            String[] drsFileNames = getDrsFileInFolder(parent, currentFile);
+            String[] drsFileNames = getDrsFilesInFolder(parent, currentFile);
 
             File f = new File(parent,drsFileNames[drsFileNames.length-1]);
             currentDrsFile = new SourceURL(f.toURI().toURL());

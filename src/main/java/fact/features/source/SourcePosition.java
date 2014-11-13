@@ -146,7 +146,7 @@ public class SourcePosition implements StatefulProcessor {
 
             File f  = new File(data.get("@source").toString());
             if (!f.equals(currentFile)){
-                System.out.println("Requesting new aux file!");
+//                System.out.println("Requesting new aux file!");
                 currentFile = f;
                 trackingManager = auxService.getTrackingPointManager(currentFile);
                 sourceManager = auxService.getSourcePointManager(currentFile);
