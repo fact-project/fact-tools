@@ -181,9 +181,9 @@ public class MuonHoughTransform implements Processor {
 		double center_x_1 = circle_x[highest_pos[1]];
 		double center_y_1 = circle_y[highest_pos[2]];
 		
-		input.put(bestRadiusKey, highest_pos[0]);
-		input.put(bestXKey, highest_pos[1]);
-		input.put(bestYKey, highest_pos[2]);
+		input.put(bestRadiusKey, radius_1);
+		input.put(bestXKey, center_x_1);
+		input.put(bestYKey, center_y_1);
 				
 		double radius_2 = circle_radius[second_highest_pos[0]];
 		double center_x_2 = circle_x[second_highest_pos[1]];

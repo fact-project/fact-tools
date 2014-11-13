@@ -44,10 +44,10 @@ public class DrsTimeCalibration implements Processor {
 		int roi = (Integer) input.get("NROI");
 		double[] relativeTimeOffsets = new double[roi*Constants.NUMBEROFPIXEL];
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++){
-			int timemarker = px / 9;
-			double offsetAtStartCell = absoluteTimeOffsets[timemarker*numberOfSlices + startCell[px]];
+			int patch = px / 9;
+			double offsetAtStartCell = absoluteTimeOffsets[patch*numberOfSlices + startCell[px]];
 			for (int slice = 0 ; slice < roi ; slice++){
-				int cell = timemarker*numberOfSlices + (slice + startCell[px])%numberOfSlices;
+				int cell = patch*numberOfSlices + (slice + startCell[px])%numberOfSlices;
 				relativeTimeOffsets[px*roi+slice] = absoluteTimeOffsets[cell]-offsetAtStartCell;
 			}
 		}

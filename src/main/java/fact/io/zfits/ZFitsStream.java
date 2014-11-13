@@ -3,6 +3,7 @@ package fact.io.zfits;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ZFitsStream extends AbstractStream {
@@ -190,7 +192,25 @@ public class ZFitsStream extends AbstractStream {
 				this.headerItem.put(key, Float.parseFloat(value));
 				break;
 			case INT:
-				this.headerItem.put(key, Integer.parseInt(value));
+				// BUGFIX:
+				// In rare cases the following four header keys could exceed the limit of an Integer in Java. The reason is,  
+				// that the values of this header keys are written as 4 Byte unsigned int, with a limit of 2^32=4294967296, 
+				// but Java only supports signed Integers with a limit of 2^31-1=2147483647.
+				// Therefore the values of the two keys are parsed into a Long. This should be investigated further and a 
+				// more appropriate solution should be found.
+				ArrayList<String> keysListWithLargeValues = new ArrayList<>(); 
+				keysListWithLargeValues.add("NTRGMISC");
+				keysListWithLargeValues.add("NTRGEXT1");
+				keysListWithLargeValues.add("NTRGTIM");
+				keysListWithLargeValues.add("NTRGPED");
+				if (keysListWithLargeValues.contains(key))
+				{
+					this.headerItem.put(key, Long.parseLong(value));
+				}
+				else
+				{
+					this.headerItem.put(key, Integer.parseInt(value));
+				}
 				break;
 			case STRING:
 				this.headerItem.put(key, value);
