@@ -31,7 +31,7 @@
         <fact.utils.PreviousEventInfo 
         	startCellKey="StartCellData"
         	outputKey="prevEvents"
-        	limitEvents="5"
+        	limitEvents="10"
         />
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
