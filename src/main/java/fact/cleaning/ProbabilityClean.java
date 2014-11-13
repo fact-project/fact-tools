@@ -8,7 +8,6 @@ import stream.Data;
 import stream.Processor;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wolfgangs idea after previous cleaning make a new cleaning depending on the distance to showeraxis.

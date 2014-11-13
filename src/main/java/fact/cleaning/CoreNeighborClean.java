@@ -2,7 +2,6 @@ package fact.cleaning;
 
 import fact.Constants;
 import fact.Utils;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  *CoreNeighborClean. Identifies showerPixel in the image array.

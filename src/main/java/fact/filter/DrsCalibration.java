@@ -3,7 +3,6 @@
  */
 package fact.filter;
 
-import fact.Constants;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

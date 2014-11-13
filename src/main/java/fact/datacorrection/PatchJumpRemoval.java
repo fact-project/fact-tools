@@ -4,21 +4,17 @@ import fact.Constants;
 import fact.Utils;
 import fact.container.JumpInfos;
 import fact.container.PreviousEventInfoContainer;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
-import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.util.LinkedList;
 
 /**
  * Removes artificial effects called "jumps" on a per patch basis.

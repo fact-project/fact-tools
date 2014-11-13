@@ -7,7 +7,6 @@ import fact.utils.LinearTimeCorrectionKernel;
 import fact.utils.TimeCorrectionKernel;
 import stream.Data;
 import stream.Processor;
-import stream.ProcessorException;
 import stream.annotations.Parameter;
 
 //TODO write unit test

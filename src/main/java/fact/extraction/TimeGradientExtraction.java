@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.io.CsvStream;
 import stream.io.SourceURL;
 
 import java.net.URL;

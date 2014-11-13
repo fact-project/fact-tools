@@ -12,8 +12,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *CoreNeighborClean. Identifies showerPixel in the image array.

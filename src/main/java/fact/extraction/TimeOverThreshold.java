@@ -5,7 +5,6 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
-import fact.hexmap.CameraPixel;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.jfree.chart.plot.IntervalMarker;
@@ -15,9 +14,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * This feature is supposed to give the number of slices above a given Threshold, 
