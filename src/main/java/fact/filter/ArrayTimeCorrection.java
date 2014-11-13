@@ -12,26 +12,28 @@ import stream.annotations.Parameter;
 
 //TODO write unit test
 public class ArrayTimeCorrection implements Processor{
+		
+	private String dataKey = null;
+	private double[] data = null;
+	
+	private String timeCalibConstKey = null;
+	private double[] timeCalibConst = null;
 
+	private String outputKey = null;
+	
+	private int roi = 0;
+	private TimeCorrectionKernel tcKernel = null;
+	
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys( input, kernel, dataCalibrated, timesOffset);
+		Utils.mapContainsKeys( input, dataKey, timeCalibConstKey);
 		
-		try{
-			dataCalibratedArray = (double[]) input.get(dataCalibrated);
-			roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
-			timesOffsetArray = (double[]) input.get(timesOffset);
-			String kernelStr = (String) input.get(kernel);
-			if(kernelStr.equalsIgnoreCase("linear"))
-				tcKernel = new LinearTimeCorrectionKernel();
-			else
-				throw new ProcessorException("Right now there is just the linear kernel.");
-				
-		}catch(Exception e)
-		{
-			throw new ProcessorException(e.getMessage() + " or something went terribly wrong in ArrayTimeCorrection. The keys were not readable.");
-		}
+		data = (double[]) input.get(dataKey);
+		roi = data.length / Constants.NUMBEROFPIXEL;
+		timeCalibConst = (double[]) input.get(timeCalibConstKey);
+		tcKernel = new LinearTimeCorrectionKernel();		
+
 		double [] calibratedValues = new double[roi * Constants.NUMBEROFPIXEL];
 		
 		for(int id = 0; id < Constants.NUMBEROFPIXEL; id++)
@@ -42,7 +44,7 @@ public class ArrayTimeCorrection implements Processor{
 			for(int slice = 0; slice < roi; slice++)
 			{
 				realtimes[slice] = getTime(id, slice);
-				values[slice] = dataCalibratedArray[id * roi + slice];
+				values[slice] = data[id * roi + slice];
 			}
 			tcKernel.fit(realtimes, values);
 			
@@ -59,30 +61,31 @@ public class ArrayTimeCorrection implements Processor{
 		return input;
 	}
 	
-	public String getKernel() {
-		return kernel;
-	}
-	@Parameter(required = true, description = "The kernel, that is use for rebinning.", defaultValue = "linear")
-	public void setKernel(String kernel) {
-		this.kernel = kernel;
-	}
-
-	public String getDataCalibrated() {
-		return dataCalibrated;
-	}
-	@Parameter(required = true, description = "dataCalibrated", defaultValue = "dataCalibrated")
-	public void setDataCalibrated(String dataCalibrated) {
-		this.dataCalibrated = dataCalibrated;
-	}
-
-	public String getTimesOffset() {
-		return timesOffset;
-	}
 	
-	@Parameter(required = true, description = "The array from DrsTimeCalibration.", defaultValue = "timeOffset")
-	public void setTimesOffset(String timesOffset) {
-		this.timesOffset = timesOffset;
+
+	public String getDataKey() {
+		return dataKey;
 	}
+
+
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
+	}
+
+
+
+	public String getTimeCalibConstKey() {
+		return timeCalibConstKey;
+	}
+
+
+
+	public void setTimeCalibConstKey(String timeCalibConstKey) {
+		this.timeCalibConstKey = timeCalibConstKey;
+	}
+
+
 
 	public String getOutputKey() {
 		return outputKey;
@@ -93,20 +96,16 @@ public class ArrayTimeCorrection implements Processor{
 		this.outputKey = outputKey;
 	}
 
+	/**
+	 * 
+	 * @param chid
+	 * @param slice
+	 * @return time in ns!
+	 */
 	private double getTime(int chid, int slice){
-		return 0.5 * (double) slice + timesOffsetArray[chid * roi + slice];
+		return 0.5 * (double) (slice - timeCalibConst[chid * roi + slice]);
 	}
 	
-	private String kernel = null;
-	private TimeCorrectionKernel tcKernel = null;
-	
-	private String dataCalibrated = null;
-	private double[] dataCalibratedArray = null;
-	
-	private String timesOffset = null;
-	private double[] timesOffsetArray = null;
 
-	private String outputKey = null;
-	private int roi = 0;
 	
 }

@@ -53,6 +53,11 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		
 		photonCharge = (double[]) input.get(photonChargeKey);
 		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
+		if (cogPixel == null)
+		{
+			input.put(outputKey, -Double.MAX_VALUE);
+			return input;
+		}
 		FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(cogPixel);
 		
 		// mindist1 < mindist2

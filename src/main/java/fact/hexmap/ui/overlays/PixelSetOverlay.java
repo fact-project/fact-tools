@@ -30,6 +30,26 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
         set.add(FactPixelMapping.getInstance().getPixelFromId(id));
     }
 
+    public int[] toIntArray(){
+        int intSet[] = new int[this.set.size()];
+        int i = 0;
+        for (CameraPixel px : this.set){
+            intSet[i] = px.id;
+            i++;
+        }
+        return intSet;
+    }
+
+    public Integer[] toIntegerArray(){
+        Integer intSet[] = new Integer[this.set.size()];
+        int i = 0;
+        for (CameraPixel px : this.set){
+            intSet[i] = px.id;
+            i++;
+        }
+        return intSet;
+    }
+
     @Override
     public void setColor(Color c) {
         this.c = c;

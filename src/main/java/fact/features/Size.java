@@ -23,12 +23,19 @@ public class Size implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys( input, showerKey, photonChargeKey);
 		
-		int[] shower 	= (int[])input.get(showerKey);
-		double[] charge 	= (double[])input.get(photonChargeKey);
+		
+		Utils.mapContainsKeys( input, photonChargeKey);
+		
+		double size = 0;
+		if (input.containsKey(showerKey))
+		{
+		
+			int[] shower 	= (int[])input.get(showerKey);
+			double[] charge 	= (double[])input.get(photonChargeKey);
 
-        double size = calculateSize(shower, charge);
+        	size = calculateSize(shower, charge);
+		}
         input.put("@size", size);
 		input.put(outputKey, size);
 		return input;

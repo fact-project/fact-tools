@@ -5,8 +5,11 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+
+import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -28,15 +31,20 @@ public class RisingEdgeForPositions implements Processor {
 	private String outputKey = null;
     @Parameter(required = true)
 	private String amplitudePositionsKey = null;
+    @Parameter(required = true)
+    private String maxSlopesKey = null;
 
 	@Override
 	public Data process(Data input) {
         Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
         double[] positions =  new double[Constants.NUMBEROFPIXEL];
+        double[] maxSlopes =  new double[Constants.NUMBEROFPIXEL];
 		
 		double[] data = (double[]) input.get(dataKey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
+		
+		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		
 		int roi = data.length / Constants.NUMBEROFPIXEL;
 		
@@ -45,14 +53,14 @@ public class RisingEdgeForPositions implements Processor {
 	
 			// temp. Variables
 			double           current_slope   = 0;
-			double           max_slope       = 0;
+			double           max_slope       = -Double.MAX_VALUE;
 			int             search_window_left  = posMaxAmp - searchWindowLeft;
 			if (search_window_left < 10)
 			{
 				search_window_left = 10;
 			}
 			int             search_window_right = posMaxAmp;
-			int arrivalPos = 0;
+			int arrivalPos = search_window_left;
 			// Loop over all timeslices of given window
 			// check for the largest derivation over 5 slices
 			for( int slice = search_window_left; slice < search_window_right; slice++)
@@ -70,8 +78,12 @@ public class RisingEdgeForPositions implements Processor {
 				}
 			}
 			positions[pix] = (double) arrivalPos;
+			m[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
+            maxSlopes[pix] = (double) max_slope;
 		}
 		input.put(outputKey, positions);
+        input.put(maxSlopesKey, maxSlopes);
+        input.put(outputKey + "Marker", m);
 		
 		return input;
 		
@@ -100,8 +112,16 @@ public class RisingEdgeForPositions implements Processor {
 	public void setAmplitudePositionsKey(String amplitudePositionsKey) {
 		this.amplitudePositionsKey = amplitudePositionsKey;
 	}
-	
-	public int getSearchWindowLeft() {
+
+    public String getMaxSlopesKey() {
+        return maxSlopesKey;
+    }
+
+    public void setMaxSlopesKey(String maxSlopesKey) {
+        this.maxSlopesKey = maxSlopesKey;
+    }
+
+    public int getSearchWindowLeft() {
 		return searchWindowLeft;
 	}
 	public void setSearchWindowLeft(int searchWindowLeft) {

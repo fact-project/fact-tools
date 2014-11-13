@@ -22,6 +22,9 @@ public class FastFourierTrafo implements Processor {
 	int excludeFreqBinsMin = (int) (0.15*lengthForFFT*0.5);
 	int excludeFreqBinsMax = (int) (0.25*lengthForFFT*0.5);
 	
+	int searchWindowLeft = 10;
+	int searchWindowRight = 250;
+	
 	
 //	excludeFreqBins[0] = (int) (0.17*lengthForFFT*0.5);
 	
@@ -31,7 +34,6 @@ public class FastFourierTrafo implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		// TODO Auto-generated method stub
 		Utils.mapContainsKeys( input, key);
 		
 		log.info("exclution range: [" + excludeFreqBinsMin + "," + excludeFreqBinsMax + "]");
@@ -46,8 +48,8 @@ public class FastFourierTrafo implements Processor {
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
 			double[] currPixel = new double[lengthForFFT];
-			int sl = 0 ;
-			for ( ; sl < roi && sl < lengthForFFT ; sl++)
+			int sl = searchWindowLeft ;
+			for ( ; sl < searchWindowRight && sl < lengthForFFT ; sl++)
 			{
 				currPixel[sl] = data[px*roi+sl];
 			}
@@ -57,10 +59,10 @@ public class FastFourierTrafo implements Processor {
 			}
 			frResultPixel = fftObject.transform(currPixel, TransformType.INVERSE);
 			sl = 0;
-			for ( ; sl < 10 ; sl++)
-			{
-				frResult[px*roi+sl] = 0;
-			}
+//			for ( ; sl < 10 ; sl++)
+//			{
+//				frResult[px*roi+sl] = 0;
+//			}
 			for ( ; sl < (lengthForFFT/2 + 1) ; sl++)
 			{
 				double real = frResultPixel[sl].getReal();
@@ -123,6 +125,22 @@ public class FastFourierTrafo implements Processor {
 
 	public void setLengthForFFT(int lengthForFFT) {
 		this.lengthForFFT = lengthForFFT;
+	}
+
+	public int getSearchWindowLeft() {
+		return searchWindowLeft;
+	}
+
+	public void setSearchWindowLeft(int searchWindowLeft) {
+		this.searchWindowLeft = searchWindowLeft;
+	}
+
+	public int getSearchWindowRight() {
+		return searchWindowRight;
+	}
+
+	public void setSearchWindowRight(int searchWindowRight) {
+		this.searchWindowRight = searchWindowRight;
 	}
 
 }
