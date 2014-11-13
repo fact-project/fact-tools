@@ -14,11 +14,12 @@
 	<property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2014/02/06/20140206_046.drs.fits.gz" /> -->
 	<!-- <property name="drivefile" value="src/test/resources/testDriveFile.fits" /> -->
     <property name="sourcename" value="crab" />
-    <property name="core_threshold" value="5.0" />
-    <property name="neighbor_threshold" value="2.0"/>
+    <property name="core_threshold" value="6.0" />
+    <property name="neighbor_threshold" value="3.0"/>
     <property name="time_threshold" value="30.0" />
     <property name="min_number_of_pixel" value="2" />
-    <property name="integral_gain" value="242.0" />
+    <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
+    <!-- <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" /> -->
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
@@ -27,49 +28,96 @@
 
     <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
     <process id="2" input="fact">
-        <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
+        <fact.utils.PreviousEventInfo 
+        	startCellKey="StartCellData"
+        	outputKey="prevEvents"
+        	limitEvents="5"
+        />
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
         <!-- <fact.io.zfits.ZFitsDrsCalib url="file:${infile}" optional="false" outputKey="DataZCal" /> 
         <fact.filter.DrsCalibration url="file:${drsfile}" key="DataZCal"  outputKey="DataCalibrated"/> -->
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
-        <fact.filter.DrsTimeCalibration url="file:${drstimefile}" outputKey="timeCalibConst"/>
-        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataTime" />
-        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
-        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
-        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
-                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime" maxSlopesKey="maxSlopes"/>
-        <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTime" outputKey="arrivalTimeFit" range="5" maxSlopesKey="maxSlopesFit"/>
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" />
-        
-
-        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
-           corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
-           timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
-
-<!--         <stream.flow.Skip condition="%{data.shower} == null" />
-        <fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>
-        <fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>
-        <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="showerDistribution" />
-        <fact.features.M3Long showerKey="shower" weightsKey="photoncharge" distribution="showerDistribution"/>
-        <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
-        <stream.flow.Skip condition="%{data.size} &lt; 25" /> -->
-		
-		<fact.cleaning.ProbabilityClean photonChargeKey="photoncharge" outputKey="prob1"
-		deltaKey="Delta" cogxKey="COGx" cogyKey="COGy" probabilityThreshold="3"
-		distanceCoeff="1.0" distanceExp="-1" />
-		
-		<fact.cleaning.ProbabilityClean photonChargeKey="photoncharge" outputKey="prob2"
-		deltaKey="Delta" cogxKey="COGx" cogyKey="COGy" probabilityThreshold="5"
-		distanceCoeff="0.8" distanceExp="-0.5" />
-		
-		<fact.cleaning.ProbabilityClean photonChargeKey="photoncharge" outputKey="prob3"
-		deltaKey="Delta" cogxKey="COGx" cogyKey="COGy" probabilityThreshold="7"
-		distanceCoeff="0.01" distanceExp="-1" />
-
+        <fact.filter.DrsCalibration 
+	        url="file:${drsfile}" 
+	        key="Data"  
+	        outputKey="DataCalibrated"
+	    />
+        <fact.filter.DrsTimeCalibration 
+        	url="file:${drstimefile}" 
+        	outputKey="timeCalibConst"
+        />
+        <fact.filter.ArrayTimeCorrection 
+        	dataKey="DataCalibrated" 
+        	timeCalibConstKey="timeCalibConst" 
+        	outputKey="DataCalibrated" 
+        />
+        <fact.datacorrection.PatchJumpRemoval 
+        	dataKey="DataCalibrated" 
+        	outputKey="DataCalibrated" 
+        	outputJumpsKey="j" 
+        	prevEventsKey="prevEvents" 
+        	startCellKey="StartCellData" 
+        	jumpLimit="2.0" 
+        />
+        <fact.datacorrection.RemoveSpikes 
+        	dataKey="DataCalibrated" 
+        	outputKey="DataCalibrated" 
+        	startCellKey="StartCellData" 
+        	leftBorder="6" 
+        	spikeLimit="20" 
+        	topSlopeLimit="16" 
+        	maxSpikeLength="4" 
+        	outputSpikesKey="Sp" 
+        />
+        <fact.datacorrection.InterpolateBadPixel 
+        	key="DataCalibrated"  
+        	outputKey="DataCalibrated"
+            badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" 
+        />
+        <fact.extraction.MaxAmplitudePosition 
+        	key="DataCalibrated" 
+        	searchWindowLeft="35" 
+        	searchWindowRight="95" 
+        	outputKey="maxAmplitudePosition"
+        />
+        <fact.extraction.RisingEdgeForPositions 
+        	dataKey="DataCalibrated" 
+        	amplitudePositionsKey="maxAmplitudePosition" 
+        	outputKey="arrivalTime" 
+        	maxSlopesKey="maxSlopes"
+        />
+        <fact.extraction.RisingEdgePolynomFit 
+        	dataKey="DataCalibrated" 
+        	risingEdgeKey="arrivalTime" 
+        	outputKey="arrivalTimeFit" 
+        	range="5" 
+        	maxSlopesKey="maxSlopesFit"
+        />
+        <fact.extraction.PhotonCharge 
+        	dataKey="DataCalibrated" 
+        	positions="maxAmplitudePosition" 
+        	outputKey="photoncharge" 
+        	url="file:${integralGainFile}" 
+        	rangeSearchWindow="25" 
+        />
+        <fact.cleaning.CoreNeighborClean 
+        	photonChargeKey="photoncharge" 
+        	outputKey="shower" 
+        	arrivalTimeKey="arrivalTime" 
+        	corePixelThreshold="${core_threshold}" 
+        	neighborPixelThreshold="${neighbor_threshold}" 
+        	timeThreshold="${time_threshold}"  
+        	minNumberOfPixel="${min_number_of_pixel}"
+        />
+        <fact.cleaning.CoreNeighborCleanTimeNeighbor
+        	photonChargeKey="photoncharge" 
+        	outputKey="showerTimeNeighbor" 
+        	arrivalTimeKey="arrivalTime" 
+        	corePixelThreshold="${core_threshold}" 
+        	neighborPixelThreshold="${neighbor_threshold}" 
+        	timeThreshold="15"  
+        	minNumberOfPixel="${min_number_of_pixel}"
+        />
 		<stream.data.PrintData />
         <fact.ShowViewer key="DataCalibrated"/>
 
