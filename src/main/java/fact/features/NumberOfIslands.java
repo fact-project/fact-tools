@@ -20,6 +20,11 @@ public class NumberOfIslands implements Processor {
 
     @Override
     public Data process(Data input) {
+    	if (!input.containsKey(key))
+    	{
+    		input.put(outputKey, 0);
+    		return input;
+    	}
         Utils.isKeyValid(input, key, int[].class);
 
         int[] showerPixel = (int[]) input.get(key);
