@@ -62,7 +62,7 @@ public class BasicExtraction {
 	 */
 	static public int CalculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data){
 		int slice = maxPos;
-		double maxHalf = data[maxPos] / 2.0;
+		double maxHalf = data[px*roi+maxPos] / 2.0;
 		
 		for (; slice > leftBorder ; slice--)
 		{
