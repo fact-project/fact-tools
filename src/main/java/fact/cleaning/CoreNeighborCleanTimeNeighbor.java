@@ -179,21 +179,7 @@ public class CoreNeighborCleanTimeNeighbor extends BasicCleaning implements Proc
 		return newList;
 	}
 	
-	
-	private double calculateMedian(double[] showerArrivals)
-	{
-		double median = 0.0;
-		Arrays.sort(showerArrivals);
-		int length = showerArrivals.length;
-		if (showerArrivals.length%2 == 1 ){
-			median =  showerArrivals[(length-1)/2];
-		} else {
-			median = 0.5*(  showerArrivals[(length)/2] + showerArrivals[(length)/2 - 1] );
-		}
-		return median;
-	}
-	
-	
+		
 	public String getPhotonChargeKey() {
 		return photonChargeKey;
 	}
