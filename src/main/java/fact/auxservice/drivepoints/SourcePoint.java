@@ -17,8 +17,24 @@ public class SourcePoint extends DrivePoint {
     public double wobbleAngle;
 
 
-    public SourcePoint(Data item) throws IllegalArgumentException{
-        super(item);
+    @Override
+    public String toString(){
+        return "SourcePoint: " + name + "  time: " + time + " raSrc, decSrc: " + raSrc + ", " + decSrc + " wobble angle: " + wobbleAngle + " wobble offset: " + wobbleOffset;
+    }
+
+
+    public SourcePoint(double time, String name, double raSrc, double decSrc, double raCmd, double decCmd, double wobbleOffset, double wobbleAngle) throws IllegalArgumentException {
+        this.name = name;
+        this.raSrc = raSrc;
+        this.decSrc = decSrc;
+        this.raCmd = raCmd;
+        this.decCmd = decCmd;
+        this.wobbleOffset = wobbleOffset;
+        this.wobbleAngle = wobbleAngle;
+    }
+
+    @Override
+    public void initialiseWithDataItem(Data item) throws IllegalArgumentException {
         try{
 
             raSrc = Double.parseDouble(item.get("Ra_src").toString());
@@ -42,24 +58,5 @@ public class SourcePoint extends DrivePoint {
             log.error("Tracking information not in data item");
             throw new IllegalArgumentException("Tracking information not in data item");
         }
-
     }
-
-    @Override
-    public String toString(){
-        return "SourcePoint: " + name + "  time: " + time + " raSrc, decSrc: " + raSrc + ", " + decSrc + " wobble angle: " + wobbleAngle + " wobble offset: " + wobbleOffset;
-    }
-
-
-    public SourcePoint(double time, String name, double raSrc, double decSrc, double raCmd, double decCmd, double wobbleOffset, double wobbleAngle) throws IllegalArgumentException {
-        super(time);
-        this.name = name;
-        this.raSrc = raSrc;
-        this.decSrc = decSrc;
-        this.raCmd = raCmd;
-        this.decCmd = decCmd;
-        this.wobbleOffset = wobbleOffset;
-        this.wobbleAngle = wobbleAngle;
-    }
-
 }

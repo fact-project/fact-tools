@@ -1,5 +1,6 @@
 package fact.auxservice;
 
+import fact.auxservice.drivepoints.DrivePoint;
 import fact.auxservice.drivepoints.DrivePointManager;
 import fact.auxservice.drivepoints.SourcePoint;
 import fact.auxservice.drivepoints.TrackingPoint;
@@ -30,8 +31,9 @@ public class AuxFileService implements Service {
     Logger log = LoggerFactory.getLogger(AuxFileService.class);
 
     DrivePointManager<TrackingPoint> trackingPointManager = new DrivePointManager();
-    DrivePointManager<SourcePoint> sourcePointManager = new DrivePointManager();
 
+    File currentlyMappedDataFile = new File("");
+    HashMap<String, SourceURL> auxFileMap =  new HashMap<>() ;
 
     @Parameter(required = false, description = "The path to the folder containing the auxilary fits files. " +
             "This folder should contain the usual folder structure: year/month/day/<aux_files>")
@@ -42,32 +44,34 @@ public class AuxFileService implements Service {
     SourceURL sourceFile;
 
     public synchronized DrivePointManager<TrackingPoint> getTrackingPointManager(File dataFile){
-        setNewFilePath(dataFile);
-        return trackingPointManager;
+        DrivePointManager<TrackingPoint> dM = (DrivePointManager<TrackingPoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_TRACKING_POSITION", new DrivePointFactory<TrackingPoint>(TrackingPoint.class));
+        return dM;
     }
 
     public synchronized DrivePointManager<SourcePoint> getSourcePointManager(File dataFile){
-        setNewFilePath(dataFile);
-        return sourcePointManager;
+//        setNewFilePath(dataFile);
+        //refacotr htis: RIGHT NOW
+        DrivePointManager<SourcePoint> dM = (DrivePointManager<SourcePoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_SOURCE_POSITION", new DrivePointFactory<SourcePoint>(SourcePoint.class));
+        return dM;
     }
 
-    private void setNewFilePath(File currentPath) {
-        try {
-            String dateString = getDateStringFromPath(currentPath);
-            if(auxFolder != null) {
-                HashMap<String, SourceURL> m = findAuxFileUrls(auxFolder, dateString);
-                sourceFile = m.get("DRIVE_CONTROL_SOURCE_POSITION");
-                trackingFile = m.get("DRIVE_CONTROL_TRACKING_POSITION");
-            }
-            sourcePointManager = getPointManagerFromFile(sourceFile, new SourcePointFactory());
-            trackingPointManager = getPointManagerFromFile(trackingFile, new TrackingPointFactory());
+    private  DrivePointManager<? extends DrivePoint>  getPointManagerForDataFile(File currentFile, String name, DrivePointFactory factory) {
 
+        try {
+            //lets check if we need to update the map.
+            if(!currentFile.equals(currentlyMappedDataFile)){
+                String dateString = getDateStringFromFile(currentFile);
+                auxFileMap = findAuxFileUrls(auxFolder, dateString);
+            }
+            return getPointManagerFromFile(auxFileMap.get(name), factory);
         } catch (FileNotFoundException e) {
+            log.error("Aux file not found.");
             e.printStackTrace();
+            return null;
         }
     }
 
-    private String getDateStringFromPath(File currentFile) throws FileNotFoundException {
+    private String getDateStringFromFile(File currentFile) throws FileNotFoundException {
 
         String currentFileName = currentFile.getName();
         if (currentFileName.length() < 17 ){
@@ -100,7 +104,7 @@ public class AuxFileService implements Service {
             public boolean accept(File dir, String name) {
                 if (name.contains(dateString) && name.endsWith(".fits")) {
                     try {
-                        //get name of aux file by removing the date string (first 9 cahrachters) and the file ending
+                        //get name of aux file by removing the date string (first 9 characters) and the file ending
                         String auxName = name.substring(9);
                         auxName = auxName.substring(0, auxName.length() - 5);
                         File f = new File(dir, name);
@@ -116,7 +120,7 @@ public class AuxFileService implements Service {
         return m;
     }
 
-    private DrivePointManager getPointManagerFromFile(SourceURL driveFileUrl, AbstractDrivePointFactory factory){
+    private DrivePointManager<? extends DrivePoint> getPointManagerFromFile(SourceURL driveFileUrl, DrivePointFactory factory){
         DrivePointManager mgr = new DrivePointManager();
         FitsStream stream = new FitsStream(driveFileUrl);
         try {

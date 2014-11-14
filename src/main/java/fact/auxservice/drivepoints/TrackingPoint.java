@@ -15,8 +15,17 @@ public class TrackingPoint extends DrivePoint {
     public double deviationAz; // Control deviation Az
     public double deviationZd; // Control deviation Zd
 
-    public TrackingPoint(Data item) throws IllegalArgumentException{
-        super(item);
+    public TrackingPoint(double time, double ra, double dec, double az, double zd, double dAz, double dZd) throws IllegalArgumentException {
+        this.ra = ra;
+        this.dec = dec;
+        this.Az = az;
+        this.Zd = zd;
+        this.deviationAz = dAz;
+        this.deviationZd = dZd;
+    }
+
+    @Override
+    public void initialiseWithDataItem(Data item) throws IllegalArgumentException {
         try {
             ra = Double.parseDouble(item.get("Ra").toString());
             ra = ra / 24 * 360.0;
@@ -33,15 +42,5 @@ public class TrackingPoint extends DrivePoint {
             log.error("Tracking information not in data item");
             throw new IllegalArgumentException("Tracking information not in data item");
         }
-    }
-
-    public TrackingPoint(double time, double ra, double dec, double az, double zd, double dAz, double dZd) throws IllegalArgumentException {
-        super(time);
-        this.ra = ra;
-        this.dec = dec;
-        this.Az = az;
-        this.Zd = zd;
-        this.deviationAz = dAz;
-        this.deviationZd = dZd;
     }
 }

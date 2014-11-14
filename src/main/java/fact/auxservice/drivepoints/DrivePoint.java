@@ -20,19 +20,7 @@ public abstract class DrivePoint implements Comparable<Double>{
     //Julian Day
     double time;
 
-    public DrivePoint(Data item) throws IllegalArgumentException{
-        time =	Double.parseDouble(item.get("Time").toString()) + 2440587.5;
-        if (time <= 2451544.5){
-            throw new IllegalArgumentException("Dates before 1.1.2000 are not supported");
-        }
-    }
-
-    public DrivePoint(double time) throws IllegalArgumentException{
-        if (time <= 2451544.5){
-            throw new IllegalArgumentException("Dates before 1.1.2000 are not supported");
-        }
-        this.time = time;
-    }
+    public abstract void initialiseWithDataItem(Data item) throws IllegalArgumentException;
 
     @Override
     public int compareTo(Double o) {
