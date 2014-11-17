@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 /**
@@ -44,14 +46,13 @@ public class AuxFileService implements Service {
     SourceURL sourceFile;
 
     public synchronized DrivePointManager<TrackingPoint> getTrackingPointManager(File dataFile){
-        DrivePointManager<TrackingPoint> dM = (DrivePointManager<TrackingPoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_TRACKING_POSITION", new DrivePointFactory<TrackingPoint>(TrackingPoint.class));
+        DrivePointManager<TrackingPoint> dM = (DrivePointManager<TrackingPoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_TRACKING_POSITION", new DrivePointFactory<>(TrackingPoint.class));
         return dM;
     }
 
     public synchronized DrivePointManager<SourcePoint> getSourcePointManager(File dataFile){
 //        setNewFilePath(dataFile);
-        //refacotr htis: RIGHT NOW
-        DrivePointManager<SourcePoint> dM = (DrivePointManager<SourcePoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_SOURCE_POSITION", new DrivePointFactory<SourcePoint>(SourcePoint.class));
+        DrivePointManager<SourcePoint> dM = (DrivePointManager<SourcePoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_SOURCE_POSITION", new DrivePointFactory<>(SourcePoint.class));
         return dM;
     }
 
@@ -87,14 +88,15 @@ public class AuxFileService implements Service {
      * @throws java.io.FileNotFoundException
      * @throws java.net.MalformedURLException
      */
-    private HashMap<String, SourceURL> findAuxFileUrls(SourceURL auxFolder, final String dateString) throws FileNotFoundException {
+    public HashMap<String, SourceURL> findAuxFileUrls(SourceURL auxFolder, final String dateString) throws FileNotFoundException {
 
         String year = dateString.substring(0,4);
         String month = dateString.substring(4,6);
         String day = dateString.substring(6,8);
-        File folder = new File(auxFolder.getFile(),year);
-        folder = new File(folder, month);
-        folder = new File(folder, day);
+
+        Path p = Paths.get(auxFolder.getPath(), year, month, day);
+        File folder = p.toFile();
+
         if(!folder.isDirectory() || !folder.exists()){
             throw new FileNotFoundException("Could not build path for tracking file.");
         }
@@ -111,6 +113,8 @@ public class AuxFileService implements Service {
                         m.put(auxName, new SourceURL(f.toURI().toURL()));
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
+                        log.error("Could not create path to auxillary file " + dir + " " +name);
+                        return false;
                     }
                     return true;
                 }
