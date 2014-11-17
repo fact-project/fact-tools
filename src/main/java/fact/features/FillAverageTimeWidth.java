@@ -2,14 +2,13 @@ package fact.features;
 
 import fact.Constants;
 import fact.Utils;
-import fact.extraction.PhotonCharge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 
 public class FillAverageTimeWidth implements Processor {
-	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
+	static Logger log = LoggerFactory.getLogger(FillAverageTimeWidth.class);
 	
 	private int numberTimeMarker = 160;
 	private int numberOfSlices = 1024;
