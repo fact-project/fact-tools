@@ -9,7 +9,7 @@ import fact.Constants;
 
 public class BasicExtraction {
 	
-	static public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
+	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
 		double[] integralGains = new double[Constants.NUMBEROFPIXEL];
 		Data integralGainData = null;
 		try {
@@ -31,7 +31,7 @@ public class BasicExtraction {
 		}
 	}
 	
-	static public int CalculateMaxPosition(int px, int leftBorder, int rightBorder, int roi, double[] data) {
+	public int calculateMaxPosition(int px, int leftBorder, int rightBorder, int roi, double[] data) {
 		int maxPos = 0;
 		double tempMax = Double.MIN_VALUE;
 		
@@ -60,7 +60,7 @@ public class BasicExtraction {
 	 * @param data
 	 * @return
 	 */
-	static public int CalculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data){
+	public int calculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data){
 		int slice = maxPos;
 		double maxHalf = data[px*roi+maxPos] / 2.0;
 		
@@ -75,7 +75,7 @@ public class BasicExtraction {
 		return slice;
 	}
 	
-	static public double CalculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
+	public double calculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
 
 		double integral = 0;
 		

@@ -90,9 +90,9 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 			{
 				rightBorder += 1;
 			}
-			maxAmplitudePositions[px] = CalculateMaxPosition(px, leftBorder, rightBorder, roi, data);
-			int halfHeightPos = CalculatePositionHalfHeight(px, maxAmplitudePositions[px], halfMaxSearchWindowSize, roi, data);
-			photoncharge[px] = CalculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
+			maxAmplitudePositions[px] = calculateMaxPosition(px, leftBorder, rightBorder, roi, data);
+			int halfHeightPos = calculatePositionHalfHeight(px, maxAmplitudePositions[px], halfMaxSearchWindowSize, roi, data);
+			photoncharge[px] = calculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
 		}
 		
 		input.put(outputKeyPhotonCharge, photoncharge);

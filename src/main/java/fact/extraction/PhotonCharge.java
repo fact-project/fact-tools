@@ -80,11 +80,11 @@ public class PhotonCharge extends BasicExtraction implements Processor  {
 				leftBorder = 0;
 			}
 			
-			int positionOfHalfMaximumValue = CalculatePositionHalfHeight(pix, positionOfMaximum, leftBorder, roi, data);
+			int positionOfHalfMaximumValue = calculatePositionHalfHeight(pix, positionOfMaximum, leftBorder, roi, data);
 			
 			// Calculate the integral over 30 slices and divide it by the
 			// calibration Gain (stored in integralGains[pix])
-			double integral = CalculateIntegral(pix, positionOfHalfMaximumValue, 30, roi, data);
+			double integral = calculateIntegral(pix, positionOfHalfMaximumValue, 30, roi, data);
 			photonCharge[pix] = integral / integralGains[pix];
 
 			m[pix] = new IntervalMarker(positionOfHalfMaximumValue,
