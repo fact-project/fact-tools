@@ -19,24 +19,13 @@ public class SourcePoint extends DrivePoint {
 
     @Override
     public String toString(){
-        return "SourcePoint: " + name + "  time: " + time + " raSrc, decSrc: " + raSrc + ", " + decSrc + " wobble angle: " + wobbleAngle + " wobble offset: " + wobbleOffset;
-    }
-
-
-    public SourcePoint(double time, String name, double raSrc, double decSrc, double raCmd, double decCmd, double wobbleOffset, double wobbleAngle) throws IllegalArgumentException {
-        this.name = name;
-        this.raSrc = raSrc;
-        this.decSrc = decSrc;
-        this.raCmd = raCmd;
-        this.decCmd = decCmd;
-        this.wobbleOffset = wobbleOffset;
-        this.wobbleAngle = wobbleAngle;
+        return "SourcePoint: " + name + "  time: " + getTime() + " raSrc, decSrc: " + raSrc + ", " + decSrc + " wobble angle: " + wobbleAngle + " wobble offset: " + wobbleOffset;
     }
 
     @Override
     public void initialiseWithDataItem(Data item) throws IllegalArgumentException {
         try{
-
+            this.setTime(Double.parseDouble(item.get("Time").toString()) + 2440587.5);
             raSrc = Double.parseDouble(item.get("Ra_src").toString());
             raSrc = raSrc / 24 * 360.0;
             decSrc = Double.parseDouble(item.get("Dec_src").toString());

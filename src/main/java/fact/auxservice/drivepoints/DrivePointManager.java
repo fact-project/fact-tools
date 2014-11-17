@@ -32,7 +32,9 @@ public class DrivePointManager<T extends DrivePoint>{
      * @return the point from the aux file with the timestamp closest to the given currentTime
      */
     public T getPoint(double currentTime) {
-
+        if (locList.isEmpty()){
+            log.error("No points from auxilary data in DrivePointManager ");
+        }
         int index = Collections.binarySearch(locList, currentTime);
 
         //element was found
@@ -46,7 +48,7 @@ public class DrivePointManager<T extends DrivePoint>{
             }
             if (insertionPoint >= locList.size()){
 //                    System.out.println("returnning last in list");
-                log.warn("EventTime larger than last point in Tracking File");
+                log.warn("EventTime larger than last point in File");
                 return locList.get(locList.size()-1);
             }
 

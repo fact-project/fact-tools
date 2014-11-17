@@ -18,7 +18,12 @@ public abstract class DrivePoint implements Comparable<Double>{
     Logger log = LoggerFactory.getLogger(DrivePoint.class);
 
     //Julian Day
-    double time;
+    private double time;
+
+    public DrivePoint(){
+
+    }
+
 
     public abstract void initialiseWithDataItem(Data item) throws IllegalArgumentException;
 
@@ -29,5 +34,16 @@ public abstract class DrivePoint implements Comparable<Double>{
 
     public double distanceTo(double t){
         return Math.abs(time - t);
+    }
+
+    public void setTime(double time){
+        this.time =	time;
+        if (time <= 2451544.5){
+            throw new IllegalArgumentException("Dates before 1.1.2000 are not supported");
+        }
+    }
+
+    public double getTime(){
+        return time;
     }
 }

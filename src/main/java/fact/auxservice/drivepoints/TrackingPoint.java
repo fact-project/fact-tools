@@ -15,18 +15,11 @@ public class TrackingPoint extends DrivePoint {
     public double deviationAz; // Control deviation Az
     public double deviationZd; // Control deviation Zd
 
-    public TrackingPoint(double time, double ra, double dec, double az, double zd, double dAz, double dZd) throws IllegalArgumentException {
-        this.ra = ra;
-        this.dec = dec;
-        this.Az = az;
-        this.Zd = zd;
-        this.deviationAz = dAz;
-        this.deviationZd = dZd;
-    }
 
     @Override
     public void initialiseWithDataItem(Data item) throws IllegalArgumentException {
         try {
+            this.setTime(Double.parseDouble(item.get("Time").toString()) + 2440587.5);
             ra = Double.parseDouble(item.get("Ra").toString());
             ra = ra / 24 * 360.0;
             dec = Double.parseDouble(item.get("Dec").toString());

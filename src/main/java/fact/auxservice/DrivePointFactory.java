@@ -19,7 +19,7 @@ public class DrivePointFactory<T extends DrivePoint> {
         try {
             T drivePoint = clazz.newInstance();
             drivePoint.initialiseWithDataItem(item);
-            return clazz.newInstance();
+            return drivePoint;
 
         } catch (InstantiationException e) {
             throw new IllegalArgumentException(e);
