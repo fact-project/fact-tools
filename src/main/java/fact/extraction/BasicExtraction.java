@@ -246,12 +246,21 @@ public class BasicExtraction implements Processor {
 		this.rangeHalfHeightWindow = rangeHalfHeightWindow;
 	}
 
-	public int getIntegralSize() {
+
+	public int getIntegrationWindow() {
 		return integrationWindow;
 	}
 
-	public void setIntegralSize(int integralSize) {
-		this.integrationWindow = integralSize;
+	public void setIntegrationWindow(int integrationWindow) {
+		this.integrationWindow = integrationWindow;
+	}
+
+	public int getValidMinimalSlice() {
+		return validMinimalSlice;
+	}
+
+	public void setValidMinimalSlice(int validMinimalSlice) {
+		this.validMinimalSlice = validMinimalSlice;
 	}
 
 	public void setUrl(SourceURL url) {
