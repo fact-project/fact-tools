@@ -13,97 +13,182 @@ import stream.io.SourceURL;
 import java.net.URL;
 
 /**
- * This should replace the classical photoncharge processor sooner or later.
- * TODO: WIP
+ * This processor takes the calculated time gradient along the longitudinal axis of a shower, calculated by the standard preprocessing.
+ * Using this time gradient it predicts a time for the cherenkov pulse in the data array, individual for each pixel, depending on the 
+ * longitudinal coordinate of the pixel.
+ * Around this predicted time, the standard algorithm for calculating the photoncharge (CalculateMaxPosition(),CalculatePositionHalfHeight(),
+ * CalculateIntegral()) are applied to calculate a new photoncharge.
  * @author Fabian Temme
  */
 public class TimeGradientExtraction extends BasicExtraction implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);
 
+	@Parameter(required=true, description="key to the delta angle of the shower")
 	private String deltaKey = null;
+	@Parameter(required=true, description="key to the xvalue of the cog of the shower")
 	private String cogxKey = null;
+	@Parameter(required=true, description="key to the yvalue of the cog of the shower")
 	private String cogyKey = null;
-	
+	@Parameter(required=true, description="key to the data array")
 	private String dataKey = null;
-	
-	private String timeGradientKey = null;
-	
-	private String outputKey = null;
-	
-	private int searchWindowSize;
-	
+	@Parameter(required=true, description="key to the timegradient slopes")
+	private String timeGradientSlopeKey = null;
+	@Parameter(required=true, description="key to the timegradient intercepts")
+	private String timeGradientInterceptKey = null;
+	@Parameter(required=true, description="outputKey for the calculated photoncharge")
+	private String outputKeyPhotonCharge = null;
+	@Parameter(required = true, description="outputKey for the calculated max amplitude positions")
+	private String outputKeyMaxAmplitudePos = null;
 	@Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
     private URL url = null;
 	
+	@Parameter(required=false, description="size of the search window for the max amplitude position",defaultValue = "40")
+	private int searchWindowSize = 40;
+	@Parameter(required=false, description="size of the integration window",defaultValue = "30")
+	private int integralSize = 30;
+	@Parameter(required=false, description="size of the search window for the position of the half maximum value",defaultValue = "25")
+	private int halfMaxSearchWindowSize = 25;
+
 	Data integralGainData = null;
     private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
-	
-	private int integralSize = 30;
-	private int halfMaxSearchWindowSize = 25;
-	
-	private double[] result = null;
-	
-	private double delta;
-	private double cogx;
-	private double cogy;
-	private double timeGradient;
-	private int roi = 0;
-	
-	private double[] data = null;
-	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(input, deltaKey, cogxKey, cogyKey, dataKey);
+		Utils.mapContainsKeys(input, deltaKey, cogxKey, cogyKey, dataKey, timeGradientSlopeKey, timeGradientInterceptKey);
 		
-		data = (double[]) input.get(dataKey);
+		double[] data = (double[]) input.get(dataKey);
 		
-		delta = (Double) input.get(deltaKey);
+		double delta = (Double) input.get(deltaKey);
 		
-		cogx = (Double) input.get(cogxKey);
-		cogy = (Double) input.get(cogyKey);
+		double cogx = (Double) input.get(cogxKey);
+		double cogy = (Double) input.get(cogyKey);
 		
-		timeGradient = (Double) input.get(timeGradientKey);
+		double slope = (Double) input.get(timeGradientSlopeKey);
+		double intercept = (Double) input.get(timeGradientInterceptKey);
 		
-		roi = (Integer) input.get("NROI");
 		
-		result = new double[Constants.NUMBEROFPIXEL];
+		int roi = (Integer) input.get("NROI");
+		
+		int[] maxAmplitudePositions = new int[Constants.NUMBEROFPIXEL];
+		double[] photoncharge = new double[Constants.NUMBEROFPIXEL];
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
-			double posx = pixelMap.getPixelFromId(px).getXPositionInMM();
-			double posy = pixelMap.getPixelFromId(px).getYPositionInMM();
-			double distance = Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, posx, posy);
+			double x = pixelMap.getPixelFromId(px).getXPositionInMM();
+			double y = pixelMap.getPixelFromId(px).getYPositionInMM();
+			double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
 			
-			int predictedTime = CalculatePredictedTime(px,posx,posy);
-			int leftBorder = predictedTime - searchWindowSize / 2;
-			int rightBorder = predictedTime + searchWindowSize / 2;
+			double predictedTime = slope*ellipseCoord[0] + intercept;
+			int predictedSlice = (int) Math.round(predictedTime);
+			
+			int leftBorder = predictedSlice - searchWindowSize / 2;
+			int rightBorder = predictedSlice + searchWindowSize / 2;
 			if (searchWindowSize%2 == 1)
 			{
 				rightBorder += 1;
 			}
-			int maxPos = CalculateMaxPosition(px, leftBorder, rightBorder, roi, data);
-			int halfHeightPos = CalculatePositionHalfHeight(px, maxPos, halfMaxSearchWindowSize, roi, data);
-			result[px] = CalculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
+			maxAmplitudePositions[px] = CalculateMaxPosition(px, leftBorder, rightBorder, roi, data);
+			int halfHeightPos = CalculatePositionHalfHeight(px, maxAmplitudePositions[px], halfMaxSearchWindowSize, roi, data);
+			photoncharge[px] = CalculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
 		}
 		
-		
-		input.put(outputKey, result);
+		input.put(outputKeyPhotonCharge, photoncharge);
+		input.put(outputKeyMaxAmplitudePos, maxAmplitudePositions);
 		
 		return input;
 	}
-
-
-
-
-	private int CalculatePredictedTime(int px, double posx, double posy) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+	public String getDeltaKey() {
+		return deltaKey;
 	}
-	
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
+	}
+
+	public String getCogxKey() {
+		return cogxKey;
+	}
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
+	}
+
+	public String getCogyKey() {
+		return cogyKey;
+	}
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
+	}
+
+	public String getDataKey() {
+		return dataKey;
+	}
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
+	}
+
+	public String getTimeGradientSlopeKey() {
+		return timeGradientSlopeKey;
+	}
+
+	public void setTimeGradientSlopeKey(String timeGradientSlopeKey) {
+		this.timeGradientSlopeKey = timeGradientSlopeKey;
+	}
+
+	public String getTimeGradientInterceptKey() {
+		return timeGradientInterceptKey;
+	}
+
+	public void setTimeGradientInterceptKey(String timeGradientInterceptKey) {
+		this.timeGradientInterceptKey = timeGradientInterceptKey;
+	}
+
+	public String getOutputKeyPhotonCharge() {
+		return outputKeyPhotonCharge;
+	}
+
+	public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
+		this.outputKeyPhotonCharge = outputKeyPhotonCharge;
+	}
+
+	public String getOutputKeyMaxAmplitudePos() {
+		return outputKeyMaxAmplitudePos;
+	}
+
+	public void setOutputKeyMaxAmplitudePos(String outputKeyMaxAmplitudePos) {
+		this.outputKeyMaxAmplitudePos = outputKeyMaxAmplitudePos;
+	}
+
+	public int getSearchWindowSize() {
+		return searchWindowSize;
+	}
+
+	public void setSearchWindowSize(int searchWindowSize) {
+		this.searchWindowSize = searchWindowSize;
+	}
+
+	public int getIntegralSize() {
+		return integralSize;
+	}
+
+	public void setIntegralSize(int integralSize) {
+		this.integralSize = integralSize;
+	}
+
+	public int getHalfMaxSearchWindowSize() {
+		return halfMaxSearchWindowSize;
+	}
+
+	public void setHalfMaxSearchWindowSize(int halfMaxSearchWindowSize) {
+		this.halfMaxSearchWindowSize = halfMaxSearchWindowSize;
+	}
+
 	public void setUrl(URL url) {
 		try {
 			integralGains = loadIntegralGainFile(new SourceURL(url),log);
