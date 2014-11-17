@@ -48,15 +48,6 @@ public class DrsFileServiceTest {
     }
 
     @Test
-    public void testAcceptFile()throws Exception{
-        URL u = DrsFileService.class.getResource("/dummy_files/20140920_012.drs.fits");
-        File dummyFile = new File(u.toURI());
-        DrsFileService s = new DrsFileService();
-        int filenumber = s.getFileNumberFromFile(dummyFile);
-        int datenumber = s.getDateNumberFromFile(dummyFile);
-    }
-
-    @Test
     public void testGetValidfiles() throws Exception{
         URL uDir = DrsFileService.class.getResource("/dummy_files/");
         URL uFile = DrsFileService.class.getResource("/dummy_files/20140920_012.drs.fits");
