@@ -3,14 +3,13 @@ package fact.extraction;
 import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
+
+import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import stream.Data;
-import stream.Processor;
-import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
-import java.net.URL;
+import stream.Data;
+import stream.annotations.Parameter;
 
 /**
  * This processor takes the calculated time gradient along the longitudinal axis of a shower, calculated by the standard preprocessing.
@@ -20,7 +19,7 @@ import java.net.URL;
  * CalculateIntegral()) are applied to calculate a new photoncharge.
  * @author Fabian Temme
  */
-public class TimeGradientExtraction extends BasicExtraction implements Processor {
+public class TimeGradientExtraction extends BasicExtraction {
 	static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);
 
 	@Parameter(required=true, description="key to the delta angle of the shower")
@@ -29,30 +28,12 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 	private String cogxKey = null;
 	@Parameter(required=true, description="key to the yvalue of the cog of the shower")
 	private String cogyKey = null;
-	@Parameter(required=true, description="key to the data array")
-	private String dataKey = null;
 	@Parameter(required=true, description="key to the timegradient slopes")
 	private String timeGradientSlopeKey = null;
 	@Parameter(required=true, description="key to the timegradient intercepts")
 	private String timeGradientInterceptKey = null;
-	@Parameter(required=true, description="outputKey for the calculated photoncharge")
-	private String outputKeyPhotonCharge = null;
-	@Parameter(required = true, description="outputKey for the calculated max amplitude positions")
-	private String outputKeyMaxAmplitudePos = null;
-	@Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
-    private URL url = null;
 	
-	@Parameter(required=false, description="size of the search window for the max amplitude position",defaultValue = "40")
-	private int searchWindowSize = 40;
-	@Parameter(required=false, description="size of the integration window",defaultValue = "30")
-	private int integralSize = 30;
-	@Parameter(required=false, description="size of the search window for the position of the half maximum value",defaultValue = "25")
-	private int halfMaxSearchWindowSize = 25;
-
-	Data integralGainData = null;
-    private double[] integralGains = new double[Constants.NUMBEROFPIXEL];
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-	
 	
 	@Override
 	public Data process(Data input) {
@@ -60,20 +41,17 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 		Utils.mapContainsKeys(input, deltaKey, cogxKey, cogyKey, dataKey, timeGradientSlopeKey, timeGradientInterceptKey);
 		
 		double[] data = (double[]) input.get(dataKey);
-		
 		double delta = (Double) input.get(deltaKey);
-		
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
-		
 		double[] slopes = (double[]) input.get(timeGradientSlopeKey);
 		double[] intercepts = (double[]) input.get(timeGradientInterceptKey);
-		
-		
 		int roi = (Integer) input.get("NROI");
 		
-		int[] maxAmplitudePositions = new int[Constants.NUMBEROFPIXEL];
-		double[] photoncharge = new double[Constants.NUMBEROFPIXEL];
+		int[] positions = new int[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] mPositions = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] mPhotonCharge = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
@@ -83,20 +61,25 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 			
 			double predictedTime = slopes[0]*ellipseCoord[0] + intercepts[0];
 			int predictedSlice = (int) Math.round(predictedTime);
+						
+			int leftBorder = predictedSlice - rangeSearchWindow / 2;
+			int[] window = getValidWindow(leftBorder, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, 210);
 			
-			int leftBorder = predictedSlice - searchWindowSize / 2;
-			int rightBorder = predictedSlice + searchWindowSize / 2;
-			if (searchWindowSize%2 == 1)
-			{
-				rightBorder += 1;
-			}
-			maxAmplitudePositions[px] = calculateMaxPosition(px, leftBorder, rightBorder, roi, data);
-			int halfHeightPos = calculatePositionHalfHeight(px, maxAmplitudePositions[px], halfMaxSearchWindowSize, roi, data);
-			photoncharge[px] = calculateIntegral(px, halfHeightPos, integralSize, roi, data) / integralGains[px];
+			positions[px] = calculateMaxPosition(px, window[0], window[1], roi, data);
+			mPositions[px] = new IntervalMarker(positions[px],positions[px] + 1);
+			
+			int halfHeightPos = calculatePositionHalfHeight(px, positions[px],positions[px]-rangeHalfHeightWindow, roi, data);
+			
+			checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
+			photonCharge[px] = calculateIntegral(px, halfHeightPos, integrationWindow, roi, data) / integralGains[px];
+			mPhotonCharge[px] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
 		
-		input.put(outputKeyPhotonCharge, photoncharge);
-		input.put(outputKeyMaxAmplitudePos, maxAmplitudePositions);
+		input.put(outputKeyMaxAmplPos, positions);
+        input.put(outputKeyMaxAmplPos + "Marker", mPositions);
+        input.put(outputKeyPhotonCharge, photonCharge);
+        input.put("@photoncharge", photonCharge);
+        input.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
 		
 		return input;
 	}
@@ -125,14 +108,6 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 		this.cogyKey = cogyKey;
 	}
 
-	public String getDataKey() {
-		return dataKey;
-	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
 	public String getTimeGradientSlopeKey() {
 		return timeGradientSlopeKey;
 	}
@@ -148,60 +123,5 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 	public void setTimeGradientInterceptKey(String timeGradientInterceptKey) {
 		this.timeGradientInterceptKey = timeGradientInterceptKey;
 	}
-
-	public String getOutputKeyPhotonCharge() {
-		return outputKeyPhotonCharge;
-	}
-
-	public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-		this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-	}
-
-	public String getOutputKeyMaxAmplitudePos() {
-		return outputKeyMaxAmplitudePos;
-	}
-
-	public void setOutputKeyMaxAmplitudePos(String outputKeyMaxAmplitudePos) {
-		this.outputKeyMaxAmplitudePos = outputKeyMaxAmplitudePos;
-	}
-
-	public int getSearchWindowSize() {
-		return searchWindowSize;
-	}
-
-	public void setSearchWindowSize(int searchWindowSize) {
-		this.searchWindowSize = searchWindowSize;
-	}
-
-	public int getIntegralSize() {
-		return integralSize;
-	}
-
-	public void setIntegralSize(int integralSize) {
-		this.integralSize = integralSize;
-	}
-
-	public int getHalfMaxSearchWindowSize() {
-		return halfMaxSearchWindowSize;
-	}
-
-	public void setHalfMaxSearchWindowSize(int halfMaxSearchWindowSize) {
-		this.halfMaxSearchWindowSize = halfMaxSearchWindowSize;
-	}
-
-	public void setUrl(URL url) {
-		try {
-			integralGains = loadIntegralGainFile(new SourceURL(url),log);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		this.url = url;
-	}
-
-
-	public URL getUrl() {
-		return url;
-	}
-		
 
 }
