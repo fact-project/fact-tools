@@ -1,13 +1,10 @@
 package fact.services;
 
 import fact.auxservice.AuxFileService;
-import fact.auxservice.DrsFileService;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import stream.io.SourceURL;
 
 import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 
