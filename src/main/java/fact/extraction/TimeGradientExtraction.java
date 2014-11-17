@@ -66,8 +66,8 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
 		
-		double slope = (Double) input.get(timeGradientSlopeKey);
-		double intercept = (Double) input.get(timeGradientInterceptKey);
+		double[] slopes = (double[]) input.get(timeGradientSlopeKey);
+		double[] intercepts = (double[]) input.get(timeGradientInterceptKey);
 		
 		
 		int roi = (Integer) input.get("NROI");
@@ -81,7 +81,7 @@ public class TimeGradientExtraction extends BasicExtraction implements Processor
 			double y = pixelMap.getPixelFromId(px).getYPositionInMM();
 			double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
 			
-			double predictedTime = slope*ellipseCoord[0] + intercept;
+			double predictedTime = slopes[0]*ellipseCoord[0] + intercepts[0];
 			int predictedSlice = (int) Math.round(predictedTime);
 			
 			int leftBorder = predictedSlice - searchWindowSize / 2;
