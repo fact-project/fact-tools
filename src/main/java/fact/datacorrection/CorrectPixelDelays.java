@@ -37,11 +37,11 @@ public class CorrectPixelDelays implements Processor {
 		
 		loadPixelDelayFile(url);
 		
-		int[] arrivalTime = (int[]) item.get(arrivalTimeKey);
+		double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
 		double[] corrArrivalTime = new double[1440];
 		for(int pix=0; pix < Constants.NUMBEROFPIXEL; pix++)
 		{
-			corrArrivalTime[pix] = (double) arrivalTime[pix] + pixelDelay[pix];
+			corrArrivalTime[pix] = arrivalTime[pix] + pixelDelay[pix];
 			log.info("Delay:" + String.valueOf(corrArrivalTime[pix]));
 			log.info("Delay:" + String.valueOf(arrivalTime[pix]));
 		}
