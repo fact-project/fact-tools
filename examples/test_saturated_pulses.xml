@@ -22,13 +22,20 @@
 <!-- 	        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" /> -->
 	        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
 	                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-
-
-	        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-	        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-    	    <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:src/main/resources/defaultIntegralGains.csv" rangeSearchWindow="25" color="#FF0F0F"/>
-	          
-             <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxAmplitudePosition" threshold="1500" thresholdOutputKey="thresholdForToT"/>
+	                
+	       	<fact.extraction.BasicExtraction
+        	dataKey="DataCalibrated" 
+        	outputKeyMaxAmplPos="maxAmplitudePosition"
+        	outputKeyPhotonCharge="photoncharge" 
+        	url="file:src/main/resources/defaultIntegralGains.csv"
+        	startSearchWindow="35"
+        	rangeSearchWindow="90"
+        	rangeHalfHeightWindow="25"
+        	/>
+			
+			<fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+    	    
+            <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxAmplitudePosition" threshold="1500" thresholdOutputKey="thresholdForToT"/>
         <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold" thresholdKey="thresholdForToT" outputKey="photonchargeSaturated"/>
             
 		<fact.utils.SubtractDataArrays key="photonchargeSaturated" subtractedKey="photoncharge" outputKey="chargeDifference"/>

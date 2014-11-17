@@ -39,23 +39,20 @@
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"
         										 outputKey="DataCalibrated"
                 								 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated"
-        									  searchWindowLeft="25"
-        									  searchWindowRight="125"
-        									  outputKey="maxAmplitudePosition"/>
+       <fact.extraction.BasicExtraction dataKey="DataCalibrated" 
+							        	outputKeyMaxAmplPos="maxAmplitudePosition"
+							        	outputKeyPhotonCharge="photoncharge" 
+							        	url="file:src/main/resources/gain_sorted_20131127.csv"
+							        	startSearchWindow="35"
+							        	rangeSearchWindow="90"
+							        	rangeHalfHeightWindow="25"
+        />
         									  
         <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" 
         										amplitudePositionsKey="maxAmplitudePosition" 
         										outputKey="arrivalTime"/>
         
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" 
-        							  positions="maxAmplitudePosition" 
-        							  outputKey="photonCharge"
-        							  url="file:src/main/resources/gain_sorted_20131127.csv"
-        							  rangeSearchWindow="25" 
-        							  color="#FF0F0F"/>
-        
+         
         <fact.cleaning.CoreNeighborClean photonChargeKey="photonCharge" 
         								 outputKey="cleanPixel"
         								 arrivalTimeKey="arrivalTime"

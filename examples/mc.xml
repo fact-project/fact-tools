@@ -11,11 +11,17 @@
 <fact.utils.Remapping key="Data" outputKey="Data" />
 <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" />
 <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" x="0" y="0"/>
+<fact.extraction.BasicExtraction
+        	dataKey="DataCalibrated" 
+        	outputKeyMaxAmplPos="maxAmplitudePosition"
+        	outputKeyPhotonCharge="photoncharge" 
+        	url="file:src/main/resources/defaultIntegralGains.csv"
+        	startSearchWindow="35"
+        	rangeSearchWindow="90"
+        	rangeHalfHeightWindow="25"
+        />
 
-<fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="125"/>
 <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-<fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" />
-
 
 <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
                                  corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"

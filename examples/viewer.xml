@@ -74,11 +74,14 @@
         	outputKey="DataCalibrated"
             badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" 
         />
-        <fact.extraction.MaxAmplitudePosition 
-        	key="DataCalibrated" 
-        	searchWindowLeft="35" 
-        	searchWindowRight="95" 
-        	outputKey="maxAmplitudePosition"
+        <fact.extraction.BasicExtraction
+        	dataKey="DataCalibrated" 
+        	outputKeyMaxAmplPos="maxAmplitudePosition"
+        	outputKeyPhotonCharge="photoncharge" 
+        	url="file:${integralGainFile}"
+        	startSearchWindow="35"
+        	rangeSearchWindow="60"
+        	rangeHalfHeightWindow="25"
         />
         <fact.extraction.RisingEdgeForPositions 
         	dataKey="DataCalibrated" 
@@ -92,13 +95,6 @@
         	outputKey="arrivalTimeFit" 
         	range="5" 
         	maxSlopesKey="maxSlopesFit"
-        />
-        <fact.extraction.PhotonCharge 
-        	dataKey="DataCalibrated" 
-        	positions="maxAmplitudePosition" 
-        	outputKey="photoncharge" 
-        	url="file:${integralGainFile}" 
-        	rangeSearchWindow="25" 
         />
         <fact.cleaning.CoreNeighborClean 
         	photonChargeKey="photoncharge" 

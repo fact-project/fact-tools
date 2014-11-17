@@ -26,10 +26,18 @@
 		
 		<fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-				
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition" />
+                
+        <fact.extraction.BasicExtraction
+        	dataKey="DataCalibrated" 
+        	outputKeyMaxAmplPos="maxAmplitudePosition"
+        	outputKeyPhotonCharge="photoncharge" 
+        	url="${integral_gain}"
+        	startSearchWindow="35"
+        	rangeSearchWindow="90"
+        	rangeHalfHeightWindow="25"
+        />        
+		
         <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime" />
-        <fact.extraction.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
         <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 				
