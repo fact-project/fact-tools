@@ -63,7 +63,7 @@ public class TimeOverThresholdArray implements Processor {
                 int timeOverThreshold = 0;
 
                 //Loop over slices after arrival time and sum up those above threshold
-                while (threshold <= data[slice] && slice < (pix+1)*roi ){
+                while (slice < data.length && threshold <= data[slice] && slice < (pix+1)*roi ){
                     width[slice] = 10;
                     timeOverThreshold++;
                     slice++;
