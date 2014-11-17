@@ -83,12 +83,12 @@ public class TimeGradient implements Processor {
 		}
 		catch (NoDataException exc)
 		{
-			log.warn("Not enough data points to regress the longitudinal timegradient. Putting -Double.NaN in data item");
-			slope[0] = -Double.NaN;
-			slopeErr[0] = -Double.NaN;
-			intercept[0] = -Double.NaN;
-			interceptErr[0] = -Double.NaN;
-			sumSquaredErrors[0] = -Double.NaN;
+			log.warn("Not enough data points to regress the longitudinal timegradient. Putting Double.NaN in data item");
+			slope[0] = Double.NaN;
+			slopeErr[0] = Double.NaN;
+			intercept[0] = Double.NaN;
+			interceptErr[0] = Double.NaN;
+			sumSquaredErrors[0] = Double.NaN;
 		}
 		
 		try
@@ -102,12 +102,12 @@ public class TimeGradient implements Processor {
 		}
 		catch (NoDataException exc)
 		{
-			log.warn("Not enough data points to regress the transversal timegradient. Putting -Double.NaN in data item");
-			slope[0] = -Double.NaN;
-			slopeErr[0] = -Double.NaN;
-			intercept[0] = -Double.NaN;
-			interceptErr[0] = -Double.NaN;
-			sumSquaredErrors[0] = -Double.NaN;
+			log.warn("Not enough data points to regress the transversal timegradient. Putting Double.NaN in data item");
+			slope[0] = Double.NaN;
+			slopeErr[0] = Double.NaN;
+			intercept[0] = Double.NaN;
+			interceptErr[0] = Double.NaN;
+			sumSquaredErrors[0] = Double.NaN;
 		}
 		
 		input.put(outputKeySlope, slope);
