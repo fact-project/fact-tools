@@ -82,9 +82,9 @@ public class BasicExtraction implements Processor {
 		return input;
 	}	
 	
-	protected int calculateMaxPosition(int px, int start, int rightBorder, int roi, double[] data) {
+	public int calculateMaxPosition(int px, int start, int rightBorder, int roi, double[] data) {
 		int maxPos = start;
-		double tempMax = Double.MIN_VALUE;
+		double tempMax = -Double.MAX_VALUE;
 		for (int sl = start ; sl < rightBorder ; sl++)
 		{
 			int pos = px * roi + sl;
@@ -108,7 +108,7 @@ public class BasicExtraction implements Processor {
 	 * @param data
 	 * @return
 	 */
-	protected int calculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data) {
+	public int calculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data) {
 		int slice = maxPos;
 		double maxHalf = data[px*roi+maxPos] / 2.0;
 		for (; slice > leftBorder ; slice--)
@@ -122,7 +122,7 @@ public class BasicExtraction implements Processor {
 		return slice;
 	}
 	
-	protected double calculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
+	public double calculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
 		double integral = 0;
 		for (int sl = startingPosition ; sl < startingPosition + integralSize ; sl++)
 		{
@@ -132,7 +132,7 @@ public class BasicExtraction implements Processor {
 		return integral;
 	}
 	
-	protected void checkWindow(int start, int size, int validLeft, int validRight)
+	public void checkWindow(int start, int size, int validLeft, int validRight)
 	{	
 		if (size < 0)
 		{
@@ -150,7 +150,7 @@ public class BasicExtraction implements Processor {
 		}	
 	}
 	
-	protected int[] getValidWindow(int start, int size, int validLeft, int validRight)
+	public int[] getValidWindow(int start, int size, int validLeft, int validRight)
 	{
 		if (size < 0)
 		{
@@ -176,7 +176,7 @@ public class BasicExtraction implements Processor {
 		return window;
 	}
 	
-	protected double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
+	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
 		double[] integralGains = new double[Constants.NUMBEROFPIXEL];
 		Data integralGainData = null;
 		try {
