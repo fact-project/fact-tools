@@ -134,14 +134,6 @@ public class ChargeRandSampleGivenWindow implements Processor {
         this.windowSize = windowSize;
     }
 
-    public int getIterations() {
-        return iterations;
-    }
-
-    public void setIterations(int iterations) {
-        this.iterations = iterations;
-    }
-
     public long getSeed() {
         return Seed;
     }
