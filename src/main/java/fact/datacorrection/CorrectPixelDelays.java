@@ -42,8 +42,6 @@ public class CorrectPixelDelays implements Processor {
 		for(int pix=0; pix < Constants.NUMBEROFPIXEL; pix++)
 		{
 			corrArrivalTime[pix] = arrivalTime[pix] + pixelDelay[pix];
-			log.info("Delay:" + String.valueOf(corrArrivalTime[pix]));
-			log.info("Delay:" + String.valueOf(arrivalTime[pix]));
 		}
 		
 		item.put(outputKey, corrArrivalTime);
