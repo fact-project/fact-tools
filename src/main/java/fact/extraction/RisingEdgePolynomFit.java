@@ -8,26 +8,28 @@ import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class RisingEdgePolynomFit implements Processor {
 	
+	@Parameter(required=true, description="Key to the position of the rising edges")
 	private String risingEdgeKey = null;
-	
+	@Parameter(required=true, description="Key to the data array")	
 	private String dataKey = null;
-	
-	private int range = 5;
-	
+	@Parameter(required=true, description="outputKey for the calculated arrival time")
 	private String outputKey = null;
-	
+	@Parameter(required=true, description="outputKey for the calculated slope at the arrival time")
 	private String maxSlopesKey = null;
+	
+	@Parameter(required=false, description="number of points used for the fit", defaultValue="11")
+	private int numberOfPoints = 11;
 
 	@Override
 	public Data process(Data input) {
 		Utils.mapContainsKeys(input, dataKey,risingEdgeKey,"NROI");
 		
-		double[] maxDerivations = new double[Constants.NUMBEROFPIXEL];
-		double[] maxDerivationsPositions = new double[Constants.NUMBEROFPIXEL];
-		
+		double[] arrivalTimes = new double[Constants.NUMBEROFPIXEL];
+		double[] maxSlopes = new double[Constants.NUMBEROFPIXEL];
 		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 		
 		double[] data = (double[]) input.get(dataKey);
@@ -45,24 +47,32 @@ public class RisingEdgePolynomFit implements Processor {
 		for (int pix = 0 ; pix < Constants.NUMBEROFPIXEL ; pix++)
 		{
 			int pos = risingEdges[pix];
+			int[] window = Utils.getValidWindow(pos-numberOfPoints/2, numberOfPoints, 0, roi);
 			WeightedObservedPoints observations = new WeightedObservedPoints();
-			for (int sl=pos-range ; sl < pos+range+1 ; sl++)
+			for (int sl = window[0] ; sl < window[1] ; sl++)
 			{
-				if (sl < 0 || sl > roi)
-				{
-					break;
-				}
 				int slice = pix*roi + sl;
 				observations.add(sl,data[slice]);
 			}
 			double[] coeff = fitter.fit(observations.toList());
 			double[] maxDerivation = calcMaxDerivation(coeff);
-			maxDerivationsPositions[pix] = maxDerivation[0];
-			m[pix] = new IntervalMarker(maxDerivationsPositions[pix],maxDerivationsPositions[pix] + 1);
-			maxDerivations[pix] = maxDerivation[1];
+			arrivalTimes[pix] = maxDerivation[0];
+			maxSlopes[pix] = maxDerivation[1];
+			if (maxDerivation[0] < window[0])
+			{
+				arrivalTimes[pix] = (double) window[0];
+				maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix],coeff);
+			}
+			else if (maxDerivation[0] > window[1])
+			{
+				arrivalTimes[pix] = (double) window[1];
+				maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix],coeff);
+			}
+			
+			m[pix] = new IntervalMarker(arrivalTimes[pix],arrivalTimes[pix] + 1);
 		}
-		input.put(outputKey, maxDerivationsPositions);
-		input.put(maxSlopesKey, maxDerivations);
+		input.put(outputKey, arrivalTimes);
+		input.put(maxSlopesKey, maxSlopes);
 		input.put(outputKey + "Marker", m);
 		
 		return input;
@@ -74,6 +84,14 @@ public class RisingEdgePolynomFit implements Processor {
 		double[] result = new double[2];
 		result[0] = -c[2]/(3*c[3]);
 		result[1] = -c[2]*c[2]/(3*c[3])+c[1];
+		return result;
+	}
+	
+	// ax^3 + bx^2 + cx + d
+	// d: c[0] ; c:c[1] ; b:c[2] ; a:c[3]
+	private double calcDerivationAtPoint(double x, double[] c) {
+		double result = 0;
+		result = c[3]*x*x + c[2]*x + c[1];
 		return result;
 	}
 
@@ -93,12 +111,12 @@ public class RisingEdgePolynomFit implements Processor {
 		this.dataKey = dataKey;
 	}
 
-	public int getRange() {
-		return range;
+	public int getNumberOfPoints() {
+		return numberOfPoints;
 	}
 
-	public void setRange(int range) {
-		this.range = range;
+	public void setNumberOfPoints(int numberOfPoints) {
+		this.numberOfPoints = numberOfPoints;
 	}
 
 	public String getOutputKey() {
