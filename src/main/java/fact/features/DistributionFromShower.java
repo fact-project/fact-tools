@@ -14,6 +14,19 @@ import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 
+//input.put(outputKey, dist);
+//input.put("varianceLong", varianceLong);
+//input.put("varianceTrans", varianceTrans);
+//input.put("M3Long", m3Long);
+//input.put("M3Trans", m3Trans);
+//input.put("M4Long", m4Long);
+//input.put("M4Trans", m4Trans);
+//input.put("COGx", cog[0]);
+//input.put("COGy", cog[1]);
+//input.put("Length", length);
+//input.put("Width", width);
+//input.put("Delta", delta);
+
 public class DistributionFromShower implements Processor {
 
 	@Parameter(required = true)
@@ -25,6 +38,24 @@ public class DistributionFromShower implements Processor {
 	// the in and outputkeys
 	@Parameter(required = true)
 	private String outputKey = null;
+	@Parameter(required = false, defaultValue="M3Long")
+	private String m3longKey = "M3Long";
+	@Parameter(required = false, defaultValue="M3Trans")
+	private String m3transKey = "M3Trans";
+	@Parameter(required = false, defaultValue="M4Long")
+	private String m4longKey = "M4Long";
+	@Parameter(required = false, defaultValue="M4Trans")
+	private String m4transKey = "M4Trans";
+	@Parameter(required = false, defaultValue="COGx")
+	private String cogxKey = "COGx";
+	@Parameter(required = false, defaultValue="COGy")
+	private String cogyKey = "COGy";
+	@Parameter(required = false, defaultValue="Length")
+	private String lengthKey = "Length";
+	@Parameter(required = false, defaultValue="Width")
+	private String widthKey = "Width";
+	@Parameter(required = false, defaultValue="Delta")
+	private String deltaKey = "Delta";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -147,15 +178,15 @@ public class DistributionFromShower implements Processor {
 		input.put(outputKey, dist);
 		input.put("varianceLong", varianceLong);
 		input.put("varianceTrans", varianceTrans);
-		input.put("M3Long", m3Long);
-		input.put("M3Trans", m3Trans);
-		input.put("M4Long", m4Long);
-		input.put("M4Trans", m4Trans);
-		input.put("COGx", cog[0]);
-		input.put("COGy", cog[1]);
-		input.put("Length", length);
-		input.put("Width", width);
-		input.put("Delta", delta);
+		input.put(m3longKey, m3Long);
+		input.put(m3transKey, m3Trans);
+		input.put(m4longKey, m4Long);
+		input.put(m4transKey, m4Trans);
+		input.put(cogxKey, cog[0]);
+		input.put(cogyKey, cog[1]);
+		input.put(lengthKey, length);
+		input.put(widthKey, width);
+		input.put(deltaKey, delta);
 
 		// double[][] rot = { {Math.cos(delta), -Math.sin(delta)},
 		// {Math.sin(delta),Math.cos(delta) }

@@ -3,8 +3,10 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -17,6 +19,11 @@ public class M3Long implements Processor {
     @Parameter(required = true, description = "The key to the showerPixel. " +
             "That is some sort of int[] containing pixel chids.")
     private  String showerKey =  null;
+    
+    @Parameter(required = false, defaultValue="m3l")
+	private String m3lKey = "m3l";
+    @Parameter(required = false, defaultValue="m3t")
+	private String m3tKey = "m3t";
 
     @Parameter(required = true)
     private String distribution =  null;
@@ -58,8 +65,8 @@ public Data process(Data input) {
 
 
 
-    input.put("m3l",Math.cbrt(m3l));
-    input.put("m3t",Math.cbrt(m3t));
+    input.put(m3lKey,Math.cbrt(m3l));
+    input.put(m3tKey,Math.cbrt(m3t));
 
 	return input;
 }
