@@ -1,7 +1,5 @@
 package fact.extraction;
 
-import javassist.bytecode.analysis.Util;
-
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.jfree.chart.plot.IntervalMarker;
@@ -25,7 +23,7 @@ public class RisingEdgeFitForPositions implements Processor {
 	@Parameter(required=true, description="outputKey for the calculated slope at the arrival time")
 	private String maxSlopesKey=null;
 	@Parameter(required=false, description="number of points in front of the position which are used to fit the rising edge",defaultValue = "11")
-	private int range = 11;
+	private int numberOfPoints = 11;
 
 	@Override
 	public Data process(Data input) {
@@ -45,7 +43,7 @@ public class RisingEdgeFitForPositions implements Processor {
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
 			WeightedObservedPoints observations = new WeightedObservedPoints();
-			int[] window = Utils.getValidWindow(positions[px]-1-range, range, 0, roi);
+			int[] window = Utils.getValidWindow(positions[px]-1-numberOfPoints, numberOfPoints, 0, roi);
 			for (int slice = window[0] ; slice <= window[1] ; slice++)
 			{
 				int pos = px * roi + slice;
@@ -89,6 +87,46 @@ public class RisingEdgeFitForPositions implements Processor {
 		double result = 0;
 		result = c[3]*x*x + c[2]*x + c[1];
 		return result;
+	}
+
+	public String getDataKey() {
+		return dataKey;
+	}
+
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
+	}
+
+	public String getPositionsKey() {
+		return positionsKey;
+	}
+
+	public void setPositionsKey(String positionsKey) {
+		this.positionsKey = positionsKey;
+	}
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+	public String getMaxSlopesKey() {
+		return maxSlopesKey;
+	}
+
+	public void setMaxSlopesKey(String maxSlopesKey) {
+		this.maxSlopesKey = maxSlopesKey;
+	}
+
+	public int getNumberOfPoints() {
+		return numberOfPoints;
+	}
+
+	public void setNumberOfPoints(int numberOfPoints) {
+		this.numberOfPoints = numberOfPoints;
 	}
 
 }
