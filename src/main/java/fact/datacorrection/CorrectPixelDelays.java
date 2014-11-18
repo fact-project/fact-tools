@@ -38,7 +38,7 @@ public class CorrectPixelDelays implements Processor {
 		loadPixelDelayFile(url);
 		
 		double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
-		double[] corrArrivalTime = new double[1440];
+		double[] corrArrivalTime = new double[Constants.NUMBEROFPIXEL];
 		for(int pix=0; pix < Constants.NUMBEROFPIXEL; pix++)
 		{
 			corrArrivalTime[pix] = arrivalTime[pix] + pixelDelay[pix];
@@ -58,11 +58,11 @@ public class CorrectPixelDelays implements Processor {
 			CsvStream stream = new CsvStream(inputUrl, " ");
 			stream.setHeader(false);
 			stream.init();
-			pixelDelayData = stream.readNext();
 
 			for (int i = 0; i < Constants.NUMBEROFPIXEL; i++)
 			{
-				String key = "column:" + (i);
+				pixelDelayData = stream.readNext();
+				String key = "column:0";
 				Double Delay = (Double) pixelDelayData.get(key);
 				this.pixelDelay[i] = Delay;
 			}
