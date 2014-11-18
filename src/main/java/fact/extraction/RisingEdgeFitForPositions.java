@@ -1,5 +1,7 @@
 package fact.extraction;
 
+import javassist.bytecode.analysis.Util;
+
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.jfree.chart.plot.IntervalMarker;
@@ -43,14 +45,8 @@ public class RisingEdgeFitForPositions implements Processor {
 		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
 		{
 			WeightedObservedPoints observations = new WeightedObservedPoints();
-			int stoppSlice = positions[px]-1;
-			int startSlice = stoppSlice - range;
-			if (startSlice <= 0)
-			{
-				log.warn("Startslice for the polynom fit for positions is below 0! pixel: " + px + " startSlice: " + startSlice + " stoppSlice: " + stoppSlice);
-				startSlice = 0;
-			}
-			for (int slice = startSlice ; slice <= stoppSlice ; slice++)
+			int[] window = Utils.getValidWindow(positions[px]-1-range, range, 0, roi);
+			for (int slice = window[0] ; slice <= window[1] ; slice++)
 			{
 				int pos = px * roi + slice;
 				observations.add(slice, data[pos]);
@@ -59,14 +55,14 @@ public class RisingEdgeFitForPositions implements Processor {
 			double[] maxDerivation = calcMaxDerivation(coeff);
 			arrivalTimes[px] = maxDerivation[0];
 			maxSlopes[px] = maxDerivation[1];
-			if (maxDerivation[0] < startSlice)
+			if (maxDerivation[0] < window[0])
 			{
-				arrivalTimes[px] = (double) startSlice;
+				arrivalTimes[px] = (double) window[0];
 				maxSlopes[px] = calcDerivationAtPoint(arrivalTimes[px],coeff);
 			}
-			else if (maxDerivation[0] > stoppSlice)
+			else if (maxDerivation[0] > window[1])
 			{
-				arrivalTimes[px] = (double) stoppSlice;
+				arrivalTimes[px] = (double) window[1];
 				maxSlopes[px] = calcDerivationAtPoint(arrivalTimes[px],coeff);
 			}
 			m[px] = new IntervalMarker(arrivalTimes[px],arrivalTimes[px] + 1);
