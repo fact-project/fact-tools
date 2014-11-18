@@ -347,7 +347,24 @@ public class Utils {
 		{
 			throw new RuntimeException("Size for window < 0! size: "+ size);
 		}
+		if (validLeft > validRight)
+		{
+			throw new RuntimeException("validLeft > validRight! validLeft: "+ validLeft + " validRight: " + validRight);
+		}
 		int[] window = {start,start+size};
+		
+		if (start > validRight)
+		{
+			window[0] = validRight;
+			window[1] = validRight;
+			return window;
+		}
+		if (start+size < validLeft)
+		{
+			window[0] = validLeft;
+			window[1] = validLeft;
+			return window;
+		}
 		if (start < validLeft)
 		{
 			window[0] = validLeft;
@@ -355,10 +372,6 @@ public class Utils {
 		if (start+size > validRight)
 		{
 			window[1] = validRight;
-		}
-		if (window[1] < window[0])
-		{
-			window[1] = window[0];
 		}
 		return window;
 	}
