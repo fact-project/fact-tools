@@ -1,14 +1,14 @@
 <container>
-
+    <property name="fhgfs" 		value="/net/phido/fhgfs" />
+    <property name="infile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_045.fits.gz" />
+    <property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_040.drs.fits.gz" />
     <!-- Pfade zu den fits files. -->
     <!-- testDataFile: 20130102_060 -->
-    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
-    <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
-    <property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
-    <property name="drivefile" value="src/test/resources/testDriveFile.fits" />
+    <!--<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />-->
+    <!--<property name="drivefile" value="src/test/resources/testDriveFile.fits" />-->
     <!-- <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" /> -->
     <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
-    <property name="outfile" value="/home/fabian/testoutfile.csv" />
+    <property name="outfile" value="/home/jbuss/testoutfile.csv" />
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="5.0" />
     <property name="neighbor_threshold" value="2.0"/>
@@ -26,8 +26,8 @@
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" />  
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
-        <fact.filter.DrsTimeCalibration url="file:${drstimefile}" drsTimeKey="SamplingTimeDeviation" outputKey="timeCalibConst"/>
-        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />
+        <!--<fact.filter.DrsTimeCalibration url="file:${drstimefile}" drsTimeKey="SamplingTimeDeviation" outputKey="timeCalibConst"/>-->
+        <!--<fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />-->
 
         <!--<fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"-->
                 <!--badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />-->
@@ -40,7 +40,9 @@
 
             <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
         <!---->
-			<fact.io.PrintKeysOnConsole                    keys="NIGHT,RUNID,EventNum,UnixTimeUTC,pointingAz_nominal,pointingZd_nominal,pointingAz_calc,pointingZd_calc,sourcePositionAz_calc,sourcePositionZd_calc,numPixelInShower,photonchargeMean,arrivalTimeMean,phChargeShower_mean,phChargeShower_max,phChargeShower_min,phChargeShower_kurtosis,phChargeShower_variance,phChargeShower_skewness,arrTimeShower_mean,arrTimeShower_max,arrTimeShower_min,arrTimeShower_kurtosis,arrTimeShower_variance,arrTimeShower_skewness,maxSlopesShower_mean,maxSlopesShower_max,maxSlopesShower_min,maxSlopesShower_kurtosis,maxSlopesShower_variance,maxSlopesShower_skewness,arrTimeFitShower_mean,arrTimeFitShower_max,arrTimeFitShower_min,arrTimeFitShower_kurtosis,arrTimeFitShower_variance,arrTimeFitShower_skewness,maxSlopesFitShower_mean,maxSlopesFitShower_max,maxSlopesFitShower_min,maxSlopesFitShower_kurtosis,maxSlopesFitShower_variance,maxSlopesFitShower_skewness,maxAmplPosShower_mean,maxAmplPosShower_max,maxAmplPosShower_min,maxAmplPosShower_kurtosis,maxAmplPosShower_variance,maxAmplPosShower_skewness,phChargeSaturation_mean,phChargeSaturation_max,phChargeSaturation_min,phChargeSaturation_kurtosis,phChargeSaturation_variance,phChargeSaturation_skewness,arrTimeSaturation_mean,arrTimeSaturation_max,arrTimeSaturation_min,arrTimeSaturation_kurtosis,arrTimeSaturation_variance,arrTimeSaturation_skewness,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,COGx,COGy,m3l,m3t,M3Long,M3Trans,M4Long,M4Trans,varianceLong,varianceTrans,Slope_long,Slope_trans,Slope_spread,Slope_spread_weighted,Timespread,Timespread_weighted,Disp,sourcePosition,antiSourcePosition_1,antiSourcePosition_2,antiSourcePosition_3,antiSourcePosition_4,antiSourcePosition_5,Alpha,Alpha_Off_1,Alpha_Off_2,Alpha_Off_3,Alpha_Off_4,Alpha_Off_5,Distance,Distance_Off_1,Distance_Off_2,Distance_Off_3,Distance_Off_4,Distance_Off_5,CosDeltaAlpha,CosDeltaAlpha_Off_1,CosDeltaAlpha_Off_2,CosDeltaAlpha_Off_3,CosDeltaAlpha_Off_4,CosDeltaAlpha_Off_5,Theta,Theta_Off_1,Theta_Off_2,Theta_Off_3,Theta_Off_4,Theta_Off_5,Theta_recPos,Theta_Off_1_recPos,Theta_Off_2_recPos,Theta_Off_3_recPos,Theta_Off_4_recPos,Theta_Off_5_recPos"/>
+        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="25" />
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+        <PrintData/>
 
     </process>
 
