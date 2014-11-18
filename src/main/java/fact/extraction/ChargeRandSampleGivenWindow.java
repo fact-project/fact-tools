@@ -6,9 +6,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -20,7 +18,7 @@ import java.util.Random;
  */
 public class ChargeRandSampleGivenWindow implements Processor {
     @Parameter(required = true)
-    private String dataKey = null;
+    private String key = null;
 
     @Parameter(required = true)
     private String outputKey = null;
@@ -41,10 +39,10 @@ public class ChargeRandSampleGivenWindow implements Processor {
     @Override
     public Data process(Data input) {
 
-        Utils.mapContainsKeys(input, dataKey, outputKey);
+        Utils.mapContainsKeys(input, key, outputKey);
 
         double[] data;
-        data = (double[]) input.get(dataKey);
+        data = (double[]) input.get(key);
 
         double[] chargeMean = new double[Constants.NUMBEROFPIXEL];
         double[] chargeRms  = new double[Constants.NUMBEROFPIXEL];
@@ -94,12 +92,12 @@ public class ChargeRandSampleGivenWindow implements Processor {
         return input;
     }
 
-    public String getDataKey() {
-        return dataKey;
+    public String getKey() {
+        return key;
     }
 
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getOutputKey() {
