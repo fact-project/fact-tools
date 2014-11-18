@@ -143,5 +143,21 @@ public void setShowerKey(String showerKey) {
         this.distribution = distribution;
     }
 
+	public String getM3lKey() {
+		return m3lKey;
+	}
+
+	public void setM3lKey(String m3lKey) {
+		this.m3lKey = m3lKey;
+	}
+
+	public String getM3tKey() {
+		return m3tKey;
+	}
+
+	public void setM3tKey(String m3tKey) {
+		this.m3tKey = m3tKey;
+	}
+
 
 }
