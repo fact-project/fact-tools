@@ -63,14 +63,14 @@ public class TimeGradientExtraction extends BasicExtraction {
 			int predictedSlice = (int) Math.round(predictedTime);
 						
 			int leftBorder = predictedSlice - rangeSearchWindow / 2;
-			int[] window = getValidWindow(leftBorder, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, 210);
+			int[] window = Utils.getValidWindow(leftBorder, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, 210);
 			
 			positions[px] = calculateMaxPosition(px, window[0], window[1], roi, data);
 			mPositions[px] = new IntervalMarker(positions[px],positions[px] + 1);
 			
 			int halfHeightPos = calculatePositionHalfHeight(px, positions[px],positions[px]-rangeHalfHeightWindow, roi, data);
 			
-			checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
+			Utils.checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
 			photonCharge[px] = calculateIntegral(px, halfHeightPos, integrationWindow, roi, data) / integralGains[px];
 			mPhotonCharge[px] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}

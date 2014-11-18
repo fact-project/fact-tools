@@ -61,7 +61,7 @@ public class BasicExtraction implements Processor {
 		double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
         IntervalMarker[] mPhotonCharge = new IntervalMarker[Constants.NUMBEROFPIXEL];
         
-        checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, roi);
+        Utils.checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, roi);
         
         for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow+rangeSearchWindow, roi, data);
@@ -69,7 +69,7 @@ public class BasicExtraction implements Processor {
 			
 			int halfHeightPos = calculatePositionHalfHeight(pix, positions[pix],positions[pix]-rangeHalfHeightWindow, roi, data);
 			
-			checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
+			Utils.checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
 			photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / integralGains[pix];
 			mPhotonCharge[pix] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
@@ -131,50 +131,7 @@ public class BasicExtraction implements Processor {
 		}
 		return integral;
 	}
-	
-	public void checkWindow(int start, int size, int validLeft, int validRight)
-	{	
-		if (size < 0)
-		{
-			throw new RuntimeException("Size for window < 0! size: "+ size);
-		}
-		if (start < validLeft)
-		{
-			String message = "start < validLeft. start/validLeft: " + start + "/" + validLeft;
-			throw new RuntimeException(message);
-		}
-		if (start+size > validRight)
-		{
-			String message = "start + size > validRight. start+size/validRight: " + (start+size) + "/" + validRight;
-			throw new RuntimeException(message);
-		}	
-	}
-	
-	public int[] getValidWindow(int start, int size, int validLeft, int validRight)
-	{
-		if (size < 0)
-		{
-			throw new RuntimeException("Size for window < 0! size: "+ size);
-		}
-		int[] window = {start,start+size};
-		if (start < validLeft)
-		{
-			String message = "start < validLeft. start/validLeft: " + start + "/" + validLeft;
-			log.warn(message);
-			window[0] = validLeft;
-		}
-		if (start+size > validRight)
-		{
-			String message = "start + size > validRight. start+size/validRight: " + (start+size) + "/" + validRight;
-			log.warn(message);
-			window[1] = validRight;
-		}
-		if (window[1] < window[0])
-		{
-			window[1] = window[0];
-		}
-		return window;
-	}
+
 	
 	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
 		double[] integralGains = new double[Constants.NUMBEROFPIXEL];
