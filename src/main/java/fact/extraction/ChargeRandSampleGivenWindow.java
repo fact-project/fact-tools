@@ -35,14 +35,16 @@ public class ChargeRandSampleGivenWindow implements Processor {
     @Parameter(description = "Seed of the random number generator")
     private long Seed = 5901;
 
+    // A logger
+    static Logger log = LoggerFactory.getLogger(ChargeRandSampleGivenWindow.class);
+
 
     @Override
     public Data process(Data input) {
 
-        Utils.mapContainsKeys(input, key, outputKey);
+        Utils.mapContainsKeys(input, key);
 
-        double[] data;
-        data = (double[]) input.get(key);
+        double[] data        = (double[]) input.get(key);
 
         double[] chargeMean = new double[Constants.NUMBEROFPIXEL];
         double[] chargeRms  = new double[Constants.NUMBEROFPIXEL];
