@@ -40,8 +40,9 @@
 
             <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
         <!---->
-        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="25" />
+        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="50" skipLast="100" windowSize="25" />
         <!--<fact.ShowViewer key="DataCalibrated"/>-->
+        <fact.io.JSONWriter url="file:${outfile}" keys="Nsb,Nsb_mean,Nsb_rms"/>
         <PrintData/>
 
     </process>
