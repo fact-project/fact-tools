@@ -3,6 +3,8 @@ package fact.extraction;
 import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -55,39 +57,49 @@ public class ChargeRandSampleGivenWindow implements Processor {
 
         int bound = roi - skipLast - skipFirst;
         int iterations = bound/windowSize;
+        log.info("Iterations: " + iterations );
 
-        int[][] sum = new int[Constants.NUMBEROFPIXEL][iterations];
+        double[][] charge = new double[Constants.NUMBEROFPIXEL][iterations];
 
+        //Loop over all pixel and calculate integrals on timeline
         for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+            int firstStartSlice = skipFirst + rand.nextInt(bound);
+            int startSlice = firstStartSlice;
 
-            int firstSlice = skipFirst + rand.nextInt(bound);
-            int startSlice = firstSlice;
+            double[] integral = new double[iterations];
 
-
+            //loop over windows on time line
             for (int i = 0; i < iterations; i++ ){
 
-                for (int sl = startSlice ; sl > startSlice + windowSize; sl++) {
+                integral[i] = 0.;
+
+                //loop over slices for a given window and integrate slice's amplitudes
+                for (int sl = startSlice ; sl < startSlice + windowSize; sl++) {
                     int pos = pix*roi;
 
-                    if (sl < roi - skipLast){
+                    // Check if current slices is within the time line's boundaries
+                    if (sl < roi - skipLast) {
                         pos += sl;
                     }
                     else{
+                        //start at the time lines beginning if slice is beyond boundaries
                         pos += skipFirst + sl - (roi - skipLast);
                     }
+                    integral[i] += data[pos];
 
-                    sum[pix][i] += data[pos];
                 }
                 startSlice += windowSize;
             }
+            charge[pix] = integral;
 
-            DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.intToDoubleArray(sum[pix]));
-
+            DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
             chargeMean[pix]  = descriptiveStatistics.getMean();
             chargeRms[pix]   = descriptiveStatistics.getStandardDeviation();
+
+
         }
 
-        input.put(outputKey, sum);
+        input.put(outputKey, charge);
         input.put(outputKey+"_mean", chargeMean);
         input.put(outputKey+"_rms", chargeRms);
 
