@@ -71,7 +71,7 @@ public class MaxAmplitudePosition implements Processor {
     public int findMaximumPosition(int pix, int roi, double[] data){
         //the first value we find is the current maximum
         double tempMaxValue = data[pix*roi+searchWindowLeft];
-        int position = 0;
+        int position = searchWindowLeft;
         //iterate over all slices
         for (int slice = searchWindowLeft; slice < searchWindowRight; slice++) {
             int pos = pix * roi + slice;
