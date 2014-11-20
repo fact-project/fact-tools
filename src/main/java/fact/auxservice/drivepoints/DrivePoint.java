@@ -8,7 +8,7 @@ import stream.Data;
  * A TrackingPoint contains all the information from the telescopes drive at on specific point in time.
  * We introduce an artificial order on TrackingPoints by comparing the 'time' attribute of two tracking points to
  * each other using the canonical definition of 'earlier' and 'later'
- * All angles in a tracking point are given in degrees.
+ * All angles in a drivepoint are given in degrees.
  * The time is given as JulianDay
  *
  * Created by kaibrugge on 06.10.14.
@@ -36,6 +36,11 @@ public abstract class DrivePoint implements Comparable<Double>{
         return Math.abs(time - t);
     }
 
+    /**
+     * All timestamps below 1.1.2000 are unsupported. They are special values written by the DAQ system.
+     *
+     * @param time
+     */
     public void setTime(double time){
         this.time =	time;
         if (time <= 2451544.5){

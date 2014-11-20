@@ -26,6 +26,7 @@ import java.util.Date;
  *  The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
  *
  *  TODO: Plot deviation between calculated and written Az and Zd for files in whitelist
+ *  TODO: handle ceta tauri and similar cases.
  *  TODO: compare sourcepositions with ganymed
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
@@ -151,7 +152,7 @@ public class SourcePosition implements StatefulProcessor {
                 trackingManager = auxService.getTrackingPointManager(currentFile);
                 sourceManager = auxService.getSourcePointManager(currentFile);
             }
-
+            //TODO check this.
             int timestamp = (int) ((eventTime[0]) + (eventTime[1]) / 1000000.0);
             //convert unixtime to julianday
             double julianDay = unixTimeToJulianDay(timestamp);

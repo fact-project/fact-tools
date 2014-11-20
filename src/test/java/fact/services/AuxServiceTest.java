@@ -15,6 +15,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class AuxServiceTest {
 
+    /**
+     * We expect a FileNotFoundException when the folder to the datestring does not exist
+     * @throws Exception
+     */
     @Test(expected = FileNotFoundException.class)
     public void testWrongFolder() throws Exception {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
@@ -25,7 +29,11 @@ public class AuxServiceTest {
         HashMap<String, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u), dateString);
     }
 
-
+    /**
+     * Tests what happens when the folder to the datestring exists but the files in that folder
+     * don't have the right datestring. We expect an empty map in response.
+     * @throws Exception
+     */
     @Test
     public void testWrongFilename() throws Exception {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");

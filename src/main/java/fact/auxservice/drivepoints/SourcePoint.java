@@ -3,10 +3,12 @@ package fact.auxservice.drivepoints;
 import stream.Data;
 
 /**
- * The sourcePoint contains all information provided by the DRIVE_SOURCE_POSITION aux files.
+ * The sourcePoint contains all information provided by a row in the DRIVE_SOURCE_POSITION aux files.
  * Created by kaibrugge on 06.10.14.
  */
 public class SourcePoint extends DrivePoint {
+
+    //the name of the source. E.g Crab, Mrk501 etc.
     public String name = "";
 
     public double raSrc;
@@ -38,7 +40,6 @@ public class SourcePoint extends DrivePoint {
             wobbleAngle = Double.parseDouble(item.get("Angle").toString());
 
             name = item.get("Name").toString();
-//            System.out.println(this);
 
         } catch (NumberFormatException e){
             log.error("Could not parse doubles in file");

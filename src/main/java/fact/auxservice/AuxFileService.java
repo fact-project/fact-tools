@@ -21,18 +21,27 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 
 /**
- * This service should provide some data from the auxilary files for a given data file.
+ * This service should provide some data from the auxiliary files for a given data file.
+ * Given the path to the aux folder via .xml and a data file this service will find and store the urls to the
+ * corresponding auxiliary files.
  *
- * Each datafile can have a different aux file. Given the data file we can request a PointManager for the corresponding
- * aux file.
- * A point manager can return rows from the aux file..
+ * The urls are stored in a map that returns the url provided the **name** of the file. The name is defined to be
+ * the substring of the filename that does not contain the extension (.fits) or the datestring. Valid names are:
+ *
+ *  * DRIVE_CONTROL_TRACKING_POSITION
+ *  * DRIVE_CONTROL_SOURCE_POSITION
+ *  * TEMPERATURE_MESSAGE
+ *  * TNG_WEATHER_DUST
+ *  * etc...
+ *
+ * A processor can  request a DrivePointManager from the service.
+ *
  * Created by kaibrugge on 07.10.14.
  */
 public class AuxFileService implements Service {
 
     Logger log = LoggerFactory.getLogger(AuxFileService.class);
 
-    DrivePointManager<TrackingPoint> trackingPointManager = new DrivePointManager();
 
     File currentlyMappedDataFile = new File("");
     HashMap<String, SourceURL> auxFileMap =  new HashMap<>() ;
@@ -40,18 +49,24 @@ public class AuxFileService implements Service {
     @Parameter(required = false, description = "The path to the folder containing the auxilary fits files. " +
             "This folder should contain the usual folder structure: year/month/day/<aux_files>")
     SourceURL auxFolder;
-    @Parameter(required = false, description = "The path to the DRIVE_CONTROL_TRACKING_POSITION file.")
-    SourceURL trackingFile;
-    @Parameter(required = false, description = "The path to the DRIVE_CONTROL_SOURCE_POSITION file")
-    SourceURL sourceFile;
 
+
+    /**
+     * Get the DrivePointManager for the DRIVE_CONTROL_TRACKING_POSITION file.
+     * @param dataFile The .fits data file that stream is currently working on.
+     * @return The DrivePointManager containing the data from the DRIVE_CONTROL_TRACKING_POSITION file.
+     */
     public synchronized DrivePointManager<TrackingPoint> getTrackingPointManager(File dataFile){
         DrivePointManager<TrackingPoint> dM = (DrivePointManager<TrackingPoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_TRACKING_POSITION", new DrivePointFactory<>(TrackingPoint.class));
         return dM;
     }
 
+    /**
+     * Get the DrivePointManager for the DRIVE_CONTROL_SOURCE_POSITION file.
+     * @param dataFile The .fits data file that stream is currently working on.
+     * @return The DrivePointManager containing the data from the DRIVE_CONTROL_SOURCE_POSITION file.
+     */
     public synchronized DrivePointManager<SourcePoint> getSourcePointManager(File dataFile){
-//        setNewFilePath(dataFile);
         DrivePointManager<SourcePoint> dM = (DrivePointManager<SourcePoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_SOURCE_POSITION", new DrivePointFactory<>(SourcePoint.class));
         return dM;
     }
@@ -82,7 +97,8 @@ public class AuxFileService implements Service {
     }
 
     /**
-     * Goes to the folder provided by auxfolder. Then uses the datestring to select the right year, month and day
+     * Goes to the folder provided by auxfolder. Then uses the datestring to select the right year, month and day for
+     * subfolders.
      * @param auxFolder
      * @return
      * @throws java.io.FileNotFoundException
@@ -148,14 +164,6 @@ public class AuxFileService implements Service {
 
     @Override
     public void reset() throws Exception {
-    }
-
-    public void setTrackingFile(SourceURL trackingFile) {
-        this.trackingFile = trackingFile;
-    }
-
-    public void setSourceFile(SourceURL sourceFile) {
-        this.sourceFile = sourceFile;
     }
 
     public void setAuxFolder(SourceURL auxFolder) {
