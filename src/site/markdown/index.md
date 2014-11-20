@@ -1,5 +1,4 @@
-FACT Tools
-----------
+#FACT Tools
 
 The fact-tools are a set of Java classes that provide an extension
 to the <a href="http://www.jwall.org/streams">streams</a> framework
@@ -11,15 +10,16 @@ The [FACT (First G-APD Cherenkov Telescope)](https://www.fact-project.org/) Tele
 Island of La Palma at the Observatorio del Roque de los Muchachos. It was put into operation in 2011 
 and has been watching various gamma ray sources since then.  
 
-####GUI
+##GUI
 One of the central components of the *fact-tools* is the [FACT viewer](viewer.html) application. This tool provides a simple
 interactive visualization component for FACT data.
 
-####Programming
+##Programming
 For a quick overview for creating your own custom processors see the [Programming Section](programming_examples/programming_example.html)
 
 
-####Downloading 
+##Downloading
 You can download the latest FACT tools binary build from the stable branch in the [Downloads section](download.html)
 
 ![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)
+
