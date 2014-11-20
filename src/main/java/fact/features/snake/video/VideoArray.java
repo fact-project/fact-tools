@@ -96,7 +96,22 @@ public class VideoArray implements Processor
 			sr1.addData(i / 2.0, data[i]);
 			
 		}
-		for(int i = maxNum; i < diff.length; i++)
+		
+		int nmbrPara1 = sr1.regress().getNumberOfParameters();
+		int nmbrPara2 = sr2.regress().getNumberOfParameters();
+		
+		//System.out.println("Anzahl an Parametern: " + nmbrPara1 + ", " + nmbrPara2);
+		
+		
+		
+		
+		
+		double slope1=0;
+		int slopeCount1=0;
+		double slope2=0;
+		int slopeCount2=0;
+		
+		for(int i=0; i<=maxNum; i++)
 		{
 			sr2.addData(i / 2.0, data[i]);
 		}
