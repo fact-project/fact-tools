@@ -139,7 +139,7 @@ public class VideoArray implements Processor
 		int nmbrPara1 = sr1.regress().getNumberOfParameters();
 		int nmbrPara2 = sr2.regress().getNumberOfParameters();
 		
-		System.out.println("Anzahl an Parametern: " + nmbrPara1 + ", " + nmbrPara2);
+		//System.out.println("Anzahl an Parametern: " + nmbrPara1 + ", " + nmbrPara2);
 		
 		
 		
