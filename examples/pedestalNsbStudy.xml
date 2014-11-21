@@ -1,20 +1,15 @@
 <container>
-    <property name="fhgfs" 		value="/net/phido/fhgfs" />
-    <property name="infile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_045.fits.gz" />
-    <property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_040.drs.fits.gz" />
+    <property name="fhgfs" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
+    <property name="infile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_089.fits.gz" />
+    <property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_112.drs.fits.gz" />
     <!-- Pfade zu den fits files. -->
     <!-- testDataFile: 20130102_060 -->
     <!--<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />-->
     <!--<property name="drivefile" value="src/test/resources/testDriveFile.fits" />-->
     <!-- <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" /> -->
     <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
-    <property name="outfile" value="/home/jbuss/testoutfile.csv" />
+    <property name="outfile" value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/testoutfile.csv" />
     <property name="sourcename" value="crab" />
-    <property name="core_threshold" value="5.0" />
-    <property name="neighbor_threshold" value="2.0"/>
-    <property name="time_threshold" value="30.0" />
-    <property name="min_number_of_pixel" value="2" />
-
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
@@ -24,25 +19,48 @@
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="20"/>
         <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" />  
-        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
+        <!--<fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />-->
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
         <!--<fact.filter.DrsTimeCalibration url="file:${drstimefile}" drsTimeKey="SamplingTimeDeviation" outputKey="timeCalibConst"/>-->
         <!--<fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />-->
 
-        <!--<fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"-->
-                <!--badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />-->
+        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
         <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="35" searchWindowRight="95" outputKey="maxAmplitudePosition"/>
         <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime" maxSlopesKey="maxSlopes"/>
         <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTime" outputKey="arrivalTimeFit" range="5" maxSlopesKey="maxSlopesFit"/>
         <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:${integralGainFile}" rangeSearchWindow="25" />
+
+        <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmothed" length="5" />
+        <fact.statistics.TimerowFeatures dataKey="DataCalibrated" movingAverageKey="DataSmothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
        
 
             <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
         <!---->
-        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="50" skipLast="100" windowSize="25" />
+        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
+
+        <fact.utils.SelectValueByChid key="Nsb_rms" chid="286" outputKey="Nsb_rms_1" />
+        <fact.plotter.HistogramPlotter key="Nsb_rms_1" binWidth="1" logAxis="true" color="#666699" />
+
+        <fact.utils.SelectValueByChid key="Nsb_mean" chid="286" outputKey="Nsb_mean_1" />
+        <fact.plotter.HistogramPlotter key="Nsb_mean_1" binWidth="1" logAxis="true" color="#666699" />
+
+        <fact.utils.SelectArrayByChid key="Nsb" chid="286" outputKey="Nsb_1" />
+
+        <fact.plotter.HistogramArrayPlotter key="Nsb_1" binWidth="1" logAxis="true" color="#666699" />
+        <fact.plotter.HistogramArrayPlotter key="Nsb_rms" binWidth="1" logAxis="true" color="#666699" />
+        <fact.plotter.HistogramArrayPlotter key="Nsb_mean" binWidth="1" logAxis="true" color="#666699" />
+        <fact.plotter.HistogramArrayPlotter key="photoncharge" binWidth="1" logAxis="true" color="#666699" />
+
+        <fact.utils.SelectValueByChid key="voltages_mean" chid="286" outputKey="voltages_mean_1" />
+        <fact.plotter.HistogramPlotter key="voltages_mean_1" binWidth="1" logAxis="true" color="#666699" />
+
+
         <!--<fact.ShowViewer key="DataCalibrated"/>-->
-        <fact.io.JSONWriter url="file:${outfile}" keys="Nsb,Nsb_mean,Nsb_rms"/>
+        <!--<fact.io.JSONWriter url="file:${outfile}" keys="Nsb,Nsb_mean,Nsb_rms"/>-->
+
+
         <PrintData/>
 
     </process>
