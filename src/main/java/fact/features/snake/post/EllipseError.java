@@ -31,7 +31,7 @@ public class EllipseError implements Processor
 	@Parameter(required = true, description = "Input: SnakeY")
 	private String snakeY = null;
 	
-	@Parameter(required = true, description = "Output: Abweichung von der Ellipse für jede Stützstelle")
+	@Parameter(required = true, description = "Output: Abweichung von der Ellipse fuer jede Stuetzstelle")
 	private String outputKey = null;
 	
 	@Override

@@ -73,7 +73,7 @@ public class SourcePositionTest {
 		
 		double[] r = sourcePosition.getSourcePosition(azPointing, zdPointing, azSource, zdSource);
 		
-		assertTrue("Calculated position for source in (zd=0.6°,az=0.0) for pointing in(zd=0.0°,az=0.0) is wrong\n"
+		assertTrue("Calculated position for source in (zd=0.6 degree ,az=0.0) for pointing in(zd=0.0 degree,az=0.0) is wrong\n"
 				+ "Calculated position: ("+r[0]+","+r[1]+")\n"
 				+ "sought position: (51.20983219603325,-0.0)", (Math.abs(r[0]-51.20983219603325)<1E-14 && Math.abs(r[1]-0.0)<1E-14));		
 	}

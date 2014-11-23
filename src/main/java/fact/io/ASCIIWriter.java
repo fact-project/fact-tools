@@ -1,25 +1,18 @@
-package fact.io;
+/*package fact.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 import java.util.zip.GZIPOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.ProcessContext;
@@ -27,7 +20,6 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.expressions.version2.Expression;
 import stream.expressions.version2.StringExpression;
-import stream.io.CsvWriter;
 
 public class ASCIIWriter implements StatefulProcessor
 {
@@ -281,4 +273,4 @@ public class ASCIIWriter implements StatefulProcessor
 		this.outputFile = outputFile;
 	}
 
-}
+}*/

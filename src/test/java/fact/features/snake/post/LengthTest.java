@@ -32,7 +32,7 @@ public class LengthTest
 
 		double erg = (Double) item.get("out");
 
-		assertTrue("Länge falsch berechnet!", erg == 8.0);
+		assertTrue("Laenge falsch berechnet!", erg == 8.0);
 
 	}
 }

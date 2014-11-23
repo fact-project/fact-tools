@@ -57,7 +57,7 @@ public class PhotonInSelection implements Processor
 		double ratioMc = sumPhoton1_Mc / sumPhoton2_Mc;
 		double ratioData = sumPhoton1_Data / sumPhoton2_Data;
 		
-		double factor = 300.0 / 2200.0;
+		final double factor = 300.0 / 2200.0;
 		
 		double ratioNoise1 = sumNoise1_Mc / sumNoise2_Mc;
 		double ratioNoise2 = sumPhoton1_Mc / (sumNoise1_Mc*factor);

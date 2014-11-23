@@ -28,7 +28,7 @@ public class CreateFakeTime implements Processor {
 		int deltaT = random.nextInt(330000);
 		boolean isValid = true;
 		
-		// Neumannsches Rückweisungsverfahren:
+		// Neumannsches Rueckweisungsverfahren:
 		while(isValid == false)
 		{
 			deltaT = random.nextInt(330000);

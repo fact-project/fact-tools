@@ -88,7 +88,7 @@ public class VideoArray implements Processor
 			return input;
 		}
 
-		SimpleRegression sr1 = new SimpleRegression();
+		/*SimpleRegression sr1 = new SimpleRegression();
 		SimpleRegression sr2 = new SimpleRegression();
 			
 		for(int i = 0; i <= maxNum; i++)
@@ -96,9 +96,13 @@ public class VideoArray implements Processor
 			sr1.addData(i / 2.0, data[i]);
 			
 		}
-		
+		for(int i=0; i<=maxNum; i++)
+		{
+			sr2.addData(i / 2.0, data[i]);
+		}
+
 		int nmbrPara1 = sr1.regress().getNumberOfParameters();
-		int nmbrPara2 = sr2.regress().getNumberOfParameters();
+		int nmbrPara2 = sr2.regress().getNumberOfParameters();*/
 		
 		//System.out.println("Anzahl an Parametern: " + nmbrPara1 + ", " + nmbrPara2);
 		
@@ -111,16 +115,6 @@ public class VideoArray implements Processor
 		double slope2=0;
 		int slopeCount2=0;
 		
-		for(int i=0; i<=maxNum; i++)
-		{
-			sr2.addData(i / 2.0, data[i]);
-		}
-
-		double slope1 = 0;
-		int slopeCount1 = 0;
-		double slope2 = 0;
-		int slopeCount2 = 0;
-
 		for(int i = 0; i <= maxNum; i++)
 		{
 			slope1 += diff[i];
@@ -149,8 +143,8 @@ public class VideoArray implements Processor
 		input.put(outkeySlope1, slope1);
 		input.put(outkeySlope2, slope2);
 		
-		input.put(outkeySlope1+"_", sr1.getSlope());
-		input.put(outkeySlope2+"_", sr2.getSlope());
+	//	input.put(outkeySlope1+"_", sr1.getSlope());
+	//	input.put(outkeySlope2+"_", sr2.getSlope());
 
 		return input;
 	}

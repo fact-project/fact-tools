@@ -44,7 +44,7 @@ public class WeightedShowerCenter implements Processor
 		
 		FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();			
 		
-		for(int i=0; i<show.length; i++)		// +500 Verschieben der Gewichte in den ausschließlich positiven Bereich
+		for(int i=0; i<show.length; i++)		// +500 Verschieben der Gewichte in den ausschliesslich positiven Bereich
 		{			
 			ergX += PixelMapping_.getPixelFromId(show[i]).getXPositionInMM() * (Math.abs(wei[show[i]]));
 			ergY += PixelMapping_.getPixelFromId(show[i]).getYPositionInMM() * (Math.abs(wei[show[i]]));			
