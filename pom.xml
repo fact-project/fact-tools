@@ -38,6 +38,13 @@
 			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<name>Jens Buss</name>
+			<email>jens.buss@tu-dortmund.de</email>
+			<organization>Physik E5b, TU-Dortmund</organization>
+			<organizationUrl>http://app.physik.uni-dortmund.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<scm>

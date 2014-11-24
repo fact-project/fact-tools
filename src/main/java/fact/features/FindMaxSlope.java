@@ -53,12 +53,9 @@ public class FindMaxSlope implements Processor {
             result[i] = 0;
         }
 
-        ArrayList[] pulseSlopes = new ArrayList[Constants.NUMBEROFPIXEL];
+        double[][] pulseSlopes = new double[Constants.NUMBEROFPIXEL][];
 
         int roi = data.length / Constants.NUMBEROFPIXEL;
-
-        double[] pulse = new double[2];
-
 
         for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 
@@ -87,7 +84,7 @@ public class FindMaxSlope implements Processor {
                 result[maxSlopePos] = slope;
 
             }
-            pulseSlopes[pix] = slopes;
+            pulseSlopes[pix] = Utils.arrayListToDouble(slopes);
 
         }
 
