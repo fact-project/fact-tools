@@ -448,15 +448,15 @@
             <fact.statistics.Derivation key="DataSmoothed" outputKey="slopeKey" />
         <fact.extraction.MinAmplitudeGlobal key="DataShaped" outputKey="minimas" />
 
-            <fact.features.ArrivalTimeFromSlope key="DataSmoothed" outputKey="arrivalTimes" derivationKey="slopeKey" visualizeKey="arrivalTimesVisual"
+            <fact.features.singlePulse.ArrivalTimeFromSlope key="DataSmoothed" outputKey="arrivalTimes" derivationKey="slopeKey" visualizeKey="arrivalTimesVisual"
 			baselineKey="baselines" skipFirstSlices="50" skipLastSlices="100"/>
-            <fact.features.FindMaxSlope key="DataShaped" derivationKey="slopeKey" outputKey="maxSlopes" outputKeyVisualization="maxSlopePos"
+            <fact.features.singlePulse.FindMaxSlope key="DataShaped" derivationKey="slopeKey" outputKey="maxSlopes" outputKeyVisualization="maxSlopePos"
                                         arrivalTimeKey="arrivalTimes" maxSearchSlice="30" numFitSlices="8"/>
-            <fact.features.OpenShutterPulseSize key="DataSmoothed" outputKey="pulseIntegrals" arrivalTimeKey="arrivalTimes" baselineKey="baselines" width="30" />
+            <fact.features.singlePulse.OpenShutterPulseSize key="DataSmoothed" outputKey="pulseIntegrals" arrivalTimeKey="arrivalTimes" baselineKey="baselines" width="30" />
 
-        <fact.features.PulseMaxAmplitude key="DataShaped" outputKey="maxPositions" pulsePositionKey="arrivalTimes" />
-        <fact.extraction.FWHMPulses key="DataShaped" outputKey="FWHM" visualizationKey="visFWHM" maxPosKey="maxPositions" minPosKey="minimas" />
-        <fact.extraction.TimeOverThresholdArray dataKey="DataShaped" positionsKey="arrivalTimes" outputKey="width" visualizationKey="visWidth"/>
+        <fact.features.singlePulse.PulseMaxAmplitude key="DataShaped" outputKey="maxPositions" pulsePositionKey="arrivalTimes" />
+        <fact.features.singlePulse.FWHMPulses key="DataShaped" outputKey="FWHM" visualizationKey="visFWHM" maxPosKey="maxPositions" minPosKey="minimas" />
+        <fact.features.singlePulse.TimeOverThresholdArray dataKey="DataShaped" positionsKey="arrivalTimes" outputKey="width" visualizationKey="visWidth"/>
             <!--<PrintData/>-->
             <!--<fact.plotter.HistogramPlotter key="maxSlopes" title="MaxSlopes" isLogAxis="True"/>-->
             <!--<fact.plotter.BarPlotter keys="maxSlopes" title="maxSlopes"/>-->

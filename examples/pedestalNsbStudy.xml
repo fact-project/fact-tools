@@ -42,9 +42,9 @@
 
         <fact.statistics.Derivation key="DataSmoothed" outputKey="slopeKey" />
 
-        <fact.features.ArrivalTimeFromSlope key="DataSmoothed" outputKey="arrivalTimes" derivationKey="slopeKey" visualizeKey="arrivalTimesVisual"
+        <fact.features.singlePulse.ArrivalTimeFromSlope key="DataSmoothed" outputKey="arrivalTimes" derivationKey="slopeKey" visualizeKey="arrivalTimesVisual"
                                             baselineKey="baselines" skipFirstSlices="50" skipLastSlices="100"/>
-        <fact.features.FindMaxSlope key="DataCalibrated" derivationKey="slopeKey" outputKey="maxSlopes" outputKeyVisualization="maxSlopePos"
+        <fact.features.singlePulse.FindMaxSlope key="DataCalibrated" derivationKey="slopeKey" outputKey="maxSlopes" outputKeyVisualization="maxSlopePos"
                                     arrivalTimeKey="arrivalTimes" maxSearchSlice="30" numFitSlices="8"/>
 
 
