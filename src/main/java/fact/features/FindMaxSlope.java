@@ -57,9 +57,6 @@ public class FindMaxSlope implements Processor {
 
         int roi = data.length / Constants.NUMBEROFPIXEL;
 
-        double[] pulse = new double[2];
-
-
         for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 
             int numberPulses = arrivalTimes[pix].size();
