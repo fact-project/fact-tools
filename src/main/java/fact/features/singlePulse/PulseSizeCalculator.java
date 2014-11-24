@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fact.features;
+package fact.features.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
