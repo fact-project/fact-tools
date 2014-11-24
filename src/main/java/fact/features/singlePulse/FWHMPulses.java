@@ -1,4 +1,4 @@
-package fact.extraction;
+package fact.features.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
