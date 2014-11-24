@@ -13,7 +13,7 @@ import stream.annotations.Parameter;
  */
 public class ShapeSignal implements Processor {
 
-    static Logger log = LoggerFactory.getLogger(MovingAverage.class);
+    static Logger log = LoggerFactory.getLogger(ShapeSignal.class);
 
 
     @Parameter(required = true)
