@@ -36,7 +36,7 @@ public class TimeOverThresholdArray implements Processor {
 	public Data process(Data input) {
 		
 		Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, positionsKey, ArrayList[].class);
+		Utils.isKeyValid(input, positionsKey, int[][].class);
 
         int[][] timeOverThresholdArrayList = new int[Constants.NUMBEROFPIXEL][];
 
@@ -54,7 +54,7 @@ public class TimeOverThresholdArray implements Processor {
 
             //Loop over positions in positions Array
             for (int i = 0 ; i < posArray[pix].length ; i++ ){
-                int     position    = (Integer) posArray[pix][i];
+                int     position    = posArray[pix][i];
                 int     slice       = (pix * roi) + position;
                 double  threshold   = data[slice];
 
