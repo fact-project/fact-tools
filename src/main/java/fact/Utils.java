@@ -188,6 +188,12 @@ public class Utils {
 		return ArrayUtils.toPrimitive(tempArray);
 	}
 
+	public static int[] arrayListToInt(ArrayList list){
+		Integer[] tempArray = new Integer[list.size()];
+		list.toArray(tempArray);
+		return ArrayUtils.toPrimitive(tempArray);
+	}
+
 	/**
 	 * This is a helper method which checks if all the keys provided are in the
 	 * data item. If one of the keys is not in the item a RuntimeException will
