@@ -64,10 +64,10 @@ public class ArrivalTimeFromSlope implements Processor {
         ArrayList[] baselineValues = new ArrayList[Constants.NUMBEROFPIXEL];
         	//value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
-        	//zero for all positions except where an arrival time is found
-              
+        //zero for all positions except where an arrival time is found
+
         for(int i = 0; i < data.length; i++){
-        	visualizePositions[i] = 0;
+            visualizePositions[i] = 0;
         }
                 
 		//for each pixel

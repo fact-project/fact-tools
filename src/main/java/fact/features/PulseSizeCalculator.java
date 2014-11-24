@@ -4,6 +4,7 @@
 package fact.features;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -35,6 +36,8 @@ public class PulseSizeCalculator implements Processor {
 
 	@Override
 	public Data process(Data input) {
+        Utils.mapContainsKeys(input, key, arrivalTimeKey);
+
         double[] data = (double[]) input.get(key);
         int roi = data.length / Constants.NUMBEROFPIXEL;
 		ArrayList[] arrivalTimes = (ArrayList[]) input.get(arrivalTimeKey);

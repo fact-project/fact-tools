@@ -62,8 +62,8 @@ public class OpenShutterPulseSize implements Processor {
      */
 	
     public ArrayList calculateSizes(int pix, int roi, double[] data, ArrayList[] arrivalTimes, ArrayList[] baselineValues){
-      
-		ArrayList<Integer> sizes = new ArrayList<Integer>();
+      //changed from int to double
+		ArrayList<Double> sizes = new ArrayList<Double>();
     	
         if(!arrivalTimes[pix].isEmpty()){
         	int numberPulses = arrivalTimes[pix].size(); 
@@ -75,7 +75,7 @@ public class OpenShutterPulseSize implements Processor {
         	}
         	
         	for(int i = 0; i < numberPulses; i++){
-                  int integral = 0;
+                  double integral = 0;
                   int start = (Integer) arrivalTimes[pix].get(i);
                   double baseline = (Double) baselineValues[pix].get(i);
                   
