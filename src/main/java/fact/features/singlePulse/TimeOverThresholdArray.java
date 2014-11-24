@@ -38,10 +38,10 @@ public class TimeOverThresholdArray implements Processor {
 		Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, positionsKey, ArrayList[].class);
 
-        ArrayList[] timeOverThresholdArrayList = new ArrayList[Constants.NUMBEROFPIXEL];
+        int[][] timeOverThresholdArrayList = new int[Constants.NUMBEROFPIXEL][];
 
 		double[] data 	 = (double[]) input.get(dataKey);
-        ArrayList[] posArray = (  ArrayList[] ) input.get(positionsKey);
+        int[][] posArray = (  int[][] ) input.get(positionsKey);
 
         double[] width 	 =  new double[data.length];
 
@@ -53,8 +53,8 @@ public class TimeOverThresholdArray implements Processor {
             ArrayList<Integer>  timeOverThresholdArray =  new ArrayList<Integer>();
 
             //Loop over positions in positions Array
-            for (int i = 0 ; i < posArray[pix].size() ; i++ ){
-                int     position    = (Integer) posArray[pix].get(i);
+            for (int i = 0 ; i < posArray[pix].length ; i++ ){
+                int     position    = (Integer) posArray[pix][i];
                 int     slice       = (pix * roi) + position;
                 double  threshold   = data[slice];
 
@@ -73,7 +73,7 @@ public class TimeOverThresholdArray implements Processor {
                 timeOverThresholdArray.add(timeOverThreshold);
 			}
 
-            timeOverThresholdArrayList[pix] =  timeOverThresholdArray;
+            timeOverThresholdArrayList[pix] =  Utils.arrayListToInt(timeOverThresholdArray);
 		}
 
 		//add times over threshold array to the DataItem

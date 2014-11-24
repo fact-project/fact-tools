@@ -48,9 +48,9 @@ public class FWHMPulses implements Processor{
 
         double[] data             = (double[])input.get(key);
         double[] minAmplitudes    = (double[])input.get(minPosKey);
-        ArrayList[] maxPosArrayList  = (ArrayList[]) input.get(maxPosKey);
+        int[][] maxPosArrayList  = (int[][]) input.get(maxPosKey);
 
-        ArrayList[] widthArrayList = new ArrayList[Constants.NUMBEROFPIXEL];
+        int[][] widthArrayList = new int[Constants.NUMBEROFPIXEL][];
         double[] visualisation 	 =  new double[data.length];
 
         int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -60,8 +60,8 @@ public class FWHMPulses implements Processor{
 
             ArrayList<Integer> widthList = new ArrayList<Integer>();
 
-            for (int pulse = 0; pulse < maxPosArrayList[pix].size(); pulse++){
-                int maxPos     = pix*roi + (Integer) maxPosArrayList[pix].get(pulse);
+            for (int pulse = 0; pulse < maxPosArrayList[pix].length; pulse++){
+                int maxPos     = pix*roi + maxPosArrayList[pix][pulse];
                 double maxAmplitude = data[maxPos] - offset;
 
                 visualisation[maxPos] = data[maxPos];
@@ -98,7 +98,7 @@ public class FWHMPulses implements Processor{
                 }
                 widthList.add(right+left);
             }
-            widthArrayList[pix]=widthList;
+            widthArrayList[pix]=Utils.arrayListToInt(widthList);
         }
         input.put(outputKey, widthArrayList);
         input.put(visualizationKey, visualisation);
