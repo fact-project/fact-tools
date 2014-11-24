@@ -4,6 +4,7 @@
 package fact.features.singlePulse;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -37,9 +38,9 @@ public class ArrivalTime implements Processor {
 	@Override
 	public Data process(Data input) {
         double[] data = (double[]) input.get(key);
-		ArrayList[] maxAmpPositions = (ArrayList[]) input.get(maxAmpPositionKey);
+		int[][] maxAmpPositions = (int[][]) input.get(maxAmpPositionKey);
         int roi = data.length / Constants.NUMBEROFPIXEL;
-        ArrayList[] arrivalTimes =  new ArrayList[Constants.NUMBEROFPIXEL];
+        int[][] arrivalTimes =  new int[Constants.NUMBEROFPIXEL][];
         double[] visualizePositions = new double[data.length];
     	//zero for all positions except where an arrival time is found
         
@@ -66,15 +67,15 @@ public class ArrivalTime implements Processor {
      * @return
      */
 	
-    public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions, double[] visualizePositions){
+    public int[] findArrivalTimes(int pix, int roi, double[] data, int[][] maxAmpPositions, double[] visualizePositions){
       
 		ArrayList<Integer> positions = new ArrayList<Integer>();
 
-        if(!maxAmpPositions[pix].isEmpty()){
-        	int numberPulses = maxAmpPositions[pix].size();        	
+        if(maxAmpPositions[pix].length > 0){
+        	int numberPulses = maxAmpPositions[pix].length;
         	for(int i = 0; i < numberPulses; i++){
                   int Position = 0;
-                  int end = (Integer) maxAmpPositions[pix].get(i);
+                  int end = maxAmpPositions[pix][i];
                   int endPos = pix * roi + end;
                   for(int slice = end; slice > end - 25; slice--){
         			   int pos = pix * roi + slice;
@@ -94,7 +95,7 @@ public class ArrivalTime implements Processor {
         	}
         }
 
-        	return positions;
+        return Utils.arrayListToInt(positions);
     }
           
      

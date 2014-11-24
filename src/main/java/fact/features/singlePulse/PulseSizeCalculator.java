@@ -40,8 +40,8 @@ public class PulseSizeCalculator implements Processor {
 
         double[] data = (double[]) input.get(key);
         int roi = data.length / Constants.NUMBEROFPIXEL;
-		ArrayList[] arrivalTimes = (ArrayList[]) input.get(arrivalTimeKey);
-	    ArrayList[] pulseSizes = new ArrayList[Constants.NUMBEROFPIXEL];
+		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
+	    int[][] pulseSizes = new int[Constants.NUMBEROFPIXEL][];
       
 	    //additional output that is a list of values for all events for a single pixel. Currently pixel 0. 
 	    ArrayList<Integer> singlePixelPulses = new ArrayList<Integer>();
@@ -55,16 +55,16 @@ public class PulseSizeCalculator implements Processor {
 			
 			//creates the list for a single pixel
 			if(pix==0){
-				if(pulseSizes[pix].size() != 0){
-					for(int i = 0; i < pulseSizes[pix].size(); i++){
-						singlePixel = (Integer) pulseSizes[pix].get(i);
+				if(pulseSizes[pix].length > 0){
+					for(int i = 0; i < pulseSizes[pix].length; i++){
+						singlePixel = pulseSizes[pix][i];
 						singlePixelPulses.add(singlePixel);
 					}
 				}
 			}
 		
 		}
-		input.put("singlePixelPulses", singlePixelPulses);
+		input.put("singlePixelPulses", Utils.arrayListToInt(singlePixelPulses));
         input.put(outputKey, pulseSizes);
         
         
@@ -81,15 +81,15 @@ public class PulseSizeCalculator implements Processor {
      * @return
      */
 	
-    public ArrayList calculateSizes(int pix, int roi, double[] data, ArrayList[] arrivalTimes){
+    public int[] calculateSizes(int pix, int roi, double[] data, int[][] arrivalTimes){
       
 		ArrayList<Integer> sizes = new ArrayList<Integer>();
     	
-        if(!arrivalTimes[pix].isEmpty()){
-        	int numberPulses = arrivalTimes[pix].size();        	
+        if(arrivalTimes[pix].length > 0){
+        	int numberPulses = arrivalTimes[pix].length;
         	for(int i = 0; i < numberPulses; i++){
                   int integral = 0;
-                  int start = (Integer) arrivalTimes[pix].get(i);
+                  int start = arrivalTimes[pix][i];
                   for(int slice = start; slice < start + width; slice++){
         			   int pos = pix * roi + slice;
         			   integral += data[pos];
@@ -97,7 +97,7 @@ public class PulseSizeCalculator implements Processor {
                   sizes.add(integral);
         	}		
         }
-        return sizes;
+        return Utils.arrayListToInt(sizes);
     }
           
      

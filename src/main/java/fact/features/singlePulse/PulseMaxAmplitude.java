@@ -4,6 +4,7 @@
 package fact.features.singlePulse;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -35,9 +36,9 @@ public class PulseMaxAmplitude implements Processor {
 	@Override
 	public Data process(Data input) {
         double[] data = (double[]) input.get(key);
-		ArrayList[] pulsePositions = (ArrayList[]) input.get(pulsePositionKey);
+		int[][] pulsePositions = (int[][]) input.get(pulsePositionKey);
         int roi = data.length / Constants.NUMBEROFPIXEL;
-        ArrayList[] positions =  new ArrayList[Constants.NUMBEROFPIXEL];
+        int[][] positions =  new int[Constants.NUMBEROFPIXEL][];
         
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
@@ -57,16 +58,16 @@ public class PulseMaxAmplitude implements Processor {
      * @return
      */
 	
-    public ArrayList findMaximumPositions(int pix, int roi, double[] data, ArrayList[] pulsePositions){
+    public int[] findMaximumPositions(int pix, int roi, double[] data, int[][] pulsePositions){
       
 		ArrayList<Integer> maxima = new ArrayList<Integer>();
 
-        if(!pulsePositions[pix].isEmpty()){
-        	int numberPulses = pulsePositions[pix].size();        	
+        if(pulsePositions[pix].length > 0){
+        	int numberPulses = pulsePositions[pix].length;
         	for(int i = 0; i < numberPulses; i++){
         		  double tempMaxValue = 0;
                   int Position = 0;
-                  int start = (Integer) pulsePositions[pix].get(i);
+                  int start = pulsePositions[pix][i];
                   for(int slice = start; slice < start + 30; slice++){
         			   int pos = pix * roi + slice;
         			   if(slice > roi) {break;}
@@ -84,7 +85,7 @@ public class PulseMaxAmplitude implements Processor {
         	}
         }
         
-        	return maxima;
+        	return Utils.arrayListToInt(maxima);
     }
           
      

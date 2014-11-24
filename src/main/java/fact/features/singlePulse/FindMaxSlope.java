@@ -45,7 +45,7 @@ public class FindMaxSlope implements Processor {
 
         double[] data             = (double[])input.get(key);
         double[] slopesArray      = (double[])input.get(derivationKey);
-        ArrayList[] arrivalTimes  = (ArrayList[]) input.get(arrivalTimeKey);
+        int[][] arrivalTimes  = (int[][]) input.get(arrivalTimeKey);
 
         double[] result     = new double[data.length];
 
@@ -59,12 +59,12 @@ public class FindMaxSlope implements Processor {
 
         for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 
-            int numberPulses = arrivalTimes[pix].size();
+            int numberPulses = arrivalTimes[pix].length;
 
             ArrayList<Double> slopes = new ArrayList<Double>();
 
             for(int i = 0; i < numberPulses; i++){
-                int arrTime = (int) arrivalTimes[pix].get(i);
+                int arrTime = (int) arrivalTimes[pix][i];
                 int pos = (pix * roi) + arrTime;
 
 //                //calculate Position of the local maximum

@@ -4,6 +4,7 @@
 package fact.features.singlePulse;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -59,9 +60,9 @@ public class ArrivalTimeFromSlope implements Processor {
         
         ArrayList[] pulsePeaks =  new ArrayList[Constants.NUMBEROFPIXEL];
         	//the position where pulse leading edges end 
-        ArrayList[] arrivalTimes = new ArrayList[Constants.NUMBEROFPIXEL];
+        int[][] arrivalTimes = new int[Constants.NUMBEROFPIXEL][];
         	//arrival times for all pulses in each pixel
-        ArrayList[] baselineValues = new ArrayList[Constants.NUMBEROFPIXEL];
+        double[][] baselineValues = new double[Constants.NUMBEROFPIXEL][];
         	//value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
@@ -155,7 +156,7 @@ public class ArrivalTimeFromSlope implements Processor {
 	
 //the function that finds the starting point of the pulse, defined by the first position with a positive slope, and
 //the position of maximum slope. both values can be used for arrival time or baseline values   
-	public ArrayList findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList[] pulsePeaks, double[] visualizePositions, ArrayList[] baselineValues){
+	public int[] findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList[] pulsePeaks, double[] visualizePositions, double[][] baselineValues){
 		ArrayList<Integer> times = new ArrayList<Integer>();
 		ArrayList<Double> baseValues = new ArrayList<Double>();
 		ArrayList<Integer> peaks = pulsePeaks[pix];
@@ -212,8 +213,8 @@ public class ArrivalTimeFromSlope implements Processor {
 			}
 				//to use maximum slope instead of first position of rising edge, simply replace start with maxpos. 
 		}
-		baselineValues[pix] = baseValues;
-        return times;
+		baselineValues[pix] = Utils.arrayListToDouble(baseValues);
+        return Utils.arrayListToInt(times);
     }
     
 
