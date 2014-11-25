@@ -41,11 +41,11 @@ public class PulseSizeCalculator implements Processor {
         double[] data = (double[]) input.get(key);
         int roi = data.length / Constants.NUMBEROFPIXEL;
 		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
-	    int[][] pulseSizes = new int[Constants.NUMBEROFPIXEL][];
+	    double[][] pulseSizes = new double[Constants.NUMBEROFPIXEL][];
 
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			pulseSizes[pix] = new int[arrivalTimes[pix].length];
+			pulseSizes[pix] = new double[arrivalTimes[pix].length];
 			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
 		}
         input.put(outputKey, pulseSizes);
@@ -64,23 +64,23 @@ public class PulseSizeCalculator implements Processor {
      * @return
      */
 	
-    public int[] calculateSizes(int pix, int roi, double[] data, int[][] arrivalTimes){
+    public double[] calculateSizes(int pix, int roi, double[] data, int[][] arrivalTimes){
       
-		ArrayList<Integer> sizes = new ArrayList<Integer>();
+		ArrayList<Double> sizes = new ArrayList<Double>();
     	
         if(arrivalTimes[pix].length > 0){
         	int numberPulses = arrivalTimes[pix].length;
         	for(int i = 0; i < numberPulses; i++){
-                  int integral = 0;
-                  int start = arrivalTimes[pix][i];
-                  for(int slice = start; slice < start + width; slice++){
-        			   int pos = pix * roi + slice;
-        			   integral += data[pos];
-                  }
-                  sizes.add(integral);
+				double integral = 0;
+				int start = arrivalTimes[pix][i];
+				for(int slice = start; slice < start + width; slice++){
+					int pos = pix * roi + slice;
+					integral += data[pos];
+				}
+				sizes.add(integral);
         	}		
         }
-        return Utils.arrayListToInt(sizes);
+        return Utils.arrayListToDouble(sizes);
     }
           
      
