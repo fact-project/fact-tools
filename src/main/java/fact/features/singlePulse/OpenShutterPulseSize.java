@@ -46,8 +46,9 @@ public class OpenShutterPulseSize implements Processor {
 	    double[][] pulseSizes = new double[Constants.NUMBEROFPIXEL][];
       
 		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {			
-			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues);	
+		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+			pulseSizes[pix] = new double[arrivalTimes[pix].length];
+			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues);
 		}
 		
         input.put(outputKey, pulseSizes);
