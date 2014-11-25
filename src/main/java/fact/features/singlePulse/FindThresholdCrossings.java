@@ -71,7 +71,7 @@ public class FindThresholdCrossings implements Processor {
 	    		}
 	    		
 	    		//	if no crossing, list for that pixel is empty	    		
-	    		
+				CrossPositions[pix] = new int[slices.size()];
 	    		CrossPositions[pix] = Utils.arrayListToInt(slices);
 	    	}
 		 

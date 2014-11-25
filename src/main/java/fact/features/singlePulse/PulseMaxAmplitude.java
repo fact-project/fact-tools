@@ -42,6 +42,7 @@ public class PulseMaxAmplitude implements Processor {
         
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+			positions[pix] = new int[pulsePositions[pix].length];
 			positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
 		}
         input.put(outputKey, positions);
@@ -85,7 +86,7 @@ public class PulseMaxAmplitude implements Processor {
         	}
         }
         
-        	return Utils.arrayListToInt(maxima);
+        return Utils.arrayListToInt(maxima);
     }
           
      

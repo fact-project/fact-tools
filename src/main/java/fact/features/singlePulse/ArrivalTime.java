@@ -50,6 +50,7 @@ public class ArrivalTime implements Processor {
         
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+            arrivalTimes[pix] = new int[maxAmpPositions.length];
 			arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
 		}
         input.put(outputKey, arrivalTimes);

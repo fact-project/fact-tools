@@ -72,8 +72,12 @@ public class ArrivalTimeFromSlope implements Processor {
         }
                 
 		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {			
+		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			pulsePeaks[pix] = findPulsePeaks(pix, roi, slopes);
+
+			arrivalTimes[pix] 	= new int[pulsePeaks[pix].size()];
+			baselineValues[pix] = new double[pulsePeaks[pix].size()];
+
 			arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
 		}
 		

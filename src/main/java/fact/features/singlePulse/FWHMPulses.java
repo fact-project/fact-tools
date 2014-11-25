@@ -98,6 +98,7 @@ public class FWHMPulses implements Processor{
                 }
                 widthList.add(right+left);
             }
+            widthArrayList[pix]=new int[widthList.size()];
             widthArrayList[pix]=Utils.arrayListToInt(widthList);
         }
         input.put(outputKey, widthArrayList);
