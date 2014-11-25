@@ -42,32 +42,14 @@ public class PulseSizeCalculator implements Processor {
         int roi = data.length / Constants.NUMBEROFPIXEL;
 		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
 	    int[][] pulseSizes = new int[Constants.NUMBEROFPIXEL][];
-      
-	    //additional output that is a list of values for all events for a single pixel. Currently pixel 0. 
-	    ArrayList<Integer> singlePixelPulses = new ArrayList<Integer>();
-        Integer singlePixel = 0;
-        
+
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			
 			pulseSizes[pix] = new int[arrivalTimes[pix].length];
 			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
-
-			
-			//creates the list for a single pixel
-			if(pix==0){
-				if(pulseSizes[pix].length > 0){
-					for(int i = 0; i < pulseSizes[pix].length; i++){
-						singlePixel = pulseSizes[pix][i];
-						singlePixelPulses.add(singlePixel);
-					}
-				}
-			}
-		
 		}
-		input.put("singlePixelPulses", Utils.arrayListToInt(singlePixelPulses));
         input.put(outputKey, pulseSizes);
-        
+
         
 //       System.out.println(Arrays.toString(pulseSizes));
 //       System.out.println(singlePixelPulses);
