@@ -50,6 +50,7 @@ public class PulseSizeCalculator implements Processor {
 		//for each pixel
 		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 			
+			pulseSizes[pix] = new int[arrivalTimes[pix].length];
 			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
 
 			
