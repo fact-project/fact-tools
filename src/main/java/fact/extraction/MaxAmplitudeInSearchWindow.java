@@ -1,6 +1,5 @@
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -19,14 +18,18 @@ public class MaxAmplitudeInSearchWindow implements Processor {
 	@Parameter(required=true)
 	private int searchWindowRight;
 	
-	private double[] amplitudes = new double[Constants.NUMBEROFPIXEL];
-	private int[] positions = new int[Constants.NUMBEROFPIXEL];
-	
+	private int npix;
 	int roi;
 	
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
+		
+		double[] amplitudes = new double[npix];
+		int[] positions = new int[npix];
+		
 		if (searchWindowLeft >= searchWindowRight)
 		{
 			throw new RuntimeException("searchWindowLeft is equal or larger than searchWindowRight: "+searchWindowLeft+" >= "+searchWindowRight);
@@ -38,7 +41,7 @@ public class MaxAmplitudeInSearchWindow implements Processor {
 		
 		roi = (Integer) input.get("NROI");
 		
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+		for (int px = 0 ; px < npix ; px++)
 		{
 			int tempPos = -1;
 			double tempMaxValue = Double.MIN_VALUE;

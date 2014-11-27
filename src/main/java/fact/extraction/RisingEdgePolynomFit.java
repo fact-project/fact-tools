@@ -4,7 +4,6 @@ import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.jfree.chart.plot.IntervalMarker;
 
-import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -17,18 +16,22 @@ public class RisingEdgePolynomFit implements Processor {
 	
 	private int range = 5;
 	
+	private int npix;
+	
 	private String outputKey = null;
 	
 	private String maxSlopesKey = null;
 
 	@Override
 	public Data process(Data input) {
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys(input, dataKey,risingEdgeKey,"NROI");
 		
-		double[] maxDerivations = new double[Constants.NUMBEROFPIXEL];
-		double[] maxDerivationsPositions = new double[Constants.NUMBEROFPIXEL];
+		double[] maxDerivations = new double[npix];
+		double[] maxDerivationsPositions = new double[npix];
 		
-		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] m = new IntervalMarker[npix];
 		
 		double[] data = (double[]) input.get(dataKey);
 		int roi = (Integer) input.get("NROI");
@@ -42,7 +45,7 @@ public class RisingEdgePolynomFit implements Processor {
 		
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
 				
-		for (int pix = 0 ; pix < Constants.NUMBEROFPIXEL ; pix++)
+		for (int pix = 0 ; pix < npix ; pix++)
 		{
 			int pos = risingEdges[pix];
 			WeightedObservedPoints observations = new WeightedObservedPoints();
