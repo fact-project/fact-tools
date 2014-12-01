@@ -11,6 +11,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -49,12 +52,12 @@ import fact.hexmap.ui.overlays.CameraMapOverlay;
  * 
  */
 public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
-		SliceObserver, MouseListener {
+		SliceObserver, MouseListener, MouseMotionListener,MouseWheelListener {
 	/** The unique class ID */
 	private static final long serialVersionUID = -4015808725138908874L;
 
 	static Logger log = LoggerFactory.getLogger(FactHexMapDisplay.class);
-	private final double radius;
+	private double radius;
 
 	FactHexTile tiles[];
 
@@ -97,6 +100,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private int offsetX = 0;
 	private int offsetY = 0;
+	private double scale = 1;
+	private Point oldMousePos = null;
 
 	/**
 	 * A Hexagon in this case is defined by the passed radius. The radius of the
@@ -129,7 +134,10 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			// add the mosuelistener so we can react to mouse clicks on the
 			// hexmap
 			this.addMouseListener(this);
-		}
+			this.addMouseMotionListener(this);
+			this.addMouseWheelListener(this);
+		}		
+		
 	}
 
 	public FactHexMapDisplay(double radius, int canvasWidth, int canvasHeight) {
@@ -256,12 +264,14 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			g2.setStroke(new BasicStroke(1.0f));
 			g2.setColor(Color.DARK_GRAY);
 			// drawGrid(g2, 25);
-
+			
 			// now draw the actual camera pixel
 			// translate to center of canvas
 			g2.translate(xOffset, yOffset);
 			// rotate 90 degrees counter clockwise
 			g2.rotate(-Math.PI / 2);
+			
+			g2.scale(scale, scale);
 			// and draw tiles
 			for (Tile tile : tiles) {
 				CameraPixel p = tile.getCameraPixel();
@@ -304,6 +314,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 				paintScale(g2, 40);
 				g2.translate(-this.canvasWidth + 40, 0);
 			}
+			
+			g2.scale(1, 1);
 		}
 
 	}
@@ -415,6 +427,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		oldMousePos = null;
 	}
 
 	@Override
@@ -423,6 +436,53 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}	
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent arg0)
+	{
+		if(arg0.getWheelRotation() > 0)
+		{
+			scale -= 0.1;
+		}
+		else if(arg0.getWheelRotation() < 0)
+		{
+			scale += 0.1;
+		}		
+		
+		this.repaint();
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent arg0)
+	{
+		if(oldMousePos == null)
+		{
+			oldMousePos = arg0.getPoint();
+			return;
+		}		
+		
+		int xOffset = this.getOffsetX();
+		int yOffset = this.getOffsetY();			
+		
+		double dx = arg0.getPoint().getX() - oldMousePos.getX();
+		double dy = arg0.getPoint().getY() - oldMousePos.getY();		
+		
+		//if(arg0.getButton() == MouseEvent.BUTTON0)
+		{
+			xOffset += dx;
+			yOffset += dy;
+			
+			this.setOffsetX(xOffset);
+			this.setOffsetY(yOffset);			
+		}		
+		oldMousePos = arg0.getPoint();
+		
+		this.repaint();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent arg0)	{		
 	}
 
 	// The update method. to update.
@@ -553,5 +613,4 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	public void setOffsetY(int offsetY) {
 		this.offsetY = offsetY;
 	}
-
 }

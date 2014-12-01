@@ -5,6 +5,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +52,7 @@ import fact.hexmap.ui.events.OverlaySelectionChangedEvent;
  * colorbar is part of the hexmap.
  * 
  * Created by kaibrugge on 02.06.14.
+ * modified by dbaack
  */
 public class DisplayPanel extends JPanel implements EventObserver {
 
@@ -55,6 +61,8 @@ public class DisplayPanel extends JPanel implements EventObserver {
 	final FactHexMapDisplay hexmap = new FactHexMapDisplay(7, 600, 530);
 	final CameraOverlayKeySelector selector = new CameraOverlayKeySelector();
 	private final Set<Class<? extends ColorMapping>> colorMapClasses;
+	
+	private double zoomFactor = 1.0;
 
 	public void setItemToDisplay(String key, Data item) {
 		hexmap.defaultKey = key;
@@ -110,7 +118,7 @@ public class DisplayPanel extends JPanel implements EventObserver {
 					exportGIF();
 					return;
 				}
-
+				
 				// select the colormap
 				for (Class<? extends ColorMapping> mapClass : colorMapClasses) {
 					if (e.getActionCommand().equals(mapClass.getSimpleName())) {
@@ -172,8 +180,7 @@ public class DisplayPanel extends JPanel implements EventObserver {
 
 		builder.add(selector, cc.xy(1, 3));
 		// builder.add(overlaySelector, cc.xywh(1,4,6,1));
-		add(builder.getPanel());
-
+		add(builder.getPanel());		
 	}
 
 	/**

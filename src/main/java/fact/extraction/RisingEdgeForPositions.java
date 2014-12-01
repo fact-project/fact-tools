@@ -3,7 +3,6 @@
  */
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 
 import org.jfree.chart.plot.IntervalMarker;
@@ -34,21 +33,25 @@ public class RisingEdgeForPositions implements Processor {
     @Parameter(required = true)
     private String maxSlopesKey = null;
 
+	private int npix;
+
 	@Override
 	public Data process(Data input) {
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
-        double[] positions =  new double[Constants.NUMBEROFPIXEL];
-        double[] maxSlopes =  new double[Constants.NUMBEROFPIXEL];
+        double[] positions =  new double[npix];
+        double[] maxSlopes =  new double[npix];
 		
 		double[] data = (double[]) input.get(dataKey);		
 		int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 		
-		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] m = new IntervalMarker[npix];
 		
-		int roi = data.length / Constants.NUMBEROFPIXEL;
+		int roi = data.length / npix;
 		
-		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+		for(int pix = 0 ; pix < npix; pix++){
 			int posMaxAmp = amplitudePositions[pix];
 	
 			// temp. Variables

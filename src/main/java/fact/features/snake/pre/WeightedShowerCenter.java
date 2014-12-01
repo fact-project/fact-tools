@@ -5,6 +5,7 @@ import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import fact.hexmap.ui.overlays.MarkerOverlay;
 
 /**
  *	WeightedShowerCenter
@@ -22,9 +23,11 @@ public class WeightedShowerCenter implements Processor
 	private String weight = null;
 	@Parameter(required = true, description = "Output: X pos ")
 	private String outkeyX = null;
-	@Parameter(required = true, description = "Output:y pos ")
+	@Parameter(required = true, description = "Output: Y pos ")
 	private String outkeyY = null;
 	
+	@Parameter(required = false, description = "Input: Draw Center")
+	private boolean draw = false;
 	
 	@Override
 	public Data process(Data input) 
@@ -80,6 +83,12 @@ public class WeightedShowerCenter implements Processor
 		input.put(outkeyY, ergY);
 		input.put(outkeyY+"2", ergY2);
 		
+		if(draw)
+		{
+			input.put("center", new MarkerOverlay(ergX, ergY));
+			input.put("center2", new MarkerOverlay(ergX2, ergY2));
+		}
+		
 		return input;
 	}
 
@@ -124,8 +133,18 @@ public class WeightedShowerCenter implements Processor
 	}
 
 
-	
+	public boolean isDraw()
+	{
+		return draw;
+	}
 
-	
+
+	public void setDraw(boolean draw)
+	{
+		this.draw = draw;
+	}
+
+
+		
 	
 }

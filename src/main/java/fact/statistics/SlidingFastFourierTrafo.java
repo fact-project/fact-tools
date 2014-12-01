@@ -1,6 +1,5 @@
 package fact.statistics;
 
-import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
@@ -23,17 +22,21 @@ public class SlidingFastFourierTrafo implements Processor {
 	
 	FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
 	
+	private int npix;
+	
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys( input, key);
 		
 		double[] data = (double[])input.get(key);
-		int roi = data.length / Constants.NUMBEROFPIXEL;
+		int roi = data.length / npix;
 		double[] result = new double[data.length]; 
 		
 		
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+		for (int px = 0 ; px < npix ; px++)
 		{
 			for (int slBegin = 0 ; slBegin < roi ; slBegin+=stepSize)
 			{
