@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.Constants;
+import fact.Utils;
 import fact.extraction.PhotonCharge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,138 +20,141 @@ import java.util.ArrayList;
  */
 
 public class FindThresholdCrossings implements Processor {
-	static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
+    static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 
-	@Parameter(required = true)
-	private String key;
-	@Parameter(required = false)
-	private String outputKey;
-	@Parameter(required = false)
-	private String visualizeOutputKey;
-	
-	private int minBelow = 0;
-	private int minAbove = 0;
-	
-	private double threshold = 5; 
-	
-	/*
-	 * minBelow is minimum number of slices required to be below the threshold before the threshold crossing
-	 * minAbove is minimum number of slices required to be above the threshold after the threshold crossing
-	 * threshold is the cutoff value
-	 *
-	 */
-	
-	
-	@Override
-	public Data process(Data input) {
+    @Parameter(required = true)
+    private String key;
+    @Parameter(required = false)
+    private String outputKey;
+    @Parameter(required = false)
+    private String visualizeOutputKey;
+    
+    private int minBelow = 0;
+    private int minAbove = 0;
+    
+    private double threshold = 5; 
+    
+    /*
+     * minBelow is minimum number of slices required to be below the threshold before the threshold crossing
+     * minAbove is minimum number of slices required to be above the threshold after the threshold crossing
+     * threshold is the cutoff value
+     *
+     */
+    private int npix;
+    
+    
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 
-		double[] data = (double[]) input.get(key);
-		int roi = data.length / Constants.NUMBEROFPIXEL;
-		
-		//the graph of the array positions visually shows the positions of the crossings for an individual pixel
-	    double[] positions =  new double[data.length];
-	    
-	    //the array CrossPositions contains lists of positions of crossings for each pixel
-	    ArrayList[] CrossPositions = new ArrayList[Constants.NUMBEROFPIXEL];
+        double[] data = (double[]) input.get(key);
+        int roi = data.length / npix;
+        
+        //the graph of the array positions visually shows the positions of the crossings for an individual pixel
+        double[] positions =  new double[data.length];
+        
+        //the array CrossPositions contains lists of positions of crossings for each pixel
+        ArrayList[] CrossPositions = new ArrayList[npix];
 
-	    	for(int pix=0; pix < Constants.NUMBEROFPIXEL; pix++){	    		
-	    		//creates a list of positions of threshold crossings for a single pixel
-	    		ArrayList<Integer> slices = new ArrayList<Integer>();
-	    		
-	    		for(int slice=0; slice < roi; slice++){
-	    			if(candidate(pix, slice, roi, data) == true) {
-	    				slices.add(slice);
-	    				positions[pix*roi+slice]=5;
-	    				slice += minAbove;
-	    			}
-	    			else {
-	    				positions[pix*roi+slice]=0;
-	    			}
-	    		}
-	    		
-	    		//	if no crossing, list for that pixel is empty	    		
-	    		
-	    		CrossPositions[pix] = slices;
-	    	}
-		 
-			input.put(visualizeOutputKey, positions);
-			input.put(outputKey, CrossPositions);
-			return input;
-		
-	}
-	
-	//to determine threshold crossings
-	public boolean candidate(int pix, int slice, int roi, double[] data){
-		boolean answer = true;
+            for(int pix=0; pix < npix; pix++){              
+                //creates a list of positions of threshold crossings for a single pixel
+                ArrayList<Integer> slices = new ArrayList<Integer>();
+                
+                for(int slice=0; slice < roi; slice++){
+                    if(candidate(pix, slice, roi, data) == true) {
+                        slices.add(slice);
+                        positions[pix*roi+slice]=5;
+                        slice += minAbove;
+                    }
+                    else {
+                        positions[pix*roi+slice]=0;
+                    }
+                }
+                
+                //  if no crossing, list for that pixel is empty                
+                
+                CrossPositions[pix] = slices;
+            }
+         
+            input.put(visualizeOutputKey, positions);
+            input.put(outputKey, CrossPositions);
+            return input;
+        
+    }
+    
+    //to determine threshold crossings
+    public boolean candidate(int pix, int slice, int roi, double[] data){
+        boolean answer = true;
 
-		int pos = pix * roi + slice;
-		
-		if(data[pos] < threshold){return false;}
-	
-		for(int i=1; i < minBelow; i++){
-			if(slice-i < 0){return false;}
-			if(data[pos-i] >= threshold){return false;}
-			}
+        int pos = pix * roi + slice;
+        
+        if(data[pos] < threshold){return false;}
+    
+        for(int i=1; i < minBelow; i++){
+            if(slice-i < 0){return false;}
+            if(data[pos-i] >= threshold){return false;}
+            }
 
-		for(int k=0; k < minAbove; k++){
-			if(slice+k > roi){return false;}
-			if(pos+k == Constants.NUMBEROFPIXEL * roi) {return false;}    
-			if(data[pos+k] <= threshold){return false;}
-			}
-	
-		return answer;
-	}
+        for(int k=0; k < minAbove; k++){
+            if(slice+k > roi){return false;}
+            if(pos+k == npix * roi) {return false;}    
+            if(data[pos+k] <= threshold){return false;}
+            }
+    
+        return answer;
+    }
 
-	//Getters and Setters
-	
-	public String getKey() {
-		return key;
-	}
+    //Getters and Setters
+    
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    public String getOutputKey() {
+        return outputKey;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
-	public String getVisualizeOutputKey() {
-		return visualizeOutputKey;
-	}
+    public String getVisualizeOutputKey() {
+        return visualizeOutputKey;
+    }
 
-	public void setVisualizeOutputKey(String visualizeOutputKey) {
-		this.visualizeOutputKey = visualizeOutputKey;
-	}
+    public void setVisualizeOutputKey(String visualizeOutputKey) {
+        this.visualizeOutputKey = visualizeOutputKey;
+    }
 
-	public int getMinBelow() {
-		return minBelow;
-	}
+    public int getMinBelow() {
+        return minBelow;
+    }
 
-	public void setMinBelow(int minBelow) {
-		this.minBelow = minBelow;
-	}
+    public void setMinBelow(int minBelow) {
+        this.minBelow = minBelow;
+    }
 
-	public int getMinAbove() {
-		return minAbove;
-	}
+    public int getMinAbove() {
+        return minAbove;
+    }
 
-	public void setMinAbove(int minAbove) {
-		this.minAbove = minAbove;
-	}
+    public void setMinAbove(int minAbove) {
+        this.minAbove = minAbove;
+    }
 
-	public double getThreshold() {
-		return threshold;
-	}
+    public double getThreshold() {
+        return threshold;
+    }
 
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
-	
-	
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+    
+    
 
 }

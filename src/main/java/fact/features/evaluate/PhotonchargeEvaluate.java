@@ -1,6 +1,5 @@
 package fact.features.evaluate;
 
-import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +25,16 @@ public class PhotonchargeEvaluate implements Processor {
 	double[] cherenkovArrTimeMean = null;
 	double[] noiseWeight = null;
 	
-	double[] qualityFactorPhotoncharge = new double[Constants.NUMBEROFPIXEL];
-	double[] qualityFactorArrivalTime = new double[Constants.NUMBEROFPIXEL];
+	private int npix;
 
 	@Override
 	public Data process(Data input) {
-		
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys(input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
+		
+		double[] qualityFactorPhotoncharge = new double[npix];
+		double[] qualityFactorArrivalTime = new double[npix];
 		
 		photoncharge = Utils.toDoubleArray(input.get(photonchargeKey));
 		arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));
@@ -40,7 +42,7 @@ public class PhotonchargeEvaluate implements Processor {
 		cherenkovArrTimeMean = Utils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
 		noiseWeight = Utils.toDoubleArray(input.get(mcNoiseWeightKey));
 		
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+		for (int px = 0 ; px < npix ; px++)
 		{
 			qualityFactorPhotoncharge[px] = photoncharge[px] / cherenkovWeight[px];
 			qualityFactorArrivalTime[px] = arrivalTime[px] / cherenkovArrTimeMean[px];

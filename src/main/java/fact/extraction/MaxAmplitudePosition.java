@@ -3,7 +3,6 @@
  */
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 
 import org.jfree.chart.plot.IntervalMarker;
@@ -34,16 +33,20 @@ public class MaxAmplitudePosition implements Processor {
 	private Integer searchWindowLeft = null;
 	private Integer searchWindowRight =  null;
 
+	private int npix;
+
 
 	@Override
 	public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        npix = (Integer) input.get("NPIX");	
+        int roi = data.length / npix;
 
-        int[] positions =  new int[Constants.NUMBEROFPIXEL];
+        int[] positions =  new int[npix];
         
-        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] m = new IntervalMarker[npix];
 
 		if (searchWindowLeft == null || searchWindowLeft < 0){
 			searchWindowLeft = 0;
@@ -52,7 +55,7 @@ public class MaxAmplitudePosition implements Processor {
 			searchWindowRight = roi;
 		}
 		//foreach pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+		for (int pix = 0; pix < npix; pix++) {
 			positions[pix] = findMaximumPosition(pix, roi, data);
 			m[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
 		}

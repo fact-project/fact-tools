@@ -33,17 +33,20 @@ public class PerPatchVoltageIntegral implements Processor {
 	@Parameter(required = true, defaultValue = "perPatchVoltageIntegral", description = "The output key")
 	private String outputKey;
 	
+	private int npix;
+	
 	@Override
 	public Data process(Data input) {
-		
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys( input, key);
 		double[] dataCalibratedArray = (double[]) input.get(key);
-		int roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
+		int roi = dataCalibratedArray.length / npix;
 		double[] perPatchVoltageIntegral = new double[160];
 		
 		int patch = 0;
 
-		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++)
+		for(int chid = 0; chid < npix; chid++)
 		{
 			for(int slice = 0; slice < roi; slice++)
 			{
