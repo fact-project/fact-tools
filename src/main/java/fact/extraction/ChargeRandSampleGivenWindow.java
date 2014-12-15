@@ -101,7 +101,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
 
         input.put(outputKey, charge);
         input.put(outputKey+"_mean", chargeMean);
-        input.put(outputKey+"_rms", chargeRms);
+        input.put(outputKey+"_var", chargeRms);
 
         return input;
     }
