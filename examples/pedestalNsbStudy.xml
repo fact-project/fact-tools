@@ -48,7 +48,7 @@
                                     arrivalTimeKey="arrivalTimes" maxSearchSlice="30" numFitSlices="8"/>
 
 
-        <fact.utils.SelectValueByChid key="Nsb_rms" chid="286" outputKey="Nsb_rms_1" />
+        <fact.utils.SelectValueByChid key="Nsb_var" chid="286" outputKey="Nsb_rms_1" />
         <fact.plotter.HistogramPlotter key="Nsb_rms_1" binWidth="1" logAxis="true" color="#666699" />
 
         <fact.utils.SelectValueByChid key="Nsb_mean" chid="286" outputKey="Nsb_mean_1" />
