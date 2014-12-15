@@ -53,7 +53,7 @@ public class CoreNeighborClean implements Processor{
             " are even considered for NeighbourCorePixel. " +
             " If Size is smaller than minSize the Pixels will be discarded.")
 	private int minNumberOfPixel;
-
+	private int npix;
 
     @Parameter(required = false)
     private String[] starPositionKeys = null;
@@ -69,7 +69,10 @@ public class CoreNeighborClean implements Processor{
 	@Override
 	public Data process(Data input) {
 		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
-		Utils.isKeyValid(input, photonChargeKey, double[].class);		
+		Utils.isKeyValid(input, photonChargeKey, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);	
+		
+		npix = (Integer) input.get("NPIX");	
 			
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 		double[] arrivalTimes = (double[]) input.get(arrivalTimeKey);
@@ -157,7 +160,7 @@ public class CoreNeighborClean implements Processor{
 	 * @return
 	 */
 	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold) {
-		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++)
+		for(int pix = 0; pix < npix; pix++)
 		{ 
 			if (photonCharge[pix] > corePixelThreshold){
 				showerPixel.add(pix);

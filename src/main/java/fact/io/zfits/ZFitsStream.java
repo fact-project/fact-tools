@@ -178,9 +178,15 @@ public class ZFitsStream extends AbstractStream {
 			String key   = entry.getKey();
 			String value = entry.getValue().getValue();
 			//ignore several information about the coloumns
-			if (key.startsWith("TFORM") || key.startsWith("ZFORM") || key.startsWith("TTYPE") || key.startsWith("ZCTYP")
-					|| key.startsWith("PCOUNT"))
-				continue;
+			ArrayList<String> ignoreStarting = new ArrayList<>();
+			ignoreStarting.add("TFORM");
+			ignoreStarting.add("ZFORM");
+			ignoreStarting.add("TTYPE");
+			ignoreStarting.add("ZCTYPE");
+			ignoreStarting.add("PCOUNT");
+			for (String ignorekey : ignoreStarting)
+				if (key.startsWith(ignorekey))
+					continue;
 			switch(entry.getValue().getType()) {
 			case BOOLEAN:
 				if (value.equals("T"))

@@ -27,9 +27,13 @@ object.
             Double maxAmplitude = 0;
 
             //get the roi. The Region of interest. Thats the length of an event in slices
-            int roi = data.length / Constants.NUMBEROFPIXEL; 
+            int roi = (Integer) input.get("NROI");
+            
+            //get npix. number of pixels
+            int npix = (Integer) input.get("NPIX");
+            
             // for each pixel
-            for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+            for(int pix = 0 ; pix < npix; pix++){
               //get the position of the first slice of pixel pix in the 1D array.
               int position = pix*roi;
               //iterate over all slices
@@ -57,7 +61,7 @@ discussion on the primitive types vs Number Objects in the Java programming lang
 If you don't worry about runtime and memory consumption you can also iterate over the pixel data by using
 the methods provided by the FactPixelMap singelton.
             
-            int roi = data.length / Constants.NUMBEROFPIXEL; 
+            int roi = (Integer) input.get("NROI");
             for (FactCameraPixel p : map.pixelArray){
                 double[] pixelData = p.getPixelData(data, roi);
             }
