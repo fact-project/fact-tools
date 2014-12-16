@@ -34,9 +34,13 @@ public class PulseSizeCalculator implements Processor {
     private int width;
     	//number of slices over which we integrate
 
+    private int npix;
+
 	@Override
 	public Data process(Data input) {
         Utils.mapContainsKeys(input, key, arrivalTimeKey);
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 
         double[] data = (double[]) input.get(key);
         int roi = data.length / npix;
