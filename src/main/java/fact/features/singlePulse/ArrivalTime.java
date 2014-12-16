@@ -43,7 +43,7 @@ public class ArrivalTime implements Processor {
         double[] data = (double[]) input.get(key);
         int[][] maxAmpPositions = (int[][]) input.get(maxAmpPositionKey);
         int roi = data.length / npix;
-        int[][] arrivalTimes =  new int[][npix];
+        int[][] arrivalTimes =  new int[npix][];
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
         
