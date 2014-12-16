@@ -1,0 +1,144 @@
+<Skip condition="%{data.shower} == null" />
+<fact.features.NumberOfPixelInShower
+    showerKey="shower"
+    outputKey="numPixelInShower"
+/>
+<Skip condition="%{data.numPixelInShower} &lt; 5" />
+
+<fact.statistics.ArrayMean
+    key="photoncharge"
+    outputKey="photonchargeMean"
+/>
+<fact.statistics.ArrayMean
+    key="arrivalTime"
+    outputKey="arrivalTimeMean"
+/>
+<fact.statistics.ArrayStatistics
+    key="photoncharge"
+    outputKey="phChargeShower"
+    pixelSetKey="shower"
+    />
+<fact.statistics.ArrayStatistics 
+    key="arrivalTime" 
+    outputKey="arrTimeShower" 
+    pixelSetKey="shower" 
+/>
+<fact.statistics.ArrayStatistics 
+    key="maxSlopes" 
+    outputKey="maxSlopesShower" 
+    pixelSetKey="shower" 
+/>
+<fact.statistics.ArrayStatistics 
+    key="arrivalTimePos" 
+    outputKey="arrTimePosShower" 
+    pixelSetKey="shower" 
+/>
+<fact.statistics.ArrayStatistics 
+    key="maxSlopesPos" 
+    outputKey="maxSlopesPosShower" 
+    pixelSetKey="shower" 
+/>
+<fact.statistics.ArrayStatistics 
+    key="maxAmplitudePosition" 
+    outputKey="maxAmplPosShower" 
+    pixelSetKey="shower" 
+/>
+<fact.statistics.ArrayStatistics 
+    key="photonchargeSaturated" 
+    outputKey="phChargeSaturation" 
+    pixelSetKey="saturatedPixel" 
+/>
+<fact.statistics.ArrayStatistics 
+    key="arrivalTimeTOT" 
+    outputKey="arrTimeSaturation" 
+    pixelSetKey="saturatedPixel" 
+/>
+<fact.features.Size 
+    showerKey="shower" 
+    photonChargeKey="photoncharge" 
+    outputKey="Size" 
+/>       
+<fact.features.DistributionFromShower
+    weightsKey="photoncharge"
+    showerKey="shower"
+    sizeKey="Size"
+    outputKey="showerDistribution"
+/>
+<fact.features.M3Long 
+    weightsKey="photoncharge" 
+    showerKey="shower" 
+    distribution="showerDistribution" 
+/>
+<fact.features.Length
+    distribution="showerDistribution"
+    outputKey="Length"
+/>
+<fact.features.Width
+    distribution="showerDistribution"
+    outputKey="Width"
+/>
+<fact.features.NumberOfIslands
+    key="shower"
+    outputKey="numIslands"
+/>
+<fact.features.TimeGradient
+    showerKey="shower"
+    arrivalTimeKey="arrivalTime"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
+    outputKeySlope="timeGradientSlope"
+    outputKeyIntercept="timeGradientIntercept"
+    outputKeySumSquaredErrors="timeGradientSSE"
+/>
+<fact.features.Concentration
+    weights="photoncharge"
+    shower="shower"
+    concOneOutputKey="Concentration_onePixel"
+    concTwoOutputKey="Concentration_twoPixel"
+/>
+<fact.features.ConcentrationCore
+    cogxKey="COGx"
+    cogyKey="COGy"
+    showerPixelKey="shower"
+    photonChargeKey="photoncharge"
+    sizeKey="Size"
+    widthKey="Width"
+    lengthKey="Length"
+    deltaKey="Delta"
+    outputKey="ConcCore"
+/>
+<fact.features.ConcentrationAtCenterOfGravity
+    photonChargeKey="photoncharge"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    sizeKey="Size"
+    outputKey="concCOG"
+/>
+<fact.features.Leakage
+    distribution="showerDistribution"
+    shower="shower"
+    weights="photoncharge"
+    outputKey="Leakage"
+/>
+<fact.features.TimeSpread
+    weightsKey="photoncharge"
+    arrivalTimeKey="arrivalTime"
+    showerKey="shower"
+    outputKey="Timespread"
+/>
+<fact.features.ShowerSlope
+    photonChargeKey="photoncharge"
+    arrivalTimeKey="arrivalTime"
+    showerKey="shower"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
+    outputKey="Slope"
+/>
+<fact.features.Disp
+    widthKey="Width"
+    lengthKey="Length"
+    c0="117.94"
+    outputKey="Disp"
+/>

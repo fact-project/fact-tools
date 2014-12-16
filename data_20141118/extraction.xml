@@ -1,0 +1,59 @@
+<module>
+<fact.extraction.BasicExtraction
+    dataKey="DataCalibrated" 
+    outputKeyMaxAmplPos="maxPos_Basic"
+    outputKeyPhotonCharge="pC_Basic" 
+    url="file:${integralGainFile}"
+    startSearchWindow="35"
+    rangeSearchWindow="80"
+    rangeHalfHeightWindow="25"
+/>
+<fact.extraction.RisingEdgeForPositions
+    dataKey="DataCalibrated"
+    amplitudePositionsKey="maxPos_Basic"
+    outputKey="arrivalTimePos"
+    maxSlopesKey="maxSlopesPos"
+/>
+<fact.extraction.RisingEdgePolynomFit
+    dataKey="DataCalibrated"
+    risingEdgeKey="arrivalTimePos"
+    outputKey="aT_Basic"
+    numberOfPoints="11"
+    maxSlopesKey="mS_Basic"
+/>
+<fact.extraction.RisingEdgeFitForPositions
+    dataKey="DataCalibrated"
+    positionsKey="maxPos_Basic"
+    outputKey="aT_Basic_FitForPositions"
+    numberOfPoints="11"
+    maxSlopesKey="mS_Basic_FitForPositions"
+/>
+<fact.extraction.TimeOverThreshold
+    dataKey="DataCalibrated"
+    outputKey="timeOverThreshold"
+    firstSliceOverThresholdOutputKey="arrivalTimeTOT"
+    positionsKey="maxPos_Basic"
+    threshold="1500" 
+    thresholdOutputKey="thresholdForToT"
+/>
+<fact.extraction.PhotonChargeTimeOverThreshold
+    timeOverThresholdKey="timeOverThreshold"
+    thresholdKey="thresholdForToT"
+    outputKey="photonchargeSaturated"
+/>
+<fact.extraction.HandleSaturation
+    photonChargeKey="pC_Basic"
+    photonChargeSaturatedKey="photonchargeSaturated"
+    arrivalTimeKey="aT_Basic"
+    arrivalTimeSaturatedKey="arrivalTimeTOT" 
+    limitForSaturatedPixel="150" 
+    outputKeyPhotonCharge="pC_Basic" 
+    outputKeyArrivalTime="aT_Basic_oD" 
+    saturatedPixelKey="saturatedPixel" 
+/>
+<fact.datacorrection.CorrectPixelDelays
+    arrivalTimeKey="aT_Basic_oD"
+    outputKey="aT_Basic"
+    url="file:${pixelDelayFile}"
+/>
+</module>
