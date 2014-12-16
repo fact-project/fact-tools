@@ -57,7 +57,7 @@ public class MinAmplitudeGlobal implements Processor{
      * @return
      */
     public double globalMinimum(int roi, int pix, double[] data){
-        double tempMinValue = 0;
+        double tempMinValue = Double.MAX_VALUE;
         for (int slice = skipFirstSlices; slice < roi-skipLastSlices; slice++) {
             int pos = pix * roi + slice;
             double value = data[pos];
