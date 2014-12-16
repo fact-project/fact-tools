@@ -11,6 +11,8 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import javax.swing.text.Utilities;
+
 /**
  * This processor simply calculates the minimum value for all time slices in each Pixel.
  * The output is a double array with an entry for each Pixel.
@@ -32,16 +34,22 @@ public class MinAmplitudeGlobal implements Processor{
     @Parameter(description = "skip the last N slices of the timeline")
     private int skipLastSlices=100;
 
+    private int npix;
+
     @Override
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
+
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
+
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
 
         //for all pixel find the maximum value
-        double[] min = new double[Constants.NUMBEROFPIXEL];
+        double[] min = new double[npix];
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
             min[pix] = globalMinimum(roi, pix, data);
         }
 
