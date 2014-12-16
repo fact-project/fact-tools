@@ -48,8 +48,14 @@ public class ChargeRandSampleGivenWindow implements Processor {
 
         double[] data        = (double[]) input.get(key);
 
-        double[] chargeMean = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeRms  = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeMean             = new double[npix];
+        double[] chargeRms              = new double[npix];
+        double[] chargeKurtosis         = new double[npix];
+        double[] chargeMax              = new double[npix];
+        double[] chargeMin              = new double[npix];
+        double[] chargeSkewness         = new double[npix];
+        double[] chargeMedian           = new double[npix];
+        double[] chargeSum              = new double[npix];
 
         int roi = data.length / Constants.NUMBEROFPIXEL;
 
@@ -93,8 +99,14 @@ public class ChargeRandSampleGivenWindow implements Processor {
             charge[pix] = integral;
 
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
-            chargeMean[pix]  = descriptiveStatistics.getMean();
-            chargeRms[pix]   = descriptiveStatistics.getStandardDeviation();
+            chargeMean[pix]         = descriptiveStatistics.getMean();
+            chargeRms[pix]          = descriptiveStatistics.getStandardDeviation();
+            chargeKurtosis[pix]     = descriptiveStatistics.getKurtosis();
+            chargeMax[pix]          = descriptiveStatistics.getMax();
+            chargeMin[pix]          = descriptiveStatistics.getMin();
+            chargeSkewness[pix]     = descriptiveStatistics.getSkewness();
+            chargeMedian[pix]       = descriptiveStatistics.getPercentile(0.5);
+            chargeSum[pix]          = descriptiveStatistics.getSum();
 
 
         }
@@ -102,6 +114,12 @@ public class ChargeRandSampleGivenWindow implements Processor {
         input.put(outputKey, charge);
         input.put(outputKey+"_mean", chargeMean);
         input.put(outputKey+"_var", chargeRms);
+        input.put(outputKey+"_kurtosis",chargeKurtosis);
+        input.put(outputKey+"_max",chargeMax);
+        input.put(outputKey+"_min",chargeMin);
+        input.put(outputKey+"_skewness",chargeSkewness);
+        input.put(outputKey+"_median",chargeMedian);
+        input.put(outputKey+"_sum",chargeSum);
 
         return input;
     }
