@@ -40,11 +40,14 @@ public class ChargeRandSampleGivenWindow implements Processor {
     // A logger
     static Logger log = LoggerFactory.getLogger(ChargeRandSampleGivenWindow.class);
 
+    private int npix;
 
     @Override
     public Data process(Data input) {
 
         Utils.mapContainsKeys(input, key);
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 
         double[] data        = (double[]) input.get(key);
 
@@ -57,7 +60,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
         double[] chargeMedian           = new double[npix];
         double[] chargeSum              = new double[npix];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
 
         Random rand = new Random(Seed);
 
@@ -65,10 +68,10 @@ public class ChargeRandSampleGivenWindow implements Processor {
         int iterations = bound/windowSize;
         log.info("Iterations: " + iterations );
 
-        double[][] charge = new double[Constants.NUMBEROFPIXEL][iterations];
+        double[][] charge = new double[npix][iterations];
 
         //Loop over all pixel and calculate integrals on timeline
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
             int firstStartSlice = skipFirst + rand.nextInt(bound);
             int startSlice = firstStartSlice;
 
