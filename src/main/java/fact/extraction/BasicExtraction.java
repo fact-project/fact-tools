@@ -48,22 +48,25 @@ public class BasicExtraction implements Processor {
 	
 	protected double[] integralGains = null;
 	
+	private int npix = Constants.NUMBEROFPIXEL;
+	
 	@Override
 	public Data process(Data input) {
 		Utils.mapContainsKeys(input, dataKey,"NROI");
 		
 		int roi = (Integer) input.get("NROI");
+		npix = (Integer) input.get("NPIX");
 		
 		double[] data = (double[]) input.get(dataKey);
 		
-		int[] positions =  new int[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] mPositions = new IntervalMarker[Constants.NUMBEROFPIXEL];
-		double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] mPhotonCharge = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		int[] positions =  new int[npix];
+        IntervalMarker[] mPositions = new IntervalMarker[npix];
+		double[] photonCharge = new double[npix];
+        IntervalMarker[] mPhotonCharge = new IntervalMarker[npix];
         
         Utils.checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, roi);
         
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
 			positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow+rangeSearchWindow, roi, data);
 			mPositions[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
 			
@@ -134,7 +137,7 @@ public class BasicExtraction implements Processor {
 
 	
 	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
-		double[] integralGains = new double[Constants.NUMBEROFPIXEL];
+		double[] integralGains = new double[npix];
 		Data integralGainData = null;
 		try {
 			CsvStream stream = new CsvStream(inputUrl, " ");
@@ -142,7 +145,7 @@ public class BasicExtraction implements Processor {
 			stream.init();
 			integralGainData = stream.readNext();
 			
-			for (int i = 0 ; i < Constants.NUMBEROFPIXEL ; i++){
+			for (int i = 0 ; i < npix ; i++){
 				String key = "column:" + (i);
 				integralGains[i] = (Double) integralGainData.get(key);
 			}

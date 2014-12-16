@@ -31,8 +31,8 @@ public class RisingEdgePolynomFit implements Processor {
         npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys(input, dataKey,risingEdgeKey,"NROI");
 		
-		double[] arrivalTimes = new double[Constants.NUMBEROFPIXEL];
-		double[] maxSlopes = new double[Constants.NUMBEROFPIXEL];
+		double[] arrivalTimes = new double[npix];
+		double[] maxSlopes = new double[npix];
 		IntervalMarker[] m = new IntervalMarker[npix];
 		
 		double[] data = (double[]) input.get(dataKey);
