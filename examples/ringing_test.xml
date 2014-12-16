@@ -1,0 +1,34 @@
+<container>
+    <property name="infile" value="/home/localhost/schennetten_fact-tools/2014-07-23_18-06-52.hex.fits.gz" />
+    
+    <Stream id="data" class="fact.io.FitsStream"
+            url="file:${infile}" />
+
+    <Process input="data">
+<!--        <stream.flow.Skip condition="%{data.EventNum} &gt; 200" />-->
+        <fact.utils.CastToDoubleArray key="Data"/>
+
+        <fact.datacorrection.RemoveSpikes dataKey="Data"
+                                          outputKey="spikelessData"
+                                          startCellKey="StartCellData"
+                                          leftBorder="6"
+                                          spikeLimit="0.01"
+                                          topSlopeLimit="0.004"
+                                          maxSpikeLength="4"
+                                          outputSpikesKey="Sp"
+                                          addSpikeInfo ="true" />
+
+       <fact.statistics.FastFourierTrafo key="spikelessData" 
+                                         lengthForFFT="1024" 
+                                         outputKey="fft" 
+                                         searchWindowLeft="10" 
+                                         searchWindowRight="1013"/>
+       <fact.extraction.RingingInSearchWindow key="fft"   
+                                              outputKey="ringing"        
+                                              searchWindowLeft="30" 
+                                              searchWindowRight="50"/>                              
+       <fact.io.RootASCIIWriter keys="EventNum,ringing,spikelessData,fft" url="file:/home/localhost/schennetten_fact-tools/ringing.txt"/>
+
+    </Process>
+
+ </container>
