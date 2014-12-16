@@ -5,7 +5,7 @@ import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.hexmap.ui.overlays.MarkerOverlay;
+//import fact.hexmap.ui.overlays.MarkerOverlay;
 
 /**
  *	WeightedShowerCenter
@@ -85,8 +85,8 @@ public class WeightedShowerCenter implements Processor
 		
 		if(draw)
 		{
-			input.put("center", new MarkerOverlay(ergX, ergY));
-			input.put("center2", new MarkerOverlay(ergX2, ergY2));
+			//input.put("center", new MarkerOverlay(ergX, ergY));
+			//input.put("center2", new MarkerOverlay(ergX2, ergY2));
 		}
 		
 		return input;

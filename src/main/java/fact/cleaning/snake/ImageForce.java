@@ -24,7 +24,7 @@ public abstract class ImageForce
 	// image intensity median
 	double median = 1;
 	
-	final FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();
+	final protected FactPixelMapping PixelMapping_  = FactPixelMapping.getInstance();
 	
 	protected ImageForce(double[] data, float centerX, float centerY)
 	{

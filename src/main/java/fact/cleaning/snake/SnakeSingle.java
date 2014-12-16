@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import fact.cleaning.snake.ImageForce;
 import fact.cleaning.snake.PhotonchargeForce;
 import fact.hexmap.ui.overlays.PolygonOverlay;
+import fact.hexmap.ui.overlays.VectorFieldOverlay;
 
 /**
  *	SnakeSingle
@@ -160,7 +161,7 @@ public class SnakeSingle extends Snake implements StatefulProcessor
 		input.put(snakeOutX, this.getSnakeX());
 		input.put(snakeOutY, this.getSnakeY());
 		input.put(numberOfVerticesOut, this.getNumberOfVertices());
-		
+			
 		return input;
 	}
 
