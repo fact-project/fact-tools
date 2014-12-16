@@ -5,7 +5,8 @@
 	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
 	<property name="drivefile" value="src/test/resources/testDriveFile.fits" /> -->
 	<!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/proton_heinz_4_psf_3_0/32910/00000003.910_D_MonteCarlo032_Events.fits.gz" /> -->
-	<property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres/proton_heinz_5/32910/00032910.910_D_MonteCarlo032_Events.fits.gz" />
+	<!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres/proton_heinz_5/32910/00032910.910_D_MonteCarlo032_Events.fits.gz" /> -->
+	<property name="infile" value="/home/fabian/mount/Phido/home_oprfact/cerestesten/individualTimeSpread/00000003.000_D_MonteCarlo000_Events.fits" />
 	<property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples.drs.fits.gz" />
 	<!-- <property name="drivefile" value="src/test/resources/testDriveFile.fits" /> -->
     <property name="sourcename" value="crab" />
@@ -14,6 +15,7 @@
     <property name="time_threshold" value="30.0" />
     <property name="min_number_of_pixel" value="2" />
     <property name="integral_gain" value="242.0" />
+    <property name="integralGainFile" value="src/main/resources/defaultIntegralGains.csv" />
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
@@ -22,7 +24,7 @@
     <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
     <process id="2" input="fact">
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
-        <stream.flow.Skip condition="%{data.MCorsikaEvtHeader.fTotalEnergy} &gt; 400" />
+        <!-- <stream.flow.Skip condition="%{data.MCorsikaEvtHeader.fTotalEnergy} &gt; 400" /> -->
         <fact.io.PrintKeysOnConsole keys="MCorsikaEvtHeader.fTotalEnergy" />
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
         <fact.utils.Remapping key="Data" outputKey="Data" />
@@ -33,11 +35,18 @@
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" />
         
-
+        <fact.extraction.BasicExtraction
+        	dataKey="DataCalibrated" 
+        	outputKeyMaxAmplPos="maxAmplitudePosition"
+        	outputKeyPhotonCharge="photoncharge" 
+        	url="file:${integralGainFile}"
+        	startSearchWindow="35"
+        	rangeSearchWindow="60"
+        	rangeHalfHeightWindow="25"
+        />
+        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" maxSlopesKey="maxSlopes" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+   
         <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
            corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
            timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
@@ -63,6 +72,10 @@
 		<!-- <stream.flow.Skip condition="%{data.shower} == null" />
         <fact.features.Size showerKey="shower" photonchargeKey="photoncharge" outputKey="Size" />    -->    
         <!-- <stream.flow.Skip condition="%{data.Size} &lt; 100" /> -->
+        
+        <fact.io.PrintKeysOnConsole keys="MCorsikaEvtHeader.fEvtNumber,MCorsikaEvtHeader.fNumReuse,MMcEvt.fEvtNumber,MMcEvt.fEventReuse" />
+        <PrintData />
+        
 
 
         <fact.ShowViewer key="DataCalibrated"/>
