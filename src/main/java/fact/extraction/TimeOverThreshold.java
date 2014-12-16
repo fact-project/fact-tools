@@ -3,7 +3,6 @@
  */
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 
@@ -39,27 +38,31 @@ public class TimeOverThreshold implements Processor {
 	private String outputKey = null;
 	
 	private PixelSetOverlay pixelSet;
+	
+	private int npix;
 
 	public Data process(Data input) {
         Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, positionsKey, int[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 				
-		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
-		double[] firstSliceOverThresholdArray =  new double[Constants.NUMBEROFPIXEL];
+		int[] timeOverThresholdArray =  new int[npix];
+		double[] firstSliceOverThresholdArray =  new double[npix];
 		
 		double[] data 	 = (double[]) input.get(dataKey);
 		int[] posArray = (int[]) input.get(positionsKey);
 		
-		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] m = new IntervalMarker[npix];
 			
-		int roi = data.length / Constants.NUMBEROFPIXEL;
+		int roi = data.length / npix;
 		int numPixelAboveThreshold = 0;
 		
 		pixelSet = new PixelSetOverlay();
         int[] totPixelSet = null;
 
 		//Loop over pixels
-		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+		for(int pix = 0 ; pix < npix; pix++){
 			firstSliceOverThresholdArray[pix] = 0;
 			
 			int pos = pix*roi;

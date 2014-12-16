@@ -3,7 +3,6 @@ package fact.extraction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 import fact.utils.RemappingKeys;
@@ -28,19 +27,21 @@ public class IdentifyPixelAboveThreshold implements Processor {
     private String outputKey;
 	
     private PixelSetOverlay pixelSet;
+    
+	private int npix;
 	
-
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(input, key, double[].class);				
+		Utils.isKeyValid(input, key, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");	
 		
-		double[] matchArray =  new double[Constants.NUMBEROFPIXEL];
+		double[] matchArray =  new double[npix];
 				
 		double[] featureArray 	 = (double[]) input.get(key);
-		
-		
+				
 		pixelSet = new PixelSetOverlay();
-		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+		for(int pix = 0 ; pix < npix; pix++){
 			matchArray[pix] = 0;
 			if ( featureArray[pix] > threshold){
 				matchArray[pix] = 1;

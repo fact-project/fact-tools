@@ -51,7 +51,7 @@ public class CoreNeighborClean extends BasicCleaning implements Processor{
             " are even considered for NeighbourCorePixel. " +
             " If Size is smaller than minSize the Pixels will be discarded.")
 	private int minNumberOfPixel;
-
+	private int npix;
 
     @Parameter(required = false)
     private String[] starPositionKeys = null;
@@ -67,7 +67,10 @@ public class CoreNeighborClean extends BasicCleaning implements Processor{
 	@Override
 	public Data process(Data input) {
 		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
-		Utils.isKeyValid(input, photonChargeKey, double[].class);		
+		Utils.isKeyValid(input, photonChargeKey, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);	
+		
+		npix = (Integer) input.get("NPIX");	
 			
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 		double[] arrivalTimes = (double[]) input.get(arrivalTimeKey);
@@ -146,8 +149,6 @@ public class CoreNeighborClean extends BasicCleaning implements Processor{
 
 		return input;
 	}
-	
-	
 	
 	/**
 	 * Remove pixels with a difference in the arrivalTime to the median of the arrivalTimes of all pixels, larger than the timeThreshold

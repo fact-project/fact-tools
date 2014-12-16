@@ -7,6 +7,7 @@ import stream.util.parser.ParseException;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -128,16 +129,33 @@ public class ZFitsUtil {
 //			System.out.println("Found table: "+fitsTable.getTableName());
 			if (!fitsTable.getTableName().equals(tableName)) {
 				// it is not the desired table so skip it entirely
-//				System.out.println("Skipping: "+fitsTable.getTableTotalSize());
-				long num = input.skipBytes((int) fitsTable.getTableTotalSize());
-//				long num = input.skip(fitsTable.getTableTotalSize());
-//				System.out.println("Num: "+num);
-				if (num!=(int)fitsTable.getTableTotalSize())
-					throw new MissingArgumentException("Couldn't skip the table, maybe file is corrupted or table is missing. Name: "+tableName);
+				// System.out.println("Skipping: "+fitsTable.getTableTotalSize());
+				long num = skipLong(input, fitsTable.getTableTotalSize());
+				// System.out.println("Num: "+num);
+				if (num!=fitsTable.getTableTotalSize())
+					throw new MissingArgumentException("Couldn't skip table or arrived at the end of the file, only skipped: "+num+" bytes. Couldn't find Table: "+tableName);
 				continue;
 			}
 			return fitsTable;
 		}
+	}
+	
+	/**
+	 * Spezial funktion to skip n bytes in an input stream. Implemented because of lack in the
+	 * standart library.
+	 * @param input The InputStream which should advance by n bytes.
+	 * @param n The amout of bytes to skip given as a long.
+	 * @return The amount of bytes skipped
+	 * @throws IOException Something went wrong working with the input stream.
+	 */
+	public static long skipLong(InputStream input, long n) throws IOException {
+		long total = 0;
+		long cur = 0;
+
+	    while ((total<n) && ((cur = input.skip(n-total)) > 0)) {
+	    	total += cur;
+	    }
+	    return total;
 	}
 
 	public static ByteBuffer wrapBig(byte[] data) {

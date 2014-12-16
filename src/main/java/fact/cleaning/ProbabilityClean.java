@@ -1,6 +1,5 @@
 package fact.cleaning;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
@@ -34,10 +33,14 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 	private double cogx;
 	private double cogy;
 	
+	private int npix;
+	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	@Override
 	public Data process(Data input) {
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys(input, photonChargeKey, deltaKey);
 		
 		photoncharge = (double[]) input.get(photonChargeKey);
@@ -49,7 +52,7 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 		
 		ArrayList<Integer> showerlist = new ArrayList<Integer>();
 		
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+		for (int px = 0 ; px < npix ; px++)
 		{
 			double xpos = pixelMap.getPixelFromId(px).getXPositionInMM();
 			double ypos = pixelMap.getPixelFromId(px).getYPositionInMM();

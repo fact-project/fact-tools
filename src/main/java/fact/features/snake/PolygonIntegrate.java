@@ -1,6 +1,5 @@
 package fact.features.snake;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
@@ -19,13 +18,15 @@ public class PolygonIntegrate implements Processor
 	private String outkeyPixelList = null;			// Liste an Pixeln die Innerhalb der Snake liegen
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-
-
+    
+	private int npix;
 
 
     @Override
 	public Data process(Data input) 
 	{
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		if(outkey == null)	throw new RuntimeException("Key \"outkey\" not set");		
 		if(outkeyNumberOfPixel == null) throw new RuntimeException("Key \"outkeyNumberOfPixel\" not set");
 		if(outkeyPixelList == null) throw new RuntimeException("Key \"outkeyPixelList\" not set");
@@ -48,7 +49,7 @@ public class PolygonIntegrate implements Processor
 		boolean[] chidInPoly = new boolean[1440];
 		
 		double erg = 0;
-		for(int i=0; i<Constants.NUMBEROFPIXEL; i++)
+		for(int i=0; i<npix; i++)
 		{
 			if(poly.contains(pixelMap.getPixelFromId(i).getXPositionInMM(), pixelMap.getPixelFromId(i).getYPositionInMM()))	// Prüfe ob Pixel im Poly/Snake liegt
 			{
@@ -60,7 +61,7 @@ public class PolygonIntegrate implements Processor
 		}
 		
 		int[] chids = new int[numberOfPixel];		
-		for(int i = 0, tmpCount=0; i<Constants.NUMBEROFPIXEL; i++)
+		for(int i = 0, tmpCount=0; i<npix; i++)
 		{
 			if(chidInPoly[i])chids[tmpCount++] = i;
 		}

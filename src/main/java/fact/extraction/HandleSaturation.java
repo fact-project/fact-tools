@@ -1,6 +1,5 @@
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 import stream.Data;
@@ -30,6 +29,8 @@ public class HandleSaturation implements Processor {
     private String saturatedPixelKey = null;
 
     private PixelSetOverlay saturatedPixelSet = null;
+    
+	private int npix;
 
 	public Data process(Data input) {
 		
@@ -37,11 +38,13 @@ public class HandleSaturation implements Processor {
 		Utils.isKeyValid(input, photonChargeSaturatedKey, double[].class);
 		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 		Utils.isKeyValid(input, arrivalTimeSaturatedKey, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
 		
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 		double[] photonChargeSaturated = (double[]) input.get(photonChargeSaturatedKey);
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		double[] arrivalTimeSaturated = (double[]) input.get(arrivalTimeSaturatedKey);
+		npix = (Integer) input.get("NPIX");
 		
 		
 		double[] resultPhotonCharge = new double[photonCharge.length];
@@ -51,7 +54,7 @@ public class HandleSaturation implements Processor {
 
         saturatedPixelSet = new PixelSetOverlay();
 
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+		for (int px = 0 ; px < npix ; px++)
 		{
 			if (photonCharge[px] > limitForSaturatedPixel)
 			{

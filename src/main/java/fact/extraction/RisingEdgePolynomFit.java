@@ -4,7 +4,6 @@ import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.jfree.chart.plot.IntervalMarker;
 
-import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -17,6 +16,8 @@ public class RisingEdgePolynomFit implements Processor {
 	@Parameter(required=true, description="Key to the data array")	
 	private String dataKey = null;
 	@Parameter(required=true, description="outputKey for the calculated arrival time")
+	private int npix;
+	
 	private String outputKey = null;
 	@Parameter(required=true, description="outputKey for the calculated slope at the arrival time")
 	private String maxSlopesKey = null;
@@ -26,11 +27,13 @@ public class RisingEdgePolynomFit implements Processor {
 
 	@Override
 	public Data process(Data input) {
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys(input, dataKey,risingEdgeKey,"NROI");
 		
 		double[] arrivalTimes = new double[Constants.NUMBEROFPIXEL];
 		double[] maxSlopes = new double[Constants.NUMBEROFPIXEL];
-		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] m = new IntervalMarker[npix];
 		
 		double[] data = (double[]) input.get(dataKey);
 		int roi = (Integer) input.get("NROI");
@@ -44,7 +47,7 @@ public class RisingEdgePolynomFit implements Processor {
 		
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
 				
-		for (int pix = 0 ; pix < Constants.NUMBEROFPIXEL ; pix++)
+		for (int pix = 0 ; pix < npix ; pix++)
 		{
 			int pos = risingEdges[pix];
 			int[] window = Utils.getValidWindow(pos-numberOfPoints/2, numberOfPoints, 0, roi);
