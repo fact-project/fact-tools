@@ -1,11 +1,12 @@
 /**
  * 
  */
-package fact.features;
+package fact.features.singlePulse;
 
+import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -44,15 +45,16 @@ public class OpenShutterPulseSize implements Processor {
         npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
         int roi = data.length / npix;
-        ArrayList[] arrivalTimes = (ArrayList[]) input.get(arrivalTimeKey);
-        ArrayList[] baselineValues = (ArrayList[]) input.get(baselineKey);
-        ArrayList[] pulseSizes = new ArrayList[npix];
+		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
+		double[][] baselineValues = (double[][]) input.get(baselineKey);
+	    double[][] pulseSizes = new double[npix][];
       
-        //for each pixel
-        for (int pix = 0; pix < npix; pix++) {          
-            pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues); 
-        }
-        
+		//for each pixel
+		for (int pix = 0; pix < npix; pix++) {
+			pulseSizes[pix] = new double[arrivalTimes[pix].length];
+			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues);
+		}
+		
         input.put(outputKey, pulseSizes);
         
         return input;
@@ -64,30 +66,30 @@ public class OpenShutterPulseSize implements Processor {
      * @param data the array which to check
      * @return
      */
-    
-    public ArrayList calculateSizes(int pix, int roi, double[] data, ArrayList[] arrivalTimes, ArrayList[] baselineValues){
-      
-        ArrayList<Integer> sizes = new ArrayList<Integer>();
-        
-        if(!arrivalTimes[pix].isEmpty()){
-            int numberPulses = arrivalTimes[pix].size(); 
-            
-            //return an empty list for any pixel where the number of pulses is not equal to the number of baseline values
-            if(numberPulses != baselineValues[pix].size()){
-                System.out.println("Error - arrival times don't match up with baseline values");
-                return sizes;
-            }
-            
-            for(int i = 0; i < numberPulses; i++){
-                  int integral = 0;
-                  int start = (Integer) arrivalTimes[pix].get(i);
-                  double baseline = (Double) baselineValues[pix].get(i);
+	
+    public double[] calculateSizes(int pix, int roi, double[] data, int[][] arrivalTimes, double[][] baselineValues){
+      //changed from int to double
+		ArrayList<Double> sizes = new ArrayList<Double>();
+    	
+        if(arrivalTimes[pix].length > 0){
+        	int numberPulses = arrivalTimes[pix].length;
+        	
+        	//return an empty list for any pixel where the number of pulses is not equal to the number of baseline values
+        	if(numberPulses != baselineValues[pix].length){
+        		System.out.println("Error - arrival times don't match up with baseline values");
+        		return Utils.arrayListToDouble(sizes);
+        	}
+        	
+        	for(int i = 0; i < numberPulses; i++){
+                  double integral = 0;
+                  int start =  arrivalTimes[pix][i];
+                  double baseline =  baselineValues[pix][i];
                   
                 
                   //ignore pulses that are too close together
                   if(numberPulses > 1 && i != 0){
-                     int first = (Integer) arrivalTimes[pix].get(i-1);
-                     int second = (Integer) arrivalTimes[pix].get(i);
+                	 int first =  arrivalTimes[pix][i-1];
+                	 int second =  arrivalTimes[pix][i];
 
                       if(second - first < width){
                           continue;
@@ -101,7 +103,7 @@ public class OpenShutterPulseSize implements Processor {
                   if(integral > 0) sizes.add(integral);
             }       
         }
-        return sizes;
+        return Utils.arrayListToDouble(sizes);
     }   
      
     /*

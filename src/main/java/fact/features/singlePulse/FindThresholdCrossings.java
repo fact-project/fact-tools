@@ -1,5 +1,6 @@
-package fact.features;
+package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import fact.extraction.PhotonCharge;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class FindThresholdCrossings implements Processor {
         double[] positions =  new double[data.length];
         
         //the array CrossPositions contains lists of positions of crossings for each pixel
-        ArrayList[] CrossPositions = new ArrayList[npix];
+        int[][] CrossPositions = new int[npix][];
 
             for(int pix=0; pix < npix; pix++){              
                 //creates a list of positions of threshold crossings for a single pixel
@@ -73,8 +74,8 @@ public class FindThresholdCrossings implements Processor {
                 }
                 
                 //  if no crossing, list for that pixel is empty                
-                
-                CrossPositions[pix] = slices;
+                CrossPositions[pix] = new int[slices.size()];
+                CrossPositions[pix] = Utils.arrayListToInt(slices);
             }
          
             input.put(visualizeOutputKey, positions);

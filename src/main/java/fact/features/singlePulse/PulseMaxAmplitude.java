@@ -1,8 +1,9 @@
 /**
  * 
  */
-package fact.features;
+package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +39,15 @@ public class PulseMaxAmplitude implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
-        ArrayList[] pulsePositions = (ArrayList[]) input.get(pulsePositionKey);
+		int[][] pulsePositions = (int[][]) input.get(pulsePositionKey);
         int roi = data.length / npix;
-        ArrayList[] positions =  new ArrayList[npix];
+        int[][] positions =  new int[npix][];
         
-        //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
-            positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
-        }
+		//for each pixel
+		for (int pix = 0; pix < npix; pix++) {
+			positions[pix] = new int[pulsePositions[pix].length];
+			positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
+		}
         input.put(outputKey, positions);
 //      System.out.println(Arrays.toString(positions));
 
@@ -59,17 +61,17 @@ public class PulseMaxAmplitude implements Processor {
      * @param data the array which to check
      * @return
      */
-    
-    public ArrayList findMaximumPositions(int pix, int roi, double[] data, ArrayList[] pulsePositions){
+	
+    public int[] findMaximumPositions(int pix, int roi, double[] data, int[][] pulsePositions){
       
         ArrayList<Integer> maxima = new ArrayList<Integer>();
 
-        if(!pulsePositions[pix].isEmpty()){
-            int numberPulses = pulsePositions[pix].size();          
-            for(int i = 0; i < numberPulses; i++){
-                  double tempMaxValue = 0;
+        if(pulsePositions[pix].length > 0){
+        	int numberPulses = pulsePositions[pix].length;
+        	for(int i = 0; i < numberPulses; i++){
+        		  double tempMaxValue = 0;
                   int Position = 0;
-                  int start = (Integer) pulsePositions[pix].get(i);
+                  int start = pulsePositions[pix][i];
                   for(int slice = start; slice < start + 30; slice++){
                        int pos = pix * roi + slice;
                        if(slice > roi) {break;}
@@ -87,7 +89,7 @@ public class PulseMaxAmplitude implements Processor {
             }
         }
         
-            return maxima;
+        return Utils.arrayListToInt(maxima);
     }
           
      
