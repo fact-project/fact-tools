@@ -1,6 +1,5 @@
 package fact.statistics;
 
-import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,24 +13,26 @@ public class CameraAverage implements Processor {
 	String key=null;
 	String outputKey=null;
 	
-	
+	private int npix;
 	
 	@Override
 	public Data process(Data input) {
 		// TODO Auto-generated method stub
 		Utils.mapContainsKeys( input, key);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		
 		double[] data=(double[]) input.get(key);
-		int currentRoi = data.length / Constants.NUMBEROFPIXEL;
+		int currentRoi = data.length / npix;
 		
 		double[] result = new double[currentRoi];
 		for (int sl = 0 ; sl < currentRoi ; sl++)
 		{
-			for (int px=0 ; px < Constants.NUMBEROFPIXEL ; px++)
+			for (int px=0 ; px < npix ; px++)
 			{
 				result[sl] += data[px*currentRoi+sl];
 			}
-			result[sl] /= Constants.NUMBEROFPIXEL;
+			result[sl] /= npix;
 		}
 		
 		input.put(outputKey, result);

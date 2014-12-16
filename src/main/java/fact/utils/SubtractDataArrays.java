@@ -6,7 +6,6 @@ package fact.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -28,6 +27,7 @@ public class SubtractDataArrays implements Processor {
     @Parameter(required = false)
     private String outputKey;
     
+	private int npix;
     
 
 	/* (non-Javadoc)
@@ -37,13 +37,15 @@ public class SubtractDataArrays implements Processor {
 	public Data process(Data input) {
 		Utils.isKeyValid(input, key, double[].class);
 		Utils.isKeyValid(input, subtractedKey, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		
-		double[] subtractedArray =  new double[Constants.NUMBEROFPIXEL];
+		double[] subtractedArray =  new double[npix];
 		
 		double[] array1 	 = (double[]) input.get(key);
 		double[] array2 	 = (double[]) input.get(subtractedKey);
 		
-		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+		for(int pix = 0 ; pix < npix; pix++){
 			subtractedArray[pix] = array1[pix] - array2[pix];
 		}
 		

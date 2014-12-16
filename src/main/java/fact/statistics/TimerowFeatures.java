@@ -4,7 +4,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 import org.apache.commons.math3.stat.StatUtils;
 
-import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -43,8 +42,12 @@ public class TimerowFeatures implements Processor {
 
 	private int[] histogram = new int[numberOfBins+2];
 	
+	private int npix;
+	
 	@Override
 	public Data process(Data input) {
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
 		
 		int roi = (Integer) input.get("NROI");
 		
@@ -60,18 +63,18 @@ public class TimerowFeatures implements Processor {
 		double[] movingAverage = (double[]) input.get(movingAverageKey);
 		
 		
-		double[] mean = new double[Constants.NUMBEROFPIXEL];
-		double[] median = new double[Constants.NUMBEROFPIXEL];
-		double[] mode = new double[Constants.NUMBEROFPIXEL];
-		double[] std = new double[Constants.NUMBEROFPIXEL];
-		double[] kurtosis = new double[Constants.NUMBEROFPIXEL];
-		double[] skewness = new double[Constants.NUMBEROFPIXEL];
-		double[] min = new double[Constants.NUMBEROFPIXEL];
-		double[] max = new double[Constants.NUMBEROFPIXEL];
-		double[] quantil25 = new double[Constants.NUMBEROFPIXEL];
-		double[] quantil75 = new double[Constants.NUMBEROFPIXEL];
+		double[] mean = new double[npix];
+		double[] median = new double[npix];
+		double[] mode = new double[npix];
+		double[] std = new double[npix];
+		double[] kurtosis = new double[npix];
+		double[] skewness = new double[npix];
+		double[] min = new double[npix];
+		double[] max = new double[npix];
+		double[] quantil25 = new double[npix];
+		double[] quantil75 = new double[npix];
 		
-		for (int pix = 0 ; pix < Constants.NUMBEROFPIXEL ; pix++)
+		for (int pix = 0 ; pix < npix ; pix++)
 		{
 			double[] values = new double[searchWindowRight - searchWindowLeft]; 
 			for (int sl = searchWindowLeft ; sl < searchWindowRight ; sl++)

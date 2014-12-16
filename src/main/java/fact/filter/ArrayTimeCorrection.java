@@ -1,7 +1,5 @@
 package fact.filter;
 
-
-import fact.Constants;
 import fact.Utils;
 import fact.utils.LinearTimeCorrectionKernel;
 import fact.utils.TimeCorrectionKernel;
@@ -21,22 +19,23 @@ public class ArrayTimeCorrection implements Processor{
 
 	private String outputKey = null;
 	
+	private int npix;
 	private int roi = 0;
 	private TimeCorrectionKernel tcKernel = null;
 	
 	@Override
-	public Data process(Data input) {
-		
+	public Data process(Data input) {		
+		Utils.isKeyValid(input, "NPIX", Integer.class);
 		Utils.mapContainsKeys( input, dataKey, timeCalibConstKey);
-		
+		npix = (Integer) input.get("NPIX");
 		data = (double[]) input.get(dataKey);
-		roi = data.length / Constants.NUMBEROFPIXEL;
+		roi = data.length / npix;
 		timeCalibConst = (double[]) input.get(timeCalibConstKey);
 		tcKernel = new LinearTimeCorrectionKernel();		
 
-		double [] calibratedValues = new double[roi * Constants.NUMBEROFPIXEL];
+		double [] calibratedValues = new double[roi * npix];
 		
-		for(int id = 0; id < Constants.NUMBEROFPIXEL; id++)
+		for(int id = 0; id < npix; id++)
 		{
 			double [] realtimes = new double[roi];
 			double [] values = new double[roi];

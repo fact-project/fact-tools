@@ -20,16 +20,16 @@ import java.util.ArrayList;
  * 
  */
 public class PulseSizeCalculator implements Processor {
-	static Logger log = LoggerFactory.getLogger(PulseSizeCalculator.class);
+    static Logger log = LoggerFactory.getLogger(PulseSizeCalculator.class);
 
     @Parameter(required = true)
     private String key;
     @Parameter(required = true)
     private String outputKey;
-    	//size of pulse
+        //size of pulse
     @Parameter(required = true)
     private String arrivalTimeKey;
-    	//positions of arrival times 
+        //positions of arrival times 
     @Parameter(required = true)
     private int width;
     	//number of slices over which we integrate
@@ -39,12 +39,12 @@ public class PulseSizeCalculator implements Processor {
         Utils.mapContainsKeys(input, key, arrivalTimeKey);
 
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
 		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
-	    double[][] pulseSizes = new double[Constants.NUMBEROFPIXEL][];
+	    double[][] pulseSizes = new double[npix][];
 
 		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+		for (int pix = 0; pix < npix; pix++) {
 			pulseSizes[pix] = new double[arrivalTimes[pix].length];
 			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
 		}
@@ -54,8 +54,8 @@ public class PulseSizeCalculator implements Processor {
 //       System.out.println(Arrays.toString(pulseSizes));
 //       System.out.println(singlePixelPulses);
 
-		return input;
-	}
+        return input;
+    }
 
     /**
      * @param pix Pixel to check
@@ -84,9 +84,9 @@ public class PulseSizeCalculator implements Processor {
     }
           
      
-	/*
-	 * Getters and Setters
-	 */
+    /*
+     * Getters and Setters
+     */
 
 
     public String getKey() {
@@ -105,20 +105,20 @@ public class PulseSizeCalculator implements Processor {
         this.outputKey = outputKey;
     }
 
-	public String getarrivalTimeKey() {
-		return arrivalTimeKey;
-	}
+    public String getarrivalTimeKey() {
+        return arrivalTimeKey;
+    }
 
-	public void setarrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
+    public void setarrivalTimeKey(String arrivalTimeKey) {
+        this.arrivalTimeKey = arrivalTimeKey;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
 }

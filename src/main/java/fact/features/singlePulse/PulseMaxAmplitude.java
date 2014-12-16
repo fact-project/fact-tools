@@ -21,35 +21,38 @@ import java.util.ArrayList;
  * 
  */
 public class PulseMaxAmplitude implements Processor {
-	static Logger log = LoggerFactory.getLogger(PulseMaxAmplitude.class);
+    static Logger log = LoggerFactory.getLogger(PulseMaxAmplitude.class);
 
     @Parameter(required = true)
     private String key;
     @Parameter(required = true)
     private String outputKey;
-    	//positions of max amplitudes of pulses
+        //positions of max amplitudes of pulses
     @Parameter(required = true)
     private String pulsePositionKey;
-    	//positions of threshold crossings
+        //positions of threshold crossings
 
+    private int npix;
 
-	@Override
-	public Data process(Data input) {
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
 		int[][] pulsePositions = (int[][]) input.get(pulsePositionKey);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
-        int[][] positions =  new int[Constants.NUMBEROFPIXEL][];
+        int roi = data.length / npix;
+        int[][] positions =  new int[npix][];
         
 		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+		for (int pix = 0; pix < npix; pix++) {
 			positions[pix] = new int[pulsePositions[pix].length];
 			positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
 		}
         input.put(outputKey, positions);
-//    	System.out.println(Arrays.toString(positions));
+//      System.out.println(Arrays.toString(positions));
 
-		return input;
-	}
+        return input;
+    }
 
     /**
      * finds the position of the highest value in the pulse. if max is not unique, last position will be taken. 
@@ -61,7 +64,7 @@ public class PulseMaxAmplitude implements Processor {
 	
     public int[] findMaximumPositions(int pix, int roi, double[] data, int[][] pulsePositions){
       
-		ArrayList<Integer> maxima = new ArrayList<Integer>();
+        ArrayList<Integer> maxima = new ArrayList<Integer>();
 
         if(pulsePositions[pix].length > 0){
         	int numberPulses = pulsePositions[pix].length;
@@ -70,29 +73,29 @@ public class PulseMaxAmplitude implements Processor {
                   int Position = 0;
                   int start = pulsePositions[pix][i];
                   for(int slice = start; slice < start + 30; slice++){
-        			   int pos = pix * roi + slice;
-        			   if(slice > roi) {break;}
-        			   if(pos == data.length) {break;}
-        	           double value = data[pos];
-        	            //update maxvalue and position if current value exceeds old value 
-        	           if(slice != start && slice != start + 30){ 
-        	        	   if(value >= tempMaxValue){
-        	        		   tempMaxValue = value;
-        	        		   Position = slice;
-        	        	   }
-        	           }
+                       int pos = pix * roi + slice;
+                       if(slice > roi) {break;}
+                       if(pos == data.length) {break;}
+                       double value = data[pos];
+                        //update maxvalue and position if current value exceeds old value 
+                       if(slice != start && slice != start + 30){ 
+                           if(value >= tempMaxValue){
+                               tempMaxValue = value;
+                               Position = slice;
+                           }
+                       }
                   }
                   maxima.add(Position);
-        	}
+            }
         }
         
         return Utils.arrayListToInt(maxima);
     }
           
      
-	/*
-	 * Getters and Setters
-	 */
+    /*
+     * Getters and Setters
+     */
 
 
     public String getKey() {
@@ -111,12 +114,12 @@ public class PulseMaxAmplitude implements Processor {
         this.outputKey = outputKey;
     }
 
-	public String getPulsePositionKey() {
-		return pulsePositionKey;
-	}
+    public String getPulsePositionKey() {
+        return pulsePositionKey;
+    }
 
-	public void setPulsePositionKey(String pulsePositionKey) {
-		this.pulsePositionKey = pulsePositionKey;
-	}
+    public void setPulsePositionKey(String pulsePositionKey) {
+        this.pulsePositionKey = pulsePositionKey;
+    }
 
 }

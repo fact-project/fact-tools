@@ -4,9 +4,9 @@
 package fact.features.singlePulse;
 
 import fact.Constants;
-import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -21,49 +21,51 @@ import java.util.ArrayList;
  * 
  */
 public class ArrivalTimeFromSlope implements Processor {
-	static Logger log = LoggerFactory.getLogger(ArrivalTimeFromSlope.class);
+    static Logger log = LoggerFactory.getLogger(ArrivalTimeFromSlope.class);
 
     @Parameter(required = true)
     private String key;
     @Parameter(required = true)
     private String derivationKey;
-    	//slopes at each time slice; used features.Derivation
+        //slopes at each time slice; used features.Derivation
     @Parameter(required = true)
     private String outputKey;
-    	//positions of arrival times
+        //positions of arrival times
     @Parameter(required = false)
     private String visualizeKey;
-    	//array of size data.length with values of zero except for time slices of arrival times. 
+        //array of size data.length with values of zero except for time slices of arrival times. 
     @Parameter(required = false)
     private String baselineKey;
-    	//used in OpenShutterPulseSize to account for negative values
+        //used in OpenShutterPulseSize to account for negative values
  
     private int skipFirstSlices = 0;
-    	//start searching after this number of slices
+        //start searching after this number of slices
     private int skipLastSlices = 0;   
-    	//stop searching this many slices before the end of the timeline 
+        //stop searching this many slices before the end of the timeline 
     private int width = 1;
-    	//should be an odd number. 
+        //should be an odd number. 
 
+    private int npix;
 
-	@Override
-	public Data process(Data input) {
-
-		if(width%2 == 0){
-			width++;
-			log.info("ArrivalTimeFromSlope only supports odd window lengths. New length is: " + width);
-		}
-		
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
+        if(width%2 == 0){
+            width++;
+            log.info("ArrivalTimeFromSlope only supports odd window lengths. New length is: " + width);
+        }
+        
         double[] data = (double[]) input.get(key);
         double[] slopes = (double[]) input.get(derivationKey);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
         
-        ArrayList[] pulsePeaks =  new ArrayList[Constants.NUMBEROFPIXEL];
-        	//the position where pulse leading edges end 
-        int[][] arrivalTimes = new int[Constants.NUMBEROFPIXEL][];
-        	//arrival times for all pulses in each pixel
-        double[][] baselineValues = new double[Constants.NUMBEROFPIXEL][];
-        	//value at the slice where you want to set your baseline
+        ArrayList[] pulsePeaks =  new ArrayList[npix];
+            //the position where pulse leading edges end 
+        int[][] arrivalTimes = new int[npix][];
+            //arrival times for all pulses in each pixel
+        double[][] baselineValues = new double[npix][];
+            //value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
 
@@ -71,93 +73,92 @@ public class ArrivalTimeFromSlope implements Processor {
             visualizePositions[i] = 0;
         }
                 
-		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			pulsePeaks[pix] = findPulsePeaks(pix, roi, slopes);
+        //for each pixel
+        for (int pix = 0; pix < npix; pix++) {          
+            pulsePeaks[pix] = findPulsePeaks(pix, roi, slopes);
 
-			arrivalTimes[pix] 	= new int[pulsePeaks[pix].size()];
-			baselineValues[pix] = new double[pulsePeaks[pix].size()];
-
-			arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
-		}
-		
+		arrivalTimes[pix] 	= new int[pulsePeaks[pix].size()];
+		baselineValues[pix] 	= new double[pulsePeaks[pix].size()];
+            arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
+        }
+        
         input.put(outputKey, arrivalTimes);
         input.put(visualizeKey, visualizePositions);
         input.put(baselineKey, baselineValues);
 //        System.out.println(Arrays.toString(baselineValues));
-		
+        
 
-		return input;
-	}
+        return input;
+    }
 
     /**
      * @param pix - Pixel to check
      * @param roi - the number of slices in one event
      */
-	
+    
  //the function that finds the pulses. returns positions of the peaks
     public ArrayList findPulsePeaks(int pix, int roi, double[] slopes){
-	
-    	ArrayList<Integer> peaks = new ArrayList<Integer>();
-		int risingEdgeLength = 10;
+    
+        ArrayList<Integer> peaks = new ArrayList<Integer>();
+        int risingEdgeLength = 10;
 
-		
-		for(int slice=0+skipFirstSlices; slice < roi-skipLastSlices; slice++){
-			int pos = pix*roi+slice;
-			boolean peak = true;
-			boolean check = false;
-				//allows one slice to have a negative slope in the leading edge
-			
+        
+        for(int slice=0+skipFirstSlices; slice < roi-skipLastSlices; slice++){
+            int pos = pix*roi+slice;
+            boolean peak = true;
+            boolean check = false;
+                //allows one slice to have a negative slope in the leading edge
+            
 
-			
-			if(slopes[pos] <= 0){
-				peak = false;
-				continue;
-			}
-			
-			else{
-				for(int i=0; i < risingEdgeLength; i++){
-					if(slice-i >= 0 && slice + i < roi){
-						if(slopes[pos-i] < 0){
-							if(check == true){
-								peak = false;
-								break;
-							}
-							else check = true;
+            
+            if(slopes[pos] <= 0){
+                peak = false;
+                continue;
+            }
+            
+            else{
+                for(int i=0; i < risingEdgeLength; i++){
+                    if(slice-i >= 0 && slice + i < roi){
+                        if(slopes[pos-i] < 0){
+                            if(check == true){
+                                peak = false;
+                                break;
+                            }
+                            else check = true;
 
-						}
-						else{
-							continue;
-						}
-					}
-					else{
-						peak = false;
-						break;
-					}
-				}
-			}											
-				
-			if(peak == false) {continue;}
-				
-				int k=0;				
-				while(slice+k < roi){
-					if(slopes[pos+k] > 0){
-						k++;
-					}
+                        }
+                        else{
+                            continue;
+                        }
+                    }
+                    else{
+                        peak = false;
+                        break;
+                    }
+                }
+            }                                           
+                
+            if(peak == false) {continue;}
+                
+                int k=0;                
+                while(slice+k < roi){
+                    if(slopes[pos+k] > 0){
+                        k++;
+                    }
 
-					else break;
-				}
-				slice += k - 1;
-					
-			if(peak == true){
-				peaks.add(slice);
-			}
-		}
-		
-    	return peaks;
+                    else break;
+                }
+                slice += k - 1;
+                    
+            if(peak == true){
+                peaks.add(slice);
+            }
+        }
+        
+        return peaks;
     }
           
-	
+    
 //the function that finds the starting point of the pulse, defined by the first position with a positive slope, and
 //the position of maximum slope. both values can be used for arrival time or baseline values   
 	public int[] findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList[] pulsePeaks, double[] visualizePositions, double[][] baselineValues){
@@ -223,74 +224,74 @@ public class ArrivalTimeFromSlope implements Processor {
     
 
      
-	/*
-	 * Getters and Setters
-	 */
+    /*
+     * Getters and Setters
+     */
 
 
-	public String getDerivationKey() {
-		return derivationKey;
-	}
+    public String getDerivationKey() {
+        return derivationKey;
+    }
 
-	public void setDerivationKey(String derivationKey) {
-		this.derivationKey = derivationKey;
-	}
+    public void setDerivationKey(String derivationKey) {
+        this.derivationKey = derivationKey;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    public String getOutputKey() {
+        return outputKey;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
-	public String getVisualizeKey() {
-		return visualizeKey;
-	}
+    public String getVisualizeKey() {
+        return visualizeKey;
+    }
 
-	public void setVisualizeKey(String visualizeKey) {
-		this.visualizeKey = visualizeKey;
-	}
+    public void setVisualizeKey(String visualizeKey) {
+        this.visualizeKey = visualizeKey;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	
-	public String getBaselineKey() {
-		return baselineKey;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
+    
+    public String getBaselineKey() {
+        return baselineKey;
+    }
 
-	public void setBaselineKey(String baselineKey) {
-		this.baselineKey = baselineKey;
-	}
+    public void setBaselineKey(String baselineKey) {
+        this.baselineKey = baselineKey;
+    }
 
-	public int getSkipFirstSlices() {
-		return skipFirstSlices;
-	}
+    public int getSkipFirstSlices() {
+        return skipFirstSlices;
+    }
 
-	public void setSkipFirstSlices(int skipFirstSlices) {
-		this.skipFirstSlices = skipFirstSlices;
-	}
+    public void setSkipFirstSlices(int skipFirstSlices) {
+        this.skipFirstSlices = skipFirstSlices;
+    }
 
-	public int getSkipLastSlices() {
-		return skipLastSlices;
-	}
+    public int getSkipLastSlices() {
+        return skipLastSlices;
+    }
 
-	public void setSkipLastSlices(int skipLastSlices) {
-		this.skipLastSlices = skipLastSlices;
-	}
+    public void setSkipLastSlices(int skipLastSlices) {
+        this.skipLastSlices = skipLastSlices;
+    }
 
-	
+    
 }

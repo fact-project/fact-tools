@@ -20,41 +20,45 @@ import java.util.ArrayList;
  * 
  */
 public class OpenShutterPulseSize implements Processor {
-	static Logger log = LoggerFactory.getLogger(OpenShutterPulseSize.class);
+    static Logger log = LoggerFactory.getLogger(OpenShutterPulseSize.class);
 
     @Parameter(required = true)
     private String key;
     @Parameter(required = true)
     private String outputKey;
-    	//size of pulse
+        //size of pulse
     @Parameter(required = true)
     private String arrivalTimeKey;
-    	//positions of arrival times - slice where the integral begins
+        //positions of arrival times - slice where the integral begins
     @Parameter(required = false)
     private String baselineKey;
-    	//values that determine the baseline for that pulse, ie at beginning of rising edge, arrival time, etc
+        //values that determine the baseline for that pulse, ie at beginning of rising edge, arrival time, etc
     @Parameter(required = true)
     private int width;
-    	//number of slices over which we integrate
+        //number of slices over which we integrate
 
-	@Override
-	public Data process(Data input) {
+    private int npix;
+    
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
 		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
 		double[][] baselineValues = (double[][]) input.get(baselineKey);
-	    double[][] pulseSizes = new double[Constants.NUMBEROFPIXEL][];
+	    double[][] pulseSizes = new double[npix][];
       
 		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+		for (int pix = 0; pix < npix; pix++) {
 			pulseSizes[pix] = new double[arrivalTimes[pix].length];
 			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues);
 		}
 		
         input.put(outputKey, pulseSizes);
         
-		return input;
-	}
+        return input;
+    }
 
     /**
      * @param pix Pixel to check
@@ -87,64 +91,64 @@ public class OpenShutterPulseSize implements Processor {
                 	 int first =  arrivalTimes[pix][i-1];
                 	 int second =  arrivalTimes[pix][i];
 
-                	  if(second - first < width){
-                		  continue;
-                	  }
+                      if(second - first < width){
+                          continue;
+                      }
                   }
                   
                   for(int slice = start; slice < start + width; slice++){
-        			   int pos = pix * roi + slice;
-        			   integral += (data[pos] - baseline);
+                       int pos = pix * roi + slice;
+                       integral += (data[pos] - baseline);
                   }
                   if(integral > 0) sizes.add(integral);
-        	}		
+            }       
         }
         return Utils.arrayListToDouble(sizes);
     }   
      
-	/*
-	 * Getters and Setters
-	 */
+    /*
+     * Getters and Setters
+     */
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    public String getOutputKey() {
+        return outputKey;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
-	public String getArrivalTimeKey() {
-		return arrivalTimeKey;
-	}
+    public String getArrivalTimeKey() {
+        return arrivalTimeKey;
+    }
 
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
+    public void setArrivalTimeKey(String arrivalTimeKey) {
+        this.arrivalTimeKey = arrivalTimeKey;
+    }
 
-	public String getBaselineKey() {
-		return baselineKey;
-	}
+    public String getBaselineKey() {
+        return baselineKey;
+    }
 
-	public void setBaselineKey(String baselineKey) {
-		this.baselineKey = baselineKey;
-	}
+    public void setBaselineKey(String baselineKey) {
+        this.baselineKey = baselineKey;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
     
 
 }

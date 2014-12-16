@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Utils;
 import fact.Constants;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
@@ -25,417 +26,421 @@ import java.util.ArrayList;
 
 
 public class MuonHoughTransform implements Processor {
-	
-	// OutputKeys
-	
-	// Peakness is a measure for how sharp the best circle is in parameter space
-	@Parameter(required = true, description = "outputkey for the hough peakness")
-	private String peaknessKey; 
-	//Distance is the Euklidian Distance between the three best circles in parameter space
-	@Parameter(required = true, description = "outputkey for the hough distance")
-	private String distanceKey;
-	// Number of octants of the best circle in which are HitPixels
-	@Parameter(required = true, description = "outputkey for the octantsHit parameter")
-	private String octantsHitKey;
-	// Number of HitPixels on best Ring/ Total number of HitPixels
-	private String cleaningPercentageKey;
-	// Number of HitPixels on best Ring/ Total number of Pixels in Best Ring
-	private String ringPercentageKey;
-	// Pixelset for the FactViewer, only returned when showRingKey=true
-	@Parameter(required = true, description = "outputkey for the hough pixelset of the best Ring")
-	private String bestCircleKey;
-	// X-Value of the center of the best circle
-	@Parameter(required = true, description = "outputkey for x coordinate of the middlepoint of the best ring")
-	private String bestXKey;
-	// Y-Value of the center of the best circle
-	@Parameter(required = true, description = "outputkey for y coordinate of the middlepoint of the best ring")
-	private String bestYKey;
-	// Radius of the best Circle
-	@Parameter(required = true, description = "outputkey for the radius of the best ring")
-	private String bestRadiusKey;
-	@Parameter(required = true, description = "outputkey for pixel chids on the best ring")
-	// Pixel Chids of the best Ring
-	private String bestRingPixelKey;
-	
-	
-	
-	//InputKeys
-	@Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
-	private String pixelKey; 
-	
-	@Parameter(required = true, description = "PhotonCharge")
-	private String photonChargeKey;
-	//If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
-	@Parameter(required = false, description = "if this key is true, the three best rings will be shown in the viewer", defaultValue="false")
-	private boolean showRingKey;
-	//if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
-	@Parameter(required = false, description = "if this key is true, the Hough Accumulator at the bestR will be printetd on the terminal", defaultValue="false")
-	private boolean showMatrixKey;
-	
+    
+    // OutputKeys
+    
+    // Peakness is a measure for how sharp the best circle is in parameter space
+    @Parameter(required = true, description = "outputkey for the hough peakness")
+    private String peaknessKey; 
+    //Distance is the Euklidian Distance between the three best circles in parameter space
+    @Parameter(required = true, description = "outputkey for the hough distance")
+    private String distanceKey;
+    // Number of octants of the best circle in which are HitPixels
+    @Parameter(required = true, description = "outputkey for the octantsHit parameter")
+    private String octantsHitKey;
+    // Number of HitPixels on best Ring/ Total number of HitPixels
+    private String cleaningPercentageKey;
+    // Number of HitPixels on best Ring/ Total number of Pixels in Best Ring
+    private String ringPercentageKey;
+    // Pixelset for the FactViewer, only returned when showRingKey=true
+    @Parameter(required = true, description = "outputkey for the hough pixelset of the best Ring")
+    private String bestCircleKey;
+    // X-Value of the center of the best circle
+    @Parameter(required = true, description = "outputkey for x coordinate of the middlepoint of the best ring")
+    private String bestXKey;
+    // Y-Value of the center of the best circle
+    @Parameter(required = true, description = "outputkey for y coordinate of the middlepoint of the best ring")
+    private String bestYKey;
+    // Radius of the best Circle
+    @Parameter(required = true, description = "outputkey for the radius of the best ring")
+    private String bestRadiusKey;
+    @Parameter(required = true, description = "outputkey for pixel chids on the best ring")
+    // Pixel Chids of the best Ring
+    private String bestRingPixelKey;
+    
+    
+    
+    //InputKeys
+    @Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
+    private String pixelKey; 
+    
+    @Parameter(required = true, description = "PhotonCharge")
+    private String photonChargeKey;
+    //If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
+    @Parameter(required = false, description = "if this key is true, the three best rings will be shown in the viewer", defaultValue="false")
+    private boolean showRingKey;
+    //if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
+    @Parameter(required = false, description = "if this key is true, the Hough Accumulator at the bestR will be printetd on the terminal", defaultValue="false")
+    private boolean showMatrixKey;
+    
 
-	// Defining the parameterspace in which we look for circles:
-	
-	private double min_radius = 40; //minimal radius in mm
-	private double max_radius = 110; //maximal  -->radius in mm
-	private double min_x = -300; //minimal center X in mm
-	private double max_x = 300; //maximal center X in mm
-	private double min_y = -300; //minimal center y in mm
-	private double max_y = 300; //maximal center y in mm
+    // Defining the parameterspace in which we look for circles:
+    
+    private double min_radius = 40; //minimal radius in mm
+    private double max_radius = 110; //maximal  -->radius in mm
+    private double min_x = -300; //minimal center X in mm
+    private double max_x = 300; //maximal center X in mm
+    private double min_y = -300; //minimal center y in mm
+    private double max_y = 300; //maximal center y in mm
 
-	// resolution
-	private int res_r = 21;
-	private int res_x = 60;
-	private int res_y = 60;
-	
-	
-	final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);	
-	
+    // resolution
+    private int res_r = 21;
+    private int res_x = 60;
+    private int res_y = 60;
+    
+    
+    final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);   
+    
+    private int npix;
+    
 
     FactPixelMapping m = FactPixelMapping.getInstance();
 
-	@Override
-	public Data process(Data input) {
-		
-		int[] cleaningPixel = (int[]) input.get(pixelKey);
-		double[] photonCharge = (double[]) input.get(photonChargeKey);
-				
-		double[] xPositions = new double[cleaningPixel.length];
-		double[] yPositions = new double[cleaningPixel.length];
-		
-		// Get X and Y Positions of the Pixel that survived Cleaning
-		
-		for(int i=0; i<cleaningPixel.length; i++){
-			xPositions[i] = m.getPixelFromId(cleaningPixel[i]).getXPositionInMM();
-			yPositions[i] = m.getPixelFromId(cleaningPixel[i]).getYPositionInMM();
-		}
-		
-		// generate Hough-Voting-Matrix n:
-		
-		double[][][] HoughMatrix = new double[res_r+1][res_x+1][res_y+1];
-		
-		//Fill the parameter space
-		
-		double[] circle_radius = new double[res_r+1];
-		double[] circle_x = new double[res_x+1];
-		double[] circle_y = new double[res_y+1];
-		
-		for (int i=0; i<=res_r; i++){
-			circle_radius[i] = (max_radius - min_radius) * i/res_r + min_radius;
-		}
-		for (int i=0; i<=res_x; i++){
-			circle_x[i] = (max_x - min_x) * i/res_x + min_x;
-		}
-		for (int i=0; i<=res_y; i++){
-			circle_y[i] = (max_y - min_y) * i/res_y + min_y;
-		}
-		
-		// HoughTransform:
-		
-		
-		int NoneZeroElems = 0;
-		
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		
-		//Position in parameter space of the three best circles
-		int[] highest_pos = {0, 0, 0};
-		int[] second_highest_pos = {0, 0, 0};
-		int[] third_highest_pos = {0, 0, 0};
-		
-				
-		for (int r = 0; r < circle_radius.length; r++){
-			for (int x = 0; x < circle_x.length; x++){
-				for (int y = 0; y < circle_y.length; y++){
-					for(int pix = 0; pix < cleaningPixel.length; pix++){
-						double distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
-						if(Math.abs(distance - circle_radius[r]) <= fact.Constants.PIXEL_SIZE ){
-							HoughMatrix[r][x][y] += photonCharge[cleaningPixel[pix]];
-						}
-					}
-					stats.addValue(HoughMatrix[r][x][y]);
-					if (HoughMatrix[r][x][y] !=0){
-						NoneZeroElems += 1;
-					}
-					if (HoughMatrix[r][x][y] > HoughMatrix[highest_pos[0]][highest_pos[1]][highest_pos[2]]){
-						third_highest_pos[0] = second_highest_pos[0];
-						third_highest_pos[1] = second_highest_pos[1];
-						third_highest_pos[2] = second_highest_pos[2];
-						second_highest_pos[0] = highest_pos[0];
-						second_highest_pos[1] = highest_pos[1];
-						second_highest_pos[2] = highest_pos[2];
-						highest_pos[0] = r;
-						highest_pos[1] = x;
-						highest_pos[2] = y;
-					}
-					
-				}
-			}
-		}
-		
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
+        
+        int[] cleaningPixel = (int[]) input.get(pixelKey);
+        double[] photonCharge = (double[]) input.get(photonChargeKey);
+                
+        double[] xPositions = new double[cleaningPixel.length];
+        double[] yPositions = new double[cleaningPixel.length];
+        
+        // Get X and Y Positions of the Pixel that survived Cleaning
+        
+        for(int i=0; i<cleaningPixel.length; i++){
+            xPositions[i] = m.getPixelFromId(cleaningPixel[i]).getXPositionInMM();
+            yPositions[i] = m.getPixelFromId(cleaningPixel[i]).getYPositionInMM();
+        }
+        
+        // generate Hough-Voting-Matrix n:
+        
+        double[][][] HoughMatrix = new double[res_r+1][res_x+1][res_y+1];
+        
+        //Fill the parameter space
+        
+        double[] circle_radius = new double[res_r+1];
+        double[] circle_x = new double[res_x+1];
+        double[] circle_y = new double[res_y+1];
+        
+        for (int i=0; i<=res_r; i++){
+            circle_radius[i] = (max_radius - min_radius) * i/res_r + min_radius;
+        }
+        for (int i=0; i<=res_x; i++){
+            circle_x[i] = (max_x - min_x) * i/res_x + min_x;
+        }
+        for (int i=0; i<=res_y; i++){
+            circle_y[i] = (max_y - min_y) * i/res_y + min_y;
+        }
+        
+        // HoughTransform:
+        
+        
+        int NoneZeroElems = 0;
+        
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        
+        //Position in parameter space of the three best circles
+        int[] highest_pos = {0, 0, 0};
+        int[] second_highest_pos = {0, 0, 0};
+        int[] third_highest_pos = {0, 0, 0};
+        
+                
+        for (int r = 0; r < circle_radius.length; r++){
+            for (int x = 0; x < circle_x.length; x++){
+                for (int y = 0; y < circle_y.length; y++){
+                    for(int pix = 0; pix < cleaningPixel.length; pix++){
+                        double distance = Math.sqrt(Math.pow((xPositions[pix] - circle_x[x]), 2.0) + Math.pow((yPositions[pix] - circle_y[y]), 2.0));
+                        if(Math.abs(distance - circle_radius[r]) <= fact.Constants.PIXEL_SIZE ){
+                            HoughMatrix[r][x][y] += photonCharge[cleaningPixel[pix]];
+                        }
+                    }
+                    stats.addValue(HoughMatrix[r][x][y]);
+                    if (HoughMatrix[r][x][y] !=0){
+                        NoneZeroElems += 1;
+                    }
+                    if (HoughMatrix[r][x][y] > HoughMatrix[highest_pos[0]][highest_pos[1]][highest_pos[2]]){
+                        third_highest_pos[0] = second_highest_pos[0];
+                        third_highest_pos[1] = second_highest_pos[1];
+                        third_highest_pos[2] = second_highest_pos[2];
+                        second_highest_pos[0] = highest_pos[0];
+                        second_highest_pos[1] = highest_pos[1];
+                        second_highest_pos[2] = highest_pos[2];
+                        highest_pos[0] = r;
+                        highest_pos[1] = x;
+                        highest_pos[2] = y;
+                    }
+                    
+                }
+            }
+        }
+        
 
-		// Calculate the Features 
+        // Calculate the Features 
 
-		// Hough-Distance and Peakness
-		
-		
-		double radius_1 = circle_radius[highest_pos[0]];
-		double center_x_1 = circle_x[highest_pos[1]];
-		double center_y_1 = circle_y[highest_pos[2]];
-		
-		input.put(bestRadiusKey, radius_1);
-		input.put(bestXKey, center_x_1);
-		input.put(bestYKey, center_y_1);
-				
-		double radius_2 = circle_radius[second_highest_pos[0]];
-		double center_x_2 = circle_x[second_highest_pos[1]];
-		double center_y_2 = circle_y[second_highest_pos[2]];
-		
-		double radius_3 = circle_radius[third_highest_pos[0]];
-		double center_x_3 = circle_x[third_highest_pos[1]];
-		double center_y_3 = circle_y[third_highest_pos[2]];
-		
-		double ParamDistance1 = Math.sqrt(Math.pow(radius_1 - radius_2, 2) + Math.pow(center_x_1 - center_x_2, 2) + Math.pow(center_y_1 - center_y_2 , 2));
-		double ParamDistance2 = Math.sqrt(Math.pow(radius_1 - radius_3, 2) + Math.pow(center_x_1 - center_x_3, 2) + Math.pow(center_y_1 - center_y_3 , 2));
-		double ParamDistance3 = Math.sqrt(Math.pow(radius_3 - radius_2, 2) + Math.pow(center_x_3 - center_x_2, 2) + Math.pow(center_y_3 - center_y_2 , 2));
-		
-	
-		double ParamDistanceSum = ParamDistance1 + ParamDistance2 + ParamDistance3; 
-		double HoughMaximum = stats.getMax();
-		double HoughSum = stats.getSum();
-		
-		double peakness = HoughMaximum/(HoughSum/NoneZeroElems);
-		input.put(peaknessKey, peakness);
-		input.put(distanceKey, ParamDistanceSum);
+        // Hough-Distance and Peakness
+        
+        
+        double radius_1 = circle_radius[highest_pos[0]];
+        double center_x_1 = circle_x[highest_pos[1]];
+        double center_y_1 = circle_y[highest_pos[2]];
+        
+        input.put(bestRadiusKey, radius_1);
+        input.put(bestXKey, center_x_1);
+        input.put(bestYKey, center_y_1);
+                
+        double radius_2 = circle_radius[second_highest_pos[0]];
+        double center_x_2 = circle_x[second_highest_pos[1]];
+        double center_y_2 = circle_y[second_highest_pos[2]];
+        
+        double radius_3 = circle_radius[third_highest_pos[0]];
+        double center_x_3 = circle_x[third_highest_pos[1]];
+        double center_y_3 = circle_y[third_highest_pos[2]];
+        
+        double ParamDistance1 = Math.sqrt(Math.pow(radius_1 - radius_2, 2) + Math.pow(center_x_1 - center_x_2, 2) + Math.pow(center_y_1 - center_y_2 , 2));
+        double ParamDistance2 = Math.sqrt(Math.pow(radius_1 - radius_3, 2) + Math.pow(center_x_1 - center_x_3, 2) + Math.pow(center_y_1 - center_y_3 , 2));
+        double ParamDistance3 = Math.sqrt(Math.pow(radius_3 - radius_2, 2) + Math.pow(center_x_3 - center_x_2, 2) + Math.pow(center_y_3 - center_y_2 , 2));
+        
+    
+        double ParamDistanceSum = ParamDistance1 + ParamDistance2 + ParamDistance3; 
+        double HoughMaximum = stats.getMax();
+        double HoughSum = stats.getSum();
+        
+        double peakness = HoughMaximum/(HoughSum/NoneZeroElems);
+        input.put(peaknessKey, peakness);
+        input.put(distanceKey, ParamDistanceSum);
 
-		
-		// Pixels belonging to the best ring:
-		
-		ArrayList<Integer> bestRingPixelList = new ArrayList<Integer>();
-		
-		int numPixBestRing = 0;
-		
-		for(int pix=0; pix<fact.Constants.NUMBEROFPIXEL; pix++){
+        
+        // Pixels belonging to the best ring:
+        
+        ArrayList<Integer> bestRingPixelList = new ArrayList<Integer>();
+        
+        int numPixBestRing = 0;
+        
+        for(int pix=0; pix<npix; pix++){
             FactCameraPixel p  = m.getPixelFromId(pix);
-			double PixelPosX = p.getXPositionInMM();
-			double PixelPosY = p.getYPositionInMM();
-			double distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
-			if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
-				bestRingPixelList.add(pix);	
-				numPixBestRing += 1;
-			}
-		}
-		
-		int[] bestRingPixel = new int[bestRingPixelList.size()];
-		
-		for(int i=0; i < bestRingPixelList.size(); i++){
-			bestRingPixel[i] = bestRingPixelList.get(i);
-		}
-		
-		input.put(bestRingPixelKey, bestRingPixel);
-		
-		
-		// percentage and octantshit
+            double PixelPosX = p.getXPositionInMM();
+            double PixelPosY = p.getYPositionInMM();
+            double distance = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
+            if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
+                bestRingPixelList.add(pix); 
+                numPixBestRing += 1;
+            }
+        }
+        
+        int[] bestRingPixel = new int[bestRingPixelList.size()];
+        
+        for(int i=0; i < bestRingPixelList.size(); i++){
+            bestRingPixel[i] = bestRingPixelList.get(i);
+        }
+        
+        input.put(bestRingPixelKey, bestRingPixel);
+        
+        
+        // percentage and octantshit
 
-		
-		double onRingPixel=0;
-			double phi=0;
-			int octantsHit=0;
-			boolean[] octants = {false,false,false,false,false,false,false,false};
-			
-			for (int pix=0; pix<cleaningPixel.length;pix++)
-			{
-				double distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
-				if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
-					onRingPixel+=1;
-					
-					phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
-					octants[(int) (((phi+Math.PI)/(Math.PI/4)))%8] = true;
-				}
-			}
-			
-			for(int i=0; i<8; i++)
-			{
-				if(octants[i])
-				{
-					octantsHit+=1;
-				}
-			}
-		
-			input.put(octantsHitKey, octantsHit);
-		
+        
+        double onRingPixel=0;
+            double phi=0;
+            int octantsHit=0;
+            boolean[] octants = {false,false,false,false,false,false,false,false};
+            
+            for (int pix=0; pix<cleaningPixel.length;pix++)
+            {
+                double distance = Math.sqrt(Math.pow((xPositions[pix] - center_x_1), 2.0) + Math.pow((yPositions[pix] - center_y_1), 2.0));
+                if(Math.abs(distance - radius_1) <= fact.Constants.PIXEL_SIZE){
+                    onRingPixel+=1;
+                    
+                    phi = Math.atan2(xPositions[pix] - center_x_1, yPositions[pix] - center_y_1);
+                    octants[(int) (((phi+Math.PI)/(Math.PI/4)))%8] = true;
+                }
+            }
+            
+            for(int i=0; i<8; i++)
+            {
+                if(octants[i])
+                {
+                    octantsHit+=1;
+                }
+            }
+        
+            input.put(octantsHitKey, octantsHit);
+        
 
-		double cleaningPercentage = onRingPixel/cleaningPixel.length;
-		double ringPercentage = onRingPixel/numPixBestRing;
-		input.put(cleaningPercentageKey, cleaningPercentage);
-		input.put(ringPercentageKey, ringPercentage);
+        double cleaningPercentage = onRingPixel/cleaningPixel.length;
+        double ringPercentage = onRingPixel/numPixBestRing;
+        input.put(cleaningPercentageKey, cleaningPercentage);
+        input.put(ringPercentageKey, ringPercentage);
 
-		// Creating the Pixelsets for the Viewer
-		if(showMatrixKey){
-			for(int x=0; x<circle_x.length; x++){
-				for(int y=0; y<circle_y.length; y++){
-					System.out.print(String.valueOf(HoughMatrix[highest_pos[0]][x][y])+" ");
-				}
-				System.out.print("\n");
-			}
-		}
-		
-		
-		if (showRingKey){
-			double distance1;
-			double distance2;
-			double distance3;
-			
-			PixelSetOverlay bestCirclePixelSet =       new PixelSetOverlay();
+        // Creating the Pixelsets for the Viewer
+        if(showMatrixKey){
+            for(int x=0; x<circle_x.length; x++){
+                for(int y=0; y<circle_y.length; y++){
+                    System.out.print(String.valueOf(HoughMatrix[highest_pos[0]][x][y])+" ");
+                }
+                System.out.print("\n");
+            }
+        }
+        
+        
+        if (showRingKey){
+            double distance1;
+            double distance2;
+            double distance3;
+            
+            PixelSetOverlay bestCirclePixelSet =       new PixelSetOverlay();
             PixelSetOverlay secondBestCirclePixelSet = new PixelSetOverlay();
             PixelSetOverlay thirdBestCirclePixelSet =  new PixelSetOverlay();
-			
-			for (int pix=0; pix<Constants.NUMBEROFPIXEL; pix++){
+            
+            for (int pix=0; pix<npix; pix++){
                 FactCameraPixel p  = m.getPixelFromId(pix);
                 double PixelPosX = p.getXPositionInMM();
                 double PixelPosY = p.getYPositionInMM();
-				distance1 = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
-				distance2 = Math.sqrt(Math.pow((PixelPosX - center_x_2), 2.0) + Math.pow((PixelPosY - center_y_2), 2.0));
-				distance3 = Math.sqrt(Math.pow((PixelPosX - center_x_3), 2.0) + Math.pow((PixelPosY - center_y_3), 2.0));
-				if(Math.abs(distance1 - radius_1) <= fact.Constants.PIXEL_SIZE ){
-					bestCirclePixelSet.addById(pix);
-				}
-				if(Math.abs(distance2 - radius_2) <= fact.Constants.PIXEL_SIZE ){
-					secondBestCirclePixelSet.addById(pix);
-				}
-				if(Math.abs(distance3 - radius_3) <= fact.Constants.PIXEL_SIZE ){
-					thirdBestCirclePixelSet.addById(pix);
-				}
-			}
-			input.put(bestCircleKey, bestCirclePixelSet);
-			input.put("second"+bestCircleKey, secondBestCirclePixelSet);
-			input.put("third"+bestCircleKey, thirdBestCirclePixelSet);
-		}
-		
-		
-		return input;
-	
-	}
-	
-	
-	public String getDistanceKey() {
-		return distanceKey;
-	}
-	public void setDistanceKey(String distanceKey) {
-		this.distanceKey = distanceKey;
-	}
-	public String getPeaknessKey() {
-		return peaknessKey;
-	}
-	public void setPeaknessKey(String peaknessKey) {
-		this.peaknessKey = peaknessKey;
-	}
-	public String getBestCircleKey() {
-		return bestCircleKey;
-	}
-	public void setBestCircleKey(String bestCircleKey) {
-		this.bestCircleKey = bestCircleKey;
-	}
-	public String getPixelKey() {
-		return pixelKey;
-	}
-	public void setPixelKey(String pixelKey) {
-		this.pixelKey = pixelKey;
-	}
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
+                distance1 = Math.sqrt(Math.pow((PixelPosX - center_x_1), 2.0) + Math.pow((PixelPosY - center_y_1), 2.0));
+                distance2 = Math.sqrt(Math.pow((PixelPosX - center_x_2), 2.0) + Math.pow((PixelPosY - center_y_2), 2.0));
+                distance3 = Math.sqrt(Math.pow((PixelPosX - center_x_3), 2.0) + Math.pow((PixelPosY - center_y_3), 2.0));
+                if(Math.abs(distance1 - radius_1) <= fact.Constants.PIXEL_SIZE ){
+                    bestCirclePixelSet.addById(pix);
+                }
+                if(Math.abs(distance2 - radius_2) <= fact.Constants.PIXEL_SIZE ){
+                    secondBestCirclePixelSet.addById(pix);
+                }
+                if(Math.abs(distance3 - radius_3) <= fact.Constants.PIXEL_SIZE ){
+                    thirdBestCirclePixelSet.addById(pix);
+                }
+            }
+            input.put(bestCircleKey, bestCirclePixelSet);
+            input.put("second"+bestCircleKey, secondBestCirclePixelSet);
+            input.put("third"+bestCircleKey, thirdBestCirclePixelSet);
+        }
+        
+        
+        return input;
+    
+    }
+    
+    
+    public String getDistanceKey() {
+        return distanceKey;
+    }
+    public void setDistanceKey(String distanceKey) {
+        this.distanceKey = distanceKey;
+    }
+    public String getPeaknessKey() {
+        return peaknessKey;
+    }
+    public void setPeaknessKey(String peaknessKey) {
+        this.peaknessKey = peaknessKey;
+    }
+    public String getBestCircleKey() {
+        return bestCircleKey;
+    }
+    public void setBestCircleKey(String bestCircleKey) {
+        this.bestCircleKey = bestCircleKey;
+    }
+    public String getPixelKey() {
+        return pixelKey;
+    }
+    public void setPixelKey(String pixelKey) {
+        this.pixelKey = pixelKey;
+    }
+    public String getPhotonChargeKey() {
+        return photonChargeKey;
+    }
+    public void setPhotonChargeKey(String photonChargeKey) {
+        this.photonChargeKey = photonChargeKey;
+    }
 
 
-	public String getoctantsHitKey() {
-		return octantsHitKey;
-	}
+    public String getoctantsHitKey() {
+        return octantsHitKey;
+    }
 
 
-	public void setoctantsHitKey(String octantsHitKey) {
-		this.octantsHitKey = octantsHitKey;
-	}
+    public void setoctantsHitKey(String octantsHitKey) {
+        this.octantsHitKey = octantsHitKey;
+    }
 
 
-	public String getBestRingPixelKey() {
-		return bestRingPixelKey;
-	}
+    public String getBestRingPixelKey() {
+        return bestRingPixelKey;
+    }
 
 
-	public void setBestRingPixelKey(String bestRingPixelKey) {
-		this.bestRingPixelKey = bestRingPixelKey;
-	}
+    public void setBestRingPixelKey(String bestRingPixelKey) {
+        this.bestRingPixelKey = bestRingPixelKey;
+    }
 
 
-	public boolean isShowRingKey() {
-		return showRingKey;
-	}
+    public boolean isShowRingKey() {
+        return showRingKey;
+    }
 
 
-	public void setShowRingKey(boolean showRingKey) {
-		this.showRingKey = showRingKey;
-	}
+    public void setShowRingKey(boolean showRingKey) {
+        this.showRingKey = showRingKey;
+    }
 
 
-	public String getBestXKey() {
-		return bestXKey;
-	}
+    public String getBestXKey() {
+        return bestXKey;
+    }
 
 
-	public void setBestXKey(String bestXKey) {
-		this.bestXKey = bestXKey;
-	}
+    public void setBestXKey(String bestXKey) {
+        this.bestXKey = bestXKey;
+    }
 
 
-	public String getBestYKey() {
-		return bestYKey;
-	}
+    public String getBestYKey() {
+        return bestYKey;
+    }
 
 
-	public void setBestYKey(String bestYKey) {
-		this.bestYKey = bestYKey;
-	}
+    public void setBestYKey(String bestYKey) {
+        this.bestYKey = bestYKey;
+    }
 
 
-	public String getBestRadiusKey() {
-		return bestRadiusKey;
-	}
+    public String getBestRadiusKey() {
+        return bestRadiusKey;
+    }
 
 
-	public void setBestRadiusKey(String bestRadiusKey) {
-		this.bestRadiusKey = bestRadiusKey;
-	}
+    public void setBestRadiusKey(String bestRadiusKey) {
+        this.bestRadiusKey = bestRadiusKey;
+    }
 
 
-	public boolean isShowMatrixKey() {
-		return showMatrixKey;
-	}
+    public boolean isShowMatrixKey() {
+        return showMatrixKey;
+    }
 
 
-	public void setShowMatrixKey(boolean showMatrixKey) {
-		this.showMatrixKey = showMatrixKey;
-	}
+    public void setShowMatrixKey(boolean showMatrixKey) {
+        this.showMatrixKey = showMatrixKey;
+    }
 
 
-	public String getCleaningPercentageKey() {
-		return cleaningPercentageKey;
-	}
+    public String getCleaningPercentageKey() {
+        return cleaningPercentageKey;
+    }
 
 
-	public void setCleaningPercentageKey(String cleaningPercentageKey) {
-		this.cleaningPercentageKey = cleaningPercentageKey;
-	}
+    public void setCleaningPercentageKey(String cleaningPercentageKey) {
+        this.cleaningPercentageKey = cleaningPercentageKey;
+    }
 
 
-	public String getRingPercentageKey() {
-		return ringPercentageKey;
-	}
+    public String getRingPercentageKey() {
+        return ringPercentageKey;
+    }
 
 
-	public void setRingPercentageKey(String ringPercentageKey) {
-		this.ringPercentageKey = ringPercentageKey;
-	}
+    public void setRingPercentageKey(String ringPercentageKey) {
+        this.ringPercentageKey = ringPercentageKey;
+    }
 
 
 }

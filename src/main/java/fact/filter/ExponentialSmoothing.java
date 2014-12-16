@@ -1,6 +1,5 @@
 package fact.filter;
 
-import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ import stream.annotations.Parameter;
  *
  */
 public class ExponentialSmoothing implements Processor {
-	static Logger log = LoggerFactory.getLogger(ExponentialSmoothing.class);
+    static Logger log = LoggerFactory.getLogger(ExponentialSmoothing.class);
 
     @Parameter (required = true, description = "This value changes the amount of smoothing that will take place. " +
             "If alpha equals 1 the values remain unchanged.  " +
@@ -31,16 +30,20 @@ public class ExponentialSmoothing implements Processor {
 
     @Parameter (required = true, description = "The outputKey to which the smoothed data will be written to the stream")
     String outputKey;
-	
-	@Override
-	public Data process(Data item) {
+    
+    private int npix;
+    
+    @Override
+    public Data process(Data item) {
         Utils.isKeyValid(item, key, double[].class);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
         double[] data = (double[]) item.get(key);
+        npix = (Integer) item.get("NPIX");
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
         double[] smoothedData= new double[data.length];
         //foreach pixel
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
             //beginn with startvalue
             smoothedData[pix*roi] = data[pix*roi];
             for (int slice = 1; slice < roi; slice++) {
@@ -50,19 +53,19 @@ public class ExponentialSmoothing implements Processor {
             }
         }
         item.put(outputKey, smoothedData);
-		return item;
-	}
+        return item;
+    }
 
-	
-	/*
-	 * Getter and Setter
-	 */
-	public double getAlpha() {
-		return alpha;
-	}
-	public void setAlpha(double alpha) {
-		this.alpha = alpha;
-	}
+    
+    /*
+     * Getter and Setter
+     */
+    public double getAlpha() {
+        return alpha;
+    }
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
 
 
 
