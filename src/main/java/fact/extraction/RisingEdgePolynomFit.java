@@ -16,14 +16,14 @@ public class RisingEdgePolynomFit implements Processor {
 	@Parameter(required=true, description="Key to the data array")	
 	private String dataKey = null;
 	@Parameter(required=true, description="outputKey for the calculated arrival time")
-	private int npix;
-	
 	private String outputKey = null;
 	@Parameter(required=true, description="outputKey for the calculated slope at the arrival time")
 	private String maxSlopesKey = null;
 	
 	@Parameter(required=false, description="number of points used for the fit", defaultValue="11")
 	private int numberOfPoints = 11;
+	
+	private int npix;
 
 	@Override
 	public Data process(Data input) {

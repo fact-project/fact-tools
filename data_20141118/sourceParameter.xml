@@ -1,3 +1,4 @@
+<module>
 <fact.features.source.SourcePosition
     outputKey="sourcePosition"
     url="file:${drivefile}"
@@ -189,3 +190,4 @@
     m3longKey="M3Long"
     outputKey="Theta_Off_5"
 />
+</module>

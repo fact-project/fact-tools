@@ -6,8 +6,10 @@
     <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
     <property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
     <property name="drivefile" value="src/test/resources/testDriveFile.fits" />
-    <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" />
-    <property name="pixelDelayFile" value="/home/fact_opr/facttools/pixel_delays_20141118.csv" />
+<!--     <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="/home/fact_opr/facttools/pixel_delays_20141118.csv" /> -->
+    <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="src/main/resources/delays_20141114.csv" />
     <property name="outfile" value="/home/fabian/testoutfile.csv" />
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="6.0" />

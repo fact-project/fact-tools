@@ -1,3 +1,4 @@
+<module>
 <fact.extraction.BasicExtraction
     dataKey="DataCalibrated" 
     outputKeyMaxAmplPos="maxAmplitudePosition"
@@ -47,7 +48,7 @@
 <fact.datacorrection.CorrectPixelDelays
     arrivalTimeKey="arrivalTime"
     outputKey="arrivalTime"
-    url="file:{pixelDelayFile}"
+    url="file:${pixelDelayFile}"
 />
 <fact.features.source.SourcePosition
     outputKey="Cetatauri"
@@ -150,7 +151,7 @@
 <fact.datacorrection.CorrectPixelDelays
     arrivalTimeKey="arrivalTime"
     outputKey="arrivalTime"
-    url="file:{pixelDelayFile}"
+    url="file:${pixelDelayFile}"
 />
 <fact.cleaning.CoreNeighborCleanTimeNeighbor
     photonChargeKey="photoncharge"
@@ -164,3 +165,4 @@
     starRadiusInCamera="11.0"
     showDifferentCleaningSets="false"
 />
+</module>

@@ -1,3 +1,4 @@
+<module>
 <Skip condition="%{data.shower} == null" />
 <fact.features.NumberOfPixelInShower
     showerKey="shower"
@@ -142,3 +143,4 @@
     c0="117.94"
     outputKey="Disp"
 />
+</module>
