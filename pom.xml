@@ -161,6 +161,11 @@
             <version>3.3</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.jwall</groupId>
             <artifactId>streams-dashboard</artifactId>
             <version>[0.2.1,)</version>
