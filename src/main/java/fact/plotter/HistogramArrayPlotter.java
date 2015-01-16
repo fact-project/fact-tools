@@ -110,7 +110,8 @@ public class HistogramArrayPlotter extends DataVisualizer {
 				chart.setTitle(title + " " + key + "    " + counter++ + " entries");
 			} catch(RuntimeException e ) {
 				//log.debug("RuntimeException while trying to add observation. Probably a missing bin for the value. Trying to create a new bin");
-				SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v[i]/binWidth)*binWidth, Math.floor(v[i]/binWidth)*binWidth + binWidth, true, false);
+				SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v[i]/binWidth)*binWidth, Math.floor(v[i]/binWidth)*binWidth + binWidth - 1e-15, true, false);
+				//The 1e-15 in the upper limit avoids rounding errors which lead to overlapping bins and therefore missing histogram entries
 				try{
 					dataset.addBin(bin);
 					dataset.addObservation(v[i]);
