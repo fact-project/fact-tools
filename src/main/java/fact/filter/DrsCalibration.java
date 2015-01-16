@@ -3,16 +3,26 @@
  */
 package fact.filter;
 
-import java.net.MalformedURLException;
-
+import fact.Constants;
+import fact.auxservice.DrsFileService;
+import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import fact.io.FitsStream;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Arrays;
 
 /**
  * <p>
@@ -24,19 +34,29 @@ import fact.io.FitsStream;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
-public class DrsCalibration implements Processor {
+public class DrsCalibration implements StatefulProcessor {
 	// conversion factor:
 	// the input values are 12-bit short values representing measurements of
 	// voltage
 
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	// String drsFile = null;
+	//	String drsFile = null;
 
 	private String outputKey = "DataCalibrated";
-	private String key = "Data";
+	private String key="Data";
 
-	Data drsData = null;
+    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
+    private SourceURL url = null;
+
+    @Parameter(required = false, description = "If given will try to use the file provided by the service")
+    private DrsFileService drsService;
+
+
+    Data drsData = null;
+
+    private String currentFilePath = "";
+
 
 	float[] drsBaselineMean;
 	float[] drsBaselineRms;
@@ -47,9 +67,10 @@ public class DrsCalibration implements Processor {
 
 	// The following keys are required to exist in the DRS data
 	final static String[] drsKeys = new String[] { "RunNumberBaseline",
-			"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
-			"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
-			"TriggerOffsetRms" };
+		"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
+		"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
+	"TriggerOffsetRms" };
+
 
 	/**
 	 * This method reads the DRS calibration values from the given data source.
@@ -59,10 +80,9 @@ public class DrsCalibration implements Processor {
 	 * That item/row in turn is expected to contain a set of variables, e.g. the
 	 * BaselineMean, BaselineRms,...
 	 * 
-	 * @param in
-	 *            sourceurl to be loaded
+	 * @param in sourceurl to be loaded
 	 */
-	protected void loadDrsData(SourceURL in) {
+	protected void loadDrsData(SourceURL  in) {
 		try {
 
 			FitsStream stream = new FitsStream(in);
@@ -108,29 +128,37 @@ public class DrsCalibration implements Processor {
 	 */
 	@Override
 	public Data process(Data data) {
-		if (this.drsData == null) {
-			// file not loaded yet. try to lookup path in getColorFromValue.
-			log.error("No url to drs file specified.");
-			throw new RuntimeException("No DRS File found");
-		}
-		log.debug("Processing Data item by applying DRS calibration...");
-		short[] rawData = (short[]) data.get(key);
-		if (rawData == null) {
-			log.error(" data .fits file did not contain the value for the key "
-					+ key + ". cannot apply drscalibration");
-			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \" + key + \". "
-							+ "cannot apply drscalibration)");
+        if( this.url == null && !currentFilePath .equals(data.get("@source").toString()) ){
+			//file not loaded yet. try to find by magic.
+            currentFilePath = data.get("@source").toString();
+            try {
+                SourceURL url = drsService.findDRSFile(currentFilePath);
+                log.info("Using drs file: " + url.toString());
+                loadDrsData(url);
+            } catch (FileNotFoundException e) {
+                log.error("Couldn't find correct .drs File.");
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
 		}
 
+		log.debug("Processing Data item by applying DRS calibration...");
+		short[] rawData = (short[]) data.get(key);
+		if(rawData == null){
+			log.error(" data .fits file did not contain the value for the key " + key + ". cannot apply drscalibration");
+            throw new RuntimeException(" data .fits file did not contain the value for the key \" + key + \". " +
+                    "cannot apply drscalibration)");
+		}
+		
+		
 		double[] rawfloatData = new double[rawData.length];
-		// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
+//		System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
 		for (int i = 0; i < rawData.length; i++) {
 			rawfloatData[i] = rawData[i];
 		}
-
+		
 		short[] startCell = (short[]) data.get("StartCellData");
-		if (startCell == null) {
+		if(startCell == null){
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
 		}
@@ -142,11 +170,8 @@ public class DrsCalibration implements Processor {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output,
-				startCell);
+		double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
 		data.put(outputKey, calibrated);
-
-		// add color value if set
 
 		return data;
 	}
@@ -233,11 +258,10 @@ public class DrsCalibration implements Processor {
 
 				pos = pixel * roi + slice;
 				// Offset and Gain vector *should look the same
-				int start = startCellVector[pixel] != -1 ? startCellVector[pixel]
-						: 0;
+				int start =  startCellVector[pixel] != -1 ? startCellVector[pixel] : 0;
 
 				offsetPos = pixel * drsBaselineMean.length / 1440
-						+ ((slice + start) % (drsBaselineMean.length / 1440));
+						+ ((slice + start)	% (drsBaselineMean.length / 1440));
 
 				triggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
 						+ slice;
@@ -264,9 +288,10 @@ public class DrsCalibration implements Processor {
 		return destination;
 	}
 
-	// -----------getter setter---------------------
 
-	@Parameter(required = false, description = "data array to be calibrated", defaultValue = "Data")
+	//-----------getter setter---------------------
+
+	@Parameter(required=false, description="data array to be calibrated", defaultValue="Data")
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -279,25 +304,37 @@ public class DrsCalibration implements Processor {
 		this.outputKey = outputKey;
 	}
 
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
 	public void setUrl(SourceURL url) {
-		try {
-			loadDrsData(url);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
+        this.url = url;
 	}
 
-	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats)")
-	public void setUrl(String urlString) {
-		try {
-			// URL url = new URL(urlString);
-			loadDrsData(new SourceURL(urlString));
-		} catch (MalformedURLException e) {
-			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
-			throw new RuntimeException("Cant open drsFile");
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
+    public void setDrsService(DrsFileService service) {
+        this.drsService = service;
+    }
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+        if(url == null && drsService == null){
+            log.error("Url and Service are not set. You need to set one of those");
+            throw new IllegalArgumentException("Wrong parameter");
+        }
+        if (url != null) {
+            try {
+                loadDrsData(url);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
+    }
 }
+

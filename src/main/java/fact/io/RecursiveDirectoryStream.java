@@ -1,20 +1,25 @@
 package fact.io;
 
+import com.google.gson.Gson;
+import fact.auxservice.DrsFileService;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
-import stream.io.Stream;
 import stream.io.multi.AbstractMultiStream;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Map;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
+ * This will automatically add @drsFile (and @driveFile if path to aux files is provided) keys to the data item.
  * Created by mackaiver on 9/21/14.
  */
 public class RecursiveDirectoryStream extends AbstractMultiStream {
@@ -26,6 +31,9 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     @Parameter(required = true, description = "The suffix to filter files by. .gz for example.")
     private String suffix;
 
+    @Parameter(required = false, description = "A file containing a json array of strings with the allowed filenames. "+
+            "(excluding the possible suffix)")
+    private SourceURL listUrl = null;
 
     private AbstractStream stream;
 
@@ -46,21 +54,46 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             throw new IllegalArgumentException("Provided url does not point to a directory");
         }
 
-        walkAndAddToQueue(f, 0);
+        HashSet<String> fileNames = new HashSet<>();
+        if(listUrl !=  null){
+            File list = new File(listUrl.getFile());
+            Gson g = new Gson();
+            fileNames = g.fromJson(new BufferedReader(new FileReader(list)), new HashSet<String>().getClass());
+        }
+
+        log.info("Loading files.");
+        ArrayList<File> fileList = walkFiles(f, suffix, 0);
+        for (File file: fileList){
+            if(fileNames.isEmpty()){
+                files.add(file);
+                continue;
+            }
+            if(fileNames.contains(file.getName())) {
+                files.add(file);
+            }
+        }
         log.info("Loaded " + files.size() + " files for streaming.");
         //super.init();
     }
 
-    private void walkAndAddToQueue(File dir, int depth){
-
+    /**
+     * Recursivly walks over all direcotries below dir. Up to the maximum depth of depth; Returns only files which names
+     * end with the given suffix.
+     * @param dir
+     * @param suffix
+     * @param depth
+     * @return
+     */
+    private ArrayList<File> walkFiles(File dir, final String suffix, int depth){
         if(depth > maxDepth){
-            return;
+            return new ArrayList<>();
         }
-        //get all files ending with the right suffix in this direcotry and add them to the queueeueue
+        //get all files ending with the right suffix in this directory and add them to the queue
         String[] fileNames = dir.list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 File f = new File(dir, name);
+//                System.out.println(name);
                 if (f.isHidden() || f.isDirectory()){
                     return false;
                 }
@@ -71,8 +104,9 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
             }
         });
+        ArrayList<File> l = new ArrayList<>();
         for(String fName : fileNames){
-            files.add(new File(dir, fName));
+            l.add(new File(dir, fName));
         }
         //now get all subdirs and do it again
         String[] directoryNames = dir.list(new FilenameFilter() {
@@ -88,9 +122,9 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         depth++;
         for (String dirName  : directoryNames){
             File subDir = new File(dir, dirName);
-            walkAndAddToQueue(subDir, depth);
+            l.addAll(walkFiles(subDir, suffix, depth));
         }
-        return;
+        return l;
     }
 
     @Override
@@ -102,6 +136,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
                 return null;
             }
             stream.setUrl(new SourceURL(f.toURI().toURL()));
+            log.info("Streaming file: " + stream.getUrl().toString());
             stream.init();
         }
         Data data = stream.read();
@@ -116,10 +151,15 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
                 stream.setUrl(new SourceURL(f.toURI().toURL()));
                 stream.init();
                 data = stream.read();
+                log.info("Streaming file: " + stream.getUrl().toString());
                 return data;
             }
         }
     }
+
+
+
+
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }
@@ -128,6 +168,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         this.suffix = suffix;
     }
 
-
+    public void setListUrl(SourceURL listUrl) {
+        this.listUrl = listUrl;
+    }
 
 }

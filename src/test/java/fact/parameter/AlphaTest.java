@@ -18,7 +18,6 @@ public class AlphaTest extends ParameterTest {
 
 	final String distribution = "dist";
 	final String sourcePosition="pos";
-	final String key = "calib";
 	final String outputKey = "alpha";
 
 	@Test

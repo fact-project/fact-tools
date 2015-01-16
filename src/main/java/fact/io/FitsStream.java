@@ -202,6 +202,14 @@ public class FitsStream extends AbstractStream {
 			long byteCounter = 0;
 			for (int n = 0; n < nameArray.length; n++) {
 				log.debug("Reading {}", nameArray[n]);
+                // read ASCII char array as string
+                if (typeArray[n].equals("A")) {
+                    int numberOfelements = lengthArray[n];
+                    byte[] el = new byte[numberOfelements];
+                    dataStream.read(el);
+                    item.put(nameArray[n], new String(el).trim());
+                    byteCounter += numberOfelements;
+                }
 				// read int
 				if (typeArray[n].equals("J")) {
 					int numberOfelements = lengthArray[n];

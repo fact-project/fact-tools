@@ -10,7 +10,10 @@
 <!-- <property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" /> -->
 <!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" /> -->
 
-<property name="objectStream" value="/Users/kaibrugge/FactTest/test.obj" />
+<property name="data" value="/home/mackaiver/Daten/20121015_071.fits.gz" />
+<property name="dataDRS" value="/home/mackaiver/Daten/20121015_065.drs.fits.gz" />
+<property name="drive_file" value="/home/mackaiver/Daten/20121015.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+<!--<property name="outfile" value="/home/mackaiver/Development/FactData/cluster/" />-->
 
 <property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
 <property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />

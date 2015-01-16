@@ -1,0 +1,28 @@
+<container>
+
+    <property name="core_threshold" value="6.0" />
+    <property name="neighbor_threshold" value="3.0"/>
+    <property name="time_threshold" value="40.0" />
+    <property name="min_number_of_pixel" value="4" />
+
+<!-- Pfade zu den fits files. -->
+    <property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/simulated/ceres/proton_heinz_5" />
+    <!-- <property name="auxfolder" value="/home/localhost/phido_fhgfs/groups/app/fact/aux" /> -->
+    <!--<property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/simulated/ceres_2_0/proton_klaus_4_psf_3_0" />-->
+
+    <!--<property name="auxfolder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/aux" />-->
+    <!-- <property name="whitelist" value="/home/localhost/Daten/WhiteList_short.json" /> -->
+    <property name="outfile" value="/Users/kaibrugge/FactTest/source_plots/parallel_mc" />
+    <!--<property name="drsfile" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/simulated/drsfiles/12bitADC/offsetMinus1863/test300samples.drs.fits" />-->
+
+    <property name="num_copies" value="2" />
+
+        <!--<service id="drsService" class="fact.auxservice.DrsFileService" url="file:/home/localhost/Daten/test300samples2.drs.fits.gz"/>-->
+        <!--<service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" />-->
+        <!-- <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:${auxfolder}" /> -->
+
+        <include file="examples/multistream/zenith_daten_mc.xml" />
+
+
+</container>
+

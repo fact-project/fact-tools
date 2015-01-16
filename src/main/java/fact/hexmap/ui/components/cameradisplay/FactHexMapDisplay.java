@@ -69,7 +69,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	public double[][] sliceValues = new double[1440][1024];
 	int currentSlice = 0;
 
-	// the data and key which to display a a hexmap
+	// the dataItem to display
 	private Data dataItem;
 
 	// store the smallest and largest value in the data. We need this to map
@@ -93,7 +93,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private boolean drawScaleNumbers = true;
 
-	private boolean includeScale = false;
+	private boolean includeScale = true;
 
 	private int offsetX = 0;
 	private int offsetY = 0;
@@ -173,6 +173,30 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	}
 
+	/**
+	 * Gets called when a new item is being selected
+	 * @param item
+	 * @param key
+	 */
+	private void updateMapDisplay(Data item, String key) {
+		if (item == null) {
+			log.error("Dataitem was null in cameraWindow");
+		}
+		try {
+			double[] data = Utils.toDoubleArray(item.get(key));
+			this.sliceValues = Utils.sortPixels(data, 1440);
+			for (double[] slices : sliceValues) {
+				for (double v : slices) {
+					minValueInData = Math.min(minValueInData, v);
+					maxValueInData = Math.max(maxValueInData, v);
+				}
+			}
+			this.repaint();
+		} catch (ClassCastException e) {
+			log.error("The viewer can only display data of type double[]");
+		}
+	}
+
 	public void setOverlayItemsToDisplay(Set<Pair<String, Color>> items) {
 		overlayKeys = items;
 		overlays = updateOverlays(items, dataItem);
@@ -204,24 +228,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		return overlays;
 	}
 
-	private void updateMapDisplay(Data item, String key) {
-		if (item == null) {
-			log.error("Dataitem was null in cameraWindow");
-		}
-		try {
-			double[] data = (double[]) item.get(key);
-			this.sliceValues = Utils.sortPixels(data, 1440);
-			for (double[] slices : sliceValues) {
-				for (double v : slices) {
-					minValueInData = Math.min(minValueInData, v);
-					maxValueInData = Math.max(maxValueInData, v);
-				}
-			}
-			this.repaint();
-		} catch (ClassCastException e) {
-			log.error("The viewer can only display data of type double[]");
-		}
-	}
+
 
 	@Override
 	public void setColorMap(ColorMapping m) {
@@ -291,7 +298,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			// to draw the grid translate back
 			g2.translate(-xOffset, -yOffset);
 
-			// draw cross across screen to indicate center ofcomponent
+			// draw cross across screen to indicate center of component
 
 			// Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
 			// g2.draw(line);
