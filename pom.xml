@@ -23,22 +23,29 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <name>Christian Bockermann</name>
-            <email>christian.bockermann@cs.uni-dortmund.de</email>
-            <organization>Informatik LS8, TU-Dortmund</organization>
-            <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <name>Kai Brügge</name>
-            <email>kai.bruegge@tu-dortmund.de</email>
-            <organization>Informatik LS8, TU-Dortmund</organization>
-            <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<name>Christian Bockermann</name>
+			<email>christian.bockermann@cs.uni-dortmund.de</email>
+			<organization>Informatik LS8, TU-Dortmund</organization>
+			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Kai Brügge</name>
+			<email>kai.bruegge@tu-dortmund.de</email>
+			<organization>Informatik LS8, TU-Dortmund</organization>
+			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Jens Buss</name>
+			<email>jens.buss@tu-dortmund.de</email>
+			<organization>Physik E5b, TU-Dortmund</organization>
+			<organizationUrl>http://app.physik.uni-dortmund.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
 
     <scm>
         <url>https://bitbucket.org/cbockermann/fact-tools</url>
@@ -150,32 +157,32 @@
             <version>0.9.9-RC2</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jwall</groupId>
-            <artifactId>streams-dashboard</artifactId>
-            <version>[0.2.1,)</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
-        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jwall</groupId>
+			<artifactId>streams-dashboard</artifactId>
+			<version>[0.2.1,)</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+	</dependencies>
 
     <build>
         <plugins>
