@@ -69,13 +69,10 @@
             <name>sonatype Snapshot Repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-
-<!--
         <site>
-            <id>fact-site</id>
-            <url>scp://kirmes.cs.uni-dortmund.de:/home/share/projekte/FACT/website/</url>
+            <id>site-sfb876</id>
+            <url>scp://sfb876.de:/var/www/sfb876.de/htdocs/fact-tools/</url>
         </site>
--->
     </distributionManagement>
 
     <repositories>
@@ -183,7 +180,8 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
-                </configuration>
+                    <encoding>UTF-8</encoding>                    
+                    </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
