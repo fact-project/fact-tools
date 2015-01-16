@@ -158,6 +158,26 @@ public class ZFitsStream extends AbstractStream {
 		super();
 	}
 
+	//this helper function checks if the key from the hdu 
+	//is in a list of keys that shall be ignored for 
+	//further processing
+	private Boolean key_in_ignore_list(String key) {
+
+		ArrayList<String> ignoreStarting = new ArrayList<>();
+		ignoreStarting.add("TFORM");
+		ignoreStarting.add("ZFORM");
+		ignoreStarting.add("TTYPE");
+		ignoreStarting.add("ZCTYPE");
+		ignoreStarting.add("PCOUNT");
+
+		for (String ignorekey : ignoreStarting) {
+			if (key.startsWith(ignorekey)) {
+				return true;
+			}
+		}
+		return false;	
+	}
+
 	@Override
 	public void init() throws Exception {
 		super.init();
@@ -177,16 +197,13 @@ public class ZFitsStream extends AbstractStream {
 		for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : this.fitsTable.getFitsHeader().getKeyMap().entrySet()) {
 			String key   = entry.getKey();
 			String value = entry.getValue().getValue();
+			
 			//ignore several information about the coloumns
-			ArrayList<String> ignoreStarting = new ArrayList<>();
-			ignoreStarting.add("TFORM");
-			ignoreStarting.add("ZFORM");
-			ignoreStarting.add("TTYPE");
-			ignoreStarting.add("ZCTYPE");
-			ignoreStarting.add("PCOUNT");
-			for (String ignorekey : ignoreStarting)
-				if (key.startsWith(ignorekey))
-					continue;
+			if ( key_in_ignore_list(key) ){
+				//log.info("ignore:" + key);
+				continue;
+			}
+
 			switch(entry.getValue().getType()) {
 			case BOOLEAN:
 				if (value.equals("T"))

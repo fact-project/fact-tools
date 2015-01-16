@@ -3,7 +3,7 @@
     <groupId>edu.udo</groupId>
     <artifactId>fact-tools</artifactId>
     <name>fact-tools</name>
-    <version>0.6.27-SNAPSHOT</version>
+    <version>0.6.29-SNAPSHOT</version>
 
     <url>http://sfb876.tu-dortmund.de/FACT/</url>
 
@@ -23,29 +23,22 @@
         </license>
     </licenses>
 
-	<developers>
-		<developer>
-			<name>Christian Bockermann</name>
-			<email>christian.bockermann@cs.uni-dortmund.de</email>
-			<organization>Informatik LS8, TU-Dortmund</organization>
-			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<name>Kai Brügge</name>
-			<email>kai.bruegge@tu-dortmund.de</email>
-			<organization>Informatik LS8, TU-Dortmund</organization>
-			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<name>Jens Buss</name>
-			<email>jens.buss@tu-dortmund.de</email>
-			<organization>Physik E5b, TU-Dortmund</organization>
-			<organizationUrl>http://app.physik.uni-dortmund.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Christian Bockermann</name>
+            <email>christian.bockermann@cs.uni-dortmund.de</email>
+            <organization>Informatik LS8, TU-Dortmund</organization>
+            <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <name>Kai Brügge</name>
+            <email>kai.bruegge@tu-dortmund.de</email>
+            <organization>Informatik LS8, TU-Dortmund</organization>
+            <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
     <scm>
         <url>https://bitbucket.org/cbockermann/fact-tools</url>
@@ -76,13 +69,10 @@
             <name>sonatype Snapshot Repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-
-<!--
         <site>
-            <id>fact-site</id>
-            <url>scp://kirmes.cs.uni-dortmund.de:/home/share/projekte/FACT/website/</url>
+            <id>site-sfb876</id>
+            <url>scp://sfb876.de:/var/www/sfb876.de/htdocs/fact-tools/</url>
         </site>
--->
     </distributionManagement>
 
     <repositories>
@@ -160,32 +150,27 @@
             <version>0.9.9-RC2</version>
         </dependency>
 
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jwall</groupId>
-			<artifactId>streams-dashboard</artifactId>
-			<version>[0.2.1,)</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jwall</groupId>
+            <artifactId>streams-dashboard</artifactId>
+            <version>[0.2.1,)</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -195,7 +180,8 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
-                </configuration>
+                    <encoding>UTF-8</encoding>                    
+                    </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
