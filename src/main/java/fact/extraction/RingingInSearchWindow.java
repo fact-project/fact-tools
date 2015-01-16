@@ -39,12 +39,6 @@ public class RingingInSearchWindow implements Processor {
         Utils.mapContainsKeys(input, key);
         
         double[] data = (double[]) input.get(key);
-//        double[] fft = new double[roi*npix];
-//		  FastFourierTrafo FFT = new FastFourierTrafo()
-//		  FFT.process(input)
-//		
-//        make fft
-//        FastFourierTrafo(input, key);
         
         for (int px = 0 ; px < npix ; px++)
         {
