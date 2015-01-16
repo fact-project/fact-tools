@@ -108,7 +108,7 @@
 
         <!--<fact.ShowViewer key="DataCalibrated"/>-->
         <PrintData/>
-        <fact.io.JSONWriter url="file:${outfile}" keys="RUNTYPE, PedIntegral,PedIntegral_min,PedIntegral_max,PedIntegral_sum,PedIntegral_median,PedIntegral_mean,PedIntegral_var,PedIntegral_skewness,PedIntegral_kurtosis,globalMin,arrivalTimes,baselines,maxSlopes,voltages_mean,voltages_median,voltages_mode,voltages_std,voltages_kurtosis,voltages_skewness,voltages_min,voltages_max"/>
+        <fact.io.JSONWriter url="file:${outfile}" keys="NIGHT,RUNID,RUNTYPE,MJDREF,PedIntegral,PedIntegral_min,PedIntegral_max,PedIntegral_sum,PedIntegral_median,PedIntegral_mean,PedIntegral_var,PedIntegral_skewness,PedIntegral_kurtosis,globalMin,arrivalTimes,baselines,maxSlopes,voltages_mean,voltages_median,voltages_mode,voltages_std,voltages_kurtosis,voltages_skewness,voltages_min,voltages_max"/>
 
 
 
