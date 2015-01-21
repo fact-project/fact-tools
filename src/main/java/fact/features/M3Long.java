@@ -20,13 +20,13 @@ public class M3Long implements Processor {
             "That is some sort of int[] containing pixel chids.")
     private  String showerKey =  null;
     
-    @Parameter(required = false, defaultValue="m3l")
-	private String m3lKey = "m3l";
-    @Parameter(required = false, defaultValue="m3t")
-	private String m3tKey = "m3t";
+    @Parameter(required = true)
+	private String m3lOutputKey = "m3l";
+    @Parameter(required = true)
+	private String m3tOutputKey = "m3t";
 
     @Parameter(required = true)
-    private String distribution =  null;
+    private String distributionKey =  null;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -39,11 +39,11 @@ public Data process(Data input) {
 	//in case the getColorFromValue doesn't contain a shower return the original input.
     Utils.isKeyValid(input, showerKey, int[].class);
     Utils.isKeyValid(input, weightsKey, double[].class);
-    Utils.isKeyValid(input, distribution, PixelDistribution2D.class);
+    Utils.isKeyValid(input, distributionKey, PixelDistribution2D.class);
 
     int[] showerPixel = (int[]) input.get(showerKey);
     double[] showerWeights = createShowerWeights(showerPixel, (double[]) input.get(weightsKey));
-    PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
+    PixelDistribution2D dist = (PixelDistribution2D) input.get(distributionKey);
     //double[] showerCenter = getCenter(showerPixel);
 
 
@@ -65,8 +65,8 @@ public Data process(Data input) {
 
 
 
-    input.put(m3lKey,Math.cbrt(m3l));
-    input.put(m3tKey,Math.cbrt(m3t));
+    input.put(m3lOutputKey,Math.cbrt(m3l));
+    input.put(m3tOutputKey,Math.cbrt(m3t));
 
 	return input;
 }
@@ -126,38 +126,38 @@ public Data process(Data input) {
         return cog;
     }
 
-
-
-public void setWeightsKey(String weights) {
-	this.weightsKey = weights;
-}
-
-
-
-public void setShowerKey(String showerKey) {
-	this.showerKey = showerKey;
-}
-
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
-    }
-
-	public String getM3lKey() {
-		return m3lKey;
+	public void setWeightsKey(String weights) {
+		this.weightsKey = weights;
+	}
+	
+	public void setShowerKey(String showerKey) {
+		this.showerKey = showerKey;
 	}
 
-	public void setM3lKey(String m3lKey) {
-		this.m3lKey = m3lKey;
+	public String getDistributionKey() {
+		return distributionKey;
 	}
 
-	public String getM3tKey() {
-		return m3tKey;
+	public void setDistributionKey(String distributionKey) {
+		this.distributionKey = distributionKey;
 	}
 
-	public void setM3tKey(String m3tKey) {
-		this.m3tKey = m3tKey;
+	public String getM3lOutputKey() {
+		return m3lOutputKey;
 	}
+
+	public void setM3lOutputKey(String m3lOutputKey) {
+		this.m3lOutputKey = m3lOutputKey;
+	}
+
+	public String getM3tOutputKey() {
+		return m3tOutputKey;
+	}
+
+	public void setM3tOutputKey(String m3tOutputKey) {
+		this.m3tOutputKey = m3tOutputKey;
+	}
+
 
 
 }

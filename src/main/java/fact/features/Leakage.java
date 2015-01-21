@@ -17,7 +17,9 @@ public class Leakage implements Processor {
     @Parameter(required = true)
 	private String weights;
     @Parameter(required = true)
-	private String outputKey;
+	private String leakage1OutputKey;
+    @Parameter(required = true)
+	private String leakage2OutputKey;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -51,8 +53,8 @@ public class Leakage implements Processor {
 	    leakageSecondBorder    = leakageSecondBorder  / size;
 
 		
-		input.put(outputKey , leakageBorder);
-		input.put(outputKey + "2" , leakageSecondBorder);
+		input.put(leakage1OutputKey , leakageBorder);
+		input.put(leakage2OutputKey , leakageSecondBorder);
 		return input;
 		
 		
@@ -87,12 +89,23 @@ public class Leakage implements Processor {
 	public void setWeights(String weights) {
 		this.weights = weights;
 	}
+
+	public String getLeakage1OutputKey() {
+		return leakage1OutputKey;
+	}
+
+	public void setLeakage1OutputKey(String leakage1OutputKey) {
+		this.leakage1OutputKey = leakage1OutputKey;
+	}
+
+	public String getLeakage2OutputKey() {
+		return leakage2OutputKey;
+	}
+
+	public void setLeakage2OutputKey(String leakage2OutputKey) {
+		this.leakage2OutputKey = leakage2OutputKey;
+	}
+
 	
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
 }

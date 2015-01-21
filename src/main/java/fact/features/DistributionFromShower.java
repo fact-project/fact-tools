@@ -163,8 +163,6 @@ public class DistributionFromShower implements Processor {
 
 		// add calculated shower parameters to data item
 		input.put(outputKey, dist);
-		input.put("varianceLong", varianceLong);
-		input.put("varianceTrans", varianceTrans);
 		input.put(m3longKey, m3Long);
 		input.put(m3transKey, m3Trans);
 		input.put(m4longKey, m4Long);
