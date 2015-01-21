@@ -1,6 +1,6 @@
 <module>
         <!-- <property name="1clKey" value="6_3_TM_B" /> -->
-        <fact.cleaning.CoreNeighborClean photonChargeKey="pC_Basic" outputKey="${1clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${1clCore}" neighborPixelThreshold="${1clNeighbor}" timeThreshold="${1clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${1clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${1clCore}" neighborPixelThreshold="${1clNeighbor}" timeThreshold="${1clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${1clKey}" outputKey="N_${1clKey}"
         />
@@ -14,7 +14,7 @@
         />
 
         <!-- <property name="2clKey" value="7_5_TM_B" /> -->
-        <fact.cleaning.CoreNeighborClean photonChargeKey="pC_Basic" outputKey="${2clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${2clCore}" neighborPixelThreshold="${2clNeighbor}" timeThreshold="${2clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${2clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${2clCore}" neighborPixelThreshold="${2clNeighbor}" timeThreshold="${2clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${2clKey}" outputKey="N_${2clKey}"
         />
@@ -28,7 +28,7 @@
         />
 
     <!-- <property name="3clKey" value="6_3_TN10_B" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_Basic" outputKey="${3clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${3clCore}" neighborPixelThreshold="${3clNeighbor}" timeThreshold="${3clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${3clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${3clCore}" neighborPixelThreshold="${3clNeighbor}" timeThreshold="${3clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${3clKey}" outputKey="N_${3clKey}"
         />
@@ -42,7 +42,7 @@
         />
 
     <!-- <property name="4clKey" value="6_3_TN15_B" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_Basic" outputKey="${4clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${4clCore}" neighborPixelThreshold="${4clNeighbor}" timeThreshold="${4clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${4clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${4clCore}" neighborPixelThreshold="${4clNeighbor}" timeThreshold="${4clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${4clKey}" outputKey="N_${4clKey}"
         />
@@ -56,7 +56,7 @@
         />
 
     <!-- <property name="5clKey" value="5_2.5_TN10_B" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_Basic" outputKey="${5clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${5clCore}" neighborPixelThreshold="${5clNeighbor}" timeThreshold="${5clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${5clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${5clCore}" neighborPixelThreshold="${5clNeighbor}" timeThreshold="${5clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${5clKey}" outputKey="N_${5clKey}"
         />
@@ -70,7 +70,7 @@
         />
 
     <!-- <property name="6clKey" value="7_5_TN10_B" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_Basic" outputKey="${6clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${6clCore}" neighborPixelThreshold="${6clNeighbor}" timeThreshold="${6clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${6clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${6clCore}" neighborPixelThreshold="${6clNeighbor}" timeThreshold="${6clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${6clKey}" outputKey="N_${6clKey}"
         />
@@ -84,7 +84,7 @@
         />
 
     <!-- <property name="7clKey" value="6_3_TM_B_oD" /> -->
-        <fact.cleaning.CoreNeighborClean photonChargeKey="pC_Basic" outputKey="${7clKey}" arrivalTimeKey="aT_Basic_oD" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${7clCore}" neighborPixelThreshold="${7clNeighbor}" timeThreshold="${7clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${7clKey}" arrivalTimeKey="aT_Basic_oD" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${7clCore}" neighborPixelThreshold="${7clNeighbor}" timeThreshold="${7clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${7clKey}" outputKey="N_${7clKey}"
         />
@@ -98,7 +98,7 @@
         />
 
 <!--     <property name="8clKey" value="6_3_TM_B_FFP" /> -->
-        <fact.cleaning.CoreNeighborClean photonChargeKey="pC_Basic" outputKey="${8clKey}" arrivalTimeKey="aT_Basic_FitForPositions" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${8clCore}" neighborPixelThreshold="${8clNeighbor}" timeThreshold="${8clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${8clKey}" arrivalTimeKey="aT_Basic_FitForPositions" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${8clCore}" neighborPixelThreshold="${8clNeighbor}" timeThreshold="${8clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${8clKey}" outputKey="N_${8clKey}"
         />
@@ -112,7 +112,7 @@
         />
 
     <!-- <property name="9clKey" value="6_3_TM_TG" /> -->
-        <fact.cleaning.CoreNeighborClean photonChargeKey="pC_TG" outputKey="${9clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${9clCore}" neighborPixelThreshold="${9clNeighbor}" timeThreshold="${9clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_TG" outputKey="${9clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${9clCore}" neighborPixelThreshold="${9clNeighbor}" timeThreshold="${9clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${9clKey}" outputKey="N_${9clKey}"
         />
@@ -126,7 +126,7 @@
         />
 
     <!-- <property name="10clKey" value="4.5_2.5_TN10_TG" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_TG" outputKey="${10clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${10clCore}" neighborPixelThreshold="${10clNeighbor}" timeThreshold="${10clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_TG" outputKey="${10clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${10clCore}" neighborPixelThreshold="${10clNeighbor}" timeThreshold="${10clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${10clKey}" outputKey="N_${10clKey}"
         />
@@ -140,7 +140,7 @@
         />
 
     <!-- <property name="11clKey" value="6_3_TN10_TG" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_TG" outputKey="${11clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${11clCore}" neighborPixelThreshold="${11clNeighbor}" timeThreshold="${11clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_TG" outputKey="${11clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${11clCore}" neighborPixelThreshold="${11clNeighbor}" timeThreshold="${11clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${11clKey}" outputKey="N_${11clKey}"
         />
@@ -154,7 +154,7 @@
         />
 
     <!-- <property name="12clKey" value="6_3_TN8_TG" /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor photonChargeKey="pC_TG" outputKey="${12clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${12clCore}" neighborPixelThreshold="${12clNeighbor}" timeThreshold="${12clTime}" minNumberOfPixel="2"
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_TG" outputKey="${12clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${12clCore}" neighborPixelThreshold="${12clNeighbor}" timeThreshold="${12clTime}" minNumberOfPixel="2"
         />
         <fact.features.NumberOfPixelInShower showerKey="${12clKey}" outputKey="N_${12clKey}"
         />

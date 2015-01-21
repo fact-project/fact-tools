@@ -96,7 +96,7 @@
         	range="5" 
         	maxSlopesKey="maxSlopesFit"
         />
-<!--         <fact.cleaning.CoreNeighborClean 
+<!--         <fact.cleaning.TwoLevelTimeMedian 
         	photonChargeKey="photoncharge" 
         	outputKey="shower" 
         	arrivalTimeKey="arrivalTime" 
@@ -105,7 +105,7 @@
         	timeThreshold="${time_threshold}"  
         	minNumberOfPixel="${min_number_of_pixel}"
         /> -->
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor
+        <fact.cleaning.TwoLevelTimeNeighbor
         	photonChargeKey="photoncharge" 
         	outputKey="shower" 
         	arrivalTimeKey="arrivalTime" 
@@ -170,7 +170,7 @@
         	range="5" 
         	maxSlopesKey="maxSlopesFitTG"
         />
-        <fact.cleaning.CoreNeighborCleanTimeNeighbor
+        <fact.cleaning.TwoLevelTimeNeighbor
         	photonChargeKey="photonchargeTG" 
         	outputKey="showerTG" 
         	arrivalTimeKey="arrivalTimeTG" 

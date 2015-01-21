@@ -1,5 +1,5 @@
 <module>
- <fact.cleaning.CoreNeighborCleanTimeNeighbor
+ <fact.cleaning.TwoLevelTimeNeighbor
     photonChargeKey="${pc_key}"
     outputKey="${cleaning_key}"
     arrivalTimeKey="${at_key}"

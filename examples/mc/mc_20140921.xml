@@ -40,7 +40,7 @@
         
         <!-- <fact.features.source.SourcePosition outputKey="Cetatauri" url="file:${drivefile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" /> -->
 
-        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
            corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
            timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" showDifferentCleaningSets="false"/>
            

@@ -24,7 +24,7 @@
         <fact.extraction.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
         <fact.extraction.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
 
-        <fact.cleaning.CoreNeighborClean key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
+        <fact.cleaning.TwoLevelTimeMedian key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 
 
         <Skip condition="%{data.shower} == null" />

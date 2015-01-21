@@ -56,7 +56,7 @@
     sourceRightAscension="84.41125"
     sourceDeclination="21.1425"
 />
-<fact.cleaning.CoreNeighborCleanTimeNeighbor
+<fact.cleaning.TwoLevelTimeNeighbor
     photonChargeKey="photoncharge"
     outputKey="shower"
     arrivalTimeKey="arrivalTime" 
@@ -153,7 +153,7 @@
     outputKey="arrivalTime"
     url="file:${pixelDelayFile}"
 />
-<fact.cleaning.CoreNeighborCleanTimeNeighbor
+<fact.cleaning.TwoLevelTimeNeighbor
     photonChargeKey="photoncharge"
     outputKey="shower"
     arrivalTimeKey="arrivalTime" 

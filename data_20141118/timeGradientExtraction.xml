@@ -1,5 +1,5 @@
 <module>
-<fact.cleaning.CoreNeighborCleanTimeNeighbor
+<fact.cleaning.TwoLevelTimeNeighbor
     photonChargeKey="pC_Basic"
     outputKey="shower"
     arrivalTimeKey="aT_Basic" 

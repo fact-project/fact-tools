@@ -1,5 +1,5 @@
 <module>
-<!-- <fact.cleaning.CoreNeighborClean
+<!-- <fact.cleaning.TwoLevelTimeMedian
     photonChargeKey="%{data.pc_key}"
     outputKey="%{data.cleaning_key}"
     arrivalTimeKey="%{data.at_key}"
@@ -10,7 +10,7 @@
     timeThreshold="{time}"
     minNumberOfPixel="2"
 /> -->
-<fact.cleaning.CoreNeighborClean
+<fact.cleaning.TwoLevelTimeMedian
     photonChargeKey="%{data.pc_key}"
     outputKey="%{data.cleaning_key}"
     arrivalTimeKey="${at_key}"

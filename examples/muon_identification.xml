@@ -53,7 +53,7 @@
         										outputKey="arrivalTime"/>
         
          
-        <fact.cleaning.CoreNeighborClean photonChargeKey="photonCharge" 
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="photonCharge" 
         								 outputKey="cleanPixel"
         								 arrivalTimeKey="arrivalTime"
            								 corePixelThreshold="4.0"

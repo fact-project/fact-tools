@@ -23,7 +23,7 @@
 
 <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
 
-<fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
+<fact.cleaning.TwoLevelTimeMedian photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
                                  corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
                                  timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" />
         <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->

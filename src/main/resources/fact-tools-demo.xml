@@ -36,7 +36,7 @@
                                       url="file:src/main/resources/gain_sorted_20131127.csv" positions="maxAmplitudePosition"
                                       outputKey="photoncharge"/>
 
-        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
                                          arrivalTimeKey="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
         
         <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
