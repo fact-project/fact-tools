@@ -29,17 +29,20 @@ public class FastFourierTrafo implements Processor {
     
     FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
     
-    private int npix;
+    private int npix = 1440;
+    private int roi = 300;
     
     @Override
     public Data process(Data input) {
         Utils.mapContainsKeys( input, key);
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
+        Utils.isKeyValid(input, "NROI", Integer.class);
+        roi = (Integer) input.get("NROI");
         
         log.info("exclution range: [" + excludeFreqBinsMin + "," + excludeFreqBinsMax + "]");
         
-        double[] freqAverage = new double[npix * 300];
+        double[] freqAverage = new double[npix * roi];
         double[] data = (double[])input.get(key);
         int roi = data.length / npix;
         double[] frResult = new double[data.length];
