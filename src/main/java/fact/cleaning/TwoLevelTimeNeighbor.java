@@ -14,17 +14,21 @@ import stream.annotations.Parameter;
 import java.util.ArrayList;
 
 /**
- *CoreNeighborClean. Identifies showerPixel in the image array.
- *	 Cleaning in three Steps:
+ * TwoLevelTimeNeighbor. Identifies showerPixel in the image array.
+ *	 Cleaning in several Steps:
  * 	1) Identify all Core Pixel (Photoncharge higher than corePixelThreshold)
- * 	2) Remove all Single Core Pixel
+ * 	2) Remove Small Cluster (Cluster with less than minNumberOfPixel Pixel)
  * 	3) Add all Neighbor Pixel, whose Photoncharge is higher than neighborPixelThreshold
+ *  4) Calculate for each Pixel the difference in arrival times to the neighboring Pixels. Remove all pixel
+ *     with less than 3 neighboring pixel with a difference smaller than timeLimit
+ *  5) Remove Small Cluster (Cluster with less than minNumberOfPixel Pixel)
+ *  6) Remove Star Cluster (Cluster which contains only pixel around a known star position
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  *
  */
 
-public class CoreNeighborCleanTimeNeighbor extends BasicCleaning implements Processor{
-	static Logger log = LoggerFactory.getLogger(CoreNeighborCleanTimeNeighbor.class);
+public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
+	static Logger log = LoggerFactory.getLogger(TwoLevelTimeNeighbor.class);
 
     @Parameter(required = true)
 	private String photonChargeKey;

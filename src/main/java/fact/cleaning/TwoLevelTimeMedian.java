@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- *CoreNeighborClean. Identifies showerPixel in the image array.
+ *TwoLevelTimeMedian. Identifies showerPixel in the image array.
  *	 Cleaning in three Steps:
  * 	1) Identify all Core Pixel (Photoncharge higher than corePixelThreshold)
  * 	2) Remove all Single Core Pixel
@@ -23,8 +23,8 @@ import java.util.Arrays;
  *
  */
 
-public class CoreNeighborClean extends BasicCleaning implements Processor{
-	static Logger log = LoggerFactory.getLogger(CoreNeighborClean.class);
+public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
+	static Logger log = LoggerFactory.getLogger(TwoLevelTimeMedian.class);
 
     @Parameter(required = true)
 	private String photonChargeKey;

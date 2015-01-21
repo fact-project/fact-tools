@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 
 import stream.Data;
 import stream.io.SourceURL;
-import fact.cleaning.CoreNeighborClean;
+import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
@@ -77,7 +77,7 @@ public class ParameterTest {
 		pR.setOutputKey(arrivalTime);
 		pR.process(item);
 
-		CoreNeighborClean poser = new CoreNeighborClean();
+		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
 		poser.setPhotonChargeKey(photonCharge);
 		poser.setArrivalTimeKey(arrivalTime);
 		poser.setOutputKey(shower);
