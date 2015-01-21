@@ -29,7 +29,7 @@ public class CoreNeighbourCleanParameterTest extends ParameterTest {
         poser.setCorePixelThreshold(0);
         poser.setNeighborPixelThreshold(0);
         poser.setMinNumberOfPixel(0);
-        poser.setTimeThreshold(300);
+        poser.setTimeLimit(300);
 		poser.setOutputKey(outputKey);
 		poser.process(item);
 		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));

@@ -84,7 +84,7 @@ public class ParameterTest {
 		poser.setCorePixelThreshold(1);
 		poser.setNeighborPixelThreshold(0.1);
 		poser.setMinNumberOfPixel(1);
-		poser.setTimeThreshold(40);
+		poser.setTimeLimit(40);
 		poser.process(item);
 
 		DistributionFromShower dist = new DistributionFromShower();
