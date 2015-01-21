@@ -48,8 +48,8 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 	private  double neighborPixelThreshold;
 
     @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" + 
-    		", which a pixel is alound to have after cleaning")
-	private  double timeThreshold;
+    		", which a pixel is aloud to have after cleaning")
+	private  double timeLimit;
 
     @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
             " are even considered for NeighbourCorePixel. " +
@@ -101,7 +101,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             return input;
         }
 
-        showerPixel = applyTimeNeighborCleaning(showerPixel, arrivalTimes, timeThreshold, 2);
+        showerPixel = applyTimeNeighborCleaning(showerPixel, arrivalTimes, timeLimit, 2);
         if (showDifferentCleaningSets == true)
         {
             addLevelToDataItem(showerPixel, outputKey + "_level4", input);
@@ -113,7 +113,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             addLevelToDataItem(showerPixel, outputKey + "_level5", input);
         }
         
-        showerPixel = applyTimeNeighborCleaning(showerPixel, arrivalTimes, timeThreshold, 1);
+        showerPixel = applyTimeNeighborCleaning(showerPixel, arrivalTimes, timeLimit, 1);
         if (showDifferentCleaningSets == true)
         {
             addLevelToDataItem(showerPixel, outputKey + "_level6", input);
@@ -222,12 +222,14 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 		this.neighborPixelThreshold = neighborPixelThreshold;
 	}
 
-	public double getTimeThreshold() {
-		return timeThreshold;
+	
+
+	public double getTimeLimit() {
+		return timeLimit;
 	}
 
-	public void setTimeThreshold(double timeThreshold) {
-		this.timeThreshold = timeThreshold;
+	public void setTimeLimit(double timeLimit) {
+		this.timeLimit = timeLimit;
 	}
 
 	public int getMinNumberOfPixel() {

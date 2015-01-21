@@ -45,7 +45,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 
     @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" + 
     		", which a pixel is alound to have after cleaning")
-	private  double timeThreshold;
+	private  double timeLimit;
 
     @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
             " are even considered for NeighbourCorePixel. " +
@@ -100,10 +100,10 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
             return input;
         }
         
-        // Hacky method to increase the timeThreshold for larger showers (which could have a larger spread in the arrival times):
-        double currentTimeThreshold = timeThreshold;
+        // Hacky method to increase the timeLimit for larger showers (which could have a larger spread in the arrival times):
+        double currentTimeThreshold = timeLimit;
         if (showerPixel.size() > 50){
-        	currentTimeThreshold = timeThreshold*Math.log10(showerPixel.size());
+        	currentTimeThreshold = timeLimit*Math.log10(showerPixel.size());
         }
 
         showerPixel = applyTimeMedianCleaning(showerPixel,arrivalTimes,currentTimeThreshold);
@@ -151,10 +151,10 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 	}
 	
 	/**
-	 * Remove pixels with a difference in the arrivalTime to the median of the arrivalTimes of all pixels, larger than the timeThreshold
+	 * Remove pixels with a difference in the arrivalTime to the median of the arrivalTimes of all pixels, larger than the timeLimit
 	 * @param showerPixel
 	 * @param arrivalTime
-	 * @param timeThreshold
+	 * @param timeLimit
 	 * @return
 	 */
 	public ArrayList<Integer> applyTimeMedianCleaning(ArrayList<Integer> showerPixel,double[] arrivalTime, double timeThreshold) {
@@ -231,12 +231,12 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 		this.neighborPixelThreshold = neighborPixelThreshold;
 	}
 
-	public double getTimeThreshold() {
-		return timeThreshold;
+	public double getTimeLimit() {
+		return timeLimit;
 	}
 
-	public void setTimeThreshold(double timeThreshold) {
-		this.timeThreshold = timeThreshold;
+	public void setTimeLimit(double timeLimit) {
+		this.timeLimit = timeLimit;
 	}
 
 	public int getMinNumberOfPixel() {
