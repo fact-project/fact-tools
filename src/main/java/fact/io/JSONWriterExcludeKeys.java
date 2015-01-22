@@ -1,16 +1,15 @@
 package fact.io;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,6 +40,7 @@ import java.util.Set;
  */
 public class JSONWriterExcludeKeys implements StatefulProcessor {
 
+    static Logger log = LoggerFactory.getLogger(JSONWriterExcludeKeys.class);
 
     @Parameter(required = true)
     private String[] keys;
@@ -61,13 +61,40 @@ public class JSONWriterExcludeKeys implements StatefulProcessor {
         Set<String> keySet = data.keySet();
 
         for(String key : keySet) {
+
+//            log.info("test key " + key + " " +data.get(key).getClass() );
+
             if (excludeKeySet.contains(key)){
                 continue;
             }
+
+//            This is a HACK to only write stuff that can be handled by the JsonWriter
+            if (!(data.get(key).getClass().equals(Double.class)
+                    || data.get(key).getClass().equals(double.class)
+                    || data.get(key).getClass().equals(Double[].class)
+                    || data.get(key).getClass().equals(float.class)
+                    || data.get(key).getClass().equals(Float.class)
+                    || data.get(key).getClass().equals(Float[].class)
+                    || data.get(key).getClass().equals(int.class)
+                    || data.get(key).getClass().equals(Integer.class)
+                    || data.get(key).getClass().equals(Integer[].class)
+                    || data.get(key).getClass().toString().contains("[I")
+//                    || data.get(key).getClass().toString().contains("[F")
+                    || data.get(key).getClass().toString().contains("[D")
+
+                    )) {
+
+                continue;
+            }
+
+
             if (data.containsKey(key)) {
+                log.info("test key " + key + " " +data.get(key).toString());
                 item.put(key, data.get(key));
             }
         }
+
+        log.info("test key", item );
 
         try {
             b.append(gson.toJson(item));
