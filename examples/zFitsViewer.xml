@@ -1,6 +1,6 @@
 <container>
 
-    <!-- Pfade zu den fits files. -->
+    <!-- Pathes to the input files -->
     <property name="fhgfs" value="/home/fabian/mount/Phido/fhgfs_app" />
     <!-- <property name="fhgfs" value="/fhgfs/groups/app" /> -->
     
@@ -20,10 +20,10 @@
     <property name="start_search_window" value="35" />
     <property name="range_search_window" value="60" />
     
-    <!-- Name des Streams und pfad zu dem Daten-File -->
+    <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/>
 
-    <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
+    <!-- Description of the process and the corresponding stream -->
     <process id="2" input="fact">
         <fact.utils.PreviousEventInfo 
         	startCellKey="StartCellData"
