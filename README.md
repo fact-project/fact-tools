@@ -70,7 +70,23 @@ Especially for adding content to our ever growing [project website](http://sfb87
 the content under the src/site directory.
   
 
- 
+Orientation for Naming of Processors and Keynames
+---------------
+Starting with version 0.7.0 we try to introduce a naming convention (or only a orientation, no punishment for not following). Due to the fact that therefore the interface of processors will change, the adapting of older processors to this naming convention will be done over a longer time period. New processors should follow this naming convention:
+
+* Processors should be structured in packages
+* Processor names should very shortly describe their functionality
+* inputKeys shall contain the targeted type of item, for example:
+ * dataKey, for processors who works on the data array
+ * showerKey, for processors who works on the cleaned shower pixels
+ * cogxKey, for processors who needs the x coordinate of the cog (center of gravity)
+ * ..., look at the interface of other processors for impression, try to use the same keyname, as other processors
+* outputKeys:
+ * in case there is only one output value, use outputKey:
+ * in case there are more than one output value, create one outputKey for each value, for example:
+  * m3lOutputKey, m3tOutputKey (processor M3Long)
+
+The details of this naming convention are of course discussable, but we should stick to one convention.
 
 
 
