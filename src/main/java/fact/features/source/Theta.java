@@ -64,7 +64,7 @@ public class Theta implements Processor {
 		// (relativ to the suspected source position, m3l*sign(cosDeltaAlpha)) of the shower:
 		// If it is larger than a constant (default -200) the reconstructed source position is 
 		// orientated towards the suspected source position
-		double sign = - Math.signum(cosDeltaAlpha) * Math.signum(m3l*Math.signum(cosDeltaAlpha)+signM3lConstant);
+		double sign = - Math.signum(cosDeltaAlpha) * Math.signum(m3l*Math.signum(cosDeltaAlpha)-signM3lConstant);
 		
 		result[0] = cogx + disp * Math.cos(delta) * sign;
 		result[1] = cogy + disp * Math.sin(delta) * sign;
