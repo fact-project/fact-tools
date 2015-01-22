@@ -67,7 +67,7 @@
 			<fact.features.NumberOfPixelInShower showerKey="cleanPixel" outputKey="numPixelInCleanPixel" />
 			<Skip condition="%{data.numPixelInCleanPixel} &lt; 15" />
 			
-			<fact.features.Leakage shower="cleanPixel" weights="photonCharge" outputKey="Leakage" />
+			<fact.features.Leakage shower="cleanPixel" weights="photonCharge" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" />
 			<Skip condition="%{data.Leakage} &gt; 0.1" />
 			
 			

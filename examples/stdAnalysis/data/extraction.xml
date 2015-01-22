@@ -1,38 +1,31 @@
 <module>
 <fact.extraction.BasicExtraction
     dataKey="DataCalibrated" 
-    outputKeyMaxAmplPos="maxPos_Basic"
-    outputKeyPhotonCharge="pC_Basic" 
+    outputKeyMaxAmplPos="maxPos"
+    outputKeyPhotonCharge="photoncharge" 
     url="file:${integralGainFile}"
-    startSearchWindow="35"
-    rangeSearchWindow="80"
+    startSearchWindow="${start_search_window}"
+    rangeSearchWindow="${range_search_window}"
     rangeHalfHeightWindow="25"
 />
 <fact.extraction.RisingEdgeForPositions
     dataKey="DataCalibrated"
-    amplitudePositionsKey="maxPos_Basic"
+    amplitudePositionsKey="maxPos"
     outputKey="arrivalTimePos"
     maxSlopesKey="maxSlopesPos"
 />
 <fact.extraction.RisingEdgePolynomFit
     dataKey="DataCalibrated"
     risingEdgeKey="arrivalTimePos"
-    outputKey="aT_Basic"
+    outputKey="arrivalTime"
     numberOfPoints="11"
-    maxSlopesKey="mS_Basic"
-/>
-<fact.extraction.RisingEdgeFitForPositions
-    dataKey="DataCalibrated"
-    positionsKey="maxPos_Basic"
-    outputKey="aT_Basic_FitForPositions"
-    numberOfPoints="11"
-    maxSlopesKey="mS_Basic_FitForPositions"
+    maxSlopesKey="maxSlopes"
 />
 <fact.extraction.TimeOverThreshold
     dataKey="DataCalibrated"
     outputKey="timeOverThreshold"
     firstSliceOverThresholdOutputKey="arrivalTimeTOT"
-    positionsKey="maxPos_Basic"
+    positionsKey="maxPos"
     threshold="1500" 
     thresholdOutputKey="thresholdForToT"
 />
@@ -42,18 +35,18 @@
     outputKey="photonchargeSaturated"
 />
 <fact.extraction.HandleSaturation
-    photonChargeKey="pC_Basic"
+    photonChargeKey="photoncharge"
     photonChargeSaturatedKey="photonchargeSaturated"
-    arrivalTimeKey="aT_Basic"
+    arrivalTimeKey="arrivalTime"
     arrivalTimeSaturatedKey="arrivalTimeTOT" 
     limitForSaturatedPixel="150" 
-    outputKeyPhotonCharge="pC_Basic" 
-    outputKeyArrivalTime="aT_Basic_oD" 
+    outputKeyPhotonCharge="photoncharge" 
+    outputKeyArrivalTime="arrivalTime" 
     saturatedPixelKey="saturatedPixel" 
 />
 <fact.datacorrection.CorrectPixelDelays
-    arrivalTimeKey="aT_Basic_oD"
-    outputKey="aT_Basic"
+    arrivalTimeKey="arrivalTime"
+    outputKey="arrivalTime"
     url="file:${pixelDelayFile}"
 />
 </module>

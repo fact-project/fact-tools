@@ -10,6 +10,9 @@
     <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
     <property name="outfile" value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/testoutfile.csv" />
     <property name="sourcename" value="crab" />
+    
+    <property name="start_search_window" value="35" />
+    <property name="range_search_window" value="60" />
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
@@ -26,16 +29,33 @@
 
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="35" searchWindowRight="95" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime" maxSlopesKey="maxSlopes"/>
-        <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTime" outputKey="arrivalTimeFit" range="5" maxSlopesKey="maxSlopesFit"/>
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" url="file:${integralGainFile}" rangeSearchWindow="25" />
+                
+        <fact.extraction.BasicExtraction
+		    dataKey="DataCalibrated" 
+		    outputKeyMaxAmplPos="maxPos"
+		    outputKeyPhotonCharge="photoncharge" 
+		    url="file:${integralGainFile}"
+		    startSearchWindow="${start_search_window}"
+		    rangeSearchWindow="${range_search_window}"
+		    rangeHalfHeightWindow="25"
+		/>
+		<fact.extraction.RisingEdgeForPositions
+		    dataKey="DataCalibrated"
+		    amplitudePositionsKey="maxPos"
+		    outputKey="arrivalTimePos"
+		    maxSlopesKey="maxSlopesPos"
+		/>
+		<fact.extraction.RisingEdgePolynomFit
+		    dataKey="DataCalibrated"
+		    risingEdgeKey="arrivalTimePos"
+		    outputKey="arrivalTime"
+		    numberOfPoints="11"
+		    maxSlopesKey="maxSlopes"
+		/>
 
         <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmothed" length="5" />
         <fact.statistics.TimerowFeatures dataKey="DataCalibrated" movingAverageKey="DataSmothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
        
-
             <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
         <!---->
         <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />

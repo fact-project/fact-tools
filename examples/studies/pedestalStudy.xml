@@ -4,15 +4,19 @@
 	<property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_275.fits.fz" />
 	<property name="drsfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_273.drs.fits.gz" />
 	<property name="outfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/pedestal" />
+	
+	<property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
 
     <property name="sourcename" value="crab" />
     <property name="core_threshold" value="6.0" />
     <property name="neighbor_threshold" value="3.0"/>
     <property name="time_threshold" value="30.0" />
     <property name="min_number_of_pixel" value="2" />
-    <property name="search_window_left" value="35" />
-    <property name="search_window_right" value="95" />
+    <property name="start_search_window" value="35" />
+    <property name="range_search_window" value="60" />
     <property name="limit" value="10" />
+    
+    
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
@@ -37,11 +41,29 @@
         <If condition="%{data.EventNum} &gt;= ${limit}" >
         <fact.io.RootASCIIWriter url="file:${outfile}_hist_fft.txt" keys="EventNum,dataStat_histogram,fftAverage" />
         </If>
-
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="${search_window_left}" searchWindowRight="${search_window_right}" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" url="file:src/main/resources/gain_sorted_20131127.csv" />
-		        
+        
+        <fact.extraction.BasicExtraction
+		    dataKey="DataCalibrated" 
+		    outputKeyMaxAmplPos="maxPos"
+		    outputKeyPhotonCharge="photoncharge" 
+		    url="file:${integralGainFile}"
+		    startSearchWindow="${start_search_window}"
+		    rangeSearchWindow="${range_search_window}"
+		    rangeHalfHeightWindow="25"
+		/>
+		<fact.extraction.RisingEdgeForPositions
+		    dataKey="DataCalibrated"
+		    amplitudePositionsKey="maxPos"
+		    outputKey="arrivalTimePos"
+		    maxSlopesKey="maxSlopesPos"
+		/>
+		<fact.extraction.RisingEdgePolynomFit
+		    dataKey="DataCalibrated"
+		    risingEdgeKey="arrivalTimePos"
+		    outputKey="arrivalTime"
+		    numberOfPoints="11"
+		    maxSlopesKey="maxSlopes"
+		/>
         <!-- Core: 4,...,8 Neigh: 2  -->
         <fact.cleaning.TwoLevelTimeMedian photonChargeKey="photoncharge" outputKey="4_2" arrivalTimeKey="arrivalTime"
            corePixelThreshold="4" neighborPixelThreshold="2"
@@ -164,14 +186,14 @@
        
         <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />       
         <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" sizeKey="Size" outputKey="showerDistribution" />
-        <fact.features.M3Long weightsKey="photoncharge" showerKey="shower" distribution="showerDistribution" />
+        <fact.features.M3Long weightsKey="photoncharge" showerKey="shower" distributionKey="showerDistribution" m3lOutputKey="m3l" m3tOutputKey="m3t" />
         <fact.features.Length distribution="showerDistribution" outputKey="Length" />
         <fact.features.Width distribution="showerDistribution" outputKey="Width" />
-        <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
+        <fact.features.NumberOfIslands showerKey="shower" outputKey="numIslands" />
         <fact.features.Concentration weights="photoncharge" shower="shower" concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel"  />
         <fact.features.ConcentrationCore cogxKey="COGx" cogyKey="COGy" showerPixelKey="shower" photonChargeKey="photoncharge" sizeKey="Size" widthKey="Width" lengthKey="Length" deltaKey="Delta" outputKey="ConcCore" />
         <fact.features.ConcentrationAtCenterOfGravity photonChargeKey="photoncharge" cogxKey="COGx" cogyKey="COGy" sizeKey="Size" outputKey="concCOG" />
-        <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
+        <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" />
         <fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />
         
         <fact.io.RootASCIIWriter url="file:${outfile}_parameter.txt" keys="EventNum,UnixTimeUTC,numPixelInShower,photonchargeMean,arrivalTimeMean,Size,Length,Width,numIslands,Concentration_onePixel,Concentration_twoPixel,ConcCore,concCOG,Leakage,Leakage2,Delta,COGx,COGy,m3l,m3t,M3Long,M3Trans,M4Long,M4Trans,varianceLong,varianceTrans,Timespread,Timespread_weighted" />

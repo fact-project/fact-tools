@@ -89,15 +89,22 @@
     <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/>
 
     <process id="2" input="fact">
+    	<!-- prevEventAndSkip: -->
+        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
+        <include file="examples/stdAnalysis/data/prevEventAndSkip.xml" />
+        <!-- Output: Data -->
+        
         <!-- Calibration: -->
-        <!-- PreviousEventInfo, DrsCalibration, PatchJumpRemoval, RemoveSpikes, DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
-        <include file="data_20141118/calibrationZFits.xml" />
+        <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes, DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
+        <include file="examples/stdAnalysis/data/calibrationZFits.xml" />
         <!-- Output: DataCalibrated -->
 
         <!-- Basic extraction -->
         <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, RisingEdgeFitForPositions, TimeOverThreshold, PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays -->
-        <include file="data_20141118/extraction.xml" />     
+        <include file="examples/stdAnalysis/data/extraction.xml" />     
         <!-- Output: pC_Basic, maxPos_Basic, aT_Basic, mS_Basic, aT_Basic_FitForPositions, mS_Basic_FitForPositions -->
+        
+        OUTDATED !!! (examples/stdAnalysis/data/extraction.xml has other keynames)
 
         <fact.features.source.SourcePosition outputKey="Cetatauri"
             url="file:${drivefile}"
@@ -105,16 +112,7 @@
             sourceDeclination="21.1425" 
         />
 
-        <!-- Time gradient extraction -->
-        <!-- CoreNeighborCleanTimeNeighbor, Size, DistributionFormShower, TimeGradient, TimeGradientExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, HandleSaturation, CorrectPixelDelays -->
-        <include file="data_20141118/timeGradientExtraction.xml" />     
-        <!-- Output: pC_TG, maxPos_TG, aT_TG, mS_TG, --> 
-
-        <include file="data_20141118/cleaningTests.xml" />     
-
-<!--         <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
- 		<fact.ShowViewer key="DataCalibrated"/> -->
-        
+        <include file="examples/studies/cleaningTests.xml" />             
 
         <fact.io.RootASCIIWriter url="file:${outfile}" keys="${keysForOutput}" />
 

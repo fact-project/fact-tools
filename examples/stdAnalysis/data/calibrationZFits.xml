@@ -1,11 +1,4 @@
-
 <module>
-<fact.utils.PreviousEventInfo
-    startCellKey="StartCellData"
-    outputKey="prevEvents"
-    limitEvents="20"
-/>
-<stream.flow.Skip condition="%{data.TriggerType} != 4" />
 <fact.io.zfits.ZFitsDrsCalib
     url="file:${infile}"
     optional="false"

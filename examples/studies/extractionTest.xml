@@ -12,6 +12,9 @@
     <property name="time_threshold" value="30.0" />
     <property name="min_number_of_pixel" value="2" />
     <property name="integral_gain" value="242.0" />
+    
+    <property name="start_search_window" value="35" />
+    <property name="range_search_window" value="60" />
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
@@ -24,12 +27,10 @@
         <fact.utils.Remapping key="Data" outputKey="Data" />
         <fact.utils.RemappingKeys keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax" />
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
-        <fact.filter.RemoveSpikesMars key="DataCalibrated" outputkey="DataCalibrated" />
+        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData"
+    		leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" />
 
-        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
-        <fact.extraction.RisingEdgeForPositions datakey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputkey="arrivalTime"/>
-        <fact.extraction.PhotonCharge key="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" integralGain="${integral_gain}" color="#FF0F0F"/>
-
+       <include file="examples/stdAnalysis/data/extraction.xml" /> 
         <fact.cleaning.TwoLevelTimeMedian key="photoncharge" outputKey="shower" keyPositions="arrivalTime" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>
 
         <fact.cleaning.TwoLevelTimeMedian key="McCherPhotWeight" outputKey="truth" keyPositions="McCherArrTimeMean" corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}" timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}"/>

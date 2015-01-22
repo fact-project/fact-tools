@@ -31,20 +31,31 @@
         <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>-->
         <!--<fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>-->
 <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="showerDistribution" />
-<fact.features.M3Long showerKey="shower" weightsKey="photoncharge" distribution="showerDistribution"/>
+<fact.features.M3Long weightsKey="photoncharge" showerKey="shower" distributionKey="showerDistribution" m3lOutputKey="m3l" m3tOutputKey="m3t" />
 <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
 
 <fact.features.NumberOfPixelInShower showerKey="shower" outputKey="numPixelInShower" />
-<fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
+<fact.features.NumberOfIslands showerKey="shower" outputKey="numIslands" />
 
 <fact.features.Concentration weights="photoncharge" shower="shower" concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel"  />
 <fact.features.ConcentrationCore cogxKey="COGx" cogyKey="COGy" showerPixelKey="shower" photonChargeKey="photoncharge" sizeKey="Size" widthKey="Width" lengthKey="Length" deltaKey="Delta" outputKey="ConcCore" />
 <fact.features.ConcentrationAtCenterOfGravity photonChargeKey="photoncharge" cogxKey="COGx" cogyKey="COGy" sizeKey="Size" outputKey="concCOG" />
-<fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
+<fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" />
 
 <fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />
 
-<fact.features.ShowerSlope photonChargeKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="Slope" />
+<fact.features.ShowerSlope
+    photonChargeKey="photoncharge"
+    arrivalTimeKey="arrivalTime"
+    showerKey="shower"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
+    slopeLongOutputKey="slope_long"
+    slopeTransOutputKey="slope_trans"
+    slopeSpreadOutputKey="slope_spread"
+    slopeSpreadWeightedOutputKey="slope_spread_weighted"
+/>
 
         <!-- <fact.features.video.CenterOfGravity dataCalibrated="DataCalibrated" showerPixel="shower" outputKey="videoCog" numberOfShowerPixelThreshold = "5"/> -->
 

@@ -40,8 +40,8 @@
     pixelSetKey="shower" 
 />
 <fact.statistics.ArrayStatistics 
-    key="maxAmplitudePosition" 
-    outputKey="maxAmplPosShower" 
+    key="maxPos" 
+    outputKey="maxPosShower" 
     pixelSetKey="shower" 
 />
 <fact.statistics.ArrayStatistics 
@@ -68,7 +68,9 @@
 <fact.features.M3Long 
     weightsKey="photoncharge" 
     showerKey="shower" 
-    distribution="showerDistribution" 
+    distributionKey="showerDistribution" 
+    m3lOutputKey="m3l"
+    m3tOutputKey="m3t"
 />
 <fact.features.Length
     distribution="showerDistribution"
@@ -79,7 +81,7 @@
     outputKey="Width"
 />
 <fact.features.NumberOfIslands
-    key="shower"
+    showerKey="shower"
     outputKey="numIslands"
 />
 <fact.features.TimeGradient
@@ -120,7 +122,8 @@
     distribution="showerDistribution"
     shower="shower"
     weights="photoncharge"
-    outputKey="Leakage"
+    leakage1OutputKey="Leakage"
+    leakage2OutputKey="Leakage2"
 />
 <fact.features.TimeSpread
     weightsKey="photoncharge"
@@ -135,7 +138,10 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    outputKey="Slope"
+    slopeLongOutputKey="Slope_long"
+    slopeTransOutputKey="Slope_trans"
+    slopeSpreadOutputKey="Slope_spread"
+    slopeSpreadWeightedOutputKey="Slope_spread_weighted"
 />
 <fact.features.Disp
     widthKey="Width"

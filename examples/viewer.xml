@@ -5,25 +5,20 @@
 	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
 	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
 	<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
-	<!-- <property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_275.fits.fz" /> -->
-	<!-- <property name="infile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_277.fits.fz" />
-	<property name="drsfile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_273.drs.fits.gz" />
-	<property name="drstimefile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001_272_drs_time_calibration.fits" />
-	<property name="drivefile" value="/home/fabian/mount/data/LinuxDaten/uni/FACT/Testdata/20141001.DRIVE_CONTROL_TRACKING_POSITION.fits" /> -->
-<!-- 	<property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2014/02/06/20140206_047.fits.fz" />
-	<property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2014/02/06/20140206_046.drs.fits.gz" /> -->
-	<!-- <property name="drivefile" value="src/test/resources/testDriveFile.fits" /> -->
-    <property name="sourcename" value="crab" />
-    <property name="core_threshold" value="6.0" />
-    <property name="neighbor_threshold" value="3.0"/>
-    <property name="time_threshold" value="30.0" />
-    <property name="min_number_of_pixel" value="2" />
+
     <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
-    <!-- <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" /> -->
+    <property name="pixelDelayFile" value="src/main/resources/delays_20141114.csv" />
+	
+    <property name="sourcename" value="crab" />
+    <property name="core_threshold" value="7.0" />
+    <property name="neighbor_threshold" value="4.5"/>
+    <property name="time_limit" value="10.0" />
+    <property name="min_number_of_pixel" value="2" />
+    <property name="start_search_window" value="35" />
+    <property name="range_search_window" value="60" />
 
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
-    <!-- <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/> -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
 
     <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
@@ -33,153 +28,17 @@
         	outputKey="prevEvents"
         	limitEvents="10"
         />
-        <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
+        <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
-        <!-- <fact.io.zfits.ZFitsDrsCalib url="file:${infile}" optional="false" outputKey="DataZCal" /> 
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="DataZCal"  outputKey="DataCalibrated"/> -->
-        <fact.filter.DrsCalibration 
-	        url="file:${drsfile}" 
-	        key="Data"  
-	        outputKey="DataCalibrated"
-	    />
-        <fact.filter.DrsTimeCalibration 
-        	url="file:${drstimefile}" 
-        	outputKey="timeCalibConst"
-        />
-        <fact.filter.ArrayTimeCorrection 
-        	dataKey="DataCalibrated" 
-        	timeCalibConstKey="timeCalibConst" 
-        	outputKey="DataCalibrated" 
-        />
-        <fact.datacorrection.PatchJumpRemoval 
-        	dataKey="DataCalibrated" 
-        	outputKey="DataCalibrated" 
-        	outputJumpsKey="j" 
-        	prevEventsKey="prevEvents" 
-        	startCellKey="StartCellData" 
-        	jumpLimit="2.0" 
-        />
-        <fact.datacorrection.RemoveSpikes 
-        	dataKey="DataCalibrated" 
-        	outputKey="DataCalibrated" 
-        	startCellKey="StartCellData" 
-        	leftBorder="6" 
-        	spikeLimit="20" 
-        	topSlopeLimit="16" 
-        	maxSpikeLength="4" 
-        	outputSpikesKey="Sp" 
-        />
-        <fact.datacorrection.InterpolateBadPixel 
-        	key="DataCalibrated"  
-        	outputKey="DataCalibrated"
-            badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" 
-        />
-        <fact.extraction.BasicExtraction
-        	dataKey="DataCalibrated" 
-        	outputKeyMaxAmplPos="maxAmplitudePosition"
-        	outputKeyPhotonCharge="photoncharge" 
-        	url="file:${integralGainFile}"
-        	startSearchWindow="35"
-        	rangeSearchWindow="60"
-        	rangeHalfHeightWindow="25"
-        />
-        <fact.extraction.RisingEdgeForPositions 
-        	dataKey="DataCalibrated" 
-        	amplitudePositionsKey="maxAmplitudePosition" 
-        	outputKey="arrivalTime" 
-        	maxSlopesKey="maxSlopes"
-        />
-        <fact.extraction.RisingEdgePolynomFit 
-        	dataKey="DataCalibrated" 
-        	risingEdgeKey="arrivalTime" 
-        	outputKey="arrivalTimeFit" 
-        	range="5" 
-        	maxSlopesKey="maxSlopesFit"
-        />
-<!--         <fact.cleaning.TwoLevelTimeMedian 
-        	photonChargeKey="photoncharge" 
-        	outputKey="shower" 
-        	arrivalTimeKey="arrivalTime" 
-        	corePixelThreshold="${core_threshold}" 
-        	neighborPixelThreshold="${neighbor_threshold}" 
-        	timeThreshold="${time_threshold}"  
-        	minNumberOfPixel="${min_number_of_pixel}"
-        /> -->
-        <fact.cleaning.TwoLevelTimeNeighbor
-        	photonChargeKey="photoncharge" 
-        	outputKey="shower" 
-        	arrivalTimeKey="arrivalTime" 
-        	corePixelThreshold="${core_threshold}" 
-        	neighborPixelThreshold="${neighbor_threshold}" 
-        	timeThreshold="15"  
-        	minNumberOfPixel="${min_number_of_pixel}"
-        />
-        <Skip condition="%{data.shower} == null" />
-
-        <fact.features.NumberOfPixelInShower 
-            showerKey="shower"
-            outputKey="numPixelInShower"
-        />
+        
+        <include file="examples/stdAnalysis/data/calibration.xml" />
+        
+        <include file="examples/stdAnalysis/data/extraction.xml" /> 
+        
+        <include file="examples/stdAnalysis/data/cleaning.xml" /> 
+        
+        <!-- <Skip condition="%{data.shower} == null" /> -->
             
-        <Skip condition="%{data.numPixelInShower} &lt; 3" />
-        <fact.features.Size
-            showerKey="shower"
-            photonChargeKey="photoncharge"
-            outputKey="Size"
-        />
-        <fact.features.DistributionFromShower
-            weightsKey="photoncharge"
-            showerKey="shower"
-            sizeKey="Size"
-            outputKey="showerDistribution"
-        />
-        <fact.features.TimeGradient
-            showerKey="shower"
-            arrivalTimeKey="arrivalTime"
-            cogxKey="COGx"
-            cogyKey="COGy"
-            deltaKey="Delta"
-            outputKeySlope="timeGradientSlope"
-            outputKeyIntercept="timeGradientIntercept"
-            outputKeySumSquaredErrors="timeGradientSSE"
-        />
-
-        <fact.extraction.TimeGradientExtraction
-            dataKey="DataCalibrated" 
-            outputKeyMaxAmplPos="maxPosTimeGraident"
-            outputKeyPhotonCharge="photonchargeTG" 
-            url="file:${integralGainFile}"
-            rangeSearchWindow="20"
-            rangeHalfHeightWindow="25"
-            deltaKey="Delta"
-            cogxKey="COGx"
-            cogyKey="COGy"
-            timeGradientSlopeKey="timeGradientSlope"
-            timeGradientInterceptKey="timeGradientIntercept"
-        />
-        <fact.extraction.RisingEdgeForPositions 
-        	dataKey="DataCalibrated" 
-        	amplitudePositionsKey="maxPosTimeGraident" 
-        	outputKey="arrivalTimeTG" 
-        	maxSlopesKey="maxSlopesTG"
-        />
-        <fact.extraction.RisingEdgePolynomFit 
-        	dataKey="DataCalibrated" 
-        	risingEdgeKey="arrivalTimeTG" 
-        	outputKey="arrivalTimeFitTG" 
-        	range="5" 
-        	maxSlopesKey="maxSlopesFitTG"
-        />
-        <fact.cleaning.TwoLevelTimeNeighbor
-        	photonChargeKey="photonchargeTG" 
-        	outputKey="showerTG" 
-        	arrivalTimeKey="arrivalTimeTG" 
-        	corePixelThreshold="4.5" 
-        	neighborPixelThreshold="2.5" 
-        	timeThreshold="10"  
-        	minNumberOfPixel="${min_number_of_pixel}"
-        />
-		<stream.data.PrintData />
         <fact.ShowViewer key="DataCalibrated"/>
 
 

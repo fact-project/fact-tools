@@ -1,10 +1,4 @@
 <module>
-<fact.utils.PreviousEventInfo
-    startCellKey="StartCellData"
-    outputKey="prevEvents"
-    limitEvents="20"
-/>
-<stream.flow.Skip condition="%{data.TriggerType} != 4" />
 <fact.filter.DrsCalibration
     url="file:${drsfile}"
     key="Data"

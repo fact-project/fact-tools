@@ -1,8 +1,8 @@
 <module>
-<fact.features.source.SourcePosition
-    outputKey="sourcePosition"
-    url="file:${drivefile}"
-    physicalSource="${sourcename}"
+<fact.features.source.SourcePosition 
+    outputKey="sourcePosition" 
+    X="0.0"
+    Y="0.0"
 />
 <fact.features.source.AntiSourcePosition
         sourcePositionKey="sourcePosition"
@@ -95,45 +95,45 @@
     outputKey="Distance_Off_5"
 />
 <fact.features.source.CosDeltaAlpha
-    sourcePosition="sourcePosition"
-    cogX="COGx"
-    cogY="COGy"
-    hillasDelta="Delta"
+    sourcePositionKey="sourcePosition"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
     outputKey="CosDeltaAlpha"
 />
 <fact.features.source.CosDeltaAlpha
-    sourcePosition="antiSourcePosition_1"
-    cogX="COGx"
-    cogY="COGy"
-    hillasDelta="Delta"
+    sourcePositionKey="antiSourcePosition_1"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
     outputKey="CosDeltaAlpha_Off_1"
 />
 <fact.features.source.CosDeltaAlpha
-    sourcePosition="antiSourcePosition_2"
-    cogX="COGx"
-    cogY="COGy"
-    hillasDelta="Delta"
+    sourcePositionKey="antiSourcePosition_2"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
     outputKey="CosDeltaAlpha_Off_2"
 />
 <fact.features.source.CosDeltaAlpha
-    sourcePosition="antiSourcePosition_3"
-    cogX="COGx"
-    cogY="COGy"
-    hillasDelta="Delta"
+    sourcePositionKey="antiSourcePosition_3"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
     outputKey="CosDeltaAlpha_Off_3"
 />
 <fact.features.source.CosDeltaAlpha
-    sourcePosition="antiSourcePosition_4"
-    cogX="COGx"
-    cogY="COGy"
-    hillasDelta="Delta"
+    sourcePositionKey="antiSourcePosition_4"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
     outputKey="CosDeltaAlpha_Off_4"
 />
 <fact.features.source.CosDeltaAlpha
-    sourcePosition="antiSourcePosition_5"
-    cogX="COGx"
-    cogY="COGy"
-    hillasDelta="Delta"
+    sourcePositionKey="antiSourcePosition_5"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltaKey="Delta"
     outputKey="CosDeltaAlpha_Off_5"
 />
 <fact.features.source.Theta
@@ -142,7 +142,9 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    m3longKey="M3Long"
+    m3lKey="m3l"
+    cosDeltaAlphaKey="CosDeltaAlpha"
+    signM3lConstant="-200"
     outputKey="Theta"
 />
 <fact.features.source.Theta
@@ -151,7 +153,9 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    m3longKey="M3Long"
+    m3lKey="m3l"
+    cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
+    signM3lConstant="-200"
     outputKey="Theta_Off_1"
 />
 <fact.features.source.Theta
@@ -160,7 +164,9 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    m3longKey="M3Long"
+    m3lKey="m3l"
+    cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
+    signM3lConstant="-200"
     outputKey="Theta_Off_2"
 />
 <fact.features.source.Theta
@@ -169,7 +175,9 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    m3longKey="M3Long"
+    m3lKey="m3l"
+    cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
+    signM3lConstant="-200"
     outputKey="Theta_Off_3"
 />
 <fact.features.source.Theta
@@ -178,7 +186,9 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    m3longKey="M3Long"
+    m3lKey="m3l"
+    cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
+    signM3lConstant="-200"
     outputKey="Theta_Off_4"
 />
 <fact.features.source.Theta
@@ -187,7 +197,9 @@
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
-    m3longKey="M3Long"
+    m3lKey="m3l"
+    cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
+    signM3lConstant="-200"
     outputKey="Theta_Off_5"
 />
 </module>

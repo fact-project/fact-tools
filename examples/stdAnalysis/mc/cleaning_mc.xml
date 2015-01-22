@@ -1,0 +1,11 @@
+<module>
+<fact.cleaning.TwoLevelTimeNeighbor
+    photonChargeKey="photoncharge"
+    outputKey="shower"
+    arrivalTimeKey="arrivalTime"
+    corePixelThreshold="${core_threshold}"
+    neighborPixelThreshold="${neighbor_threshold}"
+    timeLimit="${time_limit}"
+    minNumberOfPixel="2"
+/>
+</module>
