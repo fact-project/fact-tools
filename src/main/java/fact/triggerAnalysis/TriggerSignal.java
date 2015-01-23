@@ -31,10 +31,6 @@ public class TriggerSignal implements Processor {
 		
 		int nPatches = triggerData.length / roi;
 		
-		System.out.println("nPatches:\t" + nPatches);
-		System.out.println("nPix:\t" + nPix);
-		System.out.println("roi:\t" + roi);
-		
 		double[] triggerSignals = new double[nPatches];
 		double[] triggerSignalsViewer = new double[nPix*roi];
 		
