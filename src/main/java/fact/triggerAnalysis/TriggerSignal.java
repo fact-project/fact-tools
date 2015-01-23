@@ -40,22 +40,30 @@ public class TriggerSignal implements Processor {
 		
 		for (int patch = 0 ; patch < nPatches ; patch++)
 		{
-			int ToT = 0;
+			int ToT_max = 0;
+			
 			for (int sl = window[0] ; sl < window[1] ; sl++)
 			{
 				int slice = patch*roi+sl;
-				
 				if (triggerData[slice] > threshold)
 				{
-					ToT += 1;
-					for (int pix = 0 ; pix < numberPixelPerPatch ; pix++)
+					int ToT = 0;
+					while (sl < window[1] && triggerData[slice] > threshold)
 					{
-						int viewerSlice = (patch*numberPixelPerPatch+pix)*roi+sl;
-						triggerSignalsViewer[viewerSlice] = threshold;
+						ToT++;
+						for (int pix = 0 ; pix < numberPixelPerPatch ; pix++)
+						{
+							int viewerSlice = (patch*numberPixelPerPatch+pix)*roi+sl;
+							triggerSignalsViewer[viewerSlice] = threshold;
+						}
+						
+						sl++;
+						slice = patch*roi+sl;
 					}
+					ToT_max = Math.max(ToT_max, ToT);
 				}
 			}
-			triggerSignals[patch] = ToT;
+			triggerSignals[patch] = ToT_max;
 		}
 		for (int patch = 0 ; patch < nPatches ; patch++)
 		{
