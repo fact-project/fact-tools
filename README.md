@@ -77,17 +77,25 @@ Starting with version 0.7.0 we try to introduce a naming convention (or only a o
 * Processors should be structured in packages
 * Processor names should very shortly describe their functionality
 * inputKeys shall contain the targeted type of item, for example:
- * dataKey, for processors who works on the data array
- * showerKey, for processors who works on the cleaned shower pixels
- * cogxKey, for processors who needs the x coordinate of the cog (center of gravity)
- * ..., look at the interface of other processors for impression, try to use the same keyname, as other processors
+      - dataKey, for processors who works on the data array
+      - showerKey, for processors who works on the cleaned shower pixels
+      - cogxKey, for processors who needs the x coordinate of the cog (center of gravity)
+      - ..., look at the interface of other processors for impression, try to use the same keyname, as other processors
 * outputKeys:
- * in case there is only one output value, use outputKey:
- * in case there are more than one output value, create one outputKey for each value, for example:
-  * m3lOutputKey, m3tOutputKey (processor M3Long)
+     - in case there is only one output value, use outputKey:
+     - in case there are more than one output value, create one outputKey for each value, for example:
+     - m3lOutputKey, m3tOutputKey (processor M3Long)
+
 
 The details of this naming convention are of course discussable, but we should stick to one convention.
 
 
 
 
+Changing Documentation on the Website
+---------------
+
+Simply edit the file in the `source/site/` directory to your liking.
+Check the output by executing `mvn site:run` in a terminal and point your
+web browser to *http://localhost:8080/*. If you like the result simply push your changes from that directory to the
+master branch and the build system will take care of the rest.
