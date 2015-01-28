@@ -6,7 +6,7 @@
 	<!-- Pathes to the input files -->
 	<property name="infile" value="${fhgfs}/00034585.585_D_MonteCarlo034_Events.fits.gz" />
 	<property name="drsfile" value="${fhgfs}/test300samples.drs.fits" />
-	<property name="outfile" 	value="${fhgfs}/00000003extractorComparison.csv" />
+	<property name="outfile" 	value="${fhgfs}/00034585.585_D_MonteCarlo034_Events_extractors.json" />
 
 	<property name="integralGainFile" value="src/main/resources/defaultIntegralGains.csv" />
 
@@ -95,7 +95,9 @@
 		<!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
 		<!-- <Skip condition="%{data.shower} == null" /> -->
 
-		<fact.ShowViewer key="DataCalibrated"/>
+		<PrintData/>
+		<!--<fact.ShowViewer key="DataCalibrated"/>-->
+		<fact.io.JSONWriter url="file:${outfile}" keys="timeOverThreshold_numPixel,arrivalTimePos,arrivalTime,arrivalTimeTOT,maxPos,maxSlopesPos,photoncharge,photonchargeSaturated,MCorsikaEvtHeader.fWeightedNumPhotons,McCherPhotWeight,McCherPhotNumber"/>
 
 	</process>
 
