@@ -125,8 +125,8 @@
 		<!-- <Skip condition="%{data.shower} == null" /> -->
 
 		<PrintData/>
-		<fact.ShowViewer key="DataCalibrated"/>
-		<!--<fact.io.JSONWriter url="file:${outfile}" keys="timeOverThreshold_numPixel,arrivalTimePos,arrivalTime,arrivalTimeTOT,maxPos,maxSlopesPos,photoncharge,photonchargeSaturated,MCorsikaEvtHeader.fWeightedNumPhotons,McCherPhotWeight,McCherPhotNumber"/>-->
+		<!--<fact.ShowViewer key="DataCalibrated"/>-->
+			<fact.io.JSONWriter url="file:${outfile}" keys="timeOverThreshold,timeOverThreshold1000,arrivalTimePos,arrivalTime,arrivalTimeTOT,arrivalTimeTOT1000,maxPos,maxSlopesPos,photoncharge,photonchargeSaturated,photonchargeSaturated1000,MCorsikaEvtHeader.fWeightedNumPhotons,McCherPhotWeight,McCherPhotNumber"/>
 
 	</process>
 
