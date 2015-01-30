@@ -87,9 +87,18 @@
 				thresholdOutputKey="thresholdForToT"
 				/>
 
+		<fact.extraction.TimeOverThreshold
+				dataKey="DataCalibrated"
+				outputKey="timeOverThreshold1000"
+				firstSliceOverThresholdOutputKey="arrivalTimeTOT1000"
+				positionsKey="maxPos"
+				threshold="1000"
+				thresholdOutputKey="thresholdForToT1000"
+				/>
+
 		<fact.datacorrection.CorrectSaturation
 				dataKey="DataCalibrated"
-				outputKey="DataCalibratedNoSat"
+				outputKey="DataNoSat"
 				totKey="timeOverThreshold"
 				firstSliceOverThresholdKey="arrivalTimeTOT"
 				threshold="1800"
@@ -98,9 +107,9 @@
 				/>
 
 		<fact.extraction.BasicExtraction
-				dataKey="DataCalibratedNoSat"
+				dataKey="DataNoSat"
 				outputKeyMaxAmplPos="maxPosNoSat"
-				outputKeyPhotonCharge="photonchargeNoSat"
+				outputKeyPhotonCharge="phChargeNoSat"
 				url="file:${integralGainFile}"
 				startSearchWindow="${start_search_window}"
 				rangeSearchWindow="${range_search_window}"
@@ -111,6 +120,12 @@
 				timeOverThresholdKey="timeOverThreshold"
 				thresholdKey="thresholdForToT"
 				outputKey="photonchargeSaturated"
+				/>
+
+		<fact.extraction.PhotonChargeTimeOverThreshold
+				timeOverThresholdKey="timeOverThreshold1000"
+				thresholdKey="thresholdForToT1000"
+				outputKey="photonchargeSaturated1000"
 				/>
 
 		<fact.extraction.IdentifyPixelAboveThreshold
