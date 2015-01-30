@@ -1,6 +1,7 @@
 package fact.datacorrection;
 
 import fact.Utils;
+import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -55,10 +56,20 @@ public class CorrectSaturation implements Processor {
         double[] data       = (double[]) input.get(dataKey);
         double[] corrData   =  data.clone();
 
+        //Marker
+        IntervalMarker[] mWidth  = new IntervalMarker[npix];
+        IntervalMarker[] mMaxPos = new IntervalMarker[npix];
+        IntervalMarker[] mDeltat = new IntervalMarker[npix];
+        IntervalMarker[] mEstArrivalTime = new IntervalMarker[npix];
+        double[] mMaxAmplitude  = new double[data.length];
+        double[] mAmplitudes    = new double[data.length];
+
+
 
 
         for(int pix = 0 ; pix < npix; pix++){
-            int     lastSlice   = roi*(pix+1);
+            int     lastSlice           = roi*(pix+1);
+            int     firstSliceThresh    = roi*pix + (int)firstSlOverThresh[pix];
 
 
 
@@ -66,32 +77,44 @@ public class CorrectSaturation implements Processor {
             if (saturationThreshold > data[pix * roi + maxPos[pix] ]){
                 continue;
             }
+            mMaxPos[pix] = new IntervalMarker(maxPos[pix], maxPos[pix] + 1);
 
             //get width
             int width = totArray[pix];
+            mWidth[pix] = new IntervalMarker(firstSlOverThresh[pix],firstSlOverThresh[pix] + width);
 
             //estimate amplitude of saturated pulse (this formular is from MTreatSaturation.cc in Mars_Trunk Revision: 18096)
+            // using an 4.polynom of the function
             double estAmplitude = (threshold - baselines[pix])/(0.898417 - 0.0187633*width + 0.000163919*width*width - 6.87369e-7*width*width*width + 1.13264e-9*width*width*width*width);
 
             //calculate time difference between first slice over Threshold and arrival time of pulse;
             double deltat    = -1.41371-0.0525846*width + 93.2763/(width+13.196);
+            mDeltat[pix] = new IntervalMarker(maxPos[pix], maxPos[pix]+deltat);
 
             //estimate arrival time
             double estArrivalTime = firstSlOverThresh[pix] - deltat -1;
+            mEstArrivalTime[pix] = new IntervalMarker(estArrivalTime, estArrivalTime + 1);
 
             // Loop over saturated slices and correct amplitudes
             for (int slice = (int)firstSlOverThresh[pix];
                  slice < firstSlOverThresh[pix] + totArray[pix] && slice < lastSlice;
                  slice++) {
                 double t0  = slice - estArrivalTime;
+                mMaxAmplitude[slice] = estAmplitude;
                 Double amplitude = estAmplitude*(1-1/(1+exp(t0/2.14)))*exp(-t0/38.8)+baselines[pix];
+                mAmplitudes[slice] = amplitude;
                 if (amplitude > data[slice]){
                     corrData[slice] = amplitude;
                 }
             }
 
         }
-
+        input.put(outputKey + "_MaxAmplitude", mMaxAmplitude);
+        input.put(outputKey + "_Amplitudes", mAmplitudes);
+        input.put(outputKey + "_WidthMarker", mWidth);
+        input.put(outputKey + "_MaxPosMarker", mMaxPos);
+        input.put(outputKey + "_DeltaTMarker", mDeltat);
+        input.put(outputKey + "_estAtMarker", mEstArrivalTime);
         input.put(outputKey, corrData);
 
         return input;
