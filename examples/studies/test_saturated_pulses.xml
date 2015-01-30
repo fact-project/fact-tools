@@ -1,12 +1,12 @@
 <container>
 
-	<property name="fhgfs" value="/media/jbuss/TOSHIBAEXT/fact_data" />
+	<property name="fhgfs" value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
 	<!-- <property name="fhgfs" value="/fhgfs/groups/app" /> -->
 
 	<!-- Pathes to the input files -->
-	<property name="infile" value="${fhgfs}/00034585.585_D_MonteCarlo034_Events.fits.gz" />
-	<property name="drsfile" value="${fhgfs}/test300samples.drs.fits" />
-	<property name="outfile" 	value="${fhgfs}/00034585.585_D_MonteCarlo034_Events_extractors.json" />
+	<property name="infile" value="${fhgfs}/users/jbuss/analysis/saturationStudy/20150128_manyPhotons/00000001.001_D_MonteCarlo000_Events.fits" />
+	<property name="drsfile" value="${fhgfs}/groups/app/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples.drs.fits.gz" />
+	<property name="outfile" 	value="${fhgfs}/users/jbuss/analysis/saturationStudy/20150128_manyPhotons/00000001.001_D_MonteCarlo000_Events.json" />
 
 	<property name="integralGainFile" value="src/main/resources/defaultIntegralGains.csv" />
 
