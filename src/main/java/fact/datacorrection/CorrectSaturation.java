@@ -96,10 +96,10 @@ public class CorrectSaturation implements Processor {
             mEstArrivalTime[pix] = new IntervalMarker(estArrivalTime, estArrivalTime + 1);
 
             // Loop over saturated slices and correct amplitudes
-            for (int slice = (int)firstSlOverThresh[pix];
-                 slice < firstSlOverThresh[pix] + totArray[pix] && slice < lastSlice;
+            for (int slice = firstSliceThresh;
+                 slice < firstSliceThresh + totArray[pix] && slice < lastSlice;
                  slice++) {
-                double t0  = slice - estArrivalTime;
+                double t0  = slice - estArrivalTime - roi*pix;
                 mMaxAmplitude[slice] = estAmplitude;
                 Double amplitude = estAmplitude*(1-1/(1+exp(t0/2.14)))*exp(-t0/38.8)+baselines[pix];
                 mAmplitudes[slice] = amplitude;
