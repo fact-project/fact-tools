@@ -7,6 +7,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import static org.apache.commons.math3.util.FastMath.exp;
+import static org.apache.commons.math3.util.FastMath.pow;
 
 /**
  * Created by jbuss on 28.01.15.
@@ -47,7 +48,7 @@ public class CorrectSaturation implements Processor {
         roi         = (Integer) input.get("NROI");
 
         double[] firstSlOverThresh = (double[]) input.get(firstSliceOverThresholdKey);
-        int[] totArray 	    = (int[]) input.get(totKey);
+        int[] timeOverThreshold 	    = (int[]) input.get(totKey);
 
         int[] maxPos = (int[]) input.get(maxPosKey);
         double[] baselines  = (double[]) input.get(baselineKey);
@@ -57,52 +58,60 @@ public class CorrectSaturation implements Processor {
         double[] corrData   =  data.clone();
 
         //Marker
-        IntervalMarker[] mWidth  = new IntervalMarker[npix];
-        IntervalMarker[] mMaxPos = new IntervalMarker[npix];
-        IntervalMarker[] mDeltat = new IntervalMarker[npix];
-        IntervalMarker[] mEstArrivalTime = new IntervalMarker[npix];
         double[] mMaxAmplitude  = new double[data.length];
         double[] mAmplitudes    = new double[data.length];
+        IntervalMarker[] markWidth          = new IntervalMarker[npix];
+        IntervalMarker[] markMaxPos         = new IntervalMarker[npix];
+        IntervalMarker[] markDeltaT         = new IntervalMarker[npix];
+        IntervalMarker[] markEstArrivalTime = new IntervalMarker[npix];
 
-
-
+        // ------------------------------------------------------------------------------------------------------------
 
         for(int pix = 0 ; pix < npix; pix++){
-            int     lastSlice           = roi*(pix+1);
-            int     firstSliceThresh    = roi*pix + (int)firstSlOverThresh[pix];
-
-
+            int     firstSlice              = roi*pix;
+            int     firstSliceAboveThresh   = (int)firstSlOverThresh[pix];
+            int     maxPosInPix             = pix * roi + maxPos[pix];
+            double  maxAmplitude            = data[maxPosInPix];
 
             //check if maxAmplitude fullfill saturation criterion
-            if (saturationThreshold > data[pix * roi + maxPos[pix] ]){
+            if (saturationThreshold > maxAmplitude){
                 continue;
             }
-            mMaxPos[pix] = new IntervalMarker(maxPos[pix], maxPos[pix] + 1);
+            markMaxPos[pix] = new IntervalMarker(maxPos[pix], maxPos[pix] + 1);
 
-            //get width
-            int width = totArray[pix];
-            mWidth[pix] = new IntervalMarker(firstSlOverThresh[pix],firstSlOverThresh[pix] + width);
+            //get the width of the pulse in order to compile the correction
+            int width       = timeOverThreshold[pix];
+            markWidth[pix]  = new IntervalMarker(firstSlOverThresh[pix],firstSlOverThresh[pix] + width);
 
             //estimate amplitude of saturated pulse (this formular is from MTreatSaturation.cc in Mars_Trunk Revision: 18096)
             // using an 4.polynom of the function
-            double estAmplitude = (threshold - baselines[pix])/(0.898417 - 0.0187633*width + 0.000163919*width*width - 6.87369e-7*width*width*width + 1.13264e-9*width*width*width*width);
+            double estimatedAmplitude = (threshold - baselines[pix]);
+            estimatedAmplitude /= (0.898417 - 0.0187633*width + 0.000163919*pow(width,2) - 6.87369e-7*pow(width,3) + 1.13264e-9*pow(width,4));
 
             //calculate time difference between first slice over Threshold and arrival time of pulse;
-            double deltat    = -1.41371-0.0525846*width + 93.2763/(width+13.196);
-            mDeltat[pix] = new IntervalMarker(maxPos[pix], maxPos[pix]+deltat);
+            double deltaT       = -1.41371-0.0525846*width + 93.2763/(width+13.196);
+            markDeltaT[pix]     = new IntervalMarker(maxPos[pix], maxPos[pix]+deltaT);
 
             //estimate arrival time
-            double estArrivalTime = firstSlOverThresh[pix] - deltat -1;
-            mEstArrivalTime[pix] = new IntervalMarker(estArrivalTime, estArrivalTime + 1);
+            double estimatedArrivalTime = firstSlOverThresh[pix] - deltaT -1;
+            markEstArrivalTime[pix]     = new IntervalMarker(estimatedArrivalTime, estimatedArrivalTime + 1);
 
             // Loop over saturated slices and correct amplitudes
-            for (int slice = firstSliceThresh;
-                 slice < firstSliceThresh + totArray[pix] && slice < lastSlice;
-                 slice++) {
-                double t0  = slice - estArrivalTime - roi*pix;
                 mMaxAmplitude[slice] = estAmplitude;
-                Double amplitude = estAmplitude*(1-1/(1+exp(t0/2.14)))*exp(-t0/38.8)+baselines[pix];
                 mAmplitudes[slice] = amplitude;
+            for (int sl = firstSliceAboveThresh; sl < firstSliceAboveThresh + width && sl < roi; sl++) {
+
+                int slice = sl + firstSlice;
+
+                //check that slice is not outside of the current pixel's range
+                if (slice >= roi*(pix+1)){
+                    String message = "slice " + slice + " is is exceeding pixel " + pix;
+                    throw new RuntimeException(message);
+                }
+
+                double t_0          = sl - estimatedArrivalTime;
+                Double amplitude    = estimatedAmplitude*(1-1/(1+exp(t_0/2.14)))*exp(-t_0/38.8)+baselines[pix];
+
                 if (amplitude > data[slice]){
                     corrData[slice] = amplitude;
                 }
@@ -111,10 +120,11 @@ public class CorrectSaturation implements Processor {
         }
         input.put(outputKey + "_MaxAmplitude", mMaxAmplitude);
         input.put(outputKey + "_Amplitudes", mAmplitudes);
-        input.put(outputKey + "_WidthMarker", mWidth);
-        input.put(outputKey + "_MaxPosMarker", mMaxPos);
-        input.put(outputKey + "_DeltaTMarker", mDeltat);
-        input.put(outputKey + "_estAtMarker", mEstArrivalTime);
+
+        input.put(outputKey + "_WidthMarker", markWidth);
+        input.put(outputKey + "_MaxPosMarker", markMaxPos);
+        input.put(outputKey + "_DeltaTMarker", markDeltaT);
+        input.put(outputKey + "_estAtMarker", markEstArrivalTime);
         input.put(outputKey, corrData);
 
         return input;
