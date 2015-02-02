@@ -58,8 +58,6 @@ public class CorrectSaturation implements Processor {
         double[] corrData   =  data.clone();
 
         //Marker
-        double[] mMaxAmplitude  = new double[data.length];
-        double[] mAmplitudes    = new double[data.length];
         IntervalMarker[] markWidth          = new IntervalMarker[npix];
         IntervalMarker[] markMaxPos         = new IntervalMarker[npix];
         IntervalMarker[] markDeltaT         = new IntervalMarker[npix];
@@ -97,8 +95,6 @@ public class CorrectSaturation implements Processor {
             markEstArrivalTime[pix]     = new IntervalMarker(estimatedArrivalTime, estimatedArrivalTime + 1);
 
             // Loop over saturated slices and correct amplitudes
-                mMaxAmplitude[slice] = estAmplitude;
-                mAmplitudes[slice] = amplitude;
             for (int sl = firstSliceAboveThresh; sl < firstSliceAboveThresh + width && sl < roi; sl++) {
 
                 int slice = sl + firstSlice;
@@ -118,8 +114,6 @@ public class CorrectSaturation implements Processor {
             }
 
         }
-        input.put(outputKey + "_MaxAmplitude", mMaxAmplitude);
-        input.put(outputKey + "_Amplitudes", mAmplitudes);
 
         input.put(outputKey + "_WidthMarker", markWidth);
         input.put(outputKey + "_MaxPosMarker", markMaxPos);
