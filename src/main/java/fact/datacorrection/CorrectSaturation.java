@@ -10,31 +10,37 @@ import static org.apache.commons.math3.util.FastMath.exp;
 import static org.apache.commons.math3.util.FastMath.pow;
 
 /**
+ * This processor is supposed to correct the amplitudes of a saturated pulse by using the pulse template.
+ * It needs the time over threshold (totKey) that was measured at an amplitude of 1800 mV
+ * Currently the conversion from tot to amplitude works only for this threshold
+ *
  * Created by jbuss on 28.01.15.
  */
 public class CorrectSaturation implements Processor {
-    @Parameter(required=true, description="")
+    @Parameter(required=true, description="Array containing the raw data")
     private String dataKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required=true, description="Target Array for the saturation corrected raw data")
     private String outputKey = null;
 
-    @Parameter(required=true, description="")
+    @Parameter(required=true, description="1440pix array containing the time-over-threshold for the pixel")
     private String totKey = null;
 
-    @Parameter(required=true, description="")
+    @Parameter(required=true, description="1440pix array containing the first slice time-over-threshold for the pixel")
     private String firstSliceOverThresholdKey = null;
 
-    @Parameter(required=true, description="")
+    @Parameter(required=true, description="threshold at which the time-over-threshold was measured")
     private double  threshold = 1800.0;
 
-    @Parameter(required=false, description="")
+    @Parameter(required=false, description="threshold that defines a pixel showing saturation")
     private double  saturationThreshold = 1900.0;
 
-    @Parameter(required=true, description="")
+    @Parameter(required=true, description="1440pix array containing the slice of maximum amplitude")
     private String maxPosKey = null;
-    @Parameter(required=true, description="")
+    @Parameter(required=true, description="1440pix array containing the estimated baseline amplitude")
     private String baselineKey = null;
+
+    // Default values
     private Integer npix                = 1440;
     private Integer roi                 = 300;
 
