@@ -7,14 +7,14 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-/** Simple processor tho estimate the baseline from the average of the slices of a given window
+/** Simple processor tho estimate the baseline amplitude with the average from the slices of a given window
  * Created by jbuss on 29.01.15.
  */
 public class EstimateBaseline implements Processor {
     @Parameter(required=true, description="")
     private String dataKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required=true, description="key for the baseline output, 1440 pixel array containing a baseline amplitude for each pixel")
     private String outputKey = null;
 
     @Parameter(required = false, description="start slice of the calculation window", defaultValue="10")
