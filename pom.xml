@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.sfb876</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.3-SNAPSHOT</version>
 
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
@@ -45,13 +44,20 @@
 			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<name>Jens Buss</name>
+			<email>jens.buss@tu-dortmund.de</email>
+			<organization>Physik E5b, TU-Dortmund</organization>
+			<organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<scm>
 		<url>https://bitbucket.org/cbockermann/fact-tools</url>
 		<developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</developerConnection>
 		<connection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</connection>
-		<tag>HEAD</tag>
+		<tag>fact-tools-0.7.0</tag>
 	</scm>
 
 	<mailingLists>
@@ -238,8 +244,7 @@
 				<configuration>
 					<finalName>fact-tools-${project.version}</finalName>
 					<transformers>
-						<transformer
-							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 							<manifestEntries>
 								<Implementation-Vendor>Informatik Lehrstuhl 8, TU Dortmund</Implementation-Vendor>
 								<Implementation-Title>FACT Tools</Implementation-Title>
