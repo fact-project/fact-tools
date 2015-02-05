@@ -25,6 +25,24 @@ public class DistributionFromShower implements Processor {
 	// the in and outputkeys
 	@Parameter(required = true)
 	private String outputKey = null;
+	@Parameter(required = false, defaultValue="M3Long")
+	private String m3longKey = "M3Long";
+	@Parameter(required = false, defaultValue="M3Trans")
+	private String m3transKey = "M3Trans";
+	@Parameter(required = false, defaultValue="M4Long")
+	private String m4longKey = "M4Long";
+	@Parameter(required = false, defaultValue="M4Trans")
+	private String m4transKey = "M4Trans";
+	@Parameter(required = false, defaultValue="COGx")
+	private String cogxKey = "COGx";
+	@Parameter(required = false, defaultValue="COGy")
+	private String cogyKey = "COGy";
+	@Parameter(required = false, defaultValue="Length")
+	private String lengthKey = "Length";
+	@Parameter(required = false, defaultValue="Width")
+	private String widthKey = "Width";
+	@Parameter(required = false, defaultValue="Delta")
+	private String deltaKey = "Delta";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -145,17 +163,15 @@ public class DistributionFromShower implements Processor {
 
 		// add calculated shower parameters to data item
 		input.put(outputKey, dist);
-		input.put("varianceLong", varianceLong);
-		input.put("varianceTrans", varianceTrans);
-		input.put("M3Long", m3Long);
-		input.put("M3Trans", m3Trans);
-		input.put("M4Long", m4Long);
-		input.put("M4Trans", m4Trans);
-		input.put("COGx", cog[0]);
-		input.put("COGy", cog[1]);
-		input.put("Length", length);
-		input.put("Width", width);
-		input.put("Delta", delta);
+		input.put(m3longKey, m3Long);
+		input.put(m3transKey, m3Trans);
+		input.put(m4longKey, m4Long);
+		input.put(m4transKey, m4Trans);
+		input.put(cogxKey, cog[0]);
+		input.put(cogyKey, cog[1]);
+		input.put(lengthKey, length);
+		input.put(widthKey, width);
+		input.put(deltaKey, delta);
 
 		// double[][] rot = { {Math.cos(delta), -Math.sin(delta)},
 		// {Math.sin(delta),Math.cos(delta) }
@@ -295,5 +311,79 @@ public class DistributionFromShower implements Processor {
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
+
+	public String getM3longKey() {
+		return m3longKey;
+	}
+
+	public void setM3longKey(String m3longKey) {
+		this.m3longKey = m3longKey;
+	}
+
+	public String getM3transKey() {
+		return m3transKey;
+	}
+
+	public void setM3transKey(String m3transKey) {
+		this.m3transKey = m3transKey;
+	}
+
+	public String getM4longKey() {
+		return m4longKey;
+	}
+
+	public void setM4longKey(String m4longKey) {
+		this.m4longKey = m4longKey;
+	}
+
+	public String getM4transKey() {
+		return m4transKey;
+	}
+
+	public void setM4transKey(String m4transKey) {
+		this.m4transKey = m4transKey;
+	}
+
+	public String getCogxKey() {
+		return cogxKey;
+	}
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
+	}
+
+	public String getCogyKey() {
+		return cogyKey;
+	}
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
+	}
+
+	public String getLengthKey() {
+		return lengthKey;
+	}
+
+	public void setLengthKey(String lengthKey) {
+		this.lengthKey = lengthKey;
+	}
+
+	public String getWidthKey() {
+		return widthKey;
+	}
+
+	public void setWidthKey(String widthKey) {
+		this.widthKey = widthKey;
+	}
+
+	public String getDeltaKey() {
+		return deltaKey;
+	}
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
+	}
+	
+	
 
 }

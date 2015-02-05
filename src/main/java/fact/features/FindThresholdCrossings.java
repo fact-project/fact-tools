@@ -1,7 +1,6 @@
 package fact.features;
 
 import fact.Utils;
-import fact.extraction.PhotonCharge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
  */
 
 public class FindThresholdCrossings implements Processor {
-    static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
+	static Logger log = LoggerFactory.getLogger(FindThresholdCrossings.class);
 
     @Parameter(required = true)
     private String key;

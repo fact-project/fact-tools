@@ -14,7 +14,6 @@ import stream.annotations.Parameter;
  * outputKey+"_" +"mean"
  * outputKey+"_" +"max"
  * outputKey+"_" +"min"
- * outputKey+"_" +"geommetricMean"
  * outputKey+"_" +"kurtosis"
  * outputKey+"_" +"variance"
  * outputKey+"_" +"skewness"

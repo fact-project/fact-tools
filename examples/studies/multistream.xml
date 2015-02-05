@@ -12,7 +12,7 @@
     <property name="min_number_of_pixel" value="2" />
 
 
-        <include file="examples/mc.xml" />
+        <include file="examples/studies/mc.xml" />
 
 		
 		

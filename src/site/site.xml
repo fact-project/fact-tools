@@ -2,13 +2,13 @@
 <project name="Fact Tools">
   <bannerLeft>
     <name>tu logo</name>
-    <src>http://www-ai.cs.uni-dortmund.de/ci/Medienpool/Seitenbilder/logo_tu.png</src>
+    <src>./images/logo_tu.png</src>
     <href>http://www.uni-dortmund.de/</href>
   </bannerLeft>
   
   <bannerRight>
     <name>ls8 logo</name>
-    <src>http://www-ai.cs.uni-dortmund.de/header-bg-topLeft.png</src>
+    <src>./images/header-bg-topLeft.png</src>
     <href></href>
   </bannerRight>
   

@@ -6,35 +6,42 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * If key refers to an int[] of showerpixel. this will calculate the number of islands
+ * If showerKey refers to an int[] of showerpixel. this will calculate the number of islands
  * @author kaibrugge
  *
  */
 public class NumberOfIslands implements Processor {
 
     @Parameter(required = true, description = "Key refering to an array of integer containing pixel Ids")
-    private String key;
+    private String showerKey;
 
     @Parameter(required = true)
     private String outputKey;
 
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, key, int[].class);
+    	if (!input.containsKey(showerKey))
+    	{
+    		input.put(outputKey, 0);
+    		return input;
+    	}
+        Utils.isKeyValid(input, showerKey, int[].class);
 
-        int[] showerPixel = (int[]) input.get(key);
+        int[] showerPixel = (int[]) input.get(showerKey);
         int numIslands = Utils.breadthFirstSearch(Utils.arrayToList(showerPixel)).size();
         input.put(outputKey, numIslands);
         return input;
     }
 
+    public String getShowerKey() {
+		return showerKey;
+	}
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+	public void setShowerKey(String showerKey) {
+		this.showerKey = showerKey;
+	}
 
-
-    public void setOutputKey(String outputkey) {
+	public void setOutputKey(String outputkey) {
         this.outputKey = outputkey;
     }
 

@@ -10,9 +10,8 @@ import org.junit.rules.ExpectedException;
 
 import stream.Data;
 import stream.io.SourceURL;
-import fact.cleaning.CoreNeighborClean;
-import fact.extraction.MaxAmplitudePosition;
-import fact.extraction.PhotonCharge;
+import fact.cleaning.TwoLevelTimeMedian;
+import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
@@ -63,11 +62,14 @@ public class ParameterTest {
 		pr.setUrl(drsUrl.toString());
 		pr.setOutputKey(key);
 		pr.process(item);
-
-		MaxAmplitudePosition pP = new MaxAmplitudePosition();
-		pP.setKey(key);
-		pP.setOutputKey(positions);
-		pP.process(item);
+		
+		BasicExtraction bE = new BasicExtraction();
+		bE.setDataKey(key);
+		bE.setOutputKeyMaxAmplPos(positions);
+		bE.setOutputKeyPhotonCharge(photonCharge);
+		bE.setUrl(new SourceURL(FitsStreamTest.class
+				.getResource("/defaultIntegralGains.csv")));
+		bE.process(item);
 		
 		RisingEdgeForPositions pR = new RisingEdgeForPositions();
 		pR.setDataKey(key);
@@ -75,23 +77,14 @@ public class ParameterTest {
 		pR.setOutputKey(arrivalTime);
 		pR.process(item);
 
-		PhotonCharge pC = new PhotonCharge();
-		pC.setDataKey(key);
-		pC.setOutputKey(photonCharge);
-		pC.setUrl(new SourceURL(FitsStreamTest.class
-				.getResource("/defaultIntegralGains.csv")));
-		pC.setRangeSearchWindow(25);
-		pC.setPositions(positions);
-		pC.process(item);
-
-		CoreNeighborClean poser = new CoreNeighborClean();
+		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
 		poser.setPhotonChargeKey(photonCharge);
 		poser.setArrivalTimeKey(arrivalTime);
 		poser.setOutputKey(shower);
 		poser.setCorePixelThreshold(1);
 		poser.setNeighborPixelThreshold(0.1);
 		poser.setMinNumberOfPixel(1);
-		poser.setTimeThreshold(40);
+		poser.setTimeLimit(40);
 		poser.process(item);
 
 		DistributionFromShower dist = new DistributionFromShower();
