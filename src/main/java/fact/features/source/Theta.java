@@ -18,26 +18,32 @@ public class Theta implements Processor {
 	@Parameter(required=true)
 	private String deltaKey = null;
 	@Parameter(required=true)
-	private String m3longKey = null;
+	private String m3lKey = null;
+	@Parameter(required=true)
+	private String cosDeltaAlphaKey = null;
 	@Parameter(required=true)
 	private String outputKey = null;
+	@Parameter(required=true)
+	private double signM3lConstant = 0;
 	
 	private double[] sourcePosition = null;
 	private double disp;
 	private double cogx;
 	private double cogy;
 	private double delta;
-	private double m3long;
+	private double m3l;
+	private double cosDeltaAlpha;
 
 	public Data process(Data input) {
-		Utils.mapContainsKeys(input, sourcePositionKey,dispKey,cogxKey,cogyKey,deltaKey);
+		Utils.mapContainsKeys(input, sourcePositionKey,dispKey,cogxKey,cogyKey,deltaKey,cosDeltaAlphaKey);
 		
 		sourcePosition = (double[]) input.get(sourcePositionKey);
 		disp = (Double) input.get(dispKey);
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
 		delta = (Double) input.get(deltaKey);
-		m3long = (Double) input.get(m3longKey);
+		m3l = (Double) input.get(m3lKey);
+		cosDeltaAlpha = (Double) input.get(cosDeltaAlphaKey);
 		
 		double[] recPosition = CalculateRecPosition();
 		double theta = Math.sqrt( Math.pow(recPosition[0]-sourcePosition[0], 2)
@@ -54,8 +60,14 @@ public class Theta implements Processor {
 		
 		double[] result = new double[2];
 		
-		result[0] = cogx + disp * Math.cos(delta) * Math.signum(-m3long);
-		result[1] = cogy + disp * Math.sin(delta) * Math.signum(-m3long);
+		// The orientation of the reconstructed source position depends on the third moment
+		// (relativ to the suspected source position, m3l*sign(cosDeltaAlpha)) of the shower:
+		// If it is larger than a constant (default -200) the reconstructed source position is 
+		// orientated towards the suspected source position
+		double sign = - Math.signum(cosDeltaAlpha) * Math.signum(m3l*Math.signum(cosDeltaAlpha)-signM3lConstant);
+		
+		result[0] = cogx + disp * Math.cos(delta) * sign;
+		result[1] = cogy + disp * Math.sin(delta) * sign;
 		
 		return result;
 	}
@@ -100,12 +112,13 @@ public class Theta implements Processor {
 		this.deltaKey = deltaKey;
 	}
 
-	public String getM3longKey() {
-		return m3longKey;
+
+	public String getM3lKey() {
+		return m3lKey;
 	}
 
-	public void setM3longKey(String m3longKey) {
-		this.m3longKey = m3longKey;
+	public void setM3lKey(String m3lKey) {
+		this.m3lKey = m3lKey;
 	}
 
 	public String getOutputKey() {
@@ -115,5 +128,22 @@ public class Theta implements Processor {
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
+
+	public String getCosDeltaAlphaKey() {
+		return cosDeltaAlphaKey;
+	}
+
+	public void setCosDeltaAlphaKey(String cosDeltaAlphaKey) {
+		this.cosDeltaAlphaKey = cosDeltaAlphaKey;
+	}
+
+	public double getSignM3lConstant() {
+		return signM3lConstant;
+	}
+
+	public void setSignM3lConstant(double signM3lConstant) {
+		this.signM3lConstant = signM3lConstant;
+	}
+
 
 }

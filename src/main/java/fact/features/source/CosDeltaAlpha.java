@@ -5,40 +5,59 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+/**
+ * This processor calculates CosDeltaAlpha from MARS Code:
+ *  fCosDeltaAlpha cosine of angle between d and a, where
+ *	- d is the vector from the source position to the
+ *	center of the ellipse
+ *	- a is a vector along the main axis of the ellipse,
+ *	defined with positive x-component
+ * 
+ * @author Jan Freiwald
+ *
+ */
 public class CosDeltaAlpha implements Processor{
+	@Parameter(required=true)
+	private String sourcePositionKey;
+	@Parameter(required=true)
+	private String cogxKey;
+	@Parameter(required=true)
+	private String cogyKey;
+	@Parameter(required=true)
+	private String deltaKey;
+	@Parameter(required=true)
+	private String outputKey;
+	
 
-	/**
-	 * This function calculates CosDeltaAlpha from MARS Code:
-	 *  fCosDeltaAlpha cosine of angle between d and a, where
-	 *	- d is the vector from the source position to the
-	 *	center of the ellipse
-	 *	- a is a vector along the main axis of the ellipse,
-	 *	defined with positive x-component
-	 * @param input
-	 * @return
-	 */
+	private double[] sourcePosition;
+
+	private Double cogx;
+	private Double cogy;
+	private Double delta;
+
+	
 	@Override
 	public Data process(Data input)
 	{
 
 		double cosDeltaAlpha = 0;
 		
-		Utils.mapContainsKeys( input, sourcePosition, cogX, cogY, hillasDelta);
-		sourcePositionArray = (double[]) input.get(sourcePosition);
-		cogXValue = (Double) input.get(cogX);
-		cogYValue = (Double) input.get(cogY);
-		hillasDeltaValue = (Double) input.get(hillasDelta);
+		Utils.mapContainsKeys( input, sourcePositionKey, cogxKey, cogyKey, deltaKey);
+		sourcePosition = (double[]) input.get(sourcePositionKey);
+		cogx = (Double) input.get(cogxKey);
+		cogy = (Double) input.get(cogyKey);
+		delta = (Double) input.get(deltaKey);
 		
 		double sx,sy,dist;
-		sx = cogXValue - sourcePositionArray[0];
-		sy = cogYValue - sourcePositionArray[1];
+		sx = cogx - sourcePosition[0];
+		sy = cogy - sourcePosition[1];
 		dist = Math.sqrt(sx*sx + sy*sy);
 			
 		if(dist == 0)
 			return input;
 		
-		double s = Math.sin(hillasDeltaValue);
-		double c = Math.cos(hillasDeltaValue);
+		double s = Math.sin(delta);
+		double c = Math.cos(delta);
 		
 	    double arg2 = c*sx + s*sy; // mm
 						
@@ -52,49 +71,47 @@ public class CosDeltaAlpha implements Processor{
 		input.put(outputKey, cosDeltaAlpha);
 		return input;
 	}
-	
-	public String getSourcePosition() {
-		return sourcePosition;
+
+	public String getSourcePositionKey() {
+		return sourcePositionKey;
 	}
-	@Parameter(required = true, defaultValue = "sourcePosition", description = "Key to array containing the source position in mm.")
-	public void setSourcePosition(String sourcePosition) {
-		this.sourcePosition = sourcePosition;
+
+	public void setSourcePositionKey(String sourcePositionKey) {
+		this.sourcePositionKey = sourcePositionKey;
 	}
-	public String getCogX() {
-		return cogX;
+
+	public String getCogxKey() {
+		return cogxKey;
 	}
-	@Parameter(required = true, defaultValue = "COGx", description = "Key of the COGX value.")
-	public void setCogX(String cogX) {
-		this.cogX = cogX;
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
 	}
-	public String getCogY() {
-		return cogY;
+
+	public String getCogyKey() {
+		return cogyKey;
 	}
-	@Parameter(required = true, defaultValue = "COGy", description = "Key of the COGY value.")
-	public void setCogY(String cogY) {
-		this.cogY = cogY;
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
 	}
-	public String getHillasDelta() {
-		return hillasDelta;
+
+	public String getDeltaKey() {
+		return deltaKey;
 	}
-	@Parameter(required = true, defaultValue = "Hillas_Delta", description = "Key to the Hillas_Delta angle.")
-	public void setHillasDelta(String hillasDelta) {
-		this.hillasDelta = hillasDelta;
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
 	}
+
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(required = true, defaultValue = "CosDeltaAlpha", description = "Output key for this processor.")
+
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
-
-	private String sourcePosition;
-	private double[] sourcePositionArray;
-	private String cogX, cogY;
-	private Double cogXValue, cogYValue;
-	private String hillasDelta;
-	private Double hillasDeltaValue;
-	private String outputKey;
+	
+	
 	
 }

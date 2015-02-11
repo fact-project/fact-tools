@@ -2,19 +2,22 @@ package fact.features.source;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 //TODO: Documentation!?
 
 public class AntiSourcePosition implements Processor {
 	static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
-	
+	@Parameter(required=true)
 	private String sourcePositionKey = null;
-	
+	@Parameter(required=true)
 	private int numberOfAntiSourcePositions;
+	@Parameter(required=true)
 	private int antiSourcePositionId;
-	
+	@Parameter(required=true)
 	private String outputKey = null;
 
 	@Override

@@ -2,7 +2,6 @@ package fact.datacorrection;
 
 import fact.Utils;
 import fact.container.SpikeInfos;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +9,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tries to remove the artefact called 'Spike' from the data for different spike lengths. We know that there exist

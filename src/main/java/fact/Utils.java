@@ -340,5 +340,61 @@ public class Utils {
 
 		return ret;
 	}
+	
+	public static int[] getValidWindow(int start, int size, int validLeft, int validRight)
+	{
+		if (size < 0)
+		{
+			throw new RuntimeException("Size for window < 0! size: "+ size);
+		}
+		if (validLeft > validRight)
+		{
+			throw new RuntimeException("validLeft > validRight! validLeft: "+ validLeft + " validRight: " + validRight);
+		}
+		int[] window = {start,start+size};
+		
+		if (start > validRight)
+		{
+			window[0] = validRight;
+			window[1] = validRight;
+			return window;
+		}
+		if (start+size < validLeft)
+		{
+			window[0] = validLeft;
+			window[1] = validLeft;
+			return window;
+		}
+		if (start < validLeft)
+		{
+			window[0] = validLeft;
+		}
+		if (start+size > validRight)
+		{
+			window[1] = validRight;
+		}
+		return window;
+	}
+	
+	
+	public static void checkWindow(int start, int size, int validLeft, int validRight)
+	{	
+		if (size < 0)
+		{
+			throw new RuntimeException("Size for window < 0! size: "+ size);
+		}
+		if (start < validLeft)
+		{
+			String message = "start < validLeft. start/validLeft: " + start + "/" + validLeft;
+			throw new RuntimeException(message);
+		}
+		if (start+size > validRight)
+		{
+			String message = "start + size > validRight. start+size/validRight: " + (start+size) + "/" + validRight;
+			throw new RuntimeException(message);
+		}	
+	}
+	
+
 
 }
