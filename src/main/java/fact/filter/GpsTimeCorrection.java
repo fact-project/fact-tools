@@ -13,6 +13,7 @@ import stream.io.SourceURL;
 import java.net.URL;
 import java.util.TreeMap;
 import java.util.ArrayList;
+import java.io.*;
 
 /**
  * <p>
@@ -39,7 +40,7 @@ public class GpsTimeCorrection implements Processor {
 	 * It is filled by the constructor and 
 	 * can be accessed by the key: EventNum
 	 */ 
-	private TreeMap<Integer, Integer[]> gpsTimes = new TreeMap<Integer, Integer[]>;
+	private TreeMap<Integer, Integer[]> gpsTimes = new TreeMap<Integer, Integer[]>();
 
 	/**
 	 * This is the method called in the process loop.
@@ -76,7 +77,7 @@ public class GpsTimeCorrection implements Processor {
 	protected void loadGpsTimeCorrection(SourceURL  in) {
 		try {
 			//open file and get the data as a list
-			ArrayList<String> stringData = getTimeDataFromFile( in.getUrl() );
+			ArrayList<String> stringData = getTimeDataFromFile( in.getPath() );
 
 			//make it a nice integer list
 
@@ -105,7 +106,7 @@ public class GpsTimeCorrection implements Processor {
 	private ArrayList<String> getTimeDataFromFile(String fileName) {
 		
 		String lineData;
-		List<String> fileContents = new ArrayList<String>();
+		ArrayList<String> fileContents = new ArrayList<String>();
 		BufferedReader gpsFile=null;
 		try{
 
@@ -138,19 +139,18 @@ public class GpsTimeCorrection implements Processor {
 			{
 				lineIndex += 1;
 			}
-			lineData = gpsFile.readLine() //jump over one last unneccessary line
-			while ((lineData = moFile.readLine()) != null)
+			lineData = gpsFile.readLine(); //jump over one last unneccessary line
+			while ((lineData = gpsFile.readLine()) != null)
 			{
 				lineIndex += 1;
 				fileContents.add(lineData);
 			}
+			gpsFile.close();
 		} 
 		catch(IOException e) {
 			log.error("Exception caught while reading gps event time correction data file: " + fileName + e.toString());
 		}
-		finally{
-			gpsFile.close();
-		}
+
 		return fileContents;
 	}
 
@@ -159,10 +159,12 @@ public class GpsTimeCorrection implements Processor {
 	 */
 	private TreeMap<Integer, Integer[]> getTimeIntsFromStringList( ArrayList<String> stringList ) {
 
-		TreeMap<Integer, Integer[]> listContents = new TreeMap<Integer, Integer[]>;
+		TreeMap<Integer, Integer[]> listContents = new TreeMap<Integer, Integer[]>();
 		
 		//split the strings
-		listContents.add(key,column);
+		//listContents.add(key,column);
+
+		return listContents;
 	}
 
 	// ----------------- getters and setters -------------------
@@ -183,7 +185,7 @@ public class GpsTimeCorrection implements Processor {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
-
+}
 //#Bootstrapped |Mean Delta T| < 5e-6s && |Sigma Delta T| < 10e-6s ? -> YES, PASSED
 //#All p-values >= 0.0001 ? -> YES, PASSED
 //#All toothgaps found? -> YES, PASSED
