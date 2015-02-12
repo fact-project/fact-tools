@@ -4,9 +4,9 @@
     outputKeyMaxAmplPos="maxPos"
     outputKeyPhotonCharge="photoncharge" 
     url="file:${integralGainFile}"
-    startSearchWindow="${start_search_window}"
-    rangeSearchWindow="${range_search_window}"
-    rangeHalfHeightWindow="25"
+    startSearchWindow="${basicExtraction_startSearchWindow}"
+    rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+    rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
 />
 <fact.extraction.RisingEdgeForPositions
     dataKey="DataCalibrated"
@@ -18,7 +18,7 @@
     dataKey="DataCalibrated"
     risingEdgeKey="arrivalTimePos"
     outputKey="arrivalTime"
-    numberOfPoints="11"
+    numberOfPoints="${risingEdgePolynomFit_numberOfPoints}"
     maxSlopesKey="maxSlopes"
 />
 <fact.extraction.TimeOverThreshold
@@ -43,5 +43,10 @@
     outputKeyPhotonCharge="photoncharge" 
     outputKeyArrivalTime="arrivalTime" 
     saturatedPixelKey="saturatedPixel" 
+/>
+<fact.datacorrection.CorrectPixelDelays
+    arrivalTimeKey="arrivalTime"
+    outputKey="arrivalTime"
+    url="file:${pixelDelayFile}"
 />
 </module>

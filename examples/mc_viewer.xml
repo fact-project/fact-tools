@@ -1,4 +1,6 @@
 <container>
+
+	<properties url="classpath:/default/settings_mc.properties" />
     
     <property name="fhgfs" value="/home/fabian/mount/Phido/fhgfs_app" />
     <!-- <property name="fhgfs" value="/fhgfs/groups/app" /> -->
@@ -7,16 +9,8 @@
 	<property name="infile" value="${fhgfs}/fact/simulated/ceres/test/00000000.000_D_MonteCarlo000_Events.fits.gz" />
     <property name="drsfile" value="${fhgfs}/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples2.drs.fits.gz" />
   
-    <property name="integralGainFile" value="src/main/resources/defaultIntegralGains.csv" />
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
 	
-    <property name="core_threshold" value="7.0" />
-    <property name="neighbor_threshold" value="4.5"/>
-    <property name="time_limit" value="10.0" />
-    <property name="min_number_of_pixel" value="2" />
-    <property name="start_search_window" value="35" />
-    <property name="range_search_window" value="60" />
-
-
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
 

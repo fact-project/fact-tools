@@ -1,8 +1,8 @@
 <module>
 <fact.features.source.SourcePosition 
     outputKey="sourcePosition" 
-    X="0.0"
-    Y="0.0"
+    X="${source_x}"
+    Y="${source_y}"
 />
 <fact.features.source.AntiSourcePosition
         sourcePositionKey="sourcePosition"
