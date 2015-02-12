@@ -52,11 +52,13 @@ public class GpsTimeCorrection implements Processor {
 		//Check that the eventnum exists
 		Utils.isKeyValid(input, "EventNum", Integer.class); 
 
+		Integer triggerType = new Integer( input.get( "TriggerType").toString() );
+
 		//Check that the trigger type is 4, equivalent to the physics trigger
-		if (input.get("TriggerType") != 4 ) {
-			log.error("Non-pysics trigger type detected. Please cut on physics triggers first.");
+		if ( !triggerType.equals(4) ) {
+			log.error("Non-pysics trigger type detected: "+input.get("TriggerType")+" Please cut on physics triggers for gps time correction.");
 			throw new RuntimeException(
-					"Non-pysics trigger type detected. Please cut on physics triggers first.");
+					"Non-pysics trigger type detected. Please cut on physics triggers for gps time correction.");
 		}
 
 		Integer[] bufGpsTimes = gpsTimes.get( input.get("EventNum") );
@@ -77,17 +79,8 @@ public class GpsTimeCorrection implements Processor {
 	protected void loadGpsTimeCorrection(SourceURL  in) {
 		try {
 			//open file and get the data as a list
-			ArrayList<String> stringData = getTimeDataFromFile( in.getPath() );
-
-			//make it a nice integer list
-
-
-			//if the data turns out to be badly fitted ( one of the three tests failed 
-			// -> throw new RuntimeException )
-			
-
-			//load the corrected values into an array of two ints: Unix timestamp[seconds, microseconds].
-			//somehow similar to this: this.gpsTimes = (double[]) drsTimeData.get(drsTimeKey);
+			ArrayList<int[]> fileData = getTimeDataFromFile( in.getPath() ); //make a list of event number + the different times
+            this.gpsTimes = getTimeMapFromIntList( fileData ); //copy this event number list into a map that is accessible by id: event number
 
 		} catch (Exception e) {
 
@@ -101,49 +94,74 @@ public class GpsTimeCorrection implements Processor {
 	}
 
 	/*
-	 * This method actually openes the data file and gets the times out from it. 
+	 * This method actually openes the data file and gets the times out from it.
+	 * the return is a list of five integers:
+	 * [0] event number
+	 * [1] unixTime
+	 * [2] unixTimeMicroseconds
+	 * [3] correctedUnixTime
+	 * [4] correctedUnixTimeMicroseconds
 	 */
-	private ArrayList<String> getTimeDataFromFile(String fileName) {
+	private ArrayList<int[]> getTimeDataFromFile(String fileName) {
 		
 		String lineData;
-		ArrayList<String> fileContents = new ArrayList<String>();
+		ArrayList<int[]> fileContents = new ArrayList<int[]>();
 		BufferedReader gpsFile=null;
 		try{
 
 			Integer lineIndex = 0;
 			gpsFile = new BufferedReader (new FileReader (new File ( fileName )));
 
-			while ( lineIndex <= 68 ) { //jump over not needed content
+			while ( lineIndex < 68 ) { //jump over not needed content
 				lineData = gpsFile.readLine();
 				lineIndex += 1;
-			}				
-			if ( (lineData = gpsFile.readLine()) !=	
-				"#Bootstrapped |Mean Delta T| < 5e-6s && |Sigma Delta T| < 10e-6s ? -> YES, PASSED\n" ){
-				log.error("linedata:  " + lineData);
-				throw new RuntimeException("Bootstrapped |Mean Delta T| < 5e-6s && |Sigma Delta T| < 10e-6s test not passed.");
 			}
-			if( (lineData = gpsFile.readLine()) != 
-				"#All p-values >= 0.0001 ? -> YES, PASSED\n" ){
+            lineData = gpsFile.readLine();
+			if ( !lineData.equals("#Bootstrapped |Mean Delta T| < 5e-6s && |Sigma Delta T| < 10e-6s ? -> YES, PASSED") ){
+                log.error("linedata:  " + lineData);
+                throw new RuntimeException("Bootstrapped |Mean Delta T| < 5e-6s && |Sigma Delta T| < 10e-6s test not passed.");
+			}
+            lineData = gpsFile.readLine();
+			if( !lineData.equals("#All p-values >= 0.0001 ? -> YES, PASSED") ){
 				log.error("linedata:  " + lineData);
 				throw new RuntimeException("At least one p-value < 0.0001");
 			}
-			if( (lineData = gpsFile.readLine()) != 
-							"#All toothgaps found? -> YES, PASSED\n" ){
+            lineData = gpsFile.readLine();
+			if( !lineData.equals("#All toothgaps found? -> YES, PASSED") ){
 				log.error("linedata:  " + lineData);
 				throw new RuntimeException("Not all toothgaps found");
 			}
 			lineIndex += 3;
 
 			//jump some more
-			while ((lineData = gpsFile.readLine()) != "#Reconstructed timing DATA events:\n")
+			while ( true )
 			{
+                lineData = gpsFile.readLine();
 				lineIndex += 1;
+                if( lineData.equals("#Reconstructed timing DATA events:") ){
+                    break;
+                }
 			}
 			lineData = gpsFile.readLine(); //jump over one last unneccessary line
-			while ((lineData = gpsFile.readLine()) != null)
+            int lastEvent = 0;
+			while ( true )
 			{
+                int[] intBuf = { 0 , 0 , 0 , 0 , 0 }; //buffer for saving unix times
+                lineData = gpsFile.readLine();
 				lineIndex += 1;
-				fileContents.add(lineData);
+                if ( lineData.equals( "#" )) { //when the end of the data block is reached, escape.
+                    log.info("last event num read by gpsTimeCorrection: " + lastEvent);
+                    break;
+                }
+                String stringBuf = lineData.substring(2);
+                String[] stringParts = stringBuf.split("   ");
+                lastEvent = Integer.parseInt(stringParts[0]);
+                intBuf[0] = Integer.parseInt(stringParts[0]); // event num
+                intBuf[1] = Integer.parseInt(stringParts[1]); // unixTime
+                intBuf[2] = Integer.parseInt(stringParts[2]); // unixTimeMicroseconds
+                intBuf[3] = Integer.parseInt(stringParts[3]); // correctedUnixTime
+                intBuf[4] = Integer.parseInt(stringParts[4]); // correctedUnixTimeMicroseconds
+				fileContents.add(intBuf);
 			}
 			gpsFile.close();
 		} 
@@ -155,23 +173,26 @@ public class GpsTimeCorrection implements Processor {
 	}
 
 	/*
-	 * this method makes a nice 3 * NumDataEvts int map from the string List
+	 * this method makes a nice 3 * NumDataEvts int map from the int List
+	 * not implemented so far: check of the correct unix time (before correction)
 	 */
-	private TreeMap<Integer, Integer[]> getTimeIntsFromStringList( ArrayList<String> stringList ) {
+	private TreeMap<Integer, Integer[]> getTimeMapFromIntList( ArrayList<int[]> intList ) {
 
-		TreeMap<Integer, Integer[]> listContents = new TreeMap<Integer, Integer[]>();
-		
-		//split the strings
-		//listContents.add(key,column);
+		TreeMap<Integer, Integer[]> timeMap = new TreeMap<Integer, Integer[]>();
+        for(int i = 0; i < intList.size(); i++){
 
-		return listContents;
+            int[] ints = intList.get(i);
+            Integer key = Integer.valueOf( ints[0] ); //copy event number into Integer type
+            Integer[] column = new Integer[ 2 ];
+            column[0] = Integer.valueOf( ints[3] ); //copy correctedTimes into a list of Integers ( Seconds, Microseconds )
+            column[1] = Integer.valueOf( ints[4] );
+
+            timeMap.put(key,column);
+        }
+		return timeMap;
 	}
 
 	// ----------------- getters and setters -------------------
-	public String getOutputKey() {
-		return outputKey;
-	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
@@ -186,8 +207,3 @@ public class GpsTimeCorrection implements Processor {
 		}
 	}
 }
-//#Bootstrapped |Mean Delta T| < 5e-6s && |Sigma Delta T| < 10e-6s ? -> YES, PASSED
-//#All p-values >= 0.0001 ? -> YES, PASSED
-//#All toothgaps found? -> YES, PASSED
-
-//#Reconstructed timing DATA events:
