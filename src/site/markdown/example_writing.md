@@ -109,12 +109,11 @@ Theres is one catch however. If you want to write out an array to the file the o
 		[I@1e22ab57
       ...
 
-Thats because the `toString()` function of Javas internal Array class does not print the whole contents of the array but simply
-returns what you could consider the Java equivalent of a C pointer. A workaround would be to use the fact.io.RootASCIIWriter processor
-which can handle arrays with primitive types. Its usage is similar to the CsvWriter.
+Thats because the .csv format does not initially support data types other than simple numbers or strings. For output
+of more complex data types you could use the JSONWriter.
 
-    <-- No spaces between keys--/>    
-    <fact.io.RootASCIIWriter keys="positionArray" url="file:///tmp/output.csv" />
+    <stream.io.JSONWriter keys="EventNum,maxAmplitudeMean,some_data_structure" url="file:///tmp/output.json" />
+
 
 	
 	  

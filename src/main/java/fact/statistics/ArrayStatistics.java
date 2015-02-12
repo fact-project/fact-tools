@@ -91,11 +91,8 @@ public class ArrayStatistics implements Processor {
         this.outputKey = outputKey;
     }
 
-    public String getPixelSetKey() {
-        return pixelSetKey;
-    }
-
     public void setPixelSetKey(String pixelSetKey) {
         this.pixelSetKey = pixelSetKey;
     }
+
 }
