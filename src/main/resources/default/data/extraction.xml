@@ -3,7 +3,7 @@
     dataKey="DataCalibrated" 
     outputKeyMaxAmplPos="maxPos"
     outputKeyPhotonCharge="photoncharge" 
-    url="file:${integralGainFile}"
+    url="${integralGainFile}"
     startSearchWindow="${basicExtraction_startSearchWindow}"
     rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
     rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
@@ -47,6 +47,6 @@
 <fact.datacorrection.CorrectPixelDelays
     arrivalTimeKey="arrivalTime"
     outputKey="arrivalTime"
-    url="file:${pixelDelayFile}"
+    url="${pixelDelayFile}"
 />
 </module>
