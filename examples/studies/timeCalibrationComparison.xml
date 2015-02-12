@@ -77,7 +77,6 @@
         <fact.datacorrection.DrsTimeCalibration
                 dataKey="DataCalibrated"
                 outputKey="DataCalibrationNeu"
-                url="file:${drstimefile}"
                 />
 
         <fact.datacorrection.InterpolateBadPixel
