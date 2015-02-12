@@ -3,7 +3,7 @@
 	<groupId>de.sfb876</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-	<version>0.7.3-SNAPSHOT</version>
+	<version>0.7.4-SNAPSHOT</version>
 
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
@@ -57,7 +57,7 @@
 		<url>https://bitbucket.org/cbockermann/fact-tools</url>
 		<developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</developerConnection>
 		<connection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</connection>
-		<tag>fact-tools-0.7.0</tag>
+		<tag>fact-tools-0.7.3</tag>
 	</scm>
 
 	<mailingLists>
