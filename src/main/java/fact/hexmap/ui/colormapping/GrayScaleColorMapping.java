@@ -15,17 +15,24 @@ public class GrayScaleColorMapping
 {
     static Logger log = LoggerFactory.getLogger( GrayScaleColorMapping.class );
     double neutralValue = 0.0f;
-    Color maxColor = Color.white;
-    Color minColor = Color.black;
+//    Color maxColor = Color.white;
+//    Color minColor = Color.black;
     double minValue, maxValue;
 
     @Override
     public Color getColorFromValue(double v, double minValue, double maxValue) {
-        if(Double.isNaN(v)){
-            v = neutralValue;
-        }
-        double value = v + Math.abs(minValue);
-        value = value/(maxValue-minValue);
+//        if(Double.isNaN(v)){
+//            return Color.YELLOW;
+//        }
+//        if(Double.isInfinite(v)){
+//            if(v > 0) {
+//                return Color.RED;
+//            }   else {
+//                return Color.BLUE;
+//            }
+//        }
+//        double value = v - minValue;
+        double value = (v - minValue)/(maxValue-minValue);
         return Color.getHSBColor(0.0f, 0.0f, (float)value);
 
     }

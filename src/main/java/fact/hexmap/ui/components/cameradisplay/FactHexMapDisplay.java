@@ -42,6 +42,9 @@ import fact.hexmap.ui.colormapping.GrayScaleColorMapping;
 import fact.hexmap.ui.events.SliceChangedEvent;
 import fact.hexmap.ui.overlays.CameraMapOverlay;
 
+import static com.google.common.primitives.Doubles.max;
+import static com.google.common.primitives.Doubles.min;
+
 /**
  * This implements a PixelMap to draw a grid of hexagons as seen in the camera
  * of the fact telescope The hexagons are equally spaced and sized. Orientated
@@ -81,6 +84,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	private ColorMapping colormap = new GrayScaleColorMapping();
 
 	final private FactPixelMapping pixelMapping;
+
 	private ArrayList<CameraMapOverlay> overlays = new ArrayList<>();
 	private Set<Pair<String, Color>> overlayKeys = new HashSet<>();
 
@@ -93,7 +97,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private boolean drawScaleNumbers = true;
 
-	private boolean includeScale = false;
+	private boolean includeScale = true;
 
 	private int offsetX = 0;
 	private int offsetY = 0;
@@ -179,8 +183,18 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		this.repaint();
 	}
 
+	/**
+	 * We call this method whenever a new Overlay is supposed to be drawn.
+	 * When the user checks a checkbox for example below the cameradisplay for example. Or chooses
+	 * a new color.
+	 *
+	 * @param items
+	 * @param dataItem
+	 * @return
+	 */
 	private ArrayList<CameraMapOverlay> updateOverlays(
 			Set<Pair<String, Color>> items, Data dataItem) {
+
 		ArrayList<CameraMapOverlay> overlays = new ArrayList<>();
 		for (Pair<String, Color> s : items) {
 			CameraMapOverlay overlay = (CameraMapOverlay) dataItem.get(s
@@ -191,7 +205,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			}
 		}
 		
-		class customComparator implements Comparator<CameraMapOverlay> {
+		class CustomComparator implements Comparator<CameraMapOverlay> {
 		    public int compare(CameraMapOverlay object1, CameraMapOverlay object2) {            	
 		        return object1.getDrawRank() - object2.getDrawRank();
 		    }
@@ -199,27 +213,23 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		// Sortierung in der richtigen Reihenfolge
 		// um ueberdeckungen zu vermeiden 
 		// von niedrig nach hoch
-		Collections.sort(overlays, new customComparator());	
+		Collections.sort(overlays, new CustomComparator());
 		
 		return overlays;
 	}
 
 	private void updateMapDisplay(Data item, String key) {
 		if (item == null) {
-			log.error("Dataitem was null in cameraWindow");
+			log.error("DataItem was null in cameraWindow");
 		}
-		try {
-			double[] data = (double[]) item.get(key);
-			this.sliceValues = Utils.sortPixels(data, 1440);
-			for (double[] slices : sliceValues) {
-				for (double v : slices) {
-					minValueInData = Math.min(minValueInData, v);
-					maxValueInData = Math.max(maxValueInData, v);
-				}
-			}
+		double[] dataToPlot = Utils.toDoubleArray(item.get(key));
+		if (dataToPlot != null) {
+			minValueInData = min(dataToPlot);
+			maxValueInData = max(dataToPlot);
+			this.sliceValues = Utils.sortPixels(dataToPlot, 1440);
 			this.repaint();
-		} catch (ClassCastException e) {
-			log.error("The viewer can only display data of type double[]");
+		} else {
+			log.error("Tried to plot data that was null");
 		}
 	}
 

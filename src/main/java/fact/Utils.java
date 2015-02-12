@@ -146,6 +146,31 @@ public class Utils {
 		}
 	}
 
+	public static double[] shortToDoubleArray(short[] ar) {
+		// return toDoubleArray(ar)
+		if (ar != null) {
+			double[] ret = new double[ar.length];
+			for (int i = 0; i < ar.length; i++) {
+				ret[i] = (double) ar[i];
+			}
+			return ret;
+		} else {
+			return null;
+		}
+	}
+	public static double[] byteToDoubleArray(byte[] ar) {
+		// return toDoubleArray(ar)
+		if (ar != null) {
+			double[] ret = new double[ar.length];
+			for (int i = 0; i < ar.length; i++) {
+				ret[i] = (double) ar[i];
+			}
+			return ret;
+		} else {
+			return null;
+		}
+	}
+
 	// returns true if the specified value is anywhere in the array
 	public static boolean arrayContains(int[] ar, int value) {
 		for (int anAr : ar) {
@@ -154,6 +179,12 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * This is method might be useful for getting stuff from the data items and, if possible, cast it into a double array.
+	 * This is not very fast. And its also very ugly. But thats okay. I still like you
+	 * @param arr
+	 * @return can be null!
+	 */
 	public static double[] toDoubleArray(Serializable arr) {
 		if (arr.getClass().isArray()) {
 			Class<?> clazz = arr.getClass().getComponentType();
@@ -163,6 +194,11 @@ public class Utils {
 				return (double[]) arr;
 			} else if (clazz.equals(int.class)) {
 				return intToDoubleArray((int[]) arr);
+			} else if (clazz.equals(short.class)) {
+				return shortToDoubleArray((short[]) arr);
+			}
+			else if (clazz.equals(byte.class)) {
+				return byteToDoubleArray((byte[]) arr);
 			}
 		}
 		return null;
