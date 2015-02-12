@@ -52,12 +52,13 @@ Some processors try to find some point in time or a certain time interval in the
 Since it can be useful to actually see what your algorithm is doing you can set the background color for a time interval
 in the series. This works by adding an `IntervalMarker` for each pixel in the event.
 
-        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        int npix = (Integer) input.get("NPIX");
+        IntervalMarker[] m = new IntervalMarker[npix];
 
         for(int pixel : allPixel){
             m[pixel] =  new IntervalMarker(startposition , endposition, new Color(r,g,b, alpha));
         }
 
-		input.put("Marker", m);
+        input.put("Marker", m);
 
 The Graph Window will automatically show you the option to display the selected interval.

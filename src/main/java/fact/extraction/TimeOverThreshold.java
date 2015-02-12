@@ -3,7 +3,6 @@
  */
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 
@@ -14,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.awt.*;
 
 /**
  * This feature is supposed to give the number of slices above a given Threshold, 
@@ -41,26 +38,31 @@ public class TimeOverThreshold implements Processor {
 	private String outputKey = null;
 	
 	private PixelSetOverlay pixelSet;
+	
+	private int npix;
 
 	public Data process(Data input) {
-		
-		Utils.isKeyValid(input, dataKey, double[].class);
+        Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, positionsKey, int[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 				
-		int[] timeOverThresholdArray =  new int[Constants.NUMBEROFPIXEL];
-		double[] firstSliceOverThresholdArray =  new double[Constants.NUMBEROFPIXEL];
+		int[] timeOverThresholdArray =  new int[npix];
+		double[] firstSliceOverThresholdArray =  new double[npix];
 		
 		double[] data 	 = (double[]) input.get(dataKey);
 		int[] posArray = (int[]) input.get(positionsKey);
 		
-		IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+		IntervalMarker[] m = new IntervalMarker[npix];
 			
-		int roi = data.length / Constants.NUMBEROFPIXEL;
+		int roi = data.length / npix;
 		int numPixelAboveThreshold = 0;
 		
 		pixelSet = new PixelSetOverlay();
+        int[] totPixelSet = null;
+
 		//Loop over pixels
-		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+		for(int pix = 0 ; pix < npix; pix++){
 			firstSliceOverThresholdArray[pix] = 0;
 			
 			int pos = pix*roi;
@@ -91,7 +93,7 @@ public class TimeOverThreshold implements Processor {
 			
 			//Loop over slices after Maximum and sum up those above threshold
 			for (int sl = positionOfMaximum + 1 ; 
-					sl < pos + roi ; sl++)
+					sl < roi ; sl++)
 			{			
 				if (data[pos + sl] < threshold){
 					lastSliceOverThresh = sl-1;
@@ -119,10 +121,14 @@ public class TimeOverThreshold implements Processor {
 		input.put(outputKey, timeOverThresholdArray);
 		input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
 		input.put(outputKey+"Marker", m);
-		input.put(outputKey+"Set", pixelSet);
-		
+		input.put(outputKey+"SetOverlay", pixelSet);
 
-		return input;
+        //Add totPixelSet only to data item if it is not empty
+        totPixelSet = pixelSet.toIntArray();
+        if (totPixelSet.length != 0){
+            input.put(outputKey+"Set", pixelSet.toIntArray());
+        }
+        return input;
 	}
 
 	public double getThreshold() {

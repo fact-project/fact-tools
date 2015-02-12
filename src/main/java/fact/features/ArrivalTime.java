@@ -3,7 +3,7 @@
  */
 package fact.features;
 
-import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -20,44 +20,47 @@ import java.util.ArrayList;
  * 
  */
 public class ArrivalTime implements Processor {
-	static Logger log = LoggerFactory.getLogger(ArrivalTime.class);
+    static Logger log = LoggerFactory.getLogger(ArrivalTime.class);
 
     @Parameter(required = true)
     private String key;
     @Parameter(required = true)
     private String outputKey;
-    	//positions of arrival times
+        //positions of arrival times
     @Parameter(required = true)
     private String maxAmpPositionKey;
-    	//positions of max pulse amplitude
+        //positions of max pulse amplitude
     @Parameter(required = false)
     private String visualizeKey;
 
+    private int npix;
 
-	@Override
-	public Data process(Data input) {
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
-		ArrayList[] maxAmpPositions = (ArrayList[]) input.get(maxAmpPositionKey);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
-        ArrayList[] arrivalTimes =  new ArrayList[Constants.NUMBEROFPIXEL];
+        ArrayList[] maxAmpPositions = (ArrayList[]) input.get(maxAmpPositionKey);
+        int roi = data.length / npix;
+        ArrayList[] arrivalTimes =  new ArrayList[npix];
         double[] visualizePositions = new double[data.length];
-    	//zero for all positions except where an arrival time is found
+        //zero for all positions except where an arrival time is found
         
         for(int i = 0; i < data.length; i++){
-        	visualizePositions[i] = 0;
+            visualizePositions[i] = 0;
         }
         
-		//for each pixel
-		for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
-			arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
-		}
+        //for each pixel
+        for (int pix = 0; pix < npix; pix++) {
+            arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
+        }
         input.put(outputKey, arrivalTimes);
         input.put(visualizeKey, visualizePositions);
- //   	System.out.println(Arrays.toString(arrivalTimes));
+ //     System.out.println(Arrays.toString(arrivalTimes));
 
 
-		return input;
-	}
+        return input;
+    }
 
     /**
      * @param pix Pixel to check
@@ -65,42 +68,42 @@ public class ArrivalTime implements Processor {
      * @param data the array which to check
      * @return
      */
-	
+    
     public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions, double[] visualizePositions){
       
-		ArrayList<Integer> positions = new ArrayList<Integer>();
+        ArrayList<Integer> positions = new ArrayList<Integer>();
 
         if(!maxAmpPositions[pix].isEmpty()){
-        	int numberPulses = maxAmpPositions[pix].size();        	
-        	for(int i = 0; i < numberPulses; i++){
+            int numberPulses = maxAmpPositions[pix].size();         
+            for(int i = 0; i < numberPulses; i++){
                   int Position = 0;
                   int end = (Integer) maxAmpPositions[pix].get(i);
                   int endPos = pix * roi + end;
                   for(int slice = end; slice > end - 25; slice--){
-        			   int pos = pix * roi + slice;
-        			   if(end - 25 < 0) {continue;}
-        	           double value = data[pos];
-        	           if(slice > 0 && slice + 80 < roi && end - slice < 15){  
-        	        	   if(value <= data[endPos]/2){
-        	        		   Position = slice;
-        	        		   break;
-        	        	   }
-        	           }
+                       int pos = pix * roi + slice;
+                       if(end - 25 < 0) {continue;}
+                       double value = data[pos];
+                       if(slice > 0 && slice + 80 < roi && end - slice < 15){  
+                           if(value <= data[endPos]/2){
+                               Position = slice;
+                               break;
+                           }
+                       }
                   }
                   if(Position != 0) {
-                	  positions.add(Position);
-                	  visualizePositions[pix*roi+Position] = 15;
+                      positions.add(Position);
+                      visualizePositions[pix*roi+Position] = 15;
                 }
-        	}
+            }
         }
 
-        	return positions;
+            return positions;
     }
           
      
-	/*
-	 * Getters and Setters
-	 */
+    /*
+     * Getters and Setters
+     */
 
 
     public String getKey() {
@@ -119,20 +122,20 @@ public class ArrivalTime implements Processor {
         this.outputKey = outputKey;
     }
 
-	public String getmaxAmpPositionKey() {
-		return maxAmpPositionKey;
-	}
+    public String getmaxAmpPositionKey() {
+        return maxAmpPositionKey;
+    }
 
-	public void setmaxAmpPositionKey(String maxAmpPositionKey) {
-		this.maxAmpPositionKey = maxAmpPositionKey;
-	}
+    public void setmaxAmpPositionKey(String maxAmpPositionKey) {
+        this.maxAmpPositionKey = maxAmpPositionKey;
+    }
 
-	public String getVisualizeKey() {
-		return visualizeKey;
-	}
+    public String getVisualizeKey() {
+        return visualizeKey;
+    }
 
-	public void setVisualizeKey(String visualizeKey) {
-		this.visualizeKey = visualizeKey;
-	}
+    public void setVisualizeKey(String visualizeKey) {
+        this.visualizeKey = visualizeKey;
+    }
 
 }

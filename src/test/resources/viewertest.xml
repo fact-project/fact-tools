@@ -15,10 +15,10 @@
                                           url="file:src/main/resources/gain_sorted_20131127.csv" positions="maxAmplitudePosition"
                                           outputKey="photoncharge" color="#FF0F0F"/>
 
-            <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
-                                             arrivalTimeKey="arrivalTime" timeThreshold="30"  minNumberOfPixel="2"/>
+            <fact.cleaning.TwoLevelTimeMedian key="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
+                                             keyPositions="maxAmplitudePosition" timeThreshold="30"  minNumberOfPixel="2"/>
 
-            <fact.features.source.SourcePosition outputKey="source" X="2" Y="5" />
+            <fact.features.source.SourcePosition outputKey="Cetatauri" url="${driveFile}" sourceRightAscension="84.41125" sourceDeclination="21.1425" />
             <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
             <fact.ShowViewer key="DataCalibrated" range="25,250"/>
             <!--<fact.statistics.ArrayMean key="photoncharge" outputKey="pMean" />-->

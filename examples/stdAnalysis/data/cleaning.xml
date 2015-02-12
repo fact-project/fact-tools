@@ -1,0 +1,19 @@
+<module>
+<fact.features.source.SourcePosition
+    outputKey="Cetatauri"
+    url="file:${drivefile}"
+    sourceRightAscension="84.41125"
+    sourceDeclination="21.1425" 
+/>
+<fact.cleaning.TwoLevelTimeNeighbor
+    photonChargeKey="photoncharge"
+    outputKey="shower"
+    arrivalTimeKey="arrivalTime"
+    corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
+    neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
+    timeLimit="${twoLevelTimeNeighbor_timeLimit}"
+    minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+    starPositionKeys="Cetatauri"
+    starRadiusInCamera="11.0"
+/>
+</module>

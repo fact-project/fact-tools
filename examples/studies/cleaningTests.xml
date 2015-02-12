@@ -1,0 +1,169 @@
+<module>
+        <!-- <property name="1clKey" value="6_3_TM_B" /> -->
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${1clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${1clCore}" neighborPixelThreshold="${1clNeighbor}" timeThreshold="${1clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${1clKey}" outputKey="N_${1clKey}"
+        />
+        <fact.features.Size showerKey="${1clKey}" photonChargeKey="pC_Basic" outputKey="S_${1clKey}"
+        />
+        <fact.features.NumberOfIslands key="${1clKey}" outputKey="nI_${1clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${1clKey}" pixelSetKey="${1clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic" outputKey="aT_${1clKey}" pixelSetKey="${1clKey}"
+        />
+
+        <!-- <property name="2clKey" value="7_5_TM_B" /> -->
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${2clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${2clCore}" neighborPixelThreshold="${2clNeighbor}" timeThreshold="${2clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${2clKey}" outputKey="N_${2clKey}"
+        />
+        <fact.features.Size showerKey="${2clKey}" photonChargeKey="pC_Basic" outputKey="S_${2clKey}"
+        />
+        <fact.features.NumberOfIslands key="${2clKey}" outputKey="nI_${2clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${2clKey}" pixelSetKey="${2clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic" outputKey="aT_${2clKey}" pixelSetKey="${2clKey}"
+        />
+
+    <!-- <property name="3clKey" value="6_3_TN10_B" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${3clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${3clCore}" neighborPixelThreshold="${3clNeighbor}" timeThreshold="${3clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${3clKey}" outputKey="N_${3clKey}"
+        />
+        <fact.features.Size showerKey="${3clKey}" photonChargeKey="pC_Basic" outputKey="S_${3clKey}"
+        />
+        <fact.features.NumberOfIslands key="${3clKey}" outputKey="nI_${3clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${3clKey}" pixelSetKey="${3clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic" outputKey="aT_${3clKey}" pixelSetKey="${3clKey}"
+        />
+
+    <!-- <property name="4clKey" value="6_3_TN15_B" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${4clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${4clCore}" neighborPixelThreshold="${4clNeighbor}" timeThreshold="${4clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${4clKey}" outputKey="N_${4clKey}"
+        />
+        <fact.features.Size showerKey="${4clKey}" photonChargeKey="pC_Basic" outputKey="S_${4clKey}"
+        />
+        <fact.features.NumberOfIslands key="${4clKey}" outputKey="nI_${4clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${4clKey}" pixelSetKey="${4clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic" outputKey="aT_${4clKey}" pixelSetKey="${4clKey}"
+        />
+
+    <!-- <property name="5clKey" value="5_2.5_TN10_B" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${5clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${5clCore}" neighborPixelThreshold="${5clNeighbor}" timeThreshold="${5clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${5clKey}" outputKey="N_${5clKey}"
+        />
+        <fact.features.Size showerKey="${5clKey}" photonChargeKey="pC_Basic" outputKey="S_${5clKey}"
+        />
+        <fact.features.NumberOfIslands key="${5clKey}" outputKey="nI_${5clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${5clKey}" pixelSetKey="${5clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic" outputKey="aT_${5clKey}" pixelSetKey="${5clKey}"
+        />
+
+    <!-- <property name="6clKey" value="7_5_TN10_B" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_Basic" outputKey="${6clKey}" arrivalTimeKey="aT_Basic" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${6clCore}" neighborPixelThreshold="${6clNeighbor}" timeThreshold="${6clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${6clKey}" outputKey="N_${6clKey}"
+        />
+        <fact.features.Size showerKey="${6clKey}" photonChargeKey="pC_Basic" outputKey="S_${6clKey}"
+        />
+        <fact.features.NumberOfIslands key="${6clKey}" outputKey="nI_${6clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${6clKey}" pixelSetKey="${6clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic" outputKey="aT_${6clKey}" pixelSetKey="${6clKey}"
+        />
+
+    <!-- <property name="7clKey" value="6_3_TM_B_oD" /> -->
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${7clKey}" arrivalTimeKey="aT_Basic_oD" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${7clCore}" neighborPixelThreshold="${7clNeighbor}" timeThreshold="${7clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${7clKey}" outputKey="N_${7clKey}"
+        />
+        <fact.features.Size showerKey="${7clKey}" photonChargeKey="pC_Basic" outputKey="S_${7clKey}"
+        />
+        <fact.features.NumberOfIslands key="${7clKey}" outputKey="nI_${7clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${7clKey}" pixelSetKey="${7clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic_oD" outputKey="aT_${7clKey}" pixelSetKey="${7clKey}"
+        />
+
+<!--     <property name="8clKey" value="6_3_TM_B_FFP" /> -->
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_Basic" outputKey="${8clKey}" arrivalTimeKey="aT_Basic_FitForPositions" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${8clCore}" neighborPixelThreshold="${8clNeighbor}" timeThreshold="${8clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${8clKey}" outputKey="N_${8clKey}"
+        />
+        <fact.features.Size showerKey="${8clKey}" photonChargeKey="pC_Basic" outputKey="S_${8clKey}"
+        />
+        <fact.features.NumberOfIslands key="${8clKey}" outputKey="nI_${8clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_Basic" outputKey="pC_${8clKey}" pixelSetKey="${8clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_Basic_FitForPositions" outputKey="aT_${8clKey}" pixelSetKey="${8clKey}"
+        />
+
+    <!-- <property name="9clKey" value="6_3_TM_TG" /> -->
+        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="pC_TG" outputKey="${9clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${9clCore}" neighborPixelThreshold="${9clNeighbor}" timeThreshold="${9clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${9clKey}" outputKey="N_${9clKey}"
+        />
+        <fact.features.Size showerKey="${9clKey}" photonChargeKey="pC_TG" outputKey="S_${9clKey}"
+        />
+        <fact.features.NumberOfIslands key="${9clKey}" outputKey="nI_${9clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_TG" outputKey="pC_${9clKey}" pixelSetKey="${9clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_TG" outputKey="aT_${9clKey}" pixelSetKey="${9clKey}"
+        />
+
+    <!-- <property name="10clKey" value="4.5_2.5_TN10_TG" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_TG" outputKey="${10clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${10clCore}" neighborPixelThreshold="${10clNeighbor}" timeThreshold="${10clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${10clKey}" outputKey="N_${10clKey}"
+        />
+        <fact.features.Size showerKey="${10clKey}" photonChargeKey="pC_TG" outputKey="S_${10clKey}"
+        />
+        <fact.features.NumberOfIslands key="${10clKey}" outputKey="nI_${10clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_TG" outputKey="pC_${10clKey}" pixelSetKey="${10clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_TG" outputKey="aT_${10clKey}" pixelSetKey="${10clKey}"
+        />
+
+    <!-- <property name="11clKey" value="6_3_TN10_TG" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_TG" outputKey="${11clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${11clCore}" neighborPixelThreshold="${11clNeighbor}" timeThreshold="${11clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${11clKey}" outputKey="N_${11clKey}"
+        />
+        <fact.features.Size showerKey="${11clKey}" photonChargeKey="pC_TG" outputKey="S_${11clKey}"
+        />
+        <fact.features.NumberOfIslands key="${11clKey}" outputKey="nI_${11clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_TG" outputKey="pC_${11clKey}" pixelSetKey="${11clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_TG" outputKey="aT_${11clKey}" pixelSetKey="${11clKey}"
+        />
+
+    <!-- <property name="12clKey" value="6_3_TN8_TG" /> -->
+        <fact.cleaning.TwoLevelTimeNeighbor photonChargeKey="pC_TG" outputKey="${12clKey}" arrivalTimeKey="aT_TG" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" corePixelThreshold="${12clCore}" neighborPixelThreshold="${12clNeighbor}" timeThreshold="${12clTime}" minNumberOfPixel="2"
+        />
+        <fact.features.NumberOfPixelInShower showerKey="${12clKey}" outputKey="N_${12clKey}"
+        />
+        <fact.features.Size showerKey="${12clKey}" photonChargeKey="pC_TG" outputKey="S_${12clKey}"
+        />
+        <fact.features.NumberOfIslands key="${12clKey}" outputKey="nI_${12clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="pC_TG" outputKey="pC_${12clKey}" pixelSetKey="${12clKey}"
+        />
+        <fact.statistics.ArrayStatistics key="aT_TG" outputKey="aT_${12clKey}" pixelSetKey="${12clKey}"
+        />
+</module>

@@ -129,6 +129,16 @@ public class SourceLineTest implements Processor{
 			
 		}
 		
+		if (id_tl1 == -1 || id_tl2 == -1 || id_tl3 == -1 ||
+				id_tf1 == -1 || id_tf2 == -1 || id_tf3 == -1)
+		{
+			input.put(outputKey + "_sourceLineTestValueProjected", Double.NaN);
+			input.put(outputKey + "_sourceLineTestValueSorted", Double.NaN);
+			input.put(outputKey + "_meanShowerVelocityProjected", Double.NaN);
+			input.put(outputKey + "_meanShowerVelocitySorted", Double.NaN);
+			return input;
+		}
+		
 		double f_time = (tf1 + tf2 + tf3) / 3.0;
 		double l_time = (tl1 + tl2 + tl3) / 3.0;
 		

@@ -1,0 +1,8 @@
+<module>
+	<fact.utils.PreviousEventInfo
+	    startCellKey="StartCellData"
+	    outputKey="prevEvents"
+	    limitEvents="${prevEvents_limitEvents}"
+	/>
+	<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+</module>

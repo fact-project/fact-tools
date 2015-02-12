@@ -8,12 +8,14 @@ import fact.auxservice.DrsFileService;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.ProcessContext;
 import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+import fact.io.FitsStream;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,10 +43,10 @@ public class DrsCalibration implements StatefulProcessor {
 
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	//	String drsFile = null;
+	// String drsFile = null;
 
 	private String outputKey = "DataCalibrated";
-	private String key="Data";
+	private String key = "Data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
     private SourceURL url = null;
@@ -67,10 +69,9 @@ public class DrsCalibration implements StatefulProcessor {
 
 	// The following keys are required to exist in the DRS data
 	final static String[] drsKeys = new String[] { "RunNumberBaseline",
-		"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
-		"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
-	"TriggerOffsetRms" };
-
+			"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
+			"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
+			"TriggerOffsetRms" };
 
 	/**
 	 * This method reads the DRS calibration values from the given data source.
@@ -80,9 +81,10 @@ public class DrsCalibration implements StatefulProcessor {
 	 * That item/row in turn is expected to contain a set of variables, e.g. the
 	 * BaselineMean, BaselineRms,...
 	 * 
-	 * @param in sourceurl to be loaded
+	 * @param in
+	 *            sourceurl to be loaded
 	 */
-	protected void loadDrsData(SourceURL  in) {
+	protected void loadDrsData(SourceURL in) {
 		try {
 
 			FitsStream stream = new FitsStream(in);
@@ -144,21 +146,22 @@ public class DrsCalibration implements StatefulProcessor {
 
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
-		if(rawData == null){
-			log.error(" data .fits file did not contain the value for the key " + key + ". cannot apply drscalibration");
-            throw new RuntimeException(" data .fits file did not contain the value for the key \" + key + \". " +
-                    "cannot apply drscalibration)");
+		if (rawData == null) {
+			log.error(" data .fits file did not contain the value for the key "
+					+ key + ". cannot apply drscalibration");
+			throw new RuntimeException(
+					" data .fits file did not contain the value for the key \" + key + \". "
+							+ "cannot apply drscalibration)");
 		}
-		
-		
+
 		double[] rawfloatData = new double[rawData.length];
-//		System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
+		// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
 		for (int i = 0; i < rawData.length; i++) {
 			rawfloatData[i] = rawData[i];
 		}
-		
+
 		short[] startCell = (short[]) data.get("StartCellData");
-		if(startCell == null){
+		if (startCell == null) {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
 		}
@@ -170,7 +173,8 @@ public class DrsCalibration implements StatefulProcessor {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
+		double[] calibrated = applyDrsCalibration(rawfloatData, output,
+				startCell);
 		data.put(outputKey, calibrated);
 
 		return data;
@@ -258,10 +262,11 @@ public class DrsCalibration implements StatefulProcessor {
 
 				pos = pixel * roi + slice;
 				// Offset and Gain vector *should look the same
-				int start =  startCellVector[pixel] != -1 ? startCellVector[pixel] : 0;
+				int start = startCellVector[pixel] != -1 ? startCellVector[pixel]
+						: 0;
 
 				offsetPos = pixel * drsBaselineMean.length / 1440
-						+ ((slice + start)	% (drsBaselineMean.length / 1440));
+						+ ((slice + start) % (drsBaselineMean.length / 1440));
 
 				triggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
 						+ slice;
@@ -288,10 +293,9 @@ public class DrsCalibration implements StatefulProcessor {
 		return destination;
 	}
 
+	// -----------getter setter---------------------
 
-	//-----------getter setter---------------------
-
-	@Parameter(required=false, description="data array to be calibrated", defaultValue="Data")
+	@Parameter(required = false, description = "data array to be calibrated", defaultValue = "Data")
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -337,4 +341,3 @@ public class DrsCalibration implements StatefulProcessor {
 
     }
 }
-

@@ -28,8 +28,8 @@ public class PlotDisplayWindow implements EventObserver {
     private final KeySelector keySelector = new TimeSeriesKeySelector();
     private final KeySelector intervalKeySelector = new IntervallMarkerKeySelector();
 
-    private Set<Pair<String, Color>> selectedItems = new HashSet<>();
-    private Set<Pair<String, Color>> selectedMarker = new HashSet<>();
+//    private Set<Pair<String, Color>> selectedItems = new HashSet<>();
+//    private Set<Pair<String, Color>> selectedMarker = new HashSet<>();
 
     public PlotDisplayWindow() {
         //keySelector.addItem(new SeriesKeySelectorItem(key, Color.DARK_GRAY, keySelector));

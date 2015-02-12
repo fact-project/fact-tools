@@ -1,7 +1,7 @@
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -25,38 +25,53 @@ public class HandleSaturation implements Processor {
 	private String outputKeyPhotonCharge = null;
 	@Parameter(required=true)
 	private String outputKeyArrivalTime = null;
-	
-			
+    @Parameter(description="Key for Pixel Set of saturated Pixels")
+    private String saturatedPixelKey = null;
+
+    private PixelSetOverlay saturatedPixelSet = null;
+    
+	private int npix;
+
 	public Data process(Data input) {
 		
 		Utils.isKeyValid(input, photonChargeKey, double[].class);
 		Utils.isKeyValid(input, photonChargeSaturatedKey, double[].class);
 		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 		Utils.isKeyValid(input, arrivalTimeSaturatedKey, double[].class);
+		Utils.isKeyValid(input, "NPIX", Integer.class);
 		
 		double[] photonCharge = (double[]) input.get(photonChargeKey);
 		double[] photonChargeSaturated = (double[]) input.get(photonChargeSaturatedKey);
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		double[] arrivalTimeSaturated = (double[]) input.get(arrivalTimeSaturatedKey);
+		npix = (Integer) input.get("NPIX");
 		
 		
 		double[] resultPhotonCharge = new double[photonCharge.length];
 		System.arraycopy(photonCharge, 0, resultPhotonCharge, 0, photonCharge.length);
 		double[] resultArrivalTimes = new double[arrivalTime.length];
 		System.arraycopy(arrivalTime, 0, resultArrivalTimes, 0, arrivalTime.length);
-		
-		for (int px = 0 ; px < Constants.NUMBEROFPIXEL ; px++)
+
+        saturatedPixelSet = new PixelSetOverlay();
+
+		for (int px = 0 ; px < npix ; px++)
 		{
 			if (photonCharge[px] > limitForSaturatedPixel)
 			{
 				resultArrivalTimes[px] = arrivalTimeSaturated[px];
 				resultPhotonCharge[px] = photonChargeSaturated[px];
+                saturatedPixelSet.addById(px);
 			}
 		}
 		
 		input.put(outputKeyArrivalTime, resultArrivalTimes);
 		input.put(outputKeyPhotonCharge, resultPhotonCharge);
-		
+
+        if (saturatedPixelSet.toIntArray().length != 0){
+            input.put(saturatedPixelKey, saturatedPixelSet.toIntArray());
+        }
+        input.put(saturatedPixelKey+"Overlay", saturatedPixelSet);
+
 		return input;
 	}
 
@@ -129,6 +144,12 @@ public class HandleSaturation implements Processor {
 	public void setOutputKeyArrivalTime(String outputKeyArrivalTime) {
 		this.outputKeyArrivalTime = outputKeyArrivalTime;
 	}
-	
-	
+
+    public String getSaturatedPixelKey() {
+        return saturatedPixelKey;
+    }
+
+    public void setSaturatedPixelKey(String saturatedPixelKey) {
+        this.saturatedPixelKey = saturatedPixelKey;
+    }
 }

@@ -109,7 +109,8 @@ public class HistogramPlotter extends DataVisualizer {
 			chart.setTitle(title + " " + key + "    " + counter++ + " entries");
 		} catch(RuntimeException e ) {
 			//log.debug("RuntimeException while trying to add observation. Probably a missing bin for the value. Trying to create a new bin");
-			SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth, true, false);
+			SimpleHistogramBin bin = new SimpleHistogramBin(Math.floor(v/binWidth)*binWidth, Math.floor(v/binWidth)*binWidth + binWidth - 1e-17, true, false);
+			//The 1e-17 in the upper limit avoids rounding errors which lead to overlapping bins and therefore missing histogram entries
 			try{
 				dataset.addBin(bin);
 				dataset.addObservation(v);

@@ -21,7 +21,13 @@ public class ShowerSlope implements Processor {
 	@Parameter(required = true)
 	private String deltaKey = null;
 	@Parameter(required = true)
-	private String outputKey = null;
+	private String slopeLongOutputKey = null;
+	@Parameter(required = true)
+	private String slopeTransOutputKey = null;
+	@Parameter(required = true)
+	private String slopeSpreadOutputKey = null;
+	@Parameter(required = true)
+	private String slopeSpreadWeightedOutputKey = null;
 	
 	private double[] photonCharge = null;
 	private double[] arrivalTime = null;
@@ -102,10 +108,10 @@ public class ShowerSlope implements Processor {
 		double slopeSpread = Math.sqrt(sumbb/n - Math.pow(sumb/n, 2));
 		double slopeSpreadWeighted = Math.sqrt(sumwbb/sumw - Math.pow(sumwb/sumw, 2));
 				
-		input.put(outputKey+"_long", slopeLong);
-		input.put(outputKey+"_trans", slopeTrans);
-		input.put(outputKey+"_spread", slopeSpread);
-		input.put(outputKey+"_spread_weighted", slopeSpreadWeighted);
+		input.put(slopeLongOutputKey, slopeLong);
+		input.put(slopeTransOutputKey, slopeTrans);
+		input.put(slopeSpreadOutputKey, slopeSpread);
+		input.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
 		return input;
 	}
 
@@ -157,13 +163,38 @@ public class ShowerSlope implements Processor {
 		this.deltaKey = deltaKey;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
+	public String getSlopeLongOutputKey() {
+		return slopeLongOutputKey;
 	}
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
+	public void setSlopeLongOutputKey(String slopeLongOutputKey) {
+		this.slopeLongOutputKey = slopeLongOutputKey;
 	}
+
+	public String getSlopeTransOutputKey() {
+		return slopeTransOutputKey;
+	}
+
+	public void setSlopeTransOutputKey(String slopeTransOutputKey) {
+		this.slopeTransOutputKey = slopeTransOutputKey;
+	}
+
+	public String getSlopeSpreadOutputKey() {
+		return slopeSpreadOutputKey;
+	}
+
+	public void setSlopeSpreadOutputKey(String slopeSpreadOutputKey) {
+		this.slopeSpreadOutputKey = slopeSpreadOutputKey;
+	}
+
+	public String getSlopeSpreadWeightedOutputKey() {
+		return slopeSpreadWeightedOutputKey;
+	}
+
+	public void setSlopeSpreadWeightedOutputKey(String slopeSpreadWeightedOutputKey) {
+		this.slopeSpreadWeightedOutputKey = slopeSpreadWeightedOutputKey;
+	}
+
 	
 
 
