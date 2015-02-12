@@ -26,11 +26,11 @@
         <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
         
-        <include file="examples/stdAnalysis/data/calibrationZFits.xml" />
+        <include url="classpath:/default/data/calibrationZFits.xml" />
         
-        <include file="examples/stdAnalysis/data/extraction.xml" /> 
+        <include url="classpath:/default/data/extraction.xml" /> 
         
-        <include file="examples/stdAnalysis/data/cleaning.xml" /> 
+        <include url="classpath:/default/data/cleaning.xml" /> 
         
         <!-- <Skip condition="%{data.shower} == null" /> -->
             
