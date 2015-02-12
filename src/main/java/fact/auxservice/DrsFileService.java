@@ -57,6 +57,7 @@ public class DrsFileService implements Service {
             throw new FileNotFoundException("Could not load file names from directory");
         }
         Arrays.sort(drsFileNames);
+        return drsFileNames;
     }
     /**
      * Tries to automatically find a fitting drs file for the currrent fits file. The methods iterates over all
