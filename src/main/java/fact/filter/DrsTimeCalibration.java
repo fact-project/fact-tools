@@ -21,14 +21,16 @@ public class DrsTimeCalibration implements Processor {
 	private String startCellKey = "StartCellData";
 	@Parameter(required=true,description="Key of the time calibration constants (relative to the start cell of each pixel)")
 	private String outputKey = null;
-	
+	@Parameter(required=false, description="name of column in FTIS file to find DRS4 time calibration constants.")
+	private String drsTimeKey = "CellOffset";
+
+
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
-	
+
 	private int npix;
 
-	private String drsTimeKey = "SamplingTimeDeviation";
-	
+
 	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
 	
