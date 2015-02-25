@@ -28,9 +28,11 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Parameter(required = false, description = "")
     String dataKey = "DataCalibrated";
 
-    private String drsTimeKey = "SamplingTimeDeviation";
+    @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
+    private String drsTimeKey = "CellOffset";
+
     private Data drsTimeData;
-    public double[][] samplingConstants;
+    public double[][] true_sampling_time;
 
     private FactPixelMapping m;
     private LinearTimeCorrectionKernel linearTimeCorrectionKernel = new LinearTimeCorrectionKernel();
@@ -47,26 +49,18 @@ public class DrsTimeCalibration implements StatefulProcessor{
         m = FactPixelMapping.getInstance();
         double[] absoluteTimeOffsets = loadDrsTimeCalibConstants(url);
 
-        samplingConstants = new double[160][2048];
+        true_sampling_time = new double[160][2048];
         for(int chip = 0; chip < 160; chip++){
-            System.arraycopy(absoluteTimeOffsets, chip*1024, samplingConstants[chip], 0, 1024);
-            System.arraycopy(absoluteTimeOffsets, chip*1024, samplingConstants[chip], 1024, 1024);
+            System.arraycopy(absoluteTimeOffsets, chip*1024, true_sampling_time[chip], 0, 1024);
+            System.arraycopy(absoluteTimeOffsets, chip*1024, true_sampling_time[chip], 1024, 1024);
         }
         for(int chip = 0; chip < 160; chip++){
             for(int i = 0; i < 2048; i++){
-                samplingConstants[chip][i] += i;
+                true_sampling_time[chip][i] = i - true_sampling_time[chip][i];
             }
         }
-
     }
 
-    @Override
-    public void resetState() throws Exception {}
-
-    @Override
-    public void finish() throws Exception {
-
-    }
 
     @Override
     public Data process(Data data) {
@@ -81,24 +75,16 @@ public class DrsTimeCalibration implements StatefulProcessor{
         double [][] samplingTimes = new double[npix][roi];
 
         double [] firstSamplingTimes = new double[npix];
-//        double [] lastSamplingTimes = new double[npix];
 
         //We want to get the latest sampling point at the start of the timeseries.
         for (int pix = 0; pix < npix; pix++){
-            //these two words chip, patch are synonyms in fact. factualy
-            int chip = m.getPixelFromId(pix).patch;
+            int chip = m.getPixelFromId(pix).drs_chip;
 
-            System.arraycopy(samplingConstants[chip],startCells[pix], samplingTimes[pix],0, roi);
+            System.arraycopy(true_sampling_time[chip], startCells[pix], samplingTimes[pix], 0, roi);
 
-            firstSamplingTimes[pix]= samplingConstants[chip][startCells[pix]];
-//            lastSamplingTimes[pix]= samplingConstants[chip][startCells[pix] + roi - 1];
-
+            firstSamplingTimes[pix]= samplingTimes[pix][0];
         }
-
         double maximumFirstSamplingTime = max(firstSamplingTimes);
-//        double minimumLastSamplingTime = min(lastSamplingTimes);
-
-//        int numSamples = (int) (minimumLastSamplingTime - maximumFirstSamplingTime);
 
         //at this point the samplingTimes array contains the 't' values for each entry in 'DataCalibrated'
         double[] currentPixelsDataCalibrated = new double[roi];
@@ -111,8 +97,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
         }
 
         data.put(outputKey, timeCalibratedValues);
-        data.put("firstSamplingTime", firstSamplingTimes );
-//        data.put("lastSamplingTime", lastSamplingTimes );
+        //data.put("firstSamplingTime", firstSamplingTimes );
         return data;
     }
 
@@ -133,6 +118,14 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public void resetState() throws Exception {}
+
+    @Override
+    public void finish() throws Exception {
+
     }
 
     public void setUrl(SourceURL url) {
