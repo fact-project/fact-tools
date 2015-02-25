@@ -18,7 +18,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
 
     @Parameter(required = false, description = "", defaultValue = "The standard file provided in the jar")
-    SourceURL url = null;
+    SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 
     @Parameter(required = false, description = "")

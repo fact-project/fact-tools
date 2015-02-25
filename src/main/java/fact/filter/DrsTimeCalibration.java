@@ -33,7 +33,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
 
-	private URL url;
+	private URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
 	@Override
 	public void init(ProcessContext context) throws Exception {
