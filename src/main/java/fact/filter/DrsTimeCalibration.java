@@ -2,26 +2,25 @@ package fact.filter;
 
 import fact.Utils;
 import fact.io.FitsStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
-import stream.Processor;
+import stream.ProcessContext;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.net.URL;
 
 
-public class DrsTimeCalibration implements Processor {
+public class DrsTimeCalibration implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 	
 	@Parameter(required=false,description="Key of the StartCellData in the data fits file",defaultValue="StartCellData")
 	private String startCellKey = "StartCellData";
 	@Parameter(required=true,description="Key of the time calibration constants (relative to the start cell of each pixel)")
 	private String outputKey = null;
-	@Parameter(required=false, description="name of column in FTIS file to find DRS4 time calibration constants.")
+	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
 	private String drsTimeKey = "CellOffset";
 
 
@@ -33,18 +32,29 @@ public class DrsTimeCalibration implements Processor {
 
 	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
-	
+
+	private URL url;
+
 	@Override
-	public Data process(Data input) {		
+	public void init(ProcessContext context) throws Exception {
+		try {
+			loadDrsTimeCalibConstants(new SourceURL(url));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public Data process(Data input) {
 		Utils.isKeyValid(input, "NPIX", Integer.class);
 		Utils.mapContainsKeys(input, startCellKey, "NROI");
 		
 		npix = (Integer) input.get("NPIX");
 		int roi = (Integer) input.get("NROI");
 		short[] startCell = (short[]) input.get(startCellKey);
-		if (startCell==null)
-		{
-			log.info("Couldn't find StartCellData");
+		if (startCell==null) {
+			throw new RuntimeException("Couldn't find StartCellData");
 		}
 		double[] relativeTimeOffsets = new double[roi*npix];
 		for (int px = 0 ; px < npix ; px++){
@@ -118,11 +128,7 @@ public class DrsTimeCalibration implements Processor {
 	}
 
 	public void setUrl(URL url) {
-		try {
-			loadDrsTimeCalibConstants(new SourceURL(url));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
+		this.url = url;
 	}
 
 	public String getDrsTimeKey() {
@@ -133,4 +139,14 @@ public class DrsTimeCalibration implements Processor {
 		this.drsTimeKey = drsTimeKey;
 	}
 
+
+	@Override
+	public void resetState() throws Exception {
+
+	}
+
+	@Override
+	public void finish() throws Exception {
+
+	}
 }
