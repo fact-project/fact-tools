@@ -7,11 +7,9 @@
     <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
     <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
     <property name="drivefile" value="src/test/resources/testDriveFile.fits" />
-    <property name="drstimefile" value="src/main/resources/long_term_constants_median.time.drs.fits" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
-
 
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
@@ -49,11 +47,9 @@
         <fact.datacorrection.DrsTimeCalibration
             dataKey="DataCalibrated"
             outputKey="DataNewTimeCalibrated"
-            url="file:${drstimefile}"
             />
 
         <fact.filter.DrsTimeCalibration
-                url="file:${drstimefile}"
                 outputKey="timeCalibConst"
                 />
         <fact.filter.ArrayTimeCorrection
