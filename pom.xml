@@ -3,7 +3,7 @@
 	<groupId>de.sfb876</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-	<version>0.7.5-SNAPSHOT</version>
+	<version>0.7.6-SNAPSHOT</version>
 
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
@@ -51,7 +51,15 @@
 			<organizationUrl>http://app.tu-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
-	</developers>
+        <developer>
+            <name>Dominik Neise</name>
+            <email>neised@phys.ethz.ch</email>
+            <organization>Departement of physics, ETH Zurich</organization>
+            <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+            <timezone>+1</timezone>
+        </developer>
+
+    </developers>
 
 	<scm>
 		<url>https://bitbucket.org/cbockermann/fact-tools</url>
