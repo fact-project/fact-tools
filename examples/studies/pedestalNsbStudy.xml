@@ -4,7 +4,7 @@
     <property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_112.drs.fits.gz" />
     <!-- Pfade zu den fits files. -->
     <!-- testDataFile: 20130102_060 -->
-    <!--<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />-->
+    <!--<property name="drstimefile" value="src/main/resources/long_term_constants_median.time.drs.fits" />-->
     <!--<property name="drivefile" value="src/test/resources/testDriveFile.fits" />-->
     <!-- <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" /> -->
     <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
