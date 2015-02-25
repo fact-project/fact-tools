@@ -139,4 +139,9 @@ public class DrsTimeCalibration implements StatefulProcessor{
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
     }
+
+    public void setDrsTimeKey(String drsTimeKey) {
+        this.drsTimeKey = drsTimeKey;
+    }
+
 }
