@@ -1,3 +1,7 @@
+## Version 0.7.7
+
+Removed dependencies to old streams versions by removing all code depending on the streams-dashboard.
+
 
 ## Version 0.7.6
 
