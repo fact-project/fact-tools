@@ -12,13 +12,33 @@ import stream.io.SourceURL;
 import static com.google.common.primitives.Doubles.max;
 
 /**
- * Created by Kai on 11.02.15.
+ * Applies DRS4 time calibration by using
+ *  long_term_constants_median.time.drs.fits
+ *
+ *  The common reference point is the 976.5625 kHz DRS4 reference clock. This means the time
+ *  of sampling physical cell zero is assumed to be equal for all 160 DRS4 chips in the camera.
+ *
+ *  After finding the corrected sampling time of each sample in 'dataKey', the data is resampled
+ *  using a linearTimeCorrectionKernel, in order to obtain a time series which may be treated
+ *  as if the 2GHz DRS4 sampling process was flawless.
+ *
+ * The resampling time series starts at the maximum corrected start time of all pixels and always
+ * contains 300 samples. In case there are no more supporting points in the original time series,
+ * i.e. in case we would need to extrapolate instead of interpolate, the last sample is repeated.
+ *
+ * This means the end of the time series is likely to contain unphysical data. Most processors disregard the
+ * end of the time series and therefor this might not matter a lot, but features like PedVar, which are
+ * extracted at random positions of the timeline should be restricted to a timeframe between sample 10 and 250 I would
+ * say.
+ *
+ * @author Dominik Neise &lt;neised@phys.ethz.ch&gt;
+ *
  */
 public class DrsTimeCalibration implements StatefulProcessor{
 
 
     @Parameter(required = false, description = "", defaultValue = "The standard file provided in the jar")
-    SourceURL url = null;
+    SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 
     @Parameter(required = false, description = "")
@@ -28,9 +48,11 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Parameter(required = false, description = "")
     String dataKey = "DataCalibrated";
 
-    private String drsTimeKey = "SamplingTimeDeviation";
+    @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
+    private String drsTimeKey = "CellOffset";
+
     private Data drsTimeData;
-    public double[][] samplingConstants;
+    public double[][] true_sampling_time;
 
     private FactPixelMapping m;
     private LinearTimeCorrectionKernel linearTimeCorrectionKernel = new LinearTimeCorrectionKernel();
@@ -47,26 +69,18 @@ public class DrsTimeCalibration implements StatefulProcessor{
         m = FactPixelMapping.getInstance();
         double[] absoluteTimeOffsets = loadDrsTimeCalibConstants(url);
 
-        samplingConstants = new double[160][2048];
+        true_sampling_time = new double[160][2048];
         for(int chip = 0; chip < 160; chip++){
-            System.arraycopy(absoluteTimeOffsets, chip*1024, samplingConstants[chip], 0, 1024);
-            System.arraycopy(absoluteTimeOffsets, chip*1024, samplingConstants[chip], 1024, 1024);
+            System.arraycopy(absoluteTimeOffsets, chip*1024, true_sampling_time[chip], 0, 1024);
+            System.arraycopy(absoluteTimeOffsets, chip*1024, true_sampling_time[chip], 1024, 1024);
         }
         for(int chip = 0; chip < 160; chip++){
             for(int i = 0; i < 2048; i++){
-                samplingConstants[chip][i] += i;
+                true_sampling_time[chip][i] = i - true_sampling_time[chip][i];
             }
         }
-
     }
 
-    @Override
-    public void resetState() throws Exception {}
-
-    @Override
-    public void finish() throws Exception {
-
-    }
 
     @Override
     public Data process(Data data) {
@@ -81,24 +95,16 @@ public class DrsTimeCalibration implements StatefulProcessor{
         double [][] samplingTimes = new double[npix][roi];
 
         double [] firstSamplingTimes = new double[npix];
-//        double [] lastSamplingTimes = new double[npix];
 
         //We want to get the latest sampling point at the start of the timeseries.
         for (int pix = 0; pix < npix; pix++){
-            //these two words chip, patch are synonyms in fact. factualy
-            int chip = m.getPixelFromId(pix).patch;
+            int chip = m.getPixelFromId(pix).drs_chip;
 
-            System.arraycopy(samplingConstants[chip],startCells[pix], samplingTimes[pix],0, roi);
+            System.arraycopy(true_sampling_time[chip], startCells[pix], samplingTimes[pix], 0, roi);
 
-            firstSamplingTimes[pix]= samplingConstants[chip][startCells[pix]];
-//            lastSamplingTimes[pix]= samplingConstants[chip][startCells[pix] + roi - 1];
-
+            firstSamplingTimes[pix]= samplingTimes[pix][0];
         }
-
         double maximumFirstSamplingTime = max(firstSamplingTimes);
-//        double minimumLastSamplingTime = min(lastSamplingTimes);
-
-//        int numSamples = (int) (minimumLastSamplingTime - maximumFirstSamplingTime);
 
         //at this point the samplingTimes array contains the 't' values for each entry in 'DataCalibrated'
         double[] currentPixelsDataCalibrated = new double[roi];
@@ -111,8 +117,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
         }
 
         data.put(outputKey, timeCalibratedValues);
-        data.put("firstSamplingTime", firstSamplingTimes );
-//        data.put("lastSamplingTime", lastSamplingTimes );
+        //data.put("firstSamplingTime", firstSamplingTimes );
         return data;
     }
 
@@ -135,6 +140,14 @@ public class DrsTimeCalibration implements StatefulProcessor{
         }
     }
 
+    @Override
+    public void resetState() throws Exception {}
+
+    @Override
+    public void finish() throws Exception {
+
+    }
+
     public void setUrl(SourceURL url) {
         this.url = url;
     }
@@ -146,4 +159,9 @@ public class DrsTimeCalibration implements StatefulProcessor{
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
     }
+
+    public void setDrsTimeKey(String drsTimeKey) {
+        this.drsTimeKey = drsTimeKey;
+    }
+
 }

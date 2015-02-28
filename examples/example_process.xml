@@ -4,7 +4,6 @@
 	<property name="infile" value="src/test/resources/testDataFile.fits.gz" />
 	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
 	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
-	<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
 
 	<!-- Name of the stream and url to the input file -->
 	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" />

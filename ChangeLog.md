@@ -1,3 +1,17 @@
+## Version 0.7.7
+
+Removed dependencies to old streams versions by removing all code depending on the streams-dashboard.
+
+
+## Version 0.7.6
+
+ The new DRS4 time calibration processor has been improved
+ `fact.datacorrection.DrsTimeCalibration`
+
+ Both the old and the new DRS4 time calibration processors now use the new std
+ input file containing the measured DRS4 time calibration constants.
+ `fact-tools/src/main/resources/long_term_constants_median.time.drs.fits`
+
 ## Version 0.7.5
  
  The Camera and Plotting Windows in the viewer can now also show Arrays of types other than double.

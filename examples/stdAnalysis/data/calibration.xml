@@ -21,8 +21,6 @@
     maxSpikeLength="${removeSpikes_maxSpikeLength}"
 />
 <fact.filter.DrsTimeCalibration
-    url="file:${drstimefile}"
-    drsTimeKey="SamplingTimeDeviation"
     outputKey="timeCalibConst"
 />
 <fact.filter.ArrayTimeCorrection
