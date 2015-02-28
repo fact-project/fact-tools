@@ -8,7 +8,7 @@
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
 	<description>
-		The FACT telescope is a cherenkov telescope on the island of La Palma.
+		        The FACT telescope is a cherenkov telescope on the island of La Palma.
                 This set of tools is dedicated to read, parse and process raw data produced
                 by the FACT telescope.
 	</description>

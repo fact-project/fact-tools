@@ -11,6 +11,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.io.SourceURL;
 
 import java.io.File;
 import java.util.Date;
@@ -41,15 +42,23 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false, description = "Name of the service that provides aux files")
     private AuxFileService auxService;
 
+    @Parameter(required = false)
+    private SourceURL trackingFileUrl = null;
+    @Parameter(required = false)
+    private SourceURL sourceFileUrl = null;
+
+    @Parameter(required = false)
+    private Double x = null;
+    @Parameter(required = false)
+    private Double y = null;
+
     //position of the Telescope
-    public final double mLongitude                  = -17.890701389;
-    public final double mLatitude                   = 28.761795;
+    public final double telescopeLongitude = -17.890701389;
+    public final double telescopeLatitude = 28.761795;
     //Distance from earth center
-    public final double mDistance                   = 4890.0;
+    public final double distanceToEarthCenter = 4890.0;
 
 
-    private Float x = null;
-    private Float y = null;
     private DrivePointManager<TrackingPoint> trackingManager;
     private DrivePointManager<SourcePoint> sourceManager;
     private File currentFile;
@@ -68,13 +77,25 @@ public class SourcePosition implements StatefulProcessor {
      */
     @Override
     public void init(ProcessContext arg0) throws Exception {
-
-        if(x !=  null && y != null){
-            log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
-        } else if (auxService == null){
-            log.error("You have to provide fixed sourceposition coordinates X, Y or specify the auxService");
+        if((trackingFileUrl != null && sourceFileUrl == null) || (sourceFileUrl != null &&trackingFileUrl == null)){
+            log.error("You need to specify both trackingFileUrl and sourceFileUrl");
             throw new IllegalArgumentException();
         }
+        if(x !=  null && y != null){
+
+            log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
+
+        } else if (auxService == null && trackingFileUrl == null){
+
+            log.error("You have to provide fixed sourceposition coordinates X and Y, specify the auxService, or provide sourceFileUrl and trackingFileUrl");
+            throw new IllegalArgumentException();
+
+        } else if(trackingFileUrl !=  null && sourceFileUrl != null && auxService == null){
+            auxService = new AuxFileService();
+            trackingManager = auxService.getTrackingPointManagerForSourceFile(trackingFileUrl);
+            sourceManager = auxService.getSourcePointManagerForSourceFile(sourceFileUrl);
+        }
+
     }
 
     @Override
@@ -146,12 +167,13 @@ public class SourcePosition implements StatefulProcessor {
         try {
 
             File f  = new File(data.get("@source").toString());
-            if (!f.equals(currentFile)){
+            if (!f.equals(currentFile) && trackingFileUrl == null){
 //                System.out.println("Requesting new aux file!");
                 currentFile = f;
                 trackingManager = auxService.getTrackingPointManager(currentFile);
                 sourceManager = auxService.getSourcePointManager(currentFile);
             }
+
             //TODO check this.
             int timestamp = (int) ((eventTime[0]) + (eventTime[1]) / 1000000.0);
             //convert unixtime to julianday
@@ -193,7 +215,8 @@ public class SourcePosition implements StatefulProcessor {
     }
 
     /**
-     * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension, declination and the time in gmst format.
+     * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension,
+     * declination and the time in gmst format.
      * @param ra in degrees
      * @param dec in degrees
      * @param gmst the Eventtime of the current event in gmst format
@@ -207,8 +230,8 @@ public class SourcePosition implements StatefulProcessor {
         double y                =Math.sin(theta) *Math.sin(phi);
         double z                =Math.cos(theta);
 
-        double phi_rot_angle    = gmst + (mLongitude/ 180.0 * Math.PI);
-        double theta_rot_angle  = (mLatitude - 90) / 180.0 * Math.PI;
+        double phi_rot_angle    = gmst + (telescopeLongitude / 180.0 * Math.PI);
+        double theta_rot_angle  = (telescopeLatitude - 90) / 180.0 * Math.PI;
 
         double m_yx             = -Math.sin(phi_rot_angle);
         double m_yy             =  Math.cos(phi_rot_angle);
@@ -256,7 +279,7 @@ public class SourcePosition implements StatefulProcessor {
         x_rot   = -Math.sin(-zd)*z - Math.cos(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
         y_rot   = Math.sin(-az)*x + Math.cos(-az)*y;
         z_rot   = Math.cos(-zd)*z - Math.sin(-zd)*( Math.cos(-az)*x - Math.sin(-az)*y );
-        double[] r ={ x_rot * (-mDistance) / z_rot ,y_rot * (-mDistance) / z_rot };
+        double[] r ={ x_rot * (-distanceToEarthCenter) / z_rot ,y_rot * (-distanceToEarthCenter) / z_rot };
 
         return r;
     }
@@ -266,15 +289,21 @@ public class SourcePosition implements StatefulProcessor {
         this.outputKey = outputKey;
     }
 
-    public void setX(Float x) {
+    public void setX(Double x) {
         this.x = x;
     }
-    public void setY(Float y) {
+    public void setY(Double y) {
         this.y = y;
     }
 
     public void setAuxService(AuxFileService auxService) {
         this.auxService = auxService;
+    }
+
+    public void setTrackingFileUrl(SourceURL trackingFileUrl) { this.trackingFileUrl = trackingFileUrl; }
+
+    public void setSourceFileUrl(SourceURL sourceFileUrl) {
+        this.sourceFileUrl = sourceFileUrl;
     }
 
 }

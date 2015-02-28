@@ -1,9 +1,10 @@
 <module>
 <fact.features.source.SourcePosition
     outputKey="Cetatauri"
-    url="file:${drivefile}"
     sourceRightAscension="84.41125"
-    sourceDeclination="21.1425" 
+    sourceDeclination="21.1425"
+    trackingFileUrl="${trackingFile}"
+    sourceFileUrl="${sourceFile}"
 />
 <fact.cleaning.TwoLevelTimeNeighbor
     photonChargeKey="photoncharge"

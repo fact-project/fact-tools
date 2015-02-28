@@ -1,6 +1,6 @@
 <module>
 <fact.filter.DrsCalibration
-    url="file:${drsfile}"
+    url="${drsfile}"
     key="Data"
     outputKey="DataCalibrated"
 />  

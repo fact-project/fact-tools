@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.Arrays;
 
 /**
- * Implements a service to automaticly find a drs file belonging to the current data file.
+ * Implements a service to automaticaly find a drs file belonging to the current data file.
  * Created by kaibrugge on 09.10.14.
  */
 public class DrsFileService implements Service {

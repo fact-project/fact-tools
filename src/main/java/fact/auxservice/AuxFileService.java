@@ -36,6 +36,7 @@ import java.util.HashMap;
  *
  * A processor can  request a DrivePointManager from the service.
  *
+ * 79FRbPVCSKsBzn
  * Created by kaibrugge on 07.10.14.
  */
 public class AuxFileService implements Service {
@@ -61,6 +62,11 @@ public class AuxFileService implements Service {
         return dM;
     }
 
+    public synchronized DrivePointManager<TrackingPoint> getTrackingPointManagerForSourceFile(SourceURL sourceFile){
+        DrivePointManager<TrackingPoint> dM = (DrivePointManager<TrackingPoint>) getPointManagerFromFile(sourceFile, new DrivePointFactory<>(TrackingPoint.class));
+        return dM;
+    }
+
     /**
      * Get the DrivePointManager for the DRIVE_CONTROL_SOURCE_POSITION file.
      * @param dataFile The .fits data file that stream is currently working on.
@@ -70,6 +76,12 @@ public class AuxFileService implements Service {
         DrivePointManager<SourcePoint> dM = (DrivePointManager<SourcePoint>) getPointManagerForDataFile(dataFile, "DRIVE_CONTROL_SOURCE_POSITION", new DrivePointFactory<>(SourcePoint.class));
         return dM;
     }
+
+    public synchronized DrivePointManager<SourcePoint> getSourcePointManagerForSourceFile(SourceURL sourceFile){
+        DrivePointManager<SourcePoint> dM = (DrivePointManager<SourcePoint>) getPointManagerFromFile(sourceFile, new DrivePointFactory<>(SourcePoint.class));
+        return dM;
+    }
+
 
     private  DrivePointManager<? extends DrivePoint>  getPointManagerForDataFile(File currentFile, String name, DrivePointFactory factory) {
 
@@ -96,13 +108,14 @@ public class AuxFileService implements Service {
         return currentFileName.substring(0,8);
     }
 
+
+
     /**
      * Goes to the folder provided by auxfolder. Then uses the datestring to select the right year, month and day for
      * subfolders.
      * @param auxFolder
      * @return
      * @throws java.io.FileNotFoundException
-     * @throws java.net.MalformedURLException
      */
     public HashMap<String, SourceURL> findAuxFileUrls(SourceURL auxFolder, final String dateString) throws FileNotFoundException {
 
@@ -114,7 +127,7 @@ public class AuxFileService implements Service {
         File folder = p.toFile();
 
         if(!folder.isDirectory() || !folder.exists()){
-            throw new FileNotFoundException("Could not build path for tracking file.");
+            throw new FileNotFoundException("Could not build path for tracking file. Expected name of the data file should have the format YYYYMMDD_ID");
         }
         final HashMap<String, SourceURL> m = new HashMap<>();
         folder.list(new FilenameFilter() {

@@ -97,8 +97,8 @@ public class ParameterTest {
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();
-        pos.setX(0f);
-        pos.setY(0f);
+        pos.setX(0.0);
+        pos.setY(0.0);
         pos.setOutputKey(sourcePosition);
         pos.init(null);
         pos.process(item);

@@ -3,17 +3,19 @@
     <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
-    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
-	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
-	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+	<property name="trackingFile" value="classpath:/testDriveFile.fits" />
+    <property name="sourceFile" value="classpath:/testDriveSourcePositionFile.fits" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
 	
 
     <!-- Name of the stream and url to the input file -->
-    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
+    <service id="aux" class="fact.auxservice.AuxFileService" auxFolder="classpath:/" />
     <!-- Description of the process and the corresponding stream -->
     <process id="2" input="fact">
         <fact.utils.PreviousEventInfo 

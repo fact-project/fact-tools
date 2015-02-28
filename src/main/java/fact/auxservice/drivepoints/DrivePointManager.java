@@ -31,7 +31,7 @@ public class DrivePointManager<T extends DrivePoint>{
     public void addDrivePoint(T p){
         //get last timestamp
         int end = locList.size();
-        if (locList.get(end-1).getTime() > p.getTime() ){
+        if (end > 0 && locList.get(end-1).getTime() > p.getTime() ){
             log.error("Timestamps in auxiliary file are not ordered. The file might be broken. Aborting process.");
             throw new RuntimeException("Aux file is broken.");
         }
