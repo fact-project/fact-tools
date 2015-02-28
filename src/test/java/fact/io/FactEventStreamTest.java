@@ -49,7 +49,7 @@ public class FactEventStreamTest {
 		Data item = (Data) ois.readObject();
 		while (item != null) {
 			item = removeSpecialKeys(item);
-			log.info("Adding event {}", item);
+			//log.info("Adding event {}", item);
 			events.add(item);
 			try {
 				item = (Data) ois.readObject();
@@ -60,7 +60,7 @@ public class FactEventStreamTest {
 			}
 		}
 
-		log.info("{} events read from {}.", events, url);
+		//log.info("{} events read from {}.", events, url);
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class FactEventStreamTest {
 		Data item = fits.read();
 		while (item != null && evts.size() < events.size()) {
 			item = removeSpecialKeys(item);
-			log.info("Adding event {}", item);
+			//log.info("Adding event {}", item);
 			evts.add(item);
 			item = fits.read();
 		}
