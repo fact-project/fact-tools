@@ -14,6 +14,7 @@ import java.util.Arrays;
 import static org.junit.Assert.fail;
 
 /**
+ * Test some of the provided example xmls in the examples folder. This wont cause failing builds just yet.
  * Created by kai on 28.02.15.
  */
 public class FunctionalTest {
