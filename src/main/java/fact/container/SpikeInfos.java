@@ -1,14 +1,13 @@
 package fact.container;
 
+import fact.Constants;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
+import org.jfree.chart.plot.IntervalMarker;
+import stream.Data;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jfree.chart.plot.IntervalMarker;
-
-import stream.Data;
-import fact.Constants;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 public class SpikeInfos implements Serializable {
 

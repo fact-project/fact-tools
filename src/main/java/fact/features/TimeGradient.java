@@ -1,12 +1,11 @@
 package fact.features;
 
+import fact.Utils;
+import fact.hexmap.FactPixelMapping;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Utils;
-import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

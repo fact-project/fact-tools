@@ -3,34 +3,7 @@
  */
 package fact.hexmap.ui.components.cameradisplay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.geom.AffineTransform;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.swing.JPanel;
-
-import org.apache.commons.math3.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-
 import com.google.common.eventbus.Subscribe;
-
 import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
@@ -41,6 +14,18 @@ import fact.hexmap.ui.colormapping.ColorMapping;
 import fact.hexmap.ui.colormapping.GrayScaleColorMapping;
 import fact.hexmap.ui.events.SliceChangedEvent;
 import fact.hexmap.ui.overlays.CameraMapOverlay;
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.text.DecimalFormat;
+import java.util.*;
 
 import static com.google.common.primitives.Doubles.max;
 import static com.google.common.primitives.Doubles.min;

@@ -18,9 +18,6 @@ import org.apache.commons.math3.util.Pair;
 import stream.Data;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 public class PlotDisplayWindow implements EventObserver {
 
