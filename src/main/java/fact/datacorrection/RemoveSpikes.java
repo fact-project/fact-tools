@@ -2,10 +2,8 @@ package fact.datacorrection;
 
 import fact.Utils;
 import fact.container.SpikeInfos;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

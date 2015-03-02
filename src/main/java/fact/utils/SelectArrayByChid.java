@@ -1,14 +1,11 @@
 package fact.utils;
 
-import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.util.ArrayList;
 
 /**
  * Created by jbuss on 20.11.14.

@@ -1,10 +1,9 @@
 package fact.statistics;
 
+import fact.Utils;
+import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
-import org.apache.commons.math3.stat.StatUtils;
-
-import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

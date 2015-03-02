@@ -1,16 +1,15 @@
 package fact.extraction;
 
+import fact.Constants;
+import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
-import fact.Constants;
-import fact.Utils;
 
 /**
  * This processor performs a basic extraction on the data array. It contains three steps:

@@ -3,14 +3,12 @@ package fact.datacorrection;
 import fact.Utils;
 import fact.container.JumpInfos;
 import fact.container.PreviousEventInfoContainer;
-
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

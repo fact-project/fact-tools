@@ -4,12 +4,10 @@ import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
-import stream.io.Stream;
 import stream.io.multi.AbstractMultiStream;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
