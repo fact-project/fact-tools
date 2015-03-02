@@ -23,7 +23,7 @@ Removed dependencies to old streams versions by removing all code depending on t
            />
 
 
-## Version 0.7.0 Changelog:
+## Version 0.7.0
 
 The Version 0.7.0 was developed in the extractAndCleaningDevelop branch. There are mainly changes in the extraction and in the cleaning package, which increased the quality of the standard analysis.
 Also some internal code restructuring were done. The Analysis for the General Meeting 2015 were performed with this version.
@@ -41,7 +41,7 @@ Extraction package:
 Cleaning Development:
 - Restructering of the Cleaning package
 - new class BasicCleaning
- - contains the methods used in the two level cleaning and the removeStarCluster method
+- contains the methods used in the two level cleaning and the removeStarCluster method
 - new processor TwoLevelTimeNeighbor (the cleaning method now used in the standard analysis)
 - Renaming of CoreNeighborClean to TwoLevelTimeMedian
 
@@ -58,16 +58,16 @@ feature package:
 - therefore more keys are now needed
 
 Examples folder:
-- deleting obsolet xml-files
-- Restructuring the directory
-- only 4 xml files in the top directory:
+ - deleting obsolet xml-files
+ - Restructuring the directory
+ - only 4 xml files in the top directory:
  - all 4 xml files should work, maybe pathes has to be changed, according to the location of input files
  - viewer (performs calibration, extraction and cleaning) and opens the fact-tools viewer (for data-gz-files, data-fz-files and mc-files)
  - example_process (as a starting point for developing your own xml file). Opens an input stream and only performs a calibration on the data
-- new folders:
-- stdAnalysis folder:
+ - new folders:
+ - stdAnalysis folder:
  - xml Files for the actual standard analysis (for data-gz-files, data-fz-files and mc-files)
  - all files should work, maybe pathes has to be changed, according to the location of input files
-- studies folder:
+ - studies folder:
  - all other xml files in the previous example folder
  - changed the interface of the processors, according to the changes done for this version. Not tested.
