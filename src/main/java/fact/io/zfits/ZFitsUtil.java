@@ -1,8 +1,6 @@
 package fact.io.zfits;
 
 import org.apache.commons.cli.MissingArgumentException;
-import org.jfree.util.Log;
-
 import stream.util.parser.ParseException;
 
 import java.io.DataInputStream;

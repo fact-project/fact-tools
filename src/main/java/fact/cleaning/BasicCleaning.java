@@ -1,16 +1,15 @@
 package fact.cleaning;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-
-import stream.Data;
 import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
+import org.slf4j.Logger;
+import stream.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BasicCleaning {

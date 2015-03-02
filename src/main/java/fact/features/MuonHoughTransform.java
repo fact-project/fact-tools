@@ -1,7 +1,6 @@
 package fact.features;
 
 import fact.Utils;
-import fact.Constants;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;

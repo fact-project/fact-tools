@@ -1,19 +1,18 @@
 package fact.features;
 
-import static org.junit.Assert.*;
-
-import java.net.URL;
-
-import org.apache.commons.math3.stat.descriptive.rank.Max;
-import org.junit.Before;
-import org.junit.Test;
-
-import stream.Data;
-import stream.io.SourceURL;
 import fact.extraction.BasicExtraction;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
+import org.junit.Before;
+import org.junit.Test;
+import stream.Data;
+import stream.io.SourceURL;
+
+import java.net.URL;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BasicExtractionTest {
 	

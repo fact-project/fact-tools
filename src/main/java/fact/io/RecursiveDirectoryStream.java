@@ -15,6 +15,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -93,7 +95,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             @Override
             public boolean accept(File dir, String name) {
                 File f = new File(dir, name);
-//                System.out.println(name);
                 if (f.isHidden() || f.isDirectory()){
                     return false;
                 }
@@ -156,10 +157,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             }
         }
     }
-
-
-
-
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }

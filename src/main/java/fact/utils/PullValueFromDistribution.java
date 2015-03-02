@@ -1,6 +1,5 @@
 package fact.utils;
 
-import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -8,7 +7,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
-import org.jfree.data.statistics.SimpleHistogramDataset;
 
 import java.util.ArrayList;
 import java.util.Random;

@@ -1,15 +1,5 @@
 package fact.parameter;
 
-import static org.junit.Assert.fail;
-
-import java.net.URL;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import stream.Data;
-import stream.io.SourceURL;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
@@ -18,6 +8,15 @@ import fact.features.source.SourcePosition;
 import fact.filter.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import stream.Data;
+import stream.io.SourceURL;
+
+import java.net.URL;
+
+import static org.junit.Assert.fail;
 
 /**
  * <fact.features.HillasAlpha distribution="dist"

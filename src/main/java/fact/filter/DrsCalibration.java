@@ -6,6 +6,7 @@ package fact.filter;
 import fact.Constants;
 import fact.auxservice.DrsFileService;
 import fact.io.FitsStream;
+import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,8 @@ import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import fact.io.FitsStream;
+
+import java.net.MalformedURLException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -176,6 +178,8 @@ public class DrsCalibration implements StatefulProcessor {
 		double[] calibrated = applyDrsCalibration(rawfloatData, output,
 				startCell);
 		data.put(outputKey, calibrated);
+
+		// add color value if set
 
 		return data;
 	}

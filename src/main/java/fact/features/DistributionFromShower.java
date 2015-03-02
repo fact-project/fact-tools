@@ -1,18 +1,17 @@
 package fact.features;
 
+import fact.Utils;
+import fact.container.PixelDistribution2D;
+import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.EllipseOverlay;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Utils;
-import fact.container.PixelDistribution2D;
-import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.EllipseOverlay;
 
 public class DistributionFromShower implements Processor {
 
