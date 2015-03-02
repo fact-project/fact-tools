@@ -1,22 +1,14 @@
 package fact.auxservice;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import fact.auxservice.drivepoints.DrivePointManager;
-
 import stream.service.Service;
-import us.monoid.json.JSONException;
-import us.monoid.web.AbstractContent;
-import us.monoid.web.JSONResource;
 import us.monoid.web.Resty;
-import us.monoid.web.TextResource;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 

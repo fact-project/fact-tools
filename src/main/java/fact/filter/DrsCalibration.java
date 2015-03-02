@@ -3,30 +3,17 @@
  */
 package fact.filter;
 
-import fact.Constants;
 import fact.auxservice.DrsFileService;
-import fact.io.FitsStream;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.net.MalformedURLException;
-
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
 
 /**
  * <p>

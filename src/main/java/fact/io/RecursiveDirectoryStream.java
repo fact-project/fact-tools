@@ -1,22 +1,18 @@
 package fact.io;
 
 import com.google.gson.Gson;
-import fact.auxservice.DrsFileService;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
 import stream.io.multi.AbstractMultiStream;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 

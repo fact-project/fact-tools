@@ -15,7 +15,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 
 /**
  * This should be able to plot all data in form of a double array which has the same length as the N*1440.
