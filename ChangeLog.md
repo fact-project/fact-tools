@@ -1,3 +1,9 @@
+## Version 0.7.9
+
+Added processot to correct utc times with gps time correction files:
+	`fact.filter.GpsTimeCorrection`
+
+
 ## Version 0.7.7
 
 Removed dependencies to old streams versions by removing all code depending on the streams-dashboard.
