@@ -40,7 +40,7 @@ public class GpsTimeCorrection implements Processor {
 	 * It is filled by the constructor and 
 	 * can be accessed by the key: EventNum
 	 */ 
-	private TreeMap<Integer, Integer[]> gpsTimes = new TreeMap<Integer, Integer[]>();
+	public TreeMap<Integer, Integer[]> gpsTimes = new TreeMap<Integer, Integer[]>();
 
 	/**
 	 * This is the method called in the process loop.
@@ -58,7 +58,7 @@ public class GpsTimeCorrection implements Processor {
 		if ( !triggerType.equals(4) ) {
 			log.error("Non-pysics trigger type detected: "+input.get("TriggerType")+" Please cut on physics triggers for gps time correction.");
 			throw new RuntimeException(
-					"Non-pysics trigger type detected. Please cut on physics triggers for gps time correction.");
+                    "Non-pysics trigger type detected: "+input.get("TriggerType")+" Please cut on physics triggers for gps time correction.");
 		}
 
 		Integer[] bufGpsTimes = gpsTimes.get( input.get("EventNum") );
@@ -70,7 +70,31 @@ public class GpsTimeCorrection implements Processor {
 					"Couldn't find corresponding EventNum. Be sure to have equal gpsEventTiming file and run file.");
 		}
 
-		input.put(outputKey, bufGpsTimes);
+		//get the data in buffers and check for consistency
+		Integer unixTimeSec 	= bufGpsTimes[0];
+		Integer unixTimeMuSec 	= bufGpsTimes[1];
+		Integer gpsUnixTimeSec 	= bufGpsTimes[2];
+		Integer gpsUnixTimeMuSec= bufGpsTimes[3];
+        int[] utc = (int[]) input.get( "UnixTimeUTC");
+
+		if ( !unixTimeSec.equals(utc[0]) )
+		{
+			log.error("UnixTimeSec in GpsTimeCorrection file not equal to UnixTimeSec in stream");
+			throw new RuntimeException(
+					"UnixTimeSec in GpsTimeCorrection file not equal to UnixTimeSec in stream");
+		}
+		if ( !unixTimeMuSec.equals(utc[1]) )
+		{
+			log.error("UnixTimeMuSec in GpsTimeCorrection file not equal to UnixTimeMuSec in stream");
+			throw new RuntimeException(
+					"UnixTimeMuSec in GpsTimeCorrection file not equal to UnixTimeMuSec in stream");
+		}
+
+		Integer[] bufCorrectedTimes = new Integer[ 2 ];
+		bufCorrectedTimes[0] = gpsUnixTimeSec;
+		bufCorrectedTimes[1] = gpsUnixTimeMuSec;
+
+		input.put(outputKey, bufCorrectedTimes);
 		return input;
 	}
 
@@ -94,7 +118,7 @@ public class GpsTimeCorrection implements Processor {
 	}
 
 	/*
-	 * This method actually openes the data file and gets the times out from it.
+	 * This method actually opens the data file and gets the times out from it.
 	 * the return is a list of five integers:
 	 * [0] event number
 	 * [1] unixTime
@@ -150,7 +174,7 @@ public class GpsTimeCorrection implements Processor {
                 lineData = gpsFile.readLine();
 				lineIndex += 1;
                 if ( lineData.equals( "#" )) { //when the end of the data block is reached, escape.
-                    log.info("last event num read by gpsTimeCorrection: " + lastEvent);
+                    //log.info("last event num read by gpsTimeCorrection: " + lastEvent);
                     break;
                 }
                 String stringBuf = lineData.substring(2);
@@ -174,7 +198,6 @@ public class GpsTimeCorrection implements Processor {
 
 	/*
 	 * this method makes a nice 3 * NumDataEvts int map from the int List
-	 * not implemented so far: check of the correct unix time (before correction)
 	 */
 	private TreeMap<Integer, Integer[]> getTimeMapFromIntList( ArrayList<int[]> intList ) {
 
@@ -183,9 +206,11 @@ public class GpsTimeCorrection implements Processor {
 
             int[] ints = intList.get(i);
             Integer key = Integer.valueOf( ints[0] ); //copy event number into Integer type
-            Integer[] column = new Integer[ 2 ];
-            column[0] = Integer.valueOf( ints[3] ); //copy correctedTimes into a list of Integers ( Seconds, Microseconds )
-            column[1] = Integer.valueOf( ints[4] );
+            Integer[] column = new Integer[ 4 ];
+            column[0] = Integer.valueOf( ints[1] ); //with this I will check if the time of the event is equal
+            column[1] = Integer.valueOf( ints[2] );
+            column[2] = Integer.valueOf( ints[3] ); //copy correctedTimes into a list of Integers ( Seconds, Microseconds )
+            column[3] = Integer.valueOf( ints[4] );
 
             timeMap.put(key,column);
         }
