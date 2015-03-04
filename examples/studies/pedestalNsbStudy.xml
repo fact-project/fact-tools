@@ -4,7 +4,6 @@
     <property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_112.drs.fits.gz" />
     <!-- Pfade zu den fits files. -->
     <!-- testDataFile: 20130102_060 -->
-    <!--<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />-->
     <!--<property name="drivefile" value="src/test/resources/testDriveFile.fits" />-->
     <!-- <property name="integralGainFile" value="/home/fact_opr/facttools/gain_sorted_20131127.csv" /> -->
     <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
@@ -24,7 +23,6 @@
         <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" />  
         <!--<fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />-->
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
-        <!--<fact.filter.DrsTimeCalibration url="file:${drstimefile}" drsTimeKey="SamplingTimeDeviation" outputKey="timeCalibConst"/>-->
         <!--<fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />-->
 
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"

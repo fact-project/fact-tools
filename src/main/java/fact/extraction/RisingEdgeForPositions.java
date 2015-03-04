@@ -4,11 +4,9 @@
 package fact.extraction;
 
 import fact.Utils;
-
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

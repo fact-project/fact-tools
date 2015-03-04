@@ -13,6 +13,11 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
+ * This class provides a mapping between different Pixel ids and geometric information from the
+ * camera layout.
+ *
+ * This class cen get instatiated as a singleton with the getInstance() method.
+ *
  * The geometric coordinates stored in the text file to build this map are stored in the "odd -q" vertical layout
  * See http://www.redblobgames.com/grids/hexagons/ for details and pictures.
  *

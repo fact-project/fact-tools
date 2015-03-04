@@ -3,16 +3,15 @@
  */
 package fact.filter;
 
-import java.net.MalformedURLException;
-
+import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import fact.io.FitsStream;
+
+import java.net.MalformedURLException;
 
 /**
  * <p>

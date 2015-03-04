@@ -1,0 +1,78 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
+
+    <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
+    <property name="drivefile" value="src/test/resources/testDriveFile.fits" />
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
+
+    <!-- Name of the stream and url to the input file -->
+    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+
+    <!-- Description of the process and the corresponding stream -->
+    <process id="2" input="fact">
+        <fact.utils.PreviousEventInfo
+                startCellKey="StartCellData"
+                outputKey="prevEvents"
+                limitEvents="10"
+                />
+
+        <fact.filter.DrsCalibration
+                url="file:${drsfile}"
+                key="Data"
+                outputKey="DataCalibrated"
+                />
+
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                prevEventsKey="prevEvents"
+                startCellKey="StartCellData"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+                />
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+                />
+        <fact.datacorrection.DrsTimeCalibration
+            dataKey="DataCalibrated"
+            outputKey="DataNewTimeCalibrated"
+            />
+
+        <fact.filter.DrsTimeCalibration
+                outputKey="timeCalibConst"
+                />
+        <fact.filter.ArrayTimeCorrection
+                dataKey="DataCalibrated"
+                timeCalibConstKey="timeCalibConst"
+                outputKey="DataCalibrated"
+                />
+        <fact.datacorrection.InterpolateBadPixel
+                key="DataCalibrated"
+                outputKey="DataCalibrated"
+                badChidIds="${interpolateBadPixel_badChidIDs}"
+                />
+
+        <include url="classpath:/default/data/extraction.xml" />
+
+        <include url="classpath:/default/data/cleaning.xml" />
+
+        <!-- <Skip condition="%{data.shower} == null" /> -->
+
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+
+
+    </process>
+
+
+</container>

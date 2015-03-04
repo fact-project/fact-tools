@@ -1,15 +1,14 @@
 <container>
 
-	<!-- Pathes to the input files -->
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
 	<property name="infile" value="src/test/resources/testDataFile.fits.gz" />
 	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
 	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
-	<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
-
-    <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
 
 	<!-- Name of the stream and url to the input file -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" />
+	<stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" />
 	
 	<!-- Description of the process and the corresponding stream -->
 	<process input="fact" copies="1">

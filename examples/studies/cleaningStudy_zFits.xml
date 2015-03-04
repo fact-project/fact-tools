@@ -3,7 +3,6 @@
     <property name="config" value="src/main/resources" />
     <property name="infile" value="${fhgfs}/fact/raw/2014/02/05/20140205_108.fits.fz" />
     <property name="drsfile" value="${fhgfs}/fact/raw/2014/02/05/20140205_093.drs.fits.gz" />
-    <property name="drstimefile" value="${fhgfs}/fact/raw/2014/02/05/20140205_092.drs.time.fits" />
     <property name="drivefile" value="${fhgfs}/fact/aux/2014/02/05/20140205.DRIVE_CONTROL_TRACKING_POSITION.fits" />
     <property name="integralGainFile" value="${config}/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="${config}/delays_20141114.csv" />

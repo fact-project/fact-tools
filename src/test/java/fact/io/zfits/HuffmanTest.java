@@ -39,7 +39,7 @@ public class HuffmanTest {
 		//System.out.println("Compressed   length: "+compressedData.length);
 		//System.out.println("Decompressed length: "+decompressedData.length);
 		byte[] byteInput = shortToByteArray(input);
-		log.info("\tCompression: {}%", (compressedData.length*1.0)/(decompressedData.length*1.0)*100);
+		//log.info("\tCompression: {}%", (compressedData.length*1.0)/(decompressedData.length*1.0)*100);
 		assertEquals("The length of the input and the decompressed data missmatch.", byteInput.length, decompressedData.length);
 		for (int i=0; i<input.length; i++) {
 			assertEquals("The compression didn't work right, position: '"+i+"' wrong",byteInput[i],decompressedData[i]);

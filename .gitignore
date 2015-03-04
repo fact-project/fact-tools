@@ -1,5 +1,6 @@
-bin
-target
+bin/
+target/
+.directory
 .settings
 .classpath
 docs.aux
@@ -12,3 +13,6 @@ docs.idx
 
 #intellij stuff
 .idea/
+
+fact-tools.iml
+dependency-reduced-pom.xml

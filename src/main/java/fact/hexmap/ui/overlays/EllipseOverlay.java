@@ -5,8 +5,6 @@ import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.io.Serializable;
 
 /**
  * Draws an ellipse on the cameraview. The cameraview is rotated by 90 degrees. So X values correspond

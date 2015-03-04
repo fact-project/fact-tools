@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+import fact.Utils;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.EventObserver;
 import fact.hexmap.ui.components.cameradisplay.DisplayPanel;
@@ -16,7 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * This should be able to plot all data in form of a double array which has the same length as the N*numberofpixel.
+ * This should be able to plot all data in form of a double array which has the same length as the N*1440.
  *
  * Created by kaibrugge on 13.05.14.
  */
@@ -26,6 +27,10 @@ public class CameraWindow implements EventObserver {
     private Data dataItem;
 
 
+    /**
+     * The window takes a key to some entry in the Data item which it will display
+     * @param key
+     */
     public CameraWindow(String key){
         keyComboBox.addItem(key);
         keyComboBox.addActionListener(new ActionListener() {
@@ -35,7 +40,6 @@ public class CameraWindow implements EventObserver {
                 if(key != null) {
                     hexMapDisplay.setItemToDisplay(key, dataItem);
                 }
-                //hexMapDisplay.handleEventChange(Pair.create(dataItem, key));
             }
         });
 
@@ -46,6 +50,9 @@ public class CameraWindow implements EventObserver {
         Bus.eventBus.register(this);
     }
 
+    /**
+     * Define the layout for the window
+     */
     public void showWindow(){
         JFrame frame = new JFrame();
 
@@ -79,16 +86,12 @@ public class CameraWindow implements EventObserver {
         String selectedKey = (String) keyComboBox.getSelectedItem();
         keyComboBox.removeAllItems();
         for(String key : dataItem.keySet()){
-            try{
-                double[] data = (double[]) dataItem.get(key);
-                if(data.length > 0 && data.length%1440 == 0) {
-                    keyComboBox.addItem(key);
-                    if(key.equals(selectedKey)){
-                        keyComboBox.setSelectedItem(key);
-                    }
+            double[] data = Utils.toDoubleArray(dataItem.get(key));
+            if(data != null && data.length > 0 && data.length%1440 == 0) {
+                keyComboBox.addItem(key);
+                if(key.equals(selectedKey)){
+                    keyComboBox.setSelectedItem(key);
                 }
-            } catch(ClassCastException e){
-                continue;
             }
         }
     }

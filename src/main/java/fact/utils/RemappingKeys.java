@@ -1,16 +1,14 @@
 package fact.utils;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-
 import fact.Utils;
+import fact.hexmap.FactPixelMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fact.hexmap.FactPixelMapping;
+import java.io.Serializable;
+import java.lang.reflect.Array;
 
 
 
