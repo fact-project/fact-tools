@@ -5,8 +5,10 @@ import fact.auxservice.drivepoints.DrivePointManager;
 import fact.auxservice.drivepoints.SourcePoint;
 import fact.auxservice.drivepoints.TrackingPoint;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -51,6 +53,15 @@ public class SourcePosition implements StatefulProcessor {
     private Double x = null;
     @Parameter(required = false)
     private Double y = null;
+    
+    @Parameter(required = false)
+    private String sourceZdKey = null;
+    @Parameter(required = false)
+    private Double sourceAzKey = null;
+    @Parameter(required = false)
+    private String pointingZdKey = null;
+    @Parameter(required = false)
+    private Double pointingAzKey = null;
 
     //position of the Telescope
     public final double telescopeLongitude = -17.890701389;
@@ -85,9 +96,19 @@ public class SourcePosition implements StatefulProcessor {
 
             log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
 
+        } else if (sourceZdKey != null || sourceAzKey != null || pointingZdKey != null || pointingAzKey != null){
+        	if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
+        	{
+        		log.warn("Using zd and az values from the data item");
+        	}
+        	else
+        	{
+        		log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
+        		throw new IllegalArgumentException();
+        	}
         } else if (auxService == null && trackingFileUrl == null){
 
-            log.error("You have to provide fixed sourceposition coordinates X and Y, specify the auxService, or provide sourceFileUrl and trackingFileUrl");
+            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService, or provide sourceFileUrl and trackingFileUrl");
             throw new IllegalArgumentException();
 
         } else if(trackingFileUrl !=  null && sourceFileUrl != null && auxService == null){
@@ -158,6 +179,28 @@ public class SourcePosition implements StatefulProcessor {
             data.put(outputKey, source);
             return data;
         }
+        
+        if (sourceZdKey != null || sourceAzKey != null || pointingZdKey != null || pointingAzKey != null)
+        {
+        	double pointingZd = (Double) data.get(pointingZdKey);
+        	double pointingAz = (Double) data.get(pointingAzKey);
+        	double sourceZd = (Double) data.get(sourceZdKey);
+        	double sourceAz = (Double) data.get(sourceAzKey);
+        	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
+        	data.put(outputKey, sourcePosition);
+        	
+            data.put("@AzTracking", pointingAz);
+            data.put("@ZdTracking", pointingZd);
+
+            data.put("@AzPointing", pointingAz);
+            data.put("@ZdPointing", pointingZd);
+
+            data.put("@AzSourceCalc", sourceAz);
+            data.put("@ZdSourceCalc", sourceZd);
+
+            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
+            return data;
+        }
 
         int[] eventTime = (int[]) data.get("UnixTimeUTC");
         if(eventTime == null){
@@ -204,8 +247,6 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@ZdSourceCalc", sourceAzZd[1]);
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
-
-            data.put(outputKey, sourceAzZd);
 
         } catch (IllegalArgumentException e){
             log.error("Ignoring event.  " + e.getLocalizedMessage());
@@ -296,7 +337,39 @@ public class SourcePosition implements StatefulProcessor {
         this.y = y;
     }
 
-    public void setAuxService(AuxFileService auxService) {
+    public String getSourceZdKey() {
+		return sourceZdKey;
+	}
+
+	public void setSourceZdKey(String sourceZdKey) {
+		this.sourceZdKey = sourceZdKey;
+	}
+
+	public Double getSourceAzKey() {
+		return sourceAzKey;
+	}
+
+	public void setSourceAzKey(Double sourceAzKey) {
+		this.sourceAzKey = sourceAzKey;
+	}
+
+	public String getPointingZdKey() {
+		return pointingZdKey;
+	}
+
+	public void setPointingZdKey(String pointingZdKey) {
+		this.pointingZdKey = pointingZdKey;
+	}
+
+	public Double getPointingAzKey() {
+		return pointingAzKey;
+	}
+
+	public void setPointingAzKey(Double pointingAzKey) {
+		this.pointingAzKey = pointingAzKey;
+	}
+
+	public void setAuxService(AuxFileService auxService) {
         this.auxService = auxService;
     }
 
