@@ -1,11 +1,11 @@
 <module>
 <fact.io.zfits.ZFitsDrsCalib
-    url="file:${infile}"
+    url="${infile}"
     optional="false"
     outputKey="DataZCal"
 />
 <fact.filter.DrsCalibration 
-    url="file:${drsfile}" 
+    url="${drsfile}" 
     key="DataZCal"  
     outputKey="DataCalibrated" 
 /> 

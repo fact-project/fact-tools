@@ -6,7 +6,8 @@
     
     <property name="infile" value="${fhgfs}/fact/raw/2013/09/29/20130929_179.fits.gz" />
     <property name="drsfile" value="${fhgfs}/fact/raw/2013/09/29/20130929_167.drs.fits.gz" />
-    <property name="drivefile" value="${fhgfs}/fact/aux/2013/09/29/20130929.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <property name="trackingFile" value="${fhgfs}/fact/aux/2013/09/29/20130929.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <property name="sourceFile" value="${fhgfs}/fact/aux/2013/09/29/20130929.DRIVE_CONTROL_SOURCE_POSITION.fits" />
         
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
