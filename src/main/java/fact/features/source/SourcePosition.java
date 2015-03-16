@@ -30,7 +30,8 @@ import java.util.Date;
  *  The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
  *
  *  TODO: Plot deviation between calculated and written Az and Zd for files in whitelist
- *  TODO: handle ceta tauri and similar cases.
+ *  TODO: handle ceta tauri and similar cases. (at the moment it feels hacky)
+ *  TODO: Receive the different outputKeys from the xml files 
  *  TODO: compare sourcepositions with ganymed
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
@@ -63,6 +64,11 @@ public class SourcePosition implements StatefulProcessor {
     private String pointingZdKey = null;
     @Parameter(required = false)
     private String pointingAzKey = null;
+    
+    @Parameter(required = false)
+    private Double sourceRightAscension = null;
+    @Parameter(required = false)
+    private Double sourceDeclination = null;
 
     //position of the Telescope
     public final double telescopeLongitude = -17.890701389;
@@ -235,7 +241,18 @@ public class SourcePosition implements StatefulProcessor {
             double gmst = julianDayToGmst(julianDay);
 
             TrackingPoint trackingPoint = trackingManager.getPoint(julianDay);
-            SourcePoint sourcePoint = sourceManager.getPoint(julianDay);
+            SourcePoint sourcePoint;
+            if (sourceDeclination != null && sourceRightAscension != null)
+            {
+            	sourcePoint = new SourcePoint();
+            	sourcePoint.decSrc = sourceDeclination;
+            	sourcePoint.raSrc = sourceRightAscension;
+            }
+            else
+            {
+            	sourcePoint = sourceManager.getPoint(julianDay);
+            }
+                        
             //convert celestial coordinates to local coordinate system.
             double[] pointingAzZd = getAzZd(trackingPoint.ra, trackingPoint.dec, gmst);
             //pointAzDz should be equal to the az dz written by the drive
