@@ -1,5 +1,6 @@
 package fact.features.source;
 
+import fact.Utils;
 import fact.auxservice.AuxFileService;
 import fact.auxservice.drivepoints.DrivePointManager;
 import fact.auxservice.drivepoints.SourcePoint;
@@ -57,11 +58,11 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false)
     private String sourceZdKey = null;
     @Parameter(required = false)
-    private Double sourceAzKey = null;
+    private String sourceAzKey = null;
     @Parameter(required = false)
     private String pointingZdKey = null;
     @Parameter(required = false)
-    private Double pointingAzKey = null;
+    private String pointingAzKey = null;
 
     //position of the Telescope
     public final double telescopeLongitude = -17.890701389;
@@ -177,15 +178,24 @@ public class SourcePosition implements StatefulProcessor {
 //			System.out.println("x: "+  source[0] + " y: " +source[1] );
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
+            
+            data.put("@AzTracking", 0);
+            data.put("@ZdTracking", 0);
+
+            data.put("@AzPointing", 0);
+            data.put("@ZdPointing", 0);
+
+            data.put("@AzSourceCalc", 0);
+            data.put("@ZdSourceCalc", 0);
             return data;
         }
         
         if (sourceZdKey != null || sourceAzKey != null || pointingZdKey != null || pointingAzKey != null)
         {
-        	double pointingZd = (Double) data.get(pointingZdKey);
-        	double pointingAz = (Double) data.get(pointingAzKey);
-        	double sourceZd = (Double) data.get(sourceZdKey);
-        	double sourceAz = (Double) data.get(sourceAzKey);
+        	double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
+        	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
+        	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
+        	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
         	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
         	data.put(outputKey, sourcePosition);
         	
@@ -345,11 +355,11 @@ public class SourcePosition implements StatefulProcessor {
 		this.sourceZdKey = sourceZdKey;
 	}
 
-	public Double getSourceAzKey() {
+	public String getSourceAzKey() {
 		return sourceAzKey;
 	}
 
-	public void setSourceAzKey(Double sourceAzKey) {
+	public void setSourceAzKey(String sourceAzKey) {
 		this.sourceAzKey = sourceAzKey;
 	}
 
@@ -361,11 +371,11 @@ public class SourcePosition implements StatefulProcessor {
 		this.pointingZdKey = pointingZdKey;
 	}
 
-	public Double getPointingAzKey() {
+	public String getPointingAzKey() {
 		return pointingAzKey;
 	}
 
-	public void setPointingAzKey(Double pointingAzKey) {
+	public void setPointingAzKey(String pointingAzKey) {
 		this.pointingAzKey = pointingAzKey;
 	}
 
