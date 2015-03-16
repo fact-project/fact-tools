@@ -1,0 +1,69 @@
+
+<module>
+    <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
+            url="file:${folder}" copies="${num_copies}" suffix="Events.fits.gz">
+        <stream class="fact.io.FitsStream"  id="fact"/>
+    </stream>
+    <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
+    <process input="input:${copy.id}" copies="${num_copies}">
+        <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
+        <stream.monitor.DataRate every="20" />
+        <!-- <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/> -->
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <fact.utils.Remapping key="Data" outputKey="Data" />
+
+        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" url="file:/Users/kaibrugge/FactTest/test300samples2.drs.fits.gz" />
+
+        <!-- <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
+
+        <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
+        <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" x="0" y="0"/>
+        <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataCalibrated" />
+
+        <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="125"/>
+        <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
+        <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="maxAmplitudePosition" outputKey="photoncharge" rangeSearchWindow="25" />
+
+
+        <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime"
+                                         corePixelThreshold="${core_threshold}" neighborPixelThreshold="${neighbor_threshold}"
+                                         timeThreshold="${time_threshold}"  minNumberOfPixel="${min_number_of_pixel}" />
+        <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->
+        <stream.flow.Skip condition="%{data.shower} == null" />
+        <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>-->
+        <!--<fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>-->
+        <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="showerDistribution" />
+        <fact.features.M3Long showerKey="shower" weightsKey="photoncharge" distribution="showerDistribution"/>
+        <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
+        <stream.flow.Skip condition="%{data.size} &lt; 25" />
+
+        <fact.features.NumberOfPixelInShower showerKey="shower" outputKey="numPixelInShower" />
+        <fact.features.NumberOfIslands key="shower" outputKey="numIslands" />
+
+        <fact.features.Concentration weights="photoncharge" shower="shower" concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel"  />
+        <fact.features.ConcentrationCore cogxKey="COGx" cogyKey="COGy" showerPixelKey="shower" photonChargeKey="photoncharge" sizeKey="Size" widthKey="Width" lengthKey="Length" deltaKey="Delta" outputKey="ConcCore" />
+        <fact.features.ConcentrationAtCenterOfGravity photonChargeKey="photoncharge" cogxKey="COGx" cogyKey="COGy" sizeKey="Size" outputKey="ConcCOG" />
+        <fact.features.Leakage distribution="showerDistribution" shower="shower" weights="photoncharge" outputKey="Leakage" />
+
+        <fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />
+
+        <fact.features.ShowerSlope photonChargeKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="Slope" />
+
+        <!-- <fact.features.video.CenterOfGravity dataCalibrated="DataCalibrated" showerPixel="shower" outputKey="videoCog" numberOfShowerPixelThreshold = "5"/> -->
+
+        <fact.features.Disp widthKey="Width" lengthKey="Length" c0="117.94" outputKey="Disp" />
+
+        <!--<fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="1" outputKey="antiSourcePosition_1"/>-->
+        <!--<fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="2" outputKey="antiSourcePosition_2"/>-->
+        <!--<fact.features.source.AntiSourcePosition sourcePositionKey="sourcePosition" numberOfAntiSourcePositions="3" antiSourcePositionId="3" outputKey="antiSourcePosition_3"/>-->
+
+        <fact.features.source.Alpha distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Alpha" />
+        <fact.features.source.Distance distribution="showerDistribution" sourcePosition="sourcePosition" outputKey="Distance" />
+        <fact.features.source.CosDeltaAlpha sourcePosition="sourcePosition" cogX="COGx" cogY="COGy" hillasDelta="Delta" outputKey="CosDeltaAlpha" />
+        <fact.features.source.Theta sourcePositionKey="sourcePosition" dispKey="Disp" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" m3longKey="m3l" outputKey="Theta" />
+        <fact.io.PrintKeysOnConsole keys="@stream" />
+         <!--<PrintData/>-->
+        <!--<stream.io.CsvWriter append="false" header="true" url="file:${outfile}_${copy.id}.csv" keys="MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,Size,Alpha,Distance,Timespread,ConcCore,concCOG,Disp,m3l,m3t,Width,Length" />-->
+
+    </process>
+</module>

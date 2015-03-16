@@ -8,7 +8,7 @@
 	<url>http://sfb876.tu-dortmund.de/FACT/</url>
 
 	<description>
-		The FACT telescope is a cherenkov telescope on the island of La Palma.
+		        The FACT telescope is a cherenkov telescope on the island of La Palma.
                 This set of tools is dedicated to read, parse and process raw data produced
                 by the FACT telescope.
 	</description>
@@ -40,8 +40,8 @@
 		<developer>
 			<name>Kai Brügge</name>
 			<email>kai.bruegge@tu-dortmund.de</email>
-			<organization>Informatik LS8, TU-Dortmund</organization>
-			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+			<organization>Physik E5b, TU-Dortmund</organization>
+			<organizationUrl>http://app.tu-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
 		<developer>
@@ -106,6 +106,13 @@
 	</distributionManagement>
 
 	<dependencies>
+
+        <dependency>
+            <groupId>us.monoid.web</groupId>
+            <artifactId>resty</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

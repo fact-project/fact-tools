@@ -21,45 +21,46 @@ import static org.junit.Assert.fail;
 /**
  * <fact.features.HillasAlpha distribution="dist"
  * sourcePosition="sourcePosition" outputKey="alpha" />
- * 
+ *
  * @author bruegge
- * 
+ *
  */
 public class ParameterTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-	protected FitsStream stream;
-	protected Data item;
-	final String distribution = "dist";
-	final String sourcePosition = "pos";
-	final String key = "calib";
-	final String photonCharge = "photoncharge";
-	final String positions = "positions";
-	final String arrivalTime = "arrivalTime";
-	final String shower = "shower";
+    protected FitsStream stream;
+    protected Data item;
+    final String distribution = "dist";
+    final String sourcePosition = "pos";
+    final String key = "calib";
+    final String photonCharge = "photoncharge";
+    final String positions = "positions";
+    final String arrivalTime = "arrivalTime";
+    final String shower = "shower";
 
-	@Before
-	public void setUp() throws Exception {
-		URL dataUrl = FitsStreamTest.class.getResource("/testDataFile.fits.gz");
-		SourceURL url = new SourceURL(dataUrl);
+    @Before
+    public void setUp() throws Exception {
+        URL dataUrl = FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        SourceURL url = new SourceURL(dataUrl);
 
-		stream = new FitsStream(url);
+        stream = new FitsStream(url);
 
-		try {
-			stream.init();
-			item = stream.read();
-		} catch (Exception e) {
-			fail("could not start stream with test file");
-			e.printStackTrace();
-		}
+        try {
+            stream.init();
+            item = stream.read();
+        } catch (Exception e) {
+            fail("could not start stream with test file");
+            e.printStackTrace();
+        }
 
 		URL drsUrl = FitsStreamTest.class
 				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(drsUrl.toString());
+		pr.setUrl(new SourceURL(drsUrl));
 		pr.setOutputKey(key);
+        pr.init(null);
 		pr.process(item);
 		
 		BasicExtraction bE = new BasicExtraction();
@@ -86,19 +87,20 @@ public class ParameterTest {
 		poser.setTimeLimit(40);
 		poser.process(item);
 
-		DistributionFromShower dist = new DistributionFromShower();
-		dist.setShowerKey(shower);
-		dist.setWeightsKey(photonCharge);
-		dist.setOutputKey(distribution);
-		dist.process(item);
 
-		URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
-		SourcePosition pos = new SourcePosition();
-		pos.setUrl(driveURL);
-		pos.setPhysicalSource("crab");
-		pos.setOutputKey(sourcePosition);
-		pos.init(null);
-		pos.process(item);
-	}
+
+        DistributionFromShower dist = new DistributionFromShower();
+        dist.setShowerKey(shower);
+        dist.setWeightsKey(photonCharge);
+        dist.setOutputKey(distribution);
+        dist.process(item);
+
+        SourcePosition pos = new SourcePosition();
+        pos.setX(0.0);
+        pos.setY(0.0);
+        pos.setOutputKey(sourcePosition);
+        pos.init(null);
+        pos.process(item);
+    }
 
 }

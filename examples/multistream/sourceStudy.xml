@@ -1,0 +1,20 @@
+
+<module>
+
+    <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
+            url="file:${folder}" listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
+        <stream class="fact.io.FitsStream"  id="fact"/>
+    </stream>
+    <!--<stream class="fact.io.FitsStream"  id="fact" url="file:${file}"/>-->
+    <process input="input:${copy.id}" copies="${num_copies}">
+        <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
+        <stream.monitor.DataRate every="100" />
+        <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
+        <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
+        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService" />
+        <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" auxService="auxService"/>
+        <stream.io.CsvWriter append="false" header="true" url="file:${outfile}_hallo_${copy.id}.csv" keys="@TimeStamp,@AzPointing,@ZdPointing,@AzTracking,@ZdTracking,@AzSourceCalc,@ZdSourceCalc,@Name" />
+
+
+    </process>
+</module>

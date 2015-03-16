@@ -3,15 +3,17 @@
  */
 package fact.filter;
 
+import fact.auxservice.DrsFileService;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
-import stream.Processor;
+import stream.ProcessContext;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.net.MalformedURLException;
+import java.io.FileNotFoundException;
 
 /**
  * <p>
@@ -23,7 +25,7 @@ import java.net.MalformedURLException;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
-public class DrsCalibration implements Processor {
+public class DrsCalibration implements StatefulProcessor {
 	// conversion factor:
 	// the input values are 12-bit short values representing measurements of
 	// voltage
@@ -35,7 +37,17 @@ public class DrsCalibration implements Processor {
 	private String outputKey = "DataCalibrated";
 	private String key = "Data";
 
-	Data drsData = null;
+    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
+    private SourceURL url = null;
+
+    @Parameter(required = false, description = "If given will try to use the file provided by the service")
+    private DrsFileService drsService;
+
+
+    Data drsData = null;
+
+    private String currentFilePath = "";
+
 
 	float[] drsBaselineMean;
 	float[] drsBaselineRms;
@@ -107,11 +119,20 @@ public class DrsCalibration implements Processor {
 	 */
 	@Override
 	public Data process(Data data) {
-		if (this.drsData == null) {
-			// file not loaded yet. try to lookup path in getColorFromValue.
-			log.error("No url to drs file specified.");
-			throw new RuntimeException("No DRS File found");
+        if( this.url == null && !currentFilePath .equals(data.get("@source").toString()) ){
+			//file not loaded yet. try to find by magic.
+            currentFilePath = data.get("@source").toString();
+            try {
+                SourceURL url = drsService.findDRSFile(currentFilePath);
+                log.info("Using drs file: " + url.toString());
+                loadDrsData(url);
+            } catch (FileNotFoundException e) {
+                log.error("Couldn't find correct .drs File.");
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
 		}
+
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
 		if (rawData == null) {
@@ -278,25 +299,36 @@ public class DrsCalibration implements Processor {
 		this.outputKey = outputKey;
 	}
 
-	@Parameter(description = "A URL to the DRS calibration data (in FITS formats)")
 	public void setUrl(SourceURL url) {
-		try {
-			loadDrsData(url);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
+        this.url = url;
 	}
 
-	@Parameter(description = "A String with a valid URL to the DRS calibration data (in FITS formats)")
-	public void setUrl(String urlString) {
-		try {
-			// URL url = new URL(urlString);
-			loadDrsData(new SourceURL(urlString));
-		} catch (MalformedURLException e) {
-			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
-			throw new RuntimeException("Cant open drsFile");
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
+    public void setDrsService(DrsFileService service) {
+        this.drsService = service;
+    }
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+        if(url == null && drsService == null){
+            log.error("Url and Service are not set. You need to set one of those");
+            throw new IllegalArgumentException("Wrong parameter");
+        }
+        if (url != null) {
+            try {
+                loadDrsData(url);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
+    }
 }

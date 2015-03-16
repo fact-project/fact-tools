@@ -26,7 +26,7 @@ public class BasicExtractionTest {
 	public void setup() throws Exception {
 		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-        pr.setUrl(drsUrl.toString());
+        pr.setUrl(new SourceURL(drsUrl));
         pr.setOutputKey("test");
 
         extraction = new BasicExtraction();
@@ -46,6 +46,7 @@ public class BasicExtractionTest {
 			FitsStream stream = new FitsStream(url);
 			stream.init();
 			Data item = stream.read();
+			pr.init(null);
 			pr.process(item);
 			extraction.process(item);
 			assertTrue("Item did not contain the right key for maxAmplitude", item.containsKey(positionsKey) && item.containsKey(photonChargeKey));
