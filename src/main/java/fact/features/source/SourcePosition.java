@@ -396,6 +396,22 @@ public class SourcePosition implements StatefulProcessor {
 		this.pointingAzKey = pointingAzKey;
 	}
 
+	public Double getSourceRightAscension() {
+		return sourceRightAscension;
+	}
+
+	public void setSourceRightAscension(Double sourceRightAscension) {
+		this.sourceRightAscension = sourceRightAscension;
+	}
+
+	public Double getSourceDeclination() {
+		return sourceDeclination;
+	}
+
+	public void setSourceDeclination(Double sourceDeclination) {
+		this.sourceDeclination = sourceDeclination;
+	}
+
 	public void setAuxService(AuxFileService auxService) {
         this.auxService = auxService;
     }
