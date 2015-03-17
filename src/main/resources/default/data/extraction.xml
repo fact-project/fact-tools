@@ -56,6 +56,6 @@
 <fact.datacorrection.CorrectPixelDelays
     arrivalTimeKey="arrivalTime"
     outputKey="arrivalTime"
-    url="file:${pixelDelayFile}"
+    url="${pixelDelayFile}"
 />
 </module>
