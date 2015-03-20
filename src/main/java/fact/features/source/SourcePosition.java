@@ -134,8 +134,8 @@ public class SourcePosition implements StatefulProcessor {
      * Takes unixTime in seconds and returns the julianday as double
      * @param unixTime
      */
-    public double unixTimeToJulianDay(int unixTime){
-        return unixTime/86400.0 +  40587.0+2400000.5;
+    public double unixTimeToJulianDay(double unixTime){
+        return unixTime/86400.0 +  40587.0d+2400000.5;
     }
 
     /**
@@ -234,7 +234,7 @@ public class SourcePosition implements StatefulProcessor {
             }
 
             //TODO check this.
-            int timestamp = (int) ((eventTime[0]) + (eventTime[1]) / 1000000.0);
+            double timestamp = ((double)eventTime[0])  + ( ((double)eventTime[1])/1000000.0) ;
             //convert unixtime to julianday
             double julianDay = unixTimeToJulianDay(timestamp);
             //convert julianday to gmst
