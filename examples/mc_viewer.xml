@@ -16,9 +16,7 @@
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <!-- <stream.flow.Skip condition="%{data.MCorsikaEvtHeader.fTotalEnergy} &gt; 400" /> -->
         <fact.io.PrintKeysOnConsole keys="MCorsikaEvtHeader.fTotalEnergy" />
-        <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
         <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
-        <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
         
         <include url="classpath:/default/mc/calibration_mc.xml" />
         
