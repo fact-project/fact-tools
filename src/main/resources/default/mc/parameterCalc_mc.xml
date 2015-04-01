@@ -44,16 +44,6 @@
     outputKey="maxPosShower" 
     pixelSetKey="shower" 
 />
-<fact.statistics.ArrayStatistics 
-    key="photonchargeSaturated" 
-    outputKey="phChargeSaturation" 
-    pixelSetKey="saturatedPixel" 
-/>
-<fact.statistics.ArrayStatistics 
-    key="arrivalTimeTOT" 
-    outputKey="arrTimeSaturation" 
-    pixelSetKey="saturatedPixel" 
-/>
 <fact.features.Size 
     showerKey="shower" 
     photonChargeKey="photoncharge" 
