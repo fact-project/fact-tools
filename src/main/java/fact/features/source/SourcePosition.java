@@ -56,13 +56,13 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false)
     private Double y = null;
     
-    @Parameter(required = false)
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
     private String sourceZdKey = null;
-    @Parameter(required = false)
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
     private String sourceAzKey = null;
-    @Parameter(required = false)
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
     private String pointingZdKey = null;
-    @Parameter(required = false)
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
     private String pointingAzKey = null;
     
     @Parameter(required = false)
@@ -170,7 +170,7 @@ public class SourcePosition implements StatefulProcessor {
      * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is
      * unclear to me what to do with the second one. I simply used the sum of both in seconds..
      * Even though the numbers are small enough to NOT make a difference anyways.
-     * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by
+     * After reading the EventTime from the data we check which datapoint from the slowcontrol file we have to use by
      * comparing the times. We use the point closest in time to the current dataitem.
      *
      * @return data. The dataItem containing the calculated sourcePostion as a double[] of length 2. {x,y} .
@@ -202,10 +202,11 @@ public class SourcePosition implements StatefulProcessor {
         	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
         	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
         	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
-        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to redo the coordinate transformation
-        	// from Ceres
+        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to undo
+        	// the coordinate transformation from Ceres
         	pointingAz = 180 - pointingAz;
         	sourceAz = 180 - sourceAz;
+        	// Now we can calculate the source position from the zd,az coordinates for pointing and source
         	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
         	data.put(outputKey, sourcePosition);
         	
