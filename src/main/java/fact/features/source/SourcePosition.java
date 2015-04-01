@@ -185,14 +185,14 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
             
-            data.put("@AzTracking", 0);
-            data.put("@ZdTracking", 0);
+            data.put("AzTracking", 0);
+            data.put("ZdTracking", 0);
 
-            data.put("@AzPointing", 0);
-            data.put("@ZdPointing", 0);
+            data.put("AzPointing", 0);
+            data.put("ZdPointing", 0);
 
-            data.put("@AzSourceCalc", 0);
-            data.put("@ZdSourceCalc", 0);
+            data.put("AzSourceCalc", 0);
+            data.put("ZdSourceCalc", 0);
             return data;
         }
         
@@ -202,17 +202,21 @@ public class SourcePosition implements StatefulProcessor {
         	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
         	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
         	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to redo the coordinate transformation
+        	// from Ceres
+        	pointingAz = 180 - pointingAz;
+        	sourceAz = 180 - sourceAz;
         	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
         	data.put(outputKey, sourcePosition);
         	
-            data.put("@AzTracking", pointingAz);
-            data.put("@ZdTracking", pointingZd);
+            data.put("AzTracking", pointingAz);
+            data.put("ZdTracking", pointingZd);
 
-            data.put("@AzPointing", pointingAz);
-            data.put("@ZdPointing", pointingZd);
+            data.put("AzPointing", pointingAz);
+            data.put("ZdPointing", pointingZd);
 
-            data.put("@AzSourceCalc", sourceAz);
-            data.put("@ZdSourceCalc", sourceZd);
+            data.put("AzSourceCalc", sourceAz);
+            data.put("ZdSourceCalc", sourceZd);
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
             return data;
@@ -233,7 +237,7 @@ public class SourcePosition implements StatefulProcessor {
                 sourceManager = auxService.getSourcePointManager(currentFile);
             }
 
-            //TODO check this.
+            // eventTime[0]: UnixTime [s], eventTime[1]: additional microseconds ( < 1000000 ) 
             double timestamp = ((double)eventTime[0])  + ( ((double)eventTime[1])/1000000.0) ;
             //convert unixtime to julianday
             double julianDay = unixTimeToJulianDay(timestamp);
@@ -264,14 +268,14 @@ public class SourcePosition implements StatefulProcessor {
             double[] source = {sourcePosition[0], sourcePosition[1]};
             data.put(outputKey, source);
             data.put("@TimeStamp", new Date((long)timestamp*1000L));
-            data.put("@AzTracking", trackingPoint.Az);
-            data.put("@ZdTracking", trackingPoint.Zd);
+            data.put("AzTracking", trackingPoint.Az);
+            data.put("ZdTracking", trackingPoint.Zd);
 
-            data.put("@AzPointing", pointingAzZd[0]);
-            data.put("@ZdPointing", pointingAzZd[1]);
+            data.put("AzPointing", pointingAzZd[0]);
+            data.put("ZdPointing", pointingAzZd[1]);
 
-            data.put("@AzSourceCalc", sourceAzZd[0]);
-            data.put("@ZdSourceCalc", sourceAzZd[1]);
+            data.put("AzSourceCalc", sourceAzZd[0]);
+            data.put("ZdSourceCalc", sourceAzZd[1]);
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
 
