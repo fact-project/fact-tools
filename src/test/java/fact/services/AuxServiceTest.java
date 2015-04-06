@@ -1,5 +1,6 @@
 package fact.services;
 
+import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.AuxFileService;
 import org.junit.Test;
 import stream.io.SourceURL;
@@ -26,7 +27,7 @@ public class AuxServiceTest {
         AuxFileService s = new AuxFileService();
         //supply a wrong datestring
         String dateString = "21092014";
-        HashMap<String, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u), dateString);
+        HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(url);
     }
 
     /**
@@ -41,7 +42,7 @@ public class AuxServiceTest {
         AuxFileService s = new AuxFileService();
         //supply a wrong datestring
         String dateString = "20150921";
-        HashMap<String, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u), dateString);
+        HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u));
         assertTrue(m.isEmpty());
     }
 
@@ -53,7 +54,7 @@ public class AuxServiceTest {
         AuxFileService s = new AuxFileService();
         //supply datestring. ITS MY BIRFDAY! YAY
         String dateString = "20150920";
-        HashMap<String, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u), dateString);
+        HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u));
         assertTrue(m.containsKey("DRIVE_CONTROL_TRACKING_POSITION"));
         assertTrue(m.containsKey("DRIVE_CONTROL_POINTING_POSITION"));
     }

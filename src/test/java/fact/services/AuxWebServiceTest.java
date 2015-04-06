@@ -1,11 +1,13 @@
 package fact.services;
 
 import fact.auxservice.AuxWebService;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Date;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -14,21 +16,22 @@ import static org.junit.Assert.fail;
 public class AuxWebServiceTest {
 
     @Test
-    public void testServicesConnection() throws IOException {
-        AuxWebService web = new AuxWebService();
-        web.getAuxiliaryData("TNG_WEATHER_DUST", new Date(123), new Date(123213));
-        web.getAuxiliaryData("TNG_WEATHER_DATA", new Date(123), new Date(123213));
-        web.getAuxiliaryData("LID_CONTROL_DATA", new Date(123), new Date(123213));
-    }
+    public void testTimeFlooring() throws IOException {
+        DateTime time = new DateTime(1987, 9, 20, 12, 40, 34);
+        DateTime roundedTime = AuxWebService.floorToQuarterHour(time);
 
-    @Test
-    public void testServiceDoesNotExist() throws IOException {
-        AuxWebService web = new AuxWebService();
-        try {
-            web.getAuxiliaryData("SOME_WEIRD_SERVICE", new Date(123), new Date(123213));
-        } catch (AuxWebService.ServiceDoesNotExistException e){
-            return;
-        }
-        fail("This should have thrown an exception");
+        assertThat(roundedTime, is(new DateTime(1987, 9, 20, 12, 30, 00)));
+
+
+        time = new DateTime(1987, 9, 20, 23, 59, 59);
+        roundedTime = AuxWebService.floorToQuarterHour(time);
+
+        assertThat(roundedTime, is(new DateTime(1987, 9, 20, 23, 45, 00)));
+
+
+        time = new DateTime(1987, 9, 20, 00, 00, 01);
+        roundedTime = AuxWebService.floorToQuarterHour(time);
+
+        assertThat(roundedTime, is(new DateTime(1987, 9, 20, 00, 00, 00)));
     }
 }
