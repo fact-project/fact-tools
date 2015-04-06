@@ -1,69 +1,160 @@
 package fact.auxservice;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
-import stream.service.Service;
+import com.google.common.cache.*;
+import com.google.gson.*;
+import fact.auxservice.strategies.AuxPointStrategy;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.annotations.Parameter;
+import us.monoid.json.JSONArray;
+import us.monoid.json.JSONException;
 import us.monoid.web.Resty;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
+import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  *
  * Created by kai on 01.03.15.
  */
-public class AuxWebService implements Service {
-    private ImmutableSet<String> s;
+public class AuxWebService implements AuxiliaryService {
 
-    boolean isInit = false;
-
+    static Logger log = LoggerFactory.getLogger(AuxWebService.class);
     Resty r = new Resty();
-    Gson gson = new Gson();
+    Gson gson = new GsonBuilder().registerTypeAdapter(AuxPoint.class, new AuxPointDeserializer()).create();
 
-    private void init(){
+    @Parameter(required = true, description = "The URL to the webservice. No trailing slashes.")
+    private String url = "http://127.0.0.1:5000";
 
+    @Parameter(required = false, description = "Timewindow for which to query the Database.", defaultValue = "20 Minutes")
+    private int window = 20;
+
+    private LoadingCache<CacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterAccess(20, TimeUnit.MINUTES)
+            .removalListener(new RemovalListener<Object, Object>() {
+                @Override
+                public void onRemoval(RemovalNotification<Object, Object> notification) {
+                    log.info("Removing Data {} from cache for cause {}", notification.toString() ,notification.getCause());
+                }
+            })
+            .build(new CacheLoader<CacheKey, TreeSet<AuxPoint>>() {
+                @Override
+                public TreeSet<AuxPoint> load(CacheKey key) throws Exception {
+                    return loadDataFromDataBase(key.service, key.roundedTimeStamp);
+                }
+            });
+
+    private class CacheKey{
+        private AuxiliaryServiceName service;
+        private DateTime roundedTimeStamp;
+
+        public CacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
+            this.service = service;
+            this.roundedTimeStamp = floorToQuarterHour(timeStamp);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            CacheKey cacheKey = (CacheKey) o;
+
+            if (!roundedTimeStamp.equals(cacheKey.roundedTimeStamp)) return false;
+            if (service != cacheKey.service) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = service.hashCode();
+            result = 31 * result + roundedTimeStamp.hashCode();
+            return result;
+        }
+    }
+    private class AuxPointDeserializer implements JsonDeserializer<AuxPoint> {
+        public AuxPoint deserialize(JsonElement json, Type typeOfT,
+                                    JsonDeserializationContext context) throws JsonParseException {
+            long value = (long) (((JsonObject) json).get("Time").getAsDouble()* 1000*24*3600);
+            DateTime timeStamp = new DateTime(value, DateTimeZone.UTC);
+            Map<String, Serializable> data = new HashMap<>();
+            data = new Gson().fromJson(json, data.getClass());
+            return new AuxPoint(timeStamp, data);
+        }
+    }
+
+
+
+    private TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, DateTime time){
         try {
-            ArrayList<String> services = new ArrayList<>();
-            String json = r.text("http://127.0.0.1:5000/services").toString();
-            services = gson.fromJson(json, services.getClass());
-            s = new ImmutableSet.Builder<String>().addAll(services).build();
-            isInit = true;
-        } catch (IOException e) {
-            isInit = false;
-            e.printStackTrace();
-        }
-    }
-    /**
-     * TODO find out mysterious conversion between facttime and Date
-     * @param serviceName
-     * @param from
-     * @param to
-     * @return
-     */
-    public ArrayList<Map<String, Serializable>> getAuxiliaryData(String serviceName, Date from, Date to) throws IOException {
-        if(!isInit){
-            init();
-        }
-        if(!s.contains(serviceName)){
-            throw new ServiceDoesNotExistException();
-        }
+            log.info("Querying Database for " + service.toString() + " data for time " + time.toString());
+            TreeSet<AuxPoint> result = new TreeSet<>();
 
-        ArrayList<Map<String, Serializable>> result = new ArrayList<>();
-        String json = r.text("http://127.0.0.1:5000/aux/" + serviceName +"?from=16400.0&to=16400.5").toString();
-//        System.out.println(json);
-        result = gson.fromJson(json, result.getClass());
-        System.out.println(result);
-        return null;
+            JSONArray json = r.json(url + "/aux/" + service.toString() +"?from="+ time.minusMinutes(window) + "&to=" + time.plusMinutes(window)).array();
+            for (int i = 0; i < json.length(); i++) {
+                result.add(gson.fromJson(json.getString(i), AuxPoint.class));
+            }
+            return result;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
+    /**
+     *
+     * @param service The service to query.
+     * @param eventTimeStamp The timestamp of your current event.
+     * @return the data closest to the eventtimestamp which is found in the database.
+     */
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+        try {
+            CacheKey key = new CacheKey(service, eventTimeStamp);
+            //this set might not contain the data we need
+            TreeSet<AuxPoint> set = cache.get(key);
+            return strategy.getPointFromTreeSet(set, eventTimeStamp);
+
+        } catch (ExecutionException e) {
+            throw new IOException("Could not load data from Database. Are you connected to the intertubes?");
+//            e.printStackTrace();
+        }
+    }
+
+
+    public static DateTime floorToQuarterHour(DateTime time){
+        DateTime t = time.secondOfMinute().setCopy(0);
+        int oldMinute = t.getMinuteOfHour();
+        int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
+        return t.plusMinutes(newMinute - oldMinute);
+    }
+
     @Override
     public void reset() throws Exception {
 
     }
 
-    public class ServiceDoesNotExistException extends RuntimeException {
+    public void setUrl(String url) {
+        this.url = url;
     }
+
+    public void setWindow(int window) {
+        this.window = window;
+    }
+
+
 }

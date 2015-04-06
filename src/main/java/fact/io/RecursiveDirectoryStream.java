@@ -17,7 +17,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * This will automatically add @drsFile (and @driveFile if path to aux files is provided) keys to the data item.
+ *
  * Created by mackaiver on 9/21/14.
  */
 public class RecursiveDirectoryStream extends AbstractMultiStream {
@@ -32,6 +32,9 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     @Parameter(required = false, description = "A file containing a json array of strings with the allowed filenames. "+
             "(excluding the possible suffix)")
     private SourceURL listUrl = null;
+
+    //counts how many files have been processed
+    private int filesCounter = 0;
 
     private AbstractStream stream;
 
@@ -52,21 +55,17 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             throw new IllegalArgumentException("Provided url does not point to a directory");
         }
 
-        HashSet<String> fileNames = new HashSet<>();
+        HashSet<String> fileNamesFromWhiteList = new HashSet<>();
         if(listUrl !=  null){
             File list = new File(listUrl.getFile());
             Gson g = new Gson();
-            fileNames = g.fromJson(new BufferedReader(new FileReader(list)), new HashSet<String>().getClass());
+            fileNamesFromWhiteList = g.fromJson(new BufferedReader(new FileReader(list)), new HashSet<String>().getClass());
         }
 
         log.info("Loading files.");
         ArrayList<File> fileList = walkFiles(f, suffix, 0);
         for (File file: fileList){
-            if(fileNames.isEmpty()){
-                files.add(file);
-                continue;
-            }
-            if(fileNames.contains(file.getName())) {
+            if(fileNamesFromWhiteList.isEmpty() || fileNamesFromWhiteList.contains(file.getName())){
                 files.add(file);
             }
         }
@@ -135,6 +134,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             stream.setUrl(new SourceURL(f.toURI().toURL()));
             log.info("Streaming file: " + stream.getUrl().toString());
             stream.init();
+            filesCounter++;
         }
         Data data = stream.read();
         if (data != null) {
@@ -145,13 +145,21 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
                 return null;
             else {
                 stream.close();
+//                stream.count = 0L;
                 stream.setUrl(new SourceURL(f.toURI().toURL()));
                 stream.init();
                 data = stream.read();
                 log.info("Streaming file: " + stream.getUrl().toString());
+                filesCounter++;
                 return data;
             }
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        super.close();
+        log.info("In total " + filesCounter +  " files were processed.");
     }
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;

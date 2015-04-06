@@ -177,6 +177,12 @@ public class FitsStream extends AbstractStream {
 		}
 	}
 
+    @Override
+    public void close() throws Exception {
+        super.close();
+        this.count = 0L;
+    }
+
 	/**
 	 * this parses an event from the datastream and the bytebuffer in case we
 	 * read alot of shorts(more than 128) We use a NIO buffer to load a complete

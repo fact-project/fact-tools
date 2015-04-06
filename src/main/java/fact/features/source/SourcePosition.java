@@ -1,20 +1,24 @@
 package fact.features.source;
 
-import fact.auxservice.AuxFileService;
-import fact.auxservice.drivepoints.DrivePointManager;
-import fact.auxservice.drivepoints.SourcePoint;
-import fact.auxservice.drivepoints.TrackingPoint;
+import fact.auxservice.AuxPoint;
+import fact.auxservice.AuxWebService;
+import fact.auxservice.AuxiliaryService;
+import fact.auxservice.AuxiliaryServiceName;
+import fact.auxservice.strategies.AuxPointStrategy;
+import fact.auxservice.strategies.Closest;
+import fact.auxservice.strategies.Earlier;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
-import java.io.File;
-import java.util.Date;
+import java.io.IOException;
+
 
 /**
  *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look
@@ -28,7 +32,6 @@ import java.util.Date;
  *
  *  TODO: Plot deviation between calculated and written Az and Zd for files in whitelist
  *  TODO: handle ceta tauri and similar cases.
- *  TODO: compare sourcepositions with ganymed
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -39,29 +42,28 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
     private String outputKey = null;
 
-    @Parameter(required = false, description = "Name of the service that provides aux files")
-    private AuxFileService auxService;
+    public void setAuxService(AuxiliaryService auxService) {
+        this.auxService = auxService;
+    }
 
-    @Parameter(required = false)
-    private SourceURL trackingFileUrl = null;
-    @Parameter(required = false)
-    private SourceURL sourceFileUrl = null;
+    @Parameter(required = false, description = "Name of the service that provides aux files")
+    private AuxiliaryService auxService;
 
     @Parameter(required = false)
     private Double x = null;
     @Parameter(required = false)
     private Double y = null;
 
+
+    AuxPointStrategy closest = new Closest();
+    AuxPointStrategy earlier = new Earlier();
+
     //position of the Telescope
-    public final double telescopeLongitude = -17.890701389;
-    public final double telescopeLatitude = 28.761795;
+    private final double telescopeLongitude = -17.890701389;
+    private final double telescopeLatitude = 28.761795;
     //Distance from earth center
-    public final double distanceToEarthCenter = 4890.0;
+    private final double distanceToEarthCenter = 4890.0;
 
-
-    private DrivePointManager<TrackingPoint> trackingManager;
-    private DrivePointManager<SourcePoint> sourceManager;
-    private File currentFile;
 
     @Override
     public void finish() throws Exception {
@@ -77,24 +79,20 @@ public class SourcePosition implements StatefulProcessor {
      */
     @Override
     public void init(ProcessContext arg0) throws Exception {
-        if((trackingFileUrl != null && sourceFileUrl == null) || (sourceFileUrl != null &&trackingFileUrl == null)){
-            log.error("You need to specify both trackingFileUrl and sourceFileUrl");
-            throw new IllegalArgumentException();
-        }
         if(x !=  null && y != null){
 
             log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
 
-        } else if (auxService == null && trackingFileUrl == null){
+        } else if (auxService == null){
 
             log.error("You have to provide fixed sourceposition coordinates X and Y, specify the auxService, or provide sourceFileUrl and trackingFileUrl");
             throw new IllegalArgumentException();
-
-        } else if(trackingFileUrl !=  null && sourceFileUrl != null && auxService == null){
-            auxService = new AuxFileService();
-            trackingManager = auxService.getTrackingPointManagerForSourceFile(trackingFileUrl);
-            sourceManager = auxService.getSourcePointManagerForSourceFile(sourceFileUrl);
         }
+//        else if(trackingFileUrl !=  null && sourceFileUrl != null && auxService == null){
+//            auxService = new AuxFileService();
+//            trackingManager = auxService.getTrackingPointManagerForSourceFile(trackingFileUrl);
+//            sourceManager = auxService.getSourcePointManagerForSourceFile(sourceFileUrl);
+//        }
 
     }
 
@@ -109,6 +107,7 @@ public class SourcePosition implements StatefulProcessor {
     public double unixTimeToJulianDay(int unixTime){
         return unixTime/86400.0 +  40587.0+2400000.5;
     }
+
 
     /**
      * Calculates the Greenwhich Mean Sidereal Time from the julianDay.
@@ -146,10 +145,11 @@ public class SourcePosition implements StatefulProcessor {
      * comparing the times. We use the point closest in time to the current dataitem.
      *
      * @return data. The dataItem containing the calculated sourcePostion as a double[] of length 2. {x,y} .
-     * 				 --Also the deviation between the calculated pointing and the onw written in the .fits TRACKING file.
+     * 		    --Also the deviation between the calculated pointing and the one written in the .fits TRACKING file.
      */
     @Override
     public Data process(Data data) {
+
         if(x != null && y !=  null){
             //add source position to dataitem
             double[] source = {x, y};
@@ -166,36 +166,36 @@ public class SourcePosition implements StatefulProcessor {
         }
         try {
 
-            File f  = new File(data.get("@source").toString());
-            if (!f.equals(currentFile) && trackingFileUrl == null){
-//                System.out.println("Requesting new aux file!");
-                currentFile = f;
-                trackingManager = auxService.getTrackingPointManager(currentFile);
-                sourceManager = auxService.getSourcePointManager(currentFile);
-            }
+            DateTime timeStamp = new DateTime((long)(eventTime[0]) * 1000, DateTimeZone.UTC);
+            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
+            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
 
-            //TODO check this.
-            int timestamp = (int) ((eventTime[0]) + (eventTime[1]) / 1000000.0);
-            //convert unixtime to julianday
-            double julianDay = unixTimeToJulianDay(timestamp);
+//            System.out.println("Sourcepoint: " + sourcePoint);
+//            System.out.println("trackingPoint: " + trackingPoint);
+
+            double ra = trackingPoint.getDouble("Ra");
+            double dec = trackingPoint.getDouble("Dec");
+//            auxService.getAuxiliaryData("DRIVE_CONTROL_TRACKING_POSITION", new DateTime((long)(timestamp) * 1000, DateTimeZone.UTC));
+
+//            convert unixtime to julianday
+            double julianDay = unixTimeToJulianDay(eventTime[0]);
             //convert julianday to gmst
             double gmst = julianDayToGmst(julianDay);
 
-            TrackingPoint trackingPoint = trackingManager.getPoint(julianDay);
-            SourcePoint sourcePoint = sourceManager.getPoint(julianDay);
+
             //convert celestial coordinates to local coordinate system.
-            double[] pointingAzZd = getAzZd(trackingPoint.ra, trackingPoint.dec, gmst);
+            double[] pointingAzZd = getAzZd(ra, dec, gmst);
             //pointAzDz should be equal to the az dz written by the drive
             //double dev = Math.abs(point.Az - pointingAzDe[0]);
-            double[] sourceAzZd = getAzZd(sourcePoint.raSrc, sourcePoint.decSrc, gmst);
+
+            double[] sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gmst);
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
 
             //add source position to dataitem
             double[] source = {sourcePosition[0], sourcePosition[1]};
             data.put(outputKey, source);
-            data.put("@TimeStamp", new Date((long)timestamp*1000L));
-            data.put("@AzTracking", trackingPoint.Az);
-            data.put("@ZdTracking", trackingPoint.Zd);
+//            data.put("@AzTracking", trackingPoint.Az);
+//            data.put("@ZdTracking", trackingPoint.Zd);
 
             data.put("@AzPointing", pointingAzZd[0]);
             data.put("@ZdPointing", pointingAzZd[1]);
@@ -210,7 +210,10 @@ public class SourcePosition implements StatefulProcessor {
         } catch (IllegalArgumentException e){
             log.error("Ignoring event.  " + e.getLocalizedMessage());
             return null;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
         return data;
     }
 
@@ -296,14 +299,6 @@ public class SourcePosition implements StatefulProcessor {
         this.y = y;
     }
 
-    public void setAuxService(AuxFileService auxService) {
-        this.auxService = auxService;
-    }
 
-    public void setTrackingFileUrl(SourceURL trackingFileUrl) { this.trackingFileUrl = trackingFileUrl; }
-
-    public void setSourceFileUrl(SourceURL sourceFileUrl) {
-        this.sourceFileUrl = sourceFileUrl;
-    }
 
 }

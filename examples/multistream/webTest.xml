@@ -1,0 +1,33 @@
+<container>
+
+
+    <!-- Pfade zu den fits files. -->
+    <property name="folder" value="/home/kai/fact_phido/raw/2013/02/" />
+    <!--<property name="folder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/simulated/ceres_2_0/proton_klaus_4_psf_3_0" />-->
+
+
+    <!--<property name="auxfolder" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/aux" />-->
+    <property name="whitelist" value="/home/kai/WhiteList.json" />
+    <property name="num_copies" value="1" />
+
+    <!--<property name="drsfile" value="/Users/kaibrugge/sshfsmountfhgfs/groups/app/fact/simulated/drsfiles/12bitADC/offsetMinus1863/test300samples.drs.fits" />-->
+
+    <service id="auxWebService" class="fact.auxservice.AuxWebService" url="http://127.0.0.1:5000" window="50" />
+
+    <stream id="input:${copy.id}" class="fact.io.RecursiveDirectoryStream"
+            url="file:${folder}" listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
+        <stream class="fact.io.FitsStream"  id="fact" limit="10"/>
+    </stream>
+
+    <process input="input:${copy.id}" copies="${num_copies}" >
+
+        <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxWebService"/>
+
+        <PrintData/>
+
+
+    </process>
+
+
+</container>
+

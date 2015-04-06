@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 
 /**
  * <p>
- * This processor handles the DRS calibration. It requires a DRS data souce
+ * This processor handles the DRS calibration. It requires a DRS data source
  * either as File or URL and will read the DRS data from that. This data is then
  * applied to all FactEvents processed by this class.
  * </p>
@@ -139,8 +139,7 @@ public class DrsCalibration implements StatefulProcessor {
 			log.error(" data .fits file did not contain the value for the key "
 					+ key + ". cannot apply drscalibration");
 			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \" + key + \". "
-							+ "cannot apply drscalibration)");
+					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drscalibration)");
 		}
 
 		double[] rawfloatData = new double[rawData.length];
