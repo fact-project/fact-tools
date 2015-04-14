@@ -21,6 +21,7 @@ import java.io.Serializable;
  * @author Kai;
  * 
  */
+@Deprecated
 public class RootASCIIWriter extends CsvWriter {
 
 	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);

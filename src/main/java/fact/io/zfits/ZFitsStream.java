@@ -1,6 +1,7 @@
 package fact.io.zfits;
 
 
+import fact.io.FactStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -19,14 +20,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ZFitsStream extends AbstractStream {
-	public class ZFitsStreamException extends Exception {
-		private static final long serialVersionUID = 9189559930716693147L;
-		
-		public ZFitsStreamException(String message) {
-			super(message);
-		}
-	}
+public class ZFitsStream extends AbstractStream implements FactStream {
+
 
 	static Logger log = LoggerFactory.getLogger(ZFitsStream.class);
 	private int bufferSize = 2880;
@@ -39,13 +34,16 @@ public class ZFitsStream extends AbstractStream {
 	private ZFitsTable fitsTable = null;
 	
 	private TableReader tableReader = null;
+    private File drsFile;
 
-	@Override
+    @Override
 	public Data readNext() throws Exception {
-		Data item = DataFactory.create(headerItem);
+
+        Data item = DataFactory.create(headerItem);
+        if (drsFile != null){
+            item.put("@drsFile", drsFile);
+        }
 		
-		if (this.tableReader == null)
-			throw new NullPointerException("Didn't initialize the reader, should never happen.");
 		//get the next row of data if zero we finished
 		byte[][] dataRow = this.tableReader.readNextRow();
 		if (dataRow == null)
@@ -270,4 +268,9 @@ public class ZFitsStream extends AbstractStream {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
+
+    @Override
+    public void setDrsFile(File drsFile) {
+        this.drsFile = drsFile;
+    }
 }

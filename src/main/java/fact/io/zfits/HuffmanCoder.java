@@ -133,7 +133,7 @@ public class HuffmanCoder {
 		/**
 		 * Create the Huffman encoder, by creating the Huffman tree and the symbolarray
 		 * 
-		 * @param buffer The input Buffer (Has to be created from a short array)
+		 * @param input The input Buffer (Has to be created from a short array)
 		 * @throws EncodingException
 		 */
 		public Encoder(short[] input) throws EncodingException {
