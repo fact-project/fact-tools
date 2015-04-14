@@ -13,7 +13,9 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 
 /**
  * <p>
@@ -46,7 +48,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     Data drsData = null;
 
-    private String currentFilePath = "";
+    private File currentDrsFile = new File("");
 
 
 	float[] drsBaselineMean;
@@ -75,7 +77,6 @@ public class DrsCalibration implements StatefulProcessor {
 	 */
 	protected void loadDrsData(SourceURL in) {
 		try {
-
 			FitsStream stream = new FitsStream(in);
 			stream.init();
 			drsData = stream.readNext();
@@ -119,17 +120,22 @@ public class DrsCalibration implements StatefulProcessor {
 	 */
 	@Override
 	public Data process(Data data) {
-        if( this.url == null && !currentFilePath .equals(data.get("@source").toString()) ){
+
+        if( this.url == null){
 			//file not loaded yet. try to find by magic.
-            currentFilePath = data.get("@source").toString();
-            try {
-                SourceURL url = drsService.findDRSFile(currentFilePath);
-                log.info("Using drs file: " + url.toString());
-                loadDrsData(url);
-            } catch (FileNotFoundException e) {
-                log.error("Couldn't find correct .drs File.");
-                e.printStackTrace();
-                throw new RuntimeException();
+            File drsFile = (File) data.get("@drsFile");
+            if( !drsFile.equals(currentDrsFile)) {
+                currentDrsFile = drsFile;
+                if (drsFile != null) {
+                    try {
+                        log.info("Using .drs File " + drsFile.getAbsolutePath());
+                        loadDrsData(new SourceURL(drsFile.toURI().toURL()));
+                    } catch (MalformedURLException e) {
+                        //pass.
+                    }
+                } else {
+                    throw new IllegalArgumentException("No drs file set and no @drsFile key in data stream");
+                }
             }
 		}
 
@@ -139,7 +145,7 @@ public class DrsCalibration implements StatefulProcessor {
 			log.error(" data .fits file did not contain the value for the key "
 					+ key + ". cannot apply drscalibration");
 			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drscalibration)");
+					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
 		}
 
 		double[] rawfloatData = new double[rawData.length];
@@ -308,10 +314,10 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        if(url == null && drsService == null){
-            log.error("Url and Service are not set. You need to set one of those");
-            throw new IllegalArgumentException("Wrong parameter");
-        }
+//        if(url == null && drsService == null){
+//            log.error("Url and Service are not set. You need to set one of those");
+//            throw new IllegalArgumentException("Wrong parameter");
+//        }
         if (url != null) {
             try {
                 loadDrsData(url);

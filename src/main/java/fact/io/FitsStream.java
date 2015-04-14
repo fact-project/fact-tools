@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-public class FitsStream extends AbstractStream {
+public class FitsStream extends AbstractStream implements FactStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
 
 	int numberOfPixel;
@@ -25,6 +25,7 @@ public class FitsStream extends AbstractStream {
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
+    public File drsFile;
 
 	@Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
 	private int bufferSize = 8 * 1024;
@@ -38,6 +39,13 @@ public class FitsStream extends AbstractStream {
 	public FitsStream() {
 		super();
 	}
+
+
+    @Override
+    public void setDrsFile(File drsFile) {
+        this.drsFile = drsFile;
+    }
+
 
 	/**
 	 * This consists of 3 steps 1. Get the size of the fits header. A header
@@ -378,10 +386,19 @@ public class FitsStream extends AbstractStream {
 		}
 		item.put("@source", url.getProtocol() + ":" + url.getPath());
 		item.put("@numberOfPixel", numberOfPixel);
+
+        if(this.drsFile != null){
+            item.put("@drsFile", this.drsFile);
+        }
 		return item;
 	}
 
-	public class FitsHeader {
+
+
+    /**
+     * This class describes the header of a .fits file.
+     */
+    public class FitsHeader {
 
 		final byte[] headerData;
 
