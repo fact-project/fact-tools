@@ -2,11 +2,11 @@
 
 
     <!-- Pfade zu den fits files. -->
-    <property name="whitelist" value="/Users/kaibrugge/Development/BA/isdc/temp/20131012.json" />
+    <property name="whitelist" value="mrk421/20131012.json" />
 
-    <property name="num_copies" value="2" />
+    <property name="num_copies" value="1" />
 
-    <service id="auxFileService" class="fact.auxservice.AuxFileService" auxFolder="file:/Users/kaibrugge/fact_phido/aux/2013/10/12/" />
+    <service id="auxFileService" class="fact.auxservice.AuxFileService" auxFolder="file:/fact/aux/2013/10/12/" />
 
     <stream id="input:${copy.id}" class="fact.io.FactFileListMultiStream"
             listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
