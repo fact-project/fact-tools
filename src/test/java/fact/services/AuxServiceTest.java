@@ -16,19 +16,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class AuxServiceTest {
 
-    /**
-     * We expect a FileNotFoundException when the folder to the datestring does not exist
-     * @throws Exception
-     */
-    @Test(expected = FileNotFoundException.class)
-    public void testWrongFolder() throws Exception {
-        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
-        SourceURL url = new SourceURL(u);
-        AuxFileService s = new AuxFileService();
-        //supply a wrong datestring
-        String dateString = "21092014";
-        HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(url);
-    }
 
     /**
      * Tests what happens when the folder to the datestring exists but the files in that folder
@@ -37,11 +24,10 @@ public class AuxServiceTest {
      */
     @Test
     public void testWrongFilename() throws Exception {
-        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
-        SourceURL url = new SourceURL(u);
+        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/2015/09/");
         AuxFileService s = new AuxFileService();
         //supply a wrong datestring
-        String dateString = "20150921";
+//        String dateString = "20150921";
         HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u));
         assertTrue(m.isEmpty());
     }
@@ -49,14 +35,14 @@ public class AuxServiceTest {
 
     @Test
     public void testAuxFileFinder() throws Exception {
-        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
-        SourceURL url = new SourceURL(u);
+        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/2015/09/21");
+//        SourceURL url = new SourceURL(u);
         AuxFileService s = new AuxFileService();
         //supply datestring. ITS MY BIRFDAY! YAY
-        String dateString = "20150920";
+//        String dateString = "20150920";
         HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u));
-        assertTrue(m.containsKey("DRIVE_CONTROL_TRACKING_POSITION"));
-        assertTrue(m.containsKey("DRIVE_CONTROL_POINTING_POSITION"));
+        assertTrue(m.containsKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION));
+//        assertTrue(m.containsKey("DRIVE_CONTROL_POINTING_POSITION"));
     }
 
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * Created by mackaiver on 9/21/14.
  */
+@Deprecated
 public class RecursiveDirectoryStream extends AbstractMultiStream {
 
     static BlockingQueue<File> files = new LinkedBlockingQueue<>();
