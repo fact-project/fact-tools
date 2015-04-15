@@ -1,5 +1,6 @@
 bin/
 target/
+.directory
 .settings
 .classpath
 docs.aux
@@ -14,4 +15,4 @@ docs.idx
 .idea/
 
 fact-tools.iml
-dependecy-reduced-pom.xml
+dependency-reduced-pom.xml

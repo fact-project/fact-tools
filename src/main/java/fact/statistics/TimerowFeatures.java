@@ -50,11 +50,7 @@ public class TimerowFeatures implements Processor {
 		
 		int roi = (Integer) input.get("NROI");
 		
-		if ( searchWindowLeft < 0 || searchWindowLeft > searchWindowRight || searchWindowRight > roi)
-		{
-			throw new RuntimeException("Search window not in the correct region:\n search window: ("
-					+ searchWindowLeft + "," + searchWindowRight + ")\t roi: " + roi);
-		}
+		Utils.checkWindow(searchWindowLeft, searchWindowRight-searchWindowLeft, 0, roi);
 		
 		Utils.mapContainsKeys(input, dataKey, movingAverageKey);
 		
