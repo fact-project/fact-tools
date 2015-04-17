@@ -7,7 +7,7 @@
     keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
 />
 <fact.filter.DrsCalibration
-    url="file:${drsfile}"
+    url="${drsfile}"
     key="Data"
     outputKey="DataCalibrated"
 />  
