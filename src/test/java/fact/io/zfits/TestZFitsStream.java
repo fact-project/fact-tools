@@ -32,32 +32,4 @@ public class TestZFitsStream {
 			item = stream.read();
 		}
 	}
-	public void testDrsCalib() throws Exception {
-		URL uZfits =  TestZFitsStream.class.getResource(zfits);
-		URL ufits =  TestZFitsStream.class.getResource(fits);
-
-		ZFitsStream stream = new ZFitsStream(new SourceURL(uZfits));
-		stream.setTableName("Events");
-		stream.init();
-		
-		ZFitsDrsCalib drsCalib = new ZFitsDrsCalib();
-		drsCalib.setUrl(uZfits);
-		
-		TestFz testfz = new TestFz();
-		testfz.setUrl(ufits);
-		
-		Data item = stream.readNext();
-		while(item!=null) {
-			testfz.process(item);
-			item = stream.readNext();
-		}
-	}
-
-	public void testReadFits() {
-		
-	}
-	
-	public void testZFitsVsFits() {
-		
-	}
 }
