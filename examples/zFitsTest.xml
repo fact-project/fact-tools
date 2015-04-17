@@ -1,0 +1,27 @@
+<container>
+
+
+    <!-- Pathes to the input files -->
+    <property name="infile" value="/Users/kaibrugge/FactTest/20140101_151.fits.fz" />
+    <property name="drsfile" value="/Users/kaibrugge/FactTest/20140101_147.drs.fits.gz" />
+
+    <!--<property name="infile" value="/Users/kaibrugge/FactTest/20130104_095.fits" />-->
+    <!--<property name="drsfile" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits.gz"/>-->
+
+
+    <!-- Name of the stream and url to the input file -->
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}"/>
+
+    <!-- Description of the process and the corresponding stream -->
+    <process id="2" input="fact">
+
+        <!-- <Skip condition="%{data.shower} == null" /> -->
+        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data" outputKey="DataCalibrated" />
+
+        <fact.ShowViewer key="DataCalibrated"/>
+
+
+    </process>
+
+
+</container>
