@@ -158,7 +158,7 @@ public class SourcePosition implements StatefulProcessor {
 		if(timeIndex < locList.size()-1){
 			t = (locList.get(timeIndex))[0];
 			t1 = (locList.get(timeIndex+1))[0];
-			while(!( t < mjd && mjd < t1) && timeIndex < locList.size()-2){
+			while(!( t < mjd && mjd <= t1) && timeIndex < locList.size()-2){
 					timeIndex++;
 					t = (locList.get(timeIndex))[0];
 					t1 = (locList.get(timeIndex+1))[0];
