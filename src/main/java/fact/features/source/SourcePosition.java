@@ -73,6 +73,8 @@ public class SourcePosition implements StatefulProcessor {
     //flag which indicates whether were are looking at montecarlo files which have a wobble position
     public boolean hasMcWobblePosition;
 
+
+    //used in case we need the sourceposition of a star in the camera
     @Parameter(required = false)
     private Double sourceRightAscension = null;
     @Parameter(required = false)
@@ -203,6 +205,7 @@ public class SourcePosition implements StatefulProcessor {
 
             //We want to get the tracking point which is closest to the current event.
             AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+
 
             double ra = trackingPoint.getDouble("Ra");
             double dec = trackingPoint.getDouble("Dec");
