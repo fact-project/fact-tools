@@ -30,8 +30,6 @@ import java.io.IOException;
  *
  *  The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
  *
- *  TODO: Plot deviation between calculated and written Az and Zd for files in whitelist
- *  TODO: handle ceta tauri and similar cases.
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -70,12 +68,7 @@ public class SourcePosition implements StatefulProcessor {
     }
 
     /**
-     * In the init method we read the complete TRACKING_POSITION file and save the values in the locList.
-     * For the calculation of the appropriate sky coordinates (that is Azimuth and Zenith) we only need the values "Time", "Ra" and "Dec".
-     * There are also values for "Az" and "Zd" in file. These are calculated by the drive system itself. They can be used for a sanity check.
-     * These values differ by what seems to be a constant amount in both Az and Zd. About 1 to 3 degrees for the files that I checked.
-     * The time unit in the TRACKING file is given in unixtime/86400.0. Its still called MJD for some reason.
-     *
+     * Here we check whether an auxservice has been set or some fixed coordinates have been provided in the .xml.
      */
     @Override
     public void init(ProcessContext arg0) throws Exception {
@@ -88,12 +81,6 @@ public class SourcePosition implements StatefulProcessor {
             log.error("You have to provide fixed sourceposition coordinates X and Y, specify the auxService, or provide sourceFileUrl and trackingFileUrl");
             throw new IllegalArgumentException();
         }
-//        else if(trackingFileUrl !=  null && sourceFileUrl != null && auxService == null){
-//            auxService = new AuxFileService();
-//            trackingManager = auxService.getTrackingPointManagerForSourceFile(trackingFileUrl);
-//            sourceManager = auxService.getSourcePointManagerForSourceFile(sourceFileUrl);
-//        }
-
     }
 
     @Override
