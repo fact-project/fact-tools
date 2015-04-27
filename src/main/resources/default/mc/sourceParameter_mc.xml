@@ -1,8 +1,10 @@
 <module>
 <fact.features.source.SourcePosition 
     outputKey="sourcePosition" 
-    X="${source_x}"
-    Y="${source_y}"
+    pointingZdKey="MPointingPos.fZd"
+    pointingAzKey="MPointingPos.fAz"
+    sourceZdKey="MSimSourcePos.fZd"
+    sourceAzKey="MSimSourcePos.fAz"
 />
 <fact.features.source.AntiSourcePosition
         sourcePositionKey="sourcePosition"

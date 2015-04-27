@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
  * Created by kai on 01.03.15.
  */
 public class AuxWebServiceTest {
-
     @Test
     public void testTimeFlooring() throws IOException {
         DateTime time = new DateTime(1987, 9, 20, 12, 40, 34);
@@ -34,4 +33,5 @@ public class AuxWebServiceTest {
 
         assertThat(roundedTime, is(new DateTime(1987, 9, 20, 00, 00, 00)));
     }
+
 }

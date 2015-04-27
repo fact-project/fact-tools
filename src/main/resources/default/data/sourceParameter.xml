@@ -1,8 +1,8 @@
 <module>
 <fact.features.source.SourcePosition
     outputKey="sourcePosition"
-    url="file:${drivefile}"
-    physicalSource="${sourcename}"
+    trackingFileUrl="${trackingFile}"
+    sourceFileUrl="${sourceFile}"
 />
 <fact.features.source.AntiSourcePosition
         sourcePositionKey="sourcePosition"

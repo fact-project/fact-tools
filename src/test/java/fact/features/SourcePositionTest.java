@@ -38,7 +38,7 @@ public class SourcePositionTest {
         Date date = isoFormat.parse("2014-10-01T16:34:00");
 
         //get julian day. see http://aa.usno.navy.mil/data/docs/JulianDate.php for an online calculator
-        int unixTime = (int) (date.getTime()/1000L);
+        double unixTime = (double) (date.getTime()/1000L);
         double jd = sourcePosition.unixTimeToJulianDay(unixTime);
         Assert.assertEquals(2456932.1902, jd, 0.0001);
 

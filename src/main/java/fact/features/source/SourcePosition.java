@@ -1,7 +1,7 @@
 package fact.features.source;
 
+
 import fact.auxservice.AuxPoint;
-import fact.auxservice.AuxWebService;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.strategies.AuxPointStrategy;
@@ -10,8 +10,13 @@ import fact.auxservice.strategies.Earlier;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
+import fact.Utils;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -30,6 +35,9 @@ import java.io.IOException;
  *
  *  The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
  *
+ *  TODO: handle ceta tauri and similar cases. (at the moment it feels hacky)
+ *  TODO: Receive the different outputKeys from the xml files 
+ *  TODO: compare sourcepositions with ganymed
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -52,6 +60,23 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false)
     private Double y = null;
 
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
+    private String sourceZdKey = null;
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
+    private String sourceAzKey = null;
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
+    private String pointingZdKey = null;
+    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
+    private String pointingAzKey = null;
+
+    //flag which indicates whether were are looking at montecarlo files which have a wobble position
+    private boolean hasMcWobblePosition;
+
+    @Parameter(required = false)
+    private Double sourceRightAscension = null;
+    @Parameter(required = false)
+    private Double sourceDeclination = null;
+
 
     AuxPointStrategy closest = new Closest();
     AuxPointStrategy earlier = new Earlier();
@@ -69,30 +94,172 @@ public class SourcePosition implements StatefulProcessor {
 
     /**
      * Here we check whether an auxservice has been set or some fixed coordinates have been provided in the .xml.
+     * If any of the parameters sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey are set then all need to be set.
      */
     @Override
     public void init(ProcessContext arg0) throws Exception {
         if(x !=  null && y != null){
-
             log.warn("Setting sourcepostion to dummy values X: " + x + "  Y: " + y);
+            return;
+        }
 
-        } else if (auxService == null){
+        hasMcWobblePosition = false;
+        if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
+        	if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
+        	{
+                hasMcWobblePosition = true;
+        		log.warn("Using zd and az values from the data item");
+        	}
+        	else
+        	{
+        		log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
+        		throw new IllegalArgumentException();
+        	}
+        } else if (auxService == null ){
 
-            log.error("You have to provide fixed sourceposition coordinates X and Y, specify the auxService, or provide sourceFileUrl and trackingFileUrl");
+            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService, or provide sourceFileUrl and trackingFileUrl");
             throw new IllegalArgumentException();
         }
     }
+
+
 
     @Override
     public void resetState() throws Exception {
     }
 
+
+    /**
+     * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is
+     * unclear to me what to do with the second one. I simply used the sum of both in seconds..
+     * Even though the numbers are small enough to NOT make a difference anyways.
+     * After reading the EventTime from the data we check which datapoint from the slowcontrol file we have to use by
+     * comparing the times. We use the point closest in time to the current dataitem.
+     *
+     * @return data. The dataItem containing the calculated sourcePostion as a double[] of length 2. {x,y} .
+     * 		    --Also the deviation between the calculated pointing and the one written in the .fits TRACKING file.
+     */
+    @Override
+    public Data process(Data data) {
+
+        // In case the source position is fixed. Used for older ceres version <= revision 18159
+        if(x != null && y !=  null){
+            //add source position to dataitem
+            double[] source = {x, y};
+//			System.out.println("x: "+  source[0] + " y: " +source[1] );
+            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
+            data.put(outputKey, source);
+            
+            data.put("AzTracking", 0);
+            data.put("ZdTracking", 0);
+
+            data.put("AzPointing", 0);
+            data.put("ZdPointing", 0);
+
+            data.put("AzSourceCalc", 0);
+            data.put("ZdSourceCalc", 0);
+            return data;
+        }
+
+        if (hasMcWobblePosition)
+        {
+        	double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
+        	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
+        	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
+        	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to undo
+        	// the coordinate transformation from Ceres
+        	pointingAz = 180 - pointingAz;
+        	sourceAz = 180 - sourceAz;
+        	// Now we can calculate the source position from the zd,az coordinates for pointing and source
+        	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
+        	data.put(outputKey, sourcePosition);
+        	
+            data.put("AzTracking", pointingAz);
+            data.put("ZdTracking", pointingZd);
+
+            data.put("AzPointing", pointingAz);
+            data.put("ZdPointing", pointingZd);
+
+            data.put("AzSourceCalc", sourceAz);
+            data.put("ZdSourceCalc", sourceZd);
+
+            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
+            return data;
+        }
+
+        try {
+            int[] eventTime = (int[]) data.get("UnixTimeUTC");
+            if(eventTime == null){
+                log.error("The key \"UnixTimeUTC \" was not found in the event. Ignoring event");
+                return null;
+            }
+
+            DateTime timeStamp = new DateTime((long)(eventTime[0]) * 1000, DateTimeZone.UTC);
+            // the source position is not updated very often. We have to get the point from hte auxfile which
+            // was written earlier to the current event
+            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
+
+            //We want to get the tracking point which is closest to the current event.
+            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+
+            double ra = trackingPoint.getDouble("Ra");
+            double dec = trackingPoint.getDouble("Dec");
+
+            //convert unixtime to julianday
+            double julianDay = unixTimeToJulianDay(eventTime[0]);
+
+            //convert julianday to gmst
+            double gmst = julianDayToGmst(julianDay);
+
+
+            //convert celestial coordinates to local coordinate system.
+            double[] pointingAzZd = getAzZd(ra, dec, gmst);
+
+            //pointAzDz should be equal to the az dz written by the drive
+            //double dev = Math.abs(point.Az - pointingAzDe[0]);
+
+            double[] sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gmst);
+
+            if (sourceDeclination != null && sourceRightAscension != null)
+            {
+                sourceAzZd = getAzZd(sourceRightAscension, sourceDeclination, gmst);
+            }
+
+            double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
+
+
+            data.put(outputKey, sourcePosition);
+
+            data.put("AzTracking", trackingPoint.getDouble("Az"));
+            data.put("ZdTracking", trackingPoint.getDouble("Zd"));
+
+            data.put("AzPointing", pointingAzZd[0]);
+            data.put("ZdPointing", pointingAzZd[1]);
+
+            data.put("AzSourceCalc", sourceAzZd[0]);
+            data.put("ZdSourceCalc", sourceAzZd[1]);
+
+            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
+
+
+        } catch (IllegalArgumentException e){
+            log.error("Ignoring event.  " + e.getLocalizedMessage());
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+
     /**
      * Takes unixTime in seconds and returns the julianday as double
      * @param unixTime
      */
-    public double unixTimeToJulianDay(int unixTime){
-        return unixTime/86400.0 +  40587.0+2400000.5;
+    public double unixTimeToJulianDay(double unixTime){
+        return unixTime/86400.0 +  40587.0d+2400000.5;
     }
 
 
@@ -124,82 +291,7 @@ public class SourcePosition implements StatefulProcessor {
     }
 
 
-    /**
-     * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is
-     * unclear to me what to do with the second one. I simply used the sum of both in seconds..
-     * Even though the numbers are small enough to NOT make a difference anyways.
-     * After reading the EventTime from the data we check which datapoint from the slowcontroll file we have to use by
-     * comparing the times. We use the point closest in time to the current dataitem.
-     *
-     * @return data. The dataItem containing the calculated sourcePostion as a double[] of length 2. {x,y} .
-     * 		    --Also the deviation between the calculated pointing and the one written in the .fits TRACKING file.
-     */
-    @Override
-    public Data process(Data data) {
 
-        if(x != null && y !=  null){
-            //add source position to dataitem
-            double[] source = {x, y};
-//			System.out.println("x: "+  source[0] + " y: " +source[1] );
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
-            data.put(outputKey, source);
-            return data;
-        }
-
-        int[] eventTime = (int[]) data.get("UnixTimeUTC");
-        if(eventTime == null){
-            log.error("The key \"UnixTimeUTC \" was not found in the event. Ignoring event");
-            return null;
-        }
-        try {
-
-            DateTime timeStamp = new DateTime((long)(eventTime[0]) * 1000, DateTimeZone.UTC);
-            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
-            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
-
-//            System.out.println("Sourcepoint: " + sourcePoint);
-//            System.out.println("trackingPoint: " + trackingPoint);
-
-            double ra = trackingPoint.getDouble("Ra");
-            double dec = trackingPoint.getDouble("Dec");
-
-//            convert unixtime to julianday
-            double julianDay = unixTimeToJulianDay(eventTime[0]);
-            //convert julianday to gmst
-            double gmst = julianDayToGmst(julianDay);
-
-
-            //convert celestial coordinates to local coordinate system.
-            double[] pointingAzZd = getAzZd(ra, dec, gmst);
-            //pointAzDz should be equal to the az dz written by the drive
-            //double dev = Math.abs(point.Az - pointingAzDe[0]);
-
-            double[] sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gmst);
-            double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
-
-            //add source position to dataitem
-            double[] source = {sourcePosition[0], sourcePosition[1]};
-            data.put(outputKey, source);
-
-            data.put("@AzPointing", pointingAzZd[0]);
-            data.put("@ZdPointing", pointingAzZd[1]);
-
-            data.put("@AzSourceCalc", sourceAzZd[0]);
-            data.put("@ZdSourceCalc", sourceAzZd[1]);
-
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
-
-            data.put(outputKey, sourceAzZd);
-
-        } catch (IllegalArgumentException e){
-            log.error("Ignoring event.  " + e.getLocalizedMessage());
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return data;
-    }
 
     /**
      * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension,
@@ -282,30 +374,6 @@ public class SourcePosition implements StatefulProcessor {
         this.y = y;
     }
 
-//
-//	void sourceIsCrab()
-//	{
-//		sourceRightAscension       = (5.0 + 34.0/60 + 31.97/3600) / 24.0 * 360.0;
-//		sourceDeclination          = 22.0 + 0.0/60 + 52.10/3600;
-//	}
-//
-//	void sourceIsMrk421()
-//	{
-//		sourceRightAscension       = (11.0 + 4.0/60 + 27.0/3600) / 24.0 * 360.0;
-//		sourceDeclination          = 38.0 + 12.0/60 + 32.0/3600;
-//	}
-//
-//	void sourceIsMrk501()
-//	{
-//		sourceRightAscension       = (16.0 + 53.0/60 + 52.2/3600) / 24.0 * 360.0;
-//		sourceDeclination          = 39.0 + 45.0/60 + 37.0/3600;
-//	}
-//
-//	void setRaDec(double ra, double dec)
-//	{
-//		sourceRightAscension       = ra;
-//		sourceDeclination          = dec;
-//	}
 
 
 
@@ -318,58 +386,30 @@ public class SourcePosition implements StatefulProcessor {
 	}
 
 
-//	@Parameter(description = "A URL to the FITS file.")
-//	public void setUrl(URL url) {
-//		trackingUrl = new SourceURL(url);
-//	}
-//
-//	@Parameter(description = "A String with a valid URL FITS file.")
-//	public void setUrl(String urlString) {
-//		try{
-//			URL url = new URL(urlString);
-//			trackingUrl = new SourceURL(url);
-//		} catch (MalformedURLException e) {
-//			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
-//			throw new RuntimeException("Cant open drsFile");
-//		}
-//	}
 
-//
-//	public Double getSourceDeclination() {
-//		return sourceDeclination;
-//	}
-//	public void setSourceDeclination(Double sourceDeclination) {
-//		this.sourceDeclination = sourceDeclination;
-//	}
-//
-//
-//	public Double getSourceRightAscension() {
-//		return sourceRightAscension;
-//	}
-//	public void setSourceRightAscension(Double sourceRightAscension) {
-//		this.sourceRightAscension = sourceRightAscension;
-//	}
-//
-	
-//	public String getPhysicalSource() {
-//		return physicalSource;
-//	}
-//	@Parameter(description = "A string with the name of the source. So far this supports mrk421, crab, and mrk501. This is convinience so you dont have to use {@code setSourceRightAscension} and  {@code setSourceDeclination} ")
-//	public void setPhysicalSource(String physicalSource) {
-//		this.physicalSource = physicalSource;
-//		if(physicalSource.toLowerCase().equals("crab")){
-//			sourceIsCrab();
-//			log.info("Using the crab nebula as source");
-//		} else if (physicalSource.toLowerCase().equals("mrk421")){
-//			sourceIsMrk421();
-//			log.info("Using the mrk421 as source");
-//		} else if (physicalSource.toLowerCase().equals("mrk501")){
-//			sourceIsMrk501();
-//			log.info("Using the mrk501 as source");
-//		} else {
-//			throw new RuntimeException("physicalSource unknown. Provide the parameters sourceRightAscension and  sourceDeclination instead");
-//		}
-//	}
-//
+	public void setSourceZdKey(String sourceZdKey) {
+		this.sourceZdKey = sourceZdKey;
+	}
+
+	public void setSourceAzKey(String sourceAzKey) {
+		this.sourceAzKey = sourceAzKey;
+	}
+
+	public void setPointingZdKey(String pointingZdKey) {
+		this.pointingZdKey = pointingZdKey;
+	}
+
+	public void setPointingAzKey(String pointingAzKey) {
+		this.pointingAzKey = pointingAzKey;
+	}
+
+
+	public void setSourceRightAscension(Double sourceRightAscension) {
+		this.sourceRightAscension = sourceRightAscension;
+	}
+
+	public void setSourceDeclination(Double sourceDeclination) {
+		this.sourceDeclination = sourceDeclination;
+	}
 
 }
