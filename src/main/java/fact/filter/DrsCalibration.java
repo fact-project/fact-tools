@@ -124,18 +124,16 @@ public class DrsCalibration implements StatefulProcessor {
         if( this.url == null){
 			//file not loaded yet. try to find by magic.
             File drsFile = (File) data.get("@drsFile");
-            if( !drsFile.equals(currentDrsFile)) {
+            if( drsFile != null && !drsFile.equals(currentDrsFile)) {
                 currentDrsFile = drsFile;
-                if (drsFile != null) {
-                    try {
-                        log.info("Using .drs File " + drsFile.getAbsolutePath());
-                        loadDrsData(new SourceURL(drsFile.toURI().toURL()));
-                    } catch (MalformedURLException e) {
-                        //pass.
-                    }
-                } else {
-                    throw new IllegalArgumentException("No drs file set and no @drsFile key in data stream");
+                try {
+                    log.info("Using .drs File " + drsFile.getAbsolutePath());
+                    loadDrsData(new SourceURL(drsFile.toURI().toURL()));
+                } catch (MalformedURLException e) {
+                    //pass.
                 }
+            } else {
+                throw new IllegalArgumentException("No drs file set and no @drsFile key in data stream");
             }
 		}
 
