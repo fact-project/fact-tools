@@ -2,7 +2,7 @@
 
 
     <!-- Pfade zu den fits files. -->
-    <property name="whitelist" value="mrk421/20131012.json" />
+    <property name="whitelist" value="mrk_421/20131012.json" />
 
     <property name="num_copies" value="1" />
 
@@ -10,7 +10,7 @@
 
     <stream id="input:${copy.id}" class="fact.io.FactFileListMultiStream"
             listUrl="file:${whitelist}" copies="${num_copies}" suffix="fits.gz">
-        <stream class="fact.io.FitsStream" id="fact" limit="10"/>
+        <stream class="fact.io.zfits.ZFitsStream" id="fact" limit="100"/>
     </stream>
 
 
@@ -19,7 +19,7 @@
         <fact.filter.DrsCalibration key="Data" outputKey="DataCalibrated"/>
         <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxFileService"/>
         <!--<fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxWebService"/>-->
-        <PrintData/>
+        <!--<PrintData/>-->
         <!--<fact.ShowViewer key="DataCalibrated" />-->
     </process>
 
