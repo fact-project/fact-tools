@@ -162,7 +162,6 @@ public class SourcePosition implements StatefulProcessor {
 
             double ra = trackingPoint.getDouble("Ra");
             double dec = trackingPoint.getDouble("Dec");
-//            auxService.getAuxiliaryData("DRIVE_CONTROL_TRACKING_POSITION", new DateTime((long)(timestamp) * 1000, DateTimeZone.UTC));
 
 //            convert unixtime to julianday
             double julianDay = unixTimeToJulianDay(eventTime[0]);
@@ -181,8 +180,6 @@ public class SourcePosition implements StatefulProcessor {
             //add source position to dataitem
             double[] source = {sourcePosition[0], sourcePosition[1]};
             data.put(outputKey, source);
-//            data.put("@AzTracking", trackingPoint.Az);
-//            data.put("@ZdTracking", trackingPoint.Zd);
 
             data.put("@AzPointing", pointingAzZd[0]);
             data.put("@ZdPointing", pointingAzZd[1]);
@@ -243,6 +240,8 @@ public class SourcePosition implements StatefulProcessor {
         return r;
     }
 
+
+
     /**
      * Returns position of the source in the camera in [mm] from the given pointing Azimuth and Zenith
      * Code by F.Temme
@@ -275,9 +274,6 @@ public class SourcePosition implements StatefulProcessor {
     }
 
 
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
 
     public void setX(Double x) {
         this.x = x;
@@ -286,6 +282,94 @@ public class SourcePosition implements StatefulProcessor {
         this.y = y;
     }
 
+//
+//	void sourceIsCrab()
+//	{
+//		sourceRightAscension       = (5.0 + 34.0/60 + 31.97/3600) / 24.0 * 360.0;
+//		sourceDeclination          = 22.0 + 0.0/60 + 52.10/3600;
+//	}
+//
+//	void sourceIsMrk421()
+//	{
+//		sourceRightAscension       = (11.0 + 4.0/60 + 27.0/3600) / 24.0 * 360.0;
+//		sourceDeclination          = 38.0 + 12.0/60 + 32.0/3600;
+//	}
+//
+//	void sourceIsMrk501()
+//	{
+//		sourceRightAscension       = (16.0 + 53.0/60 + 52.2/3600) / 24.0 * 360.0;
+//		sourceDeclination          = 39.0 + 45.0/60 + 37.0/3600;
+//	}
+//
+//	void setRaDec(double ra, double dec)
+//	{
+//		sourceRightAscension       = ra;
+//		sourceDeclination          = dec;
+//	}
 
+
+
+	public String getOutputKey() {
+		return outputKey;
+	}
+	@Parameter(description = "The key to the sourcepos array that will be written to the map.")
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+
+//	@Parameter(description = "A URL to the FITS file.")
+//	public void setUrl(URL url) {
+//		trackingUrl = new SourceURL(url);
+//	}
+//
+//	@Parameter(description = "A String with a valid URL FITS file.")
+//	public void setUrl(String urlString) {
+//		try{
+//			URL url = new URL(urlString);
+//			trackingUrl = new SourceURL(url);
+//		} catch (MalformedURLException e) {
+//			log.error("Malformed URL. The URL parameter of this processor has to a be a valid url");
+//			throw new RuntimeException("Cant open drsFile");
+//		}
+//	}
+
+//
+//	public Double getSourceDeclination() {
+//		return sourceDeclination;
+//	}
+//	public void setSourceDeclination(Double sourceDeclination) {
+//		this.sourceDeclination = sourceDeclination;
+//	}
+//
+//
+//	public Double getSourceRightAscension() {
+//		return sourceRightAscension;
+//	}
+//	public void setSourceRightAscension(Double sourceRightAscension) {
+//		this.sourceRightAscension = sourceRightAscension;
+//	}
+//
+	
+//	public String getPhysicalSource() {
+//		return physicalSource;
+//	}
+//	@Parameter(description = "A string with the name of the source. So far this supports mrk421, crab, and mrk501. This is convinience so you dont have to use {@code setSourceRightAscension} and  {@code setSourceDeclination} ")
+//	public void setPhysicalSource(String physicalSource) {
+//		this.physicalSource = physicalSource;
+//		if(physicalSource.toLowerCase().equals("crab")){
+//			sourceIsCrab();
+//			log.info("Using the crab nebula as source");
+//		} else if (physicalSource.toLowerCase().equals("mrk421")){
+//			sourceIsMrk421();
+//			log.info("Using the mrk421 as source");
+//		} else if (physicalSource.toLowerCase().equals("mrk501")){
+//			sourceIsMrk501();
+//			log.info("Using the mrk501 as source");
+//		} else {
+//			throw new RuntimeException("physicalSource unknown. Provide the parameters sourceRightAscension and  sourceDeclination instead");
+//		}
+//	}
+//
 
 }
