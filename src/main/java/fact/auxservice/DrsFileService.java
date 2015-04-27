@@ -13,6 +13,7 @@ import java.util.Arrays;
  * Implements a service to automaticaly find a drs file belonging to the current data file.
  * Created by kaibrugge on 09.10.14.
  */
+@Deprecated
 public class DrsFileService implements Service {
 
     String currentDataFile = "";
