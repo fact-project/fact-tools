@@ -14,24 +14,52 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SourcePositionTest {
     static Logger log = LoggerFactory.getLogger(SourcePositionTest.class);
 
-    private SourcePosition sourcePosition;
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-	@Before
-	public void setup()
-	{
-		sourcePosition = new SourcePosition();
-		sourcePosition.setOutputKey("test");
-	}
+    @Test
+    public void testWobbleWrongParameter() throws Exception {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
+        //set only one key. eventhough we need all 4
+        sourcePosition.setPointingAzKey("bla");
+        try {
+            sourcePosition.init(null);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        fail("Should have caught an IllegalArgumentException here.");
+
+    }
+
+
+    @Test
+    public void testWobbleCorrectParameter() throws Exception {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
+        sourcePosition.setPointingAzKey("hello");
+        sourcePosition.setPointingZdKey("I am");
+        sourcePosition.setSourceAzKey("quite the ");
+        sourcePosition.setSourceZdKey("annoying feature.");
+        sourcePosition.init(null);
+
+        assertThat(sourcePosition.hasMcWobblePosition, is(true));
+    }
 
 
     @Test
     public void testTimeConversion() throws ParseException {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
         //get a test date and time
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -76,6 +104,9 @@ public class SourcePositionTest {
 	@Test
 	public void testCetaTauri() throws Exception
 	{
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
 		double C_T_rightAscension = (5.0 + 37.0/60 + 38.7/3600) / 24.0 * 360.0;
 		double C_T_declination = 21.0 + 8.0/60 + 33.0/3600;
 		
@@ -108,6 +139,9 @@ public class SourcePositionTest {
 	@Test
 	public void testSouthOrientation()
 	{
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
 		double zdSource = 0.6;
 		double azSource = 0.0;
 		double zdPointing = 0.0;

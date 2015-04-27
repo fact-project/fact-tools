@@ -38,6 +38,7 @@ import java.io.IOException;
  *  TODO: handle ceta tauri and similar cases. (at the moment it feels hacky)
  *  TODO: Receive the different outputKeys from the xml files 
  *  TODO: compare sourcepositions with ganymed
+ *  TODO: maybe set a flag in case of ceres wobble
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -70,7 +71,7 @@ public class SourcePosition implements StatefulProcessor {
     private String pointingAzKey = null;
 
     //flag which indicates whether were are looking at montecarlo files which have a wobble position
-    private boolean hasMcWobblePosition;
+    public boolean hasMcWobblePosition;
 
     @Parameter(required = false)
     private Double sourceRightAscension = null;
