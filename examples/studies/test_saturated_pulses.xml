@@ -26,7 +26,7 @@
 		<fact.utils.Remapping key="Data" outputKey="Data"/>
 		<fact.utils.RemappingKeys keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax" />
 
-		<fact.filter.DrsCalibration
+		<fact.datacorrection.DrsCalibration
 				url="file:${drsfile}"
 				key="Data"
 				outputKey="DataCalibrated"

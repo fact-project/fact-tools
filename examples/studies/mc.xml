@@ -9,7 +9,7 @@
     <!-- 			<Skip condition="%{data.TriggerType} != 4" /> -->
     <stream.monitor.DataRate every="100" />
 <fact.utils.Remapping key="Data" outputKey="Data" />
-<fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" />
+<fact.datacorrection.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" />
 <fact.features.source.SourcePosition outputKey="sourcePosition" physicalSource="crab" x="0" y="0"/>
 <fact.extraction.BasicExtraction
         	dataKey="DataCalibrated" 

@@ -21,7 +21,7 @@
     	<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+        <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#000000" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
         
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="SpikesRemoved" color="#E6172F" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="5" outputSpikesKey="Sp"/>

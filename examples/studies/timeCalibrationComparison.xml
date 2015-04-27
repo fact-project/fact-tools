@@ -22,7 +22,7 @@
                 limitEvents="10"
                 />
 
-        <fact.filter.DrsCalibration
+        <fact.datacorrection.DrsCalibration
                 url="file:${drsfile}"
                 key="Data"
                 outputKey="DataCalibrated"

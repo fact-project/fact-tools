@@ -3,7 +3,7 @@
  */
 package fact.io;
 
-import fact.filter.DrsCalibration;
+import fact.datacorrection.DrsCalibration;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

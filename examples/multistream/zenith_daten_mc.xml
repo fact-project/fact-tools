@@ -12,7 +12,7 @@
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <fact.utils.Remapping key="Data" outputKey="Data" />
 
-        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" url="file:/Users/kaibrugge/FactTest/test300samples2.drs.fits.gz" />
+        <fact.datacorrection.DrsCalibration key="Data"  outputKey="DataCalibrated" url="file:/Users/kaibrugge/FactTest/test300samples2.drs.fits.gz" />
 
         <!-- <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" /> -->
 

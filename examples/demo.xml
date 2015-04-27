@@ -23,7 +23,7 @@
 
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
+        <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
 
         <fact.demo.UpdateWidget dashboard="dashboard" widget="camera" />
 

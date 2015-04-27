@@ -16,7 +16,7 @@
     <process id="2" input="fact">
 
         <!-- <Skip condition="%{data.shower} == null" /> -->
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data" outputKey="DataCalibrated" />
+        <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data" outputKey="DataCalibrated" />
 
         <fact.ShowViewer key="DataCalibrated"/>
 

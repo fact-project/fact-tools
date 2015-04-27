@@ -16,7 +16,7 @@
 
     <process input="input:${copy.id}" copies="${num_copies}" >
 
-        <fact.filter.DrsCalibration key="Data" outputKey="DataCalibrated"/>
+        <fact.datacorrection.DrsCalibration key="Data" outputKey="DataCalibrated"/>
         <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxFileService"/>
         <!--<fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxWebService"/>-->
         <!--<PrintData/>-->

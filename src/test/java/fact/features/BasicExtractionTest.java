@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.extraction.BasicExtraction;
-import fact.filter.DrsCalibration;
+import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import org.junit.Before;

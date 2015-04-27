@@ -17,7 +17,7 @@
 	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
 	<process input="fact" copies="1">
 		<!-- <Skip condition="%{data.TriggerType} != 4" /> -->
-	        <fact.filter.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>  
+	        <fact.datacorrection.DrsCalibration url="file:${dataDRS}" key="data"  outputKey="DataCalibrated" color="#000000"/>
               <fact.filter.DrsTimeCalibration url="file:${timeDRS}" outputKey="times"/>  
             <!-- <fact.utils.CutSlices start="250" end="300" outputKey="DataCalibrated"/> -->
  <!--            <fact.filter.RemoveSpikesMars key="DataCalibrated" topSlope="8.0"/>

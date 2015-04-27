@@ -30,7 +30,7 @@
 		    limitEvents="20"
 		/>
 		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+        <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
         <fact.datacorrection.PatchJumpRemoval
 		    dataKey="DataCalibrated"
 		    outputKey="DataCalibrated"

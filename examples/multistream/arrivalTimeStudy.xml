@@ -5,7 +5,7 @@
         <stream.monitor.DataRate every="100" />
         <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
         <!--<fact.utils.Remapping key="Data" outputKey="Data" />-->
-        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService"/>
+        <fact.datacorrection.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService"/>
         <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
         <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
         <fact.statistics.ArrayStatistics key="arrivalTime" outputKey="time" />

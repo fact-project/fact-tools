@@ -12,7 +12,7 @@
     
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
     <process id="2" input="fact">
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+        <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
         <fact.features.CalculateDrs4TimeCalibrationConstants key="DataCalibrated" outputKey="DRS4_time_offsets" />
         <fact.io.PrintKeysOnConsole keys="EventNum" />
         <stream.flow.Skip condition="%{data.EventNum} &lt; 999" />

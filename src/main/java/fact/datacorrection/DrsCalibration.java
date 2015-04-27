@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fact.filter;
+package fact.datacorrection;
 
 import fact.auxservice.DrsFileService;
 import fact.io.FitsStream;
@@ -14,7 +14,6 @@ import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 
 /**

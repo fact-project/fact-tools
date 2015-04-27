@@ -10,7 +10,7 @@
         <stream.monitor.DataRate every="100" />
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-        <fact.filter.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService" />
+        <fact.datacorrection.DrsCalibration key="Data"  outputKey="DataCalibrated" drsService="drsService" />
 
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
 

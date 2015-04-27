@@ -5,7 +5,7 @@ import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
-import fact.filter.DrsCalibration;
+import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import org.junit.Before;
