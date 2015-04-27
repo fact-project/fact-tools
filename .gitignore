@@ -14,5 +14,7 @@ docs.idx
 #intellij stuff
 .idea/
 
+out/
+
 fact-tools.iml
 dependency-reduced-pom.xml
