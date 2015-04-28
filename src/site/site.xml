@@ -27,7 +27,7 @@
 	</menu>
 	
 	<menu name="Documentation">
-        <item name="Basic Usage" href="usage.html" />
+        <item name="Using Multistreams" href="multistream.html" />
         <item name="Using Auxiliary Data" href="aux.html" />
 	    <item name="Usage Examples" href="examples.html">
 	         <item name="Writing Data" href="example_writing.html" />
