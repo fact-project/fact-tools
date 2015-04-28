@@ -41,10 +41,6 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
     private SourceURL url = null;
 
-    @Parameter(required = false, description = "If given will try to use the file provided by the service")
-    private DrsFileService drsService;
-
-
     Data drsData = null;
 
     private File currentDrsFile = new File("");
@@ -286,28 +282,6 @@ public class DrsCalibration implements StatefulProcessor {
 		return destination;
 	}
 
-	// -----------getter setter---------------------
-
-	@Parameter(required = false, description = "data array to be calibrated", defaultValue = "Data")
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setUrl(SourceURL url) {
-        this.url = url;
-	}
-
-    public void setDrsService(DrsFileService service) {
-        this.drsService = service;
-    }
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
@@ -319,6 +293,7 @@ public class DrsCalibration implements StatefulProcessor {
             try {
                 loadDrsData(url);
             } catch (Exception e) {
+                log.error("Could not load .drs file specified in the url.");
                 throw new RuntimeException(e.getMessage());
             }
         }
@@ -333,4 +308,21 @@ public class DrsCalibration implements StatefulProcessor {
     public void finish() throws Exception {
 
     }
+
+	// -----------setter---------------------
+
+	@Parameter(required = false, description = "data array to be calibrated", defaultValue = "Data")
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
+
+	public void setUrl(SourceURL url) {
+        this.url = url;
+	}
+
+
 }
