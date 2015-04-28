@@ -4,7 +4,7 @@
     optional="false"
     outputKey="DataZCal"
 />
-<fact.filter.DrsCalibration 
+<fact.datacorrection.DrsCalibration
     url="${drsfile}" 
     key="DataZCal"  
     outputKey="DataCalibrated" 

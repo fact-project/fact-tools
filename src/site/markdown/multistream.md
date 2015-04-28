@@ -1,2 +1,50 @@
-## Using DRS calibration files.
+## Using Multistreams
 
+You often want to analyze many files at once or sequentially without starting a new fact-tools instance for each
+data .fits file. This is where Multistreams come in handy.
+
+### Using  FileListMultiStreams
+
+You start a multistream by wrapping your input stream in another multistream. Heres an example .xml that can utilize
+multiple CPU cores by using the `copies` property.
+
+        <property name="whitelist" value="some_list.json" />
+
+        <property name="num_copies" value="2" />
+
+        <service id="auxFileService" class="fact.auxservice.AuxFileService" auxFolder="file:/fact/aux/2013/10/12/" />
+
+
+        <stream id="input:${copy.id}" class="fact.io.FactFileListMultiStream"
+                listUrl="file:${whitelist}" copies="${num_copies}" >
+            <stream class="fact.io.zfits.ZFitsStream" id="fact" limit="100"/>
+        </stream>
+
+
+        <process input="input:${copy.id}" copies="${num_copies}" >
+
+            <fact.datacorrection.DrsCalibration key="Data" outputKey="DataCalibrated"/>
+            <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxFileService"/>
+
+        </process>
+
+
+The FactFileListMultiStream takes a json file of the form
+
+      {
+     "20131012_168":{
+          "drs_path":"\/fact\/raw\/2013\/10\/12\/20131012_189.drs.fits.gz",
+          "data_path":"\fact\/raw\/2013\/10\/12\/20131012_168.fits.gz"
+          },
+       "20131012_170":{
+          ...
+       }
+     }
+
+and creates a multistream for the files listed.
+
+The `drsPathKey` and `dataPathKey` parameter define the names of the keys in your .json. So in the example above they
+would need to be set to "drs_path" and "data_path" which are the default values. A key called `@drsFile` will
+be injected into the DataStream by this multistream.
+
+That means when you're using this stream you *don't* need to set the `url` parameter of the DrsCalibration processor.

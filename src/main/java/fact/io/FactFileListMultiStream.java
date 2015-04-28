@@ -5,7 +5,6 @@ import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
-import stream.io.Stream;
 import stream.io.multi.AbstractMultiStream;
 
 import java.io.BufferedReader;
@@ -19,13 +18,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Takes a json file of the form
  *
- * {"20131012_168":{
- *      "closest":"\/Users\/kaibrugge\/fact_phido\/raw\/2013\/10\/12\/20131012_189.drs.fits.gz",
- *      "earlier":"\/Users\/kaibrugge\/fact_phido\/raw\/2013\/10\/12\/20131012_108.drs.fits.gz",
- *      "later":"\/Users\/kaibrugge\/fact_phido\/raw\/2013\/10\/12\/20131012_189.drs.fits.gz",
- *      "night":"20131012",
- *      "data_path":"\/Users\/kaibrugge\/fact_phido\/raw\/2013\/10\/12\/20131012_168.fits.gz"
+ * {
+ * "20131012_168":{
+ *      "drs_path":"\/fact\/raw\/2013\/10\/12\/20131012_189.drs.fits.gz",
+ *      "data_path":"\fact\/raw\/2013\/10\/12\/20131012_168.fits.gz"
  *      },
+ *
  *  "20131012_170":{
  *      ...
  *   }
@@ -33,8 +31,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * and creates a multistream for the files listed.
  *
- * The 'strategy' parameter defines which .drsFile will be taken into account by injecting a key '@drsFile'
- * into the DataStream.
+ * The 'drsPathKey' and `dataPathKey` parameter define the names of the keys in your .json. So in the example above they
+ * would need to be set to "drs_path" and "data_path" which are the default values. A key called '@drsFile' will
+ * be injected into the DataStream by this multistream. That means when you're using this stream you don't need to set the
+ * `url` parameter of the DrsCalibration processor.
  *
  *
  * Created by mackaiver on 4/10/15.
@@ -62,7 +62,10 @@ public class FactFileListMultiStream extends AbstractMultiStream {
     private SourceURL listUrl = null;
 
     @Parameter(required = false)
-    private String strategy = "closest";
+    private String drsPathKey = "drs_path";
+
+    @Parameter(required = false)
+    private String dataPathKey = "data_path";
 
     //counts how many files have been processed
     private int filesCounter = 0;
@@ -86,7 +89,11 @@ public class FactFileListMultiStream extends AbstractMultiStream {
 
         log.info("Loading files.");
         for (Map<String, String> m : fileNamesFromWhiteList.values()){
-            fileQueue.add(new DataDrsPair(m.get("data_path"), m.get(strategy)));
+            if(m.get(dataPathKey) == null || m.get(drsPathKey) == null){
+                log.error("Did not find the right data in the provided whitelist .json");
+                throw new IllegalArgumentException("Did not find the right data in the provided whitelist .json");
+            }
+            fileQueue.add(new DataDrsPair(m.get(dataPathKey), m.get(drsPathKey)));
         }
         log.info("Loaded " + fileQueue.size() + " files for streaming.");
         //super.init();
@@ -149,7 +156,10 @@ public class FactFileListMultiStream extends AbstractMultiStream {
         this.listUrl = listUrl;
     }
 
-    public void setStrategy(String strategy) {
-        this.strategy = strategy;
+    public void setDrsPathKey(String drsPathKey) {
+        this.drsPathKey = drsPathKey;
+    }
+    public void setDataPathKey(String dataPathKey) {
+        this.dataPathKey = dataPathKey;
     }
 }
