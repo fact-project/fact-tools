@@ -1,6 +1,21 @@
+#Changelog for the FACT-Tools
+
+
+## Version 0.8.0
+
+
+
+To use any kind of data from an AuxFile you should now use the `AuxFileService` Service.
+
+
+The DrsCalibration processor now resides in the `fact.datacorrection` package along with such processors as
+DrsTimeCalibration and similar operations.
+
+
+
 ## Version 0.7.9
 
-Added processot to correct utc times with gps time correction files:
+Added processor to correct utc times with gps time correction files:
 	`fact.filter.GpsTimeCorrection`
 
 
