@@ -4,7 +4,7 @@ Its a common task to use some additional sensor data during your analysis. This 
 stream from the outside. In case of the FACT telescope this data comes from various sources like weather stations or
 dust measurements and is written to files during data taking.
 
-### Basic Usage
+### Reading Aux Files 
 
 In case you want to read the data from files you can use a class called AuxFileService.
 In your .xml you create an AuxService by adding the following line before the `process` tag opens.

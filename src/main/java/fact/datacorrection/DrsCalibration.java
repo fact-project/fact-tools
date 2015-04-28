@@ -3,7 +3,6 @@
  */
 package fact.datacorrection;
 
-import fact.auxservice.DrsFileService;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
