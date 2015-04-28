@@ -27,6 +27,7 @@
 	</menu>
 	
 	<menu name="Documentation">
+        <item name="Basic Usage" href="usage.html" />
 	    <item name="Usage Examples" href="examples.html">
 	         <item name="Writing Data" href="example_writing.html" />
 	         <item name="Plotting Data" href="plotting/example_plots.html" collapse="true" >
@@ -34,7 +35,6 @@
 	            <item name="Bar Plots" href="plotting/bar_plot.html" />
 	            <item name="Histogram Plots" href="plotting/histogram_plot.html" />
 	         </item>
-	
 	    </item>
 	
 	    <item name="Programming Examples" href="programming_examples/programming_example.html" collapse="false">

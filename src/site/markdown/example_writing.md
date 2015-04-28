@@ -20,7 +20,7 @@ part, i.e. the calibrated data, into a file in binary form.
 
         <process input="fact-data">
           
-            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+            <fact.datacorrection.DrsCalibration url="file:///tmp/fact.drs.fits.gz"
                                           key="data" outputKey="DataCalibrated"/>
 
             <fact.io.BinaryFactWriter key="DataCalibrated"
@@ -47,7 +47,7 @@ To calculate the mean from an array you can use the `ArrayMean` processor in the
 
         <Process input="fact-data">
           
-            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+            <fact.datacorrection.DrsCalibration url="file:///tmp/fact.drs.fits.gz"
                                           key="data" outputKey="DataCalibrated"/>
         
             <fact.features.MaxAmplitude key="DataCalibrated" outputKey="maxAmplitude"/>
