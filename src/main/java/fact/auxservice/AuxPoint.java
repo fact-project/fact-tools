@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
+ * This is a class to create immutable container holding data from some source providing auxiliary data
  * Created by kai on 31.03.15.
  */
 public class AuxPoint implements Comparable<AuxPoint>{
@@ -23,9 +24,14 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
 
 
+    /**
+     * The timestamp from the sensor.
+     * @return the timestamp for this point.
+     */
     public DateTime getTimeStamp() {
         return timeStamp;
     }
+
 
     public ImmutableMap<String, Serializable> getData() {
         return data;
@@ -34,7 +40,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
     /**
      * Returns the value for the key iff it exists and its a Double. Returns null otherwise.
      * @param key
-     * @return
+     * @return the value or null
      */
     public Double getDouble(String key){
         try {
@@ -44,6 +50,47 @@ public class AuxPoint implements Comparable<AuxPoint>{
         }
     }
 
+    /**
+     * Returns the value for the key iff it exists and its an Integer. Returns null otherwise.
+     * @param key
+     * @return the value or null
+     */
+    public Integer getInteger(String key){
+        try {
+            return (Integer) data.get(key);
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+
+    /**
+     * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
+     * @param key
+     * @return the value or null
+     */
+    public int[] getIntegerArray(String key){
+        try {
+            return (int[]) data.get(key);
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+
+    /**
+     * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
+     * @param key
+     * @return the value or null
+     */
+    public double[] getDoubleArray(String key){
+        try {
+            return (double[]) data.get(key);
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+
+
+    //below you'll find the auto generated code needed to make this object hashable and comparable
 
     @Override
     public int compareTo(AuxPoint o) {

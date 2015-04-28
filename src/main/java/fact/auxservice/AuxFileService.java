@@ -23,18 +23,11 @@ import java.util.Map;
 import java.util.TreeSet;
 
 /**
- * This service should provide some data from the auxiliary files for a given data file.
- * Given the path to the aux folder via .xml and a data file this service will find and store the urls to the
- * corresponding auxiliary files.
+ * This implements an AuxiliaryService {@link fact.auxservice.AuxiliaryService}  providing data from the auxiliary
+ * files written by the telescopes data acquisition system.
  *
- * The urls are stored in a map that returns the url provided the **name** of the file. The name is defined to be
- * the substring of the filename that does not contain the extension (.fits) or the datestring. Valid names are:
- *
- *  * DRIVE_CONTROL_TRACKING_POSITION
- *  * DRIVE_CONTROL_SOURCE_POSITION
- *  * TEMPERATURE_MESSAGE
- *  * TNG_WEATHER_DUST
- *  * etc...
+ * Given the path to the aux folder, that is the folder containing all the auxiliary file for a <bold>specific night</bold>,
+ * via .xml this service will read the requested data and store them in a map of {@link fact.auxservice.AuxPoint}.
  *
  * 79FRbPVCSKsBzn
  * Created by kaibrugge on 07.10.14.

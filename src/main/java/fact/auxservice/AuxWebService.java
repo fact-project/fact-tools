@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
+ * This implements an AuxiliaryService {@link fact.auxservice.AuxiliaryService}  providing data from some webservice
+ *
+ * TODO: get the webservice online.
  *
  * Created by kai on 01.03.15.
  */
