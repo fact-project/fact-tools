@@ -2,15 +2,18 @@
 
 The standard analysis is meant to analyise Raw data files (either from the telescope or from MC Simulations) to identify and parametrize images of air showers. The calculated parameters can afterwards used to perform a gamma-hadron classification, a energy reconstruction and an unfolding of the energy spectrum
 
+Because there are still some semantic differences between the measured and the simulated
+data we have to treat each case seperatly. 
+
 ## Standard Analysis xml Files
 
 The standard analysis xml files are:
 
-- examples/stdAnalysis/data/analysis.xml: Analysis of real data files in unzipped, or gzipped fits file format
-- examples/stdAnalysis/data/analysis_zfits.xml: Analysis of real data files, in zfits file format
-- examples/stdAnalysis/mc/analysis_mc.xml: Analysis of simulated data files in unzipped, or gzipped fits file format
+- examples/stdAnalysis/data/analysis.xml: Analysis of real data files in unzipped, or gzipped .zfits or .fits file format
+- examples/stdAnalysis/mc/analysis_mc.xml: Same as above except for simulated data 
 
-All 3 xml files follows the same structures, the difference are explained in the next subsection.
+
+The two .xml files follow the same structure, the differences are explained in the next subsection.
 
 The upper part defines the pathes to the different input files (raw data file, drs file, tracking file, source file) and the url to the default settings files (settings.properties,integralGainFile,pixelDelayFile).
 Than the stream and the process is defined.
@@ -22,14 +25,11 @@ The process contains of 6 different steps, each with an own xml file, which can 
 - /default/data/extraction.xml: The number of cherenkov photons per pixel and their arrival time are extracted. Also the saturation handling is performed
 - /default/data/cleaning.xml: The TwoLevelTimeNeighbor cleaning is performed
 - /default/data/parameterCalc.xml: All source independent parameters are calculated (see list of parameters)
-- /default/data/sourceParameter.xml: All souce dependent parameters are calculated (see list of parameters)
+- /default/data/sourceParameter.xml: All source dependent parameters are calculated (see list of parameters)
 
-## Differences between fits,zfits,mc
+## Differences between zfits,mc
 
-- Differences fits<->zfits:
- - the class of the stream is now the ZFitsStream
- - for the calibration step, the file /default/data/calibrationZFits.xml is used (which handles the zfits drs calibration correctly)
-- Differences fits<->mc:
+- Differences  simulated data (monte carlos) vs measured data:
  - the settings file for the mc and the defaultIntegralGain file is used
  - for each step the corresponding mc version of the xml files is included
  - the prevEventsAndSkip file is not used
@@ -52,7 +52,7 @@ For example changing the cleaning level:
     <property name="twoLevelTimeNeighbor_minNumberOfPixel" value="2" />
     [...]
 
-You can also add own processors in the xml files (for example new parameter calculations):
+You can also add own your processors to the process  (for example new parameter calculations):
 
     [...]
     <include url="classpath:/default/mc/parameterCalc_mc.xml" /> 
