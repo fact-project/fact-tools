@@ -29,6 +29,10 @@
 	<menu name="Documentation">
         <item name="Using Multistreams" href="multistream.html" />
         <item name="Using Auxiliary Data" href="aux.html" />
+        <item name="Standard Analysis" href="stdAnalysis/standardAnalysis.html" >
+            <item name="Standard Settings" href="stdAnalysis/standardSettings.html" />
+            <item name="Parameter List" href="stdAnalysis/parameterList.html" />
+        </item>
 	    <item name="Usage Examples" href="examples.html">
 	         <item name="Writing Data" href="example_writing.html" />
 	         <item name="Plotting Data" href="plotting/example_plots.html" collapse="true" >
