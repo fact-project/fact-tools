@@ -13,6 +13,7 @@ In your .xml you create an AuxService by adding the following line before the `p
         <service id="horst" class="fact.auxservice.AuxFileService" auxFolder="file:/fact/aux/2013/10/12/" />
 
 
+The `auxFolder` url has to point to a directory containing the data for *one* night.
 If you want to use the service inside of your processor you simply add the service as a .xml parameter.
 
         @Parameter(required = false, description = "Name of the service that provides aux files")
@@ -25,20 +26,17 @@ analysing.
         AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
 Since sensor data can be written at different time intervals and frequencies we need to specify some strategy
-for fetching the data. E.g. get the nearest point written before the given timestamp.
+for fetching the data. E.g. get the nearest point written before the given timestamp. For details about strategies which are already
+implemented check the [JavaDocs](apidocs/index.html).
 
-To get specific data from an AuxPoint you need to know the name of the key your data has in the original auxiliary file had.
+To get specific data from an AuxPoint you need to know the name of the key your data has in the original auxiliary file.
 So for example if you want to get the right ascension of your source in the sky you simply call the appropriate method
 on your AuxPoint
 
         double ra = sourcePoint.getDouble("Ra_src")
 
-
 And then you call the processor from your .xml like this
 
         <fact.somePackage.someProcessor auxService="horst"/>
-
-
-
 
 

@@ -16,23 +16,16 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 /**
- * <p>
+ *
  * This processor handles the DRS calibration. It requires a DRS data source
  * either as File or URL and will read the DRS data from that. This data is then
  * applied to all FactEvents processed by this class.
- * </p>
- * 
+ *
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
- * 
  */
 public class DrsCalibration implements StatefulProcessor {
-	// conversion factor:
-	// the input values are 12-bit short values representing measurements of
-	// voltage
-
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	// String drsFile = null;
 
 	private String outputKey = "DataCalibrated";
 	private String key = "Data";
@@ -43,7 +36,6 @@ public class DrsCalibration implements StatefulProcessor {
     Data drsData = null;
 
     private File currentDrsFile = new File("");
-
 
 	float[] drsBaselineMean;
 	float[] drsBaselineRms;
