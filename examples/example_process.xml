@@ -7,7 +7,7 @@
 	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
 	<!-- Name of the stream and url to the input file -->
-	<stream id="fact" class="fact.io.zfits.FitsStream"  url="${infile}" />
+	<stream id="fact" class="fact.io.FitsStream"  url="${infile}" />
 	
 	<!-- Description of the process and the corresponding stream -->
 	<process input="fact" copies="1">
