@@ -2,17 +2,15 @@
 
 	<properties url="classpath:/default/settings.properties" />
 
-    <property name="fhgfs" value="/home/fabian/mount/Phido/fhgfs_app" />
-    
-    <property name="infile" value="file:${fhgfs}/fact/raw/2013/09/29/20130929_179.fits.gz" />
-    <property name="drsfile" value="file:${fhgfs}/fact/raw/2013/09/29/20130929_167.drs.fits.gz" />
-    <property name="trackingFile" value="file:${fhgfs}/fact/aux/2013/09/29/20130929.DRIVE_CONTROL_TRACKING_POSITION.fits" />
-    <property name="sourceFile" value="file:${fhgfs}/fact/aux/2013/09/29/20130929.DRIVE_CONTROL_SOURCE_POSITION.fits" />
-        
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
     
-    <property name="outfile" value="file:/home/fabian/testoutfile.txt" />
+    <!--<property name="outfile" value="file:/home/fabian/testoutfile.txt" />-->
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 
 
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
@@ -55,9 +53,10 @@
         <include url="classpath:/default/data/sourceParameter.xml" /> 
         <!-- Output: source dependent parameters -->
         
-        <!-- <fact.io.PrintKeysOnConsole keys="${keysForOutput}" /> -->
+         <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
+        <fact.ShowViewer key="DataCalibrated"/>
 
-        <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />
+        <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
 
     </process>
 

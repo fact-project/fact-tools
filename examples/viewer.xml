@@ -15,7 +15,7 @@
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
-    <service id="aux" class="fact.auxservice.AuxFileService" auxFolder="classpath:/" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
     <!-- Description of the process and the corresponding stream -->
     <process id="2" input="fact">
         <fact.utils.PreviousEventInfo 
