@@ -107,7 +107,7 @@ public class SourcePositionTest {
         SourcePosition sourcePosition = new SourcePosition();
         sourcePosition.setOutputKey("test");
 
-		double C_T_rightAscension = (5.0 + 37.0/60 + 38.7/3600) / 24.0 * 360.0;
+		double C_T_rightAscension = (5.0 + 37.0/60 + 38.7/3600);
 		double C_T_declination = 21.0 + 8.0/60 + 33.0/3600;
 		
 		int[] C_T_chids = {1378,215,212};
@@ -122,7 +122,7 @@ public class SourcePositionTest {
 		C_T_coord[0] /= 3;
 		C_T_coord[1] /= 3;
 		
-		double pointingRa = 83.1375;
+		double pointingRa = 83.1375/360 * 24;
 		double pointingDec = 21.628055555555555;
 		double gmst = 1.1289573103059787;
 		

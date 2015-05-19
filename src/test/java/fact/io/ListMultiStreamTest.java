@@ -40,11 +40,9 @@ public class ListMultiStreamTest {
         FactFileListMultiStream multiStream = new FactFileListMultiStream();
         multiStream.setListUrl(new SourceURL(u));
 
-        multiStream.setDrsPathKey("closest");
-
         assertThat(multiStream.fileQueue.size(), is(0));
         multiStream.init();
-        assertThat(multiStream.fileQueue.size(), is(36));
+        assertThat(multiStream.fileQueue.size(), is(1));
     }
 
     @Test

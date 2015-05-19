@@ -28,6 +28,8 @@ public class DrsCalibration implements StatefulProcessor {
 
 
 	private String outputKey = "DataCalibrated";
+
+    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
@@ -303,8 +305,6 @@ public class DrsCalibration implements StatefulProcessor {
     }
 
 	// -----------setter---------------------
-
-	@Parameter(required = false, description = "data array to be calibrated", defaultValue = "Data")
 	public void setKey(String key) {
 		this.key = key;
 	}

@@ -29,7 +29,6 @@ import java.util.TreeSet;
  * Given the path to the aux folder, that is the folder containing all the auxiliary file for a <bold>specific night</bold>,
  * via .xml this service will read the requested data and store them in a map of {@link fact.auxservice.AuxPoint}.
  *
- * 79FRbPVCSKsBzn
  * Created by kaibrugge on 07.10.14.
  */
 public class AuxFileService implements AuxiliaryService {
@@ -54,10 +53,22 @@ public class AuxFileService implements AuxiliaryService {
             services.put(serviceName, readDataFromFile(auxFileUrls.get(serviceName)));
         }
         TreeSet<AuxPoint> set = services.get(serviceName);
+
+        if(set.last().getTimeStamp().isBefore(eventTimeStamp) || set.first().getTimeStamp().isBefore(eventTimeStamp))
+        {
+            log.warn("Provided event timestamp not in auxiliary File.");
+        }
+
+        //TODO: load a new file in case we need stuff from the next day or night
         return strategy.getPointFromTreeSet(set, eventTimeStamp);
     }
 
 
+    /**
+     * Reads data from a file provided by the url and creates an AuxPoint for each event in the file.
+     * @param driveFileUrl url to the auxfile
+     * @return treeset containing auxpoints ordered by their timestamp
+     */
     private TreeSet<AuxPoint>  readDataFromFile(SourceURL driveFileUrl){
         TreeSet<AuxPoint> result = new TreeSet<>();
         FitsStream stream = new FitsStream(driveFileUrl);
@@ -69,7 +80,6 @@ public class AuxFileService implements AuxiliaryService {
                 DateTime t = new DateTime((long)time*1000L, DateTimeZone.UTC);
                 AuxPoint p = new AuxPoint(t, slowData);
                 result.add(p);
-//                    mgr.addDrivePoint(factory.createDrivePoint(slowData));
                 slowData = stream.readNext();
             }
             stream.close();

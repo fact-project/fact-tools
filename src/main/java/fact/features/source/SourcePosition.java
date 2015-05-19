@@ -26,19 +26,26 @@ import java.io.IOException;
 
 
 /**
- *  This is supposed to calculate the position of the source in the camera. The Telescope usually does not look
+ *  This calculates the position of the source in the camera. The Telescope usually does not look
  *  directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
  *  the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
  *  The point (0.0, 0.0) is the center of the camera.
  *  In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
- *  This data is written by the telescope drive system into an auxilary .fits file called DRIVE_TRACKING_POSITION.
+ *  This data is written by the telescope drive system into  auxilary .fits files called DRIVE_CONTROL_SOURCE_POSITION and
+ *  DRIVE_CONTROL_TRACKING_POSITION.
  *
- *  The azimuth given in the TRACKING file is defined differently -(Az + 180) = calculated Az
+ *  This processor handles a handful of different tasks. It can calculate the sourceposition in the camera for
+ *  some fixed celestial coordinates (e.g. In case you want to get the coordinates of a star projected onto the camera plane)
  *
- *  TODO: handle ceta tauri and similar cases. (at the moment it feels hacky)
- *  TODO: Receive the different outputKeys from the xml files 
- *  TODO: compare sourcepositions with ganymed
- *  TODO: maybe set a flag in case of ceres wobble
+ *  For data processing we need the auxService to read data from both the DRIVE_CONTROL_SOURCE_POSITION and the DRIVE_CONTROL_TRACKING_POSITION
+ *  files. The first contains the name and celestial coordinates of the source we're at looking while the second contains
+ *  information at where the telescope pointing which is updated in small intervals.
+ *
+ *  Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
+ *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (> revision 18159),
+ *  the source and pointing information are simply taken from the datastream.
+ *
+ *  For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
  *
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
  */
@@ -61,6 +68,7 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false)
     private Double y = null;
 
+    //TODO Standarts setzen?
     @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
     private String sourceZdKey = null;
     @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
@@ -133,14 +141,8 @@ public class SourcePosition implements StatefulProcessor {
 
 
     /**
-     * The unixtimestamp in the data file is saved as an array with two elements. {seconds, miroseconds} it is
-     * unclear to me what to do with the second one. I simply used the sum of both in seconds..
-     * Even though the numbers are small enough to NOT make a difference anyways.
-     * After reading the EventTime from the data we check which datapoint from the slowcontrol file we have to use by
-     * comparing the times. We use the point closest in time to the current dataitem.
-     *
-     * @return data. The dataItem containing the calculated sourcePostion as a double[] of length 2. {x,y} .
-     * 		    --Also the deviation between the calculated pointing and the one written in the .fits TRACKING file.
+     * The process method adds the azimuth and zenith values for the pointing, tracking and source position.
+     * It also adds an overlay to the item so the position can be displayed in the viewer.
      */
     @Override
     public Data process(Data data) {
