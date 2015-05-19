@@ -1,9 +1,11 @@
 # Performing a Standard Analysis
 
-The standard analysis is meant to analyise Raw data files (either from the telescope or from MC Simulations) to identify and parametrize images of air showers. The calculated parameters can afterwards used to perform a gamma-hadron classification, a energy reconstruction and an unfolding of the energy spectrum
+The standard analysis is meant to analyse raw data files (either from the telescope or from MC Simulations) to identify 
+and parametrize images of air showers. The calculated parameters can afterwards used to perform a gamma-hadron 
+classification, a energy reconstruction and an unfolding of the energy spectrum
 
 Because there are still some semantic differences between the measured and the simulated
-data we have to treat each case seperatly. 
+data we have to treat each case seperrated. 
 
 ## Standard Analysis xml Files
 
@@ -84,3 +86,5 @@ You need to consider only some points:
  - calibration.xml: property "drsfile" set
  - extraction.xml: property "integralGainFile" set, for real data files: property pixelDelayFile set
  - sourceParameter.xml: for real data files: property "trackingFile" and property "sourceFile" set
+ 
+ 

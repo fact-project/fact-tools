@@ -14,6 +14,8 @@ In your .xml you create an AuxService by adding the following line before the `p
 
 
 The `auxFolder` url has to point to a directory containing the data for *one* night.
+The file names of the auxfiles are expected to adhere to the usual naming conventions of the form `YYYYMMDD.SERVICE_NAME.fits`
+
 If you want to use the service inside of your processor you simply add the service as a .xml parameter.
 
         @Parameter(required = false, description = "Name of the service that provides aux files")
