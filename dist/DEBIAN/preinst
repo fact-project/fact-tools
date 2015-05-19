@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-#
-USER="root"
-GROUP="root"
-
-HOME="/opt/streams"
-
