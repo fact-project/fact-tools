@@ -120,7 +120,7 @@ public class SourcePosition implements StatefulProcessor {
         	}
         } else if (auxService == null ){
 
-            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService, or provide sourceFileUrl and trackingFileUrl");
+            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
             throw new IllegalArgumentException();
         }
     }
@@ -244,7 +244,7 @@ public class SourcePosition implements StatefulProcessor {
             data.put("AzSourceCalc", sourceAzZd[0]);
             data.put("ZdSourceCalc", sourceAzZd[1]);
 
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
+            data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
 
 
         } catch (IllegalArgumentException e){
@@ -300,13 +300,16 @@ public class SourcePosition implements StatefulProcessor {
     /**
      * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension,
      * declination and the time in gmst format.
-     * @param ra in degrees
-     * @param dec in degrees
+     * @param ra in decimal Archours (e.g. 5h and 30 minutes : ra = 5.5)
+     * @param dec in decimal degrees (e.g. 21 degrees and 30 arcminutes : zd = 21.5)
      * @param gmst the Eventtime of the current event in gmst format
      * @return an array of length 2 containing {azimuth, zenith}, not null;
      */
     public double[] getAzZd(double ra, double dec, double gmst){
-        double phi              =  ra / 180.0 * Math.PI;
+        if (ra >= 24.0 || ra < 0.0 || dec >= 360.0 || dec < 0 ){
+            throw new RuntimeException("Ra or Dec values are invalid. They should be given in decimal Archours and decimal degree");
+        }
+        double phi              =  ra / 12 * Math.PI;
         double theta            =  (90 - dec) / 180.0 * Math.PI;
 
         double x                =Math.sin(theta) *Math.cos(phi);

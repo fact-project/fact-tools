@@ -49,7 +49,7 @@ public class Theta implements Processor {
 		double theta = Math.sqrt( Math.pow(recPosition[0]-sourcePosition[0], 2)
 								+ Math.pow(recPosition[1]-sourcePosition[1], 2) );
 
-        input.put("@reconstructedPostion", new SourcePositionOverlay(outputKey, recPosition));
+        input.put("@reconstructedPostion" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
         input.put(outputKey + "_recPos",  recPosition);
         input.put(outputKey, theta);
 		

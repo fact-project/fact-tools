@@ -1,8 +1,8 @@
 <module>
 <fact.features.source.SourcePosition
     outputKey="sourcePosition"
-    trackingFileUrl="${trackingFile}"
-    sourceFileUrl="${sourceFile}"
+    auxService="auxService"
+
 />
 <fact.features.source.AntiSourcePosition
         sourcePositionKey="sourcePosition"

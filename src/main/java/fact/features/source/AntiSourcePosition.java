@@ -1,5 +1,6 @@
 package fact.features.source;
 
+import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -34,7 +35,8 @@ public class AntiSourcePosition implements Processor {
 		antisource[1] = source[0] * Math.sin(rotAngle) + source[1] * Math.cos(rotAngle);
 		
 		//input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
-		
+
+		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antisource));
 		input.put(outputKey, antisource);
 		return input;
 	}
