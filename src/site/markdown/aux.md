@@ -2,7 +2,7 @@
 
 Its a common task to use some additional sensor data during your analysis. This means adding more data to your
 stream from the outside. In case of the FACT telescope this data comes from various sources like weather stations or
-dust measurements and is written to files during data taking.
+dust measurements and is written to files during data taking. 
 
 ### Reading Aux Files 
 
@@ -40,3 +40,4 @@ And then you call the processor from your .xml like this
         <fact.somePackage.someProcessor auxService="horst"/>
 
 
+For some more general information about services and streams read the [Tech Report](./ressources.html) by C. Bockermann
