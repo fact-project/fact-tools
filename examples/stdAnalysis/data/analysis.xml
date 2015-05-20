@@ -56,7 +56,6 @@
         <!-- Output: source dependent parameters -->
         
          <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
-        <fact.ShowViewer key="DataCalibrated"/>
 
         <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
 

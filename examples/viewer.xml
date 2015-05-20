@@ -20,22 +20,22 @@
 
     <!-- Description of the process and the corresponding stream -->
     <process id="2" input="fact">
-        <fact.utils.PreviousEventInfo 
+        <fact.utils.PreviousEventInfo
         	startCellKey="StartCellData"
         	outputKey="prevEvents"
         	limitEvents="10"
         />
         <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
         <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
-        
+
         <include url="classpath:/default/data/calibration.xml" />
-        
+
         <include url="classpath:/default/data/extraction.xml" />
 
         <include url="classpath:/default/data/cleaning.xml" />
-        
+
         <!-- <Skip condition="%{data.shower} == null" /> -->
-            
+
         <fact.ShowViewer key="DataCalibrated"/>
 
 
