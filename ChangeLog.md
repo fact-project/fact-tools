@@ -12,6 +12,21 @@ To use any kind of data from an AuxFile you should now use the `AuxFileService` 
 The DrsCalibration processor now resides in the `fact.datacorrection` package along with such processors as
 DrsTimeCalibration and similar operations.
 
+We completely changed the way the source position is calculated. As you can see above we now get the information from the
+auxiliary files through the new AuxService. This fixes some bugs which would occur in some edge cases while reading aux data.
+
+The SourcePosition operator now supports wobbled MonteCarlos (Ceres revision > 18159) and the output has been cleaned up.
+
+The major steps of the standard analysis have been grouped into .xml files which reside in classpath of the project. 
+(you can find them under ./src/main/resources/default/...)
+
+Cleaned up all the .xmls from the examples folder. All are checked by tests except for the GUI
+
+Added alot more documentation to the website
+
+We now support an early version of easy multistream handling to stream data from more than one file to your process.
+
+
 
 
 ## Version 0.7.9
