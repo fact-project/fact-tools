@@ -1,9 +1,7 @@
-Writing Data
-============
-Its often necessary to write all the things you calculated to some sort of file. This allows ou to further analyze your data with whatever 
-software you like. There are a couple of processors in the fact.io package which provide some basic file writing to .csv files or similar.
-
-
+#Reading and Writing Data
+The essential thing your program usually does is reading and writing of data. In our case we often read raw data from the telescope and 
+perform various steps to reduce all the data to simple parameters which may or may not be relevant for a semantic analysis of the things
+your experiment recorded. 
 
 
 ### Writing complete Events to a File

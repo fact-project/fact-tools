@@ -10,9 +10,16 @@ The [FACT (First G-APD Cherenkov Telescope)](https://www.fact-project.org/) Tele
 Island of La Palma at the Observatorio del Roque de los Muchachos. It was put into operation in 2011 
 and has been watching various gamma ray sources since then.  
 
+##Quickstart
+To get started quickly check out the [Quickstart Guide](./quickstart.html)
+
+
 ##GUI
 One of the central components of the *fact-tools* is the [FACT viewer](viewer.html) application. This tool provides a simple
 interactive visualization component for FACT data.
+
+## Standard Analysis
+To get information about the standard analysis click [here](./stdAnalysis/standardAnalysis.html)
 
 ##Programming
 For a quick overview for creating your own custom processors see the [Programming Section](programming_examples/programming_example.html)
