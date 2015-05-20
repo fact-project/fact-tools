@@ -54,7 +54,9 @@ public class AuxFileService implements AuxiliaryService {
         }
         TreeSet<AuxPoint> set = services.get(serviceName);
 
-        if(set.last().getTimeStamp().isBefore(eventTimeStamp) || set.first().getTimeStamp().isBefore(eventTimeStamp))
+        DateTime firstTimeStamp = set.first().getTimeStamp();
+        DateTime lastTimeStamp = set.last().getTimeStamp();
+        if(firstTimeStamp.isAfter(eventTimeStamp) || lastTimeStamp.isBefore(eventTimeStamp))
         {
             log.warn("Provided event timestamp not in auxiliary File.");
         }
