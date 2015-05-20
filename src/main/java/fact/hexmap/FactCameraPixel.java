@@ -15,6 +15,7 @@ public class FactCameraPixel extends CameraPixel implements Serializable {
     public int crate;
     public int patch;
     public int hardid;
+    public int drs_chip;
 
     public double posX;
     public double posY;
@@ -33,6 +34,7 @@ public class FactCameraPixel extends CameraPixel implements Serializable {
         this.board = (hardid / 100) % 10;
         this.patch = (hardid / 10) % 10;
         this.chid  = (hardid % 10) + 9 * patch + 36 * board + 360 * crate;
+        this.drs_chip = this.chid / 9;
         this.id = this.chid;
     }
 

@@ -122,7 +122,7 @@ public class FitsStreamTest {
 			log.info("Read all the required keys");
 
 		} catch(ClassCastException e){
-			fail("Wrong datatzypes in the drs file");
+			fail("Wrong data types in the drs file");
 			e.printStackTrace();
 		} catch (Exception e){
 			fail("Could not read FitsFile");
@@ -153,7 +153,7 @@ public class FitsStreamTest {
 			log.info("Read all the required keys");
 
 		} catch(ClassCastException e){
-			fail("Wrong datatzypes in the drs file");
+			fail("Wrong data types in the drs file");
 			e.printStackTrace();
 		} catch (Exception e){
 			fail("Could not read FitsFile");

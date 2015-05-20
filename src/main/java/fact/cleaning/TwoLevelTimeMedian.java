@@ -66,14 +66,14 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
-		Utils.isKeyValid(input, photonChargeKey, double[].class);
+//		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
+//		Utils.isKeyValid(input, photonChargeKey, double[].class);
 		Utils.isKeyValid(input, "NPIX", Integer.class);	
 		
 		npix = (Integer) input.get("NPIX");	
 			
-		double[] photonCharge = (double[]) input.get(photonChargeKey);
-		double[] arrivalTimes = (double[]) input.get(arrivalTimeKey);
+		double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));
+		double[] arrivalTimes = Utils.toDoubleArray(input.get(arrivalTimeKey));
 		
 		ArrayList<Integer> showerPixel= new ArrayList<>();
 		

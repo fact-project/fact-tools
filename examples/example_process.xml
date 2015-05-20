@@ -1,15 +1,13 @@
 <container>
 
-	<!-- Pathes to the input files -->
-	<property name="infile" value="src/test/resources/testDataFile.fits.gz" />
-	<property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
-	<property name="drivefile" value="src/test/resources/testDriveFile.fits" />
-	<property name="drstimefile" value="src/test/resources/testDrsTimeFile.drs.time.fits" />
+    <properties url="classpath:/default/settings.properties" />
 
-    <property name="integralGainFile" value="src/main/resources/gain_sorted_20131127.csv" />
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
 	<!-- Name of the stream and url to the input file -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" />
+	<stream id="fact" class="fact.io.FitsStream"  url="${infile}" />
 	
 	<!-- Description of the process and the corresponding stream -->
 	<process input="fact" copies="1">
@@ -19,7 +17,7 @@
         	limitEvents="10"
         />
         
-        <include file="examples/stdAnalysis/data/calibration.xml" />
+        <include url="classpath:/default/data/calibration.xml" />
 
 	</process>
 		

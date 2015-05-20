@@ -24,7 +24,7 @@ public class TileHeader {
 	 *     write numRows (int 4 bytes)
 	 *     write size    (long 8 bytes) Size of the data in bytes in the tile.
 	 * @param input The byte-array containing the tile header.
-	 * @throws FitsFileException
+	 * @throws stream.util.parser.ParseException
 	 */
 	public TileHeader(byte[] input) throws ParseException {
 		ByteBuffer buffer = ZFitsUtil.wrap(input);

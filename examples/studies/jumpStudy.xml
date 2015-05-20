@@ -1,43 +1,36 @@
 <container>
 
-    <!-- Pfade zu den fits files. -->
-    <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_060.fits.gz" />
-    <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/raw/2013/01/02/20130102_056.drs.fits.gz" />
-    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/ceresTriggerTest/new_trigger/00000003.911_D_MonteCarlo052_Events.fits" /> -->
-    <!-- <property name="infile" value="/home/fabian/mount/Phido/home_oprfact/00000003.910_D_MonteCarlo016_Events.fits" /> -->
-    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/test_run/52911/00000003.911_D_MonteCarlo052_Events.fits" /> -->
-    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/test_run_rev17391/52911/00000003.911_D_MonteCarlo052_Events.fits" /> -->
-    <!-- <property name="infile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/ceres_2_0/muon_martina_4_psf_3_0_v2/54027/00000003.027_D_MonteCarlo054_Events.fits.gz" /> -->
-    <!-- <property name="drsfile" value="/home/fabian/mount/Phido/fhgfs_app/fact/simulated/drsfiles/12bitADC/offsetMinus1850/test300samples.drs.fits" /> -->
-    <property name="drivefile" value="/home/fabian/mount/Phido/fhgfs_app/fact/aux/2013/01/02/20130102.DRIVE_CONTROL_TRACKING_POSITION.fits" />
-    <property name="outfile" value="/home/fabian/jumpStudyPatchReal.csv" />
-    <property name="sourcename" value="crab" />
-    <property name="core_threshold" value="5.0" />
-    <property name="neighbor_threshold" value="2.0"/>
-    <property name="time_threshold" value="30.0" />
-    <property name="min_number_of_pixel" value="2" />
-    <property name="integral_gain" value="242.0" />
+    <properties url="classpath:/default/settings.properties" />
 
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
+
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 
     <!-- Name des Streams und pfad zu dem Daten-File -->
     <!-- <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="100"/> -->
     
-    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
     <process id="2" input="fact">
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
 <!--         <fact.utils.CreateFakeStartCells outputKey="FStartCells" />
         <fact.utils.PreviousEventInfo startCellKey="FStartCells" outputKey="prevEvents" limitEvents="5"/> -->
-        <stream.flow.Skip condition="%{data.EventNum} &lt; 17" />
+        <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 17" />-->
         <stream.flow.Skip condition="%{data.TriggerType} != 4" /> 
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated"/>
+        <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data"  outputKey="DataCalibrated"/>
         <fact.statistics.PatchAverage key="DataCalibrated" outputKey="DataPatches" />
         
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataRemoved" outputJumpsKey="j" addJumpInfos="true" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="4.0" spikeLimit="7.0" freqAmplLimit="0.4" leftBorder="10" signalFlankLimit="0.63" lengthForFFT="32" lengthAfterPosForFFT="10" ringingPeriode="11" freqCompAmplLimit="2.0" leftRingingFreq="0.18" rightRingingFreq="0.22" timeDependLimit="10"/>
         <fact.statistics.PatchAverage key="DataRemoved" outputKey="DataPatchesRemoved" />
 		
            
-        <fact.ShowViewer key="DataCalibrated"/>
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
 
 
     </process>

@@ -55,7 +55,7 @@ public class ZFitsTableReader implements TableReader {
 			return null;
 		}
 		if (this.currentTileHeader==null) {
-			log.info("Reading tile: {}", this.currentTile);
+			log.debug("Reading tile: {}", this.currentTile);
 			byte[] data = new byte[TileHeader.getTileHeaderSize()];
 			this.inputStream.read(data);
 			this.currentTileHeader = new TileHeader(data);

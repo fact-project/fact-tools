@@ -1,11 +1,10 @@
 package fact.container;
 
-import java.io.Serializable;
-
-import org.jfree.chart.plot.IntervalMarker;
-
-import stream.Data;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
+import org.jfree.chart.plot.IntervalMarker;
+import stream.Data;
+
+import java.io.Serializable;
 
 public class JumpInfos implements Serializable {
 

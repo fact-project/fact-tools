@@ -9,7 +9,7 @@ and you're good to go.
 
 		final Logger log = LoggerFactory.getLogger(YourProcessor.class);
 
-		//for very verbose output that helps you debug youre code
+		//for very verbose output that helps you debug your code
 		log.debug("message");
 
 		//in case an error happens. usually means you want to cancel the stream and inform the user of the error

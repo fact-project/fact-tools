@@ -1,19 +1,18 @@
 package fact.features;
 
-import static org.junit.Assert.*;
+import fact.extraction.BasicExtraction;
+import fact.datacorrection.DrsCalibration;
+import fact.io.FitsStream;
+import fact.io.FitsStreamTest;
+import org.junit.Before;
+import org.junit.Test;
+import stream.Data;
+import stream.io.SourceURL;
 
 import java.net.URL;
 
-import org.apache.commons.math3.stat.descriptive.rank.Max;
-import org.junit.Before;
-import org.junit.Test;
-
-import stream.Data;
-import stream.io.SourceURL;
-import fact.extraction.BasicExtraction;
-import fact.filter.DrsCalibration;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BasicExtractionTest {
 	
@@ -27,7 +26,7 @@ public class BasicExtractionTest {
 	public void setup() throws Exception {
 		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-        pr.setUrl(drsUrl.toString());
+        pr.setUrl(new SourceURL(drsUrl));
         pr.setOutputKey("test");
 
         extraction = new BasicExtraction();
@@ -47,6 +46,7 @@ public class BasicExtractionTest {
 			FitsStream stream = new FitsStream(url);
 			stream.init();
 			Data item = stream.read();
+			pr.init(null);
 			pr.process(item);
 			extraction.process(item);
 			assertTrue("Item did not contain the right key for maxAmplitude", item.containsKey(positionsKey) && item.containsKey(photonChargeKey));

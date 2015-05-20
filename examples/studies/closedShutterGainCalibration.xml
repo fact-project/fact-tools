@@ -1,23 +1,29 @@
 <container>
 
 <!-- Closed Shutter Data: -->
-<property name="fhgfs" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
-<property name="data" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_045.fits.gz" />
-<property name="dataDRS" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_040.drs.fits.gz" />
+    <properties url="classpath:/default/settings.properties" />
 
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
+
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 <!-- Open Shutter Data: -->
 <!-- <property name="data" value="/local/data/kgray/test/20130104_095.fits.gz" />  -->
 <!-- <property name="dataDRS" value="/local/data/kgray/test/20130104_076.drs.fits.gz" /> -->
 
 
-    <stream id="fact" class="fact.io.FitsStream" 
-            url="file:${data}" />
+    <stream id="fact" class="fact.io.FitsStream" url="${infile}" />
             
         <process input="fact">
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
 <!--         <stream.flow.Skip condition="%{data.TriggerType} != 4" /> -->
-        <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" color="#000000"/>  
+        <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
         <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
@@ -51,7 +57,7 @@
 <!--         <fact.io.CreateNestedListFile DataOutputKey="ClosedPulseSizesAmp" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-amp-closed-pulses.txt" /> -->
 
 
-        <fact.ShowViewer key="DataCalibrated"/>
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
 
 	</process>
 </container>
