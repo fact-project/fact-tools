@@ -11,7 +11,9 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 
 
-
+/**
+ * The monte carlo values are written in softId order. We have to remap those values to be ordered by chid.
+ */
 public class RemappingKeys implements Processor {
     static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
     

@@ -13,7 +13,7 @@ public class FindTimeMarker implements Processor {
     @Parameter(required = true)
     private String key = null;
     @Parameter(required = true)
-    private String outputkey = null;
+    private String outputKey = null;
     @Parameter(required = true)
     private String timeOffsetKey = null;
 
@@ -108,14 +108,14 @@ public class FindTimeMarker implements Processor {
             
         }
         
-        input.put(outputkey + "_risingEdges", posRisingEdges);
-        input.put(outputkey + "_fallingEdges", posFallingEdges);
-        input.put(outputkey + "_durations", durations);
-        input.put(outputkey + "_maxHeights", maxHeights);
-        input.put(outputkey + "_integrals", integrals);
-        input.put(outputkey + "_averageHeights", averageHeights);
-        input.put(outputkey + "_offsetRis", offsetsRis);
-        input.put(outputkey + "_offsetFal", offsetsFal);
+        input.put(outputKey + "_risingEdges", posRisingEdges);
+        input.put(outputKey + "_fallingEdges", posFallingEdges);
+        input.put(outputKey + "_durations", durations);
+        input.put(outputKey + "_maxHeights", maxHeights);
+        input.put(outputKey + "_integrals", integrals);
+        input.put(outputKey + "_averageHeights", averageHeights);
+        input.put(outputKey + "_offsetRis", offsetsRis);
+        input.put(outputKey + "_offsetFal", offsetsFal);
         
         return input;
     }
@@ -128,12 +128,12 @@ public class FindTimeMarker implements Processor {
         this.key = key;
     }
 
-    public String getOutputkey() {
-        return outputkey;
+    public String getOutputKey() {
+        return outputKey;
     }
 
-    public void setOutputkey(String outputkey) {
-        this.outputkey = outputkey;
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
     }
 
     public double[] getPosRisingEdges() {
