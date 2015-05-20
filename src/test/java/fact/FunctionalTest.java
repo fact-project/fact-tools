@@ -11,6 +11,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -44,9 +46,28 @@ public class FunctionalTest {
     }
 
     @Test
-    public void studiesXMLs() {
-        File folder = new File("examples/studies/");
+    public void analysisXML() {
+        try {
+            String[] args = {"examples/stdAnalysis/data/analysis.xml"};
+            stream.run.main(args);
+        } catch (Exception e) {
+            fail("Could not run the analysis.xml");
+        }
+    }
 
+    @Test
+    public void analysis_mcXML() {
+        try {
+            String[] args = {"examples/stdAnalysis/mc/analysis_mc.xml"};
+            stream.run.main(args);
+        } catch (Exception e) {
+            fail("Could not run the analysis_mc.xml");
+        }
+    }
+
+    @Test
+    public void studiesXMLs() {
+        File folder = new File("examples/studies");
         int counter = 0;
         int size = folder.listFiles().length;
         ArrayList<String> failedFilesList = new ArrayList<>();
@@ -62,5 +83,6 @@ public class FunctionalTest {
 
         log.info("\n\n" + counter + " of " + size + " files in " + folder.getName() + " failed to execute");
         log.info(Arrays.toString(failedFilesList.toArray()));
+        assertThat(failedFilesList.size(), is(0));
     }
 }
