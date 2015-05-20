@@ -1,6 +1,7 @@
 package fact.io;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -41,7 +42,7 @@ public class JSONWriter implements StatefulProcessor {
     @Parameter(required = true)
     private URL url;
 
-    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
 
@@ -81,7 +82,9 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void finish() throws Exception {
-        bw.close();
+        if(bw != null) {
+            bw.close();
+        }
     }
 
 
