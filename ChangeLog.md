@@ -1,20 +1,16 @@
-#Changelog for the FACT-Tools
+#Changelog for the fact-tools
 
 
 ## Version 0.8.0
 
 
 The `ZFitsCalibration` processor does no longer exist. Its being handled by the `ZfitsStream` itsself.
-Beginning with this version we will slowly deprecate the old `FitsStream` and replace it with the `ZFitsStream`
-because it can read bots .fits and .zfits files.
-
-
-To use any kind of data from an AuxFile you should can use the `AuxFileService` Service.
-
+For reading good old .fits files (or ceres output) you still need the `fact.io.FitsStream`.
+ 
+To use any kind of data from an AuxFile you should now use the `AuxFileService` Service. (See the website for more details)
 
 The DrsCalibration processor now resides in the `fact.datacorrection` package along with such processors as
 DrsTimeCalibration and similar operations.
-
 
 
 
