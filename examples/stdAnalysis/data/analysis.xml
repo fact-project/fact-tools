@@ -12,6 +12,8 @@
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 
+    <!--In case you want to analyze .zfits files.-->
+    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>-->
 
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
