@@ -31,7 +31,7 @@ public class ListMultiStreamTest {
             return;
         }
 
-        fail("This shoudl have thrown an illegalargumentexception");
+        fail("This should have thrown an IllegalArgumentException");
     }
 
     @Test
