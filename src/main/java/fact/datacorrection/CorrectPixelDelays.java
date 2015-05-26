@@ -36,9 +36,6 @@ public class CorrectPixelDelays implements StatefulProcessor {
     
     @Override
     public Data process(Data item) {
-        Utils.isKeyValid(item, "NPIX", Integer.class);
-        npix = (Integer) item.get("NPIX");
-
         double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
         double[] corrArrivalTime = new double[npix];
         for(int pix=0; pix < npix; pix++)
@@ -52,11 +49,18 @@ public class CorrectPixelDelays implements StatefulProcessor {
     }
 
     @Override
-    public void init(ProcessContext processContext) throws Exception {
-        if (url != null) {
-            try {
+    public void init(ProcessContext processContext) throws Exception
+    {
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
+
+        if (url != null)
+        {
+            try
+            {
                 loadPixelDelayFile(url);
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 log.error("Could not load .drs file specified in the url.");
                 throw new RuntimeException(e.getMessage());
             }
