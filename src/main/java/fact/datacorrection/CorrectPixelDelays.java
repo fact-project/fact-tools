@@ -1,5 +1,6 @@
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,28 +33,25 @@ public class CorrectPixelDelays implements StatefulProcessor {
     Data pixelDelayData = null;
     private double[] pixelDelay = null;
 
-    private int npix;
+    private int npix = Constants.NUMBEROFPIXEL;
     
     @Override
     public Data process(Data item) {
+
         double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
-        double[] corrArrivalTime = new double[npix];
-        for(int pix=0; pix < npix; pix++)
+        double[] corrArrivalTime = new double[this.npix];
+        for(int pix=0; pix < this.npix; pix++)
         {
             corrArrivalTime[pix] = arrivalTime[pix] - pixelDelay[pix];
         }
         
         item.put(outputKey, corrArrivalTime);
-       
         return item;
     }
 
     @Override
     public void init(ProcessContext processContext) throws Exception
     {
-        Utils.isKeyValid(item, "NPIX", Integer.class);
-        npix = (Integer) item.get("NPIX");
-
         if (url != null)
         {
             try
@@ -80,12 +78,12 @@ public class CorrectPixelDelays implements StatefulProcessor {
     private void loadPixelDelayFile(SourceURL inputUrl) {
         try 
         {
-            this.pixelDelay = new double[npix];
+            this.pixelDelay = new double[this.npix];
             CsvStream stream = new CsvStream(inputUrl, " ");
             stream.setHeader(false);
             stream.init();
 
-            for (int i = 0; i < npix; i++)
+            for (int i = 0; i < this.npix; i++)
             {
                 pixelDelayData = stream.readNext();
                 String key = "column:0";
