@@ -6,7 +6,7 @@
     <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-    <property name="pixelDelayFile" value="classpath:/default/delays_20141114_subtract.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
     
     <!--<property name="outfile" value="file:/home/fabian/testoutfile.txt" />-->
 
