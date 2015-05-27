@@ -25,6 +25,7 @@ import java.util.Map;
 public class ZFitsStream extends AbstractStream implements FactStream{
 
     private File drsFile;
+    private boolean readCalibrationConstants = true;
 
     @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
     public void setBufferSize(int bufferSize) {
@@ -60,9 +61,9 @@ public class ZFitsStream extends AbstractStream implements FactStream{
             throw new IllegalArgumentException("The length of the calibData is not the same as 1024*numChannel");
 
         for (int ch=0; ch<numChannel; ch++) {
-            // if the startCellData[ch] is negativ ignore the calibration step for the channel
+            // if the startCellData[ch] is negative ignore the calibration step for the channel
             if (startCellData[ch]<0) {
-                log.warn("Start Cell for channel : "+ch+"is negativ");
+                log.warn("Start Cell for channel : " + ch + " is negative");
                 continue;
             }
             //get the startCell
@@ -90,17 +91,20 @@ public class ZFitsStream extends AbstractStream implements FactStream{
         //get calibration constants
         this.dataStream.mark(10000000);
         try {
-            ZFitsTable calibrationTable = ZFitsUtil.skipToTable(this.dataStream, "ZDrsCellOffsets");
-
-            log.info("Reading ");
-
-            TableReader drsOffsetsTableReader = BinTableReader.createTableReader(calibrationTable, this.dataStream);
-            Data item = readDataFromBytes(DataFactory.create(), drsOffsetsTableReader.readNextRow(), calibrationTable, ByteOrder.LITTLE_ENDIAN);
-
-            if (!item.containsKey("OffsetCalibration")) {
-                throw new IllegalArgumentException("Missing OffsetCalibration");
+//            ZFitsTable calibrationTable = ZFitsUtil.skipToTable(this.dataStream, "ZDrsCellOffsets");
+//
+//            log.info("Reading ");
+//
+//            TableReader drsOffsetsTableReader = BinTableReader.createTableReader(calibrationTable, this.dataStream);
+//            Data item = readDataFromBytes(DataFactory.create(), drsOffsetsTableReader.readNextRow(), calibrationTable, ByteOrder.LITTLE_ENDIAN);
+//
+//            if (!item.containsKey("OffsetCalibration")) {
+//                throw new IllegalArgumentException("Missing OffsetCalibration");
+//            }
+//            this.calibrationConstants = (short[]) item.get("OffsetCalibration");
+            if(this.readCalibrationConstants) {
+                this.calibrationConstants = readCalibrationConstants(this.url);
             }
-            this.calibrationConstants = (short[]) item.get("OffsetCalibration");
 
         } catch (MissingArgumentException e){
             log.info("Reading standard .fits file.");
@@ -177,6 +181,26 @@ public class ZFitsStream extends AbstractStream implements FactStream{
         }
     }
 
+    private short[] readCalibrationConstants(SourceURL url) throws Exception {
+        short[] constants;
+        ZFitsStream drsStream = new ZFitsStream(url);
+        drsStream.readCalibrationConstants = false;
+        drsStream.setTableName("ZDrsCellOffsets");
+        try{
+            drsStream.init();
+        } catch (MissingArgumentException e) {
+            log.error("No ZDrsCellOffsets found in file.");
+            throw e;
+        }
+        Data item = drsStream.read();
+        if (!item.containsKey("OffsetCalibration"))
+            throw new NullPointerException("Missing OffsetCalibration");
+        constants = (short[])item.get("OffsetCalibration");
+        if (constants == null) {
+            throw new NullPointerException("Should not happen");
+        }
+        return constants;
+    }
 
 
     @Override
