@@ -234,7 +234,8 @@ public class SourcePosition implements StatefulProcessor {
 
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
 
-
+            String sourceName = sourcePoint.getString("Name");
+            data.put("SourceName", sourceName);
             data.put(outputKey, sourcePosition);
 
             data.put("AzTracking", trackingPoint.getDouble("Az"));

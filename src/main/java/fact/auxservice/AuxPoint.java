@@ -63,6 +63,14 @@ public class AuxPoint implements Comparable<AuxPoint>{
         }
     }
 
+    public String getString(String key){
+        try {
+            return (String) data.get(key);
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+
     /**
      * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
      * @param key
