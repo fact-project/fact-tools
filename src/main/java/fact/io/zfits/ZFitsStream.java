@@ -91,21 +91,9 @@ public class ZFitsStream extends AbstractStream implements FactStream{
         //get calibration constants
         this.dataStream.mark(10000000);
         try {
-//            ZFitsTable calibrationTable = ZFitsUtil.skipToTable(this.dataStream, "ZDrsCellOffsets");
-//
-//            log.info("Reading ");
-//
-//            TableReader drsOffsetsTableReader = BinTableReader.createTableReader(calibrationTable, this.dataStream);
-//            Data item = readDataFromBytes(DataFactory.create(), drsOffsetsTableReader.readNextRow(), calibrationTable, ByteOrder.LITTLE_ENDIAN);
-//
-//            if (!item.containsKey("OffsetCalibration")) {
-//                throw new IllegalArgumentException("Missing OffsetCalibration");
-//            }
-//            this.calibrationConstants = (short[]) item.get("OffsetCalibration");
             if(this.readCalibrationConstants) {
                 this.calibrationConstants = readCalibrationConstants(this.url);
             }
-
         } catch (MissingArgumentException e){
             log.info("Reading standard .fits file.");
         }
