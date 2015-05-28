@@ -79,7 +79,7 @@ public class AuxFileService implements AuxiliaryService {
             Data slowData = stream.readNext();
             while (slowData != null) {
                 double time = Double.parseDouble(slowData.get("Time").toString()) * 86400;// + 2440587.5;
-                DateTime t = new DateTime((long)time*1000L, DateTimeZone.UTC);
+                DateTime t = new DateTime((long)(time*1000), DateTimeZone.UTC);
                 AuxPoint p = new AuxPoint(t, slowData);
                 result.add(p);
                 slowData = stream.readNext();
