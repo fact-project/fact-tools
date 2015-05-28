@@ -25,7 +25,7 @@ import java.util.Map;
 public class ZFitsStream extends AbstractStream implements FactStream{
 
     private File drsFile;
-    private boolean readCalibrationConstants = true;
+    private boolean hasReadCalibrationConstants = false;
 
     @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
     public void setBufferSize(int bufferSize) {
@@ -91,7 +91,7 @@ public class ZFitsStream extends AbstractStream implements FactStream{
         //get calibration constants
         this.dataStream.mark(10000000);
         try {
-            if(this.readCalibrationConstants) {
+            if(!this.hasReadCalibrationConstants) {
                 this.calibrationConstants = readCalibrationConstants(this.url);
             }
         } catch (MissingArgumentException e){
@@ -172,7 +172,7 @@ public class ZFitsStream extends AbstractStream implements FactStream{
     private short[] readCalibrationConstants(SourceURL url) throws Exception {
         short[] constants;
         ZFitsStream drsStream = new ZFitsStream(url);
-        drsStream.readCalibrationConstants = false;
+        drsStream.hasReadCalibrationConstants = true;
         drsStream.setTableName("ZDrsCellOffsets");
         try{
             drsStream.init();
@@ -205,7 +205,7 @@ public class ZFitsStream extends AbstractStream implements FactStream{
         item = readDataFromBytes(item, dataRow, this.fitsTable, this.byteOrder);
 
 
-        if(this.fitsTable.getCommpressed()){
+        if(this.fitsTable.getCommpressed() && !this.hasReadCalibrationConstants){
             Utils.mapContainsKeys(item, "Data", "StartCellData", "NROI", "NPIX");
             short[] data = ((short[])item.get("Data"));
             short[] startCellData = (short[])item.get("StartCellData");
