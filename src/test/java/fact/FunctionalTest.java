@@ -6,8 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.runtime.ProcessContainer;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Test some of the provided example xmls in the examples folder. This wont cause failing builds just yet.
+ * Test some of the provided example xmls in the examples folder.
  * Created by kai on 28.02.15.
  */
 public class FunctionalTest {
@@ -48,8 +50,9 @@ public class FunctionalTest {
     @Test
     public void analysisXML() {
         try {
-            String[] args = {"examples/stdAnalysis/data/analysis.xml"};
-            stream.run.main(args);
+            File arg = new File("examples/stdAnalysis/data/analysis.xml");
+            ProcessContainer container = new ProcessContainer(arg.toURI().toURL());
+            container.run();
         } catch (Exception e) {
             fail("Could not run the analysis.xml");
         }
