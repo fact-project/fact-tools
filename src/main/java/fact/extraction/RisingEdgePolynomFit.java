@@ -37,18 +37,18 @@ public class RisingEdgePolynomFit implements Processor {
 		double[] data = (double[]) input.get(dataKey);
 		int roi = (Integer) input.get("NROI");
 		
-		double[] buffer = (double[]) input.get(risingEdgeKey);
-		int[] risingEdges = new int[buffer.length];
-		for (int i = 0 ; i < buffer.length ; i++)
-		{
-			risingEdges[i] = (int) buffer[i];
-		}
-		
+		double[] risingEdges = (double[]) input.get(risingEdgeKey);
+//		int[] risingEdges = new int[buffer.length];
+//		for (int i = 0 ; i < buffer.length ; i++)
+//		{
+//			risingEdges[i] = (int) buffer[i];
+//		}
+
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
 				
 		for (int pix = 0 ; pix < npix ; pix++)
 		{
-			int pos = risingEdges[pix];
+			int pos = (int) risingEdges[pix];
 			int[] window = Utils.getValidWindow(pos-numberOfPoints/2, numberOfPoints, 0, roi);
 			WeightedObservedPoints observations = new WeightedObservedPoints();
 			for (int sl = window[0] ; sl < window[1] ; sl++)
