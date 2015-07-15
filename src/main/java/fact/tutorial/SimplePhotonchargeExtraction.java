@@ -44,7 +44,7 @@ public class SimplePhotonchargeExtraction implements Processor
 			int start = (int) risingEdge[pix] + pix * roi;
 			for (int slice = start; slice < start + 30; slice++)
 			{
-				photoncharge[pix] += data[slice];
+				photoncharge[pix] += data[slice] / 230.0;
 			}
 			marker[pix] = new IntervalMarker(risingEdge[pix], risingEdge[pix] + 30);
 		}
@@ -56,24 +56,14 @@ public class SimplePhotonchargeExtraction implements Processor
 	}
 	
 
-	public String getDataKey() {
-		return dataKey;
-	}
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-	public String getRisingEdgeKey() {
-		return risingEdgeKey;
-	}
 
 	public void setRisingEdgeKey(String risingEdgeKey) {
 		this.risingEdgeKey = risingEdgeKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
 	}
 
 	public void setOutputKey(String outputKey) {

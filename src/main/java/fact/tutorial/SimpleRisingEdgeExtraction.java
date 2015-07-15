@@ -83,17 +83,11 @@ public class SimpleRisingEdgeExtraction implements Processor
 	}
 
 
-	public String getDataKey() {
-		return dataKey;
-	}
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
-	}
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;

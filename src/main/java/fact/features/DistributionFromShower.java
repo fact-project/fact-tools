@@ -251,10 +251,8 @@ public class DistributionFromShower implements Processor {
 		// find weighted center of the shower pixels.
 		int i = 0;
 		for (int pix : showerPixel) {
-			cog[0] += weights[i]
-					* pixelMap.getPixelFromId(pix).getXPositionInMM();
-			cog[1] += weights[i]
-					* pixelMap.getPixelFromId(pix).getYPositionInMM();
+			cog[0] += weights[i] * pixelMap.getPixelFromId(pix).getXPositionInMM();
+			cog[1] += weights[i] * pixelMap.getPixelFromId(pix).getYPositionInMM();
 			i++;
 		}
 		cog[0] /= size;

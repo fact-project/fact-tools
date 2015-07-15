@@ -1,5 +1,6 @@
 package fact.tutorial;
 
+import com.google.common.collect.Lists;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
@@ -8,6 +9,8 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import stream.Data;
 import stream.Processor;
+
+import java.util.HashSet;
 
 /**
  * Created by kai on 15.07.15.
@@ -18,7 +21,16 @@ public class HillasParameter implements Processor {
 
     @Override
     public Data process(Data item) {
-        int[] showerPixel = (int[]) item.get("showerPixel");
+        HashSet<Integer> showerPixelSet= (HashSet<Integer>) item.get("showerPixel");
+
+        int[] showerPixel = new int[showerPixelSet.size()];
+
+        int c = 0;
+        for (int pixel : showerPixelSet){
+            showerPixel[c] = pixel;
+            c++;
+        }
+
         double[] photons = (double[]) item.get("photons");
 
         double[] weights = new double[showerPixel.length];
@@ -49,6 +61,10 @@ public class HillasParameter implements Processor {
 
 
         item.put("@Ellipse", new EllipseOverlay(cog[0], cog[1], width, length, delta));
+        item.put("Hillas:width", width);
+        item.put("Hillas:length", length);
+        item.put("Hillas:size", size);
+        item.put("Hillas:delta", size);
         return item;
     }
 

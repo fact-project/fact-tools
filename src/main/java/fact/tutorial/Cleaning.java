@@ -14,7 +14,7 @@ public class Cleaning implements Processor {
 
     @Parameter(required = false, description = "The threshold for selecting pixels. Every pixel with a value > threshold" +
             "will be selected")
-    private double threshold = 15.0;
+    private double threshold = 7.5;
 
 
     @Override
@@ -30,7 +30,12 @@ public class Cleaning implements Processor {
         }
 
         item.put("showerPixel", selectedPixel);
-        item.put("@overlay", new PixelSetOverlay(selectedPixel));
+        item.put("number_of_shower_pixel", selectedPixel.size());
+        item.put("@showerPixelOverlay", new PixelSetOverlay(selectedPixel));
         return item;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
 }
