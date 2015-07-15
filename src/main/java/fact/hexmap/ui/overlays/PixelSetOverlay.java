@@ -17,10 +17,14 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
     Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
+    public PixelSetOverlay(HashSet<Integer> set) {
+        for (Integer pix : set){
+            this.addById(pix);
+        }
+    }
     public PixelSetOverlay(Set<CameraPixel> set){
         this.set = set;
     }
-
     public PixelSetOverlay(){
     }
     public void add(CameraPixel p){
@@ -32,16 +36,6 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
 
     public int[] toIntArray(){
         int intSet[] = new int[this.set.size()];
-        int i = 0;
-        for (CameraPixel px : this.set){
-            intSet[i] = px.id;
-            i++;
-        }
-        return intSet;
-    }
-
-    public Integer[] toIntegerArray(){
-        Integer intSet[] = new Integer[this.set.size()];
         int i = 0;
         for (CameraPixel px : this.set){
             intSet[i] = px.id;
