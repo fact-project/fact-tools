@@ -40,9 +40,14 @@
                 maxSpikeLength="${removeSpikes_maxSpikeLength}"
         />
 
-        <fact.tutorial.SimpleArrivalTimeExtraction
+        <fact.tutorial.SimpleRisingEdgeExtraction
             dataKey="DataCalibrated"
-            outputKey="ArrivalTime"
+            outputKey="RisingEdge"
+        />
+        <fact.tutorial.SimplePhotonchargeExtraction
+                dataKey="DataCalibrated"
+                risingEdgeKey="RisingEdge"
+                outputKey="photoncharge"
         />
 
 
