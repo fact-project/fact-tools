@@ -64,8 +64,8 @@ public class EllipseOverlay implements CameraMapOverlay {
         double centerY = -cogY*scalingY ;
 
 
-        Line2D height = new Line2D.Double(-ellipse_height, 0, ellipse_height, 0);
-        Line2D line= new Line2D.Double(0, 0, 0, -ellipse_height*1.5);
+        Line2D height = new Line2D.Double(-ellipse_height*0.6, 0, ellipse_height*0.6, 0);
+//        Line2D line= new Line2D.Double(0, 0, 0, -ellipse_height*0.5);
         float[] dash = {5.0f};
 
 
@@ -73,16 +73,15 @@ public class EllipseOverlay implements CameraMapOverlay {
         g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dash, 0.0f));
         g2.setPaint(Color.white);
         g2.translate(centerX, centerY);
-        g2.draw(line);
 
 
         g2.rotate(-angle);
         g2.draw(height);
 //        g2.translate(-ellipse_height, 0);
-        g2.setStroke(new BasicStroke(1));
-        g2.translate(ellipse_height, 0);
-        g2.draw(arrowHead);
-        g2.translate(-ellipse_height, 0);
+//        g2.setStroke(new BasicStroke(1));
+//        g2.translate(ellipse_height, 0);
+//        g2.draw(arrowHead);
+//        g2.translate(-ellipse_height, 0);
 //        g2.translate(ellipse_height, 0);
 
         g2.setStroke(new BasicStroke(2));
