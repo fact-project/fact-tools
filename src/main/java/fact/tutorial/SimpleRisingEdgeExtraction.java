@@ -34,7 +34,7 @@ public class SimpleRisingEdgeExtraction implements Processor
 		double[] data = (double[]) input.get(dataKey);
 
 		double[] arrivalTime = new double[npix];
-		double[] derivative = new double[roi];
+		double[] derivative;
 
 		for (int pix = 0; pix < npix; pix++)
 		{
