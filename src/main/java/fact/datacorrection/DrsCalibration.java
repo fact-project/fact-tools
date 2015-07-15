@@ -32,8 +32,9 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
-    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)")
-    private SourceURL url = null;
+    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
+			defaultValue = "The test file provided under ressources/testDrsFile.drs.fits.gz")
+    private SourceURL url = new SourceURL(this.getClass().getResource("/testDrsFile.drs.fits.gz"));
 
     Data drsData = null;
 
