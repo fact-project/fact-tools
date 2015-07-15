@@ -11,38 +11,20 @@
 
     <!-- Description of the process and the corresponding stream -->
     <process id="2" input="fact">
-        <fact.utils.PreviousEventInfo
-                startCellKey="StartCellData"
-                outputKey="prevEvents"
-                limitEvents="${prevEvents_limitEvents}"
-                />
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 
-        <fact.datacorrection.DrsCalibration
-                url="${drsfile}"
-                key="Data"
-                outputKey="DataCalibrated"
-        />
-        <fact.datacorrection.PatchJumpRemoval
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                prevEventsKey="prevEvents"
-                startCellKey="StartCellData"
-                jumpLimit="${patchJumpRemoval_jumpLimit}"
-        />
-        <fact.datacorrection.RemoveSpikes
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                startCellKey="StartCellData"
-                leftBorder="${removeSpikes_leftBorder}"
-                spikeLimit="${removeSpikes_spikeLimit}"
-                topSlopeLimit="${removeSpikes_topSlopeLimit}"
-                maxSpikeLength="${removeSpikes_maxSpikeLength}"
-        />
+        <!--Calibrate the raw data, a necessary evil-->
+        <include url="classpath:/default/data/prevEventAndSkip.xml" />
+        <include url="classpath:/default/data/calibration.xml" />
 
-        <fact.tutorial.SimpleArrivalTimeExtraction
+        <!--A few simple processors to get a feeling of VHE gamma analysis-->
+        <fact.tutorial.SimpleRisingEdgeExtraction
             dataKey="DataCalibrated"
-            outputKey="ArrivalTime"
+            outputKey="RisingEdge"
+        />
+        <fact.tutorial.SimplePhotonchargeExtraction
+                dataKey="DataCalibrated"
+                risingEdgeKey="RisingEdge"
+                outputKey="photoncharge"
         />
 
 

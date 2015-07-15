@@ -1,6 +1,5 @@
 package fact.tutorial;
 
-import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
@@ -8,24 +7,15 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.io.CsvStream;
-import stream.io.SourceURL;
 
 /**
- * This processor performs a basic extraction on the data array. It contains three steps:
- * 1. Calculates the position of the max amplitude in [startSearchWindow,startSearchWindow+rangeSearchWindow[
- * 2. Calculates the position of the half height in front of the maxAmplitudePosition
- * 3. Calculates the integral by summing up the following integrationWindow slices beginning with the half heigth position
- * The resulting photoncharge is calculated by dividing the integral by the integralGain of the pixel
- * 
- * This processor also serves as a basic class for extraction processors
- * 
- * @author Fabian Temme
+ *
+ * @author Maximilian Noethe
  *
  */
-public class SimpleArrivalTimeExtraction implements Processor
+public class SimpleRisingEdgeExtraction implements Processor
 {
-	static Logger log = LoggerFactory.getLogger(SimpleArrivalTimeExtraction.class);
+	static Logger log = LoggerFactory.getLogger(SimpleRisingEdgeExtraction.class);
 
 	@Parameter(required = true, description = "key to the data array")
 	protected String dataKey = null;
@@ -43,10 +33,8 @@ public class SimpleArrivalTimeExtraction implements Processor
 
 		double[] data = (double[]) input.get(dataKey);
 
-		int[] positions = new int[npix];
-
 		double[] arrivalTime = new double[npix];
-		double[] derivative = new double[roi];
+		double[] derivative;
 
 		for (int pix = 0; pix < npix; pix++)
 		{
