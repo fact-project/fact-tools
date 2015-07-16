@@ -1,10 +1,8 @@
 <container>
 
-    <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
     <property name="infile" value="http://app.tu-dortmund.de/~mnoethe/20121119_078.fits.gz" />
-    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}" />
@@ -13,16 +11,18 @@
     <process id="2" input="fact">
 
         <!--Calibrate the raw data, a necessary evil-->
-        <include url="classpath:/default/data/prevEventAndSkip.xml" />
-        <include url="classpath:/default/data/calibration.xml" />
+        <fact.datacorrection.DrsCalibration />
+
+        <!-- Smooth the data to remove weird artifacts-->
+        <fact.filter.GaussConvolution key="DataCalibrated" outputKey="SmoothedData"/>
 
         <!--A few simple processors to get a feeling of VHE gamma analysis-->
         <fact.tutorial.SimpleRisingEdgeExtraction
-            dataKey="DataCalibrated"
+            dataKey="SmoothedData"
             outputKey="RisingEdge"
         />
         <fact.tutorial.SimplePhotonchargeExtraction
-                dataKey="DataCalibrated"
+                dataKey="SmoothedData"
                 risingEdgeKey="RisingEdge"
                 outputKey="photons"
         />
@@ -33,7 +33,7 @@
         <fact.tutorial.HillasParameter />
 
         <Skip condition="%{data.number_of_shower_pixel} &lt; 20" />
-        <fact.ShowViewer key="DataCalibrated"/>
+        <fact.ShowViewer key="SmoothedData"/>
 
     </process>
 
