@@ -1,5 +1,10 @@
 #Changelog for the fact-tools
 
+## Version 0.8.6
+
+A new tutorial package has been added. It contains some simple processors that hopefully help to understand the basic concepts
+of the analysis. 
+
 
 ## Version 0.8.0
 
