@@ -22,6 +22,7 @@
 
 	<menu name="General">
 		<item name="Overview" href="index.html"/>
+		<item name="Publications" href="publications.html" />
 		<item name="Fact Viewer" href="viewer.html" />
 		<item name="Building" href="build.html"/>
 	</menu>
