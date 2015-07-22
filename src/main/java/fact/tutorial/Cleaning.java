@@ -30,7 +30,7 @@ public class Cleaning implements Processor {
         }
 
         item.put("showerPixel", selectedPixel);
-        item.put("number_of_shower_pixel", selectedPixel.size());
+        item.put("numberOfShowerPixel", selectedPixel.size());
         item.put("@showerPixelOverlay", new PixelSetOverlay(selectedPixel));
         return item;
     }
