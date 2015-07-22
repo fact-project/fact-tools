@@ -1,0 +1,41 @@
+<container>
+
+	<properties url="classpath:/default/settings_mc_corsikaLearn.properties" />
+	
+    <property name="infile" value="file:/home/dominik/Schreibtisch/test/00000003.001_D_MonteCarlo000_Events.fits" />
+	
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+    
+    <property name="outfile" value="file:/home/dominik/Schreibtisch/testoutfile_mc.txt" />
+
+    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
+
+    <process id="2" input="fact">
+    
+	<!-- <corsika.learn.ParameterLearner /> -->
+
+	<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+       
+        <include url="classpath:/default/mc/calibration_mc.xml" />
+       
+        <include url="classpath:/default/mc/extraction_mc.xml" />     
+       
+        <include url="classpath:/default/mc/cleaning_mc.xml" />     
+               
+       <fact.features.NumberOfPixelInShower
+    		showerKey="shower"
+    		outputKey="numPixelInShower"/>
+		<fact.features.Size 
+    		showerKey="shower" 
+    		photonChargeKey="photoncharge" 
+    		outputKey="Size" />  
+    		
+    	<!-- <corsika.learn.ParameterLearner />  -->
+
+	<fact.io.RootASCIIWriter url="${outfile}" keys="RUNID,MCorsikaEvtHeader.fEvtNumber,EventNum,survivedCleaning" />
+	
+	
+    </process>
+
+
+</container>
