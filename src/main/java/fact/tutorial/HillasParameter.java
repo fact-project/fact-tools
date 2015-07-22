@@ -1,7 +1,5 @@
 package fact.tutorial;
 
-import com.google.common.collect.Lists;
-import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 import org.apache.commons.math3.linear.EigenDecomposition;
@@ -60,11 +58,11 @@ public class HillasParameter implements Processor {
 
 
 
-        item.put("@Ellipse", new EllipseOverlay(cog[0], cog[1], width, length, delta));
-        item.put("Hillas:width", width);
-        item.put("Hillas:length", length);
-        item.put("Hillas:size", size);
-        item.put("Hillas:delta", size);
+        item.put("@ellipseOverlay", new EllipseOverlay(cog[0], cog[1], width, length, delta));
+        item.put("hillas:width", width);
+        item.put("hillas:length", length);
+        item.put("hillas:size", size);
+        item.put("hillas:delta", size);
         return item;
     }
 
