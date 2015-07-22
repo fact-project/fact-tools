@@ -27,6 +27,14 @@
 		<item name="Building" href="build.html"/>
 	</menu>
 	
+	<menu name="Tutorial">
+		<item name="FACT Tools Tutorial" href="tutorial/index.html" collapse="true">
+			<item name="(1) Running FACT-Tools" href="tutorial/running.html" />
+			<item name="(2) Telescope Data Inspection" href="tutorial/viewing.html" />
+			<item name="(3) Data Preprocessing" href="tutorial/preprocessing.html" />
+		</item>
+	</menu>
+	
 	<menu name="Documentation">
         <item name="Quickstart" href="quickstart.html" />
         <item name="Using Multistreams" href="multistream.html" />
