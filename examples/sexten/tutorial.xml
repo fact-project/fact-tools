@@ -11,7 +11,7 @@
     <process id="2" input="fact">
 
         <!--Calibrate the raw data, a necessary evil-->
-        <fact.datacorrection.DrsCalibration />
+        <fact.datacorrection.DrsCalibration url="file:src/main/resources/testDrsFile.drs.fits.gz"/>
 
         <!-- Smooth the data to remove weird artifacts-->
         <fact.filter.GaussConvolution key="DataCalibrated" outputKey="SmoothedData"/>
