@@ -273,7 +273,7 @@ public class SourcePosition implements StatefulProcessor {
     /**
      * Calculates the Greenwhich Mean Sidereal Time from the julianDay.
      * @param julianDay
-     * @return gmst in degrees.
+     * @return gmst in radian.
      */
     public double julianDayToGmst(double julianDay) throws IllegalArgumentException {
 
@@ -306,7 +306,7 @@ public class SourcePosition implements StatefulProcessor {
      * @param ra in decimal Archours (e.g. 5h and 30 minutes : ra = 5.5)
      * @param dec in decimal degrees (e.g. 21 degrees and 30 arcminutes : zd = 21.5)
      * @param gmst the Eventtime of the current event in gmst format
-     * @return an array of length 2 containing {azimuth, zenith}, not null;
+     * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
      */
     public double[] getAzZd(double ra, double dec, double gmst){
         if (ra >= 24.0 || ra < 0.0 || dec >= 360.0 || dec < 0 ){
