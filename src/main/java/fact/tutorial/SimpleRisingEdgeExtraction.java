@@ -17,26 +17,25 @@ public class SimpleRisingEdgeExtraction implements Processor
 {
 	static Logger log = LoggerFactory.getLogger(SimpleRisingEdgeExtraction.class);
 
-	@Parameter(required = true, description = "key to the data array")
-	protected String dataKey = null;
-	@Parameter(required = true, description = "outputKey for the rising edge")
-	protected String outputKey = null;
+	@Parameter(required = false, description = "key to the data array")
+	protected String dataKey = "DataCalibrated";
+	@Parameter(required = false, description = "outputKey for the rising edge")
+	protected String outputKey = "RisingEdge";
 
 	@Override
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys(input, dataKey, "NROI");
-		int roi = (Integer) input.get("NROI");
-		int npix = (Integer) input.get("NPIX");
-		IntervalMarker[] marker = new IntervalMarker[npix];
+		int numberOfPixel = 1440;
+		int roi = 300;
+		IntervalMarker[] marker = new IntervalMarker[numberOfPixel];
 
 		double[] data = (double[]) input.get(dataKey);
 
-		double[] arrivalTime = new double[npix];
+		double[] arrivalTime = new double[numberOfPixel];
 		double[] derivative;
 
-		for (int pix = 0; pix < npix; pix++)
+		for (int pix = 0; pix < numberOfPixel; pix++)
 		{
 			derivative = differentiateData(pix, roi, data);
 			arrivalTime[pix] = argMax(25, 100, derivative);
@@ -44,7 +43,7 @@ public class SimpleRisingEdgeExtraction implements Processor
 		}
 
 		input.put(outputKey, arrivalTime);
-		input.put(outputKey + "Marker", marker);
+		input.put(outputKey + "_marker", marker);
 
 		return input;
 	}

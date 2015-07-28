@@ -17,6 +17,7 @@ public class Cleaning implements Processor {
     private double threshold = 7.5;
 
 
+
     @Override
     public Data process(Data item) {
 
