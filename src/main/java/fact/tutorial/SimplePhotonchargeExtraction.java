@@ -17,12 +17,12 @@ public class SimplePhotonchargeExtraction implements Processor
 {
 	static Logger log = LoggerFactory.getLogger(SimplePhotonchargeExtraction.class);
 
-	@Parameter(required = true, description = "key to the data array")
-	protected String dataKey = null;
-	@Parameter(required = true, description = "inputKey for the risingEdge")
-	protected String risingEdgeKey = null;
-	@Parameter(required = true, description = "outputKey for the rising edge")
-	protected String outputKey = null;
+	@Parameter(required = false, description = "key to the data array")
+	protected String dataKey = "DataCalibrated";
+	@Parameter(required = false, description = "inputKey for the risingEdge")
+	protected String risingEdgeKey = "RisingEdge";
+	@Parameter(required = false, description = "outputKey for the rising edge")
+	protected String outputKey = "photons";
 
 
 	@Override
