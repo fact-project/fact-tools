@@ -25,10 +25,12 @@ public class RisingEdgePolynomFit implements Processor {
 	
 	@Parameter(required=false, description="number of points used for the fit", defaultValue="11")
 	private int numberOfPoints = 11;
+    @Parameter(required=false, description="push fit results into data item", defaultValue="false")
+    private boolean showFitResult = false;
 
-    @Parameter(required=false, description="degree for the polynomial to fit", defaultValue="3" )
+
 	private int fit_degree = 3;
-
+    private double[] fitResult = null;
 	private int npix;
 
 	@Override
@@ -46,7 +48,9 @@ public class RisingEdgePolynomFit implements Processor {
 		
 		double[] risingEdges = (double[]) input.get(risingEdgeKey);
 
-//        double[] fitResult = new double[roi * npix];
+        if (showFitResult) {
+            fitResult = new double[roi * npix];
+        }
 
 		for (int pix = 0 ; pix < npix ; pix++)
 		{
@@ -96,30 +100,28 @@ public class RisingEdgePolynomFit implements Processor {
 			
 			marker[pix] = new IntervalMarker(arrivalTimes[pix], arrivalTimes[pix] + 1);
 
-//            for (int i = 0; i < roi; i++) {
-//                if (i < window[0] || i > window[1]) {
-//                    fitResult[pix * roi + i] = 0.0;
-//                } else {
-//                    fitResult[pix * roi + i] = Polynomial(i, c);
-//
-//                }
-//            }
+            if (showFitResult) {
+                for (int i = 0; i < roi; i++) {
+                    if (i < window[0] || i > window[1]) {
+                        fitResult[pix * roi + i] = 0.0;
+                    } else {
+                        fitResult[pix * roi + i] = Polynomial(i, c);
+
+                    }
+                }
+            }
         }
 
         input.put(outputKey, arrivalTimes);
 		input.put(maxSlopesKey, maxSlopes);
 		input.put(outputKey + "Marker", marker);
-//        input.put("fitResult", fitResult);
-
+        if (showFitResult) {
+            input.put("fitResult", fitResult);
+        }
 
 
 		return input;
 	}
-
-	/**
-	 * Calculates the position of the maximal derivative of a third order polynomial with coefficient vector c
-	 * f(x) = sum_{i=0}^3 c_i * x^i
-	 */
 
     private double Polynomial(double x, double[] c)
     {
@@ -133,7 +135,12 @@ public class RisingEdgePolynomFit implements Processor {
         return result;
     }
 
-	private double calcXPosMaxDerivation(double[] c)
+
+    /**
+     * Calculates the position inflection point of the third order polynomial with coefficient vector c
+     * f(x) = sum_{i=0}^3 c_i * x^i
+     */
+    private double calcXPosMaxDerivation(double[] c)
 	{
 		return - c[2] / c[3] / 3.0;
 	}
@@ -148,40 +155,24 @@ public class RisingEdgePolynomFit implements Processor {
 		return 3 * c[3]*x*x + 2 * c[2]*x + c[1];
 	}
 
-	public String getRisingEdgeKey() {
-		return risingEdgeKey;
-	}
 
-	public void setRisingEdgeKey(String risingEdgeKey) {
+
+
+
+    public void setRisingEdgeKey(String risingEdgeKey) {
 		this.risingEdgeKey = risingEdgeKey;
-	}
-
-	public String getDataKey() {
-		return dataKey;
 	}
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-	public int getNumberOfPoints() {
-		return numberOfPoints;
-	}
-
 	public void setNumberOfPoints(int numberOfPoints) {
 		this.numberOfPoints = numberOfPoints;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
-	}
-
-	public String getMaxSlopesKey() {
-		return maxSlopesKey;
 	}
 
 	public void setMaxSlopesKey(String maxSlopesKey) {
@@ -189,8 +180,8 @@ public class RisingEdgePolynomFit implements Processor {
 	}
 
 
-    public void setFit_degree(int fit_degree) {
-        this.fit_degree = fit_degree;
+    public void setShowFitResult(boolean showFitResult) {
+        this.showFitResult= showFitResult;
     }
 
 
