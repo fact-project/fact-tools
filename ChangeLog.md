@@ -1,5 +1,12 @@
 #Changelog for the fact-tools
 
+## Version 0.8.8
+Added a replacement process to measure the performance of individual Processors. 
+You can use it like this:
+        
+        <process class="fact.PerformanceMeasuringProcess" url="file:./measured_runtime.json" id="1" input="fact"
+                warmupIterations="33">
+
 ## Version 0.8.6
 
 A new tutorial package has been added. It contains some simple processors that hopefully help to understand the basic concepts
