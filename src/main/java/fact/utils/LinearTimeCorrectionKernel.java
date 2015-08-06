@@ -1,5 +1,7 @@
 package fact.utils;
 
+import java.util.Arrays;
+
 /**
  * This class does an linear interpolation of input points.
  * @author jan
@@ -52,13 +54,15 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 	 * @return
 	 */
 	private int getIndex(double t) {
-		int id = 0;
-		while(id < numPoints - 1 && times[id + 1] < t){
-			id++;
+		int pos = Arrays.binarySearch(times, t);
+		if (pos >= 0){
+			return pos;
+		}else {
+			return - (pos + 1);
 		}
-		return id;
 	}
-	
 
-	
+
+
+
 }
