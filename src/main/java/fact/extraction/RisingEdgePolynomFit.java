@@ -1,8 +1,11 @@
 package fact.extraction;
 
+import org.apache.commons.math3.linear.LUDecomposition;
 import fact.Utils;
-import org.apache.commons.math3.fitting.PolynomialCurveFitter;
-import org.apache.commons.math3.fitting.WeightedObservedPoints;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 import stream.Processor;
@@ -21,6 +24,9 @@ public class RisingEdgePolynomFit implements Processor {
 	
 	@Parameter(required=false, description="number of points used for the fit", defaultValue="11")
 	private int numberOfPoints = 11;
+
+    @Parameter(required=false, description="degree for the polynomial to fit", defaultValue="3" )
+	private int fit_degree = 3;
 	
 	private int npix;
 
@@ -32,69 +38,91 @@ public class RisingEdgePolynomFit implements Processor {
 		
 		double[] arrivalTimes = new double[npix];
 		double[] maxSlopes = new double[npix];
-		IntervalMarker[] m = new IntervalMarker[npix];
+		IntervalMarker[] marker = new IntervalMarker[npix];
 		
 		double[] data = (double[]) input.get(dataKey);
 		int roi = (Integer) input.get("NROI");
 		
 		double[] risingEdges = (double[]) input.get(risingEdgeKey);
-//		int[] risingEdges = new int[buffer.length];
-//		for (int i = 0 ; i < buffer.length ; i++)
-//		{
-//			risingEdges[i] = (int) buffer[i];
-//		}
 
-		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
-				
 		for (int pix = 0 ; pix < npix ; pix++)
 		{
 			int pos = (int) risingEdges[pix];
 			int[] window = Utils.getValidWindow(pos-numberOfPoints/2, numberOfPoints, 0, roi);
-			WeightedObservedPoints observations = new WeightedObservedPoints();
-			for (int sl = window[0] ; sl < window[1] ; sl++)
+
+			// We do a linear least squares fit of a0 + a1*x + a2*x^2 + a3*x^3
+			// Aij = fi(xj)
+			// => a = (A^T * A)^(-1) * A^T * y
+			int n_points = window[1] - window[0];
+			double[][] arrA = new double[n_points][fit_degree + 1];
+			double[] arrY = new double[n_points];
+
+			for (int i=0 ; i < n_points ; i++)
 			{
-				int slice = pix*roi + sl;
-				observations.add(sl,data[slice]);
+				int x = i + window[0];
+				int slice = pix * roi + x;
+				for (int j=0; j <= fit_degree; j++)
+				{
+					arrA[i][j] = Math.pow(x, j);
+					arrY[i] = data[slice];
+				}
 			}
-			double[] coeff = fitter.fit(observations.toList());
-			double[] maxDerivation = calcMaxDerivation(coeff);
-			arrivalTimes[pix] = maxDerivation[0];
-			maxSlopes[pix] = maxDerivation[1];
-			if (maxDerivation[0] < window[0])
+
+			RealVector y = new ArrayRealVector(arrY);
+			RealMatrix A = new Array2DRowRealMatrix(arrA);
+			RealMatrix AT = A.transpose();
+			RealMatrix ATA = AT.multiply(A);
+			RealMatrix invATA = new LUDecomposition(ATA).getSolver().getInverse();
+			RealVector a = invATA.multiply(AT).operate(y);
+
+            double[] c = a.toArray();
+
+            arrivalTimes[pix] = calcXPosMaxDerivation(c);
+            maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix], c);
+
+			if (arrivalTimes[pix] < window[0])
 			{
 				arrivalTimes[pix] = (double) window[0];
-				maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix],coeff);
+				maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix], c);
 			}
-			else if (maxDerivation[0] > window[1])
+			else if (arrivalTimes[pix] > window[1])
 			{
 				arrivalTimes[pix] = (double) window[1];
-				maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix],coeff);
+				maxSlopes[pix] = calcDerivationAtPoint(arrivalTimes[pix], c);
 			}
 			
-			m[pix] = new IntervalMarker(arrivalTimes[pix],arrivalTimes[pix] + 1);
+			marker[pix] = new IntervalMarker(arrivalTimes[pix], arrivalTimes[pix] + 1);
 		}
 		input.put(outputKey, arrivalTimes);
 		input.put(maxSlopesKey, maxSlopes);
-		input.put(outputKey + "Marker", m);
+		input.put(outputKey + "Marker", marker);
 		
 		return input;
 	}
 
-	// ax^3 + bx^2 + cx + d
-	// d: c[0] ; c:c[1] ; b:c[2] ; a:c[3]
-	private double[] calcMaxDerivation(double[] c) {
-		double[] result = new double[2];
-		result[0] = -c[2]/(3*c[3]);
-		result[1] = -c[2]*c[2]/(3*c[3])+c[1];
-		return result;
+	/**
+	 * Calculates the position of the maximal derivative of a third order polynomial with coefficient vector c
+	 * f(x) = sum_{i=0}^3 c_i * x^i
+	 */
+	private double calcXPosMaxDerivation(double[] c)
+	{
+		double x1 = (-2 * c[2] + Math.sqrt(4 * Math.pow(c[2], 2) - 12 * c[1] * c[3])) / (6 * c[3]);
+		double x2 = (-2 * c[2] - Math.sqrt(4 * Math.pow(c[2], 2) - 12 * c[1] * c[3])) / (6 * c[3]);
+		if (calcDerivationAtPoint(x1, c) > calcDerivationAtPoint(x2, c))
+		{
+			return x1;
+		}
+		return x2;
 	}
-	
-	// ax^3 + bx^2 + cx + d
-	// d: c[0] ; c:c[1] ; b:c[2] ; a:c[3]
+
+	/**
+	 * Calculates the derivative of a third order polynomial  f(x) = sum_{i=0}^3 c_i * x^i
+	 * @param x position
+	 * @param c coefficient vector
+	 * @return derivative at x for coefficient vector c
+	 */
 	private double calcDerivationAtPoint(double x, double[] c) {
-		double result = 0;
-		result = c[3]*x*x + c[2]*x + c[1];
-		return result;
+		return 3 * c[3]*x*x + 2 * c[2]*x + c[1];
 	}
 
 	public String getRisingEdgeKey() {
@@ -137,6 +165,10 @@ public class RisingEdgePolynomFit implements Processor {
 		this.maxSlopesKey = maxSlopesKey;
 	}
 
+
+    public void setFit_degree(int fit_degree) {
+        this.fit_degree = fit_degree;
+    }
 
 
 }
