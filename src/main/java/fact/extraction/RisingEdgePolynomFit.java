@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.container.PixelDistribution2D;
 import org.apache.commons.math3.linear.LUDecomposition;
 import fact.Utils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -27,7 +28,7 @@ public class RisingEdgePolynomFit implements Processor {
 
     @Parameter(required=false, description="degree for the polynomial to fit", defaultValue="3" )
 	private int fit_degree = 3;
-	
+
 	private int npix;
 
 	@Override
@@ -44,6 +45,8 @@ public class RisingEdgePolynomFit implements Processor {
 		int roi = (Integer) input.get("NROI");
 		
 		double[] risingEdges = (double[]) input.get(risingEdgeKey);
+
+//        double[] fitResult = new double[roi * npix];
 
 		for (int pix = 0 ; pix < npix ; pix++)
 		{
@@ -92,11 +95,24 @@ public class RisingEdgePolynomFit implements Processor {
 			}
 			
 			marker[pix] = new IntervalMarker(arrivalTimes[pix], arrivalTimes[pix] + 1);
-		}
-		input.put(outputKey, arrivalTimes);
+
+//            for (int i = 0; i < roi; i++) {
+//                if (i < window[0] || i > window[1]) {
+//                    fitResult[pix * roi + i] = 0.0;
+//                } else {
+//                    fitResult[pix * roi + i] = Polynomial(i, c);
+//
+//                }
+//            }
+        }
+
+        input.put(outputKey, arrivalTimes);
 		input.put(maxSlopesKey, maxSlopes);
 		input.put(outputKey + "Marker", marker);
-		
+//        input.put("fitResult", fitResult);
+
+
+
 		return input;
 	}
 
@@ -104,15 +120,22 @@ public class RisingEdgePolynomFit implements Processor {
 	 * Calculates the position of the maximal derivative of a third order polynomial with coefficient vector c
 	 * f(x) = sum_{i=0}^3 c_i * x^i
 	 */
+
+    private double Polynomial(double x, double[] c)
+    {
+        double result = 0;
+        int degree = 0;
+        for(double coeff : c)
+        {
+            result += coeff * Math.pow(x, degree);
+            degree += 1;
+        }
+        return result;
+    }
+
 	private double calcXPosMaxDerivation(double[] c)
 	{
-		double x1 = (-2 * c[2] + Math.sqrt(4 * Math.pow(c[2], 2) - 12 * c[1] * c[3])) / (6 * c[3]);
-		double x2 = (-2 * c[2] - Math.sqrt(4 * Math.pow(c[2], 2) - 12 * c[1] * c[3])) / (6 * c[3]);
-		if (calcDerivationAtPoint(x1, c) > calcDerivationAtPoint(x2, c))
-		{
-			return x1;
-		}
-		return x2;
+		return - c[2] / c[3] / 3.0;
 	}
 
 	/**
