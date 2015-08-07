@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * This class does an linear interpolation of input points.
- * @author jan
+ * @author jan, kai, max
  *
  */
 public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
@@ -49,9 +49,10 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 	}
 	
 	/**
-	 * This function return the id of the entry with smaller t.
-	 * @param t
-	 * @return
+	 * This function return the id of the entry with smaller t. Since the values in the times array
+     * are sorted in ascending order we can use a binary search to find the right index in the array.
+	 * @param t the value to get the index for.
+	 * @return the index of the times array.
 	 */
 	private int getIndex(double t) {
 		int pos = Arrays.binarySearch(times, t);
