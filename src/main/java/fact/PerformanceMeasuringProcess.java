@@ -98,8 +98,8 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
             double mean = timeMap.get(proc).getMean();
             double std = timeMap.get(proc).getStandardDeviation();
             double numberOfCallsToProcessor = timeMap.get(proc).getN();
-            double upper_sigma_quantile = timeMap.get(proc).getPercentile(15.87);
-            double lower_sigma_quantile = timeMap.get(proc).getPercentile(100 - 15.87);
+            double lower_sigma_quantile = timeMap.get(proc).getPercentile(15.87);
+            double upper_sigma_quantile = timeMap.get(proc).getPercentile(100 - 15.87);
             double lower_quartil = timeMap.get(proc).getPercentile(25);
             double upper_quartil = timeMap.get(proc).getPercentile(75);
             perf.put(proc.getClass().getSimpleName(), "mean", mean);
@@ -108,11 +108,11 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
             perf.put(proc.getClass().getSimpleName(), "order", Double.valueOf(processorCounter++));
             perf.put(proc.getClass().getSimpleName(), "upper_sigma_quantile", upper_sigma_quantile);
             perf.put(proc.getClass().getSimpleName(), "lower_sigma_quantile", lower_sigma_quantile);
-            perf.put(proc.getClass().getSimpleName(), "lower_quartil", upper_quartil);
-            perf.put(proc.getClass().getSimpleName(), "upper_quartil", lower_quartil);
+            perf.put(proc.getClass().getSimpleName(), "lower_quartil", lower_quartil);
+            perf.put(proc.getClass().getSimpleName(), "upper_quartil", upper_quartil);
 
-            log.info("      Runtime of Processor {}   Mean: {}   StandardDeviation: {}",
-            proc.getClass().getSimpleName(), mean, std);
+            log.info("      Runtime of Processor {} lower quantile: {}   Mean: {}   upper_quantile: {}",
+                proc.getClass().getSimpleName(), lower_sigma_quantile, mean, upper_sigma_quantile);
 
             if (proc instanceof StatefulProcessor) {
                 try {
