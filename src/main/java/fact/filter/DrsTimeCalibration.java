@@ -96,32 +96,16 @@ public class DrsTimeCalibration implements StatefulProcessor{
 		}
 	}
 
-	public String getStartCellKey() {
-		return startCellKey;
-	}
-
 	public void setStartCellKey(String startCellKey) {
 		this.startCellKey = startCellKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
 	}
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
-	
-	public int getNumberOfSlices() {
-		return numberOfSlices;
-	}
 
 	public void setNumberOfSlices(int numberOfSlices) {
 		this.numberOfSlices = numberOfSlices;
-	}
-
-	public int getNumberOfTimemarker() {
-		return numberOfTimemarker;
 	}
 
 	public void setNumberOfTimemarker(int numberOfTimemarker) {
@@ -130,10 +114,6 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
 	public void setUrl(URL url) {
 		this.url = url;
-	}
-
-	public String getDrsTimeKey() {
-		return drsTimeKey;
 	}
 
 	public void setDrsTimeKey(String drsTimeKey) {
