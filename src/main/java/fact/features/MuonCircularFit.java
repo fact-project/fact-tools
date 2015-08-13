@@ -93,8 +93,6 @@ public class MuonCircularFit implements StatefulProcessor {
             numerator += photoncharge[chid] * (Math.pow(pixel_x[chid] - center_x, 2) + Math.pow(pixel_y[chid] - center_y, 2));
         }
 
-        System.out.println(numerator);
-
         double radius = Math.sqrt(numerator / photoncharge_sum);
 
         data.put(outputKey + "radius", radius);
