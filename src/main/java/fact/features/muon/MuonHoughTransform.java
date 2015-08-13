@@ -1,4 +1,4 @@
-package fact.features;
+package fact.features.muon;
 
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
@@ -27,36 +27,25 @@ import java.util.ArrayList;
 public class MuonHoughTransform implements Processor {
     
     // OutputKeys
-    
-    // Peakness is a measure for how sharp the best circle is in parameter space
     @Parameter(required = false, description = "outputkey for the hough peakness")
     private String peaknessKey = "hough:peakness";
-    //Distance is the Euklidian Distance between the three best circles in parameter space
     @Parameter(required = false, description = "outputkey for the hough distance")
     private String distanceKey = "hough:distance";
-    // Number of octants of the best circle in which are HitPixels
     @Parameter(required = false, description = "outputkey for the octantsHit parameter")
     private String octantsHitKey = "hough:octants";
-    // Number of HitPixels on best Ring/ Total number of HitPixels
     @Parameter(required = false, description = "outputkey for the cleaningPercentage parameter")
     private String cleaningPercentageKey = "hough:cleaningPercentage";
-    // Number of HitPixels on best Ring/ Total number of Pixels in Best Ring
     @Parameter(required = false, description = "outputkey for the ringPercentage parameter")
     private String ringPercentageKey = "hough:ringPercentage";
-    // Pixelset for the FactViewer, only returned when showRingKey=true
     @Parameter(required = false, description = "outputkey for the hough pixelset of the best Ring")
     private String bestCircleKey = "hough:Ring";
-    // X-Value of the center of the best circle
-    @Parameter(required = false, description = "outputkey for x coordinate of the middlepoint of the best ring")
+    @Parameter(required = false, description = "outputkey for x coordinate of the center point of the best ring")
     private String bestXKey = "hough:x";
-    // Y-Value of the center of the best circle
-    @Parameter(required=false, description = "outputkey for y coordinate of the middlepoint of the best ring")
+    @Parameter(required=false, description = "outputkey for y coordinate of the center point of the best ring")
     private String bestYKey = "hough:y";
-    // Radius of the best Circle
     @Parameter(required = false, description = "outputkey for the radius of the best ring")
     private String bestRadiusKey = "hough:r";
     @Parameter(required = false, description = "outputkey for pixel chids on the best ring")
-    // Pixel Chids of the best Ring
     private String bestRingPixelKey = "hough:pixel";
     
     
