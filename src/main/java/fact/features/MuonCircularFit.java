@@ -98,7 +98,7 @@ public class MuonCircularFit implements StatefulProcessor {
         data.put(outputKey + "radius", radius);
         data.put(outputKey + "x", center_x);
         data.put(outputKey + "y", center_y);
-        data.put("@ellipseOverlay", new EllipseOverlay(center_x, center_y, 0.5*radius, 0.5*radius, 0));
+        data.put("@ellipseOverlay", new EllipseOverlay(center_x, center_y, radius, radius, 0));
 
         return data;
     }

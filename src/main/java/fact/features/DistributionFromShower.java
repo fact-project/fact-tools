@@ -191,8 +191,8 @@ public class DistributionFromShower implements Processor {
 		// maxTransCoord + cog[1], cog[0], cog[1], delta );
 
 		double[] center = calculateCenter(showerPixel);
-		input.put("Ellipse", new EllipseOverlay(center[0], center[1], width,
-				length, delta));
+		input.put("Ellipse", new EllipseOverlay(center[0], center[1], 2*width,
+				2*length, delta));
 		// input.put("CoG", new EllipseOverlay(cog[0] , cog[1], 3 , 3 , 0));
 		// input.put("Center", new EllipseOverlay(center[0] , center[1], 3 , 3 ,
 		// 0));
