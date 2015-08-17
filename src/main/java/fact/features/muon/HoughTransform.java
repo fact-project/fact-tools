@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 
 
-public class MuonHoughTransform implements Processor {
+public class HoughTransform implements Processor {
     
     // OutputKeys
     @Parameter(required = false, description = "outputkey for the hough peakness")
@@ -65,7 +65,7 @@ public class MuonHoughTransform implements Processor {
     
 
     
-    final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);   
+    final Logger log = LoggerFactory.getLogger(HoughTransform.class);
 
     FactPixelMapping m = FactPixelMapping.getInstance();
 
