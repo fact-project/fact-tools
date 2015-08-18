@@ -1,4 +1,4 @@
-package fact.features;
+package fact.features.muon;
 
 
 import fact.Constants;
@@ -98,7 +98,7 @@ public class CircularFit implements StatefulProcessor {
         data.put(outputKey + "radius", radius);
         data.put(outputKey + "x", center_x);
         data.put(outputKey + "y", center_y);
-        data.put("@ellipseOverlay", new EllipseOverlay(center_x, center_y, radius, radius, 0));
+        data.put(outputKey + "circle", new EllipseOverlay(center_x, center_y, radius, radius, 0));
 
         return data;
     }
