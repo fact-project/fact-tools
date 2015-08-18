@@ -1,5 +1,6 @@
 package fact.hexmap.ui.overlays;
 
+import fact.Constants;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 
 import java.awt.*;
@@ -14,8 +15,8 @@ import java.awt.geom.Line2D;
  */
 public class EllipseOverlay implements CameraMapOverlay {
 
-    private final double cogY;
-    private final double cogX;
+    private final double center_x;
+    private final double center_y;
     private final double ellipse_height;
     private final double ellipse_width;
     private Color fillColor = Color.GRAY;
@@ -24,13 +25,11 @@ public class EllipseOverlay implements CameraMapOverlay {
     Polygon arrowHead = new Polygon();
 
 
-    public EllipseOverlay(double cogX, double cogY, double width, double height, double angle){
-        this.cogX = cogX;
-        this.cogY = cogY;
-        //we mulitply by 4 since the width and height attribute refer to the semimajor axis or however you call that
-        //and we want to have 2 sigma of all pixels in the ellipse we multiply by two again.
-        this.ellipse_height = height*4;
-        this.ellipse_width = width*4;
+    public EllipseOverlay(double center_x, double center_y, double semi_axis_x, double semi_axis_y, double angle){
+        this.center_y = center_x;
+        this.center_x = center_y;
+        this.ellipse_height = semi_axis_y*2;
+        this.ellipse_width = semi_axis_x*2;
         this.angle = angle;
 
         arrowHead.addPoint(0, -5);
@@ -51,39 +50,27 @@ public class EllipseOverlay implements CameraMapOverlay {
         Paint oldPaint = g2.getPaint();
         Stroke oldStroke = g2.getStroke();
 
-        double scalingX = 0.172*radius;
-        double scalingY = 0.184*radius;
+        double scaling = radius / (Constants.PIXEL_SIZE / Math.sqrt(3));
 
-        Ellipse2D el = new Ellipse2D.Double( - 0.5 * ellipse_height * scalingX, - 0.5 * ellipse_width * scalingY,
-                this.ellipse_height *scalingX, this.ellipse_width * scalingY);
+        Ellipse2D el = new Ellipse2D.Double(
+                - 0.5 * ellipse_height, - 0.5 * ellipse_width,
+                this.ellipse_height, this.ellipse_width
+        );
 
 
-//        Line2D width = new Line2D.Double(0, 0, 0, ellipse_width);
-
-        double centerX = cogX*scalingX;
-        double centerY = -cogY*scalingY ;
+        double centerX = center_y * scaling;
+        double centerY = -center_x * scaling;
 
 
         Line2D height = new Line2D.Double(-ellipse_height*0.6, 0, ellipse_height*0.6, 0);
-//        Line2D line= new Line2D.Double(0, 0, 0, -ellipse_height*0.5);
         float[] dash = {5.0f};
-
-
 
         g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dash, 0.0f));
         g2.setPaint(Color.white);
         g2.translate(centerX, centerY);
-
-
         g2.rotate(-angle);
+        g2.scale(scaling, scaling);
         g2.draw(height);
-//        g2.translate(-ellipse_height, 0);
-//        g2.setStroke(new BasicStroke(1));
-//        g2.translate(ellipse_height, 0);
-//        g2.draw(arrowHead);
-//        g2.translate(-ellipse_height, 0);
-//        g2.translate(ellipse_height, 0);
-
         g2.setStroke(new BasicStroke(2));
         g2.setPaint(fillColor);
         g2.draw(el);
