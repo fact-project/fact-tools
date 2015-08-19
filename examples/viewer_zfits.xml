@@ -12,7 +12,7 @@
     <!-- Description of the process and the corresponding stream -->
     <process id="1" input="fact">
 
-        <fact.datacorrection.DrsCalibration/>
+    	<fact.datacorrection.DrsCalibration url="${drsfile}"/>
         <!-- <Skip condition="%{data.shower} == null" /> -->
 
 
