@@ -1,6 +1,7 @@
 package fact.io;
 
 import com.google.gson.Gson;
+
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -11,8 +12,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -36,6 +39,14 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
     //counts how many files have been processed
     private int filesCounter = 0;
+    
+    private int failedFilesCounter = 0;
+    
+    private List<String> failedFilesList = new ArrayList<>();
+    
+    @Parameter(required = false, description = "If false the reading of a broken file throws"
+    		+ " an exception and the process is aborted, if true the next file will be processed", defaultValue = "false")
+    private boolean skipBrokenFiles = false;
 
     private AbstractStream stream;
 
@@ -148,10 +159,29 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
                 stream.close();
 //                stream.count = 0L;
                 stream.setUrl(new SourceURL(f.toURI().toURL()));
-                stream.init();
-                data = stream.read();
                 log.info("Streaming file: " + stream.getUrl().toString());
-                filesCounter++;
+                try
+                {
+	                stream.init();
+	                data = stream.read();
+	                filesCounter++;
+                }
+                catch (IOException e)
+                {
+                	log.info("File: " + stream.getUrl().toString() + " throws IOException.");
+                	if (skipBrokenFiles == false)
+                	{
+                		throw e;
+                	}
+                	else
+                	{
+                		log.info("skipBrokenFile is true. Going on with next file.");
+                		failedFilesCounter++;
+                		failedFilesList.add(stream.getUrl().toString());
+                		data = null;
+                		return this.readNext();
+                	}
+                }
                 return data;
             }
         }
@@ -161,6 +191,11 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     public void close() throws Exception {
         super.close();
         log.info("In total " + filesCounter +  " files were processed.");
+        log.info("In total " + failedFilesCounter + " were broken (and therefore skipped). Filenames:");
+        for ( String fileName : failedFilesList)
+        {
+        	log.info(fileName);
+        }
     }
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
@@ -173,5 +208,9 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     public void setListUrl(SourceURL listUrl) {
         this.listUrl = listUrl;
     }
+
+	public void setSkipBrokenFiles(boolean skipBrokenFiles) {
+		this.skipBrokenFiles = skipBrokenFiles;
+	}
 
 }
