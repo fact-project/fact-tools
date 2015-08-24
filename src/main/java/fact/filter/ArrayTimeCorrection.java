@@ -9,15 +9,20 @@ import stream.annotations.Parameter;
 
 //TODO write unit test
 public class ArrayTimeCorrection implements Processor{
-		
+
+	@Parameter(required = true, description = "key to the drs amplitude calibrated voltage curves")
 	private String dataKey = null;
-	private double[] data = null;
-	
+
+	@Parameter(required = true, description = "Key to the time calibration constants as calculated by fact.filter.DrsTimeCalibration")
 	private String timeCalibConstKey = null;
+
+
+	@Parameter(required = true, description = "OutputKey for the calibrated voltage curves")
+	private String outputKey = null;
+
+	private double[] data = null;
 	private double[] timeCalibConst = null;
 
-	private String outputKey = null;
-	
 	private int npix;
 	private int roi = 0;
 	private TimeCorrectionKernel tcKernel = null;
@@ -41,7 +46,7 @@ public class ArrayTimeCorrection implements Processor{
 			
 			for(int slice = 0; slice < roi; slice++)
 			{
-				realtimes[slice] = getTime(id, slice);
+				realtimes[slice] = calcRealTime(id, slice);
 				values[slice] = data[id * roi + slice];
 			}
 			tcKernel.fit(realtimes, values);
@@ -58,51 +63,30 @@ public class ArrayTimeCorrection implements Processor{
 		
 		return input;
 	}
-	
-	
 
-	public String getDataKey() {
-		return dataKey;
+
+	/**
+	 *
+	 * @param chid
+	 * @param slice
+	 * @return time in ns!
+	 */
+	private double calcRealTime(int chid, int slice){
+		return slice - timeCalibConst[chid * roi + slice];
 	}
-
-
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-
-
-	public String getTimeCalibConstKey() {
-		return timeCalibConstKey;
-	}
-
-
-
 	public void setTimeCalibConstKey(String timeCalibConstKey) {
 		this.timeCalibConstKey = timeCalibConstKey;
 	}
 
-
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	@Parameter(required = true, description = "Outputkey", defaultValue = "timeCalibratedData")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
-	/**
-	 * 
-	 * @param chid
-	 * @param slice
-	 * @return time in ns!
-	 */
-	private double getTime(int chid, int slice){
-		return 0.5 * (double) (slice - timeCalibConst[chid * roi + slice]);
-	}
 	
 
 	

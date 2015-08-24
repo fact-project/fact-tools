@@ -7,8 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 public class LinearTimeCorrectionKernelTest {
 
-	double [] t = {0.0,1.0,2.0};
-	double [] x = {2.0,1.0,0.0};
+	double [] t = {0.0,1.0,2.0, 3.0};
+	double [] x = {2.0,1.0,0.0, -1.5};
 	
 	LinearTimeCorrectionKernel ltck = null;
 	
@@ -25,13 +25,16 @@ public class LinearTimeCorrectionKernelTest {
 		assertTrue("Left border test failed!", res == 2.0);
 		
 		res = ltck.interpolate(3.0);
-		assertTrue("Rigth border test failed!", res == 0.0);
+		assertTrue("Rigth border test failed!", res == -1.5);
 		
 		res = ltck.interpolate(1.0);
 		assertTrue("Equality test failed! " + res, res == 1.0);
 		
 		res = ltck.interpolate(1.5);
 		assertTrue("Interpolation test failed! " + res, res == 0.5);
+
+		res = ltck.interpolate(2.5);
+		assertTrue("Interpolation test failed! " + res, res == -0.75);
 	}
 
 }
