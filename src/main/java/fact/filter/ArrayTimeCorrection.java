@@ -53,7 +53,7 @@ public class ArrayTimeCorrection implements Processor{
 			
 			for(int slice = 0; slice < roi; slice++)
 			{
-				calibratedValues[id * roi + slice] = tcKernel.interpolate((double) slice * 0.5);
+				calibratedValues[id * roi + slice] = tcKernel.interpolate((double) slice);
 			}
 			
 		}
