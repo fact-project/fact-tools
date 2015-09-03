@@ -28,10 +28,6 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 		
 		int pos = Arrays.binarySearch(times, t);
 
-        if (pos >= values.length){
-            return values[values.length - 1];
-        }
-
         if (pos >= 0){
             return values[pos];
         }
@@ -42,6 +38,10 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
         // in case insertion point is the beginning of the array return the left border
         if(pos == 0){
             return values[0];
+        }
+        
+        if (pos >= values.length){
+            return values[values.length - 1];
         }
 
 
