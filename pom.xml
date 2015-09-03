@@ -17,7 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>0.9.22-SNAPSHOT</streams.version>
+		<streams.version>0.9.21-SNAPSHOT</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
@@ -156,20 +156,20 @@
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-core</artifactId>
-			<version>0.9.22-SNAPSHOT</version>
+			<version>0.9.21-SNAPSHOT</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-plotter</artifactId>
-			<version>0.9.22-SNAPSHOT</version>
+			<version>0.9.21-SNAPSHOT</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-runtime</artifactId>
-			<version>0.9.22-SNAPSHOT</version>
+			<version>0.9.21-SNAPSHOT</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
 
