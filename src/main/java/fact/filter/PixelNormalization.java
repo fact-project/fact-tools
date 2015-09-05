@@ -12,7 +12,7 @@ import stream.annotations.Description;
 import stream.annotations.Parameter;
 
 /**
- * Normalizes all values in a pixel. That means only  0 < value < 1 are allowed in the output. This is done per pixel.
+ * Normalizes all values in a pixel. That means only  0 &lt; value &lt; 1 are allowed in the output. This is done per pixel.
  * So the normalization is different in each one.
  *
  * @author Kai
