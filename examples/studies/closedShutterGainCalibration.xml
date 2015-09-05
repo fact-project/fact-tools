@@ -49,13 +49,13 @@
         <!--<fact.filter.MovingLinearFit key="DataShaped" slopeKey="slope14" interceptKey="intercept14" scale="10" width="14"/>-->
         <!--<fact.filter.MovingLinearFit key="DataShaped" slopeKey="slope20" interceptKey="intercept20" scale="10" width="20"/>-->
 		<fact.statistics.Derivation key="DataSmoothed" outputKey="slopeKey" />
-		<fact.features.ArrivalTimeFromSlope key="DataSmoothed" outputKey="ArrivalTimesSlope" derivationKey="slopeKey" visualizeKey="slopeArrivalTimes" 
+		<fact.features.singlePulse.ArrivalTimeFromSlope key="DataSmoothed" outputKey="ArrivalTimesSlope" derivationKey="slopeKey" visualizeKey="slopeArrivalTimes"
 			baselineKey="baselines" skipFirstSlices="20" skipLastSlices="120"/>
-		<fact.features.OpenShutterPulseSize key="DataSmoothed" outputKey="OpenPulseSizesSlope" arrivalTimeKey="ArrivalTimesSlope" baselineKey="baselines" width="30" />
+		<fact.features.singlePulse.OpenShutterPulseSize key="DataSmoothed" outputKey="OpenPulseSizesSlope" arrivalTimeKey="ArrivalTimesSlope" baselineKey="baselines" width="30" />
 
         <PrintData/>
 
-		<fact.io.JSONWriter url="file:/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/test.json" keys="OpenPulseSizesSlope,ArrivalTimesSlope,baselines"/>
+		<!--<fact.io.JSONWriter url="file:/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/test.json" keys="OpenPulseSizesSlope,ArrivalTimesSlope,baselines"/>-->
 <!--         <fact.io.CreateNestedListFile DataOutputKey="OpenPulseSizesSlope" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-slope-open-pulses.txt" /> -->
 <!--         <fact.io.CreateNestedListFile DataOutputKey="ArrivalTimesSlope" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-slope-arrivalTimes.txt" /> -->
 <!--         <fact.io.CreateNestedListFile DataOutputKey="ArrivalTimesAmp" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-amp-arrivalTimes.txt" /> -->
