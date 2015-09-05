@@ -14,7 +14,6 @@ import stream.annotations.Parameter;
  * outputKey+"_" +"mean"
  * outputKey+"_" +"max"
  * outputKey+"_" +"min"
- * outputKey+"_" +"geommetricMean"
  * outputKey+"_" +"kurtosis"
  * outputKey+"_" +"variance"
  * outputKey+"_" +"skewness"
@@ -22,6 +21,7 @@ import stream.annotations.Parameter;
  * also a subarray can be defined by a given pixelSetArray that contains the array ids that should be used for the sub array    
  */
 public class ArrayStatistics implements Processor {
+
     static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
     @Parameter(required = true, description = "Key to the array you want the information about")
     private String key = null;
@@ -79,7 +79,8 @@ public class ArrayStatistics implements Processor {
         input.put(outputKey+"_" +"skewness",s.getSkewness());
 
         return input;
-    }
+
+	}
 
     public void setKey(String key) {
         this.key = key;
@@ -89,11 +90,8 @@ public class ArrayStatistics implements Processor {
         this.outputKey = outputKey;
     }
 
-    public String getPixelSetKey() {
-        return pixelSetKey;
-    }
-
     public void setPixelSetKey(String pixelSetKey) {
         this.pixelSetKey = pixelSetKey;
     }
+
 }

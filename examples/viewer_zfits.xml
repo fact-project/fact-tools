@@ -1,0 +1,26 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
+    <!-- Name of the stream and url to the input file -->
+    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
+
+    <!-- Description of the process and the corresponding stream -->
+    <process id="1" input="fact">
+
+    	<fact.datacorrection.DrsCalibration url="${drsfile}"/>
+        <!-- <Skip condition="%{data.shower} == null" /> -->
+
+
+
+        <fact.ShowViewer key="DataCalibrated"/>
+
+
+    </process>
+
+
+</container>

@@ -3,34 +3,7 @@
  */
 package fact.hexmap.ui.components.cameradisplay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.geom.AffineTransform;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.swing.JPanel;
-
-import org.apache.commons.math3.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import stream.Data;
-
 import com.google.common.eventbus.Subscribe;
-
 import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
@@ -41,6 +14,21 @@ import fact.hexmap.ui.colormapping.ColorMapping;
 import fact.hexmap.ui.colormapping.GrayScaleColorMapping;
 import fact.hexmap.ui.events.SliceChangedEvent;
 import fact.hexmap.ui.overlays.CameraMapOverlay;
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.text.DecimalFormat;
+import java.util.*;
+
+import static com.google.common.primitives.Doubles.max;
+import static com.google.common.primitives.Doubles.min;
 
 /**
  * This implements a PixelMap to draw a grid of hexagons as seen in the camera
@@ -69,7 +57,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	public double[][] sliceValues = new double[1440][1024];
 	int currentSlice = 0;
 
-	// the data and key which to display a a hexmap
+	// the dataItem to display
 	private Data dataItem;
 
 	// store the smallest and largest value in the data. We need this to map
@@ -81,6 +69,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	private ColorMapping colormap = new GrayScaleColorMapping();
 
 	final private FactPixelMapping pixelMapping;
+
 	private ArrayList<CameraMapOverlay> overlays = new ArrayList<>();
 	private Set<Pair<String, Color>> overlayKeys = new HashSet<>();
 
@@ -93,7 +82,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	private boolean drawScaleNumbers = true;
 
-	private boolean includeScale = false;
+	private boolean includeScale = true;
 
 	private int offsetX = 0;
 	private int offsetY = 0;
@@ -179,8 +168,18 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		this.repaint();
 	}
 
+	/**
+	 * We call this method whenever a new Overlay is supposed to be drawn.
+	 * When the user checks a checkbox for example below the cameradisplay for example. Or chooses
+	 * a new color.
+	 *
+	 * @param items
+	 * @param dataItem
+	 * @return
+	 */
 	private ArrayList<CameraMapOverlay> updateOverlays(
 			Set<Pair<String, Color>> items, Data dataItem) {
+
 		ArrayList<CameraMapOverlay> overlays = new ArrayList<>();
 		for (Pair<String, Color> s : items) {
 			CameraMapOverlay overlay = (CameraMapOverlay) dataItem.get(s
@@ -191,7 +190,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			}
 		}
 		
-		class customComparator implements Comparator<CameraMapOverlay> {
+		class CustomComparator implements Comparator<CameraMapOverlay> {
 		    public int compare(CameraMapOverlay object1, CameraMapOverlay object2) {            	
 		        return object1.getDrawRank() - object2.getDrawRank();
 		    }
@@ -199,29 +198,26 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		// Sortierung in der richtigen Reihenfolge
 		// um ueberdeckungen zu vermeiden 
 		// von niedrig nach hoch
-		Collections.sort(overlays, new customComparator());	
+		Collections.sort(overlays, new CustomComparator());
 		
 		return overlays;
 	}
 
 	private void updateMapDisplay(Data item, String key) {
 		if (item == null) {
-			log.error("Dataitem was null in cameraWindow");
+			log.error("DataItem was null in cameraWindow");
 		}
-		try {
-			double[] data = (double[]) item.get(key);
-			this.sliceValues = Utils.sortPixels(data, 1440);
-			for (double[] slices : sliceValues) {
-				for (double v : slices) {
-					minValueInData = Math.min(minValueInData, v);
-					maxValueInData = Math.max(maxValueInData, v);
-				}
-			}
+		double[] dataToPlot = Utils.toDoubleArray(item.get(key));
+		if (dataToPlot != null) {
+			minValueInData = min(dataToPlot);
+			maxValueInData = max(dataToPlot);
+			this.sliceValues = Utils.sortPixels(dataToPlot, 1440);
 			this.repaint();
-		} catch (ClassCastException e) {
-			log.error("The viewer can only display data of type double[]");
+		} else {
+			log.error("Tried to plot data that was null");
 		}
 	}
+
 
 	@Override
 	public void setColorMap(ColorMapping m) {
@@ -291,7 +287,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			// to draw the grid translate back
 			g2.translate(-xOffset, -yOffset);
 
-			// draw cross across screen to indicate center ofcomponent
+			// draw cross across screen to indicate center of component
 
 			// Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
 			// g2.draw(line);

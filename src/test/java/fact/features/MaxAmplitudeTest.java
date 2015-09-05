@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.extraction.MaxAmplitude;
-import fact.filter.DrsCalibration;
+import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class MaxAmplitudeTest {
 
 		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-		pr.setUrl(drsUrl.toString());
+		pr.setUrl(new SourceURL(drsUrl));
 		pr.setOutputKey("test");
 
 
@@ -46,6 +46,7 @@ public class MaxAmplitudeTest {
 			FitsStream stream = new FitsStream(url);
 			stream.init();
 			Data item = stream.read();
+            pr.init(null);
             pr.process(item);
             maxAmp.process(item);
             assertTrue("Item did not contain the right key for maxAmplitude", item.containsKey(outputKey));

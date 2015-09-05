@@ -1,10 +1,9 @@
 package fact.statistics;
 
+import fact.Utils;
+import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
-import org.apache.commons.math3.stat.StatUtils;
-
-import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -51,11 +50,7 @@ public class TimerowFeatures implements Processor {
 		
 		int roi = (Integer) input.get("NROI");
 		
-		if ( searchWindowLeft < 0 || searchWindowLeft > searchWindowRight || searchWindowRight > roi)
-		{
-			throw new RuntimeException("Search window not in the correct region:\n search window: ("
-					+ searchWindowLeft + "," + searchWindowRight + ")\t roi: " + roi);
-		}
+		Utils.checkWindow(searchWindowLeft, searchWindowRight-searchWindowLeft, 0, roi);
 		
 		Utils.mapContainsKeys(input, dataKey, movingAverageKey);
 		

@@ -27,20 +27,17 @@ Here's a short example demonstrating how to pass a parameter ( in this case a fl
 			//process methods here
 			...
 
-			// Getter and Setter//
-			public float getSomeValue() {
-				return someValue;
-			}
-			//documentation for the parameter
+
+			//some documentation for the parameter
 			public void setSomeValue(float someValue) {
 				this.someValue = someValue;
 			}
 
 		}
 
-The usual convention here is to put the getter and setter methods as last members in the class. The corresponding line
+The usual convention here is to put the setter methods as last members in the class. The corresponding line
 in the .xml file would look like this:
 
 		<fact.somePackage.SomeProcessor someValue="3.141452234" />
 
-If you don't set the someValue parameter in the xml you will get an error message.
+If you don't set the someValue parameter in the xml and the `required`  flag is set to true you will get an error message.
