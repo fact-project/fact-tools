@@ -459,6 +459,7 @@
 						<configuration>
 							<additionalparam>-Xdoclint:none</additionalparam>
 						</configuration>
+						<version>2.10.3</version>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
