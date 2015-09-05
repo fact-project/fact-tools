@@ -52,7 +52,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
         double[] data        = (double[]) input.get(key);
 
         double[] chargeMean             = new double[npix];
-        double[] chargeRms              = new double[npix];
+        double[] chargeStd              = new double[npix];
         double[] chargeKurtosis         = new double[npix];
         double[] chargeMax              = new double[npix];
         double[] chargeMin              = new double[npix];
@@ -103,7 +103,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
 
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
             chargeMean[pix]         = descriptiveStatistics.getMean();
-            chargeRms[pix]          = descriptiveStatistics.getStandardDeviation();
+            chargeStd[pix]          = descriptiveStatistics.getStandardDeviation();
             chargeKurtosis[pix]     = descriptiveStatistics.getKurtosis();
             chargeMax[pix]          = descriptiveStatistics.getMax();
             chargeMin[pix]          = descriptiveStatistics.getMin();
@@ -116,7 +116,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
 
         input.put(outputKey, charge);
         input.put(outputKey+"_mean", chargeMean);
-        input.put(outputKey+"_var", chargeRms);
+        input.put(outputKey+"_std", chargeStd);
         input.put(outputKey+"_kurtosis",chargeKurtosis);
         input.put(outputKey+"_max",chargeMax);
         input.put(outputKey+"_min",chargeMin);
