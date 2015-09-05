@@ -175,7 +175,7 @@ public class MainPlotPanel extends JPanel implements EventObserver, SliceObserve
             Color c = selectorItem.getValue();
             if (item != null && item.containsKey(key)){
                 //for each key we have to plot we create a new renderer so we can have a custom color for every key
-                double[] data = (double[]) item.get(key);
+                double[] data = Utils.toDoubleArray(item.get(key));
                 XYLineAndShapeRenderer r = new XYLineAndShapeRenderer();
                 r.setSeriesPaint(0, c);
                 r.setBaseShapesVisible(hasTicks);

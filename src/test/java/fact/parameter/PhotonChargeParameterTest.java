@@ -1,14 +1,13 @@
 package fact.parameter;
 
-import static org.junit.Assert.assertTrue;
-
+import fact.extraction.BasicExtraction;
+import fact.io.FitsStreamTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import stream.io.SourceURL;
-import fact.extraction.BasicExtraction;
-import fact.io.FitsStreamTest;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * 

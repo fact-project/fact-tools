@@ -1,9 +1,7 @@
-Writing Data
-============
-Its often necessary to write all the things you calculated to some sort of file. This allows ou to further analyze your data with whatever 
-software you like. There are a couple of processors in the fact.io package which provide some basic file writing to .csv files or similar.
-
-
+#Reading and Writing Data
+The essential thing your program usually does is reading and writing of data. In our case we often read raw data from the telescope and 
+perform various steps to reduce all the data to simple parameters which may or may not be relevant for a semantic analysis of the things
+your experiment recorded. 
 
 
 ### Writing complete Events to a File
@@ -20,7 +18,7 @@ part, i.e. the calibrated data, into a file in binary form.
 
         <process input="fact-data">
           
-            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+            <fact.datacorrection.DrsCalibration url="file:///tmp/fact.drs.fits.gz"
                                           key="data" outputKey="DataCalibrated"/>
 
             <fact.io.BinaryFactWriter key="DataCalibrated"
@@ -47,7 +45,7 @@ To calculate the mean from an array you can use the `ArrayMean` processor in the
 
         <Process input="fact-data">
           
-            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+            <fact.datacorrection.DrsCalibration url="file:///tmp/fact.drs.fits.gz"
                                           key="data" outputKey="DataCalibrated"/>
         
             <fact.features.MaxAmplitude key="DataCalibrated" outputKey="maxAmplitude"/>
@@ -109,12 +107,11 @@ Theres is one catch however. If you want to write out an array to the file the o
 		[I@1e22ab57
       ...
 
-Thats because the `toString()` function of Javas internal Array class does not print the whole contents of the array but simply
-returns what you could consider the Java equivalent of a C pointer. A workaround would be to use the fact.io.RootASCIIWriter processor
-which can handle arrays with primitive types. Its usage is similar to the CsvWriter.
+Thats because the .csv format does not initially support data types other than simple numbers or strings. For output
+of more complex data types you could use the JSONWriter.
 
-    <-- No spaces between keys--/>    
-    <fact.io.RootASCIIWriter keys="positionArray" url="file:///tmp/output.csv" />
+    <stream.io.JSONWriter keys="EventNum,maxAmplitudeMean,some_data_structure" url="file:///tmp/output.json" />
+
 
 	
 	  

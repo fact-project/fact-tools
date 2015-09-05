@@ -28,7 +28,7 @@ FITS data file and applies the DRS calibration:
 
         <Process input="fact-data">
           
-            <fact.filter.DrsCalibration url="file:///tmp/fact.drs.fits.gz"  
+            <fact.datacorrection.DrsCalibration url="file:///tmp/fact.drs.fits.gz"
                                           key="data" outputKey="DataCalibrated"/>
         
             <fact.features.MaxAmplitude key="DataCalibrated" outputKey="maxAmplitude"/>

@@ -10,13 +10,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * The overlay selector will be shown next to a camerawindow which displays the overlays.
  * Created by kaibrugge on 02.06.14.
  */
 public class CameraOverlayKeySelector extends KeySelector {
     @Override
     public void selectionUpdate() {
         Bus.eventBus.post(new OverlaySelectionChangedEvent(getSelectedItemPairs()));
-
     }
 
     @Override

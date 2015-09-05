@@ -3,12 +3,13 @@
 	<groupId>de.sfb876</groupId>
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
-	<version>0.7.3-SNAPSHOT</version>
 
-	<url>http://sfb876.tu-dortmund.de/FACT/</url>
+	<version>0.8.8</version>
+
+	<url>http://sfb876.de/fact-tools/</url>
 
 	<description>
-		The FACT telescope is a cherenkov telescope on the island of La Palma.
+		        The FACT telescope is a cherenkov telescope on the island of La Palma.
                 This set of tools is dedicated to read, parse and process raw data produced
                 by the FACT telescope.
 	</description>
@@ -16,7 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>[0.9.18,)</streams.version>
+		<streams.version>0.9.21-SNAPSHOT</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
@@ -40,8 +41,8 @@
 		<developer>
 			<name>Kai Brügge</name>
 			<email>kai.bruegge@tu-dortmund.de</email>
-			<organization>Informatik LS8, TU-Dortmund</organization>
-			<organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+			<organization>Physik E5b, TU-Dortmund</organization>
+			<organizationUrl>http://app.tu-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
 		<developer>
@@ -51,13 +52,21 @@
 			<organizationUrl>http://app.tu-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
-	</developers>
+        <developer>
+            <name>Dominik Neise</name>
+            <email>neised@phys.ethz.ch</email>
+            <organization>Departement of physics, ETH Zurich</organization>
+            <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+            <timezone>+1</timezone>
+        </developer>
+
+    </developers>
 
 	<scm>
 		<url>https://bitbucket.org/cbockermann/fact-tools</url>
 		<developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</developerConnection>
 		<connection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</connection>
-		<tag>fact-tools-0.7.0</tag>
+		<tag>fact-tools-0.7.3</tag>
 	</scm>
 
 	<mailingLists>
@@ -68,6 +77,15 @@
 			<post>fact-analyse@lists.tu-dortmund.de</post>
 		</mailingList>
 	</mailingLists>
+
+
+	<repositories>
+		<repository>
+			<id>sonatype-snapshots</id>
+			<name>sonatype Snapshot Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
 
 
 	<distributionManagement>
@@ -84,19 +102,24 @@
 		</snapshotRepository>
 		<site>
 			<id>site-sfb876</id>
-			<url>scp://sfb876.de:/var/www/sfb876.de/htdocs/fact-tools/</url>
+			<url>scp://builder@sfb876.de:/var/www/sfb876.de/htdocs/fact-tools/</url>
 		</site>
 	</distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>sonatype-snapshots</id>
-			<name>SonaType Snapshot Maven Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>us.monoid.web</groupId>
+            <artifactId>resty</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -133,21 +156,20 @@
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-core</artifactId>
-			<version>${streams.version}</version>
-			<scope>${streams.scope}</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jwall</groupId>
-			<artifactId>streams-runtime</artifactId>
-			<version>${streams.version}</version>
+			<version>0.9.22-SNAPSHOT</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-plotter</artifactId>
-			<version>${streams.version}</version>
+			<version>0.9.22-SNAPSHOT</version>
+			<scope>${streams.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jwall</groupId>
+			<artifactId>streams-runtime</artifactId>
+			<version>0.9.22-SNAPSHOT</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
 
@@ -174,10 +196,10 @@
 			<version>3.3</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jwall</groupId>
-			<artifactId>streams-dashboard</artifactId>
-			<version>[0.2.1,)</version>
-		</dependency>
+        	    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+ 	            <version>3.3.2</version>
+        	</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -316,7 +338,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8</version>
+				<version>2.10.3</version>
 				<configuration>
 				</configuration>
 			</plugin>
@@ -338,7 +360,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.1</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -391,53 +413,41 @@
 					<value>jenkins</value>
 				</property>
 			</activation>
+		</profile>
+		<profile>
+			<id>doclint-java8-disable</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>com.github.goldin</groupId>
-						<artifactId>copy-maven-plugin</artifactId>
-						<version>0.2.5</version>
-						<executions>
-							<execution>
-								<id>create-archive</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<resources>
-										<!-- ~~~~~~~~~~~~~~ -->
-										<!-- Copy resources -->
-										<!-- ~~~~~~~~~~~~~~ -->
-										<resource>
-											<targetPath>/var/www/download.jwall.org/htdocs/fact-tools/</targetPath>
-											<directory>${project.basedir}/target/</directory>
-											<includes>
-												<include>${binary.name}.jar</include>
-											</includes>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+						<version>2.10.3</version>
 					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-site-plugin</artifactId>
+						<version>3.3</version>
+						<configuration>
+							<reportPlugins>
+								<plugin>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
+									<configuration>
+										<additionalparam>-Xdoclint:none</additionalparam>
+									</configuration>
+								</plugin>
+							</reportPlugins>
+						</configuration>
+					</plugin>
+
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>ls8-deployment</id>
-			<activation>
-				<property>
-					<name>building:site</name>
-					<value>ls8</value>
-				</property>
-			</activation>
-			<distributionManagement>
-				<site>
-					<id>fact-site</id>
-					<url>scp://webadm@kissen.cs.uni-dortmund.de:/home/info-systeme/WWW/sfb876doc/FACT</url>
-				</site>
-			</distributionManagement>
 		</profile>
 	</profiles>
 </project>

@@ -45,7 +45,7 @@ object.
               }
             }
 
-            //now we save the amplitude under the name outputkey in the map and return the input
+            //now we save the amplitude under the name outputKey in the map and return the input
             input.put(outputKey, maxAmplitude)
           }
         }

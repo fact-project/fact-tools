@@ -1,8 +1,8 @@
 package fact.utils;
 
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
-import fact.Utils;
 
 import java.util.Random;
 

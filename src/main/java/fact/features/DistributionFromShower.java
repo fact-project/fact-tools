@@ -1,18 +1,17 @@
 package fact.features;
 
+import fact.Utils;
+import fact.container.PixelDistribution2D;
+import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.EllipseOverlay;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Utils;
-import fact.container.PixelDistribution2D;
-import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.EllipseOverlay;
 
 public class DistributionFromShower implements Processor {
 
@@ -94,8 +93,7 @@ public class DistributionFromShower implements Processor {
 
 		double delta = calculateDelta(eig);
 
-		// Calculation of the showers statistical moments (Variance, Skewness,
-		// Kurtosis)
+		// Calculation of the showers statistical moments (Variance, Skewness, Kurtosis)
 		// Rotate the shower by the angle delta in order to have the ellipse
 		// main axis in parallel to the Camera-Coordinates X-Axis
 		// allocate variables for rotated coordinates
@@ -253,10 +251,8 @@ public class DistributionFromShower implements Processor {
 		// find weighted center of the shower pixels.
 		int i = 0;
 		for (int pix : showerPixel) {
-			cog[0] += weights[i]
-					* pixelMap.getPixelFromId(pix).getXPositionInMM();
-			cog[1] += weights[i]
-					* pixelMap.getPixelFromId(pix).getYPositionInMM();
+			cog[0] += weights[i] * pixelMap.getPixelFromId(pix).getXPositionInMM();
+			cog[1] += weights[i] * pixelMap.getPixelFromId(pix).getYPositionInMM();
 			i++;
 		}
 		cog[0] /= size;
@@ -312,73 +308,45 @@ public class DistributionFromShower implements Processor {
 		this.outputKey = outputKey;
 	}
 
-	public String getM3longKey() {
-		return m3longKey;
-	}
 
 	public void setM3longKey(String m3longKey) {
 		this.m3longKey = m3longKey;
 	}
 
-	public String getM3transKey() {
-		return m3transKey;
-	}
 
 	public void setM3transKey(String m3transKey) {
 		this.m3transKey = m3transKey;
 	}
 
-	public String getM4longKey() {
-		return m4longKey;
-	}
 
 	public void setM4longKey(String m4longKey) {
 		this.m4longKey = m4longKey;
-	}
-
-	public String getM4transKey() {
-		return m4transKey;
 	}
 
 	public void setM4transKey(String m4transKey) {
 		this.m4transKey = m4transKey;
 	}
 
-	public String getCogxKey() {
-		return cogxKey;
-	}
 
 	public void setCogxKey(String cogxKey) {
 		this.cogxKey = cogxKey;
 	}
 
-	public String getCogyKey() {
-		return cogyKey;
-	}
 
 	public void setCogyKey(String cogyKey) {
 		this.cogyKey = cogyKey;
 	}
 
-	public String getLengthKey() {
-		return lengthKey;
-	}
 
 	public void setLengthKey(String lengthKey) {
 		this.lengthKey = lengthKey;
 	}
 
-	public String getWidthKey() {
-		return widthKey;
-	}
 
 	public void setWidthKey(String widthKey) {
 		this.widthKey = widthKey;
 	}
 
-	public String getDeltaKey() {
-		return deltaKey;
-	}
 
 	public void setDeltaKey(String deltaKey) {
 		this.deltaKey = deltaKey;

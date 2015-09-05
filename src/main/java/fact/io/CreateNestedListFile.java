@@ -26,6 +26,7 @@ import java.util.Arrays;
  * 
  */
 
+@Deprecated
 @Description(group = "Data Stream.Output", text = "")
 public class CreateNestedListFile extends CsvWriter {
 	static Logger log = LoggerFactory.getLogger(CreateNestedListFile.class);
