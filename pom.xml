@@ -6,7 +6,7 @@
 
 	<version>0.8.8</version>
 
-	<url>http://sfb876.tu-dortmund.de/FACT/</url>
+	<url>http://sfb876.de/fact-tools/</url>
 
 	<description>
 		        The FACT telescope is a cherenkov telescope on the island of La Palma.
@@ -102,7 +102,7 @@
 		</snapshotRepository>
 		<site>
 			<id>site-sfb876</id>
-			<url>scp://sfb876.de:/var/www/sfb876.de/htdocs/fact-tools/</url>
+			<url>scp://builder@sfb876.de:/var/www/sfb876.de/htdocs/fact-tools/</url>
 		</site>
 	</distributionManagement>
 
@@ -447,19 +447,37 @@
 			</build>
 		</profile>
 		<profile>
-			<id>ls8-deployment</id>
+			<id>doclint-java8-disable</id>
 			<activation>
-				<property>
-					<name>building:site</name>
-					<value>ls8</value>
-				</property>
+				<jdk>[1.8,)</jdk>
 			</activation>
-			<distributionManagement>
-				<site>
-					<id>fact-site</id>
-					<url>scp://webadm@kissen.cs.uni-dortmund.de:/home/info-systeme/WWW/sfb876doc/FACT</url>
-				</site>
-			</distributionManagement>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-site-plugin</artifactId>
+						<version>3.3</version>
+						<configuration>
+							<reportPlugins>
+								<plugin>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
+									<configuration>
+										<additionalparam>-Xdoclint:none</additionalparam>
+									</configuration>
+								</plugin>
+							</reportPlugins>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>
