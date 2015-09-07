@@ -200,20 +200,21 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            DateTime timeStamp = new DateTime((long)(eventTime[0]) * 1000, DateTimeZone.UTC);
-            // the source position is not updated very often. We have to get the point from hte auxfile which
+            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+            // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
             AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
             //We want to get the tracking point which is closest to the current event.
-            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+//            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, earlier);
 
 
             double ra = trackingPoint.getDouble("Ra");
             double dec = trackingPoint.getDouble("Dec");
 
             //convert unixtime to julianday
-            double julianDay = unixTimeToJulianDay(eventTime[0]);
+            double julianDay = unixTimeToJulianDay(eventTime[0]+eventTime[1]/1000000.);
 
             //convert julianday to gmst
             double gmst = julianDayToGmst(julianDay);
