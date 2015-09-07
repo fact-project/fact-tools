@@ -10,7 +10,9 @@
     <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
 
 
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+    <property name="auxFolder" value="file:src/main/resources/aux/" />
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
 
     <!--In case you want to analyze .zfits files.-->
     <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>-->
