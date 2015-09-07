@@ -70,7 +70,7 @@ public class FitsHeader {
 	/**
 	 * Parse the blocks of a fits header.
 	 * @param block The block given as strings with 80 characters width.
-	 * @throws ParseExceptionThrown if the given block is not a fits header or has errors.
+	 * @throws ParseException if the given block is not a fits header or has errors.
 	 */
 	public FitsHeader(List<String> block) throws ParseException {
 		//log.info("Block size: "+block.size());

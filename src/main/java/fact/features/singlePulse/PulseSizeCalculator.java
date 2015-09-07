@@ -1,8 +1,9 @@
 /**
  * 
  */
-package fact.features;
+package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,42 +32,28 @@ public class PulseSizeCalculator implements Processor {
         //positions of arrival times 
     @Parameter(required = true)
     private int width;
-        //number of slices over which we integrate
-    private int npix;
-    
-    @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        double[] data = (double[]) input.get(key);
-        npix = (Integer) input.get("NPIX");
-        int roi = data.length / npix;
-        ArrayList[] arrivalTimes = (ArrayList[]) input.get(arrivalTimeKey);
-        ArrayList[] pulseSizes = new ArrayList[npix];
-      
-        //additional output that is a list of values for all events for a single pixel. Currently pixel 0. 
-        ArrayList<Integer> singlePixelPulses = new ArrayList<Integer>();
-        Integer singlePixel = 0;
-        
-        //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
-            
-            pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
+    	//number of slices over which we integrate
 
-            
-            //creates the list for a single pixel
-            if(pix==0){
-                if(pulseSizes[pix].size() != 0){
-                    for(int i = 0; i < pulseSizes[pix].size(); i++){
-                        singlePixel = (Integer) pulseSizes[pix].get(i);
-                        singlePixelPulses.add(singlePixel);
-                    }
-                }
-            }
-        
-        }
-        input.put("singlePixelPulses", singlePixelPulses);
+    private int npix;
+
+	@Override
+	public Data process(Data input) {
+        Utils.mapContainsKeys(input, key, arrivalTimeKey);
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
+
+        double[] data = (double[]) input.get(key);
+        int roi = data.length / npix;
+		int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
+	    double[][] pulseSizes = new double[npix][];
+
+		//for each pixel
+		for (int pix = 0; pix < npix; pix++) {
+			pulseSizes[pix] = new double[arrivalTimes[pix].length];
+			pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
+		}
         input.put(outputKey, pulseSizes);
-        
+
         
 //       System.out.println(Arrays.toString(pulseSizes));
 //       System.out.println(singlePixelPulses);
@@ -80,24 +67,24 @@ public class PulseSizeCalculator implements Processor {
      * @param data the array which to check
      * @return
      */
-    
-    public ArrayList calculateSizes(int pix, int roi, double[] data, ArrayList[] arrivalTimes){
+	
+    public double[] calculateSizes(int pix, int roi, double[] data, int[][] arrivalTimes){
       
-        ArrayList<Integer> sizes = new ArrayList<Integer>();
-        
-        if(!arrivalTimes[pix].isEmpty()){
-            int numberPulses = arrivalTimes[pix].size();            
-            for(int i = 0; i < numberPulses; i++){
-                  int integral = 0;
-                  int start = (Integer) arrivalTimes[pix].get(i);
-                  for(int slice = start; slice < start + width; slice++){
-                       int pos = pix * roi + slice;
-                       integral += data[pos];
-                  }
-                  sizes.add(integral);
-            }       
+		ArrayList<Double> sizes = new ArrayList<Double>();
+    	
+        if(arrivalTimes[pix].length > 0){
+        	int numberPulses = arrivalTimes[pix].length;
+        	for(int i = 0; i < numberPulses; i++){
+				double integral = 0;
+				int start = arrivalTimes[pix][i];
+				for(int slice = start; slice < start + width; slice++){
+					int pos = pix * roi + slice;
+					integral += data[pos];
+				}
+				sizes.add(integral);
+        	}		
         }
-        return sizes;
+        return Utils.arrayListToDouble(sizes);
     }
           
      

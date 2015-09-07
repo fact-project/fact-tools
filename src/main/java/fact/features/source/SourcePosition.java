@@ -42,7 +42,7 @@ import java.io.IOException;
  *  information at where the telescope pointing which is updated in small intervals.
  *
  *  Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
- *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (> revision 18159),
+ *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (after revision 18159),
  *  the source and pointing information are simply taken from the datastream.
  *
  *  For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
