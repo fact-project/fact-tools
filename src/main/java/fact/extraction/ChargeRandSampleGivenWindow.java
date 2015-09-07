@@ -40,18 +40,27 @@ public class ChargeRandSampleGivenWindow implements Processor {
     // A logger
     static Logger log = LoggerFactory.getLogger(ChargeRandSampleGivenWindow.class);
 
+    private int npix;
 
     @Override
     public Data process(Data input) {
 
         Utils.mapContainsKeys(input, key);
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 
         double[] data        = (double[]) input.get(key);
 
-        double[] chargeMean = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeRms  = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeMean             = new double[npix];
+        double[] chargeStd              = new double[npix];
+        double[] chargeKurtosis         = new double[npix];
+        double[] chargeMax              = new double[npix];
+        double[] chargeMin              = new double[npix];
+        double[] chargeSkewness         = new double[npix];
+        double[] chargeMedian           = new double[npix];
+        double[] chargeSum              = new double[npix];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / npix;
 
         Random rand = new Random(Seed);
 
@@ -59,10 +68,10 @@ public class ChargeRandSampleGivenWindow implements Processor {
         int iterations = bound/windowSize;
         log.info("Iterations: " + iterations );
 
-        double[][] charge = new double[Constants.NUMBEROFPIXEL][iterations];
+        double[][] charge = new double[npix][iterations];
 
         //Loop over all pixel and calculate integrals on timeline
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
             int firstStartSlice = skipFirst + rand.nextInt(bound);
             int startSlice = firstStartSlice;
 
@@ -93,15 +102,27 @@ public class ChargeRandSampleGivenWindow implements Processor {
             charge[pix] = integral;
 
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
-            chargeMean[pix]  = descriptiveStatistics.getMean();
-            chargeRms[pix]   = descriptiveStatistics.getStandardDeviation();
+            chargeMean[pix]         = descriptiveStatistics.getMean();
+            chargeStd[pix]          = descriptiveStatistics.getStandardDeviation();
+            chargeKurtosis[pix]     = descriptiveStatistics.getKurtosis();
+            chargeMax[pix]          = descriptiveStatistics.getMax();
+            chargeMin[pix]          = descriptiveStatistics.getMin();
+            chargeSkewness[pix]     = descriptiveStatistics.getSkewness();
+            chargeMedian[pix]       = descriptiveStatistics.getPercentile(0.5);
+            chargeSum[pix]          = descriptiveStatistics.getSum();
 
 
         }
 
         input.put(outputKey, charge);
         input.put(outputKey+"_mean", chargeMean);
-        input.put(outputKey+"_rms", chargeRms);
+        input.put(outputKey+"_std", chargeStd);
+        input.put(outputKey+"_kurtosis",chargeKurtosis);
+        input.put(outputKey+"_max",chargeMax);
+        input.put(outputKey+"_min",chargeMin);
+        input.put(outputKey+"_skewness",chargeSkewness);
+        input.put(outputKey+"_median",chargeMedian);
+        input.put(outputKey+"_sum",chargeSum);
 
         return input;
     }
