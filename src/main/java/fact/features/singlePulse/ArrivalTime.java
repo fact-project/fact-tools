@@ -1,8 +1,9 @@
 /**
  * 
  */
-package fact.features;
+package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,9 @@ public class ArrivalTime implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
-        ArrayList[] maxAmpPositions = (ArrayList[]) input.get(maxAmpPositionKey);
+        int[][] maxAmpPositions = (int[][]) input.get(maxAmpPositionKey);
         int roi = data.length / npix;
-        ArrayList[] arrivalTimes =  new ArrayList[npix];
+        int[][] arrivalTimes =  new int[npix][];
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
         
@@ -52,6 +53,7 @@ public class ArrivalTime implements Processor {
         
         //for each pixel
         for (int pix = 0; pix < npix; pix++) {
+	    arrivalTimes[pix] = new int[maxAmpPositions.length];
             arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
         }
         input.put(outputKey, arrivalTimes);
@@ -68,16 +70,16 @@ public class ArrivalTime implements Processor {
      * @param data the array which to check
      * @return
      */
-    
-    public ArrayList findArrivalTimes(int pix, int roi, double[] data, ArrayList[] maxAmpPositions, double[] visualizePositions){
+	
+    public int[] findArrivalTimes(int pix, int roi, double[] data, int[][] maxAmpPositions, double[] visualizePositions){
       
         ArrayList<Integer> positions = new ArrayList<Integer>();
 
-        if(!maxAmpPositions[pix].isEmpty()){
-            int numberPulses = maxAmpPositions[pix].size();         
-            for(int i = 0; i < numberPulses; i++){
+        if(maxAmpPositions[pix].length > 0){
+        	int numberPulses = maxAmpPositions[pix].length;
+        	for(int i = 0; i < numberPulses; i++){
                   int Position = 0;
-                  int end = (Integer) maxAmpPositions[pix].get(i);
+                  int end = maxAmpPositions[pix][i];
                   int endPos = pix * roi + end;
                   for(int slice = end; slice > end - 25; slice--){
                        int pos = pix * roi + slice;
@@ -97,7 +99,7 @@ public class ArrivalTime implements Processor {
             }
         }
 
-            return positions;
+        return Utils.arrayListToInt(positions);
     }
           
      

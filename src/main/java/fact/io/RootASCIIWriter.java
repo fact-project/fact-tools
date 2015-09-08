@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
+import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.CsvWriter;
 
@@ -23,6 +24,9 @@ import java.io.Serializable;
  */
 @Deprecated
 public class RootASCIIWriter extends CsvWriter {
+
+	@Parameter(required = true)
+	private String[] keys;
 
 	static Logger log = LoggerFactory.getLogger(RootASCIIWriter.class);
 	private boolean writeTreeDescriptor = true;
@@ -192,4 +196,7 @@ public class RootASCIIWriter extends CsvWriter {
 		this.writeTreeDescriptor = writeTreeDescriptor;
 	}
 
+	public void setKeys(String[] keys) {
+		this.keys = keys;
+	}
 }

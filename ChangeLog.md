@@ -1,5 +1,27 @@
 #Changelog for the fact-tools
 
+## Version 0.8.10 (tag icrc2015)
+
+With this version the results of the analysis for the icrc 2015 can be reproduced.
+Therefore a few changes were made in comparison to the previous version:
+
+SourcePosition operator:
+- The operator now uses the whole timestamp not only the seconds of the event time for calculating
+ the source position and the correct tracking report
+- The operator uses the earlier strategy to find the tracking report from the aux file. (This is for reproducibility, 
+ it will be changed in version 0.9.0 to the closest strategy)
+
+cleaning.xml in the classpath:
+- The position of zeta tauri was a little bit wrong (difference 0.7 arcsec)
+
+viewer.xml:
+- There is now the property auxFolder, to specify it via the command line
+
+stdAnalysis:
+- There is now the property auxFolder, to specify it via the command line
+- The cleaning level were lowered
+- The old delay file is used (This is for reproducibility, it will be changed in version 0.9.0)
+
 ## Version 0.8.8
 Added a replacement process to measure the performance of individual Processors. 
 You can use it like this:
