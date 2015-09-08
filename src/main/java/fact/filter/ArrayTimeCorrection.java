@@ -69,7 +69,7 @@ public class ArrayTimeCorrection implements Processor{
 	 *
 	 * @param chid
 	 * @param slice
-	 * @return time in ns!
+	 * @return time in slices
 	 */
 	private double calcRealTime(int chid, int slice){
 		return slice - timeCalibConst[chid * roi + slice];
