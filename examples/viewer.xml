@@ -7,7 +7,7 @@
 	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-    <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
 
     <property name="auxFolder" value="file:src/main/resources/aux/" />
@@ -35,8 +35,7 @@
         <include url="classpath:/default/data/extraction.xml" />
 
         <include url="classpath:/default/data/cleaning.xml" />
-
-        <include url="classpath:/default/data/parameterCalc.xml" />
+        
         <!-- <Skip condition="%{data.shower} == null" /> -->
 
         <fact.ShowViewer key="DataCalibrated"/>
