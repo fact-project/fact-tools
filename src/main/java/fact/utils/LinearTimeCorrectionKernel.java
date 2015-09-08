@@ -44,10 +44,6 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
             return values[values.length - 1];
         }
 
-        if (pos >= values.length){
-            return values[values.length - 1];
-        }
-
 
         double t0 = times[pos -1];
         double t1 = times[pos];
