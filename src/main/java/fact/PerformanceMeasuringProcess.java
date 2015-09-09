@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +46,14 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
     long iterations = 0;
 
 
-    private HashMap<Processor, SummaryStatistics> timeMap = new HashMap<>();
+    private HashMap<Processor, DescriptiveStatistics> timeMap = new HashMap<>();
 
     @Override
     public void init(Context context) throws Exception {
         super.init(context);
 
         for (Processor proc : processors) {
-           timeMap.put(proc, new SummaryStatistics());
+           timeMap.put(proc, new DescriptiveStatistics());
            if (proc instanceof StatefulProcessor) {
                 ((StatefulProcessor) proc).init(processContext);
            }
@@ -94,17 +95,24 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 
         int processorCounter = 0;
         for (Processor proc : processors) {
-                double mean = timeMap.get(proc).getMean();
-                double std = timeMap.get(proc).getStandardDeviation();
-                double numberOfCallsToProcessor = timeMap.get(proc).getN();
+            double mean = timeMap.get(proc).getMean();
+            double std = timeMap.get(proc).getStandardDeviation();
+            double numberOfCallsToProcessor = timeMap.get(proc).getN();
+            double lower_sigma_quantile = timeMap.get(proc).getPercentile(15.87);
+            double upper_sigma_quantile = timeMap.get(proc).getPercentile(100 - 15.87);
+            double lower_quartil = timeMap.get(proc).getPercentile(25);
+            double upper_quartil = timeMap.get(proc).getPercentile(75);
+            perf.put(proc.getClass().getSimpleName(), "mean", mean);
+            perf.put(proc.getClass().getSimpleName(), "standard_deviation", std);
+            perf.put(proc.getClass().getSimpleName(), "numberOfCallsToProcessor", numberOfCallsToProcessor);
+            perf.put(proc.getClass().getSimpleName(), "order", Double.valueOf(processorCounter++));
+            perf.put(proc.getClass().getSimpleName(), "upper_sigma_quantile", upper_sigma_quantile);
+            perf.put(proc.getClass().getSimpleName(), "lower_sigma_quantile", lower_sigma_quantile);
+            perf.put(proc.getClass().getSimpleName(), "lower_quartil", lower_quartil);
+            perf.put(proc.getClass().getSimpleName(), "upper_quartil", upper_quartil);
 
-                perf.put(proc.getClass().getSimpleName(), "mean", mean);
-                perf.put(proc.getClass().getSimpleName(), "standard_deviation", std);
-                perf.put(proc.getClass().getSimpleName(), "numberOfCallsToProcessor", numberOfCallsToProcessor);
-                perf.put(proc.getClass().getSimpleName(), "order", Double.valueOf(processorCounter++));
-
-                log.info("      Runtime of Processor {}   Mean: {}   StandardDeviation: {}",
-                        proc.getClass().getSimpleName(), mean, std);
+            log.info("      Runtime of Processor {} lower quantile: {}   Mean: {}   upper_quantile: {}",
+                proc.getClass().getSimpleName(), lower_sigma_quantile, mean, upper_sigma_quantile);
 
             if (proc instanceof StatefulProcessor) {
                 try {

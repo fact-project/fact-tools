@@ -1,5 +1,34 @@
 #Changelog for the fact-tools
 
+## Version 0.9.0
+
+These version contains several smaller developments:
+
+SourcePosition operator:
+- The operator now uses the closest strategy to find the tracking report from the aux file.
+
+TwoLevelTimeNeighbor operator:
+- There was a bugfix for the applyTimeNeighborCleaning function: Not only neighboring shower pixels,
+ but all neighbor pixels were checked for the time neighbor cleaning.
+
+maxnoe/risingedgepolynomfit branch:
+- The rising edge branch was merged into the version 0.9.0:
+ - the polynom fit is now calculated analytical
+ - the whole drs time calibration is calculated in the unit slices (no converting to ns)
+ - the interpolate function of the LinearTimeCorrectionKernel now uses a binary search
+ - all changes improve the runtime
+
+skipBrokenFiles branch:
+- The skipBrokenFiles branch was merged into the version 0.9.0:
+ - When using a RecursiveDirectoryStream, there is now a flag, to skip files which cannot be read in.
+  If the flag is true, the whole process is not aborted anymore
+
+settings.properties:
+- The lower cleaning level (level 1: 5.5, level 2: 3.0) are now default for data and mc.
+
+stdAnalysis:
+- The lightpulser delay file is now used in the stdAnalysis
+
 ## Version 0.8.10 (tag icrc2015)
 
 With this version the results of the analysis for the icrc 2015 can be reproduced.
