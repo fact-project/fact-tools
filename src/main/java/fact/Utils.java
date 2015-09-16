@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 /**
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
@@ -214,6 +215,18 @@ public class Utils {
 		}
 
 		return 0;
+	}
+
+	public static double[] arrayListToDouble(ArrayList list){
+		Double[] tempArray = new Double[list.size()];
+		list.toArray(tempArray);
+		return ArrayUtils.toPrimitive(tempArray);
+	}
+
+	public static int[] arrayListToInt(ArrayList list){
+		Integer[] tempArray = new Integer[list.size()];
+		list.toArray(tempArray);
+		return ArrayUtils.toPrimitive(tempArray);
 	}
 
 	/**

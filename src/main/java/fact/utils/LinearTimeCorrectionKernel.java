@@ -1,8 +1,10 @@
 package fact.utils;
 
+import java.util.Arrays;
+
 /**
  * This class does an linear interpolation of input points.
- * @author jan
+ * @author jan, kai, max
  *
  */
 public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
@@ -24,41 +26,35 @@ public class LinearTimeCorrectionKernel implements TimeCorrectionKernel {
 	@Override
 	public double interpolate(double t) {
 		
-		int id = getIndex(t);
-		if (id < numPoints - 1)
-		{
-			// check left border
-			if(id == 0 && times[0] > t)
-				return values[0];
-			
-			double t0 = times[id];
-			double t1 = times[id + 1];
-			double s = (t - t0) / (t1 - t0); // interpolation in "percent"
-		
-			double v0 = values[id];
-			double v1 = values[id + 1];
-			
-			return (v1 - v0) * s + v0;
-		}else // check right border
-		{
-			return values[numPoints - 1];
-		}
-		
-	}
-	
-	/**
-	 * This function return the id of the entry with smaller t.
-	 * @param t
-	 * @return
-	 */
-	private int getIndex(double t) {
-		int id = 0;
-		while(id < numPoints - 1 && times[id + 1] < t){
-			id++;
-		}
-		return id;
-	}
-	
+		int pos = Arrays.binarySearch(times, t);
 
-	
+        if (pos >= 0){
+            return values[pos];
+        }
+
+        // see semantic of Arrays.binaryseach return code.
+        pos = -(pos +1);
+
+        // in case insertion point is the beginning of the array return the left border
+        if(pos == 0){
+            return values[0];
+        }
+        
+        if (pos >= values.length){
+            return values[values.length - 1];
+        }
+
+
+        double t0 = times[pos -1];
+        double t1 = times[pos];
+
+        // calculate the slope
+        double s = (t - t0) / (t1 - t0);
+
+        double v0 = values[pos -1];
+        double v1 = values[pos];
+
+        return (v1 - v0) * s + v0;
+
+	}
 }

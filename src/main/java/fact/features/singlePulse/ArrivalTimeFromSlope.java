@@ -1,7 +1,8 @@
 /**
  * 
  */
-package fact.features;
+package fact.features.singlePulse;
+
 
 import fact.Utils;
 import org.slf4j.Logger;
@@ -61,13 +62,13 @@ public class ArrivalTimeFromSlope implements Processor {
         
         ArrayList[] pulsePeaks =  new ArrayList[npix];
             //the position where pulse leading edges end 
-        ArrayList[] arrivalTimes = new ArrayList[npix];
+        int[][] arrivalTimes = new int[npix][];
             //arrival times for all pulses in each pixel
-        ArrayList[] baselineValues = new ArrayList[npix];
+        double[][] baselineValues = new double[npix][];
             //value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
-            //zero for all positions except where an arrival time is found
-              
+        //zero for all positions except where an arrival time is found
+
         for(int i = 0; i < data.length; i++){
             visualizePositions[i] = 0;
         }
@@ -75,6 +76,9 @@ public class ArrivalTimeFromSlope implements Processor {
         //for each pixel
         for (int pix = 0; pix < npix; pix++) {          
             pulsePeaks[pix] = findPulsePeaks(pix, roi, slopes);
+
+		arrivalTimes[pix] 	= new int[pulsePeaks[pix].size()];
+		baselineValues[pix] 	= new double[pulsePeaks[pix].size()];
             arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
         }
         
@@ -157,65 +161,65 @@ public class ArrivalTimeFromSlope implements Processor {
     
 //the function that finds the starting point of the pulse, defined by the first position with a positive slope, and
 //the position of maximum slope. both values can be used for arrival time or baseline values   
-    public ArrayList findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList[] pulsePeaks, double[] visualizePositions, ArrayList[] baselineValues){
-        ArrayList<Integer> times = new ArrayList<Integer>();
-        ArrayList<Double> baseValues = new ArrayList<Double>();
-        ArrayList<Integer> peaks = pulsePeaks[pix];
-        int number = peaks.size();
-        int pivot = (int) (width/2.0);
-        
-        for(int pulse = 0; pulse < number; pulse++){
-            int end = (Integer) peaks.get(pulse);
-        
-            //find the starting point of the leading edge
-            int current = end;
-            while(slopes[pix*roi+current-1] > 0){
-                current --;
-            }               
-            int start = current;        //start is the first position of the leading edge
-            
-//          accounting for 'false positives':
-            if(pix*roi+end < data.length && pix*roi+start > 0){
-                double difference = data[pix*roi+end] - data[pix*roi+start];            
-                if(difference < 7){
-                    continue;
-                }
-            }
-    
-    //find max slope over leading edge
-            int maxpos = 0;
-            double maxslope = 0;
-            for(int slice = start; slice < end; slice++){
-                int pos = pix*roi+slice;
+	public int[] findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList[] pulsePeaks, double[] visualizePositions, double[][] baselineValues){
+		ArrayList<Integer> times = new ArrayList<Integer>();
+		ArrayList<Double> baseValues = new ArrayList<Double>();
+		ArrayList<Integer> peaks = pulsePeaks[pix];
+		int number = peaks.size();
+		int pivot = (int) (width/2.0);
+		
+		for(int pulse = 0; pulse < number; pulse++){
+			int end = (Integer) peaks.get(pulse);
+		
+			//find the starting point of the leading edge
+			int current = end;
+			while(slopes[pix*roi+current-1] > 0){
+				current --;
+			}				
+			int start = current;		//start is the first position of the leading edge
+			
+//			accounting for 'false positives':
+			if(pix*roi+end < data.length && pix*roi+start > 0){
+				double difference = data[pix*roi+end] - data[pix*roi+start];			
+				if(difference < 7){
+					continue;
+				}
+			}
+	
+	//find max slope over leading edge
+			int maxpos = 0;
+			double maxslope = 0;
+			for(int slice = start; slice < end; slice++){
+				int pos = pix*roi+slice;
 
-                if(width == 1){
-                    double currentslope = slopes[pos];
-                    if(currentslope > maxslope){
-                        maxslope = currentslope; 
-                        maxpos = slice;
-                    }
-                }
-                
-                else{
-                    if(slice+pivot < end && slice-pivot > start){
-                        double currentslope = data[pos+pivot] - data[pos-pivot];
-                        if(currentslope > maxslope){
-                            maxslope = currentslope;
-                            maxpos = slice;
-                        }
-                    }
-                }
-            } 
-            
-            if(start > 0+skipFirstSlices && end < roi-skipLastSlices && end - maxpos < 14){
-                visualizePositions[pix*roi+start] = 15;
-                times.add(start);
-                baseValues.add(data[pix*roi+start]);
-            }
-                //to use maximum slope instead of first position of rising edge, simply replace start with maxpos. 
-        }
-        baselineValues[pix] = baseValues;
-        return times;
+				if(width == 1){
+					double currentslope = slopes[pos];
+					if(currentslope > maxslope){
+						maxslope = currentslope; 
+						maxpos = slice;
+					}
+				}
+				
+				else{
+					if(slice+pivot < end && slice-pivot > start){
+						double currentslope = data[pos+pivot] - data[pos-pivot];
+						if(currentslope > maxslope){
+							maxslope = currentslope;
+							maxpos = slice;
+						}
+					}
+				}
+			} 
+			
+			if(start > 0+skipFirstSlices && end < roi-skipLastSlices && end - maxpos < 14){
+				visualizePositions[pix*roi+start] = 15;
+				times.add(start);
+				baseValues.add(data[pix*roi+start]);
+			}
+				//to use maximum slope instead of first position of rising edge, simply replace start with maxpos. 
+		}
+		baselineValues[pix] = Utils.arrayListToDouble(baseValues);
+        return Utils.arrayListToInt(times);
     }
     
 

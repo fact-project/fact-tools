@@ -1,5 +1,63 @@
 #Changelog for the fact-tools
 
+## Version 0.9.0
+
+These version contains several smaller developments:
+
+SourcePosition operator:
+- The operator now uses the closest strategy to find the tracking report from the aux file.
+
+TwoLevelTimeNeighbor operator:
+- There was a bugfix for the applyTimeNeighborCleaning function: Not only neighboring shower pixels,
+ but all neighbor pixels were checked for the time neighbor cleaning.
+
+maxnoe/risingedgepolynomfit branch:
+- The rising edge branch was merged into the version 0.9.0:
+ - the polynom fit is now calculated analytical
+ - the whole drs time calibration is calculated in the unit slices (no converting to ns)
+ - the interpolate function of the LinearTimeCorrectionKernel now uses a binary search
+ - all changes improve the runtime
+
+skipBrokenFiles branch:
+- The skipBrokenFiles branch was merged into the version 0.9.0:
+ - When using a RecursiveDirectoryStream, there is now a flag, to skip files which cannot be read in.
+  If the flag is true, the whole process is not aborted anymore
+
+settings.properties:
+- The lower cleaning level (level 1: 5.5, level 2: 3.0) are now default for data and mc.
+
+stdAnalysis:
+- The lightpulser delay file is now used in the stdAnalysis
+
+## Version 0.8.10 (tag icrc2015)
+
+With this version the results of the analysis for the icrc 2015 can be reproduced.
+Therefore a few changes were made in comparison to the previous version:
+
+SourcePosition operator:
+- The operator now uses the whole timestamp not only the seconds of the event time for calculating
+ the source position and the correct tracking report
+- The operator uses the earlier strategy to find the tracking report from the aux file. (This is for reproducibility, 
+ it will be changed in version 0.9.0 to the closest strategy)
+
+cleaning.xml in the classpath:
+- The position of zeta tauri was a little bit wrong (difference 0.7 arcsec)
+
+viewer.xml:
+- There is now the property auxFolder, to specify it via the command line
+
+stdAnalysis:
+- There is now the property auxFolder, to specify it via the command line
+- The cleaning level were lowered
+- The old delay file is used (This is for reproducibility, it will be changed in version 0.9.0)
+
+## Version 0.8.8
+Added a replacement process to measure the performance of individual Processors. 
+You can use it like this:
+        
+        <process class="fact.PerformanceMeasuringProcess" url="file:./measured_runtime.json" id="1" input="fact"
+                warmupIterations="33">
+
 ## Version 0.8.6
 
 A new tutorial package has been added. It contains some simple processors that hopefully help to understand the basic concepts

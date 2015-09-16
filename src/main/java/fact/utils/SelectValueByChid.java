@@ -27,7 +27,9 @@ public class SelectValueByChid implements Processor {
         double[] data = Utils.toDoubleArray(input.get(key));
 
         //add processors threshold to the DataItem
-        input.put(outputKey, data[chid]);
+        if (data !=  null){
+            input.put(outputKey, data[chid]);
+        }
 
         return input;
     }

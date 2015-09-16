@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This selector can display all arrays which are 1440*B with B > 1 length. The Selector will be displayed
+ * This selector can display all arrays which are 1440xB with B &gt; 1 length. The Selector will be displayed
  * in the plotting window.
  * Created by kaibrugge on 02.06.14.
  */

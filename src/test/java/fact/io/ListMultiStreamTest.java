@@ -18,21 +18,21 @@ import static org.junit.Assert.fail;
 public class ListMultiStreamTest {
     static Logger log = LoggerFactory.getLogger(ListMultiStreamTest.class);
 
-    @Test
-    public void readBrokenJsonTest() throws Exception {
-        URL u =  ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
-        FactFileListMultiStream multiStream = new FactFileListMultiStream();
-        multiStream.setListUrl(new SourceURL(u));
-
-        try {
-            multiStream.setDrsPathKey("bla");
-            multiStream.init();
-        } catch (IllegalArgumentException e){
-            return;
-        }
-
-        fail("This should have thrown an IllegalArgumentException");
-    }
+//    @Test
+//    public void readBrokenJsonTest() throws Exception {
+//        URL u =  ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
+//        FactFileListMultiStream multiStream = new FactFileListMultiStream();
+//        multiStream.setListUrl(new SourceURL(u));
+//
+//        try {
+//            multiStream.setDrsPathKey("bla");
+//            multiStream.init();
+//        } catch (IllegalArgumentException e){
+//            return;
+//        }
+//
+//        fail("This should have thrown an IllegalArgumentException");
+//    }
 
     @Test
     public void readJsonTest() throws Exception {
