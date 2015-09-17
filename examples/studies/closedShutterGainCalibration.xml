@@ -63,7 +63,7 @@
         <fact.filter.MovingAverage
                 key="DataCalibrated"
                 outputKey="DataSmoothed"
-                length="3"
+                length="10"
                 />
 
 <!--  For Closed Shutter Data: Threshold Extraction Method -->
@@ -79,26 +79,35 @@
 
          <fact.features.singlePulse.PulseMaxAmplitude
                  key="DataSmoothed"
-                 outputKey="PulseMaxAmp"
+                 outputKey="maxPositions"
                  pulsePositionKey="StartPositions"
                  />
 
          <fact.features.singlePulse.ArrivalTime
                  key="DataSmoothed"
-                 outputKey="ArrivalTimesAmp"
-                 maxAmpPositionKey="PulseMaxAmp"
+                 outputKey="ArrivalTimes"
+                 maxAmpPositionKey="maxPositions"
                  visualizeKey="halfMaxArrivalTimes"
                  />
 
          <fact.features.singlePulse.PulseSizeCalculator
                  key="DataSmoothed"
-                 outputKey="ClosedPulseSizesAmp"
-                 arrivalTimeKey="ArrivalTimesAmp"
-                 width="30" />
+                 outputKey="IntegratedCharge"
+                 arrivalTimeKey="ArrivalTimes"
+                 width="30"
+                 />
 
         <PrintData/>
 
-        <fact.ShowViewer key="DataCalibrated"/>
+        <fact.utils.SelectArrayByChid
+                key="IntegratedCharge"
+                chid="55"
+                outputKey="IntegratedChargePix55"
+                />
+
+        <fact.plotter.HistogramArrayPlotter key="IntegratedChargePix55" binWidth="50" logAxis="true" color="#666699" />
+
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
 
 	</process>
 </container>
