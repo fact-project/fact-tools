@@ -1,6 +1,5 @@
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ import java.util.Random;
  * the resulting distribution.
  * Created by jbuss on 17.11.14.
  */
-public class ChargeRandSampleGivenWindow implements Processor {
+public class WaveformFluctuation implements Processor {
     @Parameter(required = true)
     private String key = null;
 
@@ -38,7 +37,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
     private long Seed = 5901;
 
     // A logger
-    static Logger log = LoggerFactory.getLogger(ChargeRandSampleGivenWindow.class);
+    static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
 
     private int npix;
 
@@ -72,8 +71,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
 
         //Loop over all pixel and calculate integrals on timeline
         for (int pix = 0; pix < npix; pix++) {
-            int firstStartSlice = skipFirst + rand.nextInt(bound);
-            int startSlice = firstStartSlice;
+            int startSlice = skipFirst + rand.nextInt(bound);
 
             double[] integral = new double[iterations];
 
@@ -102,6 +100,7 @@ public class ChargeRandSampleGivenWindow implements Processor {
             charge[pix] = integral;
 
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
+
             chargeMean[pix]         = descriptiveStatistics.getMean();
             chargeStd[pix]          = descriptiveStatistics.getStandardDeviation();
             chargeKurtosis[pix]     = descriptiveStatistics.getKurtosis();
