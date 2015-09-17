@@ -23,7 +23,8 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	private String outputKey = null;
 	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
 	private String drsTimeKey = "CellOffset";
-
+	@Parameter(required = false, description = "file with the drs time calib constants", defaultValue="classpath:/long_term_constants_median.time.drs.fits")
+	private SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
@@ -34,12 +35,11 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
 
-	private URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
 	@Override
 	public void init(ProcessContext context) throws Exception {
 		try {
-			loadDrsTimeCalibConstants(new SourceURL(url));
+			loadDrsTimeCalibConstants(url);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -112,7 +112,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 		this.numberOfTimemarker = numberOfTimemarker;
 	}
 
-	public void setUrl(URL url) {
+	public void setUrl(SourceURL url) {
 		this.url = url;
 	}
 

@@ -1,0 +1,12 @@
+<container>
+    
+    <properties url="classpath:/test-settings.properties"/>
+    
+    <stream id="rnd" class="fact.io.RandomStream" limit="10"/>
+        
+
+    <process input="rnd">
+        <PrintData />
+    </process>
+    
+</container>
