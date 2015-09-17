@@ -71,8 +71,7 @@ public class WaveformFluctuation implements Processor {
 
         //Loop over all pixel and calculate integrals on timeline
         for (int pix = 0; pix < npix; pix++) {
-            int firstStartSlice = skipFirst + rand.nextInt(bound);
-            int startSlice = firstStartSlice;
+            int startSlice = skipFirst + rand.nextInt(bound);
 
             double[] integral = new double[iterations];
 
@@ -101,6 +100,7 @@ public class WaveformFluctuation implements Processor {
             charge[pix] = integral;
 
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
+
             chargeMean[pix]         = descriptiveStatistics.getMean();
             chargeStd[pix]          = descriptiveStatistics.getStandardDeviation();
             chargeKurtosis[pix]     = descriptiveStatistics.getKurtosis();
