@@ -6,6 +6,14 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 
+/**
+ * Return an array with the deviation of neighboring slices in each pixel.
+ * Therefore loop over data array and subtract the prior slice from the current.
+ *
+ * Created by ftemme, jbuss?
+ */
+
+
 public class Derivation implements Processor {
 	static Logger log = LoggerFactory.getLogger(Derivation.class);
 	
