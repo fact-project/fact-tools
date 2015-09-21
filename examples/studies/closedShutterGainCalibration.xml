@@ -13,6 +13,7 @@
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
 
+    <property name="outfile" value="file:/home/jbuss/testData/20150901_016_singles.json" />
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 <!-- Open Shutter Data: -->
@@ -70,8 +71,8 @@
 
          <fact.features.singlePulse.FindThresholdCrossings
                  key="DataSmoothed"
-                 outputKey="StartPositions"
-                 visualizeOutputKey="PositionPulseCandidates"
+                 outputKey="thresholdCrossings"
+                 visualizeOutputKey="thresholdCrossingsVis"
                  minBelow="4"
                  minAbove="9"
                  threshold="5.0"
@@ -80,34 +81,46 @@
          <fact.features.singlePulse.PulseMaxAmplitude
                  key="DataSmoothed"
                  outputKey="maxPositions"
-                 pulsePositionKey="StartPositions"
+                 pulsePositionKey="thresholdCrossings"
                  />
 
          <fact.features.singlePulse.ArrivalTime
                  key="DataSmoothed"
                  outputKey="ArrivalTimes"
                  maxAmpPositionKey="maxPositions"
-                 visualizeKey="halfMaxArrivalTimes"
+                 visualizeKey="halfMaxVis"
                  />
 
          <fact.features.singlePulse.PulseSizeCalculator
                  key="DataSmoothed"
-                 outputKey="IntegratedCharge"
+                 outputKey="IntegratedCharges"
                  arrivalTimeKey="ArrivalTimes"
                  width="30"
                  />
 
-        <PrintData/>
+        <!--<PrintData/>-->
 
-        <fact.utils.SelectArrayByChid
-                key="IntegratedCharge"
-                chid="55"
-                outputKey="IntegratedChargePix55"
-                />
+        <!--<fact.utils.SelectArrayByChid-->
+                <!--key="IntegratedCharges"-->
+                <!--chid="55"-->
+                <!--outputKey="IntegratedChargePix55"-->
+                <!--/>-->
 
-        <fact.plotter.HistogramArrayPlotter key="IntegratedChargePix55" binWidth="50" logAxis="true" color="#666699" />
+        <!--&lt;!&ndash;<stream.monitor.DataRate />&ndash;&gt;-->
+
+        <!--<fact.plotter.HistogramArrayPlotter-->
+                <!--key="IntegratedChargePix55"-->
+                <!--binWidth="50"-->
+                <!--logAxis="true"-->
+                <!--xTitle="Integrated Charge / (mV 0.5 Samples)"-->
+                <!--yTitle="frequency"-->
+                <!--color="#666699"-->
+                <!--/>-->
 
         <!--<fact.ShowViewer key="DataCalibrated"/>-->
+        <fact.io.JSONWriter
+                url="${outfile}"
+                keys="IntegratedCharges,ArrivalTimes"/>
 
 	</process>
 </container>
