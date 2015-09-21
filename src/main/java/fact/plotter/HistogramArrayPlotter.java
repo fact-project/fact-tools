@@ -32,18 +32,31 @@ public class HistogramArrayPlotter extends DataVisualizer {
 	static Logger log = LoggerFactory.getLogger(HistogramArrayPlotter.class);
 	JFrame frame;
 
-	private boolean keepOpen = true;
+    @Parameter(required = true)
 	private String key;
 
-	private double binWidth = 0.5f;
+    @Parameter(required = false)
+    private boolean logAxis = false;
 
-	private boolean logAxis = false;
+    @Parameter(required = false)
+    private String title = "Histogram";
 
-	private SimpleHistogramDataset dataset;
-	private String title = "Histogram";
-	private String color = "#666699";
-	private JFreeChart chart;
-	private long counter = 0;
+    @Parameter(required = false)
+    private String color = "#666699";
+
+    @Parameter(required = false)
+    private String xTitle = null;
+
+    @Parameter(required = false)
+    private String yTitle = null;
+
+    @Parameter(required = false)
+    private double binWidth = 0.5f;
+
+    private JFreeChart chart;
+    private SimpleHistogramDataset dataset;
+    private long counter = 0;
+    private boolean keepOpen = true;
 
 	public HistogramArrayPlotter() {
 		width = 690;
@@ -58,21 +71,25 @@ public class HistogramArrayPlotter extends DataVisualizer {
 
 		dataset = new SimpleHistogramDataset(key);
 
+        if (xTitle == null){ xTitle = key; }
+        if (yTitle == null){ yTitle = "#"; }
+
+
 		chart = ChartFactory.createHistogram(
 				title,
-				key,
-				"#",
+				xTitle,
+                yTitle,
 				dataset,
 				PlotOrientation.VERTICAL,
-				true,
-				true,
-				false
+				true,		//Legend
+				true,		//tooltips
+                false       //urls
 				);
 
 		chart.setBackgroundPaint(new Color(230,230,230));
 		XYPlot xyplot = (XYPlot)chart.getPlot();
 		if(logAxis)
-			xyplot.setRangeAxis(new LogarithmicAxis("#"));
+			xyplot.setRangeAxis(new LogarithmicAxis(yTitle));
 
 		chart.setTitle(title);
 		xyplot.setForegroundAlpha(0.7F);
@@ -187,13 +204,17 @@ public class HistogramArrayPlotter extends DataVisualizer {
 		this.color = color;
 	}
 
+    public void setyTitle(String yTitle) {
+        this.yTitle = yTitle;
+    }
 
+    public void setxTitle(String xTitle) {
+        this.xTitle = xTitle;
+    }
 
-	public double getBinWidth() {
+    public double getBinWidth() {
 		return binWidth;
 	}
-
-
 
 	public void setBinWidth(double binWidth) {
 		this.binWidth = binWidth;
