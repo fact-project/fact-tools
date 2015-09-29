@@ -1,5 +1,7 @@
 package fact.container;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.Serializable;
 
 
@@ -37,19 +39,41 @@ public class Histogram1D implements Serializable {
         this.binCenters = this.calculateBinCenters();
     }
 
-    private void CalculateBinEdges(){
-        for( int i = 0; i < nBins+1; i++){
-            lowEdges[i] = min + i*binWidth;
-        }
+    private void AddBinsBelow(int nBins){
+        double[] newCounts = new double[nBins];
+        double[] newLowEdges = new double[nBins];
+        double[] newBinCenters = new double[nBins];
+
+        counts      = ArrayUtils.addAll(newCounts, counts);
+        lowEdges    = ArrayUtils.addAll(newLowEdges, lowEdges);
+        binCenters  = ArrayUtils.addAll(newBinCenters, binCenters);
     }
 
+    private void AddBinsAbove(int nBins){
+        double[] newCounts = new double[nBins];
+        double[] newLowEdges = new double[nBins];
+        double[] newBinCenters = new double[nBins];
+
+        counts      = ArrayUtils.addAll(counts, newCounts);
+        lowEdges    = ArrayUtils.addAll(lowEdges, newLowEdges);
+        binCenters  = ArrayUtils.addAll(binCenters, newBinCenters);
+    }
+
+    private int CalculateBinFromVal(double value){
+        return (int) ((value - this.lowEdges[0]) / this.binWidth);
+    }
+
+
     public void AddValue(double value, double weight){
-        if(value < min){
+
+        int bin = CalculateBinFromVal(value);
+        if(bin < 0){
+//            AddBinsBelow(Math.abs(bin));
             underflow += weight;
-        } else if (value >= max){
+        } else if (bin >= counts.length){
+//            AddBinsAbove(bin - counts.length + 1);
             overflow += weight;
         } else {
-            int bin = (int) ((value - this.min) / this.binWidth);
             counts[bin] += weight;
         }
         nEvents += 1.;
@@ -70,6 +94,12 @@ public class Histogram1D implements Serializable {
         for (double val : series){
             AddValue(val, weights[i]);
             i++;
+        }
+    }
+
+    private void CalculateBinEdges(){
+        for( int i = 0; i < nBins+1; i++){
+            lowEdges[i] = min + i*binWidth;
         }
     }
 
