@@ -6,7 +6,7 @@ import java.io.Serializable;
 /**
  *
  * A simple Histogram container, that bins values in a given Range from min. Value to max. Value for a given number of bins. The binWidth is calculated automatically.
- * 
+ *
  * Created by jebuss on 21.09.15.
  */
 public class Histogram1D implements Serializable {
@@ -19,8 +19,9 @@ public class Histogram1D implements Serializable {
     private double  underflow   = 0;
     private double  overflow    = 0;
     private double  binWidth    = 0;
-    private double  lowEdges[];
-    private double  counts[];
+    private double[] lowEdges;
+    private double[] binCenters;
+    private double[] counts;
     private double  nEvents     = 0;
 
 
@@ -33,6 +34,7 @@ public class Histogram1D implements Serializable {
         this.binWidth   = (max - min)/nBins;
         this.lowEdges   = new double[nBins+1];
         this.CalculateBinEdges();
+        this.binCenters = this.calculateBinCenters();
     }
 
     private void CalculateBinEdges(){
@@ -69,6 +71,22 @@ public class Histogram1D implements Serializable {
             AddValue(val, weights[i]);
             i++;
         }
+    }
+
+    public double[] calculateBinCenters(){
+        double[] binCenters = new double[this.counts.length];
+        for (int i = 0; i < this.counts.length; i++){
+            binCenters[i] = this.lowEdges[i] +  this.binWidth/2;
+        }
+        return binCenters;
+    }
+
+    public double[][] toArray() {
+        double[][] XYArray = new double[2][this.nBins];
+        XYArray[0] = this.binCenters;
+        XYArray[1] = this.counts;
+
+        return XYArray;
     }
 
 
