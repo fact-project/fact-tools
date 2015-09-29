@@ -49,6 +49,7 @@ public class PlotPixelHistogram1D extends DataVisualizer {
 
     @Parameter(required = false)
     private int chid = 0;
+    private double binWidth = .1;
 
     private boolean keepOpen = true;
 
@@ -150,8 +151,8 @@ public class PlotPixelHistogram1D extends DataVisualizer {
         chart.setTitle(title);
         xyplot.setForegroundAlpha(0.7F);
         xyplot.setBackgroundPaint(Color.WHITE);
-        xyplot.setDomainGridlinePaint(new Color(150,150,150));
-        xyplot.setRangeGridlinePaint(new Color(150,150,150));
+        xyplot.setDomainGridlinePaint(new Color(150, 150,150));
+        xyplot.setRangeGridlinePaint(new Color(150, 150,150));
         XYBarRenderer xybarrenderer = (XYBarRenderer)xyplot.getRenderer();
         xybarrenderer.setShadowVisible(false);
         xybarrenderer.setBarPainter(new StandardXYBarPainter());
