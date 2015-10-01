@@ -1,6 +1,9 @@
 package fact.container;
 
+import com.sun.imageio.plugins.common.I18N;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
@@ -13,6 +16,7 @@ import java.io.Serializable;
  */
 public class Histogram1D implements Serializable {
     private static final long serialVersionUID = -7653148029952880948L;
+    static Logger log = LoggerFactory.getLogger(Histogram1D.class);
 
     private double  DEFAULT_WEIGHT = 1.;
     private int     nBins       = 100;
@@ -35,80 +39,114 @@ public class Histogram1D implements Serializable {
         this.counts     = new double[nBins];
         this.binWidth   = (max - min)/nBins;
         this.lowEdges   = new double[nBins+1];
-        this.CalculateBinEdges();
-        this.binCenters = this.calculateBinCenters();
+        this.binCenters = new double[nBins];
+        this.calculateBinEdges();
+        this.calculateBinCenters();
     }
 
-    private void AddBinsBelow(int nBins){
+    public Histogram1D(double min, double binWidth){
+        this.binWidth   = binWidth;
+        this.nBins      = 2;
+        this.min        = min;
+        this.max        = binWidth * nBins + min;
+        this.counts     = new double[nBins];
+        this.lowEdges   = new double[nBins+1];
+        this.binCenters = new double[nBins];
+        this.calculateBinEdges();
+        this.calculateBinCenters();
+    }
+
+    private void addBinsBelow(int nBins){
         double[] newCounts = new double[nBins];
         double[] newLowEdges = new double[nBins];
         double[] newBinCenters = new double[nBins];
 
-        counts      = ArrayUtils.addAll(newCounts, counts);
-        lowEdges    = ArrayUtils.addAll(newLowEdges, lowEdges);
-        binCenters  = ArrayUtils.addAll(newBinCenters, binCenters);
+        this.min -= nBins*binWidth;
+
+        this.counts      = ArrayUtils.addAll(newCounts, counts);
+        this.lowEdges    = ArrayUtils.addAll(newLowEdges, lowEdges);
+        this.binCenters  = ArrayUtils.addAll(newBinCenters, binCenters);
+
+        calculateBinEdges();
+        calculateBinCenters();
+
+        this.nBins = counts.length;
     }
 
-    private void AddBinsAbove(int nBins){
+    private void addBinsAbove(int nBins){
         double[] newCounts = new double[nBins];
         double[] newLowEdges = new double[nBins];
         double[] newBinCenters = new double[nBins];
 
-        counts      = ArrayUtils.addAll(counts, newCounts);
-        lowEdges    = ArrayUtils.addAll(lowEdges, newLowEdges);
-        binCenters  = ArrayUtils.addAll(binCenters, newBinCenters);
+        this.max += nBins*binWidth;
+
+        this.counts      = ArrayUtils.addAll(counts, newCounts);
+        this.lowEdges    = ArrayUtils.addAll(lowEdges, newLowEdges);
+        this.binCenters  = ArrayUtils.addAll(binCenters, newBinCenters);
+
+        calculateBinEdges();
+        calculateBinCenters();
+
+        this.nBins = counts.length;
     }
 
-    private int CalculateBinFromVal(double value){
-        return (int) ((value - this.lowEdges[0]) / this.binWidth);
-    }
+    public void addValue(double value, double weight){
 
+        int bin = calculateBinFromVal(value);
 
-    public void AddValue(double value, double weight){
-
-        int bin = CalculateBinFromVal(value);
         if(bin < 0){
-//            AddBinsBelow(Math.abs(bin));
-            underflow += weight;
+            addBinsBelow(Math.abs(bin));
+            log.debug("Bin is missing, adding bin Below");
+//            counts[0] += weight;
+//            underflow += weight;
+//            return;
         } else if (bin >= counts.length){
-//            AddBinsAbove(bin - counts.length + 1);
-            overflow += weight;
-        } else {
-            counts[bin] += weight;
+            addBinsAbove(bin - counts.length + 1);
+            log.debug("Bin is missing, adding bin Above");
+//            counts[counts.length - 1] += weight;
+//            overflow += weight;
+//            return;
         }
+
+        bin = calculateBinFromVal(value);
+        counts[bin] += weight;
+
         nEvents += 1.;
     }
 
-    public void AddValue(double value){
-        AddValue(value, DEFAULT_WEIGHT);
+
+    public void addValue(double value){
+        addValue(value, DEFAULT_WEIGHT);
     }
 
-    public void AddSeries(double[] series){
+    public void addSeries(double[] series){
         for (double val : series){
-            AddValue(val);
+            addValue(val);
         }
     }
 
-    public void AddSeries(double[] series, double[] weights){
+    public void addSeries(double[] series, double[] weights){
         int i =0;
         for (double val : series){
-            AddValue(val, weights[i]);
+            addValue(val, weights[i]);
             i++;
         }
     }
 
-    private void CalculateBinEdges(){
-        for( int i = 0; i < nBins+1; i++){
+    private void calculateBinEdges(){
+        for( int i = 0; i < lowEdges.length; i++){
             lowEdges[i] = min + i*binWidth;
         }
     }
 
-    public double[] calculateBinCenters(){
-        double[] binCenters = new double[this.counts.length];
-        for (int i = 0; i < this.counts.length; i++){
-            binCenters[i] = this.lowEdges[i] +  this.binWidth/2;
+    public void calculateBinCenters(){
+        for (int i = 0; i < this.binCenters.length; i++){
+            this.binCenters[i] = this.lowEdges[i] +  this.binWidth/2;
         }
-        return binCenters;
+    }
+
+    private int calculateBinFromVal(double value){
+        return (int) ((value - this.lowEdges[0]) / this.binWidth);
     }
 
     public double[][] toArray() {
