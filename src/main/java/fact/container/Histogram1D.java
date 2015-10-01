@@ -29,6 +29,7 @@ public class Histogram1D implements Serializable {
     private double[] binCenters;
     private double[] counts;
     private double  nEvents     = 0;
+    private boolean useFixedRange = false;
 
 
 
@@ -46,7 +47,7 @@ public class Histogram1D implements Serializable {
 
     public Histogram1D(double min, double binWidth){
         this.binWidth   = binWidth;
-        this.nBins      = 2;
+        this.nBins      = 1;
         this.min        = min;
         this.max        = binWidth * nBins + min;
         this.counts     = new double[nBins];
@@ -95,17 +96,21 @@ public class Histogram1D implements Serializable {
         int bin = calculateBinFromVal(value);
 
         if(bin < 0){
-            addBinsBelow(Math.abs(bin));
-            log.debug("Bin is missing, adding bin Below");
-//            counts[0] += weight;
-//            underflow += weight;
-//            return;
+            if(useFixedRange){
+                underflow += weight;
+                return;
+            } else {
+                addBinsBelow(Math.abs(bin));
+                log.debug("Bin is missing, adding bin Below");
+            }
         } else if (bin >= counts.length){
-            addBinsAbove(bin - counts.length + 1);
-            log.debug("Bin is missing, adding bin Above");
-//            counts[counts.length - 1] += weight;
-//            overflow += weight;
-//            return;
+            if(useFixedRange){
+                overflow += weight;
+                return;
+            } else {
+                addBinsAbove(bin - counts.length + 1);
+                log.debug("Bin is missing, adding bin Above");
+            }
         }
 
         bin = calculateBinFromVal(value);
@@ -192,5 +197,13 @@ public class Histogram1D implements Serializable {
 
     public double[] getCounts() {
         return counts;
+    }
+
+    public double[] getBinCenters() {
+        return binCenters;
+    }
+
+    public void setUseFixedRange(boolean useFixedRange) {
+        this.useFixedRange = useFixedRange;
     }
 }
