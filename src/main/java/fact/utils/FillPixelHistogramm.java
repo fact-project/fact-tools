@@ -1,6 +1,5 @@
 package fact.utils;
 
-import com.sun.tools.internal.jxc.ap.Const;
 import fact.Constants;
 import fact.Utils;
 import fact.container.Histogram1D;
@@ -10,8 +9,6 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-
-import java.util.ArrayList;
 
 /**
  * Created by jebuss on 23.09.15.
@@ -45,7 +42,7 @@ public class FillPixelHistogramm implements StatefulProcessor {
         double[] numEvents = new double[npix];
 
         for (int pix = 0; pix < npix; pix++){
-            histograms[pix].AddSeries(data[pix]);
+            histograms[pix].addSeries(data[pix]);
             numEvents[pix] = histograms[pix].getnEvents();
         }
 
