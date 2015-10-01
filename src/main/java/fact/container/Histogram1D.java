@@ -32,10 +32,10 @@ public class Histogram1D implements Serializable {
 
 
     /**
-     * Constructor 
-     * @param min
-     * @param max
-     * @param nBins
+     * Constructor
+     * @param min low edge of the range
+     * @param max top edge of the range
+     * @param nBins number of bins
      */
     public Histogram1D(double min, double max, int nBins){
         this.max        = max;
@@ -49,6 +49,12 @@ public class Histogram1D implements Serializable {
         this.calculateBinCenters();
     }
 
+    /**
+     * Constructor: number of bins is by default set to 1, top edge is calculated from the bin width
+     *
+     * @param min low edge of the range
+     * @param binWidth bin width
+     */
     public Histogram1D(double min, double binWidth){
         this.binWidth   = binWidth;
         this.nBins      = 1;
@@ -95,6 +101,12 @@ public class Histogram1D implements Serializable {
         this.nBins = counts.length;
     }
 
+    /**
+     * Fill a value to the histogram and rise the number of counts of that bin by the given weight.
+     *
+     * @param value
+     * @param weight
+     */
     public void addValue(double value, double weight){
 
         int bin = calculateBinFromVal(value);
@@ -125,17 +137,31 @@ public class Histogram1D implements Serializable {
         nEvents += 1.;
     }
 
-
+    /**
+     * Fill a value to the histogram and rise the number of counts of that bin by the default weight of 1.
+     *
+     * @param value
+     */
     public void addValue(double value){
         addValue(value, DEFAULT_WEIGHT);
     }
 
+    /**
+     * Fill a series of values into the Histogram.
+     *
+     * @param series
+     */
     public void addSeries(double[] series){
         for (double val : series){
             addValue(val);
         }
     }
 
+    /**
+     * Fill a series of values into the Histogram, given the array of weights.
+     * @param series
+     * @param weights
+     */
     public void addSeries(double[] series, double[] weights){
         int i =0;
         for (double val : series){
