@@ -1,6 +1,5 @@
 package fact.container;
 
-import com.sun.imageio.plugins.common.I18N;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,20 +18,25 @@ public class Histogram1D implements Serializable {
     static Logger log = LoggerFactory.getLogger(Histogram1D.class);
 
     private double  DEFAULT_WEIGHT = 1.;
-    private int     nBins       = 100;
-    private double  min         = 0;
-    private double  max         = 100;
+    private int     nBins;
+    private double  min;
+    private double  max;
     private double  underflow   = 0;
     private double  overflow    = 0;
-    private double  binWidth    = 0;
+    private double  binWidth;
     private double[] lowEdges;
     private double[] binCenters;
     private double[] counts;
     private double  nEvents     = 0;
-    private boolean useFixedRange = false;
+    private boolean useDynamicBinning = true;
 
 
-
+    /**
+     * Constructor 
+     * @param min
+     * @param max
+     * @param nBins
+     */
     public Histogram1D(double min, double max, int nBins){
         this.max        = max;
         this.min        = min;
@@ -96,16 +100,18 @@ public class Histogram1D implements Serializable {
         int bin = calculateBinFromVal(value);
 
         if(bin < 0){
-            if(useFixedRange){
+            if(!useDynamicBinning){
                 underflow += weight;
+                nEvents += 1.;
                 return;
             } else {
                 addBinsBelow(Math.abs(bin));
                 log.debug("Bin is missing, adding bin Below");
             }
         } else if (bin >= counts.length){
-            if(useFixedRange){
+            if(!useDynamicBinning){
                 overflow += weight;
+                nEvents += 1.;
                 return;
             } else {
                 addBinsAbove(bin - counts.length + 1);
@@ -203,7 +209,7 @@ public class Histogram1D implements Serializable {
         return binCenters;
     }
 
-    public void setUseFixedRange(boolean useFixedRange) {
-        this.useFixedRange = useFixedRange;
+    public void setUseDynamicBinning(boolean useDynamicBinning) {
+        this.useDynamicBinning = useDynamicBinning;
     }
 }
