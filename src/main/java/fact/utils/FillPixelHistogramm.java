@@ -23,8 +23,9 @@ public class FillPixelHistogramm implements StatefulProcessor {
     @Parameter(required = false)
     private String numEventsKey = "numEvents"+outputKey;
 
+    double binWidth = 100;
 
-    int  nBins = 100;
+    int  nBins = 2;
     double min = 0;
     double max = 100;
     int npix = Constants.NUMBEROFPIXEL;
@@ -56,8 +57,8 @@ public class FillPixelHistogramm implements StatefulProcessor {
     public void init(ProcessContext processContext) throws Exception {
         histograms = new Histogram1D[npix];
         for(int i = 0; i < npix; i++){
-            Histogram1D hist = new Histogram1D(this.min, this.max, this.nBins);
-            hist.getBinWidth();
+//            Histogram1D hist = new Histogram1D(this.min, this.max, this.nBins);
+            Histogram1D hist = new Histogram1D(this.min, this.binWidth);
             histograms[i] = hist;
         }
     }
