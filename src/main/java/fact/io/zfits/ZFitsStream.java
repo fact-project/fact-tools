@@ -209,8 +209,8 @@ public class ZFitsStream extends AbstractStream implements FactStream{
             Utils.mapContainsKeys(item, "Data", "StartCellData", "NROI", "NPIX");
             short[] data = ((short[])item.get("Data"));
             short[] startCellData = (short[])item.get("StartCellData");
-            int roi = (int) item.get("NROI");
-            int numberOfPixel = (int) item.get("NPIX");
+            int roi = (Integer) item.get("NROI");
+            int numberOfPixel = (Integer) item.get("NPIX");
 
 //            if (calibData==null)
 //                throw new NullPointerException("Should not happen");
