@@ -170,19 +170,36 @@ public class Histogram1D implements Serializable {
         }
     }
 
+    /**
+     * Get the bin with the most entries and  its frequency
+     * @return max Bin, max frequency
+     */
+
+    public int getMaximumBin(){
+        double maxVal = 0.;
+        int maxBin = 0;
+        for (int i = 0; i < this.counts.length; i++) {
+            if (this.counts[i] > maxVal){
+                maxVal = this.counts[i];
+                maxBin = i;
+            }
+        }
+        return maxBin;
+    }
+
     private void calculateBinEdges(){
         for( int i = 0; i < lowEdges.length; i++){
             lowEdges[i] = min + i*binWidth;
         }
     }
 
-    public void calculateBinCenters(){
+    private void calculateBinCenters(){
         for (int i = 0; i < this.binCenters.length; i++){
             this.binCenters[i] = this.lowEdges[i] +  this.binWidth/2;
         }
     }
 
-    private int calculateBinFromVal(double value){
+    public int calculateBinFromVal(double value){
         return (int) ((value - this.lowEdges[0]) / this.binWidth);
     }
 
