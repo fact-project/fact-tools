@@ -3,14 +3,17 @@ package fact.features.singlePulse;
 import fact.Constants;
 import fact.Utils;
 import fact.container.Histogram1D;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.PowellOptimizer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -18,6 +21,7 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.apache.commons.math3.fitting.AbstractCurveFitter.*;
@@ -36,8 +40,10 @@ public class FitSpectra implements StatefulProcessor{
     private String key;
     @Parameter(required = false)
     private String outputKey;
+    @Parameter(required = false)
+    private String startValuesKey;
 
-    private int eventIncrement = 1000;
+    private int eventIncrement = 250;
 
     private int npix = Constants.NUMBEROFPIXEL;
 
@@ -46,6 +52,15 @@ public class FitSpectra implements StatefulProcessor{
     ParametricUnivariateFunction FitFunction;
 
     double[][] fitParamters;
+    double[][] startValues;
+
+    double[] amplitude = new double[npix];
+    double[] gain      = new double[npix];
+    double[] sigma     = new double[npix];
+    double[] cross     = new double[npix];
+    double[] shift     = new double[npix];
+    double[] noise     = new double[npix];
+    double[] expo      = new double[npix];
 
 
 
@@ -60,6 +75,8 @@ public class FitSpectra implements StatefulProcessor{
         Utils.isKeyValid(input, key, Histogram1D[].class);
         histograms = (Histogram1D[]) input.get(key);
 
+
+
         if ( !(eventNum % eventIncrement == 0) ){
             input.put(outputKey, fitParamters);
             return input;
@@ -67,36 +84,12 @@ public class FitSpectra implements StatefulProcessor{
 
 
         for( int pix = 0; pix < npix; pix++){
-
-            double[] binCenters = histograms[pix].getBinCenters();
-            double[] counts     = histograms[pix].getCounts();
-            int maxBin    = histograms[pix].getMaximumBin();
-            double maxFrequency = histograms[pix].getCounts()[maxBin];
-            double maxIntegral  = histograms[pix].getBinCenters()[maxBin];
-
-
-            SinglePeSpectrumLogLikelihood negLnL = new SinglePeSpectrumLogLikelihood(binCenters, counts);
-            ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
-
-            MaxEval maxEval = new MaxEval(1000);
-            InitialGuess start_values = new InitialGuess(new double[] {maxFrequency, maxIntegral, .4, 1.5, 5, .0005, 0.2});
-            PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-8);
-
-            double[] parameters = new double[7];
-            try{
-                PointValuePair result = optimizer.optimize(ob_negLnL, GoalType.MINIMIZE, start_values, maxEval);
-
-                parameters = result.getPoint();
-            } catch (TooManyEvaluationsException e){
-                for (int i = 0; i < 7; i++) {
-                    parameters[i] = Double.NaN;
-                }
-            }
-
-            fitParamters[pix] = parameters.clone();
+            startValues[pix]  = estimateStartValues(histograms[pix]);
+            fitParamters[pix] = FitHistogram(histograms[pix], startValues[pix]);
         }
 
         input.put(outputKey, fitParamters);
+        input.put(startValuesKey, startValues);
         return input;
     }
 
@@ -104,10 +97,15 @@ public class FitSpectra implements StatefulProcessor{
     public void init(ProcessContext context) throws Exception {
 
         fitParamters = new double[npix][];
-        for( double[] parameters : fitParamters){
-            parameters = new double[7];
+        startValues  = new double[npix][];
+
+        for (int pix = 0; pix < npix; pix++) {
+
+            fitParamters[pix] = new double[7];
+            startValues[pix]  = new double[7];
             for (int i = 0; i < 7; i++) {
-                parameters[i] = Double.NaN;
+                fitParamters[pix][i] = Double.NaN;
+                startValues[pix][i]  = Double.NaN;
             }
         }
 
@@ -124,11 +122,101 @@ public class FitSpectra implements StatefulProcessor{
 
     }
 
+    public double EstimateSigma(double fractionOfMax, Histogram1D histogram){
+        int maxBin    = histogram.getMaximumBin();
+        double[] counts = histogram.getCounts();
+        double[] centers = histogram.getBinCenters();
+        double maximum = counts[maxBin];
+
+        double halfWidth = 0.;
+        for (int i = 0; i < counts.length - maxBin; i++) {
+            try{
+                if (counts[maxBin + i] <= fractionOfMax * maximum ||
+                        counts[maxBin - i] <= fractionOfMax * maximum){
+                    halfWidth = centers[maxBin + i] - centers[maxBin - i];
+                    break;
+                }
+            } catch (ArrayIndexOutOfBoundsException e){
+                halfWidth = 0.;
+            }
+        }
+        double sigma = halfWidth/ 2 / Math.sqrt(2 * Math.log(1 / fractionOfMax));
+
+        return sigma;
+    }
+
+    private double[] estimateStartValues(Histogram1D histogram){
+        int maxBin    = histogram.getMaximumBin();
+
+        double maxFrequency = histogram.getCounts()[maxBin];
+        double maxIntegral  = histogram.getBinCenters()[maxBin];
+        double sigma_start  = EstimateSigma(3./4, histogram);
+
+        double[] start_values = new double[] {
+                maxFrequency,   //amplitude
+                maxIntegral,    //gain
+                sigma_start/maxIntegral,    //sigma
+                0.10,           //crosstalk
+                0.,             //baselineshift
+                .3,          //noise
+                0.95             //coeffn
+        };
+        return start_values;
+    }
+
+    public double[] FitHistogram(Histogram1D histogram, double[] start_values){
+
+        double[] binCenters = histogram.getBinCenters();
+        double[] counts     = histogram.getCounts();
+
+        int borderBin = histogram.calculateBinFromVal(200);
+        int newLength = binCenters.length;
+
+        if (borderBin < binCenters.length){
+            newLength = binCenters.length - borderBin;
+        } else {
+            borderBin = 0;
+        }
+
+        double[] newCenters = new double[newLength];
+        double[] newCounts  = new double[newLength];
+
+        System.arraycopy(binCenters, borderBin, newCenters, 0, newLength);
+        System.arraycopy(counts, borderBin, newCounts, 0, newLength);
+
+
+
+
+        SinglePeSpectrumLogLikelihood negLnL = new SinglePeSpectrumLogLikelihood(newCenters, newCounts);
+        ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
+
+        MaxEval maxEval = new MaxEval(1000);
+        InitialGuess intitial_guess = new InitialGuess(start_values);
+        PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-8);
+
+        double[] parameters = new double[7];
+        try{
+            PointValuePair result = optimizer.optimize(ob_negLnL, GoalType.MINIMIZE, intitial_guess, maxEval);
+
+            parameters = result.getPoint();
+        } catch (TooManyEvaluationsException e){
+            for (int i = 0; i < 7; i++) {
+                parameters[i] = Double.NaN;
+            }
+        }
+
+        return parameters.clone();
+    }
+
     public void setKey(String key) {
         this.key = key;
     }
 
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
+    }
+
+    public void setStartValuesKey(String startValuesKey) {
+        this.startValuesKey = startValuesKey;
     }
 }
