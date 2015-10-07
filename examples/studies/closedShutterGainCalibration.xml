@@ -111,9 +111,8 @@
             key="IntegratedCharges"
             outputKey="IntegratedChargesHist"
             numEventsKey="numSingles"
-            nBins="2"
-            min="0"
-            max="3000"
+            binWidth="10"
+            min="150"
             />
         <stream.flow.Every n="250">
 
