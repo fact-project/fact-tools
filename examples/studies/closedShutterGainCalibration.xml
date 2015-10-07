@@ -100,31 +100,44 @@
 
         <!--<PrintData/>-->
 
-        <!--<fact.utils.SelectArrayByChid-->
-                <!--key="IntegratedCharges"-->
-                <!--chid="55"-->
-                <!--outputKey="IntegratedChargePix55"-->
-                <!--/>-->
-
-        <!--&lt;!&ndash;<stream.monitor.DataRate />&ndash;&gt;-->
-
-        <!--<fact.plotter.HistogramArrayPlotter-->
-                <!--key="IntegratedChargePix55"-->
-                <!--binWidth="50"-->
-                <!--logAxis="true"-->
-                <!--xTitle="Integrated Charge / (mV 0.5 Samples)"-->
-                <!--yTitle="frequency"-->
-                <!--color="#666699"-->
-                <!--/>-->
-
-        <fact.utils.FillPixelHistogramm
+        <fact.utils.SelectArrayByChid
                 key="IntegratedCharges"
-                outputKey="IntegratedChargesHist"
-                numEventsKey="numSingles"
+                chid="55"
+                outputKey="IntegratedChargePix55"
                 />
 
 
-        <fact.ShowViewer key="DataCalibrated"/>
+        <fact.utils.FillPixelHistogramm
+            key="IntegratedCharges"
+            outputKey="IntegratedChargesHist"
+            numEventsKey="numSingles"
+            nBins="2"
+            min="0"
+            max="3000"
+            />
+        <stream.flow.Every n="250">
+
+            <fact.features.singlePulse.FitSpectra
+                    key="IntegratedChargesHist"
+                    outputKey="FitParamters"
+                    startValuesKey="startValues"
+                    />
+
+            <!--color="#666699"-->
+            <fact.io.JSONWriter
+                    url="File:/local/data/jbuss/Studien/singlePe2.json"
+                    keys="chargesHistogram,IntegratedChargesHist,FitParamters,startValues"
+                    />
+
+            <PrintData/>
+        </stream.flow.Every>
+
+        <fact.io.JSONWriter
+                url="File:/local/data/jbuss/Studien/singlePe2Extr.json"
+                keys="IntegratedCharges"
+                />
+
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
         <!--<fact.io.JSONWriter-->
                 <!--url="${outfile}"-->
                 <!--keys="IntegratedCharges,ArrivalTimes"/>-->
