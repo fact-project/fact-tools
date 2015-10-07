@@ -22,14 +22,15 @@ public class FillPixelHistogramm implements StatefulProcessor {
     private String outputKey;
     @Parameter(required = false)
     private String numEventsKey = "numEvents"+outputKey;
+    @Parameter(required = false)
+    private double binWidth = 20;
+    @Parameter(required = false)
 
-    double binWidth = 100;
-
-    int  nBins = 2;
-    double min = 0;
-    double max = 100;
-    int npix = Constants.NUMBEROFPIXEL;
-    Histogram1D[] histograms;
+    private int  nBins = 2;
+    private double min = 0;
+    private double max = 100;
+    private int npix = Constants.NUMBEROFPIXEL;
+    private Histogram1D[] histograms;
 
     @Override
     public Data process(Data input) {
@@ -95,5 +96,9 @@ public class FillPixelHistogramm implements StatefulProcessor {
 
     public void setMax(double max) {
         this.max = max;
+    }
+
+    public void setBinWidth(double binWidth) {
+        this.binWidth = binWidth;
     }
 }
