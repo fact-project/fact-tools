@@ -39,6 +39,13 @@ public class FactPixelMapping implements PixelMapping {
             {{1, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}}  //pixel with a even x coordinate
     };
 
+    //lena----------------------------------
+    private final int[][][] neighbourOffsetsLarge = {
+            {{-2,-1}, {-2, 0}, {-2, 1}, {-1,-2}, {-1, 1}, {0,-2}, {0, 2}, {1,-2}, {1, 1}, {2,-1}, {2, 0}, {2, 1}},
+            {{-2,-1}, {-2, 0}, {-2, 1}, {-1,-1}, {-1, 2}, {0,-2}, {0, 2}, {1,-1}, {1, 2}, {2,-1}, {2, 0}, {2, 1}}
+
+    };
+    //--------------------------------------
     private int xOffset = 22;
     private int yOffset = 19;
 
@@ -135,9 +142,21 @@ public class FactPixelMapping implements PixelMapping {
 
 
     }
+
+    /**
+     * Return an array of FactCameraPixel which are direct neighbours to the pixel ID passed into this method.
+     * @param id the id of pixel
+     * @return neighbouring Pixels
+     */
     public FactCameraPixel[] getNeighboursFromID(int id){
         return getNeighboursForPixel(getPixelFromId(id));
     }
+
+    /**
+     * Return an array of FactCameraPixel which direct are neighbours to the pixel passed into this method.
+     * @param p the pixel to get the neighbours from
+     * @return neighbouring Pixels
+     */
     public FactCameraPixel[] getNeighboursForPixel(CameraPixel p) {
         ArrayList<FactCameraPixel> l = new ArrayList<>();
         //check if x coordinate is even or not
@@ -145,6 +164,36 @@ public class FactPixelMapping implements PixelMapping {
         //get the neighbour in each direction and store them in hte list
         for (int direction = 0; direction <= 5; direction++) {
             int[] d = neighbourOffsets[parity][direction];
+            FactCameraPixel np = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);
+            if (np != null){
+                l.add(np);
+            }
+        }
+        FactCameraPixel[] t = new FactCameraPixel[l.size()];
+        return l.toArray(t);
+    }
+
+    /**
+     * Return an array of FactCameraPixel which are the neighbours of the neighbours without the direct neighbours. These are all pixels with distance 2
+     * @param id
+     * @return array of FactCameraPixel; not always the same length
+     */
+    public FactCameraPixel[] getSecondOrderNeighboursFromID(int id){
+        return getSecondOrderNeighboursForPixel(getPixelFromId(id));
+    }
+
+    /**
+     * Return an array of FactCameraPixel which are the neighbours of the neighbours without the direct neighbours. These are all pixels with distance 2
+     * @param p
+     * @return array of FactCameraPixel; not always the same length
+     */
+    public FactCameraPixel[] getSecondOrderNeighboursForPixel(CameraPixel p) {
+        ArrayList<FactCameraPixel> l = new ArrayList<>();
+        //check if x coordinate is even or not
+        int parity = (p.geometricX & 1);
+        //get the neighbour in each direction and store them in hte list
+        for (int direction = 0; direction < 12; direction++) {
+            int[] d = neighbourOffsetsLarge[parity][direction];
             FactCameraPixel np = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);
             if (np != null){
                 l.add(np);
