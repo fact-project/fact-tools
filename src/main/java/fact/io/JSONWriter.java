@@ -50,7 +50,14 @@ public class JSONWriter implements StatefulProcessor {
     public Data process(Data data) {
         Data item = DataFactory.create();
 
-        String[] evKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
+        //converts unix time to simple date format
+        if(data.containsKey("UnixTimeUTC") && data.get("UnixTimeUTC") != null) {
+            int[] timestamp = (int[]) data.get("UnixTimeUTC");
+            String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date(((long) timestamp[0]) * 1000));
+            data.put("Timestamp", date);
+        }
+
+        String[] evKeys = {"EventNum", "TriggerType", "NROI", "NPIX", "Timestamp"};
         for(String key : evKeys) {
             if (data.containsKey(key)) {
                 item.put(key, data.get(key));
