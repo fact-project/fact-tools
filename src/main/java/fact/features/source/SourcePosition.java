@@ -42,7 +42,7 @@ import java.io.IOException;
  *  information at where the telescope pointing which is updated in small intervals.
  *
  *  Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
- *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (> revision 18159),
+ *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (after revision 18159),
  *  the source and pointing information are simply taken from the datastream.
  *
  *  For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
@@ -200,8 +200,8 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            DateTime timeStamp = new DateTime((long)(eventTime[0]) * 1000, DateTimeZone.UTC);
-            // the source position is not updated very often. We have to get the point from hte auxfile which
+            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+            // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
             AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
@@ -213,7 +213,7 @@ public class SourcePosition implements StatefulProcessor {
             double dec = trackingPoint.getDouble("Dec");
 
             //convert unixtime to julianday
-            double julianDay = unixTimeToJulianDay(eventTime[0]);
+            double julianDay = unixTimeToJulianDay(eventTime[0]+eventTime[1]/1000000.);
 
             //convert julianday to gmst
             double gmst = julianDayToGmst(julianDay);
@@ -273,7 +273,7 @@ public class SourcePosition implements StatefulProcessor {
     /**
      * Calculates the Greenwhich Mean Sidereal Time from the julianDay.
      * @param julianDay
-     * @return gmst in degrees.
+     * @return gmst in radian.
      */
     public double julianDayToGmst(double julianDay) throws IllegalArgumentException {
 
@@ -306,7 +306,7 @@ public class SourcePosition implements StatefulProcessor {
      * @param ra in decimal Archours (e.g. 5h and 30 minutes : ra = 5.5)
      * @param dec in decimal degrees (e.g. 21 degrees and 30 arcminutes : zd = 21.5)
      * @param gmst the Eventtime of the current event in gmst format
-     * @return an array of length 2 containing {azimuth, zenith}, not null;
+     * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
      */
     public double[] getAzZd(double ra, double dec, double gmst){
         if (ra >= 24.0 || ra < 0.0 || dec >= 360.0 || dec < 0 ){

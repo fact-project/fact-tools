@@ -22,8 +22,17 @@
 
 	<menu name="General">
 		<item name="Overview" href="index.html"/>
+		<item name="Publications" href="publications.html" />
 		<item name="Fact Viewer" href="viewer.html" />
 		<item name="Building" href="build.html"/>
+	</menu>
+	
+	<menu name="Tutorial">
+		<item name="FACT Tools Tutorial" href="tutorial/index.html" collapse="true">
+			<item name="(1) Running FACT-Tools" href="tutorial/running.html" />
+			<item name="(2) Telescope Data Inspection" href="tutorial/viewing.html" />
+			<item name="(3) Data Preprocessing" href="tutorial/preprocessing.html" />
+		</item>
 	</menu>
 	
 	<menu name="Documentation">

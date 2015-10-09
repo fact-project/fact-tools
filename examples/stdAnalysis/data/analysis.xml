@@ -8,12 +8,13 @@
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
     
-    <!--<property name="outfile" value="file:/home/fabian/testoutfile.txt" />-->
+    <property name="outfile" value="file:/home/fabian/testoutfile.txt" />
 
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+    <property name="auxFolder" value="file:src/main/resources/aux/" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
 
     <!--In case you want to analyze .zfits files.-->
-    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>-->
+    <!-- <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/> -->
 
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
@@ -54,10 +55,10 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/data/sourceParameter.xml" /> 
         <!-- Output: source dependent parameters -->
-        
-         <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
 
-        <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
+        <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
+
+        <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
 
     </process>
 

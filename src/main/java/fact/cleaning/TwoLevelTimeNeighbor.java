@@ -169,7 +169,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 			int counter = 0;
 			double time = arrivalTime[pixel];
 			for (FactCameraPixel nPix:currentNeighbors){
-				if( Math.abs(arrivalTime[nPix.id]-time) < timeThreshold){
+				if( Math.abs(arrivalTime[nPix.id]-time) < timeThreshold && showerPixel.contains(nPix.id)){
 					counter++;
 				}
 			}

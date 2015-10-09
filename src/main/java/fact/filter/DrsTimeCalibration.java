@@ -23,7 +23,8 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	private String outputKey = null;
 	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
 	private String drsTimeKey = "CellOffset";
-
+	@Parameter(required = false, description = "file with the drs time calib constants", defaultValue="classpath:/long_term_constants_median.time.drs.fits")
+	private SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
@@ -34,12 +35,11 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
 
-	private URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
 	@Override
 	public void init(ProcessContext context) throws Exception {
 		try {
-			loadDrsTimeCalibConstants(new SourceURL(url));
+			loadDrsTimeCalibConstants(url);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -96,44 +96,24 @@ public class DrsTimeCalibration implements StatefulProcessor{
 		}
 	}
 
-	public String getStartCellKey() {
-		return startCellKey;
-	}
-
 	public void setStartCellKey(String startCellKey) {
 		this.startCellKey = startCellKey;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
-	}
-	
-	public int getNumberOfSlices() {
-		return numberOfSlices;
 	}
 
 	public void setNumberOfSlices(int numberOfSlices) {
 		this.numberOfSlices = numberOfSlices;
 	}
 
-	public int getNumberOfTimemarker() {
-		return numberOfTimemarker;
-	}
-
 	public void setNumberOfTimemarker(int numberOfTimemarker) {
 		this.numberOfTimemarker = numberOfTimemarker;
 	}
 
-	public void setUrl(URL url) {
+	public void setUrl(SourceURL url) {
 		this.url = url;
-	}
-
-	public String getDrsTimeKey() {
-		return drsTimeKey;
 	}
 
 	public void setDrsTimeKey(String drsTimeKey) {

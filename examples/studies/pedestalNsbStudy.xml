@@ -54,9 +54,9 @@
        
             <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
         <!---->
-        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
+        <fact.extraction.WaveformFluctuation key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
 
-        <fact.utils.SelectValueByChid key="Nsb_rms" chid="286" outputKey="Nsb_rms_1" />
+        <fact.utils.SelectValueByChid key="Nsb_std" chid="286" outputKey="Nsb_rms_1" />
         <!--<fact.plotter.HistogramPlotter key="Nsb_rms_1" binWidth="1" logAxis="true" color="#666699" />-->
 
         <fact.utils.SelectValueByChid key="Nsb_mean" chid="286" outputKey="Nsb_mean_1" />

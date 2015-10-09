@@ -2,6 +2,8 @@ package fact.io;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import fact.io.gsonTypeAdapter.DoubleAdapter;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -38,6 +40,11 @@ public class JSONWriter implements StatefulProcessor {
 
     @Parameter(required = true)
     private String[] keys;
+    @Parameter(required = false, description = "Defines how many significant digit are used for double values", defaultValue="null")
+    private Integer doubleSignDigits = null;
+    @Parameter(required = false, description = "If true a list of data items is written (and therefore the output file is a valid"
+    		+ "json object", defaultValue = "false")
+    private boolean writeListOfItems = false;
 
     @Parameter(required = true)
     private URL url;
@@ -45,6 +52,8 @@ public class JSONWriter implements StatefulProcessor {
     private Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
+    
+    boolean isFirstLine = true;
 
     @Override
     public Data process(Data data) {
@@ -63,14 +72,24 @@ public class JSONWriter implements StatefulProcessor {
                 item.put(key, data.get(key));
             }
         }
-
         for (String key: keys){
             item.put(key, data.get(key));
         }
         try {
+        	if (isFirstLine)
+        	{
+        		isFirstLine = false;
+        	}
+        	else
+        	{
+        		if (writeListOfItems)
+        		{
+        			bw.write(",");
+        		}
+    			bw.newLine();
+        	}
             b.append(gson.toJson(item));
             bw.write(b.toString());
-            bw.newLine();
         } catch (IOException ioex) {
             ioex.printStackTrace();
         }
@@ -81,7 +100,11 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        bw= new BufferedWriter(new FileWriter(new File(url.getFile())));
+        bw = new BufferedWriter(new FileWriter(new File(url.getFile())));
+        if (writeListOfItems)
+        {
+        	bw.write("[");
+        }
     }
 
     @Override
@@ -90,6 +113,10 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public void finish() throws Exception {
         if(bw != null) {
+        	if (writeListOfItems)
+        	{
+        		bw.write("]");
+        	}
             bw.close();
         }
     }
@@ -110,6 +137,24 @@ public class JSONWriter implements StatefulProcessor {
     public void setUrl(URL url) {
         this.url = url;
     }
+
+
+	public void setDoubleSignDigits(int doubleSignDigits) {
+		this.doubleSignDigits = doubleSignDigits;
+		DoubleAdapter doubleAdapter = new DoubleAdapter();
+		doubleAdapter.setSignDigits(doubleSignDigits);
+		gson = new GsonBuilder()
+				.serializeSpecialFloatingPointValues()
+				.registerTypeAdapter(double.class, doubleAdapter)
+				.registerTypeAdapter(Double.class, doubleAdapter)
+				.enableComplexMapKeySerialization()
+				.create();
+	}
+
+
+	public void setWriteListOfItems(boolean writeListOfItems) {
+		this.writeListOfItems = writeListOfItems;
+	}
 
 
 }

@@ -31,6 +31,6 @@
 <fact.datacorrection.InterpolateBadPixel 
     key="DataCalibrated" 
     outputKey="DataCalibrated"
-    badChidIds="${interpolateBadPixel_badChidIDs}" 
+    badChIds="${interpolateBadPixel_badChidIDs}" 
 />
 </module>

@@ -57,7 +57,6 @@ public class DrsCalibrationTest {
         item.put("@drsFile", new File(drsUrl.getFile()));
 
         item = pr.process(item);
-
         assertThat(item.containsKey("test"), is(true));
 
     }
