@@ -72,7 +72,7 @@ public class MotionCleaning implements Processor {
         cleaningID = removeIsolatedPixel(cleaningID);
         cleaningID = fillHoles(cleaningID);
 
-        int NumCleaningPixel = -FellWalker.countClusterPixel(cleaningID);
+        int NumCleaningPixel = FellWalker.countClusterPixel(cleaningID);
         //System.out.println(NumClusterPixel);
 
             int[] showerPixelArray = makeShowerPixelArray(cleaningID);

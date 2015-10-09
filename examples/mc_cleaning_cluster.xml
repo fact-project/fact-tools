@@ -1,13 +1,13 @@
-<container>
+<application>
 
-    <properties url="classpath:/default/settings_mc.properties" />
+    <properties url="classpath:/default/settings_mc.properties"/>
 
 
     <!-- Pathes to the input files -->
-    <property name="num_copies" value="2" />
+    <property name="num_copies" value="4"/>
 
-    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/Gamma/" />
-    <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/" />
+    <property name="infolder" value="/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/Proton/" />
+    <property name="outfile" value="/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/proton.json" />
 
     <!-- Pathes to the input files -->
 <!--    <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/mc_gamma_11981.fits.gz" />
@@ -19,20 +19,18 @@
 
     <!--    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />-->
 
-    <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-            suffix="fits.gz" copies="${num_copies}" url="${infolder}">
-    <stream class="fact.io.FitsStream" id="_" />
+    <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream" suffix="_Events.fits.gz" copies="${num_copies}" url="file:${infolder}">
+         <stream class="fact.io.FitsStream" id="_" />
     </stream>
 
 
     <!-- Name of the stream and url to the input file -->
 <!--    <stream id="fact" class="fact.io.FitsStream"  url="${infile}" limit="500"/>-->
-
+    <queue id="result" />
 
     <!-- Description of the process and the corresponding stream -->
    <!-- <process id="2" input="fact">-->
     <process id="2" input="fact:${copy.id}" copies="${num_copies}">
-    <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
         <!-- <stream.flow.Skip condition="%{data.MCorsikaEvtHeader.fTotalEnergy} &gt; 400" /> -->
         <!--        <fact.io.PrintKeysOnConsole keys="MCorsikaEvtHeader.fTotalEnergy" />-->
         <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
@@ -65,7 +63,8 @@
 
         <fact.cleaning.MotionCleaning />
 
-        <Skip condition="%{data.NumClusterPixel}>-40 "/>
+        <Skip condition="%{data.NumClusterPixel} &lt; 15" />
+
 
         <fact.features.DistributionFromShower
                 weightsKey="photoncharge"
@@ -76,14 +75,15 @@
 
         <fact.hexmap.FellWalker />
 
-        <Skip condition="%{data.NumCluster}==0 "/>
+        <RemoveKeys keys="Data,DataCalibrated"/>
+        <Enqueue queue="result" condition="%{data.NumCluster}!=0" />
 
         <!--<fact.io.JSONWriter keys="EventNum,NumClusterPixel,NumCluster,Waste,SizeX,SizeY,SizeAbs,MaximaID,DistanceMaxima,BrightnessMaxima,ClusterArrivaltimeMaxima,ClusterArrivaltimeMean,ClusterBrightnessSum,ClusterBrightnessMean" url="${outfolder}proton_${copy.id}.json" />-->
-        <fact.io.JSONWriter keys="EventNum,NumCluster,NumClusterPixel,SizeCluster1,ChargeMax,Distance,IsolatedCluster,ErrRegCog,Angle,ArrTimeClusterStd,Size" url="${outfolder}gamma_${copy.id}.json" />
-
-        <!--<fact.ShowViewer key="DataCalibrated"/>-->
-
+               <!--<fact.ShowViewer key="DataCalibrated"/>-->
     </process>
 
+    <process input="result" id="egal" >
+            <fact.io.JSONWriter keys="EventNum,NumCluster,NumClusterPixel,SizeCluster1,ChargeMax,Distance,IsolatedCluster,ErrRegCog,Angle,ArrTimeClusterStd,Size" url="file:${outfile}" />
+    </process>
 
-</container>
+</application>
