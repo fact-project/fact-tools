@@ -34,7 +34,7 @@ The following list shows the requirements for the tutorial hands-on session:
 	* ... further examples can be simply produced following the slides
 
 [sexten-slides]:https://docs.google.com/presentation/d/18zTy3s0lEZsAStXsKdJBpP0KYAptmWDyOvxfBa9eKII/pub?start=false&loop=false&delayms=5000
-[example1]: https://sfb876.de/fact-tools/tutorial/example01.xml
-[example2]: https://sfb876.de/fact-tools/tutorial/example02.xml
-[example3]: https://sfb876.de/fact-tools/tutorial/example03.xml
-[example4]: https://sfb876.de/fact-tools/tutorial/example04.xml
+[example1]: example01.xml
+[example2]: example02.xml
+[example3]: example03.xml
+[example4]: example04.xml
