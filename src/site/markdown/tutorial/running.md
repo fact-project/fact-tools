@@ -21,5 +21,7 @@ Simple configuration file can look as following:
   </process>
 </application>
 ```
+Here a test file *testDataFile.fits.gz* was put in the archive. 
+Any other *fits* file can be used here using *file:* keyword followed by a filepath.
 
 On each data item from the FitsStream ``PrintData`` processor is applied.
