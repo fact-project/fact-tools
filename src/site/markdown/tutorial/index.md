@@ -24,11 +24,17 @@ The following list shows the requirements for the tutorial hands-on session:
 
 ### Supplementary Material
 
-* [slides for the turorial](https://docs.google.com/presentation/d/18zTy3s0lEZsAStXsKdJBpP0KYAptmWDyOvxfBa9eKII/pub?start=false&loop=false&delayms=5000) held during the CTA School in Sesto/Sexten (July, 2015)
+* [slides for the turorial][sexten-slides] held during the CTA School in Sesto/Sexten (July, 2015)
 
 * several example configuration files
-	* [example 01](tutorial/example01.xml): simply print data
-	* [example 02](tutorial/example02.xml): show viewer
-	* [example 03](tutorial/example03.xml): drs calibration with viewer
-	* [example 04](tutorial/example04.xml): drs calibration + smoothing
+	* [example 01][example1]: simply print data
+	* [example 02][example2]: show viewer
+	* [example 03][example3]: drs calibration with viewer
+	* [example 04][example4]: drs calibration + smoothing
 	* ... further examples can be simply produced following the slides
+
+[sexten-slides]:https://docs.google.com/presentation/d/18zTy3s0lEZsAStXsKdJBpP0KYAptmWDyOvxfBa9eKII/pub?start=false&loop=false&delayms=5000
+[example1]: https://sfb876.de/fact-tools/tutorial/example01.xml
+[example2]: https://sfb876.de/fact-tools/tutorial/example02.xml
+[example3]: https://sfb876.de/fact-tools/tutorial/example03.xml
+[example4]: https://sfb876.de/fact-tools/tutorial/example04.xml
