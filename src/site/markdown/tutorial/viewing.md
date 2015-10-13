@@ -11,13 +11,4 @@ a screenshot of the FACT event viewer.
 
 In order to start an event viewer you only need to add one line into the existing configuration file:
 
-```xml
-<application>
-  <stream id="fact" class="fact.io.FitsStream" 
-  		url="classpath:/testDataFile.fits.gz"/>
-
-  <process input="fact">
-		<fact.ShowViewer key="Data"/>
-  </process>
-</application>
-```
+	<fact.ShowViewer key="Data"/>
