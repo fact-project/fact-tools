@@ -18,7 +18,7 @@ The following list shows the requirements for the tutorial hands-on session:
      fine and can easily be installed on CentOS/Ubuntu machines using the
      package management.
 
-  2. The [latest FACT-Tools binary](download.html) file.
+  2. The [latest FACT-Tools binary](../download.html) file.
 
 
 
@@ -34,7 +34,7 @@ The following list shows the requirements for the tutorial hands-on session:
 	* ... further examples can be simply produced following the slides
 
 [sexten-slides]:https://docs.google.com/presentation/d/18zTy3s0lEZsAStXsKdJBpP0KYAptmWDyOvxfBa9eKII/pub?start=false&loop=false&delayms=5000
-[example1]: tutorial/example-conf/example01.xml
-[example2]: tutorial/example-conf/example02.xml
-[example3]: tutorial/example-conf/example03.xml
-[example4]: tutorial/example-conf/example04.xml
+[example1]: example-conf/example01.xml
+[example2]: example-conf/example02.xml
+[example3]: example-conf/example03.xml
+[example4]: example-conf/example04.xml
