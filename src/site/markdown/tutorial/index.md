@@ -18,7 +18,7 @@ The following list shows the requirements for the tutorial hands-on session:
      fine and can easily be installed on CentOS/Ubuntu machines using the
      package management.
 
-  2. The [latest FACT-Tools binary](http://sfb876.tu-dortmund.de/FACT/fact-tools_latest.jar) file.
+  2. The [latest FACT-Tools binary](download) file.
 
 
 
@@ -34,7 +34,7 @@ The following list shows the requirements for the tutorial hands-on session:
 	* ... further examples can be simply produced following the slides
 
 [sexten-slides]:https://docs.google.com/presentation/d/18zTy3s0lEZsAStXsKdJBpP0KYAptmWDyOvxfBa9eKII/pub?start=false&loop=false&delayms=5000
-[example1]: example01.xml
-[example2]: example02.xml
-[example3]: example03.xml
-[example4]: example04.xml
+[example1]: ../resources/example-conf/example01.xml
+[example2]: ../resources/example-conf/example02.xml
+[example3]: ../resources/example-conf/example03.xml
+[example4]: ../resources/example-conf/example04.xml

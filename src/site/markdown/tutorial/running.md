@@ -11,7 +11,7 @@ specified file.
 
 Simple configuration file can look as following:
 
-```xml
+```
 <application>
   <stream id="fact" class="fact.io.FitsStream" 
   		url="classpath:/testDataFile.fits.gz"/>
@@ -21,6 +21,7 @@ Simple configuration file can look as following:
   </process>
 </application>
 ```
+
 Here a test file *testDataFile.fits.gz* was put in the archive. 
 Any other *fits* file can be used here using *file:* keyword followed by a filepath.
 
