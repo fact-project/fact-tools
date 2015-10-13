@@ -24,5 +24,11 @@ The following list shows the requirements for the tutorial hands-on session:
 
 ### Supplementary Material
 
-We will here publish the example configuration files and slides for the tutorial
-during the CTA School in Sesto/Sexten.
+* [slides for the turorial](https://docs.google.com/presentation/d/18zTy3s0lEZsAStXsKdJBpP0KYAptmWDyOvxfBa9eKII/pub?start=false&loop=false&delayms=5000) held during the CTA School in Sesto/Sexten (July, 2015)
+
+* several example configuration files
+	* [example 01](tutorial/example01.xml): simply print data
+	* [example 02](tutorial/example02.xml): show viewer
+	* [example 03](tutorial/example03.xml): drs calibration with viewer
+	* [example 04](tutorial/example04.xml): drs calibration + smoothing
+	* ... further examples can be simply produced following the slides
