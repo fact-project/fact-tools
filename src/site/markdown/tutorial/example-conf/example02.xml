@@ -1,0 +1,6 @@
+<application>
+  <stream id="fact" class="fact.io.FitsStream" url="classpath:/testDataFile.fits.gz"/>
+  <process input="fact">
+    <fact.ShowViewer key="Data"/>
+  </process>
+</application>
