@@ -10,8 +10,6 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
-import java.util.ArrayList;
-
 /**
  * Created by jebuss on 23.09.15.
  */
@@ -24,13 +22,15 @@ public class FillPixelHistogramm implements StatefulProcessor {
     private String outputKey;
     @Parameter(required = false)
     private String numEventsKey = "numEvents"+outputKey;
+    @Parameter(required = false)
+    private double binWidth = 20;
+    @Parameter(required = false)
 
-
-    int  nBins = 100;
-    double min = 0;
-    double max = 100;
-    int npix = Constants.NUMBEROFPIXEL;
-    Histogram1D[] histograms;
+    private int  nBins = 2;
+    private double min = 0;
+    private double max = 100;
+    private int npix = Constants.NUMBEROFPIXEL;
+    private Histogram1D[] histograms;
 
     @Override
     public Data process(Data input) {
@@ -44,7 +44,7 @@ public class FillPixelHistogramm implements StatefulProcessor {
         double[] numEvents = new double[npix];
 
         for (int pix = 0; pix < npix; pix++){
-            histograms[pix].AddSeries(data[pix]);
+            histograms[pix].addSeries(data[pix]);
             numEvents[pix] = histograms[pix].getnEvents();
         }
 
@@ -58,8 +58,8 @@ public class FillPixelHistogramm implements StatefulProcessor {
     public void init(ProcessContext processContext) throws Exception {
         histograms = new Histogram1D[npix];
         for(int i = 0; i < npix; i++){
-            Histogram1D hist = new Histogram1D(this.min, this.max, this.nBins);
-            hist.getBinWidth();
+//            Histogram1D hist = new Histogram1D(this.min, this.max, this.nBins);
+            Histogram1D hist = new Histogram1D(this.min, this.binWidth);
             histograms[i] = hist;
         }
     }
@@ -96,5 +96,9 @@ public class FillPixelHistogramm implements StatefulProcessor {
 
     public void setMax(double max) {
         this.max = max;
+    }
+
+    public void setBinWidth(double binWidth) {
+        this.binWidth = binWidth;
     }
 }
