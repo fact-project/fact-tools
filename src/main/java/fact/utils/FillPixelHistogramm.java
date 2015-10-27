@@ -1,6 +1,5 @@
 package fact.utils;
 
-import com.sun.tools.internal.jxc.ap.Const;
 import fact.Constants;
 import fact.Utils;
 import fact.container.Histogram1D;
