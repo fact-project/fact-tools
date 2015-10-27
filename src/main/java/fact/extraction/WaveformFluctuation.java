@@ -52,6 +52,7 @@ public class WaveformFluctuation implements Processor {
 
         double[] chargeMean             = new double[npix];
         double[] chargeStd              = new double[npix];
+        double[] chargeVariance         = new double[npix];
         double[] chargeKurtosis         = new double[npix];
         double[] chargeMax              = new double[npix];
         double[] chargeMin              = new double[npix];
@@ -100,9 +101,9 @@ public class WaveformFluctuation implements Processor {
             charge[pix] = integral;
 
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics( integral );
-
             chargeMean[pix]         = descriptiveStatistics.getMean();
             chargeStd[pix]          = descriptiveStatistics.getStandardDeviation();
+            chargeVariance[pix]     = descriptiveStatistics.getVariance();
             chargeKurtosis[pix]     = descriptiveStatistics.getKurtosis();
             chargeMax[pix]          = descriptiveStatistics.getMax();
             chargeMin[pix]          = descriptiveStatistics.getMin();
@@ -116,6 +117,7 @@ public class WaveformFluctuation implements Processor {
         input.put(outputKey, charge);
         input.put(outputKey+"_mean", chargeMean);
         input.put(outputKey+"_std", chargeStd);
+        input.put(outputKey+"_var", chargeVariance);
         input.put(outputKey+"_kurtosis",chargeKurtosis);
         input.put(outputKey+"_max",chargeMax);
         input.put(outputKey+"_min",chargeMin);
