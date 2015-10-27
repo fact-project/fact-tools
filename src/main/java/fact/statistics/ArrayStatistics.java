@@ -18,7 +18,9 @@ import stream.annotations.Parameter;
  * outputKey+"_" +"variance"
  * outputKey+"_" +"skewness"
  *
- * also a subarray can be defined by a given pixelSetArray that contains the array ids that should be used for the sub array    
+ * also a subarray can be defined by a given pixelSetArray that contains the array ids that should be used for the sub array
+ *
+ * Created by jbuss
  */
 public class ArrayStatistics implements Processor {
 
