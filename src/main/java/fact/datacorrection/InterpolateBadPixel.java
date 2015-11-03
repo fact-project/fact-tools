@@ -4,8 +4,11 @@ import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -35,6 +38,8 @@ public class InterpolateBadPixel implements Processor {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     private int npix = Constants.NUMBEROFPIXEL;
+    
+    private PixelSetOverlay badPixelsSet = new PixelSetOverlay();
 
     @Override
     public Data process(Data item) {
@@ -51,6 +56,7 @@ public class InterpolateBadPixel implements Processor {
         }
         data = interpolate(data, badChIds);
         item.put(outputKey, data);
+        item.put("BadPixelsSet", badPixelsSet);
         return item;
     }
 
@@ -87,6 +93,9 @@ public class InterpolateBadPixel implements Processor {
     }
     public void setBadChIds(Integer[] badChIds) {
         this.badChIds = badChIds;
+        for(int id : badChIds){
+        	badPixelsSet.addById(id);
+        }
     }
     public String getKey() {
         return key;
