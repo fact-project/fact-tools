@@ -12,7 +12,7 @@ public class BadPixelInterpolationTest {
 
     int roi = 10;
     double[] mock = new double[1440*roi];
-    Integer[] badPixelChids = {2};
+    int[] badPixelChids = {2};
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     @Test
@@ -23,7 +23,7 @@ public class BadPixelInterpolationTest {
         mock[3*roi] = 1;
 
         InterpolateBadPixel p = new InterpolateBadPixel();
-        mock = p.interpolate(mock, badPixelChids);
+        mock = p.interpolateTimeLine(mock, badPixelChids);
         assertTrue("Not interpolated correctly", mock[2*roi] == 1.0/6.0);
     }
 
