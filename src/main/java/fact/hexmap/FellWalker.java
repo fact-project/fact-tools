@@ -1,40 +1,40 @@
 package fact.hexmap;
 
+import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
 import stream.Processor;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import java.util.ArrayList;
 
-/**
+/* Watershed algorithm to cluster the camera image.
+ * The image is interpreted as "landscape" with hills and valleys, where the photoncharge is used as height of a pixel.
+ * FellWalker algorithm clusters the pixels by grouping all pixels which belongs to a hill. The algorithm starts at a pixel
+ * and searches in the neighborhood for the highest pixel. From this neighbor it searches for the next higher pixel in the
+ * neighborhood and so on, until there is no higher pixel and the top of the hill is reached. Every pixel, which is used
+ * during a path to the top is added to a list. If the path ends at the top of a hill, every pixel on this list is marked
+ * with the same cluster ID. Every path to a top gets another cluster ID. If a path reaches a pixel which has already a clusterID
+ * the path up to this pixel is marked with the same cluster ID, because it would lead to the top of the same hill.
+ * After all pixels are used for a path, the whole image is clustered. In the last step all clusters are removed that contains
+ * less than 2 (fixed at the moment) cleaning pixels.
+ *
  * Created by lena on 05.08.15.
  */
 public class FellWalker implements Processor {
 
     FactPixelMapping mapping = FactPixelMapping.getInstance();
-    double[] brightness = new double[1440];
-
-    //int [] clusterID = new int[1440];
-
 
     ArrayList<Integer> aktuellerPfad = new ArrayList<>();
-    ArrayList<Integer> maxima = new ArrayList<>();
 
 
     @Override
     public Data process(Data data) {
-        double[] data_array = (double[]) data.get("DataCalibrated");
-        int [] cleaning = ((int[]) data.get("Cleaning")).clone();
-        double[] arrivalTime = ((double[]) data.get("ArrtimePos")).clone();
+        int [] cleaning = ((int[]) data.get("shower"));
+        double[] arrivalTime = ((double[]) data.get("ArrtimePos"));
+        double[] photoncharge = ((double[]) data.get("photoncharge"));
+/*        double cogX = (double) data.get("COGx");
+        double cogY = (double) data.get("COGy");*/
+
         int[] clusterID = new int[1440];
-        double[] photoncharge = ((double[]) data.get("photoncharge")).clone();
-        double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");
-
-
-        int roi = (Integer) data.get("NROI");
-        int npix = (Integer) data.get("NPIX");
-        int minClusterSize = 5;
 
 
         for(int i=0; i<1440;i++){
@@ -42,42 +42,7 @@ public class FellWalker implements Processor {
         }
 
 
-/*        //fill arrivaltime array
-        for (FactCameraPixel p : mapping.pixelArray) {
-
-            if (cleaning[p.id] != 0) {
-                double arrivaltime = arrivalTime[p.id];
-                double[] brightnessSlices = p.getPixelData(data_array, roi);
-                double temp = 0;
-               for(int i=10; i<250; i++){
-                   if (temp < brightnessSlices[i] - brightnessSlices[i-1]){
-                       arrivaltime = i;
-                   }
-               }
-                arrivalTime[p.id] = arrivaltime;
-            }
-
-        }
-
-        //fill brightness array
-        int k = 0;
-        for (FactCameraPixel p : mapping.pixelArray) {
-
-            double[] brightnessSlices = p.getPixelData(data_array, roi);
-            double b = 0;
-            for(int i=50; i<120; i++) {
-                b = b + brightnessSlices[i]/(70.0);
-            }
-            brightness[k] = b;
-            k++;
-
-        }*/
-        //System.out.println("Brightness berechnet");
-        //threshold: brightness < threshold -> -2
-        //int[] cleaning = removeUnderground(0.1);  //<---------------------------------------hardcode?
-
         int startPath = NextStartPixel(clusterID);
-        //int startPath = 988;
 
         int cluster = 1;
 
@@ -96,7 +61,6 @@ public class FellWalker implements Processor {
                 FactCameraPixel[] allNeighbours = mapping.getNeighboursFromID(currentPixel);
 
                 //find usable neighbours (pixel marked with clusterID = 0 after cleaning)
-                //FactCameraPixel[] usableNeighbours;
                 ArrayList<FactCameraPixel> usableNeighbours = new ArrayList<>();
 
                 for(FactCameraPixel n: allNeighbours){
@@ -105,13 +69,12 @@ public class FellWalker implements Processor {
                     }
                 }
 
-                //brightestNeighbourID = findBrightestNeighbour(usableNeighbours, currentPixel);
+
                 brightestNeighbourID = findMaxChargeNeighbour(usableNeighbours, currentPixel, photoncharge);
 
                 aktuellerPfad.add(brightestNeighbourID);
 
                 if (brightestNeighbourID == currentPixel) {
-                    //int brightestNeighbourIDLarge = findBrightestLargeNeighbour(currentPixel);
                     int brightestNeighbourIDLarge = findMaxChargeLargeNeighbour(currentPixel, photoncharge);
 
                     if(brightestNeighbourIDLarge != currentPixel){
@@ -149,100 +112,64 @@ public class FellWalker implements Processor {
 
         int numCluster = getNumberOfClusters(clusterID);
 
+        int[] clusterNoCleaning = clusterID.clone();
+
+
+        // remove cluster with no cleaning pixels-------------------------------------
         clusterID = removeClusterCleaning(clusterID, cleaning, numCluster);
 
+        //make successive clusterIDs
         clusterID = renameClusterID(clusterID);
 
+
+
+        //---------features for gmma/hadron-separation-----------------------------------
         int numClusterPixel = countClusterPixel(clusterID);
 
         numCluster = getNumberOfClusters(clusterID);
 
-        int [] clusterSize = getClusterSize(clusterID, numCluster);
+        if(numCluster != 0){
+            //count pixels in every cluster
+            int [] clusterSize = getClusterSize(clusterID, numCluster);
 
+            //find the pixel containing max photoncharge
+            int[] maxima = findMaxIdInCluster(clusterID, photoncharge, numCluster);
 
-        clusterID = sortClusterBySize(clusterSize, clusterID);
+            //sort cluster by size (size means the number of pixels in the cluster). Biggest cluster-> clusterID = 1, smallest cluster -> clusterID = numCluster
+            clusterID = sortClusterBySize(clusterSize, clusterID);
 
-        int[] maxima = findMaxIdInCluster(clusterID, photoncharge, numCluster);
+            clusterSize = getClusterSize(clusterID, numCluster);
 
-        double[] clusterBrightnessSum = clusterBrightnessSum(clusterID, photoncharge, numCluster);
-        double chargeMaxCluster = chargeInBiggestCluster(photoncharge, clusterID);
-        double fullCharge = clusterCharge(clusterID, photoncharge, numCluster);
-        double chargeMaxClusterRatio = chargeMaxCluster/fullCharge;
+            //ratio of photoncharge in the biggest cluster
+            double chargeMaxClusterRatio = chargeInBiggestCluster(photoncharge, clusterID)/clusterCharge(clusterID, photoncharge);
 
-        clusterSize = getClusterSize(clusterID, numCluster);
+            //count cluster with no neighbors
+            int isolatedCluster = isolatedCluster(clusterID, numCluster);
 
-        double isolatedCluster = isolatedCluster(clusterID, numCluster);
+            double clusterSizeStd = sizeStd(clusterID, photoncharge, numCluster);
 
-        //int[] clusterCog = clusterCogID(numCluster, clusterID, photoncharge);
+            double stdArrivaltimeMaxima = stdArrivaltimeMaxima(arrivalTime, maxima, numCluster);
 
-        int cogID = mapping.getPixelBelowCoordinatesInMM(cogX, cogY).id;
-        clusterID[cogID] = -10;
-
-
-
-        double errRegressionCog = regressionClusterCog(numCluster, clusterID, photoncharge)[2];
-
-        double angle = clusterAngle(numCluster, clusterID, photoncharge, cogX, cogY);
-
-        double arrTimeStd = stdArrivaltimesClusterCog(maxima, arrivalTime);
-
-        double size = sizeStd(clusterID, photoncharge, numCluster);
+/*            double[] sizeX = sizeAxisX(clusterID, photoncharge, numCluster);
+            double[] sizeY = sizeAxisY(clusterID, photoncharge, numCluster);*/
+           // int cogID = mapping.getPixelBelowCoordinatesInMM(cogX, cogY).id;
 
 
 
 
-
-        /*int[] clusterArrivaltimeMaxima = clusterArrivaltimeMaxima(clusterID, brightness, arrivalTime, maxima, numCluster);*/
-        //double[] clusterArrivaltimeMean = clusterArrivaltimeMean(clusterID, clusterSize, arrivalTime, numCluster);
-
-        //double[] clusterBrightnessMean = clusterBrightnessMean(clusterID, clusterSize, photoncharge, numCluster);
-        /*double[] distanceMaxima = distanceMaxima(maxima, numCluster);
-        double[] brightnessMaxima = brightnessMaxima(maxima, brightness, numCluster);*/
-        //double[] sizeX = sizeAxisX(clusterID, brightness, numCluster);
-        //double[] sizeY = sizeAxisY(clusterID, brightness, numCluster);
-
-        /*double[] absSize = new double[numCluster+1];
-        for(int c=1; c<=numCluster; c++){
-            absSize[c] = Math.sqrt(sizeX[c]*sizeX[c] + sizeY[c]*sizeY[c]);
-        }*/
-
-        //double distanceSize = distanceSize(clusterSize,numCluster,maxima);
-        //double distanceArrivaltime = distanceArrivaltime(arrivalTime, numCluster,maxima);
-        double distance = distanceBrightness(numCluster, maxima);
-
-        data.put("ClusterID", clusterID);
-        data.put("NumCluster", numCluster);
-        data.put("ChargeMax", chargeMaxClusterRatio);
-        data.put("SizeCluster1", clusterSize[1]);
-        data.put("NumClusterPixel", numClusterPixel);
-        data.put("Distance", distance);
-        data.put("IsolatedCluster", isolatedCluster);
-        data.put("ErrRegCog", errRegressionCog);
-        data.put("Angle", angle);
-        data.put("ArrTimeClusterStd", arrTimeStd);
-       //data.put("ClusterArrivaltimeMaxima", clusterArrivaltimeMaxima);
-        //data.put("ClusterArrivaltimeMean", clusterArrivaltimeMean);
-        data.put("ClusterBrightnessSum", clusterBrightnessSum);
-        //data.put("ClusterBrightnessMean", clusterBrightnessMean);
-        //data.put("DistanceMaxima", distanceMaxima);
-        //data.put("BrightnessMaxima", brightnessMaxima);
-        //data.put("MaximaID", maxima);
-        /*data.put("SizeX", sizeX);
-        data.put("SizeY", sizeY);*/
-        data.put("Size", size);
-        //data.put("Waste", waste);
-/*      data.put("DistanceSize", distanceSize);
-        data.put("DistanceArrivaltime", distanceArrivaltime);*/
-/*        data.put("DistanceBrightness", distanceBrightness);*/
+            data.put("ClusterID", clusterID);
+            data.put("ClusterNoCleaning", clusterNoCleaning);
+            data.put("NumCluster", numCluster);
+            data.put("ChargeMax", chargeMaxClusterRatio);
+            data.put("SizeCluster1", clusterSize[1]);
+            data.put("NumClusterPixel", numClusterPixel);
+            data.put("IsolatedCluster", isolatedCluster);
+            data.put("StdArrivaltimeMaxima", stdArrivaltimeMaxima);
+            data.put("ClusterSizeStd", clusterSizeStd);
+        }
 
         return data;
     }
-
-
-
-
-
-
 
 
 
@@ -262,75 +189,8 @@ public class FellWalker implements Processor {
         return next;
     }
 
-/*    public int[] removeUnderground(double threshold){
-        //find max/min brightness
-        double max = -10.0;
-        double min = 100.0;
-        int ID_max = -1;
-        int ID_min = -1;
-
-        int[] cleaning = new int[1440];
-        for(int i=0; i<1440; i++){
-            if(brightness[i] > max){
-                ID_max = i;
-                max = brightness[i];
-            }
-            if(brightness[i] < min){
-                ID_min = i;
-                min = brightness[i];
-            }
-        }
-        //define threshold value
-        double abs = brightness[ID_max] - brightness[ID_min];
-        double abs_threshold = brightness[ID_min] + threshold*abs;
-        //System.out.println(brightness[ID_max] + "  " + brightness[ID_min] + "     " + abs_threshold);
-
-        //set all pixel with brightness under threshold to -2
-        for(int i=0; i<1440; i++){
-            if(brightness[i] < abs_threshold) {
-                clusterID[i] = -2;
-            }
-        }
-        removeIsolatedPixel();
-        for(int i=0; i<1440; i++){
-            cleaning[i] = clusterID[i];
-        }
-        return cleaning;
-    }*/
-
-/*    public void removeIsolatedPixel() {
-        for (int i = 0; i < 1440; i++) {
-            if (clusterID[i] == 0) {
-                int numberNeighbours = 0;
-                FactCameraPixel[] neighbours = mapping.getNeighboursFromID(i);
-                for (FactCameraPixel n:neighbours) {
-                    if (clusterID[n.id] == 0) {
-                        numberNeighbours++;
-                    }
-                }
-                if (numberNeighbours == 0) {
-                    clusterID[i] = -2;
-                }
-            }
-        }
-
-    }*/
 
     //find brightest neighbour, return the currentPixel if there is no brighter neighbour!!
-    public int findBrightestNeighbour(ArrayList<FactCameraPixel> usableNeighbours, int currentPixel){
-
-        double maxBrightness = brightness[currentPixel];
-        int maxBrightnessID = currentPixel;
-
-        for (FactCameraPixel n : usableNeighbours) {
-            if (brightness[n.id] > maxBrightness) {
-                maxBrightness = brightness[n.id];
-                maxBrightnessID = n.id;
-            }
-        }
-        return maxBrightnessID;
-    }
-
     public int findMaxChargeNeighbour(ArrayList<FactCameraPixel> usableNeighbours, int currentPixel, double[] photoncharge){
 
         double maxBrightness = photoncharge[currentPixel];
@@ -346,25 +206,7 @@ public class FellWalker implements Processor {
     }
 
 
-
-
     //find brightest neighbour in large neighbourhood, return the currentPixel if there is no brighter neighbour!!
-    public int findBrightestLargeNeighbour(int currentPixel){
-        FactCameraPixel[] largeNeighbours = mapping.getSecondOrderNeighboursFromID(currentPixel);
-
-        double maxBrightness = brightness[currentPixel];
-        int maxBrightnessID = currentPixel;
-
-        for (FactCameraPixel n : largeNeighbours) {
-            if (brightness[n.id] > maxBrightness) {
-                maxBrightness = brightness[n.id];
-                maxBrightnessID = n.id;
-            }
-        }
-        return maxBrightnessID;
-    }
-
-
     public int findMaxChargeLargeNeighbour(int currentPixel, double[] photoncharge){
         FactCameraPixel[] largeNeighbours = mapping.getSecondOrderNeighboursFromID(currentPixel);
 
@@ -420,7 +262,7 @@ public class FellWalker implements Processor {
     }
 
     //remove clusters with less than minClusterSize pixel
-    public int[] removeSmallCluster(int[] clusterID, int[] clusterSize, int minClusterSize){
+/*    public int[] removeSmallCluster(int[] clusterID, int[] clusterSize, int minClusterSize){
         for(int c=1; c<clusterSize.length; c++){
             if(clusterSize[c] <= minClusterSize){
                 for(int i=0; i<1440; i++){
@@ -429,7 +271,7 @@ public class FellWalker implements Processor {
             }
         }
         return clusterID;
-    }
+    }*/
 
 
     //make succseccive clusterIDs
@@ -452,7 +294,6 @@ public class FellWalker implements Processor {
                 }
             }
         }
-        //System.out.println(ClusterList.size());
         return clusterID;
     }
 
@@ -487,18 +328,6 @@ public class FellWalker implements Processor {
         }
 
         return newClusterID;
-    }
-
-    public int findMaxEntry(int[] clusterSize, int startindex){
-        int max = clusterSize[startindex];
-        int maxID = startindex;
-        for(int c=startindex+1; c<clusterSize.length; c++){
-            if(clusterSize[c] > max){
-                max = clusterSize[c];
-                maxID = c;
-            }
-        }
-        return maxID;
     }
 
     public int getNumberOfClusters(int[] clusterID){
@@ -562,79 +391,12 @@ public class FellWalker implements Processor {
         return clusterMin;
     }
 
-    public static int getMaxID(int[] clusterMax, double[] brightness){
-        double max = brightness[clusterMax[0]];
-        int maxID = 0;
-        for(int i=1; i<clusterMax.length; i++){
-            if(brightness[clusterMax[i]] > max){
-                max = brightness[clusterMax[i]];
-                maxID = i;
-            }
-        }
-        return maxID;
-    }
 
-    public static int getMinID(int[] clusterMax, double[] brightness){
-        double min = brightness[clusterMax[0]];
-        int minID = 0;
-        for(int i=1; i<clusterMax.length; i++){
-            if(brightness[clusterMax[i]] < min){
-                min = brightness[clusterMax[i]];
-                minID = i;
-            }
-        }
-        return minID;
-    }
-
-    public static double meanArrivaltime(int[] arrivaltimeMax){
-     double arrival = 0;
-     for(int i=1; i<arrivaltimeMax.length; i++){
-         arrival = arrival + arrivaltimeMax[i]/arrivaltimeMax.length;
-     }
-     return arrival;
-    }
-
-    public static double stdDevArrivaltime(double mean, int[]arrivaltimeMax){
-        double sum = 0;
-        for(int i=1; i<arrivaltimeMax.length; i++){
-            sum = sum + Math.pow((mean - arrivaltimeMax[i]),2)/arrivaltimeMax.length;
-        }
-        return Math.sqrt(sum);
-    }
-
-
-
-    /*build mean and standard deviation of arrivaltimes from all clustermaxima.
-    * first idea: remove cluster with arrivaltime out of std dev. -> removes the shower cluster
-    * => keep cluster with arrivaltimes out of std dev, remove cluster with arrivaltime close to mean
-     */
-    public static int[] removeClusterArrivaltime(int[]clusterID, double[] brightness, int arrivalTime[], int numCluster){
-        int[] maxima = findMaxIdInCluster(clusterID, brightness, numCluster);
-        System.out.println(numCluster + "  " + maxima.length);
-        int[] arrivaltimeMax = new int[numCluster+1];
-        arrivaltimeMax[0] = 0;
-
-        for(int i=1; i<=numCluster; i++){
-                arrivaltimeMax[i] = arrivalTime[maxima[i]];
-        }
-
-        double meanArrivaltime = meanArrivaltime(arrivaltimeMax);
-        double stdDevArrivaltime = stdDevArrivaltime(meanArrivaltime,arrivaltimeMax);
-
-        for(int c = 1; c<maxima.length; c++){
-            if(Math.abs(arrivaltimeMax[c] - meanArrivaltime) < Math.abs(meanArrivaltime - stdDevArrivaltime)){
-                clusterID = setClusterToId(clusterID,c,-2);
-            }
-        }
-
-        return clusterID;
-    }
-
-    public int[] removeClusterCleaning(int[] clusterID, int[] cleaning, int numCluster){
+    public int[] removeClusterCleaning(int[] clusterID, int[] shower, int numCluster){
         for(int c = 1; c<=numCluster; c++){
             int count = 0;
             for(int i=0; i<1440; i++){
-                if(clusterID[i] == c && cleaning[i] == 0){
+                if(clusterID[i] == c && ArrayUtils.contains(shower, i)){
                     count++;
                 }
             }
@@ -646,76 +408,40 @@ public class FellWalker implements Processor {
     }
 
 
+    public static int[] setClusterToId(int[] clusterID, int oldClusterID, int newClusterID){
+        for(int i=0; i<1440; i++){
+            if(clusterID[i] == oldClusterID){
+                clusterID[i] = newClusterID;
+            }
+        }
+
+        return clusterID;
+    }
 
 
+    //----------------------------------more or less usefull features for later gamma/hadron-separation ----------------
 
-    //features
-    public static int[] clusterArrivaltimeMaxima(int[]clusterID, double[] brightness, int arrivalTime[], int[]maxima, int numCluster){
-        //System.out.println(numCluster + "  " + maxima.length);
-        int[] arrivaltimeMax = new int[numCluster+1];
-        //arrivaltimeMax[0] = 0;
+    public static double stdArrivaltimeMaxima(double arrivalTime[], int[]maxima, int numCluster){
+        double[] arrivaltimeMax = new double[numCluster+1];
+        double meanArrivaltime = 0;
 
         for(int i=1; i<=numCluster; i++){
             arrivaltimeMax[i] = arrivalTime[maxima[i]];
         }
 
-        double meanArrivaltime = meanArrivaltime(arrivaltimeMax);
-        double stdDevArrivaltime = stdDevArrivaltime(meanArrivaltime,arrivaltimeMax);
-
-        arrivaltimeMax[0] = 0;
-
-        return arrivaltimeMax;
-    }
-
-    public static double[] clusterArrivaltimeMean(int[] clusterID, int[] clusterSize, int arrivalTime[], int numCluster){
-        double [] arrivaltimeMean = new double[numCluster+1];
-        arrivaltimeMean[0] = 0;
-        for(int c=1;c<=numCluster;c++){
-            double arrival = 0;
-            for(int i=0;i<1440; i++){
-                if(clusterID[i] == c){
-                    arrival=arrival + arrivalTime[i]/clusterSize[c];
-                }
-            }
-            arrivaltimeMean[c] = arrival;
-        }
-        return arrivaltimeMean;
-    }
-
-    public double stdArrivaltimesClusterCog(int[] cogID, double[] arrivaltimes){
-        double arrtimeMean = 0;
-        double arrtimeStd = 0;
-
-        for(int c=1; c< cogID.length; c++){
-            arrtimeMean = arrtimeMean + (1.0/(cogID.length))*arrivaltimes[cogID[c]];
+        for(int i=1; i<arrivaltimeMax.length; i++){
+            meanArrivaltime = meanArrivaltime + arrivaltimeMax[i]/arrivaltimeMax.length;
         }
 
-        for(int c=1; c< cogID.length; c++){
-            arrtimeStd = arrtimeStd + (1.0/(cogID.length))*Math.pow(arrtimeMean- arrivaltimes[cogID[c]],2);
+        double sum = 0;
+        for(int i=1; i<arrivaltimeMax.length; i++){
+            sum = sum + Math.pow((meanArrivaltime - arrivaltimeMax[i]),2)/arrivaltimeMax.length;
         }
-         arrtimeStd = Math.sqrt(arrtimeStd);
 
-        return arrtimeStd;
-
+        return Math.sqrt(sum);
     }
 
-    public static double[] clusterBrightnessSum(int[] clusterID, double brightness[], int numCluster){
-        double [] brightnessSum = new double[numCluster+1];
-
-            for(int i=0;i<1440; i++){
-                if(clusterID[i] == -2){
-                    brightnessSum[0] =  brightnessSum[0] + brightness[i];
-                }
-                else{
-                    brightnessSum[clusterID[i]]+= brightness[i];
-                }
-            }
-
-        return brightnessSum;
-
-    }
-
-    public static double clusterCharge(int[] clusterID, double brightness[], int numCluster){
+    public static double clusterCharge(int[] clusterID, double brightness[]){
         double charge = 0;
         for(int i=0; i<1440; i++){
             if(clusterID[i] != -2){
@@ -725,66 +451,6 @@ public class FellWalker implements Processor {
         return charge;
     }
 
-    public static double[] clusterBrightnessMean(int[] clusterID, int[] clusterSize, double brightness[], int numCluster){
-        double [] brightnessMean = new double[1440];
-        for(int c=1;c<=numCluster;c++){
-            double b = 0;
-            for(int i=0;i<1440; i++){
-                if(clusterID[i] == c){
-                    b=b + brightness[i]/clusterSize[c];
-                }
-            }
-            for(int i=0; i<1440; i++){
-                if(clusterID[i] == -2){brightnessMean[i] = 0;}
-
-                else if(clusterID[i] == c){
-                    brightnessMean[i] = b;
-                }
-            }
-        }
-        return brightnessMean;
-
-    }
-
-    public double[] distanceMaxima(int[] maxima, int numCluster){
-        double[] dist = new double[numCluster+1];
-        dist[0] = 0;
-        if(numCluster == 1){
-            dist[1] = 0;
-        }
-        else if(numCluster == 0){
-            dist[0] = -1;
-        }
-        else {
-            for (int c = 1; c <= numCluster; c++) {
-                FactCameraPixel p = mapping.getPixelFromId(maxima[c]);
-                double temp = 0;
-                for (int cu = 1; cu <= numCluster; cu++) {
-
-                    if (c != cu) {
-                        FactCameraPixel q = mapping.getPixelFromId(maxima[cu]);
-                        double distance = Math.sqrt(Math.pow(p.posX - q.posX, 2) + Math.pow(p.posY - q.posY, 2));
-                        if (distance > temp) {
-                            temp = distance;
-                        }
-                    }
-                }
-                dist[c] = temp;
-
-            }
-        }
-        return dist;
-    }
-
-
-    public static double [] brightnessMaxima(int[] maxima, double[] brightness, int numCluster) {
-
-        double[] brightnessMaxima = new double[numCluster + 1];
-        for (int i = 1; i <= numCluster; i++) {
-            brightnessMaxima[i] = brightness[maxima[i]];
-        }
-        return brightnessMaxima;
-    }
 
     public double[] sizeAxisX(int[] clusterID, double[] brightness, int numCluster){
         int[] minima = findMinIdInCluster(clusterID, brightness, numCluster);
@@ -802,7 +468,7 @@ public class FellWalker implements Processor {
                     sum3 = sum3 + d*x;
                 }
             }
-/*            System.out.println(sum2);*/
+
             sizeX[c] = Math.sqrt(Math.abs(sum1/sum2 - Math.pow((sum3/sum2),2)));
 
 
@@ -833,21 +499,21 @@ public class FellWalker implements Processor {
         return sizeY;
     }
 
-    public double sizeAbs(int[] clusterID, double[] brightness, int numCluster){
+/*    public double sizeAbs(int[] clusterID, double[] brightness, int numCluster){
         double [] sizeX = sizeAxisX(clusterID, brightness, numCluster);
         double [] sizeY = sizeAxisX(clusterID, brightness, numCluster);
 
         double abs = 0;
         for(int c=1; c<sizeX.length; c++){
-            abs = abs + Math.sqrt(sizeX[c]*sizeX[c] + sizeY[c]*sizeY[c])/sizeX.length;
+            abs = abs + Math.sqrt(sizeX[c] * sizeX[c] + sizeY[c] * sizeY[c])/sizeX.length;
         }
 
         return abs;
-    }
+    }*/
 
     public double sizeStd(int[] clusterID, double[] brightness, int numCluster){
         double [] sizeX = sizeAxisX(clusterID, brightness, numCluster);
-        double [] sizeY = sizeAxisX(clusterID, brightness, numCluster);
+        double [] sizeY = sizeAxisY(clusterID, brightness, numCluster);
 
         double mean = 0;
         double std = 0;
@@ -867,82 +533,6 @@ public class FellWalker implements Processor {
 
 
 
-    //geometric distance between the brightest pixel of the biggest and the smallest cluster (clusterSize)
-    public double distanceSize(int[] clusterSize, int numCluster, int[] maxima){
-        if(numCluster < 2){return 0;}
-        else{
-            int min = clusterSize[1];
-            int max = clusterSize[1];
-            int minCluster = 1;
-            int maxCluster = 1;
-            for(int c=2; c<=numCluster; c++){
-                if(clusterSize[c] < min){
-                    min = clusterSize[c];
-                    minCluster = c;
-                }
-                if(clusterSize[c] > max){
-                    max = clusterSize[c];
-                    maxCluster = c;
-                }
-            }
-
-
-            double xMin = (mapping.getPixelFromId(maxima[minCluster])).posX;
-            double yMin = (mapping.getPixelFromId(maxima[minCluster])).posY;
-            double xMax = (mapping.getPixelFromId(maxima[maxCluster])).posX;
-            double yMax = (mapping.getPixelFromId(maxima[maxCluster])).posY;
-
-            double distance = Math.sqrt(Math.pow((xMin - xMax), 2) + Math.pow((yMin-yMax),2));
-            return distance;
-
-        }
-
-
-    }
-
-    //time-distance between the first and the last arriving cluster
-    public double distanceArrivaltime(int[] arrivalTime, int numCluster, int[] maxima){
-        if(numCluster < 2){return 0;}
-        else{
-            int min = arrivalTime[maxima[1]];
-            int max = arrivalTime[maxima[1]];
-            int minID = maxima[1];
-            int maxID = maxima[1];
-            for(int c=2; c<=numCluster; c++){
-                if(arrivalTime[maxima[c]] < min){
-                    min = arrivalTime[maxima[c]];
-                    minID = maxima[c];
-                }
-                if(arrivalTime[maxima[c]] > max){
-                    max = arrivalTime[maxima[c]];
-                    maxID = maxima[c];
-                }
-            }
-
-            double xMin = mapping.getPixelFromId(minID).posX;
-            double yMin = mapping.getPixelFromId(minID).posY;
-            double xMax = mapping.getPixelFromId(maxID).posX;
-            double yMax = mapping.getPixelFromId(maxID).posY;
-
-            double distance = Math.sqrt(Math.pow((xMin - xMax), 2) + Math.pow((yMin - yMax), 2));
-            return distance;
-        }
-    }
-
-    //distance between biggest and smallest cluster (pixel with max. photoncharge in cluster)
-    public double distanceBrightness(int numCluster, int[] maxima){
-        int minID = maxima[numCluster];
-        int maxID = maxima[1];
-
-            double xMin = mapping.getPixelFromId(minID).posX;
-            double yMin = mapping.getPixelFromId(minID).posY;
-            double xMax = mapping.getPixelFromId(maxID).posX;
-            double yMax = mapping.getPixelFromId(maxID).posY;
-
-            double distance = Math.sqrt(Math.pow((xMin - xMax), 2) + Math.pow((yMin - yMax), 2));
-            return distance;
-    }
-
     public static double chargeInBiggestCluster(double[] photoncharge, int[] clusterID){
         double charge = 0;
         for(int i=0; i<1440; i++){
@@ -953,9 +543,9 @@ public class FellWalker implements Processor {
         return charge;
     }
 
-    public double isolatedCluster(int [] clusterID, int numCluster){
+    public int isolatedCluster(int [] clusterID, int numCluster){
         int[] isolated  = new int[numCluster + 1];
-        double countIsolatedCluster = 0;
+        int countIsolatedCluster = 0;
         if(numCluster > 1){
             for (int i = 0; i < 1440; i++){
                 if (clusterID[i] != -2){
@@ -978,10 +568,10 @@ public class FellWalker implements Processor {
                 }
             }
         }
-        return countIsolatedCluster;///((int)numCluster);
+        return countIsolatedCluster;
     }
 
-    public double[][] calculateClusterCogInMM(int numCluster, int[] clusterID, double[] photoncharge){
+/*    public double[][] calculateClusterCogInMM(int numCluster, int[] clusterID, double[] photoncharge){
         double [][] cogCluster = new double[numCluster+1][2];
 
         for(int c=1; c<=numCluster; c++) {
@@ -1009,67 +599,20 @@ public class FellWalker implements Processor {
         }
 
         return cogCluster;
-    }
+    }*/
 
 
-    public int[] clusterCogID(int numCluster, int[] clusterID, double[] photoncharge){
+/*    public int[] clusterCogID(int numCluster, int[] clusterID, double[] photoncharge){
         double[][] cogInMM = calculateClusterCogInMM(numCluster, clusterID, photoncharge);
         int[] clusterCogID = new int[numCluster+1];
         for(int c=1; c<=numCluster; c++){
-            clusterCogID[c] = mapping.getPixelBelowCoordinatesInMM(cogInMM[c][0], cogInMM[c][1]).id;
-            //System.out.println(clusterCogID[c]+ "\t" + cogInMM[c][0] + "\t" + cogInMM[c][1]);
+            // could fail.
+             clusterCogID[c] = mapping.getPixelBelowCoordinatesInMM(cogInMM[c][0], cogInMM[c][1]).id;
         }
 
         return clusterCogID;
     }
 
-    public double[] regressionClusterCog(int numCluster, int[] clusterID, double[] photoncharge){
-        double [] parameter = new double[3];
-        if(numCluster == 1) {
-            parameter[0] = 0;
-            parameter[1] = 0;
-            parameter[2] = 0;
-
-        }
-        double[][] cogInMM = calculateClusterCogInMM(numCluster, clusterID, photoncharge);
-        double[] xInMM = new double[numCluster];
-        double[] yInMM = new double[numCluster];
-
-        for(int c=0; c<numCluster; c++){
-            xInMM[c] = cogInMM[c][0];
-            yInMM[c] = cogInMM[c][1];
-        }
-
-        parameter[0] = linRegression(xInMM, yInMM)[0];
-        parameter[1] = linRegression(xInMM, yInMM)[1];
-        parameter[2] = linRegression(xInMM, yInMM)[3];
-
-        return parameter;
-
-    }
-
-    public double clusterAngle(int numCluster, int[] clusterID, double[] photoncharge, double cogX, double cogY){
-        double[][] clusterCog = calculateClusterCogInMM(numCluster,clusterID, photoncharge);
-        double [] angle = new double[numCluster+1];
-        double meanAngle = 0;
-        double std = 0;
-
-        for (int c=1; c<=numCluster; c++){
-            angle[c] = Math.atan2((clusterCog[c][1] - cogY), (clusterCog[c][0] - cogX));
-            meanAngle = meanAngle + angle[c]/numCluster;
-        }
-
-        for (int c=1; c<=numCluster; c++){
-            std = std  + (1.0/numCluster)*Math.pow((meanAngle - angle[c]),2);
-        }
-
-
-        std = Math.sqrt(std);
-
-
-
-        return std;
-    }
 
     public double[] linRegression(double[] x, double[] y){
         SimpleRegression regression = new SimpleRegression();
@@ -1084,22 +627,6 @@ public class FellWalker implements Processor {
         regParameter[3] = regression.getRegressionSumSquares();
 
         return regParameter;
-    }
-
-
-
-
-
-    public static int[] setClusterToId(int[] clusterID, int oldClusterID, int newClusterID){
-        for(int i=0; i<1440; i++){
-            if(clusterID[i] == oldClusterID){
-                clusterID[i] = newClusterID;
-            }
-        }
-
-        return clusterID;
-    }
-
-
+    }*/
 
 }
