@@ -19,9 +19,7 @@ public class HotColorMap implements ColorMapping {
         else if(minValue == 0 && maxValue == 0){
             return Color.BLUE;
         }
-<<<<<<< Updated upstream
-        else {return Color.GREEN;}
-=======
+
         else {
 
             double l1 = (maxValue - minValue) / 3.;
@@ -47,8 +45,6 @@ public class HotColorMap implements ColorMapping {
                 return new Color(255, 255, 255);
             }
         }
-
->>>>>>> Stashed changes
     }
 }
 
