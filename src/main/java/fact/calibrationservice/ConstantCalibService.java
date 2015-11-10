@@ -11,11 +11,11 @@ import fact.hexmap.FactPixelMapping;
 
 public class ConstantCalibService implements CalibrationService {
 	
-	Logger log = LoggerFactory.getLogger(AuxFileService.class);
-	
-	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-	
+	Logger log = LoggerFactory.getLogger(ConstantCalibService.class);
+		
 	TreeSet<HardwareConfiguration> set;
+	
+	boolean isInit = false;
 	
 	/*
 	 * From the beginning on there were
@@ -58,11 +58,17 @@ public class ConstantCalibService implements CalibrationService {
 	 */
 	
 	
-	public ConstantCalibService(){
+	public void init(){
+		FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+		set = new TreeSet<HardwareConfiguration>();
+		
+		
 		HardwareConfiguration config1 = new HardwareConfiguration(new DateTime(1970, 1, 1, 0, 0));
 		int[] badPixelFromBeginning = {863,868,297,927,80,873,1093,1094,527,528,721,722};
 		config1.setBadPixels(badPixelFromBeginning);
 		config1.setNotUsablePixels(null);
+		
+		
 		
 		HardwareConfiguration config2 = new HardwareConfiguration(new DateTime(2014, 11, 15, 0, 0));
 		int[] brokenDrsBoard = {
@@ -122,12 +128,20 @@ public class ConstantCalibService implements CalibrationService {
 
 	@Override
 	public int[] getBadPixel(DateTime eventTimeStamp) {
+		if (isInit == false){
+			init();
+			isInit = true;
+		}
 		HardwareConfiguration currentConfiguration = getHardwareConfiguration(eventTimeStamp);
 		return currentConfiguration.getBadPixels();
 	}
 
 	@Override
 	public int[] getNotUsablePixels(DateTime eventTimeStamp) {
+		if (isInit == false){
+			init();
+			isInit = true;
+		}
 		HardwareConfiguration currentConfiguration = getHardwareConfiguration(eventTimeStamp);
 		return currentConfiguration.getNotUsablePixels();
 	}
