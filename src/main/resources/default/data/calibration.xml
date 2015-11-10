@@ -29,8 +29,9 @@
     outputKey="DataCalibrated"
 />
 <fact.datacorrection.InterpolateBadPixel 
-    key="DataCalibrated" 
-    outputKey="DataCalibrated"
-    badChIds="${interpolateBadPixel_badChidIDs}" 
+    calibService="calibService"
+    interpolateTimeLine="True"
+    dataKey="DataCalibrated"
+    dataOutputKey="DataCalibrated"
 />
 </module>

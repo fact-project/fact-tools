@@ -21,8 +21,9 @@
     maxSpikeLength="${removeSpikes_maxSpikeLength}"
 />
 <fact.datacorrection.InterpolateBadPixel 
-    key="DataCalibrated" 
-    outputKey="DataCalibrated"
-    badChidIds="${interpolateBadPixel_badChidIDs}" 
+    calibService="calibService"
+    interpolateTimeLine="True"
+    dataKey="DataCalibrated"
+    dataOutputKey="DataCalibrated"
 />
 </module>
