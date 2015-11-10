@@ -32,8 +32,8 @@ public class InterpolateBadPixel implements StatefulProcessor {
     CalibrationService calibService;
     
     @Parameter(required = false, description = "If true the whole time line will be interpolated",
-    		defaultValue = "true")
-    private boolean interpolateTimeLine = true;
+    		defaultValue = "false")
+    private boolean interpolateTimeLine = false;
     @Parameter(required = false, description = "If true the photoncharges and arrivalTimes will be interpolated",
     		defaultValue = "false")
     private boolean interpolatePhotonData = false;
@@ -94,11 +94,22 @@ public class InterpolateBadPixel implements StatefulProcessor {
     @Override
     public Data process(Data item) {
     	Utils.isKeyValid(item, "NPIX", Integer.class);
-    	Utils.isKeyValid(item, "UnixTimeUTC", Integer[].class);
     	npix = (Integer) item.get("NPIX");
     	
-    	int[] eventTime = (int[]) item.get("UnixTimeUTC");
-    	DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+    	DateTime timeStamp = null;
+    	
+    	if (item.containsKey("UnixTimeUTC") == true){
+    		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+    		int[] eventTime = (int[]) item.get("UnixTimeUTC");
+        	timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+    	}
+    	else {
+    		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
+    		// => The 12 bad pixels we have from the beginning on are used.
+    		timeStamp = new DateTime(2000, 1, 1, 0, 0);
+    	}
+    	
+    	
     	int[] badChIds = calibService.getBadPixel(timeStamp);
     	
     	if (interpolateTimeLine == true){
@@ -146,7 +157,7 @@ public class InterpolateBadPixel implements StatefulProcessor {
     }
 
     private double[] interpolatePixelArray(double[] pixelArray, int[] badChIds) {
-		for (int pix: badChIds){
+    	for (int pix: badChIds){
 			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
 			double avg = 0.0f;
 			int numNeighbours = 0;
