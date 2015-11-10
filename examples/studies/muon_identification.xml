@@ -11,6 +11,7 @@
 
 
 	<service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+	<service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 	<process input="fact">
 		<include url="classpath:/default/data/prevEventAndSkip.xml" />

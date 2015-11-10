@@ -12,6 +12,8 @@
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
 
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
@@ -59,11 +61,13 @@
                 timeCalibConstKey="timeCalibConst"
                 outputKey="DataCalibrated"
                 />
-        <fact.datacorrection.InterpolateBadPixel
-                key="DataCalibrated"
-                outputKey="DataCalibrated"
-                badChidIds="${interpolateBadPixel_badChidIDs}"
-                />
+        <fact.datacorrection.InterpolateBadPixel 
+            calibService="calibService"
+            interpolateTimeLine="True"
+            dataKey="DataCalibrated"
+            dataOutputKey="DataCalibrated"
+            showBadPixel="True"
+        />
 
         <include url="classpath:/default/data/extraction.xml" />
 
