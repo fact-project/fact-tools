@@ -21,7 +21,8 @@
 		<include url="classpath:/default/data/extraction.xml" />
         
          
-        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="photoncharge"
+        <fact.cleaning.TwoLevelTimeMedian calibService="calibService"
+    									 photonChargeKey="photoncharge"
         								 outputKey="cleanPixel"
         								 arrivalTimeKey="arrivalTime"
            								 corePixelThreshold="4.0"

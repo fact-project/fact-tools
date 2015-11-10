@@ -25,9 +25,9 @@
 
         <include url="classpath:/default/mc/extraction_mc.xml" />
 
-        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime" corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}" neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}" timeLimit="${twoLevelTimeNeighbor_timeLimit}"  minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"/>
+        <fact.cleaning.TwoLevelTimeMedian calibService="calibService" photonChargeKey="photoncharge" outputKey="shower" arrivalTimeKey="arrivalTime" corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}" neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}" timeLimit="${twoLevelTimeNeighbor_timeLimit}"  minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"/>
 
-        <fact.cleaning.TwoLevelTimeMedian photonChargeKey="McCherPhotWeight" outputKey="truth" arrivalTimeKey="McCherArrTimeMean" corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}" neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}" timeLimit="${twoLevelTimeNeighbor_timeLimit}"  minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"/>
+        <fact.cleaning.TwoLevelTimeMedian calibService="calibService" photonChargeKey="McCherPhotWeight" outputKey="truth" arrivalTimeKey="McCherArrTimeMean" corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}" neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}" timeLimit="${twoLevelTimeNeighbor_timeLimit}"  minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"/>
 
 		<fact.features.evaluate.PhotonchargeEvaluate photonchargeKey="photoncharge" arrivalTimeKey="arrivalTime" mcCherenkovWeightKey="McCherPhotWeight" mcCherenkovArrTimeMeanKey="McCherArrTimeMean" mcNoiseWeightKey="McNoisePhotWeight" outputKeyPhotonCharge="qualityFactorPhCh" outputKeyArrivalTime="qualityFactorArrTi"/>
             
