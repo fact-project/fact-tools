@@ -24,9 +24,16 @@ public class DoubleAdapter extends TypeAdapter<Double> {
 	}
 
 	public void write(JsonWriter writer, Double value) throws IOException {
-		BigDecimal bValue = new BigDecimal(value);
-		bValue = bValue.round(new MathContext(signDigits));
-		writer.value(bValue.doubleValue());
+		if (value.isNaN() || value.isInfinite())
+		{
+			writer.value(value);
+		}
+		else
+		{
+			BigDecimal bValue = new BigDecimal(value);
+			bValue = bValue.round(new MathContext(signDigits));
+			writer.value(bValue.doubleValue());
+		}
 	}
 	
 	public void setSignDigits(int sD){

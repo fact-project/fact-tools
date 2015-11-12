@@ -1,5 +1,9 @@
 #Changelog for the fact-tools
 
+## Version 0.9.7
+
+Changes from version 0.9.6: fixed bug in HotColorMap, division by zero
+
 ## Version 0.9.0
 
 These version contains several smaller developments:
