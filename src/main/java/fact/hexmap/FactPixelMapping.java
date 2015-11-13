@@ -35,8 +35,8 @@ public class FactPixelMapping implements PixelMapping {
     private final int[] software2chId = new int[1440];
 
     private final int[][][] neighbourOffsets = {
-            {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}}, //uneven
-            {{1, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}}  //pixel with a even x coordinate
+            {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}}, //even
+            {{1, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}}  //pixel with a uneven x coordinate
     };
 
     //lena----------------------------------
@@ -225,7 +225,6 @@ public class FactPixelMapping implements PixelMapping {
      * @param mapping url to the mapping file
      */
 	private void load(URL mapping){
-
 
         //use the csv stream to read stuff from the csv file
         CsvStream stream = null;
