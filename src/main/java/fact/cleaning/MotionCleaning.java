@@ -2,13 +2,24 @@ package fact.cleaning;
 
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.FellWalker;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 
 /**
+ * MotionCleaning:
+ * Compares the camera image on different points of time (slices) by calculating the difference between two slices for every pixel.
+ * Pixels which "move" (showerpixel) have a greater difference between the values of two slices than pixels which contain only noise.
+ * The under(left) bound is fixed at slice 25. This should be an image without a visible shower. The upper (right) bound is
+ * chosen as the mean maximum of all pixels. At this point of time the shower should be clearly visible. Every slice up to
+ * the right bound is compared with the fixed left bound by calculating the difference.
+ * If these difference is bigger than a threshold value (default = 30), a counter
+ * (accumulativeDifferences) is set +1.
+ * After all slices in the window are compared with the left bound, every pixel whose counter
+ * is bigger than threshold2 (=2 at the moment) is classified as showerpixel.
+ *
  * Created by lena on 18.08.15.
  */
 public class MotionCleaning implements Processor {
@@ -16,52 +27,51 @@ public class MotionCleaning implements Processor {
     FactPixelMapping map = FactPixelMapping.getInstance();
 
     int roi = 300;
-    double T = 30;                      //<------------------------------------hardcode: mc-pedestal: 30--------------------------
+
+
+    @Parameter(required = true)
+    private String outputKey;
+
+    @Parameter(required = false, description="minimal difference between the values of two slices to set the accumulative difference to 1", defaultValue="30")
+    protected double threshold = 30;         //<------------------------------------hardcode: mc-pedestal: 30--------------------------
 
     @Override
     public Data process(Data data) {
 
         double[] data_array = (double[]) data.get("DataCalibrated");
-        double[] maximum = (double[]) data.get("AmplitudePixel");
         int[] accumulativeDifferences = new int[1440];
         int [] cleaningID = new int[1440];
-        //double[] brightness = data.get("")
-        //int roi = (Integer) data.get("NROI");
-        int npix = (Integer) data.get("NPIX");
+
+        int numShowerPixel;
 
 
         /*positionMax: position (slice number) of the maximum mean amplitude, differences are calculated up to this slice
         * other idea: BrightnessStatistics.java calculates the position of max amplitude for each pixel ("AmplitudePixel"),
-        * could be used as boundary
+        * could be used as bound
          */
         int min = 50;
         int max = 120;
         int positionMax = positionOfMaxMeanAmplitude(data_array, min, max);
 
-        //System.out.println(positionMax);
         for(FactCameraPixel p : map.pixelArray){
             double[] pixelData = p.getPixelData(data_array, roi);
             accumulativeDifferences[p.id] = 0;
 
-            //double brightnessMax = pixelData[maximum(pixelData, min, max)];
 
-            double ref = pixelData[25];
+            double ref = pixelData[25];         //  <------------------------------------------hardcode---------------
 
-            for(int i=25; i<=positionMax; i++){   //  <------------------------------------------hardcode------------------
+
+
+            for(int i=25; i<=positionMax; i++){
                 double diff = pixelData[i] - ref;
 
-                if(diff > T){
+                if(diff > threshold){             //  <----------------------------------- threshold 1 -----------------
                     accumulativeDifferences[p.id] += 1;
 
                 }
-
-
-                //ref = pixelData[i];
             }
 
-            //System.out.println(accumulativeDifferences[p.id]);
-
-            if(accumulativeDifferences[p.id] > 2){
+            if(accumulativeDifferences[p.id] > 2){ // <--------------------------threshold2-----hardcode---------------
                 cleaningID[p.id] = 0;
             }
             else {
@@ -69,43 +79,37 @@ public class MotionCleaning implements Processor {
             }
         }
 
+        //cosmetic: remove isolated pixels and fill holes in the shower
         cleaningID = removeIsolatedPixel(cleaningID);
         cleaningID = fillHoles(cleaningID);
 
-        int NumCleaningPixel = FellWalker.countClusterPixel(cleaningID);
-        //System.out.println(NumClusterPixel);
 
-            int[] showerPixelArray = makeShowerPixelArray(cleaningID);
-            /*System.out.println(showerPixelArray.length);*/
-            double[] showerPixel_X = getShowerPixel_X(showerPixelArray);
-            double[] showerPixel_Y = getShowerPixel_Y(showerPixelArray);
+        int[] showerPixelArray = makeShowerPixelArray(cleaningID);
 
-
+        if(showerPixelArray != null){
+            numShowerPixel = showerPixelArray.length;
+        }
+        else{numShowerPixel = 0;}
 
 
-        //data.put("ClusterID", clusterID);
-        //data.put("Diff", differences);
-        data.put("AcDiff", accumulativeDifferences);
-        data.put("shower", showerPixelArray);
+        //get xy-positions of all showerpixel
+        double[] showerPixel_X = getShowerPixel_X(showerPixelArray);
+        double[] showerPixel_Y = getShowerPixel_Y(showerPixelArray);
+
+
+
+        data.put("AcDiff", accumulativeDifferences); //could be used as feature for machine learner cleaning(???)
+        data.put(outputKey, showerPixelArray);
         data.put("showerPixel_X", showerPixel_X);
         data.put("showerPixel_Y", showerPixel_Y);
-        data.put("NumClusterPixel", NumCleaningPixel);
+        data.put("NumShowerPixel", numShowerPixel);
         data.put("Cleaning", cleaningID);
 
         return data;
     }
 
-    public int maximum(double[] pixelData, int min, int max){
-        double tempValue = 0;
-        int tempMax = min;
-        for(int i=min; i<max; i++){
-            if(pixelData[i]>tempValue){
-                tempMax = i;
-            }
-        }
-        return tempMax;
-    }
 
+    //calculates the maximum of the mean over all pixels. Used for the upper(right) bound for the "difference-window"
     public int positionOfMaxMeanAmplitude(double [] data, int min, int max){
         double tempValue = 0;
         int tempPosition = min;
@@ -130,7 +134,7 @@ public class MotionCleaning implements Processor {
                 int numberNeighbours = 0;
                 FactCameraPixel[] neighbours = map.getNeighboursFromID(i);
                 for (FactCameraPixel n:neighbours) {
-                    if (clusterID[n.id] == 0) {                             //while???
+                    if (clusterID[n.id] == 0) {
                         numberNeighbours++;
                     }
                 }
@@ -160,6 +164,7 @@ public class MotionCleaning implements Processor {
         return clusterID;
     }
 
+    //returns an array with all showerpixel IDs. If no pixel survived the cleaning, returns null
     public int [] makeShowerPixelArray(int[] cleaningID){
         ArrayList<Integer> showerPixel= new ArrayList<>();
         for( int i=0; i<1440; i++){
@@ -175,17 +180,16 @@ public class MotionCleaning implements Processor {
             }
         }
         else {
-            showerPixelArray = new int[1];
-            showerPixelArray[0] = -1;
+            showerPixelArray = null;
         }
         return showerPixelArray;
     }
 
+    // returns an array with all x-position of the showerpixels
     public double[] getShowerPixel_X(int[] showerPixelArray){
         double[] showerPixel_X;
-        if(showerPixelArray[0] == -1){
-            showerPixel_X = new double[1];
-            showerPixel_X[0] = -1000;
+        if(showerPixelArray == null){
+            showerPixel_X = null;
         }
         else {
             showerPixel_X = new double[showerPixelArray.length];
@@ -193,23 +197,33 @@ public class MotionCleaning implements Processor {
                 showerPixel_X[i] = map.getPixelFromId(showerPixelArray[i]).posX;
             }
         }
-
         return showerPixel_X;
     }
-
+    // returns an array with all y-position of the showerpixels
     public double[] getShowerPixel_Y(int[] showerPixelArray) {
         double[] showerPixel_Y;
-        if(showerPixelArray[0] == -1){
-            showerPixel_Y = new double[1];
-            showerPixel_Y[0] = -1000;
+        if(showerPixelArray == null){
+            showerPixel_Y = null;
         }
         else{
             showerPixel_Y = new double[showerPixelArray.length];
             for (int i = 0; i < showerPixelArray.length; i++) {
-            showerPixel_Y[i] = map.getPixelFromId(showerPixelArray[i]).posY;
+                showerPixel_Y[i] = map.getPixelFromId(showerPixelArray[i]).posY;
+            }
         }
+        return showerPixel_Y;
     }
 
-        return showerPixel_Y;
+
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+    public String getOutputKey() {
+        return outputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
     }
 }
