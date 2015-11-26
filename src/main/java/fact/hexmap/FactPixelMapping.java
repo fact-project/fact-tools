@@ -203,6 +203,33 @@ public class FactPixelMapping implements PixelMapping {
         return l.toArray(t);
     }
 
+    /* Return an array which contains the three cube coordinates of a pixel.
+     * (Cube coordinates: x,y,z -> three axes in an angle of 120 deg)
+     */
+    public int [] getCubeCoordinatesFromId(int id){
+        int [] cube = new int[3];
+        int col = getPixelFromId(id).geometricX;
+        int row = getPixelFromId(id).geometricY;
+
+        int x = col;
+        int z = row - (col - (col%2)) / 2;
+        int y = -x -z;
+
+        cube[0] = x;
+        cube[1] = y;
+        cube[2] = z;
+
+        System.out.println(x +","+ y + "," + z);
+        return cube;
+    }
+
+    public FactCameraPixel getPixelFromCubeCoordinates(int x, int y, int z){
+        int col = x;
+        int row = z + (x-(x%2)) / 2;
+
+        return getPixelFromOffsetCoordinates(col, row);
+    }
+
     /**
      * Takes a data item containing a row from the mapping file.
      *

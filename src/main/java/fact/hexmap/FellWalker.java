@@ -152,7 +152,7 @@ public class FellWalker implements Processor {
 
 /*            double[] sizeX = sizeAxisX(clusterID, photoncharge, numCluster);
             double[] sizeY = sizeAxisY(clusterID, photoncharge, numCluster);*/
-           // int cogID = mapping.getPixelBelowCoordinatesInMM(cogX, cogY).id;
+           //int cogID = mapping.getPixelBelowCoordinatesInMM(cogX, cogY).id;
 
 
 
@@ -419,7 +419,7 @@ public class FellWalker implements Processor {
     }
 
 
-    //----------------------------------more or less usefull features for later gamma/hadron-separation ----------------
+    //----------------------------------more or less useful features for later gamma/hadron-separation ----------------
 
     public static double stdArrivaltimeMaxima(double arrivalTime[], int[]maxima, int numCluster){
         double[] arrivaltimeMax = new double[numCluster+1];
@@ -570,6 +570,10 @@ public class FellWalker implements Processor {
         }
         return countIsolatedCluster;
     }
+
+
+    //some features not used at the moment, calculateClusterCog fails because of not existing cog-pixels. not fixed.
+    //lin regression could be used for some features that works with the cluster cog's. not used at the moment
 
 /*    public double[][] calculateClusterCogInMM(int numCluster, int[] clusterID, double[] photoncharge){
         double [][] cogCluster = new double[numCluster+1][2];

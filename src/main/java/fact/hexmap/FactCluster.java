@@ -1,7 +1,6 @@
 package fact.hexmap;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -10,19 +9,17 @@ import java.util.Collections;
 public class FactCluster {
 
     FactPixelMapping mapping = FactPixelMapping.getInstance();
+
     private int clusterID;
 
     ArrayList<Integer> contentPixel = new ArrayList<>();
-    ArrayList<Integer> cleaningPixel = new ArrayList<>();               //contains all pixel in the cluster which are already in the shower-array (after cleaning)
-    ArrayList<Integer> boundPixel = new ArrayList<>();
+    ArrayList<Integer> cleaningPixel = new ArrayList<>();           //contains all pixel in the cluster which are already in the shower-array (after cleaning)
     ArrayList<Double> contentPixelPhotoncharge = new ArrayList<>();
     ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
-
-/*    ArrayList<Double> boundPixelPhotoncharge = new ArrayList<>();
-    ArrayList<Double> boundPixelArrivaltime = new ArrayList<>();*/
-
+    ArrayList<Integer> neighborClusterID = new ArrayList<>();
 
     private boolean containsShowerPixel;
+    private int neighbors;
 
 
 
@@ -59,9 +56,7 @@ public class FactCluster {
     }
 
 
-    public void addBoundPixel(int id){
-        boundPixel.add(id);
-    }
+
 
 
     public double maxPhotoncharge(){
@@ -169,7 +164,7 @@ public class FactCluster {
     }
 
 
-    //calculates the distance between the center of gravity (weighted by photoncharge) an the center of the camera              Testten!!!!!!!!!!!!!!!!
+    //calculates the distance between the center of gravity (weighted by photoncharge) an the center of the camera              Testen!!!!!!!!!!!!!!!!
     public double distanceCamCenter(){
         int cog = cogId();
         double cogX = mapping.getPixelFromId(cog).getXPositionInMM();
@@ -179,70 +174,116 @@ public class FactCluster {
 
     }
 
-    public int[] boundaryIds(){
-        findBoundary();
-        int [] boundPixelArray = new int[boundPixel.size()];
 
-        for(int i=0;i<boundPixel.size(); i++){
-            boundPixelArray[i] = boundPixel.get(i);
-        }
 
-        return boundPixelArray;
-    }
+    private ArrayList<FactCameraPixel> findSortedBoundary() {
 
-    private void findBoundary(){
+
         int startId = findStartPixelBoundary();
-        if(isBoundPixel(startId) == false){
 
-        }
+        int countPixel = 0;
         int currentId = startId;
         boolean boundEnd = false;
 
-        while (boundEnd == false) {
-            //case 1 (best case): minPhotonchargeId is a boundary-pixel
-            ArrayList<FactCameraPixel> neighbors = getNeighborsInClusterFromId(currentId);
+        ArrayList<FactCameraPixel> boundNeighbors = new ArrayList<>();
+        ArrayList<FactCameraPixel> sortedBound = new ArrayList<>();
+        sortedBound.add(mapping.getPixelFromId(startId));
 
-            ArrayList<Double> photonchargeNeighbors = new ArrayList<>();
+        while (!boundEnd) {
+            FactCameraPixel [] neighbors = getNeighborsInClusterFromId(currentId);
 
+            int i =0;
             for (FactCameraPixel p : neighbors) {
                 // short version:  photonchargeNeighbors.add(contentPixelPhotoncharge.get(contentPixel.indexOf(p.id)));
-                if(boundPixel.contains(p.id) == false && isBoundPixel(p.id) == true) {
-                    int indexOfId = contentPixel.indexOf(p.id);
-                    double photonchargeNeighbor = contentPixelPhotoncharge.get(indexOfId);
+                if (sortedBound.contains(p) || !isBoundPixel(p.id)) {
+                    neighbors[i] = null;
+                }
+                i++;
+            }
 
-                    photonchargeNeighbors.add(photonchargeNeighbor);
+            for (int k=0; k<neighbors.length; k++) {
+                if(neighbors[k] != null){
+                    boundNeighbors.add(neighbors[k]);
                 }
             }
 
-            if(photonchargeNeighbors.size() == 0){ boundEnd = true;}
-            else{
+            if(boundNeighbors.size() > 0) {
 
-            // short version:  boundPixel.add(neighbors.get(photonchargeNeighbors.indexOf(Collections.min(photonchargeNeighbors))).id);
-            double min = Collections.min(photonchargeNeighbors);
-            int indexMin = photonchargeNeighbors.indexOf(min);
-            FactCameraPixel lowestNeighbor = neighbors.get(indexMin);
-            int minId = lowestNeighbor.id;
-                boundPixel.add(minId);
-                currentId = minId;
-                System.out.println(minId);
+                // short version:  boundPixel.add(neighbors.get(photonchargeNeighbors.indexOf(Collections.min(photonchargeNeighbors))).id);
+
+                if(boundNeighbors.size() == 1){
+                    int minId = boundNeighbors.get(0).id;
+                    sortedBound.add(boundNeighbors.get(0));
+                    currentId = minId;
+                }
+                else {
+                    int min = 100;
+                    FactCameraPixel minP = boundNeighbors.get(0);
+                    for(FactCameraPixel p:boundNeighbors){
+                        int numClusterNeighbors = getNeighborsInClusterFromId(p.id).length;
+                        if(numClusterNeighbors < min){
+                            min = numClusterNeighbors;
+                            minP = p;
+                        }
+                    }
+                    int minId = minP.id;
+                    sortedBound.add(minP);
+                    currentId = minId;
+
+                }
             }
-           
+            else { FactCameraPixel [] neighborsNew = getNeighborsInClusterFromId(currentId);
+
+                if (neighborsNew.length == 1) {
+                    sortedBound.add(mapping.getPixelFromId(currentId));
+                    currentId = neighborsNew[0].id;
+                } else if (neighborsNew.length == 2 && sortedBound.size() < findBoundaryNaive().size() ){
+                    sortedBound.add(mapping.getPixelFromId(currentId));
+                    if(sortedBound.get(sortedBound.size()-1).id == neighborsNew[0].id){
+                        currentId = neighborsNew[0].id;
+                    }
+                    else {
+                        currentId = neighborsNew[1].id;
+                    }
+                }
+                else{
+                    boundEnd = true;
+                }
+            }
+
+            boundNeighbors.clear();
+
         }
+
+        return sortedBound;
+    }
+
+
+    public ArrayList<Integer> findBoundaryNaive(){
+        ArrayList<Integer> boundPixel = new ArrayList<>();
+        for(int id : contentPixel){
+            if( isBoundPixel(id)){
+                boundPixel.add(id);
+            }
+        }
+
+        return boundPixel;
     }
 
     private int findStartPixelBoundary(){
         boolean boundPixel = false;
         int i = 0;
         int id = -1;
-        while (boundPixel == false){
+        while (!boundPixel){
             boundPixel = isBoundPixel(contentPixel.get(i));
             id = contentPixel.get(i);
+            i++;
         }
 
         return id;
     }
 
-    private ArrayList<FactCameraPixel> getNeighborsInClusterFromId(int id){
+    private FactCameraPixel [] getNeighborsInClusterFromId(int id){
         FactCameraPixel[] allNeighbors = mapping.getNeighboursFromID(id);
         ArrayList<FactCameraPixel> neighborsInCluster = new ArrayList<>();
         for(FactCameraPixel p : allNeighbors){
@@ -250,17 +291,22 @@ public class FactCluster {
                 neighborsInCluster.add(p);
             }
         }
-        return neighborsInCluster;
+
+        FactCameraPixel [] neighborsArray = new FactCameraPixel[neighborsInCluster.size()];
+        for(int i=0; i<neighborsInCluster.size(); i++){
+            neighborsArray[i] = neighborsInCluster.get(i);
+        }
+        return neighborsArray;
     }
 
     private boolean isBoundPixel(int id){
         FactCameraPixel [] allCamNeighbors = mapping.getNeighboursFromID(id);
-        ArrayList<FactCameraPixel> clusterNeighbors = getNeighborsInClusterFromId(id);
+        FactCameraPixel [] clusterNeighbors = getNeighborsInClusterFromId(id);
 
-        if(allCamNeighbors.length == 6 && clusterNeighbors.size() == 6){
+        if(allCamNeighbors.length == 6 && clusterNeighbors.length == 6){
             return false;
         }
-        else if(allCamNeighbors.length < 6 && clusterNeighbors.size() == allCamNeighbors.length){
+        else if(allCamNeighbors.length < 6 && clusterNeighbors.length == allCamNeighbors.length){
             return true;
         }
         else { //if(allCamNeighbors.length > clusterNeighbors.length){
@@ -269,6 +315,79 @@ public class FactCluster {
 
     }
 
+    public int idealBoundDiff(){
+        return getBoundaryLength() - idealBound();
+    }
+
+    private int idealBound(){
+        return (int) (2*Math.sqrt(3*getNumPixel()) - 3);
+    }
+
+ public int boundAngleSum(){
+     ArrayList<FactCameraPixel> sortedBound = findSortedBoundary();
+     int cuDir = calcDirection(cubeCoordinates(sortedBound.get(0).id), cubeCoordinates(sortedBound.get(1).id));
+     int countChangeDir = 0;
+
+     for(int i=1; i<sortedBound.size()-1; i++){
+         int dir = calcDirection(cubeCoordinates(sortedBound.get(i).id), cubeCoordinates(sortedBound.get(i+1).id));
+         if(cuDir != dir){
+             countChangeDir++;
+             cuDir = dir;
+         }
+
+     }
+
+     int dir = calcDirection(cubeCoordinates(sortedBound.get(sortedBound.size()-1).id), cubeCoordinates(sortedBound.get(0).id));
+     if(cuDir != dir){
+         countChangeDir++;
+     }
+
+     return countChangeDir;
+
+ }
+
+    private int calcDirection(int[] pixel1, int[] pixel2){
+
+        int diffX = pixel2[0] - pixel1[0];
+        int diffY = pixel2[1] - pixel1[1];
+        int diffZ = pixel2[2] - pixel1[2];
+
+        if(diffY == 0){
+            return 1;
+        }
+        else if(diffZ == 0){
+            return 2;
+        }
+        else if(diffX == 0){
+            return 3;
+        }
+        else {return 0;}
+    }
+
+
+
+    private int [] cubeCoordinates(int id){
+        int [] cube = new int[3];
+        int col = mapping.getPixelFromId(id).geometricX;
+        int row = mapping.getPixelFromId(id).geometricY;
+
+        int x = col;
+        int z = row - (col - (col%2)) / 2;
+        int y = -x -z;
+
+        cube[0] = x;
+        cube[1] = y;
+        cube[2] = z;
+        return cube;
+    }
+
+    public void addNeighborCluster(int id){
+        neighborClusterID.add(id);
+    }
+
+    public int getNumNeighbors(){
+        return neighborClusterID.size();
+    }
 
 
 
@@ -291,6 +410,11 @@ public class FactCluster {
     public boolean getShowerLabel(){
         return containsShowerPixel;
     }
+
+    public int getBoundaryLength(){
+        return findBoundaryNaive().size();
+    }
+
 
     public int getNumShowerpixel(){ return cleaningPixel.size();}
 
