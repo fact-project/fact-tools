@@ -164,6 +164,12 @@ public class ClusterFellwalker implements Processor {
 
         airPixelMap(showerCluster, showerClusterID);
 
+        double numNeighborCluster = neighborClusterMean(showerCluster);
+
+        double airpixel = airpixelMean(showerCluster);
+
+        System.out.println(numNeighborCluster + "   " + airpixel);
+
 
         data.put("AllClusterID", clusterID);
         data.put("ShowerClusterID", showerClusterID);
@@ -174,6 +180,8 @@ public class ClusterFellwalker implements Processor {
         data.put("IdealBoundDiff", idealBoundDiff);
         data.put("BoundAngleSum", boundAngleSum);
         data.put("DistanceCenterSum", distanceCenterSum);
+        data.put("NeighborCluster", numNeighborCluster);
+        data.put("Airpixel", airpixel);
 
 /*            data.put("ChargeMax", chargeMaxClusterRatio);
             data.put("SizeCluster1", clusterSize[1]);
@@ -393,16 +401,13 @@ public class ClusterFellwalker implements Processor {
         for(int i=0; i<showerCluster.length; i++){
             for(int j=i+1; j<showerCluster.length; j++){
                 int airPixel = countAirPixel(gapPixel(showerCluster[i].cogId(), showerCluster[j].cogId(), showerClusterID), showerClusterID);
-                if(airPixel > 0){
-                   // map[i][j] = airPixel;
-                   // map[j][i] = airPixel;
-                }
-                else {
-                   // map[i][j] = airPixel;
-                    //map[j][i] = airPixel;
+                showerCluster[i].addNeighborDistance(airPixel);
+                showerCluster[j].addNeighborDistance(airPixel);
+                if(airPixel == 0){
                     showerCluster[i].addNeighborCluster(showerCluster[j].getClusterID());
                     showerCluster[j].addNeighborCluster(showerCluster[i].getClusterID());
                 }
+
             }
         }
 
@@ -433,7 +438,7 @@ public class ClusterFellwalker implements Processor {
         int [] cube2 = mapping.getCubeCoordinatesFromId(id2);
 
         int hexDistance = (Math.abs(cube2[0] - cube1[0]) + Math.abs(cube2[1] - cube1[1]) + Math.abs(cube2[2] - cube1[2]))/2;
-        System.out.println(hexDistance);
+       // System.out.println(hexDistance);
         double N = (double) hexDistance;
 
         for(int i=1; i<=hexDistance; i++){
@@ -485,6 +490,29 @@ public class ClusterFellwalker implements Processor {
         linePixel[2] = rz;
 
         return linePixel;
+    }
+
+    public double neighborClusterMean(FactCluster [] showerCluster){
+        double sum = 0;
+        double i = 0;
+        for (FactCluster c : showerCluster){
+            sum += c.getNumNeighbors();
+            i++;
+        }
+        return sum/i;
+    }
+
+    public double airpixelMean(FactCluster [] showerCluster){
+        double sum = 0;
+        double i = 0;
+        for (FactCluster c : showerCluster){
+            sum += c.getNumAirpixel();
+            i++;
+        }
+        if(sum < 1){
+            return 0;
+        }
+        else {return sum/i;}
     }
 
 
