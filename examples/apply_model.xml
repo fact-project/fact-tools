@@ -1,0 +1,9 @@
+<application>
+
+    <stream id="csv" class="stream.io.CsvStream" url="file:/Users/kai/Development/ma/jpmml_tests/iris_test.csv" />
+
+    <process id="1" source="csv" >
+        <fact.ApplyModel url="file:/Users/kai/Development/ma/jpmml_tests/lr.pmml" />
+    </process>
+
+</application>
