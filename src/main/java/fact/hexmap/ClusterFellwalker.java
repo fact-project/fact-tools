@@ -162,17 +162,19 @@ public class ClusterFellwalker implements Processor {
         double boundAngleSum = boundAngleSum(showerCluster);
         double distanceCenterSum = distanceCenter(showerCluster);
 
-        airPixelMap(showerCluster, showerClusterID);
+        int [] viewer = showerClusterID.clone();
+
+        airPixelMap(showerCluster, showerClusterID, viewer);
 
         double numNeighborCluster = neighborClusterMean(showerCluster);
 
         double airpixel = airpixelMean(showerCluster);
 
-        System.out.println(numNeighborCluster + "   " + airpixel);
+        //System.out.println(numNeighborCluster + "   " + airpixel);
 
 
         data.put("AllClusterID", clusterID);
-        data.put("ShowerClusterID", showerClusterID);
+        data.put("ShowerClusterID", viewer);
         data.put("ClusterNoCleaning", cluster);
         data.put("NumCluster", numCluster);
         data.put("BoundLength", lengthBoundaries);
@@ -373,46 +375,22 @@ public class ClusterFellwalker implements Processor {
     //between two cluster cog's that don't belong to a shower-cluster. From the number of air-pixel one can conclude
     //whether the clusters are neighbors, and, if not, how large the distance is between them.
     //At the moment two clusters are marked as neighbors if there are no air-pixels between them.
-/*    public int[][] airPixelMap(FactCluster [] showerCluster, int [] showerClusterID){
-        int[][] map = new int [showerCluster.length][showerCluster.length];
-        for(int i=0; i<showerCluster.length; i++){
-            for(int j=i; j<showerCluster.length; j++){
-                int airPixel = countAirPixel(gapPixel(showerCluster[i].cogId(), showerCluster[j].cogId(), showerClusterID), showerClusterID);
-                if(airPixel > 0){
-                    map[i][j] = airPixel;
-                    map[j][i] = airPixel;
-                }
-                else {
-                    map[i][j] = airPixel;
-                    map[j][i] = airPixel;
-                    showerCluster[i].addNeighborCluster(showerCluster[j].getClusterID());
-                    showerCluster[j].addNeighborCluster(showerCluster[i].getClusterID());
-                }
-            }
-        }
-
-        return map; //-------------------------------------------------------------------ungefaehr hier
-
-    }*/
-
-
-        public void airPixelMap(FactCluster [] showerCluster, int [] showerClusterID){
+    public void airPixelMap(FactCluster [] showerCluster, int [] showerClusterID, int[] viewer){
         //int[][] map = new int [showerCluster.length][showerCluster.length];
-        for(int i=0; i<showerCluster.length; i++){
-            for(int j=i+1; j<showerCluster.length; j++){
-                int airPixel = countAirPixel(gapPixel(showerCluster[i].cogId(), showerCluster[j].cogId(), showerClusterID), showerClusterID);
-                showerCluster[i].addNeighborDistance(airPixel);
-                showerCluster[j].addNeighborDistance(airPixel);
-                if(airPixel == 0){
-                    showerCluster[i].addNeighborCluster(showerCluster[j].getClusterID());
-                    showerCluster[j].addNeighborCluster(showerCluster[i].getClusterID());
+            //int [] viewer = showerClusterID.clone();
+            for(int i=0; i<showerCluster.length; i++){
+                for(int j=i+1; j<showerCluster.length; j++){
+                    int airPixel = countAirPixel(gapPixel(showerCluster[i].cogId(), showerCluster[j].cogId(), viewer), showerClusterID);
+                    showerCluster[i].addNeighborDistance(airPixel);
+                    showerCluster[j].addNeighborDistance(airPixel);
+                    if(airPixel == 0){
+                        showerCluster[i].addNeighborCluster(showerCluster[j].getClusterID());
+                        showerCluster[j].addNeighborCluster(showerCluster[i].getClusterID());
+                    }
+                    //else{System.out.println("airpixel: " + airPixel);}
+
                 }
-
             }
-        }
-
-        //return map; //-------------------------------------------------------------------ungefaehr hier
-
     }
 
 
@@ -426,27 +404,31 @@ public class ClusterFellwalker implements Processor {
             if (showerClusterID[id] == -2) {
                 countAirPixel++;
             }
+
         }
         return countAirPixel;
     }
 
     // Returns an ArrayList containing the pixel-ids which build a line between two pixels. Needs the ids of the two pixel that should be connected.
-    private ArrayList<Integer> gapPixel(int id1, int id2, int [] showerClusterID){
+    private ArrayList<Integer> gapPixel(int id1, int id2, int [] viewerArray){
         ArrayList<Integer> line = new ArrayList<>();
 
         int [] cube1 = mapping.getCubeCoordinatesFromId(id1);
         int [] cube2 = mapping.getCubeCoordinatesFromId(id2);
 
         int hexDistance = (Math.abs(cube2[0] - cube1[0]) + Math.abs(cube2[1] - cube1[1]) + Math.abs(cube2[2] - cube1[2]))/2;
-       // System.out.println(hexDistance);
+
+        //System.out.println(hexDistance);
         double N = (double) hexDistance;
 
         for(int i=1; i<=hexDistance; i++){
             double [] point = linePoint(cube1, cube2, 1.0/N * i);
-            int [] pixel = cube_round(point);
-            int linePixelId = mapping.getPixelFromCubeCoordinates(pixel[0], pixel[1], pixel[2]).id;
-            showerClusterID[linePixelId] = 0;
-            line.add(linePixelId);
+            long [] pixel = cube_round(point);
+            FactCameraPixel linePixel = mapping.getPixelFromCubeCoordinates(pixel[0], pixel[2]);
+            if (linePixel != null) {
+                viewerArray[linePixel.id] = 0; // <--------------- show lines irgendwo anders!
+                line.add(linePixel.id);
+            }
         }
 
         return line;
@@ -465,10 +447,10 @@ public class ClusterFellwalker implements Processor {
     }
 
     //Returns the (int) cube coordinates of the pixel which contains the (double) coordinates of some point in the coordinate system
-    private int[] cube_round(double [] linePoint){
-        int rx = (int) Math.round(linePoint[0]);
-        int ry = (int) Math.round(linePoint[1]);
-        int rz = (int) Math.round(linePoint[2]);
+    private long[] cube_round(double [] linePoint){
+        long rx =  Math.round(linePoint[0]);
+        long ry =  Math.round(linePoint[1]);
+        long rz =  Math.round(linePoint[2]);
 
         double x_diff = Math.abs(rx - linePoint[0]);
         double y_diff = Math.abs(ry - linePoint[1]);
@@ -484,7 +466,7 @@ public class ClusterFellwalker implements Processor {
             rz = -rx - ry;
         }
 
-        int [] linePixel = new int [3];
+        long [] linePixel = new long [3];
         linePixel[0] = rx;
         linePixel[1] = ry;
         linePixel[2] = rz;
@@ -498,21 +480,43 @@ public class ClusterFellwalker implements Processor {
         for (FactCluster c : showerCluster){
             sum += c.getNumNeighbors();
             i++;
+            //System.out.println(c.getNumNeighbors());
         }
         return sum/i;
     }
 
-    public double airpixelMean(FactCluster [] showerCluster){
+
+    /* 1) Find the air-pixel for one cluster. Air-pixel are the pixels on a line between two clusters which don't belong to any cluster.
+          (The more air-pixels between two clusters, the larger the distance between them.) Build the air-pixel-mean over all lines starting from this cluster. -> 'numAirpixel'
+       2) Sum over all 'numAirpixel' (of every cluster) -> sum
+          (the result should be a value for the spread/distribution of the clusters in the camera image)
+      */
+    public double airpixelMean(FactCluster [] showerCluster) {
         double sum = 0;
-        double i = 0;
-        for (FactCluster c : showerCluster){
-            sum += c.getNumAirpixel();
-            i++;
-        }
-        if(sum < 1){
+        if (showerCluster.length == 1) {
             return 0;
+        } else {
+            for (FactCluster c : showerCluster) {
+                sum += c.getNumAirpixel() / (showerCluster.length - 1);
+            }
+            return sum/showerCluster.length;
         }
-        else {return sum/i;}
+    }
+
+    public void numNeighbors(FactCluster [] showerSet, int[] showerClusterID){                  //------------------------------- Neighbors testen waere sinnvoll
+        int[] numNeighbors = new int [showerSet.length];
+        for(FactCluster c : showerSet){
+            ArrayList<Integer> bound = c.findBoundaryNaive();
+            for(int id : bound){
+                FactCameraPixel [] boundPixelNeighbors = mapping.getNeighboursFromID(id);
+                for(FactCameraPixel p : boundPixelNeighbors){
+                    if (showerClusterID[p.id] != c.getClusterID() && showerClusterID[p.id] != -2 && !c.naiveNeighborClusterID.contains(showerClusterID[p.id])) {
+                        c.naiveNeighborClusterID.add(showerClusterID[p.id]);
+                    }
+                }
+            }
+            c.numNeighbors = c.getNumNeighbors();
+        }
     }
 
 

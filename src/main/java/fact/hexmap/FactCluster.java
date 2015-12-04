@@ -18,9 +18,10 @@ public class FactCluster {
     ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
     ArrayList<Integer> neighborClusterID = new ArrayList<>();
     ArrayList<Integer> airpixelNeighborCluster = new ArrayList<>();
+    ArrayList<Integer> naiveNeighborClusterID = new ArrayList<>();
 
     private boolean containsShowerPixel;
-    private int neighbors;
+    int numNeighbors;
 
 
 
@@ -387,15 +388,20 @@ public class FactCluster {
     }
 
     public int getNumNeighbors(){
-        return neighborClusterID.size();
+        return naiveNeighborClusterID.size();
     }
 
     public void addNeighborDistance(int numAirPixel){
         airpixelNeighborCluster.add(numAirPixel);
     }
 
-    public int getNumAirpixel(){ return airpixelNeighborCluster.size(); }
-
+    public int getNumAirpixel(){
+        int sum = 0;
+        for(int i : airpixelNeighborCluster){
+            sum += i;
+        }
+        return sum;
+    }
 
 
     // get/set
