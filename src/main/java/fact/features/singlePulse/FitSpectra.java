@@ -155,7 +155,7 @@ public class FitSpectra implements StatefulProcessor{
         double[] start_values = new double[] {
                 maxFrequency,   //amplitude
                 maxIntegral,    //gain
-                sigma_start/maxIntegral,    //sigma
+                sigma_start,    //sigma
                 0.10,           //crosstalk
                 0.,             //baselineshift
                 .3,          //noise
@@ -169,25 +169,25 @@ public class FitSpectra implements StatefulProcessor{
         double[] binCenters = histogram.getBinCenters();
         double[] counts     = histogram.getCounts();
 
-        int borderBin = histogram.calculateBinFromVal(200);
-        int newLength = binCenters.length;
+//        int borderBin = histogram.calculateBinFromVal(200);
+//        int newLength = binCenters.length;
+//
+//        if (borderBin < binCenters.length){
+//            newLength = binCenters.length - borderBin;
+//        } else {
+//            borderBin = 0;
+//        }
+//
+//        double[] newCenters = new double[newLength];
+//        double[] newCounts  = new double[newLength];
+//
+//        System.arraycopy(binCenters, borderBin, newCenters, 0, newLength);
+//        System.arraycopy(counts, borderBin, newCounts, 0, newLength);
+//
 
-        if (borderBin < binCenters.length){
-            newLength = binCenters.length - borderBin;
-        } else {
-            borderBin = 0;
-        }
-
-        double[] newCenters = new double[newLength];
-        double[] newCounts  = new double[newLength];
-
-        System.arraycopy(binCenters, borderBin, newCenters, 0, newLength);
-        System.arraycopy(counts, borderBin, newCounts, 0, newLength);
 
 
-
-
-        SinglePeSpectrumLogLikelihood negLnL = new SinglePeSpectrumLogLikelihood(newCenters, newCounts);
+        SinglePeSpectrumLogLikelihood negLnL = new SinglePeSpectrumLogLikelihood(binCenters, counts);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
         MaxEval maxEval = new MaxEval(1000);
