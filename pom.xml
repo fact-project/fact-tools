@@ -4,12 +4,12 @@
 	<artifactId>fact-tools</artifactId>
 	<name>fact-tools</name>
 
-	<version>0.9.7-SNAPSHOT</version>
+	<version>0.9.8-SNAPSHOT</version>
 
 	<url>http://sfb876.de/fact-tools/</url>
 
 	<description>
-		        The FACT telescope is a cherenkov telescope on the island of La Palma.
+		        The FACT telescope is a Cherenkov telescope on the island of La Palma.
                 This set of tools is dedicated to read, parse and process raw data produced
                 by the FACT telescope.
 	</description>
@@ -17,7 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-		<streams.version>0.9.23-SNAPSHOT</streams.version>
+		<streams.version>0.9.23</streams.version>
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
