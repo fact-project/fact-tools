@@ -7,6 +7,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.ReadableDuration;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.sqljet.core.SqlJetException;
@@ -41,12 +43,12 @@ import java.util.concurrent.TimeUnit;
 public class SqliteService implements AuxiliaryService {
 
     static Logger log = LoggerFactory.getLogger(SqliteService.class);
-    final static String INDEX = "ix_DRIVE_CONTROL_SOURCE_POSITION_Time";
+    final static String INDEX = "time_pointing";
 
     @Parameter(required = true, description = "The URL to the sqlite database file. ")
     private SourceURL url;
 
-    @Parameter(required = false, description = "Timewindow for which to query the Database.", defaultValue = "20 Minutes")
+    @Parameter(required = false, description = "TimeWindow for which to query the Database.", defaultValue = "20 Minutes")
     private int window = 20;
 
     private LoadingCache<CacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
@@ -100,10 +102,7 @@ public class SqliteService implements AuxiliaryService {
         try {
             if (!cursor.eof()) {
                 do {
-                    System.out.println(cursor.getRowId() + " : " +
-                            cursor.getString("Dec") + " " +
-                            cursor.getString("Ra") + "  " +
-                            new DateTime(cursor.getInteger("Time")));
+                    System.out.println(cursor.getRowId() + " : " + cursor.getValue("Time"));
                 } while(cursor.next());
             }
         } finally {
@@ -125,7 +124,11 @@ public class SqliteService implements AuxiliaryService {
                 ISqlJetCursor r = table.scope(INDEX,
                         new Object[]{Integer.MIN_VALUE},
                         new Object[]{Integer.MAX_VALUE});
-
+                DateTime t = DateTime.parse("2014-01-19 01:33:43.344000", DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss.SSSSSS").withZoneUTC());
+                System.out.println(t);
+                long millis = t.getMillis();
+                r = table.lookup("time_pointing", millis);
+                System.out.println("Got " + r.getRowCount() + " rows.");
                 printRecords(r);
 
 

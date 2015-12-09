@@ -22,11 +22,11 @@ public class SqliteTest {
     @Test
     public void testSqLiteService() throws Exception {
         SqliteService s = new SqliteService();
-        s.setUrl(new SourceURL("file:///home/kai/aux.sqlite"));
-        DateTime t =  DateTime.parse("2013-10-10T22:11:59+00:00");
+        s.setUrl(new SourceURL("file:////Users/kai/Development/ma/pointing.sqlite"));
+        DateTime t =  DateTime.parse("2014-01-18T22:11:59+00:00");
 
         System.out.println(t);
-        TreeSet<AuxPoint> r = s.loadDataFromDataBase(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, t);
+        TreeSet<AuxPoint> r = s.loadDataFromDataBase(AuxiliaryServiceName.DRIVE_CONTROL_POINTING_POSITION, t);
         assertThat(r, is(not(nullValue())));
     }
 
