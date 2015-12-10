@@ -61,7 +61,7 @@
                 timeCalibConstKey="timeCalibConst"
                 outputKey="DataCalibrated"
                 />
-        <fact.datacorrection.InterpolateBadPixel 
+        <fact.datacorrection.InterpolateTimeline 
             calibService="calibService"
             interpolateTimeLine="True"
             dataKey="DataCalibrated"

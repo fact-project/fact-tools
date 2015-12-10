@@ -8,7 +8,7 @@
             <fact.filter.ExponentialSmoothing key="DataCalibrated" outputKey="smoothedData1" alpha="0.1"/>
             <fact.filter.ExponentialSmoothing key="DataCalibrated" outputKey="smoothedData2" alpha="0.2"/>
             <fact.filter.ExponentialSmoothing key="DataCalibrated" outputKey="smoothedData9" alpha="0.9"/>
-            <fact.datacorrection.InterpolateBadPixel key="DataCalibrated" outputKey="DataCalibrated"/>
+            <fact.datacorrection.InterpolateTimeline key="DataCalibrated" outputKey="DataCalibrated"/>
             <fact.extraction.MaxAmplitudePosition key="DataCalibrated" searchWindowLeft="25" searchWindowRight="125" outputKey="maxAmplitudePosition"/>
             <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated"  amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
             <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"

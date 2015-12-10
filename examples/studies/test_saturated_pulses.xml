@@ -31,7 +31,7 @@
 				topSlopeLimit="16"
 				maxSpikeLength="4"
 				/>
-		<!--<fact.datacorrection.InterpolateBadPixel-->
+		<!--<fact.datacorrection.InterpolateTimeline-->
 				<!--key="DataCalibrated"-->
 				<!--outputKey="DataCalibrated"-->
 				<!--badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722"-->

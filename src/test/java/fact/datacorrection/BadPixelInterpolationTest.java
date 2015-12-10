@@ -22,7 +22,7 @@ public class BadPixelInterpolationTest {
         mock[2*roi] = 60;
         mock[3*roi] = 1;
 
-        InterpolateBadPixel p = new InterpolateBadPixel();
+        InterpolateTimeline p = new InterpolateTimeline();
         mock = p.interpolateTimeLine(mock, badPixelChids);
         assertTrue("Not interpolated correctly", mock[2*roi] == 1.0/6.0);
     }

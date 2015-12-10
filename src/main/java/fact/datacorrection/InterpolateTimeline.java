@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.Processor;
-import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
 /**
@@ -25,37 +24,21 @@ import stream.annotations.Parameter;
   * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
-public class InterpolateBadPixel implements StatefulProcessor {
-    static Logger log = LoggerFactory.getLogger(InterpolateBadPixel.class);
+public class InterpolateTimeline implements Processor {
+    static Logger log = LoggerFactory.getLogger(InterpolateTimeline.class);
     
     @Parameter(required = true, description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
     
-    @Parameter(required = false, description = "If true the whole time line will be interpolated",
-    		defaultValue = "false")
-    private boolean interpolateTimeLine = false;
-    @Parameter(required = false, description = "If true the photoncharges and arrivalTimes will be interpolated",
-    		defaultValue = "false")
-    private boolean interpolatePhotonData = false;
     @Parameter(required = false, description = "If true a pixelSetOverlay with the bad pixels is added to the data item",
     		defaultValue = "false")
     private boolean showBadPixel = false;
 
-    @Parameter(required = false, description = "The data key to work on")
+    @Parameter(required = true, description = "The data key to work on")
     private String dataKey = null;
-    @Parameter(required = false, description = "The name of the interpolated data output")
+    @Parameter(required = true, description = "The name of the interpolated data output")
     private String dataOutputKey = null;
-    @Parameter(required = false, description = "The photoncharge key to work on")
-    private String photonChargeKey = null;
-    @Parameter(required = false, description = "The name of the interpolated photoncharge output")
-    private String photonChargeOutputKey = null;
-    @Parameter(required = false, description = "The arrivalTime key to work on")
-    private String arrivalTimeKey = null;
-    @Parameter(required = false, description = "The name of the interpolated arrivalTime output")
-    private String arrivalTimeOutputKey = null;
-
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-    
     
 
     private int npix = Constants.NUMBEROFPIXEL;
@@ -63,38 +46,12 @@ public class InterpolateBadPixel implements StatefulProcessor {
     private int minPixelToInterpolate = 3;
     
 
-	@Override
-	public void init(ProcessContext arg0) throws Exception {
-		if (interpolateTimeLine == true) {
-			if (dataKey == null | dataOutputKey == null)
-			{
-				throw new RuntimeException("Timeline shall be interpolated, but no dataKey and/or dataOutputkey specified");
-			}
-		}
-		if (interpolatePhotonData == true) {
-			if (photonChargeKey == null | photonChargeOutputKey == null | arrivalTimeKey == null | arrivalTimeOutputKey == null)
-			{
-				throw new RuntimeException("Photon data shall be interpolated, but there is at least one key of "
-						+ "photonChargeKey, photonChargeOutputKey, arrivalTimeKey, arrivalTimeOutputkey missing");
-			}
-		}
-	}
-	
-	@Override
-	public void finish() throws Exception {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void resetState() throws Exception {
-		// TODO Auto-generated method stub	
-	}
-
-
     @Override
     public Data process(Data item) {
     	Utils.isKeyValid(item, "NPIX", Integer.class);
+		Utils.isKeyValid(item, dataKey, double[].class);
     	npix = (Integer) item.get("NPIX");
+		double[] data = (double[]) item.get(dataKey);
     	
     	DateTime timeStamp = null;
     	
@@ -108,44 +65,18 @@ public class InterpolateBadPixel implements StatefulProcessor {
     		// => The 12 bad pixels we have from the beginning on are used.
     		timeStamp = new DateTime(2000, 1, 1, 0, 0);
     	}
-    	
-    	
+
     	int[] badChIds = calibService.getBadPixel(timeStamp);
     	
-    	if (interpolateTimeLine == true){
-    		Utils.isKeyValid(item, dataKey, double[].class);
-    		double[] data = (double[]) item.get(dataKey);
-    		if(!dataKey.equals(dataOutputKey)){
-    			double[] newdata = new double[data.length];
-    			System.arraycopy(data,0, newdata, 0, data.length);
-    			data = interpolateTimeLine(newdata, badChIds);
-    		} else {
-    			data = interpolateTimeLine(data, badChIds);
-    		}
-    		item.put(dataOutputKey, data);
-    	}
-    	if (interpolatePhotonData == true){
-    		Utils.isKeyValid(item, photonChargeKey, double[].class);
-    		Utils.isKeyValid(item, arrivalTimeKey, double[].class);
-    		double[] photoncharge = (double[]) item.get(photonChargeKey);
-    		double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
-    		if(!photonChargeKey.equals(photonChargeOutputKey)){
-    			double[] newPhotonCharge = new double[photoncharge.length];
-    			System.arraycopy(photoncharge,0, newPhotonCharge, 0, photoncharge.length);
-    			photoncharge = interpolatePixelArray(newPhotonCharge, badChIds);
-    		} else {
-    			photoncharge = interpolatePixelArray(photoncharge, badChIds);
-    		}
-    		if(!arrivalTimeKey.equals(arrivalTimeOutputKey)){
-    			double[] newArrivalTime = new double[arrivalTime.length];
-    			System.arraycopy(arrivalTime,0, newArrivalTime, 0, arrivalTime.length);
-    			arrivalTime = interpolatePixelArray(newArrivalTime, badChIds);
-    		} else {
-    			arrivalTime = interpolatePixelArray(arrivalTime, badChIds);
-    		}
-    		item.put(photonChargeOutputKey, photoncharge);
-    		item.put(arrivalTimeOutputKey, arrivalTime);
-    	}
+		if(!dataKey.equals(dataOutputKey)){
+			double[] newdata = new double[data.length];
+			System.arraycopy(data,0, newdata, 0, data.length);
+			data = interpolateTimeLine(newdata, badChIds);
+		} else {
+			data = interpolateTimeLine(data, badChIds);
+		}
+		
+		item.put(dataOutputKey, data);
     	if (showBadPixel == true){
     		PixelSetOverlay badPixelsSet = new PixelSetOverlay();
     		for (int px: badChIds){
@@ -155,25 +86,7 @@ public class InterpolateBadPixel implements StatefulProcessor {
     	}
         return item;
     }
-
-    private double[] interpolatePixelArray(double[] pixelArray, int[] badChIds) {
-    	for (int pix: badChIds){
-			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
-			double avg = 0.0f;
-			int numNeighbours = 0;
-			for (FactCameraPixel nPix: currentNeighbors){
-				if (ArrayUtils.contains(badChIds, nPix.id)){
-					continue;
-				}
-				avg += pixelArray[nPix.id];
-				numNeighbours++;
-			}
-			checkNumNeighbours(numNeighbours, pix);
-			pixelArray[pix] = avg/numNeighbours;
-		}
-		return pixelArray;
-	}
-
+    
 	public double[] interpolateTimeLine(double[] data, int[] badChIds) {
         int roi = data.length / npix;
 
@@ -220,14 +133,6 @@ public class InterpolateBadPixel implements StatefulProcessor {
 		this.calibService = calibService;
 	}
 
-	public void setInterpolateTimeLine(boolean interpolateTimeLine) {
-		this.interpolateTimeLine = interpolateTimeLine;
-	}
-
-	public void setInterpolatePhotonData(boolean interpolatePhotonData) {
-		this.interpolatePhotonData = interpolatePhotonData;
-	}
-
 	public void setShowBadPixel(boolean showBadPixel) {
 		this.showBadPixel = showBadPixel;
 	}
@@ -238,22 +143,6 @@ public class InterpolateBadPixel implements StatefulProcessor {
 
 	public void setDataOutputKey(String dataOutputKey) {
 		this.dataOutputKey = dataOutputKey;
-	}
-
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
-
-	public void setPhotonChargeOutputKey(String photonChargeOutputKey) {
-		this.photonChargeOutputKey = photonChargeOutputKey;
-	}
-
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
-
-	public void setArrivalTimeOutputKey(String arrivalTimeOutputKey) {
-		this.arrivalTimeOutputKey = arrivalTimeOutputKey;
 	}
 
 	public void setMinPixelToInterpolate(int minPixelToInterpolate) {

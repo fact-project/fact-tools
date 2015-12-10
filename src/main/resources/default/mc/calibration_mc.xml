@@ -20,7 +20,7 @@
     topSlopeLimit="${removeSpikes_topSlopeLimit}"
     maxSpikeLength="${removeSpikes_maxSpikeLength}"
 />
-<fact.datacorrection.InterpolateBadPixel 
+<fact.datacorrection.InterpolateTimeline 
     calibService="calibService"
     interpolateTimeLine="True"
     dataKey="DataCalibrated"

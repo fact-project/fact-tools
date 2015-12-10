@@ -44,7 +44,7 @@
                                          timeCalibConstKey="timeCalibConst"
                                          outputKey="DataCalibrated" />
 
-        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
+        <fact.datacorrection.InterpolateTimeline key="DataCalibrated"  outputKey="DataCalibrated"
                                                  badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
 
         <fact.filter.MovingAverage key="DataCalibrated"
