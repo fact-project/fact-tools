@@ -1,32 +1,20 @@
 package fact.auxservice;
 
 import com.google.common.cache.*;
-import com.google.gson.*;
 import fact.auxservice.strategies.AuxPointStrategy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.ReadableDuration;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.sqljet.core.SqlJetException;
 import org.tmatesoft.sqljet.core.SqlJetTransactionMode;
-import org.tmatesoft.sqljet.core.table.ISqlJetCursor;
-import org.tmatesoft.sqljet.core.table.ISqlJetTable;
-import org.tmatesoft.sqljet.core.table.ISqlJetTransaction;
-import org.tmatesoft.sqljet.core.table.SqlJetDb;
+import org.tmatesoft.sqljet.core.table.*;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import us.monoid.json.JSONArray;
-import us.monoid.json.JSONException;
-import us.monoid.web.Resty;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -35,25 +23,24 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * This implements an AuxiliaryService {@link AuxiliaryService}  providing data from some
- *
+ * This implements an AuxiliaryService {@link AuxiliaryService}  providing data from a sqlite file.
+ * Can handle TRACKING and SOURCE information.
  *
  * Created by kai on 01.03.15.
  */
 public class SqliteService implements AuxiliaryService {
 
     static Logger log = LoggerFactory.getLogger(SqliteService.class);
-    final static String INDEX = "time_pointing";
 
     @Parameter(required = true, description = "The URL to the sqlite database file. ")
     private SourceURL url;
 
     @Parameter(required = false, description = "TimeWindow for which to query the Database.", defaultValue = "20 Minutes")
-    private int window = 20;
+    private int window = 10;
 
     private LoadingCache<CacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
             .maximumSize(100)
-            .expireAfterAccess(20, TimeUnit.MINUTES)
+            .expireAfterAccess(window, TimeUnit.MINUTES)
             .removalListener(new RemovalListener<Object, Object>() {
                 @Override
                 public void onRemoval(RemovalNotification<Object, Object> notification) {
@@ -84,9 +71,9 @@ public class SqliteService implements AuxiliaryService {
             CacheKey cacheKey = (CacheKey) o;
 
             if (!roundedTimeStamp.equals(cacheKey.roundedTimeStamp)) return false;
-            if (service != cacheKey.service) return false;
 
-            return true;
+            return service == cacheKey.service;
+
         }
 
         @Override
@@ -98,58 +85,103 @@ public class SqliteService implements AuxiliaryService {
     }
 
 
-    private static void printRecords(ISqlJetCursor cursor) throws SqlJetException {
-        try {
-            if (!cursor.eof()) {
-                do {
-                    System.out.println(cursor.getRowId() + " : " + cursor.getValue("Time"));
-                } while(cursor.next());
-            }
-        } finally {
-            cursor.close();
-        }
-    }
-
+    /**
+     * public for unit testing purposes
+     * @param service the name of the aux data to fetch
+     * @param time the time stamp of the data event
+     * @return the TreeSet containing the AuxPoints
+     */
     public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, DateTime time){
+        TreeSet<AuxPoint> result = new TreeSet<>();
+
         try {
             log.info("Querying Database for " + service.toString() + " data for time " + time.toString());
-            TreeSet<AuxPoint> result = new TreeSet<>();
 
             SqlJetDb db = SqlJetDb.open(new File(url.getFile()), true);
             ISqlJetTable table = db.getTable(service.toString());
-
+            ISqlJetCursor cursor = null;
             try {
-                db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
-                System.out.println(time.minusMinutes(122).getMillis()/1000);
-                ISqlJetCursor r = table.scope(INDEX,
-                        new Object[]{Integer.MIN_VALUE},
-                        new Object[]{Integer.MAX_VALUE});
-                DateTime t = DateTime.parse("2014-01-19 01:33:43.344000", DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss.SSSSSS").withZoneUTC());
-                System.out.println(t);
-                long millis = t.getMillis();
-                r = table.lookup("time_pointing", millis);
-                System.out.println("Got " + r.getRowCount() + " rows.");
-                printRecords(r);
 
+                db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
+                long earlier = time.minusMinutes(5).getMillis()/1000;
+                long later = time.plusMinutes(15).getMillis()/1000;
+
+                try {
+                    if(service == AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION){
+                        cursor = table.scope("time_tracking", new Object[]{earlier}, new Object[]{later});
+                        result = getTrackingDataFromCursor(cursor);
+                    } else if(service == AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION){
+                        cursor = table.scope("time_source", new Object[]{earlier}, new Object[]{later});
+                        result = getSourceDataFromCursor(cursor);
+                    } else {
+                        throw new RuntimeException("This service only provides data from DRIVE_CONTROL_SOURCE_POSITION  and TRACKING files");
+                    }
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                }
 
             } finally {
                 db.commit();
                 db.close();
             }
 
-
-
         } catch (SqlJetException e) {
             e.printStackTrace();
         }
-        return null;
+        return result;
     }
 
+    private TreeSet<AuxPoint> getSourceDataFromCursor(ISqlJetCursor cursor) throws SqlJetException {
+        TreeSet<AuxPoint> result = new TreeSet<>();
+        if (!cursor.eof()) {
+            do {
+                Map<String, Serializable> m = new HashMap<>();
+                m.put("QoS", cursor.getInteger("QoS"));
+                //getFloat actually returns a double. WTF
+                m.put("Name", cursor.getString("Name"));
+                m.put("Angle", cursor.getFloat("Angle"));
+                m.put("Ra_src", cursor.getFloat("Ra_src"));
+                m.put("Dec_src", cursor.getFloat("Dec_src"));
+                m.put("Ra_cmd", cursor.getFloat("Ra_cmd"));
+                m.put("Dec_cmd", cursor.getFloat("Dec_cmd"));
+                m.put("Offset", cursor.getFloat("Offset"));
+                DateTime t = new DateTime(cursor.getInteger("time_in_seconds") * 1000, DateTimeZone.UTC);
+                result.add(new AuxPoint(t, m));
+            } while (cursor.next());
+        }
+
+        return result;
+    }
+
+    private TreeSet<AuxPoint> getTrackingDataFromCursor(ISqlJetCursor cursor) throws SqlJetException {
+        TreeSet<AuxPoint> result = new TreeSet<>();
+        if (!cursor.eof()) {
+            do {
+                Map<String, Serializable> m = new HashMap<>();
+                m.put("QoS", cursor.getInteger("QoS"));
+                //getFloat actually returns a double. WTF
+                m.put("Zd", cursor.getFloat("Zd"));
+                m.put("Az", cursor.getFloat("Az"));
+                m.put("Ra", cursor.getFloat("Ra"));
+                m.put("Dec", cursor.getFloat("Dec"));
+                m.put("dZd", cursor.getFloat("dZd"));
+                m.put("dAz", cursor.getFloat("dAz"));
+                m.put("dev", cursor.getFloat("dev"));
+                DateTime t = new DateTime(cursor.getInteger("time_in_seconds") * 1000, DateTimeZone.UTC);
+                result.add(new AuxPoint(t, m));
+            } while (cursor.next());
+        }
+        return result;
+    }
+
+
     /**
-     *
+     * Get auxiliary data from the cache connected to the sqlite database holding drive information.
      * @param service The service to query.
      * @param eventTimeStamp The timestamp of your current event.
-     * @return the data closest to the eventtimestamp which is found in the database.
+     * @return the data closest to the eventtimestamp which is found in the database according to the strategy.
      */
     public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         try {
@@ -159,7 +191,7 @@ public class SqliteService implements AuxiliaryService {
             return strategy.getPointFromTreeSet(set, eventTimeStamp);
 
         } catch (ExecutionException e) {
-            throw new IOException("Could not load data from Database. Are you connected to the intertubes?");
+            throw new IOException("Could not load data from Database. Is the database readable?");
 //            e.printStackTrace();
         }
     }
