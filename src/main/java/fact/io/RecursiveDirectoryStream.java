@@ -2,6 +2,8 @@ package fact.io;
 
 import com.google.gson.Gson;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -13,179 +15,162 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
- * Created by mackaiver on 9/21/14.
+ * Created by mackaiver on 12/15/15.
  */
-@Deprecated
 public class RecursiveDirectoryStream extends AbstractMultiStream {
+    static Logger log = LoggerFactory.getLogger(RecursiveDirectoryStream.class);
 
-    static BlockingQueue<File> files = new LinkedBlockingQueue<>();
+
+    static BlockingQueue<Path> files = new LinkedBlockingQueue<>();
 
     @Parameter(required = false, description = "Maximum depth of folders to traverse", defaultValue = "6")
     private int  maxDepth = 6;
-    @Parameter(required = true, description = "The suffix to filter files by. .gz for example.")
-    private String suffix;
 
-    @Parameter(required = false, description = "A file containing a json array of strings with the allowed filenames. "+
-            "(excluding the possible suffix)")
-    private SourceURL listUrl = null;
+    @Parameter(required = true, description = "The pattern to filter files by. Understand usual glob syntax")
+    private String pattern;
+
+    @Parameter(required = true, description = "The top level folder to search.")
+    private SourceURL directory;
 
     //counts how many files have been processed
     private int filesCounter = 0;
-    
     private int failedFilesCounter = 0;
-    
     private List<String> failedFilesList = new ArrayList<>();
-    
     @Parameter(required = false, description = "If false the reading of a broken file throws"
     		+ " an exception and the process is aborted, if true the next file will be processed", defaultValue = "false")
     private boolean skipBrokenFiles = false;
-
     private AbstractStream stream;
 
     public RecursiveDirectoryStream(SourceURL url) {
         super(url);
     }
 
+
+    private class GlobVisitor extends SimpleFileVisitor<Path>{
+
+        private final PathMatcher matcher;
+
+        public GlobVisitor(String pattern) {
+            matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
+            Path name = file.getFileName();
+            if (name != null && attr.isRegularFile()) {
+
+                if (matcher.matches(file.getFileName())){
+                    files.add(file);
+                }
+
+            } else {
+                log.info("Not a regular file: %s ", file);
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            Path name = dir.getFileName();
+            if(name != null && matcher.matches(name)){
+                return FileVisitResult.CONTINUE;
+            } else{
+                return FileVisitResult.SKIP_SUBTREE;
+            }
+        }
+    }
+
+
     @Override
     public void init() throws Exception {
-        if(!files.isEmpty()){
-            log.debug("files allready loaded");
-            //file allready loaded
+
+        streams.get(additionOrder.get(0));
+        if (streams.size() > 1){
+            log.error("This multistrream only supports 1 substream");
+        }
+
+        Path startingDir = Paths.get(directory.getFile());
+        GlobVisitor glob = new GlobVisitor(pattern);
+        Files.walkFileTree(startingDir, new HashSet<FileVisitOption>(), maxDepth, glob);
+
+
+
+        if(files.isEmpty()){
+            log.info("No files could be loaded");
             return;
         }
-        SourceURL url = getUrl();
-        File f = new File(url.getFile());
-        if (!f.isDirectory()){
-            throw new IllegalArgumentException("Provided url does not point to a directory");
-        }
 
-        HashSet<String> fileNamesFromWhiteList = new HashSet<>();
-        if(listUrl !=  null){
-            File list = new File(listUrl.getFile());
-            Gson g = new Gson();
-            fileNamesFromWhiteList = g.fromJson(new BufferedReader(new FileReader(list)), new HashSet<String>().getClass());
-        }
-
-        log.info("Loading files.");
-        ArrayList<File> fileList = walkFiles(f, suffix, 0);
-        for (File file: fileList){
-            if(fileNamesFromWhiteList.isEmpty() || fileNamesFromWhiteList.contains(file.getName())){
-                files.add(file);
-            }
-        }
         log.info("Loaded " + files.size() + " files for streaming.");
         //super.init();
+
+        if (stream == null) {
+            stream = (AbstractStream) streams.get(additionOrder.get(0));
+            stream.setUrl(new SourceURL(files.poll().toUri().toURL()));
+            stream.init();
+            log.info("Streaming file: " + stream.getUrl().toString());
+            filesCounter++;
+        }
     }
 
-    /**
-     * Recursivly walks over all direcotries below dir. Up to the maximum depth of depth; Returns only files which names
-     * end with the given suffix.
-     * @param dir
-     * @param suffix
-     * @param depth
-     * @return
-     */
-    private ArrayList<File> walkFiles(File dir, final String suffix, int depth){
-        if(depth > maxDepth){
-            return new ArrayList<>();
-        }
-        //get all files ending with the right suffix in this directory and add them to the queue
-        String[] fileNames = dir.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                File f = new File(dir, name);
-                if (f.isHidden() || f.isDirectory()){
-                    return false;
-                }
-                if (name.endsWith(suffix)) {
-                    return true;
-                }
-                return false;
-
-            }
-        });
-        ArrayList<File> l = new ArrayList<>();
-        for(String fName : fileNames){
-            l.add(new File(dir, fName));
-        }
-        //now get all subdirs and do it again
-        String[] directoryNames = dir.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                File f = new File(dir, name);
-                if (!f.isHidden() && f.isDirectory()){
-                    return true;
-                }
-                return false;
-            }
-        });
-        depth++;
-        for (String dirName  : directoryNames){
-            File subDir = new File(dir, dirName);
-            l.addAll(walkFiles(subDir, suffix, depth));
-        }
-        return l;
-    }
 
     @Override
     public Data readNext() throws Exception {
-        if (stream == null) {
-            stream = (AbstractStream) streams.get(additionOrder.get(0));
-            File f = files.poll();
-            if (f == null) {
-                return null;
-            }
-            stream.setUrl(new SourceURL(f.toURI().toURL()));
-            log.info("Streaming file: " + stream.getUrl().toString());
-            stream.init();
-            filesCounter++;
-        }
+
         Data data = stream.read();
         if (data != null) {
             return data;
-        } else {
-            File f = files.poll();
-            if (f == null)
-                return null;
-            else {
-                stream.close();
-//                stream.count = 0L;
-                stream.setUrl(new SourceURL(f.toURI().toURL()));
-                log.info("Streaming file: " + stream.getUrl().toString());
-                try
-                {
-	                stream.init();
-	                data = stream.read();
-	                filesCounter++;
-                }
-                catch (IOException e)
-                {
-                	log.info("File: " + stream.getUrl().toString() + " throws IOException.");
-                	if (skipBrokenFiles == false)
-                	{
-                		throw e;
-                	}
-                	else
-                	{
-                		log.info("skipBrokenFile is true. Going on with next file.");
-                		failedFilesCounter++;
-                		failedFilesList.add(stream.getUrl().toString());
-                		data = null;
-                		return this.readNext();
-                	}
-                }
+        }
+
+        if (files.isEmpty()) {
+            //stop the stream
+            return null;
+        }
+        //stream from new file.
+        File f = files.poll().toFile();
+
+        stream.close();
+        stream.setUrl(new SourceURL(f.toURI().toURL()));
+
+        try {
+            log.info("Streaming file: " + stream.getUrl().toString());
+            stream.init();
+            data = stream.read();
+            if ( data == null){
+                //try next file;
+                return this.readNext();
+            } else {
                 return data;
             }
+
+        } catch (IOException e) {
+            log.info("File: " + stream.getUrl().toString() + " throws IOException.");
+
+            if (skipBrokenFiles) {
+                log.info("Skipping broken files. Continuing with next file.");
+                failedFilesCounter++;
+                failedFilesList.add(stream.getUrl().toString());
+                return this.readNext();
+            } else {
+                log.error("Stopping stream because of IOException");
+                e.printStackTrace();
+                return null;
+            }
+
         }
     }
+
+
 
     @Override
     public void close() throws Exception {
@@ -201,14 +186,10 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         this.maxDepth = maxDepth;
     }
 
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
-
-    public void setListUrl(SourceURL listUrl) {
-        this.listUrl = listUrl;
-    }
-
+    
 	public void setSkipBrokenFiles(boolean skipBrokenFiles) {
 		this.skipBrokenFiles = skipBrokenFiles;
 	}
