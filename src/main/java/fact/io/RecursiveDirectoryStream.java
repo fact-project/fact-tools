@@ -37,7 +37,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     @Parameter(required = false, description = "Maximum depth of folders to traverse", defaultValue = "6")
     private int  maxDepth = 6;
 
-    @Parameter(required = true, description = "The pattern to filter files by. Understand usual glob syntax")
+    @Parameter(required = true, description = "The pattern to filter files by. Understands usual glob syntax")
     private String pattern;
 
     //counts how many files have been processed
@@ -84,16 +84,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             log.error("Could not visit file: {}", file);
             return FileVisitResult.CONTINUE;
         }
-
-//        @Override
-//        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-//            Path name = dir.getFileName();
-//            if(name != null && matcher.matches(name)){
-//                return FileVisitResult.CONTINUE;
-//            } else{
-//                return FileVisitResult.SKIP_SUBTREE;
-//            }
-//        }
     }
 
 
@@ -109,8 +99,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         Files.walkFileTree(startingDir, new HashSet<FileVisitOption>(), maxDepth, globVisitor);
 
         if(files.isEmpty()){
-            log.info("No files could be loaded");
-            return;
+            log.error("No files could be loaded for pattern {}", pattern);
+            throw new RuntimeException("No files could be loaded");
         }
 
         log.info("Loaded " + files.size() + " files for streaming.");
