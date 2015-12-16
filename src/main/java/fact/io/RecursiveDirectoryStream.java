@@ -32,16 +32,13 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     static Logger log = LoggerFactory.getLogger(RecursiveDirectoryStream.class);
 
 
-    static BlockingQueue<Path> files = new LinkedBlockingQueue<>();
+    public BlockingQueue<Path> files = new LinkedBlockingQueue<>();
 
     @Parameter(required = false, description = "Maximum depth of folders to traverse", defaultValue = "6")
     private int  maxDepth = 6;
 
     @Parameter(required = true, description = "The pattern to filter files by. Understand usual glob syntax")
     private String pattern;
-
-    @Parameter(required = true, description = "The top level folder to search.")
-    private SourceURL directory;
 
     //counts how many files have been processed
     private int filesCounter = 0;
@@ -62,7 +59,9 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         private final PathMatcher matcher;
 
         public GlobVisitor(String pattern) {
-            matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+            Path startingDir = Paths.get(url.getFile());
+            String globPattern = "glob:" + startingDir + pattern;
+            matcher = FileSystems.getDefault().getPathMatcher(globPattern);
         }
 
         @Override
@@ -70,41 +69,44 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             Path name = file.getFileName();
             if (name != null && attr.isRegularFile()) {
 
-                if (matcher.matches(file.getFileName())){
+                if (matcher.matches(file)){
                     files.add(file);
                 }
 
             } else {
-                log.info("Not a regular file: %s ", file);
+                log.info("Not a regular file: {} ", file);
             }
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            Path name = dir.getFileName();
-            if(name != null && matcher.matches(name)){
-                return FileVisitResult.CONTINUE;
-            } else{
-                return FileVisitResult.SKIP_SUBTREE;
-            }
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            log.error("Could not visit file: {}", file);
+            return FileVisitResult.CONTINUE;
         }
+
+//        @Override
+//        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+//            Path name = dir.getFileName();
+//            if(name != null && matcher.matches(name)){
+//                return FileVisitResult.CONTINUE;
+//            } else{
+//                return FileVisitResult.SKIP_SUBTREE;
+//            }
+//        }
     }
 
 
     @Override
     public void init() throws Exception {
 
-        streams.get(additionOrder.get(0));
-        if (streams.size() > 1){
+        if (streams != null && streams.size() > 1){
             log.error("This multistrream only supports 1 substream");
         }
 
-        Path startingDir = Paths.get(directory.getFile());
-        GlobVisitor glob = new GlobVisitor(pattern);
-        Files.walkFileTree(startingDir, new HashSet<FileVisitOption>(), maxDepth, glob);
-
-
+        Path startingDir = Paths.get(url.getFile());
+        GlobVisitor globVisitor = new GlobVisitor(pattern);
+        Files.walkFileTree(startingDir, new HashSet<FileVisitOption>(), maxDepth, globVisitor);
 
         if(files.isEmpty()){
             log.info("No files could be loaded");
@@ -114,7 +116,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         log.info("Loaded " + files.size() + " files for streaming.");
         //super.init();
 
-        if (stream == null) {
+        if (stream == null && additionOrder != null) {
             stream = (AbstractStream) streams.get(additionOrder.get(0));
             stream.setUrl(new SourceURL(files.poll().toUri().toURL()));
             stream.init();
@@ -189,7 +191,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     public void setPattern(String pattern) {
         this.pattern = pattern;
     }
-    
+
 	public void setSkipBrokenFiles(boolean skipBrokenFiles) {
 		this.skipBrokenFiles = skipBrokenFiles;
 	}
