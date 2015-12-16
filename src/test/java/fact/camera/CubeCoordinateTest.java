@@ -5,9 +5,7 @@ package fact.camera;
         import fact.hexmap.FactPixelMapping;
         import org.junit.Test;
 
-        import java.io.File;
-        import java.io.FileWriter;
-        import java.io.IOException;
+        import java.io.*;
         import java.util.ArrayList;
 
         import static org.junit.Assert.*;
@@ -20,14 +18,18 @@ public class CubeCoordinateTest {
 
     @Test
     public void testPosition() {
-/*        for(int i=0; i<1440; i++){
+        double [] xPosition = new double [1440];
+        double [] yPosition = new double [1440];
+        for(int i=0; i<1440; i++){
             int [] cube = mapping.getCubeCoordinatesFromId(i);
-            FactCameraPixel p = mapping.getPixelFromCubeCoordinates(cube[0], cube[1], cube[2]);
-            //System.out.println(p.id);
+            FactCameraPixel p = mapping.getPixelFromCubeCoordinates(cube[0], cube[2]);
+            xPosition[p.id] = p.posX;
+            yPosition[p.id] = p.posY;
+        }
+       int i =0;
 
-        }*/
-        FactCameraPixel p = mapping.getPixelFromOffsetCoordinates(-18, -11);
 //        System.out.println(p.id);
+
     }
 
     @Test

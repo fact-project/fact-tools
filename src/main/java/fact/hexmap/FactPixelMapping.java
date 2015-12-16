@@ -219,13 +219,12 @@ public class FactPixelMapping implements PixelMapping {
         cube[1] = y;
         cube[2] = z;
 
-        System.out.println(x +","+ y + "," + z);
         return cube;
     }
 
-    public FactCameraPixel getPixelFromCubeCoordinates(int x, int y, int z){
-        int col = x;
-        int row = z + (x-(x%2)) / 2;
+    public FactCameraPixel getPixelFromCubeCoordinates(long x,  long z){
+        int col =  (int) x;
+        int row = (int) (z + (x-(x&1)) / 2);
 
         return getPixelFromOffsetCoordinates(col, row);
     }

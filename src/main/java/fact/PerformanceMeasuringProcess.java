@@ -14,6 +14,7 @@ import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+import stream.runtime.ApplicationContext;
 import stream.runtime.DefaultProcess;
 
 import java.io.FileNotFoundException;
@@ -49,7 +50,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
     private HashMap<Processor, DescriptiveStatistics> timeMap = new HashMap<>();
 
     @Override
-    public void init(Context context) throws Exception {
+    public void init(ApplicationContext context) throws Exception {
         super.init(context);
 
         for (Processor proc : processors) {

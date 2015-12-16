@@ -13,15 +13,21 @@ public class FactCluster {
     private int clusterID;
 
     ArrayList<Integer> contentPixel = new ArrayList<>();
+    private ArrayList<Double> contentPixelPhotoncharge = new ArrayList<>();
+    private ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
     ArrayList<Integer> cleaningPixel = new ArrayList<>();           //contains all pixel in the cluster which are already in the shower-array (after cleaning)
-    ArrayList<Double> contentPixelPhotoncharge = new ArrayList<>();
-    ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
     ArrayList<Integer> neighborClusterID = new ArrayList<>();
     ArrayList<Integer> airpixelNeighborCluster = new ArrayList<>();
     ArrayList<Integer> naiveNeighborClusterID = new ArrayList<>();
 
     private boolean containsShowerPixel;
     int numNeighbors;
+
+
+
+
+
+
 
 
 
@@ -430,6 +436,7 @@ public class FactCluster {
 
 
     public int getNumShowerpixel(){ return cleaningPixel.size();}
+
 
 
 }

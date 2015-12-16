@@ -25,7 +25,7 @@ public class ClusterFellwalker implements Processor {
         int[] shower = ((int[]) data.get("shower"));
         double[] arrivalTime = ((double[]) data.get("ArrtimePos"));
         double[] photoncharge = ((double[]) data.get("photoncharge"));
-/*        double cogX = (double) data.get("COGx");
+/*      double cogX = (double) data.get("COGx");
         double cogY = (double) data.get("COGy");*/
 
         int[] clusterID = new int[1440];
@@ -132,8 +132,6 @@ public class ClusterFellwalker implements Processor {
 
         int numCluster = showerCluster.length;
 
-
-
         //build showerpixelArray that contains only cluster with showerpixel (just to have a quick look at it in the event viewer)
         for(FactCluster c : clusterSet){
             if(c.getShowerLabel() == true){
@@ -145,53 +143,70 @@ public class ClusterFellwalker implements Processor {
 
 
         // mark shower cog for the viewer
-        for(FactCluster c : clusterSet){
+/*        for(FactCluster c : clusterSet){
             //System.out.println(c.cogId());
             if(c.getShowerLabel() == true) {
                 showerClusterID[c.cogId()] = 0;
             }
-        }
-
-
+        }*/
 
         //markBoundaryPixel(clusterSet, showerClusterID);
 
-        int[] lengthBoundaries = countBoundaryPixel(showerCluster);
-        double ratio = boundContentRatio(showerCluster);
-        double idealBoundDiff = idealBoundDiff(showerCluster);
-        double boundAngleSum = boundAngleSum(showerCluster);
-        double distanceCenterSum = distanceCenter(showerCluster);
+        //build features (if there is any cluster left after removeCluster) and put them to data set
+        if(numCluster != 0) {
+            int[] lengthBoundaries = countBoundaryPixel(showerCluster);
+            double ratio = boundContentRatio(showerCluster);
+            double idealBoundDiff = idealBoundDiff(showerCluster);
+            double boundAngleSum = boundAngleSum(showerCluster);
+            double distanceCenterSum = distanceCenter(showerCluster);
 
-        int [] viewer = showerClusterID.clone();
+            //int [] viewer = showerClusterID.clone();
 
-        airPixelMap(showerCluster, showerClusterID, viewer);
+            //airPixelMap(showerCluster, showerClusterID, viewer);
 
-        double numNeighborCluster = neighborClusterMean(showerCluster);
 
-        double airpixel = airpixelMean(showerCluster);
+            //double airpixel = airpixelMean(showerCluster);
 
-        //System.out.println(numNeighborCluster + "   " + airpixel);
+            //System.out.println(numNeighborCluster + "   " + airpixel);
 
+            findNeighbors(showerCluster, showerClusterID);
+
+            double numNeighborCluster = neighborClusterMean(showerCluster);
+
+            //int numIsolatedCluster = numIsolatedCluster(showerCluster);
+
+            double chargeMaxClusterRatio = getChargeMaxCluster(showerCluster);
+
+            int numPixelMaxCluster = maxCluster(showerCluster).getNumPixel();
+
+            int numClusterPixel = numClusterPixel(showerCluster);
+
+            //double stdArrTimeMaxima = stdArrTime(showerCluster, arrivalTime);
+
+            double stdNumpixel = stdNumPixel(showerCluster);
+
+
+            data.put("BoundLength", lengthBoundaries);
+            data.put("BoundRatio", ratio);
+            data.put("IdealBoundDiff", idealBoundDiff);
+            data.put("BoundAngleSum", boundAngleSum);
+            data.put("DistanceCenterSum", distanceCenterSum);
+            data.put("NeighborCluster", numNeighborCluster);
+            //data.put("IsolatedCluster", numIsolatedCluster);
+            data.put("ChargeMax", chargeMaxClusterRatio);
+            data.put("MaxClusterNumPixel", numPixelMaxCluster);
+            data.put("NumClusterPixel", numClusterPixel);
+            //data.put("StdArrivaltimeMaxima", stdArrTimeMaxima);
+            data.put("StdNumPixel", stdNumpixel);
+
+            //data.put("Airpixel", airpixel);
+
+        }
 
         data.put("AllClusterID", clusterID);
-        data.put("ShowerClusterID", viewer);
+        data.put("ShowerClusterID", showerClusterID);
         data.put("ClusterNoCleaning", cluster);
         data.put("NumCluster", numCluster);
-        data.put("BoundLength", lengthBoundaries);
-        data.put("BoundRatio", ratio);
-        data.put("IdealBoundDiff", idealBoundDiff);
-        data.put("BoundAngleSum", boundAngleSum);
-        data.put("DistanceCenterSum", distanceCenterSum);
-        data.put("NeighborCluster", numNeighborCluster);
-        data.put("Airpixel", airpixel);
-
-/*            data.put("ChargeMax", chargeMaxClusterRatio);
-            data.put("SizeCluster1", clusterSize[1]);
-            data.put("NumClusterPixel", numClusterPixel);
-            data.put("IsolatedCluster", isolatedCluster);
-            data.put("StdArrivaltimeMaxima", stdArrivaltimeMaxima);
-            data.put("ClusterSizeStd", clusterSizeStd);*/
-
 
         return data;
 
@@ -209,7 +224,6 @@ public class ClusterFellwalker implements Processor {
             }
         }
         next = i;
-        //System.out.println("Next" + next);
         return next;
     }
 
@@ -244,7 +258,7 @@ public class ClusterFellwalker implements Processor {
         return maxBrightnessID;
     }
 
-    //give all pixel from path the same new clusterID
+    //give all pixel on a path the same new clusterID
     public static void pathToNewCluster(int[] clusterID, ArrayList<Integer> aktuellerPfad, int clusterNum) {
         for (int p : aktuellerPfad) {
 
@@ -324,18 +338,19 @@ public class ClusterFellwalker implements Processor {
     }
 
     public double  boundContentRatio(FactCluster [] showerCluster){
-        int[] bound = countBoundaryPixel(showerCluster);
         double ratio = 0;
 
         int i = 0;
         for(FactCluster c : showerCluster){
-            ratio += (double) bound[i]/c.getNumPixel();
+            ratio += (double) c.getBoundaryLength()/c.getNumPixel();
             i++;
         }
 
         return ratio;
     }
 
+
+    //returns sum of all idealBoundDiffs
     public double idealBoundDiff(FactCluster [] showerCluster){
         //int[] diffs = new int [showerCluster.length];
         double sum = 0;
@@ -503,20 +518,111 @@ public class ClusterFellwalker implements Processor {
         }
     }
 
-    public void numNeighbors(FactCluster [] showerSet, int[] showerClusterID){                  //------------------------------- Neighbors testen waere sinnvoll
-        int[] numNeighbors = new int [showerSet.length];
+    public void findNeighbors(FactCluster [] showerSet, int[] showerClusterID){                  //------------------------------- Neighbors testen waere sinnvoll
+        //int[] numNeighbors = new int [showerSet.length];
         for(FactCluster c : showerSet){
+            int clusterID = c.getClusterID();
             ArrayList<Integer> bound = c.findBoundaryNaive();
             for(int id : bound){
                 FactCameraPixel [] boundPixelNeighbors = mapping.getNeighboursFromID(id);
                 for(FactCameraPixel p : boundPixelNeighbors){
-                    if (showerClusterID[p.id] != c.getClusterID() && showerClusterID[p.id] != -2 && !c.naiveNeighborClusterID.contains(showerClusterID[p.id])) {
+                    if (showerClusterID[p.id] != clusterID && showerClusterID[p.id] != -2 && !c.naiveNeighborClusterID.contains(showerClusterID[p.id])) {
                         c.naiveNeighborClusterID.add(showerClusterID[p.id]);
                     }
                 }
             }
             c.numNeighbors = c.getNumNeighbors();
         }
+    }
+
+    public int numIsolatedCluster(FactCluster[] showerCluster){
+        int isolatedCluster = 0;
+        for(FactCluster c : showerCluster){
+            if(c.numNeighbors == 0){
+                isolatedCluster++;
+            }
+        }
+        return  isolatedCluster;
+    }
+
+
+    public FactCluster maxCluster(FactCluster [] showerCluster){
+        int maxClusterIndex = 0;
+        int size = 0;
+        int i = 0;
+        for (FactCluster c : showerCluster) {
+            if (c.getNumPixel() > size) {
+                size = c.getNumPixel();
+                maxClusterIndex = i;
+            }
+            i++;
+        }
+
+        return showerCluster[maxClusterIndex];
+    }
+
+    public double getChargeMaxCluster(FactCluster [] showerCluster){
+        if(showerCluster.length == 1){
+            return 1;
+        }
+        else {
+            int maxClusterIndex = 0;
+            int size = 0;
+            double chargeSum = 0;
+            int i = 0;
+            for (FactCluster c : showerCluster) {
+                chargeSum += c.getPhotonchargeSum();
+                //System.out.println(c.getPhotonchargeSum());
+                if (c.getNumPixel() > size) {
+                    size = c.getNumPixel();
+                    maxClusterIndex = i;
+                }
+                i++;
+            }
+            //System.out.println(maxClusterIndex);
+            return showerCluster[maxClusterIndex].getPhotonchargeSum() / chargeSum;
+        }
+
+    }
+
+    int numClusterPixel(FactCluster [] showerCluster){
+        int sum = 0;
+        for(FactCluster c : showerCluster){
+            sum+= c.getNumPixel();
+        }
+        return sum;
+    }
+
+    public double stdArrTime(FactCluster [] showerCluster, double [] arrivaltime){
+        double arrTimeMean = 0;
+        double arrTimeStd = 0;
+        for(FactCluster c : showerCluster){
+            int maxId = c.maxPhotonchargeId();
+            arrTimeMean += arrivaltime[maxId]/showerCluster.length;
+        }
+
+        for(FactCluster c : showerCluster){
+            int maxId = c.maxPhotonchargeId();
+            arrTimeStd += Math.pow((arrTimeMean - arrivaltime[maxId]), 2)/showerCluster.length;
+        }
+
+        return Math.sqrt(arrTimeStd);
+
+    }
+
+    public double stdNumPixel(FactCluster [] showerCluster){
+        int numCluster = showerCluster.length;
+        double mean = 0;
+        double std = 0;
+        for(FactCluster c : showerCluster){
+            mean += c.getNumPixel()/numCluster;
+        }
+
+        for(FactCluster c : showerCluster){
+            std += Math.pow((mean - c.getNumPixel()), 2)/numCluster;
+        }
+
+        return Math.sqrt(std);
     }
 
 
