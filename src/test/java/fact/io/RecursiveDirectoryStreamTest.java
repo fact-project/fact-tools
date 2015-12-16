@@ -82,7 +82,7 @@ public class RecursiveDirectoryStreamTest {
         assertThat(r.files.size(), is(2));
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testGlobPos() throws Exception {
 
         createTestFiles();
@@ -97,7 +97,7 @@ public class RecursiveDirectoryStreamTest {
         assertThat(r.files.size(), is(0));
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInvalidGlobPattern() throws Exception {
 
         createTestFiles();
