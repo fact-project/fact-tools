@@ -8,26 +8,27 @@
 
     <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Proton/" />
     <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/" />
-
+    <property name="filename" value="proton" />
 
     <!-- Pathes to the input files -->
     <!--    <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/mc_gamma_11981.fits.gz" />
         <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/00000001.001_P_MonteCarlo000_Events.fits" />-->
 
     <!--    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />-->
-    <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
-    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
+    <!--<property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />-->
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 
-    <!--    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />-->
 
         <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-                suffix="fits.gz" copies="${num_copies}" url="${infolder}">
+                suffix="_Events.fits.gz" copies="${num_copies}" url="${infolder}">
             <stream class="fact.io.FitsStream" id="_" />
         </stream>
 
 
+    <queue id="result" />
     <!-- Name of the stream and url to the input file -->
     <!--<stream id="fact" class="fact.io.FitsStream" suffix=".fits.gz"  url="${infolder}" limit="50"/>-->
 
@@ -92,13 +93,17 @@
          <Skip condition="%{data.NumCluster} == 0" />
 
 
-        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumCluster,NumClusterPixel,StdNumPixel,MaxClusterNumPixel,ChargeMax,BoundRatio,IdealBoundDiff,BoundAngleSum,DistanceCenterSum,NeighborCluster" url="${outfolder}proton_fw_all_${copy.id}.json" />
-
 
 
        <!-- <fact.ShowViewer key="DataCalibrated"/>-->
+        <Enqueue queue="result"/>
 
+        <!--<fact.io.JSONWriter keys="EventNum,NumClusterPixel,NumCluster,Waste,SizeX,SizeY,SizeAbs,MaximaID,DistanceMaxima,BrightnessMaxima,ClusterArrivaltimeMaxima,ClusterArrivaltimeMean,ClusterBrightnessSum,ClusterBrightnessMean" url="${outfolder}proton_${copy.id}.json" />-->
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
     </process>
 
+    <process input="result" id="egal" >
+        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumCluster,NumClusterPixel,StdNumPixel,MaxClusterNumPixel,ChargeMax,BoundRatio,IdealBoundDiff,BoundAngleSum,DistanceCenterSum,NeighborCluster" url="${outfolder}/${filename}.json" />
+    </process>
 
 </container>
