@@ -16,7 +16,7 @@ package fact.camera;
 public class CubeCoordinateTest {
     FactPixelMapping mapping = FactPixelMapping.getInstance();
 
-    @Test
+    /*@Test
     public void testPosition() {
         double [] xPosition = new double [1440];
         double [] yPosition = new double [1440];
@@ -94,5 +94,5 @@ public class CubeCoordinateTest {
         linePixel[2] = rz;
 
         return linePixel;
-    }
+    }*/
 }
