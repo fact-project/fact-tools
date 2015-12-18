@@ -104,7 +104,6 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         }
 
         log.info("Loaded " + files.size() + " files for streaming.");
-        //super.init();
 
         if (stream == null && additionOrder != null) {
             stream = (AbstractStream) streams.get(additionOrder.get(0));
@@ -118,22 +117,25 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
     @Override
     public Data readNext() throws Exception {
-
-        Data data = stream.read();
-        if (data != null) {
-            return data;
+        Data data = null;
+        synchronized (this) {
+            if (stream != null) {
+                data = stream.read();
+                if (data != null) {
+                    return data;
+                }
+            }
+            if (files.isEmpty()) {
+                //stop the stream
+                stream = null;
+                return null;
+            }
+            //stream from new file.
+            File f = files.poll().toFile();
+            filesCounter++;
+            stream.close();
+            stream.setUrl(new SourceURL(f.toURI().toURL()));
         }
-
-        if (files.isEmpty()) {
-            //stop the stream
-            return null;
-        }
-        //stream from new file.
-        File f = files.poll().toFile();
-
-        stream.close();
-        stream.setUrl(new SourceURL(f.toURI().toURL()));
-
         try {
             log.info("Streaming file: " + stream.getUrl().toString());
             stream.init();
@@ -156,6 +158,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             } else {
                 log.error("Stopping stream because of IOException");
                 e.printStackTrace();
+                stream.close();
                 return null;
             }
 
@@ -168,7 +171,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     public void close() throws Exception {
         super.close();
         log.info("In total " + filesCounter +  " files were processed.");
-        log.info("In total " + failedFilesCounter + " were broken (and therefore skipped). Filenames:");
+        log.info("In total " + failedFilesCounter + " were broken (and therefore skipped).");
         for ( String fileName : failedFilesList)
         {
         	log.info(fileName);

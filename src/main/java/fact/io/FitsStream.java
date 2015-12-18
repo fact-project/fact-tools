@@ -202,7 +202,6 @@ public class FitsStream extends AbstractStream implements FactStream {
 		// FactEvent item = new FactEvent();
 		Data item = DataFactory.create(headerItem);
 		// Data item = headerItem;
-
 		try {
 			dataStream.mark(blockSize + 1);
 			long byteCounter = 0;
