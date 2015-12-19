@@ -107,9 +107,10 @@ public class SqliteService implements AuxiliaryService {
                 db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
                 try {
                     if(service == AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION){
-                        long earlier = time.minusMinutes(window/5).getMillis()/1000;
-                        long later = time.plusMinutes(window).getMillis()/1000;
-                        cursor = table.scope("time_tracking", new Object[]{earlier}, new Object[]{later});
+                        String earlier = time.minusHours(4).toString("YYYY-MM-DD HH:mm:ss");
+                        String later = time.plusMinutes(window).toString("YYYY-MM-DD HH:mm:ss");
+
+                        cursor = table.scope("ix_DRIVE_CONTROL_TRACKING_POSITION_Time", new Object[]{earlier}, new Object[]{later});
                         result = getTrackingDataFromCursor(cursor);
                     } else if(service == AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION){
                         //source position is slower. get data from several hours ago.
