@@ -51,7 +51,7 @@ public class SqliteService implements AuxiliaryService {
             .build(new CacheLoader<CacheKey, TreeSet<AuxPoint>>() {
                 @Override
                 public TreeSet<AuxPoint> load(CacheKey key) throws Exception {
-                    log.info("Building entry for key: {}", key.roundedTimeStamp);
+                    log.info("Building entry for service {} and key: {}", key.service, key.roundedTimeStamp);
                     return loadDataFromDataBase(key.service, key.roundedTimeStamp);
                 }
             });
