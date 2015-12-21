@@ -3,8 +3,10 @@ package fact.io;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.Data;
 import stream.io.SourceURL;
 
+import java.io.File;
 import java.net.URL;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -50,11 +52,15 @@ public class ListMultiStreamTest {
         FactFileListMultiStream multiStream = new FactFileListMultiStream();
         URL u =  FitsStreamTest.class.getResource("/dummy_files/file_drs_list.json");
         multiStream.setListUrl(new SourceURL(u));
+
+        FitsStream m = new FitsStream();
+        multiStream.addStream("test", m);
+
         multiStream.init();
 
-        FactFileListMultiStream.DataDrsPair p = multiStream.fileQueue.poll();
-        FitsStream m = new FitsStream();
-        multiStream.setStreamProperties(m, p);
-        assertThat(m.drsFile, is(notNullValue()));
+        Data data = multiStream.readNext();
+        File drsFile = (File) data.get("@drsFile");
+
+        assertThat(drsFile.getName(), is("20140920_66.drs.fits"));
     }
 }

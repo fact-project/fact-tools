@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-public class FitsStream extends AbstractStream implements FactStream {
+public class FitsStream extends AbstractStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
 
 	int numberOfPixel;
@@ -25,12 +25,9 @@ public class FitsStream extends AbstractStream implements FactStream {
 	private String[] nameArray;
 	private String[] typeArray;
 	private Data headerItem = DataFactory.create();
-    public File drsFile;
 
 	@Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
 	private int bufferSize = 8 * 1024;
-
-	private int headerLength = 0;
 
 	public FitsStream(SourceURL url) {
 		super(url);
@@ -40,11 +37,6 @@ public class FitsStream extends AbstractStream implements FactStream {
 		super();
 	}
 
-
-    @Override
-    public void setDrsFile(File drsFile) {
-        this.drsFile = drsFile;
-    }
 
 
 	/**
@@ -72,7 +64,7 @@ public class FitsStream extends AbstractStream implements FactStream {
 
 		FitsHeader header = new FitsHeader(dataStream);
 		log.debug("Header #1 read:\n{}", header);
-		headerLength = header.getLength();
+		int headerLength = header.getLength();
 		dataStream.reset();
 		dataStream.skip(headerLength);
 
@@ -386,9 +378,6 @@ public class FitsStream extends AbstractStream implements FactStream {
 		item.put("@source", url.getProtocol() + ":" + url.getPath());
 		item.put("@numberOfPixel", numberOfPixel);
 
-        if(this.drsFile != null){
-            item.put("@drsFile", this.drsFile);
-        }
 		return item;
 	}
 
@@ -457,7 +446,7 @@ public class FitsStream extends AbstractStream implements FactStream {
 		}
 
 		public String toString() {
-			StringBuffer s = new StringBuffer();
+			StringBuilder s = new StringBuilder();
 			for (String line : getLines()) {
 				s.append(line);
 				s.append("\n");
