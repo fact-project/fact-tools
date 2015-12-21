@@ -7,7 +7,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * This is a class to create immutable container holding data from some source providing auxiliary data
+ * This is a class to create immutable container holding data from some source providing auxiliary data.
+ * This can be a file or a database. The key passed to the getters has to be known beforehand of course.
  * Created by kai on 31.03.15.
  */
 public class AuxPoint implements Comparable<AuxPoint>{
