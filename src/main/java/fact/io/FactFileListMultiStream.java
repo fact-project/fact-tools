@@ -45,8 +45,8 @@ public class FactFileListMultiStream extends AbstractMultiStream {
      * Models the connection between a dataFile and a drsFile
      */
     class DataDrsPair{
-        File drsFile;
-        File dataFile;
+        final File drsFile;
+        final File dataFile;
         public DataDrsPair(String dataFile, String drsFile){
             this.dataFile = new File(dataFile);
             this.drsFile = new File(drsFile);
@@ -54,7 +54,7 @@ public class FactFileListMultiStream extends AbstractMultiStream {
     }
 
 
-    public static final BlockingQueue<DataDrsPair> fileQueue = new LinkedBlockingQueue<>();
+    public final BlockingQueue<DataDrsPair> fileQueue = new LinkedBlockingQueue<>();
 
 
     @Parameter(required = true, description = "A file containing a json array of strings with the allowed filenames. "+
@@ -99,34 +99,27 @@ public class FactFileListMultiStream extends AbstractMultiStream {
         //super.init();
     }
 
-    public void setStreamProperties(AbstractStream stream, DataDrsPair p) throws Exception {
-        stream.setUrl(new SourceURL(p.dataFile.toURI().toURL()));
-        log.info("Streaming file: " + stream.getUrl().toString());
-        stream.init();
-        //try to set drs paths. Only works if stream is a fact stream
-        try{
-            FactStream factStream = (FactStream) stream;
-            factStream.setDrsFile(p.drsFile);
-        } catch (ClassCastException e){
-            //pass
-            log.debug("Could not set drsPath because stream is not a FactStream");
-        }
-    }
 
     @Override
     public Data readNext() throws Exception {
-
+        File drsFile = null;
         if (stream == null) {
             stream = (AbstractStream) streams.get(additionOrder.get(0));
             DataDrsPair f = fileQueue.poll();
-            if (f == null || f.dataFile == null || f.drsFile == null) {
+            if (f == null) {
                 return null;
             }
-            setStreamProperties(stream, f);
+            stream.setUrl(new SourceURL(f.dataFile.toURI().toURL()));
+            stream.init();
+
+            drsFile = f.drsFile;
             filesCounter++;
         }
 
         Data data = stream.read();
+        if(drsFile != null) {
+            data.put("@drsFile", drsFile);
+        }
         //check whether this stream has any data left and start a new stream if we necessary
         if (data != null) {
             return data;
@@ -134,12 +127,13 @@ public class FactFileListMultiStream extends AbstractMultiStream {
             stream.close();
 
             DataDrsPair f = fileQueue.poll();
-            if (f == null || f.dataFile == null) {
+            if (f == null) {
                 return null;
             }
-            setStreamProperties(stream, f);
-
-            data = stream.read();
+            stream.setUrl(new SourceURL(f.dataFile.toURI().toURL()));
+            stream.init();
+            data = stream.readNext();
+            data.put("@drsFile", f.drsFile);
 
             filesCounter++;
             return data;
