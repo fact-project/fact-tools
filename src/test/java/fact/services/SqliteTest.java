@@ -1,6 +1,7 @@
 package fact.services;
 
 import fact.auxservice.AuxPoint;
+import fact.auxservice.AuxWebService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.SqliteService;
 import fact.features.source.SourcePosition;
@@ -9,6 +10,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import stream.io.SourceURL;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.TreeSet;
 
@@ -63,5 +65,28 @@ public class SqliteTest {
         assertThat(last, is(DateTime.parse("2014-01-19T01:43:58.684").withZone(DateTimeZone.UTC)));
         assertThat(r.size(), is(480));
     }
+
+    @Test
+    public void testTimeFlooring() throws IOException {
+        DateTime time = new DateTime(1987, 9, 20, 12, 40, 34);
+
+        SqliteService.AuxDataCacheKey key = new SqliteService().new AuxDataCacheKey(AuxiliaryServiceName.BIAS_CONTROL_DAC, time);
+
+        DateTime roundedTime = key.floorToQuarterHour(time);
+        assertThat(roundedTime, is(new DateTime(1987, 9, 20, 12, 30, 00)));
+
+
+        time = new DateTime(1987, 9, 20, 23, 59, 59);
+        roundedTime = AuxWebService.floorToQuarterHour(time);
+
+        assertThat(roundedTime, is(new DateTime(1987, 9, 20, 23, 45, 00)));
+
+
+        time = new DateTime(1987, 9, 20, 00, 00, 01);
+        roundedTime = AuxWebService.floorToQuarterHour(time);
+
+        assertThat(roundedTime, is(new DateTime(1987, 9, 20, 00, 00, 00)));
+    }
+
 
 }

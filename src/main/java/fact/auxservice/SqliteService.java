@@ -39,7 +39,7 @@ public class SqliteService implements AuxiliaryService {
     @Parameter(required = false, description = "Expiry time for entries in the cache.", defaultValue = "10 Minutes")
     private int window = 10;
 
-    private LoadingCache<CacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
+    private LoadingCache<AuxDataCacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
             .maximumSize(100)
             .expireAfterAccess(window, TimeUnit.MINUTES)
             .removalListener(new RemovalListener<Object, Object>() {
@@ -48,21 +48,33 @@ public class SqliteService implements AuxiliaryService {
                     log.info("Removing Data {} from cache for cause {}", notification.toString() ,notification.getCause());
                 }
             })
-            .build(new CacheLoader<CacheKey, TreeSet<AuxPoint>>() {
+            .build(new CacheLoader<AuxDataCacheKey, TreeSet<AuxPoint>>() {
                 @Override
-                public TreeSet<AuxPoint> load(CacheKey key) throws Exception {
+                public TreeSet<AuxPoint> load(AuxDataCacheKey key) throws Exception {
                     log.info("Building entry for service {} and key: {}", key.service, key.roundedTimeStamp);
                     return loadDataFromDataBase(key.service, key.roundedTimeStamp);
                 }
             });
 
-    private class CacheKey{
-        private AuxiliaryServiceName service;
-        private DateTime roundedTimeStamp;
+    public class AuxDataCacheKey {
+        private final AuxiliaryServiceName service;
+        private final DateTime roundedTimeStamp;
 
-        public CacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
+        public AuxDataCacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
             this.service = service;
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
+        }
+
+        public DateTime floorToQuarterHour(DateTime time){
+
+            MutableDateTime t = time.toMutableDateTime();
+            t.setMillisOfSecond(0);
+            t.setSecondOfMinute(0);
+
+            int oldMinute = t.getMinuteOfHour();
+            int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
+            t.setMinuteOfHour(newMinute);
+            return new DateTime(t);
         }
 
         @Override
@@ -70,7 +82,7 @@ public class SqliteService implements AuxiliaryService {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            CacheKey cacheKey = (CacheKey) o;
+            AuxDataCacheKey cacheKey = (AuxDataCacheKey) o;
 
             if (!roundedTimeStamp.equals(cacheKey.roundedTimeStamp)) return false;
 
@@ -197,7 +209,7 @@ public class SqliteService implements AuxiliaryService {
     @Override
     public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         try {
-            CacheKey key = new CacheKey(service, eventTimeStamp);
+            AuxDataCacheKey key = new AuxDataCacheKey(service, eventTimeStamp);
             //this set might not contain the data we need
             TreeSet<AuxPoint> set = cache.get(key);
             AuxPoint a = strategy.getPointFromTreeSet(set, eventTimeStamp);
@@ -212,21 +224,9 @@ public class SqliteService implements AuxiliaryService {
     }
 
 
-    public static DateTime floorToQuarterHour(DateTime time){
-
-        MutableDateTime t = time.toMutableDateTime();
-        t.setMillisOfSecond(0);
-        t.setSecondOfMinute(0);
-
-        int oldMinute = t.getMinuteOfHour();
-        int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
-        t.setMinuteOfHour(newMinute);
-        return new DateTime(t);
-    }
-
     @Override
     public void reset() throws Exception {
-
+        log.info("Reset called on {}", this.getClass());
     }
 
     public void setUrl(SourceURL url) {
