@@ -17,11 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<streams.scope>compile</streams.scope>
-<<<<<<< HEAD
 		<streams.version>0.9.24-SNAPSHOT</streams.version>
-=======
-		<streams.version>0.9.23</streams.version>
->>>>>>> glob
 		<binary.name>fact-tools-${project.version}</binary.name>
 		<skipTests>false</skipTests>
 	</properties>
