@@ -18,29 +18,12 @@ import static org.junit.Assert.fail;
  * Created by kaibrugge on 14.04.15.
  */
 public class ListMultiStreamTest {
-    static Logger log = LoggerFactory.getLogger(ListMultiStreamTest.class);
-
-//    @Test
-//    public void readBrokenJsonTest() throws Exception {
-//        URL u =  ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
-//        FactFileListMultiStream multiStream = new FactFileListMultiStream();
-//        multiStream.setListUrl(new SourceURL(u));
-//
-//        try {
-//            multiStream.setDrsPathKey("bla");
-//            multiStream.init();
-//        } catch (IllegalArgumentException e){
-//            return;
-//        }
-//
-//        fail("This should have thrown an IllegalArgumentException");
-//    }
 
     @Test
     public void readJsonTest() throws Exception {
         URL u =  ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
-        FactFileListMultiStream multiStream = new FactFileListMultiStream();
-        multiStream.setListUrl(new SourceURL(u));
+        FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
+        multiStream.setUrl(new SourceURL(u));
 
         assertThat(multiStream.fileQueue.size(), is(0));
         multiStream.init();
@@ -49,9 +32,9 @@ public class ListMultiStreamTest {
 
     @Test
     public void testDrsInjection() throws Exception {
-        FactFileListMultiStream multiStream = new FactFileListMultiStream();
         URL u =  FitsStreamTest.class.getResource("/dummy_files/file_drs_list.json");
-        multiStream.setListUrl(new SourceURL(u));
+        FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
+        multiStream.setUrl(new SourceURL(u));
 
         FitsStream m = new FitsStream();
         multiStream.addStream("test", m);

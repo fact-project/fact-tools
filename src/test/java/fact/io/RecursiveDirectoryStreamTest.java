@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * This tests creates a dummy file tree in a temporyry folder. It will then run against a number of glob patterns
+ * This tests creates a dummy file tree in a temporary folder. It will then run against a number of glob patterns
  * Created by kai on 16.12.15.
  */
 public class RecursiveDirectoryStreamTest {
@@ -104,7 +104,7 @@ public class RecursiveDirectoryStreamTest {
         SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
-        String pattern = "/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
+        String pattern = "/**/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
         r.setPattern(pattern);
         r.init();
 
