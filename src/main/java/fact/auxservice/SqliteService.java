@@ -213,6 +213,9 @@ public class SqliteService implements AuxiliaryService {
             //this set might not contain the data we need
             TreeSet<AuxPoint> set = cache.get(key);
             AuxPoint a = strategy.getPointFromTreeSet(set, eventTimeStamp);
+            if (a == null){
+                throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
+            }
             Seconds seconds = Seconds.secondsBetween(eventTimeStamp, a.getTimeStamp());
             log.debug("Seconds between event and {} auxpoint : {}", service,  seconds.getSeconds());
             return strategy.getPointFromTreeSet(set, eventTimeStamp);
