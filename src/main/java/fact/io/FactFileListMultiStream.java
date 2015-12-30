@@ -124,10 +124,10 @@ public class FactFileListMultiStream extends AbstractMultiStream {
         }
 
         Data data = stream.read();
-        data.put("@drsFile", dataDrsPair.drsFile);
 
         //check whether this stream has any data left and start a new stream if necessary
         if (data != null) {
+            data.put("@drsFile", dataDrsPair.drsFile);
             return data;
         } else {
             stream.close();
