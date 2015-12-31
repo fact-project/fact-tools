@@ -78,6 +78,7 @@ public class ZFitsStream extends AbstractStream{
     @Override
     public void init() throws Exception {
         super.init();
+        this.count = 0L;
         log.info("Read file: {}", this.url.getFile());
         File f = new File(this.url.getFile());
         if (!f.canRead()){
