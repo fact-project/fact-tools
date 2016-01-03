@@ -260,7 +260,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.1</version>
+				<version>2.4.2</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -270,6 +270,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<!--<minimizeJar>true</minimizeJar>-->
 					<finalName>fact-tools-${project.version}</finalName>
 					<transformers>
 						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -283,6 +284,10 @@
 								<main-class>stream.run</main-class>
 							</manifestEntries>
 						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+							<resource>.fits</resource>
+							<resource>.gz</resource>
+						</transformer>
 					</transformers>
 					<filters>
 						<filter>
@@ -291,6 +296,7 @@
 								<exclude>META-INF/*.SF</exclude>
 								<exclude>META-INF/*.DSA</exclude>
 								<exclude>META-INF/*.RSA</exclude>
+								<!--<exclude>src/main/test/*</exclude>-->
 							</excludes>
 						</filter>
 					</filters>

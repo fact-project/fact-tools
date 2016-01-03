@@ -105,12 +105,20 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void finish() throws Exception {
-        if(bw != null) {
-        	if (writeListOfItems)
-        	{
-        		bw.write("]");
-        	}
-            bw.close();
+        try {
+
+            if(bw != null) {
+                if (writeListOfItems)
+                {
+                    bw.write("]");
+                }
+            }
+        } catch (IOException e){
+            //ignore stream was bw was cloes apparently
+        } finally {
+            if (bw != null){
+                bw.close();
+            }
         }
     }
 
