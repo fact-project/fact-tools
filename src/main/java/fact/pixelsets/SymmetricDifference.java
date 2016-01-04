@@ -37,19 +37,31 @@ public class SymmetricDifference implements Processor{
     @Override
     public Data process(Data input) {
 
-        if (!input.containsKey(inset1Key)) {
-            return input;
+        PixelSetOverlay inset1;
+        PixelSetOverlay inset2;
+
+        //check if inset1 is given, otherwise create an empty set
+        if (input.containsKey(inset1Key)) {
+            Utils.isKeyValid(input, inset1Key, PixelSetOverlay.class);
+            inset1 = (PixelSetOverlay) input.get(inset1Key);
+        } else {
+            //create an empty set if no set is handed over
+            inset1 = new PixelSetOverlay();
         }
 
-        if (!input.containsKey(inset2Key)) {
-            return input;
+        //check if inset2 is given, otherwise create an empty set
+        if (input.containsKey(inset2Key)) {
+            Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
+            inset2 = (PixelSetOverlay) input.get(inset2Key);
+        } else {
+            //create an empty set if no set is handed over
+            inset2 = new PixelSetOverlay();
         }
 
-        Utils.isKeyValid(input, inset1Key, PixelSetOverlay.class);
-        Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
-
-        PixelSetOverlay inset1 = (PixelSetOverlay) input.get(inset1Key);
-        PixelSetOverlay inset2 = (PixelSetOverlay) input.get(inset2Key);
+        //return if both input sets are empty
+        if (inset1.set.isEmpty() && inset2.set.isEmpty()){
+            return input;
+        }
 
         try{
             Sets.SetView<CameraPixel> symDiff = Sets.symmetricDifference(inset1.set, inset2.set);
