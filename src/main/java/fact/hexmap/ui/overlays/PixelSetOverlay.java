@@ -14,7 +14,7 @@ import java.util.Set;
  * This is overlay can draw borders around the pixels passed to it via constructor or the add methods.
  */
 public class PixelSetOverlay implements CameraMapOverlay, Serializable {
-    Set<CameraPixel> set = new HashSet<>();
+    public Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
     public PixelSetOverlay(HashSet<Integer> set) {
