@@ -37,15 +37,19 @@ public class Difference implements Processor{
             return input;
         }
 
-        if (!input.containsKey(inset2Key)) {
-            return input;
-        }
-
         Utils.isKeyValid(input, inset1Key, PixelSetOverlay.class);
-        Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
 
         PixelSetOverlay inset1 = (PixelSetOverlay) input.get(inset1Key);
-        PixelSetOverlay inset2 = (PixelSetOverlay) input.get(inset2Key);
+        PixelSetOverlay inset2;
+
+        //check if inset2 is given, otherwise create an empty set
+        if (input.containsKey(inset2Key)) {
+            Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
+            inset2 = (PixelSetOverlay) input.get(inset2Key);
+        } else {
+            //create an empty set if no set is handed over
+            inset2 = new PixelSetOverlay();
+        }
 
         try{
             Sets.SetView<CameraPixel> difference = Sets.difference(inset1.set, inset2.set);
