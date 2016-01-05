@@ -20,7 +20,7 @@ public class DistributionFromShower implements Processor {
 	private String weightsKey = null;
 	@Parameter(required = true, description = "The key to the showerPixel. "
 			+ "That is some sort of int[] containing pixel chids.")
-	private String showerKey = null;
+	private String pixelSetKey = null;
 
 	// the in and outputkeys
 	@Parameter(required = true)
@@ -55,7 +55,7 @@ public class DistributionFromShower implements Processor {
 		// in case the getColorFromValue doesn't contain a shower return the
 		// original input.
 
-		if (!input.containsKey(showerKey)) {
+		if (!input.containsKey(pixelSetKey)) {
 			return input;
 		}
 
@@ -63,10 +63,10 @@ public class DistributionFromShower implements Processor {
 			return input;
 		}
 
-		Utils.isKeyValid(input, showerKey, int[].class);
+		Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
 		Utils.isKeyValid(input, weightsKey, double[].class);
 
-		int[] showerPixel = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
+		int[] showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		double[] showerWeights = createShowerWeights(showerPixel,
 				(double[]) input.get(weightsKey));
 
@@ -254,9 +254,10 @@ public class DistributionFromShower implements Processor {
 		this.weightsKey = wheights;
 	}
 
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
+	
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;

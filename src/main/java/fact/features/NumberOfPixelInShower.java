@@ -10,7 +10,7 @@ import stream.annotations.Parameter;
 public class NumberOfPixelInShower implements Processor {
 	static Logger log = LoggerFactory.getLogger(NumberOfPixelInShower.class);
     @Parameter(required = true)
-	private String showerKey;
+	private String pixelSetKey;
     @Parameter(required = true)
 	private String outputKey;
 	
@@ -19,9 +19,9 @@ public class NumberOfPixelInShower implements Processor {
 //		EventUtils.isKeyValid(input, showerKey, int[].class);
 		
 		int length = 0;
-		if (input.containsKey(showerKey))
+		if (input.containsKey(pixelSetKey))
 		{
-			int[] shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
+			int[] shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 			length = shower.length;
 		}
 	    input.put(outputKey, length);
@@ -36,13 +36,7 @@ public class NumberOfPixelInShower implements Processor {
 		this.outputKey = outputKey;
 	}
 
-
-	public String getShowerKey() {
-		return showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
-	}
-
-
 }

@@ -14,7 +14,7 @@ public class Leakage implements Processor {
 	static Logger log = LoggerFactory.getLogger(Leakage.class);
 
     @Parameter(required = true)
-	private String shower;
+	private String pixelSetKey;
     @Parameter(required = true)
 	private String weights;
     @Parameter(required = true)
@@ -26,9 +26,9 @@ public class Leakage implements Processor {
 
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys( input, shower, weights);
+		Utils.mapContainsKeys( input, pixelSetKey, weights);
 	
-		int[] 	showerPixel = ((PixelSetOverlay) input.get(shower)).toIntArray();
+		int[] 	showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		double[] photonCharge = (double[]) input.get(weights);
 		
 		
@@ -75,14 +75,9 @@ public class Leakage implements Processor {
         return pixelMap.getNeighboursFromID(pix).length < 6;
 	}
 
-	
-	public String getShower() {
-		return shower;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
-	public void setShower(String shower) {
-		this.shower = shower;
-	}
-	
 
 	public String getWeights() {
 		return weights;

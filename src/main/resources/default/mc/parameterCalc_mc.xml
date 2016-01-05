@@ -93,7 +93,7 @@
 <fact.features.ConcentrationCore
     cogxKey="COGx"
     cogyKey="COGy"
-    showerPixelKey="shower"
+    pixelSetKey="shower"
     photonChargeKey="photoncharge"
     sizeKey="Size"
     widthKey="Width"

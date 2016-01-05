@@ -18,7 +18,7 @@ public class SourceLineTest implements Processor{
 	@Parameter(required = true, defaultValue = "arrivalTime", description = "Key of arrivaltime array.")
 	private String arrivalTime;
 	@Parameter(required = true, defaultValue = "showerPixel", description = "Key of showerpixel array.")
-	private String showerPixel;
+	private String pixelSetKey;
 	@Parameter(required = true, defaultValue = "sourceposition", description = "Key of sourceposition vector.")
 	private String sourcePosition;
 	@Parameter(required = true, defaultValue = "SourceLineTest", description = "Master outputkey, which will be written before every attribute.")
@@ -38,12 +38,12 @@ public class SourceLineTest implements Processor{
 //	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
 //	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 		//Test for keys.
-		Utils.mapContainsKeys( input, photonCharge, arrivalTime, showerPixel, sourcePosition);
+		Utils.mapContainsKeys( input, photonCharge, arrivalTime, pixelSetKey, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
 		arrivalTimeArray = (double[]) input.get(arrivalTime);
 
-		showerPixelArray = ((PixelSetOverlay) input.get(showerPixel)).toIntArray();
+		showerPixelArray = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 
 		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		
@@ -278,13 +278,11 @@ public class SourceLineTest implements Processor{
 	public void setArrivalTime(String arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
-	public String getShowerPixel() {
-		return showerPixel;
+
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
-	public void setShowerPixel(String showerPixel) {
-		this.showerPixel = showerPixel;
-	}
 	public String getSourcePosition() {
 		return sourcePosition;
 	}

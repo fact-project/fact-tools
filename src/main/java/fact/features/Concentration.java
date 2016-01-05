@@ -11,7 +11,7 @@ public class Concentration implements Processor {
 	static Logger log = LoggerFactory.getLogger(Concentration.class);
 
     @Parameter(required = true)
-	private String shower;
+	private String pixelSetKey;
     @Parameter(required = true)
 	private String weights;
     @Parameter(required = true)
@@ -25,7 +25,7 @@ public class Concentration implements Processor {
 		int[] 	showerPixel;
 		double[] photonCharge;
 		try{
-			 showerPixel = ((PixelSetOverlay) input.get(shower)).toIntArray();
+			 showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 			 photonCharge = (double[]) input.get(weights);
 		} catch (ClassCastException e){
 			log.error("Could  not cast the keys to the right types");
@@ -63,11 +63,8 @@ public class Concentration implements Processor {
 		return input;
 	}
 
-	public String getShower() {
-		return shower;
-	}
-	public void setShower(String shower) {
-		this.shower = shower;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getWeights() {

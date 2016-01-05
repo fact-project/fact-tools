@@ -25,7 +25,7 @@ public class TimeGradient implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeGradient.class);
 	
 	@Parameter(required=true, description="key to the shower pixels")
-	private String showerKey = null;
+	private String pixelSetKey = null;
 	@Parameter(required=true, description="key to the arrival times of all pixels")
 	private String arrivalTimeKey = null;
 	@Parameter(required=true, description="key to the xvalue of the cog of the shower")
@@ -45,9 +45,9 @@ public class TimeGradient implements Processor {
 
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(input, showerKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
+		Utils.mapContainsKeys(input, pixelSetKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
 		
-		int[] shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
+		int[] shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
@@ -119,12 +119,8 @@ public class TimeGradient implements Processor {
 		return input;
 	}
 
-	public String getShowerKey() {
-		return showerKey;
-	}
-
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getArrivalTimeKey() {

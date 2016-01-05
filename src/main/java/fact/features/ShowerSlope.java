@@ -14,7 +14,7 @@ public class ShowerSlope implements Processor {
 	@Parameter(required = true)
 	private String arrivalTimeKey = null;
 	@Parameter(required = true)
-	private String showerKey = null;
+	private String pixelSetKey = null;
 	@Parameter(required = true)
 	private String cogxKey = null;
 	@Parameter(required = true)
@@ -41,11 +41,11 @@ public class ShowerSlope implements Processor {
 	
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, showerKey, cogxKey, cogyKey, deltaKey);
+		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
 		
 		photonCharge = (double[]) input.get(photonChargeKey);
 		arrivalTime = (double[]) input.get(arrivalTimeKey);
-		shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
+		shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
 		delta = (Double) input.get(deltaKey);
@@ -132,12 +132,8 @@ public class ShowerSlope implements Processor {
 		this.arrivalTimeKey = arrivalTimeKey;
 	}
 
-	public String getShowerKey() {
-		return showerKey;
-	}
-
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getCogxKey() {

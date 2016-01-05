@@ -13,7 +13,7 @@ public class TimeSpread implements Processor {
 	@Parameter(required = true)
 	private String weightsKey = null;
 	@Parameter(required = true)
-	private String showerKey = null;
+	private String pixelSetKey = null;
 	@Parameter(required = true)
 	private String outputKey = null;
 	
@@ -24,11 +24,11 @@ public class TimeSpread implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, showerKey);
+		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, pixelSetKey);
 		
 		arrivalTime = (double[]) input.get(arrivalTimeKey);
 		weights = (double[]) input.get(weightsKey);
-		shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
+		shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		
 		// NumberShowerPixel
 		int n = shower.length;
@@ -81,12 +81,8 @@ public class TimeSpread implements Processor {
 		this.weightsKey = weightsKey;
 	}
 
-	public String getShowerKey() {
-		return showerKey;
-	}
-
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getOutputKey() {

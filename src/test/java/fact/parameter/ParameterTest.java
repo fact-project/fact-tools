@@ -90,7 +90,7 @@ public class ParameterTest {
 
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setShowerKey(shower);
+        dist.setPixelSetKey(shower);
         dist.setWeightsKey(photonCharge);
         dist.setOutputKey(distribution);
         dist.process(item);

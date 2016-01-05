@@ -14,35 +14,31 @@ import stream.annotations.Parameter;
 public class NumberOfIslands implements Processor {
 
     @Parameter(required = true, description = "Key refering to an array of integer containing pixel Ids")
-    private String showerKey;
+    private String pixelSetKey;
 
     @Parameter(required = true)
     private String outputKey;
 
     @Override
     public Data process(Data input) {
-    	if (!input.containsKey(showerKey))
+    	if (!input.containsKey(pixelSetKey))
     	{
     		input.put(outputKey, 0);
     		return input;
     	}
-        Utils.isKeyValid(input, showerKey, PixelSetOverlay.class);
+        Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
 
-        int[] showerPixel = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
+        int[] showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
         int numIslands = Utils.breadthFirstSearch(Utils.arrayToList(showerPixel)).size();
         input.put(outputKey, numIslands);
         return input;
     }
 
-    public String getShowerKey() {
-		return showerKey;
-	}
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
+    }
 
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
-	}
-
-	public void setOutputKey(String outputkey) {
+    public void setOutputKey(String outputkey) {
         this.outputKey = outputkey;
     }
 
