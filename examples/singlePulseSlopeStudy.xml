@@ -422,20 +422,21 @@
 
 <!-- Closed Shutter Data: -->
 <property name="fhgfs" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
-<property name="infile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_045.fits.gz" />
-<property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_040.drs.fits.gz" />
+<!-- <property name="infile" value="file:${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_045.fits.gz" />
+<property name="drsfile" value="file:${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_040.drs.fits.gz" /> -->
+<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 <property name="outfile" value="${fhgfs}/users/jbuss/test1.json" />
 
-    <stream id="fact" class="fact.io.FitsStream" 
-            url="file:${infile}"/>
+    <stream id="fact" class="fact.io.FitsStream" url="${infile}"/>
             
         <process input="fact">
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5"/>
         <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
          <stream.flow.Skip condition="%{data.TriggerType} != 1024" />
-        <fact.filter.DrsCalibration url="file:${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
+        <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data"  outputKey="DataCalibrated"/>
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
-        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
+        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" />
 
         <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmoothed" length="5"/>-->
         <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataSmoothed" variance="5"/>
