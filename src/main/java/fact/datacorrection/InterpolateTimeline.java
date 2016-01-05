@@ -29,23 +29,16 @@ public class InterpolateTimeline implements Processor {
     
     @Parameter(required = true, description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
-    
-    @Parameter(required = false, description = "If true a pixelSetOverlay with the bad pixels is added to the data item",
-    		defaultValue = "false")
-    private boolean showBadPixel = false;
-
     @Parameter(required = true, description = "The data key to work on")
     private String dataKey = null;
     @Parameter(required = true, description = "The name of the interpolated data output")
     private String dataOutputKey = null;
+    @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue="3")
+    private int minPixelToInterpolate = 3;
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
     
-
     private int npix = Constants.NUMBEROFPIXEL;
     
-    private int minPixelToInterpolate = 3;
-    
-
     @Override
     public Data process(Data item) {
     	Utils.isKeyValid(item, "NPIX", Integer.class);
@@ -67,6 +60,10 @@ public class InterpolateTimeline implements Processor {
     	}
 
     	int[] badChIds = calibService.getBadPixel(timeStamp);
+		PixelSetOverlay badPixelsSet = new PixelSetOverlay();
+		for (int px: badChIds){
+			badPixelsSet.addById(px);
+		}
     	
 		if(!dataKey.equals(dataOutputKey)){
 			double[] newdata = new double[data.length];
@@ -77,13 +74,7 @@ public class InterpolateTimeline implements Processor {
 		}
 		
 		item.put(dataOutputKey, data);
-    	if (showBadPixel == true){
-    		PixelSetOverlay badPixelsSet = new PixelSetOverlay();
-    		for (int px: badChIds){
-    			badPixelsSet.addById(px);
-    		}
-    		item.put("Bad pixels", badPixelsSet);
-    	}
+		item.put("Bad pixels", badPixelsSet);
         return item;
     }
     
@@ -131,10 +122,6 @@ public class InterpolateTimeline implements Processor {
 
 	public void setCalibService(CalibrationService calibService) {
 		this.calibService = calibService;
-	}
-
-	public void setShowBadPixel(boolean showBadPixel) {
-		this.showBadPixel = showBadPixel;
 	}
 
 	public void setDataKey(String dataKey) {
