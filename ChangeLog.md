@@ -1,5 +1,28 @@
 #Changelog for the fact-tools
 
+## Version 0.10.0
+
+These version introduce the new calibrationService. It can be used by other processors to access informations about the calibration values for the current event. At the moment it only offers the information which pixels are bad and which pixels can't be used for the cleaning process.
+
+The calibrationService is now used in the Interpolation processors and there are some improvements (and bug fixing) done:
+- The InterpolateBadPixel processor is renamed to InterpolateTimeLine
+- A new InterpolatePhotondata processor is implemented (and used in the default xml files) which interpolates also photoncharge and arrivalTime of the bad pixels
+- The bug, that also bad pixel could be used for interpolation, was fixed
+- The interpolation processors now add PixelOverlaySets for the bad pixel to the data item
+
+The calibrationService is also used in the BasicCleaning:
+- If there are notUsable pixels (for example the broken drs board) they are now not added to the cleaned pixel set
+- If there are notUsable pixels a PixelOverlaySet is added to the data item
+
+How to adapt the xml files:
+- If you are using the default xml files from the classpath, you only need to add the calibrationService to the xml file (see examples/example_process.xml)
+- If you are using the InterpolateBadPixel processor, you have to rename it and adapt the giving parameter, see src/main/resources/default/data/calibration.xml for an example
+ - maybe you want to add the new InterpolatePhotondata, see src/main/resources/default/data/extraction.xml for an example
+- If you are using cleaning processors (TwoLevelTimeNeighbor, TwoLevelTimeMedian) you have to add the calibService to parameters of the processor, see src/main/resources/default/data/cleaning.xml for an example
+
+Miscellaneous changes:
+- The impact parameter is now added to the outputfile in the standard mc analysis
+
 ## Version 0.9.7
 
 Changes from version 0.9.6: fixed bug in HotColorMap, division by zero
