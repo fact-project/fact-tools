@@ -1,12 +1,20 @@
 <container>
-    <property name="fhgfs" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
-    <property name="infile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_089.fits.gz" />
-    <property name="drsfile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_112.drs.fits.gz" />
-    <property name="drstimefile" value="${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_114.drs.time.fits" />
+
+    <properties url="classpath:/default/settings.properties" />
+
+<!--     <property name="fhgfs" 		value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/e5/fhgfs" />
+    <property name="infile" value="file:${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_089.fits.gz" />
+    <property name="drsfile" value="file:${fhgfs}/groups/app/fact/raw/2013/10/02/20131002_112.drs.fits.gz" /> -->
+
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
     <property name="outfile" value="/net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/jbuss/testoutfile.json" />
 
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    
     <!-- Name des Streams und pfad zu dem Daten-File -->
-    <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}"/>
+    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
     <property name="skipFirst" value="35" />
     <property name="skipLast"  value="100" />
@@ -18,34 +26,7 @@
         <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="20"/>
         <stream.flow.Skip condition="%{data.TriggerType} != 1024" />
 
-        <fact.filter.DrsCalibration url="file:${drsfile}"
-                                    key="Data"
-                                    outputKey="DataCalibrated" />
-
-        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated"
-                                              outputKey="DataCalibrated"
-                                              prevEventsKey="prevEvents"
-                                              startCellKey="StartCellData"
-                                              jumpLimit="2.0" />
-
-        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated"
-                                          outputKey="DataCalibrated"
-                                          startCellKey="StartCellData"
-                                          leftBorder="6"
-                                          spikeLimit="20"
-                                          topSlopeLimit="16"
-                                          maxSpikeLength="4"/>
-
-        <fact.filter.DrsTimeCalibration url="file:${drstimefile}"
-                                        drsTimeKey="SamplingTimeDeviation"
-                                        outputKey="timeCalibConst"/>
-
-        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated"
-                                         timeCalibConstKey="timeCalibConst"
-                                         outputKey="DataCalibrated" />
-
-        <fact.datacorrection.InterpolateTimeline key="DataCalibrated"  outputKey="DataCalibrated"
-                                                 badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+        <include url="classpath:/default/data/calibration.xml" />
 
         <fact.filter.MovingAverage key="DataCalibrated"
                                    outputKey="DataSmoothed"
@@ -57,11 +38,11 @@
                                          searchWindowRight="200"
                                          outputKey="voltages" />
 
-        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated"
+<!--         <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated"
                                                      outputKey="PedIntegral"
                                                      skipFirst="${skipFirst}"
                                                      skipLast="${skipLast}"
-                                                     windowSize="${searchWindowSize}" />
+                                                     windowSize="${searchWindowSize}" /> -->
 
         <fact.statistics.Derivation key="DataSmoothed"
                                     outputKey="slopeKey" />
@@ -108,7 +89,7 @@
 
         <!--<fact.ShowViewer key="DataCalibrated"/>-->
         <PrintData/>
-        <fact.io.JSONWriter url="file:${outfile}" keys="RUNTYPE, PedIntegral,PedIntegral_min,PedIntegral_max,PedIntegral_sum,PedIntegral_median,PedIntegral_mean,PedIntegral_var,PedIntegral_skewness,PedIntegral_kurtosis,globalMin,arrivalTimes,baselines,maxSlopes,voltages_mean,voltages_median,voltages_mode,voltages_std,voltages_kurtosis,voltages_skewness,voltages_min,voltages_max"/>
+<!--         <fact.io.JSONWriter url="file:${outfile}" keys="RUNTYPE, PedIntegral,PedIntegral_min,PedIntegral_max,PedIntegral_sum,PedIntegral_median,PedIntegral_mean,PedIntegral_var,PedIntegral_skewness,PedIntegral_kurtosis,globalMin,arrivalTimes,baselines,maxSlopes,voltages_mean,voltages_median,voltages_mode,voltages_std,voltages_kurtosis,voltages_skewness,voltages_min,voltages_max"/> -->
 
 
 
