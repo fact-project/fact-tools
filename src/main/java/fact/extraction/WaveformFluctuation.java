@@ -32,7 +32,7 @@ public class WaveformFluctuation implements Processor {
     private String outputKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
-    private String pixelSampleKey;
+    private String pixelSetKey;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 35;
@@ -61,9 +61,9 @@ public class WaveformFluctuation implements Processor {
         int[] pixels = null;
 
         //Load a given pixelset, otherwise use the the whole camera
-        if (input.containsKey(pixelSampleKey)) {
-            Utils.isKeyValid(input, pixelSampleKey, PixelSetOverlay.class);
-            PixelSetOverlay pixelSet = (PixelSetOverlay) input.get(pixelSampleKey);
+        if (input.containsKey(pixelSetKey)) {
+            Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
+            PixelSetOverlay pixelSet = (PixelSetOverlay) input.get(pixelSetKey);
             pixels = pixelSet.toIntArray();
         } else {
             ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
@@ -153,8 +153,8 @@ public class WaveformFluctuation implements Processor {
         return input;
     }
 
-    public void setPixelSampleKey(String pixelSampleKey) {
-        this.pixelSampleKey = pixelSampleKey;
+    public void setPixelSetKey(String pixelSampleKey) {
+        this.pixelSetKey = pixelSampleKey;
     }
 
     public String getKey() {
