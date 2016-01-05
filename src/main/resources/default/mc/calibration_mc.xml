@@ -22,7 +22,6 @@
 />
 <fact.datacorrection.InterpolateTimeline 
     calibService="calibService"
-    interpolateTimeLine="True"
     dataKey="DataCalibrated"
     dataOutputKey="DataCalibrated"
 />
