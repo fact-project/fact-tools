@@ -1,6 +1,12 @@
 package fact.extraction;
 
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
+import com.sun.tools.javac.util.List;
 import fact.Utils;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +15,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * This processor calculates integrals of a given integration window beginning at an random start sample. The next
@@ -24,11 +31,14 @@ public class WaveformFluctuation implements Processor {
     @Parameter(required = true)
     private String outputKey = null;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
-    private int skipFirst = 25;
+    @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
+    private String pixelSampleKey;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
-    private int skipLast = 25;
+    private int skipFirst = 35;
+
+    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    private int skipLast = 100;
 
     @Parameter(description = "Size of the integration window", defaultValue = "30")
     private int windowSize = 30;
@@ -47,6 +57,19 @@ public class WaveformFluctuation implements Processor {
         Utils.mapContainsKeys(input, key);
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
+
+        int[] pixels = null;
+
+        //Load a given pixelset, otherwise use the the whole camera
+        if (input.containsKey(pixelSampleKey)) {
+            Utils.isKeyValid(input, pixelSampleKey, PixelSetOverlay.class);
+            PixelSetOverlay pixelSet = (PixelSetOverlay) input.get(pixelSampleKey);
+            pixels = pixelSet.toIntArray();
+        } else {
+            ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
+            pixels = Ints.toArray(numbers);
+        }
+        log.info("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
 
@@ -70,8 +93,10 @@ public class WaveformFluctuation implements Processor {
 
         double[][] charge = new double[npix][iterations];
 
+
+
         //Loop over all pixel and calculate integrals on timeline
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix : pixels) {
             int startSlice = skipFirst + rand.nextInt(bound);
 
             double[] integral = new double[iterations];
@@ -126,6 +151,10 @@ public class WaveformFluctuation implements Processor {
         input.put(outputKey+"_sum",chargeSum);
 
         return input;
+    }
+
+    public void setPixelSampleKey(String pixelSampleKey) {
+        this.pixelSampleKey = pixelSampleKey;
     }
 
     public String getKey() {
