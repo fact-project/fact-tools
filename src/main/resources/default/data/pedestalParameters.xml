@@ -1,0 +1,22 @@
+<module>
+<fact.pixelsets.Invert 
+    insetKey="badPixel" 
+    outsetKey="goodPixel" 
+/>
+    
+<fact.pixelsets.Difference 
+    inset1Key="goodPixel" 
+    inset2Key="showerSet" 
+    outsetKey="pedestal" 
+/>
+    
+<fact.extraction.WaveformFluctuation 
+    key="DataCalibrated" 
+    pixelSampleKey="pedestal"
+    outputKey="Ped" 
+    skipFirst="35" 
+    skipLast="100" 
+    windowSize="30" 
+/>
+    
+</module>
