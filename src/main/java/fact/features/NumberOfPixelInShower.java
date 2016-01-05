@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -20,7 +21,7 @@ public class NumberOfPixelInShower implements Processor {
 		int length = 0;
 		if (input.containsKey(showerKey))
 		{
-			int[] shower = (int[]) input.get(showerKey);
+			int[] shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
 			length = shower.length;
 		}
 	    input.put(outputKey, length);

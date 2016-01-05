@@ -3,6 +3,7 @@ package fact.features;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -27,7 +28,7 @@ public class Leakage implements Processor {
 	public Data process(Data input) {
 		Utils.mapContainsKeys( input, shower, weights);
 	
-		int[] 	showerPixel = (int[])input.get(shower);
+		int[] 	showerPixel = ((PixelSetOverlay) input.get(shower)).toIntArray();
 		double[] photonCharge = (double[]) input.get(weights);
 		
 		

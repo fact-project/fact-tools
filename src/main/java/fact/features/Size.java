@@ -1,6 +1,7 @@
 package fact.features;
 
 import fact.Utils;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -31,7 +32,7 @@ public class Size implements Processor {
 		if (input.containsKey(showerKey))
 		{
 		
-			int[] shower 	= (int[])input.get(showerKey);
+			int[] shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
 			double[] charge 	= (double[])input.get(photonChargeKey);
 
         	size = calculateSize(shower, charge);

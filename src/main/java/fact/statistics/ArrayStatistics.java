@@ -1,6 +1,7 @@
 package fact.statistics;
 
 import fact.Utils;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,9 @@ public class ArrayStatistics implements Processor {
 
                 return input;
         	}
-            pixelArray  = (int[]) input.get(pixelSetKey);
+
+            pixelArray = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+
             subset = new double[pixelArray.length];
 
             //Loop over array containing the pixel ids of the desired subset

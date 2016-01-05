@@ -3,6 +3,7 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -35,11 +36,11 @@ public class M3Long implements Processor {
 public Data process(Data input) {
 	//get the required stuff from the getColorFromValue
 	//in case the getColorFromValue doesn't contain a shower return the original input.
-    Utils.isKeyValid(input, showerKey, int[].class);
+    Utils.isKeyValid(input, showerKey, PixelSetOverlay.class);
     Utils.isKeyValid(input, weightsKey, double[].class);
     Utils.isKeyValid(input, distributionKey, PixelDistribution2D.class);
 
-    int[] showerPixel = (int[]) input.get(showerKey);
+    int[] showerPixel = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
     double[] showerWeights = createShowerWeights(showerPixel, (double[]) input.get(weightsKey));
     PixelDistribution2D dist = (PixelDistribution2D) input.get(distributionKey);
     //double[] showerCenter = getCenter(showerPixel);

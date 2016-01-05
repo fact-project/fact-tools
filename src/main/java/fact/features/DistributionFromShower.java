@@ -4,6 +4,7 @@ import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -65,7 +66,7 @@ public class DistributionFromShower implements Processor {
 		Utils.isKeyValid(input, showerKey, int[].class);
 		Utils.isKeyValid(input, weightsKey, double[].class);
 
-		int[] showerPixel = (int[]) input.get(showerKey);
+		int[] showerPixel = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
 		double[] showerWeights = createShowerWeights(showerPixel,
 				(double[]) input.get(weightsKey));
 

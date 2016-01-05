@@ -5,6 +5,7 @@ import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -46,7 +47,7 @@ public class ConcentrationCore implements Processor{
 			Double cogy = (Double) input.get(cogyKey);
 			Double d = (Double) input.get(deltaKey);
 			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
-			int [] showerPixelArray = (int[]) input.get(showerPixelKey);
+			int [] showerPixelArray = ((PixelSetOverlay) input.get(showerPixelKey)).toIntArray();
 			Double l = (Double) input.get(lengthKey);
 			Double w = (Double) input.get(widthKey);
 			Double size = (Double) input.get(sizeKey);

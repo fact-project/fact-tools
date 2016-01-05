@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -24,7 +25,7 @@ public class Concentration implements Processor {
 		int[] 	showerPixel;
 		double[] photonCharge;
 		try{
-			 showerPixel = (int[])input.get(shower);
+			 showerPixel = ((PixelSetOverlay) input.get(shower)).toIntArray();
 			 photonCharge = (double[]) input.get(weights);
 		} catch (ClassCastException e){
 			log.error("Could  not cast the keys to the right types");

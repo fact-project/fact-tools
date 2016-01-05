@@ -2,6 +2,7 @@ package fact.features;
 
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class TimeGradient implements Processor {
 		
 		Utils.mapContainsKeys(input, showerKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
 		
-		int[] shower = (int[]) input.get(showerKey);
+		int[] shower = ((PixelSetOverlay) input.get(showerKey)).toIntArray();
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
