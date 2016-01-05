@@ -109,6 +109,10 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level3", input);
 		}
+		
+		if (notUsablePixelSet != null){
+			input.put("notUsablePixelSet", notUsablePixelSet);
+		}
 
         //in case we have no showerpixels. We wont get any new ones in the steps below. And also it would crash.
         if(showerPixel.size() == 0){
