@@ -2,7 +2,7 @@ package fact.statistics;
 
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;

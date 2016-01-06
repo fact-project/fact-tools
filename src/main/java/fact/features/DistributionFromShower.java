@@ -5,7 +5,7 @@ import fact.container.PixelDistribution2D;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;

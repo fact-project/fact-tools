@@ -4,9 +4,8 @@ import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
-import com.sun.tools.javac.util.List;
 import fact.Utils;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.Random;
-import java.util.stream.IntStream;
 
 /**
  * This processor calculates integrals of a given integration window beginning at an random start sample. The next

@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.hexmap.CameraPixel;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;

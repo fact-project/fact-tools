@@ -1,6 +1,6 @@
 package fact;
 
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import fact.pixelsets.Invert;
 import org.junit.Test;
 import stream.Data;

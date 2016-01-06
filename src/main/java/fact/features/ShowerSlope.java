@@ -2,7 +2,7 @@ package fact.features;
 
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
