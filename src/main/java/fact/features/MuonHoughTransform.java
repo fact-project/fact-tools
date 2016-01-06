@@ -1,5 +1,6 @@
 package fact.features;
 
+import com.google.common.primitives.Ints;
 import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
@@ -83,10 +84,10 @@ public class MuonHoughTransform implements StatefulProcessor {
     private double[] circle_x;
     private double[] circle_r;
 
-    private ArrayList<int[]>[] chid2circles = new ArrayList[Constants.NUMBEROFPIXEL];
-    private HashMap<RingId, ArrayList<Integer>> circle2chids = new HashMap<>();
+    public ArrayList<int[]>[] chid2circles = new ArrayList[Constants.NUMBEROFPIXEL];
+    public HashMap<RingId, ArrayList<Integer>> circle2chids = new HashMap<>();
 
-    final class RingId{
+    public final class RingId{
         int ir , ix , iy;
         public RingId(int ir , int ix , int iy){
             this.ir = ir;
@@ -194,10 +195,8 @@ public class MuonHoughTransform implements StatefulProcessor {
         // Pixels belonging to the best ring:
         RingId bestRing = new RingId(max_positions[0][0], max_positions[0][1], max_positions[0][2]);
         int numPixBestRing = circle2chids.get(bestRing).size();
-        int[] bestRingPixel = new int[circle2chids.get(bestRing).size()];
-        for(int i=0; i < circle2chids.get(bestRing).size(); i++){
-            bestRingPixel[i] = circle2chids.get(bestRing).get(i);
-        }
+
+        int[] bestRingPixel = Ints.toArray(circle2chids.get(bestRing));
         input.put(bestRingPixelKey, bestRingPixel);
 
 
@@ -397,7 +396,8 @@ public class MuonHoughTransform implements StatefulProcessor {
     public void setCleaningPercentageKey(String cleaningPercentageKey) {
         this.cleaningPercentageKey = cleaningPercentageKey;
     }
-        public void setRingPercentageKey(String ringPercentageKey) {
+
+    public void setRingPercentageKey(String ringPercentageKey) {
         this.ringPercentageKey = ringPercentageKey;
     }
 
