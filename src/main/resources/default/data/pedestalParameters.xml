@@ -5,8 +5,8 @@
     />
         
     <fact.pixelsets.Difference 
-        setAKey="goodPixel"
-        setBKey="shower"
+        setUKey="goodPixel"
+        setAKey="shower"
         outsetKey="pedestal" 
     />
         
