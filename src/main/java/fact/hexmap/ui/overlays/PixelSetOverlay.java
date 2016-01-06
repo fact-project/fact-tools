@@ -7,6 +7,7 @@ import fact.hexmap.ui.components.cameradisplay.Tile;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,14 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
         for (CameraPixel px : this.set){
             intSet[i] = px.id;
             i++;
+        }
+        return intSet;
+    }
+
+    public ArrayList<Integer> toArrayList(){
+        ArrayList<Integer> intSet = new ArrayList<Integer>();
+        for (CameraPixel px : this.set){
+            intSet.add(px.id);
         }
         return intSet;
     }
