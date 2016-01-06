@@ -86,7 +86,7 @@
 />
 <fact.features.Concentration
     weights="photoncharge"
-    shower="shower"
+    pixelSetKey="shower"
     concOneOutputKey="Concentration_onePixel"
     concTwoOutputKey="Concentration_twoPixel"
 />
@@ -110,7 +110,7 @@
 />
 <fact.features.Leakage
     distribution="showerDistribution"
-    shower="shower"
+    pixelSetKey="shower"
     weights="photoncharge"
     leakage1OutputKey="Leakage"
     leakage2OutputKey="Leakage2"
