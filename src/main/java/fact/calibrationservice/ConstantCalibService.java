@@ -126,6 +126,9 @@ public class ConstantCalibService implements CalibrationService {
 		set.add(config9);
 	}
 
+	/**
+	 * @see CalibrationService#getBadPixel(DateTime)
+	 */
 	@Override
 	public int[] getBadPixel(DateTime eventTimeStamp) {
 		if (isInit == false){
@@ -136,6 +139,9 @@ public class ConstantCalibService implements CalibrationService {
 		return currentConfiguration.getBadPixels();
 	}
 
+	/**
+	 * @see CalibrationService#getNotUsablePixels(DateTime)
+	 */
 	@Override
 	public int[] getNotUsablePixels(DateTime eventTimeStamp) {
 		if (isInit == false){
