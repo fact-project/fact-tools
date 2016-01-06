@@ -35,6 +35,19 @@ public class RecursiveDirectoryStreamTest {
     }
 
     @Test
+    public void testSearchPath() throws Exception {
+        SourceURL sourceUrl = new SourceURL("file:src/main/resources");
+
+        RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
+
+        String pattern = "test*.fits.*";
+        r.setPattern(pattern);
+        r.init();
+
+        log.info("Found files: {}", r.files);
+    }
+
+    @Test
     public void testGlob() throws Exception {
 
         createTestFiles();
@@ -89,6 +102,7 @@ public class RecursiveDirectoryStreamTest {
         SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
+        //no files in this directory
         String pattern = "/*DRIVE_CONTROL_SOURCE_POSITION.fits";
         r.setPattern(pattern);
         r.init();

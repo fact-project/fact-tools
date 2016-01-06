@@ -53,20 +53,16 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         private final PathMatcher matcher;
 
         public GlobVisitor(String pattern) {
-            Path startingDir = Paths.get(url.getFile());
-            String globPattern = "glob:" + startingDir + pattern;
-            matcher = FileSystems.getDefault().getPathMatcher(globPattern);
+            matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
         }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
             Path name = file.getFileName();
             if (name != null && attr.isRegularFile()) {
-
                 if (matcher.matches(file)){
                     files.add(file);
                 }
-
             } else {
                 log.info("Not a regular file: {} ", file);
             }
@@ -89,7 +85,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         }
 
         Path startingDir = Paths.get(url.getFile());
-        GlobVisitor globVisitor = new GlobVisitor(pattern);
+        GlobVisitor globVisitor = new GlobVisitor(Paths.get(startingDir.toString(), pattern).toString());
         Files.walkFileTree(startingDir, new HashSet<FileVisitOption>(), maxDepth, globVisitor);
 
         if(files.isEmpty()){
