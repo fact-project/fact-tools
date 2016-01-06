@@ -39,8 +39,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     private int failedFilesCounter = 0;
     private List<String> failedFilesList = new ArrayList<>();
     @Parameter(required = false, description = "If false the reading of a broken file throws"
-    		+ " an exception and the process is aborted, if true the next file will be processed", defaultValue = "false")
-    private boolean skipBrokenFiles = false;
+    		+ " an exception and the process is aborted, if true the next file will be processed", defaultValue = "true")
+    private boolean skipErrors = true;
     private AbstractStream stream;
 
     public RecursiveDirectoryStream(SourceURL url) {
@@ -107,40 +107,46 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
     @Override
     public Data readNext() throws Exception {
-        Data data = null;
-        synchronized (this) {
-            if (stream != null) {
-                data = stream.read();
-                if (data != null) {
-                    return data;
-                }
-            }
-            if (files.isEmpty()) {
-                //stop the stream
-                stream = null;
-                return null;
-            }
-            //stream from new file.
-            File f = files.poll().toFile();
-            filesCounter++;
-            stream.close();
-            stream.setUrl(new SourceURL(f.toURI().toURL()));
-        }
+
         try {
-            log.info("Streaming file: " + stream.getUrl().toString());
-            stream.init();
-            data = stream.read();
-            if ( data == null){
-                //try next file;
-                return this.readNext();
-            } else {
-                return data;
+
+            //create new stream when we don't have one
+            if (stream == null){
+                if (files.isEmpty()) {
+                    return null;
+                }
+                File f = files.poll().toFile();
+
+                stream = (AbstractStream) streams.get(additionOrder.get(0));
+                stream.setUrl(new SourceURL(f.toURI().toURL()));
+                stream.init();
+
+                filesCounter++;
             }
 
-        } catch (IOException e) {
+            Data data = stream.read();
+            if (data == null) {
+                //no data was returned
+                if (files.isEmpty()) {
+                    //no more files to read -> stop the stream
+                    return null;
+                }
+                //get new file
+                stream.close();
+                File f = files.poll().toFile();
+
+                stream.setUrl(new SourceURL(f.toURI().toURL()));
+                stream.init();
+                data = stream.readNext();
+                filesCounter++;
+            }
+
+            return data;
+
+        } catch(IOException e){
             log.info("File: " + stream.getUrl().toString() + " throws IOException.");
 
-            if (skipBrokenFiles) {
+            if (skipErrors) {
                 log.info("Skipping broken files. Continuing with next file.");
                 failedFilesCounter++;
                 failedFilesList.add(stream.getUrl().toString());
@@ -151,8 +157,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
                 stream.close();
                 return null;
             }
-
         }
+
     }
 
 
@@ -175,8 +181,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         this.pattern = pattern;
     }
 
-	public void setSkipBrokenFiles(boolean skipBrokenFiles) {
-		this.skipBrokenFiles = skipBrokenFiles;
+	public void setSkipErrors(boolean skipErrors) {
+		this.skipErrors = skipErrors;
 	}
 
 }

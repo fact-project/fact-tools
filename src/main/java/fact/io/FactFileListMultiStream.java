@@ -11,6 +11,7 @@ import stream.io.multi.AbstractMultiStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *  "data_path":"\/fact\/raw\/2014\/10\/02\/20141002_185.fits.fz",
  *  ...
  *  },
- *  ¬{...}
+ *  {...}
  *  ]
  *
  * and creates a single stream for the files listed. The dictionaries in the json may of course contain
@@ -63,6 +64,9 @@ public class FactFileListMultiStream extends AbstractMultiStream {
 
     @Parameter(required = true, description = "A file containing a json array of dicts with the paths to the files.")
     private SourceURL url = null;
+
+    @Parameter(required = false, description = "Flag indicating whether next file should be tried in case of erros in underlying stream.", defaultValue = "true")
+    private boolean skipErrors = true;
 
     @Parameter(required = false, defaultValue = "drs_path" )
     private String drsPathKey = "drs_path";
@@ -111,38 +115,52 @@ public class FactFileListMultiStream extends AbstractMultiStream {
 
     @Override
     public Data readNext() throws Exception {
-        if (stream == null) {
-            stream = (AbstractStream) streams.get(additionOrder.get(0));
-            dataDrsPair = fileQueue.poll();
-            if (dataDrsPair == null) {
-                return null;
+        try{
+            if (stream == null) {
+                stream = (AbstractStream) streams.get(additionOrder.get(0));
+                dataDrsPair = fileQueue.poll();
+                if (dataDrsPair == null) {
+                    return null;
+                }
+                stream.setUrl(new SourceURL(dataDrsPair.dataFile.toURI().toURL()));
+                stream.init();
+
+                filesCounter++;
             }
-            stream.setUrl(new SourceURL(dataDrsPair.dataFile.toURI().toURL()));
-            stream.init();
 
-            filesCounter++;
-        }
+            Data data = stream.read();
 
-        Data data = stream.read();
+            //check whether this stream has any data left and start a new stream if necessary
+            if(data == null) {
+                if (fileQueue.isEmpty()){
+                    return null;
+                }
+                stream.close();
 
-        //check whether this stream has any data left and start a new stream if necessary
-        if (data != null) {
+                dataDrsPair = fileQueue.poll();
+                stream.setUrl(new SourceURL(dataDrsPair.dataFile.toURI().toURL()));
+                stream.init();
+
+                data = stream.readNext();
+                data.put("@drsFile", dataDrsPair.drsFile);
+                filesCounter++;
+            }
+
             data.put("@drsFile", dataDrsPair.drsFile);
             return data;
-        } else {
-            stream.close();
 
-            DataDrsPair f = fileQueue.poll();
-            if (f == null) {
+        } catch(IOException e){
+            log.info("File: " + stream.getUrl().toString() + " throws IOException.");
+
+            if (skipErrors) {
+                log.info("Skipping broken files. Continuing with next file.");
+                return this.readNext();
+            } else {
+                log.error("Stopping stream because of IOException");
+                e.printStackTrace();
+                stream.close();
                 return null;
             }
-            stream.setUrl(new SourceURL(f.dataFile.toURI().toURL()));
-            stream.init();
-            data = stream.readNext();
-            data.put("@drsFile", f.drsFile);
-
-            filesCounter++;
-            return data;
         }
     }
 
@@ -162,4 +180,8 @@ public class FactFileListMultiStream extends AbstractMultiStream {
     public void setDataPathKey(String dataPathKey) {
         this.dataPathKey = dataPathKey;
     }
+    public void setSkipErrors(boolean skipErrors) {
+        this.skipErrors = skipErrors;
+    }
+
 }
