@@ -24,10 +24,10 @@ public class Intersection implements Processor{
     static Logger log = LoggerFactory.getLogger(Intersection.class);
 
     @Parameter(required = true, description = "key to the first set to intersect")
-    private String inset1Key;
+    private String setAKey;
 
     @Parameter(required = true, description = "key to the second set to intersect")
-    private String inset2Key;
+    private String setBKey;
 
     @Parameter(required = true, description = "key to the output set which contains the intersection")
     private String outsetKey;
@@ -35,22 +35,22 @@ public class Intersection implements Processor{
     @Override
     public Data process(Data input) {
 
-        if (!input.containsKey(inset1Key)) {
+        if (!input.containsKey(setAKey)) {
             return input;
         }
 
-        if (!input.containsKey(inset2Key)) {
+        if (!input.containsKey(setBKey)) {
             return input;
         }
 
-        Utils.isKeyValid(input, inset1Key, PixelSetOverlay.class);
-        Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
+        Utils.isKeyValid(input, setAKey, PixelSetOverlay.class);
+        Utils.isKeyValid(input, setBKey, PixelSetOverlay.class);
 
-        PixelSetOverlay inset1 = (PixelSetOverlay) input.get(inset1Key);
-        PixelSetOverlay inset2 = (PixelSetOverlay) input.get(inset2Key);
+        PixelSetOverlay setA = (PixelSetOverlay) input.get(setAKey);
+        PixelSetOverlay setB = (PixelSetOverlay) input.get(setBKey);
 
         try{
-            Sets.SetView<CameraPixel> intersection = Sets.intersection(inset1.set, inset2.set);
+            Sets.SetView<CameraPixel> intersection = Sets.intersection(setA.set, setB.set);
             Set<CameraPixel> cameraPixels = intersection.immutableCopy();
 
             PixelSetOverlay outset = new PixelSetOverlay(cameraPixels);
@@ -63,12 +63,12 @@ public class Intersection implements Processor{
         return input;
     }
 
-    public void setInset1Key(String inset1Key) {
-        this.inset1Key = inset1Key;
+    public void setSetAKey(String setAKey) {
+        this.setAKey = setAKey;
     }
 
-    public void setInset2Key(String inset2Key) {
-        this.inset2Key = inset2Key;
+    public void setSetBKey(String setBKey) {
+        this.setBKey = setBKey;
     }
 
     public void setOutsetKey(String outsetKey) {

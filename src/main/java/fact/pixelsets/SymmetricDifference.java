@@ -10,7 +10,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -26,10 +25,10 @@ public class SymmetricDifference implements Processor{
     static Logger log = LoggerFactory.getLogger(SymmetricDifference.class);
 
     @Parameter(required = true, description = "key to the first set to be compared")
-    private String inset1Key;
+    private String setAKey;
 
     @Parameter(required = true, description = "key to the second set to be united")
-    private String inset2Key;
+    private String setBKey;
 
     @Parameter(required = true, description = "key to the output set which contains the symmetric difference")
     private String outsetKey;
@@ -37,34 +36,34 @@ public class SymmetricDifference implements Processor{
     @Override
     public Data process(Data input) {
 
-        PixelSetOverlay inset1;
-        PixelSetOverlay inset2;
+        PixelSetOverlay setA;
+        PixelSetOverlay setB;
 
         //check if inset1 is given, otherwise create an empty set
-        if (input.containsKey(inset1Key)) {
-            Utils.isKeyValid(input, inset1Key, PixelSetOverlay.class);
-            inset1 = (PixelSetOverlay) input.get(inset1Key);
+        if (input.containsKey(setAKey)) {
+            Utils.isKeyValid(input, setAKey, PixelSetOverlay.class);
+            setA = (PixelSetOverlay) input.get(setAKey);
         } else {
             //create an empty set if no set is handed over
-            inset1 = new PixelSetOverlay();
+            setA = new PixelSetOverlay();
         }
 
         //check if inset2 is given, otherwise create an empty set
-        if (input.containsKey(inset2Key)) {
-            Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
-            inset2 = (PixelSetOverlay) input.get(inset2Key);
+        if (input.containsKey(setBKey)) {
+            Utils.isKeyValid(input, setBKey, PixelSetOverlay.class);
+            setB = (PixelSetOverlay) input.get(setBKey);
         } else {
             //create an empty set if no set is handed over
-            inset2 = new PixelSetOverlay();
+            setB = new PixelSetOverlay();
         }
 
         //return if both input sets are empty
-        if (inset1.set.isEmpty() && inset2.set.isEmpty()){
+        if (setA.set.isEmpty() && setB.set.isEmpty()){
             return input;
         }
 
         try{
-            Sets.SetView<CameraPixel> symDiff = Sets.symmetricDifference(inset1.set, inset2.set);
+            Sets.SetView<CameraPixel> symDiff = Sets.symmetricDifference(setA.set, setB.set);
             Set<CameraPixel> cameraPixels = symDiff.immutableCopy();
             PixelSetOverlay outset = new PixelSetOverlay(cameraPixels);
             input.put(outsetKey, outset);
@@ -75,12 +74,12 @@ public class SymmetricDifference implements Processor{
         return input;
     }
 
-    public void setInset1Key(String inset1Key) {
-        this.inset1Key = inset1Key;
+    public void setSetAKey(String setAKey) {
+        this.setAKey = setAKey;
     }
 
-    public void setInset2Key(String inset2Key) {
-        this.inset2Key = inset2Key;
+    public void setSetBKey(String setBKey) {
+        this.setBKey = setBKey;
     }
 
     public void setOutsetKey(String outsetKey) {

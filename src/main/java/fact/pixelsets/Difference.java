@@ -22,10 +22,10 @@ public class Difference implements Processor{
     static Logger log = LoggerFactory.getLogger(Difference.class);
 
     @Parameter(required = true, description = "key to the first set to be compared")
-    private String inset1Key;
+    private String setUKey;
 
     @Parameter(required = true, description = "key to the second set to be united")
-    private String inset2Key;
+    private String setAKey;
 
     @Parameter(required = true, description = "key to the output set which contains the difference")
     private String outsetKey;
@@ -33,26 +33,26 @@ public class Difference implements Processor{
     @Override
     public Data process(Data input) {
 
-        if (!input.containsKey(inset1Key)) {
+        if (!input.containsKey(setUKey)) {
             return input;
         }
 
-        Utils.isKeyValid(input, inset1Key, PixelSetOverlay.class);
+        Utils.isKeyValid(input, setUKey, PixelSetOverlay.class);
 
-        PixelSetOverlay inset1 = (PixelSetOverlay) input.get(inset1Key);
-        PixelSetOverlay inset2;
+        PixelSetOverlay setU = (PixelSetOverlay) input.get(setUKey);
+        PixelSetOverlay setA;
 
         //check if inset2 is given, otherwise create an empty set
-        if (input.containsKey(inset2Key)) {
-            Utils.isKeyValid(input, inset2Key, PixelSetOverlay.class);
-            inset2 = (PixelSetOverlay) input.get(inset2Key);
+        if (input.containsKey(setAKey)) {
+            Utils.isKeyValid(input, setAKey, PixelSetOverlay.class);
+            setA = (PixelSetOverlay) input.get(setAKey);
         } else {
             //create an empty set if no set is handed over
-            inset2 = new PixelSetOverlay();
+            setA = new PixelSetOverlay();
         }
 
         try{
-            Sets.SetView<CameraPixel> difference = Sets.difference(inset1.set, inset2.set);
+            Sets.SetView<CameraPixel> difference = Sets.difference(setU.set, setA.set);
             Set<CameraPixel> cameraPixels = difference.immutableCopy();
             PixelSetOverlay outset = new PixelSetOverlay(cameraPixels);
             input.put(outsetKey, outset);
@@ -65,12 +65,12 @@ public class Difference implements Processor{
         return input;
     }
 
-    public void setInset1Key(String inset1Key) {
-        this.inset1Key = inset1Key;
+    public void setSetUKey(String setUKey) {
+        this.setUKey = setUKey;
     }
 
-    public void setInset2Key(String inset2Key) {
-        this.inset2Key = inset2Key;
+    public void setSetAKey(String setAKey) {
+        this.setAKey = setAKey;
     }
 
     public void setOutsetKey(String outsetKey) {
