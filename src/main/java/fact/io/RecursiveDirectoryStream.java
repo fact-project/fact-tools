@@ -19,6 +19,17 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
+ * Given a glob like a pattern describing files a folder _relative_ to the provided url, starts a stream working on
+ * all files sequentially.
+ *
+ * For example:
+ *
+ *     <stream id="fact" class="fact.io.RecursiveDirectoryStream"   url="file:/some/folder" pattern="**&#47;*_Events.fits.gz*" >
+ *            <stream class="fact.io.FitsStream" id="_"/>
+ *     </stream>
+ *
+ * finds all files below (recursively) /some/folder with their names matching the pattern. See unix globs for more
+ * information on pattern syntax
  *
  * Created by mackaiver on 12/15/15.
  */
