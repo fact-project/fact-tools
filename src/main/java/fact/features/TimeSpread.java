@@ -17,18 +17,14 @@ public class TimeSpread implements Processor {
 	@Parameter(required = true)
 	private String outputKey = null;
 	
-	private double[] arrivalTime = null;
-	private double[] weights = null;
-	private int[] shower = null;
-
 	@Override
 	public Data process(Data input) {
 		
 		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, pixelSetKey);
-		
-		arrivalTime = (double[]) input.get(arrivalTimeKey);
-		weights = (double[]) input.get(weightsKey);
-		shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+
+		double[] arrivalTime 	= (double[]) input.get(arrivalTimeKey);
+		double[] weights 		= (double[]) input.get(weightsKey);
+		int[] shower 			= ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		
 		// NumberShowerPixel
 		int n = shower.length;
