@@ -28,8 +28,8 @@ public class NumberOfIslands implements Processor {
     	}
         Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
 
-        int[] showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
-        int numIslands = Utils.breadthFirstSearch(Utils.arrayToList(showerPixel)).size();
+        PixelSetOverlay showerPixel = (PixelSetOverlay) input.get(pixelSetKey);
+        int numIslands = Utils.breadthFirstSearch(showerPixel.toArrayList()).size();
         input.put(outputKey, numIslands);
         return input;
     }

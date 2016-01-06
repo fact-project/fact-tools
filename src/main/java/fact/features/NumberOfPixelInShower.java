@@ -21,8 +21,8 @@ public class NumberOfPixelInShower implements Processor {
 		int length = 0;
 		if (input.containsKey(pixelSetKey))
 		{
-			int[] shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
-			length = shower.length;
+			PixelSetOverlay shower = (PixelSetOverlay) input.get(pixelSetKey);
+			length = shower.set.size();
 		}
 	    input.put(outputKey, length);
 		return input;

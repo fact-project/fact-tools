@@ -1,6 +1,7 @@
 package fact.features;
 
 import fact.Utils;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
@@ -27,8 +28,8 @@ public class Leakage implements Processor {
 	@Override
 	public Data process(Data input) {
 		Utils.mapContainsKeys( input, pixelSetKey, weights);
-	
-		int[] 	showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+
+		PixelSetOverlay	showerPixel = (PixelSetOverlay) input.get(pixelSetKey);
 		double[] photonCharge = (double[]) input.get(weights);
 		
 		
@@ -37,17 +38,17 @@ public class Leakage implements Processor {
 	    double leakageBorder          = 0;
 	    double leakageSecondBorder    = 0;
 
-	    for (int pix: showerPixel)
+	    for (CameraPixel pix: showerPixel.set)
 	    {
-	    	size += photonCharge[pix];
-	        if (isBorderPixel(pix) )
+	    	size += photonCharge[pix.id];
+	        if (isBorderPixel(pix.id) )
 	        {
-	            leakageBorder          += photonCharge[pix];
-	            leakageSecondBorder    += photonCharge[pix];
+	            leakageBorder          += photonCharge[pix.id];
+	            leakageSecondBorder    += photonCharge[pix.id];
 	        }
-	        else if (isSecondBorderPixel(pix))
+	        else if (isSecondBorderPixel(pix.id))
 	        {
-	            leakageSecondBorder    += photonCharge[pix];
+	            leakageSecondBorder    += photonCharge[pix.id];
 	        }
 	    }
 	    leakageBorder          = leakageBorder        / size;

@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.hexmap.CameraPixel;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +23,16 @@ public class Concentration implements Processor {
 	@Override
 	public Data process(Data input) {
 
-		int[] 	showerPixel;
+		PixelSetOverlay showerPixel;
 		double[] photonCharge;
 		try{
-			 showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+			 showerPixel = (PixelSetOverlay) input.get(pixelSetKey);
 			 photonCharge = (double[]) input.get(weights);
 		} catch (ClassCastException e){
 			log.error("Could  not cast the keys to the right types");
 			throw e;
 		}
-		if(showerPixel == null || showerPixel.length == 0){
+		if(showerPixel == null || showerPixel.set.size() == 0){
 			log.warn("No shower in event. not calculating conenctration");
 			return input;
 		}
@@ -43,17 +44,17 @@ public class Concentration implements Processor {
 
 		double size = 0;
 		
-		for (int pix : showerPixel)
+		for (CameraPixel pix : showerPixel.set)
 		{
-			size += photonCharge[pix];
-			if (photonCharge[pix] > max_photon_charge)
+			size += photonCharge[pix.id];
+			if (photonCharge[pix.id] > max_photon_charge)
 			{
 				second_max_photon_charge        = max_photon_charge;
-				max_photon_charge               = photonCharge[pix];
+				max_photon_charge               = photonCharge[pix.id];
 			}
-			else if (photonCharge[pix] > second_max_photon_charge)
+			else if (photonCharge[pix.id] > second_max_photon_charge)
 			{
-				second_max_photon_charge    = photonCharge[pix];
+				second_max_photon_charge    = photonCharge[pix.id];
 			}
 
 		}

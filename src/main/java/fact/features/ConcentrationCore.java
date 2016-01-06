@@ -3,6 +3,7 @@ package fact.features;
 
 import fact.Constants;
 import fact.Utils;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
@@ -47,7 +48,7 @@ public class ConcentrationCore implements Processor{
 			Double cogy = (Double) input.get(cogyKey);
 			Double d = (Double) input.get(deltaKey);
 			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
-			int [] showerPixelArray = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+			PixelSetOverlay showerPixelArray = (PixelSetOverlay) input.get(pixelSetKey);
 			Double l = (Double) input.get(lengthKey);
 			Double w = (Double) input.get(widthKey);
 			Double size = (Double) input.get(sizeKey);
@@ -57,9 +58,9 @@ public class ConcentrationCore implements Processor{
 			
 			double concCore = 0;
 			
-			for(int pix : showerPixelArray)
+			for(CameraPixel pix : showerPixelArray.set)
 			{
-                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix);
+                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix.id);
 				double px = p.getXPositionInMM();
 				double py = p.getYPositionInMM();
 				
@@ -81,7 +82,7 @@ public class ConcentrationCore implements Processor{
 				double distr = (1+tana)/(rl + tana*rw);
 				
 				if (distr>dist0-dz || dzx==0)
-					 concCore += photonChargeArray[pix];
+					 concCore += photonChargeArray[pix.id];
 				
 			}
 			concCore /= size;

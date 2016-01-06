@@ -1,6 +1,7 @@
 package fact.features;
 
 import fact.Utils;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.apache.commons.math3.exception.NoDataException;
@@ -46,8 +47,8 @@ public class TimeGradient implements Processor {
 	public Data process(Data input) {
 		
 		Utils.mapContainsKeys(input, pixelSetKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
-		
-		int[] shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+
+		PixelSetOverlay shower = (PixelSetOverlay) input.get(pixelSetKey);
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
@@ -56,12 +57,12 @@ public class TimeGradient implements Processor {
 		SimpleRegression regressorLong = new SimpleRegression();
 		SimpleRegression regressorTrans = new SimpleRegression();
 		
-		for (int px: shower)
+		for (CameraPixel px: shower.set)
 		{
-			double x = pixelMap.getPixelFromId(px).getXPositionInMM();
-			double y = pixelMap.getPixelFromId(px).getYPositionInMM();
+			double x = pixelMap.getPixelFromId(px.id).getXPositionInMM();
+			double y = pixelMap.getPixelFromId(px.id).getYPositionInMM();
 			double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
-			double time = arrivalTime[px];
+			double time = arrivalTime[px.id];
 			regressorLong.addData(ellipseCoord[0], time);
 			regressorTrans.addData(ellipseCoord[1], time);
 		}
