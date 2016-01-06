@@ -136,16 +136,13 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             }
         }
 
-        int[] showerPixelArray = new int[showerPixel.size()];
-        if(showerPixelArray.length > 0){
+        if(showerPixel.size() > 0){
 
             cleanedPixelSet = new PixelSetOverlay();
             for (int i = 0; i < showerPixel.size(); i++) {
                 cleanedPixelSet.addById(showerPixel.get(i));
-                showerPixelArray[i] =  showerPixel.get(i);
             }
-            input.put(outputKey, showerPixelArray);
-            input.put(outputKey+"Set", cleanedPixelSet);
+            input.put(outputKey, cleanedPixelSet);
         }
 
 		return input;

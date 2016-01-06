@@ -71,16 +71,13 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 		PixelSetOverlay cleanedPixelSet = new PixelSetOverlay();
 		if (showerlist.size() > 0)
 		{
-			Integer[] showerArray = new Integer[showerlist.size()];
 			for (int i = 0; i < showerlist.size(); i++) {
                 cleanedPixelSet.addById(showerlist.get(i));
-                showerArray[i] =  showerlist.get(i);
             }
 			
-			input.put(outputKey, showerArray);
-			input.put(outputKey+"Set", cleanedPixelSet);
+			input.put(outputKey, cleanedPixelSet);
 		}
-		
+
 		return input;
 	}
 
