@@ -153,6 +153,7 @@ public class ConstantCalibService implements CalibrationService {
 	}
 	
 	private HardwareConfiguration getHardwareConfiguration(DateTime eventTimeStamp) {
+		// Create a new dummyConfiguration with the current eventTimeStamp and use the set.floor method to get the correct configuration
 		HardwareConfiguration dummyConfiguration = new HardwareConfiguration(eventTimeStamp);
 		return set.floor(dummyConfiguration);
 	}
