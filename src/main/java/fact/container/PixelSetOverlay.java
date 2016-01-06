@@ -1,9 +1,10 @@
-package fact.hexmap.ui.overlays;
+package fact.container;
 
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 import fact.hexmap.ui.components.cameradisplay.Tile;
+import fact.hexmap.ui.overlays.CameraMapOverlay;
 
 import java.awt.*;
 import java.io.Serializable;
