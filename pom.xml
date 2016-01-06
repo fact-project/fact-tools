@@ -224,6 +224,7 @@
 				<version>2.14.1</version>
 				<configuration>
 					<skipTests>${skipTests}</skipTests>
+					<argLine>-Xmx1024m</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
