@@ -23,13 +23,14 @@ public class HoughTrafoTest extends ParameterTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    final String distribution = "dist";
+
 
     @Test
     public void testValidParameter() throws Exception{
         MuonHoughTransform poser = new MuonHoughTransform();
-        poser.setPixelKey(distribution);
+        poser.setPixelKey("shower");
         poser.setPhotonChargeKey("photoncharge");
+        poser.init(null);
         poser.process(item);
     }
 

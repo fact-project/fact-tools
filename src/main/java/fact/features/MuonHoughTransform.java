@@ -114,7 +114,7 @@ public class MuonHoughTransform implements StatefulProcessor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         int npix = (Integer) input.get("NPIX");
 
-        int[] cleaningPixel = (int[]) input.get(pixelKey);
+        int[] cleaningPixel = ((PixelSet) input.get(pixelKey)).toIntArray();
         double[] photonCharge = (double[]) input.get(photonChargeKey);
 
 
