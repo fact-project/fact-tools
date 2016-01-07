@@ -5,7 +5,7 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +60,8 @@ public class WaveformFluctuation implements Processor {
 
         //Load a given pixelset, otherwise use the the whole camera
         if (input.containsKey(pixelSetKey)) {
-            Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
-            PixelSetOverlay pixelSet = (PixelSetOverlay) input.get(pixelSetKey);
+            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
             pixels = pixelSet.toIntArray();
         } else {
             ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());

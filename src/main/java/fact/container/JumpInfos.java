@@ -9,11 +9,11 @@ public class JumpInfos implements Serializable {
 
 	private static final long serialVersionUID = -4430692866625609266L;
 	
-    private PixelSetOverlay pixelWithSpikes;
-    private PixelSetOverlay pixelWithSignalFlanks;
-    private PixelSetOverlay pixelWithRinging;
-    private PixelSetOverlay pixelWithCorrectedJumps;
-    private PixelSetOverlay pixelWithWrongTimeDepend;
+    private PixelSet pixelWithSpikes;
+    private PixelSet pixelWithSignalFlanks;
+    private PixelSet pixelWithRinging;
+    private PixelSet pixelWithCorrectedJumps;
+    private PixelSet pixelWithWrongTimeDepend;
 	
     public double[] averJumpHeights;
 	
@@ -28,11 +28,11 @@ public class JumpInfos implements Serializable {
 		posMarkerDown = new IntervalMarker[numberOfPixel];
 		fftResults = new double[numberOfPixel*roi];
 		
-		pixelWithSpikes = new PixelSetOverlay();
-		pixelWithSignalFlanks = new PixelSetOverlay();
-		pixelWithRinging = new PixelSetOverlay();
-		pixelWithCorrectedJumps = new PixelSetOverlay();
-		pixelWithWrongTimeDepend = new PixelSetOverlay();
+		pixelWithSpikes = new PixelSet();
+		pixelWithSignalFlanks = new PixelSet();
+		pixelWithRinging = new PixelSet();
+		pixelWithCorrectedJumps = new PixelSet();
+		pixelWithWrongTimeDepend = new PixelSet();
 	}
 	
 	public void addPixelWithSpikes(int pixel){

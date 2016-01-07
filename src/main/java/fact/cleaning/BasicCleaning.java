@@ -8,7 +8,7 @@ import fact.hexmap.FactPixelMapping;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTime;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 
 import stream.Data;
@@ -26,7 +26,7 @@ public class BasicCleaning {
 	CalibrationService calibService;
 	
 
-    protected PixelSetOverlay notUsablePixelSet = null;
+    protected PixelSet notUsablePixelSet = null;
 
 	
 
@@ -41,7 +41,7 @@ public class BasicCleaning {
 		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
 		if (notUsablePixel != null)
 		{
-			notUsablePixelSet = new PixelSetOverlay();
+			notUsablePixelSet = new PixelSet();
 			for (int pix: notUsablePixel){
 				notUsablePixelSet.addById(pix);
 			}
@@ -117,7 +117,7 @@ public class BasicCleaning {
 	 * @param log 
 	 * @return
 	 */
-	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition, PixelSetOverlay starSet, double starRadiusInCamera, Logger log) {
+	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
 
         FactCameraPixel pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
         if (pixel == null){
@@ -157,7 +157,7 @@ public class BasicCleaning {
 		
 		if (level.length > 0)
 		{
-            PixelSetOverlay overlay = new PixelSetOverlay();
+            PixelSet overlay = new PixelSet();
     		for(int pix : level){
     			overlay.addById(pix);
     		}

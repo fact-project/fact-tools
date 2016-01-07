@@ -2,7 +2,7 @@ package fact.features;
 
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -38,7 +38,7 @@ public class ShowerSlope implements Processor {
 
         double[] photonCharge = (double[]) input.get(photonChargeKey);
         double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-		int[] shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+		int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
 		double delta = (Double) input.get(deltaKey);

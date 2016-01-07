@@ -5,7 +5,7 @@ import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -256,7 +256,7 @@ public class MuonHoughTransform implements StatefulProcessor {
             double distance;
             for (int i = 0; i < 3; i++)
             {
-                PixelSetOverlay CirclePixelSet = new PixelSetOverlay();
+                PixelSet CirclePixelSet = new PixelSet();
                 for (int pix = 0; pix < npix; pix++)
                 {
                     FactCameraPixel p = m.getPixelFromId(pix);

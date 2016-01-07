@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -26,9 +26,9 @@ public class NumberOfIslands implements Processor {
     		input.put(outputKey, 0);
     		return input;
     	}
-        Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
+        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 
-        PixelSetOverlay showerPixel = (PixelSetOverlay) input.get(pixelSetKey);
+        PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
         int numIslands = Utils.breadthFirstSearch(showerPixel.toArrayList()).size();
         input.put(outputKey, numIslands);
         return input;

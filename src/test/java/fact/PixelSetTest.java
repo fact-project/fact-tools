@@ -1,6 +1,6 @@
 package fact;
 
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import fact.pixelsets.Invert;
 import org.junit.Test;
 import stream.Data;
@@ -17,7 +17,7 @@ public class PixelSetTest {
     @Test
     public void createFullCameraSetTest(){
         Invert i = new Invert();
-        PixelSetOverlay fullCameraSet = i.createFullCameraSet(1440);
+        PixelSet fullCameraSet = i.createFullCameraSet(1440);
         assertThat(fullCameraSet.set.size(), is(1440));
     }
 
@@ -25,7 +25,7 @@ public class PixelSetTest {
     public void invertTest(){
         Data item = DataFactory.create();
 
-        PixelSetOverlay testSet = new PixelSetOverlay();
+        PixelSet testSet = new PixelSet();
         for (int pix = 0; pix < 20; pix++) {
             testSet.addById(pix);
         }
@@ -39,7 +39,7 @@ public class PixelSetTest {
         assertThat(test.containsKey("testInversion"), is(true));
 
 
-        PixelSetOverlay inversion = (PixelSetOverlay) test.get("testInversion");
+        PixelSet inversion = (PixelSet) test.get("testInversion");
         assertThat(inversion.set.size(), is(1440-20));
     }
 }

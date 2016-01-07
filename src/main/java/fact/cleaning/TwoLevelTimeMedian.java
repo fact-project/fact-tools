@@ -5,7 +5,7 @@ import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
     
     private boolean showDifferentCleaningSets = false;
 
-    private PixelSetOverlay cleanedPixelSet;
+    private PixelSet cleanedPixelSet;
 	
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -138,7 +138,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 
         if (starPositionKeys != null)
         {
-            PixelSetOverlay starSet = new PixelSetOverlay();
+            PixelSet starSet = new PixelSet();
             for (String starPositionKey : starPositionKeys)
             {
                 Utils.isKeyValid(input, starPositionKey, double[].class);
@@ -155,7 +155,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 
         if(showerPixel.size() > 0){
 
-            cleanedPixelSet = new PixelSetOverlay();
+            cleanedPixelSet = new PixelSet();
             for (int i = 0; i < showerPixel.size(); i++) {
                 cleanedPixelSet.addById(showerPixel.get(i));
             }

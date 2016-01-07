@@ -2,7 +2,7 @@ package fact.statistics;
 
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class ArrayStatistics implements Processor {
         }
         else if (input.containsKey(pixelSetKey)){
             /* if a set is specified, use only the pixel ids from the set */
-            PixelSetOverlay pixelArray = (PixelSetOverlay) input.get(pixelSetKey);
+            PixelSet pixelArray = (PixelSet) input.get(pixelSetKey);
             for(CameraPixel pix : pixelArray.set){
                 s.addValue(data[pix.id]);
             }

@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -24,7 +24,7 @@ public class TimeSpread implements Processor {
 
 		double[] arrivalTime 	= (double[]) input.get(arrivalTimeKey);
 		double[] weights 		= (double[]) input.get(weightsKey);
-		int[] shower 			= ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+		int[] shower 			= ((PixelSet) input.get(pixelSetKey)).toIntArray();
 		
 		// NumberShowerPixel
 		int n = shower.length;

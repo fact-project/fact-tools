@@ -3,7 +3,7 @@ package fact.pixelsets;
 import com.google.common.collect.Sets;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -36,25 +36,25 @@ public class SymmetricDifference implements Processor{
     @Override
     public Data process(Data input) {
 
-        PixelSetOverlay setA;
-        PixelSetOverlay setB;
+        PixelSet setA;
+        PixelSet setB;
 
         //check if inset1 is given, otherwise create an empty set
         if (input.containsKey(setAKey)) {
-            Utils.isKeyValid(input, setAKey, PixelSetOverlay.class);
-            setA = (PixelSetOverlay) input.get(setAKey);
+            Utils.isKeyValid(input, setAKey, PixelSet.class);
+            setA = (PixelSet) input.get(setAKey);
         } else {
             //create an empty set if no set is handed over
-            setA = new PixelSetOverlay();
+            setA = new PixelSet();
         }
 
         //check if inset2 is given, otherwise create an empty set
         if (input.containsKey(setBKey)) {
-            Utils.isKeyValid(input, setBKey, PixelSetOverlay.class);
-            setB = (PixelSetOverlay) input.get(setBKey);
+            Utils.isKeyValid(input, setBKey, PixelSet.class);
+            setB = (PixelSet) input.get(setBKey);
         } else {
             //create an empty set if no set is handed over
-            setB = new PixelSetOverlay();
+            setB = new PixelSet();
         }
 
         //return if both input sets are empty
@@ -65,7 +65,7 @@ public class SymmetricDifference implements Processor{
         try{
             Sets.SetView<CameraPixel> symDiff = Sets.symmetricDifference(setA.set, setB.set);
             Set<CameraPixel> cameraPixels = symDiff.immutableCopy();
-            PixelSetOverlay outset = new PixelSetOverlay(cameraPixels);
+            PixelSet outset = new PixelSet(cameraPixels);
             input.put(outsetKey, outset);
         } catch (NullPointerException e){
             e.printStackTrace();

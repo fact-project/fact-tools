@@ -3,7 +3,7 @@ package fact.pixelsets;
 import com.google.common.collect.Sets;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -32,18 +32,18 @@ public class Invert implements Processor{
         if (!input.containsKey(insetKey)) {
             return input;
         }
-        Utils.isKeyValid(input, insetKey, PixelSetOverlay.class);
-        PixelSetOverlay inset = (PixelSetOverlay) input.get(insetKey);
+        Utils.isKeyValid(input, insetKey, PixelSet.class);
+        PixelSet inset = (PixelSet) input.get(insetKey);
 
         int npix = (Integer) input.get("NPIX");
 
-        PixelSetOverlay wholeCamSet = createFullCameraSet(npix);
+        PixelSet wholeCamSet = createFullCameraSet(npix);
 
         try {
             Sets.SetView<CameraPixel> inversion = Sets.difference(wholeCamSet.set, inset.set);
             Set<CameraPixel> cameraPixels = inversion.immutableCopy();
 
-            PixelSetOverlay outset = new PixelSetOverlay(cameraPixels);
+            PixelSet outset = new PixelSet(cameraPixels);
 
             input.put(outsetKey, outset);
         } catch (NullPointerException e){
@@ -53,8 +53,8 @@ public class Invert implements Processor{
         return input;
     }
 
-    public PixelSetOverlay createFullCameraSet(int npix) {
-        PixelSetOverlay wholeCamSet = new PixelSetOverlay();
+    public PixelSet createFullCameraSet(int npix) {
+        PixelSet wholeCamSet = new PixelSet();
         for (int pix = 0; pix < npix; pix++) {
             wholeCamSet.addById(pix);
         }

@@ -5,7 +5,7 @@ import fact.container.PixelDistribution2D;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -64,10 +64,10 @@ public class DistributionFromShower implements Processor {
 			return input;
 		}
 
-		Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
+		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 		Utils.isKeyValid(input, weightsKey, double[].class);
 
-		PixelSetOverlay showerPixel = (PixelSetOverlay) input.get(pixelSetKey);
+		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
 		double[] showerWeights = createShowerWeights(showerPixel.toIntArray(),
 				(double[]) input.get(weightsKey));
 
@@ -217,7 +217,7 @@ public class DistributionFromShower implements Processor {
 		return cog;
 	}
 
-	public double[] calculateCenter(PixelSetOverlay showerPixel) {
+	public double[] calculateCenter(PixelSet showerPixel) {
 
 		double[] cog = { 0, 0 };
 		// find center of the shower pixels.

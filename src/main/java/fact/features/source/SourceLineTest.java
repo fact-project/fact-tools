@@ -2,7 +2,7 @@ package fact.features.source;
 
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -43,7 +43,7 @@ public class SourceLineTest implements Processor{
 		photonChargeArray = (double[]) input.get(photonCharge);
 		arrivalTimeArray = (double[]) input.get(arrivalTime);
 
-		showerPixelArray = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+		showerPixelArray = ((PixelSet) input.get(pixelSetKey)).toIntArray();
 
 		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		

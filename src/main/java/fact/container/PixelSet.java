@@ -15,19 +15,19 @@ import java.util.Set;
 /**
  * This is overlay can draw borders around the pixels passed to it via constructor or the add methods.
  */
-public class PixelSetOverlay implements CameraMapOverlay, Serializable {
+public class PixelSet implements CameraMapOverlay, Serializable {
     public Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
-    public PixelSetOverlay(HashSet<Integer> set) {
+    public PixelSet(HashSet<Integer> set) {
         for (Integer pix : set){
             this.addById(pix);
         }
     }
-    public PixelSetOverlay(Set<CameraPixel> set){
+    public PixelSet(Set<CameraPixel> set){
         this.set = set;
     }
-    public PixelSetOverlay(){
+    public PixelSet(){
     }
     public void add(CameraPixel p){
         set.add(p);

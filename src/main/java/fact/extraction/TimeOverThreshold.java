@@ -4,7 +4,7 @@
 package fact.extraction;
 
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class TimeOverThreshold implements Processor {
 	@Parameter(required = true)
 	private String outputKey = null;
 	
-	private PixelSetOverlay pixelSet;
+	private PixelSet pixelSet;
 	
 	private int npix;
 
@@ -56,7 +56,7 @@ public class TimeOverThreshold implements Processor {
 		int roi = data.length / npix;
 		int numPixelAboveThreshold = 0;
 		
-		pixelSet = new PixelSetOverlay();
+		pixelSet = new PixelSet();
         int[] totPixelSet = null;
 
 		//Loop over pixels

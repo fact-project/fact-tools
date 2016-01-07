@@ -3,7 +3,7 @@ package fact.datacorrection;
 import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 
@@ -59,7 +59,7 @@ public class InterpolateTimeSeries implements Processor {
     	}
 
     	int[] badChIds = calibService.getBadPixel(timeStamp);
-		PixelSetOverlay badPixelsSet = new PixelSetOverlay();
+		PixelSet badPixelsSet = new PixelSet();
 		for (int px: badChIds){
 			badPixelsSet.addById(px);
 		}

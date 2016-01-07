@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -27,9 +27,9 @@ public class Length implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		Utils.isKeyValid(input, pixelSetKey, PixelSetOverlay.class);
+		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 		
-		PixelSetOverlay pixelSet = (PixelSetOverlay) input.get(pixelSetKey);
+		PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
 		
 		int length = pixelSet.set.size();
 		input.put(outputKey, length);

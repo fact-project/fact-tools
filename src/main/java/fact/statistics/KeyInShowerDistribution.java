@@ -1,7 +1,7 @@
 package fact.statistics;
 
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -22,7 +22,7 @@ public class KeyInShowerDistribution implements Processor {
 			
 		Serializable serialData = input.get(Key);
 		double[] keyData = Utils.toDoubleArray(serialData);
-		int[] showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+		int[] showerPixel = ((PixelSet) input.get(pixelSetKey)).toIntArray();
 		
 		if(showerPixel.length<=1){
 			log.info("No Sample Standard Deviation defined for sample.length<2, filling up with -1");

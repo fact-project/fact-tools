@@ -3,7 +3,7 @@ package fact.pixelsets;
 import com.google.common.collect.Sets;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -43,17 +43,17 @@ public class Intersection implements Processor{
             return input;
         }
 
-        Utils.isKeyValid(input, setAKey, PixelSetOverlay.class);
-        Utils.isKeyValid(input, setBKey, PixelSetOverlay.class);
+        Utils.isKeyValid(input, setAKey, PixelSet.class);
+        Utils.isKeyValid(input, setBKey, PixelSet.class);
 
-        PixelSetOverlay setA = (PixelSetOverlay) input.get(setAKey);
-        PixelSetOverlay setB = (PixelSetOverlay) input.get(setBKey);
+        PixelSet setA = (PixelSet) input.get(setAKey);
+        PixelSet setB = (PixelSet) input.get(setBKey);
 
         try{
             Sets.SetView<CameraPixel> intersection = Sets.intersection(setA.set, setB.set);
             Set<CameraPixel> cameraPixels = intersection.immutableCopy();
 
-            PixelSetOverlay outset = new PixelSetOverlay(cameraPixels);
+            PixelSet outset = new PixelSet(cameraPixels);
 
             input.put(outsetKey, outset);
         } catch (NullPointerException e){

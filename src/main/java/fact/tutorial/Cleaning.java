@@ -1,6 +1,6 @@
 package fact.tutorial;
 
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -32,7 +32,7 @@ public class Cleaning implements Processor {
 
         item.put("showerPixel", selectedPixel);
         item.put("numberOfShowerPixel", selectedPixel.size());
-        item.put("@showerPixelOverlay", new PixelSetOverlay(selectedPixel));
+        item.put("@showerPixelOverlay", new PixelSet(selectedPixel));
         return item;
     }
 

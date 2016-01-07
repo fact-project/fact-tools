@@ -1,7 +1,7 @@
 package fact.extraction;
 
 import fact.Utils;
-import fact.container.PixelSetOverlay;
+import fact.container.PixelSet;
 import fact.utils.RemappingKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class IdentifyPixelAboveThreshold implements Processor {
     @Parameter(required = false)
     private String outputKey;
 	
-    private PixelSetOverlay pixelSet;
+    private PixelSet pixelSet;
     
 	private int npix;
 	
@@ -39,7 +39,7 @@ public class IdentifyPixelAboveThreshold implements Processor {
 				
 		double[] featureArray 	 = (double[]) input.get(key);
 				
-		pixelSet = new PixelSetOverlay();
+		pixelSet = new PixelSet();
 		for(int pix = 0 ; pix < npix; pix++){
 			matchArray[pix] = 0;
 			if ( featureArray[pix] > threshold){
@@ -88,12 +88,12 @@ public class IdentifyPixelAboveThreshold implements Processor {
 	}
 
 
-	public PixelSetOverlay getPixelSet() {
+	public PixelSet getPixelSet() {
 		return pixelSet;
 	}
 
 
-	public void setPixelSet(PixelSetOverlay pixelSet) {
+	public void setPixelSet(PixelSet pixelSet) {
 		this.pixelSet = pixelSet;
 	}
 
