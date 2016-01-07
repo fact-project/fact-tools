@@ -53,4 +53,11 @@
     numberOfPoints="${risingEdgePolynomFit_numberOfPoints}"
     maxSlopesKey="maxSlopes"
 />
+<fact.datacorrection.InterpolatePhotondata
+    calibService="calibService"
+    photonChargeKey="photoncharge"
+    photonChargeOutputKey="photoncharge"
+    arrivalTimeKey="arrivalTime"
+    arrivalTimeOutputKey="arrivalTime"
+/>
 </module>

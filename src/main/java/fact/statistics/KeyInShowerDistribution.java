@@ -1,6 +1,7 @@
 package fact.statistics;
 
 import fact.Utils;
+import fact.container.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -9,7 +10,7 @@ import stream.Processor;
 import java.io.Serializable;
 public class KeyInShowerDistribution implements Processor {
 
-	private String showerPixelKey;
+	private String pixelSetKey;
 	private String outputKey;
 	private String Key
 	;
@@ -21,7 +22,7 @@ public class KeyInShowerDistribution implements Processor {
 			
 		Serializable serialData = input.get(Key);
 		double[] keyData = Utils.toDoubleArray(serialData);
-		int[] showerPixel = (int[]) input.get(showerPixelKey);
+		int[] showerPixel = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 		
 		if(showerPixel.length<=1){
 			log.info("No Sample Standard Deviation defined for sample.length<2, filling up with -1");
@@ -54,12 +55,12 @@ public class KeyInShowerDistribution implements Processor {
 		return input;
 	}
 
-	public String getShowerPixelKey() {
-		return showerPixelKey;
+	public String getPixelSetKey() {
+		return pixelSetKey;
 	}
 
-	public void setShowerPixelKey(String showerPixelKey) {
-		this.showerPixelKey = showerPixelKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getOutputKey() {

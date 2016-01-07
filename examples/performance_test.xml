@@ -2,7 +2,8 @@
 
     <properties url="classpath:/default/settings.properties" />
 
-    <property name="infile" value="file:/Users/kai/test.fits.gz" />
+    <!-- <property name="infile" value="file:/Users/kai/test.fits.gz" /> -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
     <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
@@ -11,6 +12,8 @@
     <!--<property name="outfile" value="file:/home/fabian/testoutfile.txt" />-->
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <!--In case you want to analyze .zfits files.-->
     <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>-->

@@ -1,6 +1,7 @@
 package fact.features;
 
 import fact.Utils;
+import fact.container.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -15,7 +16,7 @@ import stream.annotations.Parameter;
 public class Size implements Processor {
 
     @Parameter(required = true)
-	private String showerKey;
+	private String pixelSetKey;
     @Parameter(required = true)
 	private String photonChargeKey;
     @Parameter(required = true)
@@ -28,10 +29,10 @@ public class Size implements Processor {
 		Utils.mapContainsKeys( input, photonChargeKey);
 		
 		double size = 0;
-		if (input.containsKey(showerKey))
+		if (input.containsKey(pixelSetKey))
 		{
 		
-			int[] shower 	= (int[])input.get(showerKey);
+			int[] shower = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
 			double[] charge 	= (double[])input.get(photonChargeKey);
 
         	size = calculateSize(shower, charge);
@@ -63,12 +64,9 @@ public class Size implements Processor {
 		this.outputKey = outputKey;
 	}
 
-	
-	public String getShowerKey() {
-		return showerKey;
-	}
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getPhotonChargeKey() {
