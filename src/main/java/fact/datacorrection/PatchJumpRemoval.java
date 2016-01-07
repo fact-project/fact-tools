@@ -128,7 +128,7 @@ public class PatchJumpRemoval implements Processor {
 				{
 					if (addJumpInfos == true)
 					{
-						jumpInfos.addPosMarkerForPatch(patch,pos);
+						jumpInfos.addPosMarkerForPatch(patch,pos,isStartCell);
 					}
 					result = HandleSpike(patch, pos, result, jumpInfos);
 					
@@ -140,15 +140,15 @@ public class PatchJumpRemoval implements Processor {
 					CreatePatchAverage(patch, patchAverage, patchDerivationAverage, result);
 					
 					double jumpHeight = CheckForJump(patch,pos,patchDerivationAverage,isStartCell);
-					if (jumpHeight > 0)
+					if (jumpHeight != 0)
 					{
 						boolean isJump=false;
 						isJump = CheckForSignalFlank(patch, pos, patchDerivationAverage,isStartCell, jumpHeight);
 						if (isJump == true)
 						{
 							jumpHeight = CheckForRingingFFT(patch,pos,patchAverage,patchDerivationAverage,jumpHeight,jumpInfos);
-								if (jumpHeight > 0)
-								{
+							if (jumpHeight != 0)
+							{
 								isJump = CheckForTimeDependency(patch, deltaT,jumpHeight,jumpInfos);
 								if (isJump == true)
 								{
