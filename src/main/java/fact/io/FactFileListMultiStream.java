@@ -36,7 +36,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * The 'drsPathKey' and `dataPathKey` parameter define the names of the keys to the file paths. So in the example above they
  * would need to be set to "drs_path" and "data_path" which are the default values. A key called '@drsFile' will
  * be injected into the DataStream by this multistream. That means when you're using this stream you don't need to set the
- * `url` parameter of the DrsCalibration processor.
+ * `url` parameter of the DrsCalibration processor. If the underlying stream throws an IOexception in case of missing files,
+ * the next file will be tried when the skipErrors flag is set. 
  *
  * Created by mackaiver on 4/10/15.
  */
@@ -65,7 +66,7 @@ public class FactFileListMultiStream extends AbstractMultiStream {
     @Parameter(required = true, description = "A file containing a json array of dicts with the paths to the files.")
     private SourceURL url = null;
 
-    @Parameter(required = false, description = "Flag indicating whether next file should be tried in case of erros in underlying stream.", defaultValue = "true")
+    @Parameter(required = false, description = "Flag indicating whether next file should be tried in case of errors in underlying stream.", defaultValue = "true")
     private boolean skipErrors = true;
 
     @Parameter(required = false, defaultValue = "drs_path" )
