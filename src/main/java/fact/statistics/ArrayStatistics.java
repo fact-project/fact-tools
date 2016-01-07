@@ -58,7 +58,9 @@ public class ArrayStatistics implements Processor {
                 s.addValue(data[pix.id]);
             }
         }
-
+        input.put(outputKey+"_" +"median",s.getPercentile(50));
+        input.put(outputKey+"_" +"p25",s.getPercentile(25));
+        input.put(outputKey+"_" +"p75",s.getPercentile(75));
         input.put(outputKey+"_" +"mean",s.getMean());
         input.put(outputKey+"_" +"max",s.getMax());
         input.put(outputKey+"_" +"min",s.getMin());
