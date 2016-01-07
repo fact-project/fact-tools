@@ -1,12 +1,14 @@
-package fact.hexmap.ui.overlays;
+package fact.container;
 
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 import fact.hexmap.ui.components.cameradisplay.Tile;
+import fact.hexmap.ui.overlays.CameraMapOverlay;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +16,7 @@ import java.util.Set;
  * This is overlay can draw borders around the pixels passed to it via constructor or the add methods.
  */
 public class PixelSetOverlay implements CameraMapOverlay, Serializable {
-    Set<CameraPixel> set = new HashSet<>();
+    public Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
     public PixelSetOverlay(HashSet<Integer> set) {
@@ -40,6 +42,14 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
         for (CameraPixel px : this.set){
             intSet[i] = px.id;
             i++;
+        }
+        return intSet;
+    }
+
+    public ArrayList<Integer> toArrayList(){
+        ArrayList<Integer> intSet = new ArrayList<Integer>();
+        for (CameraPixel px : this.set){
+            intSet.add(px.id);
         }
         return intSet;
     }

@@ -25,7 +25,7 @@
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
         <!--<fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />-->
 
-        <fact.datacorrection.InterpolateTimeline 
+        <fact.datacorrection.InterpolateTimeSeries 
             calibService="calibService"
             interpolateTimeLine="True"
             dataKey="DataCalibrated"

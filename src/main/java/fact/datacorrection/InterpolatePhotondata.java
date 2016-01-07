@@ -3,9 +3,9 @@ package fact.datacorrection;
 import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
+import fact.container.PixelSetOverlay;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTime;
@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
-import stream.ProcessContext;
 import stream.Processor;
 import stream.annotations.Parameter;
 

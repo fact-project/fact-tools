@@ -2,30 +2,49 @@ package fact.features.source;
 
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
+import fact.container.PixelSetOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+/**
+ * This function calculates the source line test (after an idea by W. Rhode).
+ */
 public class SourceLineTest implements Processor{
-	
+
+	@Parameter(required = true, defaultValue = "photonCharge", description = "Key of photoncharge array.")
+	private String photonCharge;
+	//consider the error of the arrival time later...
+	@Parameter(required = true, defaultValue = "arrivalTime", description = "Key of arrivaltime array.")
+	private String arrivalTime;
+	@Parameter(required = true, defaultValue = "showerPixel", description = "Key of showerpixel array.")
+	private String pixelSetKey;
+	@Parameter(required = true, defaultValue = "sourceposition", description = "Key of sourceposition vector.")
+	private String sourcePosition;
+	@Parameter(required = true, defaultValue = "SourceLineTest", description = "Master outputkey, which will be written before every attribute.")
+	private String outputKey;
+
+	private double[] arrivalTimeArray = null;
+	private double[] photonChargeArray = null;
+	private int[] showerPixelArray = null;
+	private double[] sourcePositionArray = null;
+
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-	/**
-	 * This function calculates the source line test (after an idea by W. Rhode).
-	 */
+
 	@Override
 	public Data process(Data input)
 	{
 //	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
 //	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
 		//Test for keys.
-		Utils.mapContainsKeys( input, photonCharge, arrivalTime, showerPixel, sourcePosition);
+		Utils.mapContainsKeys( input, photonCharge, arrivalTime, pixelSetKey, sourcePosition);
 		
 		photonChargeArray = (double[]) input.get(photonCharge);
 		arrivalTimeArray = (double[]) input.get(arrivalTime);
-	
-		
-		showerPixelArray = (int[]) input.get(showerPixel);
+
+		showerPixelArray = ((PixelSetOverlay) input.get(pixelSetKey)).toIntArray();
+
 		sourcePositionArray = (double[]) input.get(sourcePosition);		
 		
 		if (showerPixelArray.length < 4)
@@ -248,52 +267,34 @@ public class SourceLineTest implements Processor{
 	public String getPhotonCharge() {
 		return photonCharge;
 	}
-	@Parameter(required = true, defaultValue = "photonCharge", description = "Key of photoncharge array.")
+
 	public void setPhotonCharge(String photonCharge) {
 		this.photonCharge = photonCharge;
 	}
 	public String getArrivalTime() {
 		return arrivalTime;
 	}
-	@Parameter(required = true, defaultValue = "arrivalTime", description = "Key of arrivaltime array.")
+
 	public void setArrivalTime(String arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
-	public String getShowerPixel() {
-		return showerPixel;
+
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
-	@Parameter(required = true, defaultValue = "showerPixel", description = "Key of showerpixel array.")
-	public void setShowerPixel(String showerPixel) {
-		this.showerPixel = showerPixel;
-	}
+
 	public String getSourcePosition() {
 		return sourcePosition;
 	}
-	@Parameter(required = true, defaultValue = "sourceposition", description = "Key of sourceposition vector.")
+
 	public void setSourcePosition(String sourcePosition) {
 		this.sourcePosition = sourcePosition;
 	}
 	public String getOutputKey() {
 		return outputKey;
 	}
-	@Parameter(required = true, defaultValue = "SourceLineTest", description = "Master outputkey, which will be written before every attribute.")
+
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
-
-
-
-	private double[] arrivalTimeArray = null;
-	private double[] photonChargeArray = null;
-	private int[] showerPixelArray = null;
-	private double[] sourcePositionArray = null;
-	
-	private String photonCharge;
-	//consider the error of the arrival time later...
-	private String arrivalTime;
-	private String showerPixel;
-	private String sourcePosition;
-	private String outputKey;
-	
-	
 }

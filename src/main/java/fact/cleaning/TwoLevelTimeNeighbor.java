@@ -4,10 +4,10 @@ import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import fact.container.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,16 +156,13 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             }
         }
 
-        int[] showerPixelArray = new int[showerPixel.size()];
-        if(showerPixelArray.length > 0){
+        if(showerPixel.size() > 0){
 
             cleanedPixelSet = new PixelSetOverlay();
             for (int i = 0; i < showerPixel.size(); i++) {
                 cleanedPixelSet.addById(showerPixel.get(i));
-                showerPixelArray[i] =  showerPixel.get(i);
             }
-            input.put(outputKey, showerPixelArray);
-            input.put(outputKey+"Set", cleanedPixelSet);
+            input.put(outputKey, cleanedPixelSet);
         }
 
 		return input;

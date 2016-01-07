@@ -5,10 +5,10 @@ import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTime;
+import fact.container.PixelSetOverlay;
 import org.slf4j.Logger;
 
 import stream.Data;

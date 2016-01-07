@@ -1,6 +1,5 @@
 package fact.container;
 
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 

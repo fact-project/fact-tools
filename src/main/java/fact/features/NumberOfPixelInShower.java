@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.container.PixelSetOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -9,7 +10,7 @@ import stream.annotations.Parameter;
 public class NumberOfPixelInShower implements Processor {
 	static Logger log = LoggerFactory.getLogger(NumberOfPixelInShower.class);
     @Parameter(required = true)
-	private String showerKey;
+	private String pixelSetKey;
     @Parameter(required = true)
 	private String outputKey;
 	
@@ -18,10 +19,10 @@ public class NumberOfPixelInShower implements Processor {
 //		EventUtils.isKeyValid(input, showerKey, int[].class);
 		
 		int length = 0;
-		if (input.containsKey(showerKey))
+		if (input.containsKey(pixelSetKey))
 		{
-			int[] shower = (int[]) input.get(showerKey);
-			length = shower.length;
+			PixelSetOverlay shower = (PixelSetOverlay) input.get(pixelSetKey);
+			length = shower.set.size();
 		}
 	    input.put(outputKey, length);
 		return input;
@@ -35,13 +36,7 @@ public class NumberOfPixelInShower implements Processor {
 		this.outputKey = outputKey;
 	}
 
-
-	public String getShowerKey() {
-		return showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
-	}
-
-
 }

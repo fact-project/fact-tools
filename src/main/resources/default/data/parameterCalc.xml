@@ -1,7 +1,7 @@
 <module>
 <Skip condition="%{data.shower} == null" />
 <fact.features.NumberOfPixelInShower
-    showerKey="shower"
+    pixelSetKey="shower"
     outputKey="numPixelInShower"
 />
 <Skip condition="%{data.numPixelInShower} &lt; 5" />
@@ -45,19 +45,19 @@
     pixelSetKey="shower" 
 />
 <fact.features.Size 
-    showerKey="shower" 
+    pixelSetKey="shower" 
     photonChargeKey="photoncharge" 
     outputKey="Size" 
 />       
 <fact.features.DistributionFromShower
     weightsKey="photoncharge"
-    showerKey="shower"
+    pixelSetKey="shower"
     sizeKey="Size"
     outputKey="showerDistribution"
 />
 <fact.features.M3Long 
-    weightsKey="photoncharge" 
-    showerKey="shower" 
+    weightsKey="photoncharge"
+    pixelSetKey="shower" 
     distributionKey="showerDistribution" 
     m3lOutputKey="m3l"
     m3tOutputKey="m3t"
@@ -71,11 +71,11 @@
     outputKey="Width"
 />
 <fact.features.NumberOfIslands
-    showerKey="shower"
+    pixelSetKey="shower"
     outputKey="numIslands"
 />
 <fact.features.TimeGradient
-    showerKey="shower"
+    pixelSetKey="shower"
     arrivalTimeKey="arrivalTime"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -86,14 +86,14 @@
 />
 <fact.features.Concentration
     weights="photoncharge"
-    shower="shower"
+    pixelSetKey="shower"
     concOneOutputKey="Concentration_onePixel"
     concTwoOutputKey="Concentration_twoPixel"
 />
 <fact.features.ConcentrationCore
     cogxKey="COGx"
     cogyKey="COGy"
-    showerPixelKey="shower"
+    pixelSetKey="shower"
     photonChargeKey="photoncharge"
     sizeKey="Size"
     widthKey="Width"
@@ -110,7 +110,7 @@
 />
 <fact.features.Leakage
     distribution="showerDistribution"
-    shower="shower"
+    pixelSetKey="shower"
     weights="photoncharge"
     leakage1OutputKey="Leakage"
     leakage2OutputKey="Leakage2"
@@ -118,13 +118,13 @@
 <fact.features.TimeSpread
     weightsKey="photoncharge"
     arrivalTimeKey="arrivalTime"
-    showerKey="shower"
+    pixelSetKey="shower"
     outputKey="Timespread"
 />
 <fact.features.ShowerSlope
     photonChargeKey="photoncharge"
     arrivalTimeKey="arrivalTime"
-    showerKey="shower"
+    pixelSetKey="shower"
     cogxKey="COGx"
     cogyKey="COGy"
     deltaKey="Delta"
