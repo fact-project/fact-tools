@@ -19,7 +19,7 @@
         windowSize="30" 
     />
 
-    <fact.features.NumberOfPixelInShower
+    <fact.pixelsets.Length
             pixelSetKey="pedestal"
             outputKey="numPixelInPedestal"
     />
