@@ -1,6 +1,5 @@
 package fact.container;
 
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 
@@ -20,11 +19,13 @@ public class JumpInfos implements Serializable {
 	
     public double[] fftResults;
 	
-    public IntervalMarker[] posMarker;
+    public IntervalMarker[] posMarkerUp;
+    public IntervalMarker[] posMarkerDown;
 
 	public JumpInfos(int numberOfPixel, int numberOfPatches, int roi) {
 		averJumpHeights = new double[numberOfPatches];
-		posMarker = new IntervalMarker[numberOfPixel];
+		posMarkerUp = new IntervalMarker[numberOfPixel];
+		posMarkerDown = new IntervalMarker[numberOfPixel];
 		fftResults = new double[numberOfPixel*roi];
 		
 		pixelWithSpikes = new PixelSetOverlay();
@@ -75,14 +76,22 @@ public class JumpInfos implements Serializable {
 		input.put(name+prevEvent+"Ringing", pixelWithRinging);
 		input.put(name+prevEvent+"JumpsSet", pixelWithCorrectedJumps);
 		input.put(name+prevEvent+"TimeSet", pixelWithWrongTimeDepend);
-		input.put(name+prevEvent+"Marker", posMarker);
+		input.put(name+prevEvent+"MarkerUp", posMarkerUp);
+		input.put(name+prevEvent+"MarkerDown", posMarkerDown);
 		input.put(name+prevEvent+"fftResults", fftResults);
 	}
 
-	public void addPosMarkerForPatch(int patch, short pos) {
+	public void addPosMarkerForPatch(int patch, short pos, boolean isStartCell) {
 		for (int px = 0 ; px < 9 ; px++)
 		{
-			posMarker[patch*9+px] = new IntervalMarker(pos, pos+1);
+			if (isStartCell == true)
+			{
+				posMarkerUp[patch*9+px] = new IntervalMarker(pos, pos+1);				
+			}
+			else
+			{
+				posMarkerDown[patch*9+px] = new IntervalMarker(pos, pos+1);				
+			}
 		}
 	}
     

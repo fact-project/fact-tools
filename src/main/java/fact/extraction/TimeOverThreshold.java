@@ -4,7 +4,7 @@
 package fact.extraction;
 
 import fact.Utils;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSetOverlay;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

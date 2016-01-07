@@ -58,4 +58,11 @@
     outputKey="arrivalTime"
     url="${pixelDelayFile}"
 />
+<fact.datacorrection.InterpolatePhotondata
+    calibService="calibService"
+    photonChargeKey="photoncharge"
+    photonChargeOutputKey="photoncharge"
+    arrivalTimeKey="arrivalTime"
+    arrivalTimeOutputKey="arrivalTime"
+/>
 </module>
