@@ -2,7 +2,11 @@
 
 ## Version 0.10.0
 
-These version introduce the new calibrationService. It can be used by other processors to access informations about the calibration values for the current event. At the moment it only offers the information which pixels are bad and which pixels can't be used for the cleaning process.
+This versions contains the calibrationService branch and the PixelSetOverlay branch.
+
+### calibrationService
+
+The new calibrationService can be used by other processors to access informations about the calibration values for the current event. At the moment it only offers the information which pixels are bad and which pixels can't be used for the cleaning process.
 
 The calibrationService is now used in the Interpolation processors and there are some improvements (and bug fixing) done:
 - The InterpolateBadPixel processor is renamed to InterpolateTimeLine
@@ -20,11 +24,26 @@ How to adapt the xml files:
  - maybe you want to add the new InterpolatePhotondata, see src/main/resources/default/data/extraction.xml for an example
 - If you are using cleaning processors (TwoLevelTimeNeighbor, TwoLevelTimeMedian) you have to add the calibService to parameters of the processor, see src/main/resources/default/data/cleaning.xml for an example
 
-Bugfix in PatchJumpRemoval:
+### Bugfix in PatchJumpRemoval:
 - fixed a bug, which caused the jump removal to remove only jumps up.
 
+### pixelset package
+The new pixel set package allows to perform set operations (union, intersection, difference,...) on sets of pixels. These processors allow to take the set of pixels after cleaning and e.g. calculate the set of non shower pixel without broken pixels.
+There is now also a pixelsets.Length processor, calculating the length of a pixelsets and replacing the NumberOfPixelInShower processor
+
+### PixelSetOverlay instead of int array 
+All processors that work on a set of pixels or have a pixel set as result where changed such that:
+- Instead of an int array a PixelSetOverlay is stored in the data item
+- The so far used int array with cleaned pixels was removed.
+- In all processors the key for a set of pixels was renamed from pixelSampleKey, shower, showerKey to pixelSetKey for consistency reasons
+- pixelSetOverlay was moved from hexmap.ui.overlays to containers
+
+### WaveformFluctuations with pixel set option
+The WaveformFluctuationsPixelSample processor is changed that way that it is possible to hand over a pixels set on which the calculations shall be performed.
+
 Miscellaneous changes:
-- The impact parameter is now added to the outputfile in the standard mc analysis
+- The impact parameter is now added to the outputfile in the standard mc analysis    
+
 
 ## Version 0.9.7
 
