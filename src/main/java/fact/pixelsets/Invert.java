@@ -35,7 +35,7 @@ public class Invert implements Processor{
         Utils.isKeyValid(input, insetKey, PixelSetOverlay.class);
         PixelSetOverlay inset = (PixelSetOverlay) input.get(insetKey);
 
-        int npix = (int) input.get("NPIX");
+        int npix = (Integer) input.get("NPIX");
 
         PixelSetOverlay wholeCamSet = createFullCameraSet(npix);
 
