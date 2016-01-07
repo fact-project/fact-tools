@@ -68,6 +68,7 @@ public class FunctionalTest {
         }
     }
 
+
     @Test
     public void studiesXMLs() {
         File folder = new File("examples/studies");
