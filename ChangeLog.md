@@ -20,6 +20,9 @@ How to adapt the xml files:
  - maybe you want to add the new InterpolatePhotondata, see src/main/resources/default/data/extraction.xml for an example
 - If you are using cleaning processors (TwoLevelTimeNeighbor, TwoLevelTimeMedian) you have to add the calibService to parameters of the processor, see src/main/resources/default/data/cleaning.xml for an example
 
+Bugfix in PatchJumpRemoval:
+- fixed a bug, which caused the jump removal to remove only jumps up.
+
 Miscellaneous changes:
 - The impact parameter is now added to the outputfile in the standard mc analysis
 
