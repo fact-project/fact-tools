@@ -1,6 +1,6 @@
 <module>
 <Skip condition="%{data.shower} == null" />
-<fact.features.NumberOfPixelInShower
+<fact.pixelsets.Length
     pixelSetKey="shower"
     outputKey="numPixelInShower"
 />

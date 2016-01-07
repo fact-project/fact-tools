@@ -33,7 +33,7 @@
         
 
             <Skip condition="%{data.cleanPixel}==null"/>
-			<fact.features.NumberOfPixelInShower pixelSetKey="cleanPixel" outputKey="numPixelInCleanPixel" />
+			<fact.pixelsets.Length pixelSetKey="cleanPixel" outputKey="numPixelInCleanPixel" />
 			<Skip condition="%{data.numPixelInCleanPixel} &lt; 15" />
 			
 			<fact.features.Leakage pixelSetKey="cleanPixel" weights="photoncharge" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" />
