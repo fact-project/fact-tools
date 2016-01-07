@@ -48,7 +48,7 @@ public class DividePixelArrays implements Processor {
 			if (denominator[pix] != 0){
 				dividedArray[pix] = numerator[pix] / denominator[pix];
 			} else {
-				dividedArray[pix] = 0; //TODO this is a very dirty HACK, for the sake of the viewer we should change it!
+				dividedArray[pix] = Double.NaN; //TODO this the viewer cannot handle, we should change it!
 			}
 		}
 		
