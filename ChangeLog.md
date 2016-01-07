@@ -4,7 +4,18 @@
 
 ### Changes
 
-The FileListMultiStream was rewritten. It wants a different kind of json file now. The .json files can be created from the rundb by using ERNA https://github.com/mackaiver/erna
+The FileListMultiStream was rewritten. It wants a different kind of json file now. The .json files can be created from the runDB by using ERNA https://github.com/mackaiver/erna
+It also tries to skip files that throw an IOexception.
+The new syntax for the .json files is
+
+      [
+      {
+       "drs_path":"\/fact\/raw\/2014\/10\/02\/20141002_193.drs.fits.gz",
+       "data_path":"\/fact\/raw\/2014\/10\/02\/20141002_185.fits.fz",
+       ...
+       },
+       {...}
+       ]
 
 ### New Features
   Convenient stuff for simpler processing of data was added
