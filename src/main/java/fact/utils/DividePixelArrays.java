@@ -60,36 +60,14 @@ public class DividePixelArrays implements Processor {
 	}
 
 
-
-
-	public String getNumeratorKey() {
-		return numeratorKey;
-	}
-
-
-
 	public void setNumeratorKey(String numeratorKey) {
 		this.numeratorKey = numeratorKey;
 	}
 
 
-
-	public String getDenominatorKey() {
-		return denominatorKey;
-	}
-
-
-
 	public void setDenominatorKey(String denominatorKey) {
 		this.denominatorKey = denominatorKey;
 	}
-
-
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
 
 
 	public void setOutputKey(String outputKey) {
