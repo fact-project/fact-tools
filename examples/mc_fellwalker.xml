@@ -23,9 +23,15 @@
 
 
         <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-                suffix="_Events.fits.gz" copies="${num_copies}" url="${infolder}">
+                pattern="**/*_Events.fits.gz"  url="${infolder}">
             <stream class="fact.io.FitsStream" id="_" />
         </stream>
+
+
+<!--    <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream"
+            pattern="**/proton_klaus_12/*_Events.fits.gz"  url="${infolder}">
+        <stream class="fact.io.FitsStream" id="_" />
+    </stream>-->
 
 
     <queue id="result" />
@@ -39,7 +45,7 @@
 
     <!-- Description of the process and the corresponding stream -->
 <!--    <process id="2" input="fact">-->
-    <process id="2" input="fact:${copy.id}" copies="${num_copies}">
+    <process id="2" input="fact">
 
     <!--<stream.flow.Skip condition="%{data.EventNum} != 40" />-->
         <!-- <stream.flow.Skip condition="%{data.MCorsikaEvtHeader.fTotalEnergy} &gt; 400" /> -->
@@ -95,7 +101,7 @@
 
 
 
-       <!-- <fact.ShowViewer key="DataCalibrated"/>-->
+        <!--<fact.ShowViewer key="DataC alibrated"/>-->
         <Enqueue queue="result"/>
 
         <!--<fact.io.JSONWriter keys="EventNum,NumClusterPixel,NumCluster,Waste,SizeX,SizeY,SizeAbs,MaximaID,DistanceMaxima,BrightnessMaxima,ClusterArrivaltimeMaxima,ClusterArrivaltimeMean,ClusterBrightnessSum,ClusterBrightnessMean" url="${outfolder}proton_${copy.id}.json" />-->
@@ -103,7 +109,8 @@
     </process>
 
     <process input="result" id="egal" >
-        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumCluster,NumClusterPixel,StdNumPixel,MaxClusterNumPixel,ChargeMax,BoundRatio,IdealBoundDiff,BoundAngleSum,DistanceCenterSum,NeighborCluster" url="${outfolder}/${filename}.json" />
+        <!--<fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumCluster,NumClusterPixel,StdNumPixel,MaxClusterNumPixel,ChargeMax,BoundRatio,IdealBoundDiff,BoundAngleSum,DistanceCenterSum,NeighborCluster" url="${outfolder}/${filename}.json" />-->
+        <fact.ShowViewer key="DataCalibrated"/>
     </process>
 
 </container>
