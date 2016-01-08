@@ -16,8 +16,8 @@ public class FactCluster {
     private ArrayList<Double> contentPixelPhotoncharge = new ArrayList<>();
     private ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
     ArrayList<Integer> cleaningPixel = new ArrayList<>();           //contains all pixel in the cluster which are already in the shower-array (after cleaning)
-    ArrayList<Integer> neighborClusterID = new ArrayList<>();
-    ArrayList<Integer> airpixelNeighborCluster = new ArrayList<>();
+    ArrayList<Integer> compactClusterID = new ArrayList<>();        //contains the ids from all clusters in the event which belongs to the same compact group of clusters, means that there are no air pixel on the line between this cluster an the clusters in this list
+    ArrayList<Integer> airpixelCluster = new ArrayList<>();         //contains number of air pixel on the line from this cluster to every other cluster. If clusters are direct or indirect neighbors, the number of air pixels is 0. List should have (number of clusters - 1) entries.
     ArrayList<Integer> naiveNeighborClusterID = new ArrayList<>();
 
     private boolean containsShowerPixel;
@@ -333,11 +333,11 @@ public class FactCluster {
 
  public int boundAngleSum(){
      ArrayList<FactCameraPixel> sortedBound = findSortedBoundary();
-     int cuDir = calcDirection(cubeCoordinates(sortedBound.get(0).id), cubeCoordinates(sortedBound.get(1).id));
+     int cuDir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(0).id), mapping.getCubeCoordinatesFromId(sortedBound.get(1).id));
      int countChangeDir = 0;
 
      for(int i=1; i<sortedBound.size()-1; i++){
-         int dir = calcDirection(cubeCoordinates(sortedBound.get(i).id), cubeCoordinates(sortedBound.get(i+1).id));
+         int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(i).id), mapping.getCubeCoordinatesFromId(sortedBound.get(i+1).id));
          if(cuDir != dir){
              countChangeDir++;
              cuDir = dir;
@@ -345,7 +345,7 @@ public class FactCluster {
 
      }
 
-     int dir = calcDirection(cubeCoordinates(sortedBound.get(sortedBound.size()-1).id), cubeCoordinates(sortedBound.get(0).id));
+     int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(sortedBound.size()-1).id), mapping.getCubeCoordinatesFromId(sortedBound.get(0).id));
      if(cuDir != dir){
          countChangeDir++;
      }
@@ -374,7 +374,7 @@ public class FactCluster {
 
 
 
-    private int [] cubeCoordinates(int id){
+/*    private int [] cubeCoordinates(int id){
         int [] cube = new int[3];
         int col = mapping.getPixelFromId(id).geometricX;
         int row = mapping.getPixelFromId(id).geometricY;
@@ -387,23 +387,24 @@ public class FactCluster {
         cube[1] = y;
         cube[2] = z;
         return cube;
-    }
+    }*/
 
-    public void addNeighborCluster(int id){
-        neighborClusterID.add(id);
+    public void addCompactCluster(int id){
+        compactClusterID.add(id);
     }
 
     public int getNumNeighbors(){
         return naiveNeighborClusterID.size();
     }
+    public int getCompactClusters() {return compactClusterID.size();}
 
-    public void addNeighborDistance(int numAirPixel){
-        airpixelNeighborCluster.add(numAirPixel);
+    public void addAirDistance(int numAirPixel){
+        airpixelCluster.add(numAirPixel);
     }
 
     public int getNumAirpixel(){
         int sum = 0;
-        for(int i : airpixelNeighborCluster){
+        for(int i : airpixelCluster){
             sum += i;
         }
         return sum;

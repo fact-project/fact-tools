@@ -211,10 +211,20 @@ public class FactPixelMapping implements PixelMapping {
         int col = getPixelFromId(id).geometricX;
         int row = getPixelFromId(id).geometricY;
 
-        int x = col;
-        int z = row - (col - (col%2)) / 2;
-        int y = -x -z;
+        int x,y,z;
 
+        if(col > 0){    //warum col und nicht row?????????  drehung camera?
+       //odd -q
+            x = col;
+            z = row - (col - (col%2)) / 2;
+            y = -x -z;
+        }
+        else {
+        //even-q
+            x = col;
+            z = row - (col + (col%2)) / 2;
+            y = -x-z;
+        }
         cube[0] = x;
         cube[1] = y;
         cube[2] = z;
@@ -228,6 +238,75 @@ public class FactPixelMapping implements PixelMapping {
 
         return getPixelFromOffsetCoordinates(col, row);
     }
+
+
+    /**
+     * Find lines between two pixels on the hexagonal grid. Line here means the 'path' with the minimal number of pixels between these two pixels.
+     * The length of the line is calculated as hexagonal distance.
+     * Returns an ArrayList containing the IDs of the line-pixel (including end-pixels id1 and id2).
+     * @param id1
+     * @param id2
+     * @return ArrayList<Integer>
+     */
+    public ArrayList<Integer> line(int id1, int id2){
+
+        ArrayList<Integer> line = new ArrayList<>();
+
+        int[] cube1 = getCubeCoordinatesFromId(id1);
+        int[] cube2 = getCubeCoordinatesFromId(id2);
+
+        int hexDistance = (Math.abs(cube2[0] - cube1[0]) + Math.abs(cube2[1] - cube1[1]) + Math.abs(cube2[2] - cube1[2])) / 2;
+
+        double N = (double) hexDistance;
+
+        for (int i = 0; i <= hexDistance; i++) {
+            double[] point = linePoint(cube1, cube2, 1.0 / N * i);
+            int[] pixel = cube_round(point);
+            FactCameraPixel linePixel = getPixelFromCubeCoordinates(pixel[0], pixel[2]);
+            if(linePixel != null){
+                line.add(linePixel.id);
+            }
+
+        }
+
+        return line;
+    }
+
+    private double[] linePoint(int[] cube1, int [] cube2, double t){
+        double [] linePoint = new double[3];
+        linePoint[0] = (double) cube1[0] + ((double) cube2[0] - (double)cube1[0])*t;
+        linePoint[1] = (double) cube1[1] + ((double) cube2[1] - (double)cube1[1])*t;
+        linePoint[2] = (double) cube1[2] + ((double) cube2[2] - (double)cube1[2])*t;
+
+        return linePoint;
+    }
+
+    private int[] cube_round(double [] linePoint) {
+        int rx = (int) Math.round(linePoint[0]);
+        int ry = (int) Math.round(linePoint[1]);
+        int rz = (int) Math.round(linePoint[2]);
+
+        double x_diff = Math.abs(rx - linePoint[0]);
+        double y_diff = Math.abs(ry - linePoint[1]);
+        double z_diff = Math.abs(rz - linePoint[2]);
+
+        if (x_diff > y_diff && x_diff > z_diff) {
+            rx = -ry - rz;
+        } else if (y_diff > z_diff) {
+            ry = -rx - rz;
+        } else {
+            rz = -rx - ry;
+        }
+
+        int[] linePixel = new int[3];
+        linePixel[0] = rx;
+        linePixel[1] = ry;
+        linePixel[2] = rz;
+
+        return linePixel;
+    }
+
+
 
     /**
      * Takes a data item containing a row from the mapping file.

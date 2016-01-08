@@ -161,11 +161,8 @@ public class ClusterFellwalker implements Processor {
             double distanceCenterSum = distanceCenter(showerCluster);
 
             //int [] viewer = showerClusterID.clone();
+            int convexity = searchForCompactGroups(showerCluster, showerClusterID);
 
-            //airPixelMap(showerCluster, showerClusterID, viewer);
-
-
-            //double airpixel = airpixelMean(showerCluster);
 
             //System.out.println(numNeighborCluster + "   " + airpixel);
 
@@ -186,27 +183,40 @@ public class ClusterFellwalker implements Processor {
             double stdNumpixel = stdNumPixel(showerCluster);
 
 
-            data.put("BoundLength", lengthBoundaries);
-            data.put("BoundRatio", ratio);
-            data.put("IdealBoundDiff", idealBoundDiff);
-            data.put("BoundAngleSum", boundAngleSum);
-            data.put("DistanceCenterSum", distanceCenterSum);
-            data.put("NeighborCluster", numNeighborCluster);
-            //data.put("IsolatedCluster", numIsolatedCluster);
-            data.put("ChargeMax", chargeMaxClusterRatio);
-            data.put("MaxClusterNumPixel", numPixelMaxCluster);
-            data.put("NumClusterPixel", numClusterPixel);
-            //data.put("StdArrivaltimeMaxima", stdArrTimeMaxima);
-            data.put("StdNumPixel", stdNumpixel);
+/*            data.put("boundLength", lengthBoundaries);
+            data.put("boundRatio", ratio);
+            data.put("idealBoundDiff", idealBoundDiff);*/
+            data.put("boundAngleSum", boundAngleSum);
+/*            data.put("distanceCenterSum", distanceCenterSum);
+            data.put("neighborCluster", numNeighborCluster);
+            data.put("chargeMax", chargeMaxClusterRatio);
+            data.put("maxClusterNumPixel", numPixelMaxCluster);
+            data.put("numClusterPixel", numClusterPixel);
+            data.put("stdNumPixel", stdNumpixel);*/
 
-            //data.put("Airpixel", airpixel);
+            data.put("convexity", convexity);
+
+        }
+        else{
+/*            data.put("boundLength", null);
+            data.put("boundRatio", null);
+            data.put("idealBoundDiff", null);*/
+            data.put("boundAngleSum", null);
+/*            data.put("distanceCenterSum", null);
+            data.put("neighborCluster", null);
+            data.put("chargeMax", null);
+            data.put("maxClusterNumPixel", null);
+            data.put("numClusterPixel", null);*/
+            data.put("convexity", null);
+
 
         }
 
         data.put("AllClusterID", clusterID);
         data.put("ShowerClusterID", showerClusterID);
         data.put("ClusterNoCleaning", cluster);
-        data.put("NumCluster", numCluster);
+        data.put("numCluster", numCluster);
+
 
         return data;
 
@@ -386,31 +396,39 @@ public class ClusterFellwalker implements Processor {
 
 
 
-    //Returns an 2 dimensional array containing the "air-pixel" between two clusters. "Air-pixel" are the pixel on the line
-    //between two cluster cog's that don't belong to a shower-cluster. From the number of air-pixel one can conclude
-    //whether the clusters are neighbors, and, if not, how large the distance is between them.
-    //At the moment two clusters are marked as neighbors if there are no air-pixels between them.
-    public void airPixelMap(FactCluster [] showerCluster, int [] showerClusterID, int[] viewer){
+    /** Method to search for all neighbor clusters of all clusters in the camera image. Two clusters are neighbors if there are no air pixels on the line between their cog's.
+    * "Air pixels" are the pixel on this line that don't belong to any shower-cluster. From the number of air-pixel one can conclude
+    * whether the clusters are neighbors, and, if not, how large the distance is between them.
+    * At the moment two clusters are marked as neighbors if there are no air-pixels between them.
+     * Keep in mind that currently clusters are marked as neighbors even if they are "indirect neighbors" (means they have a third cluster between them). In this case there are also no air pixel on the line
+     * between their cog's, because all pixel on this line belongs to a cluster.
+     * But maybe this is an opportunitt to define another parameter for the whole image, something like "convexity". If there are no air pixel in the image at all, the group of clusters could be defined as convex.
+     * This makes sense probably only for images with more than two clusters.
+     * Returns the sum over all found air pixels as a parameter for convexity.
+     *
+     * Maybe it's not necessary to fill the distances between the clusters in lists... the resulting 'number of neighbors' from this method isn't really a number of neighbors (as found in findNeighbors);
+     * it's more like an estimation for the compactness of the clusters (how many clusters build a compact/connected group in the image). Therefore 'neighborDistance' and 'neighborClusters' could be misleading...
+    */
+    public int searchForCompactGroups(FactCluster [] showerCluster, int [] showerClusterID){
         //int[][] map = new int [showerCluster.length][showerCluster.length];
             //int [] viewer = showerClusterID.clone();
+        int sumAirpixel = 0;
             for(int i=0; i<showerCluster.length; i++){
                 for(int j=i+1; j<showerCluster.length; j++){
-                    int airPixel = countAirPixel(gapPixel(showerCluster[i].cogId(), showerCluster[j].cogId(), viewer), showerClusterID);
-                    showerCluster[i].addNeighborDistance(airPixel);
-                    showerCluster[j].addNeighborDistance(airPixel);
+                    int airPixel = countAirPixel(mapping.line(showerCluster[i].cogId(), showerCluster[j].cogId()), showerClusterID);
+                    showerCluster[i].addAirDistance(airPixel);
+                    showerCluster[j].addAirDistance(airPixel);
                     if(airPixel == 0){
-                        showerCluster[i].addNeighborCluster(showerCluster[j].getClusterID());
-                        showerCluster[j].addNeighborCluster(showerCluster[i].getClusterID());
+                        showerCluster[i].addCompactCluster(showerCluster[j].getClusterID());
+                        showerCluster[j].addCompactCluster(showerCluster[i].getClusterID());
                     }
-                    //else{System.out.println("airpixel: " + airPixel);}
+                    else{sumAirpixel += airPixel;}
 
                 }
             }
+
+        return sumAirpixel;
     }
-
-
-
-
 
 
     public int countAirPixel(ArrayList<Integer> gapPixel, int[] showerClusterID){
@@ -422,71 +440,6 @@ public class ClusterFellwalker implements Processor {
 
         }
         return countAirPixel;
-    }
-
-    // Returns an ArrayList containing the pixel-ids which build a line between two pixels. Needs the ids of the two pixel that should be connected.
-    private ArrayList<Integer> gapPixel(int id1, int id2, int [] viewerArray){
-        ArrayList<Integer> line = new ArrayList<>();
-
-        int [] cube1 = mapping.getCubeCoordinatesFromId(id1);
-        int [] cube2 = mapping.getCubeCoordinatesFromId(id2);
-
-        int hexDistance = (Math.abs(cube2[0] - cube1[0]) + Math.abs(cube2[1] - cube1[1]) + Math.abs(cube2[2] - cube1[2]))/2;
-
-        //System.out.println(hexDistance);
-        double N = (double) hexDistance;
-
-        for(int i=1; i<=hexDistance; i++){
-            double [] point = linePoint(cube1, cube2, 1.0/N * i);
-            long [] pixel = cube_round(point);
-            FactCameraPixel linePixel = mapping.getPixelFromCubeCoordinates(pixel[0], pixel[2]);
-            if (linePixel != null) {
-                viewerArray[linePixel.id] = 0; // <--------------- show lines irgendwo anders!
-                line.add(linePixel.id);
-            }
-        }
-
-        return line;
-    }
-
-
-
-    //Returns the (double) cube coordinates for a point on the line between two pixels
-    private double[] linePoint(int[] cube1, int [] cube2, double t){
-        double [] linePoint = new double[3];
-        linePoint[0] = cube1[0] + (cube2[0] - cube1[0])*t;
-        linePoint[1] = cube1[1] + (cube2[1] - cube1[1])*t;
-        linePoint[2] = cube1[2] + (cube2[2] - cube1[2])*t;
-
-        return linePoint;
-    }
-
-    //Returns the (int) cube coordinates of the pixel which contains the (double) coordinates of some point in the coordinate system
-    private long[] cube_round(double [] linePoint){
-        long rx =  Math.round(linePoint[0]);
-        long ry =  Math.round(linePoint[1]);
-        long rz =  Math.round(linePoint[2]);
-
-        double x_diff = Math.abs(rx - linePoint[0]);
-        double y_diff = Math.abs(ry - linePoint[1]);
-        double z_diff = Math.abs(rz - linePoint[2]);
-
-        if(x_diff > y_diff && x_diff > z_diff){
-            rx = -ry - rz;
-        }
-        else if(y_diff > z_diff){
-            ry = -rx - rz;
-        }
-        else {
-            rz = -rx - ry;
-        }
-
-        long [] linePixel = new long [3];
-        linePixel[0] = rx;
-        linePixel[1] = ry;
-        linePixel[2] = rz;
-
-        return linePixel;
     }
 
     public double neighborClusterMean(FactCluster [] showerCluster){
@@ -501,12 +454,12 @@ public class ClusterFellwalker implements Processor {
     }
 
 
-    /* 1) Find the air-pixel for one cluster. Air-pixel are the pixels on a line between two clusters which don't belong to any cluster.
-          (The more air-pixels between two clusters, the larger the distance between them.) Build the air-pixel-mean over all lines starting from this cluster. -> 'numAirpixel'
+    /* 1) Find the air pixels for one cluster. Air-pixel are the pixels on a line between two clusters which don't belong to any cluster.
+          (The more airspixels between two clusters, the larger the distance between them.) Build the air-pixel-mean over all lines starting from this cluster. -> 'numAirpixel'
        2) Sum over all 'numAirpixel' (of every cluster) -> sum
           (the result should be a value for the spread/distribution of the clusters in the camera image)
       */
-    public double airpixelMean(FactCluster [] showerCluster) {
+/*    public double airpixelMean(FactCluster [] showerCluster) {
         double sum = 0;
         if (showerCluster.length == 1) {
             return 0;
@@ -516,7 +469,7 @@ public class ClusterFellwalker implements Processor {
             }
             return sum/showerCluster.length;
         }
-    }
+    }*/
 
     public void findNeighbors(FactCluster [] showerSet, int[] showerClusterID){                  //------------------------------- Neighbors testen waere sinnvoll
         //int[] numNeighbors = new int [showerSet.length];
