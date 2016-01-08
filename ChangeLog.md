@@ -65,7 +65,8 @@ All processors that work on a set of pixels or have a pixel set as result where 
 ### WaveformFluctuations with Pixel Set Option
 The WaveformFluctuationsPixelSample processor is changed that way that it is possible to hand over a pixels set on which the calculations shall be performed.
 
-Miscellaneous changes:
+### Miscellaneous changes:
+
 - The impact parameter is now added to the outputfile in the standard mc analysis    
 
 
