@@ -28,7 +28,7 @@ The new syntax for the .json files is
 
 This versions contains the calibrationService branch and the PixelSetOverlay branch.
 
-### calibrationService
+### Calibration Service
 
 The new calibrationService can be used by other processors to access informations about the calibration values for the current event. At the moment it only offers the information which pixels are bad and which pixels can't be used for the cleaning process.
 
@@ -51,7 +51,7 @@ How to adapt the xml files:
 ### Bugfix in PatchJumpRemoval:
 - fixed a bug, which caused the jump removal to remove only jumps up.
 
-### pixelset package
+### Pixel Set Package
 The new pixel set package allows to perform set operations (union, intersection, difference,...) on sets of pixels. These processors allow to take the set of pixels after cleaning and e.g. calculate the set of non shower pixel without broken pixels.
 There is now also a pixelsets.Length processor, calculating the length of a pixelsets and replacing the NumberOfPixelInShower processor
 
@@ -62,7 +62,7 @@ All processors that work on a set of pixels or have a pixel set as result where 
 - In all processors the key for a set of pixels was renamed from pixelSampleKey, shower, showerKey to pixelSetKey for consistency reasons
 - pixelSetOverlay was moved from hexmap.ui.overlays to containers
 
-### WaveformFluctuations with pixel set option
+### WaveformFluctuations with Pixel Set Option
 The WaveformFluctuationsPixelSample processor is changed that way that it is possible to hand over a pixels set on which the calculations shall be performed.
 
 Miscellaneous changes:
