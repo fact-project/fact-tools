@@ -14,8 +14,8 @@ import stream.annotations.Parameter;
 import java.io.Serializable;
 
 
-/*
- *
+/**
+ * Convert an int array of chids into a PixelSet
  *
  */
 public class FromChidArray implements Processor{

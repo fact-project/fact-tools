@@ -15,9 +15,9 @@ import java.util.Set;
 
 
 /**
- * This processor gets two pixel sets (U and A) and returns the difference of these sets,
- * denoted U \ A, is the set of all members of U that are not members of A
- * Created by jebuss on 17.12.15.
+ * This processor creates an int array with the chids 
+ * from the pixelSet.
+ * created by maxnoe
  */
 public class ToChidArray implements Processor{
     static Logger log = LoggerFactory.getLogger(ToChidArray.class);
