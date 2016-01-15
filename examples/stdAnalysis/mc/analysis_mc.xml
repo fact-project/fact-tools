@@ -9,6 +9,8 @@
     
     <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
 
     <process id="2" input="fact">

@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * This tests creates a dummy file tree in a temporyry folder. It will then run against a number of glob patterns
+ * This tests creates a dummy file tree in a temporary folder. It will then run against a number of glob patterns
  * Created by kai on 16.12.15.
  */
 public class RecursiveDirectoryStreamTest {
@@ -32,6 +32,19 @@ public class RecursiveDirectoryStreamTest {
         folder.newFile("aux/2014/09/20150812.DRIVE_CONTROL_SOURCE_POSITION.fits");
         folder.newFile("aux/2014/09/20150812.DRIVE_CONTROL_POINTING_POSITION.fits");
         folder.newFile("aux/2014/09/20150812.DRIVE_CONTROL_TRACKING_POSITION.fits");
+    }
+
+    @Test
+    public void testSearchPath() throws Exception {
+        SourceURL sourceUrl = new SourceURL("file:src/main/resources");
+
+        RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
+
+        String pattern = "test*.fits.*";
+        r.setPattern(pattern);
+        r.init();
+
+        log.info("Found files: {}", r.files);
     }
 
     @Test
@@ -89,6 +102,7 @@ public class RecursiveDirectoryStreamTest {
         SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
+        //no files in this directory
         String pattern = "/*DRIVE_CONTROL_SOURCE_POSITION.fits";
         r.setPattern(pattern);
         r.init();
@@ -104,7 +118,7 @@ public class RecursiveDirectoryStreamTest {
         SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
-        String pattern = "/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
+        String pattern = "/**/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
         r.setPattern(pattern);
         r.init();
 

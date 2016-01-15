@@ -17,7 +17,7 @@ public interface AuxiliaryService extends Service {
     /**
      * An AuxiliaryService needs to implement just one method.
      * Providing the timestamp of the event, the name of the service
-     * and some strategy this method should return an AuxPoint.
+     * and some strategy, this method should return an AuxPoint.
      *
      * @param serviceName
      * @param eventTimeStamp

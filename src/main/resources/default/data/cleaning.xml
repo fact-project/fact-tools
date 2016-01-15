@@ -7,6 +7,7 @@
 />
 
 <fact.cleaning.TwoLevelTimeNeighbor
+    calibService="calibService"
     photonChargeKey="photoncharge"
     outputKey="shower"
     arrivalTimeKey="arrivalTime"

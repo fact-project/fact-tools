@@ -12,6 +12,8 @@
 
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 <!-- Open Shutter Data: -->
 <!-- <property name="data" value="/local/data/kgray/test/20130104_095.fits.gz" />  -->
 <!-- <property name="dataDRS" value="/local/data/kgray/test/20130104_076.drs.fits.gz" /> -->
@@ -26,7 +28,12 @@
         <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data"  outputKey="DataCalibrated" color="#000000"/>
         <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" color="#E6172F" outputJumpsKey="j" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" outputSpikesKey="Sp" color="#000000" />
-        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+        <fact.datacorrection.InterpolateTimeSeries 
+            calibService="calibService"
+            interpolateTimeLine="True"
+            dataKey="DataCalibrated"
+            dataOutputKey="DataCalibrated"
+        />
        
         <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmoothedold" length="5"/>
         <fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataSmoothed" variance="1"/>

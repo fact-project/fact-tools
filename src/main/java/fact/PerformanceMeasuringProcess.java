@@ -46,6 +46,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 	private int warmupIterations = 0;
 
 	long iterations = 0;
+	long dataItems = 0;
 
 	private HashMap<Processor, DescriptiveStatistics> timeMap = new HashMap<>();
 
@@ -66,7 +67,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 	public Data process(Data data) {
 
 		log.trace("{}: processing data {}", this, data);
-
+        dataItems++;
 		Stopwatch stopwatch = Stopwatch.createUnstarted();
 		for (Processor proc : processors) {
 			stopwatch.start();
@@ -81,7 +82,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 		}
 		iterations++;
 		if ((iterations - warmupIterations) % 10 == 0) {
-			log.info("Measured {} iterations", (iterations - warmupIterations));
+			log.info("Measured {} complete iterations for {} data items", (iterations - warmupIterations), dataItems);
 		}
 		return data;
 	}

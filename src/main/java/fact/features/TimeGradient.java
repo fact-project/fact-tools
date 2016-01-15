@@ -1,7 +1,9 @@
 package fact.features;
 
 import fact.Utils;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
+import fact.container.PixelSet;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
@@ -24,7 +26,7 @@ public class TimeGradient implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeGradient.class);
 	
 	@Parameter(required=true, description="key to the shower pixels")
-	private String showerKey = null;
+	private String pixelSetKey = null;
 	@Parameter(required=true, description="key to the arrival times of all pixels")
 	private String arrivalTimeKey = null;
 	@Parameter(required=true, description="key to the xvalue of the cog of the shower")
@@ -44,9 +46,9 @@ public class TimeGradient implements Processor {
 
 	public Data process(Data input) {
 		
-		Utils.mapContainsKeys(input, showerKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
-		
-		int[] shower = (int[]) input.get(showerKey);
+		Utils.mapContainsKeys(input, pixelSetKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
+
+		PixelSet shower = (PixelSet) input.get(pixelSetKey);
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
@@ -55,12 +57,12 @@ public class TimeGradient implements Processor {
 		SimpleRegression regressorLong = new SimpleRegression();
 		SimpleRegression regressorTrans = new SimpleRegression();
 		
-		for (int px: shower)
+		for (CameraPixel px: shower.set)
 		{
-			double x = pixelMap.getPixelFromId(px).getXPositionInMM();
-			double y = pixelMap.getPixelFromId(px).getYPositionInMM();
+			double x = pixelMap.getPixelFromId(px.id).getXPositionInMM();
+			double y = pixelMap.getPixelFromId(px.id).getYPositionInMM();
 			double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
-			double time = arrivalTime[px];
+			double time = arrivalTime[px.id];
 			regressorLong.addData(ellipseCoord[0], time);
 			regressorTrans.addData(ellipseCoord[1], time);
 		}
@@ -118,12 +120,8 @@ public class TimeGradient implements Processor {
 		return input;
 	}
 
-	public String getShowerKey() {
-		return showerKey;
-	}
-
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getArrivalTimeKey() {

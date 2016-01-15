@@ -73,7 +73,7 @@ Here is an example .xml file.
 
 
         <stream id="mystream:${copy.id}" class="fact.io.FactFileListMultiStream"
-                listUrl="file:${whitelist}" copies="${num_copies}" >
+                url="file:${whitelist}" copies="${num_copies}" >
             <stream class="fact.io.zfits.ZFitsStream" id="_" limit="100"/>
         </stream>
 

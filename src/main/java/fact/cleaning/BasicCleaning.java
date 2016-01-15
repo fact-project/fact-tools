@@ -2,11 +2,17 @@ package fact.cleaning;
 
 import fact.Constants;
 import fact.Utils;
+import fact.calibrationservice.CalibrationService;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.joda.time.DateTime;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
+
 import stream.Data;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +21,12 @@ import java.util.List;
 public class BasicCleaning {
 	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	
+	@Parameter(required=true)
+	CalibrationService calibService;
+	
+
+    protected PixelSet notUsablePixelSet = null;
 
 	
 
@@ -25,9 +37,22 @@ public class BasicCleaning {
 	 * @param corePixelThreshold
 	 * @return
 	 */
-	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold) {
+	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold, DateTime eventTimeStamp) {
+		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
+		if (notUsablePixel != null)
+		{
+			notUsablePixelSet = new PixelSet();
+			for (int pix: notUsablePixel){
+				notUsablePixelSet.addById(pix);
+			}
+		}
 		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++)
-		{ 
+		{
+			if (notUsablePixel != null){
+				if (ArrayUtils.contains(notUsablePixel,pix) == true){
+					continue;
+				}
+			}
 			if (photonCharge[pix] > corePixelThreshold){
 				showerPixel.add(pix);
 			}
@@ -43,12 +68,18 @@ public class BasicCleaning {
 	 * @param photonCharge
 	 * @return 
 	 */
-	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel, double[] photonCharge, double neighborPixelThreshold)
+	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel, double[] photonCharge, double neighborPixelThreshold, DateTime eventTimeStamp)
 	{
+		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
 		ArrayList<Integer> newList = new ArrayList<>();
 		for (int pix: showerPixel){
 			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
 			for (FactCameraPixel nPix:currentNeighbors){
+				if (notUsablePixel != null){
+					if (ArrayUtils.contains(notUsablePixel,nPix.chid) == true){
+						continue;
+					}
+				}
 				if(photonCharge[nPix.id] > neighborPixelThreshold && !newList.contains(nPix.id) && !showerPixel.contains(nPix.id)){
 					newList.add(nPix.id);
 				}
@@ -86,7 +117,7 @@ public class BasicCleaning {
 	 * @param log 
 	 * @return
 	 */
-	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition, PixelSetOverlay starSet, double starRadiusInCamera, Logger log) {
+	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, double[] starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
 
         FactCameraPixel pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
         if (pixel == null){
@@ -126,7 +157,7 @@ public class BasicCleaning {
 		
 		if (level.length > 0)
 		{
-            PixelSetOverlay overlay = new PixelSetOverlay();
+            PixelSet overlay = new PixelSet();
     		for(int pix : level){
     			overlay.addById(pix);
     		}
@@ -147,6 +178,13 @@ public class BasicCleaning {
 		double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
 		
 		return Math.sqrt((xdist*xdist)+(ydist*ydist));
+	}
+
+
+
+
+	public void setCalibService(CalibrationService calibService) {
+		this.calibService = calibService;
 	}
 	
 

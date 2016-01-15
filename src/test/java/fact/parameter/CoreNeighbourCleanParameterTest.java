@@ -24,6 +24,7 @@ public class CoreNeighbourCleanParameterTest extends ParameterTest {
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
 		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
+		poser.setCalibService(calibService);
 		poser.setPhotonChargeKey(photonCharge);
 		poser.setArrivalTimeKey(arrivalTime);
         poser.setCorePixelThreshold(0);
