@@ -8,7 +8,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import fact.container.PixelSet;
-import fact.io.gsonTypeAdapter.DoubleAdapter;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
