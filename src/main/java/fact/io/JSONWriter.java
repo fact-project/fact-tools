@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import fact.container.PixelSet;
 import fact.io.gsonTypeAdapter.DoubleAdapter;
@@ -18,6 +19,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -168,10 +171,6 @@ public class JSONWriter implements StatefulProcessor {
 		this.doubleSignDigits = doubleSignDigits;
 	}
 
-    private int[] pixelSetAdapter(PixelSet pixelSet){
-        return pixelSet.toIntArray();
-    }
-
 	public void setWriteListOfItems(boolean writeListOfItems) {
 		this.writeListOfItems = writeListOfItems;
 	}
@@ -198,6 +197,39 @@ public class JSONWriter implements StatefulProcessor {
         public PixelSet read(JsonReader jsonReader) throws IOException {
             return null;
         }
+    }
+
+    public class DoubleAdapter extends TypeAdapter<Double> {
+
+        private int signDigits;
+
+        public Double read(JsonReader reader) throws IOException {
+            if (reader.peek() == JsonToken.NULL)
+            {
+                reader.nextNull();
+                return null;
+            }
+            double x = reader.nextDouble();
+            return x;
+        }
+
+        public void write(JsonWriter writer, Double value) throws IOException {
+            if (value.isNaN() || value.isInfinite())
+            {
+                writer.value(value);
+            }
+            else
+            {
+                BigDecimal bValue = new BigDecimal(value);
+                bValue = bValue.round(new MathContext(signDigits));
+                writer.value(bValue.doubleValue());
+            }
+        }
+
+        public void setSignDigits(int sD){
+            signDigits = sD;
+        }
+
     }
 
 }
