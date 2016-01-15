@@ -35,4 +35,12 @@ public class ToChidArray implements Processor{
         input.put(outputKey, pixelSet.toIntArray());
         return input;
     }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
+
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
+    }
 }

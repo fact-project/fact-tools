@@ -38,4 +38,12 @@ public class FromChidArray implements Processor{
         input.put(outputKey, pixelSet);
         return input;
     }
+
+    public void setInputKey(String inputKey) {
+        this.inputKey = inputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 }
