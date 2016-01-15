@@ -98,11 +98,11 @@ public class MotionCleaning implements Processor {
 
 
 
-        data.put("AcDiff", accumulativeDifferences); //could be used as feature for machine learner cleaning(???)
+        //data.put("accDiff", accumulativeDifferences); //could be used as feature for machine learner cleaning(???)
         data.put(outputKey, showerPixelArray);
-        data.put("showerPixel_X", showerPixel_X);
-        data.put("showerPixel_Y", showerPixel_Y);
-        data.put("NumShowerPixel", numShowerPixel);
+        //data.put("showerPixel_X", showerPixel_X);
+        //data.put("showerPixel_Y", showerPixel_Y);
+        data.put("numShowerPixel", numShowerPixel);
         data.put("Cleaning", cleaningID);
 
         return data;

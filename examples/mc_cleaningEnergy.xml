@@ -6,11 +6,11 @@
     <!-- Pathes to the input files -->
     <!--<property name="num_copies" value="4" />-->
 
-    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Gamma/" />
+    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Proton/" />
     <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/" />
     <property name="filename1" value="proton1" />
     <property name="filename2" value="proton2" />
-    <property name="filename3" value="convexityBAS_gamma" />
+    <property name="filename3" value="12ParametersTest_proton" />
 
     <!-- Pathes to the input files -->
     <!--    <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/mc_gamma_11981.fits.gz" />
@@ -25,7 +25,7 @@
 
 
     <stream id="fact" class="fact.io.RecursiveDirectoryStream"
-            pattern="**/*_Events.fits.gz"  url="${infolder}" limit="10000">
+            pattern="**/*_Events.fits.gz"  url="${infolder}" limit="1000">
         <stream class="fact.io.FitsStream" id="_" />
     </stream>
 
@@ -95,7 +95,7 @@
 
         <Skip condition="%{data.NumCluster} == 0" />
 
-        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumShowerPixel,numCluster,convexity,boundAngleSum" url="${outfolder}${filename3}.json"/>
+        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,numShowerPixel,numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" url="${outfolder}${filename3}.json"/>
 
 
         <!--<fact.ShowViewer key="DataCalibrated"/>-->

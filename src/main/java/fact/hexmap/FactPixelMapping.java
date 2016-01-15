@@ -213,18 +213,11 @@ public class FactPixelMapping implements PixelMapping {
 
         int x,y,z;
 
-        if(col > 0){    //warum col und nicht row?????????  drehung camera?
-       //odd -q
             x = col;
-            z = row - (col - (col%2)) / 2;
+            z = row - (col - Math.abs(col%2)) / 2;
             y = -x -z;
-        }
-        else {
-        //even-q
-            x = col;
-            z = row - (col + (col%2)) / 2;
-            y = -x-z;
-        }
+
+
         cube[0] = x;
         cube[1] = y;
         cube[2] = z;

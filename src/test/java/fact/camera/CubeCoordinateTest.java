@@ -32,7 +32,7 @@ public class CubeCoordinateTest {
 
     }*/
 
-    @Test
+/*    @Test
     public void testLine(){
             ArrayList<Integer> line1 = mapping.line(1128,378);
             ArrayList<Integer> line2 = mapping.line(295,574);
@@ -49,7 +49,7 @@ public class CubeCoordinateTest {
             assertTrue("Wrong line pixel " + line2.get(7) +". Should be id 460.", line2.get(7)==460);
             assertTrue("Wrong line pixel " + line2.get(8) +". Should be id 463.", line2.get(8)==463);
             assertTrue("Wrong line pixel " + line2.get(9) +". Should be id 497.", line2.get(9)==497);
-    }
+    }*/
 
     /*public ArrayList<Integer> line(int id1, int id2) {
 
@@ -120,7 +120,7 @@ public class CubeCoordinateTest {
             return linePixel;
     }
 */
-/*    @Test
+    @Test
         public void testY() throws FileNotFoundException, UnsupportedEncodingException {
             PrintWriter writer = new PrintWriter("/home/lena/Dokumente/Masterarbeit/pyPlot/testCubeY.txt", "UTF-8");
             for(int i=0;i<1440;i++){
@@ -131,7 +131,7 @@ public class CubeCoordinateTest {
             }
 
             writer.close();
-    }*/
+    }
 
 
 }

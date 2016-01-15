@@ -6,7 +6,7 @@
     <!-- Pathes to the input files -->
 <!--    <property name="num_copies" value="1" />-->
 
-    <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/Proton/00029037.037_D_MonteCarlo029_Events.fits.gz" />
+    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Proton/" />
     <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/CleaningArrivaltime/" />
 
     <!-- Pathes to the input files -->
@@ -28,7 +28,12 @@
 
 
     <!-- Name of the stream and url to the input file -->
-        <stream id="fact" class="fact.io.FitsStream"  url="${infile}" limit="50"/>
+        <stream id="fact" class="fact.io.FitsStream"  url="${infolder}" limit="50"/>
+
+<!--    <stream id="fact" class="fact.io.RecursiveDirectoryStream"
+            suffix="_Events.fits.gz" url="${infolder}">
+        <stream class="fact.io.FitsStream" id="_" />
+    </stream>-->
 
 
     <!-- Description of the process and the corresponding stream -->
@@ -65,7 +70,10 @@
                 maxSlopesKey="maxSlope"/>
 
 
-        <fact.cleaning.MotionCleaning />
+        <fact.cleaning.MotionCleaning
+                threshold = "30"
+                outputKey = "shower"/>
+
 
         <Skip condition="%{data.NumClusterPixel}>-40 "/>
 
