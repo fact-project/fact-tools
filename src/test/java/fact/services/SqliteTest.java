@@ -4,7 +4,11 @@ import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxWebService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.SqliteService;
+import fact.auxservice.strategies.AuxPointStrategy;
+import fact.auxservice.strategies.Closest;
+import fact.auxservice.strategies.Later;
 import fact.features.source.SourcePosition;
+import org.hamcrest.core.IsNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -41,6 +45,16 @@ public class SqliteTest {
         assertThat(first, is(DateTime.parse("2014-01-19T01:22:18.045").withZone(DateTimeZone.UTC)));
         assertThat(last, is(DateTime.parse("2014-01-19T01:42:58.391").withZone(DateTimeZone.UTC)));
         assertThat(r.size(), is(9));
+    }
+
+    @Test
+    public void testMissingPointsInDB() throws Exception {
+        SqliteService s = new SqliteService();
+        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_5_20.sqlite")));
+
+        DateTime t =  DateTime.parse("2014-05-20T23:46:14.560Z");
+        AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, t, new Closest());
+        assertThat(auxiliaryData, is(not(nullValue())));
     }
 
     /**
