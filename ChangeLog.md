@@ -1,5 +1,9 @@
 #Changelog for the fact-tools
 
+## Version 0.11.1
+
+Fixed the SqliteService. It now works on data that was not taken exclusively in january.
+
 ## Version 0.11.0
 
 ### Changes
