@@ -1,0 +1,56 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+    <property name="auxFolder" value="file:src/main/resources/aux/" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+    <!-- Name of the stream and url to the input file -->
+    <stream id="fact" class="fact.io.LoopStream" events="1000">
+        <stream id="_" class="fact.io.FitsStream"  url="${infile}" />
+    </stream>
+    <!-- Description of the process and the corresponding stream -->
+    <process input="fact" copies="1">
+        <fact.DataRate every="100"/>
+        <!-- prevEventAndSkip: -->
+        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
+        <include url="classpath:/default/data/prevEventAndSkip.xml" />
+        <!-- Output: Data -->
+
+        <!-- Calibration: -->
+        <include url="classpath:/default/data/calibration.xml" />
+        <!-- Output: DataCalibrated -->
+
+        <!-- Extraction -->
+        <include url="classpath:/default/data/extraction.xml" />
+        <!-- Output: photoncharge, arrivalTime -->
+
+        <!-- Cleaning -->
+        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
+        <include url="classpath:/default/data/cleaning.xml" />
+        <!-- Output: shower -->
+
+        <!-- Parameter calculation (only source independent) -->
+        <include url="classpath:/default/data/parameterCalc.xml" />
+        <!-- Output: source independent parameters -->
+
+        <!-- Parameter calculation (only source dependent) -->
+        <include url="classpath:/default/data/sourceParameter.xml" />
+        <!-- Output: source dependent parameters -->
+
+
+    </process>
+
+
+
+</container>
+
