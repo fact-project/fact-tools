@@ -4,30 +4,28 @@
 
 
     <!-- Pathes to the input files -->
-    <!--<property name="num_copies" value="4" />-->
 
-    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Proton/" />
+    <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/Data/20160111_Crab/20160118_087.fits.fz" />
+    <property name="drsfile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/Data/20160111_Crab/20160118_080.drs.fits.gz"/>
+
     <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/" />
-    <property name="filename" value="proton" />
+    <property name="filename" value="data_crab_20160118_087" />
 
-
-
-    <!--    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />-->
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
-    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
-    <!--<property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />-->
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+    <property name="auxFolder" value="file:src/main/resources/aux/" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
 
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <stream id="fact" class="fact.io.RecursiveDirectoryStream"
-            pattern="**/*_Events.fits.gz"  url="${infolder}">
-        <stream class="fact.io.FitsStream" id="_" />
-    </stream>
-
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
 
     <!-- Description of the process and the corresponding stream -->
     <process id="2" input="fact" >
+
+
+         <Skip condition="%{data.TriggerType} != 4" />
 
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
         <include url="classpath:/default/data/calibration.xml" />
@@ -47,31 +45,24 @@
                 amplitudePositionsKey="maxPos"
                 maxSlopesKey="maxSlope"/>
 
-
-        <fact.cleaning.MotionCleaning
+         <fact.cleaning.MotionCleaning
                 threshold = "30"
-                outputKey = "shower"/>
+                outputKey = "pixelSet"/>
 
         <Skip condition="%{data.numShowerPixel} &lt; 15 "/>
 
-
-        <fact.features.DistributionFromShower
-                weightsKey="photoncharge"
-                showerKey="shower"
-                sizeKey="Size"
-                outputKey="showerDistribution"
+        <fact.hexmap.ClusterFellwalker
+                pixelSetKey="pixelSet"
         />
 
 
 
-        <fact.hexmap.ClusterFellwalker />
 
+        <!--<Skip condition="%{data.NumCluster} == 0" />-->
 
+        <!--<fact.io.JSONWriter keys="EventNum,numShowerPixel,numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" url="${outfolder}${filename}.json"/>-->
 
-
-        <Skip condition="%{data.NumCluster} == 0" />
-
-        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,numShowerPixel,numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" url="${outfolder}${filename}.json"/>
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
 
     </process>
 
