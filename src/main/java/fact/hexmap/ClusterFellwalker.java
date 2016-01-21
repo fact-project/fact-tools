@@ -4,8 +4,10 @@ package fact.hexmap;
  * Created by lena on 16.11.15.
  */
 
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 
@@ -19,18 +21,33 @@ public class ClusterFellwalker implements Processor {
     ArrayList<Integer> aktuellerPfad = new ArrayList<>();
 
 
+    @Parameter(required = false, description="Minimal number of pixels a cluster must contain to be labeled as 'showerCluster'", defaultValue="2")
+    protected int minShowerpixel = 2;
+
+    @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
+    protected String pixelSetKey = null;
+
+    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "ArrtimePos")
+    protected String arrivaltimePosKey = "ArrtimePos";
+
+    @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
+    protected String photonchargeKey = "photoncharge";
+
+
+
 
     @Override
     public Data process(Data data) {
-        int[] shower = ((int[]) data.get("shower"));
-        double[] arrivalTime = ((double[]) data.get("ArrtimePos"));
-        double[] photoncharge = ((double[]) data.get("photoncharge"));
+        PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
+        double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
+        double[] photoncharge = ((double[]) data.get(photonchargeKey));
 
+        //get 'shower' as int array with pixel id's from 'pixelSet' (HashSet)
+        int [] shower = pixelSet.toIntArray();
 
         int[] clusterID = new int[1440];
         int[] showerClusterID = new int[1440];
 
-        int minShowerpixel = 2;
 
 
         for (int i = 0; i < 1440; i++) {
@@ -103,7 +120,7 @@ public class ClusterFellwalker implements Processor {
         }
         //end FellWalker
 
-        /* create a FactCluster-array which contains all cluster as objects. The array-index of a cluster is equal to the
+        /* create a FactCluster array which contains all cluster as objects. The array-index of a cluster is equal to the
          clusterID set in the fellwalker-algorithm. Keep in mind, that there is no clusterID 0, so the first cluster-object
          has to be treated separately!
           */
@@ -125,12 +142,17 @@ public class ClusterFellwalker implements Processor {
         }
 
 
-        //set containsShowerPixel to false if cluster comtains less the minShowerpixel showerpixel and count all "surviving" cluster
+        /* Here the parameter minShowerpixel is used. Label all clusters with true (containsShowerPixel) if they contain at least 'minShowerpixel' showerpixel
+         * (pixel that survive the cleaning) and false if they contain less showerpixel. The clusters that are labeled 'true' get a new successive id.
+         * All of these clusters are put to a new FactCluster array 'showerCluster'.
+        */
         FactCluster[] showerCluster = removeCluster(clusterSet,minShowerpixel);
 
         int numCluster = showerCluster.length;
 
-        //build showerpixelArray that contains only cluster with showerpixel (just to have a quick look at it in the event viewer)
+        /* build 1440-int array that contains the id's of the cluster that survive 'removeCluster' for every pixel.
+         * (Just to have a quick look at it in the event viewer, not relevant for the algorithm itself or the resulting event parameters.)
+        */
         for(FactCluster c : clusterSet){
             if(c.getShowerLabel()){
                 for(int i : c.contentPixel){
@@ -157,7 +179,6 @@ public class ClusterFellwalker implements Processor {
             double boundAngleSum = boundAngleSum(showerCluster);
             double distanceCenterSum = distanceCenter(showerCluster);
 
-            //int [] viewer = showerClusterID.clone();
             int convexity = searchForCompactGroups(showerCluster, showerClusterID);
 
 
@@ -185,6 +206,7 @@ public class ClusterFellwalker implements Processor {
             data.put("numClusterPixel", numClusterPixel);
             data.put("stdNumPixel", stdNumpixel);
             data.put("convexity", convexity);
+
 
         }
         else{
@@ -279,19 +301,6 @@ public class ClusterFellwalker implements Processor {
     }
 
 
-    //redundant. -> showerCluster.size()
-/*    public int getNumberOfClusters(int[] clusterID){
-        ArrayList<Integer> ClusterList = new ArrayList<>();
-        for(int i=0; i<1440; i++){
-            if(clusterID[i] != -2){
-                if(!ClusterList.contains(clusterID[i])){
-                    ClusterList.add(clusterID[i]);
-                }
-            }
-        }
-        return (ClusterList.size());
-    }*/
-
     public FactCluster [] removeCluster(FactCluster clusterSet[], int minShowerpixel){
         ArrayList<FactCluster> showerCluster = new ArrayList<>();
         int numShowerCluster = 0;
@@ -317,7 +326,8 @@ public class ClusterFellwalker implements Processor {
 
     }
 
-    public void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
+    // not needed for parameter calculation, just to have a quick look in the viewer
+/*    public void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
         for(FactCluster c : clusterSet){
             if(c.getShowerLabel()){
             ArrayList<Integer> boundPixel = c.findBoundaryNaive();
@@ -329,60 +339,64 @@ public class ClusterFellwalker implements Processor {
                 }
             }
         }
-    }
+    }*/
 
- /*   public int [] countBoundaryPixel(FactCluster [] showerCluster){
-        int[] boundLength = new int[showerCluster.length];
 
-        for(int i=0; i<showerCluster.length; i++){
-            boundLength[i] = showerCluster[i].getBoundaryLength();
-        }
-
-        return boundLength;
-    }
-    */
-
+    /* Calculates the ratio of number of bound pixel to number of content pixels and sums it up for all clusters.
+     * So this feature is correlated to the number of clusters in the event ('NumCluster'). One could divide the returned
+     * 'ratio' by 'showerCluster.length' to have a normed value.
+     * Idea behind is to have a value for the shape of a cluster.
+     */
     public double  boundContentRatio(FactCluster [] showerCluster){
         double ratio = 0;
 
-        int i = 0;
         for(FactCluster c : showerCluster){
             ratio += (double) c.getBoundaryLength()/c.getNumPixel();
-            i++;
         }
 
         return ratio;
     }
 
 
-    //returns sum of all idealBoundDiffs
+    /*
+     * Sums up the 'idealBoundDiff' of every cluster in the event. The 'ideal boundary' is the minimum number of boundary pixels,
+     * which means the cluster would have the shape of a circle. 'idealBoundDiff' means therefore the difference between the real number
+     * of boundary pixels and the ideal(minimal) number of boundary pixels a cluster with a certain number of pixel could have.
+     * Keep in mind that this feature is again correlated to 'NumCluster', as long as the returned 'sum' is not divided by 'showerCluster.length'.
+     */
     public double idealBoundDiff(FactCluster [] showerCluster){
-        //int[] diffs = new int [showerCluster.length];
         double sum = 0;
-        int i = 0;
         for (FactCluster c : showerCluster){
             sum += c.idealBoundDiff();
-            i++;
         }
-
-        return sum; ///showerCluster.length;
+        return sum;
     }
 
+    /*
+     * Sums up the 'boundAngleSum' for all clusters in the event. 'boundAngleSum' does something like count how often you
+     * have to change the direction (on a hexagonal coordinate system) if you walk along the boundary of the cluster.
+     * This is another feature that should describe the shape of a cluster. If a cluster has kind of a 'smooth' shape
+     * (like circle or ellipse) the 'boundAngleSum' should be smaller than the value for a cluster with a irregular random
+     * splashy shape...(Again: correlation to 'NumCluster' if not dividing by 'showerCluster.length'.)
+
+     */
     public double boundAngleSum(FactCluster[] showerCluster){
         double sum = 0;
         for (FactCluster c : showerCluster){
             sum += c.boundAngleSum();
         }
         return sum;
-
     }
 
+
+    /*
+     * Returns the mean over all distances from all cluster center of gravity to the camera center (the center position
+     * in mm not the 'center pixel'). Gives an information about the geometrical distribution of the clusters in the camera image.
+     */
     public double distanceCenter(FactCluster[] showerCluster){
         double sum = 0;
-        int i = 0;
         for (FactCluster c : showerCluster){
             sum += c.distanceCamCenter();
-            i++;
         }
         return sum/showerCluster.length;
     }
@@ -395,7 +409,7 @@ public class ClusterFellwalker implements Processor {
     * At the moment two clusters are marked as neighbors if there are no air-pixels between them.
      * Keep in mind that currently clusters are marked as neighbors even if they are "indirect neighbors" (means they have a third cluster between them). In this case there are also no air pixel on the line
      * between their cog's, because all pixel on this line belongs to a cluster.
-     * But maybe this is an opportunitt to define another parameter for the whole image, something like "convexity". If there are no air pixel in the image at all, the group of clusters could be defined as convex.
+     * But maybe this is an opportunity to define another parameter for the whole image, something like "convexity". If there are no air pixel in the image at all, the group of clusters could be defined as convex.
      * This makes sense probably only for images with more than two clusters.
      * Returns the sum over all found air pixels as a parameter for convexity.
      *
@@ -423,7 +437,6 @@ public class ClusterFellwalker implements Processor {
         return sumAirpixel;
     }
 
-
     public int countAirPixel(ArrayList<Integer> gapPixel, int[] showerClusterID){
         int countAirPixel = 0;
         for(int id : gapPixel){
@@ -435,6 +448,9 @@ public class ClusterFellwalker implements Processor {
         return countAirPixel;
     }
 
+    /*
+     * Mean over the number of (naive) neighbors for all clusters in an event.
+     */
     public double neighborClusterMean(FactCluster [] showerCluster){
         double sum = 0;
         double i = 0;
@@ -444,24 +460,6 @@ public class ClusterFellwalker implements Processor {
         }
         return sum/i;
     }
-
-
-    /* 1) Find the air pixels for one cluster. Air-pixel are the pixels on a line between two clusters which don't belong to any cluster.
-          (The more airspixels between two clusters, the larger the distance between them.) Build the air-pixel-mean over all lines starting from this cluster. -> 'numAirpixel'
-       2) Sum over all 'numAirpixel' (of every cluster) -> sum
-          (the result should be a value for the spread/distribution of the clusters in the camera image)
-      */
-/*    public double airpixelMean(FactCluster [] showerCluster) {
-        double sum = 0;
-        if (showerCluster.length == 1) {
-            return 0;
-        } else {
-            for (FactCluster c : showerCluster) {
-                sum += c.getNumAirpixel() / (showerCluster.length - 1);
-            }
-            return sum/showerCluster.length;
-        }
-    }*/
 
     public void findNeighbors(FactCluster [] showerSet, int[] showerClusterID){                  //------------------------------- Neighbors testen waere sinnvoll
         //int[] numNeighbors = new int [showerSet.length];
@@ -480,6 +478,8 @@ public class ClusterFellwalker implements Processor {
         }
     }
 
+
+    //Possible, but not a good feature. Maybe nice to have for further ideas...
 /*    public int numIsolatedCluster(FactCluster[] showerCluster){
         int isolatedCluster = 0;
         for(FactCluster c : showerCluster){
@@ -536,6 +536,8 @@ public class ClusterFellwalker implements Processor {
         return sum;
     }
 
+
+    //Possible, but not a good feature. Arrival times are therefore not use for feature creation so far.
 /*    public double stdArrTime(FactCluster [] showerCluster, double [] arrivaltime){
         double arrTimeMean = 0;
         double arrTimeStd = 0;
@@ -553,6 +555,7 @@ public class ClusterFellwalker implements Processor {
 
     }*/
 
+    // Standard deviation of the mean over the number of pixels in every cluster in the event.
     public double stdNumPixel(FactCluster [] showerCluster){
         int numCluster = showerCluster.length;
         double mean = 0;
@@ -569,30 +572,13 @@ public class ClusterFellwalker implements Processor {
     }
 
 
-    /*public int[] removeClusterArray(int[] clusterID, int[] shower, int numCluster, int minShowerpixel){
-        for(int c = 1; c<=numCluster; c++){
-            int count = 0;
-            for(int i=0; i<1440; i++){
-                if(clusterID[i] == c && ArrayUtils.contains(shower, i)){
-                    count++;
-                }
-            }
-            if(count <= minShowerpixel){    //<----------------------------------------------------threshold cleaning-pixel in cluster
-                clusterID = setClusterToId(clusterID,c,-2);
-            }
-        }
-        return clusterID;
+    public void setMinShowerpixel(int minShowerpixel) {
+        this.minShowerpixel = minShowerpixel;
     }
-
-    public static int[] setClusterToId(int[] clusterID, int oldClusterID, int newClusterID){
-        for(int i=0; i<1440; i++){
-            if(clusterID[i] == oldClusterID){
-                clusterID[i] = newClusterID;
-            }
-        }
-
-        return clusterID;
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
     }
-*/
+    public void setArrivaltimePosKey(String arrivaltimePosKey){this.arrivaltimePosKey = arrivaltimePosKey;}
+    public void setPhotonchargeKey(String photonchargeKey){this.photonchargeKey = photonchargeKey;}
 
 }

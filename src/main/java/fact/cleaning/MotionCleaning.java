@@ -1,5 +1,6 @@
 package fact.cleaning;
 
+import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
@@ -7,6 +8,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * MotionCleaning:
@@ -53,6 +55,8 @@ public class MotionCleaning implements Processor {
         int max = 120;
         int positionMax = positionOfMaxMeanAmplitude(data_array, min, max);
 
+        //System.out.println(maxAmplitude);
+
         for(FactCameraPixel p : map.pixelArray){
             double[] pixelData = p.getPixelData(data_array, roi);
             accumulativeDifferences[p.id] = 0;
@@ -83,23 +87,34 @@ public class MotionCleaning implements Processor {
         cleaningID = removeIsolatedPixel(cleaningID);
         cleaningID = fillHoles(cleaningID);
 
-
         int[] showerPixelArray = makeShowerPixelArray(cleaningID);
 
+        //PixelSet (HashSet) contains all pixel from showerPixelArray
+        PixelSet pixelSet = new PixelSet();
+
+        //Array -> PixelSet
         if(showerPixelArray != null){
             numShowerPixel = showerPixelArray.length;
+            for (int id : showerPixelArray) {
+                pixelSet.addById(id);
+            }
         }
-        else{numShowerPixel = 0;}
+        else{
+            numShowerPixel = 0;
+            pixelSet.add(null);
+
+        }
+
+        //get xy-positions of all showerpixel (useful for arrivaltime cleaning)
+/*        double[] showerPixel_X = getShowerPixel_X(showerPixelArray);
+        double[] showerPixel_Y = getShowerPixel_Y(showerPixelArray);*/
 
 
-        //get xy-positions of all showerpixel
-        double[] showerPixel_X = getShowerPixel_X(showerPixelArray);
-        double[] showerPixel_Y = getShowerPixel_Y(showerPixelArray);
 
-
+       // System.out.println(numShowerPixel);
 
         //data.put("accDiff", accumulativeDifferences); //could be used as feature for machine learner cleaning(???)
-        data.put(outputKey, showerPixelArray);
+        data.put(outputKey, pixelSet);
         //data.put("showerPixel_X", showerPixel_X);
         //data.put("showerPixel_Y", showerPixel_Y);
         data.put("numShowerPixel", numShowerPixel);

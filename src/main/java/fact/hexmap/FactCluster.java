@@ -27,10 +27,6 @@ public class FactCluster {
 
 
 
-
-
-
-
     public void addContentPixel(int id){
         contentPixel.add(id);
     }
@@ -55,6 +51,8 @@ public class FactCluster {
         return sum;
     }
 
+
+    //not used at the moment, could maybe be used as a kind of weight later... Useful for cleaning??
     public double getPhotonchargePerPixel(){
         double sum = 0;
         for(double p : contentPixelPhotoncharge){
@@ -62,10 +60,6 @@ public class FactCluster {
         }
         return sum/contentPixelPhotoncharge.size();
     }
-
-
-
-
 
     public double maxPhotoncharge(){
         return Collections.max(contentPixelPhotoncharge);
@@ -75,8 +69,8 @@ public class FactCluster {
         return contentPixel.get(contentPixelPhotoncharge.indexOf(maxPhotoncharge()));
     }
 
-    // calculate center of gravity for the cluster (weighted by photoncharge). If there is no pixel on the calculated position
-    // or the calculated pixel is not part of the cluster, the 'brightest' pixel (max photoncharge) is returned instead
+    // calculate center of gravity for the cluster (weighted by photon charge). If there is no pixel on the calculated position
+    // or the calculated pixel is not part of the cluster, the 'brightest' pixel (max photon charge) is returned instead
         public int cogId(){
             double cogX = 0;
             double cogY = 0;
@@ -108,8 +102,10 @@ public class FactCluster {
     }
 
 
-    // a parameter to describe some kind of 'size'. This is the standard deviation of each pixel center from the cluster cog (centroid), where each pixel is weighted by its photoncharge or arrivaltime.
-    // values for photoncharge must be positive. Therefore (arbitrary) 10 is added to every photoncharge. Values for arrivaltime should always be positive.
+    /* Std: a parameter to describe some kind of 'size'. This is the standard deviation of each pixel center from the cluster cog (centroid), where each pixel is weighted by its photon charge or arrival time.
+    * Values for photon charge must be positive. Therefore (arbitrary) 10 is added to every photon charge. Values for arrival time should always be positive.
+    * Not used and evaluated at the moment. Maybe for further ideas...(CLEANING????) But maybe it's quatsch.
+    */
 
     public double stdPhotonchargeX(){
         double sumX2 = 0;    //d_i*x_i^2
@@ -172,7 +168,7 @@ public class FactCluster {
     }
 
 
-    //calculates the distance between the center of gravity (weighted by photoncharge) an the center of the camera              Testen!!!!!!!!!!!!!!!!
+    //calculates the distance between the center of gravity (weighted by photon charge) an the center of the camera
     public double distanceCamCenter(){
         int cog = cogId();
         double cogX = mapping.getPixelFromId(cog).getXPositionInMM();
@@ -183,13 +179,16 @@ public class FactCluster {
     }
 
 
-
+    /*
+     * This nice little method is used for the calculation of 'boundAngleSum'. It returns a list containing all boundary
+     * as they appear if one would walk over the boundary. So the pixel list can be seen as path around the cluster. This
+     * is needed to calculate the change of direction from step to step (pixel to pixel).
+     */
     private ArrayList<FactCameraPixel> findSortedBoundary() {
 
 
         int startId = findStartPixelBoundary();
 
-        int countPixel = 0;
         int currentId = startId;
         boolean boundEnd = false;
 
@@ -291,6 +290,7 @@ public class FactCluster {
         return id;
     }
 
+    //Gets a pixel id and returns an array of all pixels that are neighbors of this pixel AND belong to the same cluster.
     private FactCameraPixel [] getNeighborsInClusterFromId(int id){
         FactCameraPixel[] allNeighbors = mapping.getNeighboursFromID(id);
         ArrayList<FactCameraPixel> neighborsInCluster = new ArrayList<>();
@@ -307,6 +307,7 @@ public class FactCluster {
         return neighborsArray;
     }
 
+    //Gets a pixel id, returns true if this pixel is a boundary pixel of the cluster ans false if it's not.
     private boolean isBoundPixel(int id){
         FactCameraPixel [] allCamNeighbors = mapping.getNeighboursFromID(id);
         FactCameraPixel [] clusterNeighbors = getNeighborsInClusterFromId(id);
@@ -317,42 +318,61 @@ public class FactCluster {
         else if(allCamNeighbors.length < 6 && clusterNeighbors.length == allCamNeighbors.length){
             return true;
         }
-        else { //if(allCamNeighbors.length > clusterNeighbors.length){
+        else {
             return true;
         }
 
     }
 
+    /* Returns (parameter) idealBoundDiff. This is the difference between the real number of boundary pixels and the minimal number
+     * of boundary pixels this cluster could have.
+     */
     public int idealBoundDiff(){
         return getBoundaryLength() - idealBound();
     }
 
+    /*
+     * Calculation of the minimal (ideal) number of boundary pixels this cluster could have. The ideal shape is of hexagon
+     * (if you link the cog's of the boundary pixel).
+     * Since there are just some discrete numbers of pixels that form a full hexagon, the ideal boundary also has to be
+     * calculated for all numbers between this 'full hexagon numbers'.
+     * The equation is only an approximation, but for the range of numbers in this case (up to 1440 pixels) it fits quite well.
+     */
     private int idealBound(){
         return (int) (2*Math.sqrt(3*getNumPixel()) - 3);
     }
 
- public int boundAngleSum(){
-     ArrayList<FactCameraPixel> sortedBound = findSortedBoundary();
-     int cuDir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(0).id), mapping.getCubeCoordinatesFromId(sortedBound.get(1).id));
-     int countChangeDir = 0;
+    /*
+     * Returns a parameter for the cluster which should quantify the shape of the cluster. Imagine the boundary of the cluster
+     * as path in a hexagonal cube coordinate system with three axis. To walk from one pixel to another you have six opportunities,
+     * two on every hexagonal axis, makes three 'directions'. The first step defines the first direction (if you walk along the
+     * x-, y- or z-axis). In the next step you could walk along the same axis in the same direction or change axis/direction.
+     * This algorithm counts how often the direction is changed along the walk over the boundary. It doesn't matter which
+     * direction is taken in the next step it just matters if is the same as in the step before or not.
+     * Idea behind: If the cluster has a smooth round shape the boundAngleSum should be quite small. In case of zigzag it increases.
+     */
+    public int boundAngleSum(){
+        ArrayList<FactCameraPixel> sortedBound = findSortedBoundary();
+        int cuDir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(0).id), mapping.getCubeCoordinatesFromId(sortedBound.get(1).id));
+        int countChangeDir = 0;
 
-     for(int i=1; i<sortedBound.size()-1; i++){
+        for(int i=1; i<sortedBound.size()-1; i++){
          int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(i).id), mapping.getCubeCoordinatesFromId(sortedBound.get(i+1).id));
          if(cuDir != dir){
              countChangeDir++;
              cuDir = dir;
          }
 
-     }
+        }
 
-     int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(sortedBound.size()-1).id), mapping.getCubeCoordinatesFromId(sortedBound.get(0).id));
-     if(cuDir != dir){
+        int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(sortedBound.size()-1).id), mapping.getCubeCoordinatesFromId(sortedBound.get(0).id));
+        if(cuDir != dir){
          countChangeDir++;
-     }
+        }
 
-     return countChangeDir;
+        return countChangeDir;
 
- }
+    }
 
     private int calcDirection(int[] pixel1, int[] pixel2){
 
@@ -373,21 +393,7 @@ public class FactCluster {
     }
 
 
-
-/*    private int [] cubeCoordinates(int id){
-        int [] cube = new int[3];
-        int col = mapping.getPixelFromId(id).geometricX;
-        int row = mapping.getPixelFromId(id).geometricY;
-
-        int x = col;
-        int z = row - (col - (col%2)) / 2;
-        int y = -x -z;
-
-        cube[0] = x;
-        cube[1] = y;
-        cube[2] = z;
-        return cube;
-    }*/
+    // some sets, gets and adds
 
     public void addCompactCluster(int id){
         compactClusterID.add(id);
