@@ -8,7 +8,7 @@ import java.io.IOException;
 //TODO create as Interface
 public class BinTableReader implements TableReader {
 	public static TableReader createTableReader(ZFitsTable table, DataInputStream input) throws ParseException, IOException {
-		if (table.getCommpressed()) {
+		if (table.isCompressed) {
 			return new ZFitsTableReader(table, input);
 		} else {
 			//normale Bintable
