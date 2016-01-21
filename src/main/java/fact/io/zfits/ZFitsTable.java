@@ -13,7 +13,7 @@ public class ZFitsTable {
 	private Map<String, FitsTableColumn> id2ColumnMap = new HashMap<String, FitsTableColumn>();
 	private List<FitsTableColumn> columns = new ArrayList<FitsTableColumn>();
 
-	private boolean isCompressed = false;
+	public boolean isCompressed = false;
 	private FitsHeader header = null;
 	private int numCols = 0;
 	private int numRows = 0;
@@ -81,12 +81,9 @@ public class ZFitsTable {
 			
 			
 			String format = header.getKeyValue(formName+strNum);
-			Integer tmp = Integer.parseInt(format.substring(0, format.length()-1));
-			if (tmp==null)
-				throw new ParseException("Can't get the Format from row: "+strNum+" format is: "+format);
-			int numEntries = tmp.intValue();
+			int numEntries = Integer.parseInt(format.substring(0, format.length()-1));
 			DataType type = DataType.getTypeFromChar(format.charAt(format.length()-1));
-			
+
 			FitsTableColumn column = new FitsTableColumn(id, numEntries, type.getNumBytes(), type, unit, compression);
 			
 			this.id2ColumnMap.put(id, column);
@@ -180,14 +177,6 @@ public class ZFitsTable {
 	
 	public FitsTableColumn getColumns(int index) {
 		return this.columns.get(index);
-	}
-	
-	/**
-	 * Return if the BINTABLE is a zfits table or not.
-	 * @return True if zfits table.
-	 */
-	public boolean getCommpressed() {
-		return this.isCompressed;
 	}
 	
 	/**
