@@ -3,21 +3,24 @@
     <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
-    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+    <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />-->
+    <!--<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />-->
+
+    <property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />
+    <property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <property name="auxFolder" value="file:src/main/resources/aux/" />
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+    <service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <!-- Name of the stream and url to the input file -->
-    <stream id="fact" class="fact.io.LoopStream" events="1000">
-        <stream id="_" class="fact.io.FitsStream"  url="${infile}" />
-    </stream>
+    <!--<stream id="fact" class="fact.io.LoopStream" events="1000">-->
+        <!--<stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
+    <!--</stream>-->
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
         <fact.DataRate every="100"/>
@@ -47,6 +50,7 @@
         <include url="classpath:/default/data/sourceParameter.xml" />
         <!-- Output: source dependent parameters -->
 
+        <fact.ShowViewer key="DataCalibrated"/>
 
     </process>
 
