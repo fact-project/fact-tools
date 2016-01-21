@@ -24,7 +24,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Test the implementation of the sqliteservice test by querying the test file.
+ * Test the implementation of the sqliteservice test by querying the test files.
  * Created by kai on 06.12.15.
  */
 public class SqliteTest {
@@ -32,7 +32,7 @@ public class SqliteTest {
     @Test
     public void testSourcePosition() throws Exception {
         SqliteService s = new SqliteService();
-        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control.sqlite")));
+        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_unittest_20140118_19.sqlite")));
 
         DateTime t =  DateTime.parse("2014-01-19T01:40:33+00:00");
         TreeSet<AuxPoint> r = s.loadDataFromDataBase(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, t);
@@ -48,7 +48,7 @@ public class SqliteTest {
     }
 
     @Test
-    public void testMissingPointsInDB() throws Exception {
+    public void testSourcePositionInMay() throws Exception {
         SqliteService s = new SqliteService();
         s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_5_20.sqlite")));
 
@@ -66,7 +66,7 @@ public class SqliteTest {
     @Test
     public void testTrackingPosition() throws Exception {
         SqliteService s = new SqliteService();
-        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control.sqlite")));
+        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_unittest_20140118_19.sqlite")));
 
         DateTime t =  DateTime.parse("2014-01-19T01:34:00+00:00");
         TreeSet<AuxPoint> r = s.loadDataFromDataBase(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, t);
