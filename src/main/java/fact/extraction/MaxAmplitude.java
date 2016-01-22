@@ -3,112 +3,73 @@
  */
 package fact.extraction;
 
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.util.Interval;
 
 /**
- * This processor simply calculates the maximum value for all time slices in
- * each Pixel. The output is a double array with an entry for each Pixel. The
- * <code>window</code> parameter is used to limit the search window for the
- * maximal amplitudes for each pixel.
- * 
- * By default, the search window ranges from slice 35 to 125.
- * 
- * The processor also computes the positions for the maximum values for each of
- * the pixels. The positions are written to an int[] attribute with key
- * <code>${outputKey}:pos</code>.
- * 
- * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;, Christian Bockermann
+ * This processor simply calculates the maximum value for all time slices in each Pixel. 
+ * The output is a double array with an entry for each Pixel.
+ * TODO: REfactor to only search inside a window
+ *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
-public class MaxAmplitude implements Processor {
-    static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
+public class MaxAmplitude implements Processor{
+	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 
     @Parameter(required = true)
     private String key;
-
     @Parameter(required = true)
     private String outputKey;
 
-    @Parameter(description = "The search window (slices), to determine max amplitudes for each pixel, default is '35,125'.")
-    Interval window = new Interval(35, 125);
+	private int npix;
 
     @Override
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
         Utils.isKeyValid(input, "NPIX", Integer.class);
         double[] data = (double[]) input.get(key);
-        int npix = (Integer) input.get("NPIX");
+        npix = (Integer) input.get("NPIX");
         int roi = data.length / npix;
 
-        // for all pixel find the maximum value
+        //for all pixel find the maximum value
         double[] max = new double[npix];
-        int[] maxPos = new int[npix];
 
-        int from = Math.max(0, window.start.intValue());
-        int to = Math.min(roi, window.end.intValue());
-
-        // log.info("Searching maximum from {} to {}", from, to);
         for (int pix = 0; pix < npix; pix++) {
-            maximum(roi, pix, data, from, to, max, maxPos);
+            max[pix] = maximum(roi, pix, data);
         }
 
         input.put(outputKey, max);
-        input.put(outputKey + ":pos", maxPos);
         return input;
     }
 
     /**
-     * Find the maximum value in the array. Searches in the window given by
-     * <code>start</code> and <code>end</code>. The maximal values and their
-     * positions are written to the given output array <code>maxValues</code>
-     * and <code>maxPos</code>.
-     * 
+     * Find the maximum value in the array. searchs in the window from pix * roi + slice to pix * roi + (slice + roi -1)
      * @param roi
-     * @param pix
-     *            pixel to be checked
-     * @param data
-     *            the array to be checked
+     * @param pix pixel to be checked
+     * @param data the array to be checked
+     * @return
      */
-    public double maximum(int roi, int pix, double[] data, int start, int end, double[] maxValues, int[] maxPos) {
+    public double maximum(int roi, int pix, double[] data){
         double tempMaxValue = 0;
-        maxPos[pix] = 0;
-        for (int slice = start; slice < end; slice++) {
+        for (int slice = 0; slice < roi; slice++) {
             int pos = pix * roi + slice;
             double value = data[pos];
             if (value > tempMaxValue) {
                 tempMaxValue = value;
-                maxValues[pix] = value;
-                maxPos[pix] = slice;
-                // log.info("Found new maximum for pixel {} in slice {} : " +
-                // value, pix, slice);
             }
         }
         return tempMaxValue;
     }
 
-    public double maximum(int roi, int pix, double[] data) {
-        return maximum(roi, pix, data, 0, data.length, new double[data.length / roi], new int[data.length / roi]);
-    }
 
-    /**
-     * @param key
-     *            the key to set
-     */
     public void setKey(String key) {
         this.key = key;
     }
 
-    /**
-     * @param outputKey
-     *            the outputKey to set
-     */
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }
