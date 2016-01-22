@@ -3,7 +3,7 @@ package fact.features;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import fact.datacorrection.DrsCalibration;
 import fact.extraction.MaxAmplitude;
 import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
 import stream.Data;
 import stream.data.DataFactory;
 import stream.io.SourceURL;
@@ -34,23 +33,24 @@ public class MaxAmplitudeTest {
     @Before
     public void setup() throws Exception {
 
-        URL drsUrl = FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-        pr.setUrl(new SourceURL(drsUrl));
+        pr.setUrl(new SourceURL("classpath:/testDrsFile.drs.fits.gz"));
         pr.setOutputKey("test");
 
         maxAmp = new MaxAmplitude();
-        maxAmp.setKey("test");
-        maxAmp.setOutputKey(outputKey);
 
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("key", "test");
+        params.put("outputKey", outputKey);
+
+        ParameterInjection.inject(maxAmp, params, new Variables());
     }
 
     @Test
     public void dataTypes() {
 
         try {
-            URL dataUrl = FitsStreamTest.class.getResource("/testDataFile.fits.gz");
-            SourceURL url = new SourceURL(dataUrl);
+            SourceURL url = new SourceURL("classpath:/testDataFile.fits.gz");
             FitsStream stream = new FitsStream(url);
             stream.init();
             Data item = stream.read();
@@ -71,7 +71,8 @@ public class MaxAmplitudeTest {
                 12 };
         double[] maxValues = new double[mock.length];
         int[] maxPos = new int[mock.length];
-        double max = maxAmp.maximum(mock.length, 0, mock, 0, mock.length, maxValues, maxPos);
+        maxAmp.maximum(mock.length, 0, mock, 0, mock.length, maxValues, maxPos);
+        double max = maxValues[0];
         assertTrue("Maximum should be 4123.00001", max == 4123.00001);
     }
 
