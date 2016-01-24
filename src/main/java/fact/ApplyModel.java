@@ -20,13 +20,14 @@ import stream.io.SourceURL;
 
 import javax.xml.transform.Source;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Applies a .pmml model to data in the data item. The model can be written with SciKit learn. Using ERnA for example.
  *
- * Applies a .pmml model to data in the data item. The model can be written with SciKit learn for example.
  *
  * Created by kai on 03.12.15.
  */
@@ -50,17 +51,13 @@ public class ApplyModel implements StatefulProcessor{
     @Override
     public void init(ProcessContext processContext) throws Exception {
         //load model and marshal it into pmml version  > 4.0
-        InputStream is = url.openStream();
-        try{
+        log.info("Loading .pmml model");
+        try (InputStream is = url.openStream()) {
             Source transformedSource = ImportFilter.apply(new InputSource(is));
             pmml = JAXBUtil.unmarshalPMML(transformedSource);
-        } catch (SAXException ex){
+        } catch (SAXException ex) {
             log.error("Could not load model from file provided at" + url);
-        } finally {
-            log.info("Closing input stream");
-            is.close();
         }
-
         //build a modelevaluator from the loaded pmml file
         ModelEvaluatorFactory modelEvaluatorFactory = ModelEvaluatorFactory.newInstance();
         modelEvaluator = modelEvaluatorFactory.newModelManager(pmml);
@@ -89,12 +86,12 @@ public class ApplyModel implements StatefulProcessor{
 
     @Override
     public Data process(Data data) {
-        
+
         for(FieldName activeField : activeFields){
-//            log.info("Loading Active field from data item:  " + activeField.toString());
+
             Object rawValue = data.get(activeField.toString());
 
-            // The raw value is passed through: 1) outlier treatment, 2) missing value treatment, 3) invalid value treatment and 4) type conversion
+            // The raw value is passed through: type conversion or any other transofrmations applied in sklearn
             FieldValue activeValue = modelEvaluator.prepare(activeField, rawValue);
 
             arguments.put(activeField, activeValue);
@@ -105,6 +102,12 @@ public class ApplyModel implements StatefulProcessor{
         Object targetValue = results.get(targetName);
 
         log.info("Prediction: " + targetValue);
+        try{
+            data.put(targetName.getValue(),(Serializable) targetValue);
+        } catch (ClassCastException e){
+            log.warn("Cannot cast target type to serializable type");
+            data.put(targetName.getValue(), targetValue.toString());
+        }
 
         return data;
     }
