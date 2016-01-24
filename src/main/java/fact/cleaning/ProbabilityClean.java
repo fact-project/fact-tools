@@ -2,7 +2,7 @@ package fact.cleaning;
 
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 
@@ -68,19 +68,16 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 		
 		showerlist = removeSmallCluster(showerlist,2);
 		
-		PixelSetOverlay cleanedPixelSet = new PixelSetOverlay();
+		PixelSet cleanedPixelSet = new PixelSet();
 		if (showerlist.size() > 0)
 		{
-			Integer[] showerArray = new Integer[showerlist.size()];
 			for (int i = 0; i < showerlist.size(); i++) {
                 cleanedPixelSet.addById(showerlist.get(i));
-                showerArray[i] =  showerlist.get(i);
             }
 			
-			input.put(outputKey, showerArray);
-			input.put(outputKey+"Set", cleanedPixelSet);
+			input.put(outputKey, cleanedPixelSet);
 		}
-		
+
 		return input;
 	}
 

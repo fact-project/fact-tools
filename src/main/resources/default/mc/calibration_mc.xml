@@ -20,9 +20,9 @@
     topSlopeLimit="${removeSpikes_topSlopeLimit}"
     maxSpikeLength="${removeSpikes_maxSpikeLength}"
 />
-<fact.datacorrection.InterpolateBadPixel 
-    key="DataCalibrated" 
-    outputKey="DataCalibrated"
-    badChidIds="${interpolateBadPixel_badChidIDs}" 
+<fact.datacorrection.InterpolateTimeSeries 
+    calibService="calibService"
+    dataKey="DataCalibrated"
+    dataOutputKey="DataCalibrated"
 />
 </module>

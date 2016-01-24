@@ -1,31 +1,33 @@
-package fact.hexmap.ui.overlays;
+package fact.container;
 
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 import fact.hexmap.ui.components.cameradisplay.Tile;
+import fact.hexmap.ui.overlays.CameraMapOverlay;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * This is overlay can draw borders around the pixels passed to it via constructor or the add methods.
  */
-public class PixelSetOverlay implements CameraMapOverlay, Serializable {
-    Set<CameraPixel> set = new HashSet<>();
+public class PixelSet implements CameraMapOverlay, Serializable {
+    public Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
-    public PixelSetOverlay(HashSet<Integer> set) {
+    public PixelSet(HashSet<Integer> set) {
         for (Integer pix : set){
             this.addById(pix);
         }
     }
-    public PixelSetOverlay(Set<CameraPixel> set){
+    public PixelSet(Set<CameraPixel> set){
         this.set = set;
     }
-    public PixelSetOverlay(){
+    public PixelSet(){
     }
     public void add(CameraPixel p){
         set.add(p);
@@ -40,6 +42,14 @@ public class PixelSetOverlay implements CameraMapOverlay, Serializable {
         for (CameraPixel px : this.set){
             intSet[i] = px.id;
             i++;
+        }
+        return intSet;
+    }
+
+    public ArrayList<Integer> toArrayList(){
+        ArrayList<Integer> intSet = new ArrayList<Integer>();
+        for (CameraPixel px : this.set){
+            intSet.add(px.id);
         }
         return intSet;
     }

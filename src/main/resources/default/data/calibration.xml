@@ -28,9 +28,9 @@
     timeCalibConstKey="timeCalibConst"
     outputKey="DataCalibrated"
 />
-<fact.datacorrection.InterpolateBadPixel 
-    key="DataCalibrated" 
-    outputKey="DataCalibrated"
-    badChIds="${interpolateBadPixel_badChidIDs}" 
+<fact.datacorrection.InterpolateTimeSeries 
+    calibService="calibService"
+    dataKey="DataCalibrated"
+    dataOutputKey="DataCalibrated"
 />
 </module>
