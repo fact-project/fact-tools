@@ -80,6 +80,9 @@ public class WaveformFluctuation implements Processor {
         double[] chargeSkewness         = new double[npix];
         double[] chargeMedian           = new double[npix];
         double[] chargeSum              = new double[npix];
+        double[] median                 = new double[npix];
+        double[] p25                    = new double[npix];
+        double[] p75                    = new double[npix];
 
         int roi = data.length / npix;
 
@@ -133,11 +136,15 @@ public class WaveformFluctuation implements Processor {
             chargeSkewness[pix]     = descriptiveStatistics.getSkewness();
             chargeMedian[pix]       = descriptiveStatistics.getPercentile(0.5);
             chargeSum[pix]          = descriptiveStatistics.getSum();
-
-
+            median[pix]             = descriptiveStatistics.getPercentile(50);
+            p25[pix]                = descriptiveStatistics.getPercentile(25);
+            p75[pix]                = descriptiveStatistics.getPercentile(75);
         }
 
         input.put(outputKey, charge);
+        input.put(outputKey+"_median", median);
+        input.put(outputKey+"_p25", p25);
+        input.put(outputKey+"_p75", p75);
         input.put(outputKey+"_mean", chargeMean);
         input.put(outputKey+"_std", chargeStd);
         input.put(outputKey+"_var", chargeVariance);
