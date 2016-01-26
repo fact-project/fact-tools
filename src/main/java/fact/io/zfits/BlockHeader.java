@@ -15,7 +15,7 @@ public class BlockHeader {
 		
 		private final short id;
 		// using int and casting to short saves us the work to write '(short)x' everywhere above
-		private Prozessor(int id) {
+		Prozessor(int id) {
 			this.id = (short)id;
 		}
 		public short getId() {
@@ -149,7 +149,7 @@ public class BlockHeader {
 	}
 
 	public byte[] decode() throws DecodingException {
-		for (int i=0; i<(int)this.numProzessors; i++) {
+		for (int i=0; i< this.numProzessors; i++) {
 			//we must go backwards, the prozessors show the coding not the decoding
 			switch (this.prozessors[(this.numProzessors-1)-i]) {
 			case UNCOMPRESSED:

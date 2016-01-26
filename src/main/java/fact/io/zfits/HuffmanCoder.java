@@ -171,21 +171,6 @@ public class HuffmanCoder {
 		}
 		
 		/**
-		 * Returns the codeTable as a string
-		 * @return
-		 */
-		public String codeTableAsString() {
-			String s = "Entries: "+this.numCodeTableEntries+"\n";
-			for (int i=0; i<this.symbol2Code.length; i++) {
-				Code c = this.symbol2Code[i];
-				if (c==null)
-					continue;
-				s += "\t"+i+ ":" + c.numBits +":'"+String.format("%"+c.numBits+"s", Integer.toBinaryString(c.bits)).replace(' ','0')+"'\n";
-			} 
-			return s;
-		}
-
-		/**
 		 * Creates the codeTable and returns it as and byte array.
 		 * Format:
 		 *    write NumOfCodeTableEntries (long 8 bytes)
