@@ -31,7 +31,10 @@
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
         <include url="classpath:/default/mc/cleaning_mc.xml" />     
-        <!-- Output: shower -->   
+        <!-- Output: shower -->
+
+        <!-- PedestalParameters -->
+        <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
         
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
