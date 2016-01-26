@@ -24,26 +24,20 @@ import java.util.Map;
 
 public class ZFitsStream extends AbstractStream{
 
-    private boolean hasReadCalibrationConstants = false;
 
-    @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
-    public void setBufferSize(int bufferSize) {
-        this.bufferSize = bufferSize;
-    }
-
-
-    @Parameter(required = false, description = "This value defines which table of the ZFitsfile should be read.", defaultValue = "Events")
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 
     static Logger log = LoggerFactory.getLogger(ZFitsStream.class);
+
+    @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "2880")
     private int bufferSize = 2880;
 
-    private DataInputStream dataStream;
-    private Data headerItem = DataFactory.create();
+    @Parameter(required = false, description = "This value defines which table of the ZFitsfile should be read.", defaultValue = "Events")
     private String tableName = "Events";
 
+
+    private DataInputStream dataStream;
+
+    private Data headerItem = DataFactory.create();
 
     private ZFitsTable fitsTable = null;
 
@@ -190,33 +184,12 @@ public class ZFitsStream extends AbstractStream{
         return item;
     }
 
-//    private short[] readCalibrationConstants(SourceURL url) throws Exception {
-//        short[] constants;
-//        ZFitsStream drsStream = new ZFitsStream(url);
-//        drsStream.hasReadCalibrationConstants = true;
-//        drsStream.setTableName("ZDrsCellOffsets");
-//        try{
-//            drsStream.init();
-//        } catch (MissingArgumentException e) {
-//            log.error("No ZDrsCellOffsets found in file.");
-//            throw e;
-//        }
-//        Data item = drsStream.read();
-//        if (!item.containsKey("OffsetCalibration"))
-//            throw new NullPointerException("Missing OffsetCalibration");
-//        constants = (short[])item.get("OffsetCalibration");
-//        if (constants == null) {
-//            throw new NullPointerException("Should not happen");
-//        }
-//        return constants;
-//    }
-
-
     @Override
     public Data readNext() throws Exception {
 
-        if (this.tableReader == null)
+        if (this.tableReader == null) {
             throw new NullPointerException("Didn't initialize the reader, should never happen.");
+        }
         //get the next row of data if zero we finished
         byte[][] dataRow = this.tableReader.readNextRow();
         if (dataRow == null) {
@@ -236,7 +209,6 @@ public class ZFitsStream extends AbstractStream{
             applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
             item.put("Data", data);
         }
-//		log.debug(item.toString());
         return item;
     }
 
@@ -269,8 +241,7 @@ public class ZFitsStream extends AbstractStream{
                         item.put(columnInfo.getId(), b);
                     } else {
                         byte[] bArray = new byte[columnInfo.getNumEntries()];
-                        for (int i=0; i<bArray.length; i++)
-                            bArray[i] = data[i];
+                        System.arraycopy(data, 0, bArray, 0, bArray.length);
                         item.put(columnInfo.getId(), bArray);
                     }
                     break;
@@ -368,4 +339,9 @@ public class ZFitsStream extends AbstractStream{
         }
         return false;
     }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+    public void setBufferSize(int bufferSize) {this.bufferSize = bufferSize;}
 }

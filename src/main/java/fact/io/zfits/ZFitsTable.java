@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ZFitsTable {
-	private Map<String, FitsTableColumn> id2ColumnMap = new HashMap<String, FitsTableColumn>();
-	private List<FitsTableColumn> columns = new ArrayList<FitsTableColumn>();
+	private Map<String, FitsTableColumn> id2ColumnMap = new HashMap<>();
+	private List<FitsTableColumn> columns = new ArrayList<>();
 
 	public boolean isCompressed = false;
 	private FitsHeader header = null;
@@ -131,34 +131,10 @@ public class ZFitsTable {
 		return Long.parseLong(this.header.getKeyValue("ZHEAPPTR", "0"));
 	}
 	
-	/**
-	 * This should work i hope
-	 * @return The gap that i can't explain after the heap
-	 */
-	public long getSpezialGap() {
-		//return this.numCols*16;
-		return 0;
-	}
-
 	public long getSpezialAreaSize() {
 		return Long.parseLong(header.getKeyValue("PCOUNT", "0"));
 	}
 
-	public long getPaddingSize() {
-		long size = 0;
-		// get offset of special data area from start of main table            
-		//size += this.getHeapSize();
-		
-        // and special data area size
-        size += this.getSpezialAreaSize();
-        
-        // spezial gap from somewhere
-        //size += getSpezialGap();
-
-        // necessary to answer with padding %2880
-        return 2880-(size%2880);
-        //return ((size+2871)/2880)*2880 - size;
-	}
 
 	public long getTableTotalSize() {
 		long size = 0;
