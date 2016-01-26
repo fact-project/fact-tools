@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ZFitsTable {
-	private Map<String, FitsTableColumn> id2ColumnMap = new HashMap<String, FitsTableColumn>();
-	private List<FitsTableColumn> columns = new ArrayList<FitsTableColumn>();
+	private Map<String, FitsTableColumn> id2ColumnMap = new HashMap<>();
+	private List<FitsTableColumn> columns = new ArrayList<>();
 
-	private boolean isCompressed = false;
+	public boolean isCompressed = false;
 	private FitsHeader header = null;
 	private int numCols = 0;
 	private int numRows = 0;
@@ -81,12 +81,9 @@ public class ZFitsTable {
 			
 			
 			String format = header.getKeyValue(formName+strNum);
-			Integer tmp = Integer.parseInt(format.substring(0, format.length()-1));
-			if (tmp==null)
-				throw new ParseException("Can't get the Format from row: "+strNum+" format is: "+format);
-			int numEntries = tmp.intValue();
+			int numEntries = Integer.parseInt(format.substring(0, format.length()-1));
 			DataType type = DataType.getTypeFromChar(format.charAt(format.length()-1));
-			
+
 			FitsTableColumn column = new FitsTableColumn(id, numEntries, type.getNumBytes(), type, unit, compression);
 			
 			this.id2ColumnMap.put(id, column);
@@ -134,34 +131,10 @@ public class ZFitsTable {
 		return Long.parseLong(this.header.getKeyValue("ZHEAPPTR", "0"));
 	}
 	
-	/**
-	 * This should work i hope
-	 * @return The gap that i can't explain after the heap
-	 */
-	public long getSpezialGap() {
-		//return this.numCols*16;
-		return 0;
-	}
-
 	public long getSpezialAreaSize() {
 		return Long.parseLong(header.getKeyValue("PCOUNT", "0"));
 	}
 
-	public long getPaddingSize() {
-		long size = 0;
-		// get offset of special data area from start of main table            
-		//size += this.getHeapSize();
-		
-        // and special data area size
-        size += this.getSpezialAreaSize();
-        
-        // spezial gap from somewhere
-        //size += getSpezialGap();
-
-        // necessary to answer with padding %2880
-        return 2880-(size%2880);
-        //return ((size+2871)/2880)*2880 - size;
-	}
 
 	public long getTableTotalSize() {
 		long size = 0;
@@ -180,14 +153,6 @@ public class ZFitsTable {
 	
 	public FitsTableColumn getColumns(int index) {
 		return this.columns.get(index);
-	}
-	
-	/**
-	 * Return if the BINTABLE is a zfits table or not.
-	 * @return True if zfits table.
-	 */
-	public boolean getCommpressed() {
-		return this.isCompressed;
 	}
 	
 	/**

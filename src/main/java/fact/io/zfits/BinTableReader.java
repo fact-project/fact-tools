@@ -5,10 +5,9 @@ import stream.util.parser.ParseException;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-//TODO create as Interface
 public class BinTableReader implements TableReader {
 	public static TableReader createTableReader(ZFitsTable table, DataInputStream input) throws ParseException, IOException {
-		if (table.getCommpressed()) {
+		if (table.isCompressed) {
 			return new ZFitsTableReader(table, input);
 		} else {
 			//normale Bintable
@@ -40,7 +39,7 @@ public class BinTableReader implements TableReader {
 	public byte[][] readNextRow() throws IOException {
 		if (this.currentRow==table.getNumRows())
 			return null;
-		byte[][] output = new byte[this.table.getNumRows()][];
+		byte[][] output = new byte[this.table.getNumCols()][];
 		for (int i=0; i<this.table.getNumCols(); i++) {
 			output[i] = new byte[this.table.getColumns(i).getColumnSize()];
 			this.inputStream.read(output[i]);

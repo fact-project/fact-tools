@@ -73,7 +73,7 @@ public class ZFitsUtil {
 	 * @throws IOException Thrown if something went wrong reading from input.
 	 */
 	public static List<String> readBlock(DataInputStream input) throws IOException {
-		List<String> block = new ArrayList<String>();
+		List<String> block = new ArrayList<>();
 		byte[] byteData = new byte[80];
 		boolean loadingBlocks = true;
 		while ( loadingBlocks ) {
