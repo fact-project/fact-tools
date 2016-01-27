@@ -10,7 +10,9 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
 import java.util.Random;
@@ -22,7 +24,7 @@ import java.util.Random;
  * the resulting distribution.
  * Created by jbuss on 17.11.14.
  */
-public class WaveformFluctuation implements Processor {
+public class WaveformFluctuation implements StatefulProcessor {
     @Parameter(required = true)
     private String key = null;
 
@@ -48,6 +50,8 @@ public class WaveformFluctuation implements Processor {
     static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
 
     private int npix;
+
+    private Random rand;
 
     @Override
     public Data process(Data input) {
@@ -85,8 +89,6 @@ public class WaveformFluctuation implements Processor {
         double[] p75                    = new double[npix];
 
         int roi = data.length / npix;
-
-        Random rand = new Random(Seed);
 
         int bound = roi - skipLast - skipFirst;
         int iterations = bound/windowSize;
@@ -208,5 +210,20 @@ public class WaveformFluctuation implements Processor {
 
     public void setSeed(long seed) {
         Seed = seed;
+    }
+
+    @Override
+    public void init(ProcessContext context) throws Exception {
+        rand = new Random(Seed);
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
     }
 }
