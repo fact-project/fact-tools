@@ -71,7 +71,7 @@ public class WaveformFluctuation implements StatefulProcessor {
             ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
             pixels = Ints.toArray(numbers);
         }
-        log.info("npix: " + pixels.length );
+        log.debug("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
 
@@ -92,7 +92,7 @@ public class WaveformFluctuation implements StatefulProcessor {
 
         int bound = roi - skipLast - skipFirst;
         int iterations = bound/windowSize;
-        log.info("Iterations: " + iterations );
+        log.debug("Iterations: " + iterations );
 
         double[][] charge = new double[npix][iterations];
 
