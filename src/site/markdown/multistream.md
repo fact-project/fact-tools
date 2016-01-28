@@ -15,8 +15,8 @@ the process in this case, you need a unique `id` for each of these. You can acce
 ### Using RecursiveDirectoryStreams
 
 This particular MultiStream is quite useful in case you want to analyze a bunch of files in a directory. 
-Monte Carlo data for example is usually split up over several thousand fits files. You specify a suffix 
-to only take into account the filenames containing a certain suffix. In this example we only want to read 
+Monte Carlo data for example is usually split up over several thousand fits files. You specify a pattern 
+to only take into account the filenames containing a certain pattern. In this example we only want to read 
 the files ending with `_Events.fits.gz`. These are the usual filenames for simulated Telescope data written
 by the simulation program Ceres.
 
@@ -32,7 +32,7 @@ by the simulation program Ceres.
             <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
         
             <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream"
-                    suffix="_Events.fits.gz" copies="${num_copies}" url="${infile}">
+                    pattern="_Events.fits.gz" copies="${num_copies}" url="${infile}">
                 <stream class="fact.io.FitsStream" id="_" limit="10"/>
             </stream>
         
@@ -73,7 +73,7 @@ Here is an example .xml file.
 
 
         <stream id="mystream:${copy.id}" class="fact.io.FactFileListMultiStream"
-                listUrl="file:${whitelist}" copies="${num_copies}" >
+                url="file:${whitelist}" copies="${num_copies}" >
             <stream class="fact.io.zfits.ZFitsStream" id="_" limit="100"/>
         </stream>
 

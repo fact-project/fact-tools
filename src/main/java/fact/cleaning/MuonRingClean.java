@@ -1,6 +1,6 @@
 package fact.cleaning;
 
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -28,7 +28,7 @@ public class MuonRingClean implements Processor {
 		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
 		
 		ArrayList<Integer> cleanRingList = new ArrayList<Integer>();
-		PixelSetOverlay cleanPixelSet = new PixelSetOverlay();
+		PixelSet cleanPixelSet = new PixelSet();
 		
 		for(int i=0; i<ringPixel.length; i++){
 			if(photonCharge[ringPixel[i]] >= photonChargeThreshold){ 

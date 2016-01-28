@@ -2,7 +2,6 @@ package fact.io.zfits;
 
 
 import fact.Utils;
-import fact.io.FactStream;
 import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +21,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ZFitsStream extends AbstractStream implements FactStream{
+public class ZFitsStream extends AbstractStream{
 
-    private File drsFile;
     private boolean hasReadCalibrationConstants = false;
 
     @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
@@ -80,6 +78,7 @@ public class ZFitsStream extends AbstractStream implements FactStream{
     @Override
     public void init() throws Exception {
         super.init();
+        this.count = 0L;
         log.info("Read file: {}", this.url.getFile());
         File f = new File(this.url.getFile());
         if (!f.canRead()){
@@ -317,9 +316,7 @@ public class ZFitsStream extends AbstractStream implements FactStream{
                     throw new ParseException("The type of a column is wrong, or could not be read.");
             }
         }
-        if(this.drsFile != null){
-            item.put("@drsFile", this.drsFile);
-        }
+
         return item;
     }
 
@@ -349,10 +346,5 @@ public class ZFitsStream extends AbstractStream implements FactStream{
             }
         }
         return false;
-    }
-
-    @Override
-    public void setDrsFile(File drsFile) {
-        this.drsFile = drsFile;
     }
 }

@@ -12,7 +12,6 @@ import stream.annotations.Parameter;
 /**
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
  */
 @Description(group = "Fact Tools.Filter", text = "A simple running average")
 public class MovingAverage implements StatefulProcessor{
@@ -75,7 +74,7 @@ public class MovingAverage implements StatefulProcessor{
     public void init(ProcessContext context) throws Exception {
         if((length & 1) == 0){
             length++;
-            log.info("CentralMovingAverage only supports uneven window lengths. New length is: " + length);
+            log.warn("CentralMovingAverage only supports uneven window lengths. New length is: " + length);
         }
     }
 

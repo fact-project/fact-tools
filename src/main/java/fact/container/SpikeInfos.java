@@ -1,7 +1,6 @@
 package fact.container;
 
 import fact.Constants;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 
@@ -19,7 +18,7 @@ public class SpikeInfos implements Serializable {
 	List<Double> spHeight = new ArrayList<Double>();
 	List<Double> spTopSlope = new ArrayList<Double>();
 	
-	PixelSetOverlay spikesSet = new PixelSetOverlay();
+	PixelSet spikesSet = new PixelSet();
 	
 	IntervalMarker[] spikeMarker = new IntervalMarker[Constants.NUMBEROFPIXEL];
 

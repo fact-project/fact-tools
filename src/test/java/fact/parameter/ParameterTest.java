@@ -1,5 +1,6 @@
 package fact.parameter;
 
+import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
@@ -8,9 +9,11 @@ import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -39,11 +42,14 @@ public class ParameterTest {
     final String positions = "positions";
     final String arrivalTime = "arrivalTime";
     final String shower = "shower";
+    final ConstantCalibService calibService = new ConstantCalibService();
 
     @Before
     public void setUp() throws Exception {
         URL dataUrl = FitsStreamTest.class.getResource("/testDataFile.fits.gz");
         SourceURL url = new SourceURL(dataUrl);
+        
+        
 
         stream = new FitsStream(url);
 
@@ -78,6 +84,7 @@ public class ParameterTest {
 		pR.process(item);
 
 		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
+		poser.setCalibService(calibService);
 		poser.setPhotonChargeKey(photonCharge);
 		poser.setArrivalTimeKey(arrivalTime);
 		poser.setOutputKey(shower);
@@ -90,7 +97,7 @@ public class ParameterTest {
 
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setShowerKey(shower);
+        dist.setPixelSetKey(shower);
         dist.setWeightsKey(photonCharge);
         dist.setOutputKey(distribution);
         dist.process(item);

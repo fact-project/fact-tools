@@ -3,8 +3,10 @@ package fact.features;
 
 import fact.Constants;
 import fact.Utils;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -28,7 +30,7 @@ public class ConcentrationCore implements Processor{
 	@Parameter(required = true, description  = "Key of the photoncharge array")
 	private String photonChargeKey;
 	@Parameter(required = true, description  = "Key of the shower pixel array")
-	private String showerPixelKey;
+	private String pixelSetKey;
 	@Parameter(required = true, description  = "Key of the shower width")
 	private String widthKey;
 	@Parameter(required = true, description  = "Key of the shower lengthKey")
@@ -39,14 +41,14 @@ public class ConcentrationCore implements Processor{
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, showerPixelKey, lengthKey, widthKey, sizeKey);
+		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
 		
 		try{
 			Double cogx = (Double) input.get(cogxKey);
 			Double cogy = (Double) input.get(cogyKey);
 			Double d = (Double) input.get(deltaKey);
 			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
-			int [] showerPixelArray = (int[]) input.get(showerPixelKey);
+			PixelSet showerPixelArray = (PixelSet) input.get(pixelSetKey);
 			Double l = (Double) input.get(lengthKey);
 			Double w = (Double) input.get(widthKey);
 			Double size = (Double) input.get(sizeKey);
@@ -56,9 +58,9 @@ public class ConcentrationCore implements Processor{
 			
 			double concCore = 0;
 			
-			for(int pix : showerPixelArray)
+			for(CameraPixel pix : showerPixelArray.set)
 			{
-                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix);
+                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix.id);
 				double px = p.getXPositionInMM();
 				double py = p.getYPositionInMM();
 				
@@ -80,7 +82,7 @@ public class ConcentrationCore implements Processor{
 				double distr = (1+tana)/(rl + tana*rw);
 				
 				if (distr>dist0-dz || dzx==0)
-					 concCore += photonChargeArray[pix];
+					 concCore += photonChargeArray[pix.id];
 				
 			}
 			concCore /= size;
@@ -142,12 +144,8 @@ public class ConcentrationCore implements Processor{
 		this.photonChargeKey = photonChargeKey;
 	}
 
-	public String getShowerPixelKey() {
-		return showerPixelKey;
-	}
-
-	public void setShowerPixelKey(String showerPixelKey) {
-		this.showerPixelKey = showerPixelKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
 
 	public String getWidthKey() {
