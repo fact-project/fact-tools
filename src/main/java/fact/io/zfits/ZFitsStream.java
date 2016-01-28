@@ -74,7 +74,7 @@ public class ZFitsStream extends AbstractStream{
     public void init() throws Exception {
         super.init();
         this.count = 0L;
-        log.info("Read file: {}", this.url.getFile());
+        log.info("Reading file: {}", this.url.getFile());
         File f = new File(this.url.getFile());
         if (!f.canRead()){
             log.error("Cannot read file. Wrong path? ");
@@ -82,17 +82,16 @@ public class ZFitsStream extends AbstractStream{
         }
         this.dataStream = new DataInputStream(new BufferedInputStream(url.openStream(), bufferSize ));
 
-        //get calibration constants
-        this.dataStream.mark(10000000);
 
+        this.dataStream.mark(2000000);
         //read the header and output some information
         List<String> block = ZFitsUtil.readBlock(dataStream);
         FitsHeader header = new FitsHeader(block);
         if (header.getKeyValue("SIMPLE").equals("T")){
-            log.info("Header claims this file conforms to FITS standard");
+            log.debug("Header claims this file conforms to FITS standard");
         }
         if (header.getKeyValue("EXTEND").equals("T")){
-            log.info("This file may contain extensions");
+            log.debug("This file may contain extensions");
         }
 
         //read the second header
@@ -100,6 +99,9 @@ public class ZFitsStream extends AbstractStream{
         FitsHeader secondHeader = new FitsHeader(block);
         if(secondHeader.check("ZTABLE", FitsHeader.ValueType.BOOLEAN, "T")){
             log.info("File is ZFITS compresssed.");
+        }
+        if (! secondHeader.check("PCOUNT", FitsHeader.ValueType.INT)){
+            log.warn("Invalid header format in file. Trying to read anyway.");
         }
         if(secondHeader.check("EXTNAME", FitsHeader.ValueType.STRING, "ZDrsCellOffsets")){
             log.info("File contains ZDrsCellOffsets.");
@@ -190,9 +192,10 @@ public class ZFitsStream extends AbstractStream{
         if (this.tableReader == null) {
             throw new NullPointerException("Didn't initialize the reader, should never happen.");
         }
-        //get the next row of data if zero we finished
+        //get the next row of data. When its null the file has ended
         byte[][] dataRow = this.tableReader.readNextRow();
         if (dataRow == null) {
+            log.info("File {} ended.", url.getFile());
             return null;
         }
         ByteOrder order = this.fitsTable.isCompressed ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
