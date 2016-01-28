@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
+ *
+ * A special CameraPixel containing fact specific ids.
+ * @see fact.hexmap.CameraPixel
  * Created by kaibrugge on 23.04.14.
  */
 public class FactCameraPixel extends CameraPixel implements Serializable {
@@ -22,12 +25,16 @@ public class FactCameraPixel extends CameraPixel implements Serializable {
 
     /**
      * This sets the chid of this pixel.
-     * @param chid
+     * @param chid the chid to set.
      */
     public void setId(int chid){
         this.id = chid;
     }
 
+    /**
+     * This will automatically set crate,board,patch,chid and drs_chip. All these values can be inferred from the hardid
+     * @param hardID the id to set.
+     */
     public void setHardid(int hardID) {
         this.hardid = hardID;
         this.crate = hardid / 1000;

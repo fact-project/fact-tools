@@ -1,0 +1,69 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testMCDrsFile.drs.fits.gz" />
+
+    <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />-->
+    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />-->
+    <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_096.fits.gz" />-->
+    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
+
+
+    <!--<property name="infile" value="file:/Users/kai/fact_phido/simulated/ceres/proton_heinz_12/32917/00032917.917_D_MonteCarlo032_Events.fits.gz" />-->
+    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+    <service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+    <!-- Name of the stream and url to the input file -->
+    <stream id="fact" class="fact.io.LoopStream" events="10">
+        <stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
+    </stream>
+    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
+    <!-- Description of the process and the corresponding stream -->
+    <process input="fact" copies="1">
+        <fact.DataRate every="20"/>
+        <If condition="%{data.McCherPhotWeight} != null" >
+            <fact.utils.Remapping
+                    key="Data"
+                    outputKey="Data"
+            />
+            <fact.utils.RemappingKeys
+                    keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+            />
+        </If>
+        <!-- prevEventAndSkip: -->
+        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
+        <include url="classpath:/default/data/prevEventAndSkip.xml" />
+        <!-- Output: Data -->
+
+        <!-- Calibration: -->
+        <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
+        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
+        <include url="classpath:/default/data/calibration.xml" />
+        <!-- Output: DataCalibrated -->
+
+        <!-- Extraction -->
+        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
+        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
+        <include url="classpath:/default/data/extraction.xml" />
+        <!-- Output: photoncharge, arrivalTime -->
+
+
+        <fact.rta.LightCurve/>
+        <!-- Output: DataCalibrated -->
+        <!--<fact.ShowViewer key="DataCalibrated" />-->
+
+    </process>
+
+
+
+</container>
+

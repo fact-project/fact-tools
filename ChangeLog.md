@@ -3,7 +3,7 @@
 
 ## Version 0.11.2
 
-Fixed a bug in the FactFileListMultiStream. The Wrapped stream wasnt initialized properly when it threw an exception during initialization.
+Fixed a bug in the FactFileListMultiStream. The Wrapped stream wasn't initialized properly when it threw an exception during initialization.
 
 ## Version 0.11.1
 
