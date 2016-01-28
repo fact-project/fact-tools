@@ -6,4 +6,5 @@
 * However these classes are_not_meant to provide the same feature set as a real scientific plotting application like  GNUPLot.  
 * Most plotters in this package extend the__DataVisualizer__class from the Streams-Framework and rely on the __JFreeChart__ library for graphical output.
 */
+@Deprecated
 package fact.plotter;
