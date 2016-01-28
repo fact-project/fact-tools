@@ -1,6 +1,6 @@
 package fact.parameter;
 
-import fact.cleaning.CoreNeighborClean;
+import fact.cleaning.TwoLevelTimeMedian;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,13 +23,14 @@ public class CoreNeighbourCleanParameterTest extends ParameterTest {
 	public void testValidParameter() throws Exception{
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
-		CoreNeighborClean poser = new CoreNeighborClean();
+		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
+		poser.setCalibService(calibService);
 		poser.setPhotonChargeKey(photonCharge);
 		poser.setArrivalTimeKey(arrivalTime);
         poser.setCorePixelThreshold(0);
         poser.setNeighborPixelThreshold(0);
         poser.setMinNumberOfPixel(0);
-        poser.setTimeThreshold(300);
+        poser.setTimeLimit(300);
 		poser.setOutputKey(outputKey);
 		poser.process(item);
 		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));

@@ -1,7 +1,7 @@
 package fact.extraction;
 
 import fact.Utils;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -28,7 +28,7 @@ public class HandleSaturation implements Processor {
     @Parameter(description="Key for Pixel Set of saturated Pixels")
     private String saturatedPixelKey = null;
 
-    private PixelSetOverlay saturatedPixelSet = null;
+    private PixelSet saturatedPixelSet = null;
     
 	private int npix;
 
@@ -52,7 +52,7 @@ public class HandleSaturation implements Processor {
 		double[] resultArrivalTimes = new double[arrivalTime.length];
 		System.arraycopy(arrivalTime, 0, resultArrivalTimes, 0, arrivalTime.length);
 
-        saturatedPixelSet = new PixelSetOverlay();
+        saturatedPixelSet = new PixelSet();
 
 		for (int px = 0 ; px < npix ; px++)
 		{

@@ -3,7 +3,7 @@
  */
 package fact.io;
 
-import fact.filter.DrsCalibration;
+import fact.datacorrection.DrsCalibration;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,6 @@ import stream.ProcessorList;
 import stream.io.SourceURL;
 import stream.runtime.ProcessContextImpl;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,24 +32,24 @@ public class FitsSpeedTest {
 		int limit = 100;
 
 		try {
-			SourceURL url = new SourceURL(FitsStreamTest.class.getResource("/testDataFile.fits.gz"));
+			SourceURL url = new SourceURL("classpath:/testDataFile.fits.gz");
 			FitsStream stream = new FitsStream(url);
 			stream.init();
 
 			ProcessorList preprocess = new ProcessorList();
 			DrsCalibration drs = new DrsCalibration();
-			URL u =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
-			drs.setUrl(new SourceURL(u));
+			// URL u =
+			// FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+			drs.setUrl(new SourceURL("classpath:/testDrsFile.drs.fits.gz"));
 			preprocess.add(drs);
-//			preprocess.add(new PhotonCharge());
-//			preprocess.add(new MaxAmplitude());
+			// preprocess.add(new PhotonCharge());
+			// preprocess.add(new MaxAmplitude());
 
 			preprocess.init(new ProcessContextImpl());
 			Long start = System.currentTimeMillis();
 			Data item = stream.read();
-			log.info( "size of data array: {}",
-					((short[]) item.get("Data")).length 
-					);
+			log.info("size of data array: {}",
+					((short[]) item.get("Data")).length);
 			int i = 0;
 			while (item != null) {
 				item = stream.read();

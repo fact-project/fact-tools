@@ -1,6 +1,8 @@
 package fact.statistics;
 
 import fact.Utils;
+import fact.hexmap.CameraPixel;
+import fact.container.PixelSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +16,14 @@ import stream.annotations.Parameter;
  * outputKey+"_" +"mean"
  * outputKey+"_" +"max"
  * outputKey+"_" +"min"
- * outputKey+"_" +"geommetricMean"
  * outputKey+"_" +"kurtosis"
  * outputKey+"_" +"variance"
  * outputKey+"_" +"skewness"
  *
- * also a subarray can be defined by a given pixelSetArray that contains the array ids that should be used for the sub array    
+ * also a subarray can be defined by a given pixelSet that contains the pixel ids that should be used for the sub array.
+ * If no set can be find for the given key NaN are returned for the values.
+ *
+ * Created by jbuss
  */
 public class ArrayStatistics implements Processor {
 
@@ -28,49 +32,35 @@ public class ArrayStatistics implements Processor {
     private String key = null;
     @Parameter(required = true, description = "The name of the data written to the stream")
     private String outputKey = null;
-    @Parameter(description = "key of an array containing the IDs of a desired Subset")
+    @Parameter(description = "key of a pixelSet (PixelSetOverlay) containing the IDs of a desired Subset")
     private String pixelSetKey = null;
-
-    private int []      pixelArray  = null;
 
 
     @Override
     public Data process(Data input) {
         Utils.mapContainsKeys( input, key);
 
-        double[]    subset      = null;
-        double[] data = Utils.toDoubleArray(input.get(key));
-
-        if (pixelSetKey == null){
-            subset = data;
-        }
-        else{
-        	if (!input.containsKey(pixelSetKey))
-        	{
-        		input.put(outputKey+"_" +"mean",-Double.MAX_VALUE);
-                input.put(outputKey+"_" +"max",-Double.MAX_VALUE);
-                input.put(outputKey+"_" +"min",-Double.MAX_VALUE);
-//                input.put(outputKey+"_" +"geometricMean",-Double.MAX_VALUE);
-                input.put(outputKey+"_" +"kurtosis",-Double.MAX_VALUE);
-                input.put(outputKey+"_" +"variance",-Double.MAX_VALUE);
-                input.put(outputKey+"_" +"skewness",-Double.MAX_VALUE);
-
-                return input;
-        	}
-            pixelArray  = (int[]) input.get(pixelSetKey);
-            subset = new double[pixelArray.length];
-
-            //Loop over array containing the pixel ids of the desired subset
-            for (int i = 0; i < pixelArray.length; i++){
-                subset[i] = data[pixelArray[i]];
-            }
-        }
+        double[] data   = Utils.toDoubleArray(input.get(key));
 
 
         DescriptiveStatistics s = new DescriptiveStatistics();
-        for(double value: subset){
-            s.addValue(value);
+
+        if (pixelSetKey == null){
+            /* run over whole data array if no set is specified */
+            for(double value : data){
+                s.addValue(value);
+            }
         }
+        else if (input.containsKey(pixelSetKey)){
+            /* if a set is specified, use only the pixel ids from the set */
+            PixelSet pixelArray = (PixelSet) input.get(pixelSetKey);
+            for(CameraPixel pix : pixelArray.set){
+                s.addValue(data[pix.id]);
+            }
+        }
+        input.put(outputKey+"_" +"median",s.getPercentile(50));
+        input.put(outputKey+"_" +"p25",s.getPercentile(25));
+        input.put(outputKey+"_" +"p75",s.getPercentile(75));
         input.put(outputKey+"_" +"mean",s.getMean());
         input.put(outputKey+"_" +"max",s.getMax());
         input.put(outputKey+"_" +"min",s.getMin());

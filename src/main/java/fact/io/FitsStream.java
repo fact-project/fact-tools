@@ -1,25 +1,17 @@
 package fact.io;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 public class FitsStream extends AbstractStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
@@ -37,8 +29,6 @@ public class FitsStream extends AbstractStream {
 	@Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
 	private int bufferSize = 8 * 1024;
 
-	private int headerLength = 0;
-
 	public FitsStream(SourceURL url) {
 		super(url);
 	}
@@ -46,6 +36,8 @@ public class FitsStream extends AbstractStream {
 	public FitsStream() {
 		super();
 	}
+
+
 
 	/**
 	 * This consists of 3 steps 1. Get the size of the fits header. A header
@@ -72,7 +64,7 @@ public class FitsStream extends AbstractStream {
 
 		FitsHeader header = new FitsHeader(dataStream);
 		log.debug("Header #1 read:\n{}", header);
-		headerLength = header.getLength();
+		int headerLength = header.getLength();
 		dataStream.reset();
 		dataStream.skip(headerLength);
 
@@ -185,6 +177,12 @@ public class FitsStream extends AbstractStream {
 		}
 	}
 
+    @Override
+    public void close() throws Exception {
+        super.close();
+        this.count = 0L;
+    }
+
 	/**
 	 * this parses an event from the datastream and the bytebuffer in case we
 	 * read alot of shorts(more than 128) We use a NIO buffer to load a complete
@@ -196,7 +194,6 @@ public class FitsStream extends AbstractStream {
 		// FactEvent item = new FactEvent();
 		Data item = DataFactory.create(headerItem);
 		// Data item = headerItem;
-
 		try {
 			dataStream.mark(blockSize + 1);
 			long byteCounter = 0;
@@ -380,10 +377,16 @@ public class FitsStream extends AbstractStream {
 		}
 		item.put("@source", url.getProtocol() + ":" + url.getPath());
 		item.put("@numberOfPixel", numberOfPixel);
+
 		return item;
 	}
 
-	public class FitsHeader {
+
+
+    /**
+     * This class describes the header of a .fits file.
+     */
+    public class FitsHeader {
 
 		final byte[] headerData;
 
@@ -443,7 +446,7 @@ public class FitsStream extends AbstractStream {
 		}
 
 		public String toString() {
-			StringBuffer s = new StringBuffer();
+			StringBuilder s = new StringBuilder();
 			for (String line : getLines()) {
 				s.append(line);
 				s.append("\n");

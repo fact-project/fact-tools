@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 
+/**
+ * Prints the specified keys to the console in a nicely formatted manner.
+ */
 public class PrintKeysOnConsole implements Processor {
 	
 	private String[] keys;

@@ -14,31 +14,59 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SourcePositionTest {
     static Logger log = LoggerFactory.getLogger(SourcePositionTest.class);
 
-    private SourcePosition sourcePosition;
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-	@Before
-	public void setup()
-	{
-		sourcePosition = new SourcePosition();
-		sourcePosition.setOutputKey("test");
-	}
+    @Test
+    public void testWobbleWrongParameter() throws Exception {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
+        //set only one key. eventhough we need all 4
+        sourcePosition.setPointingAzKey("bla");
+        try {
+            sourcePosition.init(null);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        fail("Should have caught an IllegalArgumentException here.");
+
+    }
+
+
+    @Test
+    public void testWobbleCorrectParameter() throws Exception {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
+        sourcePosition.setPointingAzKey("hello");
+        sourcePosition.setPointingZdKey("I am");
+        sourcePosition.setSourceAzKey("quite the ");
+        sourcePosition.setSourceZdKey("annoying feature.");
+        sourcePosition.init(null);
+
+        assertThat(sourcePosition.hasMcWobblePosition, is(true));
+    }
 
 
     @Test
     public void testTimeConversion() throws ParseException {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
         //get a test date and time
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = isoFormat.parse("2014-10-01T16:34:00");
 
         //get julian day. see http://aa.usno.navy.mil/data/docs/JulianDate.php for an online calculator
-        int unixTime = (int) (date.getTime()/1000L);
+        double unixTime = (double) (date.getTime()/1000L);
         double jd = sourcePosition.unixTimeToJulianDay(unixTime);
         Assert.assertEquals(2456932.1902, jd, 0.0001);
 
@@ -76,7 +104,10 @@ public class SourcePositionTest {
 	@Test
 	public void testCetaTauri() throws Exception
 	{
-		double C_T_rightAscension = (5.0 + 37.0/60 + 38.7/3600) / 24.0 * 360.0;
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
+		double C_T_rightAscension = (5.0 + 37.0/60 + 38.7/3600);
 		double C_T_declination = 21.0 + 8.0/60 + 33.0/3600;
 		
 		int[] C_T_chids = {1378,215,212};
@@ -91,7 +122,7 @@ public class SourcePositionTest {
 		C_T_coord[0] /= 3;
 		C_T_coord[1] /= 3;
 		
-		double pointingRa = 83.1375;
+		double pointingRa = 83.1375/360 * 24;
 		double pointingDec = 21.628055555555555;
 		double gmst = 1.1289573103059787;
 		
@@ -108,6 +139,9 @@ public class SourcePositionTest {
 	@Test
 	public void testSouthOrientation()
 	{
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
 		double zdSource = 0.6;
 		double azSource = 0.0;
 		double zdPointing = 0.0;

@@ -22,22 +22,36 @@
 
 	<menu name="General">
 		<item name="Overview" href="index.html"/>
+		<item name="Publications" href="publications.html" />
 		<item name="Fact Viewer" href="viewer.html" />
 		<item name="Building" href="build.html"/>
 	</menu>
 	
+	<menu name="Tutorial">
+		<item name="FACT Tools Tutorial" href="tutorial/index.html" collapse="true">
+			<item name="(1) Running FACT-Tools" href="tutorial/running.html" />
+			<item name="(2) Telescope Data Inspection" href="tutorial/viewing.html" />
+			<item name="(3) Data Preprocessing" href="tutorial/preprocessing.html" />
+		</item>
+	</menu>
+	
 	<menu name="Documentation">
+        <item name="Quickstart" href="quickstart.html" />
+        <item name="Using Multistreams" href="multistream.html" />
+        <item name="Using Auxiliary Data" href="aux.html" />
+        <item name="Standard Analysis" href="stdAnalysis/standardAnalysis.html" >
+            <item name="Standard Settings" href="stdAnalysis/standardSettings.html" />
+        </item>
 	    <item name="Usage Examples" href="examples.html">
-	         <item name="Writing Data" href="example_writing.html" />
+	         <item name="Reading and Writing Data" href="example_writing.html" />
 	         <item name="Plotting Data" href="plotting/example_plots.html" collapse="true" >
 	            <item name="Scatter Plots" href="plotting/scatter_plot.html" />
 	            <item name="Bar Plots" href="plotting/bar_plot.html" />
-	            <item name="Histogram Plots" href="plotting/histogram_plot.html" />
+	            <!--<item name="Histogram Plots" href="plotting/histogram_plot.html" />-->
 	         </item>
-	
 	    </item>
 	
-	    <item name="Programming Examples" href="programming_examples/programming_example.html" collapse="false">
+	    <item name="Programming Examples" href="programming_examples/programming_example.html" collapse="true">
                 <item name="Displaying data in the Viewer" href="programming_examples/displaying.html" />
                 <item name="Creating custom color maps" href="programming_examples/colormaps.html" />
                 <item name="Finding the maximum" href="programming_examples/maximum.html" />

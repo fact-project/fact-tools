@@ -18,9 +18,6 @@ import org.apache.commons.math3.util.Pair;
 import stream.Data;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 public class PlotDisplayWindow implements EventObserver {
 
@@ -28,8 +25,8 @@ public class PlotDisplayWindow implements EventObserver {
     private final KeySelector keySelector = new TimeSeriesKeySelector();
     private final KeySelector intervalKeySelector = new IntervallMarkerKeySelector();
 
-    private Set<Pair<String, Color>> selectedItems = new HashSet<>();
-    private Set<Pair<String, Color>> selectedMarker = new HashSet<>();
+//    private Set<Pair<String, Color>> selectedItems = new HashSet<>();
+//    private Set<Pair<String, Color>> selectedMarker = new HashSet<>();
 
     public PlotDisplayWindow() {
         //keySelector.addItem(new SeriesKeySelectorItem(key, Color.DARK_GRAY, keySelector));

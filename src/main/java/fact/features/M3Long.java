@@ -3,10 +3,7 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelDistribution2D;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.EllipseOverlay;
-import org.apache.commons.math3.linear.EigenDecomposition;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
+import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -20,10 +17,15 @@ public class M3Long implements Processor {
     private String weightsKey =  null;
     @Parameter(required = true, description = "The key to the showerPixel. " +
             "That is some sort of int[] containing pixel chids.")
-    private  String showerKey =  null;
+    private  String pixelSetKey =  null;
+    
+    @Parameter(required = true)
+	private String m3lOutputKey = "m3l";
+    @Parameter(required = true)
+	private String m3tOutputKey = "m3t";
 
     @Parameter(required = true)
-    private String distribution =  null;
+    private String distributionKey =  null;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -34,13 +36,13 @@ public class M3Long implements Processor {
 public Data process(Data input) {
 	//get the required stuff from the getColorFromValue
 	//in case the getColorFromValue doesn't contain a shower return the original input.
-    Utils.isKeyValid(input, showerKey, int[].class);
+    Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
     Utils.isKeyValid(input, weightsKey, double[].class);
-    Utils.isKeyValid(input, distribution, PixelDistribution2D.class);
+    Utils.isKeyValid(input, distributionKey, PixelDistribution2D.class);
 
-    int[] showerPixel = (int[]) input.get(showerKey);
+    int[] showerPixel = ((PixelSet) input.get(pixelSetKey)).toIntArray();
     double[] showerWeights = createShowerWeights(showerPixel, (double[]) input.get(weightsKey));
-    PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
+    PixelDistribution2D dist = (PixelDistribution2D) input.get(distributionKey);
     //double[] showerCenter = getCenter(showerPixel);
 
 
@@ -62,8 +64,8 @@ public Data process(Data input) {
 
 
 
-    input.put("m3l",Math.cbrt(m3l));
-    input.put("m3t",Math.cbrt(m3t));
+    input.put(m3lOutputKey,Math.cbrt(m3l));
+    input.put(m3tOutputKey,Math.cbrt(m3t));
 
 	return input;
 }
@@ -123,22 +125,38 @@ public Data process(Data input) {
         return cog;
     }
 
+	public void setWeightsKey(String weights) {
+		this.weightsKey = weights;
+	}
 
-
-public void setWeightsKey(String weights) {
-	this.weightsKey = weights;
-}
-
-
-
-public void setShowerKey(String showerKey) {
-	this.showerKey = showerKey;
-}
-
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
     }
+
+    public String getDistributionKey() {
+		return distributionKey;
+	}
+
+	public void setDistributionKey(String distributionKey) {
+		this.distributionKey = distributionKey;
+	}
+
+	public String getM3lOutputKey() {
+		return m3lOutputKey;
+	}
+
+	public void setM3lOutputKey(String m3lOutputKey) {
+		this.m3lOutputKey = m3lOutputKey;
+	}
+
+	public String getM3tOutputKey() {
+		return m3tOutputKey;
+	}
+
+	public void setM3tOutputKey(String m3tOutputKey) {
+		this.m3tOutputKey = m3tOutputKey;
+	}
+
 
 
 }

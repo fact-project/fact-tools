@@ -1,79 +1,25 @@
 <container>
 
-<!-- Pfade zu den fits files. -->
- <!--<property name="data" value="/home/bruegge/FactTest/20120209_061.fits" />-->
- <!--<property name="dataDRS" value="/home/bruegge/FactTest/20120209_050.drs.fits" />-->
- <!--<property name="drive_file" value="/home/bruegge/FactTest/drive_file.fits" />-->
-<!-- <property name="sample" value="/home/bruegge/FactTest/sample.fits.gz" /> -->
-<!--<property name="sampleDRS" value="/home/bruegge/FactTest/test.drs.fits.gz" />-->
-<!--<property name="outfile" value="/home/bruegge/FactTest/output.csv" />-->
-<!-- <property name="data" value="/Users/kaibrugge/FactTest/jafs_mc.fits.gz" /> -->
-<!-- <property name="dataDRS" value="/Users/kaibrugge/FactTest/jafs_mc.drs.fits.gz" /> -->
+    <properties url="classpath:/default/settings.properties" />
 
-<property name="data" value="/home/mackaiver/Daten/20121015_071.fits.gz" />
-<property name="dataDRS" value="/home/mackaiver/Daten/20121015_065.drs.fits.gz" />
-<property name="drive_file" value="/home/mackaiver/Daten/20121015.DRIVE_CONTROL_TRACKING_POSITION.fits" />
-<!--<property name="outfile" value="/home/mackaiver/Development/FactData/cluster/" />-->
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
-<property name="data" value="/Users/kaibrugge/FactTest/20130104_095.fits" />
-<property name="dataDRS" value="/Users/kaibrugge/FactTest/20130104_076.drs.fits" />
-<property name="outfile" value="/Users/kaibrugge/FactTest/m3_test.csv" />
-<property name="drive_file" value="/Users/kaibrugge/FactTest/20130104.DRIVE_CONTROL_TRACKING_POSITION.fits" />
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<stream id="fact" class="fact.io.FitsStream"  url="file:${data}" />
+	<!-- Name of the stream and url to the input file -->
+	<stream id="fact" class="fact.io.FitsStream"  url="${infile}" />
 	
-	<!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dfieser gehört -->
+	<!-- Description of the process and the corresponding stream -->
 	<process input="fact" copies="1">
-        <!--<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10"/>-->
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-            <fact.filter.DrsCalibration url="file:${dataDRS}" key="Data"  outputKey="DataCalibrated" />
-            <!--<fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />-->
-            <!--<fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>-->
-            <!--<fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated" />-->
-
-
-
-            <!--<fact.filter.Interpolator key="DataCalibrated" outputKey="interpolated"/>-->
-            <!--<fact.filter.FirFilter key="interpolated" outputKey="laplaceInt" coefficients="1,-2,1"/>-->
-            <!--<fact.filter.FirFilter key="interpolated" outputKey="frstInt" coefficients="-0.5,0.5"/>-->
-
-            <!--<fact.features.CountRoots key="interpolated" outputKey="countInt" />-->
-            <!--<fact.features.CountRoots key="interpolatedderivative" outputKey="countIntDerivative" />-->
-            <!--<fact.features.CountRoots key="interpolatedderivation" outputKey="countDeriv" />-->
-
-
-
-            <fact.features.source.SourcePosition url="file:${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
-            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="maxAmplitudePosition" searchWindowLeft="25" searchWindowRight="200"/>
-            <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxAmplitudePosition" outputKey="arrivalTime"/>
-            <fact.extraction.PhotonCharge dataKey="DataCalibrated" rangeSearchWindow="25"
-                                                  positions="arrivalTime"
-                                                  outputKey="photoncharge"/>
-
-            <fact.cleaning.CoreNeighborClean photonChargeKey="photoncharge" outputKey="shower" corePixelThreshold="5" neighborPixelThreshold="2"
-                                                 arrivalTimeKey="arrivalTime" timeThreshold="60"  minNumberOfPixel="2"/>
-
-            <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 50" />-->
-            <stream.flow.Skip condition="%{data.shower} == null" />
-                <!--<fact.filter.MovingAverage key="DataCalibrated" outputKey="smoothed" length="19"/>-->
-                <!--<fact.filter.PixelNormalization key="DataCalibrated" outputKey="normalized"/>-->
-                <fact.features.NumberOfIslands key="shower" outputKey="islands" />
-                <fact.features.DistributionFromShower weightsKey="photoncharge" showerKey="shower" outputKey="dist" />
-                <fact.features.Size showerKey="shower" photonChargeKey="photoncharge" outputKey="Size" />
-                <!--<stream.flow.Skip condition="%{data.Size} &lt; 400 " />-->
-                    <!--<fact.filter.GaussConvolution key="DataCalibrated" outputKey="gauss" variance="5"/>-->
-                    <!--<fact.features.PixelStatistics key="gauss" outputPrefix="gauss"  searchWindow="30,160"/>-->
-
-                    <!--<fact.features.PixelStatistics key="interpolated" outputPrefix="inter_"  searchWindow="20,180"/>-->
-
-                    <!--<fact.io.ClusterWriter showerKey="shower" url="file:${outfile}" />-->
-
-<!-- 			<fact.plotter.ScatterPlotter xValue="showerPositionMean" yValue="showerPhotonChargeMean" logAxis="false" /> -->
-<!-- 			<fact.plotter.HistogramPlotter key="showerPositionMean" binWidth="1" logAxis="false" /> -->
-<!-- 			<fact.plotter.BarPlotter keys="posMean,showerPositionMean" /> -->
-<!-- 			<fact.plotter.CameraPlotter key="risingedge" /> -->
-<!-- 			<fact.plotter.CameraPlotter key="photoncharge" /> -->
+        <fact.utils.PreviousEventInfo 
+        	startCellKey="StartCellData"
+        	outputKey="prevEvents"
+        	limitEvents="10"
+        />
+        
+        <include url="classpath:/default/data/calibration.xml" />
 
 	</process>
 		

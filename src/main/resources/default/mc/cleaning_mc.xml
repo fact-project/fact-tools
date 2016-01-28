@@ -1,0 +1,12 @@
+<module>
+<fact.cleaning.TwoLevelTimeNeighbor
+    calibService="calibService"
+    photonChargeKey="photoncharge"
+    outputKey="shower"
+    arrivalTimeKey="arrivalTime"
+    corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
+    neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
+    timeLimit="${twoLevelTimeNeighbor_timeLimit}"
+    minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+/>
+</module>

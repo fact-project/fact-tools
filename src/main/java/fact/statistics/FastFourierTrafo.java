@@ -90,7 +90,7 @@ public class FastFourierTrafo implements Processor {
                 double ima = backTrafo[sl].getImaginary();
                 resultBackTrafo[px*roi+sl] = Math.sqrt(real*real + ima*ima);
             }
-            for ( ; sl < lengthForFFT && sl < roi ; sl++)
+            for ( ; sl < roi ; sl++)
             {
                 resultBackTrafo[px*roi+sl] = 0;
             }

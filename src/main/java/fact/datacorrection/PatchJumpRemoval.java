@@ -3,21 +3,15 @@ package fact.datacorrection;
 import fact.Utils;
 import fact.container.JumpInfos;
 import fact.container.PreviousEventInfoContainer;
-import fact.hexmap.ui.overlays.PixelSetOverlay;
-
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
-import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.util.LinkedList;
 
 /**
  * Removes artificial effects called "jumps" on a per patch basis.
@@ -134,7 +128,7 @@ public class PatchJumpRemoval implements Processor {
 				{
 					if (addJumpInfos == true)
 					{
-						jumpInfos.addPosMarkerForPatch(patch,pos);
+						jumpInfos.addPosMarkerForPatch(patch,pos,isStartCell);
 					}
 					result = HandleSpike(patch, pos, result, jumpInfos);
 					
@@ -143,23 +137,23 @@ public class PatchJumpRemoval implements Processor {
 					// create patch voltage average array and patch voltage derivation array:
 					double[] patchAverage = new double[roi];
 					double[] patchDerivationAverage = new double[roi];
-					CreatePatchAverage(patch, patchAverage, patchDerivationAverage, result);
+					createPatchAverage(patch, patchAverage, patchDerivationAverage, result);
 					
-					double jumpHeight = CheckForJump(patch,pos,patchDerivationAverage,isStartCell);
-					if (jumpHeight > 0)
+					double jumpHeight = checkForJump(patch,pos,patchDerivationAverage,isStartCell);
+					if (jumpHeight != 0)
 					{
 						boolean isJump=false;
-						isJump = CheckForSignalFlank(patch, pos, patchDerivationAverage,isStartCell, jumpHeight);
+						isJump = checkForSignalFlank(patch, pos, patchDerivationAverage,isStartCell, jumpHeight);
 						if (isJump == true)
 						{
-							jumpHeight = CheckForRingingFFT(patch,pos,patchAverage,patchDerivationAverage,jumpHeight,jumpInfos);
-								if (jumpHeight > 0)
-								{
-								isJump = CheckForTimeDependency(patch, deltaT,jumpHeight,jumpInfos);
+							jumpHeight = checkForRingingFFT(patch,pos,patchAverage,patchDerivationAverage,jumpHeight,jumpInfos);
+							if (jumpHeight != 0)
+							{
+								isJump = checkForTimeDependency(patch, deltaT,jumpHeight,jumpInfos);
 								if (isJump == true)
 								{
 									stopLoop = false;
-									result = CorrectJump(patch, pos, isStartCell, result, jumpHeight);
+									result = correctJump(patch, pos, isStartCell, result, jumpHeight);
 								}
 							}
 						}
@@ -295,7 +289,7 @@ public class PatchJumpRemoval implements Processor {
 	 * @param patchAverage
 	 * @param patchDerivationAverage
 	 */
-	public void CreatePatchAverage(int patch, double[] patchAverage,double[] patchDerivationAverage, double[] result){
+	public void createPatchAverage(int patch, double[] patchAverage,double[] patchDerivationAverage, double[] result){
 		for (int sl=0 ; sl < roi ; sl++)
 		{
 			for (int px=0 ; px < 8 ; px++)
@@ -319,7 +313,7 @@ public class PatchJumpRemoval implements Processor {
 	 * @param isStartCell
 	 * @return
 	 */
-	public double CheckForJump(int patch,int pos,double[] derivation,boolean isStartCell){
+	public double checkForJump(int patch,int pos,double[] derivation,boolean isStartCell){
 		double jumpHeight = 0;
 		
 		double derivAtJump = derivation[pos+1];
@@ -344,7 +338,7 @@ public class PatchJumpRemoval implements Processor {
 	 * @param jumpInfos
 	 * @return
 	 */
-	public boolean CheckForTimeDependency(int patch, double deltaT,double jumpHeight,JumpInfos jumpInfos){
+	public boolean checkForTimeDependency(int patch, double deltaT,double jumpHeight,JumpInfos jumpInfos){
 		boolean timeDependIsCorrect = true;
 		
 		double predictedJumpHeight = constant*Math.pow(deltaT, tau);
@@ -370,7 +364,7 @@ public class PatchJumpRemoval implements Processor {
 	 * @param isStartCell
 	 * @return
 	 */
-	public boolean CheckForSignalFlank(int patch, int pos, double[] derivation, boolean isStartCell, double jumpHeight){
+	public boolean checkForSignalFlank(int patch, int pos, double[] derivation, boolean isStartCell, double jumpHeight){
 		boolean noSignalFlank = true;
 		
 		// Calculate the average derivation over 3 slices before and 3 slices after the jump
@@ -422,7 +416,7 @@ public class PatchJumpRemoval implements Processor {
 	 * @param derivation
 	 * @return
 	 */
-	public double CheckForRingingFFT(int patch, int pos,double[] dataArray, double[] derivation, double jumpHeight, JumpInfos jumpInfos){
+	public double checkForRingingFFT(int patch, int pos,double[] dataArray, double[] derivation, double jumpHeight, JumpInfos jumpInfos){
 		FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
 	
 		// we perform a FFT on 32 slices of the data array. This 32 slices have to be between ]leftBorder,roi[
@@ -529,7 +523,7 @@ public class PatchJumpRemoval implements Processor {
 	 * @param jumpHeight
 	 * @return
 	 */
-	public double[] CorrectJump(int patch,int pos,boolean isStartCell, double[] result, double jumpHeight){
+	public double[] correctJump(int patch,int pos,boolean isStartCell, double[] result, double jumpHeight){
 		int leftBorder = pos+1;
 		int rightBorder = roi;
 		
@@ -558,164 +552,85 @@ public class PatchJumpRemoval implements Processor {
 		return result;
 	}
 
-	public double getFreqCompAmplLimit() {
-		return freqCompAmplLimit;
-	}
-
-	public void setFreqCompAmplLimit(double freqCompAmplLimit) {
-		this.freqCompAmplLimit = freqCompAmplLimit;
-	}
-
-	public boolean isAddJumpInfos() {
-		return addJumpInfos;
-	}
-
-	public void setAddJumpInfos(boolean addJumpInfos) {
-		this.addJumpInfos = addJumpInfos;
-	}
-
-	public String getDataKey() {
-		return dataKey;
-	}
-
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
 	}
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
-	public String getOutputJumpsKey() {
-		return outputJumpsKey;
-	}
-
 	public void setOutputJumpsKey(String outputJumpsKey) {
 		this.outputJumpsKey = outputJumpsKey;
-	}
-
-	public String getPrevEventsKey() {
-		return prevEventsKey;
 	}
 
 	public void setPrevEventsKey(String prevEventsKey) {
 		this.prevEventsKey = prevEventsKey;
 	}
 
-	public String getStartCellKey() {
-		return startCellKey;
-	}
-
 	public void setStartCellKey(String startCellKey) {
 		this.startCellKey = startCellKey;
-	}
-
-	public double getJumpLimit() {
-		return jumpLimit;
 	}
 
 	public void setJumpLimit(double jumpLimit) {
 		this.jumpLimit = jumpLimit;
 	}
 
-	public int getLeftBorder() {
-		return leftBorder;
-	}
-
 	public void setLeftBorder(int leftBorder) {
 		this.leftBorder = leftBorder;
-	}
-
-	public double getSpikeLimit() {
-		return spikeLimit;
 	}
 
 	public void setSpikeLimit(double spikeLimit) {
 		this.spikeLimit = spikeLimit;
 	}
 
-	public double getSignalFlankLimit() {
-		return signalFlankLimit;
-	}
-
 	public void setSignalFlankLimit(double signalFlankLimit) {
 		this.signalFlankLimit = signalFlankLimit;
-	}
-
-	public int getLengthForFFT() {
-		return lengthForFFT;
 	}
 
 	public void setLengthForFFT(int lengthForFFT) {
 		this.lengthForFFT = lengthForFFT;
 	}
 
-	public int getLengthAfterPosForFFT() {
-		return lengthAfterPosForFFT;
-	}
-
 	public void setLengthAfterPosForFFT(int lengthAfterPosForFFT) {
 		this.lengthAfterPosForFFT = lengthAfterPosForFFT;
-	}
-
-	public int getRingingPeriode() {
-		return ringingPeriode;
 	}
 
 	public void setRingingPeriode(int ringingPeriode) {
 		this.ringingPeriode = ringingPeriode;
 	}
 
-	public double getLeftRingingFreq() {
-		return leftRingingFreq;
+	public void setFreqAmplLimit(double freqAmplLimit) {
+		this.freqAmplLimit = freqAmplLimit;
+	}
+
+	public void setFreqCompAmplLimit(double freqCompAmplLimit) {
+		this.freqCompAmplLimit = freqCompAmplLimit;
 	}
 
 	public void setLeftRingingFreq(double leftRingingFreq) {
 		this.leftRingingFreq = leftRingingFreq;
 	}
 
-	public double getRightRingingFreq() {
-		return rightRingingFreq;
-	}
-
 	public void setRightRingingFreq(double rightRingingFreq) {
 		this.rightRingingFreq = rightRingingFreq;
-	}
-
-	public double getFreqAmplLimit() {
-		return freqAmplLimit;
-	}
-
-	public void setFreqAmplLimit(double freqAmplLimit) {
-		this.freqAmplLimit = freqAmplLimit;
-	}
-
-	public double getTau() {
-		return tau;
 	}
 
 	public void setTau(double tau) {
 		this.tau = tau;
 	}
 
-	public double getConstant() {
-		return constant;
-	}
-
 	public void setConstant(double constant) {
 		this.constant = constant;
-	}
-
-	public double getTimeDependLimit() {
-		return timeDependLimit;
 	}
 
 	public void setTimeDependLimit(double timeDependLimit) {
 		this.timeDependLimit = timeDependLimit;
 	}
+
+	public void setAddJumpInfos(boolean addJumpInfos) {
+		this.addJumpInfos = addJumpInfos;
+	}
+	
 	
 }

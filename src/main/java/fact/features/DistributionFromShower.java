@@ -1,18 +1,19 @@
 package fact.features;
 
+import fact.Utils;
+import fact.container.PixelDistribution2D;
+import fact.hexmap.CameraPixel;
+import fact.hexmap.FactPixelMapping;
+import fact.hexmap.ui.overlays.EllipseOverlay;
+import fact.container.PixelSet;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.Utils;
-import fact.container.PixelDistribution2D;
-import fact.hexmap.FactPixelMapping;
-import fact.hexmap.ui.overlays.EllipseOverlay;
 
 public class DistributionFromShower implements Processor {
 
@@ -20,11 +21,29 @@ public class DistributionFromShower implements Processor {
 	private String weightsKey = null;
 	@Parameter(required = true, description = "The key to the showerPixel. "
 			+ "That is some sort of int[] containing pixel chids.")
-	private String showerKey = null;
+	private String pixelSetKey = null;
 
 	// the in and outputkeys
 	@Parameter(required = true)
 	private String outputKey = null;
+	@Parameter(required = false, defaultValue="M3Long")
+	private String m3longKey = "M3Long";
+	@Parameter(required = false, defaultValue="M3Trans")
+	private String m3transKey = "M3Trans";
+	@Parameter(required = false, defaultValue="M4Long")
+	private String m4longKey = "M4Long";
+	@Parameter(required = false, defaultValue="M4Trans")
+	private String m4transKey = "M4Trans";
+	@Parameter(required = false, defaultValue="COGx")
+	private String cogxKey = "COGx";
+	@Parameter(required = false, defaultValue="COGy")
+	private String cogyKey = "COGy";
+	@Parameter(required = false, defaultValue="Length")
+	private String lengthKey = "Length";
+	@Parameter(required = false, defaultValue="Width")
+	private String widthKey = "Width";
+	@Parameter(required = false, defaultValue="Delta")
+	private String deltaKey = "Delta";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -37,7 +56,7 @@ public class DistributionFromShower implements Processor {
 		// in case the getColorFromValue doesn't contain a shower return the
 		// original input.
 
-		if (!input.containsKey(showerKey)) {
+		if (!input.containsKey(pixelSetKey)) {
 			return input;
 		}
 
@@ -45,11 +64,11 @@ public class DistributionFromShower implements Processor {
 			return input;
 		}
 
-		Utils.isKeyValid(input, showerKey, int[].class);
+		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 		Utils.isKeyValid(input, weightsKey, double[].class);
 
-		int[] showerPixel = (int[]) input.get(showerKey);
-		double[] showerWeights = createShowerWeights(showerPixel,
+		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
+		double[] showerWeights = createShowerWeights(showerPixel.toIntArray(),
 				(double[]) input.get(weightsKey));
 
 		double size = 0;
@@ -57,10 +76,10 @@ public class DistributionFromShower implements Processor {
 			size += v;
 		}
 
-		double[] cog = calculateCog(showerWeights, showerPixel, size);
+		double[] cog = calculateCog(showerWeights, showerPixel.toIntArray(), size);
 
 		// Calculate the weighted Empirical variance along the x and y axis.
-		RealMatrix covarianceMatrix = calculateCovarianceMatrix(showerPixel,
+		RealMatrix covarianceMatrix = calculateCovarianceMatrix(showerPixel.toIntArray(),
 				showerWeights, cog);
 
 		// get the eigenvalues and eigenvectors of the matrix and weigh them
@@ -76,27 +95,28 @@ public class DistributionFromShower implements Processor {
 
 		double delta = calculateDelta(eig);
 
-		// Calculation of the showers statistical moments (Variance, Skewness,
-		// Kurtosis)
+		// Calculation of the showers statistical moments (Variance, Skewness, Kurtosis)
 		// Rotate the shower by the angle delta in order to have the ellipse
 		// main axis in parallel to the Camera-Coordinates X-Axis
 		// allocate variables for rotated coordinates
-		double[] longitudinalCoords = new double[showerPixel.length];
-		double[] transversalCoords = new double[showerPixel.length];
+		double[] longitudinalCoords = new double[showerPixel.set.size()];
+		double[] transversalCoords = new double[showerPixel.set.size()];
 
-		for (int i = 0; i < showerPixel.length; i++) {
+		int counter =0;
+		for (CameraPixel pix : showerPixel.set) {
 			// translate to center
-			double posx = pixelMap.getPixelFromId(showerPixel[i])
+			double posx = pixelMap.getPixelFromId(pix.id)
 					.getXPositionInMM();
-			double posy = pixelMap.getPixelFromId(showerPixel[i])
+			double posy = pixelMap.getPixelFromId(pix.id)
 					.getYPositionInMM();
 			// rotate
 			double[] c = Utils.transformToEllipseCoordinates(posx, posy,
 					cog[0], cog[1], delta);
 
-			// fill array of new showerKey coordinates
-			longitudinalCoords[i] = c[0];
-			transversalCoords[i] = c[1];
+			// fill array of new shower coordinates
+			longitudinalCoords[counter] = c[0];
+			transversalCoords[counter] = c[1];
+			counter++;
 		}
 
 		// find max long coords
@@ -122,21 +142,6 @@ public class DistributionFromShower implements Processor {
 		double m4Trans = calculateMoment(4, 0, transversalCoords, showerWeights);
 		m4Trans /= Math.pow(width, 4);
 
-		// double newLength = Math.sqrt(calculateMoment(2, 0,
-		// longitudinalCoords, showerWeights));
-		// double newWidth = Math.sqrt(calculateMoment(2, 0, transversalCoords,
-		// showerWeights));
-		//
-		// double meanLong = calculateMoment(1, 0, longitudinalCoords,
-		// showerWeights);
-		// double meanTrans = calculateMoment(1, 0, transversalCoords,
-		// showerWeights);
-
-		// System.out.println("Width: " + width + " newwidth: " + newWidth);
-		// System.out.println("Length: " + length + " newlength: " + newLength);
-		// System.out.println("Mean long, trans (should be 0): " + meanLong +
-		// ", " + meanTrans);
-
 		PixelDistribution2D dist = new PixelDistribution2D(
 				covarianceMatrix.getEntry(0, 0),
 				covarianceMatrix.getEntry(1, 1),
@@ -145,58 +150,24 @@ public class DistributionFromShower implements Processor {
 
 		// add calculated shower parameters to data item
 		input.put(outputKey, dist);
-		input.put("varianceLong", varianceLong);
-		input.put("varianceTrans", varianceTrans);
-		input.put("M3Long", m3Long);
-		input.put("M3Trans", m3Trans);
-		input.put("M4Long", m4Long);
-		input.put("M4Trans", m4Trans);
-		input.put("COGx", cog[0]);
-		input.put("COGy", cog[1]);
-		input.put("Length", length);
-		input.put("Width", width);
-		input.put("Delta", delta);
-
-		// double[][] rot = { {Math.cos(delta), -Math.sin(delta)},
-		// {Math.sin(delta),Math.cos(delta) }
-		// };
-
-		// RealMatrix rotMatrix = MatrixUtils.createRealMatrix(rot);
-		// double[] a = {0 , 20};
-		// RealVector v = MatrixUtils.createRealVector(a);
-		// RealVector cogV = MatrixUtils.createRealVector(cog);
-		// v = rotMatrix.operate(v);
-		// v = v.add(cogV);
-
-		// double[] thead = Utils.transformToEllipseCoordinates(maxLongCoord +
-		// cog[0], 0 + cog[1], cog[0], cog[1], delta );
-		// double[] ttail = Utils.transformToEllipseCoordinates(minLongCoord +
-		// cog[0], 0 + cog[1], cog[0], cog[1], delta );
-		//
-		// double[] tMaxTrans = Utils.transformToEllipseCoordinates(0 + cog[0],
-		// maxTransCoord + cog[1], cog[0], cog[1], delta );
+		input.put(m3longKey, m3Long);
+		input.put(m3transKey, m3Trans);
+		input.put(m4longKey, m4Long);
+		input.put(m4transKey, m4Trans);
+		input.put(cogxKey, cog[0]);
+		input.put(cogyKey, cog[1]);
+		input.put(lengthKey, length);
+		input.put(widthKey, width);
+		input.put(deltaKey, delta);
 
 		double[] center = calculateCenter(showerPixel);
-		input.put("Ellipse", new EllipseOverlay(center[0], center[1], width,
+		input.put("2-sigma-ellipse", new EllipseOverlay(center[0], center[1], 2*width,
+				2*length, delta));
+		input.put("1-sigma-ellipse", new EllipseOverlay(center[0], center[1], width,
 				length, delta));
-		// input.put("CoG", new EllipseOverlay(cog[0] , cog[1], 3 , 3 , 0));
-		// input.put("Center", new EllipseOverlay(center[0] , center[1], 3 , 3 ,
-		// 0));
-		//
-		// input.put("Tail", new LineOverlay(cog[0], cog[1], cog[0] + ttail[0],
-		// cog[1] + ttail[1]));
-		// input.put("Head", new LineOverlay(cog[0], cog[1], cog[0] + thead[0],
-		// cog[1] + thead[1]));
-		// input.put("MaxTrans", new LineOverlay(cog[0], cog[1], cog[0] +
-		// tMaxTrans[0], cog[1] + tMaxTrans[1]));
 
 		input.put("@width", width);
 		input.put("@length", length);
-
-		// look at what i found
-		// V=cov(x,y);
-		// [vec,val]=eig(V);
-		// angles=atan2( vec(2,:),vec(1,:) );
 
 		return input;
 	}
@@ -237,10 +208,8 @@ public class DistributionFromShower implements Processor {
 		// find weighted center of the shower pixels.
 		int i = 0;
 		for (int pix : showerPixel) {
-			cog[0] += weights[i]
-					* pixelMap.getPixelFromId(pix).getXPositionInMM();
-			cog[1] += weights[i]
-					* pixelMap.getPixelFromId(pix).getYPositionInMM();
+			cog[0] += weights[i] * pixelMap.getPixelFromId(pix).getXPositionInMM();
+			cog[1] += weights[i] * pixelMap.getPixelFromId(pix).getYPositionInMM();
 			i++;
 		}
 		cog[0] /= size;
@@ -248,16 +217,16 @@ public class DistributionFromShower implements Processor {
 		return cog;
 	}
 
-	public double[] calculateCenter(int[] showerPixel) {
+	public double[] calculateCenter(PixelSet showerPixel) {
 
 		double[] cog = { 0, 0 };
 		// find center of the shower pixels.
-		for (int pix : showerPixel) {
-			cog[0] += pixelMap.getPixelFromId(pix).getXPositionInMM();
-			cog[1] += pixelMap.getPixelFromId(pix).getYPositionInMM();
+		for (CameraPixel pix : showerPixel.set) {
+			cog[0] += pixelMap.getPixelFromId(pix.id).getXPositionInMM();
+			cog[1] += pixelMap.getPixelFromId(pix.id).getYPositionInMM();
 		}
-		cog[0] /= showerPixel.length;
-		cog[1] /= showerPixel.length;
+		cog[0] /= showerPixel.set.size();
+		cog[1] /= showerPixel.set.size();
 		return cog;
 	}
 
@@ -288,12 +257,59 @@ public class DistributionFromShower implements Processor {
 		this.weightsKey = wheights;
 	}
 
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
+	
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
+
+
+	public void setM3longKey(String m3longKey) {
+		this.m3longKey = m3longKey;
+	}
+
+
+	public void setM3transKey(String m3transKey) {
+		this.m3transKey = m3transKey;
+	}
+
+
+	public void setM4longKey(String m4longKey) {
+		this.m4longKey = m4longKey;
+	}
+
+	public void setM4transKey(String m4transKey) {
+		this.m4transKey = m4transKey;
+	}
+
+
+	public void setCogxKey(String cogxKey) {
+		this.cogxKey = cogxKey;
+	}
+
+
+	public void setCogyKey(String cogyKey) {
+		this.cogyKey = cogyKey;
+	}
+
+
+	public void setLengthKey(String lengthKey) {
+		this.lengthKey = lengthKey;
+	}
+
+
+	public void setWidthKey(String widthKey) {
+		this.widthKey = widthKey;
+	}
+
+
+	public void setDeltaKey(String deltaKey) {
+		this.deltaKey = deltaKey;
+	}
+	
+	
 
 }

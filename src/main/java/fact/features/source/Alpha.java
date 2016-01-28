@@ -1,23 +1,25 @@
 package fact.features.source;
 
 import fact.container.PixelDistribution2D;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 /**
- * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution (aka the shower ellipse)... <a>
- *I have no idea.
+ * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution
+ * (aka the shower ellipse) I have no idea.
  * 
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
  */
 public class Alpha implements Processor {
 	static Logger log = LoggerFactory.getLogger(Alpha.class);
+	@Parameter(required=true)
 	private String distribution = null;
+	@Parameter(required=true)
 	private String sourcePosition = null;
+	@Parameter(required=true)
 	private String outputKey = null;
 	
 	@Override
