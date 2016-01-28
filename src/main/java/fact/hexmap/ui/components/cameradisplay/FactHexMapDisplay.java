@@ -182,8 +182,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 		ArrayList<CameraMapOverlay> overlays = new ArrayList<>();
 		for (Pair<String, Color> s : items) {
-			CameraMapOverlay overlay = (CameraMapOverlay) dataItem.get(s
-					.getKey());
+			CameraMapOverlay overlay = (CameraMapOverlay) dataItem.get(s.getKey());
 			if (overlay != null) {
 				overlay.setColor(s.getValue());
 				overlays.add(overlay);

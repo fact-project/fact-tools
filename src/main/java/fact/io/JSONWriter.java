@@ -3,7 +3,11 @@ package fact.io;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import fact.io.gsonTypeAdapter.DoubleAdapter;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+import fact.container.PixelSet;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -14,7 +18,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * Writes a file containing a hopefully valid JSON String on each line.
@@ -46,10 +53,13 @@ public class JSONWriter implements StatefulProcessor {
     		+ "json object", defaultValue = "false")
     private boolean writeListOfItems = false;
 
+    @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
+    private boolean pixelSetsAsInt = true;
+
     @Parameter(required = true)
     private URL url;
 
-    private Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
+    private Gson gson;
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
     
@@ -94,6 +104,22 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public void init(ProcessContext processContext) throws Exception {
         bw = new BufferedWriter(new FileWriter(new File(url.getFile())));
+
+        GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
+        if (doubleSignDigits != null) {
+            DoubleAdapter doubleAdapter = new DoubleAdapter();
+            doubleAdapter.setSignDigits(doubleSignDigits);
+            gsonBuilder.registerTypeAdapter(double.class, doubleAdapter)
+                    .registerTypeAdapter(Double.class, doubleAdapter)
+                    .enableComplexMapKeySerialization();
+        }
+
+        if (pixelSetsAsInt){
+            gsonBuilder.registerTypeAdapter(PixelSet.class, new PixelSetAdapter());
+        }
+
+        gson = gsonBuilder.create();
+
         if (writeListOfItems)
         {
         	bw.write("[");
@@ -105,12 +131,20 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void finish() throws Exception {
-        if(bw != null) {
-        	if (writeListOfItems)
-        	{
-        		bw.write("]");
-        	}
-            bw.close();
+        try {
+
+            if(bw != null) {
+                if (writeListOfItems)
+                {
+                    bw.write("]");
+                }
+            }
+        } catch (IOException e){
+            //ignore stream was bw was cloes apparently
+        } finally {
+            if (bw != null){
+                bw.close();
+            }
         }
     }
 
@@ -134,20 +168,67 @@ public class JSONWriter implements StatefulProcessor {
 
 	public void setDoubleSignDigits(int doubleSignDigits) {
 		this.doubleSignDigits = doubleSignDigits;
-		DoubleAdapter doubleAdapter = new DoubleAdapter();
-		doubleAdapter.setSignDigits(doubleSignDigits);
-		gson = new GsonBuilder()
-				.serializeSpecialFloatingPointValues()
-				.registerTypeAdapter(double.class, doubleAdapter)
-				.registerTypeAdapter(Double.class, doubleAdapter)
-				.enableComplexMapKeySerialization()
-				.create();
 	}
-
 
 	public void setWriteListOfItems(boolean writeListOfItems) {
 		this.writeListOfItems = writeListOfItems;
 	}
 
+    public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
+        this.pixelSetsAsInt = pixelSetsAsInt;
+    }
+
+    public class PixelSetAdapter extends TypeAdapter<PixelSet>{
+
+        @Override
+        public void write(JsonWriter jsonWriter, PixelSet pixelSet) throws IOException {
+            if (pixelSet == null){
+                jsonWriter.nullValue();
+            }
+            jsonWriter.beginArray();
+            for (int chid: pixelSet.toIntArray()){
+                jsonWriter.value(chid);
+            }
+            jsonWriter.endArray();
+        }
+
+        @Override
+        public PixelSet read(JsonReader jsonReader) throws IOException {
+            return null;
+        }
+    }
+
+    public class DoubleAdapter extends TypeAdapter<Double> {
+
+        private int signDigits;
+
+        public Double read(JsonReader reader) throws IOException {
+            if (reader.peek() == JsonToken.NULL)
+            {
+                reader.nextNull();
+                return null;
+            }
+            double x = reader.nextDouble();
+            return x;
+        }
+
+        public void write(JsonWriter writer, Double value) throws IOException {
+            if (value.isNaN() || value.isInfinite())
+            {
+                writer.value(value);
+            }
+            else
+            {
+                BigDecimal bValue = new BigDecimal(value);
+                bValue = bValue.round(new MathContext(signDigits));
+                writer.value(bValue.doubleValue());
+            }
+        }
+
+        public void setSignDigits(int sD){
+            signDigits = sD;
+        }
+
+    }
 
 }
