@@ -65,6 +65,10 @@ import java.net.URL;
  *     df = pd.DataFrame(data)
  * </code>
  *
+ * If you do not want this behaviour, you can use
+ * <code>specialDoubleValuesAsString="true"</code>
+ * to convert these values to json compatible strings containing "inf", "-inf" or "nan"
+ *
  *
  * fact.container.PixelSet is converted to an array of chids by default,
  * if you want to have the full output of this container, set
@@ -93,6 +97,8 @@ public class JSONWriter implements StatefulProcessor {
     private  boolean append = false;
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
     private boolean pixelSetsAsInt = true;
+    @Parameter(required = false, description = "If true, Infinity, -Infinity and NaN are converted to strings 'inf', '-inf' and 'nan'", defaultValue = "false")
+    private boolean specialDoubleValuesAsString = false;
 
     @Parameter(required = true)
     private URL url;
@@ -146,11 +152,17 @@ public class JSONWriter implements StatefulProcessor {
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
         gsonBuilder.enableComplexMapKeySerialization();
 
+        if (specialDoubleValuesAsString){
+            SpecialDoubleValuesAdapter specialDoubleValuesAdapter = new SpecialDoubleValuesAdapter();
+            gsonBuilder.registerTypeAdapter(double.class, specialDoubleValuesAdapter);
+            gsonBuilder.registerTypeAdapter(Double.class, specialDoubleValuesAdapter);
+        }
+
         if (doubleSignDigits != null) {
-            DoubleAdapter doubleAdapter = new DoubleAdapter();
-            doubleAdapter.setSignDigits(doubleSignDigits);
-            gsonBuilder.registerTypeAdapter(double.class, doubleAdapter)
-                    .registerTypeAdapter(Double.class, doubleAdapter);
+            SignDigitsAdapter signDigitsAdapter = new SignDigitsAdapter();
+            signDigitsAdapter.setSignDigits(doubleSignDigits);
+            gsonBuilder.registerTypeAdapter(double.class, signDigitsAdapter);
+            gsonBuilder.registerTypeAdapter(Double.class, signDigitsAdapter);
         }
 
         if (pixelSetsAsInt){
@@ -211,6 +223,10 @@ public class JSONWriter implements StatefulProcessor {
         this.pixelSetsAsInt = pixelSetsAsInt;
     }
 
+    public void setSpecialDoubleValuesAsString(boolean specialDoubleValuesAsString) {
+        this.specialDoubleValuesAsString = specialDoubleValuesAsString;
+    }
+
     public class PixelSetAdapter extends TypeAdapter<PixelSet>{
 
         @Override
@@ -231,18 +247,12 @@ public class JSONWriter implements StatefulProcessor {
         }
     }
 
-    public class DoubleAdapter extends TypeAdapter<Double> {
+    public class SignDigitsAdapter extends TypeAdapter<Double> {
 
         private int signDigits;
 
         public Double read(JsonReader reader) throws IOException {
-            if (reader.peek() == JsonToken.NULL)
-            {
-                reader.nextNull();
-                return null;
-            }
-            double x = reader.nextDouble();
-            return x;
+            return null;
         }
 
         public void write(JsonWriter writer, Double value) throws IOException {
@@ -264,4 +274,25 @@ public class JSONWriter implements StatefulProcessor {
 
     }
 
+    public class SpecialDoubleValuesAdapter extends TypeAdapter<Double> {
+
+        public Double read(JsonReader reader) throws IOException {
+            return null;
+        }
+
+        public void write(JsonWriter writer, Double value) throws IOException {
+            if (value == Double.NEGATIVE_INFINITY) {
+                writer.value("-inf");
+            }
+            else if (value == Double.POSITIVE_INFINITY) {
+                writer.value("inf");
+            }
+            else if (value.isNaN()) {
+                writer.value("nan");
+            }
+            else{
+                writer.value(value);
+            }
+        }
+    }
 }
