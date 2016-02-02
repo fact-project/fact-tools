@@ -22,25 +22,52 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
-import java.util.Arrays;
+
 
 /**
- * Writes a file containing a hopefully valid JSON String on each line.
- * Heres a simple Pyhton script to read it:
-
- import json
-
- def main():
-    with open('test.json', 'r') as file:
-        for line in file:
-            event = json.loads(line)
-            print(event['NROI'])
-
- if __name__ == "__main__":
-    main()
+ * Writes a keys from the data item to .json files.
+ * The format will be:
+ * <code>
+ *   [
+ *     {"key1": value, ...},
+ *     ...,
+ *     {"key1": value, ...}
+ *   ]
+ * <code/>
  *
+ * keys is evaluated using the stream.Keys class, so wild cards
+ * <code>*<code/>, <code>?<code/> and negations with <code>!</code> are possible:
  *
- * Keep in mind that some events might have keys missing.
+ * <code>
+ *     <fact.io.JSONWrite keys="*Pointing,!AzPointing" url="file:test.json" />
+ * </code>
+ * Will write all keys ending with `Pointing` to the json file but not AzPointing.
+ *
+ * The writer also supports the .jsonl format.
+ * http://jsonlines.org/
+ * To use the .jsonl format provide the key jsonl="true" in the xml.
+ *
+ * In this case the format will be:
+ * <code>
+ *     {"key1": value, ...}
+ *     ...
+ *     {"key1": value, ...}
+ * </code>
+ * To be able to store special float values we use the extension of the json standard
+ * found in most implementations. E. g. Google's gson, most JavaScript parsers and python's json module.
+ * So we use Infinity, -Infinity and NaN.
+ * python's pandas das not support this format directly, so use json to load the data and then create the DataFrame:
+ * <code>
+ *     import json
+ *     import pandas as pd
+ *     with open('test.json', 'r') as f:
+ *         data = json.load(f)
+ *     df = pd.DataFrame(data)
+ * </code>
+ *
+ * The following keys are added by default to the output:
+ * EventNum, TriggerType, NROI, NPIX
+ *
  * Created by bruegge on 7/30/14.
  */
 public class JSONWriter implements StatefulProcessor {
