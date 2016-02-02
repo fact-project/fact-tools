@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import fact.container.PixelSet;
 import stream.Data;
+import stream.Keys;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
@@ -46,7 +47,7 @@ public class JSONWriter implements StatefulProcessor {
 
 
     @Parameter(required = true)
-    private String[] keys;
+    private Keys keys = new Keys("");
     @Parameter(required = false, description = "Defines how many significant digit are used for double values", defaultValue="null")
     private Integer doubleSignDigits = null;
     @Parameter(required = false, description = "If true a list of data items is written (and therefore the output file is a valid"
@@ -62,6 +63,7 @@ public class JSONWriter implements StatefulProcessor {
     private Gson gson;
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
+    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
     
     boolean isFirstLine = true;
 
@@ -69,15 +71,14 @@ public class JSONWriter implements StatefulProcessor {
     public Data process(Data data) {
         Data item = DataFactory.create();
 
-        String[] evKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
-        for(String key : evKeys) {
-            if (data.containsKey(key)) {
-                item.put(key, data.get(key));
-            }
-        }
-        for (String key: keys){
+        for (String key: defaultKeys ){
             item.put(key, data.get(key));
         }
+
+        for (String key: keys.select(data) ){
+            item.put(key, data.get(key));
+        }
+
         try {
         	if (isFirstLine)
         	{
@@ -149,16 +150,9 @@ public class JSONWriter implements StatefulProcessor {
     }
 
 
-    public String[] getKeys() {
-        return keys;
-    }
-    public void setKeys(String[] keys) {
+
+    public void setKeys(Keys keys) {
         this.keys = keys;
-    }
-
-
-    public URL getUrl() {
-        return url;
     }
 
     public void setUrl(URL url) {
