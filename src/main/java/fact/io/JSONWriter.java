@@ -144,12 +144,13 @@ public class JSONWriter implements StatefulProcessor {
         bw = new BufferedWriter(new FileWriter(new File(url.getFile()), append));
 
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
+        gsonBuilder.enableComplexMapKeySerialization();
+
         if (doubleSignDigits != null) {
             DoubleAdapter doubleAdapter = new DoubleAdapter();
             doubleAdapter.setSignDigits(doubleSignDigits);
             gsonBuilder.registerTypeAdapter(double.class, doubleAdapter)
-                    .registerTypeAdapter(Double.class, doubleAdapter)
-                    .enableComplexMapKeySerialization();
+                    .registerTypeAdapter(Double.class, doubleAdapter);
         }
 
         if (pixelSetsAsInt){
