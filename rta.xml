@@ -3,11 +3,12 @@
     <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
-    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-    <property name="drsfile" value="file:src/main/resources/testMCDrsFile.drs.fits.gz" />
+    <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />-->
+    <!--<property name="drsfile" value="file:src/main/resources/testMCDrsFile.drs.fits.gz" />-->
+    <property name="pmml" value="file:/Users/kai/rf.pmml" />
 
-    <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />-->
-    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />-->
+    <property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />
+    <property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />
     <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_096.fits.gz" />-->
     <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
 
@@ -23,13 +24,13 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <!-- Name of the stream and url to the input file -->
-    <stream id="fact" class="fact.io.LoopStream" events="10">
+    <stream id="fact" class="fact.io.LoopStream" events="40">
         <stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
     </stream>
     <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
-        <fact.DataRate every="20"/>
+        <fact.DataRate every="25"/>
         <If condition="%{data.McCherPhotWeight} != null" >
             <fact.utils.Remapping
                     key="Data"
@@ -56,8 +57,31 @@
         <include url="classpath:/default/data/extraction.xml" />
         <!-- Output: photoncharge, arrivalTime -->
 
+        <!-- Cleaning -->
+        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
+        <include url="classpath:/default/data/cleaning.xml" />
+        <!-- Output: shower -->
 
-        <fact.rta.LightCurve/>
+        <!-- Parameter calculation (only source independent) -->
+        <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
+        arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
+        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+        Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
+        ShowerSlope, Disp -->
+        <include url="classpath:/default/data/parameterCalc.xml" />
+        <!-- Output: source independent parameters -->
+
+        <!-- Parameter calculation (only source dependent) -->
+        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
+        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
+        <include url="classpath:/default/data/sourceParameter.xml" />
+
+        <fact.rta.LoopOffPositions>
+            <fact.ApplyModel url="${pmml}" />
+            <!--<fact.io.PrintKeysOnConsole keys="@label" />-->
+        </fact.rta.LoopOffPositions>
+        <!--<PrintData/>-->
+        <!--<fact.rta.LightCurve/>-->
         <!-- Output: DataCalibrated -->
         <!--<fact.ShowViewer key="DataCalibrated" />-->
 

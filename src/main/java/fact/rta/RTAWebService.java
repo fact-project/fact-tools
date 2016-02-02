@@ -23,12 +23,12 @@ public class RTAWebService implements Service {
 
     public RTAWebService() {
         staticFileLocation("/templates");
-        get("/rta", (request, response) -> {
+        get("/", (request, response) -> {
             Map<String, Object> attributes = new HashMap<>();
             attributes.put("title", "FACT RTA");
             return new ModelAndView(attributes, "index.html");
         }, new HandlebarsTemplateEngine());
-        get("/datarate", (request, response) -> String.format("Datarate: %f events per second.", datarate));
+        get("/datarate", (request, response) -> String.format("%f events per second.", datarate));
     }
 
 
