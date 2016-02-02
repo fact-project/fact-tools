@@ -1,5 +1,6 @@
-fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/) 
+fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/)  
 =============
+[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
 
 The *fact-tools* are a collection of processors and stream implementations
 for the [streams](http://www.jwall.org/streams/) framework. The tools are
@@ -89,13 +90,3 @@ Starting with version 0.7.0 we try to introduce a naming convention (or only a o
 
 The details of this naming convention are of course discussable, but we should stick to one convention.
 
-
-
-
-Changing Documentation on the Website
----------------
-
-Simply edit the file in the `source/site/` directory to your liking.
-Check the output by executing `mvn site:run` in a terminal and point your
-web browser to *http://localhost:8080/*. If you like the result simply push your changes from that directory to the
-master branch and the build system will take care of the rest.
