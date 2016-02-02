@@ -55,7 +55,7 @@ import java.net.URL;
  * </code>
  * To be able to store special float values we use the extension of the json standard
  * found in most implementations. E. g. Google's gson, most JavaScript parsers and python's json module.
- * So we use Infinity, -Infinity and NaN.
+ * So we are using Infinity, -Infinity and NaN by default.
  * python's pandas das not support this format directly, so use json to load the data and then create the DataFrame:
  * <code>
  *     import json
@@ -170,8 +170,8 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public void finish() throws Exception {
         try {
-
             if(bw != null) {
+                bw.newLine();
                 if (!jsonl)
                 {
                     bw.write("]");
