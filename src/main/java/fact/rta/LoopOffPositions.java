@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class LoopOffPositions extends ProcessorList {
 
     @Parameter(required = false)
-    private Keys offKeys = new Keys("Theta_Off_?");
+    private Keys offKeys = new Keys("Theta,Theta_Off_?");
 
     @Parameter(required = false)
     private String targetKey = "Theta";
