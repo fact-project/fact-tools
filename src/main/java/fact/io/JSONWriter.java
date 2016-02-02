@@ -80,10 +80,9 @@ public class JSONWriter implements StatefulProcessor {
 
     @Parameter(required = true)
     private Keys keys = new Keys("");
-    @Parameter(required = false, description = "Defines how many significant digit are used for double values", defaultValue="null")
+    @Parameter(required = false, description = "Defines how many significant digits are used for double values", defaultValue="null")
     private Integer doubleSignDigits = null;
-    @Parameter(required = false, description = "If true a list of data items is written (and therefore the output file is a valid"
-    		+ "json object", defaultValue = "false")
+    @Parameter(required = false, description = "If true, use jsonl format instead of json format", defaultValue = "false")
     private boolean jsonl = false;
 
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
