@@ -65,6 +65,11 @@ import java.net.URL;
  *     df = pd.DataFrame(data)
  * </code>
  *
+ *
+ * fact.container.PixelSet is converted to an array of chids by default,
+ * if you want to have the full output of this container, set
+ * <code>pixelSetsAsInt="false"</code>
+ *
  * The following keys are added by default to the output:
  * EventNum, TriggerType, NROI, NPIX
  *
