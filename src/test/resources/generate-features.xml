@@ -1,0 +1,105 @@
+<container>
+
+    <stream id="factdata"
+            class="stream.io.CsvStream"
+            url="classpath:monte-carlo-sample.csv"
+            limit="1"/>
+
+    <process input="factdata">
+        <fact.features.KeysToLower/>
+        <fact.features.GenerateFeatures
+                name="MaxPhotonCharge" calculation="concentration_onepixel * size"
+                parameterList="size::Double, concentration_onepixel::Double"/>
+        <fact.features.GenerateFeatures
+                name="logMaxPhotonCharge" calculation="log(MaxPhotonCharge)"
+                parameterList="MaxPhotonCharge::Double"/>
+        <fact.features.GenerateFeatures
+                name="logSize" calculation="log(size)"
+                parameterList="size::Double"/>
+        <fact.features.GenerateFeatures
+                name="logLength" calculation="log(length)"
+                parameterList="length::Double"/>
+        <fact.features.GenerateFeatures
+                name="logWidth" calculation="log(width)"
+                parameterList="width::Double"/>
+        <fact.features.GenerateFeatures
+                name="logM4Long" calculation="log(m4long)"
+                parameterList="m4long::Double"/>
+        <fact.features.GenerateFeatures
+                name="logM4Trans" calculation="log(m4trans)"
+                parameterList="m4trans::Double"/>
+        <fact.features.GenerateFeatures
+                name="logabs(m3trans)" calculation="log(abs(m3trans))"
+                parameterList="m3trans::Double"/>
+        <fact.features.GenerateFeatures
+                name="logabs(m3long)" calculation="log(abs(m3long))"
+                parameterList="m3long::Double"/>
+        <fact.features.GenerateFeatures
+                name="logabs(m3t)" calculation="log(abs(m3t))"
+                parameterList="m3t::Double"/>
+        <fact.features.GenerateFeatures
+                name="logabs(m3l)" calculation="log(abs(m3l))"
+                parameterList="m3l::Double"/>
+        <fact.features.GenerateFeatures
+                name="logConc1" calculation="log(concentration_onepixel)"
+                parameterList="concentration_onepixel::Double"/>
+        <fact.features.GenerateFeatures
+                name="area" calculation="pi * width * length"
+                parameterList="width::Double, length::Double"
+                mathParameters="pi"/>
+        <fact.features.GenerateFeatures
+                name="ThetaDeg" calculation="theta/9.5*0.11"
+                parameterList="theta::Double"/>
+        <fact.features.GenerateFeatures
+                name="SizeArea" calculation="size/area"
+                parameterList="size::Double, area::Double"/>
+        <fact.features.GenerateFeatures
+                name="Conc1area" calculation="concentration_onepixel * area"
+                parameterList="concentration_onepixel::Double, area::Double"/>
+        <fact.features.GenerateFeatures
+                name="SizeConc1" calculation="size/concentration_onepixel"
+                parameterList="concentration_onepixel::Double, size::Double"/>
+        <fact.features.GenerateFeatures
+                name="LengthNumberShowerPixel" calculation="length / numpixelinshower"
+                parameterList="numpixelinshower::Integer, length::Double"/>
+        <fact.features.GenerateFeatures
+                name="Conc1NumberShowerPixel" calculation="concentration_onepixel / numpixelinshower"
+                parameterList="numpixelinshower::Integer, concentration_onepixel::Double"/>
+        <fact.features.GenerateFeatures
+                name="logSizeWidthLength" calculation="log(size) / (width * length)"
+                parameterList="size::Double, length::Double, width::Double"/>
+        <fact.features.GenerateFeatures
+                name="sign(m3long)" calculation="m3long * signum(cosdeltaalpha)"
+                parameterList="cosdeltaalpha::Double, m3long::Double"/>
+        <fact.features.GenerateFeatures
+                name="logConc1area" calculation="log(concentration_onepixel*area)"
+                parameterList="concentration_onepixel::Double, area::Double"/>
+        <fact.features.GenerateFeatures
+                name="logConc1NumberShowerPixel" calculation="log(concentration_onepixel / numpixelinshower)"
+                parameterList="concentration_onepixel::Double, numpixelinshower::Integer"/>
+        <fact.features.GenerateFeatures
+                name="logLengthNumberShowerPixel" calculation="log(length / numpixelinshower)"
+                parameterList="length::Double, numpixelinshower::Integer"/>
+        <fact.features.GenerateFeatures
+                name="logLengthWidth" calculation="log(length / width)"
+                parameterList="width::Double, length::Double"/>
+        <fact.features.GenerateFeatures
+                name="logSizeArea" calculation="log(size / area)"
+                parameterList="size::Double, area::Double"/>
+        <fact.features.GenerateFeatures
+                name="logArea" calculation="log(area)"
+                parameterList="area::Double"/>
+        <fact.features.GenerateFeatures
+                name="AreaSizeCutVar" calculation="area / log(size)^2"
+                parameterList="size::Double, area::Double"/>
+        <fact.features.GenerateFeatures
+                name="sign(m3l)" calculation="m3l * signum(cosdeltaalpha)"
+                parameterList="cosdeltaalpha::Double, m3l::Double"/>
+        <fact.features.GenerateFeatures
+                name="ThetaDeg2" calculation="ThetaDeg^2"
+                parameterList="ThetaDeg::Double"/>
+
+        <PrintData />
+    </process>
+
+</container>
