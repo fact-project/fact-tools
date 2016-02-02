@@ -52,7 +52,7 @@ public class JSONWriter implements StatefulProcessor {
     private Integer doubleSignDigits = null;
     @Parameter(required = false, description = "If true a list of data items is written (and therefore the output file is a valid"
     		+ "json object", defaultValue = "false")
-    private boolean writeListOfItems = false;
+    private boolean jsonl = false;
 
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
     private boolean pixelSetsAsInt = true;
@@ -86,7 +86,7 @@ public class JSONWriter implements StatefulProcessor {
         	}
         	else
         	{
-        		if (writeListOfItems)
+        		if (!jsonl)
         		{
         			bw.write(",");
         		}
@@ -121,7 +121,7 @@ public class JSONWriter implements StatefulProcessor {
 
         gson = gsonBuilder.create();
 
-        if (writeListOfItems)
+        if (!jsonl)
         {
         	bw.write("[");
         }
@@ -135,13 +135,13 @@ public class JSONWriter implements StatefulProcessor {
         try {
 
             if(bw != null) {
-                if (writeListOfItems)
+                if (!jsonl)
                 {
                     bw.write("]");
                 }
             }
         } catch (IOException e){
-            //ignore stream was bw was cloes apparently
+            // ignore stream bw was closed apparently
         } finally {
             if (bw != null){
                 bw.close();
@@ -159,16 +159,15 @@ public class JSONWriter implements StatefulProcessor {
         this.url = url;
     }
 
+    public void setJsonl(boolean jsonl) {
+        this.jsonl = jsonl;
+    }
 
-	public void setDoubleSignDigits(int doubleSignDigits) {
+    public void setDoubleSignDigits(int doubleSignDigits) {
 		this.doubleSignDigits = doubleSignDigits;
 	}
 
-	public void setWriteListOfItems(boolean writeListOfItems) {
-		this.writeListOfItems = writeListOfItems;
-	}
-
-    public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
+	public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
         this.pixelSetsAsInt = pixelSetsAsInt;
     }
 
