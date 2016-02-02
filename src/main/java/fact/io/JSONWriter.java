@@ -73,6 +73,11 @@ import java.net.URL;
  * The following keys are added by default to the output:
  * EventNum, TriggerType, NROI, NPIX
  *
+ * By default, the JSONWriter overwrites an existing file, if you want to append
+ * (which actually only makes sense if <code>jsonl="true</code>,
+ * you can use:
+ * <code>append="true"</code>
+ *
  * Created by bruegge on 7/30/14.
  */
 public class JSONWriter implements StatefulProcessor {
@@ -84,7 +89,8 @@ public class JSONWriter implements StatefulProcessor {
     private Integer doubleSignDigits = null;
     @Parameter(required = false, description = "If true, use jsonl format instead of json format", defaultValue = "false")
     private boolean jsonl = false;
-
+    @Parameter(required = false, description = "If true, append to existing file else overwrite", defaultValue = "false")
+    private  boolean append = false;
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
     private boolean pixelSetsAsInt = true;
 
@@ -135,7 +141,7 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        bw = new BufferedWriter(new FileWriter(new File(url.getFile())));
+        bw = new BufferedWriter(new FileWriter(new File(url.getFile()), append));
 
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
         if (doubleSignDigits != null) {
@@ -180,7 +186,9 @@ public class JSONWriter implements StatefulProcessor {
         }
     }
 
-
+    public void setAppend(boolean append) {
+        this.append = append;
+    }
 
     public void setKeys(Keys keys) {
         this.keys = keys;
