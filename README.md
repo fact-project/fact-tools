@@ -1,4 +1,5 @@
-fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/) 
+fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/)  
+[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
 =============
 
 The *fact-tools* are a collection of processors and stream implementations
