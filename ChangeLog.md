@@ -1,5 +1,33 @@
 #Changelog for the fact-tools
 
+## Version 0.12.1
+Other changes:
+
+* Deleted unused xml files in project root. 
+* Fixed a bug in the SQLiteService which only allowed for data taken in January.
+* Replaced empty test sqlite file with real one.
+
+Changes in `fact.io.JSONWriter` 
+
+* `json` format by default, optional `jsonl` format by using `jsonl="true"` in the `xml`
+* New `append` option, default is false, so existing files are overwritten.
+* The `keys` key is now evaluated using the `stream.Keys` class, so glob patterns now work.
+* Add flag `specialDoubleValuesAsString` to write special Double as strings for strict json compatability. See Issue #92 for more details. Via default special values are converted to `Infinity`, `-Infinity` and `NaN`. 
+
+
+No xmls in the example folder needed to be changed, although they are no behaving differently (output is `json`, not `jsonl` now).
+
+
+
+
+## Version 0.11.2
+
+Fixed a bug in the FactFileListMultiStream. The Wrapped stream wasnt initialized properly when it threw an exception during initialization.
+
+## Version 0.11.1
+
+Fixed the SqliteService. It now works on data that was not taken exclusively in january.
+
 ## Version 0.11.0
 
 ### Changes
