@@ -11,20 +11,106 @@
         <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
         <script src="https://intercoolerreleases-leaddynocom.netdna-ssl.com/intercooler-0.9.3.min.js"></script>
         <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/rta_style.css">
 
     </head>
     <body>
-        <!--[if lt IE 8]>
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+    <!--[if lt IE 8]>
+    <p class="browserupgrade">You are using a <strong> very very outdated</strong> browser. Please <a href="http://browsehappy.com/"> upgrade your browser</a> right effing now. </p>
+    <![endif]-->
 
-        <p>Hello world! Datarate is </p>
+    <!--<div class="pure-g">-->
+        <!--<div class="pure-u-1-3" style="background-color: #888888"> Lecker</div>-->
+        <!--<div class="pure-u-1-3" style="background-color: aquamarine"> Mädchen</div>-->
+        <!--<div class="pure-u-1-3" style="background-color: aqua">mit senf</div>-->
+    <!--</div>-->
 
-          <span ic-poll="2s" ic-src="/datarate">
-            This span will poll the server every two seconds...
-          </span>
-        <img src="img/fact.jpg" />
+    <div id="layout" class="pure-g">
+        <div class="sidebar pure-u-1-4">
+            <header class="header">
+                <h1>FACT RTA</h1>
+                <h2>The FACT real time analysis webpage.</h2>
+
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="pure-button" href="http://purecss.io">Pure</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="pure-button" href="http://yuilibrary.com">YUI Library</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+            <section >
+                <p>
+                    The current FACT  datarate is <span ic-poll="2s" ic-src="/datarate"> Loading... </span>
+                </p>
+
+            </section>
+        </div>
+
+        <div class="content pure-u-3-4">
+
+                <!-- A wrapper for all the blog posts -->
+                <article>
+                    <!-- A single blog post -->
+                    <section class="post">
+                        <header class="post-header">
+                            <img class="post-avatar" height="48" width="48" src="https://avatars3.githubusercontent.com/u/4076745?v=3&s=460">
+
+                            <h2>Datarate</h2>
+
+                            <p class="post-meta">
+                                By <a href="#" class="post-author">Kai B.</a>
+                            </p>
+                        </header>
+
+
+                            <p>
+                                Datarates over the last couple of minutes are shown in this plot.
+                            </p>
+
+                    </section>
+                </article>
+
+                <article>
+                    <section class="post">
+                        <header class="post-header">
+                            <img class="post-avatar" height="48" width="48" src="https://avatars3.githubusercontent.com/u/4076745?v=3&s=460">
+
+                            <h2 class="post-title">Events tagged as signal</h2>
+
+                            <p class="post-meta">
+                                By <a class="post-author" href="#">Kai B.</a>
+                            </p>
+                        </header>
+
+                            <p id="hipstercontent">
+
+                            </p>
+
+                    </section>
+                </article>
+        </div>
+        <footer class="pure-u-1">
+            <div class="pure-menu pure-menu-horizontal">
+                <ul>
+                    <li class="pure-menu-item"><a href="http://purecss.io/" class="pure-menu-link">About</a></li>
+                    <li class="pure-menu-item"><a href="http://twitter.com/yuilibrary/" class="pure-menu-link">Twitter</a></li>
+                    <li class="pure-menu-item"><a href="http://github.com/yahoo/pure/" class="pure-menu-link">GitHub</a></li>
+                </ul>
+            </div>
+
+            The FACT RTA. Built using the <a href="http://sparkjava.com/">Spark Web Framework</a> and hosted on <a href="https://github.com/mackaiver">Github</a>
+        </footer>
+    </div>
+
+
+
+
+        <!--<img src="img/fact.jpg" />-->
         <script src="js/main.js"></script>
     </body>
 </html>

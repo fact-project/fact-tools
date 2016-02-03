@@ -1,0 +1,26 @@
+body {
+    background-color: #f5f5f5;
+}
+
+.post {
+    padding: 1em;
+    background-color:white;
+    margin-top: 2em;
+    margin-right: 3em;
+    border: 2px lightslategray;
+}
+
+.post p {
+    color: #555555;
+    padding-right: 0.5em;
+    padding-left: 0;
+}
+
+footer {
+    align-content: center;
+}
+
+header > h2{
+    font-size: medium;
+    color: #555555;
+}
