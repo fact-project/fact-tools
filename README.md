@@ -33,7 +33,7 @@ includes all required classes.
 Continous Integration
 -------------------------
 
-A Trabis instance is running. 
+A Travis instance is running. 
 
 [![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
 
