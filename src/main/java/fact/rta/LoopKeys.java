@@ -10,19 +10,19 @@ import java.io.Serializable;
 /**
  * Created by kai on 02.02.16.
  */
-public class LoopOffPositions extends ProcessorList {
+public class LoopKeys extends ProcessorList {
 
-    @Parameter(required = false)
-    private Keys offKeys = new Keys("Theta,Theta_Off_?");
+    @Parameter(required = true)
+    private Keys keys = new Keys("*");
 
-    @Parameter(required = false)
+    @Parameter(required = true)
     private String targetKey = "Theta";
 
 
     @Override
     public Data process(Data data) {
         Serializable originalValue = data.remove(targetKey);
-        for (String key : offKeys.select(data)) {
+        for (String key : keys.select(data)) {
             Serializable offValue = data.get(key);
             data.put(targetKey, offValue);
             data = super.process(data);
@@ -32,8 +32,8 @@ public class LoopOffPositions extends ProcessorList {
         return data;
     }
 
-    public void setOffKeys(Keys offKeys) {
-        this.offKeys = offKeys;
+    public void setKeys(Keys keys) {
+        this.keys = keys;
     }
 
     public void setTargetKey(String targetKey) {

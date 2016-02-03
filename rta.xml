@@ -23,11 +23,14 @@
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
+    <service id="rf" class="fact.PredictionService" url="${pmml}" predictionThreshold="0.95" />
+    <service id="rta_service" class="fact.rta.RTAWebService" />
+
     <!-- Name of the stream and url to the input file -->
-    <stream id="fact" class="fact.io.LoopStream" events="40">
-        <stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
-    </stream>
-    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
+    <!--<stream id="fact" class="fact.io.LoopStream" events="40">-->
+        <!--<stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
+    <!--</stream>-->
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
         <fact.DataRate every="25"/>
@@ -76,14 +79,12 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/data/sourceParameter.xml" />
 
-        <fact.rta.LoopOffPositions>
-            <fact.ApplyModel url="${pmml}" />
-            <!--<fact.io.PrintKeysOnConsole keys="@label" />-->
-        </fact.rta.LoopOffPositions>
-        <!--<PrintData/>-->
-        <!--<fact.rta.LightCurve/>-->
-        <!-- Output: DataCalibrated -->
-        <!--<fact.ShowViewer key="DataCalibrated" />-->
+        <Skip condition="%{data.numPixeInShower} &lt; 10" />
+
+            <fact.rta.Signal predictor="rf" predictionThreshold="0.9"/>
+            <fact.rta.Background predictor="rf" predictionThreshold="0.9" />
+            <fact.rta.LightCurve webService="rta_service"/>
+            <!--<fact.io.PrintKeysOnConsole keys="@signal,@background" />-->
 
     </process>
 
