@@ -4,7 +4,7 @@ import java.awt.*;
 
 
 /**
- * Map values to the matplotlib magma colormap
+ * Map values to the matplotlib plasma colormap
  * @author maxnoe
  */
 public class PlasmaColorMapping extends ArrayColorMapping

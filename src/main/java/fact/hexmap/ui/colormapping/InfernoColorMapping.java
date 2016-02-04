@@ -4,7 +4,7 @@ import java.awt.*;
 
 
 /**
- * Map values to the matplotlib magma colormap
+ * Map values to the matplotlib inferno colormap
  * @author maxnoe
  */
 public class InfernoColorMapping extends ArrayColorMapping
