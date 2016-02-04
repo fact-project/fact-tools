@@ -5,12 +5,16 @@
     <!-- Pathes to the input files -->
     <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />-->
     <!--<property name="drsfile" value="file:src/main/resources/testMCDrsFile.drs.fits.gz" />-->
-    <property name="pmml" value="file:/Users/kai/rf.pmml" />
+    <!--<property name="pmml" value="file:/home/kai/rf.pmml" />-->
 
-    <property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />
-    <property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />
+    <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />-->
+    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />-->
     <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_096.fits.gz" />-->
     <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
+
+
+    <!--<property name="infile" value="file:/home/kai/20140105_093.fits.fz" />-->
+    <!--<property name="drsfile" value="file:/home/kai/20140105_088.drs.fits.gz" />-->
 
 
     <!--<property name="infile" value="file:/Users/kai/fact_phido/simulated/ceres/proton_heinz_12/32917/00032917.917_D_MonteCarlo032_Events.fits.gz" />-->
@@ -19,40 +23,64 @@
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />
+    <!--<service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />-->
+    <service id="auxService" class="fact.auxservice.SqliteService" url="file:${db}" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <service id="rf" class="fact.PredictionService" url="${pmml}" predictionThreshold="0.95" />
+    <service id="rf" class="fact.PredictionService" url="file:${pmml}" />
     <service id="rta_service" class="fact.rta.RTAWebService" />
 
     <!-- Name of the stream and url to the input file -->
     <!--<stream id="fact" class="fact.io.LoopStream" events="40">-->
         <!--<stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
     <!--</stream>-->
-    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
+    <stream id="fact" class="fact.io.FactFileListMultiStream"   url="file:${input}">
+        <stream class="fact.io.zfits.ZFitsStream" id="_" />
+    </stream>
+
+    <Queue id="out_queue" />
     <!-- Description of the process and the corresponding stream -->
-    <process input="fact" copies="1">
+    <process input="fact" copies="${num_copies}">
         <fact.DataRate every="25"/>
-        <If condition="%{data.McCherPhotWeight} != null" >
-            <fact.utils.Remapping
-                    key="Data"
-                    outputKey="Data"
-            />
-            <fact.utils.RemappingKeys
-                    keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
-            />
-        </If>
         <!-- prevEventAndSkip: -->
         <!-- PreviousEventInfo, Skip(no Data Trigger) -->
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
         <!-- Output: Data -->
 
-        <!-- Calibration: -->
-        <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
-        <include url="classpath:/default/data/calibration.xml" />
-        <!-- Output: DataCalibrated -->
+        <fact.datacorrection.DrsCalibration
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                prevEventsKey="prevEvents"
+                startCellKey="StartCellData"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+        />
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+        />
+        <fact.filter.DrsTimeCalibration
+                outputKey="timeCalibConst"
+        />
+        <fact.filter.ArrayTimeCorrection
+                dataKey="DataCalibrated"
+                timeCalibConstKey="timeCalibConst"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
 
         <!-- Extraction -->
         <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
@@ -81,14 +109,19 @@
 
         <Skip condition="%{data.numPixeInShower} &lt; 10" />
 
-            <fact.rta.Signal predictor="rf" predictionThreshold="0.9"/>
-            <fact.rta.Background predictor="rf" predictionThreshold="0.9" />
+            <fact.rta.Signal predictor="rf" predictionThreshold="0.7"/>
+            <fact.rta.Background predictor="rf" predictionThreshold="0.7" />
             <fact.rta.LightCurve webService="rta_service"/>
             <!--<fact.io.PrintKeysOnConsole keys="@signal,@background" />-->
-
+            <fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,@signal,@background,excess"/>
+            <Enqueue queues="out_queue" />
     </process>
 
 
+
+    <process input="out_queue">
+        <fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,@signal,@background,excess"/>
+    </process>
 
 </container>
 

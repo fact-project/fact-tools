@@ -82,7 +82,8 @@ public class PredictionService implements Service {
         activeFields = modelEvaluator.getActiveFields();
     }
 
-    public ProbabilityDistribution predict(Data data){
+    public synchronized ProbabilityDistribution predict(Data data){
+
         if (modelEvaluator == null){
             init();
         }

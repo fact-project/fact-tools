@@ -3,6 +3,7 @@ package fact.rta;
 import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -10,8 +11,11 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
+ * Use number of signal and background events to calculate a light curve.
+ *
  * Created by kai on 24.01.16.
  */
 public class LightCurve implements Processor {
@@ -34,8 +38,31 @@ public class LightCurve implements Processor {
 
     Range<DateTime> currentBin;
 
+    /**
+     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
+     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
+     *
+     * @param eventTime the UnixTimeUTC array as found in the FITS file.
+     * @return an Optional containing the Datetime instance
+     */
+    public  static Optional<DateTime> unixTimeUTCToDateTime(int [] eventTime){
+        if(eventTime != null && eventTime.length == 2) {
+            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+            return Optional.of(timeStamp);
+        }
+        return Optional.empty();
+    }
+
+
     @Override
     public Data process(Data data) {
+
+        int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
+
+        DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
+                                        orElseThrow(() -> new IllegalArgumentException("No valid timestamp in event."));
+
+
         if (!data.containsKey("@signal")){
             log.warn("No signal in event. Ignoring.");
             return data;
@@ -62,8 +89,6 @@ public class LightCurve implements Processor {
             lightCurve.put(currentBin, cumulativeExcess);
         }
 
-        System.out.println("cexcess:  " + cumulativeExcess);
-
 
 
         // remove old bins so we don't accumulate too many old results in memory
@@ -77,6 +102,10 @@ public class LightCurve implements Processor {
         if (data.containsKey("@datarate")){
             webService.updateDatarate((double) data.get("@datarate"));
         }
+
+
+        data.put("@timestamp", eventTimeStamp.toString());
+        data.put("excess", excess);
         return data;
     }
 
