@@ -12,10 +12,10 @@ or installed on Ubuntu systems using apt-get:
      # sudo apt-get install maven2
 
 
-Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [drone.IO project site](https://drone.io/bitbucket.org/cbockermann/fact-tools)
+Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [travis-ci project site](https://travis-ci.org/fact-project/fact-tools)
 
 
-![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)
+![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)
 
 
 

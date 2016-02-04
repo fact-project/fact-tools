@@ -29,8 +29,6 @@ For a quick overview for creating your own custom processors see the [Programmin
 You can download the latest FACT tools binary build from the stable branch in the [Downloads section](download.html)
 
 
-You can checkout the source code from our [Bitbucket Repository](https://bitbucket.org/cbockermann/fact-tools)
+You can checkout the source code from our [Github Repository](https://github.com/fact-project/fact-tools)
 
-
-![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)
-
+[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)

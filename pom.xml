@@ -53,21 +53,20 @@
 			<organizationUrl>http://app.tu-dortmund.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
-        <developer>
-            <name>Dominik Neise</name>
-            <email>neised@phys.ethz.ch</email>
-            <organization>Departement of physics, ETH Zurich</organization>
-            <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
-            <timezone>+1</timezone>
-        </developer>
-
-    </developers>
+		<developer>
+				<name>Dominik Neise</name>
+				<email>neised@phys.ethz.ch</email>
+				<organization>Departement of physics, ETH Zurich</organization>
+				<organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+				<timezone>+1</timezone>
+		</developer>
+	</developers>
 
 	<scm>
-		<url>https://bitbucket.org/cbockermann/fact-tools</url>
-		<developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</developerConnection>
-		<connection>scm:git:ssh://git@bitbucket.org/cbockermann/fact-tools</connection>
-		<tag>fact-tools-0.11.0</tag>
+		<url>https://github.com/fact-project/fact-tools</url>
+		<developerConnection>scm:git:ssh://git@github.com/fact-project/fact-tools</developerConnection>
+		<connection>scm:git:ssh://git@github.com/fact-project/fact-tools</connection>
+		<tag>fact-tools-0.12.1</tag>
 	</scm>
 
 	<mailingLists>
