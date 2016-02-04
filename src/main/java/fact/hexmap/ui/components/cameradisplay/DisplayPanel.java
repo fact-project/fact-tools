@@ -29,6 +29,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -43,7 +45,7 @@ public class DisplayPanel extends JPanel implements EventObserver {
 
 	final FactHexMapDisplay hexmap = new FactHexMapDisplay(7, 600, 530);
 	final CameraOverlayKeySelector selector = new CameraOverlayKeySelector();
-	private final Set<Class<? extends ColorMapping>> colorMapClasses;
+	private final Set<Class<? extends ColorMapping>> colorMapClasses = new HashSet<>();
 
 	public void setItemToDisplay(String key, Data item) {
 		hexmap.defaultKey = key;
@@ -74,7 +76,11 @@ public class DisplayPanel extends JPanel implements EventObserver {
 
 		// get all classes that implement the colormapping interface
 		Reflections reflections = new Reflections("fact");
-		colorMapClasses = reflections.getSubTypesOf(ColorMapping.class);
+		for (Class<? extends ColorMapping> colorMap: reflections.getSubTypesOf(ColorMapping.class)){
+			if(!Modifier.isAbstract(colorMap.getModifiers())){
+				colorMapClasses.add(colorMap);
+			}
+		}
 
 		// setup the hexmap component of the viewer
 		hexmap.setBackground(Color.BLACK);
