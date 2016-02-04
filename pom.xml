@@ -142,7 +142,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>17.0</version>
+			<version>19.0</version>
 		</dependency>
 
 		<dependency>
@@ -235,10 +235,76 @@
 			<artifactId>exp4j</artifactId>
 			<version>[0.4.5,)</version>
 		</dependency>
-	</dependencies>
+
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.7.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.8.11.2</version>
+        </dependency>
+
+    </dependencies>
 
 	<build>
 		<plugins>
+            <plugin>
+                <!-- Use org.jooq            for the Open Source edition
+     org.jooq.pro        for commercial editions,
+     org.jooq.pro-java-6 for commercial editions with Java 6 support,
+     org.jooq.trial      for the free trial edition -->
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>3.7.2</version>
+
+                <!-- The plugin should hook into the generate goal -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.xerial</groupId>
+                        <artifactId>sqlite-jdbc</artifactId>
+                        <version>3.8.11.2</version>
+                    </dependency>
+                </dependencies>
+
+                <!-- Specify the plugin configuration.
+                     The configuration format is the same as for the standalone code generator -->
+                <configuration>
+
+                    <!-- JDBC connection parameters -->
+                    <jdbc>
+                        <driver>org.sqlite.JDBC</driver>
+                        <url>jdbc:sqlite:./rta.sqlite</url>
+                        <user></user>
+                        <password></password>
+                    </jdbc>
+
+                    <!-- Generator parameters -->
+                    <generator>
+                        <database>
+                            <name>org.jooq.util.sqlite.SQLiteDatabase</name>
+                            <includes>.*</includes>
+                            <excludes></excludes>
+                            <inputSchema></inputSchema>
+                        </database>
+                        <target>
+                            <packageName>fact.rta.persistence</packageName>
+                            <directory>src/main/java/</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
