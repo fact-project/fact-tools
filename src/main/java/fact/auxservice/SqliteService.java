@@ -42,12 +42,7 @@ public class SqliteService implements AuxiliaryService {
     private LoadingCache<AuxDataCacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
             .maximumSize(100)
             .expireAfterAccess(window, TimeUnit.MINUTES)
-            .removalListener(new RemovalListener<Object, Object>() {
-                @Override
-                public void onRemoval(RemovalNotification<Object, Object> notification) {
-                    log.info("Removing Data {} from cache for cause {}", notification.toString() ,notification.getCause());
-                }
-            })
+            .removalListener(notification -> log.info("Removing Data from cache for cause {}", notification.getCause()))
             .build(new CacheLoader<AuxDataCacheKey, TreeSet<AuxPoint>>() {
                 @Override
                 public TreeSet<AuxPoint> load(AuxDataCacheKey key) throws Exception {
