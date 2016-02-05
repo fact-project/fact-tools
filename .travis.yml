@@ -11,3 +11,4 @@ deploy:
   file: target/fact-tools-*.jar
   on:
     tags: true
+    repo: fact-project/fact-tools
