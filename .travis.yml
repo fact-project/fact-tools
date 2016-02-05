@@ -4,3 +4,12 @@ script: mvn clean verify
 jdk:
   - openjdk7
   - oraclejdk8 # openjdk8 is not available on travis
+
+# build and deploy the webpage
+after_script:
+  - mvn site
+  - bash ./deploy_site.sh
+
+env:
+  global:
+    - GH_REF github.com/fact-project/fact-tools.git
