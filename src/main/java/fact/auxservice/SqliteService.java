@@ -217,7 +217,6 @@ public class SqliteService implements AuxiliaryService {
 
         } catch (ExecutionException e) {
             throw new IOException("Could not load data from Database. Is the database readable?");
-//            e.printStackTrace();
         }
     }
 

@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Signal extends TableImpl<SignalRecord> {
 
-	private static final long serialVersionUID = -659816843;
+	private static final long serialVersionUID = 613067122;
 
 	/**
 	 * The reference instance of <code>signal</code>
@@ -65,9 +65,19 @@ public class Signal extends TableImpl<SignalRecord> {
 	public final TableField<SignalRecord, Integer> BACKGROUND = createField("background", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
+	 * The column <code>signal.trigger_rate</code>.
+	 */
+	public final TableField<SignalRecord, Float> TRIGGER_RATE = createField("trigger_rate", org.jooq.impl.SQLDataType.REAL, this, "");
+
+	/**
+	 * The column <code>signal.relative_on_time</code>.
+	 */
+	public final TableField<SignalRecord, Float> RELATIVE_ON_TIME = createField("relative_on_time", org.jooq.impl.SQLDataType.REAL, this, "");
+
+	/**
 	 * The column <code>signal.duration_in_seconds</code>.
 	 */
-	public final TableField<SignalRecord, Float> DURATION_IN_SECONDS = createField("duration_in_seconds", org.jooq.impl.SQLDataType.REAL, this, "");
+	public final TableField<SignalRecord, Integer> DURATION_IN_SECONDS = createField("duration_in_seconds", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>signal</code> table reference

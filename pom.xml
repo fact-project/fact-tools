@@ -9,9 +9,9 @@
 	<url>http://sfb876.de/fact-tools/</url>
 
 	<description>
-		        The FACT telescope is a Cherenkov telescope on the island of La Palma.
-                This set of tools is dedicated to read, parse and process raw data produced
-                by the FACT telescope.
+        The FACT telescope is a Cherenkov telescope on the island of La Palma.
+        This set of tools is dedicated to read, parse and process raw data produced
+        by the FACT telescope.
 	</description>
 
 	<properties>
@@ -202,10 +202,10 @@
 			<version>3.3</version>
 		</dependency>
 		<dependency>
-        	    <groupId>org.apache.commons</groupId>
+            <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
- 	            <version>3.3.2</version>
-        	</dependency>
+            <version>3.3.2</version>
+        </dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -285,7 +285,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.sqlite.JDBC</driver>
-                        <url>jdbc:sqlite:./rta.sqlite</url>
+                        <url>jdbc:sqlite:src/test/resources/rta.sqlite</url>
                         <user></user>
                         <password></password>
                     </jdbc>
@@ -493,28 +493,6 @@
 					<value>true</value>
 				</property>
 			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>exec-maven-plugin</artifactId>
-							<groupId>org.codehaus.mojo</groupId>
-							<executions>
-								<execution><!-- Run our version calculation script -->
-									<id>documentation</id>
-									<phase>generate-sources</phase>
-									<goals>
-										<goal>exec</goal>
-									</goals>
-									<configuration>
-										<executable>${basedir}/src/main/resources/CreateDoc.sh</executable>
-									</configuration>
-								</execution>
-							</executions>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
 		</profile>
 
 		<profile>
