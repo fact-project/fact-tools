@@ -5,8 +5,6 @@ set -e # exit with nonzero exit code if anything fails
 if [[ $TRAVIS_BRANCH == 'testpage' ]]
 then
 	rm -rf ~/out || exit 0;
-	mkdir ~/out;
-
 	# run our compile script, discussed above
 	mvn site
 
