@@ -25,64 +25,71 @@ import java.net.URL;
 
 
 /**
+ * <p>
  * Writes a keys from the data item to .json files.
  * The format will be:
- * <code>
- *   [
- *     {"key1": value, ...},
- *     ...,
- *     {"key1": value, ...}
- *   ]
- * <code/>
- *
- * keys is evaluated using the stream.Keys class, so wild cards
- * <code>*<code/>, <code>?<code/> and negations with <code>!</code> are possible:
- *
- * <code>
- *     <fact.io.JSONWrite keys="*Pointing,!AzPointing" url="file:test.json" />
- * </code>
- * Will write all keys ending with `Pointing` to the json file but not AzPointing.
- *
+ * <pre>
+ * [
+ *   {"key1": value, ...},
+ *   ...,
+ *   {"key1": value, ...}
+ * ]
+ * </p>
+ * </pre>
+ * <p>
+ * <code>keys</code> is evaluated using the stream.Keys class, so wild cards
+ * <code>*</code>, <code>?</code> and negations with <code>!</code> are possible.
+ * This will write all keys ending with `Pointing` to the json file but not AzPointing.
+ * <pre>
+ * &lt;fact.io.JSONWriter keys="*Pointing,!AzPointing" url="file:test.json" /&gt;
+ * </pre>
+ * </p>
+ * <p>
  * The writer also supports the .jsonl format.
  * http://jsonlines.org/
  * To use the .jsonl format provide the key jsonl="true" in the xml.
  *
  * In this case the format will be:
- * <code>
- *     {"key1": value, ...}
- *     ...
- *     {"key1": value, ...}
- * </code>
+ * <pre>
+ * {"key1": value, ...}
+ * ...
+ * {"key1": value, ...}
+ * </pre>
+ * </p>
+ * <p>
  * To be able to store special float values we use the extension of the json standard
  * found in most implementations. E. g. Google's gson, most JavaScript parsers and python's json module.
  * So we are using Infinity, -Infinity and NaN by default.
  * python's pandas das not support this format directly, so use json to load the data and then create the DataFrame:
- * <code>
- *     import json
- *     import pandas as pd
- *     with open('test.json', 'r') as f:
- *         data = json.load(f)
- *     df = pd.DataFrame(data)
- * </code>
+ * <pre>
+ * import json
+ * import pandas as pd
+ * with open('test.json', 'r') as f:
+ *     data = json.load(f)
+ * df = pd.DataFrame(data)
+ * </pre>
  *
  * If you do not want this behaviour, you can use
  * <code>specialDoubleValuesAsString="true"</code>
  * to convert these values to json compatible strings containing "inf", "-inf" or "nan"
- *
- *
+ * </p>
+ * <p>
  * fact.container.PixelSet is converted to an array of chids by default,
  * if you want to have the full output of this container, set
  * <code>pixelSetsAsInt="false"</code>
- *
+ * </p>
+ * <p>
  * The following keys are added by default to the output:
  * EventNum, TriggerType, NROI, NPIX
- *
+ * </p>
+ * <p>
  * By default, the JSONWriter overwrites an existing file, if you want to append
- * (which actually only makes sense if <code>jsonl="true</code>,
+ * (which actually only makes sense if <code>jsonl="true</code>),
  * you can use:
  * <code>append="true"</code>
- *
+ * </p>
  * Created by bruegge on 7/30/14.
+ * Refactored by maxnoe on 2/2/2016
  */
 public class JSONWriter implements StatefulProcessor {
 

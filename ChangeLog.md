@@ -1,5 +1,14 @@
 #Changelog for the fact-tools
 
+## Version 0.12.2
+
+Changes:
+
+* Add new  colormaps for the viewer. Viridis, Inferno, Magma ...
+* Remove obsolete Processor called `JSONWriterExcludeKeys`
+
+
+
 ## Version 0.12.1
 Other changes:
 
