@@ -2,7 +2,7 @@
 set -e # exit with nonzero exit code if anything fails
 
 # clear and re-create the out directory
-if [[ $TRAVIS_BRANCH == 'testpage' ]]
+if [[ $TRAVIS_BRANCH == 'master' ]]
 then
 	rm -rf ~/out || exit 0;
 	# run our compile script, discussed above
