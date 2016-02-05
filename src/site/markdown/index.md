@@ -31,4 +31,4 @@ You can download the latest FACT tools binary build from the stable branch in th
 
 You can checkout the source code from our [Github Repository](https://github.com/fact-project/fact-tools)
 
-[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
+<a href="https://travis-ci.org/fact-project/fact-tools"><img alt="Build Status" src="https://travis-ci.org/fact-project/fact-tools.svg?branch=master"></a>

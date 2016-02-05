@@ -15,7 +15,7 @@ or installed on Ubuntu systems using apt-get:
 Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [travis-ci project site](https://travis-ci.org/fact-project/fact-tools)
 
 
-![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)
+<a href="https://travis-ci.org/fact-project/fact-tools"><img alt="Build Status" src="https://travis-ci.org/fact-project/fact-tools.svg?branch=master"></a>
 
 
 
@@ -23,7 +23,7 @@ Building the FACT Tools
 -----------------------
 
 Building the *fact-tools* is straight forward: Simply [checkout the
-fact-tools code](source-repository.html) and enter the directory. By running the `mvn` command,
+fact-tools code](https://github.com/fact-project/fact-tools) and enter the directory. By running the `mvn` command,
 Maven will take care of the build:
 
      # cd fact-tools
