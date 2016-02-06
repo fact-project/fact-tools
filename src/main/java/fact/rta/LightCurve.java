@@ -4,12 +4,14 @@ import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,18 +27,49 @@ public class LightCurve implements Processor {
     @Parameter(required = true)
     RTAWebService webService;
 
-    @Parameter(required = false)
-    int offRegions = 6;
 
-    @Parameter(required = false , description = "Binning in seconds")
-    int binning = 60;
+    @Parameter(required = false , description = "Binning in minutes")
+    int binning = 1;
 
-    @Parameter(required = false , description = "Keep bins that are *history* hours old and delete older ones")
-    int history = 12;
+    @Parameter(required = false , description = "Keep bins that are *history* minutes old and delete older ones")
+    int history = 20;
 
-    private TreeRangeMap<DateTime, Double> lightCurve = TreeRangeMap.create();
+    @Parameter(required = false , description = "Number of off regions that are used to measure background")
+    int offRegions = 5;
 
-    Range<DateTime> currentBin;
+    private TreeRangeMap<DateTime, SignalContainer> lightCurve = TreeRangeMap.create();
+
+    Range<DateTime> edgesOfCurrentBin;
+
+    class SignalContainer{
+        public Integer signalEvents = 0;
+        public Integer backgroundEvents = 0;
+
+
+        public final DateTime timestamp;
+        public final Duration duration;
+        public final int numberOfOffRegions;
+
+        SignalContainer(Integer signalEvents, Integer backgroundEvents, DateTime timestamp, Duration duration, int numberOfOffRegions) {
+            this.signalEvents = signalEvents;
+            this.backgroundEvents = backgroundEvents;
+            this.timestamp = timestamp;
+
+            this.duration = duration;
+            this.numberOfOffRegions = numberOfOffRegions;
+        }
+
+
+        public Timestamp getTimestampAsSQLTimeStamp() {
+            return new Timestamp(timestamp.getMillis());
+        }
+
+        public int getDurationInSeconds() {
+            return duration.toStandardSeconds().getSeconds();
+        }
+
+
+    }
 
     /**
      * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
@@ -70,29 +103,26 @@ public class LightCurve implements Processor {
         int signal = (int) data.get("@signal");
         int background = (int) data.get("@background");
 
-        double excess = signal - 1.0/offRegions  * background;
-
         //check if we have a new bin. If we start a new bin the excess rate is still zero
+        //TODO: think whether we should use the event timestamp here. maybe also watch the delay?
         DateTime time = DateTime.now();
-        double cumulativeExcess = 0;
-
-        Double e = lightCurve.get(time);
-        if (e == null){
-            currentBin = Range.closedOpen(time, time.plusSeconds(binning));
-            cumulativeExcess = excess;
-            lightCurve.put(currentBin, cumulativeExcess);
+        SignalContainer container = lightCurve.get(time);
+        if (container != null){
+            container.signalEvents += signal;
+            container.backgroundEvents += background;
+            lightCurve.put(edgesOfCurrentBin, container);
+        } else {
+            edgesOfCurrentBin = Range.closedOpen(time, time.plusSeconds(binning));
+            SignalContainer c = new SignalContainer(signal, background, eventTimeStamp, Duration.standardMinutes(binning), offRegions);
+            lightCurve.put(edgesOfCurrentBin, c);
 
             webService.updateLightCurve(lightCurve);
-
-        } else {
-            cumulativeExcess += e;
-            lightCurve.put(currentBin, cumulativeExcess);
         }
 
 
 
         // remove old bins so we don't accumulate too many old results in memory
-        Map.Entry<Range<DateTime>, Double> entry = lightCurve.getEntry(time.minusHours(history));
+        Map.Entry<Range<DateTime>, SignalContainer> entry = lightCurve.getEntry(time.minusMinutes(binning + history));
         if (entry != null){
             lightCurve.remove(entry.getKey());
         }
@@ -105,7 +135,6 @@ public class LightCurve implements Processor {
 
 
         data.put("@timestamp", eventTimeStamp.toString());
-        data.put("excess", excess);
         return data;
     }
 
