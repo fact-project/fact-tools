@@ -258,14 +258,16 @@ public class JSONWriter implements StatefulProcessor {
 
         @Override
         public void write(JsonWriter jsonWriter, PixelSet pixelSet) throws IOException {
-            if (pixelSet == null){
+            if (pixelSet == null) {
                 jsonWriter.nullValue();
             }
-            jsonWriter.beginArray();
-            for (int chid: pixelSet.toIntArray()){
-                jsonWriter.value(chid);
+            else {
+                jsonWriter.beginArray();
+                for (int chid : pixelSet.toIntArray()) {
+                    jsonWriter.value(chid);
+                }
+                jsonWriter.endArray();
             }
-            jsonWriter.endArray();
         }
 
         @Override
