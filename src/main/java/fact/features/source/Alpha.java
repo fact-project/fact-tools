@@ -8,7 +8,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 /**
  * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution
- * (aka the shower ellipse) I have no idea.
  * 
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  * 
@@ -37,7 +36,7 @@ public class Alpha implements Processor {
 		}
 
 
-		double[] source = null;
+		double[] source;
 		try{
 			source  = (double[]) input.get(sourcePosition);
 			if(source ==  null){
@@ -45,23 +44,21 @@ public class Alpha implements Processor {
 			}
 		} catch (ClassCastException e){
 			log.error("wrong types" + e.toString());
+			return null;
 		}
 
-		double alpha = 0.0;
-        //TODO: this might throw an NPE for source[1]
 	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 	
-	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;
-	
-	    alpha                  =  (dist.getAngle() - auxiliary_angle);
+
+	    double alpha = (dist.getAngle() - auxiliary_angle);
 	
 	    if (alpha > Math.PI / 2)
 	    {
-	        alpha              = alpha - Math.PI;
+	        alpha = alpha - Math.PI;
 	    }
 	    if (alpha < -Math.PI / 2)
 	    {
-	        alpha              = Math.PI + alpha;
+	        alpha = Math.PI + alpha;
 	    }
 	    input.put(outputKey, alpha);
 		return input;

@@ -35,7 +35,7 @@ public class Theta implements Processor {
 	private double cosDeltaAlpha;
 
 	public Data process(Data input) {
-		Utils.mapContainsKeys(input, sourcePositionKey,dispKey,cogxKey,cogyKey,deltaKey,cosDeltaAlphaKey);
+		Utils.mapContainsKeys(input,sourcePositionKey,dispKey,cogxKey,cogyKey,deltaKey,cosDeltaAlphaKey);
 		
 		sourcePosition = (double[]) input.get(sourcePositionKey);
 		disp = (Double) input.get(dispKey);
