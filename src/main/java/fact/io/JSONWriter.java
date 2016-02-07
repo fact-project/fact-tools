@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import fact.container.PixelSet;
+import org.joda.time.DateTime;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -169,6 +170,7 @@ public class JSONWriter implements StatefulProcessor {
 
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
         gsonBuilder.enableComplexMapKeySerialization();
+        gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeAdapter());
 
         if (specialDoubleValuesAsString){
             SpecialDoubleValuesAdapter specialDoubleValuesAdapter = new SpecialDoubleValuesAdapter();
@@ -247,6 +249,24 @@ public class JSONWriter implements StatefulProcessor {
 
     public void setSpecialDoubleValuesAsString(boolean specialDoubleValuesAsString) {
         this.specialDoubleValuesAsString = specialDoubleValuesAsString;
+    }
+
+    public class DateTimeAdapter extends TypeAdapter<DateTime>{
+
+        @Override
+        public void write(JsonWriter jsonWriter, DateTime dateTime) throws IOException {
+            if (dateTime == null){
+                jsonWriter.nullValue();
+            }
+            else{
+                jsonWriter.value(dateTime.toString());
+            }
+        }
+
+        @Override
+        public DateTime read(JsonReader jsonReader) throws IOException {
+            return null;
+        }
     }
 
     public class PixelSetAdapter extends TypeAdapter<PixelSet>{
