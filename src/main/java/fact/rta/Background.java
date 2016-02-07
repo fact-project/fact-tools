@@ -28,7 +28,7 @@ public class Background implements Processor {
 
     @Override
     public Data process(Data data) {
-        int backgroundEvents = 0;
+        double backgroundEvents = 0;
 
         Serializable originalValue = data.remove(targetKey);
         //loop over background regions and see if its a signal event.
@@ -37,8 +37,8 @@ public class Background implements Processor {
             data.put(targetKey, offValue);
 
             ProbabilityDistribution distribution = predictor.predict(data);
-            if (distribution != null && distribution.getProbability(signalClassName) > predictionThreshold){
-                backgroundEvents += 1;
+            if (distribution != null){
+                backgroundEvents += distribution.getProbability(signalClassName);
             }
         }
         //restore original state of the values

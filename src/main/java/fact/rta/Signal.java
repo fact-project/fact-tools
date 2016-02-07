@@ -28,12 +28,9 @@ public class Signal implements Processor {
     public Data process(Data data) {
 
         ProbabilityDistribution distribution = predictor.predict(data);
-        if (distribution != null && distribution.getProbability(signalClassName) > predictionThreshold){
-            data.put("@signal", 1);
-        } else {
-            data.put("@signal", 0);
+        if (distribution != null){
+            data.put("@signal", distribution.getProbability(signalClassName));
         }
-
         return data;
     }
 
