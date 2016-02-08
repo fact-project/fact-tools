@@ -1,0 +1,71 @@
+<module>
+    <fact.cleaning.SimpleThreshold
+            calibService="calibService"
+            photonChargeKey="McCherPhotWeight"
+            outputKey="true_shower"
+            threshold="0.5"
+    />
+
+    <fact.pixelsets.Invert
+    insetKey="badPixel"
+    outsetKey="mc_goodPixel"
+    />
+
+    <fact.pixelsets.Difference
+    setUKey="mc_goodPixel"
+    setAKey="true_shower"
+    outsetKey="true_pedestal"
+    />
+
+    <fact.pixelsets.Length
+    pixelSetKey="true_pedestal"
+    outputKey="true_numPixelInPedestal"
+    />
+
+    <fact.pixelsets.Length
+    pixelSetKey="true_shower"
+    outputKey="true_numPixelInShower"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="McCherPhotWeight"
+    outputKey="true_phChargeShower"
+    pixelSetKey="true_shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="photoncharge"
+    outputKey="truePixel_phChargePedestal"
+    pixelSetKey="true_pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="photoncharge"
+    outputKey="truePixel_phChargeShower"
+    pixelSetKey="true_shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="arrivalTime"
+    outputKey="truePixel_arrTimePedestal"
+    pixelSetKey="true_pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="arrivalTime"
+    outputKey="truePixel_arrTimeShower"
+    pixelSetKey="true_shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="ped_mean"
+    outputKey="truePixel_ped_mean"
+    pixelSetKey="true_pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+    key="ped_var"
+    outputKey="truePixel_ped_var"
+    pixelSetKey="true_pedestal"
+    />
+</module>
