@@ -4,7 +4,11 @@ import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxWebService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.SqliteService;
+import fact.auxservice.strategies.AuxPointStrategy;
+import fact.auxservice.strategies.Closest;
+import fact.auxservice.strategies.Later;
 import fact.features.source.SourcePosition;
+import org.hamcrest.core.IsNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -20,7 +24,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Test the implementation of the sqliteservice test by querying the test file.
+ * Test the implementation of the sqliteservice test by querying the test files.
  * Created by kai on 06.12.15.
  */
 public class SqliteTest {
@@ -28,7 +32,7 @@ public class SqliteTest {
     @Test
     public void testSourcePosition() throws Exception {
         SqliteService s = new SqliteService();
-        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control.sqlite")));
+        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_unittest_20140118_19.sqlite")));
 
         DateTime t =  DateTime.parse("2014-01-19T01:40:33+00:00");
         TreeSet<AuxPoint> r = s.loadDataFromDataBase(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, t);
@@ -43,6 +47,16 @@ public class SqliteTest {
         assertThat(r.size(), is(9));
     }
 
+    @Test
+    public void testSourcePositionInMay() throws Exception {
+        SqliteService s = new SqliteService();
+        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_5_20.sqlite")));
+
+        DateTime t =  DateTime.parse("2014-05-20T23:46:14.560Z");
+        AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, t, new Closest());
+        assertThat(auxiliaryData, is(not(nullValue())));
+    }
+
     /**
      * Should deliver the same result as
      *       SELECT * FROM DRIVE_CONTROL_TRACKING_POSITION WHERE Time BETWEEN "2014-01-19 01:33:00" AND "2014-01-19 01:44:00"
@@ -52,7 +66,7 @@ public class SqliteTest {
     @Test
     public void testTrackingPosition() throws Exception {
         SqliteService s = new SqliteService();
-        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control.sqlite")));
+        s.setUrl(new SourceURL(SqliteTest.class.getResource("/drive_control_unittest_20140118_19.sqlite")));
 
         DateTime t =  DateTime.parse("2014-01-19T01:34:00+00:00");
         TreeSet<AuxPoint> r = s.loadDataFromDataBase(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, t);

@@ -155,6 +155,7 @@ public class FactFileListMultiStream extends AbstractMultiStream {
 
             if (skipErrors) {
                 log.info("Skipping broken files. Continuing with next file.");
+                stream = null;
                 return this.readNext();
             } else {
                 log.error("Stopping stream because of IOException");
