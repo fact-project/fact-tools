@@ -4,6 +4,8 @@ script: mvn clean verify
 jdk:
 - openjdk7
 - oraclejdk8
+before_deploy:
+  - mv target/fact-tools-*.jar target/fact-tools-$TRAVIS_BRANCH.jar
 deploy:
   provider: releases
   api_key:
