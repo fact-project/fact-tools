@@ -159,6 +159,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
             if (skipErrors) {
                 log.info("Skipping broken files. Continuing with next file.");
+                stream = null;
                 failedFilesCounter++;
                 failedFilesList.add(stream.getUrl().toString());
                 return this.readNext();
