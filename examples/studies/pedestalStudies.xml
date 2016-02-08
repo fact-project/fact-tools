@@ -3,8 +3,8 @@
     <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
-    <property name="infile" value="file:/home/jbuss/testData/20150901_016.fits.fz" />
-    <property name="drsfile" value="file:/home/jbuss/testData/20150901_011.drs.fits.gz" />
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
