@@ -86,6 +86,11 @@ import java.util.zip.GZIPOutputStream;
  * you can use:
  * <code>append="true"</code>
  * </p>
+ * <p>
+ * The JSONWriter can also add gzip compression on the fly. Use the <code>gzip</code> Option
+ * to directly write gzip compressed files.
+ * <code>append="true"</code>
+ * </p>
  * Created by bruegge on 7/30/14.
  * Refactored by maxnoe on 2/2/2016
  */
