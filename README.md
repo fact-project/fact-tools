@@ -1,5 +1,6 @@
-fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/) 
+fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/)  
 =============
+[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
 
 The *fact-tools* are a collection of processors and stream implementations
 for the [streams](http://www.jwall.org/streams/) framework. The tools are
@@ -32,13 +33,9 @@ includes all required classes.
 Continous Integration
 -------------------------
 
-A buildbot is running at [drone.io](https://drone.io/bitbucket.org/cbockermann/fact-tools) to provide some continuous integration services.
-The [Website](http://sfb876.tu-dortmund.de/FACT/)  will also be rebuild automatically. So any changes to the *src/site/* directory will 
-be visible on the web after a few minutes. At the moment a complete build takes about 10 to 15 minutes.
+A Travis instance is running. 
 
-[![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)](https://drone.io/bitbucket.org/cbockermann/fact-tools/latest)
-
-
+[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
 
 
 
@@ -89,13 +86,3 @@ Starting with version 0.7.0 we try to introduce a naming convention (or only a o
 
 The details of this naming convention are of course discussable, but we should stick to one convention.
 
-
-
-
-Changing Documentation on the Website
----------------
-
-Simply edit the file in the `source/site/` directory to your liking.
-Check the output by executing `mvn site:run` in a terminal and point your
-web browser to *http://localhost:8080/*. If you like the result simply push your changes from that directory to the
-master branch and the build system will take care of the rest.
