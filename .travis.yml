@@ -4,6 +4,8 @@ script: mvn clean verify
 jdk:
 - openjdk7
 - oraclejdk8
+before_deploy:
+  - mv target/fact-tools-*.jar target/fact-tools-$TRAVIS_BRANCH.jar
 deploy:
   provider: releases
   api_key:
@@ -12,3 +14,6 @@ deploy:
   on:
     tags: true
     repo: fact-project/fact-tools
+notifications:
+  slack:
+    secure: IwBFEZoQ5bYquYbOfsVE/EQ6bc6CemwDeCQw1Ok5AryUuj1RvYHBrV1o00kPDi6T2PFuc+jWUTg8VTCTzXUUgJOrjhiBuvYAwEOaDRtCi9uhDHsrPUBLwjB80k2rm90A8RgRd3DDZjxfdz4hHdlsgjFVP/zMCTCvB27vnRMONpejuWQXhTuFhdQqkyzje8s2lGdbtJ7cu7zHuqEn3w5b5J7AbDpwYnbmIZxElgtuJBw3yRkfF5+dmnEIHUKZp+NtffYjW0NEhJQZojP2ea4Qv4qiMv4mwEU3L7ahHNhzz4P9tv3mrjaDHOGcZOk4UuJDW8iNaShvO4RBlWbwWhasahnpg06Oq7YqYzkD85oc+qG5ByKvM1eRn7OyYM9AXuxu1BVncnyz1WKJiuFFTLCnYFD393X/tyjC4iY8MbVhx9NcfhCxFaD6kv6bkAj1ilxs5oMVcthDuLsT/UFQBHM/zMe0zo9AxbWvpyuYToGR5y0UmVCupuQ96jzW9nShmPJtgMuz5jMqki9F6aeBd9e2BGCInBtRBQ1dFpvrqR70Jx+6aiQm//zgVVkfReg0pvJrpYchaG3UIcbI0Kor8+wslmlOY1v0XkJgx1A0BN9m/hRewfPRfn4YR8y7xHHpQRY7AY3j1Ezp8CPRdJ0BzrR2yymAtL8X2bDJZkg64O4BnmM=
