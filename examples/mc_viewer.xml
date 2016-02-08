@@ -24,8 +24,12 @@
         
         <include url="classpath:/default/mc/extraction_mc.xml" /> 
         
-        <include url="classpath:/default/mc/cleaning_mc.xml" /> 
-        
+        <include url="classpath:/default/mc/cleaning_mc.xml" />
+
+        <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
+
+        <include url="classpath:/default/mc/truth_mc.xml" />
+
         <!-- <Skip condition="%{data.shower} == null" /> -->
             
         <fact.ShowViewer key="DataCalibrated"/>
