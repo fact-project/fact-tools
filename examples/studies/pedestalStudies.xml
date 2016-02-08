@@ -75,8 +75,8 @@
 
 
 
-
-        <fact.ShowViewer key="DataCalibrated"/>
+        <!--Uncomment to use the viewer-->
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
 
 
     </process>
