@@ -12,7 +12,7 @@ public class ArrayTimeCorrection implements Processor{
 
 	@Parameter(required = true, defaultValue = "raw:dataCalibrated",
 			description = "key to the drs amplitude calibrated voltage curves")
-	private String dataKey = "raw:dataCalibrated";
+	private String inputKey = "raw:dataCalibrated";
 	@Parameter(required = true, defaultValue = "meta:timeCalibConst",
 			description = "Key to the time calibration constants as calculated by fact.filter.DrsTimeCalibration")
 	private String timeCalibConstKey = "meta:timeCalibConst";
@@ -30,9 +30,9 @@ public class ArrayTimeCorrection implements Processor{
 	@Override
 	public Data process(Data item) {
 		Utils.isKeyValid(item, "NPIX", Integer.class);
-		Utils.mapContainsKeys( item, dataKey, timeCalibConstKey);
+		Utils.mapContainsKeys( item, inputKey, timeCalibConstKey);
 		npix = (Integer) item.get("NPIX");
-		data = (double[]) item.get(dataKey);
+		data = (double[]) item.get(inputKey);
 		roi = data.length / npix;
 		timeCalibConst = (double[]) item.get(timeCalibConstKey);
 		tcKernel = new LinearTimeCorrectionKernel();		
