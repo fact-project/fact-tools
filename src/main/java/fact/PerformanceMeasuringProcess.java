@@ -14,12 +14,12 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.gson.GsonBuilder;
 
-import stream.Context;
 import stream.Data;
 import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+import stream.runtime.ApplicationContext;
 import stream.runtime.DefaultProcess;
 
 /**
@@ -53,7 +53,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
      * @see stream.runtime.AbstractProcess#init(stream.Context)
      */
     @Override
-    public void init(Context context) throws Exception {
+    public void init(ApplicationContext context) throws Exception {
         super.init(context);
 
         for (Processor proc : processors) {
