@@ -36,36 +36,29 @@ public class ArrayStatistics implements Processor {
     static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
     @Parameter(required = true, description = "Key to the array you want the information about")
     private String key = null;
-    @Parameter(required = false, description = "The basename for the output, if not given, use 'key:'")
+    @Parameter(required = false, description = "The basename for the output, if not given, use 'pixelSetKey:key:'")
     private String outputKey = null;
-    @Parameter(description = "Key pointing to a pixelSet, if given, only calculate values on these pixels")
-    private String pixelSetKey = null;
+    @Parameter(description = "Key pointing to a pixelSet, default: pixels")
+    private String pixelSetKey = "pixels";
 
 
     @Override
     public Data process(Data item) {
         Utils.mapContainsKeys(item, key);
+        Utils.mapContainsKeys(item, pixelSetKey);
 
         if (outputKey == null){
-            outputKey = key;
+            outputKey = pixelSetKey + ":" + key;
         }
+
         double[] values   = Utils.toDoubleArray(item.get(key));
+        PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
 
         DescriptiveStatistics s = new DescriptiveStatistics();
-
-        if (pixelSetKey == null){
-            /* run over whole data array if no set is specified */
-            for(double value : values){
-                s.addValue(value);
-            }
-        }
-        else if (item.containsKey(pixelSetKey)){
-            /* if a set is specified, use only the pixel ids from the set */
-            PixelSet pixelArray = (PixelSet) item.get(pixelSetKey);
-            for(CameraPixel pix : pixelArray.set){
+        for(CameraPixel pix: pixelSet.set){
                 s.addValue(values[pix.id]);
-            }
         }
+
         item.put(outputKey + ":" + "median", s.getPercentile(50));
         item.put(outputKey + ":" + "mean", s.getMean());
         item.put(outputKey + ":" + "max", s.getMax());
