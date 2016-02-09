@@ -12,10 +12,12 @@ import stream.annotations.Parameter;
 public class PreviousEventInfo implements Processor {
 	static Logger log = LoggerFactory.getLogger(PreviousEventInfo.class);
 	
-	@Parameter(required=true)
-	String startCellKey = null;
-	@Parameter(required=true)
-	String outputKey=null;
+	@Parameter(required=true, defaultValue = "StartCellData",
+				description = "Key of the StartCellData in the data fits file")
+	String startCellKey = "StartCellData";
+	@Parameter(required=true, defaultValue = "meta:prevEvents",
+				description = "Outputkey for the previous events Key")
+	String outputKey = "meta:prevEvents";
 	
 	int limitEvents=20;
 	
