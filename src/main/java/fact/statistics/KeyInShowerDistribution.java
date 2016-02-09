@@ -18,7 +18,7 @@ public class KeyInShowerDistribution implements Processor {
 	@Override
 	public Data process(Data input) {
 		
-		final Logger log = LoggerFactory.getLogger(ArrayMean.class);
+		final Logger log = LoggerFactory.getLogger(KeyInShowerDistribution.class);
 			
 		Serializable serialData = input.get(Key);
 		double[] keyData = Utils.toDoubleArray(serialData);
