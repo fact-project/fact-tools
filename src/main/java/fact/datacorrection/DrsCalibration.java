@@ -26,10 +26,10 @@ import java.net.MalformedURLException;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-
+	@Parameter(required = false, description = "Ouputkey for calibrated Data array", defaultValue = "raw:dataCalibrated")
 	private String outputKey = "raw:dataCalibrated";
 
-    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
+    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "raw:data")
 	private String inputKey = "raw:data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
