@@ -30,18 +30,18 @@ public class Remapping implements Processor{
     private int npix = Constants.NUMBEROFPIXEL;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, inputKey, short[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, inputKey, short[].class);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
 
-        short[] data = (short[]) input.get(inputKey);
-        npix = (Integer) input.get("NPIX");
+        short[] data = (short[]) item.get(inputKey);
+        npix = (Integer) item.get("NPIX");
 
         short[] remapped = new short[data.length];
         remapFromSoftIdToChid(data, remapped);
 
-        input.put(outputKey, remapped);
-        return input;
+        item.put(outputKey, remapped);
+        return item;
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {

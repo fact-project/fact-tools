@@ -1,8 +1,5 @@
 <module>
-<fact.utils.Remapping
-    key="Data" 
-    outputKey="Data"
-/>
+<fact.utils.Remapping />
 <fact.utils.RemappingKeys 
     keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
 />
