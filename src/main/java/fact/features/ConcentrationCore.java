@@ -17,40 +17,35 @@ import stream.annotations.Parameter;
 public class ConcentrationCore implements Processor{
 	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 	
-	@Parameter(required=true)
-	private String outputKey;
-	@Parameter(required = true, description  = "Key of the Center of Gravity X (by Distribution from shower)")
-	private String cogxKey;
-	@Parameter(required = true, description  = "Key of the Center of Gravity Y (by Distribution from shower)")
-	private String cogyKey;
-	@Parameter(required = true, description  = "Key of the delta angle")
-	private String deltaKey;
-	@Parameter(required = true, description  = "Key of the sizeKey")
-	private String sizeKey;
+	@Parameter(required=false)
+	private String outputKey = "shower:concentrationCore";
+	@Parameter(required=false)
+	private String ellipseKey = "shower:ellipse";
+
+	@Parameter(required = true, description  = "Key to the size feature")
+	private String sizeKey = "shower:size";
 	@Parameter(required = true, description  = "Key of the photoncharge array")
-	private String photonChargeKey;
+	private String estNumPhotonsKey = "pixels:estNumPhotons";
 	@Parameter(required = true, description  = "Key of the shower pixel array")
-	private String pixelSetKey;
-	@Parameter(required = true, description  = "Key of the shower width")
-	private String widthKey;
-	@Parameter(required = true, description  = "Key of the shower lengthKey")
-	private String lengthKey;
+	private String pixelSetKey = "shower";
+
 	
 	final private double pixelRadius = Constants.PIXEL_SIZE;
 	
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
-		
+		Utils.mapContainsKeys( input, estNumPhotonsKey, pixelSetKey, ellipseKey, sizeKey);
+
 		try{
-			Double cogx = (Double) input.get(cogxKey);
-			Double cogy = (Double) input.get(cogyKey);
-			Double d = (Double) input.get(deltaKey);
-			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
+			Double cogx = (Double) input.get(pixelSetKey + ":cog:x");
+			Double cogy = (Double) input.get(pixelSetKey + ":cog:y");
+
+            Double d = (Double) input.get(ellipseKey + ":delta");
+			double [] photonChargeArray = (double[]) input.get(estNumPhotonsKey);
 			PixelSet showerPixelArray = (PixelSet) input.get(pixelSetKey);
-			Double l = (Double) input.get(lengthKey);
-			Double w = (Double) input.get(widthKey);
+			Double l = (Double) input.get(ellipseKey + ":length");
+			Double w = (Double) input.get(ellipseKey + ":width");
 			Double size = (Double) input.get(sizeKey);
 			
 			double c = Math.cos(d);
@@ -60,12 +55,11 @@ public class ConcentrationCore implements Processor{
 			
 			for(CameraPixel pix : showerPixelArray.set)
 			{
-                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix.id);
+                FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
 				double px = p.getXPositionInMM();
 				double py = p.getYPositionInMM();
 				
 				// short names adapted from mars code (change when understood)
-
 				double dx = px - cogx;
 				double dy = py - cogy;
 				
@@ -96,73 +90,6 @@ public class ConcentrationCore implements Processor{
 
 	}
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-	public String getDeltaKey() {
-		return deltaKey;
-	}
-
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
-
-	public String getSizeKey() {
-		return sizeKey;
-	}
-
-	public void setSizeKey(String sizeKey) {
-		this.sizeKey = sizeKey;
-	}
-
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getWidthKey() {
-		return widthKey;
-	}
-
-	public void setWidthKey(String widthKey) {
-		this.widthKey = widthKey;
-	}
-
-	public String getLengthKey() {
-		return lengthKey;
-	}
-
-	public void setLengthKey(String lengthKey) {
-		this.lengthKey = lengthKey;
-	}
 	
 
 	
