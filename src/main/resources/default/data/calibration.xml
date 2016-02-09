@@ -1,8 +1,6 @@
 <module>
 <fact.datacorrection.DrsCalibration
     url="${drsfile}"
-    key="Data"
-    outputKey="DataCalibrated"
 />  
 <fact.datacorrection.PatchJumpRemoval
     dataKey="DataCalibrated"
