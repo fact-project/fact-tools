@@ -133,7 +133,7 @@
     <fact.features.TimeGradient arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKeyIntercept="timeGradientIntercept" outputKeySlope="timeGradientSlope" outputKeySumSquaredErrors="timeGradientSSE" pixelSetKey="shower"/>
     <fact.features.Concentration/>
     <fact.features.ConcentrationCore/>
-    <fact.features.ConcentrationAtCenterOfGravity cogxKey="COGx" cogyKey="COGy" outputKey="concCOG" photonChargeKey="photoncharge" sizeKey="Size"/>
+    <fact.features.ConcentrationAtCenterOfGravity/>
     <fact.features.Leakage distribution="showerDistribution" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" pixelSetKey="shower" weights="photoncharge"/>
     <fact.features.TimeSpread arrivalTimeKey="arrivalTime" outputKey="Timespread" pixelSetKey="shower" weightsKey="photoncharge"/>
     <fact.features.ShowerSlope arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" photonChargeKey="photoncharge" pixelSetKey="shower" slopeLongOutputKey="Slope_long" slopeSpreadOutputKey="Slope_spread" slopeSpreadWeightedOutputKey="Slope_spread_weighted" slopeTransOutputKey="Slope_trans"/>
