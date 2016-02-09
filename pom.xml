@@ -172,9 +172,17 @@
 			<version>${streams.version}</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-runtime</artifactId>
+			<version>${streams.version}</version>
+			<scope>${streams.scope}</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>de.sfb876</groupId>
+			<artifactId>streams-performance</artifactId>
 			<version>${streams.version}</version>
 			<scope>${streams.scope}</scope>
 		</dependency>
@@ -285,10 +293,12 @@
 								<main-class>stream.run</main-class>
 							</manifestEntries>
 						</transformer>
+						<!--
 						<transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
 							<resource>.fits</resource>
 							<resource>.gz</resource>
 						</transformer>
+						-->
 					</transformers>
 					<filters>
 						<filter>

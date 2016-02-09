@@ -12,27 +12,30 @@ import stream.io.CsvStream;
 import stream.io.SourceURL;
 
 /**
- * This processor performs a basic extraction on the data array. It contains
- * three steps: 1. Calculates the position of the max amplitude in
- * [startSearchWindow,startSearchWindow+rangeSearchWindow[ 2. Calculates the
- * position of the half height in front of the maxAmplitudePosition 3.
- * Calculates the integral by summing up the following integrationWindow slices
- * beginning with the half height position The resulting photoncharge is
- * calculated by dividing the integral by the integralGain of the pixel
+ * This processor computes the photon charge based on the maximum amplitudes and
+ * the data array. The maximum amplitudes need to be provided as an array,
+ * holding the position (slice) of the maximum for each pixel.
  * 
- * This processor also serves as a basic class for extraction processors
+ * The photon charge is computed by integration of a window of slices. This
+ * window is derived from the maximum amplitude position and the position of the
+ * half-value of the maximum before the maximum. The resulting sum is divided by
+ * the integralGain for each pixel, leaving the photoncharge value.
  * 
- * @author Fabian Temme
+ * 
+ * @author Fabian Temme, adapted by Christian Bockermann
  *
  */
 public class PhotonCharge implements Processor {
     static Logger log = LoggerFactory.getLogger(PhotonCharge.class);
 
     @Parameter(required = true, description = "key to the data array")
-    protected String dataKey = null;
+    protected String dataKey = "data:calibrated";
 
     @Parameter(required = true, description = "outputKey for the calculated photoncharge")
     protected String outputKeyPhotonCharge = null;
+
+    @Parameter(description = "Attribute holding the maximum positions of all amplitudes, default 'amplitudes:max:pos'.")
+    String amplitudePosKey = "amplitudes:max:pos";
 
     @Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants", defaultValue = "file:src/main/resources/defaultIntegralGains.csv")
     protected SourceURL url = null;
@@ -55,50 +58,24 @@ public class PhotonCharge implements Processor {
         Utils.mapContainsKeys(input, dataKey, "NROI");
 
         int roi = (Integer) input.get("NROI");
-        npix = (Integer) input.get("NPIX");
+        int npix = (Integer) input.get("NPIX");
 
-        double[] data = (double[]) input.get(dataKey);
+        final double[] data = (double[]) input.get(dataKey);
 
-        int[] positions = new int[npix];
-
-        positions = (int[]) input.get("amplitude:max:pos");
-
-        // IntervalMarker[] mPositions2 = new IntervalMarker[npix];
-        double[] photonCharge = new double[npix];
-        // IntervalMarker[] mPhotonCharge = new IntervalMarker[npix];
+        final int[] positions = (int[]) input.get(amplitudePosKey);
+        final double[] photonCharge = new double[npix];
 
         for (int pix = 0; pix < npix; pix++) {
 
             int halfHeightPos = calculatePositionHalfHeight(pix, positions[pix],
                     Math.max(0, positions[pix] - rangeHalfHeightWindow), roi, data);
 
-            // Utils.checkWindow(halfHeightPos, integrationWindow,
-            // validMinimalSlice, roi);
-            photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data)
-                    / integralGains[pix];
-            // mPhotonCharge[pix] = new IntervalMarker(halfHeightPos,
-            // halfHeightPos + integrationWindow);
+            int start = Math.min(Math.max(validMinimalSlice, halfHeightPos), roi);
+            photonCharge[pix] = calculateIntegral(pix, start, integrationWindow, roi, data) / integralGains[pix];
         }
 
-        // input.put(outputKeyMaxAmplPos + "Marker", mPositions2);
         input.put(outputKeyPhotonCharge, photonCharge);
-        input.put("@photoncharge", photonCharge);
-        // input.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
-
         return input;
-    }
-
-    public int calculateMaxPosition(int px, int start, int rightBorder, int roi, double[] data) {
-        int maxPos = start;
-        double tempMax = -Double.MAX_VALUE;
-        for (int sl = start; sl < rightBorder; sl++) {
-            int pos = px * roi + sl;
-            if (data[pos] > tempMax) {
-                maxPos = sl;
-                tempMax = data[pos];
-            }
-        }
-        return maxPos;
     }
 
     /**
@@ -113,7 +90,7 @@ public class PhotonCharge implements Processor {
      * @param data
      * @return
      */
-    public int calculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data) {
+    private int calculatePositionHalfHeight(int px, int maxPos, int leftBorder, int roi, double[] data) {
         int slice = maxPos;
         double maxHalf = data[px * roi + maxPos] / 2.0;
         for (; slice > leftBorder; slice--) {
@@ -125,7 +102,7 @@ public class PhotonCharge implements Processor {
         return slice;
     }
 
-    public double calculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
+    private double calculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
         double integral = 0;
         for (int sl = startingPosition; sl < startingPosition + integralSize; sl++) {
             int pos = px * roi + sl;
@@ -134,7 +111,7 @@ public class PhotonCharge implements Processor {
         return integral;
     }
 
-    public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
+    private double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
         double[] integralGains = new double[npix];
         Data integralGainData = null;
         try {
@@ -156,46 +133,6 @@ public class PhotonCharge implements Processor {
         }
     }
 
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKeyPhotonCharge() {
-        return outputKeyPhotonCharge;
-    }
-
-    public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-        this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-    }
-
-    public int getRangeHalfHeightWindow() {
-        return rangeHalfHeightWindow;
-    }
-
-    public void setRangeHalfHeightWindow(int rangeHalfHeightWindow) {
-        this.rangeHalfHeightWindow = rangeHalfHeightWindow;
-    }
-
-    public int getIntegrationWindow() {
-        return integrationWindow;
-    }
-
-    public void setIntegrationWindow(int integrationWindow) {
-        this.integrationWindow = integrationWindow;
-    }
-
-    public int getValidMinimalSlice() {
-        return validMinimalSlice;
-    }
-
-    public void setValidMinimalSlice(int validMinimalSlice) {
-        this.validMinimalSlice = validMinimalSlice;
-    }
-
     public void setUrl(SourceURL url) {
         try {
             integralGains = loadIntegralGainFile(url, log);
@@ -203,9 +140,5 @@ public class PhotonCharge implements Processor {
             throw new RuntimeException(e.getMessage());
         }
         this.url = url;
-    }
-
-    public SourceURL getUrl() {
-        return url;
     }
 }

@@ -4,7 +4,9 @@
         
     <!-- Pathes to the input files -->
     <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
+    <!-- 
 	<property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
+     -->
   
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
 
