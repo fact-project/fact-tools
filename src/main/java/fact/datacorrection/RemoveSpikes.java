@@ -57,7 +57,7 @@ public class RemoveSpikes implements Processor {
 		for (int spikeLength = 1 ; spikeLength <= maxSpikeLength ; spikeLength++)
 		{
 			SpikeInfos spikeInfos = null;
-			if (addSpikeInfo == true)
+			if (addSpikeInfo)
 			{
 				spikeInfos = new SpikeInfos();
 			}
@@ -80,7 +80,7 @@ public class RemoveSpikes implements Processor {
 					if (result[slice] - result[slice-1] > spikeLimit)
 					{
 						averTopValues += result[slice];
-						for (int topSlice = 1 ; topSlice < spikeLength && isSpike == true ; topSlice++)
+						for (int topSlice = 1 ; topSlice < spikeLength && isSpike ; topSlice++)
 						{
 							// Check for small steps (with a maximum slope of topSlope):
 							if (Math.abs(result[slice+topSlice] - result[slice+topSlice-1]) >= topSlopeLimit)
@@ -93,7 +93,7 @@ public class RemoveSpikes implements Processor {
 								averTopValues += result[slice+topSlice];
 							}
 						}
-						if (isSpike == true)
+						if (isSpike)
 						{
 							if (result[slice+spikeLength] - result[slice+spikeLength-1] < -spikeLimit)
 							{
@@ -103,7 +103,7 @@ public class RemoveSpikes implements Processor {
 									averTopValues /= spikeLength;
 								}
 								double spikeHeight = CorrectSpike(slice, spikeLength, averTopValues,result);
-								if (addSpikeInfo == true)
+								if (addSpikeInfo)
 								{
 									spikeInfos.addSpike(px,sl,startCells[px],spikeHeight,averTopSlope);
 								}
@@ -113,7 +113,7 @@ public class RemoveSpikes implements Processor {
 				}
 			}
 			
-			if (addSpikeInfo == true)
+			if (addSpikeInfo)
 			{
 				spikeInfos.addInfosToDataItem(input,spikeLength,outputSpikesKey);
 			}
@@ -127,7 +127,7 @@ public class RemoveSpikes implements Processor {
 
 	private double CorrectSpike(int pos, int spikeLength,double averTopValues, double[] result)
 	{
-		double spikeHeight = 0;
+		double spikeHeight;
 		
 		double averBaseValues = (result[pos-1] + result[pos+spikeLength])/2.0;
 		
@@ -140,78 +140,4 @@ public class RemoveSpikes implements Processor {
 		
 		return spikeHeight;
 	}
-
-	public String getDataKey() {
-		return dataKey;
-	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public String getStartCellKey() {
-		return startCellKey;
-	}
-
-	public void setStartCellKey(String startCellKey) {
-		this.startCellKey = startCellKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public double getSpikeLimit() {
-		return spikeLimit;
-	}
-
-	public void setSpikeLimit(double spikeLimit) {
-		this.spikeLimit = spikeLimit;
-	}
-
-	public double getTopSlopeLimit() {
-		return topSlopeLimit;
-	}
-
-	public void setTopSlopeLimit(double topSlopeLimit) {
-		this.topSlopeLimit = topSlopeLimit;
-	}
-
-	public String getOutputSpikesKey() {
-		return outputSpikesKey;
-	}
-
-	public void setOutputSpikesKey(String outputSpikesKey) {
-		this.outputSpikesKey = outputSpikesKey;
-	}
-
-	public int getMaxSpikeLength() {
-		return maxSpikeLength;
-	}
-
-	public void setMaxSpikeLength(int maxSpikeLength) {
-		this.maxSpikeLength = maxSpikeLength;
-	}
-
-	public int getLeftBorder() {
-		return leftBorder;
-	}
-
-	public void setLeftBorder(int leftBorder) {
-		this.leftBorder = leftBorder;
-	}
-
-	public boolean isAddSpikeInfo() {
-		return addSpikeInfo;
-	}
-
-	public void setAddSpikeInfo(boolean addSpikeInfo) {
-		this.addSpikeInfo = addSpikeInfo;
-	}
-
-	
 }
