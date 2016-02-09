@@ -108,40 +108,20 @@ public class FWHMPulses implements Processor{
         return input;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public String getMaxPosKey() {
-        return maxPosKey;
     }
 
     public void setMaxPosKey(String maxPosKey) {
         this.maxPosKey = maxPosKey;
     }
 
-    public String getMinPosKey() {
-        return minPosKey;
-    }
-
     public void setMinPosKey(String minPosKey) {
         this.minPosKey = minPosKey;
     }
 
-    public String getOutputKey() {
-        return outputKey;
-    }
-
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
-    }
-
-    public String getVisualizationKey() {
-        return visualizationKey;
     }
 
     public void setVisualizationKey(String visualizationKey) {
