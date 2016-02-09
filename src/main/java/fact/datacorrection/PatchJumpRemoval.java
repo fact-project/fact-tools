@@ -22,18 +22,18 @@ public class PatchJumpRemoval implements Processor {
 	static Logger log = LoggerFactory.getLogger(PatchJumpRemoval.class);
 	
 	@Parameter(required=true)
-	String dataKey=null;
+	String dataKey 		= "raw:dataCalibrated";
 	@Parameter(required=true)
-	String outputKey=null;
+	String outputKey	= "raw:dataCalibrated";
+	@Parameter(required=true)
+	String prevEventsKey= "meta:prevEvents";
+	@Parameter(required=true)
+	String startCellKey = "meta:startCellData";
+	@Parameter(required=false)
+	double jumpLimit   = 5.0;
 	@Parameter(required=false, description = "Useful for jump studies")
 	String outputJumpsKey=null;
-	@Parameter(required=true)
-	String prevEventsKey=null;
-	@Parameter(required=true)
-	String startCellKey=null;
-	@Parameter(required=true)
-	double jumpLimit=5.0;
-	
+
 	int leftBorder = 10;
 	
 	double spikeLimit = 7.0;
