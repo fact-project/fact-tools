@@ -108,11 +108,11 @@ public class DrsCalibration implements StatefulProcessor {
 	 * @see stream.Processor#process(stream.Data)
 	 */
 	@Override
-	public Data process(Data data) {
+	public Data process(Data item) {
 
         if( this.url == null){
 			//file not loaded yet. try to find by magic.
-            File drsFile = (File) data.get("@drsFile");
+            File drsFile = (File) item.get("@drsFile");
             if( drsFile != null){
                 if (!drsFile.equals(currentDrsFile)) {
                     currentDrsFile = drsFile;
@@ -129,7 +129,7 @@ public class DrsCalibration implements StatefulProcessor {
 		}
 
 		log.debug("Processing Data item by applying DRS calibration...");
-		short[] rawData = (short[]) data.get(inputKey);
+		short[] rawData = (short[]) item.get(inputKey);
 		if (rawData == null) {
 			log.error(" data .fits file did not contain the value for the inputKey "
 					+ inputKey + ". cannot apply drscalibration");
@@ -143,7 +143,7 @@ public class DrsCalibration implements StatefulProcessor {
 			rawfloatData[i] = rawData[i];
 		}
 
-		short[] startCell = (short[]) data.get("StartCellData");
+		short[] startCell = (short[]) item.get("StartCellData");
 		if (startCell == null) {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
@@ -158,11 +158,11 @@ public class DrsCalibration implements StatefulProcessor {
 
 		double[] dataCalibrated = applyDrsCalibration(rawfloatData, output,
 				startCell);
-		data.put(outputKey, dataCalibrated);
+		item.put(outputKey, dataCalibrated);
 
 		// add color value if set
 
-		return data;
+		return item;
 	}
 
 	public double[] applyDrsCalibration(double[] data, double[] destination,
