@@ -8,6 +8,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 
 /**
  * This operator returns the length of the array specified by the key
@@ -28,10 +29,7 @@ public class ArrayLength implements Processor {
 			outputKey = key + ":length";
 		}
 		Serializable serializable = input.get(key);
-		double[] values = Utils.toDoubleArray(serializable);
-		int length = values.length;
-
-		input.put(outputKey, length);
+		input.put(outputKey, Array.getLength(serializable));
 		return input;
 	}
 }
