@@ -27,9 +27,11 @@ import stream.annotations.Parameter;
  * * p25 - lower quartile
  * * p75 - upper quartile
  *
+ *
  * If <code>pixelSet</code> is given, these values are only calculated for the given pixels.
  *
  * Created by jbuss
+ * Refactored by maxnoe
  */
 public class ArrayStatistics implements Processor {
 
@@ -48,7 +50,7 @@ public class ArrayStatistics implements Processor {
         Utils.mapContainsKeys(item, pixelSetKey);
 
         if (outputKey == null){
-            outputKey = pixelSetKey + ":" + key;
+            outputKey = pixelSetKey + ":" + key.replace("pixels:", "");
         }
 
         double[] values   = Utils.toDoubleArray(item.get(key));
@@ -74,6 +76,5 @@ public class ArrayStatistics implements Processor {
         item.put(outputKey + ":" + "p75", s.getPercentile(75));
 
         return item;
-
 	}
 }
