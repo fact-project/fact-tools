@@ -22,11 +22,11 @@ public class ConcentrationCore implements Processor{
 	@Parameter(required=false)
 	private String ellipseKey = "shower:ellipse";
 
-	@Parameter(required = true, description  = "Key to the size feature")
+	@Parameter(required = false, description  = "Key to the size feature")
 	private String sizeKey = "shower:size";
-	@Parameter(required = true, description  = "Key of the photoncharge array")
+	@Parameter(required = false, description  = "Key of the photoncharge array")
 	private String estNumPhotonsKey = "pixels:estNumPhotons";
-	@Parameter(required = true, description  = "Key of the shower pixel array")
+	@Parameter(required = false, description  = "Key of the shower pixel array")
 	private String pixelSetKey = "shower";
 
 	

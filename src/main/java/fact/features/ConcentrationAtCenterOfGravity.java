@@ -31,8 +31,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	private String outputKey = "shower:concentrationCOG";
 
 	
-	private double[] photonCharge = null;
-	
+
 
 	/**
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
@@ -45,8 +44,8 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		double cogx = (Double) input.get(pixelSetKey + ":cog:x");
 		double cogy = (Double) input.get(pixelSetKey + ":cog:y");
 		double size = (Double) input.get(pixelSetKey + ":size");
-		
-		photonCharge = (double[]) input.get(photonChargeKey);
+
+        double[] photonCharge = (double[]) input.get(photonChargeKey);
 		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		if (cogPixel == null)
 		{
