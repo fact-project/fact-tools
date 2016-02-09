@@ -5,14 +5,6 @@
 <fact.datacorrection.PatchJumpRemoval />
 <fact.datacorrection.RemoveSpikes />
 <fact.filter.DrsTimeCalibration />
-<fact.filter.ArrayTimeCorrection
-    dataKey="DataCalibrated"
-    timeCalibConstKey="timeCalibConst"
-    outputKey="DataCalibrated"
-/>
-<fact.datacorrection.InterpolateTimeSeries 
-    calibService="calibService"
-    dataKey="DataCalibrated"
-    dataOutputKey="DataCalibrated"
-/>
+<fact.filter.ArrayTimeCorrection />
+<fact.datacorrection.InterpolateTimeSeries calibService="calibService" />
 </module>
