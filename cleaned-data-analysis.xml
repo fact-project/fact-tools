@@ -10,7 +10,7 @@
     <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz"/>
 
 
-<!-- TODO: Remove and make default --->
+<!-- TODO: Remove and make default -->
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv"/>
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv"/>
 <!-- END-TODO -->
@@ -134,7 +134,7 @@
     <fact.features.Concentration/>
     <fact.features.ConcentrationCore/>
     <fact.features.ConcentrationAtCenterOfGravity/>
-    <fact.features.Leakage distribution="showerDistribution" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" pixelSetKey="shower" weights="photoncharge"/>
+    <fact.features.Leakage/>
     <fact.features.TimeSpread arrivalTimeKey="arrivalTime" outputKey="Timespread" pixelSetKey="shower" weightsKey="photoncharge"/>
     <fact.features.ShowerSlope arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" photonChargeKey="photoncharge" pixelSetKey="shower" slopeLongOutputKey="Slope_long" slopeSpreadOutputKey="Slope_spread" slopeSpreadWeightedOutputKey="Slope_spread_weighted" slopeTransOutputKey="Slope_trans"/>
     <fact.features.Disp c0="117.94" lengthKey="Length" outputKey="Disp" widthKey="Width"/> 
