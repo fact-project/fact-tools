@@ -85,8 +85,8 @@
     <!-- Parameter calculation (only source independent) -->
     <Skip condition="%{data.shower} == null" />
 
-    <fact.pixelsets.Length outputKey="numPixelInShower" pixelSetKey="shower" />
-    <Skip condition="%{data.numPixelInShower} &lt; 5" />
+    <fact.pixelsets.NumPixel pixelSetKey="shower" />
+    <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
     <fact.statistics.ArrayStatistics key="pixels:estNumPhotons"/>
     <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
