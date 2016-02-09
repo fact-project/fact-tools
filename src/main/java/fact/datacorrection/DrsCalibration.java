@@ -156,9 +156,9 @@ public class DrsCalibration implements StatefulProcessor {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output,
+		double[] dataCalibrated = applyDrsCalibration(rawfloatData, output,
 				startCell);
-		data.put(outputKey, calibrated);
+		data.put(outputKey, dataCalibrated);
 
 		// add color value if set
 
