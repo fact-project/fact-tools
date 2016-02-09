@@ -91,7 +91,7 @@ public class PatchJumpRemoval implements Processor {
 		
 		// Loop over all previous Events
 		int prevEvent=1; // we start at 1, cause the startcells of the current Event are already filled in the prevEventInfo
-		for ( ; prevEvent < prevEventInfo.getListSize() && stopLoop == false ; prevEvent++)
+		for ( ; prevEvent < prevEventInfo.getListSize() && !stopLoop ; prevEvent++)
 		{
 			short[] currPrevStartCells = prevEventInfo.getPrevStartCells(prevEvent);
 			short[] currPrevStopCells = prevEventInfo.getPrevStoppCells(prevEvent);
@@ -124,9 +124,9 @@ public class PatchJumpRemoval implements Processor {
 						posInROI=true;
 					}
 				}
-				if (posInROI == true)
+				if (posInROI)
 				{
-					if (addJumpInfos == true)
+					if (addJumpInfos)
 					{
 						jumpInfos.addPosMarkerForPatch(patch,pos,isStartCell);
 					}
@@ -142,15 +142,15 @@ public class PatchJumpRemoval implements Processor {
 					double jumpHeight = checkForJump(patch,pos,patchDerivationAverage,isStartCell);
 					if (jumpHeight != 0)
 					{
-						boolean isJump=false;
+						boolean isJump;
 						isJump = checkForSignalFlank(patch, pos, patchDerivationAverage,isStartCell, jumpHeight);
-						if (isJump == true)
+						if (isJump)
 						{
 							jumpHeight = checkForRingingFFT(patch,pos,patchAverage,patchDerivationAverage,jumpHeight,jumpInfos);
 							if (jumpHeight != 0)
 							{
 								isJump = checkForTimeDependency(patch, deltaT,jumpHeight,jumpInfos);
-								if (isJump == true)
+								if (isJump)
 								{
 									stopLoop = false;
 									result = correctJump(patch, pos, isStartCell, result, jumpHeight);
@@ -164,7 +164,7 @@ public class PatchJumpRemoval implements Processor {
 					stopLoop = false;
 				}
 			}
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addInfosToDataItem(input, prevEvent, outputJumpsKey, deltaT);
 			}
@@ -177,15 +177,15 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if there are spikes directly in front of the jump and/or after the jump. Correct this jump if necessary
-	 * @param patch
-	 * @param pos
-	 * @return 
+	 * @param patch patch number
+	 * @param pos Position in data array
+	 * @return data array
 	 */
 	public double[] HandleSpike(int patch, int pos, double[] result, JumpInfos jumpInfo){
 		
 		for (int px = 0 ; px < 8 ; px++)
 		{
-			int pixel = patch*9+px;	
+			int pixel = patch*9+px;
 			// Check for a double spike in front of the jump
 			// properties of a double spike: large jump up, small step, large jump down
 			double diff = result[pixel*roi+pos-1] - result[pixel*roi+pos-2];
@@ -198,7 +198,7 @@ public class PatchJumpRemoval implements Processor {
 						double correctionValue = (result[pixel*roi+pos-3] + result[pixel*roi+pos-2]) / 2.0;
 						result[pixel*roi+pos-1] = correctionValue;
 						result[pixel*roi+pos] = correctionValue;
-						if (addJumpInfos == true)
+						if (addJumpInfos)
 						{
 							jumpInfo.addPixelWithSpikes(pixel);
 						}
@@ -218,7 +218,7 @@ public class PatchJumpRemoval implements Processor {
 						correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 						// and correct pos+1 with the average of the following two slices:
 						result[pixel*roi+pos+1] = correctionValue;
-						if (addJumpInfos == true)
+						if (addJumpInfos)
 						{
 							jumpInfo.addPixelWithSpikes(pixel);
 						}
@@ -236,7 +236,7 @@ public class PatchJumpRemoval implements Processor {
 						double correctionValue = (result[pixel*roi+pos+3] + result[pixel*roi+pos+4]) / 2.0;
 						result[pixel*roi+pos+1] = correctionValue;
 						result[pixel*roi+pos+2] = correctionValue;
-						if (addJumpInfos == true)
+						if (addJumpInfos)
 						{
 							jumpInfo.addPixelWithSpikes(pixel);
 						}
@@ -253,7 +253,7 @@ public class PatchJumpRemoval implements Processor {
 					// single spike in slices pos found, correct it with the average of the previous two slices:
 					double correctionValue = (result[pixel*roi+pos-2] + result[pixel*roi+pos-1]) / 2.0;
 					result[pixel*roi+pos] = correctionValue;
-					if (addJumpInfos == true)
+					if (addJumpInfos)
 					{
 						jumpInfo.addPixelWithSpikes(pixel);
 					}
@@ -270,7 +270,7 @@ public class PatchJumpRemoval implements Processor {
 					// single spike in slices pos+1 found, correct it with the average of the following two slices:
 					double correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 					result[pixel*roi+pos+1] = correctionValue;
-					if (addJumpInfos == true)
+					if (addJumpInfos)
 					{
 						jumpInfo.addPixelWithSpikes(pixel);
 					}
@@ -285,7 +285,7 @@ public class PatchJumpRemoval implements Processor {
 	/**
 	 * Calculates the average of the result data array for a given patch. Also calulates the derivation of this patch average. 
 	 * The timemarker channels are excluded from the averaging
-	 * @param patch
+	 * @param patch patch number
 	 * @param patchAverage
 	 * @param patchDerivationAverage
 	 */
@@ -307,7 +307,7 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if there is a jump from the slices pos to pos+1
-	 * @param patch
+	 * @param patch patch number
 	 * @param pos
 	 * @param derivation
 	 * @param isStartCell
@@ -318,7 +318,7 @@ public class PatchJumpRemoval implements Processor {
 		
 		double derivAtJump = derivation[pos+1];
 		
-		if (isStartCell == false)
+		if (!isStartCell)
 		{
 			derivAtJump *= -1;
 		}
@@ -332,7 +332,7 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if the jumpHeight is in the range of the predicted jumpHeight, depending on deltaT
-	 * @param patch
+	 * @param patch patch number
 	 * @param deltaT
 	 * @param jumpHeight
 	 * @param jumpInfos
@@ -346,7 +346,7 @@ public class PatchJumpRemoval implements Processor {
 		if (Math.abs(jumpHeight) > timeDependLimit * predictedJumpHeight)
 		{
 			timeDependIsCorrect = false;
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addPatchWithWrongTiming(patch);
 			}
@@ -358,7 +358,7 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if the detected jumps comes from a photon signal flank 
-	 * @param patch
+	 * @param patch patch number
 	 * @param pos
 	 * @param derivation
 	 * @param isStartCell
@@ -384,7 +384,7 @@ public class PatchJumpRemoval implements Processor {
 		averDerivAroundJump /= counter;
 		
 		// If we have a stop cell, we only want to check if we have a falling flank. Therefore we multiply with -1, to have positive derivations.
-		if (isStartCell == false)
+		if (!isStartCell)
 		{
 			averDerivAroundJump *= -1;
 		}
@@ -393,7 +393,7 @@ public class PatchJumpRemoval implements Processor {
 		if (averDerivAroundJump > signalFlankLimit*Math.abs(jumpHeight))
 		{
 			noSignalFlank = false;
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addPatchWithSignalFlanks(patch);
 			}
@@ -463,7 +463,7 @@ public class PatchJumpRemoval implements Processor {
 		}
 		ringingFreqAmpl /= (freqBorderBinRight - freqBorderBinLeft + 1);
 		
-		if (addJumpInfos == true)
+		if (addJumpInfos)
 		{
 			// this is only for getting the results of the FFT in the viewer
 			for (int sl=0 ; sl <= lengthForFFT/2 ; sl++)
@@ -499,7 +499,7 @@ public class PatchJumpRemoval implements Processor {
 			averRingingDerviation /= counter;
 			
 			jumpHeight -= averRingingDerviation;
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addPatchWithRinging(patch);
 			}
@@ -529,13 +529,13 @@ public class PatchJumpRemoval implements Processor {
 		
 		double jumpheight = Math.abs(jumpHeight);
 		
-		if (addJumpInfos == true)
+		if (addJumpInfos)
 		{
 			jumpInfos.addPatchWithCorrectedJumps(patch);
 			jumpInfos.averJumpHeights[patch] = jumpHeight;
 		}
 		
-		if (isStartCell == false)
+		if (!isStartCell)
 		{
 			leftBorder = 0;
 			rightBorder = pos+1;
