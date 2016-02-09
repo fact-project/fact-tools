@@ -19,7 +19,7 @@ public class EllipseParameter implements Processor {
 	@Parameter(required = false)
 	public String estNumPhotonsKey = "pixels:estNumPhotons";
 
-	@Parameter(required = true, description = "The key to the showerPixel. That is some sort of int[] containing pixel chids.")
+	@Parameter(required = false, description = "The key to the showerPixel. That is some sort of int[] containing pixel chids.")
 	public String pixelSetKey = "shower";
 
 	// the in and outputkeys
