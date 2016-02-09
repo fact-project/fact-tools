@@ -2,11 +2,15 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
@@ -23,21 +27,22 @@ import stream.io.SourceURL;
  * @author Fabian Temme
  *
  */
-public class BasicExtraction implements Processor {
+public class BasicExtraction implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(BasicExtraction.class);
-	@Parameter(required = true, description="key to the data array")
-	protected String dataKey = null;
-	@Parameter(required = true, description="outputKey for the position of the max amplitudes")
-	protected String outputKeyMaxAmplPos = null;
-	@Parameter(required = true, description="outputKey for the calculated photoncharge")
-	protected String outputKeyPhotonCharge = null;
+	@Parameter(required = false, description="key to the data array", defaultValue="raw:dataCalibrated")
+	protected String dataKey = "raw:dataCalibrated";
+	@Parameter(required = false, description="outputKey for the position of the max amplitudes", defaultValue="pixels:maxAmplitudePositions")
+	protected String maxAmplitudePositionsKey = "pixels:maxAmplitudePositions";
+	@Parameter(required = false, description="outputKey for the calculated photoncharge", defaultValue="pixels:estNumPhotons")
+	protected String estNumPhotonsKey = "pixels:estNumPhotons";
 	
-	@Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
+	// TODO: Think about a reasonable default value
+	@Parameter(required = true, description = "The url to the inputfiles for the gain calibration constants")
 	protected SourceURL url = null;
 	@Parameter(required = false, description="start slice of the search window for the max amplitude", defaultValue="35")
 	protected int startSearchWindow = 35;
-	@Parameter(required = false, description="range of the search window for the max amplitude", defaultValue="90")
-	protected int rangeSearchWindow = 90;
+	@Parameter(required = false, description="range of the search window for the max amplitude", defaultValue="60")
+	protected int rangeSearchWindow = 60;
 	@Parameter(required = false, description="range of the search window for the half heigt position", defaultValue="25")
 	protected int rangeHalfHeightWindow = 25;
 	@Parameter(required = false, description="range of the integration window", defaultValue="30")
@@ -48,40 +53,59 @@ public class BasicExtraction implements Processor {
 	protected double[] integralGains = null;
 	
 	private int npix = Constants.NUMBEROFPIXEL;
+
+
+	@Override
+	public void init(ProcessContext arg0) throws Exception {
+		try {
+			integralGains = loadIntegralGainFile(url,log);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void resetState() throws Exception {
+		
+	}
 	
 	@Override
-	public Data process(Data input) {
-		Utils.mapContainsKeys(input, dataKey,"NROI");
+	public void finish() throws Exception {
+	}
+	
+	@Override
+	public Data process(Data item) {
+		Utils.mapContainsKeys(item, dataKey,"NROI");
 		
-		int roi = (Integer) input.get("NROI");
-		npix = (Integer) input.get("NPIX");
+		int roi = (Integer) item.get("NROI");
+		npix = (Integer) item.get("NPIX");
 		
-		double[] data = (double[]) input.get(dataKey);
+		double[] data = (double[]) item.get(dataKey);
 		
 		int[] positions =  new int[npix];
-        IntervalMarker[] mPositions = new IntervalMarker[npix];
-		double[] photonCharge = new double[npix];
-        IntervalMarker[] mPhotonCharge = new IntervalMarker[npix];
+        IntervalMarker[] markerPositions = new IntervalMarker[npix];
+		double[] estNumPhotons = new double[npix];
+        IntervalMarker[] markerEstNumPhotons = new IntervalMarker[npix];
         
         Utils.checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, roi);
         
         for (int pix = 0; pix < npix; pix++) {
 			positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow+rangeSearchWindow, roi, data);
-			mPositions[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
+			markerPositions[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
 			
 			int halfHeightPos = calculatePositionHalfHeight(pix, positions[pix],positions[pix]-rangeHalfHeightWindow, roi, data);
 			
 			Utils.checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
-			photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / integralGains[pix];
-			mPhotonCharge[pix] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
+			estNumPhotons[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / integralGains[pix];
+			markerEstNumPhotons[pix] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
-        input.put(outputKeyMaxAmplPos, positions);
-        input.put(outputKeyMaxAmplPos + "Marker", mPositions);
-        input.put(outputKeyPhotonCharge, photonCharge);
-        input.put("@photoncharge", photonCharge);
-        input.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
+        item.put(maxAmplitudePositionsKey, positions);
+        item.put(maxAmplitudePositionsKey + "Marker", markerPositions);
+        item.put(estNumPhotonsKey, estNumPhotons);
+        item.put("@estNumPhotons", estNumPhotons);
+        item.put(estNumPhotonsKey + "Marker", markerEstNumPhotons);
         
-		return input;
+		return item;
 	}	
 	
 	public int calculateMaxPosition(int px, int start, int rightBorder, int roi, double[] data) {
@@ -133,20 +157,23 @@ public class BasicExtraction implements Processor {
 		}
 		return integral;
 	}
-
 	
+	public void setUrl(SourceURL url) {
+		this.url = url;
+	}
+
 	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
 		double[] integralGains = new double[npix];
-		Data integralGainData = null;
+		Data integralGainsItem = null;
 		try {
 			CsvStream stream = new CsvStream(inputUrl, " ");
 			stream.setHeader(false);
 			stream.init();
-			integralGainData = stream.readNext();
+			integralGainsItem = stream.readNext();
 			
 			for (int i = 0 ; i < npix ; i++){
 				String key = "column:" + (i);
-				integralGains[i] = (Double) integralGainData.get(key);
+				integralGains[i] = (Double) integralGainsItem.get(key);
 			}
 			return integralGains;
 			
@@ -156,84 +183,5 @@ public class BasicExtraction implements Processor {
 			return null;
 		}
 	}
-	
-	public String getDataKey() {
-		return dataKey;
-	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public String getOutputKeyMaxAmplPos() {
-		return outputKeyMaxAmplPos;
-	}
-
-	public void setOutputKeyMaxAmplPos(String outputKeyMaxAmplPos) {
-		this.outputKeyMaxAmplPos = outputKeyMaxAmplPos;
-	}
-
-	public String getOutputKeyPhotonCharge() {
-		return outputKeyPhotonCharge;
-	}
-
-	public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-		this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-	}
-
-	public int getStartSearchWindow() {
-		return startSearchWindow;
-	}
-
-	public void setStartSearchWindow(int startSearchWindow) {
-		this.startSearchWindow = startSearchWindow;
-	}
-
-	public int getRangeSearchWindow() {
-		return rangeSearchWindow;
-	}
-
-	public void setRangeSearchWindow(int rangeSearchWindow) {
-		this.rangeSearchWindow = rangeSearchWindow;
-	}
-
-	public int getRangeHalfHeightWindow() {
-		return rangeHalfHeightWindow;
-	}
-
-	public void setRangeHalfHeightWindow(int rangeHalfHeightWindow) {
-		this.rangeHalfHeightWindow = rangeHalfHeightWindow;
-	}
-
-
-	public int getIntegrationWindow() {
-		return integrationWindow;
-	}
-
-	public void setIntegrationWindow(int integrationWindow) {
-		this.integrationWindow = integrationWindow;
-	}
-
-	public int getValidMinimalSlice() {
-		return validMinimalSlice;
-	}
-
-	public void setValidMinimalSlice(int validMinimalSlice) {
-		this.validMinimalSlice = validMinimalSlice;
-	}
-
-	public void setUrl(SourceURL url) {
-		try {
-			integralGains = loadIntegralGainFile(url,log);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		this.url = url;
-	}
-
-	public SourceURL getUrl() {
-		return url;
-	}
-
 
 }

@@ -73,11 +73,11 @@ public class TimeGradientExtraction extends BasicExtraction {
 			mPhotonCharge[px] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
 		
-		input.put(outputKeyMaxAmplPos, positions);
-        input.put(outputKeyMaxAmplPos + "Marker", mPositions);
-        input.put(outputKeyPhotonCharge, photonCharge);
+		input.put(maxAmplitudePositionsKey, positions);
+        input.put(maxAmplitudePositionsKey + "Marker", mPositions);
+        input.put(estNumPhotonsKey, photonCharge);
         input.put("@photoncharge", photonCharge);
-        input.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
+        input.put(estNumPhotonsKey + "Marker", mPhotonCharge);
 		
 		return input;
 	}

@@ -29,9 +29,6 @@ public class PhotonChargeParameterTest extends ParameterTest {
 		assertTrue("Expecteds output already in data item",
 				!item.containsKey(outputKey));
 		BasicExtraction extraction = new BasicExtraction();
-		extraction.setDataKey(key);
-		extraction.setOutputKeyMaxAmplPos(positions);
-		extraction.setOutputKeyPhotonCharge(outputKey);
 		extraction.setUrl(new SourceURL(FitsStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 		extraction.process(item);

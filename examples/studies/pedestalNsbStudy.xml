@@ -20,8 +20,8 @@
     <fact.datacorrection.InterpolateTimeSeries calibService="calibService" interpolateTimeLine="True" dataKey="DataCalibrated" dataOutputKey="DataCalibrated" />
     <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
     rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
-    <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
-    <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
+    <fact.extraction.ArrivalTimeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
+    <fact.extraction.ArrivalTimePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
     <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmothed" length="5" />
     <fact.statistics.TimerowFeatures dataKey="DataCalibrated" movingAverageKey="DataSmothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
     <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->

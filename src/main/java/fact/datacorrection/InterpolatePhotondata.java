@@ -30,14 +30,14 @@ public class InterpolatePhotondata implements Processor {
     @Service(description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
 
-    @Parameter(required = true, description = "The photoncharge key to work on")
-    private String photonChargeKey = null;
-    @Parameter(required = true, description = "The name of the interpolated photoncharge output")
-    private String photonChargeOutputKey = null;
-    @Parameter(required = true, description = "The arrivalTime key to work on")
-    private String arrivalTimeKey = null;
-    @Parameter(required = true, description = "The name of the interpolated arrivalTime output")
-    private String arrivalTimeOutputKey = null;
+    @Parameter(required = true, description = "The photoncharge key to work on", defaultValue="pixels:estNumPhotons")
+    private String estNumPhotonsKey = "pixels:estNumPhotons";
+    @Parameter(required = true, description = "The name of the interpolated photoncharge output", defaultValue="pixels:estNumPhotons")
+    private String estNumPhotonsOutputKey = "pixels:estNumPhotons";
+    @Parameter(required = true, description = "The arrivalTime key to work on", defaultValue="pixels:arrivalTimes")
+    private String arrivalTimesKey = "pixels:arrivalTimes";
+    @Parameter(required = true, description = "The name of the interpolated arrivalTime output", defaultValue="pixels:arrivalTimes")
+    private String arrivalTimesOutputKey = "pixels:arrivalTimes";
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
     private int minPixelToInterpolate = 3;
 
@@ -45,10 +45,10 @@ public class InterpolatePhotondata implements Processor {
 
     @Override
     public Data process(Data item) {
-        Utils.isKeyValid(item, photonChargeKey, double[].class);
-        Utils.isKeyValid(item, arrivalTimeKey, double[].class);
-        double[] photoncharge = (double[]) item.get(photonChargeKey);
-        double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
+        Utils.isKeyValid(item, estNumPhotonsKey, double[].class);
+        Utils.isKeyValid(item, arrivalTimesKey, double[].class);
+        double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
+        double[] arrivalTimes = (double[]) item.get(arrivalTimesKey);
 
         DateTime timeStamp = null;
 
@@ -69,22 +69,22 @@ public class InterpolatePhotondata implements Processor {
             badPixelsSet.addById(px);
         }
 
-        if (!photonChargeKey.equals(photonChargeOutputKey)) {
-            double[] newPhotonCharge = new double[photoncharge.length];
-            System.arraycopy(photoncharge, 0, newPhotonCharge, 0, photoncharge.length);
-            photoncharge = interpolatePixelArray(newPhotonCharge, badChIds);
+        if (!estNumPhotonsKey.equals(estNumPhotonsOutputKey)) {
+            double[] newEstNumPhotons = new double[estNumPhotons.length];
+            System.arraycopy(estNumPhotons, 0, newEstNumPhotons, 0, estNumPhotons.length);
+            estNumPhotons = interpolatePixelArray(newEstNumPhotons, badChIds);
         } else {
-            photoncharge = interpolatePixelArray(photoncharge, badChIds);
+            estNumPhotons = interpolatePixelArray(estNumPhotons, badChIds);
         }
-        if (!arrivalTimeKey.equals(arrivalTimeOutputKey)) {
-            double[] newArrivalTime = new double[arrivalTime.length];
-            System.arraycopy(arrivalTime, 0, newArrivalTime, 0, arrivalTime.length);
-            arrivalTime = interpolatePixelArray(newArrivalTime, badChIds);
+        if (!arrivalTimesKey.equals(arrivalTimesOutputKey)) {
+            double[] newArrivalTimes = new double[arrivalTimes.length];
+            System.arraycopy(arrivalTimes, 0, newArrivalTimes, 0, arrivalTimes.length);
+            arrivalTimes = interpolatePixelArray(newArrivalTimes, badChIds);
         } else {
-            arrivalTime = interpolatePixelArray(arrivalTime, badChIds);
+            arrivalTimes = interpolatePixelArray(arrivalTimes, badChIds);
         }
-        item.put(photonChargeOutputKey, photoncharge);
-        item.put(arrivalTimeOutputKey, arrivalTime);
+        item.put(estNumPhotonsOutputKey, estNumPhotons);
+        item.put(arrivalTimesOutputKey, arrivalTimes);
         item.put("Bad pixels", badPixelsSet);
 
         return item;
@@ -119,30 +119,6 @@ public class InterpolatePhotondata implements Processor {
                             + numNeighbours + " valid neighboring pixel to interpolate.\n"
                             + "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
         }
-    }
-
-    public void setCalibService(CalibrationService calibService) {
-        this.calibService = calibService;
-    }
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-    public void setPhotonChargeOutputKey(String photonChargeOutputKey) {
-        this.photonChargeOutputKey = photonChargeOutputKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public void setArrivalTimeOutputKey(String arrivalTimeOutputKey) {
-        this.arrivalTimeOutputKey = arrivalTimeOutputKey;
-    }
-
-    public void setMinPixelToInterpolate(int minPixelToInterpolate) {
-        this.minPixelToInterpolate = minPixelToInterpolate;
     }
 
 }

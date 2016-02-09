@@ -3,8 +3,8 @@ package fact.parameter;
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
-import fact.extraction.RisingEdgeForPositions;
 import fact.features.EllipseParameter;
+import fact.extraction.ArrivalTimeForPositions;
 import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
@@ -70,17 +70,11 @@ public class ParameterTest {
 		pr.process(item);
 		
 		BasicExtraction bE = new BasicExtraction();
-		bE.setDataKey(key);
-		bE.setOutputKeyMaxAmplPos(positions);
-		bE.setOutputKeyPhotonCharge(photonCharge);
 		bE.setUrl(new SourceURL(FitsStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 		bE.process(item);
 		
-		RisingEdgeForPositions pR = new RisingEdgeForPositions();
-		pR.setDataKey(key);
-		pR.setAmplitudePositionsKey(positions);
-		pR.setOutputKey(arrivalTime);
+		ArrivalTimeForPositions pR = new ArrivalTimeForPositions();
 		pR.process(item);
 
 		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();

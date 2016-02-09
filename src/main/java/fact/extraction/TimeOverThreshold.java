@@ -22,49 +22,48 @@ import stream.annotations.Parameter;
 public class TimeOverThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeOverThreshold.class);
 	
-	@Parameter(required = true)
-	private String dataKey = null;
-	@Parameter(required = true)
-	private String positionsKey = null;
-	@Parameter(required = true)
-	private double threshold = 50;
-	@Parameter(required = true)
-	private String thresholdOutputKey = null;
-	@Parameter(required = true)
-	private String firstSliceOverThresholdOutputKey = null;
-	@Parameter(required = true)
-	private String outputKey = null;
+	@Parameter(required = false, defaultValue="raw:dataCalibrated")
+	private String dataKey = "raw:dataCalibrated";
+	@Parameter(required = false)
+	private String maxAmplitudePositionsKey = "pixels:maxAmplitudePositions";
+	@Parameter(required = false, defaultValue="1800")
+	private double threshold = 1800;
+	@Parameter(required = false, defaultValue="pixels:firstSliceOverThresholds")
+	private String firstSliceOverThresholdsKey = "pixels:firstSliceOverThresholds";
+	@Parameter(required = false, defaultValue="pixels:timeOverThresholds")
+	private String outputKey = "pixels:timeOverThresholds";
+	@Parameter(required = false, defaultValue = "meta:timeOverThreshold:threshold")
+	private String thresholdKey = "meta:timeOverThresholdProcessor:threshold";
 	
 	private PixelSet pixelSet;
 	
 	private int npix;
 
-	public Data process(Data input) {
-        Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, positionsKey, int[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+	public Data process(Data item) {
+        Utils.isKeyValid(item, dataKey, double[].class);
+		Utils.isKeyValid(item, maxAmplitudePositionsKey, int[].class);
+		Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
 				
-		int[] timeOverThresholdArray =  new int[npix];
-		double[] firstSliceOverThresholdArray =  new double[npix];
+		int[] timeOverThresholds =  new int[npix];
+		double[] firstSliceOverThresholds =  new double[npix];
 		
-		double[] data 	 = (double[]) input.get(dataKey);
-		int[] posArray = (int[]) input.get(positionsKey);
+		double[] data 	 = (double[]) item.get(dataKey);
+		int[] maxAmplitudePositions = (int[]) item.get(maxAmplitudePositionsKey);
 		
-		IntervalMarker[] m = new IntervalMarker[npix];
+		IntervalMarker[] marker = new IntervalMarker[npix];
 			
 		int roi = data.length / npix;
 		int numPixelAboveThreshold = 0;
 		
 		pixelSet = new PixelSet();
-        int[] totPixelSet = null;
 
 		//Loop over pixels
 		for(int pix = 0 ; pix < npix; pix++){
-			firstSliceOverThresholdArray[pix] = 0;
+			firstSliceOverThresholds[pix] = 0;
 			
 			int pos = pix*roi;
-			int positionOfMaximum = posArray[pix];
+			int positionOfMaximum = maxAmplitudePositions[pix];
 			
 			//Check if maximum is above threshold otherwise skip the pixel
 			if (data[pos + positionOfMaximum] < threshold){
@@ -102,82 +101,23 @@ public class TimeOverThreshold implements Processor {
 			}
 
 
-			timeOverThresholdArray[pix] = timeOverThreshold;
-			firstSliceOverThresholdArray[pix] = (double) firstSliceOverThresh;
-			m[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh);	
+			timeOverThresholds[pix] = timeOverThreshold;
+			firstSliceOverThresholds[pix] = (double) firstSliceOverThresh;
+			marker[pix] = new IntervalMarker(firstSliceOverThresh, lastSliceOverThresh);	
 		}
 		
-	
-		
-		//add processors threshold to the DataItem
-		input.put(thresholdOutputKey, threshold);
+		item.put(thresholdKey,threshold);
 		
 		//add number of pixel above this threshold to the DataItem
-		input.put(outputKey+"_numPixel", numPixelAboveThreshold); 
+		item.put(outputKey+":numPixels", numPixelAboveThreshold); 
 				
 		//add times over threshold to the DataItem
-		input.put(outputKey, timeOverThresholdArray);
-		input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
-		input.put(outputKey+"Marker", m);
-		input.put(outputKey+"SetOverlay", pixelSet);
-
-        //Add totPixelSet only to data item if it is not empty
-        totPixelSet = pixelSet.toIntArray();
-        if (totPixelSet.length != 0){
-            input.put(outputKey+"Set", pixelSet.toIntArray());
-        }
-        return input;
+		item.put(outputKey, timeOverThresholds);
+		item.put(firstSliceOverThresholdsKey, firstSliceOverThresholds);
+		item.put(outputKey+"Marker", marker);
+		item.put(outputKey+"SetOverlay", pixelSet);
+        return item;
 	}
-
-	public double getThreshold() {
-		return threshold;
-	}
-
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
-
-	public String getDataKey() {
-		return dataKey;
-	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public String getPositionsKey() {
-		return positionsKey;
-	}
-
-	public void setPositionsKey(String positionsKey) {
-		this.positionsKey = positionsKey;
-	}
-
-	public String getThresholdOutputKey() {
-		return thresholdOutputKey;
-	}
-
-	public void setThresholdOutputKey(String thresholdOutputKey) {
-		this.thresholdOutputKey = thresholdOutputKey;
-	}
-
-	public String getFirstSliceOverThresholdOutputKey() {
-		return firstSliceOverThresholdOutputKey;
-	}
-
-	public void setFirstSliceOverThresholdOutputKey(
-			String firstSliceOverThresholdOutputKey) {
-		this.firstSliceOverThresholdOutputKey = firstSliceOverThresholdOutputKey;
-	}
-	
 	
 
 }
