@@ -10,15 +10,15 @@ import stream.annotations.Parameter;
 //TODO write unit test
 public class ArrayTimeCorrection implements Processor{
 
-	@Parameter(required = true, description = "key to the drs amplitude calibrated voltage curves")
-	private String dataKey = null;
-
-	@Parameter(required = true, description = "Key to the time calibration constants as calculated by fact.filter.DrsTimeCalibration")
-	private String timeCalibConstKey = null;
-
-
-	@Parameter(required = true, description = "OutputKey for the calibrated voltage curves")
-	private String outputKey = null;
+	@Parameter(required = true, defaultValue = "raw:dataCalibrated",
+			description = "key to the drs amplitude calibrated voltage curves")
+	private String dataKey = "raw:dataCalibrated";
+	@Parameter(required = true, defaultValue = "meta:timeCalibConst",
+			description = "Key to the time calibration constants as calculated by fact.filter.DrsTimeCalibration")
+	private String timeCalibConstKey = "meta:timeCalibConst";
+	@Parameter(required = true, defaultValue = "raw:dataCalibrated",
+			description = "OutputKey for the calibrated voltage curves")
+	private String outputKey = "raw:dataCalibrated";
 
 	private double[] data = null;
 	private double[] timeCalibConst = null;
