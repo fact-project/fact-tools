@@ -22,9 +22,9 @@ public class RemappingKeys implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
         if(keys == null)
         {
             log.error("No key specified");
@@ -32,9 +32,9 @@ public class RemappingKeys implements Processor {
         }
         for (String key : keys){
             Serializable value;
-            if(input.containsKey(key))
+            if(item.containsKey(key))
             {
-                value = input.get(key);
+                value = item.get(key);
             }
             else
             {
@@ -102,8 +102,8 @@ public class RemappingKeys implements Processor {
                 System.arraycopy(arrayInSoftID, softId, arrayInCHID, chid, 1 );
             }
             // TODO Auto-generated method stub
-            input.put(key,(Serializable) arrayInCHID);
+            item.put(key,(Serializable) arrayInCHID);
         }
-        return input;
+        return item;
     }
 }
