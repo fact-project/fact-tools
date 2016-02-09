@@ -6,6 +6,8 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import static fact.container.PixelSet.name;
+
 /**
  * Calculate the number of disconnected graph components in the pixelSet.
  * @author kaibrugge
@@ -16,7 +18,7 @@ public class NumberOfIslands implements Processor {
     private String pixelSetKey = "shower";
 
     @Parameter(required = false)
-    private String outputKey = "shower:numIslands";
+    private String outputKey = null;
 
     @Override
     public Data process(Data input) {
@@ -29,8 +31,9 @@ public class NumberOfIslands implements Processor {
 
         PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
         int numIslands = Utils.breadthFirstSearch(showerPixel.toArrayList()).size();
-        input.put(outputKey, numIslands);
+
+
+        input.put(name(outputKey, pixelSetKey, "numIslands"), numIslands);
         return input;
     }
-
 }
