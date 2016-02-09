@@ -9,15 +9,7 @@
     startCellKey="StartCellData"
     jumpLimit="${patchJumpRemoval_jumpLimit}"
 />
-<fact.datacorrection.RemoveSpikes
-    dataKey="DataCalibrated"
-    outputKey="DataCalibrated"
-    startCellKey="StartCellData"
-    leftBorder="${removeSpikes_leftBorder}"
-    spikeLimit="${removeSpikes_spikeLimit}"
-    topSlopeLimit="${removeSpikes_topSlopeLimit}"
-    maxSpikeLength="${removeSpikes_maxSpikeLength}"
-/>
+<fact.datacorrection.RemoveSpikes />
 <fact.filter.DrsTimeCalibration
     outputKey="timeCalibConst"
 />

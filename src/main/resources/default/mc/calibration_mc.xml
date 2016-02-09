@@ -6,18 +6,8 @@
 <fact.utils.RemappingKeys 
     keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
 />
-<fact.datacorrection.DrsCalibration
-    url="${drsfile}"
-/>  
-<fact.datacorrection.RemoveSpikes
-    dataKey="DataCalibrated"
-    outputKey="DataCalibrated"
-    startCellKey="StartCellData"
-    leftBorder="${removeSpikes_leftBorder}"
-    spikeLimit="${removeSpikes_spikeLimit}"
-    topSlopeLimit="${removeSpikes_topSlopeLimit}"
-    maxSpikeLength="${removeSpikes_maxSpikeLength}"
-/>
+<fact.datacorrection.DrsCalibration url="${drsfile}" />
+<fact.datacorrection.RemoveSpikes />
 <fact.datacorrection.InterpolateTimeSeries 
     calibService="calibService"
     dataKey="DataCalibrated"
