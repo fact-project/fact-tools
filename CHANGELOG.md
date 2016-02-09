@@ -1,5 +1,10 @@
 #Changelog for the fact-tools
 
+## Version 0.12.3
+
+* `JSONWriter` now supports directly writing gzipped files with the 
+option `gzip="true"`
+
 ## Version 0.12.2
 
 Changes:
