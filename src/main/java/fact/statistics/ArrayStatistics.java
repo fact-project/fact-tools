@@ -31,7 +31,7 @@ public class ArrayStatistics implements Processor {
     @Parameter(required = true, description = "Key to the array you want the information about")
     private String key = null;
     @Parameter(required = true, description = "The name of the data written to the stream")
-    private String outputKey = null;
+    private String outputKey = key + ":";
     @Parameter(description = "key of a pixelSet (PixelSetOverlay) containing the IDs of a desired Subset")
     private String pixelSetKey = null;
 
