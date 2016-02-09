@@ -12,16 +12,16 @@ public class FactCluster {
 
     private int clusterID;
 
-    ArrayList<Integer> contentPixel = new ArrayList<>();
+    public ArrayList<Integer> contentPixel = new ArrayList<>();
     private ArrayList<Double> contentPixelPhotoncharge = new ArrayList<>();
     private ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
-    ArrayList<Integer> cleaningPixel = new ArrayList<>();           //contains all pixel in the cluster which are already in the shower-array (after cleaning)
+    public ArrayList<Integer> cleaningPixel = new ArrayList<>();           //contains all pixel in the cluster which are already in the shower-array (after cleaning)
     ArrayList<Integer> compactClusterID = new ArrayList<>();        //contains the ids from all clusters in the event which belongs to the same compact group of clusters, means that there are no air pixel on the line between this cluster an the clusters in this list
     ArrayList<Integer> airpixelCluster = new ArrayList<>();         //contains number of air pixel on the line from this cluster to every other cluster. If clusters are direct or indirect neighbors, the number of air pixels is 0. List should have (number of clusters - 1) entries.
-    ArrayList<Integer> naiveNeighborClusterID = new ArrayList<>();
+    public ArrayList<Integer> naiveNeighborClusterID = new ArrayList<>();
 
     private boolean containsShowerPixel;
-    int numNeighbors;
+    public int numNeighbors;
 
 
 
@@ -167,6 +167,26 @@ public class FactCluster {
         return Math.sqrt(sumY2 / sumD - Math.pow((sumY/ sumD),2));
     }
 
+    public double meanArrivaltime(){
+        double mean = 0;
+        for(double at : contentPixelArrivaltime){
+            mean = mean + at/contentPixelArrivaltime.size();
+        }
+
+        return mean;
+    }
+
+    public double stdArrivaltime(){
+        double mean = meanArrivaltime();
+        double std = 0;
+
+        for(double at : contentPixelArrivaltime){
+            std = std + Math.pow((mean - at),2)/contentPixelArrivaltime.size();
+        }
+
+        return Math.sqrt(std);
+    }
+
 
     //calculates the distance between the center of gravity (weighted by photon charge) an the center of the camera
     public double distanceCamCenter(){
@@ -175,6 +195,18 @@ public class FactCluster {
         double cogY = mapping.getPixelFromId(cog).getYPositionInMM();
 
         return Math.sqrt(cogX*cogX + cogY*cogY);
+
+    }
+
+    public double distanceCog(double showerCogX, double showerCogY){
+        int cog = cogId();
+        double clusterCogX = mapping.getPixelFromId(cog).getXPositionInMM();
+        double clusterCogY = mapping.getPixelFromId(cog).getYPositionInMM();
+
+        double absX = Math.abs(clusterCogX - showerCogX);
+        double absY = Math.abs(clusterCogY - showerCogY);
+
+        return Math.sqrt(absX*absX + absY*absY);
 
     }
 
