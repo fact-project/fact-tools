@@ -23,9 +23,9 @@ public class Remapping implements Processor{
 
     @Parameter(required = true, defaultValue = "raw:dataCalibrated",
             description = "Key refering to an array of short containing pixel data sorted by SoftId")
-    private String inputKey     ="raw:dataCalibrated";
+    private String inputKey     = "raw:dataCalibrated";
     @Parameter(required = true, defaultValue = "raw:dataCalibrated")
-    private String outputKey    ="raw:dataCalibrated";
+    private String outputKey    = "raw:dataCalibrated";
 
     private int npix = Constants.NUMBEROFPIXEL;
 
