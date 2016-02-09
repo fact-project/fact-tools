@@ -28,13 +28,13 @@ public class ArrayTimeCorrection implements Processor{
 	private TimeCorrectionKernel tcKernel = null;
 	
 	@Override
-	public Data process(Data input) {		
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		Utils.mapContainsKeys( input, dataKey, timeCalibConstKey);
-		npix = (Integer) input.get("NPIX");
-		data = (double[]) input.get(dataKey);
+	public Data process(Data item) {
+		Utils.isKeyValid(item, "NPIX", Integer.class);
+		Utils.mapContainsKeys( item, dataKey, timeCalibConstKey);
+		npix = (Integer) item.get("NPIX");
+		data = (double[]) item.get(dataKey);
 		roi = data.length / npix;
-		timeCalibConst = (double[]) input.get(timeCalibConstKey);
+		timeCalibConst = (double[]) item.get(timeCalibConstKey);
 		tcKernel = new LinearTimeCorrectionKernel();		
 
 		double [] calibratedValues = new double[roi * npix];
@@ -58,10 +58,10 @@ public class ArrayTimeCorrection implements Processor{
 			
 		}
 		
-		input.put(outputKey, calibratedValues);
+		item.put(outputKey, calibratedValues);
 		
 		
-		return input;
+		return item;
 	}
 
 
