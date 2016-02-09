@@ -17,28 +17,29 @@ import stream.annotations.Parameter;
 public class RemoveSpikes implements Processor {
 	static Logger log = LoggerFactory.getLogger(RemoveSpikes.class);
 
-	@Parameter(required=true)
-	String dataKey = null;
-	@Parameter(required=true)
-	String startCellKey = null;
-	@Parameter(required=true)
-	String outputKey = null;
-	@Parameter(required=true)
-	double spikeLimit;
-	@Parameter(required=true)
-	double topSlopeLimit;
-	@Parameter(required=false,description = "useful for spike studies")
-	String outputSpikesKey = null;
-	@Parameter(required=true, defaultValue = "2")
-	int maxSpikeLength = 2;
+	@Parameter(required=true, defaultValue = "raw:dataCalibrated", description = "calibrated Data array")
+	String dataKey 		= "raw:dataCalibrated";
+	@Parameter(required=true, defaultValue = "meta:startCellData", description = "key for start cell information")
+	String startCellKey = "meta:startCellData";
+	@Parameter(required=true, defaultValue = "raw:dataCalibrated", description = "Ouputkey for corrected Data array")
+	String outputKey 	= "raw:dataCalibrated";
 	@Parameter(required=false)
-	boolean addSpikeInfo = false;
-	
+	double spikeLimit 	= 20;
+	@Parameter(required=false)
+	double topSlopeLimit 	= 16;
+	@Parameter(required=false,description = "useful for spike studies")
+	String outputSpikesKey 	= null;
+	@Parameter(required=false, defaultValue = "2")
+	int maxSpikeLength 		= 4;
+	@Parameter(required=false)
+	boolean addSpikeInfo= false;
+	@Parameter(required=false)
+	int leftBorder 			= 6;
+
 	int roi;
 	int npix;
-	
-	int leftBorder = 10;
-	
+
+
 	
 	@Override
 	public Data process(Data input) {
