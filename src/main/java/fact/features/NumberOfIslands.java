@@ -7,17 +7,16 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * If showerKey refers to an int[] of showerpixel. this will calculate the number of islands
+ * Calculate the number of connected components in the pixelSet.
  * @author kaibrugge
- *
  */
 public class NumberOfIslands implements Processor {
 
-    @Parameter(required = true, description = "Key refering to an array of integer containing pixel Ids")
-    private String pixelSetKey;
+    @Parameter(required = false, description = "Key refering to the pixelSet to calculate the number of islands on")
+    private String pixelSetKey = "shower";
 
-    @Parameter(required = true)
-    private String outputKey;
+    @Parameter(required = false)
+    private String outputKey = "shower:numIslands";
 
     @Override
     public Data process(Data input) {
@@ -32,14 +31,6 @@ public class NumberOfIslands implements Processor {
         int numIslands = Utils.breadthFirstSearch(showerPixel.toArrayList()).size();
         input.put(outputKey, numIslands);
         return input;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setOutputKey(String outputkey) {
-        this.outputKey = outputkey;
     }
 
 }

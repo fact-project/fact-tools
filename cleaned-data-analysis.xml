@@ -129,7 +129,7 @@
     <fact.statistics.ArrayStatistics key="maxPos" outputKey="maxPosShower" pixelSetKey="shower"/>
     <fact.features.Size outputKey="Size" photonChargeKey="photoncharge" pixelSetKey="shower"/>
     <fact.features.EllipseParameter/>
-    <fact.features.NumberOfIslands outputKey="numIslands" pixelSetKey="shower"/>
+    <fact.features.NumberOfIslands/>
     <fact.features.TimeGradient arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKeyIntercept="timeGradientIntercept" outputKeySlope="timeGradientSlope" outputKeySumSquaredErrors="timeGradientSSE" pixelSetKey="shower"/>
     <fact.features.Concentration concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel" pixelSetKey="shower" weights="photoncharge"/>
     <fact.features.ConcentrationCore cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" lengthKey="Length" outputKey="ConcCore" photonChargeKey="photoncharge" pixelSetKey="shower" sizeKey="Size" widthKey="Width"/>
