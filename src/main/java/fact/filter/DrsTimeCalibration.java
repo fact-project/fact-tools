@@ -52,13 +52,13 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	}
 
 	@Override
-	public Data process(Data input) {
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		Utils.mapContainsKeys(input, startCellKey, "NROI");
+	public Data process(Data item) {
+		Utils.isKeyValid(item, "NPIX", Integer.class);
+		Utils.mapContainsKeys(item, startCellKey, "NROI");
 		
-		npix = (Integer) input.get("NPIX");
-		int roi = (Integer) input.get("NROI");
-		short[] startCell = (short[]) input.get(startCellKey);
+		npix = (Integer) item.get("NPIX");
+		int roi = (Integer) item.get("NROI");
+		short[] startCell = (short[]) item.get(startCellKey);
 		if (startCell==null) {
 			throw new RuntimeException("Couldn't find StartCellData");
 		}
@@ -72,8 +72,8 @@ public class DrsTimeCalibration implements StatefulProcessor{
 			}
 		}
 		
-		input.put(outputKey, relativeTimeOffsets);
-		return input;
+		item.put(outputKey, relativeTimeOffsets);
+		return item;
 	}
 		
 	protected void loadDrsTimeCalibConstants(SourceURL  in) {
