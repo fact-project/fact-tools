@@ -67,27 +67,11 @@ public class ArrayTimeCorrection implements Processor{
 
 	/**
 	 *
-	 * @param chid
-	 * @param slice
+	 * @param chid continous hardware id of the pixel
+	 * @param slice slice in the time series
 	 * @return time in slices
 	 */
 	private double calcRealTime(int chid, int slice){
 		return slice - timeCalibConst[chid * roi + slice];
 	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public void setTimeCalibConstKey(String timeCalibConstKey) {
-		this.timeCalibConstKey = timeCalibConstKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	
-
-	
 }
