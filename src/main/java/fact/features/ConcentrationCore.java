@@ -13,19 +13,18 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import static fact.container.PixelSet.name;
+
 
 public class ConcentrationCore implements Processor{
 	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 	
 	@Parameter(required=false)
-	private String outputKey = "shower:concentrationCore";
-	@Parameter(required=false)
-	private String ellipseKey = "shower:ellipse";
+	private String outputKey = null;
 
-	@Parameter(required = false, description  = "Key to the size feature")
-	private String sizeKey = "shower:size";
 	@Parameter(required = false, description  = "Key of the photoncharge array")
 	private String estNumPhotonsKey = "pixels:estNumPhotons";
+
 	@Parameter(required = false, description  = "Key of the shower pixel array")
 	private String pixelSetKey = "shower";
 
@@ -35,18 +34,19 @@ public class ConcentrationCore implements Processor{
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys( input, estNumPhotonsKey, pixelSetKey, ellipseKey, sizeKey);
+		Utils.mapContainsKeys( input, estNumPhotonsKey, pixelSetKey);
+        String ellipse =  pixelSetKey + ":" + "ellipse";
 
 		try{
 			Double cogx = (Double) input.get(pixelSetKey + ":cog:x");
 			Double cogy = (Double) input.get(pixelSetKey + ":cog:y");
 
-            Double d = (Double) input.get(ellipseKey + ":delta");
+            Double d = (Double) input.get(ellipse + ":delta");
 			double [] photonChargeArray = (double[]) input.get(estNumPhotonsKey);
 			PixelSet showerPixelArray = (PixelSet) input.get(pixelSetKey);
-			Double l = (Double) input.get(ellipseKey + ":length");
-			Double w = (Double) input.get(ellipseKey + ":width");
-			Double size = (Double) input.get(sizeKey);
+			Double l = (Double) input.get(ellipse + ":length");
+			Double w = (Double) input.get(ellipse + ":width");
+			Double size = (Double) input.get(pixelSetKey + ":size");
 			
 			double c = Math.cos(d);
 			double s = Math.sin(d);
@@ -80,7 +80,7 @@ public class ConcentrationCore implements Processor{
 				
 			}
 			concCore /= size;
-			input.put(outputKey, concCore);
+			input.put(name(outputKey, pixelSetKey, "concentrationCore"), concCore);
 			return input;
 			
 		} catch (ClassCastException e){
