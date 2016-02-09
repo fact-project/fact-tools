@@ -27,7 +27,7 @@ public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 
-	private String outputKey = "DataCalibrated";
+	private String outputKey = "raw:dataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String inputKey = "Data";
