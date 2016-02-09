@@ -21,20 +21,20 @@ import stream.annotations.Parameter;
 public class Remapping implements Processor{
     static Logger log = LoggerFactory.getLogger(Remapping.class);
 
-    @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
-    private String key;
-
-    @Parameter(required = true)
-    private String outputKey;
+    @Parameter(required = true, defaultValue = "raw:dataCalibrated",
+            description = "Key refering to an array of short containing pixel data sorted by SoftId")
+    private String inputKey     ="raw:dataCalibrated";
+    @Parameter(required = true, defaultValue = "raw:dataCalibrated")
+    private String outputKey    ="raw:dataCalibrated";
 
     private int npix = Constants.NUMBEROFPIXEL;
 
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, key, short[].class);
+        Utils.isKeyValid(input, inputKey, short[].class);
         Utils.isKeyValid(input, "NPIX", Integer.class);
 
-        short[] data = (short[]) input.get(key);
+        short[] data = (short[]) input.get(inputKey);
         npix = (Integer) input.get("NPIX");
 
         short[] remapped = new short[data.length];
