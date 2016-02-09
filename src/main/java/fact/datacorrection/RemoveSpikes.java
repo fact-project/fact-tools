@@ -39,21 +39,19 @@ public class RemoveSpikes implements Processor {
 	int roi;
 	int npix;
 
-
-	
 	@Override
-	public Data process(Data input) {
-		Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, startCellKey, short[].class);
-		Utils.isKeyValid(input, "NROI", Integer.class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
+	public Data process(Data item) {
+		Utils.isKeyValid(item, dataKey, double[].class);
+		Utils.isKeyValid(item, startCellKey, short[].class);
+		Utils.isKeyValid(item, "NROI", Integer.class);
+		Utils.isKeyValid(item, "NPIX", Integer.class);
 		
-		double[] data = (double[]) input.get(dataKey);
+		double[] data = (double[]) item.get(dataKey);
 		double[] result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
-		roi = (Integer) input.get("NROI");
-		npix = (Integer) input.get("NPIX");
-		short[] startCells = (short[]) input.get(startCellKey);
+		roi = (Integer) item.get("NROI");
+		npix = (Integer) item.get("NPIX");
+		short[] startCells = (short[]) item.get(startCellKey);
 		
 		for (int spikeLength = 1 ; spikeLength <= maxSpikeLength ; spikeLength++)
 		{
@@ -116,14 +114,14 @@ public class RemoveSpikes implements Processor {
 			
 			if (addSpikeInfo)
 			{
-				spikeInfos.addInfosToDataItem(input,spikeLength,outputSpikesKey);
+				spikeInfos.addInfosToDataItem(item,spikeLength,outputSpikesKey);
 			}
 				
 		}
 		
-		input.put(outputKey,result);
+		item.put(outputKey,result);
 
-		return input;
+		return item;
 	}
 
 	private double CorrectSpike(int pos, int spikeLength,double averTopValues, double[] result)
