@@ -51,9 +51,9 @@ public class InterpolateTimeSeries implements Processor {
         npix = (Integer) item.get("NPIX");
         double[] data = (double[]) item.get(dataKey);
 
-        DateTime timeStamp = null;
+        DateTime timeStamp;
 
-        if (item.containsKey("UnixTimeUTC") == true) {
+        if (item.containsKey("UnixTimeUTC")) {
             Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
             int[] eventTime = (int[]) item.get("UnixTimeUTC");
             timeStamp = new DateTime((long) ((eventTime[0] + eventTime[1] / 1000000.) * 1000), DateTimeZone.UTC);
@@ -123,21 +123,4 @@ public class InterpolateTimeSeries implements Processor {
                             + "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
         }
     }
-
-    public void setCalibService(CalibrationService calibService) {
-        this.calibService = calibService;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setDataOutputKey(String dataOutputKey) {
-        this.dataOutputKey = dataOutputKey;
-    }
-
-    public void setMinPixelToInterpolate(int minPixelToInterpolate) {
-        this.minPixelToInterpolate = minPixelToInterpolate;
-    }
-
 }
