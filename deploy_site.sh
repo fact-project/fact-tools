@@ -28,5 +28,5 @@ then
 	# /dev/null to hide any sensitive credential data that might otherwise be exposed.
 	git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
 else
-	echo "NOT ON TESTPAGE, WILL NOT DEPLOY SITE"
+	echo "NOT ON MASTER BRANCH, WILL NOT DEPLOY SITE"
 fi
