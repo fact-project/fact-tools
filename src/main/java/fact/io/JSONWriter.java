@@ -15,13 +15,11 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.data.DataFactory;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -88,6 +86,11 @@ import java.net.URL;
  * you can use:
  * <code>append="true"</code>
  * </p>
+ * <p>
+ * The JSONWriter can also add gzip compression on the fly. Use the <code>gzip</code> Option
+ * to directly write gzip compressed files.
+ * <code>append="true"</code>
+ * </p>
  * Created by bruegge on 7/30/14.
  * Refactored by maxnoe on 2/2/2016
  */
@@ -106,6 +109,8 @@ public class JSONWriter implements StatefulProcessor {
     private boolean pixelSetsAsInt = true;
     @Parameter(required = false, description = "If true, Infinity, -Infinity and NaN are converted to strings 'inf', '-inf' and 'nan'", defaultValue = "false")
     private boolean specialDoubleValuesAsString = false;
+    @Parameter(required = false, description = "If true, use gzip compression")
+    private boolean gzip = false;
 
     @Parameter(required = true)
     private URL url;
@@ -154,7 +159,13 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        bw = new BufferedWriter(new FileWriter(new File(url.getFile()), append));
+        if (gzip){
+            GZIPOutputStream gzip = new GZIPOutputStream(new FileOutputStream(new File(url.getFile()), append));
+            bw = new BufferedWriter(new OutputStreamWriter(gzip, "UTF-8"));
+        }
+        else {
+            bw = new BufferedWriter(new FileWriter(new File(url.getFile()), append));
+        }
 
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
         gsonBuilder.enableComplexMapKeySerialization();
@@ -220,6 +231,10 @@ public class JSONWriter implements StatefulProcessor {
 
     public void setJsonl(boolean jsonl) {
         this.jsonl = jsonl;
+    }
+
+    public void setGzip(boolean gzip) {
+        this.gzip = gzip;
     }
 
     public void setDoubleSignDigits(int doubleSignDigits) {
