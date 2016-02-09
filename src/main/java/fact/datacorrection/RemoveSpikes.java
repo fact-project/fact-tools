@@ -23,18 +23,18 @@ public class RemoveSpikes implements Processor {
 	String startCellKey = "meta:startCellData";
 	@Parameter(required=true, defaultValue = "raw:dataCalibrated", description = "Ouputkey for corrected Data array")
 	String outputKey 	= "raw:dataCalibrated";
-	@Parameter(required=false)
+	@Parameter(required=false, defaultValue = "20")
 	double spikeLimit 	= 20;
-	@Parameter(required=false)
-	double topSlopeLimit 	= 16;
-	@Parameter(required=false,description = "useful for spike studies")
-	String outputSpikesKey 	= null;
-	@Parameter(required=false, defaultValue = "2")
-	int maxSpikeLength 		= 4;
-	@Parameter(required=false)
-	boolean addSpikeInfo= false;
-	@Parameter(required=false)
-	int leftBorder 			= 6;
+    @Parameter(required=false, defaultValue = "4")
+	int maxSpikeLength 	= 4;
+    @Parameter(required=false, defaultValue = "6")
+    int leftBorder 		= 6;
+    @Parameter(required=false, defaultValue = "16")
+    double topSlopeLimit 	= 16;
+    @Parameter(required=false, defaultValue = "false")
+	boolean addSpikeInfo    = false;
+    @Parameter(required=false,description = "useful for spike studies")
+    String outputSpikesKey 	= null;
 
 	int roi;
 	int npix;
