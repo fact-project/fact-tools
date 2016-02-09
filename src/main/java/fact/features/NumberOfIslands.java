@@ -7,7 +7,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * Calculate the number of connected components in the pixelSet.
+ * Calculate the number of disconnected graph components in the pixelSet.
  * @author kaibrugge
  */
 public class NumberOfIslands implements Processor {
