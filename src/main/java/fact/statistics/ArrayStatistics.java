@@ -1,8 +1,8 @@
 package fact.statistics;
 
 import fact.Utils;
-import fact.hexmap.CameraPixel;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,59 +30,50 @@ public class ArrayStatistics implements Processor {
     static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
     @Parameter(required = true, description = "Key to the array you want the information about")
     private String key = null;
-    @Parameter(required = true, description = "The name of the data written to the stream")
+    @Parameter(required = false, description = "The basename for the output, if not given, use inputKey")
     private String outputKey = null;
     @Parameter(description = "key of a pixelSet (PixelSetOverlay) containing the IDs of a desired Subset")
     private String pixelSetKey = null;
 
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys( input, key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
-        double[] data   = Utils.toDoubleArray(input.get(key));
-
+        if (outputKey == null){
+            outputKey = key;
+        }
+        double[] values   = Utils.toDoubleArray(item.get(key));
 
         DescriptiveStatistics s = new DescriptiveStatistics();
 
         if (pixelSetKey == null){
             /* run over whole data array if no set is specified */
-            for(double value : data){
+            for(double value : values){
                 s.addValue(value);
             }
         }
-        else if (input.containsKey(pixelSetKey)){
+        else if (item.containsKey(pixelSetKey)){
             /* if a set is specified, use only the pixel ids from the set */
-            PixelSet pixelArray = (PixelSet) input.get(pixelSetKey);
+            PixelSet pixelArray = (PixelSet) item.get(pixelSetKey);
             for(CameraPixel pix : pixelArray.set){
-                s.addValue(data[pix.id]);
+                s.addValue(values[pix.id]);
             }
         }
-        input.put(outputKey+"_" +"median",s.getPercentile(50));
-        input.put(outputKey+"_" +"p25",s.getPercentile(25));
-        input.put(outputKey+"_" +"p75",s.getPercentile(75));
-        input.put(outputKey+"_" +"mean",s.getMean());
-        input.put(outputKey+"_" +"max",s.getMax());
-        input.put(outputKey+"_" +"min",s.getMin());
-//        input.put(outputKey+"_" +"geometricMean",s.getGeometricMean());
-        input.put(outputKey+"_" +"kurtosis",s.getKurtosis());
-        input.put(outputKey+"_" +"variance",s.getVariance());
-        input.put(outputKey+"_" +"skewness",s.getSkewness());
+        item.put(outputKey + ":" + "median", s.getPercentile(50));
+        item.put(outputKey + ":" + "pSigmaLow", s.getPercentile(15.87));
+        item.put(outputKey + ":" + "pSimgaHigh", s.getPercentile(84.13));
+        item.put(outputKey + ":" + "p25", s.getPercentile(25));
+        item.put(outputKey + ":" + "p75", s.getPercentile(75));
+        item.put(outputKey + ":" + "mean", s.getMean());
+        item.put(outputKey + ":" + "max", s.getMax());
+        item.put(outputKey + ":" + "min", s.getMin());
+        item.put(outputKey + ":" + "stdDev", s.getStandardDeviation());
+        item.put(outputKey + ":" + "variance", s.getVariance());
+        item.put(outputKey + ":" + "kurtosis", s.getKurtosis());
+        item.put(outputKey + ":" + "skewness", s.getSkewness());
 
-        return input;
+        return item;
 
 	}
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
 }
