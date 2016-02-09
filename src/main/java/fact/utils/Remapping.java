@@ -51,13 +51,4 @@ public class Remapping implements Processor{
             System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
         }
     }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public void setOutputKey(String outputkey) {
-        this.outputKey = outputkey;
-    }
 }
