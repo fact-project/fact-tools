@@ -59,8 +59,6 @@ public class ArrayTimeCorrection implements Processor{
 		}
 		
 		item.put(outputKey, calibratedValues);
-		
-		
 		return item;
 	}
 
