@@ -46,9 +46,9 @@ public class RemoveSpikes implements Processor {
 		Utils.isKeyValid(item, "NROI", Integer.class);
 		Utils.isKeyValid(item, "NPIX", Integer.class);
 		
-		double[] data = (double[]) item.get(dataKey);
-		double[] result = new double[data.length];
-		System.arraycopy(data, 0, result, 0, data.length);
+		double[] rawData = (double[]) item.get(dataKey);
+		double[] result = new double[rawData.length];
+		System.arraycopy(rawData, 0, result, 0, rawData.length);
 		roi = (Integer) item.get("NROI");
 		npix = (Integer) item.get("NPIX");
 		short[] startCells = (short[]) item.get(startCellKey);
