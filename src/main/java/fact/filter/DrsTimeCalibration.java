@@ -17,14 +17,19 @@ import java.net.URL;
 public class DrsTimeCalibration implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 	
-	@Parameter(required=false,description="Key of the StartCellData in the data fits file",defaultValue="StartCellData")
+	@Parameter(required=false, defaultValue="StartCellData",
+			description="Key of the StartCellData in the data fits file")
 	private String startCellKey = "StartCellData";
-	@Parameter(required=true,description="Key of the time calibration constants (relative to the start cell of each pixel)")
-	private String outputKey = null;
-	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
+	@Parameter(required=true, defaultValue="meta:timeCalibConst",
+			description="Key of the time calibration constants (relative to the start cell of each pixel)")
+	private String outputKey = "meta:timeCalibConst";
+	@Parameter(required=false, defaultValue="CellOffset",
+			description="name of column in FITS file to find DRS4 time calibration constants.")
 	private String drsTimeKey = "CellOffset";
-	@Parameter(required = false, description = "file with the drs time calib constants", defaultValue="classpath:/long_term_constants_median.time.drs.fits")
-	private SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
+	@Parameter(required = false, defaultValue="classpath:/long_term_constants_median.time.drs.fits",
+			description = "file with the drs time calib constants")
+	private SourceURL url = new SourceURL(
+			DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
