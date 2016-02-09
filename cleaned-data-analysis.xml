@@ -69,32 +69,32 @@
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
         <!-- Split BasicExtraction into MaxAmplitude, PhotonCharge, ... ?  -->
-        <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}" rangeSearchWindow="${basicExtraction_rangeSearchWindow}" startSearchWindow="${basicExtraction_startSearchWindow}" url="${integralGainFile}"/>
+        <fact.extraction.BasicExtraction url="${integralGainFile}"/>
 
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.extraction.EstimateBaseline dataKey="DataCalibrated" firstSlice="10" outputKey="baseline" range="30"/>
+        <fact.extraction.EstimateBaseline />
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->        
-        <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" firstSliceOverThresholdOutputKey="arrivalTimeTOT" outputKey="timeOverThreshold" positionsKey="maxPos" threshold="1800" thresholdOutputKey="thresholdForToT"/>
+        <fact.extraction.TimeOverThreshold />
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.datacorrection.CorrectSaturation baselineKey="baseline" dataKey="DataCalibrated" firstSliceOverThresholdKey="arrivalTimeTOT" maxPosKey="maxPos" outputKey="DataCalibrated" threshold="1800" totKey="timeOverThreshold"/>
+        <fact.datacorrection.CorrectSaturation />
 
         <!-- TODO: Is this need if we split off the maxAmp+photon-charge processors from BasicExtraction? -->
-        <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}" rangeSearchWindow="${basicExtraction_rangeSearchWindow}" startSearchWindow="${basicExtraction_startSearchWindow}" url="${integralGainFile}"/>
+        <fact.extraction.BasicExtraction url="${integralGainFile}"/>
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.extraction.RisingEdgeForPositions amplitudePositionsKey="maxPos" dataKey="DataCalibrated" maxSlopesKey="maxSlopesPos" outputKey="arrivalTimePos"/>
+        <fact.extraction.ArrivalTimeForPositions />
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" maxSlopesKey="maxSlopes" numberOfPoints="11" outputKey="arrivalTime" risingEdgeKey="arrivalTimePos"/>
+        <fact.extraction.ArrivalTimePolynomFit />
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.datacorrection.CorrectPixelDelays arrivalTimeKey="arrivalTime" outputKey="arrivalTime" url="${pixelDelayFile}"/>
+        <fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}"/>
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.datacorrection.InterpolatePhotondata arrivalTimeKey="arrivalTime" arrivalTimeOutputKey="arrivalTime" calibService="calibService" photonChargeKey="photoncharge" photonChargeOutputKey="photoncharge"/>     
+        <fact.datacorrection.InterpolatePhotondata />     
 
 
         <!-- Cleaning -->

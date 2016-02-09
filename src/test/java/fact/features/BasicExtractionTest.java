@@ -30,9 +30,6 @@ public class BasicExtractionTest {
         pr.setOutputKey("test");
 
         extraction = new BasicExtraction();
-        extraction.setDataKey("test");
-        extraction.setOutputKeyMaxAmplPos(positionsKey);
-        extraction.setOutputKeyPhotonCharge(photonChargeKey);
         extraction.setUrl(new SourceURL(FitsStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 	}
