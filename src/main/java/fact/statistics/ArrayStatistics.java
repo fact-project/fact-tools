@@ -72,6 +72,7 @@ public class ArrayStatistics implements Processor {
         item.put(outputKey + ":" + "variance", s.getVariance());
         item.put(outputKey + ":" + "kurtosis", s.getKurtosis());
         item.put(outputKey + ":" + "skewness", s.getSkewness());
+        item.put(outputKey + ":" + "sum", s.getSum());
 
         return item;
 
