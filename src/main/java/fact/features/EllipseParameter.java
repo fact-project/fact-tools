@@ -25,24 +25,6 @@ public class EllipseParameter implements Processor {
 	// the in and outputkeys
 	@Parameter(required = false)
 	public String outputKey = "shower:ellipse";
-//	@Parameter(required = false, defaultValue="M3Long")
-//	private String m3longKey = "M3Long";
-//	@Parameter(required = false, defaultValue="M3Trans")
-//	private String m3transKey = "M3Trans";
-//	@Parameter(required = false, defaultValue="M4Long")
-//	private String m4longKey = "M4Long";
-//	@Parameter(required = false, defaultValue="M4Trans")
-//	private String m4transKey = "M4Trans";
-//	@Parameter(required = false, defaultValue="COGx")
-//	private String cogxKey = "COGx";
-//	@Parameter(required = false, defaultValue="COGy")
-//	private String cogyKey = "COGy";
-//	@Parameter(required = false, defaultValue="Length")
-//	private String lengthKey = "Length";
-//	@Parameter(required = false, defaultValue="Width")
-//	private String widthKey = "Width";
-//	@Parameter(required = false, defaultValue="Delta")
-//	private String deltaKey = "Delta";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
