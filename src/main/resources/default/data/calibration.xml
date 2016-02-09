@@ -2,17 +2,9 @@
 <fact.datacorrection.DrsCalibration
     url="${drsfile}"
 />  
-<fact.datacorrection.PatchJumpRemoval
-    dataKey="DataCalibrated"
-    outputKey="DataCalibrated"
-    prevEventsKey="prevEvents"
-    startCellKey="StartCellData"
-    jumpLimit="${patchJumpRemoval_jumpLimit}"
-/>
+<fact.datacorrection.PatchJumpRemoval />
 <fact.datacorrection.RemoveSpikes />
-<fact.filter.DrsTimeCalibration
-    outputKey="timeCalibConst"
-/>
+<fact.filter.DrsTimeCalibration />
 <fact.filter.ArrayTimeCorrection
     dataKey="DataCalibrated"
     timeCalibConstKey="timeCalibConst"
