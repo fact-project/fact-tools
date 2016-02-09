@@ -30,7 +30,7 @@ public class DrsCalibration implements StatefulProcessor {
 	private String outputKey = "raw:dataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
-	private String inputKey = "Data";
+	private String inputKey = "raw:data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
