@@ -8,9 +8,5 @@
 />
 <fact.datacorrection.DrsCalibration url="${drsfile}" />
 <fact.datacorrection.RemoveSpikes />
-<fact.datacorrection.InterpolateTimeSeries 
-    calibService="calibService"
-    dataKey="DataCalibrated"
-    dataOutputKey="DataCalibrated"
-/>
+<fact.datacorrection.InterpolateTimeSeries calibService="calibService" />
 </module>
