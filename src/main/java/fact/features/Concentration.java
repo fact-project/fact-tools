@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.container.PixelSet;
 import org.slf4j.Logger;
@@ -14,19 +15,19 @@ public class Concentration implements Processor {
     @Parameter(required = false)
 	private String pixelSetKey = "shower";
     @Parameter(required = false)
-	private String weights = "pixels:numEstPhotons";
-
+	private String estNumPhotonsKey = "pixels:estNumPhotons";
     @Parameter(required = false)
 	private String outputKey = "shower:concentration:one";
 
 	@Override
 	public Data process(Data input) {
-
+		Utils.mapContainsKeys(input, pixelSetKey, estNumPhotonsKey);
 		PixelSet showerPixel;
-		double[] photonCharge;
+
+		double[] estNumPhotons;
 		try{
 			 showerPixel = (PixelSet) input.get(pixelSetKey);
-			 photonCharge = (double[]) input.get(weights);
+			 estNumPhotons = (double[]) input.get(estNumPhotonsKey);
 		} catch (ClassCastException e){
 			log.error("Could  not cast the keys to the right types");
 			throw e;
@@ -35,25 +36,23 @@ public class Concentration implements Processor {
 			log.warn("No shower in event. not calculating conenctration");
 			return input;
 		}
-
 		
 		//concentration according to F.Temme
-		double maxWeight                 = 0;
-		double secondMaxWeight          = 0;
-
+		double maxWeight = 0;
+		double secondMaxWeight = 0;
 		double size = 0;
 		
 		for (CameraPixel pix : showerPixel.set)
 		{
-			size += photonCharge[pix.id];
-			if (photonCharge[pix.id] > maxWeight)
+			size += estNumPhotons[pix.id];
+			if (estNumPhotons[pix.id] > maxWeight)
 			{
 				secondMaxWeight        = maxWeight;
-				maxWeight               = photonCharge[pix.id];
+				maxWeight               = estNumPhotons[pix.id];
 			}
-			else if (photonCharge[pix.id] > secondMaxWeight)
+			else if (estNumPhotons[pix.id] > secondMaxWeight)
 			{
-				secondMaxWeight    = photonCharge[pix.id];
+				secondMaxWeight    = estNumPhotons[pix.id];
 			}
 
 		}

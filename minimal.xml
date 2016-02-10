@@ -58,6 +58,19 @@
         <fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />
         <fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />
 
+        <fact.features.Size />
+        <fact.features.EllipseParameter/>
+        <fact.features.NumberOfIslands/>
+        <fact.features.TimeGradient />
+				<fact.io.PrintKeysOnConsole keys="pixels:estNumPhotons"/>
+        <fact.features.Concentration/>
+        <fact.features.ConcentrationCore/>
+        <fact.features.ConcentrationAtCenterOfGravity/>
+        <fact.features.Leakage/>
+        <fact.features.TimeSpread />
+        <!-- <fact.features.ShowerSlope /> -->
+        <fact.features.Disp />
+
 				<fact.io.JSONWriter keys="pixels:*:*,shower:*" url="file:test.json" />
 				<!-- <fact.ShowViewer key="raw:dataCalibrated"/> -->
     </process>

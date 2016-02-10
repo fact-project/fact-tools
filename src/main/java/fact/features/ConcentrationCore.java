@@ -34,20 +34,20 @@ public class ConcentrationCore implements Processor{
 	public Data process(Data input)
 	{
 
-		Utils.mapContainsKeys( input, estNumPhotonsKey, pixelSetKey);
-        String ellipse =  pixelSetKey + ":" + "ellipse";
+		String ellipse =  pixelSetKey + ":" + "ellipse";
+		Utils.mapContainsKeys( input, estNumPhotonsKey, pixelSetKey, ellipse+":cog:x", pixelSetKey + ":size");
 
 		try{
-			Double cogx = (Double) input.get(pixelSetKey + ":cog:x");
-			Double cogy = (Double) input.get(pixelSetKey + ":cog:y");
 
-            Double d = (Double) input.get(ellipse + ":delta");
 			double [] photonChargeArray = (double[]) input.get(estNumPhotonsKey);
 			PixelSet showerPixelArray = (PixelSet) input.get(pixelSetKey);
+			Double size = (Double) input.get(pixelSetKey + ":size");
+			Double cogx = (Double) input.get(ellipse + ":cog:x");
+			Double cogy = (Double) input.get(ellipse + ":cog:y");
+			Double d = (Double) input.get(ellipse + ":delta");
 			Double l = (Double) input.get(ellipse + ":length");
 			Double w = (Double) input.get(ellipse + ":width");
-			Double size = (Double) input.get(pixelSetKey + ":size");
-			
+
 			double c = Math.cos(d);
 			double s = Math.sin(d);
 			
