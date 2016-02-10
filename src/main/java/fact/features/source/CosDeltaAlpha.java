@@ -17,44 +17,41 @@ import stream.annotations.Parameter;
  *
  */
 public class CosDeltaAlpha implements Processor{
-	@Parameter(required=true)
-	private String sourcePositionKey;
-	@Parameter(required=true)
-	private String cogxKey;
-	@Parameter(required=true)
-	private String cogyKey;
-	@Parameter(required=true)
-	private String deltaKey;
-	@Parameter(required=true)
-	private String outputKey;
 	
-
-	private double[] sourcePosition;
-
-	private Double cogx;
-	private Double cogy;
-	private Double delta;
-
+	
+	@Parameter(required = false, defaultValue="sourcePosition:x")
+	private String sourcePositionXKey = "sourcePosition:x";
+	@Parameter(required = false, defaultValue="sourcePosition:y")
+	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x")
+	private String cogxKey = "shower:ellipse:cog:x";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y")
+	private String cogyKey = "shower:ellipse:cog:y";
+	@Parameter(required = false, defaultValue = "shower:ellipse:delta")
+	private String deltaKey = "shower:ellipse:delta";
+	@Parameter(required = false, defaultValue="shower:source:cosDeltaAlpha")
+	private String outputKey = "shower:source:cosDeltaAlpha";
 	
 	@Override
-	public Data process(Data input)
+	public Data process(Data item)
 	{
-
-		double cosDeltaAlpha = 0;
 		
-		Utils.mapContainsKeys( input, sourcePositionKey, cogxKey, cogyKey, deltaKey);
-		sourcePosition = (double[]) input.get(sourcePositionKey);
-		cogx = (Double) input.get(cogxKey);
-		cogy = (Double) input.get(cogyKey);
-		delta = (Double) input.get(deltaKey);
+		Utils.mapContainsKeys( item, sourcePositionXKey, sourcePositionYKey, cogxKey, cogyKey, deltaKey);
+		
+		double sourcex = (Double) item.get(sourcePositionXKey);
+		double sourcey = (Double) item.get(sourcePositionYKey);
+
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double delta = (Double) item.get(deltaKey);
 		
 		double sx,sy,dist;
-		sx = cogx - sourcePosition[0];
-		sy = cogy - sourcePosition[1];
+		sx = cogx - sourcex;
+		sy = cogy - sourcey;
 		dist = Math.sqrt(sx*sx + sy*sy);
 			
 		if(dist == 0)
-			return input;
+			return item;
 		
 		double s = Math.sin(delta);
 		double c = Math.cos(delta);
@@ -62,56 +59,13 @@ public class CosDeltaAlpha implements Processor{
 	    double arg2 = c*sx + s*sy; // mm
 						
 	     if (arg2 == 0)
-	         return input;
+	         return item;
 
 	    //double arg1 = c*sy - s*sx;          // [mm]
 
-		cosDeltaAlpha = arg2 / dist;
+		double cosDeltaAlpha = arg2 / dist;
 		
-		input.put(outputKey, cosDeltaAlpha);
-		return input;
+		item.put(outputKey, cosDeltaAlpha);
+		return item;
 	}
-
-	public String getSourcePositionKey() {
-		return sourcePositionKey;
-	}
-
-	public void setSourcePositionKey(String sourcePositionKey) {
-		this.sourcePositionKey = sourcePositionKey;
-	}
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-	public String getDeltaKey() {
-		return deltaKey;
-	}
-
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-	
-	
-	
 }
