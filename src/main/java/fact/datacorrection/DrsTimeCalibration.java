@@ -85,7 +85,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Override
     public Data process(Data data) {
 
-        short[] startCells = (short[]) data.get("StartCellData");
+        short[] startCells = (short[]) data.get("meta:startCellData");
         double[] dataCalibrated = (double[]) data.get(dataKey);
         int npix = 1440;
         int roi = 300;

@@ -18,9 +18,6 @@ public class DrsTimeCalibrationTest {
         try {
             DrsTimeCalibration drsTimeCalibration = new DrsTimeCalibration();
             URL resource = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
-
-            drsTimeCalibration.setUrl(new SourceURL(resource));
-            drsTimeCalibration.setDataKey("CellOffset");
             drsTimeCalibration.init(null);
 
         } catch (Exception e) {
@@ -34,9 +31,6 @@ public class DrsTimeCalibrationTest {
         try {
             DrsTimeCalibration drsTimeCalibration = new DrsTimeCalibration();
             URL resource = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
-
-            drsTimeCalibration.setUrl(new SourceURL(resource));
-            drsTimeCalibration.setDataKey("CellOffset");
             drsTimeCalibration.init(null);
 
 

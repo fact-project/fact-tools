@@ -19,8 +19,8 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	
 	@Parameter(required=false, defaultValue="StartCellData",
 			description="Key of the StartCellData in the data fits file")
-	private String startCellKey = "StartCellData";
-	@Parameter(required=true, defaultValue="meta:timeCalibConst",
+	private String startCellKey = "meta:startCellData";
+	@Parameter(required=false, defaultValue="meta:timeCalibConst",
 			description="Key of the time calibration constants (relative to the start cell of each pixel)")
 	private String outputKey = "meta:timeCalibConst";
 	@Parameter(required=false, defaultValue="CellOffset",
