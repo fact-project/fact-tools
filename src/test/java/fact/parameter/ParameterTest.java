@@ -61,11 +61,7 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-		URL drsUrl = FitsStreamTest.class
-				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey(key);
         pr.init(null);
 		pr.process(item);
 		
