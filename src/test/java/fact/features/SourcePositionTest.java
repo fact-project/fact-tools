@@ -27,10 +27,7 @@ public class SourcePositionTest {
     @Test
     public void testWobbleWrongParameter() throws Exception {
         SourcePosition sourcePosition = new SourcePosition();
-        sourcePosition.setOutputKey("test");
-
         //set only one key. eventhough we need all 4
-        sourcePosition.setPointingAzKey("bla");
         try {
             sourcePosition.init(null);
         } catch (IllegalArgumentException e) {
@@ -98,7 +95,6 @@ public class SourcePositionTest {
 	public void testCetaTauri() throws Exception
 	{
         SourcePosition sourcePosition = new SourcePosition();
-        sourcePosition.setOutputKey("test");
 
 		double C_T_rightAscension = (5.0 + 37.0/60 + 38.7/3600);
 		double C_T_declination = 21.0 + 8.0/60 + 33.0/3600;
