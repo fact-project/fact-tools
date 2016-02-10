@@ -341,8 +341,4 @@ public class ZFitsStream extends AbstractStream{
         }
         return false;
     }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 }

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 
 import stream.Data;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class BasicCleaning {
 	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
-	@Parameter(required=true)
+	@Service(required=true)
 	CalibrationService calibService;
 	
 

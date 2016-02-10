@@ -14,23 +14,23 @@ import stream.annotations.Parameter;
 public class Leakage implements Processor {
 	static Logger log = LoggerFactory.getLogger(Leakage.class);
 
-    @Parameter(required = true)
-	private String pixelSetKey;
-    @Parameter(required = true)
-	private String weights;
-    @Parameter(required = true)
-	private String leakage1OutputKey;
-    @Parameter(required = true)
-	private String leakage2OutputKey;
+    @Parameter(required = false)
+	private String pixelSetKey = "shower";
+
+    @Parameter(required = false)
+	private String weightsKey = "pixels:estNumPhotons";
+
+    @Parameter(required = false)
+	private String outputKey= "shower:leakage";
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Override
 	public Data process(Data input) {
-		Utils.mapContainsKeys( input, pixelSetKey, weights);
+		Utils.mapContainsKeys( input, pixelSetKey, weightsKey);
 
 		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
-		double[] photonCharge = (double[]) input.get(weights);
+		double[] photonCharge = (double[]) input.get(weightsKey);
 		
 		
 		double size = 0;
@@ -55,11 +55,9 @@ public class Leakage implements Processor {
 	    leakageSecondBorder    = leakageSecondBorder  / size;
 
 		
-		input.put(leakage1OutputKey , leakageBorder);
-		input.put(leakage2OutputKey , leakageSecondBorder);
+		input.put(outputKey + ":one", leakageBorder);
+		input.put(outputKey + ":two", leakageSecondBorder);
 		return input;
-		
-		
 	}
 	
 	//this is of course not the most efficient solution
@@ -75,34 +73,4 @@ public class Leakage implements Processor {
 	boolean isBorderPixel(int pix){
         return pixelMap.getNeighboursFromID(pix).length < 6;
 	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getWeights() {
-		return weights;
-	}
-	public void setWeights(String weights) {
-		this.weights = weights;
-	}
-
-	public String getLeakage1OutputKey() {
-		return leakage1OutputKey;
-	}
-
-	public void setLeakage1OutputKey(String leakage1OutputKey) {
-		this.leakage1OutputKey = leakage1OutputKey;
-	}
-
-	public String getLeakage2OutputKey() {
-		return leakage2OutputKey;
-	}
-
-	public void setLeakage2OutputKey(String leakage2OutputKey) {
-		this.leakage2OutputKey = leakage2OutputKey;
-	}
-
-	
-
 }

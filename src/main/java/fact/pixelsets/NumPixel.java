@@ -15,17 +15,21 @@ import stream.annotations.Parameter;
  * @author ftemme,jbuss
  *
  */
-public class Length implements Processor {
+public class NumPixel implements Processor {
 	
-	static Logger log = LoggerFactory.getLogger(Length.class);
+	static Logger log = LoggerFactory.getLogger(NumPixel.class);
 	
-	@Parameter(required=true, description="The pixelset of which you want to calculate the length")
+	@Parameter(required=true, description="The pixelSet of which you want to store the number of pixels in the outputKey")
 	private String pixelSetKey;
-	@Parameter(required=true, description="The outputkey.")
-	private String outputKey;
+	@Parameter(description="The outputKey", defaultValue="<pixelSetKey>:numPixel")
+	private String outputKey = null;
 
 	@Override
 	public Data process(Data input) {
+
+		if (outputKey == null){
+			outputKey = pixelSetKey + ":numPixel";
+		}
 		
 		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 		

@@ -61,7 +61,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
      * We save the sampling constants into a 2D Array once before the process starts.
      * The dimension is 2*1024 so we dont have to worry about overlaps in the ringbuffer.
      *
-     * @param processContext
+     * @param processContext this is the process context
      * @throws Exception
      */
     @Override
@@ -85,7 +85,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Override
     public Data process(Data data) {
 
-        short[] startCells = (short[]) data.get("StartCellData");
+        short[] startCells = (short[]) data.get("meta:startCellData");
         double[] dataCalibrated = (double[]) data.get(dataKey);
         int npix = 1440;
         int roi = 300;
@@ -147,21 +147,4 @@ public class DrsTimeCalibration implements StatefulProcessor{
     public void finish() throws Exception {
 
     }
-
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setDrsTimeKey(String drsTimeKey) {
-        this.drsTimeKey = drsTimeKey;
-    }
-
 }

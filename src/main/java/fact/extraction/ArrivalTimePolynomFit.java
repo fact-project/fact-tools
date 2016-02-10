@@ -1,6 +1,5 @@
 package fact.extraction;
 
-import fact.container.PixelDistribution2D;
 import org.apache.commons.math3.linear.LUDecomposition;
 import fact.Utils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -12,16 +11,16 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-public class RisingEdgePolynomFit implements Processor {
+public class ArrivalTimePolynomFit implements Processor {
 	
-	@Parameter(required=true, description="Key to the position of the rising edges")
-	private String risingEdgeKey = null;
-	@Parameter(required=true, description="Key to the data array")	
-	private String dataKey = null;
-	@Parameter(required=true, description="outputKey for the calculated arrival time")
-	private String outputKey = null;
-	@Parameter(required=true, description="outputKey for the calculated slope at the arrival time")
-	private String maxSlopesKey = null;
+	@Parameter(required=false, description="Key to the position of the rising edges", defaultValue="pixels:arrivalTimes")
+	private String risingEdgesKey = "pixels:arrivalTimes";
+	@Parameter(required=false, description="Key to the data array", defaultValue="raw:dataCalibrated")	
+	private String dataKey = "raw:dataCalibrated";
+	@Parameter(required=false, description="outputKey for the calculated arrival time", defaultValue="pixels:arrivalTimes")
+	private String outputKey = "pixels:arrivalTimes";
+	@Parameter(required=false, description="outputKey for the calculated slope at the arrival time", defaultValue="pixels:maxSlopes")
+	private String maxSlopesKey = "pixels:maxSlopes";
 	
 	@Parameter(required=false, description="number of points used for the fit", defaultValue="11")
 	private int numberOfPoints = 11;
@@ -34,19 +33,19 @@ public class RisingEdgePolynomFit implements Processor {
 	private int npix;
 
 	@Override
-	public Data process(Data input) {
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-		Utils.mapContainsKeys(input, dataKey,risingEdgeKey,"NROI");
+	public Data process(Data tiem) {
+		Utils.isKeyValid(tiem, "NPIX", Integer.class);
+        npix = (Integer) tiem.get("NPIX");
+		Utils.mapContainsKeys(tiem, dataKey,risingEdgesKey,"NROI");
 		
 		double[] arrivalTimes = new double[npix];
 		double[] maxSlopes = new double[npix];
 		IntervalMarker[] marker = new IntervalMarker[npix];
 		
-		double[] data = (double[]) input.get(dataKey);
-		int roi = (Integer) input.get("NROI");
+		double[] data = (double[]) tiem.get(dataKey);
+		int roi = (Integer) tiem.get("NROI");
 		
-		double[] risingEdges = (double[]) input.get(risingEdgeKey);
+		double[] risingEdges = (double[]) tiem.get(risingEdgesKey);
 
         if (showFitResult) {
             fitResult = new double[roi * npix];
@@ -112,15 +111,15 @@ public class RisingEdgePolynomFit implements Processor {
             }
         }
 
-        input.put(outputKey, arrivalTimes);
-		input.put(maxSlopesKey, maxSlopes);
-		input.put(outputKey + "Marker", marker);
+        tiem.put(outputKey, arrivalTimes);
+		tiem.put(maxSlopesKey, maxSlopes);
+		tiem.put(outputKey + "Marker", marker);
         if (showFitResult) {
-            input.put("fitResult", fitResult);
+            tiem.put("fitResult", fitResult);
         }
 
 
-		return input;
+		return tiem;
 	}
 
     private double Polynomial(double x, double[] c)
@@ -154,35 +153,4 @@ public class RisingEdgePolynomFit implements Processor {
 	private double calcDerivationAtPoint(double x, double[] c) {
 		return 3 * c[3]*x*x + 2 * c[2]*x + c[1];
 	}
-
-
-
-
-
-    public void setRisingEdgeKey(String risingEdgeKey) {
-		this.risingEdgeKey = risingEdgeKey;
-	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public void setNumberOfPoints(int numberOfPoints) {
-		this.numberOfPoints = numberOfPoints;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setMaxSlopesKey(String maxSlopesKey) {
-		this.maxSlopesKey = maxSlopesKey;
-	}
-
-
-    public void setShowFitResult(boolean showFitResult) {
-        this.showFitResult= showFitResult;
-    }
-
-
 }

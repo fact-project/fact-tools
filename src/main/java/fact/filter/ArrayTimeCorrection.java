@@ -10,15 +10,15 @@ import stream.annotations.Parameter;
 //TODO write unit test
 public class ArrayTimeCorrection implements Processor{
 
-	@Parameter(required = true, description = "key to the drs amplitude calibrated voltage curves")
-	private String dataKey = null;
-
-	@Parameter(required = true, description = "Key to the time calibration constants as calculated by fact.filter.DrsTimeCalibration")
-	private String timeCalibConstKey = null;
-
-
-	@Parameter(required = true, description = "OutputKey for the calibrated voltage curves")
-	private String outputKey = null;
+	@Parameter(required = false, defaultValue = "raw:dataCalibrated",
+			description = "key to the drs amplitude calibrated voltage curves")
+	private String inputKey = "raw:dataCalibrated";
+	@Parameter(required = false, defaultValue = "meta:timeCalibConst",
+			description = "Key to the time calibration constants as calculated by fact.filter.DrsTimeCalibration")
+	private String timeCalibConstKey = "meta:timeCalibConst";
+	@Parameter(required = false, defaultValue = "raw:dataCalibrated",
+			description = "OutputKey for the calibrated voltage curves")
+	private String outputKey = "raw:dataCalibrated";
 
 	private double[] data = null;
 	private double[] timeCalibConst = null;
@@ -28,13 +28,13 @@ public class ArrayTimeCorrection implements Processor{
 	private TimeCorrectionKernel tcKernel = null;
 	
 	@Override
-	public Data process(Data input) {		
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		Utils.mapContainsKeys( input, dataKey, timeCalibConstKey);
-		npix = (Integer) input.get("NPIX");
-		data = (double[]) input.get(dataKey);
+	public Data process(Data item) {
+		Utils.isKeyValid(item, "NPIX", Integer.class);
+		Utils.mapContainsKeys( item, inputKey, timeCalibConstKey);
+		npix = (Integer) item.get("NPIX");
+		data = (double[]) item.get(inputKey);
 		roi = data.length / npix;
-		timeCalibConst = (double[]) input.get(timeCalibConstKey);
+		timeCalibConst = (double[]) item.get(timeCalibConstKey);
 		tcKernel = new LinearTimeCorrectionKernel();		
 
 		double [] calibratedValues = new double[roi * npix];
@@ -58,36 +58,18 @@ public class ArrayTimeCorrection implements Processor{
 			
 		}
 		
-		input.put(outputKey, calibratedValues);
-		
-		
-		return input;
+		item.put(outputKey, calibratedValues);
+		return item;
 	}
 
 
 	/**
 	 *
-	 * @param chid
-	 * @param slice
+	 * @param chid continous hardware id of the pixel
+	 * @param slice slice in the time series
 	 * @return time in slices
 	 */
 	private double calcRealTime(int chid, int slice){
 		return slice - timeCalibConst[chid * roi + slice];
 	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public void setTimeCalibConstKey(String timeCalibConstKey) {
-		this.timeCalibConstKey = timeCalibConstKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	
-
-	
 }
