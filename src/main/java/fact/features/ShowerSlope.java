@@ -11,7 +11,7 @@ public class ShowerSlope implements Processor {
 
 	@Parameter(required = false, defaultValue = "pixel:estNumPhotons",
 				description = "")
-	private String photonChargeKey 	= "pixel:estNumPhotons";
+	private String estNumPhotonsKey = "pixel:estNumPhotons";
 	@Parameter(required = false, defaultValue = "pixel:arrivalTimes",
 				description = "")
 	private String arrivalTimeKey 	= "pixel:arrivalTimes";
@@ -44,9 +44,9 @@ public class ShowerSlope implements Processor {
 
 	@Override
 	public Data process(Data item) {
-		Utils.mapContainsKeys( item, photonChargeKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
+		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
 
-        double[] photonCharge = (double[]) item.get(photonChargeKey);
+        double[] photonCharge = (double[]) item.get(estNumPhotonsKey);
         double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
 		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
 		double cogx = (Double) item.get(cogxKey);
