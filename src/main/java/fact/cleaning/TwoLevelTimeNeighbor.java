@@ -41,7 +41,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 	private String arrivalTimeKey = "pixels:arrivalTimes";
 
     @Parameter(required = false)
-	private String outputKey = "pixelSet";
+	private String outputKey = "shower";
 
     @Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have to be " +
             "identified as a CorePixel", defaultValue = "5.5")
@@ -63,7 +63,8 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
     private String[] starPositionKeys = null;
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
 	private double starRadiusInCamera = Constants.PIXEL_SIZE;
-    
+
+	@Parameter(required = false, description = "If true, put pixelSets for the different stages into the dataItem", defaultValue = "false")
     private boolean showDifferentCleaningSets = false;
 
     private PixelSet cleanedPixelSet;

@@ -47,7 +47,13 @@
         <fact.statistics.ArrayStatistics key="pixels:estNumPhotons"/>
         <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
 
-				<fact.io.JSONWriter keys="pixels:*:*" url="file:test.json" />
-				<fact.ShowViewer key="raw:dataCalibrated"/>
+        <fact.cleaning.TwoLevelTimeNeighbor calibService="calibService"/>
+        <Skip condition="%{data.shower} == null" />
+
+        <fact.pixelsets.NumPixel pixelSetKey="shower" />
+        <Skip condition="%{data.shower:numPixel} &lt; 5" />
+
+				<fact.io.JSONWriter keys="pixels:*:*,shower:*" url="file:test.json" />
+				<!-- <fact.ShowViewer key="raw:dataCalibrated"/> -->
     </process>
 </container>
