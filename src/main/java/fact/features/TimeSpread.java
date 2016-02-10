@@ -60,33 +60,4 @@ public class TimeSpread implements Processor {
 		
 		return item;
 	}
-
-	public String getArrivalTimeKey() {
-		return arrivalTimeKey;
-	}
-
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
-
-	public String getWeightsKey() {
-		return weightsKey;
-	}
-
-	public void setWeightsKey(String weightsKey) {
-		this.weightsKey = weightsKey;
-	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
 }
