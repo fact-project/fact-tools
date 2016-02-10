@@ -8,13 +8,17 @@ import stream.annotations.Parameter;
 
 public class TimeSpread implements Processor {
 	
-	@Parameter(required = false)
+	@Parameter(required = false, defaultValue = "pixel:arrivalTimes",
+			description = "array with arrivaltimes in pixesls")
 	private String arrivalTimeKey 	= "pixel:arrivalTimes";
-	@Parameter(required = false)
+	@Parameter(required = false, defaultValue = "pixel:estNumPhotons",
+				description = "array with weights e.g. number of extracted photons in pixels")
 	private String weightsKey 		= "pixel:estNumPhotons";
-	@Parameter(required = false)
+	@Parameter(required = false, defaultValue = "shower",
+				description = "pixels set")
 	private String pixelSetKey 		= "shower";
-	@Parameter(required = false)
+	@Parameter(required = false, defaultValue = "shower:timespread",
+				description = "output key")
 	private String outputKey 		= "shower:timespread";
 	
 	@Override
