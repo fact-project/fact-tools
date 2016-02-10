@@ -43,15 +43,15 @@ public class ShowerSlope implements Processor {
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Override
-	public Data process(Data input) {
-		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
+	public Data process(Data item) {
+		Utils.mapContainsKeys( item, photonChargeKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
 
-        double[] photonCharge = (double[]) input.get(photonChargeKey);
-        double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-		int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
-		double cogx = (Double) input.get(cogxKey);
-		double cogy = (Double) input.get(cogyKey);
-		double delta = (Double) input.get(deltaKey);
+        double[] photonCharge = (double[]) item.get(photonChargeKey);
+        double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
+		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double delta = (Double) item.get(deltaKey);
 
 		// NumberShowerPixel
 		int n = shower.length;
@@ -112,10 +112,10 @@ public class ShowerSlope implements Processor {
 		double slopeSpread = Math.sqrt(sumbb/n - Math.pow(sumb/n, 2));
 		double slopeSpreadWeighted = Math.sqrt(sumwbb/sumw - Math.pow(sumwb/sumw, 2));
 
-		input.put(slopeLongOutputKey, slopeLong);
-		input.put(slopeTransOutputKey, slopeTrans);
-		input.put(slopeSpreadOutputKey, slopeSpread);
-		input.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
-		return input;
+		item.put(slopeLongOutputKey, slopeLong);
+		item.put(slopeTransOutputKey, slopeTrans);
+		item.put(slopeSpreadOutputKey, slopeSpread);
+		item.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
+		return item;
 	}
 }
