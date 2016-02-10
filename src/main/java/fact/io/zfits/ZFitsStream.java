@@ -209,8 +209,12 @@ public class ZFitsStream extends AbstractStream{
             applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
 
             item.put("raw:data", data);
-            item.put("Data", data);
+        } else {
+            Utils.mapContainsKeys(item, "Data");
+            short[] data = ((short[])item.get("Data"));
+            item.put("raw:data", data);
         }
+
         return item;
     }
 
