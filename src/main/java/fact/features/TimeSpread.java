@@ -9,13 +9,13 @@ import stream.annotations.Parameter;
 public class TimeSpread implements Processor {
 	
 	@Parameter(required = true)
-	private String arrivalTimeKey = null;
+	private String arrivalTimeKey = "pixel:arrivalTimes";
 	@Parameter(required = true)
-	private String weightsKey = null;
+	private String weightsKey = "pixel:estNumPhotons";
 	@Parameter(required = true)
-	private String pixelSetKey = null;
+	private String pixelSetKey = "shower";
 	@Parameter(required = true)
-	private String outputKey = null;
+	private String outputKey = "shower:timespread";
 	
 	@Override
 	public Data process(Data input) {
