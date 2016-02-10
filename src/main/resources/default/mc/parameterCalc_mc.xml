@@ -116,19 +116,8 @@
     leakage2OutputKey="Leakage2"
 />
 <fact.features.TimeSpread />
+<fact.features.ShowerSlope />
 
-<fact.features.ShowerSlope
-    photonChargeKey="photoncharge"
-    arrivalTimeKey="arrivalTime"
-    pixelSetKey="shower"
-    cogxKey="COGx"
-    cogyKey="COGy"
-    deltaKey="Delta"
-    slopeLongOutputKey="Slope_long"
-    slopeTransOutputKey="Slope_trans"
-    slopeSpreadOutputKey="Slope_spread"
-    slopeSpreadWeightedOutputKey="Slope_spread_weighted"
-/>
 <fact.features.Disp
     widthKey="Width"
     lengthKey="Length"

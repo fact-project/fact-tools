@@ -27,7 +27,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	@Parameter(required = false)
 	public String pixelSetKey = "shower";
 
-	@Parameter(required = true, description = "The key of the generated value.")
+	@Parameter(required = false, description = "The key of the generated value.")
 	private String outputKey = "shower:concentrationCOG";
 
 	
@@ -37,20 +37,20 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
 	 */
 	@Override
-	public Data process(Data input)
+	public Data process(Data item)
 	{
-		Utils.mapContainsKeys( input, pixelSetKey, photonChargeKey);
+		Utils.mapContainsKeys( item, pixelSetKey, photonChargeKey, pixelSetKey + ":ellipse:cog:x");
 		
-		double cogx = (Double) input.get(pixelSetKey + ":cog:x");
-		double cogy = (Double) input.get(pixelSetKey + ":cog:y");
-		double size = (Double) input.get(pixelSetKey + ":size");
+		double cogx = (Double) item.get(pixelSetKey + ":ellipse:cog:x");
+		double cogy = (Double) item.get(pixelSetKey + ":ellipse:cog:y");
+		double size = (Double) item.get(pixelSetKey + ":size");
 
-        double[] photonCharge = (double[]) input.get(photonChargeKey);
+        double[] photonCharge = (double[]) item.get(photonChargeKey);
 		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		if (cogPixel == null)
 		{
-			input.put(outputKey, -Double.MAX_VALUE);
-			return input;
+			item.put(outputKey, -Double.MAX_VALUE);
+			return item;
 		}
 		FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(cogPixel);
 		
@@ -83,9 +83,9 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		
 		double conc = photonCharge[cogPixel.id] + photonCharge[minChId1.id] + photonCharge[minChId2.id];
 		conc /= size;
-		input.put(outputKey, conc);
+		item.put(outputKey, conc);
 		
-		return input;
+		return item;
 	}
 	
 }

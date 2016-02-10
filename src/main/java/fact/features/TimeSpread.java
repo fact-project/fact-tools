@@ -10,10 +10,10 @@ public class TimeSpread implements Processor {
 	
 	@Parameter(required = false, defaultValue = "pixel:arrivalTimes",
 			description = "array with arrivaltimes in pixesls")
-	private String arrivalTimeKey 	= "pixel:arrivalTimes";
+	private String arrivalTimeKey 	= "pixels:arrivalTimes";
 	@Parameter(required = false, defaultValue = "pixel:estNumPhotons",
 				description = "array with weights e.g. number of extracted photons in pixels")
-	private String weightsKey 		= "pixel:estNumPhotons";
+	private String weightsKey 		= "pixels:estNumPhotons";
 	@Parameter(required = false, defaultValue = "shower",
 				description = "pixels set")
 	private String pixelSetKey 		= "shower";
