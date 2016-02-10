@@ -14,9 +14,9 @@ import stream.annotations.Parameter;
 public class AntiSourcePosition implements Processor {
 	static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
 	
-	@Parameter(required = false, defaultValue="sourcePosition")
+	@Parameter(required = false, defaultValue="sourcePosition:x")
 	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition")
+	@Parameter(required = false, defaultValue="sourcePosition:y")
 	private String sourcePositionYKey = "sourcePosition:y";
 	@Parameter(required = false, defaultValue="5")
 	private int numberOfAntiSourcePositions = 5;

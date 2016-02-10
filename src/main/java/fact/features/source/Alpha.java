@@ -22,9 +22,9 @@ public class Alpha implements Processor {
 	private String cogyKey = "shower:ellipse:cog:y";
 	@Parameter(required = false, defaultValue = "shower:ellipse:delta")
 	private String deltaKey = "shower:ellipse:delta";
-	@Parameter(required = false, defaultValue="sourcePosition")
+	@Parameter(required = false, defaultValue="sourcePosition:x")
 	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition")
+	@Parameter(required = false, defaultValue="sourcePosition:y")
 	private String sourcePositionYKey = "sourcePosition:y";
 	@Parameter(required = false, defaultValue="shower:source:alpha")
 	private String outputKey = "shower:source:alpha";
