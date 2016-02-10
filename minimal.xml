@@ -15,7 +15,6 @@
     <process id="2" input="fact">
 				<RenameKey from="Data" to="raw:data" />
 				<fact.pixelsets.AllPixels outputKey="pixels" />
-				<PrintData />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 				<RenameKey from="StartCellData" to="meta:startCellData" />
 
@@ -62,7 +61,6 @@
         <fact.features.EllipseParameter/>
         <fact.features.NumberOfIslands/>
         <fact.features.TimeGradient />
-				<fact.io.PrintKeysOnConsole keys="pixels:estNumPhotons"/>
         <fact.features.Concentration/>
         <fact.features.ConcentrationCore/>
         <fact.features.ConcentrationAtCenterOfGravity/>
@@ -72,6 +70,5 @@
         <fact.features.Disp />
 
 				<fact.io.JSONWriter keys="pixels:*:*,shower:*" url="file:test.json" />
-				<!-- <fact.ShowViewer key="raw:dataCalibrated"/> -->
     </process>
 </container>
