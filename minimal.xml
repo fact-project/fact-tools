@@ -3,7 +3,6 @@
 		<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <stream class="fact.io.FitsStream" id="fact" url="${infile}" />
-		<stream class="stream.io.CsvStream" id="test" url="file:test.csv" />
 
     <property name="outfile" value="analysis-output.txt" />
     <property name="auxFolder" value="file:src/main/resources/aux/" />
@@ -40,6 +39,8 @@
         <fact.extraction.ArrivalTimePolynomFit />
 
         <fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}"/>
+
+        <fact.datacorrection.InterpolatePhotondata calibService="calibService"/>
 				<fact.ShowViewer key="raw:dataCalibrated"/>
     </process>
 </container>
