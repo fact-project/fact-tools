@@ -30,9 +30,9 @@ public class TimeGradient implements Processor {
 	@Parameter(required=false, description="key to the arrival times of all pixels", defaultValue="pixels:arrivalTimes")
 	private String arrivalTimesKey = "pixels:arrivalTimes";
 	@Parameter(required=false, description="key to the xvalue of the cog of the shower", defaultValue="shower:cog:x")
-	private String cogxKey = "shower:cog:x";
+	private String cogxKey = "shower:ellipse:cog:x";
 	@Parameter(required=false, description="key to the yvalue of the cog of the shower", defaultValue="shower:cog:y")
-	private String cogyKey = "shower:cog:y";
+	private String cogyKey = "shower:ellipse:cog:y";
 	@Parameter(required=false, description="key to the delta angle of the shower", defaultValue="shower:delta")
 	private String deltaKey = "shower:ellipse:delta";
 	@Parameter(required=false, description="outputKey for the calculated timegradient slopes", defaultValue="shower:timeGradient:slope")
