@@ -61,11 +61,7 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-		URL drsUrl = FitsStreamTest.class
-				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey(key);
         pr.init(null);
 		pr.process(item);
 		
@@ -97,9 +93,6 @@ public class ParameterTest {
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();
-        pos.setX(0.0);
-        pos.setY(0.0);
-        pos.setOutputKey(sourcePosition);
         pos.init(null);
         pos.process(item);
     }

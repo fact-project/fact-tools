@@ -21,10 +21,10 @@ import stream.io.SourceURL;
 public class CorrectPixelDelays implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(CorrectPixelDelays.class);
     
-    @Parameter(required = true, description = "arrivalTime input", defaultValue="pixels:arrivalTimes")
+    @Parameter(required = false, description = "arrivalTime input", defaultValue="pixels:arrivalTimes")
     private String arrivalTimeKey = "pixels:arrivalTimes";
     
-    @Parameter(required = true, description = "The name of the output", defaultValue="pixels:arrivalTimes")
+    @Parameter(required = false, description = "The name of the output", defaultValue="pixels:arrivalTimes")
     private String outputKey = "pixels:arrivalTimes";
     
     // TODO: Define reasonable default value

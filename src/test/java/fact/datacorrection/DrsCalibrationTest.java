@@ -33,7 +33,6 @@ public class DrsCalibrationTest {
     @Test
     public void testMissingURLParameter() throws Exception{
         DrsCalibration pr = new DrsCalibration();
-        pr.setOutputKey("test");
         pr.init(null);
 
         Data item = stream.readNext();
@@ -50,7 +49,6 @@ public class DrsCalibrationTest {
     public void testDrsURLinStream() throws Exception{
 
         DrsCalibration pr = new DrsCalibration();
-        pr.setOutputKey("test");
         pr.init(null);
 
         Data item = stream.readNext();

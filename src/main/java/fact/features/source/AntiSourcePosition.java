@@ -1,8 +1,10 @@
 package fact.features.source;
 
-import fact.hexmap.ui.overlays.SourcePositionOverlay;
+import fact.Utils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -11,67 +13,39 @@ import stream.annotations.Parameter;
 
 public class AntiSourcePosition implements Processor {
 	static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
-	@Parameter(required=true)
-	private String sourcePositionKey = null;
-	@Parameter(required=true)
-	private int numberOfAntiSourcePositions;
+	
+	@Parameter(required = false, defaultValue="sourcePosition:x")
+	private String sourcePositionXKey = "sourcePosition:x";
+	@Parameter(required = false, defaultValue="sourcePosition:y")
+	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="5")
+	private int numberOfAntiSourcePositions = 5;
 	@Parameter(required=true)
 	private int antiSourcePositionId;
-	@Parameter(required=true)
+	@Parameter(required = false, description = "The outputkey for the antiSourcePosition, if not specified antiSourcePosition:<id> is used")
 	private String outputKey = null;
 
 	@Override
-	public Data process(Data input) {
-		if(sourcePositionKey != null && !input.containsKey(sourcePositionKey)){
-			log.error("No source position in data item. Can not calculate anti source position!");
-			throw new RuntimeException("Missing parameter. Enter valid sourcePositionKey");
-		}
-		double[] source  = (double[]) input.get(sourcePositionKey);
+	public Data process(Data item) {
 		
-		double[] antisource = {0,0};
+		Utils.mapContainsKeys(item, sourcePositionXKey, sourcePositionYKey);
+		
+		double sourcex = (Double) item.get(sourcePositionXKey);
+		double sourcey = (Double) item.get(sourcePositionYKey);
+		
+		double antisourcex = 0;
+		double antisourcey = 0;
 		
 		double rotAngle = 2 * Math.PI * antiSourcePositionId / (numberOfAntiSourcePositions + 1);
-		antisource[0] = source[0] * Math.cos(rotAngle) - source[1] * Math.sin(rotAngle);
-		antisource[1] = source[0] * Math.sin(rotAngle) + source[1] * Math.cos(rotAngle);
+		antisourcex = sourcex * Math.cos(rotAngle) - sourcey * Math.sin(rotAngle);
+		antisourcey = sourcex * Math.sin(rotAngle) + sourcey * Math.cos(rotAngle);
 		
-		//input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
-
-		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antisource));
-		input.put(outputKey, antisource);
-		return input;
+		if (outputKey == null){
+			outputKey = "antiSourecPosition:"+ antiSourcePositionId;
+		}
+				
+		item.put(outputKey + ":x", antisourcex);
+		item.put(outputKey + ":y", antisourcey);
+		return item;
 	}
-
-	public String getSourcePositionKey() {
-		return sourcePositionKey;
-	}
-
-	public void setSourcePositionKey(String sourcePositionKey) {
-		this.sourcePositionKey = sourcePositionKey;
-	}
-
-	public int getNumberOfAntiSourcePositions() {
-		return numberOfAntiSourcePositions;
-	}
-
-	public void setNumberOfAntiSourcePositions(int numberOfAntiSourcePositions) {
-		this.numberOfAntiSourcePositions = numberOfAntiSourcePositions;
-	}
-
-	public int getAntiSourcePositionId() {
-		return antiSourcePositionId;
-	}
-
-	public void setAntiSourcePositionId(int antiSourcePositionId) {
-		this.antiSourcePositionId = antiSourcePositionId;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	
 }

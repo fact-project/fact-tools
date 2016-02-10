@@ -21,13 +21,13 @@ import stream.annotations.Parameter;
 public class PatchJumpRemoval implements Processor {
 	static Logger log = LoggerFactory.getLogger(PatchJumpRemoval.class);
 	
-	@Parameter(required=true, defaultValue = "raw:dataCalibrated")
+	@Parameter(required=false, defaultValue = "raw:dataCalibrated")
 	String dataKey 		= "raw:dataCalibrated";
-	@Parameter(required=true, defaultValue = "raw:dataCalibrated")
+	@Parameter(required=false, defaultValue = "raw:dataCalibrated")
 	String outputKey	= "raw:dataCalibrated";
-	@Parameter(required=true, defaultValue = "meta:prevEvents")
+	@Parameter(required=false, defaultValue = "meta:prevEvents")
 	String prevEventsKey= "meta:prevEvents";
-	@Parameter(required=true, defaultValue = "StartCellData",
+	@Parameter(required=false, defaultValue = "StartCellData",
                 description = "Key of the StartCellData in the data fits file")
 	String startCellKey = "StartCellData";
 	@Parameter(required=false, defaultValue = "2.0")

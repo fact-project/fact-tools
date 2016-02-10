@@ -26,8 +26,6 @@ public class BasicExtractionTest {
 	public void setup() throws Exception {
 		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-        pr.setUrl(new SourceURL(drsUrl));
-        pr.setOutputKey("test");
 
         extraction = new BasicExtraction();
         extraction.setUrl(new SourceURL(FitsStreamTest.class

@@ -40,7 +40,6 @@ public class FitsSpeedTest {
 			DrsCalibration drs = new DrsCalibration();
 			// URL u =
 			// FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
-			drs.setUrl(new SourceURL("classpath:/testDrsFile.drs.fits.gz"));
 			preprocess.add(drs);
 			// preprocess.add(new PhotonCharge());
 			// preprocess.add(new MaxAmplitude());

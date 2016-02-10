@@ -41,7 +41,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 	private String arrivalTimeKey = "pixels:arrivalTimes";
 
     @Parameter(required = false)
-	private String outputKey = "pixelSet";
+	private String outputKey = "shower";
 
     @Parameter(required = false, description = "The smallest PhotonCharge a Pixel must have to be " +
             "identified as a CorePixel", defaultValue = "5.5")
@@ -51,13 +51,11 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             "previously identified corePixel", defaultValue = "3.0")
 	private  double neighborPixelThreshold = 3.0;
 
-    @Parameter(required = false, description = "Maximal difference in arrival time to the median of the arrival times of the shower" +
-    		", which a pixel is aloud to have after cleaning", defaultValue = "10.0")
+    @Parameter(required = false, description = "Maximal difference in arrival time between two pixels of a shower.", defaultValue = "10.0")
 	private  double timeLimit = 10.0;
 
-    @Parameter(required = false, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
-            " are even considered for NeighbourCorePixel. " +
-            " If Size is smaller than minSize the Pixels will be discarded.", defaultValue = "2")
+    @Parameter(required = false, description = "Number of pixels a cluster of pixels must have after each single cleaning step." +
+            " If number of pixels is smaller than minSize the cluster is discarded.", defaultValue = "2")
 	private int minNumberOfPixel = 2;
 
 
@@ -65,7 +63,8 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
     private String[] starPositionKeys = null;
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
 	private double starRadiusInCamera = Constants.PIXEL_SIZE;
-    
+
+	@Parameter(required = false, description = "If true, put pixelSets for the different stages into the dataItem", defaultValue = "false")
     private boolean showDifferentCleaningSets = false;
 
     private PixelSet cleanedPixelSet;

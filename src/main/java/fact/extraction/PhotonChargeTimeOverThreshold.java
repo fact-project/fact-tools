@@ -19,6 +19,7 @@ import stream.annotations.Parameter;
  * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a> 
  *
  */
+@Deprecated
 public class PhotonChargeTimeOverThreshold implements Processor {
 	static Logger log = LoggerFactory.getLogger(PhotonChargeTimeOverThreshold.class);
 	
