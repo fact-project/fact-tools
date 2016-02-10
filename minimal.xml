@@ -1,0 +1,45 @@
+<container>
+		<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+		<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
+    <stream class="fact.io.FitsStream" id="fact" url="${infile}" />
+		<stream class="stream.io.CsvStream" id="test" url="file:test.csv" />
+
+    <property name="outfile" value="analysis-output.txt" />
+    <property name="auxFolder" value="file:src/main/resources/aux/" />
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+    <process id="2" input="fact">
+				<RenameKey from="Data" to="raw:data" />
+				<PrintData />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+				<RenameKey from="StartCellData" to="meta:startCellData" />
+
+        <fact.utils.PreviousEventInfo />
+        <fact.datacorrection.DrsCalibration url="${drsfile}" />
+
+        <fact.datacorrection.RemoveSpikes />
+
+        <fact.filter.DrsTimeCalibration />
+        <fact.filter.ArrayTimeCorrection />
+        <fact.datacorrection.InterpolateTimeSeries calibService="calibService"/>
+
+				<!-- Extract numEstPhotons -->
+				<fact.extraction.BasicExtraction url="${integralGainFile}"/>
+        <fact.extraction.EstimateBaseline />
+        <fact.extraction.TimeOverThreshold />
+        <fact.datacorrection.CorrectSaturation />
+				<fact.extraction.BasicExtraction url="${integralGainFile}"/>
+
+				<!-- Extract ArrivalTimes -->
+        <fact.extraction.ArrivalTimeForPositions />
+        <fact.extraction.ArrivalTimePolynomFit />
+
+        <fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}"/>
+				<fact.ShowViewer key="raw:dataCalibrated"/>
+    </process>
+</container>

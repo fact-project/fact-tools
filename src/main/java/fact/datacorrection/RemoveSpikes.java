@@ -17,11 +17,11 @@ import stream.annotations.Parameter;
 public class RemoveSpikes implements Processor {
 	static Logger log = LoggerFactory.getLogger(RemoveSpikes.class);
 
-	@Parameter(required=true, defaultValue = "raw:dataCalibrated", description = "calibrated Data array")
+	@Parameter(required=false, defaultValue = "raw:dataCalibrated", description = "calibrated Data array")
 	String dataKey 		= "raw:dataCalibrated";
-	@Parameter(required=true, defaultValue = "meta:startCellData", description = "key for start cell information")
+	@Parameter(required=false, defaultValue = "meta:startCellData", description = "key for start cell information")
 	String startCellKey = "meta:startCellData";
-	@Parameter(required=true, defaultValue = "raw:dataCalibrated", description = "Ouputkey for corrected Data array")
+	@Parameter(required=false, defaultValue = "raw:dataCalibrated", description = "Ouputkey for corrected Data array")
 	String outputKey 	= "raw:dataCalibrated";
 	@Parameter(required=false, defaultValue = "20")
 	double spikeLimit 	= 20;

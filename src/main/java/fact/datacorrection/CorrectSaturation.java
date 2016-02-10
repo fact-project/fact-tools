@@ -19,16 +19,16 @@ import static org.apache.commons.math3.util.FastMath.pow;
  * Created by jbuss on 28.01.15.
  */
 public class CorrectSaturation implements Processor {
-    @Parameter(required=true, description="Array containing the raw data", defaultValue="raw:dataCalibrated")
+    @Parameter(required=false, description="Array containing the raw data", defaultValue="raw:dataCalibrated")
     private String dataKey = "raw:dataCalibrated";
 
-    @Parameter(required=true, description="Target Array for the saturation corrected raw data", defaultValue="raw:dataCalibrated")
+    @Parameter(required=false, description="Target Array for the saturation corrected raw data", defaultValue="raw:dataCalibrated")
     private String outputKey = "raw:dataCalibrated";
 
-    @Parameter(required=true, description="1440pix array containing the time-over-threshold for the pixel", defaultValue="pixels:timeOverThresholds")
+    @Parameter(required=false, description="1440pix array containing the time-over-threshold for the pixel", defaultValue="pixels:timeOverThresholds")
     private String timeOverThresholdsKey = "pixels:timeOverThresholds";;
 
-    @Parameter(required=true, description="1440pix array containing the first slice time-over-threshold for the pixel", defaultValue="pixels:firstSliceOverThresholds")
+    @Parameter(required=false, description="1440pix array containing the first slice time-over-threshold for the pixel", defaultValue="pixels:firstSliceOverThresholds")
     private String firstSliceOverThresholdsKey = "pixels:firstSliceOverThresholds";
     
     @Parameter(required = false, defaultValue = "meta:timeOverThreshold:threshold")
@@ -37,7 +37,7 @@ public class CorrectSaturation implements Processor {
     @Parameter(required=false, description="threshold that defines a pixel showing saturation", defaultValue="1900.0")
     private double saturationThreshold = 1900.0;
 
-    @Parameter(required=true, description="1440pix array containing the slice of maximum amplitude", defaultValue="pixels:maxAmplitudePositions")
+    @Parameter(required=false, description="1440pix array containing the slice of maximum amplitude", defaultValue="pixels:maxAmplitudePositions")
 	protected String maxAmplitudePositionsKey = "pixels:maxAmplitudePositions";
     @Parameter(required=false, description="key for the baseline output, 1440 pixel array containing a baseline amplitude for each pixel", defaultValue="pixels:baselines")
     private String baselinesKey = "pixels:baselines";

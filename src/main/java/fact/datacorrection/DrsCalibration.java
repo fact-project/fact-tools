@@ -143,7 +143,7 @@ public class DrsCalibration implements StatefulProcessor {
 			rawfloatData[i] = rawData[i];
 		}
 
-		short[] startCell = (short[]) item.get("StartCellData");
+		short[] startCell = (short[]) item.get("meta:startCellData");
 		if (startCell == null) {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
