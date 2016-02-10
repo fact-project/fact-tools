@@ -1,8 +1,7 @@
-package fact.extraction;
+package fact.cleaning;
 
 import fact.Utils;
 import fact.container.PixelSet;
-import fact.utils.RemappingKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
