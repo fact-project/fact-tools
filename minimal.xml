@@ -53,6 +53,11 @@
         <fact.pixelsets.NumPixel pixelSetKey="shower" />
         <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
+        <fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />
+
 				<fact.io.JSONWriter keys="pixels:*:*,shower:*" url="file:test.json" />
 				<!-- <fact.ShowViewer key="raw:dataCalibrated"/> -->
     </process>
