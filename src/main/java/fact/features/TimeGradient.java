@@ -34,7 +34,7 @@ public class TimeGradient implements Processor {
 	@Parameter(required=false, description="key to the yvalue of the cog of the shower", defaultValue="shower:cog:y")
 	private String cogyKey = "shower:cog:y";
 	@Parameter(required=false, description="key to the delta angle of the shower", defaultValue="shower:delta")
-	private String deltaKey = "shower:delta";
+	private String deltaKey = "shower:ellipse:delta";
 	@Parameter(required=false, description="outputKey for the calculated timegradient slopes", defaultValue="shower:timeGradient:slope")
 	private String outputKeySlope = "shower:timeGradient:slope";
 	@Parameter(required=false, description="outputKey for the calculated timegradient intercepts", defaultValue="shower:timeGradient:intercept")
