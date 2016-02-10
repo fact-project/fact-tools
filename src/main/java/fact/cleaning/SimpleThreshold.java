@@ -13,6 +13,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -47,13 +48,6 @@ public class SimpleThreshold extends BasicCleaning implements Processor{
 
 	@Override
 	public Data process(Data input) {
-		try {
-			Utils.isKeyValid(input, photonChargeKey, double[].class);
-		} catch (ClassCastException e){
-			Utils.isKeyValid(input, photonChargeKey, float[].class);
-			System.out.println("casting to float");
-		}
-
 		DateTime timeStamp = null;
 		if (input.containsKey("UnixTimeUTC") == true){
     		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
