@@ -18,13 +18,13 @@ public class TimeSpread implements Processor {
 	private String outputKey = "shower:timespread";
 	
 	@Override
-	public Data process(Data input) {
+	public Data process(Data item) {
 		
-		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, pixelSetKey);
+		Utils.mapContainsKeys( item, arrivalTimeKey, weightsKey, pixelSetKey);
 
-		double[] arrivalTime 	= (double[]) input.get(arrivalTimeKey);
-		double[] weights 		= (double[]) input.get(weightsKey);
-		int[] shower 			= ((PixelSet) input.get(pixelSetKey)).toIntArray();
+		double[] arrivalTime 	= (double[]) item.get(arrivalTimeKey);
+		double[] weights 		= (double[]) item.get(weightsKey);
+		int[] shower 			= ((PixelSet) item.get(pixelSetKey)).toIntArray();
 		
 		// NumberShowerPixel
 		int n = shower.length;
@@ -55,10 +55,10 @@ public class TimeSpread implements Processor {
 		double timespread = Math.sqrt( sumtt / n - Math.pow(sumt/n,2));
 		double weightedTimespread = Math.sqrt( sumwtt / sumw - Math.pow(sumwt/sumw,2));
 		
-		input.put(outputKey, timespread);
-		input.put(outputKey+"_weighted", weightedTimespread);
+		item.put(outputKey, timespread);
+		item.put(outputKey+"_weighted", weightedTimespread);
 		
-		return input;
+		return item;
 	}
 
 	public String getArrivalTimeKey() {
