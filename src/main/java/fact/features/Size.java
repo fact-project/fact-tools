@@ -15,31 +15,34 @@ import stream.annotations.Parameter;
  */
 public class Size implements Processor {
 
-    @Parameter(required = true)
-	private String pixelSetKey;
-    @Parameter(required = true)
-	private String photonChargeKey;
-    @Parameter(required = true)
-	private String outputKey;
+    @Parameter(required = false, description = "Key to the pixelSet, on which Size should be calculated", defaultValue = "pixels")
+	private String pixelSetKey = "pixels";
+    @Parameter(required = false, description = "Key to the estimated number of Photons", defaultValue = "pixels:estNumPhotons")
+	private String estNumPhotonsKey = "pixels:estNumPhotons";
+    @Parameter(required = false, description = "The outputkey, if not given, '<pixelset>:Size' is used")
+	private String outputKey = null;
 
 	@Override
-	public Data process(Data input) {
+	public Data process(Data item) {
+
+		if (outputKey == null){
+			outputKey = pixelSetKey + ":Size";
+		}
 		
 		
-		Utils.mapContainsKeys( input, photonChargeKey);
+		Utils.mapContainsKeys( item, estNumPhotonsKey);
 		
 		double size = 0;
-		if (input.containsKey(pixelSetKey))
+		if (item.containsKey(pixelSetKey))
 		{
 		
-			int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
-			double[] charge 	= (double[])input.get(photonChargeKey);
+			int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
+			double[] charge = (double[]) item.get(estNumPhotonsKey);
 
         	size = calculateSize(shower, charge);
 		}
-        input.put("@size", size);
-		input.put(outputKey, size);
-		return input;
+		item.put(outputKey, size);
+		return item;
 	}
 
     /**
@@ -55,25 +58,4 @@ public class Size implements Processor {
         }
         return size;
     }
-
-
-    public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
-
 }
