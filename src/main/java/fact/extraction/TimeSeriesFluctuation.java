@@ -29,10 +29,10 @@ public class TimeSeriesFluctuation implements Processor {
     @Parameter(required = false, defaultValue = "pixels:pedvar")
     private String outputKey = "pixels:pedvar";
 
-    @Parameter(required = false, description = "Number of slices to be skipped at the time series beginning", defaultValue = "35")
+    @Parameter(required = false, description = "Number of slices to be skipped at the time series' beginning", defaultValue = "35")
     private int skipFirst = 35;
 
-    @Parameter(required = false, description = "Number of slices to be skipped at the time series end", defaultValue = "100")
+    @Parameter(required = false, description = "Number of slices to be skipped at the time series' end", defaultValue = "100")
     private int skipLast = 100;
 
     @Parameter(required = false, description = "Size of the integration window", defaultValue = "30")
