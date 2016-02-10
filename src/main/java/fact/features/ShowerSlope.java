@@ -9,26 +9,36 @@ import stream.annotations.Parameter;
 
 public class ShowerSlope implements Processor {
 
-	@Parameter(required = true)
-	private String photonChargeKey = null;
-	@Parameter(required = true)
-	private String arrivalTimeKey = null;
-	@Parameter(required = true)
-	private String pixelSetKey = null;
-	@Parameter(required = true)
-	private String cogxKey = null;
-	@Parameter(required = true)
-	private String cogyKey = null;
-	@Parameter(required = true)
-	private String deltaKey = null;
-	@Parameter(required = true)
-	private String slopeLongOutputKey = null;
-	@Parameter(required = true)
-	private String slopeTransOutputKey = null;
-	@Parameter(required = true)
-	private String slopeSpreadOutputKey = null;
-	@Parameter(required = true)
-	private String slopeSpreadWeightedOutputKey = null;
+	@Parameter(required = false, defaultValue = "pixel:estNumPhotons",
+				description = "")
+	private String photonChargeKey 	= "pixel:estNumPhotons";
+	@Parameter(required = false, defaultValue = "pixel:arrivalTimes",
+				description = "")
+	private String arrivalTimeKey 	= "pixel:arrivalTimes";
+	@Parameter(required = false, defaultValue = "shower",
+				description = "")
+	private String pixelSetKey 		= "shower";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x",
+				description = "")
+	private String cogxKey 			= "shower:ellipse:cog:x";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y",
+				description = "")
+	private String cogyKey 			= "shower:ellipse:cog:y";
+	@Parameter(required = false, defaultValue = "shower:ellipse:delta",
+				description = "")
+	private String deltaKey 		= "shower:ellipse:delta";
+	@Parameter(required = false, defaultValue = "shower:slope:long",
+				description = "")
+	private String slopeLongOutputKey 			= "shower:slope:long";
+	@Parameter(required = false, defaultValue = "shower:slope:trans",
+				description = "")
+	private String slopeTransOutputKey 			= "shower:slope:trans";
+	@Parameter(required = false, defaultValue = "shower:slope:spread",
+				description = "")
+	private String slopeSpreadOutputKey 		= "shower:slope:spread";
+	@Parameter(required = false, defaultValue = "shower:slope:spreadWeighted",
+				description = "")
+	private String slopeSpreadWeightedOutputKey = "shower:slope:spreadWeighted";
 	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
