@@ -68,7 +68,7 @@
         <fact.features.ConcentrationAtCenterOfGravity/>
         <fact.features.Leakage/>
         <fact.features.TimeSpread />
-        <!-- <fact.features.ShowerSlope /> -->
+        <fact.features.ShowerSlope />
         <fact.features.Disp />
 
 				<fact.io.JSONWriter keys="pixels:*:*,shower:*" url="file:test.json" />

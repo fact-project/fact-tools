@@ -11,10 +11,10 @@ public class ShowerSlope implements Processor {
 
 	@Parameter(required = false, defaultValue = "pixel:estNumPhotons",
 				description = "")
-	private String estNumPhotonsKey = "pixel:estNumPhotons";
+	private String estNumPhotonsKey = "pixels:estNumPhotons";
 	@Parameter(required = false, defaultValue = "pixel:arrivalTimes",
 				description = "")
-	private String arrivalTimeKey 	= "pixel:arrivalTimes";
+	private String arrivalTimeKey 	= "pixels:arrivalTimes";
 	@Parameter(required = false, defaultValue = "shower",
 				description = "")
 	private String pixelSetKey 		= "shower";
