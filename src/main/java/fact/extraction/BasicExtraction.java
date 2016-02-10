@@ -102,7 +102,6 @@ public class BasicExtraction implements StatefulProcessor {
         item.put(maxAmplitudePositionsKey, positions);
         item.put(maxAmplitudePositionsKey + "Marker", markerPositions);
         item.put(estNumPhotonsKey, estNumPhotons);
-        item.put("@estNumPhotons", estNumPhotons);
         item.put(estNumPhotonsKey + "Marker", markerEstNumPhotons);
         
 		return item;

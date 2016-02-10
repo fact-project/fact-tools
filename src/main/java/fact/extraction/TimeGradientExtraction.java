@@ -77,7 +77,6 @@ public class TimeGradientExtraction extends BasicExtraction {
 		item.put(maxAmplitudePositionsKey, positions);
         item.put(maxAmplitudePositionsKey + "Marker", markerPositions);
         item.put(estNumPhotonsKey, estNumPhotons);
-        item.put("@estNumPhotons", estNumPhotons);
         item.put(estNumPhotonsKey + "Marker", markerEstNumPhotons);
 		
 		return item;
