@@ -23,9 +23,9 @@ public class TimeGradientExtraction extends BasicExtraction {
 	@Parameter(required=false, description="key to the delta angle of the shower", defaultValue="shower:ellipse:delta")
 	private String deltaKey = "shower:ellipse:delta";
 	@Parameter(required=false, description="key to the xvalue of the cog of the shower", defaultValue="shower:cog:x")
-	private String cogxKey = "shower:cog:x";
+	private String cogxKey = "shower:ellipse:cog:x";
 	@Parameter(required=false, description="key to the yvalue of the cog of the shower", defaultValue="shower:cog:y")
-	private String cogyKey = "shower:cog:y";
+	private String cogyKey = "shower:ellipse:cog:y";
 	@Parameter(required=false, description="key to the timegradient slope on the longitudinal-axis", defaultValue="shower:timeGradient:slope:long")
 	private String timeGradientSlopeLongKey = "shower:timeGradient:slope:long";
 	@Parameter(required=false, description="key to the timegradient intercept on the longitudinal-axis", defaultValue="shower:timeGradient:intercept:long")

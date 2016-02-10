@@ -25,34 +25,34 @@ public class TimeGradient implements Processor {
 	
 	static Logger log = LoggerFactory.getLogger(TimeGradient.class);
 	
-	@Parameter(required=true, description="key to the shower pixels")
-	private String pixelSetKey = null;
-	@Parameter(required=true, description="key to the arrival times of all pixels")
-	private String arrivalTimeKey = null;
-	@Parameter(required=true, description="key to the xvalue of the cog of the shower")
-	private String cogxKey = null;
-	@Parameter(required=true, description="key to the yvalue of the cog of the shower")
-	private String cogyKey = null;
-	@Parameter(required=true, description="key to the delta angle of the shower")
-	private String deltaKey = null;
-	@Parameter(required=true, description="outputKey for the calculated timegradient slopes")
-	private String outputKeySlope = null;
-	@Parameter(required=true, description="outputKey for the calculated timegradient intercepts")
-	private String outputKeyIntercept = null;
-	@Parameter(required=true, description="outputKey for the sum squared errors of the linear fits")
-	private String outputKeySumSquaredErrors = null;
+	@Parameter(required=false, description="key to the shower pixels", defaultValue="shower")
+	private String pixelSetKey = "shower";
+	@Parameter(required=false, description="key to the arrival times of all pixels", defaultValue="pixels:arrivalTimes")
+	private String arrivalTimesKey = "pixels:arrivalTimes";
+	@Parameter(required=false, description="key to the xvalue of the cog of the shower", defaultValue="shower:cog:x")
+	private String cogxKey = "shower:ellipse:cog:x";
+	@Parameter(required=false, description="key to the yvalue of the cog of the shower", defaultValue="shower:cog:y")
+	private String cogyKey = "shower:ellipse:cog:y";
+	@Parameter(required=false, description="key to the delta angle of the shower", defaultValue="shower:delta")
+	private String deltaKey = "shower:ellipse:delta";
+	@Parameter(required=false, description="outputKey for the calculated timegradient slopes", defaultValue="shower:timeGradient:slope")
+	private String outputKeySlope = "shower:timeGradient:slope";
+	@Parameter(required=false, description="outputKey for the calculated timegradient intercepts", defaultValue="shower:timeGradient:intercept")
+	private String outputKeyIntercept = "shower:timeGradient:intercept";
+	@Parameter(required=false, description="outputKey for the sum squared errors of the linear fits", defaultValue="shower:timeGradient:sumSquaredErrors")
+	private String outputKeySumSquaredErrors = "shower:timeGradient:sumSquaredErrors";
 	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-	public Data process(Data input) {
+	public Data process(Data item) {
 		
-		Utils.mapContainsKeys(input, pixelSetKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
+		Utils.mapContainsKeys(item, pixelSetKey,arrivalTimesKey,cogxKey,cogyKey,deltaKey);
 
-		PixelSet shower = (PixelSet) input.get(pixelSetKey);
-		double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-		double cogx = (Double) input.get(cogxKey);
-		double cogy = (Double) input.get(cogyKey);
-		double delta = (Double) input.get(deltaKey);
+		PixelSet shower = (PixelSet) item.get(pixelSetKey);
+		double[] arrivalTimes = (double[]) item.get(arrivalTimesKey);
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double delta = (Double) item.get(deltaKey);
 		
 		SimpleRegression regressorLong = new SimpleRegression();
 		SimpleRegression regressorTrans = new SimpleRegression();
@@ -62,7 +62,7 @@ public class TimeGradient implements Processor {
 			double x = pixelMap.getPixelFromId(px.id).getXPositionInMM();
 			double y = pixelMap.getPixelFromId(px.id).getYPositionInMM();
 			double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
-			double time = arrivalTime[px.id];
+			double time = arrivalTimes[px.id];
 			regressorLong.addData(ellipseCoord[0], time);
 			regressorTrans.addData(ellipseCoord[1], time);
 		}
@@ -104,80 +104,24 @@ public class TimeGradient implements Processor {
 		catch (NoDataException exc)
 		{
 			log.warn("Not enough data points to regress the transversal timegradient. Putting Double.NaN in data item");
-			slope[0] = Double.NaN;
-			slopeErr[0] = Double.NaN;
-			intercept[0] = Double.NaN;
-			interceptErr[0] = Double.NaN;
-			sumSquaredErrors[0] = Double.NaN;
+			slope[1] = Double.NaN;
+			slopeErr[1] = Double.NaN;
+			intercept[1] = Double.NaN;
+			interceptErr[1] = Double.NaN;
+			sumSquaredErrors[1] = Double.NaN;
 		}
 		
-		input.put(outputKeySlope, slope);
-		input.put(outputKeySlope+"_err", slopeErr);
-		input.put(outputKeyIntercept, intercept);
-		input.put(outputKeyIntercept+"_err", interceptErr);
-		input.put(outputKeySumSquaredErrors, sumSquaredErrors);
+		item.put(outputKeySlope+":long", slope[0]);
+		item.put(outputKeySlope+":trans", slope[1]);
+		item.put(outputKeySlope+":long:err", slopeErr[0]);
+		item.put(outputKeySlope+":trans:err", slopeErr[1]);
+		item.put(outputKeyIntercept+":long", intercept[0]);
+		item.put(outputKeyIntercept+":trans", intercept[1]);
+		item.put(outputKeyIntercept+":long:err", interceptErr[0]);
+		item.put(outputKeyIntercept+":trans:err", interceptErr[1]);
+		item.put(outputKeySumSquaredErrors+":long", sumSquaredErrors[0]);
+		item.put(outputKeySumSquaredErrors+":trans", sumSquaredErrors[1]);
 		
-		return input;
+		return item;
 	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getArrivalTimeKey() {
-		return arrivalTimeKey;
-	}
-
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-	public String getDeltaKey() {
-		return deltaKey;
-	}
-
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
-
-	public String getOutputKeySlope() {
-		return outputKeySlope;
-	}
-
-	public void setOutputKeySlope(String outputKeySlope) {
-		this.outputKeySlope = outputKeySlope;
-	}
-
-	public String getOutputKeyIntercept() {
-		return outputKeyIntercept;
-	}
-
-	public void setOutputKeyIntercept(String outputKeyIntercept) {
-		this.outputKeyIntercept = outputKeyIntercept;
-	}
-
-	public String getOutputKeySumSquaredErrors() {
-		return outputKeySumSquaredErrors;
-	}
-
-	public void setOutputKeySumSquaredErrors(String outputKeySumSquaredErrors) {
-		this.outputKeySumSquaredErrors = outputKeySumSquaredErrors;
-	}
-
 }

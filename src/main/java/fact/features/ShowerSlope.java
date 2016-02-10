@@ -9,39 +9,49 @@ import stream.annotations.Parameter;
 
 public class ShowerSlope implements Processor {
 
-	@Parameter(required = true)
-	private String photonChargeKey = null;
-	@Parameter(required = true)
-	private String arrivalTimeKey = null;
-	@Parameter(required = true)
-	private String pixelSetKey = null;
-	@Parameter(required = true)
-	private String cogxKey = null;
-	@Parameter(required = true)
-	private String cogyKey = null;
-	@Parameter(required = true)
-	private String deltaKey = null;
-	@Parameter(required = true)
-	private String slopeLongOutputKey = null;
-	@Parameter(required = true)
-	private String slopeTransOutputKey = null;
-	@Parameter(required = true)
-	private String slopeSpreadOutputKey = null;
-	@Parameter(required = true)
-	private String slopeSpreadWeightedOutputKey = null;
+	@Parameter(required = false, defaultValue = "pixel:estNumPhotons",
+				description = "")
+	private String estNumPhotonsKey = "pixels:estNumPhotons";
+	@Parameter(required = false, defaultValue = "pixel:arrivalTimes",
+				description = "")
+	private String arrivalTimeKey 	= "pixels:arrivalTimes";
+	@Parameter(required = false, defaultValue = "shower",
+				description = "")
+	private String pixelSetKey 		= "shower";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x",
+				description = "")
+	private String cogxKey 			= "shower:ellipse:cog:x";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y",
+				description = "")
+	private String cogyKey 			= "shower:ellipse:cog:y";
+	@Parameter(required = false, defaultValue = "shower:ellipse:delta",
+				description = "")
+	private String deltaKey 		= "shower:ellipse:delta";
+	@Parameter(required = false, defaultValue = "shower:slope:long",
+				description = "")
+	private String slopeLongOutputKey 			= "shower:slope:long";
+	@Parameter(required = false, defaultValue = "shower:slope:trans",
+				description = "")
+	private String slopeTransOutputKey 			= "shower:slope:trans";
+	@Parameter(required = false, defaultValue = "shower:slope:spread",
+				description = "")
+	private String slopeSpreadOutputKey 		= "shower:slope:spread";
+	@Parameter(required = false, defaultValue = "shower:slope:spreadWeighted",
+				description = "")
+	private String slopeSpreadWeightedOutputKey = "shower:slope:spreadWeighted";
 	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Override
-	public Data process(Data input) {
-		Utils.mapContainsKeys( input, photonChargeKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
+	public Data process(Data item) {
+		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
 
-        double[] photonCharge = (double[]) input.get(photonChargeKey);
-        double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-		int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
-		double cogx = (Double) input.get(cogxKey);
-		double cogy = (Double) input.get(cogyKey);
-		double delta = (Double) input.get(deltaKey);
+        double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
+        double[] arrivalTimes = (double[]) item.get(arrivalTimeKey);
+		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double delta = (Double) item.get(deltaKey);
 
 		// NumberShowerPixel
 		int n = shower.length;
@@ -62,8 +72,8 @@ public class ShowerSlope implements Processor {
 			double[] rotPixels = Utils.transformToEllipseCoordinates(xcoord, ycoord, cogx, cogy, delta);
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];
-			t[i] = arrivalTime[chid];
-			w[i] = photonCharge[chid];
+			t[i] = arrivalTimes[chid];
+			w[i] = estNumPhotons[chid];
 		}
 
 		// Calculate several element wise multiplication
@@ -102,90 +112,10 @@ public class ShowerSlope implements Processor {
 		double slopeSpread = Math.sqrt(sumbb/n - Math.pow(sumb/n, 2));
 		double slopeSpreadWeighted = Math.sqrt(sumwbb/sumw - Math.pow(sumwb/sumw, 2));
 
-		input.put(slopeLongOutputKey, slopeLong);
-		input.put(slopeTransOutputKey, slopeTrans);
-		input.put(slopeSpreadOutputKey, slopeSpread);
-		input.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
-		return input;
+		item.put(slopeLongOutputKey, slopeLong);
+		item.put(slopeTransOutputKey, slopeTrans);
+		item.put(slopeSpreadOutputKey, slopeSpread);
+		item.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
+		return item;
 	}
-
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
-
-	public String getArrivalTimeKey() {
-		return arrivalTimeKey;
-	}
-
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-	public String getDeltaKey() {
-		return deltaKey;
-	}
-
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
-
-	public String getSlopeLongOutputKey() {
-		return slopeLongOutputKey;
-	}
-
-	public void setSlopeLongOutputKey(String slopeLongOutputKey) {
-		this.slopeLongOutputKey = slopeLongOutputKey;
-	}
-
-	public String getSlopeTransOutputKey() {
-		return slopeTransOutputKey;
-	}
-
-	public void setSlopeTransOutputKey(String slopeTransOutputKey) {
-		this.slopeTransOutputKey = slopeTransOutputKey;
-	}
-
-	public String getSlopeSpreadOutputKey() {
-		return slopeSpreadOutputKey;
-	}
-
-	public void setSlopeSpreadOutputKey(String slopeSpreadOutputKey) {
-		this.slopeSpreadOutputKey = slopeSpreadOutputKey;
-	}
-
-	public String getSlopeSpreadWeightedOutputKey() {
-		return slopeSpreadWeightedOutputKey;
-	}
-
-	public void setSlopeSpreadWeightedOutputKey(String slopeSpreadWeightedOutputKey) {
-		this.slopeSpreadWeightedOutputKey = slopeSpreadWeightedOutputKey;
-	}
-
-	
-
-
 }
