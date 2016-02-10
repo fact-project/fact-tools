@@ -3,8 +3,8 @@ package fact.parameter;
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
+import fact.features.EllipseParameter;
 import fact.extraction.ArrivalTimeForPositions;
-import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
@@ -90,10 +90,10 @@ public class ParameterTest {
 
 
 
-        DistributionFromShower dist = new DistributionFromShower();
-        dist.setPixelSetKey(shower);
-        dist.setWeightsKey(photonCharge);
-        dist.setOutputKey(distribution);
+        EllipseParameter dist = new EllipseParameter();
+        dist.pixelSetKey = shower;
+        dist.estNumPhotonsKey = photonCharge;
+        dist.outputKey = distribution;
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();

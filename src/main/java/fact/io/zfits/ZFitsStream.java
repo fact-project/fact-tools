@@ -215,7 +215,7 @@ public class ZFitsStream extends AbstractStream{
 //                throw new NullPointerException("Should not happen");
 
             applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
-            item.put("Data", data);
+            item.put("raw:data", data);
         }
 //		log.debug(item.toString());
         return item;

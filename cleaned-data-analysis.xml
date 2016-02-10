@@ -1,51 +1,53 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <container>
 
-  <properties url="classpath:/default/settings.properties" />
-  <!-- Specify input URL, e.g. file:/ or classpath:/ or http(s):/... -->
-  <property name="infile" value="classpath:/testDataFile.fits.gz" />
-  <!-- DRS calibration constants  -->
-  <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
 
-  <!-- TODO: Remove and make default =-->
-  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
-  <!-- END-TODO -->
+    <properties url="classpath:/default/settings.properties" />
+    <!-- Specify input URL, e.g. file:/ or classpath:/ or http(s):/... -->
+    <property name="infile" value="classpath:/testDataFile.fits.gz" />
+    <!-- DRS calibration constants  -->
+    <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
 
-  <property name="outfile" value="analysis-output.txt" />
-  <property name="auxFolder" value="file:src/main/resources/aux/" />
+    <!-- TODO: Remove and make default =-->
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+    <!-- END-TODO -->
 
-  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    <property name="outfile" value="analysis-output.txt" />
+    <property name="auxFolder" value="file:src/main/resources/aux/" />
 
-  <stream class="fact.io.FitsStream" id="fact" url="${infile}" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-  <process id="2" input="fact">
-    <!-- TODO:   startCellKey -> use default value -->
-    <fact.utils.PreviousEventInfo limitEvents="20" outputKey="prevEvents" startCellKey="StartCellData" />
-    <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-    <!-- Output: Data -->
-    <!-- Calibration: -->
-    <fact.datacorrection.DrsCalibration key="Data" outputKey="DataCalibrated" url="${drsfile}" />
-    <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-    <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" jumpLimit="${patchJumpRemoval_jumpLimit}" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" />
-    <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-    <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" leftBorder="${removeSpikes_leftBorder}" maxSpikeLength="${removeSpikes_maxSpikeLength}" outputKey="DataCalibrated" spikeLimit="${removeSpikes_spikeLimit}" startCellKey="StartCellData"
-    topSlopeLimit="${removeSpikes_topSlopeLimit}" />
-    <!-- TODO: use default keys, hard-coded default values for most parameters  
-             TODO: Combine these two processors into one
-        -->
-    <fact.filter.DrsTimeCalibration outputKey="timeCalibConst" />
-    <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" outputKey="DataCalibrated" timeCalibConstKey="timeCalibConst" />
-    <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-    <!-- TODO: Wofuer ist das notwendig, wenn spaeter noch die PhotonDataTimeSeries interpoliert werden? -->
-    <fact.datacorrection.InterpolateTimeSeries calibService="calibService" dataKey="DataCalibrated" dataOutputKey="DataCalibrated" />
-    <!-- Output: DataCalibrated -->
-    <!-- Extraction -->
-    <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
-        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
+    <stream class="fact.io.FitsStream" id="fact" url="${infile}" />
 
-    <!-- TODO: use default keys, hard-coded default values for most parameters  -->
+    <process id="2" input="fact">
+        <!-- TODO:   startCellKey -> use default value -->
+        <fact.utils.PreviousEventInfo limitEvents="20" outputKey="prevEvents" startCellKey="StartCellData" />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <!-- Output: Data -->
+        <!-- Calibration: -->
+        <fact.datacorrection.DrsCalibration key="Data" outputKey="DataCalibrated" url="${drsfile}" />
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
+        <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" jumpLimit="${patchJumpRemoval_jumpLimit}" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" />
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
+        <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" leftBorder="${removeSpikes_leftBorder}" maxSpikeLength="${removeSpikes_maxSpikeLength}" outputKey="DataCalibrated" spikeLimit="${removeSpikes_spikeLimit}" startCellKey="StartCellData"
+                                          topSlopeLimit="${removeSpikes_topSlopeLimit}" />
+        <!-- TODO: use default keys, hard-coded default values for most parameters
+
+                 TODO: Combine these two processors into one
+            -->
+        <fact.filter.DrsTimeCalibration outputKey="timeCalibConst" />
+        <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" outputKey="DataCalibrated" timeCalibConstKey="timeCalibConst" />
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
+        <!-- TODO: Wofuer ist das notwendig, wenn spaeter noch die PhotonDataTimeSeries interpoliert werden? -->
+        <fact.datacorrection.InterpolateTimeSeries calibService="calibService" dataKey="DataCalibrated" dataOutputKey="DataCalibrated" />
+        <!-- Output: DataCalibrated -->
+        <!-- Extraction -->
+        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
+            PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
+
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
         <!-- Split BasicExtraction into MaxAmplitude, PhotonCharge, ... ?  -->
         <fact.extraction.BasicExtraction url="${integralGainFile}"/>
 
@@ -53,7 +55,7 @@
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
         <fact.extraction.EstimateBaseline />
 
-        <!-- TODO: use default keys, hard-coded default values for most parameters  -->        
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
         <fact.extraction.TimeOverThreshold />
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
@@ -72,83 +74,79 @@
         <fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}"/>
 
         <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-        <fact.datacorrection.InterpolatePhotondata />     
-    <!-- Cleaning -->
-    <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-    <!-- Kann man die folgenden zwei Prozessoeren nicht besser zusammenfassen? -->
-    <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-    <fact.features.source.SourcePosition auxService="auxService" outputKey="Cetatauri" sourceDeclination="21.1425" sourceRightAscension="5.627416667" />
-    <!-- TODO: use default keys, hard-coded default values for most parameters  -->
-    <fact.cleaning.TwoLevelTimeNeighbor arrivalTimeKey="arrivalTime" calibService="calibService" corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}" minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
-    neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}" outputKey="shower" photonChargeKey="photoncharge" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" timeLimit="${twoLevelTimeNeighbor_timeLimit}" />
-    <!-- Output: shower -->
-    <!-- Parameter calculation (only source independent) -->
-    <Skip condition="%{data.shower} == null" />
+        <fact.datacorrection.InterpolatePhotondata />
+        <!-- Cleaning -->
+        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
+        <!-- Kann man die folgenden zwei Prozessoeren nicht besser zusammenfassen? -->
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
+        <fact.features.source.SourcePosition auxService="auxService" outputKey="Cetatauri" sourceDeclination="21.1425" sourceRightAscension="5.627416667" />
+        <!-- TODO: use default keys, hard-coded default values for most parameters  -->
+        <fact.cleaning.TwoLevelTimeNeighbor arrivalTimeKey="arrivalTime" calibService="calibService" corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}" minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+                                            neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}" outputKey="shower" photonChargeKey="photoncharge" starPositionKeys="Cetatauri" starRadiusInCamera="11.0" timeLimit="${twoLevelTimeNeighbor_timeLimit}" />
+        <!-- Output: shower -->
+        <!-- Parameter calculation (only source independent) -->
+        <Skip condition="%{data.shower} == null" />
 
-    <fact.pixelsets.Length outputKey="numPixelInShower" pixelSetKey="shower" />
-    <Skip condition="%{data.numPixelInShower} &lt; 5" />
+        <fact.pixelsets.NumPixel pixelSetKey="shower" />
+        <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
-    <fact.statistics.ArrayStatistics key="pixels:estNumPhotons"/>
-    <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
-    <fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />
-    <fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />
-    <fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />
-    <fact.statistics.ArrayStatistics key="pixels:arrivalTimePositions" pixelSetKey="shower" />
-    <fact.statistics.ArrayStatistics key="pixels:maxSlopePositions" pixelSetKey="shower" />
-    <fact.statistics.ArrayStatistics key="pixels:maxPositions" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:estNumPhotons"/>
+        <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
+        <fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:arrivalTimePositions" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:maxSlopePositions" pixelSetKey="shower" />
+        <fact.statistics.ArrayStatistics key="pixels:maxPositions" pixelSetKey="shower" />
 
-    <fact.features.Size photonChargeKey="photoncharge" pixelSetKey="shower" />
-    <fact.features.DistributionFromShower outputKey="showerDistribution" pixelSetKey="shower" sizeKey="Size" weightsKey="photoncharge" />
-    <fact.features.M3Long distributionKey="showerDistribution" m3lOutputKey="m3l" m3tOutputKey="m3t" pixelSetKey="shower" weightsKey="photoncharge" />
-    <fact.features.Length distribution="showerDistribution" outputKey="Length" />
-    <fact.features.Width distribution="showerDistribution" outputKey="Width" />
-    <fact.features.NumberOfIslands outputKey="numIslands" pixelSetKey="shower" />
-    <fact.features.TimeGradient arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKeyIntercept="timeGradientIntercept" outputKeySlope="timeGradientSlope" outputKeySumSquaredErrors="timeGradientSSE" pixelSetKey="shower" />
-    <fact.features.Concentration concOneOutputKey="Concentration_onePixel" concTwoOutputKey="Concentration_twoPixel" pixelSetKey="shower" weights="photoncharge" />
-    <fact.features.ConcentrationCore cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" lengthKey="Length" outputKey="ConcCore" photonChargeKey="photoncharge" pixelSetKey="shower" sizeKey="Size" widthKey="Width" />
-    <fact.features.ConcentrationAtCenterOfGravity cogxKey="COGx" cogyKey="COGy" outputKey="concCOG" photonChargeKey="photoncharge" sizeKey="Size" />
-    <fact.features.Leakage distribution="showerDistribution" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" pixelSetKey="shower" weights="photoncharge" />
-    <fact.features.TimeSpread arrivalTimeKey="arrivalTime" outputKey="Timespread" pixelSetKey="shower" weightsKey="photoncharge" />
-    <fact.features.ShowerSlope arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" photonChargeKey="photoncharge" pixelSetKey="shower" slopeLongOutputKey="Slope_long" slopeSpreadOutputKey="Slope_spread"
-    slopeSpreadWeightedOutputKey="Slope_spread_weighted" slopeTransOutputKey="Slope_trans" />
-    <fact.features.Disp c0="117.94" lengthKey="Length" outputKey="Disp" widthKey="Width" />
-    <!-- Output: source independent parameters -->
-    <!-- Parameter calculation (only source dependent) -->
-    <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
+        <fact.features.Size outputKey="Size" photonChargeKey="photoncharge" pixelSetKey="shower"/>
+        <fact.features.EllipseParameter/>
+        <fact.features.NumberOfIslands/>
+        <fact.features.TimeGradient arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKeyIntercept="timeGradientIntercept" outputKeySlope="timeGradientSlope" outputKeySumSquaredErrors="timeGradientSSE" pixelSetKey="shower"/>
+        <fact.features.Concentration/>
+        <fact.features.ConcentrationCore/>
+        <fact.features.ConcentrationAtCenterOfGravity/>
+        <fact.features.Leakage/>
+        <fact.features.TimeSpread arrivalTimeKey="arrivalTime" outputKey="Timespread" pixelSetKey="shower" weightsKey="photoncharge"/>
+        <fact.features.ShowerSlope arrivalTimeKey="arrivalTime" cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" photonChargeKey="photoncharge" pixelSetKey="shower" slopeLongOutputKey="Slope_long" slopeSpreadOutputKey="Slope_spread" slopeSpreadWeightedOutputKey="Slope_spread_weighted" slopeTransOutputKey="Slope_trans"/>
+        <fact.features.Disp c0="117.94" lengthKey="Length" outputKey="Disp" widthKey="Width"/>
+        <!-- Output: source independent parameters -->
+        <!-- Parameter calculation (only source dependent) -->
+        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
+            Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
 
-        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-    <fact.features.source.SourcePosition auxService="auxService" outputKey="sourcePosition" />
-    <fact.features.source.AntiSourcePosition antiSourcePositionId="1" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_1" sourcePositionKey="sourcePosition" />
-    <fact.features.source.AntiSourcePosition antiSourcePositionId="2" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_2" sourcePositionKey="sourcePosition" />
-    <fact.features.source.AntiSourcePosition antiSourcePositionId="3" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_3" sourcePositionKey="sourcePosition" />
-    <fact.features.source.AntiSourcePosition antiSourcePositionId="4" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_4" sourcePositionKey="sourcePosition" />
-    <fact.features.source.AntiSourcePosition antiSourcePositionId="5" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_5" sourcePositionKey="sourcePosition" />
-    <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha" sourcePosition="sourcePosition" />
-    <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance" sourcePosition="sourcePosition" />
-    <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_1" sourcePosition="antiSourcePosition_1" />
-    <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_1" sourcePosition="antiSourcePosition_1" />
-    <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_2" sourcePosition="antiSourcePosition_2" />
-    <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_2" sourcePosition="antiSourcePosition_2" />
-    <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_3" sourcePosition="antiSourcePosition_3" />
-    <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_3" sourcePosition="antiSourcePosition_3" />
-    <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_4" sourcePosition="antiSourcePosition_4" />
-    <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_4" sourcePosition="antiSourcePosition_4" />
-    <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_5" sourcePosition="antiSourcePosition_5" />
-    <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_5" sourcePosition="antiSourcePosition_5" />
-    <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha" sourcePositionKey="sourcePosition" />
-    <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_1" sourcePositionKey="antiSourcePosition_1" />
-    <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_2" sourcePositionKey="antiSourcePosition_2" />
-    <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_3" sourcePositionKey="antiSourcePosition_3" />
-    <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_4" sourcePositionKey="antiSourcePosition_4" />
-    <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_5" sourcePositionKey="antiSourcePosition_5" />
-    <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta" signM3lConstant="-200" sourcePositionKey="sourcePosition" />
-    <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_1" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_1" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_1" />
-    <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_2" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_2" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_2" />
-    <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_3" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_3" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_3" />
-    <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_4" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_4" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_4" />
-    <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_5" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_5" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_5" />
-    <!-- Output: source dependent parameters -->
-    <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
-    <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
-  </process>
+        <fact.features.source.SourcePosition auxService="auxService" outputKey="sourcePosition" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="1" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_1" sourcePositionKey="sourcePosition" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="2" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_2" sourcePositionKey="sourcePosition" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="3" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_3" sourcePositionKey="sourcePosition" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="4" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_4" sourcePositionKey="sourcePosition" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="5" numberOfAntiSourcePositions="5" outputKey="antiSourcePosition_5" sourcePositionKey="sourcePosition" />
+        <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha" sourcePosition="sourcePosition" />
+        <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance" sourcePosition="sourcePosition" />
+        <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_1" sourcePosition="antiSourcePosition_1" />
+        <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_1" sourcePosition="antiSourcePosition_1" />
+        <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_2" sourcePosition="antiSourcePosition_2" />
+        <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_2" sourcePosition="antiSourcePosition_2" />
+        <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_3" sourcePosition="antiSourcePosition_3" />
+        <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_3" sourcePosition="antiSourcePosition_3" />
+        <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_4" sourcePosition="antiSourcePosition_4" />
+        <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_4" sourcePosition="antiSourcePosition_4" />
+        <fact.features.source.Alpha distribution="showerDistribution" outputKey="Alpha_Off_5" sourcePosition="antiSourcePosition_5" />
+        <fact.features.source.Distance distribution="showerDistribution" outputKey="Distance_Off_5" sourcePosition="antiSourcePosition_5" />
+        <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha" sourcePositionKey="sourcePosition" />
+        <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_1" sourcePositionKey="antiSourcePosition_1" />
+        <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_2" sourcePositionKey="antiSourcePosition_2" />
+        <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_3" sourcePositionKey="antiSourcePosition_3" />
+        <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_4" sourcePositionKey="antiSourcePosition_4" />
+        <fact.features.source.CosDeltaAlpha cogxKey="COGx" cogyKey="COGy" deltaKey="Delta" outputKey="CosDeltaAlpha_Off_5" sourcePositionKey="antiSourcePosition_5" />
+        <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta" signM3lConstant="-200" sourcePositionKey="sourcePosition" />
+        <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_1" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_1" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_1" />
+        <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_2" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_2" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_2" />
+        <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_3" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_3" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_3" />
+        <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_4" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_4" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_4" />
+        <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_5" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_5" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_5" />
+        <!-- Output: source dependent parameters -->
+        <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
+        <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
+    </process>
 </container>

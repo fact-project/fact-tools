@@ -44,6 +44,7 @@ public class ArrayStatistics implements Processor {
     private String pixelSetKey = "pixels";
 
 
+
     @Override
     public Data process(Data item) {
         Utils.mapContainsKeys(item, key);

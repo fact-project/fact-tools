@@ -26,11 +26,11 @@ import java.net.MalformedURLException;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
+	@Parameter(required = false, description = "Ouputkey for calibrated Data array", defaultValue = "raw:dataCalibrated")
+	private String outputKey = "raw:dataCalibrated";
 
-	private String outputKey = "DataCalibrated";
-
-    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
-	private String key = "Data";
+    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "raw:data")
+	private String inputKey = "raw:data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
@@ -76,7 +76,7 @@ public class DrsCalibration implements StatefulProcessor {
 			//
 			for (String key : drsKeys) {
 				if (!drsData.containsKey(key)) {
-					throw new RuntimeException("DRS data is missing key '"
+					throw new RuntimeException("DRS data is missing inputKey '"
 							+ key + "'!");
 				}
 			}
@@ -108,11 +108,11 @@ public class DrsCalibration implements StatefulProcessor {
 	 * @see stream.Processor#process(stream.Data)
 	 */
 	@Override
-	public Data process(Data data) {
+	public Data process(Data item) {
 
         if( this.url == null){
 			//file not loaded yet. try to find by magic.
-            File drsFile = (File) data.get("@drsFile");
+            File drsFile = (File) item.get("@drsFile");
             if( drsFile != null){
                 if (!drsFile.equals(currentDrsFile)) {
                     currentDrsFile = drsFile;
@@ -124,17 +124,17 @@ public class DrsCalibration implements StatefulProcessor {
                     }
                 }
             } else {
-                throw new IllegalArgumentException("No drs file set or no @drsFile key in data stream");
+                throw new IllegalArgumentException("No drs file set or no @drsFile inputKey in data stream");
             }
 		}
 
 		log.debug("Processing Data item by applying DRS calibration...");
-		short[] rawData = (short[]) data.get(key);
+		short[] rawData = (short[]) item.get(inputKey);
 		if (rawData == null) {
-			log.error(" data .fits file did not contain the value for the key "
-					+ key + ". cannot apply drscalibration");
+			log.error(" data .fits file did not contain the value for the inputKey "
+					+ inputKey + ". cannot apply drscalibration");
 			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
+					" data .fits file did not contain the value for the inputKey \"" + inputKey + "\". Cannot apply drs calibration)");
 		}
 
 		double[] rawfloatData = new double[rawData.length];
@@ -143,7 +143,7 @@ public class DrsCalibration implements StatefulProcessor {
 			rawfloatData[i] = rawData[i];
 		}
 
-		short[] startCell = (short[]) data.get("StartCellData");
+		short[] startCell = (short[]) item.get("StartCellData");
 		if (startCell == null) {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
@@ -152,17 +152,17 @@ public class DrsCalibration implements StatefulProcessor {
 		log.debug("StartCellData has {} elements", startCell.length);
 
 		double[] output = rawfloatData;
-		if (!key.equals(outputKey)) {
+		if (!inputKey.equals(outputKey)) {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output,
+		double[] dataCalibrated = applyDrsCalibration(rawfloatData, output,
 				startCell);
-		data.put(outputKey, calibrated);
+		item.put(outputKey, dataCalibrated);
 
 		// add color value if set
 
-		return data;
+		return item;
 	}
 
 	public double[] applyDrsCalibration(double[] data, double[] destination,
@@ -304,19 +304,4 @@ public class DrsCalibration implements StatefulProcessor {
     public void finish() throws Exception {
 
     }
-
-	// -----------setter---------------------
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setUrl(SourceURL url) {
-        this.url = url;
-	}
-
-
 }
