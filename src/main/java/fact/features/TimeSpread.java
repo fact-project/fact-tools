@@ -8,13 +8,13 @@ import stream.annotations.Parameter;
 
 public class TimeSpread implements Processor {
 	
-	@Parameter(required = true)
+	@Parameter(required = false)
 	private String arrivalTimeKey = "pixel:arrivalTimes";
-	@Parameter(required = true)
+	@Parameter(required = false)
 	private String weightsKey = "pixel:estNumPhotons";
-	@Parameter(required = true)
+	@Parameter(required = false)
 	private String pixelSetKey = "shower";
-	@Parameter(required = true)
+	@Parameter(required = false)
 	private String outputKey = "shower:timespread";
 	
 	@Override
@@ -56,7 +56,7 @@ public class TimeSpread implements Processor {
 		double weightedTimespread = Math.sqrt( sumwtt / sumw - Math.pow(sumwt/sumw,2));
 		
 		item.put(outputKey, timespread);
-		item.put(outputKey+"_weighted", weightedTimespread);
+		item.put(outputKey+"Weighted", weightedTimespread);
 		
 		return item;
 	}
