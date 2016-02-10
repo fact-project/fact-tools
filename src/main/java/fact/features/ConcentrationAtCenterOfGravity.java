@@ -39,10 +39,10 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	@Override
 	public Data process(Data item)
 	{
-		Utils.mapContainsKeys( item, pixelSetKey, photonChargeKey);
+		Utils.mapContainsKeys( item, pixelSetKey, photonChargeKey, pixelSetKey + ":ellipse:cog:x");
 		
-		double cogx = (Double) item.get(pixelSetKey + ":cog:x");
-		double cogy = (Double) item.get(pixelSetKey + ":cog:y");
+		double cogx = (Double) item.get(pixelSetKey + ":ellipse:cog:x");
+		double cogy = (Double) item.get(pixelSetKey + ":ellipse:cog:y");
 		double size = (Double) item.get(pixelSetKey + ":size");
 
         double[] photonCharge = (double[]) item.get(photonChargeKey);

@@ -16,7 +16,7 @@ import stream.annotations.Parameter;
 public class Size implements Processor {
 
     @Parameter(required = false, description = "Key to the pixelSet, on which Size should be calculated", defaultValue = "pixels")
-	private String pixelSetKey = "pixels";
+	private String pixelSetKey = "shower";
     @Parameter(required = false, description = "Key to the estimated number of Photons", defaultValue = "pixels:estNumPhotons")
 	private String estNumPhotonsKey = "pixels:estNumPhotons";
     @Parameter(required = false, description = "The outputkey, if not given, '<pixelset>:Size' is used")
@@ -26,7 +26,7 @@ public class Size implements Processor {
 	public Data process(Data item) {
 
 		if (outputKey == null){
-			outputKey = pixelSetKey + ":Size";
+			outputKey = pixelSetKey + ":size";
 		}
 		
 		
