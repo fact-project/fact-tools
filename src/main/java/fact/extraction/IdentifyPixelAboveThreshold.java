@@ -10,19 +10,20 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * Identify pixel with a signal above a given threshold by means of photon chrage, hand them over as list and pixel array
+ * Identify pixel with a signal above a given threshold by means of a given pixels array (for example estNumPhotons),
+ * hand them over as list and pixel array
  * 
- * @author jbuss
+ * @author jbuss, ftemme
  *
  */
 public class IdentifyPixelAboveThreshold implements Processor {
-	static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
+	static Logger log = LoggerFactory.getLogger(IdentifyPixelAboveThreshold.class);
 	
-    @Parameter(required = true, description = "The key to your data array.")
+    @Parameter(required = true, description = "The key to your pixels array.")
     private String key;
     @Parameter(required = true, description = "The threshold you want to check for.")
-    private Integer threshold = 0;
-    @Parameter(required = false)
+    private Integer threshold;
+    @Parameter(required = true, description = "The outputkey for the matching array (contains the value of the pixels array if it is above the threshold or 0 if it is below.")
     private String outputKey;
 	
     private PixelSet pixelSet;
@@ -30,14 +31,14 @@ public class IdentifyPixelAboveThreshold implements Processor {
 	private int npix;
 	
 	@Override
-	public Data process(Data input) {
-		Utils.isKeyValid(input, key, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");	
+	public Data process(Data item) {
+		Utils.isKeyValid(item, key, double[].class);
+		Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");	
 		
 		double[] matchArray =  new double[npix];
 				
-		double[] featureArray 	 = (double[]) input.get(key);
+		double[] featureArray 	 = (double[]) item.get(key);
 				
 		pixelSet = new PixelSet();
 		for(int pix = 0 ; pix < npix; pix++){
@@ -47,54 +48,10 @@ public class IdentifyPixelAboveThreshold implements Processor {
 				pixelSet.addById(pix);
 			}
 		}
+
+        item.put(outputKey+"Set", pixelSet);
+		item.put(outputKey, matchArray);
 		
-
-        input.put(outputKey+"Set", pixelSet);
-		
-		input.put(outputKey, matchArray);
-		
-		// TODO Auto-generated method stub
-		return input;
+		return item;
 	}
-
-
-	public String getKey() {
-		return key;
-	}
-
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-
-	public Integer getThreshold() {
-		return threshold;
-	}
-
-
-	public void setThreshold(Integer threshold) {
-		this.threshold = threshold;
-	}
-
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-
-	public PixelSet getPixelSet() {
-		return pixelSet;
-	}
-
-
-	public void setPixelSet(PixelSet pixelSet) {
-		this.pixelSet = pixelSet;
-	}
-
 }
