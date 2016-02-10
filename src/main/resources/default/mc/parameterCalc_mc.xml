@@ -48,7 +48,7 @@
     pixelSetKey="shower"
     photonChargeKey="photoncharge" 
     outputKey="Size" 
-/>       
+/>
 <fact.features.DistributionFromShower
     weightsKey="photoncharge"
     pixelSetKey="shower"
@@ -115,12 +115,8 @@
     leakage1OutputKey="Leakage"
     leakage2OutputKey="Leakage2"
 />
-<fact.features.TimeSpread
-    weightsKey="photoncharge"
-    arrivalTimeKey="arrivalTime"
-    pixelSetKey="shower"
-    outputKey="Timespread"
-/>
+<fact.features.TimeSpread />
+
 <fact.features.ShowerSlope
     photonChargeKey="photoncharge"
     arrivalTimeKey="arrivalTime"
