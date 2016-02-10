@@ -44,12 +44,6 @@ public class SourcePositionTest {
     @Test
     public void testWobbleCorrectParameter() throws Exception {
         SourcePosition sourcePosition = new SourcePosition();
-        sourcePosition.setOutputKey("test");
-
-        sourcePosition.setPointingAzKey("hello");
-        sourcePosition.setPointingZdKey("I am");
-        sourcePosition.setSourceAzKey("quite the ");
-        sourcePosition.setSourceZdKey("annoying feature.");
         sourcePosition.init(null);
 
         assertThat(sourcePosition.hasMcWobblePosition, is(true));
@@ -59,7 +53,6 @@ public class SourcePositionTest {
     @Test
     public void testTimeConversion() throws ParseException {
         SourcePosition sourcePosition = new SourcePosition();
-        sourcePosition.setOutputKey("test");
         //get a test date and time
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -140,7 +133,6 @@ public class SourcePositionTest {
 	public void testSouthOrientation()
 	{
         SourcePosition sourcePosition = new SourcePosition();
-        sourcePosition.setOutputKey("test");
 
 		double zdSource = 0.6;
 		double azSource = 0.0;
