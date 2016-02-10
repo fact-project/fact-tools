@@ -1,11 +1,14 @@
 #Changelog for the fact-tools
 
-## Version 0.12.3
-
+## Version 0.12.4
 Changes:
 
 * new Feature: TimeOverThresholdTL allows to calculate the time over Threshold for a given window on the Timeline
 * FWHMPulses uses Doubles instead of Ints
+
+## Version 0.12.3
+* `JSONWriter` now supports directly writing gzipped files with the 
+option `gzip="true"`
 
 ## Version 0.12.2
 
