@@ -8,23 +8,23 @@ import stream.annotations.Parameter;
 
 public class TimeSpread implements Processor {
 	
-	@Parameter(required = true)
-	private String arrivalTimeKey = null;
-	@Parameter(required = true)
-	private String weightsKey = null;
-	@Parameter(required = true)
-	private String pixelSetKey = null;
-	@Parameter(required = true)
-	private String outputKey = null;
+	@Parameter(required = false)
+	private String arrivalTimeKey = "pixel:arrivalTimes";
+	@Parameter(required = false)
+	private String weightsKey = "pixel:estNumPhotons";
+	@Parameter(required = false)
+	private String pixelSetKey = "shower";
+	@Parameter(required = false)
+	private String outputKey = "shower:timespread";
 	
 	@Override
-	public Data process(Data input) {
+	public Data process(Data item) {
 		
-		Utils.mapContainsKeys( input, arrivalTimeKey, weightsKey, pixelSetKey);
+		Utils.mapContainsKeys( item, arrivalTimeKey, weightsKey, pixelSetKey);
 
-		double[] arrivalTime 	= (double[]) input.get(arrivalTimeKey);
-		double[] weights 		= (double[]) input.get(weightsKey);
-		int[] shower 			= ((PixelSet) input.get(pixelSetKey)).toIntArray();
+		double[] arrivalTime 	= (double[]) item.get(arrivalTimeKey);
+		double[] weights 		= (double[]) item.get(weightsKey);
+		int[] shower 			= ((PixelSet) item.get(pixelSetKey)).toIntArray();
 		
 		// NumberShowerPixel
 		int n = shower.length;
@@ -55,38 +55,9 @@ public class TimeSpread implements Processor {
 		double timespread = Math.sqrt( sumtt / n - Math.pow(sumt/n,2));
 		double weightedTimespread = Math.sqrt( sumwtt / sumw - Math.pow(sumwt/sumw,2));
 		
-		input.put(outputKey, timespread);
-		input.put(outputKey+"_weighted", weightedTimespread);
+		item.put(outputKey, timespread);
+		item.put(outputKey+"Weighted", weightedTimespread);
 		
-		return input;
+		return item;
 	}
-
-	public String getArrivalTimeKey() {
-		return arrivalTimeKey;
-	}
-
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
-
-	public String getWeightsKey() {
-		return weightsKey;
-	}
-
-	public void setWeightsKey(String weightsKey) {
-		this.weightsKey = weightsKey;
-	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
 }
