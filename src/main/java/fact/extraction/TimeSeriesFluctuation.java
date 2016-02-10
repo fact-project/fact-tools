@@ -32,10 +32,10 @@ public class TimeSeriesFluctuation implements Processor {
     @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
     private String pixelSetKey;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time series' beginning", defaultValue = "50")
     private int skipFirst = 35;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time series' beginning", defaultValue = "50")
     private int skipLast = 100;
 
     @Parameter(description = "Size of the integration window", defaultValue = "30")
