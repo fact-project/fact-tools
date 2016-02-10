@@ -23,25 +23,22 @@ import java.util.Random;
  * Created by jbuss on 17.11.14.
  */
 public class TimeSeriesFluctuation implements Processor {
-    @Parameter(required = true)
-    private String key = null;
+    @Parameter(required = false, defaultValue = "raw:dataCalibrated")
+    private String dataKey = "raw:dataCalibrated";
 
-    @Parameter(required = true)
-    private String outputKey = null;
+    @Parameter(required = false, defaultValue = "pixels:pedvar")
+    private String outputKey = "pixels:pedvar";
 
-    @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
-    private String pixelSetKey;
-
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time series beginning", defaultValue = "35")
     private int skipFirst = 35;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time series end", defaultValue = "100")
     private int skipLast = 100;
 
     @Parameter(description = "Size of the integration window", defaultValue = "30")
     private int windowSize = 30;
 
-    @Parameter(description = "Seed of the random number generator")
+    @Parameter(description = "Seed of the random number generator", defaultValue="5901")
     private long Seed = 5901;
 
     // A logger
@@ -50,26 +47,16 @@ public class TimeSeriesFluctuation implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, key);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+        Utils.mapContainsKeys(item, dataKey);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
 
-        int[] pixels = null;
+        ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
+        int[] pixels = Ints.toArray(numbers);
 
-        //Load a given pixelset, otherwise use the the whole camera
-        if (input.containsKey(pixelSetKey)) {
-            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-            pixels = pixelSet.toIntArray();
-        } else {
-            ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
-            pixels = Ints.toArray(numbers);
-        }
-        log.info("npix: " + pixels.length );
-
-        double[] data        = (double[]) input.get(key);
+        double[] data        = (double[]) item.get(dataKey);
 
         double[] chargeMean             = new double[npix];
         double[] chargeStd              = new double[npix];
@@ -91,9 +78,7 @@ public class TimeSeriesFluctuation implements Processor {
 
         double[][] charge = new double[npix][iterations];
 
-
-
-        //Loop over all pixel and calculate integrals on timeline
+        //Loop over all pixel and calculate integrals on timeseries
         for (int pix : pixels) {
             int startSlice = skipFirst + rand.nextInt(bound);
 
@@ -137,69 +122,17 @@ public class TimeSeriesFluctuation implements Processor {
 
         }
 
-        input.put(outputKey, charge);
-        input.put(outputKey+"_mean", chargeMean);
-        input.put(outputKey+"_std", chargeStd);
-        input.put(outputKey+"_var", chargeVariance);
-        input.put(outputKey+"_kurtosis",chargeKurtosis);
-        input.put(outputKey+"_max",chargeMax);
-        input.put(outputKey+"_min",chargeMin);
-        input.put(outputKey+"_skewness",chargeSkewness);
-        input.put(outputKey+"_median",chargeMedian);
-        input.put(outputKey+"_sum",chargeSum);
+        item.put(outputKey, charge);
+        item.put(outputKey+":mean", chargeMean);
+        item.put(outputKey+":std", chargeStd);
+        item.put(outputKey+":var", chargeVariance);
+        item.put(outputKey+":kurtosis",chargeKurtosis);
+        item.put(outputKey+":max",chargeMax);
+        item.put(outputKey+":min",chargeMin);
+        item.put(outputKey+":skewness",chargeSkewness);
+        item.put(outputKey+":median",chargeMedian);
+        item.put(outputKey+":sum",chargeSum);
 
-        return input;
-    }
-
-    public void setPixelSetKey(String pixelSampleKey) {
-        this.pixelSetKey = pixelSampleKey;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getSkipFirst() {
-        return skipFirst;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public int getSkipLast() {
-        return skipLast;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
-    }
-
-    public int getWindowSize() {
-        return windowSize;
-    }
-
-    public void setWindowSize(int windowSize) {
-        this.windowSize = windowSize;
-    }
-
-    public long getSeed() {
-        return Seed;
-    }
-
-    public void setSeed(long seed) {
-        Seed = seed;
+        return item;
     }
 }
