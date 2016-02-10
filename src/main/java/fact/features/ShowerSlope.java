@@ -47,7 +47,7 @@ public class ShowerSlope implements Processor {
 		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
 
         double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
-        double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
+        double[] arrivalTimes = (double[]) item.get(arrivalTimeKey);
 		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
 		double cogx = (Double) item.get(cogxKey);
 		double cogy = (Double) item.get(cogyKey);
@@ -72,7 +72,7 @@ public class ShowerSlope implements Processor {
 			double[] rotPixels = Utils.transformToEllipseCoordinates(xcoord, ycoord, cogx, cogy, delta);
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];
-			t[i] = arrivalTime[chid];
+			t[i] = arrivalTimes[chid];
 			w[i] = estNumPhotons[chid];
 		}
 
