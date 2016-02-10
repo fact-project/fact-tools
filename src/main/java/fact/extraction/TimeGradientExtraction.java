@@ -20,15 +20,15 @@ import stream.annotations.Parameter;
 public class TimeGradientExtraction extends BasicExtraction {
 	static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);
 
-	@Parameter(required=true, description="key to the delta angle of the shower")
+	@Parameter(required=false, description="key to the delta angle of the shower", defaultValue="shower:ellipse:delta")
 	private String deltaKey = "shower:ellipse:delta";
-	@Parameter(required=true, description="key to the xvalue of the cog of the shower")
+	@Parameter(required=false, description="key to the xvalue of the cog of the shower", defaultValue="shower:cog:x")
 	private String cogxKey = "shower:cog:x";
-	@Parameter(required=true, description="key to the yvalue of the cog of the shower")
+	@Parameter(required=false, description="key to the yvalue of the cog of the shower", defaultValue="shower:cog:y")
 	private String cogyKey = "shower:cog:y";
-	@Parameter(required=true, description="key to the timegradient slope on the longitudinal-axis")
+	@Parameter(required=false, description="key to the timegradient slope on the longitudinal-axis", defaultValue="shower:timeGradient:slope:long")
 	private String timeGradientSlopeLongKey = "shower:timeGradient:slope:long";
-	@Parameter(required=true, description="key to the timegradient intercept on the longitudinal-axis")
+	@Parameter(required=false, description="key to the timegradient intercept on the longitudinal-axis", defaultValue="shower:timeGradient:intercept:long")
 	private String timeGradientInterceptLongKey = "shower:timeGradient:intercept:long";
 	
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
