@@ -14,6 +14,7 @@
 
     <process id="2" input="fact">
 				<RenameKey from="Data" to="raw:data" />
+				<fact.pixelsets.AllPixels outputKey="pixels" />
 				<PrintData />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 				<RenameKey from="StartCellData" to="meta:startCellData" />
@@ -37,10 +38,16 @@
 				<!-- Extract ArrivalTimes -->
         <fact.extraction.ArrivalTimeForPositions />
         <fact.extraction.ArrivalTimePolynomFit />
-
         <fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}"/>
 
+
         <fact.datacorrection.InterpolatePhotondata calibService="calibService"/>
+
+				<!-- Statistical Features -->
+        <fact.statistics.ArrayStatistics key="pixels:estNumPhotons"/>
+        <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
+
+				<fact.io.JSONWriter keys="pixels:*:*" url="file:test.json" />
 				<fact.ShowViewer key="raw:dataCalibrated"/>
     </process>
 </container>
