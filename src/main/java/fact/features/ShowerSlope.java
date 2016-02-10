@@ -46,7 +46,7 @@ public class ShowerSlope implements Processor {
 	public Data process(Data item) {
 		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
 
-        double[] photonCharge = (double[]) item.get(estNumPhotonsKey);
+        double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
         double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
 		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
 		double cogx = (Double) item.get(cogxKey);
@@ -73,7 +73,7 @@ public class ShowerSlope implements Processor {
 			x[i] = rotPixels[0];
 			y[i] = rotPixels[1];
 			t[i] = arrivalTime[chid];
-			w[i] = photonCharge[chid];
+			w[i] = estNumPhotons[chid];
 		}
 
 		// Calculate several element wise multiplication
