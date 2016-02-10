@@ -30,13 +30,13 @@ public class InterpolatePhotondata implements Processor {
     @Service(description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
 
-    @Parameter(required = true, description = "The photoncharge key to work on", defaultValue="pixels:estNumPhotons")
+    @Parameter(required = false, description = "The photoncharge key to work on", defaultValue="pixels:estNumPhotons")
     private String estNumPhotonsKey = "pixels:estNumPhotons";
-    @Parameter(required = true, description = "The name of the interpolated photoncharge output", defaultValue="pixels:estNumPhotons")
+    @Parameter(required = false, description = "The name of the interpolated photoncharge output", defaultValue="pixels:estNumPhotons")
     private String estNumPhotonsOutputKey = "pixels:estNumPhotons";
-    @Parameter(required = true, description = "The arrivalTime key to work on", defaultValue="pixels:arrivalTimes")
+    @Parameter(required = false, description = "The arrivalTime key to work on", defaultValue="pixels:arrivalTimes")
     private String arrivalTimesKey = "pixels:arrivalTimes";
-    @Parameter(required = true, description = "The name of the interpolated arrivalTime output", defaultValue="pixels:arrivalTimes")
+    @Parameter(required = false, description = "The name of the interpolated arrivalTime output", defaultValue="pixels:arrivalTimes")
     private String arrivalTimesOutputKey = "pixels:arrivalTimes";
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
     private int minPixelToInterpolate = 3;
