@@ -1,5 +1,7 @@
 package fact.features.source;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import fact.container.PixelSet;
@@ -12,95 +14,111 @@ import stream.annotations.Parameter;
  */
 public class SourceLineTest implements Processor{
 
-	@Parameter(required = true, defaultValue = "photonCharge", description = "Key of photoncharge array.")
-	private String photonCharge;
+	@Parameter(required = false, defaultValue = "pixels:estNumPhotons", description = "Key of photoncharge array.")
+	private String estNumPhotonsKey = "pixels:estNumPhotons";
 	//consider the error of the arrival time later...
-	@Parameter(required = true, defaultValue = "arrivalTime", description = "Key of arrivaltime array.")
-	private String arrivalTime;
-	@Parameter(required = true, defaultValue = "showerPixel", description = "Key of showerpixel array.")
-	private String pixelSetKey;
-	@Parameter(required = true, defaultValue = "sourceposition", description = "Key of sourceposition vector.")
-	private String sourcePosition;
-	@Parameter(required = true, defaultValue = "SourceLineTest", description = "Master outputkey, which will be written before every attribute.")
-	private String outputKey;
-
-	private double[] arrivalTimeArray = null;
-	private double[] photonChargeArray = null;
-	private int[] showerPixelArray = null;
-	private double[] sourcePositionArray = null;
+	@Parameter(required = false, defaultValue = "pixels:arrivalTimes", description = "Key of arrivaltime array.")
+	private String arrivalTimesKey = "pixels:arrivalTimes";
+	@Parameter(required = false, defaultValue = "shower", description = "Key of showerpixel array.")
+	private String pixelSetKey = "shower";
+	@Parameter(required = false, defaultValue="sourcePosition:x")
+	private String sourcePositionXKey = "sourcePosition:x";
+	@Parameter(required = false, defaultValue="sourcePosition:y")
+	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue = "shower:sourceLineTest", description = "Master outputkey, which will be written before every attribute.")
+	private String outputKey = "shower:sourceLineTest";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 
 	@Override
-	public Data process(Data input)
+	public Data process(Data item)
 	{
-//	    float[] mpGeomXCoord            = DefaultPixelMapping.getGeomXArray();
-//	    float[] mpGeomYCoord            = DefaultPixelMapping.getGeomYArray();
-		//Test for keys.
-		Utils.mapContainsKeys( input, photonCharge, arrivalTime, pixelSetKey, sourcePosition);
+		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimesKey, pixelSetKey, sourcePositionXKey, sourcePositionYKey);
 		
-		photonChargeArray = (double[]) input.get(photonCharge);
-		arrivalTimeArray = (double[]) input.get(arrivalTime);
+		double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
+		double[] arrivalTimes = (double[]) item.get(arrivalTimesKey);
 
-		showerPixelArray = ((PixelSet) input.get(pixelSetKey)).toIntArray();
+		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
 
-		sourcePositionArray = (double[]) input.get(sourcePosition);		
+		double sourcex = (Double) item.get(sourcePositionXKey);
+		double sourcey = (Double) item.get(sourcePositionYKey);
 		
-		if (showerPixelArray.length < 4)
-		{
-			input.put(outputKey + "_sourceLineTestValueProjected", Double.NaN);
-			input.put(outputKey + "_sourceLineTestValueSorted", Double.NaN);
-			input.put(outputKey + "_meanShowerVelocityProjected", Double.NaN);
-			input.put(outputKey + "_meanShowerVelocitySorted", Double.NaN);
-			return input;
-		}
+		// output variables set to NaN, so if the values cannot be calculated, NaN will be put in the data item
+		double sourceLineTestValueProjected = Double.NaN;
+		double sourceLineTestValueSorted = Double.NaN;
+		double meanShowerVelocityProjected = Double.NaN;
+		double meanShowerVelocitySorted = Double.NaN;
+		
+		// Calculation only possible if there are at least 4 shower pixel
+		if (shower.length >= 4)
+		{	
+			double[] result = calculateCogSpaceAndTime(shower, arrivalTimes, estNumPhotons);
+			double cogt = result[0];
+			double cogx = result[1];
+			double cogy = result[2];
 			
-		
-		double cogT = 0;
-		double size = 0;
-		double cogX = 0,cogY = 0;
-		
-		// Variables for speed calculation
-		double projPrimary = 0; // Projected ordinate on primary axis towards source position
-		//double projSecondary = 0; // secondary axis concerning cog---source
-		
-		double projPrimaryMin = Double.MAX_VALUE;
-		double projPrimaryMax = Double.MIN_VALUE;
-		double timeMin = Double.MAX_VALUE;
-		double timeMax = Double.MIN_VALUE;
-		
-		double cogSourceAngle = 0;
-		
-		// variables for reconstruction
-		
-		double [] recoX = new double[photonChargeArray.length];
-		double [] recoY = new double[photonChargeArray.length];
-		double [] recoW = new double[photonChargeArray.length]; // weights are 1.0 in this version
-		double recoWsum = photonChargeArray.length;
-		
-		// output variables
-		double sourceLineTestValueProjected = 0;
-		double sourceLineTestValueSorted = 0;
-		
-		double meanShowerVelocityProjected = 0;
+			double cogSourceAngle = Math.atan2((cogy - sourcey) , (cogx - sourcex));
+			
+			double f_time = 0;
+			double l_time = 0;
+			int[] foundIds = findFirstAndLastThreePixelInShower(shower, arrivalTimes, f_time, l_time);
 
+			// If one of the ids is -1 the calculation is not possible
+			if (!ArrayUtils.contains(foundIds, -1))
+			{
+				result = calculateMeanShowerVelocity(shower, arrivalTimes, foundIds, l_time, f_time, cogx, cogy, cogt, cogSourceAngle, sourcex, sourcey);
+				meanShowerVelocityProjected = result[0];
+				meanShowerVelocitySorted = result[1];
+				
+				result = calculateTestValues(shower, estNumPhotons, arrivalTimes, cogt, cogx, cogy, cogSourceAngle, meanShowerVelocityProjected, meanShowerVelocitySorted);
+				sourceLineTestValueProjected = result[0];
+				sourceLineTestValueSorted = result[1];
+				
+			}			
+		}
+		item.put(outputKey + ":value:projected", sourceLineTestValueProjected);
+		item.put(outputKey + ":value:sourted", sourceLineTestValueSorted);
+		item.put(outputKey + ":meanShowerVelocity:projected", meanShowerVelocityProjected);
+		item.put(outputKey + ":meanShowerVelocity:sorted", meanShowerVelocitySorted);
+		return item;
+	}
+	
+	private double[] calculateCogSpaceAndTime(int[] shower, double[] arrivalTimes, double[] estNumPhotons){
+		double cogt = 0;
+		double size = 0;
+		double cogx = 0;
+		double cogy = 0;
+		for(int chid : shower)
+		{
+			cogt += arrivalTimes[chid] * estNumPhotons[chid];
+			cogx += pixelMap.getPixelFromId(chid).getXPositionInMM() * estNumPhotons[chid];
+			cogy += pixelMap.getPixelFromId(chid).getYPositionInMM() * estNumPhotons[chid];
+			size += estNumPhotons[chid];
+		}
+		cogt /= size;
+		cogx /= size;
+		cogy /= size;
+		double[] result = {cogt,cogx,cogy};
+		return result;
+	}
+		
+	private int[] findFirstAndLastThreePixelInShower(
+			int[] shower,
+			double[] arrivalTimes,
+			double f_time, 
+			double l_time
+			){
+		
 		double tf1 = Double.MAX_VALUE, tf2 = Double.MAX_VALUE, tf3 = Double.MAX_VALUE; // First three times
 		double tl1 = Double.MIN_VALUE, tl2 = Double.MIN_VALUE, tl3 = Double.MIN_VALUE; // Last three times
-		int id_tf1 = -1, id_tf2 = -1, id_tf3 = -1; // Corresponding ids
+		// id_t<f,l><1,2,3> stands for chid of the pixel with the <f: first, l: last> arrival times (<1,2,3> is the number)
+		int id_tf1 = -1, id_tf2 = -1, id_tf3 = -1;
 		int id_tl1 = -1, id_tl2 = -1, id_tl3 = -1;
 		
-		
-		
-		for(int chid : showerPixelArray)
+		for(int chid : shower)
 		{
-			cogT += arrivalTimeArray[chid] * photonChargeArray[chid];
-			cogX += pixelMap.getPixelFromId(chid).getXPositionInMM() * photonChargeArray[chid];
-			cogY += pixelMap.getPixelFromId(chid).getYPositionInMM() * photonChargeArray[chid];
-			size += photonChargeArray[chid];
-			
-			double t = arrivalTimeArray[chid]; // tf1 < tf2 < tf3 // tl1 > tl2 > tl3
-
+			double t = arrivalTimes[chid]; // tf1 < tf2 < tf3 // tl1 > tl2 > tl3
 			
 			if (t < tf1)
 			{
@@ -148,55 +166,65 @@ public class SourceLineTest implements Processor{
 			
 		}
 		
-		if (id_tl1 == -1 || id_tl2 == -1 || id_tl3 == -1 ||
-				id_tf1 == -1 || id_tf2 == -1 || id_tf3 == -1)
-		{
-			input.put(outputKey + "_sourceLineTestValueProjected", Double.NaN);
-			input.put(outputKey + "_sourceLineTestValueSorted", Double.NaN);
-			input.put(outputKey + "_meanShowerVelocityProjected", Double.NaN);
-			input.put(outputKey + "_meanShowerVelocitySorted", Double.NaN);
-			return input;
-		}
+		f_time = (tf1 + tf2 + tf3) / 3.0;
+		l_time = (tl1 + tl2 + tl3) / 3.0;
 		
-		double f_time = (tf1 + tf2 + tf3) / 3.0;
-		double l_time = (tl1 + tl2 + tl3) / 3.0;
+		int[] foundIds = {id_tf1,id_tf2,id_tf3,id_tl1,id_tl2,id_tl3};
+		return foundIds;
+	}
+	
+	private double[] calculateMeanShowerVelocity(
+			int[] shower,
+			double[] arrivalTimes,
+			int[] foundIds, 
+			double l_time,
+			double f_time,
+			double cogx, 
+			double cogy, 
+			double cogt, 
+			double cogSourceAngle,
+			double sourcex, 
+			double sourcey
+			){
+		// Variables for speed calculation
+		double projPrimary = 0; // Projected ordinate on primary axis towards source position
+		//double projSecondary = 0; // secondary axis concerning cog---source
 		
-		double tf1_x = pixelMap.getPixelFromId(id_tf1).getXPositionInMM();
-		double tf1_y = pixelMap.getPixelFromId(id_tf1).getXPositionInMM();
-		double tf2_x = pixelMap.getPixelFromId(id_tf2).getXPositionInMM();
-		double tf2_y = pixelMap.getPixelFromId(id_tf2).getXPositionInMM();
-		double tf3_x = pixelMap.getPixelFromId(id_tf3).getXPositionInMM();
-		double tf3_y = pixelMap.getPixelFromId(id_tf3).getXPositionInMM();
+		double projPrimaryMin = Double.MAX_VALUE;
+		double projPrimaryMax = Double.MIN_VALUE;
+		double timeMin = Double.MAX_VALUE;
+		double timeMax = Double.MIN_VALUE;
+		
+		double tf1_x = pixelMap.getPixelFromId(foundIds[0]).getXPositionInMM();
+		double tf1_y = pixelMap.getPixelFromId(foundIds[0]).getXPositionInMM();
+		double tf2_x = pixelMap.getPixelFromId(foundIds[1]).getXPositionInMM();
+		double tf2_y = pixelMap.getPixelFromId(foundIds[1]).getXPositionInMM();
+		double tf3_x = pixelMap.getPixelFromId(foundIds[2]).getXPositionInMM();
+		double tf3_y = pixelMap.getPixelFromId(foundIds[2]).getXPositionInMM();
 		
 		double f_x = (tf1_x + tf2_x + tf3_x) / 3.0;
 		double f_y = (tf1_y + tf2_y + tf3_y) / 3.0;
 		
-		double tl1_x = pixelMap.getPixelFromId(id_tl1).getXPositionInMM();
-		double tl1_y = pixelMap.getPixelFromId(id_tl1).getXPositionInMM();
-		double tl2_x = pixelMap.getPixelFromId(id_tl2).getXPositionInMM();
-		double tl2_y = pixelMap.getPixelFromId(id_tl2).getXPositionInMM();
-		double tl3_x = pixelMap.getPixelFromId(id_tl3).getXPositionInMM();
-		double tl3_y = pixelMap.getPixelFromId(id_tl3).getXPositionInMM();
+		double tl1_x = pixelMap.getPixelFromId(foundIds[3]).getXPositionInMM();
+		double tl1_y = pixelMap.getPixelFromId(foundIds[3]).getXPositionInMM();
+		double tl2_x = pixelMap.getPixelFromId(foundIds[4]).getXPositionInMM();
+		double tl2_y = pixelMap.getPixelFromId(foundIds[4]).getXPositionInMM();
+		double tl3_x = pixelMap.getPixelFromId(foundIds[5]).getXPositionInMM();
+		double tl3_y = pixelMap.getPixelFromId(foundIds[5]).getXPositionInMM();
 		
 		double l_x = (tl1_x + tl2_x + tl3_x) / 3.0;
 		double l_y = (tl1_y + tl2_y + tl3_y) / 3.0;
 		
 		double meanShowerVelocitySorted = Math.sqrt((f_x - l_x)*(f_x - l_x) + (f_y - l_y) * (f_y - l_y)) / (l_time - f_time);
 		
-		cogX /= size;
-		cogY /= size;
-		cogT /= size;
-		
-		cogSourceAngle = Math.atan2((cogY - sourcePositionArray[1]) , (cogX - sourcePositionArray[0]));
-		
 		// Calculate values for reconstruction
-		for(int chid : showerPixelArray)
+		for(int chid : shower)
 		{
 			double posx = pixelMap.getPixelFromId(chid).getXPositionInMM();
 			double posy = pixelMap.getPixelFromId(chid).getYPositionInMM();
 			
-			double pixelSourceAngle = Math.atan2((posy - sourcePositionArray[1]), (posx - sourcePositionArray[0]));
-			double pixelSourceDist       = (posy - sourcePositionArray[1]) / Math.sin(pixelSourceAngle);
+			double pixelSourceAngle = Math.atan2((posy - sourcey), (posx - sourcex));
+			double pixelSourceDist       = (posy - sourcey) / Math.sin(pixelSourceAngle);
 			
 			projPrimary = Math.cos(pixelSourceAngle - cogSourceAngle) * pixelSourceDist;
 			
@@ -211,27 +239,50 @@ public class SourceLineTest implements Processor{
 			{
 				projPrimaryMax = projPrimary;
 			}
-			if(arrivalTimeArray[chid] < timeMin)
+			if(arrivalTimes[chid] < timeMin)
 			{
-				timeMin = arrivalTimeArray[chid];
+				timeMin = arrivalTimes[chid];
 			}
-			if(arrivalTimeArray[chid] > timeMax)
+			if(arrivalTimes[chid] > timeMax)
 			{
-				timeMax = arrivalTimeArray[chid];
+				timeMax = arrivalTimes[chid];
 			}
 		}
-		meanShowerVelocityProjected = (projPrimaryMax - projPrimaryMin) / (timeMax - timeMin);
+		double meanShowerVelocityProjected = (projPrimaryMax - projPrimaryMin) / (timeMax - timeMin);
+		double[] result = {meanShowerVelocityProjected,meanShowerVelocitySorted};
+		return result;
+		
+	}
+
+	private double[] calculateTestValues(
+			int[] shower,
+			double[] estNumPhotons,
+			double[] arrivalTimes,
+			double cogt,
+			double cogx,
+			double cogy,
+			double cogSourceAngle,
+			double meanShowerVelocityProjected,
+			double meanShowerVelocitySorted
+			){
+		// variables for reconstruction
+		double [] recoX = new double[estNumPhotons.length];
+		double [] recoY = new double[estNumPhotons.length];
+		double [] recoW = new double[estNumPhotons.length]; // weights are 1.0 in this version
+		double recoWsum = estNumPhotons.length;
 		
 		recoWsum = 0;
-		for(int chid : showerPixelArray)
+		double sourceLineTestValueProjected = 0;
+		double sourceLineTestValueSorted = 0;
+		for(int chid : shower)
 		{
 			 recoW[chid] = 1.0; // consider arrival time error later
 		     
 			 // Calculate with projected velocity
-			 double dt = arrivalTimeArray[chid] - cogT;
+			 double dt = arrivalTimes[chid] - cogt;
 		     double dx = dt * meanShowerVelocityProjected;
-		     recoX[chid] = cogX + dx * Math.cos(cogSourceAngle);
-		     recoY[chid] = cogY + dx * Math.sin(cogSourceAngle);
+		     recoX[chid] = cogx + dx * Math.cos(cogSourceAngle);
+		     recoY[chid] = cogy + dx * Math.sin(cogSourceAngle);
 		     
 		     double posx = pixelMap.getPixelFromId(chid).getXPositionInMM();
 			 double posy = pixelMap.getPixelFromId(chid).getYPositionInMM();
@@ -239,10 +290,10 @@ public class SourceLineTest implements Processor{
 		     sourceLineTestValueProjected += recoW[chid] * Math.sqrt((recoX[chid] - posx) * (recoX[chid] - posx) + (recoY[chid] - posy) * (recoY[chid] - posy));
 		     
 		     // Calculate with sorted velocity
-			 dt = arrivalTimeArray[chid] - cogT;
+			 dt = arrivalTimes[chid] - cogt;
 		     dx = dt * meanShowerVelocitySorted;
-		     recoX[chid] = cogX + dx * Math.cos(cogSourceAngle);
-		     recoY[chid] = cogY + dx * Math.sin(cogSourceAngle);
+		     recoX[chid] = cogx + dx * Math.cos(cogSourceAngle);
+		     recoY[chid] = cogy + dx * Math.sin(cogSourceAngle);
 		     
 		     sourceLineTestValueSorted += recoW[chid] * Math.sqrt((recoX[chid] - posx) * (recoX[chid] - posx) + (recoY[chid] - posy) * (recoY[chid] - posy));
 		     
@@ -252,49 +303,9 @@ public class SourceLineTest implements Processor{
 		
 		sourceLineTestValueProjected /= recoWsum;
 		sourceLineTestValueSorted /= recoWsum;
+		double[] result = {sourceLineTestValueProjected,sourceLineTestValueSorted};
+		return result;
 		
-		
-		input.put(outputKey + "_sourceLineTestValueProjected", sourceLineTestValueProjected);
-		input.put(outputKey + "_sourceLineTestValueSorted", sourceLineTestValueSorted);
-		input.put(outputKey + "_meanShowerVelocityProjected", meanShowerVelocityProjected);
-		input.put(outputKey + "_meanShowerVelocitySorted", meanShowerVelocitySorted);
-		
-		
-		return input;
-	}
-	
-	
-	public String getPhotonCharge() {
-		return photonCharge;
 	}
 
-	public void setPhotonCharge(String photonCharge) {
-		this.photonCharge = photonCharge;
-	}
-	public String getArrivalTime() {
-		return arrivalTime;
-	}
-
-	public void setArrivalTime(String arrivalTime) {
-		this.arrivalTime = arrivalTime;
-	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getSourcePosition() {
-		return sourcePosition;
-	}
-
-	public void setSourcePosition(String sourcePosition) {
-		this.sourcePosition = sourcePosition;
-	}
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
 }
