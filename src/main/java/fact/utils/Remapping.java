@@ -21,27 +21,27 @@ import stream.annotations.Parameter;
 public class Remapping implements Processor{
     static Logger log = LoggerFactory.getLogger(Remapping.class);
 
-    @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
-    private String key;
-
-    @Parameter(required = true)
-    private String outputKey;
+    @Parameter(required = true, defaultValue = "raw:dataCalibrated",
+            description = "Key refering to an array of short containing pixel data sorted by SoftId")
+    private String inputKey     = "raw:dataCalibrated";
+    @Parameter(required = true, defaultValue = "raw:dataCalibrated")
+    private String outputKey    = "raw:dataCalibrated";
 
     private int npix = Constants.NUMBEROFPIXEL;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, short[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, inputKey, short[].class);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
 
-        short[] data = (short[]) input.get(key);
-        npix = (Integer) input.get("NPIX");
+        short[] data = (short[]) item.get(inputKey);
+        npix = (Integer) item.get("NPIX");
 
         short[] remapped = new short[data.length];
         remapFromSoftIdToChid(data, remapped);
 
-        input.put(outputKey, remapped);
-        return input;
+        item.put(outputKey, remapped);
+        return item;
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {
@@ -50,14 +50,5 @@ public class Remapping implements Processor{
             int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
             System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
         }
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public void setOutputKey(String outputkey) {
-        this.outputKey = outputkey;
     }
 }

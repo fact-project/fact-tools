@@ -22,8 +22,8 @@
     <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
     rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
     <fact.extraction.EstimateBaseline dataKey="DataCalibrated" outputKey="baseline" firstSlice="10" range="40" />
-    <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
-    <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
+    <fact.extraction.ArrivalTimeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
+    <fact.extraction.ArrivalTimePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
     <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxPos" threshold="1800" thresholdOutputKey="thresholdForToT" />
     <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold1000" firstSliceOverThresholdOutputKey="arrivalTimeTOT1000" positionsKey="maxPos" threshold="1000" thresholdOutputKey="thresholdForToT1000" />
     <fact.datacorrection.CorrectSaturation dataKey="DataCalibrated" outputKey="DataNoSat" totKey="timeOverThreshold" firstSliceOverThresholdKey="arrivalTimeTOT" threshold="1800" maxPosKey="maxPos" baselineKey="baseline" />

@@ -40,13 +40,13 @@
     rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
     rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
 />
-<fact.extraction.RisingEdgeForPositions
+<fact.extraction.ArrivalTimeForPositions
     dataKey="DataCalibrated"
     amplitudePositionsKey="maxPos"
     outputKey="arrivalTimePos"
     maxSlopesKey="maxSlopesPos"
 />
-<fact.extraction.RisingEdgePolynomFit
+<fact.extraction.ArrivalTimePolynomFit
     dataKey="DataCalibrated"
     risingEdgeKey="arrivalTimePos"
     outputKey="arrivalTime"

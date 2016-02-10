@@ -47,7 +47,7 @@ public class PixelSet implements CameraMapOverlay, Serializable {
     }
 
     public ArrayList<Integer> toArrayList(){
-        ArrayList<Integer> intSet = new ArrayList<Integer>();
+        ArrayList<Integer> intSet = new ArrayList<>();
         for (CameraPixel px : this.set){
             intSet.add(px.id);
         }
@@ -81,4 +81,12 @@ public class PixelSet implements CameraMapOverlay, Serializable {
 	public int getDrawRank() {		
 		return 1;
 	}
+
+
+    public static String name(String outputKey, String pixelSetKey, String feature){
+        if (outputKey == null){
+            return pixelSetKey + ":" + feature;
+        }
+        return outputKey;
+    }
 }
