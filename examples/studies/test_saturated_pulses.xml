@@ -31,7 +31,7 @@
     rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
     <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold" thresholdKey="thresholdForToT" outputKey="photonchargeSaturated" />
     <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold1000" thresholdKey="thresholdForToT1000" outputKey="photonchargeSaturated1000" />
-    <fact.extraction.IdentifyPixelAboveThreshold key="photoncharge" threshold="200" outputKey="pixelAbove200Pe" />
+    <fact.cleaning.IdentifyPixelAboveThreshold key="photoncharge" threshold="200" outputKey="pixelAbove200Pe" />
     <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
     <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
     <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
