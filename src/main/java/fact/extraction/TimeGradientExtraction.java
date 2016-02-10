@@ -34,18 +34,18 @@ public class TimeGradientExtraction extends BasicExtraction {
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 	
 	@Override
-	public Data process(Data input) {
+	public Data process(Data item) {
 		
-		Utils.mapContainsKeys(input, deltaKey, cogxKey, cogyKey, dataKey,
+		Utils.mapContainsKeys(item, deltaKey, cogxKey, cogyKey, dataKey,
 				timeGradientSlopeLongKey, timeGradientInterceptLongKey);
 		
-		double[] data = (double[]) input.get(dataKey);
-		double delta = (Double) input.get(deltaKey);
-		double cogx = (Double) input.get(cogxKey);
-		double cogy = (Double) input.get(cogyKey);
-		double slopeLong = (Double) input.get(timeGradientSlopeLongKey);
-		double interceptLong = (Double) input.get(timeGradientInterceptLongKey);
-		int roi = (Integer) input.get("NROI");
+		double[] data = (double[]) item.get(dataKey);
+		double delta = (Double) item.get(deltaKey);
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double slopeLong = (Double) item.get(timeGradientSlopeLongKey);
+		double interceptLong = (Double) item.get(timeGradientInterceptLongKey);
+		int roi = (Integer) item.get("NROI");
 		
 		int[] positions = new int[Constants.NUMBEROFPIXEL];
 		IntervalMarker[] markerPositions = new IntervalMarker[Constants.NUMBEROFPIXEL];
@@ -74,12 +74,12 @@ public class TimeGradientExtraction extends BasicExtraction {
 			markerEstNumPhotons[px] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
 		
-		input.put(maxAmplitudePositionsKey, positions);
-        input.put(maxAmplitudePositionsKey + "Marker", markerPositions);
-        input.put(estNumPhotonsKey, estNumPhotons);
-        input.put("@estNumPhotons", estNumPhotons);
-        input.put(estNumPhotonsKey + "Marker", markerEstNumPhotons);
+		item.put(maxAmplitudePositionsKey, positions);
+        item.put(maxAmplitudePositionsKey + "Marker", markerPositions);
+        item.put(estNumPhotonsKey, estNumPhotons);
+        item.put("@estNumPhotons", estNumPhotons);
+        item.put(estNumPhotonsKey + "Marker", markerEstNumPhotons);
 		
-		return input;
+		return item;
 	}
 }
