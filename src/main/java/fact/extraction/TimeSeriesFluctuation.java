@@ -22,7 +22,7 @@ import java.util.Random;
  * the resulting distribution.
  * Created by jbuss on 17.11.14.
  */
-public class WaveformFluctuation implements Processor {
+public class TimeSeriesFluctuation implements Processor {
     @Parameter(required = true)
     private String key = null;
 
@@ -45,7 +45,7 @@ public class WaveformFluctuation implements Processor {
     private long Seed = 5901;
 
     // A logger
-    static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
+    static Logger log = LoggerFactory.getLogger(TimeSeriesFluctuation.class);
 
     private int npix;
 

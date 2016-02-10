@@ -10,7 +10,7 @@
         outsetKey="pedestal" 
     />
         
-    <fact.extraction.WaveformFluctuation 
+    <fact.extraction.TimeSeriesFluctuation 
         key="DataCalibrated"
         pixelSetKey="pedestal"
         outputKey="Ped" 
