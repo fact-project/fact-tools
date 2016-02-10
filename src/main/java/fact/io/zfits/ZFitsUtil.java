@@ -22,7 +22,7 @@ public class ZFitsUtil {
 	 * Enumeration containing the diffrent types of datatypes supported by the fits format.
 	 * @author Michael Bulinski
 	 */
-	public static enum DataType {
+	public enum DataType {
 		NONE(' ', 0),
 		STRING('A', 1),
 		BOOLEAN('L', 1),
@@ -73,7 +73,7 @@ public class ZFitsUtil {
 	 * @throws IOException Thrown if something went wrong reading from input.
 	 */
 	public static List<String> readBlock(DataInputStream input) throws IOException {
-		List<String> block = new ArrayList<String>();
+		List<String> block = new ArrayList<>();
 		byte[] byteData = new byte[80];
 		boolean loadingBlocks = true;
 		while ( loadingBlocks ) {
@@ -179,11 +179,5 @@ public class ZFitsUtil {
 		ByteBuffer buffer = ByteBuffer.wrap(data);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		return buffer;
-	}
-	
-	public static void printByteArray(byte[] array) {
-		for (int i=0; i<array.length; i++) {
-			System.out.println(String.format("%8s", Integer.toBinaryString(array[i]&0xFF)).replace(' ', '0'));
-		}
 	}
 }
