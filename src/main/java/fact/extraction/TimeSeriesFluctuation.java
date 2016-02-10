@@ -29,16 +29,16 @@ public class TimeSeriesFluctuation implements Processor {
     @Parameter(required = false, defaultValue = "pixels:pedvar")
     private String outputKey = "pixels:pedvar";
 
-    @Parameter(description = "Number of slices to be skipped at the time series beginning", defaultValue = "35")
+    @Parameter(required = false, description = "Number of slices to be skipped at the time series beginning", defaultValue = "35")
     private int skipFirst = 35;
 
-    @Parameter(description = "Number of slices to be skipped at the time series end", defaultValue = "100")
+    @Parameter(required = false, description = "Number of slices to be skipped at the time series end", defaultValue = "100")
     private int skipLast = 100;
 
-    @Parameter(description = "Size of the integration window", defaultValue = "30")
+    @Parameter(required = false, description = "Size of the integration window", defaultValue = "30")
     private int windowSize = 30;
 
-    @Parameter(description = "Seed of the random number generator", defaultValue="5901")
+    @Parameter(required = false, description = "Seed of the random number generator", defaultValue="5901")
     private long Seed = 5901;
 
     // A logger
