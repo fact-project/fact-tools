@@ -21,19 +21,19 @@ public class Distance implements Processor {
 	private String cogxKey = "shower:ellipse:cog:x";
 	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y")
 	private String cogyKey = "shower:ellipse:cog:y";
-	@Parameter(required = false, defaultValue="sourcePosition:x")
-	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition:y")
-	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="source:x")
+	private String sourcexKey = "source:x";
+	@Parameter(required = false, defaultValue="source:y")
+	private String sourceyKey = "source:y";
 	@Parameter(required = false, defaultValue="shower:source:distance")
 	private String outputKey = "shower:source:distance";
 
 	@Override
 	public Data process(Data item) {
-		Utils.mapContainsKeys( item, cogxKey, cogyKey, sourcePositionXKey, sourcePositionYKey);
+		Utils.mapContainsKeys( item, cogxKey, cogyKey, sourcexKey, sourceyKey);
 
-		double sourcex = (Double) item.get(sourcePositionXKey);
-		double sourcey = (Double) item.get(sourcePositionYKey);
+		double sourcex = (Double) item.get(sourcexKey);
+		double sourcey = (Double) item.get(sourceyKey);
 
 		double cogx = (Double) item.get(cogxKey);
 		double cogy = (Double) item.get(cogyKey);

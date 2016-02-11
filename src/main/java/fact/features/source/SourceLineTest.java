@@ -16,15 +16,14 @@ public class SourceLineTest implements Processor{
 
 	@Parameter(required = false, defaultValue = "pixels:estNumPhotons", description = "Key of photoncharge array.")
 	private String estNumPhotonsKey = "pixels:estNumPhotons";
-	//consider the error of the arrival time later...
 	@Parameter(required = false, defaultValue = "pixels:arrivalTimes", description = "Key of arrivaltime array.")
 	private String arrivalTimesKey = "pixels:arrivalTimes";
 	@Parameter(required = false, defaultValue = "shower", description = "Key of showerpixel array.")
 	private String pixelSetKey = "shower";
-	@Parameter(required = false, defaultValue="sourcePosition:x")
-	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition:y")
-	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="source:x")
+	private String sourcexKey = "source:x";
+	@Parameter(required = false, defaultValue="source:y")
+	private String sourceyKey = "source:y";
 	@Parameter(required = false, defaultValue = "shower:sourceLineTest", description = "Master outputkey, which will be written before every attribute.")
 	private String outputKey = "shower:sourceLineTest";
 
@@ -34,15 +33,15 @@ public class SourceLineTest implements Processor{
 	@Override
 	public Data process(Data item)
 	{
-		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimesKey, pixelSetKey, sourcePositionXKey, sourcePositionYKey);
+		Utils.mapContainsKeys( item, estNumPhotonsKey, arrivalTimesKey, pixelSetKey, sourcexKey, sourceyKey);
 		
 		double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
 		double[] arrivalTimes = (double[]) item.get(arrivalTimesKey);
 
 		int[] shower = ((PixelSet) item.get(pixelSetKey)).toIntArray();
 
-		double sourcex = (Double) item.get(sourcePositionXKey);
-		double sourcey = (Double) item.get(sourcePositionYKey);
+		double sourcex = (Double) item.get(sourcexKey);
+		double sourcey = (Double) item.get(sourceyKey);
 		
 		// output variables set to NaN, so if the values cannot be calculated, NaN will be put in the data item
 		double sourceLineTestValueProjected = Double.NaN;
