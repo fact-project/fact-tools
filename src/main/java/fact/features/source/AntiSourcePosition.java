@@ -41,7 +41,7 @@ public class AntiSourcePosition implements Processor {
 		antisourcey = sourcex * Math.sin(rotAngle) + sourcey * Math.cos(rotAngle);
 		
 		if (outputKey == null){
-			outputKey = "antiSourecPosition:"+ antiSourcePositionId;
+			outputKey = "antiSources:"+ antiSourcePositionId;
 		}
 				
 		item.put(outputKey + ":x", antisourcex);
