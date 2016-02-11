@@ -12,26 +12,28 @@ import stream.annotations.Parameter;
 public class PreviousEventInfo implements Processor {
 	static Logger log = LoggerFactory.getLogger(PreviousEventInfo.class);
 	
-	@Parameter(required=true)
-	String startCellKey = null;
-	@Parameter(required=true)
-	String outputKey=null;
-	
+	@Parameter(required=false, defaultValue = "meta:startCellData",
+				description = "Key of the StartCellData in the data fits file")
+	String startCellKey = "meta:startCellData";
+	@Parameter(required=false, defaultValue = "meta:prevEvents",
+				description = "Outputkey for the previous events Key")
+	String outputKey = "meta:prevEvents";
+	@Parameter(required=false, defaultValue = "20")
 	int limitEvents=20;
 	
 	PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();
 	
 
 	@Override
-	public Data process(Data input) {
+	public Data process(Data item) {
 		
-		Utils.isKeyValid(input, startCellKey, short[].class);
-		Utils.isKeyValid(input, "NROI", Integer.class);
-		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
+		Utils.isKeyValid(item, startCellKey, short[].class);
+		Utils.isKeyValid(item, "NROI", Integer.class);
+		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
 				
-		int[] eventTime = (int[]) input.get("UnixTimeUTC");
-		short[] startCellArray = (short[])input.get(startCellKey);
-		int length = (Integer) input.get("NROI");
+		int[] eventTime = (int[]) item.get("UnixTimeUTC");
+		short[] startCellArray = (short[])item.get(startCellKey);
+		int length = (Integer) item.get("NROI");
 		
 		short[] stopCellArray = new short[startCellArray.length];
 		//calculate the stopcellArray for the current event
@@ -47,8 +49,8 @@ public class PreviousEventInfo implements Processor {
 			previousEventInfo.removeLastInfo();
 		}
 		
-		input.put(outputKey, previousEventInfo);
-		return input;
+		item.put(outputKey, previousEventInfo);
+		return item;
 	}
 
 	public String getStartCellKey() {

@@ -3,8 +3,8 @@ package fact.parameter;
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
-import fact.extraction.RisingEdgeForPositions;
-import fact.features.DistributionFromShower;
+import fact.features.EllipseParameter;
+import fact.extraction.ArrivalTimeForPositions;
 import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FitsStream;
@@ -61,26 +61,16 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-		URL drsUrl = FitsStreamTest.class
-				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey(key);
         pr.init(null);
 		pr.process(item);
 		
 		BasicExtraction bE = new BasicExtraction();
-		bE.setDataKey(key);
-		bE.setOutputKeyMaxAmplPos(positions);
-		bE.setOutputKeyPhotonCharge(photonCharge);
 		bE.setUrl(new SourceURL(FitsStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 		bE.process(item);
 		
-		RisingEdgeForPositions pR = new RisingEdgeForPositions();
-		pR.setDataKey(key);
-		pR.setAmplitudePositionsKey(positions);
-		pR.setOutputKey(arrivalTime);
+		ArrivalTimeForPositions pR = new ArrivalTimeForPositions();
 		pR.process(item);
 
 		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
@@ -96,16 +86,13 @@ public class ParameterTest {
 
 
 
-        DistributionFromShower dist = new DistributionFromShower();
-        dist.setPixelSetKey(shower);
-        dist.setWeightsKey(photonCharge);
-        dist.setOutputKey(distribution);
+        EllipseParameter dist = new EllipseParameter();
+        dist.pixelSetKey = shower;
+        dist.estNumPhotonsKey = photonCharge;
+        dist.outputKey = distribution;
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();
-        pos.setX(0.0);
-        pos.setY(0.0);
-        pos.setOutputKey(sourcePosition);
         pos.init(null);
         pos.process(item);
     }

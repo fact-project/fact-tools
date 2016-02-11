@@ -1,59 +1,49 @@
 package fact.features.source;
 
-import fact.container.PixelDistribution2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fact.Utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 /**
- * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution
- * (aka the shower ellipse) I have no idea.
+ * This processor calculates the angle between the main axis of the shower and the line cog <-> sourcePosition
  * 
- *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;Fabian Temme
  * 
  */
 public class Alpha implements Processor {
 	static Logger log = LoggerFactory.getLogger(Alpha.class);
-	@Parameter(required=true)
-	private String distribution = null;
-	@Parameter(required=true)
-	private String sourcePosition = null;
-	@Parameter(required=true)
-	private String outputKey = null;
+
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x")
+	private String cogxKey = "shower:ellipse:cog:x";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y")
+	private String cogyKey = "shower:ellipse:cog:y";
+	@Parameter(required = false, defaultValue = "shower:ellipse:delta")
+	private String deltaKey = "shower:ellipse:delta";
+	@Parameter(required = false, defaultValue="sourcePosition:x")
+	private String sourcePositionXKey = "sourcePosition:x";
+	@Parameter(required = false, defaultValue="sourcePosition:y")
+	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="shower:source:alpha")
+	private String outputKey = "shower:source:alpha";
 	
 	@Override
-	public Data process(Data input) {
-		PixelDistribution2D dist;
-		try{
-			dist = (PixelDistribution2D) input.get(distribution);
-			if(dist ==  null){
-				log.info("No showerpixel in this event. Not calculating alpha");
-				return input;
-			}
-		} catch (ClassCastException e){
-			log.error("distribution is not of type PixelDistribution2D. Aborting");
-			return null;
-		}
+	public Data process(Data item) {
+		
+		Utils.mapContainsKeys(item, sourcePositionXKey, sourcePositionYKey, cogxKey, cogyKey, deltaKey);
 
+		double sourcex = (Double) item.get(sourcePositionXKey);
+		double sourcey = (Double) item.get(sourcePositionYKey);
 
-		double[] source = null;
-		try{
-			source  = (double[]) input.get(sourcePosition);
-			if(source ==  null){
-				throw new RuntimeException("This event didnt have a sourceposition. Eventnumber: " + input.get("EventNum"));
-			}
-		} catch (ClassCastException e){
-			log.error("wrong types" + e.toString());
-		}
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double delta = (Double) item.get(deltaKey);
 
 		double alpha = 0.0;
-        //TODO: this might throw an NPE for source[1]
-	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
-	
-	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;
-	
-	    alpha                  =  (dist.getAngle() - auxiliary_angle);
+	    double auxiliary_angle  = Math.atan( (sourcey - cogy )/(sourcex - cogx) );
+	    alpha                  =  (delta - auxiliary_angle);
 	
 	    if (alpha > Math.PI / 2)
 	    {
@@ -63,37 +53,7 @@ public class Alpha implements Processor {
 	    {
 	        alpha              = Math.PI + alpha;
 	    }
-	    input.put(outputKey, alpha);
-		return input;
+	    item.put(outputKey, alpha);
+		return item;
 	}
-
-	
-	
-	public String getDistribution() {
-		return distribution;
-	}
-	public void setDistribution(String distribution) {
-		this.distribution = distribution;
-	}
-
-
-
-	public String getSourcePosition() {
-		return sourcePosition;
-	}
-
-	public void setSourcePosition(String sourcePosition) {
-		this.sourcePosition = sourcePosition;
-	}
-
-
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-
 }

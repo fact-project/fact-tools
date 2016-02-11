@@ -5,68 +5,61 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PatchAverage implements Processor {
     static Logger log = LoggerFactory.getLogger(PatchAverage.class);
 
+    @Parameter(description = "Key pointing to the input array with length npix or npix * roi", required = true)
     String key=null;
+    @Parameter(description = "Key for the output array, if not given, '<key>:patchAverage' is used", required = false)
     String outputKey=null;
+    @Parameter(required = false, description="If true, ignore the 9th channel of each patch, which contains the timemarker", defaultValue="true")
+    boolean ignoreTimeMarker = true;
 
-    String color = null;
+    int usablePixelsPerPatch = 9;
+
 
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        // TODO Auto-generated method stub
-        Utils.mapContainsKeys( input, key);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.mapContainsKeys( item, key);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
 
-        double[] data = (double[])input.get(key);
+        if (outputKey == null){
+            outputKey = key + ":patchAverage";
+        }
+
+        npix = (Integer) item.get("NPIX");
+
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
+
+        if (ignoreTimeMarker){
+            usablePixelsPerPatch = 8;
+        }
 
         int numberOfPatches = npix / 9;
         int currentRoi = data.length / npix;
 
-        for (int patch = 0 ; patch < numberOfPatches ; patch++)
-        {
-            for (int sl = 0 ; sl < currentRoi ; sl++)
-            {
-                for (int px = 0 ; px < 8 ; px++)
-                {
-                    int slice = (patch*9+px)*currentRoi+sl;
-                    result[patch*9*currentRoi+sl] += data[slice];
+        for (int patch = 0; patch < numberOfPatches; patch++){
+            for (int sl = 0; sl < currentRoi; sl++){
+
+                for (int px = 0 ; px < usablePixelsPerPatch ; px++){
+                    int slice = (patch * 9 + px) * currentRoi + sl;
+                    result[patch * 9 * currentRoi + sl] += data[slice];
                 }
-                result[patch*9*currentRoi+sl] /= 8;
-                for (int px = 0 ; px < 9 ; px++)
-                {
-                    int slice = (patch*9+px)*currentRoi+sl;
+                result[patch * 9 * currentRoi + sl] /= 9;
+
+                for (int px = 0 ; px < 9 ; px++){
+                    int slice = (patch * 9 + px) * currentRoi + sl;
                     result[slice] = result[patch*9*currentRoi+sl];
                 }
             }
         }
-        input.put(outputKey,result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
     }
-    public String getKey() {
-        return key;
-    }
-    public void setKey(String key) {
-        this.key = key;
-    }
-    public String getOutputKey() {
-        return outputKey;
-    }
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-    public String getColor() {
-        return color;
-    }
-    public void setColor(String color) {
-        this.color = color;
-    }
-
 }

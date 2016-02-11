@@ -17,14 +17,19 @@ import java.net.URL;
 public class DrsTimeCalibration implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 	
-	@Parameter(required=false,description="Key of the StartCellData in the data fits file",defaultValue="StartCellData")
-	private String startCellKey = "StartCellData";
-	@Parameter(required=true,description="Key of the time calibration constants (relative to the start cell of each pixel)")
-	private String outputKey = null;
-	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
+	@Parameter(required=false, defaultValue="StartCellData",
+			description="Key of the StartCellData in the data fits file")
+	private String startCellKey = "meta:startCellData";
+	@Parameter(required=false, defaultValue="meta:timeCalibConst",
+			description="Key of the time calibration constants (relative to the start cell of each pixel)")
+	private String outputKey = "meta:timeCalibConst";
+	@Parameter(required=false, defaultValue="CellOffset",
+			description="name of column in FITS file to find DRS4 time calibration constants.")
 	private String drsTimeKey = "CellOffset";
-	@Parameter(required = false, description = "file with the drs time calib constants", defaultValue="classpath:/long_term_constants_median.time.drs.fits")
-	private SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
+	@Parameter(required = false, defaultValue="classpath:/long_term_constants_median.time.drs.fits",
+			description = "file with the drs time calib constants")
+	private SourceURL url = new SourceURL(
+			DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
@@ -47,13 +52,13 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	}
 
 	@Override
-	public Data process(Data input) {
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		Utils.mapContainsKeys(input, startCellKey, "NROI");
+	public Data process(Data item) {
+		Utils.isKeyValid(item, "NPIX", Integer.class);
+		Utils.mapContainsKeys(item, startCellKey, "NROI");
 		
-		npix = (Integer) input.get("NPIX");
-		int roi = (Integer) input.get("NROI");
-		short[] startCell = (short[]) input.get(startCellKey);
+		npix = (Integer) item.get("NPIX");
+		int roi = (Integer) item.get("NROI");
+		short[] startCell = (short[]) item.get(startCellKey);
 		if (startCell==null) {
 			throw new RuntimeException("Couldn't find StartCellData");
 		}
@@ -67,8 +72,8 @@ public class DrsTimeCalibration implements StatefulProcessor{
 			}
 		}
 		
-		input.put(outputKey, relativeTimeOffsets);
-		return input;
+		item.put(outputKey, relativeTimeOffsets);
+		return item;
 	}
 		
 	protected void loadDrsTimeCalibConstants(SourceURL  in) {
@@ -95,31 +100,6 @@ public class DrsTimeCalibration implements StatefulProcessor{
 			throw new RuntimeException(e.getMessage());
 		}
 	}
-
-	public void setStartCellKey(String startCellKey) {
-		this.startCellKey = startCellKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setNumberOfSlices(int numberOfSlices) {
-		this.numberOfSlices = numberOfSlices;
-	}
-
-	public void setNumberOfTimemarker(int numberOfTimemarker) {
-		this.numberOfTimemarker = numberOfTimemarker;
-	}
-
-	public void setUrl(SourceURL url) {
-		this.url = url;
-	}
-
-	public void setDrsTimeKey(String drsTimeKey) {
-		this.drsTimeKey = drsTimeKey;
-	}
-
 
 	@Override
 	public void resetState() throws Exception {

@@ -2,7 +2,6 @@ package fact.io.zfits;
 
 
 import fact.Utils;
-import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -19,36 +18,32 @@ import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * The ZfitsReader can read FITS files containing raw dat as recorded by the FACT telescope DAQ. It also reads FITS files written
+ * by the Monte Carlo simulation program CERES. It can decompress binary tables which have been compressed according to the ZFITS
+ * standard. See http://arxiv.org/abs/1506.06045.
+ *
+ */
 public class ZFitsStream extends AbstractStream{
-
-    private boolean hasReadCalibrationConstants = false;
+    static Logger log = LoggerFactory.getLogger(ZFitsStream.class);
 
     @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
-    public void setBufferSize(int bufferSize) {
-        this.bufferSize = bufferSize;
-    }
-
+    public int bufferSize = 2880;
 
     @Parameter(required = false, description = "This value defines which table of the ZFitsfile should be read.", defaultValue = "Events")
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
+    public String tableName = "Events";
 
-    static Logger log = LoggerFactory.getLogger(ZFitsStream.class);
-    private int bufferSize = 2880;
-
-    private DataInputStream dataStream;
     private Data headerItem = DataFactory.create();
-    private String tableName = "Events";
-    private ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
+
 
     private ZFitsTable fitsTable = null;
 
     private TableReader tableReader = null;
 
-    private short[] calibrationConstants;
+    private short[] calibrationConstants =  null;
 
     public void applyDrsOffsetCalib(int numSlices, int numChannel, short[] data, short[] startCellData, short[] calibrationConstants) throws IllegalArgumentException {
         if (data==null || data.length != numSlices*numChannel)
@@ -79,53 +74,81 @@ public class ZFitsStream extends AbstractStream{
     public void init() throws Exception {
         super.init();
         this.count = 0L;
-        log.info("Read file: {}", this.url.getFile());
+        log.info("Reading file: {}", this.url.getFile());
         File f = new File(this.url.getFile());
         if (!f.canRead()){
             log.error("Cannot read file. Wrong path? ");
             throw new FileNotFoundException("Cannot read file");
         }
-        this.dataStream = new DataInputStream(new BufferedInputStream(getInputStream(), bufferSize ));
 
-        //get calibration constants
-        this.dataStream.mark(10000000);
-        try {
-            if(!this.hasReadCalibrationConstants) {
-                this.calibrationConstants = readCalibrationConstants(this.url);
+        DataInputStream dataStream = new DataInputStream(new BufferedInputStream(url.openStream(), bufferSize));
+        dataStream.mark(2000000);
+        //read the header and output some information
+        List<String> block = ZFitsUtil.readBlock(dataStream);
+        FitsHeader header = new FitsHeader(block);
+        if (header.getKeyValue("SIMPLE").equals("T")){
+            log.debug("Header claims this file conforms to FITS standard");
+        }
+        if (header.getKeyValue("EXTEND").equals("T")){
+            log.debug("This file may contain extensions");
+        }
+
+        //read the second header
+        block = ZFitsUtil.readBlock(dataStream);
+        FitsHeader secondHeader = new FitsHeader(block);
+        if(secondHeader.check("ZTABLE", FitsHeader.ValueType.BOOLEAN, "T")){
+            log.info("File is ZFITS compresssed.");
+        }
+        if (! secondHeader.check("PCOUNT", FitsHeader.ValueType.INT)){
+            log.warn("Invalid header format in file. Trying to read anyway.");
+        }
+        if(secondHeader.check("EXTNAME", FitsHeader.ValueType.STRING, "ZDrsCellOffsets")){
+            log.info("File contains ZDrsCellOffsets.");
+            ZFitsTable offsetTable = new ZFitsTable(secondHeader);
+            TableReader reader = BinTableReader.createTableReader(offsetTable, dataStream);
+            byte[][] bytes = reader.readNextRow();
+
+            ByteOrder order = offsetTable.isCompressed ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+            Data offsetsItem =  readDataFromBytes(bytes, offsetTable, order);
+
+            if (offsetsItem.containsKey("OffsetCalibration")){
+                this.calibrationConstants = (short[]) offsetsItem.get("OffsetCalibration");
+            } else {
+                throw new RuntimeException("OffsetCalibration constants not found in data file.");
             }
-        } catch (MissingArgumentException e){
-            log.info("Reading standard .fits file.");
         }
 
 
-
         //reset to old mark and read the event table
-        this.dataStream.reset();
-        this.fitsTable = ZFitsUtil.skipToTable(this.dataStream, this.tableName);
+        dataStream.reset();
+        this.fitsTable = ZFitsUtil.skipToTable(dataStream, this.tableName);
+        this.headerItem = createHeaderItem(fitsTable);
+        //create the reader
+        this.tableReader = BinTableReader.createTableReader(this.fitsTable, dataStream);
+    }
 
-        log.info("Found Table " + tableName);
-
+    private Data createHeaderItem(ZFitsTable fitsTable) {
         // create headerItem
-        // add all key value pairs which are not the column information TODO finish extracting column information
-        for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : this.fitsTable.getFitsHeader().getKeyMap().entrySet()) {
+        // add all key value pairs which are not the column information
+        Data item = DataFactory.create();
+        for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : fitsTable.getFitsHeader().getKeyMap().entrySet()) {
             String key   = entry.getKey();
             String value = entry.getValue().getValue();
 
             //ignore several information about the columns
             if ( key_in_ignore_list(key) ){
-                //log.info("ignore:" + key);
                 continue;
             }
 
             switch(entry.getValue().getType()) {
                 case BOOLEAN:
                     if (value.equals("T"))
-                        this.headerItem.put(key, Boolean.TRUE);
+                        item.put(key, Boolean.TRUE);
                     else
-                        this.headerItem.put(key, Boolean.FALSE);
+                        item.put(key, Boolean.FALSE);
                     break;
                 case FLOAT:
-                    this.headerItem.put(key, Float.parseFloat(value));
+                    item.put(key, Float.parseFloat(value));
                     break;
                 case INT:
                     // BUGFIX:
@@ -141,87 +164,63 @@ public class ZFitsStream extends AbstractStream{
                     keysListWithLargeValues.add("NTRGPED");
                     if (keysListWithLargeValues.contains(key))
                     {
-                        this.headerItem.put(key, Long.parseLong(value));
+                        item.put(key, Long.parseLong(value));
                     }
                     else
                     {
-                        this.headerItem.put(key, Integer.parseInt(value));
+                        item.put(key, Integer.parseInt(value));
                     }
                     break;
                 case STRING:
-                    this.headerItem.put(key, value);
+                    item.put(key, value);
                     break;
                 default:
                     break;
             }
         }
         //insert filename
-        this.headerItem.put("@source", this.url.getProtocol() + ":" + this.url.getPath());
-
-        //create the reader
-        this.tableReader = BinTableReader.createTableReader(this.fitsTable, this.dataStream);
-
-        if (this.fitsTable.getCommpressed()) {
-            this.byteOrder = ByteOrder.LITTLE_ENDIAN;
-        } else {
-            this.byteOrder = ByteOrder.BIG_ENDIAN;
-        }
+        item.put("@source", this.url.getProtocol() + ":" + this.url.getPath());
+        return item;
     }
-
-    private short[] readCalibrationConstants(SourceURL url) throws Exception {
-        short[] constants;
-        ZFitsStream drsStream = new ZFitsStream(url);
-        drsStream.hasReadCalibrationConstants = true;
-        drsStream.setTableName("ZDrsCellOffsets");
-        try{
-            drsStream.init();
-        } catch (MissingArgumentException e) {
-            log.error("No ZDrsCellOffsets found in file.");
-            throw e;
-        }
-        Data item = drsStream.read();
-        if (!item.containsKey("OffsetCalibration"))
-            throw new NullPointerException("Missing OffsetCalibration");
-        constants = (short[])item.get("OffsetCalibration");
-        if (constants == null) {
-            throw new NullPointerException("Should not happen");
-        }
-        return constants;
-    }
-
 
     @Override
     public Data readNext() throws Exception {
-        Data item = DataFactory.create(headerItem);
 
-        if (this.tableReader == null)
+        if (this.tableReader == null) {
             throw new NullPointerException("Didn't initialize the reader, should never happen.");
-        //get the next row of data if zero we finished
+        }
+        //get the next row of data. When its null the file has ended
         byte[][] dataRow = this.tableReader.readNextRow();
-        if (dataRow == null)
+        if (dataRow == null) {
+            log.info("File {} ended.", url.getFile());
             return null;
+        }
+        ByteOrder order = this.fitsTable.isCompressed ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+        Data item = readDataFromBytes(dataRow, this.fitsTable, order);
+        item.putAll(headerItem);
 
-        item = readDataFromBytes(item, dataRow, this.fitsTable, this.byteOrder);
-
-
-        if(this.fitsTable.getCommpressed() && !this.hasReadCalibrationConstants){
+        if( this.fitsTable.isCompressed && (this.calibrationConstants != null)){
             Utils.mapContainsKeys(item, "Data", "StartCellData", "NROI", "NPIX");
             short[] data = ((short[])item.get("Data"));
             short[] startCellData = (short[])item.get("StartCellData");
             int roi = (Integer) item.get("NROI");
             int numberOfPixel = (Integer) item.get("NPIX");
 
-//            if (calibData==null)
-//                throw new NullPointerException("Should not happen");
-
             applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
-            item.put("Data", data);
+
+            item.put("raw:data", data);
+        } else {
+            Utils.mapContainsKeys(item, "Data");
+            short[] data = ((short[])item.get("Data"));
+            item.put("raw:data", data);
         }
-//		log.debug(item.toString());
+
         return item;
     }
 
-    private Data readDataFromBytes(Data item, byte[][] dataRow, ZFitsTable table, ByteOrder byteOrder) throws ParseException {
+    private Data readDataFromBytes(byte[][] dataRow, ZFitsTable table, ByteOrder byteOrder) throws ParseException {
+        Data item = DataFactory.create();
+
         //read the desired columns
         for (int colIndex=0; colIndex<table.getNumCols(); colIndex++) {
             byte[] data = dataRow[colIndex];
@@ -248,8 +247,7 @@ public class ZFitsStream extends AbstractStream{
                         item.put(columnInfo.getId(), b);
                     } else {
                         byte[] bArray = new byte[columnInfo.getNumEntries()];
-                        for (int i=0; i<bArray.length; i++)
-                            bArray[i] = data[i];
+                        System.arraycopy(data, 0, bArray, 0, bArray.length);
                         item.put(columnInfo.getId(), bArray);
                     }
                     break;

@@ -22,37 +22,36 @@ public class RemappingKeys implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
         if(keys == null)
         {
             log.error("No key specified");
             throw new RuntimeException("You have to specify the key to remap");
         }
-        for (int i = 0;i<keys.length;i++)
-        {
-            String key = keys[i];
-            Serializable value = null;
-            if(input.containsKey(key))
+        for (String key : keys){
+            Serializable value;
+            if(item.containsKey(key))
             {
-                value = input.get(key);
+                value = item.get(key);
             }
             else
             {
                 throw new RuntimeException("Could not get key: "+ key + " from data item");
             }
-            Object arrayInSoftID = null;
-            Object arrayInCHID = null;
+            Object arrayInSoftID;
+            Object arrayInCHID;
             if (value.getClass().isArray())
             {
     //          
                 Class<?> type = value.getClass().getComponentType();
-                int length = 0;
+                int length;
                 if(type == float.class)
                 {
                     float[] temp = ((float[]) value);
                     length = temp.length;
+                    ///TODO: why is this instanciated and overwritten emediately, docu?
                     arrayInSoftID = Array.newInstance(type,length);
                     arrayInSoftID = temp;
                     arrayInCHID = Array.newInstance(type,length);
@@ -61,6 +60,7 @@ public class RemappingKeys implements Processor {
                 {
                     double[] temp = ((double[]) value);
                     length = temp.length;
+                    ///TODO: why is this instanciated and overwritten emediately, docu?
                     arrayInSoftID = Array.newInstance(type,length);
                     arrayInSoftID = temp;
                     arrayInCHID = Array.newInstance(type,length);
@@ -69,6 +69,7 @@ public class RemappingKeys implements Processor {
                 {
                     int[] temp = ((int[]) value);
                     length = temp.length;
+                    ///TODO: why is this instanciated and overwritten emediately, docu?
                     arrayInSoftID = Array.newInstance(type,length);
                     arrayInSoftID = temp;
                     arrayInCHID = Array.newInstance(type,length);
@@ -77,6 +78,7 @@ public class RemappingKeys implements Processor {
                 {
                     String[] temp = ((String[]) value);
                     length = temp.length;
+                    ///TODO: why is this instanciated and overwritten emediately, docu?
                     arrayInSoftID = Array.newInstance(type,length);
                     arrayInSoftID = temp;
                     arrayInCHID = Array.newInstance(type,length);
@@ -100,20 +102,8 @@ public class RemappingKeys implements Processor {
                 System.arraycopy(arrayInSoftID, softId, arrayInCHID, chid, 1 );
             }
             // TODO Auto-generated method stub
-            input.put(key,(Serializable) arrayInCHID);
+            item.put(key,(Serializable) arrayInCHID);
         }
-        return input;
+        return item;
     }
-    
-
-    public String[] getKeys() {
-        return keys;
-    }
-
-
-    public void setKeys(String keys[]) {
-        this.keys = keys;
-    }
-
-
 }

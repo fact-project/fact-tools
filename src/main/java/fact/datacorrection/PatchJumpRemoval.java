@@ -21,19 +21,20 @@ import stream.annotations.Parameter;
 public class PatchJumpRemoval implements Processor {
 	static Logger log = LoggerFactory.getLogger(PatchJumpRemoval.class);
 	
-	@Parameter(required=true)
-	String dataKey=null;
-	@Parameter(required=true)
-	String outputKey=null;
+	@Parameter(required=false, defaultValue = "raw:dataCalibrated")
+	String dataKey 		= "raw:dataCalibrated";
+	@Parameter(required=false, defaultValue = "raw:dataCalibrated")
+	String outputKey	= "raw:dataCalibrated";
+	@Parameter(required=false, defaultValue = "meta:prevEvents")
+	String prevEventsKey= "meta:prevEvents";
+	@Parameter(required=false, defaultValue = "StartCellData",
+                description = "Key of the StartCellData in the data fits file")
+	String startCellKey = "StartCellData";
+	@Parameter(required=false, defaultValue = "2.0")
+	double jumpLimit   = 2.0;
 	@Parameter(required=false, description = "Useful for jump studies")
 	String outputJumpsKey=null;
-	@Parameter(required=true)
-	String prevEventsKey=null;
-	@Parameter(required=true)
-	String startCellKey=null;
-	@Parameter(required=true)
-	double jumpLimit=5.0;
-	
+
 	int leftBorder = 10;
 	
 	double spikeLimit = 7.0;
@@ -63,22 +64,22 @@ public class PatchJumpRemoval implements Processor {
 	JumpInfos jumpInfos;
 	
 	@Override
-	public Data process(Data input) {
+	public Data process(Data item) {
 		
-		Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, prevEventsKey, PreviousEventInfoContainer.class);
-		Utils.isKeyValid(input, startCellKey, short[].class);
-		Utils.isKeyValid(input, "NROI", Integer.class);
-		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
+		Utils.isKeyValid(item, dataKey, double[].class);
+		Utils.isKeyValid(item, prevEventsKey, PreviousEventInfoContainer.class);
+		Utils.isKeyValid(item, startCellKey, short[].class);
+		Utils.isKeyValid(item, "NROI", Integer.class);
+		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+		Utils.isKeyValid(item, "NPIX", Integer.class);
 		
 		// Get variables out of data item
-		npix = (Integer) input.get("NPIX");
-		int[] currentTime = (int[]) input.get("UnixTimeUTC");
-		roi = (Integer) input.get("NROI");
-		short[] currentStartCells = (short[]) input.get(startCellKey);
-		double[] data = (double[]) input.get(dataKey);
-		PreviousEventInfoContainer prevEventInfo = (PreviousEventInfoContainer) input.get(prevEventsKey);
+		npix = (Integer) item.get("NPIX");
+		int[] currentTime = (int[]) item.get("UnixTimeUTC");
+		roi = (Integer) item.get("NROI");
+		short[] currentStartCells = (short[]) item.get(startCellKey);
+		double[] data = (double[]) item.get(dataKey);
+		PreviousEventInfoContainer prevEventInfo = (PreviousEventInfoContainer) item.get(prevEventsKey);
 		
 		double[] result = new double[data.length];
 		System.arraycopy(data, 0, result, 0, data.length);
@@ -91,7 +92,7 @@ public class PatchJumpRemoval implements Processor {
 		
 		// Loop over all previous Events
 		int prevEvent=1; // we start at 1, cause the startcells of the current Event are already filled in the prevEventInfo
-		for ( ; prevEvent < prevEventInfo.getListSize() && stopLoop == false ; prevEvent++)
+		for ( ; prevEvent < prevEventInfo.getListSize() && !stopLoop ; prevEvent++)
 		{
 			short[] currPrevStartCells = prevEventInfo.getPrevStartCells(prevEvent);
 			short[] currPrevStopCells = prevEventInfo.getPrevStoppCells(prevEvent);
@@ -124,9 +125,9 @@ public class PatchJumpRemoval implements Processor {
 						posInROI=true;
 					}
 				}
-				if (posInROI == true)
+				if (posInROI)
 				{
-					if (addJumpInfos == true)
+					if (addJumpInfos)
 					{
 						jumpInfos.addPosMarkerForPatch(patch,pos,isStartCell);
 					}
@@ -142,15 +143,15 @@ public class PatchJumpRemoval implements Processor {
 					double jumpHeight = checkForJump(patch,pos,patchDerivationAverage,isStartCell);
 					if (jumpHeight != 0)
 					{
-						boolean isJump=false;
+						boolean isJump;
 						isJump = checkForSignalFlank(patch, pos, patchDerivationAverage,isStartCell, jumpHeight);
-						if (isJump == true)
+						if (isJump)
 						{
 							jumpHeight = checkForRingingFFT(patch,pos,patchAverage,patchDerivationAverage,jumpHeight,jumpInfos);
 							if (jumpHeight != 0)
 							{
 								isJump = checkForTimeDependency(patch, deltaT,jumpHeight,jumpInfos);
-								if (isJump == true)
+								if (isJump)
 								{
 									stopLoop = false;
 									result = correctJump(patch, pos, isStartCell, result, jumpHeight);
@@ -164,28 +165,28 @@ public class PatchJumpRemoval implements Processor {
 					stopLoop = false;
 				}
 			}
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
-				jumpInfos.addInfosToDataItem(input, prevEvent, outputJumpsKey, deltaT);
+				jumpInfos.addInfosToDataItem(item, prevEvent, outputJumpsKey, deltaT);
 			}
 		}
-		input.put(outputKey,result);
+		item.put(outputKey,result);
 		
-		return input;
+		return item;
 		
 	}
 	
 	/**
 	 * Checks if there are spikes directly in front of the jump and/or after the jump. Correct this jump if necessary
-	 * @param patch
-	 * @param pos
-	 * @return 
+	 * @param patch patch number
+	 * @param pos Position in data array
+	 * @return data array
 	 */
 	public double[] HandleSpike(int patch, int pos, double[] result, JumpInfos jumpInfo){
 		
 		for (int px = 0 ; px < 8 ; px++)
 		{
-			int pixel = patch*9+px;	
+			int pixel = patch*9+px;
 			// Check for a double spike in front of the jump
 			// properties of a double spike: large jump up, small step, large jump down
 			double diff = result[pixel*roi+pos-1] - result[pixel*roi+pos-2];
@@ -198,7 +199,7 @@ public class PatchJumpRemoval implements Processor {
 						double correctionValue = (result[pixel*roi+pos-3] + result[pixel*roi+pos-2]) / 2.0;
 						result[pixel*roi+pos-1] = correctionValue;
 						result[pixel*roi+pos] = correctionValue;
-						if (addJumpInfos == true)
+						if (addJumpInfos)
 						{
 							jumpInfo.addPixelWithSpikes(pixel);
 						}
@@ -218,7 +219,7 @@ public class PatchJumpRemoval implements Processor {
 						correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 						// and correct pos+1 with the average of the following two slices:
 						result[pixel*roi+pos+1] = correctionValue;
-						if (addJumpInfos == true)
+						if (addJumpInfos)
 						{
 							jumpInfo.addPixelWithSpikes(pixel);
 						}
@@ -236,7 +237,7 @@ public class PatchJumpRemoval implements Processor {
 						double correctionValue = (result[pixel*roi+pos+3] + result[pixel*roi+pos+4]) / 2.0;
 						result[pixel*roi+pos+1] = correctionValue;
 						result[pixel*roi+pos+2] = correctionValue;
-						if (addJumpInfos == true)
+						if (addJumpInfos)
 						{
 							jumpInfo.addPixelWithSpikes(pixel);
 						}
@@ -253,7 +254,7 @@ public class PatchJumpRemoval implements Processor {
 					// single spike in slices pos found, correct it with the average of the previous two slices:
 					double correctionValue = (result[pixel*roi+pos-2] + result[pixel*roi+pos-1]) / 2.0;
 					result[pixel*roi+pos] = correctionValue;
-					if (addJumpInfos == true)
+					if (addJumpInfos)
 					{
 						jumpInfo.addPixelWithSpikes(pixel);
 					}
@@ -270,7 +271,7 @@ public class PatchJumpRemoval implements Processor {
 					// single spike in slices pos+1 found, correct it with the average of the following two slices:
 					double correctionValue = (result[pixel*roi+pos+2] + result[pixel*roi+pos+3]) / 2.0;
 					result[pixel*roi+pos+1] = correctionValue;
-					if (addJumpInfos == true)
+					if (addJumpInfos)
 					{
 						jumpInfo.addPixelWithSpikes(pixel);
 					}
@@ -285,7 +286,7 @@ public class PatchJumpRemoval implements Processor {
 	/**
 	 * Calculates the average of the result data array for a given patch. Also calulates the derivation of this patch average. 
 	 * The timemarker channels are excluded from the averaging
-	 * @param patch
+	 * @param patch patch number
 	 * @param patchAverage
 	 * @param patchDerivationAverage
 	 */
@@ -307,7 +308,7 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if there is a jump from the slices pos to pos+1
-	 * @param patch
+	 * @param patch patch number
 	 * @param pos
 	 * @param derivation
 	 * @param isStartCell
@@ -318,7 +319,7 @@ public class PatchJumpRemoval implements Processor {
 		
 		double derivAtJump = derivation[pos+1];
 		
-		if (isStartCell == false)
+		if (!isStartCell)
 		{
 			derivAtJump *= -1;
 		}
@@ -332,7 +333,7 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if the jumpHeight is in the range of the predicted jumpHeight, depending on deltaT
-	 * @param patch
+	 * @param patch patch number
 	 * @param deltaT
 	 * @param jumpHeight
 	 * @param jumpInfos
@@ -346,7 +347,7 @@ public class PatchJumpRemoval implements Processor {
 		if (Math.abs(jumpHeight) > timeDependLimit * predictedJumpHeight)
 		{
 			timeDependIsCorrect = false;
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addPatchWithWrongTiming(patch);
 			}
@@ -358,7 +359,7 @@ public class PatchJumpRemoval implements Processor {
 	
 	/**
 	 * Checks if the detected jumps comes from a photon signal flank 
-	 * @param patch
+	 * @param patch patch number
 	 * @param pos
 	 * @param derivation
 	 * @param isStartCell
@@ -384,7 +385,7 @@ public class PatchJumpRemoval implements Processor {
 		averDerivAroundJump /= counter;
 		
 		// If we have a stop cell, we only want to check if we have a falling flank. Therefore we multiply with -1, to have positive derivations.
-		if (isStartCell == false)
+		if (!isStartCell)
 		{
 			averDerivAroundJump *= -1;
 		}
@@ -393,7 +394,7 @@ public class PatchJumpRemoval implements Processor {
 		if (averDerivAroundJump > signalFlankLimit*Math.abs(jumpHeight))
 		{
 			noSignalFlank = false;
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addPatchWithSignalFlanks(patch);
 			}
@@ -463,7 +464,7 @@ public class PatchJumpRemoval implements Processor {
 		}
 		ringingFreqAmpl /= (freqBorderBinRight - freqBorderBinLeft + 1);
 		
-		if (addJumpInfos == true)
+		if (addJumpInfos)
 		{
 			// this is only for getting the results of the FFT in the viewer
 			for (int sl=0 ; sl <= lengthForFFT/2 ; sl++)
@@ -499,7 +500,7 @@ public class PatchJumpRemoval implements Processor {
 			averRingingDerviation /= counter;
 			
 			jumpHeight -= averRingingDerviation;
-			if (addJumpInfos == true)
+			if (addJumpInfos)
 			{
 				jumpInfos.addPatchWithRinging(patch);
 			}
@@ -529,13 +530,13 @@ public class PatchJumpRemoval implements Processor {
 		
 		double jumpheight = Math.abs(jumpHeight);
 		
-		if (addJumpInfos == true)
+		if (addJumpInfos)
 		{
 			jumpInfos.addPatchWithCorrectedJumps(patch);
 			jumpInfos.averJumpHeights[patch] = jumpHeight;
 		}
 		
-		if (isStartCell == false)
+		if (!isStartCell)
 		{
 			leftBorder = 0;
 			rightBorder = pos+1;
@@ -551,86 +552,4 @@ public class PatchJumpRemoval implements Processor {
 		}
 		return result;
 	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setOutputJumpsKey(String outputJumpsKey) {
-		this.outputJumpsKey = outputJumpsKey;
-	}
-
-	public void setPrevEventsKey(String prevEventsKey) {
-		this.prevEventsKey = prevEventsKey;
-	}
-
-	public void setStartCellKey(String startCellKey) {
-		this.startCellKey = startCellKey;
-	}
-
-	public void setJumpLimit(double jumpLimit) {
-		this.jumpLimit = jumpLimit;
-	}
-
-	public void setLeftBorder(int leftBorder) {
-		this.leftBorder = leftBorder;
-	}
-
-	public void setSpikeLimit(double spikeLimit) {
-		this.spikeLimit = spikeLimit;
-	}
-
-	public void setSignalFlankLimit(double signalFlankLimit) {
-		this.signalFlankLimit = signalFlankLimit;
-	}
-
-	public void setLengthForFFT(int lengthForFFT) {
-		this.lengthForFFT = lengthForFFT;
-	}
-
-	public void setLengthAfterPosForFFT(int lengthAfterPosForFFT) {
-		this.lengthAfterPosForFFT = lengthAfterPosForFFT;
-	}
-
-	public void setRingingPeriode(int ringingPeriode) {
-		this.ringingPeriode = ringingPeriode;
-	}
-
-	public void setFreqAmplLimit(double freqAmplLimit) {
-		this.freqAmplLimit = freqAmplLimit;
-	}
-
-	public void setFreqCompAmplLimit(double freqCompAmplLimit) {
-		this.freqCompAmplLimit = freqCompAmplLimit;
-	}
-
-	public void setLeftRingingFreq(double leftRingingFreq) {
-		this.leftRingingFreq = leftRingingFreq;
-	}
-
-	public void setRightRingingFreq(double rightRingingFreq) {
-		this.rightRingingFreq = rightRingingFreq;
-	}
-
-	public void setTau(double tau) {
-		this.tau = tau;
-	}
-
-	public void setConstant(double constant) {
-		this.constant = constant;
-	}
-
-	public void setTimeDependLimit(double timeDependLimit) {
-		this.timeDependLimit = timeDependLimit;
-	}
-
-	public void setAddJumpInfos(boolean addJumpInfos) {
-		this.addJumpInfos = addJumpInfos;
-	}
-	
-	
 }

@@ -12,8 +12,8 @@ import org.junit.Test;
 /**
  * Created by kaibrugge on 27.08.14.
  */
-public class HillasTest {
-    DistributionFromShower poser = new DistributionFromShower();
+public class EllipseParameterTest {
+    EllipseParameter poser = new EllipseParameter();
     final double EPSILON = 1e-9;
 
     int[] showerPixelIds = {278,281,279,282,285,284,256,259,276,377};

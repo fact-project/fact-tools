@@ -21,42 +21,36 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	
 	static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
 	
-	@Parameter(required = true, defaultValue = "photonCharge", description = "Key of the array of photoncharge.")
-	private String photonChargeKey = null;
-	@Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
-	private String cogxKey = null;
-	@Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
-	private String cogyKey = null;
-	@Parameter(required = true, defaultValue  = "Size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
-	private String sizeKey = null;
-	@Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
-	private String outputKey = null;
+	@Parameter(required = false, description = "Key of the array of photoncharge.")
+	public  String photonChargeKey = "pixels:estNumPhotons";
+
+	@Parameter(required = false)
+	public String pixelSetKey = "shower";
+
+	@Parameter(required = false, description = "The key of the generated value.")
+	private String outputKey = "shower:concentrationCOG";
+
 	
-	private double cogx;
-	private double cogy;
-	private double size;
-	
-	private double[] photonCharge = null;
-	
+
 
 	/**
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
 	 */
 	@Override
-	public Data process(Data input)
+	public Data process(Data item)
 	{
-		Utils.mapContainsKeys( input, cogxKey, cogyKey, sizeKey, photonChargeKey);
+		Utils.mapContainsKeys( item, pixelSetKey, photonChargeKey, pixelSetKey + ":ellipse:cog:x");
 		
-		cogx = (Double) input.get(cogxKey);
-		cogy = (Double) input.get(cogyKey);
-		size = (Double) input.get(sizeKey);
-		
-		photonCharge = (double[]) input.get(photonChargeKey);
+		double cogx = (Double) item.get(pixelSetKey + ":ellipse:cog:x");
+		double cogy = (Double) item.get(pixelSetKey + ":ellipse:cog:y");
+		double size = (Double) item.get(pixelSetKey + ":size");
+
+        double[] photonCharge = (double[]) item.get(photonChargeKey);
 		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		if (cogPixel == null)
 		{
-			input.put(outputKey, -Double.MAX_VALUE);
-			return input;
+			item.put(outputKey, -Double.MAX_VALUE);
+			return item;
 		}
 		FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(cogPixel);
 		
@@ -89,60 +83,9 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		
 		double conc = photonCharge[cogPixel.id] + photonCharge[minChId1.id] + photonCharge[minChId2.id];
 		conc /= size;
-		input.put(outputKey, conc);
+		item.put(outputKey, conc);
 		
-		return input;
+		return item;
 	}
-
-
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-
-
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
-
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-
-	public String getSizeKey() {
-		return sizeKey;
-	}
-
-
-	public void setSizeKey(String sizeKey) {
-		this.sizeKey = sizeKey;
-	}
-
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-	
 	
 }

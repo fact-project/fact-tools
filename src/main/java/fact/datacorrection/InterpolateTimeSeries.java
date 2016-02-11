@@ -30,13 +30,10 @@ public class InterpolateTimeSeries implements Processor {
 
     @Service(description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
-
-    @Parameter(required = true, description = "The data key to work on")
-    private String dataKey = null;
-
-    @Parameter(required = true, description = "The name of the interpolated data output")
-    private String dataOutputKey = null;
-
+    @Parameter(required = false, description = "The data key to work on", defaultValue="raw:dataCalibrated")
+    private String dataKey          = "raw:dataCalibrated";
+    @Parameter(required = false, description = "The name of the interpolated data output", defaultValue="raw:dataCalibrated")
+    private String dataOutputKey    = "raw:dataCalibrated";
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
     private int minPixelToInterpolate = 3;
 
@@ -51,9 +48,9 @@ public class InterpolateTimeSeries implements Processor {
         npix = (Integer) item.get("NPIX");
         double[] data = (double[]) item.get(dataKey);
 
-        DateTime timeStamp = null;
+        DateTime timeStamp;
 
-        if (item.containsKey("UnixTimeUTC") == true) {
+        if (item.containsKey("UnixTimeUTC")) {
             Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
             int[] eventTime = (int[]) item.get("UnixTimeUTC");
             timeStamp = new DateTime((long) ((eventTime[0] + eventTime[1] / 1000000.) * 1000), DateTimeZone.UTC);
@@ -123,21 +120,4 @@ public class InterpolateTimeSeries implements Processor {
                             + "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
         }
     }
-
-    public void setCalibService(CalibrationService calibService) {
-        this.calibService = calibService;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setDataOutputKey(String dataOutputKey) {
-        this.dataOutputKey = dataOutputKey;
-    }
-
-    public void setMinPixelToInterpolate(int minPixelToInterpolate) {
-        this.minPixelToInterpolate = minPixelToInterpolate;
-    }
-
 }

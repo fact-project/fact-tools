@@ -67,8 +67,7 @@ public class HillasParameter implements Processor {
     }
 
 
-    public double[] calculateCog(double[] weights, int[] showerPixel,
-                                 double size) {
+    public double[] calculateCog(double[] weights, int[] showerPixel, double size) {
 
         double[] cog = { 0, 0 };
         // find weighted center of the shower pixels.
