@@ -7,10 +7,10 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 public class Theta implements Processor {
-	@Parameter(required = false, defaultValue="sourcePosition:x")
-	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition:y")
-	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="source:x")
+	private String sourcexKey = "source:x";
+	@Parameter(required = false, defaultValue="source:y")
+	private String sourceyKey = "source:y";
 	@Parameter(required = false, defaultValue="shower:disp")
 	private String dispKey = "shower:disp";
 	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x")
@@ -29,10 +29,10 @@ public class Theta implements Processor {
 	private double signM3lConstant = -200;
 	
 	public Data process(Data item) {
-		Utils.mapContainsKeys(item, sourcePositionXKey, sourcePositionYKey, dispKey);
+		Utils.mapContainsKeys(item, sourcexKey, sourceyKey, dispKey);
 		
-		double sourcex = (Double) item.get(sourcePositionXKey);
-		double sourcey = (Double) item.get(sourcePositionYKey);
+		double sourcex = (Double) item.get(sourcexKey);
+		double sourcey = (Double) item.get(sourceyKey);
 		double disp = (Double) item.get(dispKey);
 		double cogx = (Double) item.get(cogxKey);
 		double cogy = (Double) item.get(cogyKey);
