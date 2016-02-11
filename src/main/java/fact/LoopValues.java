@@ -51,13 +51,13 @@ public class LoopValues extends ProcessorList {
                 for (Field declaredField : declaredFields) {
                     // try to set the right key-field to a given value
                     if (declaredField.getName().equals(key)) {
-                        setFieldValue(value, processor, declaredField);
+                        setFieldValue(value.trim(), processor, declaredField);
                     }
 
                     // try to set the right output-field to iterated value
                     if (declaredField.getName().equals("outputKey")) {
-                        String givenValue = outputKeys[iteration];
-                        setFieldValue(givenValue, processor, declaredField);
+                        setFieldValue(outputKeys[iteration].trim(),
+                                processor, declaredField);
                     }
                 }
             }
