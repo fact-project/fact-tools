@@ -14,8 +14,8 @@ import stream.annotations.Parameter;
 
 /**
  * This processor calculates a kind of third moment along the longitudinal and the transversal axis 
- * of the shower. Only kind of, because it is not normed, as it is for the correct definition of the
- * third moment.
+ * of the shower. Only kind of, because it is not normed to units of the standard deviation, 
+ * as it is for the correct definition of the third moment.
  * 
  * @author Fabian Temme
  *
@@ -23,9 +23,9 @@ import stream.annotations.Parameter;
 public class M3Long implements Processor {
 	static Logger log = LoggerFactory.getLogger(M3Long.class);
 
-    @Parameter(required = true)
+    @Parameter(required = false, defaultValue = "pixels:estNumPhotons")
     private String estNumPhotonsKey =  "pixels:estNumPhotons";
-    @Parameter(required = true, description = "The key to the showerPixel. " +
+    @Parameter(required = false, description = "The key to the showerPixel. " +
             "That is some sort of int[] containing pixel chids.")
     private  String pixelSetKey =  "shower";    
     @Parameter(required = false, defaultValue = "shower:ellipse:cog:x")
@@ -35,9 +35,9 @@ public class M3Long implements Processor {
     @Parameter(required = false, defaultValue = "shower:ellipse:delta")
 	private String deltaKey = "shower:ellipse:delta";
     
-    @Parameter(required = true)
+    @Parameter(required = false, defaultValue = "shower:ellipse:m3l")
 	private String m3lOutputKey = "shower:ellipse:m3l";
-    @Parameter(required = true)
+    @Parameter(required = false, defaultValue = "shower:ellipse:m3t")
 	private String m3tOutputKey = "shower:ellipse:m3t";
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
