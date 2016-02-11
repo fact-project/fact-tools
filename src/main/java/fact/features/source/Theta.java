@@ -7,56 +7,52 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 public class Theta implements Processor {
-	@Parameter(required=true)
-	private String sourcePositionKey = null;
-	@Parameter(required=true)
-	private String dispKey = null;
-	@Parameter(required=true)
-	private String cogxKey = null;
-	@Parameter(required=true)
-	private String cogyKey = null;
-	@Parameter(required=true)
-	private String deltaKey = null;
-	@Parameter(required=true)
-	private String m3lKey = null;
-	@Parameter(required=true)
-	private String cosDeltaAlphaKey = null;
-	@Parameter(required=true)
-	private String outputKey = null;
-	@Parameter(required=true)
-	private double signM3lConstant = 0;
+	@Parameter(required = false, defaultValue="sourcePosition:x")
+	private String sourcePositionXKey = "sourcePosition:x";
+	@Parameter(required = false, defaultValue="sourcePosition:y")
+	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="shower:disp")
+	private String dispKey = "shower:disp";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x")
+	private String cogxKey = "shower:ellipse:cog:x";
+	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y")
+	private String cogyKey = "shower:ellipse:cog:y";
+	@Parameter(required = false, defaultValue = "shower:ellipse:delta")
+	private String deltaKey = "shower:ellipse:delta";
+	@Parameter(required = false, defaultValue = "shower:ellipse:m3l")
+	private String m3lKey = "shower:ellipse:m3l";
+	@Parameter(required = false, defaultValue = "shower:ellipse:delta")
+	private String cosDeltaAlphaKey = "shower:source:cosDeltaAlpha";
+	@Parameter(required = false, defaultValue = "shower:source:theta")
+	private String outputKey = "shower:source:theta";
+	@Parameter(required=false, defaultValue = "-200")
+	private double signM3lConstant = -200;
 	
-	private double[] sourcePosition = null;
-	private double disp;
-	private double cogx;
-	private double cogy;
-	private double delta;
-	private double m3l;
-	private double cosDeltaAlpha;
+	public Data process(Data item) {
+		Utils.mapContainsKeys(item, sourcePositionXKey, sourcePositionYKey, dispKey);
+		
+		double sourcex = (Double) item.get(sourcePositionXKey);
+		double sourcey = (Double) item.get(sourcePositionYKey);
+		double disp = (Double) item.get(dispKey);
+		double cogx = (Double) item.get(cogxKey);
+		double cogy = (Double) item.get(cogyKey);
+		double delta = (Double) item.get(deltaKey);
+		double m3l = (Double) item.get(m3lKey);
+		double cosDeltaAlpha = (Double) item.get(cosDeltaAlphaKey);
+		
+		double[] recPosition = CalculateRecPosition(cogx, cogy, disp, delta, m3l, cosDeltaAlpha);
+		double theta = Math.sqrt( Math.pow(recPosition[0]-sourcex, 2)
+								+ Math.pow(recPosition[1]-sourcey, 2) );
 
-	public Data process(Data input) {
-		Utils.mapContainsKeys(input, sourcePositionKey,dispKey,cogxKey,cogyKey,deltaKey,cosDeltaAlphaKey);
+        item.put("gui:sourceOverlay:reconstructedPosition:" + outputKey, new SourcePositionOverlay("gui:sourceOverlay:reconstructedPosition:" + outputKey, recPosition));
+        item.put(outputKey + ":recPos:x",  recPosition[0]);
+        item.put(outputKey + ":recPos:y",  recPosition[1]);
+        item.put(outputKey, theta);
 		
-		sourcePosition = (double[]) input.get(sourcePositionKey);
-		disp = (Double) input.get(dispKey);
-		cogx = (Double) input.get(cogxKey);
-		cogy = (Double) input.get(cogyKey);
-		delta = (Double) input.get(deltaKey);
-		m3l = (Double) input.get(m3lKey);
-		cosDeltaAlpha = (Double) input.get(cosDeltaAlphaKey);
-		
-		double[] recPosition = CalculateRecPosition();
-		double theta = Math.sqrt( Math.pow(recPosition[0]-sourcePosition[0], 2)
-								+ Math.pow(recPosition[1]-sourcePosition[1], 2) );
-
-        input.put("@reconstructedPostion" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
-        input.put(outputKey + "_recPos",  recPosition);
-        input.put(outputKey, theta);
-		
-		return input;
+		return item;
 	}
 
-	private double[] CalculateRecPosition() {
+	private double[] CalculateRecPosition(double cogx, double cogy, double disp, double delta, double m3l, double cosDeltaAlpha) {
 		
 		double[] result = new double[2];
 		
@@ -71,79 +67,4 @@ public class Theta implements Processor {
 		
 		return result;
 	}
-
-	public String getSourcePositionKey() {
-		return sourcePositionKey;
-	}
-
-	public void setSourcePositionKey(String sourcePositionKey) {
-		this.sourcePositionKey = sourcePositionKey;
-	}
-
-	public String getDispKey() {
-		return dispKey;
-	}
-
-	public void setDispKey(String dispKey) {
-		this.dispKey = dispKey;
-	}
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-	public String getDeltaKey() {
-		return deltaKey;
-	}
-
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
-
-
-	public String getM3lKey() {
-		return m3lKey;
-	}
-
-	public void setM3lKey(String m3lKey) {
-		this.m3lKey = m3lKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public String getCosDeltaAlphaKey() {
-		return cosDeltaAlphaKey;
-	}
-
-	public void setCosDeltaAlphaKey(String cosDeltaAlphaKey) {
-		this.cosDeltaAlphaKey = cosDeltaAlphaKey;
-	}
-
-	public double getSignM3lConstant() {
-		return signM3lConstant;
-	}
-
-	public void setSignM3lConstant(double signM3lConstant) {
-		this.signM3lConstant = signM3lConstant;
-	}
-
-
 }
