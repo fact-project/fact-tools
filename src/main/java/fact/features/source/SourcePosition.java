@@ -177,7 +177,7 @@ public class SourcePosition implements StatefulProcessor {
             // coordinates for pointing and source
             double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
             item.put(outputKey + ":x", sourcePosition[0]);
-            item.put(outputKey + ":y", sourcePosition[0]);
+            item.put(outputKey + ":y", sourcePosition[1]);
             
             item.put(outputKey + ":azTracking", pointingAz);
             item.put(outputKey + ":zdTracking", pointingZd);
@@ -244,7 +244,7 @@ public class SourcePosition implements StatefulProcessor {
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
             
             item.put(outputKey + ":x", sourcePosition[0]);
-            item.put(outputKey + ":y", sourcePosition[0]);
+            item.put(outputKey + ":y", sourcePosition[1]);
             
             item.put(outputKey + ":azTracking", trackingPoint.getDouble("Az"));
             item.put(outputKey + ":zdTracking", trackingPoint.getDouble("Zd"));
