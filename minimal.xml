@@ -66,7 +66,7 @@
                             shower:arrivalTimes,
                             shower:maxSlopes,
                             shower:maxAmplitudePositions">
-            <fact.statistics.ArrayStatistics key="pixe" pixelSetKey="shower" />
+            <fact.statistics.ArrayStatistics key="" pixelSetKey="shower" />
         </fact.LoopValues>
         <PrintData/>
 
