@@ -57,7 +57,7 @@
         <!--<fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />-->
         <!--<fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />-->
         <fact.LoopValues
-                key="ky"
+                key="key"
                 values="pixels:estNumPhotons,
                         pixels:arrivalTimes,
                         pixels:maxSlopes,
