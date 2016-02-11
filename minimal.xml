@@ -54,10 +54,23 @@
         <fact.pixelsets.NumPixel pixelSetKey="shower" />
         <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
-        <fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />
-        <fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />
-        <fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />
-        <fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />
+        <!--<fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />-->
+        <!--<fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />-->
+        <!--<fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />-->
+        <!--<fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />-->
+        <fact.LoopValues
+                key="key"
+                values="pixels:estNumPhotons,
+                        pixels:arrivalTimes,
+                        pixels:maxSlopes,
+                        pixels:maxAmplitudePositions"
+                outputKeys="shower:estNumPhotons,
+                            shower:arrivalTimes,
+                            shower:maxSlopes,
+                            shower:maxAmplitudePositions">
+            <fact.statistics.ArrayStatistics key="" pixelSetKey="shower" />
+        </fact.LoopValues>
+        <PrintData/>
 
         <fact.features.Size />
         <fact.features.EllipseParameter/>

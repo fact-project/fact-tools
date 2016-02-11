@@ -10,6 +10,8 @@ import stream.ProcessorList;
 import stream.annotations.Parameter;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Loop over values for some given processor key.
@@ -20,25 +22,62 @@ public class LoopValues extends ProcessorList {
 
     static Logger log = LoggerFactory.getLogger(LoopValues.class);
 
-    @Parameter(required = true)
+    @Parameter(required = true,
+            description = "Key value ")
     private String key = "";
 
-    @Parameter(required = true)
+    @Parameter(required = true,
+            description = "List of different values to be inserted for key-field")
     private String[] values = null;
 
-    @Parameter(required = true)
+    @Parameter(required = true,
+            description = "List of different keys used for output.")
     private String[] outputKeys = null;
-    // liste von outputKeys
 
+    private List<Processor> loopProcessors = new ArrayList<>(0);
 
     @Override
     public void init (ProcessContext context) throws Exception {
         super.init(context);
+
+        // detect mismatch in parameter arrays length
         if (outputKeys.length != values.length) {
             String message = "Number of values for LoopValues is not the same" +
                     "as number of output keys.";
             log.error(message);
             throw new IllegalArgumentException(message);
+        }
+
+        searchProcessorsWithFields();
+
+        // if no processor was found containing field named by key and
+        // field 'outputKey', then do not start processing.
+        if (loopProcessors.size() == 0) {
+            String m = "No field '" + key + "' was found to be " +
+                    "set within LoopValues.";
+            log.error(m);
+            throw new IllegalArgumentException(m);
+        }
+    }
+
+    /**
+     * Iterate through list of processors and identify those with a field named
+     * by a key and another one field named 'outputKey'.
+     */
+    private void searchProcessorsWithFields () {
+        for (Processor processor : processors) {
+            try {
+                Class<?> processorClass = processor.getClass();
+                if (processorClass.getDeclaredField(key) != null) {
+                    if (processorClass.getDeclaredField("outputKey") != null) {
+                        loopProcessors.add(processor);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Processor {} doesn't contain field {}",
+                        processor, key);
+            }
         }
     }
 
@@ -46,19 +85,20 @@ public class LoopValues extends ProcessorList {
     public Data process (Data data) {
         int iteration = 0;
         for (String value : values) {
-            for (Processor processor : processors) {
-                Field[] declaredFields = processor.getClass().getDeclaredFields();
-                for (Field declaredField : declaredFields) {
-                    // try to set the right key-field to a given value
-                    if (declaredField.getName().equals(key)) {
-                        setFieldValue(value, processor, declaredField);
-                    }
+            for (Processor processor : loopProcessors) {
+                try {
+                    // try to set the right key-field to iterated value
+                    Field declaredField = processor.getClass().getDeclaredField(key);
+                    setFieldValue(value.trim(), processor, declaredField);
 
                     // try to set the right output-field to iterated value
-                    if (declaredField.getName().equals("outputKey")) {
-                        String givenValue = outputKeys[iteration];
-                        setFieldValue(givenValue, processor, declaredField);
-                    }
+                    declaredField = processor.getClass().getDeclaredField("outputKey");
+                    setFieldValue(outputKeys[iteration].trim(),
+                            processor, declaredField);
+                } catch (NoSuchFieldException e) {
+                    log.error("LoopValues could not retrieve declared " +
+                            "fields {} and outputKey", key);
+                    return null;
                 }
             }
             data = super.process(data);
