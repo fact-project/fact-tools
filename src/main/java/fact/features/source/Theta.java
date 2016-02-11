@@ -29,7 +29,7 @@ public class Theta implements Processor {
 	private double signM3lConstant = -200;
 	
 	public Data process(Data item) {
-		Utils.mapContainsKeys(item, sourcexKey, sourceyKey, dispKey);
+		Utils.mapContainsKeys(item, sourcexKey, sourceyKey, dispKey, cogxKey, cogyKey, deltaKey, m3lKey, cosDeltaAlphaKey);
 		
 		double sourcex = (Double) item.get(sourcexKey);
 		double sourcey = (Double) item.get(sourceyKey);
