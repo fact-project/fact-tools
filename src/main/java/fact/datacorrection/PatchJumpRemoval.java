@@ -27,9 +27,9 @@ public class PatchJumpRemoval implements Processor {
 	String outputKey	= "raw:dataCalibrated";
 	@Parameter(required=false, defaultValue = "meta:prevEvents")
 	String prevEventsKey= "meta:prevEvents";
-	@Parameter(required=false, defaultValue = "StartCellData",
+	@Parameter(required=false, defaultValue = "meta:startCellData",
                 description = "Key of the StartCellData in the data fits file")
-	String startCellKey = "StartCellData";
+	String startCellKey = "meta:startCellData";
 	@Parameter(required=false, defaultValue = "2.0")
 	double jumpLimit   = 2.0;
 	@Parameter(required=false, description = "Useful for jump studies")
