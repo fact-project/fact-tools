@@ -47,10 +47,9 @@
         <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
 
         <fact.features.source.SourcePosition outputKey="cetatauri" sourceRightAscension="5.627416667" sourceDeclination="21.1425" auxService="auxService" />
+        <fact.cleaning.TwoLevelTimeNeighbor calibService="calibService" starPositionKeys="cetatauri" />
 
-        <fact.cleaning.TwoLevelTimeNeighbor calibService="calibService" />
-        <Skip condition="%{data.shower} == null" starPositionKeys="cetatauri" />
-
+        <Skip condition="%{data.shower} == null"/>
         <fact.pixelsets.NumPixel pixelSetKey="shower" />
         <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
@@ -97,32 +96,31 @@
         <fact.features.source.CosDeltaAlpha />
         <fact.features.source.Theta />
 
-        <fact.features.source.Alpha sourcexKey="antiSources:1:x" sourceyKey="antiSources:1:y" outputKey="shower:antiSources:1:alpha" />
-        <fact.features.source.Distance sourcexKey="antiSources:1:x" sourceyKey="antiSources:1:y" outputKey="shower:antiSources:1:distance" />
-        <fact.features.source.CosDeltaAlpha sourcexKey="antiSources:1:x" sourceyKey="antiSources:1:y" outputKey="shower:antiSources:1:cosDeltaAlpha" />
-        <fact.features.source.Theta sourcexKey="antiSources:1:x" sourceyKey="antiSources:1:y" outputKey="shower:antiSources:1:theta" />
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:alpha,shower:antiSources:2:alpha,shower:antiSources:3:alpha,shower:antiSources:4:alpha,shower:antiSources:5:alpha">
+            <fact.features.source.Alpha key="" />
+        </fact.LoopValues>
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:distance,shower:antiSources:2:distance,shower:antiSources:3:distance,shower:antiSources:4:distance,shower:antiSources:5:distance">
+            <fact.features.source.Distance key="" />
+        </fact.LoopValues>
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:cosDeltaAlpha,shower:antiSources:2:cosDeltaAlpha,shower:antiSources:3:cosDeltaAlpha,shower:antiSources:4:cosDeltaAlpha,shower:antiSources:5:cosDeltaAlpha">
+            <fact.features.source.CosDeltaAlpha key="" />
+        </fact.LoopValues>
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:theta,shower:antiSources:2:theta,shower:antiSources:3:theta,shower:antiSources:4:theta,shower:antiSources:5:theta">
+            <fact.features.source.Theta key="" />
+        </fact.LoopValues>
 
-        <fact.features.source.Alpha sourcexKey="antiSources:2:x" sourceyKey="antiSources:2:y" outputKey="shower:antiSources:2:alpha" />
-        <fact.features.source.Distance sourcexKey="antiSources:2:x" sourceyKey="antiSources:2:y" outputKey="shower:antiSources:2:distance" />
-        <fact.features.source.CosDeltaAlpha sourcexKey="antiSources:2:x" sourceyKey="antiSources:2:y" outputKey="shower:antiSources:2:cosDeltaAlpha" />
-        <fact.features.source.Theta sourcexKey="antiSources:2:x" sourceyKey="antiSources:2:y" outputKey="shower:antiSources:2:theta" />
-
-        <fact.features.source.Alpha sourcexKey="antiSources:3:x" sourceyKey="antiSources:3:y" outputKey="shower:antiSources:3:alpha" />
-        <fact.features.source.Distance sourcexKey="antiSources:3:x" sourceyKey="antiSources:3:y" outputKey="shower:antiSources:3:distance" />
-        <fact.features.source.CosDeltaAlpha sourcexKey="antiSources:3:x" sourceyKey="antiSources:3:y" outputKey="shower:antiSources:3:cosDeltaAlpha" />
-        <fact.features.source.Theta sourcexKey="antiSources:3:x" sourceyKey="antiSources:3:y" outputKey="shower:antiSources:3:theta" />
-
-        <fact.features.source.Alpha sourcexKey="antiSources:4:x" sourceyKey="antiSources:4:y" outputKey="shower:antiSources:4:alpha" />
-        <fact.features.source.Distance sourcexKey="antiSources:4:x" sourceyKey="antiSources:4:y" outputKey="shower:antiSources:4:distance" />
-        <fact.features.source.CosDeltaAlpha sourcexKey="antiSources:4:x" sourceyKey="antiSources:4:y" outputKey="shower:antiSources:4:cosDeltaAlpha" />
-        <fact.features.source.Theta sourcexKey="antiSources:4:x" sourceyKey="antiSources:4:y" outputKey="shower:antiSources:4:theta" />
-
-        <fact.features.source.Alpha sourcexKey="antiSources:5:x" sourceyKey="antiSources:5:y" outputKey="shower:antiSources:5:alpha" />
-        <fact.features.source.Distance sourcexKey="antiSources:5:x" sourceyKey="antiSources:5:y" outputKey="shower:antiSources:5:distance" />
-        <fact.features.source.CosDeltaAlpha sourcexKey="antiSources:5:x" sourceyKey="antiSources:5:y" outputKey="shower:antiSources:5:cosDeltaAlpha" />
-        <fact.features.source.Theta sourcexKey="antiSources:5:x" sourceyKey="antiSources:5:y" outputKey="shower:antiSources:5:theta" />
-
-
-				<fact.io.JSONWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test.json" />
+		<fact.io.JSONWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test.json" />
     </process>
 </container>
