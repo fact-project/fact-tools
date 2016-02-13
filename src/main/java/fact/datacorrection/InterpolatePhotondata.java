@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 /**
  *
@@ -25,7 +26,7 @@ import stream.annotations.Parameter;
 public class InterpolatePhotondata implements Processor {
     static Logger log = LoggerFactory.getLogger(InterpolatePhotondata.class);
     
-    @Parameter(required = true, description = "The calibration service which provides the information about the bad pixels")
+    @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
     @Parameter(required = true, description = "The photoncharge key to work on")
     private String photonChargeKey = null;

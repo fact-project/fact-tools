@@ -5,6 +5,7 @@ import stream.Data;
 import stream.Keys;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.Serializable;
 
@@ -13,7 +14,7 @@ import java.io.Serializable;
  */
 public class Background implements Processor {
 
-    @Parameter(required = true)
+    @Service(required = true)
     fact.PredictionService predictor;
 
     @Parameter(required = false, description = "Prediction threshold")
@@ -47,15 +48,4 @@ public class Background implements Processor {
         return data;
     }
 
-    public void setPredictor(fact.PredictionService predictor) {
-        this.predictor = predictor;
-    }
-
-    public void setPredictionThreshold(double predictionThreshold) {
-        this.predictionThreshold = predictionThreshold;
-    }
-
-    public void setSignalClassName(String signalClassName) {
-        this.signalClassName = signalClassName;
-    }
 }
