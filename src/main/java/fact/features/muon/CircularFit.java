@@ -2,22 +2,22 @@ package fact.features.muon;
 
 
 import fact.Constants;
+import fact.Utils;
+import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.shell.Run;
 
 /**
  * Created by maxnoe on 12.08.15.
  *
  * Calculates center and radius of a ring according to
- * "Optimum circular fit to weighted data in multidimensional space", B.B. Chaudhuri and P.Kundu
+ * "Optimum circular fit to weighted data in multidimensional space", B.B. Chaudhuri and P. Kundu
  * Pattern Recognition Letters 14 (1993)
  * http://www.sciencedirect.com/science/article/pii/016786559390126X
  *
@@ -27,8 +27,8 @@ public class CircularFit implements StatefulProcessor {
 
     @Parameter(required = false, description = "Key to the extracted photoncharges", defaultValue = "photoncharge")
     private String photonchargeKey = "photoncharge";
-    @Parameter(required = false, description = "Key to the cleaningPixel", defaultValue = "shower")
-    private String cleaningPixelKey = "shower";
+    @Parameter(required = false, description = "PixelSet to perform the fit on", defaultValue = "shower")
+    private String pixelSetKey = "shower";
     @Parameter(required = false, description = "Base for the Outputkeys, outputs are radius, x, y", defaultValue = "circfit_")
     private String outputKey = "circfit_";
 
@@ -37,27 +37,20 @@ public class CircularFit implements StatefulProcessor {
     private double[] pixel_x = new double[npix];
     private double[] pixel_y = new double[npix];
 
-    public Data process(Data data) {
-        if (!data.containsKey(photonchargeKey)) {
-            throw new RuntimeException("photonchargeKey " + photonchargeKey + "not found in data item");
-        }
-        if (!data.containsKey(cleaningPixelKey)){
-            throw new RuntimeException("cleaningPixelKey " + cleaningPixelKey + "not found in data item");
-        }
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, photonchargeKey, pixelSetKey);
 
-        double[] photoncharge = (double[]) data.get(photonchargeKey);
-        int[] cleaningPixel = (int[]) data.get(cleaningPixelKey);
-        System.out.println(cleaningPixel);
+        double[] photoncharge = (double[]) item.get(photonchargeKey);
+        PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
 
         double mean_x = 0,
                 mean_y = 0,
                 photoncharge_sum = 0;
 
-        for (int i = 0; i < cleaningPixel.length; i++) {
-            int chid = cleaningPixel[i];
-            photoncharge_sum += photoncharge[chid];
-            mean_x += photoncharge[chid] * pixel_x[chid];
-            mean_y += photoncharge[chid] * pixel_y[chid];
+        for (CameraPixel pix: pixelSet.set) {
+            photoncharge_sum += photoncharge[pix.id];
+            mean_x += photoncharge[pix.id] * pixel_x[pix.id];
+            mean_y += photoncharge[pix.id] * pixel_y[pix.id];
         }
 
         mean_x /= photoncharge_sum;
@@ -71,11 +64,10 @@ public class CircularFit implements StatefulProcessor {
                 C1 = 0,
                 C2 = 0;
 
-        for (int i = 0; i < cleaningPixel.length; i++) {
-            int chid = cleaningPixel[i];
-            double x = pixel_x[chid];
-            double y = pixel_y[chid];
-            double m = photoncharge[chid];
+        for (CameraPixel pix: pixelSet.set) {
+            double x = pixel_x[pix.id];
+            double y = pixel_y[pix.id];
+            double m = photoncharge[pix.id];
             A1 += m * (x - mean_x) * x;
             A2 += m * (y - mean_y) * x;
             B1 += m * (x - mean_x) * y;
@@ -88,19 +80,18 @@ public class CircularFit implements StatefulProcessor {
         double center_y = (A2 * C1 - A1 * C2)/ (A2 * B1 - A1 * B2);
 
         double numerator = 0;
-        for (int i = 0; i < cleaningPixel.length; i++) {
-            int chid = cleaningPixel[i];
-            numerator += photoncharge[chid] * (Math.pow(pixel_x[chid] - center_x, 2) + Math.pow(pixel_y[chid] - center_y, 2));
+        for (CameraPixel pix: pixelSet.set) {
+            numerator += photoncharge[pix.id] * (Math.pow(pixel_x[pix.id] - center_x, 2) + Math.pow(pixel_y[pix.id] - center_y, 2));
         }
 
         double radius = Math.sqrt(numerator / photoncharge_sum);
 
-        data.put(outputKey + "radius", radius);
-        data.put(outputKey + "x", center_x);
-        data.put(outputKey + "y", center_y);
-        data.put(outputKey + "circle", new EllipseOverlay(center_x, center_y, radius, radius, 0));
+        item.put(outputKey + "r", radius);
+        item.put(outputKey + "x", center_x);
+        item.put(outputKey + "y", center_y);
+        item.put(outputKey + "circle", new EllipseOverlay(center_x, center_y, radius, radius, 0));
 
-        return data;
+        return item;
     }
 
     @Override
@@ -129,7 +120,7 @@ public class CircularFit implements StatefulProcessor {
         this.outputKey = outputKey;
     }
 
-    public void setCleaningPixelKey(String cleaningPixelKey) {
-        this.cleaningPixelKey = cleaningPixelKey;
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
     }
 }
