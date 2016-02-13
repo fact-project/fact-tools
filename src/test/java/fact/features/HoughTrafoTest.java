@@ -29,7 +29,7 @@ public class HoughTrafoTest extends ParameterTest {
     @Test
     public void testValidParameter() throws Exception{
         HoughTransform poser = new HoughTransform();
-        poser.setPixelKey("shower");
+        poser.setPixelSetKey("shower");
         poser.setPhotonChargeKey("photoncharge");
         poser.init(null);
         poser.process(item);

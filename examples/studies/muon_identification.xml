@@ -14,10 +14,9 @@
 
   <process input="fact">
     <include url="classpath:/default/data/prevEventAndSkip.xml" />
-
     <include url="classpath:/default/data/calibration.xml" />
-
     <include url="classpath:/default/data/extraction.xml" />
+
     <fact.cleaning.TwoLevelTimeMedian calibService="calibService"
       photonChargeKey="photoncharge"
       outputKey="cleanPixel"
@@ -38,12 +37,12 @@
     <Skip condition="%{data.Leakage} &gt; 0.1" />
 
 
-    <fact.features.MuonHoughTransform showRingKey="false"  
+    <fact.features.muon.HoughTransform showRingKey="false"  
       showMatrixKey="false"
       photonChargeKey="photoncharge"
       peaknessKey="houghPeakness"
       bestCircleKey="bestRing"
-      pixelKey="cleanPixel" 
+      pixelSetKey="cleanPixel" 
       cleaningPercentageKey="houghCleaningPercentage"
       ringPercentageKey="houghRingPercentage"
       distanceKey="houghDistance"
