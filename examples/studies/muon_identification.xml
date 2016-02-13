@@ -1,7 +1,6 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
 
-  <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
@@ -56,6 +55,5 @@
       />
 
     <fact.io.PrintKeysOnConsole keys="EventNum,houghPeakness,houghDistance,houghCleaningPercentage,houghRingPercentage,octantsHit"/>
-
   </process>
 </container>
