@@ -11,6 +11,8 @@
 
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
 
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
     <!-- Name des Streams und pfad zu dem Daten-File -->
     <stream id="fact" class="fact.io.FitsStream"  url="${infile}" limit="3"/>
 
@@ -23,8 +25,12 @@
         <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4"/>
         <!--<fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />-->
 
-        <fact.datacorrection.InterpolateBadPixel key="DataCalibrated"  outputKey="DataCalibrated"
-                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+        <fact.datacorrection.InterpolateTimeSeries 
+            calibService="calibService"
+            interpolateTimeLine="True"
+            dataKey="DataCalibrated"
+            dataOutputKey="DataCalibrated"
+        />
                 
         <fact.extraction.BasicExtraction
 		    dataKey="DataCalibrated" 
@@ -54,9 +60,9 @@
        
             <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
         <!---->
-        <fact.extraction.ChargeRandSampleGivenWindow key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
+        <fact.extraction.WaveformFluctuation key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
 
-        <fact.utils.SelectValueByChid key="Nsb_rms" chid="286" outputKey="Nsb_rms_1" />
+        <fact.utils.SelectValueByChid key="Nsb_std" chid="286" outputKey="Nsb_rms_1" />
         <!--<fact.plotter.HistogramPlotter key="Nsb_rms_1" binWidth="1" logAxis="true" color="#666699" />-->
 
         <fact.utils.SelectValueByChid key="Nsb_mean" chid="286" outputKey="Nsb_mean_1" />

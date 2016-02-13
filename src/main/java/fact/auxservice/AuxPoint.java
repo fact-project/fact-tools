@@ -7,7 +7,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * This is a class to create immutable container holding data from some source providing auxiliary data
+ * This is a class to create immutable container holding data from some source providing auxiliary data.
+ * This can be a file or a database. The key passed to the getters has to be known beforehand of course.
  * Created by kai on 31.03.15.
  */
 public class AuxPoint implements Comparable<AuxPoint>{
@@ -18,6 +19,12 @@ public class AuxPoint implements Comparable<AuxPoint>{
         this.timeStamp = new DateTime(timeStamp);
     }
 
+
+    /**
+     * Creates an AuxPoint from a Timestamp and a map containing key,value pairs as found in the slow control data.
+     * @param timeStamp the timestamp specifying  when the auxiliary data was recorded.
+     * @param data a map containing the names and values from the .fits files as key values pairs.
+     */
     public AuxPoint(DateTime timeStamp, Map<String, Serializable> data){
         this.data = new ImmutableMap.Builder<String, Serializable>().putAll(data).build();
         this.timeStamp = new DateTime(timeStamp);
@@ -25,7 +32,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
 
 
     /**
-     * The timestamp from the sensor.
+     * The timestamp from when sensor recorded this AuxPoint.
      * @return the timestamp for this point.
      */
     public DateTime getTimeStamp() {

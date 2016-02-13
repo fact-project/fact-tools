@@ -2,8 +2,10 @@ package fact.features;
 
 import fact.Utils;
 import fact.container.PixelDistribution2D;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
+import fact.container.PixelSet;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -19,7 +21,7 @@ public class DistributionFromShower implements Processor {
 	private String weightsKey = null;
 	@Parameter(required = true, description = "The key to the showerPixel. "
 			+ "That is some sort of int[] containing pixel chids.")
-	private String showerKey = null;
+	private String pixelSetKey = null;
 
 	// the in and outputkeys
 	@Parameter(required = true)
@@ -54,7 +56,7 @@ public class DistributionFromShower implements Processor {
 		// in case the getColorFromValue doesn't contain a shower return the
 		// original input.
 
-		if (!input.containsKey(showerKey)) {
+		if (!input.containsKey(pixelSetKey)) {
 			return input;
 		}
 
@@ -62,11 +64,11 @@ public class DistributionFromShower implements Processor {
 			return input;
 		}
 
-		Utils.isKeyValid(input, showerKey, int[].class);
+		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 		Utils.isKeyValid(input, weightsKey, double[].class);
 
-		int[] showerPixel = (int[]) input.get(showerKey);
-		double[] showerWeights = createShowerWeights(showerPixel,
+		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
+		double[] showerWeights = createShowerWeights(showerPixel.toIntArray(),
 				(double[]) input.get(weightsKey));
 
 		double size = 0;
@@ -74,10 +76,10 @@ public class DistributionFromShower implements Processor {
 			size += v;
 		}
 
-		double[] cog = calculateCog(showerWeights, showerPixel, size);
+		double[] cog = calculateCog(showerWeights, showerPixel.toIntArray(), size);
 
 		// Calculate the weighted Empirical variance along the x and y axis.
-		RealMatrix covarianceMatrix = calculateCovarianceMatrix(showerPixel,
+		RealMatrix covarianceMatrix = calculateCovarianceMatrix(showerPixel.toIntArray(),
 				showerWeights, cog);
 
 		// get the eigenvalues and eigenvectors of the matrix and weigh them
@@ -97,22 +99,24 @@ public class DistributionFromShower implements Processor {
 		// Rotate the shower by the angle delta in order to have the ellipse
 		// main axis in parallel to the Camera-Coordinates X-Axis
 		// allocate variables for rotated coordinates
-		double[] longitudinalCoords = new double[showerPixel.length];
-		double[] transversalCoords = new double[showerPixel.length];
+		double[] longitudinalCoords = new double[showerPixel.set.size()];
+		double[] transversalCoords = new double[showerPixel.set.size()];
 
-		for (int i = 0; i < showerPixel.length; i++) {
+		int counter =0;
+		for (CameraPixel pix : showerPixel.set) {
 			// translate to center
-			double posx = pixelMap.getPixelFromId(showerPixel[i])
+			double posx = pixelMap.getPixelFromId(pix.id)
 					.getXPositionInMM();
-			double posy = pixelMap.getPixelFromId(showerPixel[i])
+			double posy = pixelMap.getPixelFromId(pix.id)
 					.getYPositionInMM();
 			// rotate
 			double[] c = Utils.transformToEllipseCoordinates(posx, posy,
 					cog[0], cog[1], delta);
 
-			// fill array of new showerKey coordinates
-			longitudinalCoords[i] = c[0];
-			transversalCoords[i] = c[1];
+			// fill array of new shower coordinates
+			longitudinalCoords[counter] = c[0];
+			transversalCoords[counter] = c[1];
+			counter++;
 		}
 
 		// find max long coords
@@ -138,21 +142,6 @@ public class DistributionFromShower implements Processor {
 		double m4Trans = calculateMoment(4, 0, transversalCoords, showerWeights);
 		m4Trans /= Math.pow(width, 4);
 
-		// double newLength = Math.sqrt(calculateMoment(2, 0,
-		// longitudinalCoords, showerWeights));
-		// double newWidth = Math.sqrt(calculateMoment(2, 0, transversalCoords,
-		// showerWeights));
-		//
-		// double meanLong = calculateMoment(1, 0, longitudinalCoords,
-		// showerWeights);
-		// double meanTrans = calculateMoment(1, 0, transversalCoords,
-		// showerWeights);
-
-		// System.out.println("Width: " + width + " newwidth: " + newWidth);
-		// System.out.println("Length: " + length + " newlength: " + newLength);
-		// System.out.println("Mean long, trans (should be 0): " + meanLong +
-		// ", " + meanTrans);
-
 		PixelDistribution2D dist = new PixelDistribution2D(
 				covarianceMatrix.getEntry(0, 0),
 				covarianceMatrix.getEntry(1, 1),
@@ -171,46 +160,14 @@ public class DistributionFromShower implements Processor {
 		input.put(widthKey, width);
 		input.put(deltaKey, delta);
 
-		// double[][] rot = { {Math.cos(delta), -Math.sin(delta)},
-		// {Math.sin(delta),Math.cos(delta) }
-		// };
-
-		// RealMatrix rotMatrix = MatrixUtils.createRealMatrix(rot);
-		// double[] a = {0 , 20};
-		// RealVector v = MatrixUtils.createRealVector(a);
-		// RealVector cogV = MatrixUtils.createRealVector(cog);
-		// v = rotMatrix.operate(v);
-		// v = v.add(cogV);
-
-		// double[] thead = Utils.transformToEllipseCoordinates(maxLongCoord +
-		// cog[0], 0 + cog[1], cog[0], cog[1], delta );
-		// double[] ttail = Utils.transformToEllipseCoordinates(minLongCoord +
-		// cog[0], 0 + cog[1], cog[0], cog[1], delta );
-		//
-		// double[] tMaxTrans = Utils.transformToEllipseCoordinates(0 + cog[0],
-		// maxTransCoord + cog[1], cog[0], cog[1], delta );
-
 		double[] center = calculateCenter(showerPixel);
-		input.put("Ellipse", new EllipseOverlay(center[0], center[1], 2*width,
+		input.put("2-sigma-ellipse", new EllipseOverlay(center[0], center[1], 2*width,
 				2*length, delta));
-		// input.put("CoG", new EllipseOverlay(cog[0] , cog[1], 3 , 3 , 0));
-		// input.put("Center", new EllipseOverlay(center[0] , center[1], 3 , 3 ,
-		// 0));
-		//
-		// input.put("Tail", new LineOverlay(cog[0], cog[1], cog[0] + ttail[0],
-		// cog[1] + ttail[1]));
-		// input.put("Head", new LineOverlay(cog[0], cog[1], cog[0] + thead[0],
-		// cog[1] + thead[1]));
-		// input.put("MaxTrans", new LineOverlay(cog[0], cog[1], cog[0] +
-		// tMaxTrans[0], cog[1] + tMaxTrans[1]));
+		input.put("1-sigma-ellipse", new EllipseOverlay(center[0], center[1], width,
+				length, delta));
 
 		input.put("@width", width);
 		input.put("@length", length);
-
-		// look at what i found
-		// V=cov(x,y);
-		// [vec,val]=eig(V);
-		// angles=atan2( vec(2,:),vec(1,:) );
 
 		return input;
 	}
@@ -260,16 +217,16 @@ public class DistributionFromShower implements Processor {
 		return cog;
 	}
 
-	public double[] calculateCenter(int[] showerPixel) {
+	public double[] calculateCenter(PixelSet showerPixel) {
 
 		double[] cog = { 0, 0 };
 		// find center of the shower pixels.
-		for (int pix : showerPixel) {
-			cog[0] += pixelMap.getPixelFromId(pix).getXPositionInMM();
-			cog[1] += pixelMap.getPixelFromId(pix).getYPositionInMM();
+		for (CameraPixel pix : showerPixel.set) {
+			cog[0] += pixelMap.getPixelFromId(pix.id).getXPositionInMM();
+			cog[1] += pixelMap.getPixelFromId(pix.id).getYPositionInMM();
 		}
-		cog[0] /= showerPixel.length;
-		cog[1] /= showerPixel.length;
+		cog[0] /= showerPixel.set.size();
+		cog[1] /= showerPixel.set.size();
 		return cog;
 	}
 
@@ -300,9 +257,10 @@ public class DistributionFromShower implements Processor {
 		this.weightsKey = wheights;
 	}
 
-	public void setShowerKey(String showerKey) {
-		this.showerKey = showerKey;
+	public void setPixelSetKey(String pixelSetKey) {
+		this.pixelSetKey = pixelSetKey;
 	}
+	
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;

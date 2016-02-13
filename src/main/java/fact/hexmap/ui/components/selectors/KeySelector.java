@@ -16,7 +16,7 @@ import java.util.Set;
  * in the selectedItems HashSet. In case a new Event (DataItem) will be shown in the viewer, this class will call
  * the abstract filterItems(Data item) method.
  *
- * The filterItems(Data item) should return a Set<KeySelectorItem> which will be shown in the JPanel
+ * The filterItems(Data item) should return a Set &lt; KeySelectorItem &gt; which will be shown in the JPanel
  *
  *
  *

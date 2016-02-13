@@ -8,3 +8,7 @@ a screenshot of the FACT event viewer.
 <div style="text-align:center;">
 	<img style="width:800px;" src="../images/fact-viewer-screenshot.png" />
 </div>
+
+In order to start an event viewer you only need to add one line into the existing configuration file:
+
+	<fact.ShowViewer key="Data"/>

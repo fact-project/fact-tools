@@ -12,10 +12,10 @@ or installed on Ubuntu systems using apt-get:
      # sudo apt-get install maven2
 
 
-Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [drone.IO project site](https://drone.io/bitbucket.org/cbockermann/fact-tools)
+Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [travis-ci project site](https://travis-ci.org/fact-project/fact-tools)
 
 
-![Build Status](https://drone.io/bitbucket.org/cbockermann/fact-tools/status.png)
+<a href="https://travis-ci.org/fact-project/fact-tools"><img alt="Build Status" src="https://travis-ci.org/fact-project/fact-tools.svg?branch=master"></a>
 
 
 
@@ -23,7 +23,7 @@ Building the FACT Tools
 -----------------------
 
 Building the *fact-tools* is straight forward: Simply [checkout the
-fact-tools code](source-repository.html) and enter the directory. By running the `mvn` command,
+fact-tools code](https://github.com/fact-project/fact-tools) and enter the directory. By running the `mvn` command,
 Maven will take care of the build:
 
      # cd fact-tools

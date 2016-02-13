@@ -1,83 +1,61 @@
 <container>
-	<properties url="classpath:/default/settings.properties" />
+  <properties url="classpath:/default/settings.properties" />
 
-	<!-- Pathes to the input files -->
-	<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+  <!-- Pathes to the input files -->
+  <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+  <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
-	<property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-	<property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
-
-
-	<service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
-	<stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
-
-	<process input="fact">
-		<include url="classpath:/default/data/prevEventAndSkip.xml" />
-
-		<include url="classpath:/default/data/calibration.xml" />
-
-		<include url="classpath:/default/data/extraction.xml" />
+  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
 
 
-		<fact.cleaning.TwoLevelTimeMedian
-			photonChargeKey="photoncharge"
-			outputKey="cleanPixel"
-			arrivalTimeKey="arrivalTime"
-			corePixelThreshold="4.0"
-			neighborPixelThreshold="2.0"
-			timeLimit="15"
-			minNumberOfPixel="2" 
-			showDifferentCleaningSets="false"
-			/>
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
+
+  <process input="fact">
+    <include url="classpath:/default/data/prevEventAndSkip.xml" />
+
+    <include url="classpath:/default/data/calibration.xml" />
+
+    <include url="classpath:/default/data/extraction.xml" />
+    <fact.cleaning.TwoLevelTimeMedian calibService="calibService"
+      photonChargeKey="photoncharge"
+      outputKey="cleanPixel"
+      arrivalTimeKey="arrivalTime"
+      corePixelThreshold="4.0"
+      neighborPixelThreshold="2.0"
+      timeLimit="15"
+      minNumberOfPixel="2" 
+      showDifferentCleaningSets="false"
+      />
 
 
-		<Skip condition="%{data.cleanPixel}==null"/>
-		<fact.features.NumberOfPixelInShower
-			showerKey="cleanPixel"
-			outputKey="numPixelInCleanPixel"
-			/>
+    <Skip condition="%{data.cleanPixel}==null"/>
+    <fact.pixelsets.Length pixelSetKey="cleanPixel" outputKey="numPixelInCleanPixel" />
+    <Skip condition="%{data.numPixelInCleanPixel} &lt; 15" />
 
-		<Skip condition="%{data.numPixelInCleanPixel} &lt; 15" />
-
-		<fact.features.Leakage
-			shower="cleanPixel"
-			weights="photoncharge"
-			leakage1OutputKey="Leakage"
-			leakage2OutputKey="Leakage2"
-			/>
-
-		<Skip condition="%{data.Leakage} &gt; 0.1" />
+    <fact.features.Leakage pixelSetKey="cleanPixel" weights="photoncharge" leakage1OutputKey="Leakage" leakage2OutputKey="Leakage2" />
+    <Skip condition="%{data.Leakage} &gt; 0.1" />
 
 
-		<fact.features.muon.HoughTransform 
-			showRingKey="false"  
-			showMatrixKey="false"
-			photonChargeKey="photoncharge"
-			peaknessKey="houghPeakness"
-			bestCircleKey="bestRing"
-			pixelKey="cleanPixel" 
-			cleaningPercentageKey="houghCleaningPercentage"
-			ringPercentageKey="houghRingPercentage"
-			distanceKey="houghDistance"
-			octantsHitKey="octantsHit"
-			bestRingPixelKey="bestRingPixel"
-			bestRadiusKey="bestR" 
-			bestXKey="bestX"
-			bestYKey="bestY"
-			/>
+    <fact.features.MuonHoughTransform showRingKey="false"  
+      showMatrixKey="false"
+      photonChargeKey="photoncharge"
+      peaknessKey="houghPeakness"
+      bestCircleKey="bestRing"
+      pixelKey="cleanPixel" 
+      cleaningPercentageKey="houghCleaningPercentage"
+      ringPercentageKey="houghRingPercentage"
+      distanceKey="houghDistance"
+      octantsHitKey="octantsHit"
+      bestRingPixelKey="bestRingPixel"
+      bestRadiusKey="bestR" 
+      bestXKey="bestX"
+      bestYKey="bestY"
+      />
 
-		<fact.io.PrintKeysOnConsole keys="EventNum,hough:peakness,hough:distance,hough:cleaningPercentage,hough:ringPercentage,hough:octantsHit"/>
+    <fact.io.PrintKeysOnConsole keys="EventNum,houghPeakness,houghDistance,houghCleaningPercentage,houghRingPercentage,octantsHit"/>
 
-		<!-- 			Cuts: -->											  
-		<Skip condition="%{data.houghDistance} &gt; 100" />
-		<Skip condition="%{data.houghPeakness} &lt; 7" />
-		<Skip condition="%{data.houghCleaningPercentage} &lt; 0.7" />
-		<!-- 			<Skip condition="%{data.houghRingPercentage} &lt; 0.22" /> -->
-		<Skip condition="%{data.octantsHit} &lt; 5" />
-
-
-		<!-- 			<fact.ShowViewer key="photonCharge" range="25,250"/>  -->
-		<!--<fact.io.JSONWriter url="file:${outfile}" keys="houghPeakness,houghDistance,houghCleaningPercentage,houghRingPercentage,octantsHit,bestR,bestX,bestY,NIGHT,RUNID,EventNum,photoncharge,arrivalTime,bestRingPixel" />-->
-	</process>
+  </process>
 </container>

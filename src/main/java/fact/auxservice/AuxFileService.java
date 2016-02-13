@@ -43,6 +43,19 @@ public class AuxFileService implements AuxiliaryService {
     boolean isInit = false;
     private HashMap<AuxiliaryServiceName, SourceURL> auxFileUrls;
 
+    /**
+     * This method returns an AuxPoint according to the strategy and the time stamp passed to this method.
+     * This is useful for getting the source position from the drive files for example. It can work like this:
+     *
+     *      AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+     *      double ra = trackingPoint.getDouble("Ra");
+     *
+     * @param serviceName The name of the service.
+     * @param eventTimeStamp The time stamp of the current raw data event.
+     * @param strategy One of the strategies provided.
+     * @return
+     * @throws FileNotFoundException
+     */
     @Override
     public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws FileNotFoundException {
         if(!isInit){
@@ -61,7 +74,7 @@ public class AuxFileService implements AuxiliaryService {
             log.warn("Provided event timestamp not in auxiliary File.");
         }
 
-        //TODO: load a new file in case we need stuff from the next day or night
+        //TODO: load a new file in case we need stuff from the next day or night. I don't know whether this is ever a valid use case.
         return strategy.getPointFromTreeSet(set, eventTimeStamp);
     }
 
