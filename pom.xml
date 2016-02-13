@@ -207,6 +207,11 @@
       <artifactId>commons-codec</artifactId>
       <version>1.9</version>
     </dependency>
+    <dependency>
+      <groupId>gov.nasa.gsfc.heasarc</groupId>
+      <artifactId>nom-tam-fits</artifactId>
+      <version>(1.14.0,]</version>
+    </dependency>
   </dependencies>
 
   <build>
