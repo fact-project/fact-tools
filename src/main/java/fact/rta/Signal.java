@@ -27,7 +27,7 @@ public class Signal implements Processor {
 
         ProbabilityDistribution distribution = predictor.predict(data);
         if (distribution != null){
-            data.put("@signal", distribution.getProbability(signalClassName));
+            data.put("signal:prediction", distribution.getProbability(signalClassName));
         }
         return data;
     }
