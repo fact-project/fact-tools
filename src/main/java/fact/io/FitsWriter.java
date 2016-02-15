@@ -1,10 +1,9 @@
 package fact.io;
 
-import nom.tam.fits.BinaryTable;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsFactory;
+import nom.tam.fits.*;
 import nom.tam.fits.common.FitsException;
 import nom.tam.util.BufferedFile;
+import nom.tam.util.Cursor;
 import org.apache.commons.lang3.ClassUtils;
 import stream.Data;
 import stream.ProcessContext;
@@ -12,17 +11,29 @@ import stream.StatefulProcessor;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * @author alexey
  */
 public class FitsWriter implements StatefulProcessor {
 
+    public static final String TTYPE = "TTYPE";
+    public static final String TFORM = "TFORM";
     static int counter = 0;
+    private Fits fits;
+
+    static ArrayList<String> names = new ArrayList<>(0);
+    static ArrayList<Object> values = new ArrayList<>(0);
+    private BinaryTable table;
+    private BufferedFile bf;
 
     @Override
     public void init (ProcessContext processContext) throws Exception {
-
+        fits = new Fits();
+        table = new BinaryTable();
+        //TODO output selection
+        bf = new BufferedFile("test" + counter + ".fits", "rw");
     }
 
     @Override
@@ -32,93 +43,104 @@ public class FitsWriter implements StatefulProcessor {
 
     @Override
     public void finish () throws Exception {
-
     }
 
     @Override
     public Data process (Data data) {
-        Fits fits = new Fits();
+        //TODO key selection
         for (String key : data.keySet()) {
             Serializable serializable = data.get(key);
             try {
-                addHDU(fits, key, serializable);
+                collectObjects(key, serializable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         try {
-            BufferedFile bf = new BufferedFile("test" + counter++ + ".fits", "rw");
-            fits.write(bf);
-            bf.close();
-        } catch (FitsException | IOException e) {
+            Object[] valuesArr = values.toArray();
+            table.addRow(valuesArr);
+            try {
+                if (counter == 2) {
+                    //FIXME naxis1 is wrong, pcount is wrong
+                    BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
+                    Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
+                    while (iterator.hasNext()) {
+                        HeaderCard next = iterator.next();
+                        if (next.getKey().startsWith(TFORM)) {
+                            String s = next.getKey().toLowerCase();
+                            String substring = s.substring(5);
+                            int tformNumber = Integer.valueOf(substring);
+                            String ttype = names.get(tformNumber - 1);
+                            HeaderCard headerCard = new HeaderCard(
+                                    TTYPE + tformNumber, ttype, "");
+                            basicHDU.getHeader().addLine(headerCard);
+                        }
+                    }
+                    fits.addHDU(basicHDU);
+                    fits.write(bf);
+                    bf.close();
+                }
+                counter++;
+            } catch (IOException | FitsException e) {
+                e.printStackTrace();
+            }
+            names.clear();
+            values.clear();
+        } catch (FitsException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private void addHDU (Fits fits, String key, Serializable serialized) throws FitsException {
-        Object[] objects = new Object[2];
-        objects[0] = new String[]{key};
+    private void collectObjects (String key, Serializable serialized) throws FitsException {
         Class<? extends Serializable> type = serialized.getClass();
         if (type.isArray()) {
             if (serialized instanceof int[]) {
                 int[] arr = (int[]) serialized;
-                fits.addHDU(FitsFactory.hduFactory(arr));
-                return;
+                names.add(key);
+                values.add(arr);
             } else if (serialized instanceof double[]) {
                 double[] arr = (double[]) serialized;
-                fits.addHDU(FitsFactory.hduFactory(arr));
-                return;
+                values.add(arr);
+                names.add(key);
             } else if (serialized instanceof byte[]) {
                 byte[] arr = (byte[]) serialized;
-                objects= new Object[]{key, arr};
-                fits.addHDU(FitsFactory.hduFactory(objects));
-                return;
-            } else {
-                return;
+                values.add(arr);
+                names.add(key);
+            } else if (serialized instanceof String[]) {
+
+            } else if (serialized instanceof float[]) {
+
+            } else if (serialized instanceof short[]) {
+
+            } else if (serialized instanceof long[]) {
+
+            } else if (serialized instanceof boolean[]) {
+
             }
         } else {
             if (ClassUtils.isAssignable(type, String.class)) {
-                objects[1] = new String[]{(String) serialized};
+                values.add(new String[]{(String) serialized});
+                names.add(key);
             } else if (ClassUtils.isAssignable(type, Integer.class)) {
-                objects[1] = new int[]{(int) serialized};
+                values.add(new int[]{(int) serialized});
+                names.add(key);
             } else if (ClassUtils.isAssignable(type, Double.class)) {
-                objects[1] = new double[]{(double) serialized};
+                values.add(new double[]{(double) serialized});
+                names.add(key);
             } else if (ClassUtils.isAssignable(type, Float.class)) {
-                objects[1] = new float[]{(float) serialized};
+                values.add(new float[]{(float) serialized});
+                names.add(key);
             } else if (ClassUtils.isAssignable(type, Short.class)) {
-                objects[1] = new short[]{(short) serialized};
+                values.add(new short[]{(short) serialized});
+                names.add(key);
             } else if (ClassUtils.isAssignable(type, Long.class)) {
-                objects[1] = new long[]{(long) serialized};
+                values.add(new long[]{(long) serialized});
+                names.add(key);
             } else if (ClassUtils.isAssignable(type, Boolean.class)) {
-                objects[1] = new boolean[]{(boolean) serialized};
-            } else {
-                return;
+                values.add(new boolean[]{(boolean) serialized});
+                names.add(key);
             }
-        }
-        fits.addHDU(FitsFactory.hduFactory(objects));
-    }
-
-    private void addColumnnToTable (BinaryTable table, Serializable serialized) throws FitsException {
-        Class<? extends Serializable> type = serialized.getClass();
-        if (ClassUtils.isAssignable(type, String.class)) {
-            String[] strings = {(String) serialized};
-            table.addColumn(strings);
-        } else if (ClassUtils.isAssignable(type, Integer.class)) {
-            int[] integers = {(int) serialized};
-            table.addColumn(integers);
-        } else if (ClassUtils.isAssignable(type, Double.class)) {
-            double[] doubles = {(double) serialized};
-            table.addColumn(doubles);
-        } else if (ClassUtils.isAssignable(type, Float.class)) {
-            float[] floats = {(float) serialized};
-            table.addColumn(floats);
-        } else if (ClassUtils.isAssignable(type, Short.class)) {
-            short[] shorts = {(short) serialized};
-            table.addColumn(shorts);
-        } else if (ClassUtils.isAssignable(type, Long.class)) {
-            long[] longs = {(long) serialized};
-            table.addColumn(longs);
         }
     }
 }
