@@ -28,34 +28,29 @@ public class Background implements Processor {
 
     @Override
     public Data process(Data data) {
-        double backgroundEvents = 0;
+        double backgroundSignal = 0;
 
         Serializable originalValue = data.remove(targetKey);
         //loop over background regions and see if its a signal event.
+        double thetaBackground = 0;
         for (String key : offKeys.select(data)) {
             Serializable offValue = data.get(key);
             data.put(targetKey, offValue);
 
             ProbabilityDistribution distribution = predictor.predict(data);
             if (distribution != null){
-                backgroundEvents += distribution.getProbability(signalClassName);
+                if (distribution.getProbability(signalClassName) > backgroundSignal){
+                    backgroundSignal = distribution.getProbability(signalClassName);
+                    thetaBackground = (double) offValue;
+                }
             }
         }
         //restore original state of the values
+        data.put("background:prediction", backgroundSignal);
+        data.put("background:theta", thetaBackground);
+
         data.put(targetKey, originalValue);
-        data.put("@background", backgroundEvents);
+
         return data;
-    }
-
-    public void setPredictor(fact.PredictionService predictor) {
-        this.predictor = predictor;
-    }
-
-    public void setPredictionThreshold(double predictionThreshold) {
-        this.predictionThreshold = predictionThreshold;
-    }
-
-    public void setSignalClassName(String signalClassName) {
-        this.signalClassName = signalClassName;
     }
 }
