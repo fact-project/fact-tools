@@ -57,8 +57,7 @@ public class FitsWriter implements StatefulProcessor {
             }
         }
         try {
-            Object[] valuesArr = values.toArray();
-            table.addRow(valuesArr);
+            table.addRow(values.toArray());
             try {
                 if (counter == 2) {
                     //FIXME pcount is wrong
@@ -67,12 +66,13 @@ public class FitsWriter implements StatefulProcessor {
                     while (iterator.hasNext()) {
                         HeaderCard next = iterator.next();
                         if (next.getKey().startsWith(TFORM)) {
-                            String s = next.getKey().toLowerCase();
-                            String substring = s.substring(5);
+                            String key = next.getKey().toLowerCase();
+                            String substring = key.substring(5);
                             int tformNumber = Integer.valueOf(substring);
-                            String ttype = names.get(tformNumber - 1);
                             HeaderCard headerCard = new HeaderCard(
-                                    TTYPE + tformNumber, ttype, "");
+                                    TTYPE + tformNumber, // 'TTYPE'+number
+                                    names.get(tformNumber - 1), // ttype
+                                    ""); // comment
                             basicHDU.getHeader().addLine(headerCard);
                         }
                     }
@@ -105,55 +105,68 @@ public class FitsWriter implements StatefulProcessor {
         return null;
     }
 
-    private void collectObjects (String key, Serializable serialized) throws FitsException {
+    /**
+     * Consider given serialized object and save it to array list of values if
+     * it has primitive JAVA type. Complex objects are escaped.
+     *
+     * @param key        object name
+     * @param serialized serialized object from data item
+     * @throws FitsException
+     */
+    private void collectObjects (String key, Serializable serialized)
+            throws FitsException {
         Class<? extends Serializable> type = serialized.getClass();
+        // save number of values to decide afterwards if the key should be
+        // saved or not (some complex structures are ignored)
+        int oldValuesCount = values.size();
         if (type.isArray()) {
             if (serialized instanceof int[]) {
                 int[] arr = (int[]) serialized;
-                names.add(key);
                 values.add(arr);
             } else if (serialized instanceof double[]) {
                 double[] arr = (double[]) serialized;
                 values.add(arr);
-                names.add(key);
             } else if (serialized instanceof byte[]) {
                 byte[] arr = (byte[]) serialized;
                 values.add(arr);
-                names.add(key);
             } else if (serialized instanceof String[]) {
-
+                String[] arr = (String[]) serialized;
+                values.add(arr);
             } else if (serialized instanceof float[]) {
-
+                float[] arr = (float[]) serialized;
+                values.add(arr);
             } else if (serialized instanceof short[]) {
-
+                short[] arr = (short[]) serialized;
+                values.add(arr);
             } else if (serialized instanceof long[]) {
-
+                long[] arr = (long[]) serialized;
+                values.add(arr);
             } else if (serialized instanceof boolean[]) {
-
+                boolean[] arr = (boolean[]) serialized;
+                values.add(arr);
             }
         } else {
             if (ClassUtils.isAssignable(type, String.class)) {
                 values.add(new String[]{(String) serialized});
-                names.add(key);
             } else if (ClassUtils.isAssignable(type, Integer.class)) {
                 values.add(new int[]{(int) serialized});
-                names.add(key);
             } else if (ClassUtils.isAssignable(type, Double.class)) {
                 values.add(new double[]{(double) serialized});
-                names.add(key);
             } else if (ClassUtils.isAssignable(type, Float.class)) {
                 values.add(new float[]{(float) serialized});
-                names.add(key);
             } else if (ClassUtils.isAssignable(type, Short.class)) {
                 values.add(new short[]{(short) serialized});
-                names.add(key);
             } else if (ClassUtils.isAssignable(type, Long.class)) {
                 values.add(new long[]{(long) serialized});
-                names.add(key);
             } else if (ClassUtils.isAssignable(type, Boolean.class)) {
                 values.add(new boolean[]{(boolean) serialized});
-                names.add(key);
             }
+        }
+
+        // add key to the list of object names if given object has been
+        // added to the list of values
+        if (oldValuesCount < values.size()) {
+            names.add(key);
         }
     }
 }
