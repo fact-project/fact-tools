@@ -29,20 +29,8 @@ public class Signal implements Processor {
 
         ProbabilityDistribution distribution = predictor.predict(data);
         if (distribution != null){
-            data.put("@signal", distribution.getProbability(signalClassName));
+            data.put("signal:prediction", distribution.getProbability(signalClassName));
         }
         return data;
-    }
-
-    public void setPredictor(fact.PredictionService predictor) {
-        this.predictor = predictor;
-    }
-
-    public void setPredictionThreshold(double predictionThreshold) {
-        this.predictionThreshold = predictionThreshold;
-    }
-
-    public void setSignalClassName(String signalClassName) {
-        this.signalClassName = signalClassName;
     }
 }
