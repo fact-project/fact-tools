@@ -61,7 +61,7 @@ public class FitsWriter implements StatefulProcessor {
             table.addRow(valuesArr);
             try {
                 if (counter == 2) {
-                    //FIXME naxis1 is wrong, pcount is wrong
+                    //FIXME pcount is wrong
                     BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
                     Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
                     while (iterator.hasNext()) {
@@ -75,6 +75,19 @@ public class FitsWriter implements StatefulProcessor {
                                     TTYPE + tformNumber, ttype, "");
                             basicHDU.getHeader().addLine(headerCard);
                         }
+                    }
+
+                    // retrieve the true NAXIS1 value
+                    Header header = new Header();
+                    table.fillHeader(header);
+
+                    // set true NAXIS1 value in the basic hdu used for writing
+                    HeaderCard naxis1 = header.findCard("NAXIS1");
+                    if (naxis1 != null) {
+                        basicHDU.addValue(
+                                naxis1.getKey(),
+                                naxis1.getValue(),
+                                naxis1.getComment());
                     }
                     fits.addHDU(basicHDU);
                     fits.write(bf);
