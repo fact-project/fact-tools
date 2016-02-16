@@ -15,9 +15,12 @@ import stream.annotations.Parameter;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
+ * Write data with given keys into fits file.
+ *
  * @author alexey
  */
 public class FitsWriter implements StatefulProcessor {
@@ -26,6 +29,9 @@ public class FitsWriter implements StatefulProcessor {
 
     @Parameter(required = true)
     private Keys keys = new Keys("");
+
+    @Parameter(required = true)
+    private URL url;
 
     private final static String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
 
@@ -45,7 +51,7 @@ public class FitsWriter implements StatefulProcessor {
         fits = new Fits();
         table = new BinaryTable();
         //TODO output selection
-        bf = new BufferedFile("test" + counter + ".fits", "rw");
+        bf = new BufferedFile(url.getFile(), "rw");
     }
 
     @Override
