@@ -55,6 +55,43 @@ public class FitsWriter implements StatefulProcessor {
 
     @Override
     public void finish () throws Exception {
+        //FIXME pcount is wrong
+        BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
+        Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
+        while (iterator.hasNext()) {
+            HeaderCard next = iterator.next();
+            if (next.getKey().startsWith(TFORM)) {
+                String key = next.getKey().toLowerCase();
+                String substring = key.substring(5);
+                int tformNumber = Integer.valueOf(substring);
+                HeaderCard headerCard = new HeaderCard(
+                        TTYPE + tformNumber, // 'TTYPE'+number
+                        names.get(tformNumber - 1), // ttype
+                        ""); // comment
+                basicHDU.getHeader().addLine(headerCard);
+            }
+
+            // remove information about dimensionality as it is described by TFORM
+            if (next.getKey().startsWith("TDIM")) {
+                basicHDU.getHeader().deleteKey(next.getKey());
+            }
+        }
+
+        // retrieve the true NAXIS1 value
+        Header header = new Header();
+        table.fillHeader(header);
+
+        // set true NAXIS1 value in the basic hdu used for writing
+        HeaderCard naxis1 = header.findCard(NAXIS_1);
+        if (naxis1 != null) {
+            basicHDU.addValue(
+                    naxis1.getKey(),
+                    naxis1.getValue(),
+                    naxis1.getComment());
+        }
+        fits.addHDU(basicHDU);
+        fits.write(bf);
+        bf.close();
     }
 
     @Override
@@ -75,46 +112,6 @@ public class FitsWriter implements StatefulProcessor {
 
         try {
             table.addRow(values.toArray());
-            try {
-                if (counter == 2) {
-                    //FIXME pcount is wrong
-                    BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
-                    Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
-                    while (iterator.hasNext()) {
-                        HeaderCard next = iterator.next();
-                        if (next.getKey().startsWith(TFORM)) {
-                            String key = next.getKey().toLowerCase();
-                            String substring = key.substring(5);
-                            int tformNumber = Integer.valueOf(substring);
-                            HeaderCard headerCard = new HeaderCard(
-                                    TTYPE + tformNumber, // 'TTYPE'+number
-                                    names.get(tformNumber - 1), // ttype
-                                    ""); // comment
-                            basicHDU.getHeader().addLine(headerCard);
-                        }
-                    }
-
-                    // retrieve the true NAXIS1 value
-                    Header header = new Header();
-                    table.fillHeader(header);
-
-                    // set true NAXIS1 value in the basic hdu used for writing
-                    HeaderCard naxis1 = header.findCard(NAXIS_1);
-                    if (naxis1 != null) {
-                        basicHDU.addValue(
-                                naxis1.getKey(),
-                                naxis1.getValue(),
-                                naxis1.getComment());
-                    }
-                    fits.addHDU(basicHDU);
-                    fits.write(bf);
-                    bf.close();
-                }
-                counter++;
-            } catch (IOException | FitsException e) {
-                e.printStackTrace();
-            }
-            names.clear();
             values.clear();
         } catch (FitsException e) {
             e.printStackTrace();
