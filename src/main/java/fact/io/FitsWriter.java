@@ -20,6 +20,7 @@ public class FitsWriter implements StatefulProcessor {
 
     public static final String TTYPE = "TTYPE";
     public static final String TFORM = "TFORM";
+    public static final String NAXIS_1 = "NAXIS1";
     static int counter = 0;
     private Fits fits;
 
@@ -82,7 +83,7 @@ public class FitsWriter implements StatefulProcessor {
                     table.fillHeader(header);
 
                     // set true NAXIS1 value in the basic hdu used for writing
-                    HeaderCard naxis1 = header.findCard("NAXIS1");
+                    HeaderCard naxis1 = header.findCard(NAXIS_1);
                     if (naxis1 != null) {
                         basicHDU.addValue(
                                 naxis1.getKey(),
@@ -120,6 +121,7 @@ public class FitsWriter implements StatefulProcessor {
         // saved or not (some complex structures are ignored)
         int oldValuesCount = values.size();
         if (type.isArray()) {
+            // add array of primitive values
             if (serialized instanceof int[]) {
                 int[] arr = (int[]) serialized;
                 values.add(arr);
@@ -146,6 +148,7 @@ public class FitsWriter implements StatefulProcessor {
                 values.add(arr);
             }
         } else {
+            // add single primitive value as array of length 1
             if (ClassUtils.isAssignable(type, String.class)) {
                 values.add(new String[]{(String) serialized});
             } else if (ClassUtils.isAssignable(type, Integer.class)) {
