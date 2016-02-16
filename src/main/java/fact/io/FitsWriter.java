@@ -185,7 +185,9 @@ public class FitsWriter implements StatefulProcessor {
         // add key to the list of object names if given object has been
         // added to the list of values
         if (oldValuesCount < values.size()) {
-            names.add(key);
+            if (!names.contains(key)) {
+                names.add(key);
+            }
         }
     }
 }
