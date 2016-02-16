@@ -1,14 +1,16 @@
 <container>
 
-    <properties url="classpath:/default/settings.properties" />
+    <properties url="classpath:/default/settings_mc.properties" />
 
 
     <!-- Pathes to the input files -->
 
-    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Proton/" />
+    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Gamma/" />
+<!--    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Gamma/" />-->
+
     <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/" />
-    <property name="filename" value="proton1" />
-    <property name="label" value="0"/>
+    <property name="filename" value="train_gamma_50000" />
+    <property name="label" value="1"/>
 
 
 
@@ -23,55 +25,47 @@
 
 
     <stream id="fact" class="fact.io.RecursiveDirectoryStream"
-            pattern="*_Events.fits.gz"  url="${infolder}" limit="1000">
+            pattern="*_Events.fits.gz"  url="${infolder}" limit="100000">
         <stream class="fact.io.FitsStream" id="_" />
     </stream>
 
+
     <process id="2" input="fact" >
+
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+
+        <Skip condition="%{data.EventNum} !=145" />
+
 
         <include url="classpath:/default/mc/calibration_mc.xml" />
 
-        <fact.extraction.BasicExtraction
-                dataKey="DataCalibrated"
-                outputKeyMaxAmplPos="maxPos"
-                outputKeyPhotonCharge="photoncharge"
-                url="${integralGainFile}"
-                startSearchWindow="${basicExtraction_startSearchWindow}"
-                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"/>
+        <include url="classpath:/default/mc/extraction_mc.xml" />
 
-        <fact.extraction.RisingEdgeForPositions
-                dataKey="DataCalibrated"
-                outputKey="ArrtimePos"
-                amplitudePositionsKey="maxPos"
-                maxSlopesKey="maxSlope"/>
 
         <fact.cleaning.MotionCleaning
                 threshold = "30"
                 outputKey = "pixelSet"
-                numPixelKey="numShowerPixel"/>
+                numPixelKey="numPixelInShower"/>
 
-        <Skip condition="%{data.numShowerPixel} &lt; 15 "/>
+        <Skip condition="%{data.numPixelInShower} &lt; 30 "/>
 
-        <fact.features.DistributionFromShower
-                weightsKey="photoncharge"
-                pixelSetKey="pixelSet"
-                sizeKey="Size"
-                outputKey="showerDistribution"
-        />
+        <include url="classpath:/default/mc/parameterCalc_mc.xml" />
 
         <fact.hexmap.ClusterFellwalker
                 pixelSetKey="pixelSet"
                 minShowerpixel="2"
         />
 
+        <Skip condition="%{data.numCluster} == 0" />
 
         <fact.features.ClusterArrivalTimes
                 pixelSetKey="pixelSet"
                 minShowerpixel="2"
         />
 
-        <Skip condition="%{data.numCluster} == 0" />
+
+
+        <include url="classpath:/default/mc/sourceParameter_mc.xml" />
 
         <fact.features.SetLabel
             label="${label}"
@@ -80,7 +74,10 @@
 
         <fact.ShowViewer key="DataCalibrated"/>
 
-        <!--<fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,numShowerPixel,numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" url="${outfolder}${filename}.json"/>-->
+        <!--<fact.io.JSONWriter keys="MCorsikaEvtHeader.fTotalEnergy,${stat_phCharge_param},${stat_arrTime_param},${stat_maxSlopes_param},${stat_arrTimePos_param},${stat_maxSlopesPos_param},${stat_maxPos_param},${spread_param},${shower_param},${conc_param}Theta,Alpha,Distance,CosDeltaAlpha,numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,distanceCog,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity,stdArrivaltime,boundRatioAT,idealBoundDiffAT,boundAngleSumAT,distanceCogMeanAT,numClusterAT" url="${outfolder}${filename}.json"/>-->
+
+
+
 
     </process>
 

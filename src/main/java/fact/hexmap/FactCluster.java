@@ -385,24 +385,27 @@ public class FactCluster {
      */
     public int boundAngleSum(){
         ArrayList<FactCameraPixel> sortedBound = findSortedBoundary();
-        int cuDir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(0).id), mapping.getCubeCoordinatesFromId(sortedBound.get(1).id));
-        int countChangeDir = 0;
+        if(sortedBound.size() > 1) {
+            int cuDir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(0).id), mapping.getCubeCoordinatesFromId(sortedBound.get(1).id));
+            int countChangeDir = 0;
 
-        for(int i=1; i<sortedBound.size()-1; i++){
-         int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(i).id), mapping.getCubeCoordinatesFromId(sortedBound.get(i+1).id));
-         if(cuDir != dir){
-             countChangeDir++;
-             cuDir = dir;
-         }
+            for (int i = 1; i < sortedBound.size() - 1; i++) {
+                int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(i).id), mapping.getCubeCoordinatesFromId(sortedBound.get(i + 1).id));
+                if (cuDir != dir) {
+                    countChangeDir++;
+                    cuDir = dir;
+                }
 
+            }
+
+            int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(sortedBound.size() - 1).id), mapping.getCubeCoordinatesFromId(sortedBound.get(0).id));
+            if (cuDir != dir) {
+                countChangeDir++;
+            }
+
+            return countChangeDir;
         }
-
-        int dir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(sortedBound.size()-1).id), mapping.getCubeCoordinatesFromId(sortedBound.get(0).id));
-        if(cuDir != dir){
-         countChangeDir++;
-        }
-
-        return countChangeDir;
+        else {return 0;}
 
     }
 

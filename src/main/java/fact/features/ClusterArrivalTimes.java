@@ -30,8 +30,8 @@ public class ClusterArrivalTimes implements Processor {
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
     protected String pixelSetKey = null;
 
-    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "ArrtimePos")
-    protected String arrivaltimePosKey = "ArrtimePos";
+    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
+    protected String arrivaltimePosKey = "arrivalTimePos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
     protected String photonchargeKey = "photoncharge";
@@ -150,6 +150,7 @@ public class ClusterArrivalTimes implements Processor {
 
         int numCluster = showerCluster.length;
 
+
         /* build 1440-int array that contains the id's of the cluster that survive 'removeCluster' for every pixel.
          * (Just to have a quick look at it in the event viewer, not relevant for the algorithm itself or the resulting event parameters.)
         */
@@ -229,13 +230,13 @@ public class ClusterArrivalTimes implements Processor {
             double stdArrivaltime = stdArrivaltime(showerCluster);
             double ratio = boundContentRatio(showerCluster);
             double idealBoundDiff = idealBoundDiff(showerCluster);
-            double boundAngleMean = boundAngleSum(showerCluster);
+            //double boundAngleMean = boundAngleSum(showerCluster);
             double distanceCogMean = distanceCog(showerCluster, cogX, cogY);
 
             data.put("stdArrivaltime", stdArrivaltime);
             data.put("boundRatioAT", ratio);
             data.put("idealBoundDiffAT", idealBoundDiff);
-            data.put("boundAngleSumAT", boundAngleMean);
+            //data.put("boundAngleSumAT", boundAngleMean);
             data.put("distanceCogMeanAT", distanceCogMean);
 
 
@@ -246,15 +247,15 @@ public class ClusterArrivalTimes implements Processor {
             data.put("stdArrivaltime", null);
             data.put("boundRatioAT", null);
             data.put("idealBoundDiffAT", null);
-            data.put("boundAngleSumAT", null);
+            //data.put("boundAngleSumAT", null);
             data.put("distanceCogMeanAT", null);
 
         }
-        data.put("AllClusterID", clusterID);
-        data.put("ShowerClusterID", showerClusterID);
-        data.put("ClusterNoCleaning", cluster);
-        data.put("numCluster", numCluster);
-        data.put("label", label);
+        data.put("AllClusterIDAT", clusterID);
+        data.put("ShowerClusterIDAT", showerClusterID);
+        data.put("ClusterNoCleaningAT", cluster);
+        data.put("numClusterAT", numCluster);
+
 
 
 

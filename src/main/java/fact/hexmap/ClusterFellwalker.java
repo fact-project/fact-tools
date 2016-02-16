@@ -27,8 +27,8 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
     protected String pixelSetKey = null;
 
-    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "ArrtimePos")
-    protected String arrivaltimePosKey = "ArrtimePos";
+    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
+    protected String arrivaltimePosKey = "arrivalTimePos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
     protected String photonchargeKey = "photoncharge";
@@ -44,6 +44,9 @@ public class ClusterFellwalker implements Processor {
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
         double[] photoncharge = ((double[]) data.get(photonchargeKey));
+        double cogX = (double) data.get("COGx");
+        double cogY = (double) data.get("COGy");
+
 
         //get 'shower' as int array with pixel id's from 'pixelSet' (HashSet)
         int [] shower = pixelSet.toIntArray();
@@ -181,6 +184,7 @@ public class ClusterFellwalker implements Processor {
             double idealBoundDiff = idealBoundDiff(showerCluster);
             double boundAngleSum = boundAngleSum(showerCluster);
             double distanceCenterSum = distanceCenter(showerCluster);
+            double distanceCog = distanceCog(showerCluster, cogX, cogY);
 
             int convexity = searchForCompactGroups(showerCluster, showerClusterID);
 
@@ -203,6 +207,7 @@ public class ClusterFellwalker implements Processor {
             data.put("idealBoundDiff", idealBoundDiff);
             data.put("boundAngleSum", boundAngleSum);
             data.put("distanceCenterSum", distanceCenterSum);
+            data.put("distanceCog", distanceCog);
             data.put("neighborCluster", numNeighborCluster);
             data.put("chargeMax", chargeMaxClusterRatio);
             data.put("maxClusterNumPixel", numPixelMaxCluster);
@@ -217,6 +222,7 @@ public class ClusterFellwalker implements Processor {
             data.put("idealBoundDiff", null);
             data.put("boundAngleSum", null);
             data.put("distanceCenterSum", null);
+            data.put("distanceCog", null);
             data.put("neighborCluster", null);
             data.put("chargeMax", null);
             data.put("maxClusterNumPixel", null);
@@ -401,6 +407,14 @@ public class ClusterFellwalker implements Processor {
         double sum = 0;
         for (FactCluster c : showerCluster){
             sum += c.distanceCamCenter();
+        }
+        return sum/showerCluster.length;
+    }
+
+    public double distanceCog(FactCluster [] showerCluster, double cogX, double cogY){
+        double sum = 0;
+        for (FactCluster c : showerCluster){
+            sum += c.distanceCog(cogX, cogY);
         }
         return sum/showerCluster.length;
     }
