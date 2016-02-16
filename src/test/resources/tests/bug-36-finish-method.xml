@@ -1,0 +1,24 @@
+<container>
+    <property name="num_copies" value="12" />
+
+    <stream id="random" class="stream.generator.RandomStream"/>
+
+    <queue id="result" />
+
+    <process id="reader-${copy.id}" input="random" copies="${num_copies}">
+        <CreateID />
+        <fact.utils.Finisher group="enqueue" />
+        <Enqueue queue="result"/>
+
+    </process>
+
+    <process id="collector-${copy.id}" input="result" copies="4">
+        <!--
+
+        <If condition="%{data.att1} &gt; 4.0">
+                <PrintData/>
+        </If>
+    -->
+        <fact.utils.Finisher group="result" />
+    </process>
+</container>
