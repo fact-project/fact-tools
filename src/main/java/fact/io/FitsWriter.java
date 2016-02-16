@@ -5,9 +5,13 @@ import nom.tam.fits.common.FitsException;
 import nom.tam.util.BufferedFile;
 import nom.tam.util.Cursor;
 import org.apache.commons.lang3.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
+import stream.Keys;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+import stream.annotations.Parameter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,6 +21,13 @@ import java.util.ArrayList;
  * @author alexey
  */
 public class FitsWriter implements StatefulProcessor {
+
+    static Logger log = LoggerFactory.getLogger(FitsWriter.class);
+
+    @Parameter(required = true)
+    private Keys keys = new Keys("");
+
+    private final static String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
 
     public static final String TTYPE = "TTYPE";
     public static final String TFORM = "TFORM";
@@ -48,15 +59,20 @@ public class FitsWriter implements StatefulProcessor {
 
     @Override
     public Data process (Data data) {
-        //TODO key selection
-        for (String key : data.keySet()) {
-            Serializable serializable = data.get(key);
-            try {
-                collectObjects(key, serializable);
-            } catch (Exception e) {
-                e.printStackTrace();
+        // process keys
+        try {
+            for (String key : defaultKeys) {
+                collectObjects(key, data.get(key));
             }
+
+            for (String key : keys.select(data)) {
+                collectObjects(key, data.get(key));
+            }
+        } catch (Exception e) {
+            log.error("Collecting objects for FitsWriter thrown an exception." +
+                    "Data will not be written.\nError message:{}", e.getMessage());
         }
+
         try {
             table.addRow(values.toArray());
             try {
