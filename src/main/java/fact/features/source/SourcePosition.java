@@ -28,7 +28,7 @@ import stream.annotations.Service;
  * exactly in the center but at some point (X,Y). This point will be called
  * source position from now on. The point (0.0, 0.0) is the center of the
  * camera. In order to calculate the source position we need to know where the
- * telescope is looking. And at what time exactly. This item is written by the
+ * telescope is looking. And at what time exactly. This data is written by the
  * telescope drive system into auxilary .fits files called
  * DRIVE_CONTROL_SOURCE_POSITION and DRIVE_CONTROL_TRACKING_POSITION.
  *
@@ -37,13 +37,13 @@ import stream.annotations.Service;
  * case you want to get the coordinates of a star projected onto the camera
  * plane)
  *
- * For item processing we need the auxService to read item from both the
+ * For data processing we need the auxService to read data from both the
  * DRIVE_CONTROL_SOURCE_POSITION and the DRIVE_CONTROL_TRACKING_POSITION files.
- * The first contains the name and celestial coordinates of the source we're at
- * looking while the second contains information at where the telescope pointing
+ * The first contains the name and celestial coordinates of the source we're 
+ * looking at while the second contains information at where the telescope is pointing
  * which is updated in small intervals.
  *
- * Unfortunately MC processed files have to be treated differently than item
+ * Unfortunately MC processed files have to be treated differently than data
  * files since there are no pointing positions written to auxiliary files. For
  * newer ceres versions which allow the simulation of wobble positions (after
  * revision 18159), the source and pointing information are simply taken from
@@ -58,10 +58,10 @@ import stream.annotations.Service;
 public class SourcePosition implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
-    @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
-    private String outputKey = null;
+    @Parameter(required = false, description = "The key for all output objects written to the data item.", defaultValue="source")
+    private String outputKey = "source";
 
-
+    // TODO specify default value
     @Service(description = "Name of the service that provides aux files")
     private AuxiliaryService auxService;
 
@@ -70,7 +70,7 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false)
     private Double y = null;
 
-    // TODO Standards setzen?
+    // TODO specify default values
     @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
     private String sourceZdKey = null;
     @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
@@ -97,7 +97,7 @@ public class SourcePosition implements StatefulProcessor {
     private final double telescopeLongitude = -17.890701389;
     private final double telescopeLatitude = 28.761795;
     // Distance from earth center
-    private final double distanceToEarthCenter = 4890.0;
+    private final double distanceCameraMirror = 4890.0;
 
     @Override
     public void finish() throws Exception {
@@ -145,23 +145,21 @@ public class SourcePosition implements StatefulProcessor {
     @Override
     public Data process(Data item) {
 
-        // In case the source position is fixed. Used for older ceres version <=
-        // revision 18159
+        // In case the source position is fixed. Used for older ceres version <= revision 18159
         if (x != null && y != null) {
-            // add source position to dataitem
             double[] source = { x, y };
-            // System.out.println("x: "+ source[0] + " y: " +source[1] );
-            item.put("gui:sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
-            item.put(outputKey, source);
+            item.put("gui:sourceOverlay:" + outputKey, new SourcePositionOverlay(outputKey, source));
+            item.put(outputKey + ":x", x);
+            item.put(outputKey + ":y", y);
 
-            item.put("source:azTracking", 0);
-            item.put("source:zdTracking", 0);
+            item.put(outputKey + ":azTracking", 0);
+            item.put(outputKey + ":zdTracking", 0);
 
-            item.put("source:azPointing", 0);
-            item.put("source:zdPointing", 0);
+            item.put(outputKey + ":azPointing", 0);
+            item.put(outputKey + ":zdPointing", 0);
 
-            item.put("source:azCalc", 0);
-            item.put("source:zdCalc", 0);
+            item.put(outputKey + ":azCalc", 0);
+            item.put(outputKey + ":zdCalc", 0);
             return item;
         }
 
@@ -178,26 +176,26 @@ public class SourcePosition implements StatefulProcessor {
             // Now we can calculate the source position from the zd,az
             // coordinates for pointing and source
             double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
-            item.put(outputKey, sourcePosition);
+            item.put(outputKey + ":x", sourcePosition[0]);
+            item.put(outputKey + ":y", sourcePosition[1]);
+            
+            item.put(outputKey + ":azTracking", pointingAz);
+            item.put(outputKey + ":zdTracking", pointingZd);
 
-            item.put("source:azTracking", pointingAz);
-            item.put("source:zdTracking", pointingZd);
+            item.put(outputKey + ":azPointing", pointingAz);
+            item.put(outputKey + ":zdPointing", pointingZd);
 
-            item.put("source:azPointing", pointingAz);
-            item.put("source:zdPointing", pointingZd);
+            item.put(outputKey + ":azCalc", sourceAz);
+            item.put(outputKey + ":zdCalc", sourceZd);
 
-            item.put("source:azCalc", sourceAz);
-            item.put("source:zdCalc", sourceZd);
-
-            item.put("gui:sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
+            item.put("gui:sourceOverlay:" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
             return item;
         }
 
         try {
             int[] eventTime = (int[]) item.get("UnixTimeUTC");
             if (eventTime == null) {
-                log.error("The key \"UnixTimeUTC \" was not found in the event. Ignoring event");
-                return null;
+                throw new RuntimeException("The key \"UnixTimeUTC \" was not found in the event.");
             }
 
             DateTime timeStamp = new DateTime((long) ((eventTime[0] + eventTime[1] / 1000000.) * 1000),
@@ -227,30 +225,37 @@ public class SourcePosition implements StatefulProcessor {
 
             // pointAzDz should be equal to the az dz written by the drive
             // double dev = Math.abs(point.Az - pointingAzDe[0]);
-
-            double[] sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gmst);
-
+            
+            double[] sourceAzZd = {0,0};
+            // If we want to calculate the position of a star in the camera, the variables sourceDeclination and
+            // sourceRightAscension are set via the xml file. In this case we use these variables for calculating
+            // Az and Zd.
+            // In the other case we use the informations of the source aux file. The file also contains the name of
+            // the source, which we than put in the data item.
             if (sourceDeclination != null && sourceRightAscension != null) {
                 sourceAzZd = getAzZd(sourceRightAscension, sourceDeclination, gmst);
             }
+            else {
+                sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gmst);
+            	String sourceName = sourcePoint.getString("Name");
+                item.put(outputKey + ":name", sourceName);
+            }
 
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
+            
+            item.put(outputKey + ":x", sourcePosition[0]);
+            item.put(outputKey + ":y", sourcePosition[1]);
+            
+            item.put(outputKey + ":azTracking", trackingPoint.getDouble("Az"));
+            item.put(outputKey + ":zdTracking", trackingPoint.getDouble("Zd"));
 
-            String sourceName = sourcePoint.getString("Name");
-            item.put("source:name", sourceName);
-            item.put(outputKey, sourcePosition);
+            item.put(outputKey + ":azPointing", pointingAzZd[0]);
+            item.put(outputKey + ":zdPointing", pointingAzZd[1]);
 
-            item.put("source:azTracking", trackingPoint.getDouble("Az"));
-            item.put("source:zdTracking", trackingPoint.getDouble("Zd"));
+            item.put(outputKey + ":azCalc", sourceAzZd[0]);
+            item.put(outputKey + ":zdCalc", sourceAzZd[1]);
 
-            item.put("source:azPointing", pointingAzZd[0]);
-            item.put("source:zdPointing", pointingAzZd[1]);
-
-            item.put("source:azCalc", sourceAzZd[0]);
-            item.put("source:zdCalc", sourceAzZd[1]);
-
-            item.put("gui:Source" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
-
+            item.put("gui:sourceOverlay:" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
         } catch (IllegalArgumentException e) {
             log.error("Ignoring event.  " + e.getLocalizedMessage());
             return null;
@@ -373,7 +378,7 @@ public class SourcePosition implements StatefulProcessor {
         x_rot = -Math.sin(-zd) * z - Math.cos(-zd) * (Math.cos(-az) * x - Math.sin(-az) * y);
         y_rot = Math.sin(-az) * x + Math.cos(-az) * y;
         z_rot = Math.cos(-zd) * z - Math.sin(-zd) * (Math.cos(-az) * x - Math.sin(-az) * y);
-        double[] r = { x_rot * (-distanceToEarthCenter) / z_rot, y_rot * (-distanceToEarthCenter) / z_rot };
+        double[] r = { x_rot * (-distanceCameraMirror) / z_rot, y_rot * (-distanceCameraMirror) / z_rot };
 
         return r;
     }

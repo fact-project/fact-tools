@@ -2,7 +2,7 @@
 		<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
 		<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
-    <stream class="fact.io.FitsStream" id="fact" url="${infile}" />
+    <stream class="fact.io.zfits.ZFitsStream" id="fact" url="${infile}" />
 
     <property name="outfile" value="analysis-output.txt" />
     <property name="auxFolder" value="file:src/main/resources/aux/" />
@@ -13,22 +13,22 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <process id="2" input="fact">
-				<RenameKey from="Data" to="raw:data" />
-				<fact.pixelsets.AllPixels outputKey="pixels" />
-        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-				<RenameKey from="StartCellData" to="meta:startCellData" />
+				<!-- <RenameKey from="Data" to="raw:data" /> -->
+		<fact.pixelsets.AllPixels outputKey="pixels" />
+        <RenameKey from="StartCellData" to="meta:startCellData" />
 
         <fact.utils.PreviousEventInfo />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+
         <fact.datacorrection.DrsCalibration url="${drsfile}" />
-
+        <fact.datacorrection.PatchJumpRemoval />
         <fact.datacorrection.RemoveSpikes />
-
         <fact.filter.DrsTimeCalibration />
         <fact.filter.ArrayTimeCorrection />
         <fact.datacorrection.InterpolateTimeSeries calibService="calibService"/>
 
-				<!-- Extract numEstPhotons -->
-				<fact.extraction.BasicExtraction url="${integralGainFile}"/>
+		<!-- Extract numEstPhotons -->
+		<fact.extraction.BasicExtraction url="${integralGainFile}"/>
         <fact.extraction.EstimateBaseline />
         <fact.extraction.TimeOverThreshold />
         <fact.datacorrection.CorrectSaturation />
@@ -46,19 +46,34 @@
         <fact.statistics.ArrayStatistics key="pixels:estNumPhotons"/>
         <fact.statistics.ArrayStatistics key="pixels:arrivalTimes"/>
 
-        <fact.cleaning.TwoLevelTimeNeighbor calibService="calibService"/>
-        <Skip condition="%{data.shower} == null" />
+        <fact.features.source.SourcePosition outputKey="cetatauri" sourceRightAscension="5.627416667" sourceDeclination="21.1425" auxService="auxService" />
+        <fact.cleaning.TwoLevelTimeNeighbor calibService="calibService" starPositionKeys="cetatauri" />
 
+        <Skip condition="%{data.shower} == null"/>
         <fact.pixelsets.NumPixel pixelSetKey="shower" />
         <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
-        <fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />
-        <fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />
-        <fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />
-        <fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />
+        <!--<fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />-->
+        <!--<fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />-->
+        <!--<fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />-->
+        <!--<fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />-->
+        <fact.LoopValues
+                key="key"
+                values="pixels:estNumPhotons,
+                        pixels:arrivalTimes,
+                        pixels:maxSlopes,
+                        pixels:maxAmplitudePositions"
+                outputKeys="shower:estNumPhotons,
+                            shower:arrivalTimes,
+                            shower:maxSlopes,
+                            shower:maxAmplitudePositions">
+            <fact.statistics.ArrayStatistics key="" pixelSetKey="shower" />
+        </fact.LoopValues>
+        <PrintData/>
 
         <fact.features.Size />
         <fact.features.EllipseParameter/>
+        <fact.features.M3Long/>
         <fact.features.NumberOfIslands/>
         <fact.features.TimeGradient />
         <fact.features.Concentration/>
@@ -69,6 +84,43 @@
         <fact.features.ShowerSlope />
         <fact.features.Disp />
 
-				<fact.io.JSONWriter keys="pixels:*:*,shower:*" url="file:test.json" />
+        <fact.features.source.SourcePosition auxService="auxService" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="1" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="2" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="3" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="4" />
+        <fact.features.source.AntiSourcePosition antiSourcePositionId="5" />
+
+        <fact.features.source.Alpha />
+        <fact.features.source.Distance />
+        <fact.features.source.CosDeltaAlpha />
+        <fact.features.source.Theta />
+
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:alpha,shower:antiSources:2:alpha,shower:antiSources:3:alpha,shower:antiSources:4:alpha,shower:antiSources:5:alpha">
+            <fact.features.source.Alpha key="" />
+        </fact.LoopValues>
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:distance,shower:antiSources:2:distance,shower:antiSources:3:distance,shower:antiSources:4:distance,shower:antiSources:5:distance">
+            <fact.features.source.Distance key="" />
+        </fact.LoopValues>
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:cosDeltaAlpha,shower:antiSources:2:cosDeltaAlpha,shower:antiSources:3:cosDeltaAlpha,shower:antiSources:4:cosDeltaAlpha,shower:antiSources:5:cosDeltaAlpha">
+            <fact.features.source.CosDeltaAlpha key="" />
+        </fact.LoopValues>
+        <fact.LoopValues 
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:theta,shower:antiSources:2:theta,shower:antiSources:3:theta,shower:antiSources:4:theta,shower:antiSources:5:theta">
+            <fact.features.source.Theta key="" />
+        </fact.LoopValues>
+
+		<fact.io.JSONWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test.json" />
     </process>
 </container>

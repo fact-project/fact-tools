@@ -22,20 +22,20 @@ public class Alpha implements Processor {
 	private String cogyKey = "shower:ellipse:cog:y";
 	@Parameter(required = false, defaultValue = "shower:ellipse:delta")
 	private String deltaKey = "shower:ellipse:delta";
-	@Parameter(required = false, defaultValue="sourcePosition:x")
-	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition:y")
-	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="source:x")
+	private String sourcexKey = "source:x";
+	@Parameter(required = false, defaultValue="source:y")
+	private String sourceyKey = "source:y";
 	@Parameter(required = false, defaultValue="shower:source:alpha")
 	private String outputKey = "shower:source:alpha";
 	
 	@Override
 	public Data process(Data item) {
 		
-		Utils.mapContainsKeys(item, sourcePositionXKey, sourcePositionYKey, cogxKey, cogyKey, deltaKey);
+		Utils.mapContainsKeys(item, sourcexKey, sourceyKey, cogxKey, cogyKey, deltaKey);
 
-		double sourcex = (Double) item.get(sourcePositionXKey);
-		double sourcey = (Double) item.get(sourcePositionYKey);
+		double sourcex = (Double) item.get(sourcexKey);
+		double sourcey = (Double) item.get(sourceyKey);
 
 		double cogx = (Double) item.get(cogxKey);
 		double cogy = (Double) item.get(cogyKey);

@@ -14,24 +14,24 @@ import stream.annotations.Parameter;
 public class AntiSourcePosition implements Processor {
 	static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
 	
-	@Parameter(required = false, defaultValue="sourcePosition:x")
-	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition:y")
-	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="source:x")
+	private String sourcexKey = "source:x";
+	@Parameter(required = false, defaultValue="source:y")
+	private String sourceyKey = "source:y";
 	@Parameter(required = false, defaultValue="5")
 	private int numberOfAntiSourcePositions = 5;
 	@Parameter(required=true)
 	private int antiSourcePositionId;
-	@Parameter(required = false, description = "The outputkey for the antiSourcePosition, if not specified antiSourcePosition:<id> is used")
+	@Parameter(required = false, description = "The outputkey for the antiSourcePosition, if not specified antiSources:<id> is used")
 	private String outputKey = null;
 
 	@Override
 	public Data process(Data item) {
 		
-		Utils.mapContainsKeys(item, sourcePositionXKey, sourcePositionYKey);
+		Utils.mapContainsKeys(item, sourcexKey, sourceyKey);
 		
-		double sourcex = (Double) item.get(sourcePositionXKey);
-		double sourcey = (Double) item.get(sourcePositionYKey);
+		double sourcex = (Double) item.get(sourcexKey);
+		double sourcey = (Double) item.get(sourceyKey);
 		
 		double antisourcex = 0;
 		double antisourcey = 0;
@@ -41,7 +41,7 @@ public class AntiSourcePosition implements Processor {
 		antisourcey = sourcex * Math.sin(rotAngle) + sourcey * Math.cos(rotAngle);
 		
 		if (outputKey == null){
-			outputKey = "antiSourecPosition:"+ antiSourcePositionId;
+			outputKey = "antiSources:"+ antiSourcePositionId;
 		}
 				
 		item.put(outputKey + ":x", antisourcex);

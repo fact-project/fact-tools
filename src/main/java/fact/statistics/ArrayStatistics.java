@@ -72,7 +72,7 @@ public class ArrayStatistics implements Processor {
         item.put(outputKey + ":" + "skewness", s.getSkewness());
         item.put(outputKey + ":" + "sum", s.getSum());
         item.put(outputKey + ":" + "pSigmaLow", s.getPercentile(15.87));
-        item.put(outputKey + ":" + "pSimgaHigh", s.getPercentile(84.13));
+        item.put(outputKey + ":" + "pSigmaHigh", s.getPercentile(84.13));
         item.put(outputKey + ":" + "p25", s.getPercentile(25));
         item.put(outputKey + ":" + "p75", s.getPercentile(75));
 

@@ -19,10 +19,10 @@ import stream.annotations.Parameter;
 public class CosDeltaAlpha implements Processor{
 	
 	
-	@Parameter(required = false, defaultValue="sourcePosition:x")
-	private String sourcePositionXKey = "sourcePosition:x";
-	@Parameter(required = false, defaultValue="sourcePosition:y")
-	private String sourcePositionYKey = "sourcePosition:y";
+	@Parameter(required = false, defaultValue="source:x")
+	private String sourcexKey = "source:x";
+	@Parameter(required = false, defaultValue="source:y")
+	private String sourceyKey = "source:y";
 	@Parameter(required = false, defaultValue = "shower:ellipse:cog:x")
 	private String cogxKey = "shower:ellipse:cog:x";
 	@Parameter(required = false, defaultValue = "shower:ellipse:cog:y")
@@ -36,10 +36,10 @@ public class CosDeltaAlpha implements Processor{
 	public Data process(Data item)
 	{
 		
-		Utils.mapContainsKeys( item, sourcePositionXKey, sourcePositionYKey, cogxKey, cogyKey, deltaKey);
+		Utils.mapContainsKeys( item, sourcexKey, sourceyKey, cogxKey, cogyKey, deltaKey);
 		
-		double sourcex = (Double) item.get(sourcePositionXKey);
-		double sourcey = (Double) item.get(sourcePositionYKey);
+		double sourcex = (Double) item.get(sourcexKey);
+		double sourcey = (Double) item.get(sourceyKey);
 
 		double cogx = (Double) item.get(cogxKey);
 		double cogy = (Double) item.get(cogyKey);

@@ -21,17 +21,14 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	
 	static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
 	
-	@Parameter(required = false, description = "Key of the array of photoncharge.")
-	public  String photonChargeKey = "pixels:estNumPhotons";
+	@Parameter(required = false, defaultValue="pixels:estNumPhotons", description = "Key of the array of photoncharge.")
+	public  String estNumPhotonsKey = "pixels:estNumPhotons";
 
-	@Parameter(required = false)
+	@Parameter(required = false, defaultValue="shower")
 	public String pixelSetKey = "shower";
 
-	@Parameter(required = false, description = "The key of the generated value.")
+	@Parameter(required = false, defaultValue="shower:concentrationCOG", description = "The key of the generated value.")
 	private String outputKey = "shower:concentrationCOG";
-
-	
-
 
 	/**
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
@@ -39,13 +36,13 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	@Override
 	public Data process(Data item)
 	{
-		Utils.mapContainsKeys( item, pixelSetKey, photonChargeKey, pixelSetKey + ":ellipse:cog:x");
+		Utils.mapContainsKeys( item, pixelSetKey, estNumPhotonsKey, pixelSetKey + ":ellipse:cog:x");
 		
 		double cogx = (Double) item.get(pixelSetKey + ":ellipse:cog:x");
 		double cogy = (Double) item.get(pixelSetKey + ":ellipse:cog:y");
 		double size = (Double) item.get(pixelSetKey + ":size");
 
-        double[] photonCharge = (double[]) item.get(photonChargeKey);
+        double[] estNumPhotons = (double[]) item.get(estNumPhotonsKey);
 		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		if (cogPixel == null)
 		{
@@ -81,7 +78,7 @@ public class ConcentrationAtCenterOfGravity implements Processor
 			}
 		}
 		
-		double conc = photonCharge[cogPixel.id] + photonCharge[minChId1.id] + photonCharge[minChId2.id];
+		double conc = estNumPhotons[cogPixel.id] + estNumPhotons[minChId1.id] + estNumPhotons[minChId2.id];
 		conc /= size;
 		item.put(outputKey, conc);
 		

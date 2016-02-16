@@ -143,8 +143,10 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             PixelSet starSet = new PixelSet();
             for (String starPositionKey : starPositionKeys)
             {
-                Utils.isKeyValid(item, starPositionKey, double[].class);
-                double[] starPosition = (double[]) item.get(starPositionKey);
+                Utils.mapContainsKeys(item, starPositionKey + ":x", starPositionKey + ":y");
+                double[] starPosition = {0,0};
+                starPosition[0] = (Double) item.get(starPositionKey+":x");
+                starPosition[1] = (Double) item.get(starPositionKey+":y");
 
                 pixelSetList = removeStarIslands(pixelSetList,starPosition,starSet,starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true)

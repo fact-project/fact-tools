@@ -1,22 +1,11 @@
 <module>
-<fact.extraction.BasicExtraction
-    url="${integralGainFile}"
-/>
-<fact.extraction.EstimateBaseline
-/>
-<fact.extraction.TimeOverThreshold
-/>
-<fact.datacorrection.CorrectSaturation
-/>
-<fact.extraction.BasicExtraction
-/>
-<fact.extraction.ArrivalTimeForPositions
-/>
-<fact.extraction.ArrivalTimePolynomFit
-/>
-<fact.datacorrection.CorrectPixelDelays
-    url="${pixelDelayFile}"
-/>
-<fact.datacorrection.InterpolatePhotondata
-/>
+<fact.extraction.BasicExtraction url="${integralGainFile}" />
+<fact.extraction.EstimateBaseline />
+<fact.extraction.TimeOverThreshold />
+<fact.datacorrection.CorrectSaturation />
+<fact.extraction.BasicExtraction url="${integralGainFile}" />
+<fact.extraction.ArrivalTimeForPositions />
+<fact.extraction.ArrivalTimePolynomFit />
+<fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}" />
+<fact.datacorrection.InterpolatePhotondata calibService="calibService" />
 </module>
