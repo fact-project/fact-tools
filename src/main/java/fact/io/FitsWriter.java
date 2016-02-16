@@ -13,7 +13,6 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,7 +37,6 @@ public class FitsWriter implements StatefulProcessor {
     public static final String TTYPE = "TTYPE";
     public static final String TFORM = "TFORM";
     public static final String NAXIS_1 = "NAXIS1";
-    static int counter = 0;
     private Fits fits;
 
     static ArrayList<String> names = new ArrayList<>(0);
@@ -50,38 +48,17 @@ public class FitsWriter implements StatefulProcessor {
     public void init (ProcessContext processContext) throws Exception {
         fits = new Fits();
         table = new BinaryTable();
-        //TODO output selection
         bf = new BufferedFile(url.getFile(), "rw");
     }
 
     @Override
     public void resetState () throws Exception {
-
     }
 
     @Override
     public void finish () throws Exception {
         //FIXME pcount is wrong
-        BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
-        Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
-        while (iterator.hasNext()) {
-            HeaderCard next = iterator.next();
-            if (next.getKey().startsWith(TFORM)) {
-                String key = next.getKey().toLowerCase();
-                String substring = key.substring(5);
-                int tformNumber = Integer.valueOf(substring);
-                HeaderCard headerCard = new HeaderCard(
-                        TTYPE + tformNumber, // 'TTYPE'+number
-                        names.get(tformNumber - 1), // ttype
-                        ""); // comment
-                basicHDU.getHeader().addLine(headerCard);
-            }
-
-            // remove information about dimensionality as it is described by TFORM
-            if (next.getKey().startsWith("TDIM")) {
-                basicHDU.getHeader().deleteKey(next.getKey());
-            }
-        }
+        BasicHDU<?> basicHDU = updateHDU();
 
         // retrieve the true NAXIS1 value
         Header header = new Header();
@@ -123,6 +100,38 @@ public class FitsWriter implements StatefulProcessor {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Add for each TFORMn a TTYPEn header card containing the name of each
+     * column in the file.
+     *
+     * @return basic hdu
+     * @throws FitsException
+     */
+    private BasicHDU<?> updateHDU () throws FitsException {
+        // add header cards with TTYPEn (n = number) containing names of columns
+        BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
+        Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
+        while (iterator.hasNext()) {
+            HeaderCard next = iterator.next();
+            if (next.getKey().startsWith(TFORM)) {
+                String key = next.getKey().toLowerCase();
+                String substring = key.substring(5);
+                int tformNumber = Integer.valueOf(substring);
+                HeaderCard headerCard = new HeaderCard(
+                        TTYPE + tformNumber, // 'TTYPE'+number
+                        names.get(tformNumber - 1), // ttype
+                        ""); // comment
+                basicHDU.getHeader().addLine(headerCard);
+            }
+
+            // remove information about dimensionality as it is described by TFORM
+            if (next.getKey().startsWith("TDIM")) {
+                basicHDU.getHeader().deleteKey(next.getKey());
+            }
+        }
+        return basicHDU;
     }
 
     /**
