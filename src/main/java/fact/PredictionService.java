@@ -49,7 +49,7 @@ public class PredictionService implements Service {
     String[] classNames = {"0", "1"};
 
     public void init() {
-        log.info("Loading .pmml model");
+        log.info("Loading pmml model from url: " + url);
         try (InputStream is = url.openStream()) {
             Source transformedSource = ImportFilter.apply(new InputSource(is));
             pmml = JAXBUtil.unmarshalPMML(transformedSource);
@@ -107,6 +107,36 @@ public class PredictionService implements Service {
             return null;
         } catch (ClassCastException e){
             log.error("The modell did not return a ProbalilityDistribution");
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public synchronized Double estimate(Data data){
+
+        if (modelEvaluator == null){
+            init();
+        }
+        for(FieldName activeField : activeFields){
+
+            Object rawValue = data.get(activeField.toString());
+
+            FieldValue activeValue = modelEvaluator.prepare(activeField, rawValue);
+
+            arguments.put(activeField, activeValue);
+        }
+        try {
+
+            Map<FieldName, ?> results = modelEvaluator.evaluate(arguments);
+            Object targetValue = results.get(targetName);
+            Double target = (Double) targetValue;
+            return target;
+
+        } catch (MissingFieldException e){
+            log.warn("Event had missing fields or missing field values. Skipping to next event.");
+            return null;
+        } catch (ClassCastException e){
+            log.error("The model did not return a double as target");
             throw new RuntimeException(e);
         }
 

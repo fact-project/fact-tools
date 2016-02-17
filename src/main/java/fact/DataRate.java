@@ -81,6 +81,7 @@ public class DataRate implements StatefulProcessor {
                 input.put("@totalmemory", runtime.totalMemory());
                 input.put("@maxmemory", runtime.maxMemory());
             }
+            input.put("@thread", Thread.currentThread().getName());
             input.put(output, dataRatePerSecond);
 
             stopwatch.reset();
@@ -93,20 +94,4 @@ public class DataRate implements StatefulProcessor {
         return input;
     }
 
-
-    public void setEvery(long every) {
-        this.every = every;
-    }
-
-    public void setSilent(boolean silent) {
-        this.silent = silent;
-    }
-
-    public void setOutput(String output) {
-        this.output = output;
-    }
-
-    public void setLogmemory(boolean logmemory) {
-        this.logmemory = logmemory;
-    }
 }

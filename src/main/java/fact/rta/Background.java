@@ -17,7 +17,6 @@ public class Background implements Processor {
     @Service(required = true)
     fact.PredictionService predictor;
 
-
     @Parameter
     String nameOfBackgroundClassName = "1";
 
@@ -44,7 +43,7 @@ public class Background implements Processor {
                 }
             }
         }
-        //restore original state of the values
+
         data.put("background:prediction", backgroundSignal);
         data.put("background:theta", thetaBackground);
 
