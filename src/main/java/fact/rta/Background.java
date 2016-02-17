@@ -5,6 +5,7 @@ import stream.Data;
 import stream.Keys;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.Serializable;
 
@@ -13,14 +14,12 @@ import java.io.Serializable;
  */
 public class Background implements Processor {
 
-    @Parameter(required = true)
+    @Service(required = true)
     fact.PredictionService predictor;
 
-    @Parameter(required = false, description = "Prediction threshold")
-    double predictionThreshold = 0.5;
 
     @Parameter
-    String signalClassName = "1";
+    String nameOfBackgroundClassName = "1";
 
 
     Keys offKeys = new Keys("Theta_Off_?");
@@ -39,8 +38,8 @@ public class Background implements Processor {
 
             ProbabilityDistribution distribution = predictor.predict(data);
             if (distribution != null){
-                if (distribution.getProbability(signalClassName) > backgroundSignal){
-                    backgroundSignal = distribution.getProbability(signalClassName);
+                if (distribution.getProbability(nameOfBackgroundClassName) > backgroundSignal){
+                    backgroundSignal = distribution.getProbability(nameOfBackgroundClassName);
                     thetaBackground = (double) offValue;
                 }
             }

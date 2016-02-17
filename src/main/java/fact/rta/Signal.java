@@ -6,6 +6,7 @@ import stream.ProcessContext;
 import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 import stream.expressions.version2.AbstractExpression;
 import stream.expressions.version2.Condition;
 import stream.expressions.version2.ConditionFactory;
@@ -15,11 +16,8 @@ import stream.expressions.version2.ConditionFactory;
  */
 public class Signal implements Processor {
 
-    @Parameter(required = true)
+    @Service(required = true)
     fact.PredictionService predictor;
-
-    @Parameter(required = false, description = "Prediction threshold")
-    double predictionThreshold = 0.5;
 
     @Parameter
     String signalClassName = "1";

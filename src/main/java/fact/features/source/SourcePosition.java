@@ -21,6 +21,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.IOException;
 
@@ -60,7 +61,7 @@ public class SourcePosition implements StatefulProcessor {
         this.auxService = auxService;
     }
 
-    @Parameter(required = false, description = "Name of the service that provides aux files")
+    @Service(required = false, description = "Name of the service that provides aux files")
     private AuxiliaryService auxService;
 
     @Parameter(required = false)
