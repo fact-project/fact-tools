@@ -1,7 +1,6 @@
 package fact.io;
 
 import nom.tam.fits.*;
-import nom.tam.fits.common.FitsException;
 import nom.tam.util.BufferedFile;
 import nom.tam.util.Cursor;
 import org.apache.commons.lang3.ClassUtils;
@@ -90,10 +89,15 @@ public class FitsWriter implements StatefulProcessor {
         // set true NAXIS1 value in the basic hdu used for writing
         HeaderCard naxis1 = header.findCard(NAXIS_1);
         if (naxis1 != null) {
-            basicHDU.addValue(
-                    naxis1.getKey(),
-                    naxis1.getValue(),
-                    naxis1.getComment());
+            try {
+                basicHDU.addValue(
+                        naxis1.getKey(),
+                        Integer.valueOf(naxis1.getValue()),
+                        naxis1.getComment());
+            } catch (NumberFormatException exc) {
+                log.error("{} couldn't have been converted to integer value.",
+                        naxis1.getValue());
+            }
         }
         fits.addHDU(basicHDU);
         fits.write(bf);
