@@ -1,30 +1,21 @@
 <container>
-
-
-
-    <stream id="fact" class="fact.io.FitsStream" 
-            url="${data}" />
-            
-        <process input="fact">
-            <fact.filter.DrsCalibration url="${dataDRS}" key="data"  outputKey="DataCalibrated"/>
-            <fact.utils.CutSlices  start="22" end="220"/>
-            <fact.datacorrection.InterpolateTimeSeries key="DataCalibrated"  outputKey="DataCalibrated"
-                badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
-                
-            <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
-<!--
+  <stream id="fact" class="fact.io.FitsStream" url="${data}" />
+  <process input="fact">
+    <fact.filter.DrsCalibration url="${dataDRS}" key="data" outputKey="DataCalibrated" />
+    <fact.utils.CutSlices start="22" end="220" />
+    <fact.datacorrection.InterpolateTimeSeries key="DataCalibrated" outputKey="DataCalibrated" badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722" />
+    <fact.filter.RemoveSpikesMars key="DataCalibrated" outputKey="DataCalibrated" />
+    <!--
             <fact.processors.RemoveJumps key="DataCalibrated" outputKey="DataCalibrated" />
 -->
-            
-            <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
-            <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="AmplitudePositions" url="${integralGainsFile}" rangeSearchWindow="25" outputKey="photoncharge"/>
-            
-			<fact.cleaning.TwoLevelTimeMedian key="photoncharge" outputKey="shower" neighborPixelThreshold="2" corePixelThreshold="5" keyPositions="AmplitudePositions" timeThreshold="30"  minNumberOfPixel="2"/>
-            <fact.features.source.SourcePosition url="${drive_file}" outputKey="sourcePosition" physicalSource="crab"/>
-<!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
+    <fact.extraction.MaxAmplitudePosition key="DataCalibrated" outputKey="AmplitudePositions" />
+    <fact.extraction.PhotonCharge dataKey="DataCalibrated" positions="AmplitudePositions" url="${integralGainsFile}" rangeSearchWindow="25" outputKey="photoncharge" />
+    <fact.cleaning.TwoLevelTimeMedian key="photoncharge" outputKey="shower" neighborPixelThreshold="2" corePixelThreshold="5" keyPositions="AmplitudePositions" timeThreshold="30" minNumberOfPixel="2" />
+    <fact.features.source.SourcePosition url="${drive_file}" outputKey="sourcePosition" physicalSource="crab" />
+    <!--             <fact.features.HillasParameter pixels="showerPixel" photonEquivalent="photonCharge" sourcePosition="sourcePosition" outputKey="Hillas_"/> -->
     <stream.flow.Skip condition="%{data.shower} == null" />
-	        <fact.features.DistributionFromShower weights="photoncharge" showerKey="shower"  outputKey="dist" />
-			<fact.features.source.Alpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
-            <fact.io.RootASCIIWriter keys="EventNum,TriggerType,alpha" url="${outfile}" />
-		</process>
+    <fact.features.DistributionFromShower weights="photoncharge" showerKey="shower" outputKey="dist" />
+    <fact.features.source.Alpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+    <fact.io.RootASCIIWriter keys="EventNum,TriggerType,alpha" url="${outfile}" />
+  </process>
 </container>
