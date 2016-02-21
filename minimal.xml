@@ -13,7 +13,7 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <process id="2" input="fact">
-				<!-- <RenameKey from="Data" to="raw:data" /> -->
+        <!-- <RenameKey from="Data" to="raw:data" /> -->
 		<fact.pixelsets.AllPixels outputKey="pixels" />
         <RenameKey from="StartCellData" to="meta:startCellData" />
 
@@ -52,10 +52,6 @@
         <fact.pixelsets.NumPixel pixelSetKey="shower" />
         <Skip condition="%{data.shower:numPixel} &lt; 5" />
 
-        <!--<fact.statistics.ArrayStatistics key="pixels:estNumPhotons" pixelSetKey="shower" />-->
-        <!--<fact.statistics.ArrayStatistics key="pixels:arrivalTimes" pixelSetKey="shower" />-->
-        <!--<fact.statistics.ArrayStatistics key="pixels:maxSlopes" pixelSetKey="shower" />-->
-        <!--<fact.statistics.ArrayStatistics key="pixels:maxAmplitudePositions" pixelSetKey="shower" />-->
         <fact.LoopValues
                 key="key"
                 values="pixels:estNumPhotons,
@@ -93,32 +89,33 @@
         <fact.features.source.CosDeltaAlpha />
         <fact.features.source.Theta />
 
-        <!--<fact.LoopValues-->
-            <!--key="sourceKey"-->
-            <!--values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"-->
-            <!--outputKeys="shower:antiSources:1:alpha,shower:antiSources:2:alpha,shower:antiSources:3:alpha,shower:antiSources:4:alpha,shower:antiSources:5:alpha">-->
-            <!--<fact.features.source.Alpha sourceKey="" />-->
-        <!--</fact.LoopValues>-->
-        <!--<fact.LoopValues-->
-            <!--key="sourceKey"-->
-            <!--values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"-->
-            <!--outputKeys="shower:antiSources:1:distance,shower:antiSources:2:distance,shower:antiSources:3:distance,shower:antiSources:4:distance,shower:antiSources:5:distance">-->
-            <!--<fact.features.source.Distance sourceKey="" />-->
-        <!--</fact.LoopValues>-->
-        <!--<fact.LoopValues-->
-            <!--key="sourceKey"-->
-            <!--values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"-->
-            <!--outputKeys="shower:antiSources:1:cosDeltaAlpha,shower:antiSources:2:cosDeltaAlpha,shower:antiSources:3:cosDeltaAlpha,shower:antiSources:4:cosDeltaAlpha,shower:antiSources:5:cosDeltaAlpha">-->
-            <!--<fact.features.source.CosDeltaAlpha sourceKey="" />-->
-        <!--</fact.LoopValues>-->
-        <!--<fact.LoopValues-->
-            <!--key="sourceKey"-->
-            <!--values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"-->
-            <!--outputKeys="shower:antiSources:1:theta,shower:antiSources:2:theta,shower:antiSources:3:theta,shower:antiSources:4:theta,shower:antiSources:5:theta">-->
-            <!--<fact.features.source.Theta sourceKey="" />-->
-        <!--</fact.LoopValues>-->
+        <fact.LoopValues
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:alpha,shower:antiSources:2:alpha,shower:antiSources:3:alpha,shower:antiSources:4:alpha,shower:antiSources:5:alpha">
+            <fact.features.source.Alpha/>
+        </fact.LoopValues>
+        <fact.LoopValues
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:distance,shower:antiSources:2:distance,shower:antiSources:3:distance,shower:antiSources:4:distance,shower:antiSources:5:distance">
+            <fact.features.source.Distance/>
+        </fact.LoopValues>
+        <fact.LoopValues
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:cosDeltaAlpha,shower:antiSources:2:cosDeltaAlpha,shower:antiSources:3:cosDeltaAlpha,shower:antiSources:4:cosDeltaAlpha,shower:antiSources:5:cosDeltaAlpha">
+            <fact.features.source.CosDeltaAlpha/>
+        </fact.LoopValues>
+        <fact.LoopValues
+            key="sourceKey"
+            values="antiSources:1,antiSources:2,antiSources:3,antiSources:4,antiSources:5"
+            outputKeys="shower:antiSources:1:theta,shower:antiSources:2:theta,shower:antiSources:3:theta,shower:antiSources:4:theta,shower:antiSources:5:theta">
+            <fact.features.source.Theta/>
+        </fact.LoopValues>
 
         <fact.io.FitsWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test-fits.fits"/>
+        
 		<fact.io.JSONWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test.json" />
     </process>
 </container>

@@ -146,7 +146,7 @@
         <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_4" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_4" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_4" />
         <fact.features.source.Theta cogxKey="COGx" cogyKey="COGy" cosDeltaAlphaKey="CosDeltaAlpha_Off_5" deltaKey="Delta" dispKey="Disp" m3lKey="m3l" outputKey="Theta_Off_5" signM3lConstant="-200" sourcePositionKey="antiSourcePosition_5" />
         <!-- Output: source dependent parameters -->
-        <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
+        <fact.io.PrintKeys keys="${keysForOutput}" />
         <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
     </process>
 </container>

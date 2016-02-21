@@ -167,6 +167,12 @@
     </dependency>
     <dependency>
       <groupId>de.sfb876</groupId>
+      <artifactId>streams-performance</artifactId>
+      <version>${streams.version}</version>
+      <scope>${streams.scope}</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-plotter</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
