@@ -1,6 +1,6 @@
 <container>
-		<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-		<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
     <stream class="fact.io.zfits.ZFitsStream" id="fact" url="${infile}" />
 
@@ -38,7 +38,6 @@
         <fact.extraction.ArrivalTimeForPositions />
         <fact.extraction.ArrivalTimePolynomFit />
         <fact.datacorrection.CorrectPixelDelays url="${pixelDelayFile}"/>
-
 
         <fact.datacorrection.InterpolatePhotondata calibService="calibService"/>
 
@@ -115,6 +114,8 @@
             <fact.features.source.Theta/>
         </fact.LoopValues>
 
+        <fact.io.FitsWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test-fits.fits"/>
+        
 		<fact.io.JSONWriter keys="pixels:*:*,shower:*,source:*,antiSources:*,cetatauri:*" url="file:test.json" />
     </process>
 </container>

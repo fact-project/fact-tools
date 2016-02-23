@@ -11,10 +11,7 @@ import stream.io.AbstractStream;
 import stream.io.SourceURL;
 import stream.util.parser.ParseException;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -189,33 +186,38 @@ public class ZFitsStream extends AbstractStream{
         if (this.tableReader == null) {
             throw new NullPointerException("Didn't initialize the reader, should never happen.");
         }
-        //get the next row of data. When its null the file has ended
-        byte[][] dataRow = this.tableReader.readNextRow();
-        if (dataRow == null) {
-            log.info("File {} ended.", url.getFile());
+        try {
+            //get the next row of data. When its null the file has ended
+            byte[][] dataRow = this.tableReader.readNextRow();
+            if (dataRow == null) {
+                log.info("File {} ended.", url.getFile());
+                return null;
+            }
+            ByteOrder order = this.fitsTable.isCompressed ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+            Data item = readDataFromBytes(dataRow, this.fitsTable, order);
+            item.putAll(headerItem);
+
+            if (this.fitsTable.isCompressed && (this.calibrationConstants != null)) {
+                Utils.mapContainsKeys(item, "Data", "StartCellData", "NROI", "NPIX");
+                short[] data = ((short[]) item.get("Data"));
+                short[] startCellData = (short[]) item.get("StartCellData");
+                int roi = (Integer) item.get("NROI");
+                int numberOfPixel = (Integer) item.get("NPIX");
+
+                applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
+
+                item.put("raw:data", data);
+            } else {
+                Utils.mapContainsKeys(item, "Data");
+                short[] data = ((short[]) item.get("Data"));
+                item.put("raw:data", data);
+            }
+            return item;
+        }catch (EOFException e) {
+            log.error("Unexpected end of ZLIB input stream.");
             return null;
         }
-        ByteOrder order = this.fitsTable.isCompressed ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
-        Data item = readDataFromBytes(dataRow, this.fitsTable, order);
-        item.putAll(headerItem);
 
-        if( this.fitsTable.isCompressed && (this.calibrationConstants != null)){
-            Utils.mapContainsKeys(item, "Data", "StartCellData", "NROI", "NPIX");
-            short[] data = ((short[])item.get("Data"));
-            short[] startCellData = (short[])item.get("StartCellData");
-            int roi = (Integer) item.get("NROI");
-            int numberOfPixel = (Integer) item.get("NPIX");
-
-            applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
-
-            item.put("raw:data", data);
-        } else {
-            Utils.mapContainsKeys(item, "Data");
-            short[] data = ((short[])item.get("Data"));
-            item.put("raw:data", data);
-        }
-
-        return item;
     }
 
     private Data readDataFromBytes(byte[][] dataRow, ZFitsTable table, ByteOrder byteOrder) throws ParseException {
