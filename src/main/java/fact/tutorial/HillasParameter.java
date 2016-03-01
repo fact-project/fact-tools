@@ -58,7 +58,7 @@ public class HillasParameter implements Processor {
 
 
 
-        item.put("@ellipseOverlay", new EllipseOverlay(cog[0], cog[1], width, length, delta));
+        item.put("@ellipseOverlay", new EllipseOverlay(cog[0], cog[1], 2*width, 2*length, delta));
         item.put("hillas:width", width);
         item.put("hillas:length", length);
         item.put("hillas:size", size);

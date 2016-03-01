@@ -1,5 +1,61 @@
 #Changelog for the fact-tools
 
+## Version 0.13.0 -- 16.02.2016
+
+* new package `fact.features.muon`
+  * move `fact.features.MuonHoughTransform` to `fact.features.muon.HoughTransform`
+  * new Processor `fact.features.muon.CircularFit` to fit a circle to the light distribution
+  * new Processor `fact.feautures.muon.GaussianFit` to fit a gaussian to the radial light 
+  distribution
+  * example xml to show how these work: examples/studies/muon_fitting.xml
+* exceptions occuring in the functional tests are now logged 
+* new Processor `UnixTimeUTC2DateTime` to convert from a tuple of (seconds, microsends)
+to a DateTime object
+* new TypeAdapter in `JSONWriter` to write out `DateTime` objects as ISO string
+* fix null-value handling for the `PixelSetAdapter` in JSONWriter
+
+## Version 0.12.3
+
+* `JSONWriter` now supports directly writing gzipped files with the 
+option `gzip="true"`
+
+## Version 0.12.2
+
+Changes:
+
+* Add new  colormaps for the viewer. Viridis, Inferno, Magma ...
+* Remove obsolete Processor called `JSONWriterExcludeKeys`
+
+
+
+## Version 0.12.1
+Other changes:
+
+* Deleted unused xml files in project root. 
+* Fixed a bug in the SQLiteService which only allowed for data taken in January.
+* Replaced empty test sqlite file with real one.
+
+Changes in `fact.io.JSONWriter` 
+
+* `json` format by default, optional `jsonl` format by using `jsonl="true"` in the `xml`
+* New `append` option, default is false, so existing files are overwritten.
+* The `keys` key is now evaluated using the `stream.Keys` class, so glob patterns now work.
+* Add flag `specialDoubleValuesAsString` to write special Double as strings for strict json compatability. See Issue #92 for more details. Via default special values are converted to `Infinity`, `-Infinity` and `NaN`. 
+
+
+No xmls in the example folder needed to be changed, although they are no behaving differently (output is `json`, not `jsonl` now).
+
+
+
+
+## Version 0.11.2
+
+Fixed a bug in the FactFileListMultiStream. The Wrapped stream wasnt initialized properly when it threw an exception during initialization.
+
+## Version 0.11.1
+
+Fixed the SqliteService. It now works on data that was not taken exclusively in january.
+
 ## Version 0.11.0
 
 ### Changes
