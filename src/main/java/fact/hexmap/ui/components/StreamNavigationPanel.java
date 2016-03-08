@@ -35,7 +35,7 @@ public class StreamNavigationPanel extends JPanel implements EventObserver {
     @Subscribe
     public void handleEventChange(Pair<Data, String> itemKeyPair) {
         Data item = itemKeyPair.getFirst();
-        Integer roi = (Integer)item.get("ROI");
+        Integer roi = (Integer)item.get("NROI");
         if(roi != null){
             slider.setMaximum(roi - 1);
         }
