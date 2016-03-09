@@ -7,7 +7,7 @@
 	
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
     
-    <property name="outfile" value="file:/Users/jebuss/testoutfile_mc.json" />
+    <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -19,7 +19,7 @@
         <!-- Calibration: -->
         <!-- PreviousEventInfo, DrsCalibration, PatchJumpRemoval, RemoveSpikes,
         DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
-        <!--<include url="classpath:/default/mc/calibration_mc.xml" />-->
+        <include url="classpath:/default/mc/calibration_mc.xml" />
         <!-- Output: DataCalibrated -->
 
         <!-- Extraction -->
@@ -31,11 +31,7 @@
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
         <include url="classpath:/default/mc/cleaning_mc.xml" />     
-        <!-- Output: shower -->
-
-        <!-- PedestalParameters -->
-        <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
-        <include url="classpath:/default/mc/truth_mc.xml" />
+        <!-- Output: shower -->   
         
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
@@ -52,12 +48,6 @@
         <include url="classpath:/default/mc/sourceParameter_mc.xml" /> 
         <!-- Output: source dependent parameters -->
         
-         <!--<fact.io.PrintKeysOnConsole keys="${keysForOutput}" />-->
-
         <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
-        <!--<fact.io.JSONWriter keys="${keysForOutput}" url="${outfile}" writeListOfItems="True"/>-->
-
     </process>
-
-
 </container>
