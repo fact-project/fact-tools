@@ -101,6 +101,14 @@
                 outputKey="slopeKey"
         />
 
+        <fact.filter.MovingLinearFit
+                key="DataShaped"
+                slopeKey="slope5"
+                interceptKey="intercept5"
+                scale="10"
+                width="5"
+        />
+
         <fact.features.singlePulse.ArrivalTimeFromSlope
                 key="DataSmoothed"
                 outputKey="ArrivalTimesSlope"
@@ -111,20 +119,42 @@
                 skipLastSlices="120"
         />
 
-        <fact.filter.MovingLinearFit
-                key="DataShaped"
-                slopeKey="slope5"
-                interceptKey="intercept5"
-                scale="10"
-                width="5"
-        />
 
         <fact.features.singlePulse.PulseSizeCalculator
                 key="DataSmoothed"
                 arrivalTimeKey="ArrivalTimes"
-                outputKey="ClosedPulseSizesAmp"
+                outputKey="pulseIntegrals"
                 width="30"
         />
+
+
+        <fact.features.singlePulse.PulseSlopeCalculator
+                key="DataSmoothed"
+                arrivalTimeKey="ArrivalTimes"
+                outputKey="PulseSlopes"
+                width="2"
+        />
+
+        <fact.features.singlePulse.PulseSlopeCalculatorPolynom
+                key="DataSmoothed"
+                risingEdgesKey="ArrivalTimes"
+                outputKey="pulsePolynom"
+        />
+
+
+        <fact.utils.SelectArrayByChid
+                key="pulsePolynom_slopes"
+                chid="150"
+                outputKey="PulseSlopes_pix"
+        />
+
+        <fact.plotter.HistogramArrayPlotter
+                key="PulseSlopes_pix"
+                binWidth="0.05"
+                logAxis="true"
+                color="#667695"
+        />
+
 
         <!--<fact.filter.GaussConvolution key="DataCalibrated" outputKey="DataSmoothed10" variance="10" />-->
         <!--  For Closed Shutter Data: Threshold Extraction Method -->
@@ -138,7 +168,8 @@
         <!--         <fact.io.CreateNestedListFile DataOutputKey="ArrivalTimesSlope" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-slope-arrivalTimes.txt" /> -->
         <!--         <fact.io.CreateNestedListFile DataOutputKey="ArrivalTimesAmp" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-amp-arrivalTimes.txt" /> -->
         <!--         <fact.io.CreateNestedListFile DataOutputKey="ClosedPulseSizesAmp" urlString="file:///net/home.e5.physik.tu-dortmund.de/vol/ph_e5v/e5b/homes/kgray/data/test/file-amp-closed-pulses.txt" /> -->
-        <fact.ShowViewer key="DataCalibrated" />
+        <!--<fact.ShowViewer key="DataCalibrated" />-->
+        <PrintData/>
     </process>
 
     <!-- Pathes to the input files -->
