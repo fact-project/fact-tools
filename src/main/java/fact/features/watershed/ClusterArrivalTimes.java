@@ -1,8 +1,8 @@
-package fact.features;
+package fact.features.watershed;
 
 import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
-import fact.hexmap.FactCluster;
+import fact.features.watershed.FactCluster;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;

@@ -1,10 +1,12 @@
-package fact.hexmap;
+package fact.features.watershed;
 
 /**
  * Created by lena on 16.11.15.
  */
 
 import fact.container.PixelSet;
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -33,9 +35,8 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
     protected String photonchargeKey = "photoncharge";
 
-    @Parameter(required = false, description = "Label: 0 = Proton, 1 = Gamma", defaultValue = "-1")
-    protected int label = -1;
-
+    @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePosition")
+    protected String sourcePositionKey = "sourcePosition" ;
 
 
 
@@ -44,17 +45,32 @@ public class ClusterFellwalker implements Processor {
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
         double[] photoncharge = ((double[]) data.get(photonchargeKey));
+
+
+        //source position not needed for example-xml, need to be calculated in "sourceParameter_mc.xml" for the feature "distanceSource"
+        //same for COGxy, needed for distanceCog, but not in the example xml
+
+        /*double [] sourcePosition = (double[]) data.get(sourcePositionKey);
         double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");
+        double cogY = (double) data.get("COGy");*/
 
 
-        //get 'shower' as int array with pixel id's from 'pixelSet' (HashSet)
+        //get 'shower' as int array with pixel id's3System.out.println();
         int [] shower = pixelSet.toIntArray();
 
         int[] clusterID = new int[1440];
         int[] showerClusterID = new int[1440];
 
 
+/*        int[] cleaning = new int[1440];
+        for(int i=0; i<1440; i++)
+        {
+            cleaning[i] = 0;
+        }
+
+        for(int i=0; i<shower.length;i++){
+            cleaning[shower[i]] = 1;
+        }*/
 
         for (int i = 0; i < 1440; i++) {
             clusterID[i] = 0;
@@ -155,6 +171,8 @@ public class ClusterFellwalker implements Processor {
         FactCluster[] showerCluster = removeCluster(clusterSet,minShowerpixel);
 
         int numCluster = showerCluster.length;
+        //System.out.println(numCluster);
+
 
         /* build 1440-int array that contains the id's of the cluster that survive 'removeCluster' for every pixel.
          * (Just to have a quick look at it in the event viewer, not relevant for the algorithm itself or the resulting event parameters.)
@@ -172,11 +190,11 @@ public class ClusterFellwalker implements Processor {
 /*        for(FactCluster c : clusterSet){
             //System.out.println(c.cogId());
             if(c.getShowerLabel() == true) {
-                showerClusterID[c.cogId()] = 0;
+                showerClusterID[c.cogId()] = numCluster+1;
             }
-        }*/
+        }
 
-        //markBoundaryPixel(clusterSet, showerClusterID);
+        markBoundaryPixel(clusterSet, showerClusterID);*/
 
         //build features (if there is any cluster left after removeCluster) and put them to data set
         if(numCluster != 0) {
@@ -184,9 +202,22 @@ public class ClusterFellwalker implements Processor {
             double idealBoundDiff = idealBoundDiff(showerCluster);
             double boundAngleSum = boundAngleSum(showerCluster);
             double distanceCenterSum = distanceCenter(showerCluster);
-            double distanceCog = distanceCog(showerCluster, cogX, cogY);
+
+
+            /*
+            Source dependent parameter! Not needed for fellwalker_example. If this parameter shall be calculated,
+            "sourceParameter_mc.xml" has to be included in the xml-file, cause source position has to be known
+             */
+            //double distanceSource = distanceSource(showerCluster, sourcePosition);
+            /*
+            cog must be calculated in DistributionFromShower, before distanceCog can be calculated
+             */
+            //double distanceCog = distanceCog(showerCluster, cogX, cogY);
+
+
 
             int convexity = searchForCompactGroups(showerCluster, showerClusterID);
+
 
 
             findNeighbors(showerCluster, showerClusterID);
@@ -205,9 +236,10 @@ public class ClusterFellwalker implements Processor {
 
             data.put("boundRatio", ratio);
             data.put("idealBoundDiff", idealBoundDiff);
-            data.put("boundAngleSum", boundAngleSum);
-            data.put("distanceCenterSum", distanceCenterSum);
-            data.put("distanceCog", distanceCog);
+            data.put("boundAngle", boundAngleSum);
+            data.put("distanceCenter", distanceCenterSum);
+            //data.put("distanceCog", distanceCog);
+            //data.put("distanceSource", distanceSource);
             data.put("neighborCluster", numNeighborCluster);
             data.put("chargeMax", chargeMaxClusterRatio);
             data.put("maxClusterNumPixel", numPixelMaxCluster);
@@ -220,9 +252,10 @@ public class ClusterFellwalker implements Processor {
         else{
             data.put("boundRatio", null);
             data.put("idealBoundDiff", null);
-            data.put("boundAngleSum", null);
-            data.put("distanceCenterSum", null);
+            data.put("boundAngle", null);
+            data.put("distanceCenter", null);
             data.put("distanceCog", null);
+            data.put("distanceSource", null);
             data.put("neighborCluster", null);
             data.put("chargeMax", null);
             data.put("maxClusterNumPixel", null);
@@ -235,11 +268,26 @@ public class ClusterFellwalker implements Processor {
 
         data.put("AllClusterID", clusterID);
         data.put("ShowerClusterID", showerClusterID);
-        data.put("ClusterNoCleaning", cluster);
+        data.put("clusterNoCleaning", cluster);
         data.put("numCluster", numCluster);
-        data.put("label", label);
 
 
+/*        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter("/home/lena/Dokumente/Masterarbeit/Vortrag/DPG/protonShower7.txt", "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        for(int i=0;i<1440;i++){
+            writer.println(i + "\t" + showerClusterID[i] + "\t" + photoncharge[i] + "\t" + cleaning[i]);
+        }
+
+        writer.close();
+
+
+        System.out.println(data.get("EventNum"));*/
 
 
         return data;
@@ -337,7 +385,7 @@ public class ClusterFellwalker implements Processor {
     }
 
     // not needed for parameter calculation, just to have a quick look in the viewer
-/*    public void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
+    public void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
         for(FactCluster c : clusterSet){
             if(c.getShowerLabel()){
             ArrayList<Integer> boundPixel = c.findBoundaryNaive();
@@ -349,7 +397,7 @@ public class ClusterFellwalker implements Processor {
                 }
             }
         }
-    }*/
+    }
 
 
     /* Calculates the ratio of number of bound pixel to number of content pixels and sums it up for all clusters.
@@ -379,7 +427,7 @@ public class ClusterFellwalker implements Processor {
         for (FactCluster c : showerCluster){
             sum += c.idealBoundDiff();
         }
-        return sum;
+        return sum/showerCluster.length;
     }
 
     /*
@@ -419,6 +467,14 @@ public class ClusterFellwalker implements Processor {
         return sum/showerCluster.length;
     }
 
+    public double distanceSource(FactCluster[] showerCluster, double [] sourcePosition){
+        double sum = 0;
+        for (FactCluster c : showerCluster){
+            sum += c.distanceSource(sourcePosition[0], sourcePosition[1]);
+        }
+        return sum/showerCluster.length;
+    }
+
 
 
     /** Method to search for all neighbor clusters of all clusters in the camera image. Two clusters are neighbors if there are no air pixels on the line between their cog's.
@@ -447,7 +503,9 @@ public class ClusterFellwalker implements Processor {
                         showerCluster[i].addCompactCluster(showerCluster[j].getClusterID());
                         showerCluster[j].addCompactCluster(showerCluster[i].getClusterID());
                     }
-                    else{sumAirpixel += airPixel;}
+                    else{sumAirpixel += airPixel;
+                        //System.out.println(sumAirpixel);
+                        }
 
                 }
             }
@@ -554,7 +612,7 @@ public class ClusterFellwalker implements Processor {
 
 
     //Possible, but not a good feature. Arrival times are therefore not use for feature creation so far.
-/*    public double stdArrTime(FactCluster [] showerCluster, double [] arrivaltime){
+    public double stdArrTime(FactCluster [] showerCluster, double [] arrivaltime){
         double arrTimeMean = 0;
         double arrTimeStd = 0;
         for(FactCluster c : showerCluster){
@@ -569,7 +627,7 @@ public class ClusterFellwalker implements Processor {
 
         return Math.sqrt(arrTimeStd);
 
-    }*/
+    }
 
     // Standard deviation of the mean over the number of pixels in every cluster in the event.
     public double stdNumPixel(FactCluster [] showerCluster){
@@ -596,6 +654,6 @@ public class ClusterFellwalker implements Processor {
     }
     public void setArrivaltimePosKey(String arrivaltimePosKey){this.arrivaltimePosKey = arrivaltimePosKey;}
     public void setPhotonchargeKey(String photonchargeKey){this.photonchargeKey = photonchargeKey;}
-    public void setLabel(int label){this.label = label;}
+    public void setSourcePositionKey(String sourcePositionKey){this.sourcePositionKey = sourcePositionKey;}
 
 }

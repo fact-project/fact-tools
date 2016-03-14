@@ -1,4 +1,7 @@
-package fact.hexmap;
+package fact.features.watershed;
+
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -209,6 +212,19 @@ public class FactCluster {
         return Math.sqrt(absX*absX + absY*absY);
 
     }
+
+    public double distanceSource(double sourceX, double sourceY){
+        int cog = cogId();
+        double clusterCogX = mapping.getPixelFromId(cog).getXPositionInMM();
+        double clusterCogY = mapping.getPixelFromId(cog).getYPositionInMM();
+
+        double absX = Math.abs(clusterCogX - sourceX);
+        double absY = Math.abs(clusterCogY - sourceY);
+
+        return Math.sqrt(absX*absX + absY*absY);
+
+    }
+
 
 
     /*

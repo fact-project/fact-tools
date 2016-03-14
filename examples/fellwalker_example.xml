@@ -35,17 +35,20 @@
                 maxSlopesKey="maxSlope"/>
 
         <fact.cleaning.MotionCleaning
-                threshold = "30"
+                numPixelKey = "numShowerPixel"
                 outputKey = "pixelSet"/>
 
         <Skip condition="%{data.numShowerPixel} &lt; 15 "/>
 
-        <fact.hexmap.ClusterFellwalker
+
+
+        <fact.features.watershed.ClusterFellwalker
+                arrivaltimePosKey = "ArrtimePos"
                 pixelSetKey="pixelSet"
                 minShowerpixel="2"
         />
 
-        <fact.io.PrintKeysOnConsole keys="numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />
+        <fact.io.PrintKeysOnConsole keys="numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />
 
 
         <Skip condition="%{data.mumCluster} == 0" />

@@ -113,9 +113,6 @@ public class MotionCleaning implements Processor {
         double[] showerPixel_Y = getShowerPixel_Y(showerPixelArray);*/
 
 
-
-       // System.out.println(numShowerPixel);
-
         //data.put("accDiff", accumulativeDifferences); //could be used as feature for machine learner cleaning(???)
         data.put(outputKey, pixelSet);
         //data.put("showerPixel_X", showerPixel_X);
