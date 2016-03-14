@@ -58,11 +58,6 @@
         <include url="classpath:/default/data/sourceParameter.xml" /> 
         <!-- Output: source dependent parameters -->
 
-        <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
-
         <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
-
     </process>
-
-
 </container>

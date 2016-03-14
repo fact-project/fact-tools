@@ -1,4 +1,4 @@
-package fact.features;
+package fact.features.muon;
 
 import com.google.common.primitives.Ints;
 import fact.Constants;
@@ -26,7 +26,7 @@ import java.util.HashMap;
  */
 
 
-public class MuonHoughTransform implements StatefulProcessor {
+public class HoughTransform implements StatefulProcessor {
 
     // OutputKeys
     @Parameter(required = false, description = "outputkey for the hough peakness")
@@ -54,7 +54,7 @@ public class MuonHoughTransform implements StatefulProcessor {
 
     //InputKeys
     @Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
-    private String pixelKey;
+    private String pixelSetKey;
 
     @Parameter(required = true, description = "PhotonCharge")
     private String photonChargeKey;
@@ -77,7 +77,8 @@ public class MuonHoughTransform implements StatefulProcessor {
     int res_x = 60;
     int res_y = 60;
 
-    final Logger log = LoggerFactory.getLogger(MuonHoughTransform.class);
+    final Logger log = LoggerFactory.getLogger(HoughTransform.class);
+
 
     FactPixelMapping m = FactPixelMapping.getInstance();
     private double[] circle_y;
@@ -114,7 +115,7 @@ public class MuonHoughTransform implements StatefulProcessor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         int npix = (Integer) input.get("NPIX");
 
-        int[] cleaningPixel = ((PixelSet) input.get(pixelKey)).toIntArray();
+        int[] cleaningPixel = ((PixelSet) input.get(pixelSetKey)).toIntArray();
         double[] photonCharge = (double[]) input.get(photonChargeKey);
 
 
@@ -364,8 +365,8 @@ public class MuonHoughTransform implements StatefulProcessor {
     public void setBestCircleKey(String bestCircleKey) {
         this.bestCircleKey = bestCircleKey;
     }
-    public void setPixelKey(String pixelKey) {
-        this.pixelKey = pixelKey;
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
     }
     public void setPhotonChargeKey(String photonChargeKey) {
         this.photonChargeKey = photonChargeKey;
