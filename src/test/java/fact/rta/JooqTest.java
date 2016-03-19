@@ -18,10 +18,15 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
+ * Test some aspects of jooq
  * Created by kai on 04.02.16.
  */
 public class JooqTest {
 
+    /**
+     * Open the test sqlite database and print some information thats in there.
+     * @throws SQLException
+     */
     @Test
     public void  testJooq() throws SQLException {
         String url = "jdbc:sqlite:rta.sqlite";
