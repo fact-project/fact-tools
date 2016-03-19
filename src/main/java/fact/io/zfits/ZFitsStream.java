@@ -208,13 +208,8 @@ public class ZFitsStream extends AbstractStream{
 
             applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
 
-            item.put("raw:data", data);
-        } else {
-            Utils.mapContainsKeys(item, "Data");
-            short[] data = ((short[])item.get("Data"));
-            item.put("raw:data", data);
+            item.put("Data", data);
         }
-        item.put("meta:startCellData", item.get("StartCellData"));
 
         return item;
     }
@@ -345,5 +340,13 @@ public class ZFitsStream extends AbstractStream{
             }
         }
         return false;
+    }
+
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }
