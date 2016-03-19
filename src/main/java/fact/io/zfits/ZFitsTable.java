@@ -54,13 +54,13 @@ public class ZFitsTable {
 		this.tableName     = header.getKeyValue("EXTNAME").trim();
 		int fixedTableSize = Integer.parseInt(header.getKeyValue("THEAP", "0"));
 		int totalBytes     = Integer.parseInt(header.getKeyValue("NAXIS1"))*Integer.parseInt(header.getKeyValue("NAXIS2"));
-		if (totalBytes != fixedTableSize && this.isCompressed)
-			throw new ParseException("The 'THEAP' is not equal NAXIS1*NAXIS2, "+fixedTableSize+"!="+totalBytes);
+		if (totalBytes != fixedTableSize && this.isCompressed) {
+			throw new ParseException("The 'THEAP' is not equal NAXIS1*NAXIS2, " + fixedTableSize + "!=" + totalBytes);
+		}
 		this.bytesPerRow = this.isCompressed ? Integer.parseInt(header.getKeyValue("ZNAXIS1")) : Integer.parseInt(header.getKeyValue("NAXIS1"));
 		this.numRows    = this.isCompressed ? Integer.parseInt(header.getKeyValue("ZNAXIS2")) : Integer.parseInt(header.getKeyValue("NAXIS2"));
 		this.numCols    = Integer.parseInt(header.getKeyValue("TFIELDS"));
-		//long datasum    = this.isCompressed ? Long.parseLong(header.getKeyValue("ZDATASUM", "-1")) : Long.parseLong(header.getKeyValue("DATASUM","-1"));
-		
+
 		String formName = this.isCompressed ? "ZFORM" : "TFORM";
 
 		int offset = 0;
@@ -76,13 +76,19 @@ public class ZFitsTable {
 			String compression = header.getKeyValue("ZCTYP"+strNum, "");
 			if (isCompressed) {
 				if (!compression.equals("FACT") && !compression.isEmpty())
-					throw new ParseException("Only Fact compression supported, but for row: '"+strNum+"' we got: "+compression);
+					throw new ParseException("Only FACT compression supported, but for row: '"+strNum+"' we got: "+compression);
 			}
 			
 			
 			String format = header.getKeyValue(formName+strNum);
-			int numEntries = Integer.parseInt(format.substring(0, format.length()-1));
+
+            format = format.trim();
+            int numEntries = 1;
+            if (format.length() > 1){
+                numEntries = Integer.parseInt(format.substring(0, format.length()-1));
+            }
 			DataType type = DataType.getTypeFromChar(format.charAt(format.length()-1));
+
 
 			FitsTableColumn column = new FitsTableColumn(id, numEntries, type.getNumBytes(), type, unit, compression);
 			
@@ -116,12 +122,7 @@ public class ZFitsTable {
 		return this.numCols;
 	}
 
-	public long getHeapDifferenz() {
-		long diff = getHeapSize();
-		diff -= Long.parseLong(this.header.getKeyValue("THEAP", "0"));
-		return diff;
-	}
-	
+
 	public long getHeapSize() {
 		if (!this.isCompressed) {
 			return this.numRows*this.bytesPerRow;
@@ -131,9 +132,6 @@ public class ZFitsTable {
 		return Long.parseLong(this.header.getKeyValue("ZHEAPPTR", "0"));
 	}
 	
-	public long getSpezialAreaSize() {
-		return Long.parseLong(header.getKeyValue("PCOUNT", "0"));
-	}
 
 
 	public long getTableTotalSize() {
@@ -142,7 +140,7 @@ public class ZFitsTable {
 		size += this.getHeapSize();
 		
         // and heap data area size
-        size += this.getSpezialAreaSize();
+        size += Long.parseLong(header.getKeyValue("PCOUNT", "0"));
         
         // spezial gap from somewhere
         //size += this.getSpezialGap();
