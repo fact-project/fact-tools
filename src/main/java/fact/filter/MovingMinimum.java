@@ -16,7 +16,7 @@ import stream.annotations.Parameter;
 @Description(group = "Fact Tools.Filter", text = "A running mininum")
 public class MovingMinimum implements StatefulProcessor{
 
-	static Logger log = LoggerFactory.getLogger(MovingAverage.class);
+	static Logger log = LoggerFactory.getLogger(MovingMinimum.class);
 
 
     @Parameter(required = true)
