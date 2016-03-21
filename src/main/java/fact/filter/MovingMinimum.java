@@ -10,10 +10,23 @@ import stream.annotations.Description;
 import stream.annotations.Parameter;
 
 /**
+ * Calculate moving minimum with given window size.
+ * 
+ * Similar to a moving average, this processor calculates 
+ * a moving minimum. When moving the window over the 
+ * time series, the processor calculates the minimum inside the
+ * window for every time and returns it.
+ *
+ * This can be used, when answering the question:
+ *  What is the highest signal with a given width.
+ * In conjuction with extraction.MaxAmplitude, 
+ * the position and the height of the highest signal
+ * with a given width (i.e. the window size)
+ * can be found.
  * 
  * @author Dominik Neise &lt;neised@phys.ethz.ch&gt;
  */
-@Description(group = "Fact Tools.Filter", text = "A running mininum")
+@Description(group = "Fact Tools.Filter", text = "Moving Minimum")
 public class MovingMinimum implements StatefulProcessor{
 
 	static Logger log = LoggerFactory.getLogger(MovingMinimum.class);
