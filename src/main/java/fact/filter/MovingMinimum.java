@@ -41,17 +41,6 @@ public class MovingMinimum implements StatefulProcessor{
 
         int roi = data.length / npix;
 
-        int length_left_half;
-        int length_right_half;
-        if (length % 2 == 1){
-            length_left_half = length/2;
-            length_right_half = length/2 + 1;
-        }
-        else{
-            length_left_half = length/2;
-            length_right_half = length/2;            
-        }
-
         for(int pix = 0; pix < npix; pix++) {
             for(int pivot = 0; pivot < roi; pivot++){
                 int pivotPosition = pix*roi + pivot;
@@ -60,8 +49,8 @@ public class MovingMinimum implements StatefulProcessor{
 
                 //loop over the window
                 //intentional precission loss by division
-                int start = pivotPosition - length_left_half;
-                int end = pivotPosition + length_right_half;
+                int start = pivotPosition - length/2;
+                int end = pivotPosition + length/2 + 1;
 
                 start = start > seriesStart ? start : seriesStart;
                 end = end < seriesEnd ? end : seriesEnd;
