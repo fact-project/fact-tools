@@ -15,13 +15,11 @@ import static org.junit.Assert.assertThat;
 
 
 /**
+ * Compare predictions from sklearn to those of the predictions service.
  * Created by kai on 19.03.16.
  */
 public class PredictionServiceTest {
 
-    /**
-     * Compare predictions from sklearn to those of the predictions service.
-     */
     @Test
     public void comparePredictions() throws Exception {
         URL url = PredictionServiceTest.class.getResource("/prediction_test_files/model.pmml.gz");
