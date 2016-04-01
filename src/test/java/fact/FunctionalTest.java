@@ -80,6 +80,7 @@ public class FunctionalTest {
             try{
                 stream.run.main(args);
             } catch (Exception e){
+                log.error("Error executing xml: " + f, e);
                 failedFilesList.add(f.getName());
                 counter++;
             }

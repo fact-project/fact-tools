@@ -14,6 +14,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.gson.GsonBuilder;
 
+import stream.Context;
 import stream.Data;
 import stream.Processor;
 import stream.StatefulProcessor;
@@ -50,7 +51,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 	private HashMap<Processor, DescriptiveStatistics> timeMap = new HashMap<>();
 
 	@Override
-	public void init(ApplicationContext context) throws Exception {
+	public void init(Context context) throws Exception {
 		super.init(context);
 
 		for (Processor proc : processors) {

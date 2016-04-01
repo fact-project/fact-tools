@@ -1,8 +1,6 @@
 <container>
-    <stream id="firstStream" class="stream.io.CsvStream"
-            url="http://www.jwall.org/streams/sample-stream.csv" limit="10000" />
-
-    <process input="firstStream">
-        <PrintData />
-    </process>
- </container>
+  <stream id="firstStream" class="stream.io.CsvStream" url="http://www.jwall.org/streams/sample-stream.csv" limit="10000" />
+  <process input="firstStream">
+    <PrintData />
+  </process>
+</container>

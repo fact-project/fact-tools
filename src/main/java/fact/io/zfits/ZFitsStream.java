@@ -2,7 +2,6 @@ package fact.io.zfits;
 
 
 import fact.Utils;
-import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -22,22 +21,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The ZfitsReader can read FITS files containing raw dat as recorded by the FACT telescope DAQ. It also reads FITS files written
+ * by the Monte Carlo simulation program CERES. It can decompress binary tables which have been compressed according to the ZFITS
+ * standard. See http://arxiv.org/abs/1506.06045.
+ *
+ */
 public class ZFitsStream extends AbstractStream{
-
-
 
     static Logger log = LoggerFactory.getLogger(ZFitsStream.class);
 
-    @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "2880")
-    private int bufferSize = 2880;
+    @Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
+    public int bufferSize = 2880;
 
     @Parameter(required = false, description = "This value defines which table of the ZFitsfile should be read.", defaultValue = "Events")
-    private String tableName = "Events";
-
-
-    private DataInputStream dataStream;
+    public String tableName = "Events";
 
     private Data headerItem = DataFactory.create();
+
 
     private ZFitsTable fitsTable = null;
 
@@ -80,10 +81,8 @@ public class ZFitsStream extends AbstractStream{
             log.error("Cannot read file. Wrong path? ");
             throw new FileNotFoundException("Cannot read file");
         }
-        this.dataStream = new DataInputStream(new BufferedInputStream(url.openStream(), bufferSize ));
-
-
-        this.dataStream.mark(2000000);
+        DataInputStream dataStream = new DataInputStream(new BufferedInputStream(url.openStream(), bufferSize));
+        dataStream.mark(3000000);
         //read the header and output some information
         List<String> block = ZFitsUtil.readBlock(dataStream);
         FitsHeader header = new FitsHeader(block);
@@ -106,7 +105,7 @@ public class ZFitsStream extends AbstractStream{
         if(secondHeader.check("EXTNAME", FitsHeader.ValueType.STRING, "ZDrsCellOffsets")){
             log.info("File contains ZDrsCellOffsets.");
             ZFitsTable offsetTable = new ZFitsTable(secondHeader);
-            TableReader reader = BinTableReader.createTableReader(offsetTable, this.dataStream);
+            TableReader reader = BinTableReader.createTableReader(offsetTable, dataStream);
             byte[][] bytes = reader.readNextRow();
 
             ByteOrder order = offsetTable.isCompressed ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
@@ -121,17 +120,16 @@ public class ZFitsStream extends AbstractStream{
 
 
         //reset to old mark and read the event table
-        this.dataStream.reset();
-        this.fitsTable = ZFitsUtil.skipToTable(this.dataStream, this.tableName);
+        dataStream.reset();
+        this.fitsTable = ZFitsUtil.skipToTable(dataStream, this.tableName);
         this.headerItem = createHeaderItem(fitsTable);
         //create the reader
-        this.tableReader = BinTableReader.createTableReader(this.fitsTable, this.dataStream);
-
+        this.tableReader = BinTableReader.createTableReader(this.fitsTable, dataStream);
     }
 
     private Data createHeaderItem(ZFitsTable fitsTable) {
         // create headerItem
-        // add all key value pairs which are not the column information TODO finish extracting column information
+        // add all key value pairs which are not the column information
         Data item = DataFactory.create();
         for (Map.Entry<String, FitsHeader.FitsHeaderEntry> entry : fitsTable.getFitsHeader().getKeyMap().entrySet()) {
             String key   = entry.getKey();
@@ -139,7 +137,6 @@ public class ZFitsStream extends AbstractStream{
 
             //ignore several information about the columns
             if ( key_in_ignore_list(key) ){
-                //log.info("ignore:" + key);
                 continue;
             }
 
@@ -210,8 +207,10 @@ public class ZFitsStream extends AbstractStream{
             int numberOfPixel = (Integer) item.get("NPIX");
 
             applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
+
             item.put("Data", data);
         }
+
         return item;
     }
 
@@ -343,8 +342,11 @@ public class ZFitsStream extends AbstractStream{
         return false;
     }
 
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
-    public void setBufferSize(int bufferSize) {this.bufferSize = bufferSize;}
 }
