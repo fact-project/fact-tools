@@ -85,7 +85,7 @@ public class MovingMinimum implements StatefulProcessor{
     public void init(ProcessContext context) throws Exception {
         if((length & 1) == 0){
             length++;
-            log.warn("CentralMovingAverage only supports uneven window lengths. New length is: " + length);
+            log.warn("MovingMinimum only supports uneven window lengths. New length is: " + length);
         }
     }
 
