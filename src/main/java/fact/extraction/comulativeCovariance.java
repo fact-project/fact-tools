@@ -99,6 +99,11 @@ public class comulativeCovariance implements StatefulProcessor {
                 comulativeCovariance[pix] += covariance;
                 comulativeCorelation[pix] += covariance / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
             }
+
+            // weight with number of neighbours, (necessary for pixel at the camera fringe)
+            comulativeCovariance[pix] /= neighbours.length;
+            comulativeCorelation[pix] /= neighbours.length;
+
         }
 
         input.put("comulativeCovariance", comulativeCovariance);
