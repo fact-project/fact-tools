@@ -47,16 +47,13 @@ public class comulativeCovariance implements StatefulProcessor {
         double[] scaledData = data.clone();
 
         for (int pix = 0; pix < npix; pix++) {
-            double maxAmpl = amplitudePositions[pix];
+            int maxAmplPos = roi*pix + amplitudePositions[pix];
+            double maxAmpl = data[maxAmplPos];
+//            double[] pixData = Arrays.copyOfRange(data,pix*roi, (pix+1)*roi - 1);
 
             for (int slice = 0; slice < roi; slice++) {
                 scaledData[pix*roi+slice] /= maxAmpl;
             }
-
-
-//            double[] pixData = Arrays.copyOfRange(data,pix*roi + skipFirst, (pix+1)*roi - 1 - skipLast);
-
-
         }
         input.put(outputKey, scaledData);
 
