@@ -5,6 +5,7 @@ import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
@@ -13,7 +14,7 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 
 /**
- * Caclutlate the comulative covariance of neighboring pixels to determine similarities
+ * Caclutlate the average covariance and correlation of neighboring pixels to determine similarities
  *
  * Created by jebuss on 04.04.16.
  */
@@ -25,10 +26,10 @@ public class meanCorrelation implements StatefulProcessor {
     private String amplitudePositionsKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
-    private int skipFirst = 35;
+    private int skipFirst = 15;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
-    private int skipLast = 100;
+    private int skipLast = 50;
 
     @Parameter(required = false)
     private String scaledDataKey = "DataScaled";
@@ -60,6 +61,8 @@ public class meanCorrelation implements StatefulProcessor {
 
         roi = data.length / npix;
 
+        IntervalMarker[] m = new IntervalMarker[npix];
+
         double[] meanCovariance     = new double[npix];
         double[] meanCorrelation    = new double[npix];
 
@@ -82,7 +85,7 @@ public class meanCorrelation implements StatefulProcessor {
                 double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
                 double neighbourMean        = pixelStatistics[neighbour.id].getMean();
 
-                double covariance = calculateCovariance(scaledData, pix, pixMean, 
+                double covariance = calculateCovariance(scaledData, pix, pixMean,
                                                         neighbour, neighbourMean, skipFirst, skipLast);
 
                 meanCovariance[pix]     += covariance;
@@ -93,8 +96,11 @@ public class meanCorrelation implements StatefulProcessor {
             meanCovariance[pix] /= neighbours.length;
             meanCorrelation[pix] /= neighbours.length;
 
+            m[pix] = new IntervalMarker(skipFirst,roi - skipLast);
+
         }
 
+        input.put("covWindow", m);
         input.put(covarianceKey, meanCovariance);
         input.put(correlationKey, meanCorrelation);
         input.put(scaledDataKey, scaledData);
