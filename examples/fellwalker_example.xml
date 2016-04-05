@@ -19,42 +19,26 @@
 
         <include url="classpath:/default/mc/calibration_mc.xml" />
 
-        <fact.extraction.BasicExtraction
-                dataKey="DataCalibrated"
-                outputKeyMaxAmplPos="maxPos"
-                outputKeyPhotonCharge="photoncharge"
-                url="${integralGainFile}"
-                startSearchWindow="${basicExtraction_startSearchWindow}"
-                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"/>
+        <include url="classpath:/default/mc/extraction_mc.xml" />
 
-        <fact.extraction.RisingEdgeForPositions
-                dataKey="DataCalibrated"
-                outputKey="ArrtimePos"
-                amplitudePositionsKey="maxPos"
-                maxSlopesKey="maxSlope"/>
+        <include url="classpath:/default/mc/cleaning_mc.xml" />
+        <!-- Output: shower -->
+        <include url="classpath:/default/mc/parameterCalc_mc.xml" />
 
-        <fact.cleaning.MotionCleaning
-                numPixelKey = "numShowerPixel"
-                outputKey = "pixelSet"/>
-
-        <Skip condition="%{data.numShowerPixel} &lt; 15 "/>
-
+        <include url="classpath:/default/mc/sourceParameter_mc.xml" />
 
 
         <fact.features.watershed.ClusterFellwalker
-                arrivaltimePosKey = "ArrtimePos"
-                pixelSetKey="pixelSet"
+                arrivaltimePosKey = "arrivalTime"
+                pixelSetKey="shower"
                 minShowerpixel="2"
         />
-
-        <fact.io.PrintKeysOnConsole keys="numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />
-
 
         <Skip condition="%{data.mumCluster} == 0" />
 
 
-       <!-- <fact.ShowViewer key="DataCalibrated"/>-->
+        <fact.io.PrintKeysOnConsole keys="numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />
+
 
     </process>
 

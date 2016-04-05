@@ -50,9 +50,9 @@ public class ClusterFellwalker implements Processor {
         //source position not needed for example-xml, need to be calculated in "sourceParameter_mc.xml" for the feature "distanceSource"
         //same for COGxy, needed for distanceCog, but not in the example xml
 
-        /*double [] sourcePosition = (double[]) data.get(sourcePositionKey);
+        double [] sourcePosition = (double[]) data.get(sourcePositionKey);
         double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");*/
+        double cogY = (double) data.get("COGy");
 
 
         //get 'shower' as int array with pixel id's3System.out.println();
@@ -159,7 +159,7 @@ public class ClusterFellwalker implements Processor {
         }
 
         //add showerpixel in a cluster to list
-        for(int i=1; i<shower.length;i++){
+        for(int i=0; i<shower.length;i++){
             clusterSet[clusterID[shower[i]]].addCleaningPixel(shower[i]);
         }
 
@@ -208,11 +208,11 @@ public class ClusterFellwalker implements Processor {
             Source dependent parameter! Not needed for fellwalker_example. If this parameter shall be calculated,
             "sourceParameter_mc.xml" has to be included in the xml-file, cause source position has to be known
              */
-            //double distanceSource = distanceSource(showerCluster, sourcePosition);
+            double distanceSource = distanceSource(showerCluster, sourcePosition);
             /*
             cog must be calculated in DistributionFromShower, before distanceCog can be calculated
              */
-            //double distanceCog = distanceCog(showerCluster, cogX, cogY);
+            double distanceCog = distanceCog(showerCluster, cogX, cogY);
 
 
 
@@ -238,8 +238,10 @@ public class ClusterFellwalker implements Processor {
             data.put("idealBoundDiff", idealBoundDiff);
             data.put("boundAngle", boundAngleSum);
             data.put("distanceCenter", distanceCenterSum);
-            //data.put("distanceCog", distanceCog);
-            //data.put("distanceSource", distanceSource);
+
+            data.put("distanceCog", distanceCog);
+            data.put("distanceSource", distanceSource);
+
             data.put("neighborCluster", numNeighborCluster);
             data.put("chargeMax", chargeMaxClusterRatio);
             data.put("maxClusterNumPixel", numPixelMaxCluster);
@@ -405,7 +407,7 @@ public class ClusterFellwalker implements Processor {
      * 'ratio' by 'showerCluster.length' to have a normed value.
      * Idea behind is to have a value for the shape of a cluster.
      */
-    public double  boundContentRatio(FactCluster [] showerCluster){
+    public static double  boundContentRatio(FactCluster[] showerCluster){
         double ratio = 0;
 
         for(FactCluster c : showerCluster){
@@ -422,7 +424,7 @@ public class ClusterFellwalker implements Processor {
      * of boundary pixels and the ideal(minimal) number of boundary pixels a cluster with a certain number of pixel could have.
      * Keep in mind that this feature is again correlated to 'NumCluster', as long as the returned 'sum' is not divided by 'showerCluster.length'.
      */
-    public double idealBoundDiff(FactCluster [] showerCluster){
+    public static double idealBoundDiff(FactCluster[] showerCluster){
         double sum = 0;
         for (FactCluster c : showerCluster){
             sum += c.idealBoundDiff();
@@ -438,7 +440,7 @@ public class ClusterFellwalker implements Processor {
      * splashy shape...(Again: correlation to 'NumCluster' if not dividing by 'showerCluster.length'.)
 
      */
-    public double boundAngleSum(FactCluster[] showerCluster){
+    public static double boundAngleSum(FactCluster[] showerCluster){
         double sum = 0;
         for (FactCluster c : showerCluster){
             sum += c.boundAngleSum();
@@ -451,7 +453,7 @@ public class ClusterFellwalker implements Processor {
      * Returns the mean over all distances from all cluster center of gravity to the camera center (the center position
      * in mm not the 'center pixel'). Gives an information about the geometrical distribution of the clusters in the camera image.
      */
-    public double distanceCenter(FactCluster[] showerCluster){
+    public static double distanceCenter(FactCluster[] showerCluster){
         double sum = 0;
         for (FactCluster c : showerCluster){
             sum += c.distanceCamCenter();
@@ -580,7 +582,7 @@ public class ClusterFellwalker implements Processor {
         return showerCluster[maxClusterIndex];
     }
 
-    public double getChargeMaxCluster(FactCluster [] showerCluster){
+    public static double getChargeMaxCluster(FactCluster[] showerCluster){
         if(showerCluster.length == 1){
             return 1;
         }
@@ -630,7 +632,7 @@ public class ClusterFellwalker implements Processor {
     }
 
     // Standard deviation of the mean over the number of pixels in every cluster in the event.
-    public double stdNumPixel(FactCluster [] showerCluster){
+    public static double stdNumPixel(FactCluster[] showerCluster){
         int numCluster = showerCluster.length;
         double mean = 0;
         double std = 0;
