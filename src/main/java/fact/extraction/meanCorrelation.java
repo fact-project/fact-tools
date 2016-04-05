@@ -69,7 +69,7 @@ public class MeanCorrelation implements Processor {
         Utils.mapContainsKeys(input, key, amplitudePositionsKey);
         double[] data = (double[]) input.get(key);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
-        int[] pixels = Utils.getValidPixelSet(input, npix, pixelSetKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
         log.debug("npix: " + pixels.length );
 
         roi = data.length / npix;

@@ -47,7 +47,7 @@ public class Utils {
 	 * Return an int array with the ids of the pixelSet belonging to the given Key,
 	 * return all camera pixel Ids if the set is not existing
 	 */
-	public static int[] getValidPixelSet(Data input, int npix, String pixelSetKey) {
+	public static int[] getValidPixelSetAsIntArr(Data input, int npix, String pixelSetKey) {
 		int[] pixels = null;
 
 		//Load a given pixelset, otherwise use the the whole camera

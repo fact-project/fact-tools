@@ -56,7 +56,7 @@ public class WaveformFluctuation implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
 
-        int[] pixels = Utils.getValidPixelSet(input, npix, pixelSetKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
         log.info("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
