@@ -1,12 +1,21 @@
 #Changelog for the fact-tools
 
-## Version 0.12.4
-Changes:
+## Version 0.13.0 -- 16.02.2016
 
-* new Feature: TimeOverThresholdTL allows to calculate the time over Threshold for a given window on the Timeline
-* FWHMPulses uses Doubles instead of Ints
+* new package `fact.features.muon`
+  * move `fact.features.MuonHoughTransform` to `fact.features.muon.HoughTransform`
+  * new Processor `fact.features.muon.CircularFit` to fit a circle to the light distribution
+  * new Processor `fact.feautures.muon.GaussianFit` to fit a gaussian to the radial light 
+  distribution
+  * example xml to show how these work: examples/studies/muon_fitting.xml
+* exceptions occuring in the functional tests are now logged 
+* new Processor `UnixTimeUTC2DateTime` to convert from a tuple of (seconds, microsends)
+to a DateTime object
+* new TypeAdapter in `JSONWriter` to write out `DateTime` objects as ISO string
+* fix null-value handling for the `PixelSetAdapter` in JSONWriter
 
 ## Version 0.12.3
+
 * `JSONWriter` now supports directly writing gzipped files with the 
 option `gzip="true"`
 
