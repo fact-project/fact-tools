@@ -81,7 +81,10 @@ public class ClusterArrivalTimes implements Processor {
 
         clusterID[seed] = cluster;
 
-        int current = findNearestBlankNeighbor(seed, arrivalTime, clusterID, shower,cluster, showerArray)[0];
+        int [] current_cluster  = findNearestBlankNeighbor(seed, arrivalTime, clusterID, shower,cluster, showerArray);
+        int current = current_cluster[0];
+
+        cluster = current_cluster[1];
 
 
         //Region Growing Algorithm
@@ -89,7 +92,7 @@ public class ClusterArrivalTimes implements Processor {
         while(finishCluster == false){
 
 
-            //System.out.println(current);
+            System.out.println(current);
 
             //get ids from neighbor pixel which have already a cluster id
             ArrayList<Integer> flaggedNeighborPixel = findNeighborCluster(current, clusterID);
@@ -97,6 +100,8 @@ public class ClusterArrivalTimes implements Processor {
             double minDiff = Math.abs(arrivalTime[current] - arrivalTime[flaggedNeighborPixel.get(0)]);
             int minClusterID = clusterID[flaggedNeighborPixel.get(0)];
             int minPixelID = flaggedNeighborPixel.get(0);
+
+            System.out.println(1);
 
             if(flaggedNeighborPixel.size() > 1) {
 
@@ -112,25 +117,36 @@ public class ClusterArrivalTimes implements Processor {
                 }
             }
 
+            System.out.println(2);
+
             if(minDiff < threshold){
                 clusterID[current] = minClusterID;
-                current = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray)[0];
+                int [] temp = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray);
+                current = temp[0];
+                cluster = temp[1];
                 if(current == -1){
                     finishCluster = true;
                 }
             }
+
             else{
+                System.out.println(3);
                 if(showerArray[current] == 1){
+                    System.out.println(4);
                     cluster++;
                     clusterID[current] = cluster;
-                    current = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray)[0];
+                    int [] temp = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray);
+                    current = temp[0];
+                    cluster = temp[1];
                     if(current == -1){
                         finishCluster = true;
                     }
                 }
                 else{
-                    current = findNextSeed(shower, clusterID,cluster,arrivalTime, showerArray)[0];
-                    cluster = findNextSeed(shower, clusterID,cluster,arrivalTime, showerArray)[1];
+                    System.out.println(5);
+                    int [] temp = findNextSeed(shower, clusterID,cluster,arrivalTime, showerArray);
+                    current = temp[0];
+                    cluster = temp[1];
                     //cluster++;
                     if(current == -1){
                         finishCluster = true;
@@ -201,7 +217,7 @@ public class ClusterArrivalTimes implements Processor {
         while(foundSeed == false && p<shower.length){
             int showerPixelID = shower[p];
             if (clusterID[showerPixelID] == 0) {
-                FactCameraPixel[] neighbors = mapping.getNeighboursFromID(p);
+                FactCameraPixel[] neighbors = mapping.getNeighboursFromID(showerPixelID);
                 boolean foundFlaggedNeighbor = false;
                 int n = 0;
                 while(foundFlaggedNeighbor == false && n < neighbors.length){
@@ -209,8 +225,8 @@ public class ClusterArrivalTimes implements Processor {
                         foundFlaggedNeighbor = true;
                         seed = showerPixelID;
                         foundSeed = true;
-                        n++;
                     }
+                    n++;
                 }
 
             }
@@ -223,6 +239,7 @@ public class ClusterArrivalTimes implements Processor {
                     clusterID[pixel] = cluster+1;
                     cluster = cluster+1;
                     seed = findNearestBlankNeighbor(p, arrivalTime, clusterID, shower, cluster, showerArray)[0];
+                    System.out.println("findNextSeed: " + "  " +seed);
                 }
             }
 
@@ -263,11 +280,14 @@ public class ClusterArrivalTimes implements Processor {
 
         if(minID == -1){
            minID = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray)[0];
+            System.out.println("findNeartestBlankNeighbor: " + "  " + minID);
             cluster = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray)[1];
         }
         //System.out.println(minID);
         return new int [] {minID, cluster};
     }
+
+
 
     public void setThreshold(double threshold) {
         this.threshold = threshold;
