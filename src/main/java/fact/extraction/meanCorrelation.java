@@ -58,7 +58,7 @@ public class MeanCorrelation implements StatefulProcessor {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     // A logger
-    static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
+    static Logger log = LoggerFactory.getLogger(MeanCorrelation.class);
 
     @Override
     public Data process(Data input) {
