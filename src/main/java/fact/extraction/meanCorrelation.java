@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
-import stream.StatefulProcessor;
+import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * Created by jebuss on 04.04.16.
  */
-public class MeanCorrelation implements StatefulProcessor {
+public class MeanCorrelation implements Processor {
     @Parameter(required = true, description = "raw data array")
     private String key = null;
 
@@ -178,22 +178,7 @@ public class MeanCorrelation implements StatefulProcessor {
         }
         return scaledData;
     }
-
-    @Override
-    public void init(ProcessContext context) throws Exception {
-
-    }
-
-    @Override
-    public void resetState() throws Exception {
-
-    }
-
-    @Override
-    public void finish() throws Exception {
-
-    }
-
+    
     public void setKey(String key) {
         this.key = key;
     }
