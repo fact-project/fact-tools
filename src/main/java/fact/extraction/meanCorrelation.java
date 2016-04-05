@@ -4,14 +4,19 @@ import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jfree.chart.plot.IntervalMarker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Caclutlate the average covariance and correlation of neighboring pixels to determine similarities
@@ -24,6 +29,9 @@ public class meanCorrelation implements StatefulProcessor {
 
     @Parameter(required = true, description = "array containing the positions of maximum amplitudes for each pixel")
     private String amplitudePositionsKey = null;
+
+    @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
+    private String pixelSetKey;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 15;
@@ -40,13 +48,18 @@ public class meanCorrelation implements StatefulProcessor {
     @Parameter(required = false)
     private String covarianceKey = "meanCovariance";
 
+    @Parameter(required = false)
+    private String markerKey = "covarianceWindow";
+
 
     private int npix = 1440;
     private int roi = 300;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-    //TODO add window handling
+    // A logger
+    static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
+
     //TODO add pixelset handling
 
     @Override
@@ -58,6 +71,8 @@ public class meanCorrelation implements StatefulProcessor {
         Utils.mapContainsKeys(input, key, amplitudePositionsKey);
         double[] data = (double[]) input.get(key);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
+        int[] pixels = Utils.getValidPixelSet(input, npix, pixelSetKey);
+        log.info("npix: " + pixels.length );
 
         roi = data.length / npix;
 
@@ -70,7 +85,7 @@ public class meanCorrelation implements StatefulProcessor {
         DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
 
         //Loop over all pixels to calculate the correlation with their neighbours
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix : pixels) {
             FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
 
             double pixVariance  = pixelStatistics[pix].getVariance();
@@ -79,8 +94,16 @@ public class meanCorrelation implements StatefulProcessor {
             meanCovariance[pix]     = 0.;
             meanCorrelation[pix]    = 0.;
 
+            int numNeighbours = neighbours.length;
+
             //Loop over all neighbour pixels to calculate the correlation with the given pixel
             for (CameraPixel neighbour : neighbours) {
+
+                //exclude pixel that are not contained in the pixel set             }
+                if (!ArrayUtils.contains(pixels, neighbour.id)   ){
+                    numNeighbours -= 1;
+                    continue;
+                }
 
                 double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
                 double neighbourMean        = pixelStatistics[neighbour.id].getMean();
@@ -93,14 +116,14 @@ public class meanCorrelation implements StatefulProcessor {
             }
 
             // weight with number of neighbours, (necessary for pixel at the camera fringe)
-            meanCovariance[pix] /= neighbours.length;
-            meanCorrelation[pix] /= neighbours.length;
+            meanCovariance[pix] /= numNeighbours;
+            meanCorrelation[pix] /= numNeighbours;
 
             m[pix] = new IntervalMarker(skipFirst,roi - skipLast);
 
         }
 
-        input.put("covWindow", m);
+        input.put(markerKey, m);
         input.put(covarianceKey, meanCovariance);
         input.put(correlationKey, meanCorrelation);
         input.put(scaledDataKey, scaledData);
@@ -196,5 +219,13 @@ public class meanCorrelation implements StatefulProcessor {
 
     public void setCovarianceKey(String covarianceKey) {
         this.covarianceKey = covarianceKey;
+    }
+
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
+    }
+
+    public void setMarkerKey(String markerKey) {
+        this.markerKey = markerKey;
     }
 }
