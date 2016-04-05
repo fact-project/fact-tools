@@ -16,7 +16,7 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 
 /**
- * Caclutlate the average covariance and correlation of neighboring pixels to determine
+ * Calculate the average covariance and correlation of neighboring pixels to determine
  * the correlation of theire timeseries
  *
  * Created by jebuss on 04.04.16.
