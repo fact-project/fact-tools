@@ -14,41 +14,41 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
- * Caclutlate the average covariance and correlation of neighboring pixels to determine similarities
+ * Caclutlate the average covariance and correlation of neighboring pixels to determine
+ * the correlation of theire timeseries
  *
  * Created by jebuss on 04.04.16.
  */
 public class meanCorrelation implements StatefulProcessor {
-    @Parameter(required = true)
+    @Parameter(required = true, description = "raw data array")
     private String key = null;
 
     @Parameter(required = true, description = "array containing the positions of maximum amplitudes for each pixel")
     private String amplitudePositionsKey = null;
 
-    @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
+    @Parameter(description = "Key of the pixel sample that should be used, " +
+            "if no pixelset is given, the whole camera is used", defaultValue = "")
     private String pixelSetKey;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "15")
     private int skipFirst = 15;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipLast = 50;
 
-    @Parameter(required = false)
+    @Parameter(required = false, description = "Outputkey for the scaled Data array")
     private String scaledDataKey = "DataScaled";
 
-    @Parameter(required = false)
+    @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
     private String correlationKey = "meanCorrelation";
 
-    @Parameter(required = false)
+    @Parameter(required = false, description = "Outputkey for the mean covariance of neighbouring pixels")
     private String covarianceKey = "meanCovariance";
 
-    @Parameter(required = false)
+    @Parameter(required = false, description = "Outputkey for the covariance window marker")
     private String markerKey = "covarianceWindow";
 
 
@@ -60,8 +60,6 @@ public class meanCorrelation implements StatefulProcessor {
     // A logger
     static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
 
-    //TODO add pixelset handling
-
     @Override
     public Data process(Data input) {
 
@@ -72,19 +70,22 @@ public class meanCorrelation implements StatefulProcessor {
         double[] data = (double[]) input.get(key);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
         int[] pixels = Utils.getValidPixelSet(input, npix, pixelSetKey);
-        log.info("npix: " + pixels.length );
+        log.debug("npix: " + pixels.length );
 
         roi = data.length / npix;
 
         IntervalMarker[] m = new IntervalMarker[npix];
 
+        //scale the data in the array to make it comparable
+        double[] scaledData      = scaleData(data, amplitudePositions);
+
+        //get mean and variance of the timeseries for each pixel
+        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
+
         double[] meanCovariance     = new double[npix];
         double[] meanCorrelation    = new double[npix];
 
-        double[]                scaledData      = scaleData(data, amplitudePositions);
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
-
-        //Loop over all pixels to calculate the correlation with their neighbours
+        //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
             FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
 
@@ -115,7 +116,7 @@ public class meanCorrelation implements StatefulProcessor {
                 meanCorrelation[pix]    += calculateCorrelation(pixVariance, neighbourVariance, covariance);
             }
 
-            // weight with number of neighbours, (necessary for pixel at the camera fringe)
+            // weight with number of neighbours, (necessary for pixel at the camera edges and faulty pixels)
             meanCovariance[pix] /= numNeighbours;
             meanCorrelation[pix] /= numNeighbours;
 
