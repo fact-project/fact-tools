@@ -10,7 +10,6 @@ import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
-import stream.ProcessContext;
 import stream.Processor;
 import stream.annotations.Parameter;
 
@@ -178,7 +177,7 @@ public class MeanCorrelation implements Processor {
         }
         return scaledData;
     }
-    
+
     public void setKey(String key) {
         this.key = key;
     }
