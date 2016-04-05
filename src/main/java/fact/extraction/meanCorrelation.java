@@ -17,7 +17,7 @@ import java.util.Arrays;
  *
  * Created by jebuss on 04.04.16.
  */
-public class comulativeCovariance implements StatefulProcessor {
+public class meanCorrelation implements StatefulProcessor {
     @Parameter(required = true)
     private String key = null;
 
