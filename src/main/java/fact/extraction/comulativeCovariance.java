@@ -39,6 +39,9 @@ public class comulativeCovariance implements StatefulProcessor {
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
+    //TODO add window handling
+    //TODO add pixelset handling
+
     @Override
     public Data process(Data input) {
 
@@ -50,10 +53,10 @@ public class comulativeCovariance implements StatefulProcessor {
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 
         int roi = data.length / npix;
+
         double[] scaledData = data.clone();
 
         DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
-        double[][] scaledPixelData = new double[npix][];
 
         double[] comulativeCovariance = new double[npix];
         double[] comulativeCorelation = new double[npix];
@@ -66,8 +69,8 @@ public class comulativeCovariance implements StatefulProcessor {
                 scaledData[pix*roi+slice] /= maxAmpl;
             }
 
-            scaledPixelData[pix] = Arrays.copyOfRange(scaledData,pix*roi, (pix+1)*roi);
-            pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData[pix] );
+            double[] scaledPixelData = Arrays.copyOfRange(scaledData,pix*roi, (pix+1)*roi);
+            pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
         }
 
 //        Till this point we scaled all timeserise to the max amplitude in each pixel. Now I would like to calculate the covariance of neightborpixel time series
@@ -90,8 +93,8 @@ public class comulativeCovariance implements StatefulProcessor {
                 double covariance = 0.;
 
                 for (int slice = 0; slice < roi; slice++) {
-                    double distancePixel = scaledPixelData[pix][slice] - pixMean;
-                    double distanceNeighbour = scaledPixelData[neighbour.id][slice] - neighbourMean;
+                    double distancePixel        = scaledData[pix*roi+slice] - pixMean;
+                    double distanceNeighbour    = scaledData[neighbour.id*roi+slice] - neighbourMean;
                     covariance += distancePixel * distanceNeighbour;
                 }
                 covariance /= roi;
