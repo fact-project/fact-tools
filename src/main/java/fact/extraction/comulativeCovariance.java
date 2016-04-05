@@ -7,7 +7,6 @@ import fact.hexmap.FactPixelMapping;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
@@ -36,6 +35,7 @@ public class comulativeCovariance implements StatefulProcessor {
 
 
     private int npix = 1440;
+    private int roi = 300;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -52,28 +52,15 @@ public class comulativeCovariance implements StatefulProcessor {
         double[] data = (double[]) input.get(key);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 
-        int roi = data.length / npix;
-
-        double[] scaledData = data.clone();
-
-        DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
+        roi = data.length / npix;
 
         double[] comulativeCovariance = new double[npix];
         double[] comulativeCorelation = new double[npix];
 
-        for (int pix = 0; pix < npix; pix++) {
-            int maxAmplPos = roi*pix + amplitudePositions[pix];
-            double maxAmpl = data[maxAmplPos];
+        double[]                scaledData      = scaleData(data, amplitudePositions);
+        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData);
 
-            for (int slice = 0; slice < roi; slice++) {
-                scaledData[pix*roi+slice] /= maxAmpl;
-            }
-
-            double[] scaledPixelData = Arrays.copyOfRange(scaledData,pix*roi, (pix+1)*roi);
-            pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
-        }
-
-//        Till this point we scaled all timeserise to the max amplitude in each pixel. Now I would like to calculate the covariance of neightborpixel time series
+        //Loop over all pixels to calculate the correlation with their neighbours
         for (int pix = 0; pix < npix; pix++) {
             FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
 
@@ -83,24 +70,16 @@ public class comulativeCovariance implements StatefulProcessor {
             comulativeCovariance[pix] = 0.;
             comulativeCorelation[pix] = 0.;
 
-            for (CameraPixel neighbour :
-                    neighbours) {
+            //Loop over all neighbour pixels to calculate the correlation with the given pixel
+            for (CameraPixel neighbour : neighbours) {
 
                 double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
                 double neighbourMean        = pixelStatistics[neighbour.id].getMean();
 
-
-                double covariance = 0.;
-
-                for (int slice = 0; slice < roi; slice++) {
-                    double distancePixel        = scaledData[pix*roi+slice] - pixMean;
-                    double distanceNeighbour    = scaledData[neighbour.id*roi+slice] - neighbourMean;
-                    covariance += distancePixel * distanceNeighbour;
-                }
-                covariance /= roi;
+                double covariance = calculateCovariance(scaledData, pix, pixMean, neighbour, neighbourMean);
 
                 comulativeCovariance[pix] += covariance;
-                comulativeCorelation[pix] += covariance / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
+                comulativeCorelation[pix] += calculateCorrelation(pixVariance, neighbourVariance, covariance);
             }
 
             // weight with number of neighbours, (necessary for pixel at the camera fringe)
@@ -117,6 +96,44 @@ public class comulativeCovariance implements StatefulProcessor {
         input.put(outputKey, scaledData);
 
         return input;
+    }
+
+    private double calculateCorrelation(double pixVariance, double neighbourVariance, double covariance) {
+        return covariance / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
+    }
+
+    private double calculateCovariance(double[] scaledData, int pix, double pixMean, CameraPixel neighbour, double neighbourMean) {
+        double covariance = 0.;
+
+        for (int slice = 0; slice < roi; slice++) {
+            double distancePixel        = scaledData[pix*roi+slice] - pixMean;
+            double distanceNeighbour    = scaledData[neighbour.id*roi+slice] - neighbourMean;
+            covariance += distancePixel * distanceNeighbour;
+        }
+        covariance /= roi;
+        return covariance;
+    }
+
+    private DescriptiveStatistics[] getTimeseriesStatistics(double[] data) {
+        DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
+        for (int pix = 0; pix < npix; pix++) {
+            double[] scaledPixelData = Arrays.copyOfRange(data,pix*roi, (pix+1)*roi);
+            pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
+        }
+        return pixelStatistics;
+    }
+
+    private double[] scaleData(double[] data, int[] amplitudePositions) {
+        double[] scaledData = data.clone();
+        for (int pix = 0; pix < npix; pix++) {
+            int maxAmplPos = roi*pix + amplitudePositions[pix];
+            double maxAmpl = data[maxAmplPos];
+
+            for (int slice = 0; slice < roi; slice++) {
+                scaledData[pix*roi+slice] /= maxAmpl;
+            }
+        }
+        return scaledData;
     }
 
     @Override
