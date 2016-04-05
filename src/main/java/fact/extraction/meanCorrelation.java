@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * Created by jebuss on 04.04.16.
  */
-public class meanCorrelation implements StatefulProcessor {
+public class MeanCorrelation implements StatefulProcessor {
     @Parameter(required = true, description = "raw data array")
     private String key = null;
 
