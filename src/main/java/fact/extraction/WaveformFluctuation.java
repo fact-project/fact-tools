@@ -56,17 +56,7 @@ public class WaveformFluctuation implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
 
-        int[] pixels = null;
-
-        //Load a given pixelset, otherwise use the the whole camera
-        if (input.containsKey(pixelSetKey)) {
-            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-            pixels = pixelSet.toIntArray();
-        } else {
-            ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
-            pixels = Ints.toArray(numbers);
-        }
+        int[] pixels = Utils.getValidPixelSet(input, npix, pixelSetKey);
         log.info("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);

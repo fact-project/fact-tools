@@ -1,5 +1,10 @@
 package fact;
 
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
+import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
@@ -34,6 +39,25 @@ public class Utils {
 				double value = data[pixId];
 				pixels[pix][slice] = value;
 			}
+		}
+		return pixels;
+	}
+
+	/**
+	 * Return an int array with the ids of the pixelSet belonging to the given Key,
+	 * return all camera pixel Ids if the set is not existing
+	 */
+	public static int[] getValidPixelSet(Data input, int npix, String pixelSetKey) {
+		int[] pixels = null;
+
+		//Load a given pixelset, otherwise use the the whole camera
+		if (input.containsKey(pixelSetKey)) {
+			Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+			PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
+			pixels = pixelSet.toIntArray();
+		} else {
+			ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
+			pixels = Ints.toArray(numbers);
 		}
 		return pixels;
 	}
