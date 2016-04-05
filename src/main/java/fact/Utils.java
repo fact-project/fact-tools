@@ -51,14 +51,16 @@ public class Utils {
 		int[] pixels = null;
 
 		//Load a given pixelset, otherwise use the the whole camera
-		if (input.containsKey(pixelSetKey)) {
+
+		if(pixelSetKey == null){
+			ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
+			pixels = Ints.toArray(numbers);
+		} else {
 			Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 			PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
 			pixels = pixelSet.toIntArray();
-		} else {
-			ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
-			pixels = Ints.toArray(numbers);
 		}
+
 		return pixels;
 	}
 

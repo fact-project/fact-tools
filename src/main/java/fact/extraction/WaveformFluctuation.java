@@ -25,7 +25,7 @@ public class WaveformFluctuation implements Processor {
     private String outputKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
-    private String pixelSetKey;
+    private String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 35;

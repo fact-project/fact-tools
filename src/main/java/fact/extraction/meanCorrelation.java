@@ -30,7 +30,7 @@ public class MeanCorrelation implements Processor {
 
     @Parameter(description = "Key of the pixel sample that should be used, " +
             "if no pixelset is given, the whole camera is used", defaultValue = "")
-    private String pixelSetKey;
+    private String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "15")
     private int skipFirst = 15;
