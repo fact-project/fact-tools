@@ -1,5 +1,11 @@
 #Changelog for the fact-tools
 
+## Version 0.13.2
+
+* new Feature: TimeOverThresholdTL allows to calculate the time over Threshold for a given window on the Timeline
+* FWHMPulses uses Doubles instead of Ints
+
+
 ## Version 0.13.0 -- 16.02.2016
 
 * new package `fact.features.muon`
