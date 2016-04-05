@@ -31,7 +31,13 @@ public class comulativeCovariance implements StatefulProcessor {
     private int skipLast = 100;
 
     @Parameter(required = false)
-    private String outputKey = "DataScaled";
+    private String scaledDataKey = "DataScaled";
+
+    @Parameter(required = false)
+    private String correlationKey = "meanCorrelation";
+
+    @Parameter(required = false)
+    private String covarianceKey = "meanCovariance";
 
 
     private int npix = 1440;
@@ -54,8 +60,8 @@ public class comulativeCovariance implements StatefulProcessor {
 
         roi = data.length / npix;
 
-        double[] comulativeCovariance = new double[npix];
-        double[] comulativeCorelation = new double[npix];
+        double[] meanCovariance     = new double[npix];
+        double[] meanCorrelation    = new double[npix];
 
         double[]                scaledData      = scaleData(data, amplitudePositions);
         DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData);
@@ -67,8 +73,8 @@ public class comulativeCovariance implements StatefulProcessor {
             double pixVariance  = pixelStatistics[pix].getVariance();
             double pixMean      = pixelStatistics[pix].getMean();
 
-            comulativeCovariance[pix] = 0.;
-            comulativeCorelation[pix] = 0.;
+            meanCovariance[pix]     = 0.;
+            meanCorrelation[pix]    = 0.;
 
             //Loop over all neighbour pixels to calculate the correlation with the given pixel
             for (CameraPixel neighbour : neighbours) {
@@ -78,28 +84,26 @@ public class comulativeCovariance implements StatefulProcessor {
 
                 double covariance = calculateCovariance(scaledData, pix, pixMean, neighbour, neighbourMean);
 
-                comulativeCovariance[pix] += covariance;
-                comulativeCorelation[pix] += calculateCorrelation(pixVariance, neighbourVariance, covariance);
+                meanCovariance[pix]     += covariance;
+                meanCorrelation[pix]    += calculateCorrelation(pixVariance, neighbourVariance, covariance);
             }
 
             // weight with number of neighbours, (necessary for pixel at the camera fringe)
-            comulativeCovariance[pix] /= neighbours.length;
-            comulativeCorelation[pix] /= neighbours.length;
+            meanCovariance[pix] /= neighbours.length;
+            meanCorrelation[pix] /= neighbours.length;
 
         }
 
-        input.put("comulativeCovariance", comulativeCovariance);
-        input.put("comulativeCorelation", comulativeCorelation);
-
-//            double[] scaledPixelData = Arrays.copyOfRange(scaledData,pix*roi, (pix+1)*roi - 1);
-
-        input.put(outputKey, scaledData);
+        input.put(covarianceKey, meanCovariance);
+        input.put(correlationKey, meanCorrelation);
+        input.put(scaledDataKey, scaledData);
 
         return input;
     }
 
     private double calculateCorrelation(double pixVariance, double neighbourVariance, double covariance) {
-        return covariance / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
+        Double correlation = Math.abs(covariance) / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
+        return Math.abs(correlation);
     }
 
     private double calculateCovariance(double[] scaledData, int pix, double pixMean, CameraPixel neighbour, double neighbourMean) {
@@ -167,7 +171,15 @@ public class comulativeCovariance implements StatefulProcessor {
         this.skipLast = skipLast;
     }
 
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
+    public void setScaledDataKey(String scaledDataKey) {
+        this.scaledDataKey = scaledDataKey;
+    }
+
+    public void setCorrelationKey(String correlationKey) {
+        this.correlationKey = correlationKey;
+    }
+
+    public void setCovarianceKey(String covarianceKey) {
+        this.covarianceKey = covarianceKey;
     }
 }
