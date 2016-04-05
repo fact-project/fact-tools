@@ -64,7 +64,7 @@ public class meanCorrelation implements StatefulProcessor {
         double[] meanCorrelation    = new double[npix];
 
         double[]                scaledData      = scaleData(data, amplitudePositions);
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData);
+        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
 
         //Loop over all pixels to calculate the correlation with their neighbours
         for (int pix = 0; pix < npix; pix++) {
@@ -82,7 +82,8 @@ public class meanCorrelation implements StatefulProcessor {
                 double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
                 double neighbourMean        = pixelStatistics[neighbour.id].getMean();
 
-                double covariance = calculateCovariance(scaledData, pix, pixMean, neighbour, neighbourMean);
+                double covariance = calculateCovariance(scaledData, pix, pixMean, 
+                                                        neighbour, neighbourMean, skipFirst, skipLast);
 
                 meanCovariance[pix]     += covariance;
                 meanCorrelation[pix]    += calculateCorrelation(pixVariance, neighbourVariance, covariance);
@@ -106,22 +107,30 @@ public class meanCorrelation implements StatefulProcessor {
         return Math.abs(correlation);
     }
 
-    private double calculateCovariance(double[] scaledData, int pix, double pixMean, CameraPixel neighbour, double neighbourMean) {
+    private double calculateCovariance(double[] scaledData, int pix, double pixMean, CameraPixel neighbour,
+                                       double neighbourMean, int skipFirst, int skipLast) {
         double covariance = 0.;
 
-        for (int slice = 0; slice < roi; slice++) {
-            double distancePixel        = scaledData[pix*roi+slice] - pixMean;
-            double distanceNeighbour    = scaledData[neighbour.id*roi+slice] - neighbourMean;
+        for (int slice = 0 + skipFirst; slice < roi - skipLast; slice++) {
+            double distancePixel        = scaledData[absPos(pix, slice)] - pixMean;
+            double distanceNeighbour    = scaledData[absPos(neighbour.id, slice)] - neighbourMean;
             covariance += distancePixel * distanceNeighbour;
         }
         covariance /= roi;
         return covariance;
     }
 
-    private DescriptiveStatistics[] getTimeseriesStatistics(double[] data) {
+    private int absPos(int pix, int slice) {
+        return pix*roi+slice;
+    }
+
+    private DescriptiveStatistics[] getTimeseriesStatistics(double[] data, int skipFirst, int skipLast) {
         DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
+
         for (int pix = 0; pix < npix; pix++) {
-            double[] scaledPixelData = Arrays.copyOfRange(data,pix*roi, (pix+1)*roi);
+            int left_edge   = absPos(pix, skipFirst);
+            int right_edge  = absPos(pix+1, (-1)*skipLast);
+            double[] scaledPixelData = Arrays.copyOfRange(data, left_edge, right_edge);
             pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
         }
         return pixelStatistics;
@@ -130,11 +139,11 @@ public class meanCorrelation implements StatefulProcessor {
     private double[] scaleData(double[] data, int[] amplitudePositions) {
         double[] scaledData = data.clone();
         for (int pix = 0; pix < npix; pix++) {
-            int maxAmplPos = roi*pix + amplitudePositions[pix];
+            int maxAmplPos = absPos(pix, amplitudePositions[pix]);
             double maxAmpl = data[maxAmplPos];
 
             for (int slice = 0; slice < roi; slice++) {
-                scaledData[pix*roi+slice] /= maxAmpl;
+                scaledData[absPos(pix, slice)] /= maxAmpl;
             }
         }
         return scaledData;
