@@ -2,8 +2,12 @@
 
 ## Version 0.13.2
 
-* new Feature: TimeOverThresholdTL allows to calculate the time over Threshold for a given window on the Timeline
+* new Processor: TimeOverThresholdTL allows to calculate the time over Threshold for a given window on the Timeline
 * FWHMPulses uses Doubles instead of Ints
+
+## Version 0.13.1 -- 6.02.2016
+
+* new Processor `fact.extraction.MeanCorrelation` to calculate the average covariance and correlation of the time series of neighboring pixels 
 
 
 ## Version 0.13.0 -- 16.02.2016
