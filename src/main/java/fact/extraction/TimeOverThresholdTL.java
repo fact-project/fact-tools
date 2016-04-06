@@ -90,24 +90,12 @@ public class TimeOverThresholdTL implements Processor {
         return input;
 	}
 
-	public double getThreshold() {
-		return threshold;
-	}
-
 	public void setThreshold(double threshold) {
 		this.threshold = threshold;
 	}
 
-	public String getDataKey() {
-		return dataKey;
-	}
-
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
-	}
-
-	public String getOutputKey() {
-		return outputKey;
 	}
 
 	public void setOutputKey(String outputKey) {
