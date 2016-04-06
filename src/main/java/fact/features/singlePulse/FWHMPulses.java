@@ -71,7 +71,7 @@ public class FWHMPulses implements Processor{
                 double rightAmplitude = maxAmplitude;
                 double leftAmplitude  = maxAmplitude;
 
-                ///TODO: this method is still super fishy, rework it!
+                boolean out_of_bounds = false;
 
                 while(rightAmplitude >= maxAmplitude/2 || leftAmplitude >= maxAmplitude/2){
 
@@ -79,6 +79,7 @@ public class FWHMPulses implements Processor{
                         right++;
                         if (maxPos+right >= (pix+1)*roi){
 //                            log.error(String.format("(right) slices out of bounds in pixel %s at %s", pix, maxPos+right));
+                            out_of_bounds = true;
                             break;
                         }
 
@@ -90,13 +91,18 @@ public class FWHMPulses implements Processor{
                         left++;
                         if (maxPos-left < pix*roi){
 //                            log.error(String.format("(left) slices out of bounds in pixel %s at %s", pix, maxPos-left));
+                            out_of_bounds = true;
                             break;
                         }
                         leftAmplitude  = data[maxPos - left] - offset;
                         visualisation[maxPos-left]=data[maxPos]/2;
                     }
                 }
-                widthList.add((double) right+left);
+                if (out_of_bounds == false) {
+                    widthList.add((double) right + left);
+                } else {
+                    widthList.add(Double.NaN);
+                }
             }
             widthArrayList[pix]=new double[widthList.size()];
             widthArrayList[pix]=Utils.arrayListToDouble(widthList);
