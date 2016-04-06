@@ -3,7 +3,7 @@
 ## Version 0.13.2
 
 * new Processor: `fact.extraction.TimeOverThresholdTL` allows to calculate the time over Threshold for a given window on the Timeline
-* FWHMPulses uses Doubles instead of Ints
+* `fact.features.singlePulse.FWHMPulses` now uses Doubles instead of Ints and throws NaNs in case of out-of-boundary issues 
 
 ## Version 0.13.1 -- 6.02.2016
 
