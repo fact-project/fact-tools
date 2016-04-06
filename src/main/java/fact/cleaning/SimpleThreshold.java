@@ -18,9 +18,8 @@ import java.util.ArrayList;
 
 /**
  * SimpleThreshold. Identifies showerPixel in the image array.
- *	 Cleaning in several Steps:
  * 	Identify all pixel with a charge above a given threshold (Photoncharge higher Threshold)
- *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
+ *  @author Jens Buss &lt;jens.buss@tu-dortmund.de&gt
  *
  */
 
