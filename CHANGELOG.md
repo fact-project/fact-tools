@@ -1,5 +1,15 @@
 #Changelog for the fact-tools
 
+## branch pedestal Parameters
+* added several xmls to calculate features on non-shower pixels e.g. pedestalParameters_mc.xml, pedestalParameters.xml
+* modified `hexmap.ui.components.StreamNavigationPanel` to use other ROIs than 300
+* new Processor: `fact.cleaning.calculateStarSet` to get a pixel set for the stars in the FOV
+* new Processor: `fact.cleaning.calculateCenterPixelSet` to get a pixel set of the centerpixels that are turned of for moon observations
+* new Processor: `fact.cleaning.SimpleThreshold` Identify all pixel with a charge above a given threshold
+* new xml for pedestal statistics studies/pedestalStatistics.xml
+
+ 
+
 ## Version 0.13.3 -- 06.04.2016
 
 * new Processor: `fact.ApplyModel` which applies a .pmml model to data in the data item. The model can be written with SciKit learn.
