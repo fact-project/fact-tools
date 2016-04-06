@@ -37,11 +37,11 @@ public class HuffmanCoder {
 	 */
 	public static class Encoder {
 		public class TreeNode {
-			private short symbol = 0;
-			private int count = 0;
-			private int size = 1; // the size of the tree
-			private TreeNode one = null;
-			private TreeNode zero = null;
+			short symbol = 0;
+			int count = 0;
+			int size = 1; // the size of the tree
+			public TreeNode one;
+			public TreeNode zero;
 
 			public TreeNode(short symbol, int count) {
 				this.symbol = symbol;
@@ -55,37 +55,17 @@ public class HuffmanCoder {
 				this.size = Math.max(a.size, b.size) + 1;
 			}
 
-			public int getCount() {
-				return this.count;
-			}
-
-			public int getSize() {
-				return this.size;
-			}
-
-			public short getSymbol() {
-				return this.symbol;
-			}
-			
 			public boolean isLeaf() {
 				return this.one==null && this.zero==null;
-			}
-			
-			public TreeNode getZero() {
-				return this.zero;
-			}
-			
-			public TreeNode getOne() {
-				return this.one;
 			}
 		}
 
 		public class TreeNodeSorter implements Comparator<TreeNode> {
 			@Override
 			public int compare(TreeNode arg0, TreeNode arg1) {
-				int tmp = Integer.compare(arg0.getCount(), arg1.getCount());
+				int tmp = Integer.compare(arg0.count, arg1.count);
 				if (tmp == 0) {
-					return Integer.compare(arg0.getSize(), arg1.getSize());
+					return Integer.compare(arg0.size, arg1.size);
 				}
 				return tmp;
 			}
@@ -119,14 +99,14 @@ public class HuffmanCoder {
 			}
 			if (node.isLeaf()) {
 				if (numBits==0) {
-					throw new EncodingException("We need at least one bit to encode a symbol: '"+node.getSymbol()+"' count: '"+node.getCount()+"'");
+					throw new EncodingException("We need at least one bit to encode a symbol: '"+node.symbol+"' count: '"+node.count+"'");
 				}
 				codeTableSize += 2+1+((numBits+7)/8); //short(symbol), byte(numBits), byte[1-4](bits)
-				this.symbol2Code[node.getSymbol()&0xFFFF] = new Code(bits, numBits);
+				this.symbol2Code[node.symbol&0xFFFF] = new Code(bits, numBits);
 				this.numCodeTableEntries++;
 			} else {
-				createSymbolArray(node.getZero(), bits, numBits+1);
-				createSymbolArray(node.getOne(), bits | (1<<numBits), numBits+1);
+				createSymbolArray(node.zero, bits, numBits+1);
+				createSymbolArray(node.one, bits | (1<<numBits), numBits+1);
 			}
 		}
 
@@ -324,8 +304,6 @@ public class HuffmanCoder {
 		Decoder(ByteBuffer buffer) throws DecodingException {
 			// first 4 bytes are the number of entries
 			long numEntries = (int)buffer.getLong();
-			//System.out.println("entries: "+Long.toHexString(numEntries));
-			//log.info("Decoding HuffmanTree, {} entries", numEntries);
 			// read all entries and create the decoding tree 
 			for (long i = 0; i < numEntries; i++) {
 				// first two bytes are the symbole
@@ -382,7 +360,7 @@ public class HuffmanCoder {
 				int index = curByte&0xFF;
 
 				curTree = curTree.get(index);
-				if (curTree.isLeaf() == false) {
+				if (!curTree.isLeaf()) {
 					bufferPosition++;
 					continue;
 				}
@@ -426,7 +404,7 @@ public class HuffmanCoder {
 	 *    write sizeOfInput in number of shorts (long 8 bytes)
 	 *    write codeTable
 	 *    write encodedData
-	 * @param input
+	 * @param input the uncompressed data
 	 * @return The compressed Data with codeTable and everything.
 	 * @throws EncodingException
 	 */

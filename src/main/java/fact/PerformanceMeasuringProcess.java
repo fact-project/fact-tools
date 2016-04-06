@@ -47,14 +47,22 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 	long iterations = 0;
 	long dataItems = 0;
 
-	private HashMap<Processor, DescriptiveStatistics> timeMap = new HashMap<>();
+	private HashMap<String, DescriptiveStatistics> timeMap = new HashMap<>();
 
 	@Override
 	public void init(ApplicationContext context) throws Exception {
 		super.init(context);
 
+		HashMap<String, Integer> numberOfUses = new HashMap<>();
 		for (Processor proc : processors) {
-			timeMap.put(proc, new DescriptiveStatistics());
+			String name = proc.getClass().getSimpleName();
+			if (numberOfUses.containsKey(name)){
+				numberOfUses.put(name, numberOfUses.get(name) + 1);
+			} else {
+				numberOfUses.put(name, 1);
+			}
+			String key = name + String.valueOf(numberOfUses.get(name));
+			timeMap.put(key, new DescriptiveStatistics());
 			if (proc instanceof StatefulProcessor) {
 				((StatefulProcessor) proc).init(processContext);
 			}
@@ -68,11 +76,19 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 		log.trace("{}: processing data {}", this, data);
         dataItems++;
 		Stopwatch stopwatch = Stopwatch.createUnstarted();
+		HashMap<String, Integer> numberOfUses = new HashMap<>();
 		for (Processor proc : processors) {
+			String name = proc.getClass().getSimpleName();
+			if (numberOfUses.containsKey(name)){
+				numberOfUses.put(name, numberOfUses.get(name) + 1);
+			} else {
+				numberOfUses.put(name, 1);
+			}
 			stopwatch.start();
 			data = proc.process(data);
 			if (iterations > warmupIterations) {
-				timeMap.get(proc).addValue(stopwatch.elapsed(TimeUnit.MICROSECONDS));
+				String key = name + String.valueOf(numberOfUses.get(name));
+				timeMap.get(key).addValue(stopwatch.elapsed(TimeUnit.MICROSECONDS));
 			}
 			stopwatch.reset();
 			if (data == null) {
@@ -95,25 +111,33 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 		log.info("Runtime of used processors in Microseconds ");
 
 		int processorCounter = 0;
+		HashMap<String, Integer> numberOfUses = new HashMap<>();
 		for (Processor proc : processors) {
-			double mean = timeMap.get(proc).getMean();
-			double std = timeMap.get(proc).getStandardDeviation();
-			double numberOfCallsToProcessor = timeMap.get(proc).getN();
-			double lower_sigma_quantile = timeMap.get(proc).getPercentile(15.87);
-			double upper_sigma_quantile = timeMap.get(proc).getPercentile(100 - 15.87);
-			double lower_quartil = timeMap.get(proc).getPercentile(25);
-			double upper_quartil = timeMap.get(proc).getPercentile(75);
-			perf.put(proc.getClass().getSimpleName(), "mean", mean);
-			perf.put(proc.getClass().getSimpleName(), "standard_deviation", std);
-			perf.put(proc.getClass().getSimpleName(), "numberOfCallsToProcessor", numberOfCallsToProcessor);
-			perf.put(proc.getClass().getSimpleName(), "order", Double.valueOf(processorCounter++));
-			perf.put(proc.getClass().getSimpleName(), "upper_sigma_quantile", upper_sigma_quantile);
-			perf.put(proc.getClass().getSimpleName(), "lower_sigma_quantile", lower_sigma_quantile);
-			perf.put(proc.getClass().getSimpleName(), "lower_quartil", lower_quartil);
-			perf.put(proc.getClass().getSimpleName(), "upper_quartil", upper_quartil);
+			String name = proc.getClass().getSimpleName();
+			if (numberOfUses.containsKey(name)){
+				numberOfUses.put(name, numberOfUses.get(name) + 1);
+			} else {
+				numberOfUses.put(name, 1);
+			}
+			String key = name + String.valueOf(numberOfUses.get(name));
+			double mean = timeMap.get(key).getMean();
+			double std = timeMap.get(key).getStandardDeviation();
+			double numberOfCallsToProcessor = timeMap.get(key).getN();
+			double lower_sigma_quantile = timeMap.get(key).getPercentile(15.87);
+			double upper_sigma_quantile = timeMap.get(key).getPercentile(100 - 15.87);
+			double lower_quartil = timeMap.get(key).getPercentile(25);
+			double upper_quartil = timeMap.get(key).getPercentile(75);
+			perf.put(key, "mean", mean);
+			perf.put(key, "standard_deviation", std);
+			perf.put(key, "numberOfCallsToProcessor", numberOfCallsToProcessor);
+			perf.put(key, "order", Double.valueOf(processorCounter++));
+			perf.put(key, "upper_sigma_quantile", upper_sigma_quantile);
+			perf.put(key, "lower_sigma_quantile", lower_sigma_quantile);
+			perf.put(key, "lower_quartil", lower_quartil);
+			perf.put(key, "upper_quartil", upper_quartil);
 
 			log.info("      Runtime of Processor {} lower quantile: {}   Mean: {}   upper_quantile: {}",
-					proc.getClass().getSimpleName(), lower_sigma_quantile, mean, upper_sigma_quantile);
+					key, lower_sigma_quantile, mean, upper_sigma_quantile);
 
 			if (proc instanceof StatefulProcessor) {
 				try {

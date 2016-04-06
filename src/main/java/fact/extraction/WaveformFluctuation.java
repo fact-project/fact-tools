@@ -1,18 +1,11 @@
 package fact.extraction;
 
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.Range;
-import com.google.common.primitives.Ints;
 import fact.Utils;
-import fact.container.PixelSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
-import stream.ProcessContext;
 import stream.Processor;
-import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
 import java.util.Random;
@@ -24,7 +17,7 @@ import java.util.Random;
  * the resulting distribution.
  * Created by jbuss on 17.11.14.
  */
-public class WaveformFluctuation implements StatefulProcessor {
+public class WaveformFluctuation implements Processor {
     @Parameter(required = true)
     private String key = null;
 
@@ -32,7 +25,7 @@ public class WaveformFluctuation implements StatefulProcessor {
     private String outputKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
-    private String pixelSetKey;
+    private String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 35;
@@ -51,8 +44,6 @@ public class WaveformFluctuation implements StatefulProcessor {
 
     private int npix;
 
-    private Random rand;
-
     @Override
     public Data process(Data input) {
 
@@ -60,18 +51,8 @@ public class WaveformFluctuation implements StatefulProcessor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
 
-        int[] pixels = null;
-
-        //Load a given pixelset, otherwise use the the whole camera
-        if (input.containsKey(pixelSetKey)) {
-            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-            pixels = pixelSet.toIntArray();
-        } else {
-            ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
-            pixels = Ints.toArray(numbers);
-        }
-        log.debug("npix: " + pixels.length );
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
+        log.info("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
 
@@ -84,15 +65,14 @@ public class WaveformFluctuation implements StatefulProcessor {
         double[] chargeSkewness         = new double[npix];
         double[] chargeMedian           = new double[npix];
         double[] chargeSum              = new double[npix];
-        double[] median                 = new double[npix];
-        double[] p25                    = new double[npix];
-        double[] p75                    = new double[npix];
 
         int roi = data.length / npix;
 
+        Random rand = new Random(Seed);
+
         int bound = roi - skipLast - skipFirst;
         int iterations = bound/windowSize;
-        log.debug("Iterations: " + iterations );
+        log.info("Iterations: " + iterations );
 
         double[][] charge = new double[npix][iterations];
 
@@ -138,15 +118,11 @@ public class WaveformFluctuation implements StatefulProcessor {
             chargeSkewness[pix]     = descriptiveStatistics.getSkewness();
             chargeMedian[pix]       = descriptiveStatistics.getPercentile(0.5);
             chargeSum[pix]          = descriptiveStatistics.getSum();
-            median[pix]             = descriptiveStatistics.getPercentile(50);
-            p25[pix]                = descriptiveStatistics.getPercentile(25);
-            p75[pix]                = descriptiveStatistics.getPercentile(75);
+
+
         }
 
         input.put(outputKey, charge);
-        input.put(outputKey+"_median", median);
-        input.put(outputKey+"_p25", p25);
-        input.put(outputKey+"_p75", p75);
         input.put(outputKey+"_mean", chargeMean);
         input.put(outputKey+"_std", chargeStd);
         input.put(outputKey+"_var", chargeVariance);
@@ -210,20 +186,5 @@ public class WaveformFluctuation implements StatefulProcessor {
 
     public void setSeed(long seed) {
         Seed = seed;
-    }
-
-    @Override
-    public void init(ProcessContext context) throws Exception {
-        rand = new Random(Seed);
-    }
-
-    @Override
-    public void resetState() throws Exception {
-
-    }
-
-    @Override
-    public void finish() throws Exception {
-
     }
 }

@@ -8,25 +8,26 @@ import java.nio.ShortBuffer;
 import java.util.NoSuchElementException;
 
 public class BlockHeader {
-	enum Prozessor {
+	enum Processor {
 		UNCOMPRESSED(0),
 		SMOOTHING(1),
 		HUFFMAN(2);
 		
 		private final short id;
 		// using int and casting to short saves us the work to write '(short)x' everywhere above
-		Prozessor(int id) {
+		Processor(int id) {
 			this.id = (short)id;
 		}
 		public short getId() {
 			return this.id;
 		}
-		public static BlockHeader.Prozessor getProzesserFromId(short id) {
-			for (BlockHeader.Prozessor p : Prozessor.values()) {
+
+		public static Processor getProcessorFromId(short id) {
+			for (Processor p : Processor.values()) {
 				if (p.getId() == id)
 					return p;
 			}
-			throw new NoSuchElementException("The given prozessor id: '"+id+"' is not supported");
+			throw new NoSuchElementException("The given processor id: '"+id+"' is not supported");
 		}
 	}
 	enum Ordering {
@@ -52,8 +53,8 @@ public class BlockHeader {
 	private BlockHeader.Ordering ordering;
 	private int numRows = 1;
 	private FitsTableColumn columnInfo;
-	private int numProzessors; //should be unsigned char but we don't have it so let it be int
-	private BlockHeader.Prozessor[] prozessors;
+	private int numProcessors; //should be unsigned char but we don't have it so let it be int
+	private Processor[] processors;
 	
 	public byte[] data;
 	
@@ -74,11 +75,11 @@ public class BlockHeader {
 
 		this.size = buffer.getLong();
 		this.ordering = Ordering.getOrderingFormCharacter((char)buffer.get());
-		this.numProzessors = (int)buffer.get();
+		this.numProcessors = (int)buffer.get();
 		
-		this.prozessors = new BlockHeader.Prozessor[this.numProzessors];
-		for (int i=0; i < this.numProzessors; i++) {
-			this.prozessors[i] = Prozessor.getProzesserFromId(buffer.getShort());
+		this.processors = new Processor[this.numProcessors];
+		for (int i=0; i < this.numProcessors; i++) {
+			this.processors[i] = Processor.getProcessorFromId(buffer.getShort());
 		}
 		//read the data into buffer and make it the buffer
 		ByteBuffer dataBuffer = ZFitsUtil.create(buffer.remaining());
@@ -89,9 +90,9 @@ public class BlockHeader {
 	public String toString() {
 		String s = "Size: "+String.format("%6s", this.size)
 				 + ", Ordering: "+String.format("%6s", this.ordering.toString())
-				 + ", Prozessors Num: "+this.numProzessors
+				 + ", Prozessors Num: "+this.numProcessors
 				 + ", P: ";
-		for (BlockHeader.Prozessor p : this.prozessors) {
+		for (Processor p : this.processors) {
 			s += p.toString()+", ";
 		}
 		return s;
@@ -149,9 +150,9 @@ public class BlockHeader {
 	}
 
 	public byte[] decode() throws DecodingException {
-		for (int i=0; i< this.numProzessors; i++) {
-			//we must go backwards, the prozessors show the coding not the decoding
-			switch (this.prozessors[(this.numProzessors-1)-i]) {
+		for (int i=0; i< this.numProcessors; i++) {
+			//we must go backwards, the processors show the coding not the decoding
+			switch (this.processors[(this.numProcessors -1)-i]) {
 			case UNCOMPRESSED:
 				break;
 			case SMOOTHING:
