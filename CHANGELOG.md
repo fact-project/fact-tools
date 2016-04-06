@@ -1,5 +1,29 @@
 #Changelog for the fact-tools
 
+## Version 0.13.2
+
+* new Processor: `fact.extraction.TimeOverThresholdTL` allows to calculate the time over Threshold for a given window on the Timeline
+* `fact.features.singlePulse.FWHMPulses` now uses Doubles instead of Ints and throws NaNs in case of out-of-boundary issues 
+
+## Version 0.13.1 -- 6.02.2016
+
+* new Processor `fact.extraction.MeanCorrelation` to calculate the average covariance and correlation of the time series of neighboring pixels 
+
+
+## Version 0.13.0 -- 16.02.2016
+
+* new package `fact.features.muon`
+  * move `fact.features.MuonHoughTransform` to `fact.features.muon.HoughTransform`
+  * new Processor `fact.features.muon.CircularFit` to fit a circle to the light distribution
+  * new Processor `fact.feautures.muon.GaussianFit` to fit a gaussian to the radial light 
+  distribution
+  * example xml to show how these work: examples/studies/muon_fitting.xml
+* exceptions occuring in the functional tests are now logged 
+* new Processor `UnixTimeUTC2DateTime` to convert from a tuple of (seconds, microsends)
+to a DateTime object
+* new TypeAdapter in `JSONWriter` to write out `DateTime` objects as ISO string
+* fix null-value handling for the `PixelSetAdapter` in JSONWriter
+
 ## Version 0.12.3
 
 * `JSONWriter` now supports directly writing gzipped files with the 
