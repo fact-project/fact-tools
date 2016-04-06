@@ -42,7 +42,7 @@ public class ClusterArrivalTimes implements Processor {
 
     @Override
     public Data process(Data data) {
-        //System.out.println(data.get("EventNum"));
+        System.out.println(data.get("EventNum"));
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
         double[] photoncharge = ((double[]) data.get(photonchargeKey));
@@ -78,6 +78,7 @@ public class ClusterArrivalTimes implements Processor {
         int cog = mapping.getPixelBelowCoordinatesInMM(cogX, cogY).id;
 
         int seed = shower[0];
+        System.out.println(seed);
 
         clusterID[seed] = cluster;
 
@@ -92,88 +93,107 @@ public class ClusterArrivalTimes implements Processor {
         while(finishCluster == false){
 
 
-            System.out.println(current);
+//            System.out.println(current);
 
             //get ids from neighbor pixel which have already a cluster id
+
             ArrayList<Integer> flaggedNeighborPixel = findNeighborCluster(current, clusterID);
 
-            double minDiff = Math.abs(arrivalTime[current] - arrivalTime[flaggedNeighborPixel.get(0)]);
-            int minClusterID = clusterID[flaggedNeighborPixel.get(0)];
-            int minPixelID = flaggedNeighborPixel.get(0);
+            if(flaggedNeighborPixel.size() == 0){
+                cluster++;
+                clusterID[current] = cluster;
+                current_cluster = findNextSeed(shower, clusterID, cluster, arrivalTime, showerArray);
+                current = current_cluster[0];
+                cluster = current_cluster[1];
+            }
+            else {
+                double minDiff = Math.abs(arrivalTime[current] - arrivalTime[flaggedNeighborPixel.get(0)]);
+                int minClusterID = clusterID[flaggedNeighborPixel.get(0)];
+                int minPixelID = flaggedNeighborPixel.get(0);
 
-            System.out.println(1);
+                System.out.println(1);
 
-            if(flaggedNeighborPixel.size() > 1) {
+                if (flaggedNeighborPixel.size() > 1) {
 
 
-                for (int c = 1; c < flaggedNeighborPixel.size(); c++) {
-                    double diff = Math.abs(arrivalTime[current] - arrivalTime[flaggedNeighborPixel.get(c)]);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        //clusterID for pixel with the minimal difference in arrival time:
-                        minClusterID = clusterID[flaggedNeighborPixel.get(c)];
-                        minPixelID = flaggedNeighborPixel.get(c);
+                    for (int c = 1; c < flaggedNeighborPixel.size(); c++) {
+                        double diff = Math.abs(arrivalTime[current] - arrivalTime[flaggedNeighborPixel.get(c)]);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            //clusterID for pixel with the minimal difference in arrival time:
+                            minClusterID = clusterID[flaggedNeighborPixel.get(c)];
+                            minPixelID = flaggedNeighborPixel.get(c);
+                        }
                     }
                 }
-            }
 
-            System.out.println(2);
+                System.out.println(2);
 
-            if(minDiff < threshold){
-                clusterID[current] = minClusterID;
-                int [] temp = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray);
-                current = temp[0];
-                cluster = temp[1];
-                if(current == -1){
-                    finishCluster = true;
-                }
-            }
-
-            else{
-                System.out.println(3);
-                if(showerArray[current] == 1){
-                    System.out.println(4);
-                    cluster++;
-                    clusterID[current] = cluster;
-                    int [] temp = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray);
+                if (minDiff < threshold) {
+                    clusterID[current] = minClusterID;
+                    System.out.println("Main 2 calls");
+                    int[] temp = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray);
                     current = temp[0];
                     cluster = temp[1];
-                    if(current == -1){
+                    if (current == -1) {
+                        System.out.println("finish1");
                         finishCluster = true;
                     }
-                }
-                else{
-                    System.out.println(5);
-                    int [] temp = findNextSeed(shower, clusterID,cluster,arrivalTime, showerArray);
-                    current = temp[0];
-                    cluster = temp[1];
-                    //cluster++;
-                    if(current == -1){
-                        finishCluster = true;
+                } else {
+                    System.out.println(3);
+                    if (showerArray[current] == 1) {
+                        System.out.println(4);
+                        System.out.println(cluster);
+                        cluster++;
+                        System.out.println(cluster);
+                        clusterID[current] = cluster;
+                        System.out.println("Main 4 calls");
+                        int[] temp = findNearestBlankNeighbor(current, arrivalTime, clusterID, shower, cluster, showerArray);
+                        System.out.println(cluster);
+                        current = temp[0];
+                        cluster = temp[1];
+                        System.out.println(cluster);
+                        if (current == -1) {
+                            System.out.println("finish2");
+                            finishCluster = true;
+                        }
+                    } else {
+                        System.out.println(5);
+                        int[] temp = findNextSeed(shower, clusterID, cluster, arrivalTime, showerArray);
+                        current = temp[0];
+                        cluster = temp[1];
+                        //cluster++;
+                        if (current == -1) {
+                            System.out.println("finish3");
+                            finishCluster = true;
+                        }
                     }
                 }
             }
+
+            System.out.print("cluster: ");
+            System.out.println(cluster);
 
         }
 
         //Clustering done
-        System.out.print("cluster: ");
+        System.out.print("cluster fertig: ");
         System.out.println(cluster);
 
-//
-//        FactCluster[]  clusterSet = new FactCluster[cluster+1];
-//        for (int i=0; i<=cluster; i++){
-//            clusterSet[i] = new FactCluster();
-//            clusterSet[i].setClusterID(i);
-//        }
-//
-//        for(int i=0;i<1440;i++){
-//            System.out.println(i + "\t" + clusterID[i]);
-//            clusterSet[clusterID[i]].addContentPixel(i);
-//            clusterSet[clusterID[i]].addContentPixelPhotoncharge(photoncharge[i]);
-//            clusterSet[clusterID[i]].addContentPixelArrivaltime(arrivalTime[i]);
-//
-//        }
+
+        FactCluster[]  clusterSet = new FactCluster[cluster+1];
+        for (int i=0; i<=cluster; i++){
+            clusterSet[i] = new FactCluster();
+            clusterSet[i].setClusterID(i);
+        }
+
+        for(int i=0;i<1440;i++){
+            //System.out.println(i + "\t" + clusterID[i]);
+            clusterSet[clusterID[i]].addContentPixel(i);
+            clusterSet[clusterID[i]].addContentPixelPhotoncharge(photoncharge[i]);
+            clusterSet[clusterID[i]].addContentPixelArrivaltime(arrivalTime[i]);
+
+        }
 //
 //        //add showerpixel in a cluster to list
 //        for(int i=0; i<shower.length;i++){
@@ -234,13 +254,23 @@ public class ClusterArrivalTimes implements Processor {
         }
 
         if(seed == -1){
-            for(int pixel:shower){
+            // foundSeed = false;
+            int k = 0;
+            while(foundSeed == false && k<shower.length){
+                int pixel = shower[k];
                 if (clusterID[pixel] == 0) {
+                    foundSeed = true;
                     clusterID[pixel] = cluster+1;
                     cluster = cluster+1;
-                    seed = findNearestBlankNeighbor(p, arrivalTime, clusterID, shower, cluster, showerArray)[0];
-                    System.out.println("findNextSeed: " + "  " +seed);
+                    System.out.println("findNextSeed calls");
+                    int [] current_cluster = findNearestBlankNeighbor(p, arrivalTime, clusterID, shower, cluster, showerArray);
+                    seed = current_cluster[0];
+                    cluster = current_cluster[1];
+
+                    System.out.println("findNextSeed: " + "  " +cluster);
+
                 }
+                k++;
             }
 
         }
@@ -262,6 +292,8 @@ public class ClusterArrivalTimes implements Processor {
         return neighborCluster;
     }
 
+
+
     private int [] findNearestBlankNeighbor(int current, double[] arrivalTime, int[] clusterID, int[] shower, int cluster, int[] showerArray) {
         FactCameraPixel[] neighbors = mapping.getNeighboursFromID(current);
         double minDiff = 1000;
@@ -279,9 +311,11 @@ public class ClusterArrivalTimes implements Processor {
         }
 
         if(minID == -1){
-           minID = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray)[0];
-            System.out.println("findNeartestBlankNeighbor: " + "  " + minID);
-            cluster = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray)[1];
+           int [] temp = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray);
+
+            minID = temp[0];
+            cluster = temp[1];
+            System.out.println("findNeartestBlankNeighbor: " + "  " + cluster);
         }
         //System.out.println(minID);
         return new int [] {minID, cluster};
