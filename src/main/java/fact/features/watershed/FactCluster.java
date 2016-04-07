@@ -386,8 +386,12 @@ public class FactCluster {
      * calculated for all numbers between this 'full hexagon numbers'.
      * The equation is only an approximation, but for the range of numbers in this case (up to 1440 pixels) it fits quite well.
      */
-    private int idealBound(){
-        return (int) (2*Math.sqrt(3*getNumPixel()) - 3);
+    private int idealBound() {
+        if (getNumPixel() < 7) {
+            return getNumPixel();
+        } else {
+            return (int) (2 * Math.sqrt(3 * getNumPixel()) - 3);
+        }
     }
 
     /*

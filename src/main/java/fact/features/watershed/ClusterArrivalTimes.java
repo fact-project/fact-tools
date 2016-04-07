@@ -1,11 +1,8 @@
 package fact.features.watershed;
 
 import fact.container.PixelSet;
-import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
-import fact.features.watershed.FactCluster;
 import fact.hexmap.FactPixelMapping;
-import org.apache.commons.math3.ml.clustering.Cluster;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -13,6 +10,21 @@ import stream.annotations.Parameter;
 import java.util.ArrayList;
 
 /**
+ * This class clusters shower pixels(!) by their arrival times. In this case a region growing algorithm is used, which
+ * works like
+ * 1. Find seed (= an unflagged shower pixel). For the first iteration the first shower pixel is used as seed (shower[0]).
+ *      This is kind of a random seed and could cause different cluster results for the same event for different runs!
+ * 2. Find all neighbor pixel which have the smallest difference in arrival time. This pixel is the 'current' pixel.
+ *
+ * 3. Find all flagged neighbor pixel for the 'current' pixel.
+ * 4. Search for the flagged pixel which has the smallest difference in arrival time.
+ * 5. Check if the smallest difference is under a threshold (hardcode at the moment, could be variable, maybe std of all arrival times in cluster so far?)
+ * 6. difference < threshold: current pixel gets the same cluster id as the neighbor pixel with this difference
+ *    difference > threshold: current pixel gets a new cluster ID
+ * 7. Search for the next current or seed pixel to cluster. Keep in mind that only shower pixels should be clustered.
+ *  --> iterate step 3. - 7. until all shower pixels have a cluster ID
+ *
+ *
  * Created by lena on 09.02.16.
  */
 
@@ -22,9 +34,6 @@ import java.util.ArrayList;
 public class ClusterArrivalTimes implements Processor {
 
     FactPixelMapping mapping = FactPixelMapping.getInstance();
-
-    ArrayList<Integer> aktuellerPfad = new ArrayList<>();
-
 
     @Parameter(required = false, description = "Threshold to decide whether a pixel belongs to a cluster or not", defaultValue = "3")
     protected double threshold = 3;
@@ -45,8 +54,7 @@ public class ClusterArrivalTimes implements Processor {
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
         double[] photoncharge = ((double[]) data.get(photonchargeKey));
-        double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");
+
 
         //get 'shower' as int array with pixel id's from 'pixelSet' (HashSet)
         int[] shower = pixelSet.toIntArray();
@@ -57,16 +65,12 @@ public class ClusterArrivalTimes implements Processor {
         }
 
         int[] clusterID = new int[1440];
-        int[] showerClusterID = new int[1440];
-
-
         for (int i = 0; i < 1440; i++) {
             clusterID[i] = 0;
-            //showerClusterID[i] = -2;
         }
 
         // set hard coded (random) threshold!!!!!!!!!!!!!!!!!!!!!!!!!!! First approx, should be replaced later...
-        //double threshold = 1;
+
 
 
         boolean finishCluster = false;
@@ -131,7 +135,6 @@ public class ClusterArrivalTimes implements Processor {
             }
         }
 
-        System.out.println(cluster);
 
         //Clustering done
 
@@ -142,7 +145,6 @@ public class ClusterArrivalTimes implements Processor {
         }
 
         for(int pixel : shower){
-            //System.out.println(i + "\t" + clusterID[i]);
 
             clusterSet[clusterID[pixel]-1].addContentPixel(pixel);
             clusterSet[clusterID[pixel]-1].addContentPixelPhotoncharge(photoncharge[pixel]);
@@ -152,31 +154,20 @@ public class ClusterArrivalTimes implements Processor {
 
 //        // remove one pixel cluster???????????
 //
-//        double ratioAT = ClusterFellwalker.boundContentRatio(clusterSet);
-//        //double idealBoundDiffAT = ClusterFellwalker.idealBoundDiff(clusterSet);
-//        //double boundAngleSumAT = ClusterFellwalker.boundAngleSum(clusterSet);
-//        //double distanceCenterAT = ClusterFellwalker.distanceCenter(clusterSet);
-//        //double chargeMaxClusterRatioAT = ClusterFellwalker.getChargeMaxCluster(clusterSet);
-
-
-
+        double boundRatioAT = ClusterFellwalker.boundContentRatio(clusterSet);
+        double idealBoundDiffAT = ClusterFellwalker.idealBoundDiff(clusterSet);
+        double distanceCenterAT = ClusterFellwalker.distanceCenter(clusterSet);
+        double chargeMaxClusterRatioAT = ClusterFellwalker.getChargeMaxCluster(clusterSet);
         double stdNumpixel = ClusterFellwalker.stdNumPixel(clusterSet);
-//
-//
-//
-//
-//
-//
-        System.out.println(stdNumpixel);
-//
-//        data.put("boundRatioAT", ratioAT);
-////        data.put("idealBoundDiffAT", idealBoundDiffAT);
-////        data.put("boundAngleAT", boundAngleSumAT);
-////        data.put("distanceCenterAT", distanceCenterAT);
-////        data.put("chargeMaxAT", chargeMaxClusterRatioAT);
-////        data.put("stdNumpixel", stdNumpixel);
+
+
+        data.put("boundRatioAT", boundRatioAT);
+        data.put("idealBoundDiffAT", idealBoundDiffAT);
+        data.put("distanceCenterAT", distanceCenterAT);
+        data.put("chargeMaxAT", chargeMaxClusterRatioAT);
+        data.put("stdNumPixelAT", stdNumpixel);
         data.put("ArrrialTimeClusterID", clusterID);
-//        data.put("numClusterAT", cluster);
+        data.put("numClusterAT", cluster);
 
 
         return data;
@@ -252,13 +243,13 @@ public class ClusterArrivalTimes implements Processor {
         double minDiff = 1000;
         int minID = -1;
 
-        for(int i=0; i<neighbors.length; i++) {
-            if (clusterID[neighbors[i].id] == 0 && showerArray[neighbors[i].id] == 1) {
+        for(FactCameraPixel n : neighbors) {
+            if (clusterID[n.id] == 0 && showerArray[n.id] == 1) {
 
-                double diff = Math.abs(arrivalTime[neighbors[i].id] - arrivalTime[current]);
+                double diff = Math.abs(arrivalTime[n.id] - arrivalTime[current]);
                 if (diff < minDiff) {
                     minDiff = diff;
-                    minID = neighbors[i].id;
+                    minID = n.id;
                 }
             }
         }

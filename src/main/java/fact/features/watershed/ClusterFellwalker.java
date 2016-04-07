@@ -387,7 +387,7 @@ public class ClusterFellwalker implements Processor {
     }
 
     // not needed for parameter calculation, just to have a quick look in the viewer
-    public void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
+    public static void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
         for(FactCluster c : clusterSet){
             if(c.getShowerLabel()){
             ArrayList<Integer> boundPixel = c.findBoundaryNaive();
