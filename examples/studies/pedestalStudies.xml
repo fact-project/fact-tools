@@ -1,0 +1,85 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
+    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+    <!--In case you want to analyze .zfits files.-->
+    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>-->
+
+    <!-- Name of the stream and url to the input file -->
+    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
+
+    <!-- Description of the process and the corresponding stream -->
+    <process id="2" input="fact">
+        <fact.utils.PreviousEventInfo
+                startCellKey="StartCellData"
+                outputKey="prevEvents"
+                limitEvents="10"
+                />
+        <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
+        <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
+        <fact.datacorrection.DrsCalibration
+                url="${drsfile}"
+                key="Data"
+                outputKey="DataCalibrated"
+                />
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                prevEventsKey="prevEvents"
+                startCellKey="StartCellData"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+                />
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+                />
+        <fact.filter.DrsTimeCalibration
+                outputKey="timeCalibConst"
+                />
+        <fact.filter.ArrayTimeCorrection
+                dataKey="DataCalibrated"
+                timeCalibConstKey="timeCalibConst"
+                outputKey="DataCalibrated"
+                />
+
+        <fact.filter.GaussConvolution
+                key="DataCalibrated"
+                outputKey="DataSmoothed"
+                variance="3"/>
+
+        <fact.statistics.Derivation
+                key="DataSmoothed"
+                outputKey="1Derivation" />
+
+        <fact.filter.MovingAverage
+                key="1Derivation"
+                outputKey="1DerivationSmoothed"
+                length="2"/>
+
+        <fact.extraction.TimeOverThresholdTL
+                dataKey="1DerivationSmoothed"
+                threshold="0.5"
+                outputKey="TimeOverThresh" />
+
+
+
+        <!--Uncomment to use the viewer-->
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+
+
+    </process>
+
+
+</container>

@@ -50,7 +50,7 @@ public class FWHMPulses implements Processor{
         double[] minAmplitudes    = (double[])input.get(minPosKey);
         int[][] maxPosArrayList  = (int[][]) input.get(maxPosKey);
 
-        int[][] widthArrayList = new int[Constants.NUMBEROFPIXEL][];
+        double[][] widthArrayList = new double[Constants.NUMBEROFPIXEL][];
         double[] visualisation 	 =  new double[data.length];
 
         int roi = data.length / Constants.NUMBEROFPIXEL;
@@ -58,7 +58,7 @@ public class FWHMPulses implements Processor{
         for (int pix = 0; pix < maxPosArrayList.length; pix++){
             double offset = minAmplitudes[pix];
 
-            ArrayList<Integer> widthList = new ArrayList<Integer>();
+            ArrayList<Double> widthList = new ArrayList<>();
 
             for (int pulse = 0; pulse < maxPosArrayList[pix].length; pulse++){
                 int maxPos     = pix*roi + maxPosArrayList[pix][pulse];
@@ -71,14 +71,15 @@ public class FWHMPulses implements Processor{
                 double rightAmplitude = maxAmplitude;
                 double leftAmplitude  = maxAmplitude;
 
-                ///ToDo this method is still super fishy, rework it!
+                boolean out_of_bounds = false;
 
                 while(rightAmplitude >= maxAmplitude/2 || leftAmplitude >= maxAmplitude/2){
 
                     if(rightAmplitude >= maxAmplitude/2){
                         right++;
                         if (maxPos+right >= (pix+1)*roi){
-                            log.error(String.format("(right) slices out of bounds in pixel %s at %s", pix, maxPos+right));
+//                            log.error(String.format("(right) slices out of bounds in pixel %s at %s", pix, maxPos+right));
+                            out_of_bounds = true;
                             break;
                         }
 
@@ -89,17 +90,22 @@ public class FWHMPulses implements Processor{
                     if(leftAmplitude >= maxAmplitude/2) {
                         left++;
                         if (maxPos-left < pix*roi){
-                            log.error(String.format("(left) slices out of bounds in pixel %s at %s", pix, maxPos-left));
+//                            log.error(String.format("(left) slices out of bounds in pixel %s at %s", pix, maxPos-left));
+                            out_of_bounds = true;
                             break;
                         }
                         leftAmplitude  = data[maxPos - left] - offset;
                         visualisation[maxPos-left]=data[maxPos]/2;
                     }
                 }
-                widthList.add(right+left);
+                if (out_of_bounds == false) {
+                    widthList.add((double) right + left);
+                } else {
+                    widthList.add(Double.NaN);
+                }
             }
-            widthArrayList[pix]=new int[widthList.size()];
-            widthArrayList[pix]=Utils.arrayListToInt(widthList);
+            widthArrayList[pix]=new double[widthList.size()];
+            widthArrayList[pix]=Utils.arrayListToDouble(widthList);
         }
         input.put(outputKey, widthArrayList);
         input.put(visualizationKey, visualisation);
@@ -108,40 +114,20 @@ public class FWHMPulses implements Processor{
         return input;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public String getMaxPosKey() {
-        return maxPosKey;
     }
 
     public void setMaxPosKey(String maxPosKey) {
         this.maxPosKey = maxPosKey;
     }
 
-    public String getMinPosKey() {
-        return minPosKey;
-    }
-
     public void setMinPosKey(String minPosKey) {
         this.minPosKey = minPosKey;
     }
 
-    public String getOutputKey() {
-        return outputKey;
-    }
-
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
-    }
-
-    public String getVisualizationKey() {
-        return visualizationKey;
     }
 
     public void setVisualizationKey(String visualizationKey) {

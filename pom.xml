@@ -4,7 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-  <version>0.13.0</version>
+  <version>0.13.3</version>
   <url>http://sfb876.de/fact-tools/</url>
 
 	<description>
@@ -207,6 +207,11 @@
       <artifactId>commons-codec</artifactId>
       <version>1.9</version>
     </dependency>
+    <dependency>
+		<groupId>org.jpmml</groupId>
+		<artifactId>pmml-evaluator</artifactId>
+		<version>1.2.9</version>
+	</dependency>
   </dependencies>
 
   <build>
@@ -453,4 +458,5 @@
       </build>
     </profile>
   </profiles>
+
 </project>

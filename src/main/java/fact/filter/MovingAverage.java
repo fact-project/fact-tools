@@ -10,6 +10,16 @@ import stream.annotations.Description;
 import stream.annotations.Parameter;
 
 /**
+ * This is processor applies a central moving average to the time series in the camera raw data (NPIX*ROI).
+ * This is essentially a smoothing operation. It takes the mean value within a given window of the timeseries and applies that
+ * value to the pivot element.
+ *  
+ * Central means it has one pivot element in the center of the window and the same number of elements left and right to it.
+ * This implies that only uneven window lengths are supported.
+ * 
+ * This is a somewhat naive implementation which could be made much faster. See the Wikipedia article at 
+ * https://en.wikipedia.org/wiki/Moving_average
+ * 
  * 
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
