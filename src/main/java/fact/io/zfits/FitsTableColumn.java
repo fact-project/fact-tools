@@ -9,10 +9,6 @@ public class FitsTableColumn {
 	private DataType type;
 	private String unit;
 	private String compressionName;
-	
-	public FitsTableColumn(String id, int numEntries, int entrySize, DataType type, String unit) {
-		this(id, numEntries, entrySize, type, unit, null);
-	}
 
 	public FitsTableColumn(String id, int numEntries, int entrySize, DataType type, String unit, String comp) {
 		this.id = id;

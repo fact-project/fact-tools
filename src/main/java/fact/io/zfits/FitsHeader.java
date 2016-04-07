@@ -14,12 +14,11 @@ import java.util.Map;
  * @author Michael Bulinski
  */
 public class FitsHeader {
-	static Logger log = LoggerFactory.getLogger(FitsHeader.class);
 
 	/**
 	 * The posible Valuetypes of the values in the fits header.
 	 */
-	public static enum ValueType {
+	public enum ValueType {
 		NONE(null),
 		STRING(String.class),
 		BOOLEAN(Boolean.class),
@@ -27,13 +26,11 @@ public class FitsHeader {
 		FLOAT(Float.class);
 
 		private final Class<?> typeClass;
-		private ValueType(Class<?> typeClass) {
-			this.typeClass = typeClass; 
-		}
-		public Class<?> getTypeClass() {
-			return this.typeClass;
+		ValueType(Class<?> typeClass) {
+			this.typeClass = typeClass;
 		}
 	}
+
 	/**
 	 * Entry of a card in the fits header
 	 * @author Michael Bulinski
@@ -164,16 +161,6 @@ public class FitsHeader {
 		return true;
 	}
 	
-	/**
-	 * Works just like {@link FitsHeader#check(String)} but throws a Exception instead of returning an boolean.
-	 * @param key The key to check.
-	 * @throws ParseException Thrown if the key is missing.
-	 */
-	public void checkThrow(String key) throws ParseException {
-		FitsHeaderEntry entry = this.keyMap.get(key);
-		if (entry == null)
-			throw new ParseException("Missing header entry: '"+key+"'");
-	}
 
 	/**
 	 * Works just like {@link FitsHeader#check(String, ValueType)} but throws a Exception instead of returning an boolean.

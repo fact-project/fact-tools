@@ -1,5 +1,21 @@
 #Changelog for the fact-tools
 
+## Version 0.13.3 -- 06.04.2016
+
+* new Processor: `fact.ApplyModel` which applies a .pmml model to data in the data item. The model can be written with SciKit learn.
+* added several xml files, making use of the ApplyModel processor.
+* MeasurePerformance now handles multiple uses of the same Processor correctly
+
+## Version 0.13.2 -- 06.04.2016
+
+* new Processor: `fact.extraction.TimeOverThresholdTL` allows to calculate the time over Threshold for a given window on the Timeline
+* `fact.features.singlePulse.FWHMPulses` now uses Doubles instead of Ints and throws NaNs in case of out-of-boundary issues 
+
+## Version 0.13.1 -- 06.04.2016
+
+* new Processor `fact.extraction.MeanCorrelation` to calculate the average covariance and correlation of the time series of neighboring pixels 
+
+
 ## Version 0.13.0 -- 16.02.2016
 
 * new package `fact.features.muon`
@@ -225,7 +241,7 @@ We now support an early version of easy multistream handling to stream data from
 ## Version 0.7.9
 
 Added processor to correct utc times with gps time correction files:
-	`fact.filter.GpsTimeCorrection`
+  `fact.filter.GpsTimeCorrection`
 
 
 ## Version 0.7.7

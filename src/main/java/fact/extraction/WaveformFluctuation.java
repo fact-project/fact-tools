@@ -1,11 +1,6 @@
 package fact.extraction;
 
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.Range;
-import com.google.common.primitives.Ints;
 import fact.Utils;
-import fact.container.PixelSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +25,7 @@ public class WaveformFluctuation implements Processor {
     private String outputKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
-    private String pixelSetKey;
+    private String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 35;
@@ -56,17 +51,7 @@ public class WaveformFluctuation implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
 
-        int[] pixels = null;
-
-        //Load a given pixelset, otherwise use the the whole camera
-        if (input.containsKey(pixelSetKey)) {
-            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-            pixels = pixelSet.toIntArray();
-        } else {
-            ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix-1), DiscreteDomain.integers());
-            pixels = Ints.toArray(numbers);
-        }
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
         log.info("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
