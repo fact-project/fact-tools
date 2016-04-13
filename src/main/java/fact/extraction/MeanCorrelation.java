@@ -171,8 +171,17 @@ public class MeanCorrelation implements Processor {
             int maxAmplPos = absPos(pix, amplitudePositions[pix]);
             double maxAmpl = data[maxAmplPos];
 
-            for (int slice = 0; slice < roi; slice++) {
-                scaledData[absPos(pix, slice)] /= maxAmpl;
+            //check if maxAmpl is 0 to avoid division by zero which leads to NaN values in scaledData. Quick and dirty solution: if maxAmpl is close to 0, add an arbitrary 10 to every slice.
+            //Other solution: do something with baseline. could be more elegant...
+            if(Math.abs(maxAmpl) < 0.1){
+                for (int slice = 0; slice < roi; slice++) {
+                    scaledData[absPos(pix, slice)] = (scaledData[absPos(pix, slice)] + 10) / (maxAmpl+10);
+                }
+            }
+            else {
+                for (int slice = 0; slice < roi; slice++) {
+                    scaledData[absPos(pix, slice)] = (scaledData[absPos(pix, slice)] / maxAmpl);
+                }
             }
         }
         return scaledData;

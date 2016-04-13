@@ -18,6 +18,7 @@ public class FactCluster {
     public ArrayList<Integer> contentPixel = new ArrayList<>();
     private ArrayList<Double> contentPixelPhotoncharge = new ArrayList<>();
     private ArrayList<Double> contentPixelArrivaltime = new ArrayList<>();
+    private ArrayList<Double> contentPixelMorphology = new ArrayList<>(); //list all content values if morphology is not photoncharge
     public ArrayList<Integer> cleaningPixel = new ArrayList<>();           //contains all pixel in the cluster which are already in the shower-array (after cleaning)
     ArrayList<Integer> compactClusterID = new ArrayList<>();        //contains the ids from all clusters in the event which belongs to the same compact group of clusters, means that there are no air pixel on the line between this cluster an the clusters in this list
     ArrayList<Integer> airpixelCluster = new ArrayList<>();         //contains number of air pixel on the line from this cluster to every other cluster. If clusters are direct or indirect neighbors, the number of air pixels is 0. List should have (number of clusters - 1) entries.
@@ -32,6 +33,10 @@ public class FactCluster {
 
     public void addContentPixel(int id){
         contentPixel.add(id);
+    }
+
+    protected void addContentMorphology(double morph){
+        contentPixelMorphology.add(morph);
     }
 
     public void addCleaningPixel(int id){
@@ -49,6 +54,13 @@ public class FactCluster {
     public double getPhotonchargeSum(){
         double sum = 0;
         for(double p : contentPixelPhotoncharge){
+            sum = sum +p;
+        }
+        return sum;
+    }
+    public double getMorphSum(){
+        double sum = 0;
+        for(double p : contentPixelMorphology){
             sum = sum +p;
         }
         return sum;
@@ -386,8 +398,12 @@ public class FactCluster {
      * calculated for all numbers between this 'full hexagon numbers'.
      * The equation is only an approximation, but for the range of numbers in this case (up to 1440 pixels) it fits quite well.
      */
-    private int idealBound(){
-        return (int) (2*Math.sqrt(3*getNumPixel()) - 3);
+    private int idealBound() {
+        if (getNumPixel() < 7) {
+            return getNumPixel();
+        } else {
+            return (int) (2 * Math.sqrt(3 * getNumPixel()) - 3);
+        }
     }
 
     /*
