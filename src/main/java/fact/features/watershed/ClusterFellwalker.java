@@ -4,6 +4,7 @@ package fact.features.watershed;
  * Created by lena on 16.11.15.
  */
 
+import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
@@ -26,7 +27,7 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = false, description="Minimal number of pixels a cluster must contain to be labeled as 'showerCluster'", defaultValue="2")
     protected int minShowerpixel = 2;
 
-    @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
+    @Parameter(required = true, description = "Input key for pixel set (aka shower pixel). Used to keep/remove cluster if areaKey=null.")
     protected String pixelSetKey = null;
 
     @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
@@ -35,16 +36,28 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
     protected String photonchargeKey = "photoncharge";
 
+    @Parameter(required = false, description = "Value chosen for clustering. Could be photoncharge, arrival times or mean correlation.", defaultValue = "photoncharge")
+    protected String morphologyKey = photonchargeKey;
+
     @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePosition")
     protected String sourcePositionKey = "sourcePosition" ;
+
+    @Parameter(required = false, description = "Pixel set to cluster. If null, cluster all camera pixel; in that case decide which clusters should be kept via pixelSetKey", defaultValue = "null")
+    protected String areaKey = null;
 
 
 
     @Override
     public Data process(Data data) {
-        PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
+        int npix = (Integer) data.get("NPIX");
+        int [] shower = Utils.getValidPixelSetAsIntArr(data, npix, pixelSetKey);
+        int [] area = Utils.getValidPixelSetAsIntArr(data, npix, areaKey);
+
+
+
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
         double[] photoncharge = ((double[]) data.get(photonchargeKey));
+        double[] morphology = ((double[]) data.get(morphologyKey));
 
 
         //source position not needed for example-xml, need to be calculated in "sourceParameter_mc.xml" for the feature "distanceSource"
@@ -56,21 +69,24 @@ public class ClusterFellwalker implements Processor {
 
 
         //get 'shower' as int array with pixel id's3System.out.println();
-        int [] shower = pixelSet.toIntArray();
+
 
         int[] clusterID = new int[1440];
         int[] showerClusterID = new int[1440];
 
+        int [] areaArray =new int[1440];
+        if(areaKey != null) {
 
-/*        int[] cleaning = new int[1440];
-        for(int i=0; i<1440; i++)
-        {
-            cleaning[i] = 0;
+            for (int i = 0; i < area.length; i++) {
+                areaArray[area[i]] = 1;
+            }
         }
+        else{
 
-        for(int i=0; i<shower.length;i++){
-            cleaning[shower[i]] = 1;
-        }*/
+            for (int i = 0; i < 1440; i++) {
+                areaArray[i] = 1;
+            }
+        }
 
         for (int i = 0; i < 1440; i++) {
             clusterID[i] = 0;
@@ -78,7 +94,7 @@ public class ClusterFellwalker implements Processor {
         }
 
 
-        int startPath = NextStartPixel(clusterID);
+        int startPath = NextStartPixel(clusterID, area);
 
         int cluster = 1;
 
@@ -86,7 +102,7 @@ public class ClusterFellwalker implements Processor {
         //FellWalker
         while (startPath != -1) {
 
-            int brightestNeighbourID;
+            int highestNeighbourID;
             int currentPixel = startPath;
             boolean pathend = false;
 
@@ -100,45 +116,45 @@ public class ClusterFellwalker implements Processor {
                 ArrayList<FactCameraPixel> usableNeighbours = new ArrayList<>();
 
                 for (FactCameraPixel n : allNeighbours) {
-                    if (clusterID[n.id] != -2) {
+                    if (clusterID[n.id] != -2 && areaArray[n.id] == 1) {
                         usableNeighbours.add(n);
                     }
                 }
 
 
-                brightestNeighbourID = findMaxChargeNeighbour(usableNeighbours, currentPixel, photoncharge);
+                highestNeighbourID = findMaxChargeNeighbour(usableNeighbours, currentPixel, morphology);
 
-                aktuellerPfad.add(brightestNeighbourID);
+                aktuellerPfad.add(highestNeighbourID);
 
-                if (brightestNeighbourID == currentPixel) {
-                    int brightestNeighbourIDLarge = findMaxChargeLargeNeighbour(currentPixel, photoncharge);
-
-                    if (brightestNeighbourIDLarge != currentPixel) {
-
-                        if (clusterID[brightestNeighbourIDLarge] != 0) {
-                            pathToExistingCluster(clusterID, aktuellerPfad, clusterID[brightestNeighbourIDLarge]);
-                            pathend = true;
-                        } else {
-                            currentPixel = brightestNeighbourIDLarge;
-                        }
-                    } else {
+                if (highestNeighbourID == currentPixel) {
+//                    int brightestNeighbourIDLarge = findMaxChargeLargeNeighbour(currentPixel, photoncharge);
+//
+//                    if (brightestNeighbourIDLarge != currentPixel) {
+//
+//                      if (clusterID[brightestNeighbourIDLarge] != 0) {
+//                          pathToExistingCluster(clusterID, aktuellerPfad, clusterID[brightestNeighbourIDLarge]);
+//                          pathend = true;
+//                        } else {
+//                            currentPixel = brightestNeighbourIDLarge;
+//                        }
+//                    } else {
                         pathToNewCluster(clusterID, aktuellerPfad, cluster);
                         cluster++;
                         pathend = true;
-                    }
+                //    }
 
                 } else {
-                    if (clusterID[brightestNeighbourID] != 0) {
+                    if (clusterID[highestNeighbourID] != 0) {
 
-                        pathToExistingCluster(clusterID, aktuellerPfad, clusterID[brightestNeighbourID]);
+                        pathToExistingCluster(clusterID, aktuellerPfad, clusterID[highestNeighbourID]);
                         pathend = true;
 
                     } else {
-                        currentPixel = brightestNeighbourID;
+                        currentPixel = highestNeighbourID;
                     }
                 }
             }
-            startPath = NextStartPixel(clusterID);
+            startPath = NextStartPixel(clusterID, area);
         }
         //end FellWalker
 
@@ -146,6 +162,8 @@ public class ClusterFellwalker implements Processor {
          clusterID set in the fellwalker-algorithm. Keep in mind, that there is no clusterID 0, so the first cluster-object
          has to be treated separately!
           */
+
+
         FactCluster[]  clusterSet = new FactCluster[cluster];
         for (int i=0; i<cluster; i++){
             clusterSet[i] = new FactCluster();
@@ -158,9 +176,27 @@ public class ClusterFellwalker implements Processor {
             clusterSet[clusterID[i]].addContentPixelArrivaltime(arrivalTime[i]);
         }
 
-        //add showerpixel in a cluster to list
-        for(int i=0; i<shower.length;i++){
-            clusterSet[clusterID[shower[i]]].addCleaningPixel(shower[i]);
+
+        // fill another list with morphology values if morphology is not photoncharge
+        if(morphologyKey!= photonchargeKey){
+            for(int i=0;i<1440; i++){
+                clusterSet[clusterID[i]].addContentMorphology(morphology[i]);
+            }
+        }
+
+        //add showerpixel/areapixel in a cluster to its cleaningPixelList:
+        //if the whole camera pixels are clustered, (areaKey = null) use shower[] as 'cleaningPixel'.
+        //If another pixel set (area) should be clustered, use area[] as 'cleaningPixel'. In this case all clustershould be kept, exept clusters with less than 'minShowerpixel' content.
+        //Naming is quite confusing.
+        if(areaKey == null) {
+            for (int i = 0; i < shower.length; i++) {
+                clusterSet[clusterID[shower[i]]].addCleaningPixel(shower[i]);
+            }
+        }
+        else {
+            for (int i = 0; i < area.length; i++) {
+                clusterSet[clusterID[area[i]]].addCleaningPixel(area[i]);
+            }
         }
 
 
@@ -168,7 +204,13 @@ public class ClusterFellwalker implements Processor {
          * (pixel that survive the cleaning) and false if they contain less showerpixel. The clusters that are labeled 'true' get a new successive id.
          * All of these clusters are put to a new FactCluster array 'showerCluster'.
         */
-        FactCluster[] showerCluster = removeCluster(clusterSet,minShowerpixel);
+
+
+
+
+        FactCluster[] showerCluster = removeCluster(clusterSet, minShowerpixel);
+
+
 
         int numCluster = showerCluster.length;
         //System.out.println(numCluster);
@@ -223,8 +265,13 @@ public class ClusterFellwalker implements Processor {
             findNeighbors(showerCluster, showerClusterID);
 
             double numNeighborCluster = neighborClusterMean(showerCluster);
-
-            double chargeMaxClusterRatio = getChargeMaxCluster(showerCluster);
+            double chargeMaxClusterRatio;
+            if(morphologyKey == photonchargeKey) {
+                chargeMaxClusterRatio = getChargeMaxCluster(showerCluster);
+            }
+            else{
+                chargeMaxClusterRatio = getMorphMaxCluster(showerCluster);
+            }
 
             int numPixelMaxCluster = maxCluster(showerCluster).getNumPixel();
 
@@ -297,18 +344,22 @@ public class ClusterFellwalker implements Processor {
     }
 
     //find next pixel without clusterID to start a new path, return ID
-    public int NextStartPixel(int[] clusterID) {
+    public int NextStartPixel(int[] clusterID, int[] shower) {
         int next;
         int i = 0;
-        while (clusterID[i] != 0) {
+        while (clusterID[shower[i]] != 0) {
             i++;
-            if (i == 1440) {
+            if (i == shower.length) {
                 i = -1;
                 break;
             }
         }
-        next = i;
-        return next;
+        if(i == -1){
+            return -1;
+        }
+        else{
+            return shower[i];
+        }
     }
 
     //find brightest neighbour, return the currentPixel if there is no brighter neighbour!!
@@ -582,6 +633,31 @@ public class ClusterFellwalker implements Processor {
         return showerCluster[maxClusterIndex];
     }
 
+
+    public static double getMorphMaxCluster(FactCluster[] showerCluster){
+        if(showerCluster.length == 1){
+            return 1;
+        }
+        else {
+            int maxClusterIndex = 0;
+            int size = 0;
+            double chargeSum = 0;
+            int i = 0;
+            for (FactCluster c : showerCluster) {
+                chargeSum += c.getMorphSum();
+                if (c.getNumPixel() > size) {
+                    size = c.getNumPixel();
+                    maxClusterIndex = i;
+                }
+                i++;
+            }
+            return showerCluster[maxClusterIndex].getPhotonchargeSum() / chargeSum;
+        }
+
+    }
+
+
+
     public static double getChargeMaxCluster(FactCluster[] showerCluster){
         if(showerCluster.length == 1){
             return 1;
@@ -657,5 +733,7 @@ public class ClusterFellwalker implements Processor {
     public void setArrivaltimePosKey(String arrivaltimePosKey){this.arrivaltimePosKey = arrivaltimePosKey;}
     public void setPhotonchargeKey(String photonchargeKey){this.photonchargeKey = photonchargeKey;}
     public void setSourcePositionKey(String sourcePositionKey){this.sourcePositionKey = sourcePositionKey;}
+    public void setAreaKey(String areaKey){this.areaKey = areaKey;}
+    public void setMorphologyKey(String morphologyKey){this.morphologyKey= morphologyKey;}
 
 }

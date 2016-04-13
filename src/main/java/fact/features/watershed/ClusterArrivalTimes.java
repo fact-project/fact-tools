@@ -71,11 +71,13 @@ public class ClusterArrivalTimes implements Processor {
 
         // set hard coded (random) threshold!!!!!!!!!!!!!!!!!!!!!!!!!!! First approx, should be replaced later...
 
+        //ArrayList<FactCluster> clusterList = new ArrayList<>();
+
+        //clusterList.add(0,new FactCluster());
+        //clusterList.get(0).setClusterID(1);
 
 
         boolean finishCluster = false;
-
-
         int cluster = 1;
 
 
@@ -83,6 +85,7 @@ public class ClusterArrivalTimes implements Processor {
         int seed = shower[0];
 
         clusterID[seed] = cluster;
+        //clusterList.get(0).addContentPixel(seed);
 
         int [] current_cluster  = findNearestBlankNeighbor(seed, arrivalTime, clusterID, shower,cluster, showerArray);
         int current = current_cluster[0];
@@ -100,6 +103,7 @@ public class ClusterArrivalTimes implements Processor {
 
             if(flaggedNeighborPixel.size() == 0){
                 cluster++; //???????
+
                 clusterID[current] = cluster;
             }
             else {

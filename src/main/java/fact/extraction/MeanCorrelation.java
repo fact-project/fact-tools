@@ -61,7 +61,7 @@ public class MeanCorrelation implements Processor {
 
     @Override
     public Data process(Data input) {
-        
+
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
 
