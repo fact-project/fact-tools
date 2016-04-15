@@ -316,7 +316,7 @@ public class ClusterFellwalker implements Processor {
         }
 
         data.put("AllClusterID", clusterID);
-        data.put("ShowerClusterID", showerClusterID);
+        data.put(morphologyKey + "ClusterID", showerClusterID);
         data.put("clusterNoCleaning", cluster);
         data.put("numCluster", numCluster);
 

@@ -27,9 +27,13 @@ public class GeometricalConvolution implements Processor {
     protected FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     @Override
+
     public Data process(Data item) {
+        //GeometricalConvolutionNextNeighboursBell bellConv = new GeometricalConvolutionNextNeighboursBell();
         init(item);
+        //System.out.println(data[0]);
         double[] convolutedData= new double[data.length];
+
 
         for(int slice = 0; slice < roi; slice++) {
             for(int pix = 0; pix < npix; pix++) {
@@ -51,16 +55,38 @@ public class GeometricalConvolution implements Processor {
         roi = data.length / npix;
     }
 
+//    protected double getConvolution(int pix, int slice) {
+//        // 2D default Convolution Kernel:
+//        //         ___
+//        //     ___/ 0 \___
+//        //    / 0 \___/ 0 \
+//        //    \___/ 1 \___/
+//        //    / 0 \___/ 0 \
+//        //    \___/ 0 \___/
+//        //        \___/
+//        return data[pixAndSlice2ArrayIndex(pix,slice)];
+//    }
+
     protected double getConvolution(int pix, int slice) {
-        // 2D default Convolution Kernel:
+        // 2D Bell Convolution Kernel using only next neighbours:
         //         ___
-        //     ___/ 0 \___
-        //    / 0 \___/ 0 \
+        //     ___/ 1 \___
+        //    / 1 \___/ 1 \
+        //    \___/ 6 \___/  __1_
+        //    / 1 \___/ 1 \   12
         //    \___/ 1 \___/
-        //    / 0 \___/ 0 \
-        //    \___/ 0 \___/
         //        \___/
-        return data[pixAndSlice2ArrayIndex(pix,slice)];
+
+        final double centerToNeighbourRatio = 6;
+        //System.out.println(data[0]);
+        double buf = data[pixAndSlice2ArrayIndex(pix,slice)] * centerToNeighbourRatio;
+        FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
+
+        for(FactCameraPixel neigbour : neighbours) {
+            buf += data[ pixAndSlice2ArrayIndex(neigbour.chid,slice) ];
+        }
+
+        return buf / (neighbours.length + centerToNeighbourRatio);
     }
 
     protected int pixAndSlice2ArrayIndex(int pix, int slice) {
