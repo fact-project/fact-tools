@@ -203,7 +203,7 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            double unixTime = eventTime[0] + eventTime[1] / 1000000.0;
+            double unixTime = eventTime[0] + (eventTime[1] / 1000000.0);
             DateTime timeStamp = new DateTime((long) (1000 * unixTime), DateTimeZone.UTC);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
@@ -224,7 +224,11 @@ public class SourcePosition implements StatefulProcessor {
             {
                 sourceAzZd = equatorialToHorizontal(sourceRightAscension, sourceDeclination, timeStamp);
             } else {
-                sourceAzZd = equatorialToHorizontal(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), timeStamp);
+                sourceAzZd = equatorialToHorizontal(
+                        sourcePoint.getDouble("Ra_src"),
+                        sourcePoint.getDouble("Dec_src"),
+                        timeStamp
+                );
             }
 
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
@@ -264,7 +268,6 @@ public class SourcePosition implements StatefulProcessor {
 
         // normalize to [0, 24] and convert to radians
         gst = (gst % 24) / 12.0 * Math.PI;
-        System.out.println("gst: " + gst);
         return gst;
     }
 
@@ -284,16 +287,13 @@ public class SourcePosition implements StatefulProcessor {
 
         double gst = datetimeToGST(datetime);
 
-
-        System.out.println("ra: " + ra);
-        System.out.println("dec: " + dec);
-
         ra = ra / 12. * Math.PI;
         dec = Math.toRadians(dec);
         
         double telLatRad = Math.toRadians(telescopeLatitudeDeg);
         double telLonRad = Math.toRadians(telescopeLongitudeDeg);
 
+        // wikipedia assumes longitude positive in west direction
         double hourAngle = gst + telLonRad - ra;
         
         double altitude = Math.asin(
