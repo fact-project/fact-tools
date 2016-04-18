@@ -8,11 +8,12 @@ import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
 import fact.auxservice.strategies.Earlier;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 
 import fact.Utils;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class SourcePosition implements StatefulProcessor {
     @Parameter(required = false)
     private Double y = null;
 
-    //TODO Standarts setzen?
+    //TODO Standards setzen?
     @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
     private String sourceZdKey = null;
     @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
@@ -93,8 +94,8 @@ public class SourcePosition implements StatefulProcessor {
     AuxPointStrategy earlier = new Earlier();
 
     //position of the Telescope
-    private final double telescopeLongitude = -17.890701389;
-    private final double telescopeLatitude = 28.761795;
+    private final double telescopeLongitudeDeg = -17.890701389;
+    private final double telescopeLatitudeDeg = 28.761795;
     //Distance from earth center
     private final double distanceToEarthCenter = 4890.0;
 
@@ -200,7 +201,7 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+            DateTime timeStamp = new DateTime((long)((eventTime[0] * 1000. + eventTime[1] / 1000.)), DateTimeZone.UTC);
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
             AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
@@ -216,20 +217,20 @@ public class SourcePosition implements StatefulProcessor {
             double julianDay = unixTimeToJulianDay(eventTime[0]+eventTime[1]/1000000.);
 
             //convert julianday to gmst
-            double gmst = julianDayToGmst(julianDay);
-
+            // double gmst = julianDayToGmst(julianDay);
+            double gst = datetimeToGst(timeStamp);
 
             //convert celestial coordinates to local coordinate system.
-            double[] pointingAzZd = getAzZd(ra, dec, gmst);
+            double[] pointingAzZd = getAzZd(ra, dec, gst);
 
             //pointAzDz should be equal to the az dz written by the drive
             //double dev = Math.abs(point.Az - pointingAzDe[0]);
 
-            double[] sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gmst);
+            double[] sourceAzZd = getAzZd(sourcePoint.getDouble("Ra_src"), sourcePoint.getDouble("Dec_src"), gst);
 
             if (sourceDeclination != null && sourceRightAscension != null)
             {
-                sourceAzZd = getAzZd(sourceRightAscension, sourceDeclination, gmst);
+                sourceAzZd = getAzZd(sourceRightAscension, sourceDeclination, gst);
             }
 
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
@@ -296,51 +297,60 @@ public class SourcePosition implements StatefulProcessor {
         //convert to degrees.
         return (gmst*Math.PI/12);
     }
-
-
-
+    
+    
+    /**
+     * Convert a DateTime object to greenwhich sidereal time according to 
+     * https://en.wikipedia.org/wiki/Sidereal_time#Definition
+     * @param datetime 
+     * @return gst in radians
+     */
+    public double datetimeToGst(DateTime datetime){
+    	System.out.println(datetime);
+    	DateTime reference = new DateTime(2000, 1, 1, 12, 0, DateTimeZone.UTC);
+    	Duration difference = new Duration(reference, datetime);
+    	
+    	System.out.println(difference.getMillis() / 86400000.0 / 365.0);
+    	
+    	double gst = 18.697374558 + 24.06570982441908 * (difference.getMillis() / 86400000.0);
+    	
+    	System.out.println(gst);
+    	gst = gst % 24;
+    	System.out.println(gst);
+    	
+    	
+    	return gst / 12 * Math.PI;
+    }
 
     /**
-     * This is an adaption of the C++ Code by F.Temme.  This method calculates Azimuth and Zenith from right ascension,
-     * declination and the time in gmst format.
+     * Implementation of the formulas from 
+     * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+     * 
      * @param ra in decimal Archours (e.g. 5h and 30 minutes : ra = 5.5)
      * @param dec in decimal degrees (e.g. 21 degrees and 30 arcminutes : zd = 21.5)
      * @param gmst the Eventtime of the current event in gmst format
      * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
      */
-    public double[] getAzZd(double ra, double dec, double gmst){
+    public double[] getAzZd(double ra, double dec, double gst){
+    	System.out.println("ra: " + ra + " dec " + dec + " gst: " + gst);
         if (ra >= 24.0 || ra < 0.0 || dec >= 360.0 || dec < 0 ){
             throw new RuntimeException("Ra or Dec values are invalid. They should be given in decimal Archours and decimal degree");
         }
-        double phi              =  ra / 12 * Math.PI;
-        double theta            =  (90 - dec) / 180.0 * Math.PI;
-
-        double x                =Math.sin(theta) *Math.cos(phi);
-        double y                =Math.sin(theta) *Math.sin(phi);
-        double z                =Math.cos(theta);
-
-        double phi_rot_angle    = gmst + (telescopeLongitude / 180.0 * Math.PI);
-        double theta_rot_angle  = (telescopeLatitude - 90) / 180.0 * Math.PI;
-
-        double m_yx             = -Math.sin(phi_rot_angle);
-        double m_yy             =  Math.cos(phi_rot_angle);
-
-        double m_zx             = -Math.sin(theta_rot_angle) *Math.cos(phi_rot_angle);
-        double m_zy             = -Math.sin(theta_rot_angle) *Math.sin(phi_rot_angle);
-        double m_zz             =  Math.cos(theta_rot_angle);
-
-
-        //		    double x_rot            = m_xx * x + m_xy * y + m_xz * z;
-        double y_rot            = m_yx * x + m_yy * y;
-        double z_rot            = m_zx * x + m_zy * y + m_zz * z;
-
-
-        double theta_rot        = Math.acos(z_rot);
-        double phi_rot          = Math.asin( y_rot /Math.sin(theta_rot) );
-        //azimuth and zenith
-        double[] r =  {phi_rot / Math.PI * 180.0, theta_rot / Math.PI * 180.0 };
-        return r;
-    }
+        ra = ra / 12. * Math.PI;
+        dec = Math.toRadians(dec);
+        
+        double telLat = Math.toRadians(telescopeLatitudeDeg);
+        double telLon = Math.toRadians(telescopeLongitudeDeg);
+        
+        double hourangle = gst - telLon - ra;
+        
+        double altitude = Math.asin( Math.sin(telLat) * Math.sin(dec) + Math.cos(telLat) * Math.cos(dec) * Math.cos(hourangle) );
+        double azimuth = Math.atan2(Math.sin(hourangle),
+        		Math.cos(hourangle) * Math.sin(telLat) - Math.tan(dec) * Math.cos(telLat));
+        
+        return new double[]{Math.toDegrees(azimuth), 90 - Math.toDegrees(altitude)};
+        
+        }
 
 
 
