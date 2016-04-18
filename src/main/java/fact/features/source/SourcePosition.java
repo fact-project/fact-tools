@@ -307,7 +307,7 @@ public class SourcePosition implements StatefulProcessor {
         );
 
         
-        return new double[]{Math.toDegrees(azimuth), 90 - Math.toDegrees(altitude)};
+        return new double[]{Math.toDegrees(azimuth) - 180, 90 - Math.toDegrees(altitude)};
     }
 
 
