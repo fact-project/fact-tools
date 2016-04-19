@@ -82,34 +82,6 @@
                     range="30"
             />
 
-            <fact.extraction.TimeOverThreshold
-                    dataKey="DataCalibrated"
-                    outputKey="timeOverThreshold"
-                    firstSliceOverThresholdOutputKey="arrivalTimeTOT"
-                    positionsKey="maxPos"
-                    threshold="1800"
-                    thresholdOutputKey="thresholdForToT"
-            />
-
-            <fact.datacorrection.CorrectSaturation
-                    dataKey="DataCalibrated"
-                    outputKey="DataCalibrated"
-                    totKey="timeOverThreshold"
-                    firstSliceOverThresholdKey="arrivalTimeTOT"
-                    threshold="1800"
-                    maxPosKey="maxPos"
-                    baselineKey="baseline"
-            />
-
-            <fact.extraction.BasicExtraction
-                    dataKey="DataCalibrated"
-                    outputKeyMaxAmplPos="maxPos"
-                    outputKeyPhotonCharge="photoncharge"
-                    url="${integralGainFile}"
-                    startSearchWindow="${basicExtraction_startSearchWindow}"
-                    rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                    rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
-            />
 
             <fact.extraction.RisingEdgeForPositions
                     dataKey="DataCalibrated"
@@ -149,6 +121,15 @@
                     setUKey="goodPixel"
                     setAKey="shower"
                     outsetKey="pedestal"
+            />
+
+            <fact.extraction.MeanCorrelation
+                    key="DataCalibrated"
+                    amplitudePositionsKey="maxPos"
+                    pixelSetKey="goodPixel"
+                    outputKey="baseline"
+                    firstSlice="10"
+                    range="30"
             />
 
             <fact.extraction.WaveformFluctuation
