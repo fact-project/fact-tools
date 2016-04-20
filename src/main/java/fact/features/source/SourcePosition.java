@@ -306,11 +306,13 @@ public class SourcePosition implements StatefulProcessor {
         		Math.cos(hourAngle) * Math.sin(telLatRad) - Math.tan(dec) * Math.cos(telLatRad)
         );
 
+        azimuth -= Math.PI;
+
         if (azimuth <= - Math.PI){
             azimuth += 2 * Math.PI;
         }
         
-        return new double[]{Math.toDegrees(azimuth) - 180, 90 - Math.toDegrees(altitude)};
+        return new double[]{Math.toDegrees(azimuth), 90 - Math.toDegrees(altitude)};
     }
 
 
