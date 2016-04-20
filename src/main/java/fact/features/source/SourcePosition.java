@@ -97,7 +97,7 @@ public class SourcePosition implements StatefulProcessor {
     private final double telescopeLongitudeDeg = -17.890701389;
     private final double telescopeLatitudeDeg = 28.761795;
     //Distance from earth center
-    private final double distanceToEarthCenter = 4890.0;
+    private final double distanceToEarthCenter = 4889.0;
 
     // reference datetime
     DateTime gstReferenceDateTime = new DateTime(2000, 1, 1, 12, 0, DateTimeZone.UTC);
