@@ -4,24 +4,120 @@ import fact.Constants;
 import fact.features.source.SourcePosition;
 import fact.hexmap.FactPixelMapping;
 import junit.framework.Assert;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class SourcePositionTest {
     static Logger log = LoggerFactory.getLogger(SourcePositionTest.class);
 
-    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+    //Adjust the precision for the equatorialToHorizontal (raDec to AzimuthZenith) conversion here.
+    double precision = 0.35;
+
+
+    /**
+     * Coordinates are compared to those we get from astropy
+     from astropy.time import Time
+     from astropy import units as u
+     from astropy.coordinates import SkyCoord, EarthLocation, AltAz
+
+     orm = EarthLocation.from_geodetic(
+         lon=-17.891366*u.deg,
+         lat=28.761795*u.deg,
+         height=2200*u.meter,
+     )
+
+     mrk = SkyCoord.from_name('Mrk421')
+     mrk.ra.hourangle
+     mrk.dec.deg
+
+     t = Time('2014-03-25 00:42:29', scale='utc', location=orm)
+     frame = AltAz(obstime=t, location=orm)
+     mrk_t = mrk.transform_to(frame)
+     print('Az Alt')
+     mrk_t.az.deg, 90 - mrk_t.alt.deg
+     *
+     *
+     */
+    @Test
+    public void testRaDecToAltZenithForMrk421(){
+        SourcePosition sourcePosition = new SourcePosition();
+        DateTime dateTime = new DateTime(2014, 3, 25, 00, 42, 29, DateTimeZone.UTC);
+        double ra = 11.074266;
+        double dec = 38.208801;
+        double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
+        assertEquals(azAlt[0], -35.79439714367527, precision);
+        assertEquals(azAlt[1], 11.899209660776094, precision);
+    }
+
+
+    @Test
+    public void testRaDecToAltZenithForMrk501(){
+        SourcePosition sourcePosition = new SourcePosition();
+        DateTime dateTime = new DateTime(2013, 2, 25, 22, 42, 29, DateTimeZone.UTC);
+        double ra = 16.8978379666666;
+        double dec = 39.76016913;
+        double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
+        assertEquals(azAlt[0], -326.45127290084133, precision);
+        assertEquals(azAlt[1], 99.68421165386194, precision);
+    }
+
+    @Test
+    public void testRaDecToAltZenithForCrab(){
+        SourcePosition sourcePosition = new SourcePosition();
+        DateTime dateTime = new DateTime(2015, 11, 25, 22, 42, 29, DateTimeZone.UTC);
+        double ra = 5.57553886;
+        double dec = 22.0145;
+        double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
+        assertEquals(azAlt[0], -276.12947205268705, precision);
+        assertEquals(azAlt[1], 51.108027267582536, precision);
+    }
+
+
+    @Test
+    public void testRaDecToAltZenith(){
+        // 6th of April in 2004 at 21:00 o clock
+        // alt az coordinates from http://www.convertalot.com/celestial_horizon_co-ordinates_calculator.html
+        SourcePosition sourcePosition = new SourcePosition();
+        DateTime dateTime = new DateTime(2004, 4, 6, 21, 0, 0, DateTimeZone.UTC);
+        double ra = 3.0;
+        double dec = 24.0;
+        double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
+        assertEquals(azAlt[0], 290.3377994063796 - 360, precision);
+        assertEquals(azAlt[1], 90 - 13.234937521900273 , precision);
+    }
+
+
+
+
+
+
+    
+    @Test
+    public void testWobbleCorrectParameter() throws Exception {
+        SourcePosition sourcePosition = new SourcePosition();
+        sourcePosition.setOutputKey("test");
+
+        sourcePosition.setPointingAzKey("hello");
+        sourcePosition.setPointingZdKey("I am");
+        sourcePosition.setSourceAzKey("quite the ");
+        sourcePosition.setSourceZdKey("annoying feature.");
+        sourcePosition.init(null);
+
+        assertThat(sourcePosition.hasMcWobblePosition, is(true));
+    }
+
 
     @Test
     public void testWobbleWrongParameter() throws Exception {
@@ -36,22 +132,6 @@ public class SourcePositionTest {
             return;
         }
         fail("Should have caught an IllegalArgumentException here.");
-
-    }
-
-
-    @Test
-    public void testWobbleCorrectParameter() throws Exception {
-        SourcePosition sourcePosition = new SourcePosition();
-        sourcePosition.setOutputKey("test");
-
-        sourcePosition.setPointingAzKey("hello");
-        sourcePosition.setPointingZdKey("I am");
-        sourcePosition.setSourceAzKey("quite the ");
-        sourcePosition.setSourceZdKey("annoying feature.");
-        sourcePosition.init(null);
-
-        assertThat(sourcePosition.hasMcWobblePosition, is(true));
     }
 
 
