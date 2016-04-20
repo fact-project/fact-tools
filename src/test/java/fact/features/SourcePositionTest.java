@@ -84,6 +84,17 @@ public class SourcePositionTest {
         assertEquals(azAlt[1], 51.108027267582536, precision);
     }
 
+    @Test
+    public void testRaDecToAltZenithFor1ES2344514(){
+        SourcePosition sourcePosition = new SourcePosition();
+        DateTime dateTime = new DateTime(2015, 10, 01, 04, 00, 29, DateTimeZone.UTC);
+        double ra = 23.784676866666672;
+        double dec = 51.704967;
+        double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
+        assertEquals(azAlt[0], -44.335413306125076, precision);
+        assertEquals(azAlt[1], 46.337781827425495, precision);
+    }
+
 
     @Test
     public void testRaDecToAltZenith(){
@@ -103,7 +114,7 @@ public class SourcePositionTest {
 
 
 
-    
+
     @Test
     public void testWobbleCorrectParameter() throws Exception {
         SourcePosition sourcePosition = new SourcePosition();
