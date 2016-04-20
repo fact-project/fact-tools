@@ -321,25 +321,28 @@ public class SourcePosition implements StatefulProcessor {
      * Returns position of the source in the camera in [mm] from the given pointing Azimuth and Zenith
      * Code by F. Temme
      * @param pointingAz
-     * @param pointingZe
+     * @param pointingZd
      * @param sourceAz
-     * @param sourceZe
+     * @param sourceZd
      * @return
      */
-    public double[] getSourcePosition(double pointingAz, double pointingZe, double sourceAz, double sourceZe)
+    public double[] getSourcePosition(double pointingAz, double pointingZd, double sourceAz, double sourceZd)
     {
 
-        double az = pointingAz / 180 * Math.PI;
-        double zd = pointingZe / 180 * Math.PI;
-
-        double x = Math.sin(sourceZe / 180 * Math.PI) * Math.cos(sourceAz / 180 * Math.PI);
-        double y = Math.sin(sourceZe / 180 * Math.PI) * Math.sin(sourceAz / 180 * Math.PI);
-        double z = Math.cos(sourceZe / 180 * Math.PI);
+        double paz = Math.toRadians(pointingAz);
+        double pzd = Math.toRadians(pointingZd);
+        double saz = Math.toRadians(sourceAz);
+        double szd = Math.toRadians(sourceZd);
 
 
-        double x_rot = -Math.sin(-zd) * z - Math.cos(-zd) * (Math.cos(-az) * x - Math.sin(-az) * y);
-        double y_rot =  Math.sin(-az) * x + Math.cos(-az) * y;
-        double z_rot =  Math.cos(-zd) * z - Math.sin(-zd) * (Math.cos(-az) * x - Math.sin(-az) * y);
+        double x = Math.sin(szd) * Math.cos(saz);
+        double y = Math.sin(szd) * Math.sin(saz);
+        double z = Math.cos(szd);
+
+
+        double x_rot = -Math.sin(-pzd) * z - Math.cos(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
+        double y_rot =  Math.sin(-paz) * x + Math.cos(-paz) * y;
+        double z_rot =  Math.cos(-pzd) * z - Math.sin(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
 
         double[] r = new double[2];
         r[0] = x_rot * (-distanceToEarthCenter) / z_rot;
