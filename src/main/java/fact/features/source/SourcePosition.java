@@ -48,7 +48,7 @@ import java.io.IOException;
  *
  *  For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
  *
- *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt;
+ *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt, Max Nöthe;
  */
 public class SourcePosition implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(SourcePosition.class);
@@ -359,10 +359,6 @@ public class SourcePosition implements StatefulProcessor {
         this.y = y;
     }
 
-
-	public String getOutputKey() {
-		return outputKey;
-	}
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;

@@ -24,7 +24,7 @@ public class SourcePositionTest {
     static Logger log = LoggerFactory.getLogger(SourcePositionTest.class);
 
 
-    PixelMapping pixelMap = FactPixelMapping.getInstance();
+//    PixelMapping pixelMap = FactPixelMapping.getInstance();
 
     //Adjust the precision for the equatorialToHorizontal (raDec to AzimuthZenith) conversion here.
     double precision = 0.35;
