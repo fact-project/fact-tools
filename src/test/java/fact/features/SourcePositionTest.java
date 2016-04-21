@@ -49,8 +49,12 @@ public class SourcePositionTest {
      t = Time('2014-03-25 00:42:29', scale='utc', location=orm)
      frame = AltAz(obstime=t, location=orm)
      mrk_t = mrk.transform_to(frame)
-     print('Az Alt')
-     mrk_t.az.deg, 90 - mrk_t.alt.deg
+     zd = 90 - mrk_t.alt.deg
+     if mrk_t.az.deg > 180:
+        az = mrk_t.az.deg - 360
+     else:
+        az = mrk_t.az.deg
+     print('Az: {} Zd {}'.format(az, zd))
      *
      *
      */
