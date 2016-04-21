@@ -346,7 +346,7 @@ public class SourcePosition implements StatefulProcessor {
 
         double[] r = new double[2];
         r[0] = x_rot * (-distanceToEarthCenter) / z_rot;
-        r[1] = y_rot * (-distanceToEarthCenter) / z_rot;
+        r[1] = - y_rot * (-distanceToEarthCenter) / z_rot;
 
         return r;
     }
