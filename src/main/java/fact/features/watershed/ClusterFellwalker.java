@@ -651,7 +651,7 @@ public class ClusterFellwalker implements Processor {
                 }
                 i++;
             }
-            return showerCluster[maxClusterIndex].getPhotonchargeSum() / chargeSum;
+            return showerCluster[maxClusterIndex].getMorphSum() / chargeSum;
         }
 
     }
