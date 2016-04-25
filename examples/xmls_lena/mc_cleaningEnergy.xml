@@ -1,0 +1,112 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+
+    <!-- Pathes to the input files -->
+    <!--<property name="num_copies" value="4" />-->
+
+    <property name="infolder" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MC/Proton/" />
+    <property name="outfolder" value="file:/home/lena/Dokumente/Masterarbeit/FellWalker/Separation/" />
+    <property name="filename1" value="proton1" />
+    <property name="filename2" value="proton2" />
+    <property name="filename3" value="12ParametersTest_proton" />
+
+    <!-- Pathes to the input files -->
+    <!--    <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/mc_gamma_11981.fits.gz" />
+        <property name="infile" value="file:/home/lena/Dokumente/Masterarbeit/FACT_Data/MonteCarlo/00000001.001_P_MonteCarlo000_Events.fits" />-->
+
+    <!--    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />-->
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
+    <!--<property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />-->
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+
+
+    <stream id="fact" class="fact.io.RecursiveDirectoryStream"
+            pattern="**/*_Events.fits.gz"  url="${infolder}" limit="1000">
+        <stream class="fact.io.FitsStream" id="_" />
+    </stream>
+
+    <!-- Name of the stream and url to the input file -->
+    <!--<stream id="fact" class="fact.io.FitsStream" suffix=".fits.gz"  url="${infolder}" limit="50"/>-->
+
+    <!--    <stream id="fact" class="fact.io.RecursiveDirectoryStream" suffix=".fits.gz"  url="file:${infolder}">
+            <stream class="fact.io.FitsStream" id="_" />
+        </stream>-->
+
+
+    <!-- Description of the process and the corresponding stream -->
+    <!--    <process id="2" input="fact">-->
+    <process id="2" input="fact" >
+
+        <!--<stream.flow.Skip condition="%{data.EventNum} != 40" />-->
+        <!-- <stream.flow.Skip condition="%{data.MCorsikaEvtHeader.fTotalEnergy} &gt; 400" /> -->
+        <!--        <fact.io.PrintKeysOnConsole keys="MCorsikaEvtHeader.fTotalEnergy" />-->
+        <!-- <stream.flow.Skip condition="%{data.EventNum} &lt;0" /> -->
+
+        <include url="classpath:/default/mc/calibration_mc.xml" />
+
+        <!--        <include url="classpath:/default/mc/extraction_mc.xml" />-->
+
+        <!--        <include url="classpath:/default/mc/cleaning_mc.xml" />-->
+
+        <!-- <Skip condition="%{data.shower} == null" /> -->
+
+        <fact.extraction.BasicExtraction
+                dataKey="DataCalibrated"
+                outputKeyMaxAmplPos="maxPos"
+                outputKeyPhotonCharge="photoncharge"
+                url="${integralGainFile}"
+                startSearchWindow="${basicExtraction_startSearchWindow}"
+                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"/>
+
+        <fact.extraction.RisingEdgeForPositions
+                dataKey="DataCalibrated"
+                outputKey="ArrtimePos"
+                amplitudePositionsKey="maxPos"
+                maxSlopesKey="maxSlope"/>
+
+        <!--<fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy" url="${outfolder}${filename1}.json"/>-->
+
+
+        <fact.cleaning.MotionCleaning
+                threshold = "30"
+                outputKey = "shower"/>
+
+        <Skip condition="%{data.numShowerPixel} &lt; 15 "/>
+        <!--<fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumShowerPixel" url="${outfolder}${filename2}.json"/>-->
+
+        <fact.features.DistributionFromShower
+                weightsKey="photoncharge"
+                showerKey="shower"
+                sizeKey="Size"
+                outputKey="showerDistribution"
+        />
+
+
+
+        <fact.hexmap.ClusterFellwalker />
+
+
+
+
+        <Skip condition="%{data.NumCluster} == 0" />
+
+        <fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,numShowerPixel,numCluster,boundRatio,idealBoundDiff,boundAngleSum,distanceCenterSum,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" url="${outfolder}${filename3}.json"/>
+
+
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+
+        <!--<fact.io.JSONWriter keys="EventNum,NumClusterPixel,NumCluster,Waste,SizeX,SizeY,SizeAbs,MaximaID,DistanceMaxima,BrightnessMaxima,ClusterArrivaltimeMaxima,ClusterArrivaltimeMean,ClusterBrightnessSum,ClusterBrightnessMean" url="${outfolder}proton_${copy.id}.json" />-->
+        <!--<fact.ShowViewer key="DataCalibrated"/>-->
+    </process>
+
+<!--    <process input="result" id="egal" >
+        &lt;!&ndash;<fact.io.JSONWriter keys="EventNum,MCorsikaEvtHeader.fTotalEnergy,NumCluster,NumClusterPixel,StdNumPixel,MaxClusterNumPixel,ChargeMax,BoundRatio,IdealBoundDiff,BoundAngleSum,DistanceCenterSum,NeighborCluster" url="${outfolder}/${filename}.json" />&ndash;&gt;
+        <fact.ShowViewer key="DataCalibrated"/>
+    </process>-->
+
+</container>

@@ -1,0 +1,76 @@
+<container>
+
+    <properties url="classpath:/default/settings_mc.properties" />
+
+    <property name="twoLevelTimeNeighbor_neighborThreshold" value="2.0" />
+    <property name="twoLevelTimeNeighbor_coreThreshold" value="4.0" />
+
+
+    <!-- Pathes to the input files -->
+
+    <property name="infolder" value="file:/Users/lena/Documents/Masterarbeit/FACT_Data/MC/Proton/" />
+
+    <property name="outfolder" value="file:/Users/lena/Documents/Masterarbeit/Missmatch/" />
+    <property name="filename" value="proton_all" />
+    <property name="label" value="0"/>
+
+
+
+
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
+
+    <!--<property name="drsfile" value="file:/home/llinhoff/testMcDrsFile.drs.fits.gz" />-->
+
+
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+
+    <stream id="fact" class="fact.io.RecursiveDirectoryStream"
+            pattern="*_Events.fits.gz"  url="${infolder}" limit="10000">
+        <stream class="fact.io.FitsStream" id="_" />
+    </stream>
+
+    <process id="2" input="fact">
+
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <!--<Skip condition="%{data.EventNum} != 4 "/>-->
+
+        <include url="classpath:/default/mc/calibration_mc.xml" />
+
+        <include url="classpath:/default/mc/extraction_mc.xml" />
+
+        <include url="classpath:/default/mc/cleaning_mc.xml" />
+
+        <include url="classpath:/default/mc/parameterCalc_mc.xml" />
+
+        <include url="classpath:/default/mc/sourceParameter_mc.xml" />
+
+        <fact.extraction.MeanCorrelation
+                key="DataCalibrated"
+                amplitudePositionsKey="maxPos"
+                skipLast="50"
+        />
+
+
+        <fact.features.watershed.ClusterFellwalker
+                arrivaltimePosKey = "arrivalTime"
+                pixelSetKey="shower"
+                photonchargeKey="meanCorrelation"
+                minShowerpixel="2"
+        />
+
+        <fact.features.SetLabel
+                label="${label}"
+        />
+
+        <fact.ShowViewer key="DataCalibrated"/>
+
+        <!--<fact.io.JSONWriter keys="MCorsikaEvtHeader.fTotalEnergy,${stat_allPix_param},${stat_phCharge_param},${stat_arrTime_param},${stat_maxSlopes_param},${stat_arrTimePos_param},${stat_maxSlopesPos_param},${stat_maxPos_param},${spread_param},${shower_param},${conc_param},Theta,Alpha,Distance,CosDeltaAlpha,numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,distanceCog,distanceSource,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity,stdArrivaltime,boundRatioAT,idealBoundDiffAT,distanceCogMeanAT,numClusterAT,numShowerPixelMotion,clusterNoCleaning" url="${outfolder}${filename}.json"/>-->
+
+    </process>
+
+
+</container>
