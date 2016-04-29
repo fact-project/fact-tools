@@ -50,6 +50,9 @@ public class MeanCorrelation implements Processor {
     @Parameter(required = false, description = "Outputkey for the covariance window marker")
     private String markerKey = "covarianceWindow";
 
+    @Parameter(required = false, description = "Return scaled mean correlation (values between 0 and 1) if 'true'. Return absolute values if 'false'.", defaultValue = "false")
+    private boolean returnScaledCorrelation = false;
+
 
     private int npix = 1440;
     private int roi = 300;
@@ -123,9 +126,16 @@ public class MeanCorrelation implements Processor {
 
         }
 
+        if (returnScaledCorrelation == true) {
+            double[] scaledCorrelation = scaleCorrelation(meanCorrelation);
+            input.put(correlationKey, scaledCorrelation);
+        }
+        else{
+            input.put(correlationKey, meanCorrelation);
+        }
+
         input.put(markerKey, m);
         input.put(covarianceKey, meanCovariance);
-        input.put(correlationKey, meanCorrelation);
         input.put(scaledDataKey, scaledData);
 
         return input;
@@ -187,6 +197,32 @@ public class MeanCorrelation implements Processor {
         return scaledData;
     }
 
+
+    private double[] scaleCorrelation(double[] correlation){
+
+        double[] scaledCorrelation = new double[1440];
+        double max = 0;
+        double min = 1000;
+        for(int i=0; i<1440; i++){
+            if(correlation[i] > max){
+                int maxIndex = i;
+                max = correlation[i];
+            }
+            if(correlation[i] < min){
+                int minIndex = i;
+                min = correlation[i];
+            }
+        }
+
+
+        for(int i=0; i<1440; i++){
+            scaledCorrelation[i] = (correlation[i] - min) / (max - min);
+        }
+
+        return scaledCorrelation;
+    }
+
+
     public void setKey(String key) {
         this.key = key;
     }
@@ -222,4 +258,6 @@ public class MeanCorrelation implements Processor {
     public void setMarkerKey(String markerKey) {
         this.markerKey = markerKey;
     }
+
+    public void setReturnScaledCorrelation(boolean returnScaledCorrelation) {this.returnScaledCorrelation = returnScaledCorrelation;}
 }

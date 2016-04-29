@@ -29,12 +29,14 @@
 
 
         <fact.features.watershed.ClusterFellwalker
-                arrivaltimePosKey = "arrivalTime"
+                arrivaltimePosKey="arrivalTime"
+                photonchargeKey="photoncharge"
                 pixelSetKey="shower"
+                morphologyKey="photoncharge"
                 minShowerpixel="2"
         />
 
-        <Skip condition="%{data.mumCluster} == 0" />
+        <Skip condition="%{data.numCluster} == 0" />
 
 
         <fact.io.PrintKeysOnConsole keys="numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />

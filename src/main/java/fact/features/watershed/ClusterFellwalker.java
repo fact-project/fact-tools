@@ -417,7 +417,7 @@ public class ClusterFellwalker implements Processor {
         int numShowerCluster = 0;
         int newID = 1;
         for(int c=1; c<clusterSet.length;c++){
-            if(clusterSet[c].cleaningPixel.size()>minShowerpixel){
+            if(clusterSet[c].cleaningPixel.size()>=minShowerpixel){
                 clusterSet[c].setShowerLabel(true);
                 clusterSet[c].setClusterID(newID);
                 newID++;
