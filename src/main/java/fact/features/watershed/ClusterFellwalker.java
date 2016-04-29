@@ -1,6 +1,17 @@
 package fact.features.watershed;
 
 /**
+ *
+ *  Watershed algorithm to cluster the camera image.
+ * The image is interpreted as "landscape" with hills and valleys, where the photoncharge is used as height of a pixel.
+ * FellWalker algorithm clusters the pixels by grouping all pixels which belongs to a hill. The algorithm starts at a pixel
+ * and searches in the neighborhood for the highest pixel. From this neighbor it searches for the next higher pixel in the
+ * neighborhood and so on, until there is no higher pixel and the top of the hill is reached. Every pixel, which is used
+ * during a path to the top is added to a list. If the path ends at the top of a hill, every pixel on this list is marked
+ * with the same cluster ID. Every path to a top gets another cluster ID. If a path reaches a pixel which has already a clusterID
+ * the path up to this pixel is marked with the same cluster ID, because it would lead to the top of the same hill.
+ * After all pixels are used for a path, the whole image is clustered. In the last step all clusters are removed that contains
+ * less than 2 (fixed at the moment) cleaning pixels.
  * Created by lena on 16.11.15.
  */
 

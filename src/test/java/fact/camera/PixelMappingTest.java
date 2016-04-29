@@ -296,17 +296,5 @@ public class PixelMappingTest {
             }
         }
     }
-
-/*    @Test
-    public void testGetPixelFromCubeCoordinates() {
-        FactPixelMapping m  = FactPixelMapping.getInstance();
-
-        FactCameraPixel nullPixel = m.getPixelFromCubeCoordinates(0,0,0);
-        int [] nullCubeCoordinates = m.getCubeCoordinatesFromId(nullPixel.id);
-
-        assertTrue("P");    //  <------------------ pixel/ cube coordinates finden!!
-
-    }*/
-
-
+    
 }
