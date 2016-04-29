@@ -39,7 +39,7 @@ public class ClusterArrivalTimes implements Processor {
     protected double threshold = 3;
 
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
-    protected String pixelSetKey = null;
+    protected String showerKey = null;
 
     @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
     protected String arrivaltimePosKey = "arrivalTimePos";
@@ -51,7 +51,7 @@ public class ClusterArrivalTimes implements Processor {
 
     @Override
     public Data process(Data data) {
-        PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
+        PixelSet pixelSet = (PixelSet) data.get(showerKey);
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
         double[] photoncharge = ((double[]) data.get(photonchargeKey));
 
@@ -274,8 +274,8 @@ public class ClusterArrivalTimes implements Processor {
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
+    public void setShowerKey(String showerKey) {
+        this.showerKey = showerKey;
     }
     public void setArrivaltimePosKey(String arrivaltimePosKey){this.arrivaltimePosKey = arrivaltimePosKey;}
     public void setPhotonchargeKey(String photonchargeKey){this.photonchargeKey = photonchargeKey;}

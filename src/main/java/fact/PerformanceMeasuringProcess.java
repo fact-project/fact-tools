@@ -36,7 +36,6 @@ import stream.runtime.DefaultProcess;
  * Created by Alexey and Kai on 27.05.15.
  */
 public class PerformanceMeasuringProcess extends DefaultProcess {
-
 	static Logger log = LoggerFactory.getLogger(PerformanceMeasuringProcess.class);
 
 	@Parameter(required = false, description = "Url to the .json file where the performance numbers are stored")

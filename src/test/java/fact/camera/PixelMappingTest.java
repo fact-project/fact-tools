@@ -296,5 +296,5 @@ public class PixelMappingTest {
             }
         }
     }
-    
+
 }

@@ -11,7 +11,19 @@ package fact.features.watershed;
  * with the same cluster ID. Every path to a top gets another cluster ID. If a path reaches a pixel which has already a clusterID
  * the path up to this pixel is marked with the same cluster ID, because it would lead to the top of the same hill.
  * After all pixels are used for a path, the whole image is clustered. In the last step all clusters are removed that contains
- * less than 2 (fixed at the moment) cleaning pixels.
+ * less than 'minShowerpixel' cleaning pixels.
+ *
+ * edit:
+ * morphologyKey:
+ * FellWalker works on the morphology you choose. Photoncharge would be the most intuitive one, but other pixel values like
+ * arrival times or mean correlation are possible. 'photoncharge' is default.
+ * areaKey:
+ * Define the area which should be segmented. By default the whole camera image (all 1440 pixels) are clustered (areaKey = null),
+ * but one can choose another pixel set that should be used for clustering (e.g. cleaning set).
+ * showerKey:
+ * For areaKey = null (whole image clustered) only clusters are kept, if they contain 'minShowerpixel' cleaning pixel, which
+ * are collected in a pixelSet named showerKey (e.g. output "shower" from TwoLevelTimeNeighbor or other pixel sets created by other cleaning algorithms).
+ *
  * Created by lena on 16.11.15.
  */
 
@@ -39,7 +51,7 @@ public class ClusterFellwalker implements Processor {
     protected int minShowerpixel = 2;
 
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel). Used to keep/remove cluster if areaKey=null.")
-    protected String pixelSetKey = null;
+    protected String showerKey = null;
 
     @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
     protected String arrivaltimePosKey = "arrivalTimePos";
@@ -61,7 +73,7 @@ public class ClusterFellwalker implements Processor {
     @Override
     public Data process(Data data) {
         int npix = (Integer) data.get("NPIX");
-        int [] shower = Utils.getValidPixelSetAsIntArr(data, npix, pixelSetKey);
+        int [] shower = Utils.getValidPixelSetAsIntArr(data, npix, showerKey);
         int [] area = Utils.getValidPixelSetAsIntArr(data, npix, areaKey);
 
 
@@ -738,8 +750,8 @@ public class ClusterFellwalker implements Processor {
     public void setMinShowerpixel(int minShowerpixel) {
         this.minShowerpixel = minShowerpixel;
     }
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
+    public void setShowerKey(String showerKey) {
+        this.showerKey = showerKey;
     }
     public void setArrivaltimePosKey(String arrivaltimePosKey){this.arrivaltimePosKey = arrivaltimePosKey;}
     public void setPhotonchargeKey(String photonchargeKey){this.photonchargeKey = photonchargeKey;}

@@ -31,7 +31,7 @@
         <fact.features.watershed.ClusterFellwalker
                 arrivaltimePosKey="arrivalTime"
                 photonchargeKey="photoncharge"
-                pixelSetKey="shower"
+                showerKey="shower"
                 morphologyKey="photoncharge"
                 minShowerpixel="2"
         />
