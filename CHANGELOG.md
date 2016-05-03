@@ -1,5 +1,16 @@
 #Changelog for the fact-tools
 
+## Version 0.14.0 -- 03.05.2016
+
+* Bug fix for the calculation of the source position (and position of stars in the camera):
+  * There was a arcsin in the calculation of the az of a given ra/dec coordinate, causing the calculated az to be in -90 to 90 degree.
+  * This was not a problem for Crab Nebula data (or at least for most of it, so that a clear signal could be achieved) but for Mrk 421 data. For this data, there was no signal of the source visible.
+  * New calculation formulas are now implemented, which are using the atan2 method for this.
+  * The new calculated coordinate transformation were checked against python implementation and also checked by Max Ahnen, who could cleary see a signal of Mrk 421 after the bugfix.
+  * Corresponding tests were adapted.
+* There is now also an example file for the erna std analysis (this is work in progress)
+
+
 ## Version 0.13.3 -- 06.04.2016
 
 * new Processor: `fact.ApplyModel` which applies a .pmml model to data in the data item. The model can be written with SciKit learn.
