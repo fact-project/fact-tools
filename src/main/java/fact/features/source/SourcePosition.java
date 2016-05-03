@@ -114,7 +114,7 @@ public class SourcePosition implements StatefulProcessor {
     @Override
     public void init(ProcessContext arg0) throws Exception {
         if(x !=  null && y != null){
-            log.warn("Setting source postion to dummy values X: " + x + "  Y: " + y);
+            log.warn("Setting source position to dummy values X: " + x + "  Y: " + y);
             return;
         }
 
