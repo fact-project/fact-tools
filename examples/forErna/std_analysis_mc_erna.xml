@@ -3,39 +3,32 @@
     This Process contains the standard analysis for FACT, with modifications to be used with the SGE/TORQUE cluster
     execution tool ERNA (Easy RuN Access) https://github.com/fact-project/erna
     -->
-    <properties url="classpath:/default/settings.properties" />
+    <properties url="classpath:/default/settings_mc.properties" />
 
-    <property name="db" value="file:./2015.sqlite" />
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
 
-    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
-
-    <service id="auxService" class="fact.auxservice.SqliteService" url="${db}" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
-    
+
     <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
     <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
         <stream class="fact.io.zfits.ZFitsStream" id="_" />
     </stream>
 
     <process id="1" input="fact">
-        <!-- prevEventAndSkip: -->
-        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
-        <include url="classpath:/default/data/prevEventAndSkip.xml" />
-        <!-- Output: Data -->
 
-        <!-- Calibration: -->
+        <fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+        />
+        <fact.utils.RemappingKeys
+                keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+        />
+
         <fact.datacorrection.DrsCalibration
                 key="Data"
                 outputKey="DataCalibrated"
         />
-        <fact.datacorrection.PatchJumpRemoval
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                prevEventsKey="prevEvents"
-                startCellKey="StartCellData"
-                jumpLimit="${patchJumpRemoval_jumpLimit}"
-        />
+
         <fact.datacorrection.RemoveSpikes
                 dataKey="DataCalibrated"
                 outputKey="DataCalibrated"
@@ -44,14 +37,6 @@
                 spikeLimit="${removeSpikes_spikeLimit}"
                 topSlopeLimit="${removeSpikes_topSlopeLimit}"
                 maxSpikeLength="${removeSpikes_maxSpikeLength}"
-        />
-        <fact.filter.DrsTimeCalibration
-                outputKey="timeCalibConst"
-        />
-        <fact.filter.ArrayTimeCorrection
-                dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
-                outputKey="DataCalibrated"
         />
         <fact.datacorrection.InterpolateTimeSeries
                 calibService="calibService"
@@ -62,12 +47,12 @@
         <!-- Extraction -->
         <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
         PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
-        <include url="classpath:/default/data/extraction.xml" />
+        <include url="classpath:/default/mc/extraction_mc.xml" />
         <!-- Output: photoncharge, arrivalTime -->
 
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-        <include url="classpath:/default/data/cleaning.xml" />
+        <include url="classpath:/default/mc/cleaning_mc.xml" />
         <!-- Output: shower -->
 
         <!-- Parameter calculation (only source independent) -->
@@ -76,13 +61,13 @@
         Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
         Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
         ShowerSlope, Disp -->
-        <include url="classpath:/default/data/parameterCalc.xml" />
+        <include url="classpath:/default/mc/parameterCalc_mc.xml" />
         <!-- Output: source independent parameters -->
 
         <!-- Parameter calculation (only source dependent) -->
         <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <include url="classpath:/default/data/sourceParameter.xml" />
+        <include url="classpath:/default/mc/sourceParameter_mc.xml" />
         <!-- Output: source dependent parameters -->
 
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
