@@ -74,10 +74,8 @@
 	<fact.io.JSONWriter keys="${keysForOutput}" 
 		url="${output}" 
 		writeListOfItems="True" 
-		specialDoubleValuesAsString="True"
 		pixelSetsAsInt="True"
 		/>
-	<!-- <PrintData/> -->
 	<!-- <fact.io.PrintKeysOnConsole keys="${keysForOutput}" /> -->
     </process>
 </container>

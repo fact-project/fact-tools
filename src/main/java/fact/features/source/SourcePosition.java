@@ -175,10 +175,10 @@ public class SourcePosition implements StatefulProcessor {
         	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
         	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
         	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
-        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to undo
-        	// the coordinate transformation from Ceres
-        	pointingAz = 180 - pointingAz;
-        	sourceAz = 180 - sourceAz;
+        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to
+        	// rotate the coordinate system by 180 deg such that 0 deg is north
+        	pointingAz = 180 + pointingAz;
+        	sourceAz = 180 + sourceAz;
         	// Now we can calculate the source position from the zd,az coordinates for pointing and source
         	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
         	data.put(outputKey, sourcePosition);
