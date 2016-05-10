@@ -1,5 +1,10 @@
 #Changelog for the fact-tools
 
+## Version 0.14.1 -- 10.05.2016
+* Bug fix for the calculation of the source position in Monte Carlos:
+  * Corsika, Ceres and FACT-Tools are using different definitions of the Zd/Az coordinate systen. In FACT-Tools 0.14.0 we change to the definition used by Astropy, but a bug was left in the coordinate transformation for MCs. Now this transformation was changed to fit the definition used in Astropy
+* Example XMLs to be used with the tourque/maui grid wrapper, called ERNA (https://github.com/fact-project/erna)
+
 ## Version 0.14.0 -- 03.05.2016
 
 * Bug fix for the calculation of the source position (and position of stars in the camera):
