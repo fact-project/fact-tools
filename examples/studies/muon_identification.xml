@@ -146,6 +146,6 @@
 
 
     <fact.io.JSONWriter  url="file:${outfile}" keys="${outputKeys}" />
-    <fact.ShowViewer key="DataCalibrated"/>
+    <!-- <fact.ShowViewer key="DataCalibrated"/> -->
   </process>
 </container>
