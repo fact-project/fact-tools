@@ -22,12 +22,20 @@ public class Signal implements Processor {
     @Parameter
     String signalClassName = "1";
 
+    public static double thetaDegreesToThetaSquaredInMM(double theta){
+        double pixelsize = 9.5;
+        double fovPerPixel = 0.11;
+        return Math.pow(theta*(fovPerPixel/pixelsize), 2);
+    }
+
     @Override
     public Data process(Data data) {
 
         ProbabilityDistribution distribution = predictor.predict(data);
         if (distribution != null){
             data.put("signal:prediction", distribution.getProbability(signalClassName));
+            double theta = (double) data.get("Theta");
+            data.put("signal:thetasquare", thetaDegreesToThetaSquaredInMM(theta));
         }
         return data;
     }

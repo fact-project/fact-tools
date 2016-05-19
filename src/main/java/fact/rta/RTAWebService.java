@@ -48,7 +48,7 @@ public class RTAWebService implements Service {
             attributes.put("title", "FACT RTA");
             return new ModelAndView(attributes, "index.html");
         }, new HandlebarsTemplateEngine());
-        get("/datarate", (request, response) -> String.format("%f events per second.", datarate));
+        get("/datarate", (request, response) -> datarate);
         get("/lightcurve", (request, response) -> lc());
 
 
@@ -57,10 +57,17 @@ public class RTAWebService implements Service {
         create = DSL.using(conn, SQLDialect.SQLITE);
     }
 
+    /**
+     * return the view of the lightcurve
+     * @return
+     */
     private String lc(){
-        StringJoiner sj = new StringJoiner("-");
-        lightCurve.asMapOfRanges().forEach((b,c) -> sj.add(c.signalEvents.toString()));
-        return sj.toString();
+        if (lightCurve != null) {
+            StringJoiner sj = new StringJoiner("-");
+            lightCurve.asMapOfRanges().forEach((b, c) -> sj.add(c.signalEvents.toString()));
+            return sj.toString();
+        }
+        return "";
     }
 
 

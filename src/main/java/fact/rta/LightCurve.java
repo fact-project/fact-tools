@@ -5,12 +5,16 @@ import com.google.common.collect.TreeRangeMap;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
+import org.jpmml.evaluator.ProbabilityDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
+import stream.Keys;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Optional;
@@ -24,9 +28,8 @@ public class LightCurve implements Processor {
     //TODO: use service annotation to inject rtawebservice
     static Logger log = LoggerFactory.getLogger(LightCurve.class);
 
-    @Parameter(required = true)
+    @Service(required = true)
     RTAWebService webService;
-
 
     @Parameter(required = false , description = "Binning in minutes")
     int binning = 1;
@@ -36,6 +39,9 @@ public class LightCurve implements Processor {
 
     @Parameter(required = false , description = "Number of off regions that are used to measure background")
     int offRegions = 5;
+
+    double thetaCut = 0.1;
+    double predictionThreshold = 0.7;
 
     private TreeRangeMap<DateTime, SignalContainer> lightCurve = TreeRangeMap.create();
 
@@ -86,6 +92,25 @@ public class LightCurve implements Processor {
         return Optional.empty();
     }
 
+    private int background(Data data, double thetaCut){
+        Keys offKeys = new Keys("Theta_Off_?");
+        for (String key : offKeys.select(data)) {
+            double offValue = (double) data.get(key);
+            if (offValue > thetaCut){
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private int signal(Data data, double predictionThreshold, double thetaCut){
+        double prediction = (double) data.get("signal:prediction");
+        double theta = (double) data.get("signal:thetasquare");
+        if (prediction <= predictionThreshold && theta <= thetaCut){
+            return 1;
+        }
+        return 0;
+    }
 
     @Override
     public Data process(Data data) {
@@ -95,18 +120,22 @@ public class LightCurve implements Processor {
         DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
                                         orElseThrow(() -> new IllegalArgumentException("No valid timestamp in event."));
 
+        if (data.containsKey("@datarate")){
+            webService.updateDatarate((double) data.get("@datarate"));
+        }
 
-        if (!data.containsKey("@signal")){
-            log.warn("No signal in event. Ignoring.");
+        if (!data.containsKey("signal:prediction")){
+//            log.warn("No signal in event. Ignoring.");
             return data;
         }
-        int signal = (int) data.get("@signal");
-        int background = (int) data.get("@background");
+//        double signal = (double) data.get("signal:prediction");
 
         //check if we have a new bin. If we start a new bin the excess rate is still zero
         //TODO: think whether we should use the event timestamp here. maybe also watch the delay?
         DateTime time = DateTime.now();
         SignalContainer container = lightCurve.get(time);
+        int signal = signal(data, predictionThreshold, thetaCut);
+        int background = background(data, thetaCut);
         if (container != null){
             container.signalEvents += signal;
             container.backgroundEvents += background;
@@ -120,19 +149,11 @@ public class LightCurve implements Processor {
         }
 
 
-
         // remove old bins so we don't accumulate too many old results in memory
         Map.Entry<Range<DateTime>, SignalContainer> entry = lightCurve.getEntry(time.minusMinutes(binning + history));
         if (entry != null){
             lightCurve.remove(entry.getKey());
         }
-
-
-
-        if (data.containsKey("@datarate")){
-            webService.updateDatarate((double) data.get("@datarate"));
-        }
-
 
         data.put("@timestamp", eventTimeStamp.toString());
         return data;

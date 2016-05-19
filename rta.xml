@@ -5,16 +5,23 @@
     <!-- Pathes to the input files -->
     <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />-->
     <!--<property name="drsfile" value="file:src/main/resources/testMCDrsFile.drs.fits.gz" />-->
-    <property name="pmml" value="/home/kai/rf.pmml" />
-    <property name="db" value="/home/kai/drive_2014.sqlite" />
-    <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />-->
-    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />-->
+
+    <property name="pmml" value="/Users/kai/rf.pmml" />
+    <property name="db" value="/Users/kai/drive_2014.sqlite" />
+
+    <!--<property name="pmml" value="/home/kai/rf.pmml" />-->
+    <!--<property name="db" value="/home/kai/drive_2014.sqlite" />-->
+
+    <property name="infile" value="/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />
+    <property name="drsfile" value="/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />
+
+
     <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_096.fits.gz" />-->
     <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
 
 
-    <property name="infile" value="/home/kai/20140105_093.fits.fz" />
-    <property name="drsfile" value="/home/kai/20140105_088.drs.fits.gz" />
+    <!--<property name="infile" value="/home/kai/20140105_093.fits.fz" />-->
+    <!--<property name="drsfile" value="/home/kai/20140105_088.drs.fits.gz" />-->
 
 
     <!--<property name="infile" value="file:/Users/kai/fact_phido/simulated/ceres/proton_heinz_12/32917/00032917.917_D_MonteCarlo032_Events.fits.gz" />-->
@@ -29,7 +36,7 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <service id="rf" class="fact.PredictionService" url="file:${pmml}" />
-    <!--<service id="rta_service" class="fact.rta.RTAWebService" />-->
+    <service id="rta_service" class="fact.rta.RTAWebService" />
 
     <!-- Name of the stream and url to the input file -->
     <!--<stream id="fact" class="fact.io.LoopStream" events="40">-->
@@ -41,7 +48,7 @@
 
     <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}" />
 
-    <Queue id="out_queue" />
+    <!--<Queue id="out_queue" />-->
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
         <fact.DataRate every="25"/>
@@ -113,17 +120,17 @@
         <Skip condition="%{data.numPixeInShower} &lt; 10" />
 
             <fact.rta.Signal predictor="rf" />
-            <fact.rta.Background predictor="rf"  />
-            <!--<fact.rta.LightCurve webService="rta_service"/>-->
+            <!--<fact.rta.Background predictor="rf"  />-->
+            <fact.rta.LightCurve webService="rta_service"/>
 
-            <Enqueue queues="out_queue" />
+            <!--<Enqueue queues="out_queue" />-->
     </process>
 
 
 
-    <process input="out_queue">
-        <fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,@signal,@background,Leakage,Theta_Off_?,Theta,Alpha,Alpha_Off_?"/>
-    </process>
+    <!--<process input="out_queue">-->
+        <!--<fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,@signal,@background,Leakage,Theta_Off_?,Theta,Alpha,Alpha_Off_?"/>-->
+    <!--</process>-->
 
 </container>
 
