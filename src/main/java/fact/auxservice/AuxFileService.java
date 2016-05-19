@@ -118,8 +118,11 @@ public class AuxFileService implements AuxiliaryService {
         Path p = Paths.get(auxFolder.getPath());
         File folder = p.toFile();
 
-        if(!folder.isDirectory() || !folder.exists()){
-            throw new FileNotFoundException("Could not enter folder. Does it exist?");
+        if(!folder.exists()){
+            throw new FileNotFoundException("The path does not exist:  " + folder.toString());
+        }
+        if(!folder.isDirectory()){
+            throw new FileNotFoundException("The path does not point to a directory:  " + folder.toString());
         }
         final HashMap<AuxiliaryServiceName, SourceURL> m = new HashMap<>();
         folder.list(new FilenameFilter() {
@@ -133,11 +136,9 @@ public class AuxFileService implements AuxiliaryService {
                         File f = new File(dir, name);
                         m.put(AuxiliaryServiceName.valueOf(auxName), new SourceURL(f.toURI().toURL()));
                     } catch (MalformedURLException e) {
-//                        e.printStackTrace();
                         log.error("Could not create path to auxillary file " + dir + " " +name);
                         return false;
                     }catch (IllegalArgumentException e) {
-//                        e.printStackTrace();
                         log.warn("The file " + dir + " " +name + " is not a recognized aux service. ");
                         return false;
                     }

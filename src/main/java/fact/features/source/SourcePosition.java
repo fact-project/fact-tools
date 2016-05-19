@@ -249,7 +249,9 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
 
         } catch (IOException e) {
+            log.error("SourcePosition could not be calculated. Stopping stream.");
             e.printStackTrace();
+            return null;
         }
 
         return data;
