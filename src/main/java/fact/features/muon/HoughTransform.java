@@ -12,6 +12,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import streams.tikz.Pixel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -197,7 +198,10 @@ public class HoughTransform implements StatefulProcessor {
         RingId bestRing = new RingId(max_positions[0][0], max_positions[0][1], max_positions[0][2]);
         int numPixBestRing = circle2chids.get(bestRing).size();
 
-        int[] bestRingPixel = Ints.toArray(circle2chids.get(bestRing));
+        PixelSet bestRingPixel = new PixelSet();
+        for(int chid: circle2chids.get(bestRing)){
+            bestRingPixel.addById(chid);
+        }
         input.put(bestRingPixelKey, bestRingPixel);
 
 

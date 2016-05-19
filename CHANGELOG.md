@@ -1,5 +1,37 @@
 #Changelog for the fact-tools
 
+## Version 0.14.1 -- 10.05.2016
+* Bug fix for the calculation of the source position in Monte Carlos:
+  * Corsika, Ceres and FACT-Tools are using different definitions of the Zd/Az coordinate systen. In FACT-Tools 0.14.0 we change to the definition used by Astropy, but a bug was left in the coordinate transformation for MCs. Now this transformation was changed to fit the definition used in Astropy
+* Example XMLs to be used with the tourque/maui grid wrapper, called ERNA (https://github.com/fact-project/erna)
+
+## Version 0.14.0 -- 03.05.2016
+
+* Bug fix for the calculation of the source position (and position of stars in the camera):
+  * There was an arcsin in the calculation of the az of a given ra/dec coordinate, causing the calculated az to be in -90 to 90 degree.
+  * This was not a problem for Crab Nebula data (or at least for most of it, so that a clear signal could be achieved) but for Mrk 421 data. For this data, there was no signal of the source visible.
+  * New calculation formulas are now implemented, which are using the atan2 method for this.
+  * The new calculated coordinate transformation were checked against python implementation and also checked by Max Ahnen, who could clearly see a signal of Mrk 421 after the bugfix.
+  * Corresponding tests were adapted.
+* There is now also an example file for the erna std analysis (this is work in progress)
+
+
+## Version 0.13.3 -- 06.04.2016
+
+* new Processor: `fact.ApplyModel` which applies a .pmml model to data in the data item. The model can be written with SciKit learn.
+* added several xml files, making use of the ApplyModel processor.
+* MeasurePerformance now handles multiple uses of the same Processor correctly
+
+## Version 0.13.2 -- 06.04.2016
+
+* new Processor: `fact.extraction.TimeOverThresholdTL` allows to calculate the time over Threshold for a given window on the Timeline
+* `fact.features.singlePulse.FWHMPulses` now uses Doubles instead of Ints and throws NaNs in case of out-of-boundary issues 
+
+## Version 0.13.1 -- 06.04.2016
+
+* new Processor `fact.extraction.MeanCorrelation` to calculate the average covariance and correlation of the time series of neighboring pixels 
+
+
 ## Version 0.13.0 -- 16.02.2016
 
 * new package `fact.features.muon`
@@ -225,7 +257,7 @@ We now support an early version of easy multistream handling to stream data from
 ## Version 0.7.9
 
 Added processor to correct utc times with gps time correction files:
-	`fact.filter.GpsTimeCorrection`
+  `fact.filter.GpsTimeCorrection`
 
 
 ## Version 0.7.7

@@ -157,8 +157,8 @@ public class SqliteService implements AuxiliaryService {
                 m.put("Angle", cursor.getFloat("Angle"));
                 m.put("Ra_src", cursor.getFloat("Ra_src"));
                 m.put("Dec_src", cursor.getFloat("Dec_src"));
-                m.put("Ra_cmd", cursor.getFloat("Ra_cmd"));
-                m.put("Dec_cmd", cursor.getFloat("Dec_cmd"));
+                // m.put("Ra_cmd", cursor.getFloat("Ra_cmd"));
+                // m.put("Dec_cmd", cursor.getFloat("Dec_cmd"));
                 m.put("Offset", cursor.getFloat("Offset"));
 
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss.SSSSSS");
