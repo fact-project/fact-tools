@@ -4,7 +4,8 @@
 
     <!-- Pathes to the input files -->
     <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />-->
-    <!--<property name="drsfile" value="file:src/main/resources/testMCDrsFile.drs.fits.gz" />-->
+    <property name="drsfile" value="src/main/resources/testDrsFile.drs.fits.gz" />
+
 
     <property name="pmml" value="/Users/kai/rf.pmml" />
     <property name="db" value="/Users/kai/drive_2014.sqlite" />
@@ -12,8 +13,8 @@
     <!--<property name="pmml" value="/home/kai/rf.pmml" />-->
     <!--<property name="db" value="/home/kai/drive_2014.sqlite" />-->
 
-    <property name="infile" value="/Users/kai/fact_phido/raw/2014/01/05/20140105_151.fits.fz" />
-    <property name="drsfile" value="/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />
+    <property name="infile" value="/Users/kai/20140105_151.fits.fz" />
+    <!--<property name="drsfile" value="/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />-->
 
 
     <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_096.fits.gz" />-->
@@ -52,6 +53,7 @@
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
         <fact.DataRate every="25"/>
+        <Delay time="500ms" />
         <!-- prevEventAndSkip: -->
         <!-- PreviousEventInfo, Skip(no Data Trigger) -->
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
@@ -121,9 +123,10 @@
 
             <fact.rta.Signal predictor="rf" />
             <!--<fact.rta.Background predictor="rf"  />-->
-            <fact.rta.LightCurve webService="rta_service"/>
+            <fact.rta.RTAProcessor webService="rta_service"/>
 
             <!--<Enqueue queues="out_queue" />-->
+
     </process>
 
 

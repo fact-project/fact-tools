@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<!--
+	Prism by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+        <title>{{title}}</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Live results of the FACT Cherenkov Telescope">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+		<!--<script src="assets/js/bundle.js"></script>-->
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>-->
+        <!--<script src="http://cdn.intercoolerjs.org/intercooler-0.9.6.min.js"></script>-->
+        <!--<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
+        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>-->
+
+
+        <script src="assets/js/bundle.js"></script>
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body>
+
+		<!-- Banner -->
+			<section id="banner">
+				<div class="inner split">
+					<section>
+						<h2>FACT RTA</h2>
+					</section>
+					<section>
+						<p> This page collects live data from the FACT telescope.
+                            It display current data rates and event counts.
+                            A few selected events from the camera are also shown
+                        </p>
+
+					</section>
+				</div>
+			</section>
+
+		<!-- One -->
+			<section id="one" class="wrapper">
+				<div class="inner split">
+					<section>
+						<h2>Latest Event</h2>
+						<p>
+                            Here you see the latest gamma-like event found by our analysis chain.
+                            It's selected by a multivariate model which has been trained offline on simulated labeled data.
+                            Additionally, a cut in its reconstructed position has been performed.
+                        </p>
+                        <table>
+                            <tr>
+                                <td>Source</td>
+                                <td id="source">...</td>
+                            </tr>
+                            <tr>
+                                <td>Timestamp</td>
+                                <td id="timestamp">...</td>
+                            </tr>
+                        </table>
+
+					</section>
+					<section>
+                        <div id="fact_map">
+
+                        </div>
+					</section>
+				</div>
+			</section>
+
+		<!-- Two -->
+			<section id="two" class="wrapper style2 alt">
+				<div class="inner">
+					<div class="spotlight">
+						<div class="image">
+							<img src="images/pic01.jpg" alt="" />
+						</div>
+						<div class="content">
+							<h3>Data rates</h3>
+                            <p>
+                                The current FACT  datarate is <span id="datarate"> ... </span> events per second.
+                            </p>
+							<ul class="actions">
+								<li><a href="#" class="button alt">Details</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="spotlight">
+						<div class="image">
+							<img src="images/pic02.jpg" alt="" />
+						</div>
+						<div class="content">
+							<h3>Hipster</h3>
+							<p id="hipstercontent">Loading Hipstercontent</p>
+						</div>
+					</div>
+					<div class="spotlight">
+						<div class="image">
+							<img src="images/pic03.jpg" alt="" />
+						</div>
+						<div class="content">
+							<h3>Machine status</h3>
+							<p>Basic information about the machine running the RTA. It's running at the experiment site.  </p>
+                            <ul>
+                                <li>Free disk space on machine: <span id="space">...</span>GB</li>
+                                <li>Currently reserved memory:  <span id="memory">...</span>MB</li>
+                                <li>Reserved CPU cores: <span id="cpus">...</span></li>
+                            </ul>
+						</div>
+					</div>
+					<ul class="actions special">
+						<li><a href="#" class="button alt">Ipsum magna tempus</a></li>
+					</ul>
+				</div>
+			</section>
+
+		<!-- Contact -->
+			<section id="contact" class="wrapper">
+				<div class="inner split">
+					<section>
+						<h2>Orci malesuada</h2>
+						<p>Morbi pharetra vitae felis placerat pharetra. Nulla risus orci, dapibus id malesuada et nec, malesuada quis pellentesque eget.</p>
+						<form action="#" class="alt" method="POST">
+							<div class="row uniform">
+								<div class="6u 12u$(xsmall)">
+									<input name="name" placeholder="Name" type="text">
+								</div>
+								<div class="6u$ 12u$(xsmall)">
+									<input name="email" placeholder="Email" type="email">
+								</div>
+								<div class="12u$">
+									<textarea name="message" placeholder="Message" rows="4"></textarea>
+ 								</div>
+ 							</div>
+ 							<ul class="actions">
+ 								<li><input class="alt" value="Send message" type="submit"></li>
+ 							</ul>
+ 						</form>
+					</section>
+					<section>
+						<ul class="contact">
+							<li class="fa-web"><a href="#">www.fact-project.org</a></li>
+							<li class="fa-git"><a href="#">github.com/fact-project</a></li>
+							<li class="fa-envelope"><a href="#">information@untitled.tld</a></li>
+							<li class="fa-home">TU Dortmund, Otto-Hahn-Straße 4a <br/>Dortmund, Germany</li>
+						</ul>
+					</section>
+				</div>
+			</section>
+
+		<!-- Footer -->
+			<footer id="footer">
+				<div class="copyright">
+					&copy; FACT RTA. Header Image: <a href="http://unsplash.com">Unsplash</a>. Design adapted from : <a href="http://templated.co">TEMPLATED</a>.
+				</div>
+			</footer>
+
+
+	</body>
+</html>

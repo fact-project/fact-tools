@@ -1,0 +1,27 @@
+{
+  "name": "rta",
+  "version": "0.0.1",
+  "description": "Use d3 to diaply the camera of the FACT telescope",
+  "main": "assets/js/main.js",
+  "dependencies": {
+    "hexmap" : "https://github.com/mackaiver/hexmap"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fact-project/fact-tools"
+  },
+  "keywords": [
+    "cherenkov",
+    "gamma",
+    "FACT"
+  ],
+  "author": "Kai Brügge",
+  "license": "Beerware",
+  "bugs": {
+    "url": "https://github.com/fact-procet/fact-tools"
+  }
+}
