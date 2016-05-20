@@ -144,7 +144,7 @@ public class RTAWebService implements Service {
     }
 
 
-    public void updateEvent(double[] photonCharges, double estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime timestamp) {
+    public void updateEvent(double[] photonCharges, double estimatedEnergy, double size, double thetaSquare, String sourceName, String timestamp) {
         Map m = new HashMap<String, Serializable>();
         m.put("image", photonCharges);
         m.put("energy", estimatedEnergy);

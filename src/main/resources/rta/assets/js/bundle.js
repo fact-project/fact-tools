@@ -105,6 +105,18 @@ function init() {
     }
 
 
+    function loadDataRate(){
+        console.log("loading rate")
+
+        $.getJSON('/rate', function(rate){
+            if (rate) {
+                console.log(rate)
+                $('#rate').html( rate );
+            }
+        });
+    }
+
+
     loadHipsterContent();
     window.setInterval(loadHipsterContent, 60*SECONDS);
 

@@ -137,7 +137,7 @@ public class RTAProcessor implements Processor {
             double estimatedEnergy = Math.random();
             double size = (double) data.get("Size");
             String sourceName = (String) data.get("SourceName");
-            webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
+            webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp.toString());
         }
 
         //check if we have a new bin. If we start a new bin the excess rate is still zero
