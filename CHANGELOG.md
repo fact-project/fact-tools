@@ -1,5 +1,14 @@
 #Changelog for the fact-tools
 
+## Version 0.15.0 -- 23.05.2016
+
+* Muon Analysis
+  * New Processor `RingStandardDeviationWithThreshold` to calculate Standard Deviation of the ArrivalTime on MyonRing pixels above a threshold.
+  * Update example xml for muon study (`examples/studies/muon_identification.xml`)
+  * `fact.features.muon.HoughTransform` now uses a `PixelSet` for the `BestRingPixels`
+  * Default outputkeys of `fact.features.muon.GaussianFit` and `fact.features.muon.CircularFit` now use CamelCase instead of snake_case.
+
+
 ## Version 0.14.1 -- 10.05.2016
 * Bug fix for the calculation of the source position in Monte Carlos:
   * Corsika, Ceres and FACT-Tools are using different definitions of the Zd/Az coordinate systen. In FACT-Tools 0.14.0 we change to the definition used by Astropy, but a bug was left in the coordinate transformation for MCs. Now this transformation was changed to fit the definition used in Astropy
