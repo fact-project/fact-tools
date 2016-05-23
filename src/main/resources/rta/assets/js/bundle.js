@@ -108,15 +108,14 @@ function init() {
     function loadEvent() {
         console.log("loading Event")
 
-        $.getJSON('/event', function (event) {
-            if (event) {
-                console.log(event)
-                this.camera.update(event.photonCharges, duration = 1);
-                $('#source_name').html(event.sourceName);
-                $('#eventTimeStamp').html(event.eventTimeStamp);
-                $('#size').html(numeral(event.size).format('0.00'));
-                $('#energy').html(numeral(event.estimatedEnergy).format('0.00'));
-                $('#theta_square').html(numeral(event.thetaSquare).format('0.000'));
+        $.getJSON('/event', function (latestEvent) {
+            if (latestEvent) {
+                this.camera.update(latestEvent.photonCharges, duration = 1);
+                $('#source_name').html(latestEvent.sourceName);
+                $('#eventTimeStamp').html(latestEvent.eventTimeStamp);
+                $('#size').html(numeral(latestEvent.size).format('0.00'));
+                $('#energy').html(numeral(latestEvent.estimatedEnergy).format('0.00'));
+                $('#theta_square').html(numeral(latestEvent.thetaSquare).format('0.000'));
             }
         });
     }
@@ -126,17 +125,23 @@ function init() {
         var chart = null;
         var latestTimeStamp = null;
         $.getJSON('/status', function (status_dict) {
-
-            rs  = _.map(status_dict, 'usedMemory');
-            var currentRate = rs[rs.length - 1]
+            console.log("MEMORY BITCH");
+            console.log(status_dict);
+            var rs = _.values(status_dict)
+            var latestStatus = rs[rs.length - 1]
+            rs  = _.map(rs, 'usedMemory');
             rs = ['usedMemory'].concat(rs);
 
-            ts  = _.map(status_dict, 'timeStamp');
+            var ts  = _.keys(status_dict);
             latestTimeStamp = ts[ts.length - 1];
             ts = ['t'].concat(ts);
 
-            //console.log(rs);
-            //console.log(ts);
+            $('#space').html(latestStatus.freeSpace);
+            $('#memory').html(latestStatus.usedMemory);
+            $('#cpus').html(latestStatus.availableProcessors);
+
+            console.log(rs);
+            console.log(ts);
             chart = c3.generate({
                 size: {
                     height: 240,
@@ -155,7 +160,7 @@ function init() {
                 },
                 bar: {
                     width: {
-                        ratio: 1 // this makes bar width 50% of length between ticks
+                        ratio: 1
                     }
                 },
                 axis: {
@@ -175,13 +180,15 @@ function init() {
                 $.getJSON('/status?timestamp='+latestTimeStamp, function (status_dict) {
                     if (status_dict) {
 
-                        var latestStatus = status_dict[status_dict.length - 1]
-                        rs  = _.map(status_dict, 'usedMemory');
+                        var rs = _.values(status_dict)
+                        var latestStatus = rs[rs.length - 1]
+                        rs  = _.map(rs, 'usedMemory');
                         rs = ['usedMemory'].concat(rs);
 
-                        ts  = _.map(status_dict, 'timeStamp');
+                        var ts  = _.keys(status_dict);
                         latestTimeStamp = ts[ts.length - 1];
                         ts = ['t'].concat(ts);
+
                         console.log(rs)
                         console.log(ts)
 
@@ -243,6 +250,7 @@ function init() {
                 },
                 axis: {
                     x: {
+                        count: 100,
                         type: 'timeseries',
                         tick: {
                             format: '%H:%M:%S'
@@ -257,11 +265,11 @@ function init() {
             if(chart) {
                 $.getJSON('/datarate?timestamp='+latestTimeStamp, function (rates) {
                     if (rates) {
-                        rs  = _.values(rates);
+                        var rs  = _.values(rates);
                         var currentRate = rs[rs.length - 1];
                         rs = ['rate'].concat(rs);
 
-                        ts  = _.keys(rates)
+                        var ts  = _.keys(rates)
                         latestTimeStamp = ts[ts.length - 1];
                         ts = ['t'].concat(ts);
 
@@ -290,14 +298,14 @@ function init() {
     window.setInterval(DataRateChart.load, 2*SECONDS);
 
 
-    //loadSkyCamImage();
-    //window.setInterval(loadSkyCamImage, 3*MINUTES);
+    loadSkyCamImage();
+    window.setInterval(loadSkyCamImage, 3*MINUTES);
     //
-    //loadEvent();
-    //window.setInterval(loadEvent, 15*SECONDS);
+    loadEvent();
+    window.setInterval(loadEvent, 15*SECONDS);
     //
-    //MemoryChart();
-    //window.setInterval(MemoryChart.load, 30*SECONDS);
+    MemoryChart();
+    window.setInterval(MemoryChart.load, 30*SECONDS);
 
 }
 },{"c3":2,"hexmap":12,"lodash/core":13,"numeral":14,"zeptojs":15}],2:[function(require,module,exports){

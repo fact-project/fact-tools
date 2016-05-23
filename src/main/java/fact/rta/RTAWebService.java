@@ -36,7 +36,10 @@ public class RTAWebService implements Service {
     private static Logger log = LoggerFactory.getLogger(RTAWebService.class);
 
     private Runtime runtime = Runtime.getRuntime();
-    private Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeAdapter()).create();
+    private Gson gson = new GsonBuilder()
+            .enableComplexMapKeySerialization()
+            .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
+            .create();
 
 
     private class StatusContainer{
@@ -126,11 +129,11 @@ public class RTAWebService implements Service {
 
 //        Spark.get("/lightcurve", (request, response) -> lc());
 
-        Spark.get("/datarate", "application/json", (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
+        Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
-        Spark.get("/event", "application/json",  (request, response) -> getEvents(request.queryParams("timestamp")), gson::toJson);
+        Spark.get("/event", (request, response) -> getLatestEvent(), gson::toJson);
 //
-        Spark.get("/status", "application/json", (request, response) -> getSystemStatus(request.queryParams("timestamp")), gson::toJson);
+        Spark.get("/status",  (request, response) -> getSystemStatus(request.queryParams("timestamp")), gson::toJson);
 
 
         String url = "jdbc:sqlite:rta.sqlite";
@@ -146,22 +149,20 @@ public class RTAWebService implements Service {
 
     public void updateEvent(double[] photoncharges,double  estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
         RTAEvent event = new RTAEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
-        eventMap.put(DateTime.now(), event);
+        DateTime now = DateTime.now();
+        eventMap.put(now, event);
+
+        Seconds delta = Seconds.secondsBetween(eventMap.firstKey(), now);
+        if(delta.isGreaterThan(Seconds.seconds(60))){
+            rateMap.pollFirstEntry();
+        }
     }
 
-    public ArrayList<RTAEvent> getEvents(String timeStamp){
-        ArrayList<RTAEvent> l = new ArrayList<>();
-        if (timeStamp != null) {
-            try {
-                eventMap.tailMap(DateTime.parse(timeStamp), false).forEach((k, v) -> l.add(v));
-//                rateMap.descendingMap().headMap(DateTime.parse(timeStamp)).forEach((k, v) -> l.add(new DataRate(k,v)));
-                return l;
-            } catch (IllegalArgumentException ignored) {
-
-            }
+    public RTAEvent getLatestEvent(){
+        if (!eventMap.isEmpty()) {
+            return eventMap.lastEntry().getValue();
         }
-        eventMap.forEach((k, v) -> l.add(v));
-        return l;
+        return null;
     }
 
     public NavigableMap<DateTime, Double> getDataRates(String timeStamp){
@@ -175,7 +176,7 @@ public class RTAWebService implements Service {
 
     public void updateDataRate(DateTime timeStamp, Double dataRate){
         rateMap.put(timeStamp, dataRate);
-        Seconds delta = Seconds.secondsBetween(rateMap.lastKey(), timeStamp);
+        Seconds delta = Seconds.secondsBetween(rateMap.firstKey(), timeStamp);
         if(delta.isGreaterThan(Seconds.seconds(60))){
             rateMap.pollFirstEntry();
         }
@@ -183,25 +184,25 @@ public class RTAWebService implements Service {
 
 
 
-    private ArrayList<StatusContainer> getSystemStatus(String timeStamp){
-        ArrayList<StatusContainer> l = new ArrayList<>();
-        if (timeStamp != null) {
-            try {
-                systemStatusMap.tailMap(DateTime.parse(timeStamp), false).forEach((k, v) -> l.add(v));
-                return l;
-            } catch (IllegalArgumentException ignored) {
+    private NavigableMap<DateTime, StatusContainer> getSystemStatus(String timeStamp){
 
-            }
-        }
-        systemStatusMap.forEach((k, v) -> l.add(new StatusContainer()));
 
         DateTime now = DateTime.now();
         Seconds seconds = Seconds.secondsBetween(systemStatusMap.lastKey(), now);
-        if (seconds.isGreaterThan(Seconds.seconds(30))){
-            StatusContainer c = new StatusContainer();
-            systemStatusMap.put(now, c);
+        if (seconds.isGreaterThan(Seconds.seconds(5))){
+            systemStatusMap.put(now, new StatusContainer());
         }
-        return l;
+
+        if (systemStatusMap.size() > 200){
+            systemStatusMap.pollFirstEntry();
+        }
+
+        if (timeStamp != null) {
+            try {
+                return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
+            } catch (IllegalArgumentException ignored) { }
+        }
+        return systemStatusMap.descendingMap();
     }
 
     /**
