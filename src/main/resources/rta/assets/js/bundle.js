@@ -123,17 +123,20 @@ function init() {
 
 
     function MemoryChart() {
-        var chart;
-        $.getJSON('/status/all', function (statuslist) {
+        var chart = null;
+        var latestTimeStamp = null;
+        $.getJSON('/status', function (status_dict) {
 
-            rs = _.map(statuslist, 'usedMemory');
-            rs = ['memory'].concat(rs);
+            rs  = _.map(status_dict, 'usedMemory');
+            var currentRate = rs[rs.length - 1]
+            rs = ['usedMemory'].concat(rs);
 
-            ts = _.map(statuslist, 'timeStamp');
+            ts  = _.map(status_dict, 'timeStamp');
+            latestTimeStamp = ts[ts.length - 1];
             ts = ['t'].concat(ts);
 
-            console.log(rs);
-            console.log(ts);
+            //console.log(rs);
+            //console.log(ts);
             chart = c3.generate({
                 size: {
                     height: 240,
@@ -143,12 +146,12 @@ function init() {
                 data: {
                     x: 't',
                     xFormat: '%Y-%m-%dT%H:%M:%S.%L',
-                    y: 'memory',
+                    y: 'usedMemory',
                     columns:[
                         ts,
                         rs
                     ],
-                    type:'bar',
+                    type:'bar'
                 },
                 bar: {
                     width: {
@@ -165,22 +168,38 @@ function init() {
                 }
             });
         });
-        function load() {
-            $.getJSON('/status', function (status) {
-                if (status) {
-                    console.log(status);
-                    $('#space').html(status.freeSpace);
-                    $('#memory').html(status.usedMemory);
-                    $('#cpus').html(status.availableProcessors);
 
-                    chart.flow({
-                        columns: [
-                            ['t', status.timeStamp],
-                            ["memory", status.usedMemory]
-                        ]
-                    });
-                }
-            });
+        function load(){
+            if(chart) {
+                console.log("request  " +  '/status?timestamp='+latestTimeStamp)
+                $.getJSON('/status?timestamp='+latestTimeStamp, function (status_dict) {
+                    if (status_dict) {
+
+                        var latestStatus = status_dict[status_dict.length - 1]
+                        rs  = _.map(status_dict, 'usedMemory');
+                        rs = ['usedMemory'].concat(rs);
+
+                        ts  = _.map(status_dict, 'timeStamp');
+                        latestTimeStamp = ts[ts.length - 1];
+                        ts = ['t'].concat(ts);
+                        console.log(rs)
+                        console.log(ts)
+
+                        $('#space').html(latestStatus.freeSpace);
+                        $('#memory').html(latestStatus.usedMemory);
+                        $('#cpus').html(latestStatus.availableProcessors);
+
+                        chart.flow({
+                            columns: [
+                                ts,
+                                rs
+                            ]
+                        });
+                    }
+                });
+            } else{
+                console.log("Error. chart not loaded.")
+            }
         }
 
         MemoryChart.load = load;
@@ -196,11 +215,12 @@ function init() {
 
         $.getJSON('/datarate', function(rates){
 
-            rs  = _.map(rates, 'rate');
+            rs  = _.values(rates);
+            var currentRate = rs[rs.length - 1];
             rs = ['rate'].concat(rs);
 
-            ts  = _.map(rates, 'timeStamp');
-            latestTimeStamp = ts[0];
+            ts  = _.keys(rates)
+            latestTimeStamp = ts[ts.length - 1];
             ts = ['t'].concat(ts);
 
 
@@ -232,29 +252,26 @@ function init() {
             });
         });
 
+
         function load(){
             if(chart) {
-                console.log("request  " +  '/datarate?timestamp='+latestTimeStamp)
                 $.getJSON('/datarate?timestamp='+latestTimeStamp, function (rates) {
                     if (rates) {
-                        console.log(rates)
-                        rs  = _.map(rates, 'rate');
-                        var currentRate = rs[rs.length - 1]
+                        rs  = _.values(rates);
+                        var currentRate = rs[rs.length - 1];
                         rs = ['rate'].concat(rs);
 
-                        ts  = _.map(rates, 'timeStamp');
+                        ts  = _.keys(rates)
                         latestTimeStamp = ts[ts.length - 1];
                         ts = ['t'].concat(ts);
-                        console.log(ts)
+
                         $('#datarate').html(numeral(currentRate).format('0.0'));
-                        // console.log(rate);
+
                         chart.flow({
                             columns: [
                                 ts,
                                 rs
                             ]
-                            // to: '13:25:55',
-                            // duration: 1000,
                         });
                     }
                 });
@@ -273,14 +290,14 @@ function init() {
     window.setInterval(DataRateChart.load, 2*SECONDS);
 
 
-    loadSkyCamImage();
-    window.setInterval(loadSkyCamImage, 3*MINUTES);
-
-    loadEvent();
-    window.setInterval(loadEvent, 15*SECONDS);
-
-    MemoryChart();
-    window.setInterval(MemoryChart.load, 30*SECONDS);
+    //loadSkyCamImage();
+    //window.setInterval(loadSkyCamImage, 3*MINUTES);
+    //
+    //loadEvent();
+    //window.setInterval(loadEvent, 15*SECONDS);
+    //
+    //MemoryChart();
+    //window.setInterval(MemoryChart.load, 30*SECONDS);
 
 }
 },{"c3":2,"hexmap":12,"lodash/core":13,"numeral":14,"zeptojs":15}],2:[function(require,module,exports){

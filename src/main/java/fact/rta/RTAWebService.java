@@ -1,6 +1,5 @@
 package fact.rta;
 
-import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.TreeRangeMap;
 import static fact.rta.persistence.tables.Signal.*;
 
@@ -40,18 +39,14 @@ public class RTAWebService implements Service {
     private Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeAdapter()).create();
 
 
-    private StatusContainer currentStatus;
-
-
     private class StatusContainer{
         final long usedMemory;
         final long memoryLimit;
         final int availableProcessors;
         final long totalSpace;
         final long freeSpace;
-        final DateTime timeStamp;
 
-        public StatusContainer(){
+        private StatusContainer(){
             long usedMemory = runtime.totalMemory() - runtime.freeMemory();
             //convert to mega bytes
             usedMemory /= 1024L * 1024L;
@@ -77,7 +72,6 @@ public class RTAWebService implements Service {
             this.memoryLimit = memoryLimit;
             this.totalSpace = totalSpace;
             this.usedMemory = usedMemory;
-            this.timeStamp = DateTime.now();
         }
     }
 
@@ -110,9 +104,9 @@ public class RTAWebService implements Service {
         }
     }
 
-    private EvictingQueue<RTAEvent> eventQueue = EvictingQueue.create(250);
+    private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
-    private EvictingQueue<StatusContainer> systemStatusQueue = EvictingQueue.create(100);
+    private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
 
     private TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve;
 
@@ -134,9 +128,9 @@ public class RTAWebService implements Service {
 
         Spark.get("/datarate", "application/json", (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
-//        Spark.get("/event", (request, response) -> currentEvent, gson::toJson);
+        Spark.get("/event", "application/json",  (request, response) -> getEvents(request.queryParams("timestamp")), gson::toJson);
 //
-//        Spark.get("/status", (request, response) -> getSystemStatus(), gson::toJson);
+        Spark.get("/status", "application/json", (request, response) -> getSystemStatus(request.queryParams("timestamp")), gson::toJson);
 
 
         String url = "jdbc:sqlite:rta.sqlite";
@@ -144,8 +138,7 @@ public class RTAWebService implements Service {
         create = DSL.using(conn, SQLDialect.SQLITE);
 
         StatusContainer c = new StatusContainer();
-        systemStatusQueue.add(c);
-        currentStatus = c;
+        systemStatusMap.put(DateTime.now(), c);
     }
 
 
@@ -153,23 +146,31 @@ public class RTAWebService implements Service {
 
     public void updateEvent(double[] photoncharges,double  estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
         RTAEvent event = new RTAEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
-        eventQueue.add(event);
+        eventMap.put(DateTime.now(), event);
     }
 
-
-    public ArrayList<DataRate> getDataRates(String timeStamp){
-        ArrayList<DataRate> l = new ArrayList<>();
+    public ArrayList<RTAEvent> getEvents(String timeStamp){
+        ArrayList<RTAEvent> l = new ArrayList<>();
         if (timeStamp != null) {
             try {
-                rateMap.tailMap(DateTime.parse(timeStamp), false).forEach((k, v) -> l.add(new DataRate(k,v)));
+                eventMap.tailMap(DateTime.parse(timeStamp), false).forEach((k, v) -> l.add(v));
 //                rateMap.descendingMap().headMap(DateTime.parse(timeStamp)).forEach((k, v) -> l.add(new DataRate(k,v)));
                 return l;
             } catch (IllegalArgumentException ignored) {
 
             }
         }
-        rateMap.forEach((k, v) -> l.add(new DataRate(k, v)));
+        eventMap.forEach((k, v) -> l.add(v));
         return l;
+    }
+
+    public NavigableMap<DateTime, Double> getDataRates(String timeStamp){
+        if (timeStamp != null) {
+            try {
+                return rateMap.tailMap(DateTime.parse(timeStamp), false);
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return rateMap.descendingMap();
     }
 
     public void updateDataRate(DateTime timeStamp, Double dataRate){
@@ -178,6 +179,29 @@ public class RTAWebService implements Service {
         if(delta.isGreaterThan(Seconds.seconds(60))){
             rateMap.pollFirstEntry();
         }
+    }
+
+
+
+    private ArrayList<StatusContainer> getSystemStatus(String timeStamp){
+        ArrayList<StatusContainer> l = new ArrayList<>();
+        if (timeStamp != null) {
+            try {
+                systemStatusMap.tailMap(DateTime.parse(timeStamp), false).forEach((k, v) -> l.add(v));
+                return l;
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        }
+        systemStatusMap.forEach((k, v) -> l.add(new StatusContainer()));
+
+        DateTime now = DateTime.now();
+        Seconds seconds = Seconds.secondsBetween(systemStatusMap.lastKey(), now);
+        if (seconds.isGreaterThan(Seconds.seconds(30))){
+            StatusContainer c = new StatusContainer();
+            systemStatusMap.put(now, c);
+        }
+        return l;
     }
 
     /**
@@ -193,21 +217,6 @@ public class RTAWebService implements Service {
         }
         return "";
     }
-
-
-    private StatusContainer getSystemStatus(){
-        DateTime now = DateTime.now();
-        Seconds seconds = Seconds.secondsBetween(currentStatus.timeStamp, now);
-        System.out.println(seconds.getSeconds());
-        if (seconds.isGreaterThan(Seconds.seconds(4))){
-            StatusContainer c = new StatusContainer();
-            currentStatus = c;
-            systemStatusQueue.add(c);
-            System.out.println("updated status");
-        }
-        return currentStatus;
-    }
-
 
 
 
