@@ -3,6 +3,7 @@ package fact.hexmap.ui.colormapping;
 import java.awt.*;
 
 /**
+ * Colormap minimal value: black, maximal value white
  * Created by lena on 30.06.15.
  */
 public class HotColorMap implements ColorMapping {
@@ -19,7 +20,6 @@ public class HotColorMap implements ColorMapping {
         else if(minValue == 0 && maxValue == 0){
             return Color.BLUE;
         }
-
         else {
 
             double l1 = (maxValue - minValue) / 3.;
@@ -45,6 +45,7 @@ public class HotColorMap implements ColorMapping {
                 return new Color(255, 255, 255);
             }
         }
+
     }
 }
 
