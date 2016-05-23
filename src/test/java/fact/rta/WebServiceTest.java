@@ -15,7 +15,7 @@ public class WebServiceTest {
     public void startServer() throws SQLException, InterruptedException {
         RTAWebService s = new RTAWebService();
         for (int i = 0; i < 3600; i++) {
-            Thread.sleep(500);
+            Thread.sleep(1100);
             Random random = new Random();
 
             double[] photons = random.doubles(1440).toArray();

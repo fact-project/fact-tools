@@ -132,7 +132,7 @@ public class RTAWebService implements Service {
 
 //        Spark.get("/lightcurve", (request, response) -> lc());
 
-        Spark.get("/datarate", (request, response) -> getDataRates(request.queryParams("timeStamp")), gson::toJson);
+        Spark.get("/datarate", "application/json", (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
 //        Spark.get("/event", (request, response) -> currentEvent, gson::toJson);
 //
@@ -161,13 +161,14 @@ public class RTAWebService implements Service {
         ArrayList<DataRate> l = new ArrayList<>();
         if (timeStamp != null) {
             try {
-                rateMap.descendingMap().headMap(DateTime.parse(timeStamp)).forEach((k, v) -> l.add(new DataRate(k,v)));
+                rateMap.tailMap(DateTime.parse(timeStamp), false).forEach((k, v) -> l.add(new DataRate(k,v)));
+//                rateMap.descendingMap().headMap(DateTime.parse(timeStamp)).forEach((k, v) -> l.add(new DataRate(k,v)));
                 return l;
-            } catch (IllegalArgumentException e) {
-                return l;
+            } catch (IllegalArgumentException ignored) {
+
             }
         }
-        rateMap.descendingMap().forEach((k, v) -> l.add(new DataRate(k, v)));
+        rateMap.forEach((k, v) -> l.add(new DataRate(k, v)));
         return l;
     }
 
@@ -243,7 +244,7 @@ public class RTAWebService implements Service {
                 jsonWriter.nullValue();
             }
             else{
-                jsonWriter.value(dateTime.toString("y-M-d'T'H:mm:s.SZ"));
+                jsonWriter.value(dateTime.toString("y-M-d'T'H:mm:s.SSS"));
             }
         }
 

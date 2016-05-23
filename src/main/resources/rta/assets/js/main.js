@@ -141,7 +141,7 @@ function init() {
                 bindto: '#memory_chart',
                 data: {
                     x: 't',
-                    xFormat: '%Y-%m-%dT%H:%M:%S.%L%Z',
+                    xFormat: '%Y-%m-%dT%H:%M:%S.%L',
                     y: 'memory',
                     columns:[
                         ts,
@@ -213,7 +213,7 @@ function init() {
                 bindto: '#datarate_chart',
                 data: {
                     x: 't',
-                    xFormat: '%Y-%m-%dT%H:%M:%S.%L%Z',
+                    xFormat: '%Y-%m-%dT%H:%M:%S.%L',
                     y: 'rate',
                     columns:[
                         ts,
@@ -236,14 +236,15 @@ function init() {
                 console.log("request  " +  '/datarate?timestamp='+latestTimeStamp)
                 $.getJSON('/datarate?timestamp='+latestTimeStamp, function (rates) {
                     if (rates) {
+                        console.log(rates)
                         rs  = _.map(rates, 'rate');
-                        var currentRate = rs[0]
+                        var currentRate = rs[rs.length - 1]
                         rs = ['rate'].concat(rs);
 
                         ts  = _.map(rates, 'timeStamp');
-                        latestTimeStamp = ts[0];
+                        latestTimeStamp = ts[ts.length - 1];
                         ts = ['t'].concat(ts);
-
+                        console.log(ts)
                         $('#datarate').html(numeral(currentRate).format('0.0'));
                         // console.log(rate);
                         chart.flow({
