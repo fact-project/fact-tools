@@ -251,7 +251,7 @@ public class JSONWriter implements StatefulProcessor {
         this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
-    public class DateTimeAdapter extends TypeAdapter<DateTime>{
+    public static class DateTimeAdapter extends TypeAdapter<DateTime>{
 
         @Override
         public void write(JsonWriter jsonWriter, DateTime dateTime) throws IOException {

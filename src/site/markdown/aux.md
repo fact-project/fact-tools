@@ -21,14 +21,14 @@ If you want to use the service inside of your processor you simply add the servi
         @Parameter(required = false, description = "Name of the service that provides aux files")
         private AuxiliaryService auxService;
 
-To get a data point from the service you need to specify a timestamp or take the one from the data event you're currently
+To get a data point from the service you need to specify a eventTimeStamp or take the one from the data event you're currently
 analysing.
 
         AuxPointStrategy earlier = new Earlier();
         AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
 Since sensor data can be written at different time intervals and frequencies we need to specify some strategy
-for fetching the data. E.g. get the nearest point written before the given timestamp. For details about strategies which are already
+for fetching the data. E.g. get the nearest point written before the given eventTimeStamp. For details about strategies which are already
 implemented check the [JavaDocs](apidocs/index.html).
 
 To get specific data from an AuxPoint you need to know the name of the key your data has in the original auxiliary file.

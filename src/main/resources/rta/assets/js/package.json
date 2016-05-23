@@ -4,7 +4,11 @@
   "description": "Use d3 to diaply the camera of the FACT telescope",
   "main": "assets/js/main.js",
   "dependencies": {
-    "hexmap" : "https://github.com/mackaiver/hexmap"
+    "zeptojs":"^1.1.4",
+    "numeral":"^1.5.3",
+    "c3":"^0.4.11",
+    "hexmap" : "https://github.com/mackaiver/hexmap",
+    "lodash" : "4.12.0"
   },
   "devDependencies": {},
   "scripts": {

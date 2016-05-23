@@ -2,7 +2,9 @@ package fact;
 
 import com.google.common.base.Stopwatch;
 
+import fact.rta.RTAWebService;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 /**
  * DataRate counts number of items processed per second. Additionally it can log memory (free,
@@ -43,6 +46,11 @@ public class DataRate implements StatefulProcessor {
     @Parameter(required = false, description = "The key under which you'll find the datarate " +
             "in the item after calculating it.", defaultValue = "@datarate")
     String output = "@datarate";
+
+
+    @Service(required = false, description = "If a RTAwebservice is provided this will update the " +
+            "datarate for the webservice to display")
+    RTAWebService webService;
 
     SummaryStatistics statistics = new SummaryStatistics();
     private Stopwatch stopwatch;
@@ -83,6 +91,10 @@ public class DataRate implements StatefulProcessor {
             }
             input.put("@thread", Thread.currentThread().getName());
             input.put(output, dataRatePerSecond);
+
+            if(webService != null){
+                webService.updateDataRate(DateTime.now(), dataRatePerSecond);
+            }
 
             stopwatch.reset();
             stopwatch.start();

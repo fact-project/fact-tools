@@ -7,6 +7,9 @@
 //
 const $ = require('zeptojs');
 const Hexmap = require('hexmap');
+const numeral = require('numeral');
+const c3 = require('c3');
+const _ = require('lodash/core')
 
 
 //(function($) {
@@ -53,76 +56,228 @@ FACT RTA stuff
  */
 
 SECONDS = 1000;
-
+MINUTES = 60*SECONDS;
 
 
 $(document).ready(init);
 
 
-function init() {
-    console.log("blabla")
+function generateChart(){
+    var chart = c3.generate({
+        data: {
+            x: 'x',
+            columns: [
+                ['x', '2012-12-29', '2012-12-30', '2012-12-31'],
+                ['data1', 230, 300, 330],
+                ['data2', 190, 230, 200],
+                ['data3', 90, 130, 180],
+            ]
+        },
+        axis: {
+            x: {
+                type: 'timeseries',
+                tick: {
+                    format: '%M/%s',
+                }
+            }
+        }
+    });
+}
 
+function init() {
     //initialize the hex display
     var parentID = 'fact_map';
     var size = 450;
     var radius = 5;
     this.camera = new Hexmap(parentID, size, radius);
 
-    function loadHipsterContent() {
-        console.log("loading hipster")
-        $.getJSON('http://hipsterjesus.com/api/?paras=1&type=hipster-centric', function(data) {
-            $('#hipstercontent').html( data.text );
-        });
+    function loadSkyCamImage() {
+        console.log("loading allskycam iamge")
+        $("#allskycam").attr("width", "400");
+        $("#allskycam").attr("src", "./images/hex-loader2.gif")
+        setTimeout(function () {
+            console.log("loading allskycam iamg inner ")
+            d = new Date();
+            $("#allskycam").attr("width", " ");
+            $("#allskycam").attr("src", "http://www.gtc.iac.es/multimedia/netcam/camaraAllSky.jpg?" + d.getTime());
+        }, 4000);
     }
 
 
-    function loadEvent(){
+    function loadEvent() {
         console.log("loading Event")
 
-        $.getJSON('/event', function(event){
+        $.getJSON('/event', function (event) {
             if (event) {
                 console.log(event)
-                this.camera.update(event.image, duration = 1);
-                $('#source').html( event.sourceName );
-                $('#timestamp').html( event.timestamp );
+                this.camera.update(event.photonCharges, duration = 1);
+                $('#source_name').html(event.sourceName);
+                $('#eventTimeStamp').html(event.eventTimeStamp);
+                $('#size').html(numeral(event.size).format('0.00'));
+                $('#energy').html(numeral(event.estimatedEnergy).format('0.00'));
+                $('#theta_square').html(numeral(event.thetaSquare).format('0.000'));
             }
         });
     }
 
 
-    function loadStatus(){
-        console.log("loading Event")
+    function MemoryChart() {
+        var chart;
+        $.getJSON('/status/all', function (statuslist) {
 
-        $.getJSON('/status', function(status){
-            if (status) {
-                console.log(status)
-                $('#space').html( status.freeSpace );
-                $('#memory').html( status.usedMemory );
-                $('#cpus').html( status.availableProcessors);
-            }
+            rs = _.map(statuslist, 'usedMemory');
+            rs = ['memory'].concat(rs);
+
+            ts = _.map(statuslist, 'timeStamp');
+            ts = ['t'].concat(ts);
+
+            console.log(rs);
+            console.log(ts);
+            chart = c3.generate({
+                size: {
+                    height: 240,
+                    width: 480
+                },
+                bindto: '#memory_chart',
+                data: {
+                    x: 't',
+                    xFormat: '%Y-%m-%dT%H:%M:%S.%L%Z',
+                    y: 'memory',
+                    columns:[
+                        ts,
+                        rs
+                    ],
+                    type:'bar',
+                },
+                bar: {
+                    width: {
+                        ratio: 1 // this makes bar width 50% of length between ticks
+                    }
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            format: '%H:%M:%S'
+                        }
+                    }
+                }
+            });
         });
+        function load() {
+            $.getJSON('/status', function (status) {
+                if (status) {
+                    console.log(status);
+                    $('#space').html(status.freeSpace);
+                    $('#memory').html(status.usedMemory);
+                    $('#cpus').html(status.availableProcessors);
+
+                    chart.flow({
+                        columns: [
+                            ['t', status.timeStamp],
+                            ["memory", status.usedMemory]
+                        ]
+                    });
+                }
+            });
+        }
+
+        MemoryChart.load = load;
     }
 
 
-    function loadDataRate(){
-        console.log("loading rate")
 
-        $.getJSON('/rate', function(rate){
-            if (rate) {
-                console.log(rate)
-                $('#rate').html( rate );
-            }
+
+
+    function DataRateChart(){
+        var chart = null;
+        var latestTimeStamp = null;
+
+        $.getJSON('/datarate', function(rates){
+
+            rs  = _.map(rates, 'rate');
+            rs = ['rate'].concat(rs);
+
+            ts  = _.map(rates, 'timeStamp');
+            latestTimeStamp = ts[0];
+            ts = ['t'].concat(ts);
+
+
+            console.log(rs);
+            console.log(ts);
+            chart = c3.generate({
+                size: {
+                    height: 240,
+                    width: 480
+                },
+                bindto: '#datarate_chart',
+                data: {
+                    x: 't',
+                    xFormat: '%Y-%m-%dT%H:%M:%S.%L%Z',
+                    y: 'rate',
+                    columns:[
+                        ts,
+                        rs
+                    ]
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            format: '%H:%M:%S'
+                        }
+                    }
+                }
+            });
         });
+
+        function load(){
+            if(chart) {
+                console.log("request  " +  '/datarate?timestamp='+latestTimeStamp)
+                $.getJSON('/datarate?timestamp='+latestTimeStamp, function (rates) {
+                    if (rates) {
+                        rs  = _.map(rates, 'rate');
+                        var currentRate = rs[0]
+                        rs = ['rate'].concat(rs);
+
+                        ts  = _.map(rates, 'timeStamp');
+                        latestTimeStamp = ts[0];
+                        ts = ['t'].concat(ts);
+
+                        $('#datarate').html(numeral(currentRate).format('0.0'));
+                        // console.log(rate);
+                        chart.flow({
+                            columns: [
+                                ts,
+                                rs
+                            ]
+                            // to: '13:25:55',
+                            // duration: 1000,
+                        });
+                    }
+                });
+            } else{
+                console.log("Error. chart not loaded.")
+            }
+        }
+        DataRateChart.load = load;
     }
 
 
-    loadHipsterContent();
-    window.setInterval(loadHipsterContent, 60*SECONDS);
+
+
+
+    DataRateChart();
+    window.setInterval(DataRateChart.load, 2*SECONDS);
+
+
+    loadSkyCamImage();
+    window.setInterval(loadSkyCamImage, 3*MINUTES);
 
     loadEvent();
-    window.setInterval(loadEvent, 10*SECONDS);
+    window.setInterval(loadEvent, 15*SECONDS);
 
-    loadStatus();
-    window.setInterval(loadStatus, 30*SECONDS);
+    MemoryChart();
+    window.setInterval(MemoryChart.load, 30*SECONDS);
 
 }

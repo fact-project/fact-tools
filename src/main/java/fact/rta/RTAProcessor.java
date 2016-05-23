@@ -64,11 +64,11 @@ public class RTAProcessor implements Processor {
         }
 
 
-        public Timestamp getTimestampAsSQLTimeStamp() {
+        Timestamp getTimestampAsSQLTimeStamp() {
             return new Timestamp(timestamp.getMillis());
         }
 
-        public int getDurationInSeconds() {
+        int getDurationInSeconds() {
             return duration.toStandardSeconds().getSeconds();
         }
 
@@ -116,13 +116,7 @@ public class RTAProcessor implements Processor {
         int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
 
         DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
-                                        orElseThrow(() -> new IllegalArgumentException("No valid timestamp in event."));
-
-        if (data.containsKey("@datarate")){
-            webService.updateDatarate((double) data.get("@datarate"));
-//            System.out.println("updateing teh image");
-
-        }
+                                        orElseThrow(() -> new IllegalArgumentException("No valid eventTimeStamp in event."));
 
         if (!data.containsKey("signal:prediction")){
 //            log.warn("No signal in event. Ignoring.");
@@ -137,11 +131,11 @@ public class RTAProcessor implements Processor {
             double estimatedEnergy = Math.random();
             double size = (double) data.get("Size");
             String sourceName = (String) data.get("SourceName");
-            webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp.toString());
+            webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
         }
 
         //check if we have a new bin. If we start a new bin the excess rate is still zero
-        //TODO: think whether we should use the event timestamp here. maybe also watch the delay?
+        //TODO: think whether we should use the event eventTimeStamp here. maybe also watch the delay?
         DateTime time = DateTime.now();
         SignalContainer container = lightCurve.get(time);
         int signal = signal(data, predictionThreshold, thetaCut);
@@ -166,7 +160,7 @@ public class RTAProcessor implements Processor {
             lightCurve.remove(entry.getKey());
         }
 
-        data.put("@timestamp", eventTimeStamp.toString());
+        data.put("@eventTimeStamp", eventTimeStamp.toString());
         return data;
     }
 

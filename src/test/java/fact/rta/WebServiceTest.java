@@ -1,5 +1,6 @@
 package fact.rta;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -15,7 +16,16 @@ public class WebServiceTest {
         RTAWebService s = new RTAWebService();
         for (int i = 0; i < 3600; i++) {
             Thread.sleep(500);
-            s.updateDatarate(new Random().nextDouble()*10);
+            Random random = new Random();
+
+            double[] photons = random.doubles(1440).toArray();
+            double thetaSquare = random.nextDouble();
+            double size = random.nextDouble()*1000;
+            double energy = random.nextDouble()*2000;
+
+
+            s.updateEvent(photons, energy, size, thetaSquare, "Wow", DateTime.now());
+            s.updateDataRate(DateTime.now() , new Random().nextDouble()*10);
         }
 
     }

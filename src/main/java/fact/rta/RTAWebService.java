@@ -1,14 +1,17 @@
 package fact.rta;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.TreeRangeMap;
 import static fact.rta.persistence.tables.Signal.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import fact.rta.persistence.tables.records.SignalRecord;
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -19,41 +22,103 @@ import spark.template.handlebars.HandlebarsTemplateEngine;
 import stream.service.Service;
 
 import java.io.File;
-import java.io.Serializable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 
 /**
  * Created by kai on 24.01.16.
  */
 public class RTAWebService implements Service {
-    static Logger log = LoggerFactory.getLogger(RTAWebService.class);
+    private static Logger log = LoggerFactory.getLogger(RTAWebService.class);
 
-    double datarate = 0;
-    private Map event;
-
-    Runtime runtime = Runtime.getRuntime();
-    Gson gson = new GsonBuilder().create();
-
-    Cache<String, String> cache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.SECONDS)
-            .build();
+    private Runtime runtime = Runtime.getRuntime();
+    private Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeAdapter()).create();
 
 
+    private StatusContainer currentStatus;
 
-    TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve;
 
-    final Connection conn;
-    final DSLContext create;
+    private class StatusContainer{
+        final long usedMemory;
+        final long memoryLimit;
+        final int availableProcessors;
+        final long totalSpace;
+        final long freeSpace;
+        final DateTime timeStamp;
+
+        public StatusContainer(){
+            long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+            //convert to mega bytes
+            usedMemory /= 1024L * 1024L;
+
+            long memoryLimit = runtime.maxMemory();
+            memoryLimit /= 1024L * 1024L;
+
+            int availableProcessors = runtime.availableProcessors();
+
+            long totalSpace = 0;
+            long freeSpace = 0;
+            File[] roots = File.listRoots();
+            for (File root : roots) {
+                totalSpace += root.getTotalSpace();
+                freeSpace += root.getFreeSpace();
+            }
+            //to GB
+            totalSpace /= 1024L * 1024L * 1024L;
+            freeSpace  /= 1024L * 1024L * 1024L;
+
+            this.availableProcessors = availableProcessors;
+            this.freeSpace = freeSpace;
+            this.memoryLimit = memoryLimit;
+            this.totalSpace = totalSpace;
+            this.usedMemory = usedMemory;
+            this.timeStamp = DateTime.now();
+        }
+    }
+
+    private class DataRate{
+        final Double rate;
+        final DateTime timeStamp;
+
+        DataRate(DateTime timeStamp, Double rate) {
+            this.rate = rate;
+            this.timeStamp = timeStamp;
+        }
+    }
+
+    private class RTAEvent{
+        final double[] photonCharges;
+        final double estimatedEnergy;
+        final double size;
+        final double thetaSquare;
+        final String sourceName;
+        final DateTime eventTimeStamp;
+
+        RTAEvent(double[] photonCharges, double estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
+
+            this.photonCharges = photonCharges;
+            this.estimatedEnergy = estimatedEnergy;
+            this.size = size;
+            this.thetaSquare = thetaSquare;
+            this.sourceName = sourceName;
+            this.eventTimeStamp = eventTimeStamp;
+        }
+    }
+
+    private EvictingQueue<RTAEvent> eventQueue = EvictingQueue.create(250);
+    private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
+    private EvictingQueue<StatusContainer> systemStatusQueue = EvictingQueue.create(100);
+
+    private TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve;
+
+
+    private final Connection conn;
+    private final DSLContext create;
 
 
 
@@ -64,20 +129,59 @@ public class RTAWebService implements Service {
             attributes.put("title", "FACT RTA - Real Time Analysis");
             return new ModelAndView(attributes, "rta/index.html");
         }, new HandlebarsTemplateEngine());
-        Spark.get("/datarate", (request, response) -> datarate);
-        Spark.get("/lightcurve", (request, response) -> lc());
-        Spark.get("/event", (request, response) -> getEvent());
-        Spark.get("/status", (request, response) -> getStatus());
+
+//        Spark.get("/lightcurve", (request, response) -> lc());
+
+        Spark.get("/datarate", (request, response) -> getDataRates(request.queryParams("timeStamp")), gson::toJson);
+
+//        Spark.get("/event", (request, response) -> currentEvent, gson::toJson);
+//
+//        Spark.get("/status", (request, response) -> getSystemStatus(), gson::toJson);
 
 
         String url = "jdbc:sqlite:rta.sqlite";
         conn = DriverManager.getConnection(url, "", "");
         create = DSL.using(conn, SQLDialect.SQLITE);
+
+        StatusContainer c = new StatusContainer();
+        systemStatusQueue.add(c);
+        currentStatus = c;
+    }
+
+
+
+
+    public void updateEvent(double[] photoncharges,double  estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
+        RTAEvent event = new RTAEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
+        eventQueue.add(event);
+    }
+
+
+    public ArrayList<DataRate> getDataRates(String timeStamp){
+        ArrayList<DataRate> l = new ArrayList<>();
+        if (timeStamp != null) {
+            try {
+                rateMap.descendingMap().headMap(DateTime.parse(timeStamp)).forEach((k, v) -> l.add(new DataRate(k,v)));
+                return l;
+            } catch (IllegalArgumentException e) {
+                return l;
+            }
+        }
+        rateMap.descendingMap().forEach((k, v) -> l.add(new DataRate(k, v)));
+        return l;
+    }
+
+    public void updateDataRate(DateTime timeStamp, Double dataRate){
+        rateMap.put(timeStamp, dataRate);
+        Seconds delta = Seconds.secondsBetween(rateMap.lastKey(), timeStamp);
+        if(delta.isGreaterThan(Seconds.seconds(60))){
+            rateMap.pollFirstEntry();
+        }
     }
 
     /**
      * return the view of the lightcurve
-     * @return
+     * @return nothing yet
      */
     private String lc(){
 
@@ -90,74 +194,21 @@ public class RTAWebService implements Service {
     }
 
 
-    /**
-     * Collect system information and return information as json.
-     *
-     * @return a json string
-     */
-    private String getStatus(){
-        String status = "{}";
-        try {
-            status = cache.get("status", () -> {
-                long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-                //convert to mega bytes
-                usedMemory /= 1024L * 1024L;
-
-                long memoryLimit = runtime.maxMemory();
-                memoryLimit /= 1024L * 1024L;
-
-                int availableProcessors = runtime.availableProcessors();
-
-
-                long totalSpace = 0;
-                long freeSpace = 0;
-                File[] roots = File.listRoots();
-                for (File root : roots) {
-                    totalSpace += root.getTotalSpace();
-                    freeSpace += root.getFreeSpace();
-                }
-                //to GB
-                totalSpace /= 1024L * 1024L * 1024L;
-                freeSpace  /= 1024L * 1024L * 1024L;
-
-                Map m = new HashMap<String, Number>();
-                m.put("usedMemory", usedMemory);
-                m.put("memoryLimit", memoryLimit);
-                m.put("availableProcessors", availableProcessors);
-                m.put("totalSpace", totalSpace);
-                m.put("freeSpace", freeSpace);
-
-                return gson.toJson(m);
-            });
-        } catch (ExecutionException e) {
-            log.error("Cannot load system status to cache.");
+    private StatusContainer getSystemStatus(){
+        DateTime now = DateTime.now();
+        Seconds seconds = Seconds.secondsBetween(currentStatus.timeStamp, now);
+        System.out.println(seconds.getSeconds());
+        if (seconds.isGreaterThan(Seconds.seconds(4))){
+            StatusContainer c = new StatusContainer();
+            currentStatus = c;
+            systemStatusQueue.add(c);
+            System.out.println("updated status");
         }
-        return status;
-    }
-
-    /**
-     * The last event which was "interesting". A collection of photoncharges.
-     * @return json array conatineing the photoncharges.
-     */
-    private String getEvent(){
-        return gson.toJson(event);
+        return currentStatus;
     }
 
 
-    public void updateEvent(double[] photonCharges, double estimatedEnergy, double size, double thetaSquare, String sourceName, String timestamp) {
-        Map m = new HashMap<String, Serializable>();
-        m.put("image", photonCharges);
-        m.put("energy", estimatedEnergy);
-        m.put("Size", size);
-        m.put("thetasquare", thetaSquare);
-        m.put("timestamp", timestamp);
-        m.put("sourceName", sourceName);
-        event = m;
-    }
 
-    public void updateDatarate(double rate){
-        datarate = rate;
-    }
 
     @Override
     public void reset() throws Exception {
@@ -182,6 +233,24 @@ public class RTAWebService implements Service {
         lightCurve.asDescendingMapOfRanges().forEach((c, b) ->
                 step.values(b.getTimestampAsSQLTimeStamp(), b.signalEvents, b.backgroundEvents, triggerRate, relativeOnTime ,b.getDurationInSeconds()));
 
+    }
+
+    public static class DateTimeAdapter extends TypeAdapter<DateTime> {
+
+        @Override
+        public void write(JsonWriter jsonWriter, DateTime dateTime) throws IOException {
+            if (dateTime == null){
+                jsonWriter.nullValue();
+            }
+            else{
+                jsonWriter.value(dateTime.toString("y-M-d'T'H:mm:s.SZ"));
+            }
+        }
+
+        @Override
+        public DateTime read(JsonReader jsonReader) throws IOException {
+            return DateTime.parse(jsonReader.toString());
+        }
     }
 
 
