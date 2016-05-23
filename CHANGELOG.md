@@ -8,6 +8,7 @@
   * `fact.features.muon.HoughTransform` now uses a `PixelSet` for the `BestRingPixels`
   * Default outputkeys of `fact.features.muon.GaussianFit` and `fact.features.muon.CircularFit` now use CamelCase instead of snake_case.
 
+* Improved error handling in source position calculation and AuxServices. The process now properly stops in case an IO related error occurs.
 
 ## Version 0.14.1 -- 10.05.2016
 * Bug fix for the calculation of the source position in Monte Carlos:
