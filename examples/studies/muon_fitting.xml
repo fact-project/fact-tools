@@ -32,13 +32,13 @@
 
         <fact.features.muon.CircularFit />
         <fact.features.muon.GaussianFit 
-          startXKey="circfit_x"
-          startYKey="circfit_y"
-          startRKey="circfit_r"
+          startXKey="circFitX"
+          startYKey="circFitY"
+          startRKey="circFitR"
           />
 
         <fact.io.JSONWriter
-          keys="*_r,*_x,*_y,*_sigma"
+          keys="*R,*X,*Y,*Sigma"
           url="file:test.json"
           specialDoubleValuesAsString="true"
           doubleSignDigits="6"
