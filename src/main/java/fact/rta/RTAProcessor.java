@@ -33,46 +33,27 @@ public class RTAProcessor implements Processor {
     int binning = 1;
 
     @Parameter(required = false , description = "Keep bins that are *history* minutes old and delete older ones")
-    int history = 20;
+    int history = 180;
 
     @Parameter(required = false , description = "Number of off regions that are used to measure background")
     int offRegions = 5;
 
     double thetaCut = 0.1;
     double predictionThreshold = 0.7;
+    private Range<DateTime> edgesOfCurrentBin;
+    private SignalContainer container = new SignalContainer(0, 0, offRegions);
 
-    private TreeRangeMap<DateTime, SignalContainer> lightCurve = TreeRangeMap.create();
-
-    Range<DateTime> edgesOfCurrentBin;
-
-    class SignalContainer{
+    public class SignalContainer{
         public Integer signalEvents = 0;
         public Integer backgroundEvents = 0;
 
-
-        public final DateTime timestamp;
-        public final Duration duration;
         public final int numberOfOffRegions;
 
-        SignalContainer(Integer signalEvents, Integer backgroundEvents, DateTime timestamp, Duration duration, int numberOfOffRegions) {
+        public SignalContainer(Integer signalEvents, Integer backgroundEvents, int numberOfOffRegions) {
             this.signalEvents = signalEvents;
             this.backgroundEvents = backgroundEvents;
-            this.timestamp = timestamp;
-
-            this.duration = duration;
             this.numberOfOffRegions = numberOfOffRegions;
         }
-
-
-        Timestamp getTimestampAsSQLTimeStamp() {
-            return new Timestamp(timestamp.getMillis());
-        }
-
-        int getDurationInSeconds() {
-            return duration.toStandardSeconds().getSeconds();
-        }
-
-
     }
 
     /**
@@ -91,14 +72,16 @@ public class RTAProcessor implements Processor {
     }
 
     private int background(Data data, double thetaCut){
+        int backGroundEvents = 0;
+
         Keys offKeys = new Keys("Theta_Off_?");
         for (String key : offKeys.select(data)) {
             double offValue = (double) data.get(key);
             if (offValue > thetaCut){
-                return 1;
+                backGroundEvents += 1;
             }
         }
-        return 0;
+        return backGroundEvents;
     }
 
     private int signal(Data data, double predictionThreshold, double thetaCut){
@@ -118,10 +101,41 @@ public class RTAProcessor implements Processor {
         DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
                                         orElseThrow(() -> new IllegalArgumentException("No valid eventTimeStamp in event."));
 
+        data.put("@eventTimeStamp", eventTimeStamp.toString());
+
+        String sourceName = (String) data.get("SourceName");
+
         if (!data.containsKey("signal:prediction")){
 //            log.warn("No signal in event. Ignoring.");
             return data;
         }
+
+
+        int signal = signal(data, predictionThreshold, thetaCut);
+        if (signal == 0){
+            return data;
+        }
+        updateWebService(data, eventTimeStamp);
+        int background = background(data, thetaCut);
+
+        //check if we have need a new bin.
+        if (edgesOfCurrentBin.contains(eventTimeStamp)){
+            container.signalEvents += signal;
+            container.backgroundEvents += background;
+        } else {
+            Range<DateTime> dateTimeRange = Range.closedOpen(eventTimeStamp, eventTimeStamp.plusMinutes(binning));
+            SignalContainer signalContainer = new SignalContainer(signal, background, offRegions);
+
+            webService.updateLightCurve(dateTimeRange, container, sourceName);
+
+            container = signalContainer;
+            edgesOfCurrentBin = dateTimeRange;
+        }
+
+        return data;
+    }
+
+    private void updateWebService(Data data, DateTime eventTimeStamp) {
         double prediction = (double) data.get("signal:prediction");
         if (prediction > 0.5){
             System.out.println("updateing event");
@@ -133,35 +147,6 @@ public class RTAProcessor implements Processor {
             String sourceName = (String) data.get("SourceName");
             webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
         }
-
-        //check if we have a new bin. If we start a new bin the excess rate is still zero
-        //TODO: think whether we should use the event eventTimeStamp here. maybe also watch the delay?
-        DateTime time = DateTime.now();
-        SignalContainer container = lightCurve.get(time);
-        int signal = signal(data, predictionThreshold, thetaCut);
-        int background = background(data, thetaCut);
-        if (container != null){
-            container.signalEvents += signal;
-            container.backgroundEvents += background;
-            lightCurve.put(edgesOfCurrentBin, container);
-        } else {
-            edgesOfCurrentBin = Range.closedOpen(time, time.plusSeconds(binning));
-            SignalContainer c = new SignalContainer(signal, background, eventTimeStamp, Duration.standardMinutes(binning), offRegions);
-            lightCurve.put(edgesOfCurrentBin, c);
-
-            webService.updateLightCurve(lightCurve);
-        }
-
-
-
-        // remove old bins so we don't accumulate too many old results in memory
-        Map.Entry<Range<DateTime>, SignalContainer> entry = lightCurve.getEntry(time.minusMinutes(binning + history));
-        if (entry != null){
-            lightCurve.remove(entry.getKey());
-        }
-
-        data.put("@eventTimeStamp", eventTimeStamp.toString());
-        return data;
     }
 
 

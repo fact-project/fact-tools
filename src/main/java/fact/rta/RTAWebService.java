@@ -1,31 +1,29 @@
 package fact.rta;
 
+import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
-import static fact.rta.persistence.tables.Signal.*;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import fact.rta.persistence.tables.records.SignalRecord;
 import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import org.joda.time.Seconds;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.Spark;
 import spark.template.handlebars.HandlebarsTemplateEngine;
+import stream.annotations.Parameter;
+import stream.io.SourceURL;
 import stream.service.Service;
 
-import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 
 
@@ -33,62 +31,22 @@ import java.util.*;
  * Created by kai on 24.01.16.
  */
 public class RTAWebService implements Service {
-    private static Logger log = LoggerFactory.getLogger(RTAWebService.class);
-
-    private Runtime runtime = Runtime.getRuntime();
-    private Gson gson = new GsonBuilder()
-            .enableComplexMapKeySerialization()
-            .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
-            .create();
 
 
-    private class StatusContainer{
-        final long usedMemory;
-        final long memoryLimit;
-        final int availableProcessors;
-        final long totalSpace;
-        final long freeSpace;
+    @Parameter(required = true, description = "Path to the .sqlite file")
+    SourceURL sqlitePath;
 
-        private StatusContainer(){
-            long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-            //convert to mega bytes
-            usedMemory /= 1024L * 1024L;
 
-            long memoryLimit = runtime.maxMemory();
-            memoryLimit /= 1024L * 1024L;
 
-            int availableProcessors = runtime.availableProcessors();
+    private final DBI dbi;
 
-            long totalSpace = 0;
-            long freeSpace = 0;
-            File[] roots = File.listRoots();
-            for (File root : roots) {
-                totalSpace += root.getTotalSpace();
-                freeSpace += root.getFreeSpace();
-            }
-            //to GB
-            totalSpace /= 1024L * 1024L * 1024L;
-            freeSpace  /= 1024L * 1024L * 1024L;
+    final private static Logger log = LoggerFactory.getLogger(RTAWebService.class);
 
-            this.availableProcessors = availableProcessors;
-            this.freeSpace = freeSpace;
-            this.memoryLimit = memoryLimit;
-            this.totalSpace = totalSpace;
-            this.usedMemory = usedMemory;
-        }
-    }
 
-    private class DataRate{
-        final Double rate;
-        final DateTime timeStamp;
+    final private Gson gson;
 
-        DataRate(DateTime timeStamp, Double rate) {
-            this.rate = rate;
-            this.timeStamp = timeStamp;
-        }
-    }
 
-    private class RTAEvent{
+    final private class RTAEvent{
         final double[] photonCharges;
         final double estimatedEnergy;
         final double size;
@@ -107,19 +65,29 @@ public class RTAWebService implements Service {
         }
     }
 
+
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
+    private TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve = TreeRangeMap.create();
 
-    private TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve;
+    public RTAWebService(String path) throws SQLException {
+        Type type = new TypeToken<Range<DateTime>>() {}.getType();
+
+        gson = new GsonBuilder()
+                .enableComplexMapKeySerialization()
+                .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
+                .registerTypeAdapter(type, new DateRangeAdapter())
+                .registerTypeAdapter(RTAProcessor.SignalContainer.class, new SignalContainerAdapter())
+                .create();
+        //fuck this
+        if (sqlitePath != null) {
+            dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
+        } else {
+            dbi = new DBI("jdbc:sqlite:" + path);
+        }
 
 
-    private final Connection conn;
-    private final DSLContext create;
-
-
-
-    public RTAWebService() throws SQLException {
         Spark.staticFileLocation("/rta");
         Spark.get("/", (request, response) -> {
             Map<String, Object> attributes = new HashMap<>();
@@ -127,24 +95,31 @@ public class RTAWebService implements Service {
             return new ModelAndView(attributes, "rta/index.html");
         }, new HandlebarsTemplateEngine());
 
-//        Spark.get("/lightcurve", (request, response) -> lc());
+        Spark.get("/lightcurve", (request, response) -> getLightCurve());
 
         Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
         Spark.get("/event", (request, response) -> getLatestEvent(), gson::toJson);
-//
+
         Spark.get("/status",  (request, response) -> getSystemStatus(request.queryParams("timestamp")), gson::toJson);
 
 
-        String url = "jdbc:sqlite:rta.sqlite";
-        conn = DriverManager.getConnection(url, "", "");
-        create = DSL.using(conn, SQLDialect.SQLITE);
+        //update systemstatus once per minute
+        int MINUTE = 1000*60;
 
-        StatusContainer c = new StatusContainer();
-        systemStatusMap.put(DateTime.now(), c);
+        Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                systemStatusMap.put(DateTime.now(), StatusContainer.create());
+                Minutes deltaT = Minutes.minutesBetween(systemStatusMap.firstKey(), systemStatusMap.lastKey());
+                if(deltaT.isGreaterThan(Minutes.minutes(30))){
+                    systemStatusMap.pollFirstEntry();
+                }
+            }
+        }, 0, 10000);
+
     }
-
-
 
 
     public void updateEvent(double[] photoncharges,double  estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
@@ -152,8 +127,8 @@ public class RTAWebService implements Service {
         DateTime now = DateTime.now();
         eventMap.put(now, event);
 
-        Seconds delta = Seconds.secondsBetween(eventMap.firstKey(), now);
-        if(delta.isGreaterThan(Seconds.seconds(60))){
+        Seconds delta = Seconds.secondsBetween(eventMap.firstKey(), eventMap.lastKey());
+        if(delta.isGreaterThan(Seconds.seconds(180))){
             rateMap.pollFirstEntry();
         }
     }
@@ -166,6 +141,9 @@ public class RTAWebService implements Service {
     }
 
     public NavigableMap<DateTime, Double> getDataRates(String timeStamp){
+        if (rateMap.isEmpty()){
+            return null;
+        }
         if (timeStamp != null) {
             try {
                 return rateMap.tailMap(DateTime.parse(timeStamp), false);
@@ -177,7 +155,7 @@ public class RTAWebService implements Service {
     public void updateDataRate(DateTime timeStamp, Double dataRate){
         rateMap.put(timeStamp, dataRate);
         Seconds delta = Seconds.secondsBetween(rateMap.firstKey(), timeStamp);
-        if(delta.isGreaterThan(Seconds.seconds(60))){
+        if(delta.isGreaterThan(Seconds.seconds(180))){
             rateMap.pollFirstEntry();
         }
     }
@@ -185,18 +163,9 @@ public class RTAWebService implements Service {
 
 
     private NavigableMap<DateTime, StatusContainer> getSystemStatus(String timeStamp){
-
-
-        DateTime now = DateTime.now();
-        Seconds seconds = Seconds.secondsBetween(systemStatusMap.lastKey(), now);
-        if (seconds.isGreaterThan(Seconds.seconds(5))){
-            systemStatusMap.put(now, new StatusContainer());
+        if(systemStatusMap.isEmpty()){
+            return null;
         }
-
-        if (systemStatusMap.size() > 200){
-            systemStatusMap.pollFirstEntry();
-        }
-
         if (timeStamp != null) {
             try {
                 return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
@@ -205,21 +174,12 @@ public class RTAWebService implements Service {
         return systemStatusMap.descendingMap();
     }
 
-    /**
-     * return the view of the lightcurve
-     * @return nothing yet
-     */
-    private String lc(){
-
-        if (lightCurve != null){
-            StringJoiner sj = new StringJoiner("-");
-            lightCurve.asMapOfRanges().forEach((b, c) -> sj.add(c.signalEvents.toString()));
-            return sj.toString();
+    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve() {
+        if(lightCurve.asMapOfRanges().isEmpty()){
+            return null;
         }
-        return "";
+        return lightCurve.asDescendingMapOfRanges();
     }
-
-
 
     @Override
     public void reset() throws Exception {
@@ -227,23 +187,26 @@ public class RTAWebService implements Service {
     }
 
 
-    public void updateLightCurve(TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve) {
-        this.lightCurve = lightCurve;
-        persist(lightCurve);
+    public void updateLightCurve(Range<DateTime> edgesOfCurrentBin, RTAProcessor.SignalContainer signalContainer, String source) {
+        lightCurve.put(edgesOfCurrentBin, signalContainer);
+        // remove old bins so we don't accumulate too many old results in memory
 
+        Map.Entry<Range<DateTime>, RTAProcessor.SignalContainer> entry = lightCurve.getEntry(edgesOfCurrentBin.lowerEndpoint().minusHours(12));
+        if (entry != null){
+            lightCurve.remove(entry.getKey());
+        }
+        persist(lightCurve, source);
     }
 
-    private void persist(TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve) {
+    private void persist(TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve, String source) {
+        //its probably enough to just insert the lates entry here. I think. Anyways lets try and insert all of them.
+        RTASignalTable t = dbi.open(RTASignalTable.class);
+        lightCurve.asDescendingMapOfRanges().forEach((dateTimeRange, signalContainer) -> {
 
-        Float triggerRate = 80.0F;
-        Float relativeOnTime = 0.96F;
-
-        InsertValuesStep6<SignalRecord, Timestamp, Integer, Integer, Float, Float, Integer> step =
-                create.insertInto(SIGNAL, SIGNAL.TIMESTAMP, SIGNAL.SIGNAL_, SIGNAL.BACKGROUND, SIGNAL.TRIGGER_RATE, SIGNAL.RELATIVE_ON_TIME, SIGNAL.DURATION_IN_SECONDS);
-
-        lightCurve.asDescendingMapOfRanges().forEach((c, b) ->
-                step.values(b.getTimestampAsSQLTimeStamp(), b.signalEvents, b.backgroundEvents, triggerRate, relativeOnTime ,b.getDurationInSeconds()));
-
+            DateTime start = dateTimeRange.lowerEndpoint();
+            DateTime end = dateTimeRange.upperEndpoint();
+            t.insertOrIgnore(start.toString(), end.toString(), source, signalContainer.signalEvents, signalContainer.backgroundEvents);
+        });
     }
 
     public static class DateTimeAdapter extends TypeAdapter<DateTime> {
@@ -263,6 +226,44 @@ public class RTAWebService implements Service {
             return DateTime.parse(jsonReader.toString());
         }
     }
+    public static class DateRangeAdapter extends TypeAdapter<Range<DateTime>> {
 
+        @Override
+        public void write(JsonWriter jsonWriter, Range<DateTime> range) throws IOException {
+            if (range == null){
+                jsonWriter.nullValue();
+            }
+            else{
+                jsonWriter.value("from:"+range.lowerEndpoint().toString("y-M-d'T'H:mm:s.SSS") + ",to:" + range.upperEndpoint().toString("y-M-d'T'H:mm:s.SSS"));
+            }
+        }
 
+        @Override
+        public Range<DateTime> read(JsonReader jsonReader) throws IOException {
+//            return DateTime.parse(jsonReader.toString());
+            //TODO: this
+            return null;
+        }
+    }
+
+    public static class SignalContainerAdapter extends TypeAdapter<RTAProcessor.SignalContainer> {
+
+        @Override
+        public void write(JsonWriter jsonWriter, RTAProcessor.SignalContainer c) throws IOException {
+            if (c == null){
+                jsonWriter.nullValue();
+            }
+            else{
+                jsonWriter.value(c.backgroundEvents);
+                jsonWriter.value(c.signalEvents);
+                jsonWriter.value(c.numberOfOffRegions);
+            }
+        }
+
+        @Override
+        public RTAProcessor.SignalContainer read(JsonReader jsonReader) throws IOException {
+            //TODO: this
+            return null;
+        }
+    }
 }

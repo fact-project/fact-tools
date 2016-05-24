@@ -70,14 +70,14 @@ function generateChart(){
                 ['x', '2012-12-29', '2012-12-30', '2012-12-31'],
                 ['data1', 230, 300, 330],
                 ['data2', 190, 230, 200],
-                ['data3', 90, 130, 180],
+                ['data3', 90, 130, 180]
             ]
         },
         axis: {
             x: {
                 type: 'timeseries',
                 tick: {
-                    format: '%M/%s',
+                    format: '%M/%s'
                 }
             }
         }
@@ -89,11 +89,11 @@ function init() {
     var parentID = 'fact_map';
     var size = 450;
     var radius = 5;
-    this.camera = new Hexmap(parentID, size, radius);
+    var camera = new Hexmap(parentID, size, radius);
 
     function loadSkyCamImage() {
         console.log("loading allskycam iamge")
-        $("#allskycam").attr("width", "400");
+        $("#allskycam").attr("width", "200");
         $("#allskycam").attr("src", "./images/hex-loader2.gif")
         setTimeout(function () {
             console.log("loading allskycam iamg inner ")
@@ -109,7 +109,7 @@ function init() {
 
         $.getJSON('/event', function (latestEvent) {
             if (latestEvent) {
-                this.camera.update(latestEvent.photonCharges, duration = 1);
+                camera.update(latestEvent.photonCharges, duration = 2.0);
                 $('#source_name').html(latestEvent.sourceName);
                 $('#eventTimeStamp').html(latestEvent.eventTimeStamp);
                 $('#size').html(numeral(latestEvent.size).format('0.00'));
@@ -119,28 +119,72 @@ function init() {
         });
     }
 
+    function LightCurve() {
+        console.log("loading LC")
+
+        $.getJSON('/lightcurve', function (lightcurve) {
+            if (lightcurve) {
+                $('#lightcurve').html(lightcurve);
+            }
+        });
+
+        function refresh(){
+            console.log("loading LC")
+            $.getJSON('/lightcurve', function (lightcurve) {
+                console.log(lightcurve);
+                if (lightcurve) {
+                    $('#lightcurve').html(lightcurve);
+                }
+            });
+        }
+
+        LightCurve.refresh = refresh;
+    }
+
 
     function MemoryChart() {
+
+        var MB = 1/(1024*1024);
+        var GB = 1/(1024*1024*1024);
         var chart = null;
-        var latestTimeStamp = null;
-        $.getJSON('/status', function (status_dict) {
-            console.log("MEMORY BITCH");
-            console.log(status_dict);
-            var rs = _.values(status_dict)
-            var latestStatus = rs[rs.length - 1]
+        var latestEntry = null;
+
+        var refreshDisplay = function (latestEntry){
+            latestStatus = latestEntry.value;
+            $('#space').html(numeral(latestStatus.freeSpace * GB).format('0.0'));
+            $('#memory').html(numeral(latestStatus.usedMemory * MB).format('0.0'));
+            $('#cpus').html(latestStatus.availableProcessors);
+        };
+
+        var parseDataToColumns = function (status_dict){
+            var rs = _.values(status_dict);
+            var latestStatus = rs[rs.length - 1];
             rs  = _.map(rs, 'usedMemory');
+            rs = _.map(rs, function(r){
+                return r*MB;
+            });
             rs = ['usedMemory'].concat(rs);
 
             var ts  = _.keys(status_dict);
             latestTimeStamp = ts[ts.length - 1];
             ts = ['t'].concat(ts);
+            return {"time":ts, "value":rs};
+        };
 
-            $('#space').html(latestStatus.freeSpace);
-            $('#memory').html(latestStatus.usedMemory);
-            $('#cpus').html(latestStatus.availableProcessors);
+        var  getLatestEntry = function (status_dict){
+            var rs = _.values(status_dict);
+            var latestStatus = rs[rs.length - 1];
 
-            console.log(rs);
-            console.log(ts);
+            var ts  = _.keys(status_dict);
+            latestTimeStamp = ts[ts.length - 1];
+            return {"time":latestTimeStamp, "value":latestStatus};
+        };
+
+        $.getJSON('/status', function (status_dict) {
+            latestEntry = getLatestEntry(status_dict);
+            refreshDisplay(latestEntry);
+
+            var columns = parseDataToColumns(status_dict);
             chart = c3.generate({
                 size: {
                     height: 240,
@@ -152,8 +196,8 @@ function init() {
                     xFormat: '%Y-%m-%dT%H:%M:%S.%L',
                     y: 'usedMemory',
                     columns:[
-                        ts,
-                        rs
+                        columns.time,
+                        columns.value
                     ],
                     type:'bar'
                 },
@@ -173,32 +217,22 @@ function init() {
             });
         });
 
+
         function load(){
             if(chart) {
                 console.log("request  " +  '/status?timestamp='+latestTimeStamp)
                 $.getJSON('/status?timestamp='+latestTimeStamp, function (status_dict) {
                     if (status_dict) {
-                        console.log(status_dict)
-                        var rs = _.values(status_dict)
-                        var latestStatus = rs[rs.length - 1]
-                        rs  = _.map(rs, 'usedMemory');
-                        rs = ['usedMemory'].concat(rs);
 
-                        var ts  = _.keys(status_dict);
-                        latestTimeStamp = ts[ts.length - 1];
-                        ts = ['t'].concat(ts);
+                        latestEntry = getLatestEntry(status_dict);
+                        refreshDisplay(latestEntry);
 
-                        console.log(rs)
-                        console.log(ts)
-
-                        $('#space').html(latestStatus.freeSpace);
-                        $('#memory').html(latestStatus.usedMemory);
-                        $('#cpus').html(latestStatus.availableProcessors);
+                        var column = parseDataToColumns(status_dict);
 
                         chart.flow({
                             columns: [
-                                ts,
-                                rs
+                                column.value,
+                                column.time
                             ]
                         });
                     }
@@ -225,7 +259,7 @@ function init() {
             var currentRate = rs[rs.length - 1];
             rs = ['rate'].concat(rs);
 
-            ts  = _.keys(rates)
+            ts  = _.keys(rates);
             latestTimeStamp = ts[ts.length - 1];
             ts = ['t'].concat(ts);
 
@@ -291,11 +325,8 @@ function init() {
 
 
 
-
-
     DataRateChart();
     window.setInterval(DataRateChart.load, 2*SECONDS);
-
 
     loadSkyCamImage();
     window.setInterval(loadSkyCamImage, 3*MINUTES);
@@ -305,5 +336,8 @@ function init() {
     //
     MemoryChart();
     window.setInterval(MemoryChart.load, 30*SECONDS);
+
+    LightCurve();
+    window.setInterval(LightCurve.refresh, 10*SECONDS);
 
 }
