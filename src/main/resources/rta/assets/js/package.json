@@ -8,6 +8,7 @@
     "numeral":"^1.5.3",
     "c3":"^0.4.11",
     "hexmap" : "https://github.com/mackaiver/hexmap",
+    "d3-time": "^0.2.5",
     "lodash" : "4.12.0"
   },
   "devDependencies": {},

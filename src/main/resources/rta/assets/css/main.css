@@ -17,6 +17,27 @@
 		vertical-align: baseline;
 	}
 
+		.chart {
+			font-family: Arial, sans-serif;
+			font-size: 10px;
+		}
+
+		.axis path{
+			fill: none;
+			/* stroke: #000; */
+			shape-rendering: crispEdges;
+		}
+
+		.axis line {
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+		}
+
+		.bar {
+			fill: steelblue;
+		}
+
 	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
 		display: block;
 	}

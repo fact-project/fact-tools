@@ -2,9 +2,7 @@ package fact.rta;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -76,9 +74,8 @@ public class RTAWebService implements Service {
 
         gson = new GsonBuilder()
                 .enableComplexMapKeySerialization()
+                .registerTypeAdapter(Range.class, new RangeSerializer())
                 .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
-                .registerTypeAdapter(type, new DateRangeAdapter())
-                .registerTypeAdapter(RTAProcessor.SignalContainer.class, new SignalContainerAdapter())
                 .create();
         //fuck this
         if (sqlitePath != null) {
@@ -95,7 +92,7 @@ public class RTAWebService implements Service {
             return new ModelAndView(attributes, "rta/index.html");
         }, new HandlebarsTemplateEngine());
 
-        Spark.get("/lightcurve", (request, response) -> getLightCurve());
+        Spark.get("/lightcurve", (request, response) -> getLightCurve(), gson::toJson);
 
         Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
@@ -174,6 +171,7 @@ public class RTAWebService implements Service {
         return systemStatusMap.descendingMap();
     }
 
+
     private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve() {
         if(lightCurve.asMapOfRanges().isEmpty()){
             return null;
@@ -226,44 +224,14 @@ public class RTAWebService implements Service {
             return DateTime.parse(jsonReader.toString());
         }
     }
-    public static class DateRangeAdapter extends TypeAdapter<Range<DateTime>> {
 
-        @Override
-        public void write(JsonWriter jsonWriter, Range<DateTime> range) throws IOException {
-            if (range == null){
-                jsonWriter.nullValue();
-            }
-            else{
-                jsonWriter.value("from:"+range.lowerEndpoint().toString("y-M-d'T'H:mm:s.SSS") + ",to:" + range.upperEndpoint().toString("y-M-d'T'H:mm:s.SSS"));
-            }
-        }
-
-        @Override
-        public Range<DateTime> read(JsonReader jsonReader) throws IOException {
-//            return DateTime.parse(jsonReader.toString());
-            //TODO: this
-            return null;
-        }
-    }
-
-    public static class SignalContainerAdapter extends TypeAdapter<RTAProcessor.SignalContainer> {
-
-        @Override
-        public void write(JsonWriter jsonWriter, RTAProcessor.SignalContainer c) throws IOException {
-            if (c == null){
-                jsonWriter.nullValue();
-            }
-            else{
-                jsonWriter.value(c.backgroundEvents);
-                jsonWriter.value(c.signalEvents);
-                jsonWriter.value(c.numberOfOffRegions);
-            }
-        }
-
-        @Override
-        public RTAProcessor.SignalContainer read(JsonReader jsonReader) throws IOException {
-            //TODO: this
-            return null;
+    private class RangeSerializer implements JsonSerializer<Range<DateTime>> {
+        public JsonElement serialize(Range<DateTime> range, Type typeOfSrc, JsonSerializationContext context) {
+            String format = "y-M-d'T'H:mm:s.SSS";
+            JsonObject obj = new JsonObject();
+            obj.addProperty("start", range.lowerEndpoint().toString(format));
+            obj.addProperty("end", range.upperEndpoint().toString(format));
+            return obj;
         }
     }
 }

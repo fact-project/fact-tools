@@ -27,7 +27,7 @@ public class WebServiceTest {
             double energy = random.nextDouble()*2000;
             DateTime now = DateTime.now();
 
-            RTAProcessor.SignalContainer c = new RTAProcessor().new SignalContainer(random.nextInt(), random.nextInt(), 5);
+            RTAProcessor.SignalContainer c = new RTAProcessor().new SignalContainer(random.nextInt(2), random.nextInt(5), 5);
 
             Range<DateTime> dateTimeRange = Range.closedOpen(now, now.plusSeconds(15));
             s.updateLightCurve(dateTimeRange, c, "Wow");
