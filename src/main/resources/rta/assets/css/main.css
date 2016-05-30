@@ -12,7 +12,6 @@
 		margin: 0;
 		padding: 0;
 		border: 0;
-		font-size: 100%;
 		font: inherit;
 		vertical-align: baseline;
 	}
@@ -20,6 +19,7 @@
 		.chart {
 			font-family: Arial, sans-serif;
 			font-size: 10px;
+			margin: 20px 20px 15px 5px;
 		}
 
 		.axis path{
@@ -36,6 +36,30 @@
 
 		.bar {
 			fill: steelblue;
+		}
+
+		.error {
+			fill: gray;
+			stroke: gray;
+		}
+
+		.tooltip {
+			position: absolute;
+			text-align: left;
+			width: 95px;
+			height: 45px;
+			padding: 3px;
+			font: 10px sans-serif;
+			background: white;
+			color: darkgray;
+			pointer-events: none;
+		}
+
+        .tooltip h1 {
+			font: 12px sans-serif;
+			color: steelblue;
+			padding: 0;
+			margin: 0;
 		}
 
 	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {

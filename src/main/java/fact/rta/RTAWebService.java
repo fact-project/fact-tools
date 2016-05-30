@@ -92,13 +92,23 @@ public class RTAWebService implements Service {
             return new ModelAndView(attributes, "rta/index.html");
         }, new HandlebarsTemplateEngine());
 
-        Spark.get("/lightcurve", (request, response) -> getLightCurve(), gson::toJson);
+        Spark.get("/lightcurve", (request, response) -> getLightCurve(request.queryParams("hours")), gson::toJson);
 
         Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
         Spark.get("/event", (request, response) -> getLatestEvent(), gson::toJson);
 
         Spark.get("/status",  (request, response) -> getSystemStatus(request.queryParams("timestamp")), gson::toJson);
+
+        Spark.exception(NumberFormatException.class, (e, req, res) ->{
+            res.status(400);
+            res.body(gson.toJson("Error. Bad Request. Cannot parse number " +req.queryParams("hours") +   " in query string"));
+        });
+
+        Spark.exception(IllegalArgumentException.class, (e, req, res) ->{
+            res.status(400);
+            res.body(gson.toJson("Error. Bad Request. Cannot parse date " +req.queryParams("timestamp") +  " in query string"));
+        });
 
 
         //update systemstatus once per minute
@@ -142,9 +152,7 @@ public class RTAWebService implements Service {
             return null;
         }
         if (timeStamp != null) {
-            try {
-                return rateMap.tailMap(DateTime.parse(timeStamp), false);
-            } catch (IllegalArgumentException ignored) {}
+            return rateMap.tailMap(DateTime.parse(timeStamp), false);
         }
         return rateMap.descendingMap();
     }
@@ -164,17 +172,30 @@ public class RTAWebService implements Service {
             return null;
         }
         if (timeStamp != null) {
-            try {
-                return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
-            } catch (IllegalArgumentException ignored) { }
+            return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
         }
         return systemStatusMap.descendingMap();
     }
 
 
-    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve() {
+    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve(String minusHours) throws NumberFormatException{
         if(lightCurve.asMapOfRanges().isEmpty()){
             return null;
+        }
+
+        if(minusHours != null){
+            Integer hours = Integer.parseInt(minusHours);
+            DateTime history = DateTime.now().minusSeconds(hours);
+
+            Map<Range<DateTime>, RTAProcessor.SignalContainer> resultMap = new HashMap<>();
+
+            lightCurve.asDescendingMapOfRanges().forEach((range, container) ->{
+                if(range.lowerEndpoint().isAfter(history)){
+                    resultMap.put(range, container);
+                }
+            });
+
+            return resultMap;
         }
         return lightCurve.asDescendingMapOfRanges();
     }

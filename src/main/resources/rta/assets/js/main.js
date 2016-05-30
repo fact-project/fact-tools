@@ -63,29 +63,6 @@ MINUTES = 60*SECONDS;
 
 $(document).ready(init);
 
-
-function generateChart(){
-    var chart = c3.generate({
-        data: {
-            x: 'x',
-            columns: [
-                ['x', '2012-12-29', '2012-12-30', '2012-12-31'],
-                ['data1', 230, 300, 330],
-                ['data2', 190, 230, 200],
-                ['data3', 90, 130, 180]
-            ]
-        },
-        axis: {
-            x: {
-                type: 'timeseries',
-                tick: {
-                    format: '%M/%s'
-                }
-            }
-        }
-    });
-}
-
 function init() {
     //initialize the hex display
     var parentID = 'fact_map';
@@ -124,7 +101,7 @@ function init() {
     function LightCurve(binning) {
         console.log("loading LC");
 
-        $.getJSON('/lightcurve', function (lightcurve) {
+        $.getJSON('/lightcurve?hours=20', function (lightcurve) {
             if (lightcurve) {
                 excessPlot(lightcurve, 5);
                 //$('#lightcurve').html(excess);
@@ -150,7 +127,15 @@ function init() {
                 var date  = formatter.parse(range.start);
                 var alpha = 1.0 / value.numberOfOffRegions;
                 var excess =  value.signalEvents - value.backgroundEvents * alpha;
-                return {"date":date, "excess":excess};
+                var lower = excess - Math.sqrt(value.signalEvents + value.backgroundEvents * alpha)*0.5;
+                var upper = excess + Math.sqrt(value.signalEvents + value.backgroundEvents * alpha)*0.5;
+                return {"date":date,
+                    "excess":excess,
+                    "lower": lower,
+                    "upper":upper,
+                    "signal":value.signalEvents,
+                    "background": value.backgroundEvents
+                };
             });
             var dates = _.map(data,'date');
 
@@ -166,22 +151,26 @@ function init() {
 
             var maxExcess = d3.max(data, function(d) { return d.excess; });
             var minExcess = d3.min(data, function(d) { return d.excess; });
-            console.log(_.map(data,'excess'));
+//console.log(_.map(data,'lower'))
 
             var x = d3.time.scale()
                 .domain([earliestDate, d3.time.second.offset(latestDate, 1)])
                 .rangeRound([0, width - margin.left - margin.right]);
 
             var y = d3.scale.linear()
-                .domain([minExcess - 0.2, maxExcess  + 0.2])
+                .domain([minExcess - 1, maxExcess  + 1])
                 .range([height - margin.top - margin.bottom, 0]);
 
             var xAxis = d3.svg.axis()
                 .scale(x)
                 .tickValues(dates)
                 .tickFormat(d3.time.format('%H:%M:%S'))
-                .tickSize(5)
-                .tickPadding(8);
+                .tickSize(6)
+                .tickPadding(5);
+
+            var div = d3.select("#two").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
 
             var yAxis = d3.svg.axis()
                 .scale(y)
@@ -195,30 +184,96 @@ function init() {
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-            var barHeight = 3;
+            var barHeight = 2;
+            var errorBarHeight = 0.5;
+            var errorBarWidth = 15;
 
-            svg.selectAll('.chart')
-                .data(data)
-                .enter().append('rect')
+// make gray backgorund rectangle
+            svg.append("rect")
+                .style("fill", "#f8f8f8")
+                .attr("x", x(earliestDate))
+                .attr("y", y(maxExcess + 2))
+                .attr("width", domainWidth)
+                .attr("height", y(minExcess) - y(maxExcess + 3))
+
+            var selectedData = svg.selectAll('.chart')
+                .data(data).enter();
+
+            selectedData.append('rect')
                 .attr('class', 'bar')
                 .attr('x', function(d) { return x(d.date); })
                 .attr('y', function(d) { return y(d.excess) - 0.5* barHeight })
                 .attr('width', domainWidth/(bars + 1))
                 .attr('height', function(d) {
-                    console.log(d)
                     return barHeight;
                 });
+
+//add invisible rectangle for tooltip hover
+            selectedData.append('rect')
+                .style("fill", "#ffffff")
+                .style("opacity", "0")
+                .attr('x', function(d) { return x(d.date); })
+                .attr('y', function(d) { return y(d.excess) - 0.5* 50 })
+                .attr('width', domainWidth/(bars + 1))
+                .attr('height', function(d) {
+                    return 50;
+                })
+                .on("mouseover", function(d) {
+                    console.log("lecker")
+                    div.transition()
+                        .duration(300)
+                        .style("opacity", .9);
+                    div.html( "<h1>" + "Excess: " + (d.excess) + "</h1><br/>"
+                            + "Signal: "+ (d.signal) + "<br/>"
+                            + "Background: " + (d.background))
+                        .style("left", (d3.event.pageX  + 8) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+
+            selectedData.append('rect')
+                .attr('class', 'error')
+                .attr('x', function(d) { return x(d.date) + errorBarWidth/2; })
+                .attr('y', function(d) { return y(d.lower) - 0.5* barHeight })
+                .attr('width', (domainWidth/(bars + 1))-errorBarWidth)
+                .attr('height', errorBarHeight);
+
+            selectedData.append('rect')
+                .attr('class', 'error')
+                .attr('x', function(d) { return x(d.date) + errorBarWidth/2; })
+                .attr('y', function(d) { return y(d.upper) - 0.5* barHeight })
+                .attr('width', domainWidth/(bars + 1) - errorBarWidth)
+                .attr('height', errorBarHeight);
+
+            selectedData.append('line')
+                .attr('class', 'error')
+                .attr('x1', function(d) { return x(d.date) + errorBarWidth; })
+                .attr('y1', function(d) { return y(d.upper) - 0.5* barHeight })
+                .attr('x2', function(d) { return x(d.date) + errorBarWidth; })
+                .attr('y2', function(d) { return y(d.lower) - 0.5* barHeight });
 
             svg.append('g')
                 .attr('class', 'x axis')
                 .attr('transform', 'translate(0, ' + (height - margin.top - margin.bottom) + ')')
-                .call(xAxis);
+                .call(xAxis)
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", function(d) {
+                    return "rotate(-40)"
+                });
 
             svg.append("line")          // attach a line
-                .style("stroke", "gray")  // colour the line
+                .style("stroke", "lightgray")  // colour the line
+                .style("stroke-width", "0.5px")
                 .attr("x1", x(earliestDate))     // x position of the first end of the line
                 .attr("y1", y(0))      // y position of the first end of the line
-                .attr("x2", x(latestDate))     // x position of the second end of the line
+                .attr("x2", x(latestDate) + domainWidth/(bars + 1))     // x position of the second end of the line
                 .attr("y2", y(0));    // y position of the second end of the line
 
             svg.append('g')
