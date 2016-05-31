@@ -20,31 +20,34 @@
 
 
         <script src="assets/js/bundle.js"></script>
+		<link rel="stylesheet" href="assets/css/nomralize.css" />
+		<link rel="stylesheet" href="assets/css/skeleton.css" />
 		<link rel="stylesheet" href="assets/css/main.css" />
         <link rel="stylesheet" href="assets/js/node_modules/c3/c3.min.css" />
 	</head>
 	<body>
 
 		<!-- Banner -->
-			<section id="banner">
-				<div class="inner split">
-					<section>
+			<section class="banner">
+				<div class="row">
+					<div class="one-half column">
 						<h2>FACT RTA</h2>
-					</section>
-					<section>
+					</div>
+					<div class="one-half column">
 						<p> This page collects live data from the FACT telescope.
                             It display current data rates and event counts.
                             A few selected events from the camera are also shown
                         </p>
 
-					</section>
+					</div>
 				</div>
 			</section>
 
 		<!-- One -->
-			<section id="one" class="wrapper">
-				<div class="inner split">
-					<section>
+			<section id="intro">
+                <div class="container">
+                    <div class="row">
+				    <section id="evetninfo" class="one-half column">
 						<h2>Latest Event</h2>
 						<p>
                             Here you see the latest gamma-like event found by our analysis chain.
@@ -52,6 +55,7 @@
                             Additionally, a cut in its reconstructed position has been performed.
                         </p>
                         <table>
+                            <tbody>
                             <tr>
                                 <td>Source</td>
                                 <td id="source_name">...</td>
@@ -72,36 +76,39 @@
 								<td>Theta<sup>2</sup></td>
 								<td id="theta_square">...</td>
 							</tr>
+                            </tbody>
                         </table>
 
 					</section>
-					<section>
+					<section id="camera" class="one-half column">
                         <div id="fact_map">
 
                         </div>
 					</section>
-				</div>
+                </div>
+               </div>
 			</section>
 
 		<!-- Two -->
-			<section id="two" class="wrapper style2 alt">
-				<div class="inner">
-					<div class="spotlight">
-						<div id="lightcurve">
-							<!-- Lecker data rate plot here -->
-						</div>
-						<div class="content">
-							<h3>Excess Rates</h3>
-							<p>
-								The plot shows excess rates of the currently analyzed source.
-							</p>
-						</div>
+			<section class="content">
+				<div class="container">
+                        <div class="row">
+                            <div id="lightcurve" class="two-thirds column">
+                                <!--plot goes here-->
+                            </div>
+                            <div class="one-third column">
+                                <h3>Excess Rates</h3>
+                                <p>
+                                    The plot shows excess rates of the currently analyzed source.
+                                </p>
+                            </div>
+                        </div>
 					</div>
-					<div class="spotlight">
-						<div id="datarate_chart">
+					<div class="row">
+						<div class="two-thirds column" id="datarate_chart">
 							<!-- Lecker data rate plot here -->
 						</div>
-						<div class="content">
+						<div class="one-third column">
 							<h3>Data rates</h3>
                             <p>
                                 The current datarate of the RTA process is <span id="datarate"> ... </span> events per second.
@@ -111,11 +118,11 @@
 						</div>
 					</div>
 
-					<div class="spotlight">
-						<div id="memory_chart" class="image">
+					<div class="row">
+						<div id="memory_chart" class="two-thirds column">
 
 						</div>
-						<div class="content">
+						<div class="one-third column">
 							<h3>Machine status</h3>
 							<p>Basic information about the machine running the RTA. It's running at the experiment site.  </p>
                             <ul>
@@ -125,16 +132,14 @@
                             </ul>
 						</div>
 					</div>
-                    <div class="spotlight">
-                        <div class="image">
+                    <div class="row">
+                        <div class="figure two-thirds column">
                             <img id="allskycam" src="images/hex-loader2.gif" alt="Sky over La Palma" />
                         </div>
-                        <div class="content">
+                        <div class="one-third column">
                             <h3>Sky Image</h3>
                             <p>Image of the sky over La Palma. This is fetched from the All-Sky-Camera near the GTC Telescope.</p>
-                            <ul class="actions special">
-                                <li><a href="http://www.gtc.iac.es/multimedia/webcams.php" class="button alt">More Information</a></li>
-                            </ul>
+                            <a href="http://www.gtc.iac.es/multimedia/webcams.php" class="button alt">More Information</a>
                         </div>
                     </div>
 

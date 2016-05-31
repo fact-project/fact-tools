@@ -169,9 +169,9 @@ function init() {
                 .tickSize(6)
                 .tickPadding(5);
 
-            var div = d3.select("#two").append("div")
+            var tooltip = d3.select("#lightcurve").append("div")
                 .attr("class", "tooltip")
-                .style("opacity", 0);
+                .style("opacity", 0.0);
 
             var yAxis = d3.svg.axis()
                 .scale(y)
@@ -220,20 +220,22 @@ function init() {
                     return 50;
                 })
                 .on("mouseover", function(d) {
-                    console.log("lecker")
-                    div.transition()
+
+                    var x = d3.mouse(this)[0];
+                    var y = d3.mouse(this)[1];
+                    tooltip.transition()
                         .duration(300)
                         .style("opacity", .9);
-                    div.html( "<h1>" + "Excess: " + (d.excess) + "</h1><br/>"
+                    tooltip.html( "<h1>" + "Excess: " + numeral(d.excess).format('0.00') + "</h1>"
                             + "Signal: "+ (d.signal) + "<br/>"
                             + "Background: " + (d.background))
-                        .style("left", (d3.event.pageX  + 8) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
+                        .style("left", (x + 50) + "px")
+                        .style("top", (y) + "px");
                 })
                 .on("mouseout", function(d) {
-                    div.transition()
+                    tooltip.transition()
                         .duration(500)
-                        .style("opacity", 0);
+                        .style("opacity", .0);
                 });
 
             selectedData.append('rect')
