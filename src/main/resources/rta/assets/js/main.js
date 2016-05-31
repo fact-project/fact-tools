@@ -72,12 +72,10 @@ function init() {
 
     function loadSkyCamImage() {
         console.log("loading allskycam iamge")
-        $("#allskycam").attr("width", "200");
         $("#allskycam").attr("src", "./images/hex-loader2.gif")
         setTimeout(function () {
             console.log("loading allskycam iamg inner ")
             d = new Date();
-            $("#allskycam").attr("width", " ");
             $("#allskycam").attr("src", "http://www.gtc.iac.es/multimedia/netcam/camaraAllSky.jpg?" + d.getTime());
         }, 4000);
     }
@@ -146,6 +144,13 @@ function init() {
                 height = 400;
 
             var domainWidth = width - margin.left - margin.right;
+
+            var barWidth = domainWidth/(bars + 1);
+            var barHeight = 2;
+
+            var errorBarHeight = 0.5;
+            var errorBarWidth = barWidth*0.66;
+
             var earliestDate = d3.min(dates);
             var latestDate = d3.max(dates);
 
@@ -184,9 +189,7 @@ function init() {
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-            var barHeight = 2;
-            var errorBarHeight = 0.5;
-            var errorBarWidth = 15;
+
 
 // make gray backgorund rectangle
             svg.append("rect")
@@ -204,9 +207,7 @@ function init() {
                 .attr('x', function(d) { return x(d.date); })
                 .attr('y', function(d) { return y(d.excess) - 0.5* barHeight })
                 .attr('width', domainWidth/(bars + 1))
-                .attr('height', function(d) {
-                    return barHeight;
-                });
+                .attr('height', barHeight);
 
 //add invisible rectangle for tooltip hover
             selectedData.append('rect')
@@ -236,26 +237,26 @@ function init() {
                         .duration(500)
                         .style("opacity", .0);
                 });
-
+    //errorbars
             selectedData.append('rect')
                 .attr('class', 'error')
-                .attr('x', function(d) { return x(d.date) + errorBarWidth/2; })
+                .attr('x', function(d) { return x(d.date) + (barWidth - errorBarWidth)/2; })
                 .attr('y', function(d) { return y(d.lower) - 0.5* barHeight })
-                .attr('width', (domainWidth/(bars + 1))-errorBarWidth)
+                .attr('width', errorBarWidth)
                 .attr('height', errorBarHeight);
 
             selectedData.append('rect')
                 .attr('class', 'error')
-                .attr('x', function(d) { return x(d.date) + errorBarWidth/2; })
+                .attr('x', function(d) { return x(d.date) + (barWidth - errorBarWidth)/2; })
                 .attr('y', function(d) { return y(d.upper) - 0.5* barHeight })
-                .attr('width', domainWidth/(bars + 1) - errorBarWidth)
+                .attr('width', errorBarWidth)
                 .attr('height', errorBarHeight);
 
             selectedData.append('line')
                 .attr('class', 'error')
-                .attr('x1', function(d) { return x(d.date) + errorBarWidth; })
+                .attr('x1', function(d) { return x(d.date) + barWidth/2; })
                 .attr('y1', function(d) { return y(d.upper) - 0.5* barHeight })
-                .attr('x2', function(d) { return x(d.date) + errorBarWidth; })
+                .attr('x2', function(d) { return x(d.date) + barWidth/2; })
                 .attr('y2', function(d) { return y(d.lower) - 0.5* barHeight });
 
             svg.append('g')
@@ -335,8 +336,8 @@ function init() {
             var columns = parseDataToColumns(status_dict);
             chart = c3.generate({
                 size: {
-                    height: 240,
-                    width: 480
+                    height: 290,
+                    width: 450
                 },
                 bindto: '#memory_chart',
                 data: {
@@ -416,8 +417,8 @@ function init() {
             console.log(ts);
             chart = c3.generate({
                 size: {
-                    height: 240,
-                    width: 480
+                    height: 290,
+                    width: 450
                 },
                 bindto: '#datarate_chart',
                 data: {
