@@ -25,6 +25,10 @@
 	stroke: gray;
 }
 
+body {
+    background-color: #fafafa;
+}
+
 .tooltip {
 	position: absolute;
 	text-align: left;
@@ -44,6 +48,10 @@
 	margin: 0;
 }
 
+section {
+    margin-bottom: 2em;
+}
+
 .content .row .figure{
 	padding: 1em;
 }
@@ -53,16 +61,45 @@
 
 
 .banner {
-	/* height: 320px; */
-	background-color: #333;
+	background-color: #224;
 	color: #eee;
-	padding-top: 7em;
-	margin-bottom: 5em;
-	padding-bottom: 3em;
+	padding-top: 6em;
+	margin-bottom: 0;
+	padding-bottom: 6em;
+}
+
+.banner p {
+    margin-right: 20em;
 }
 
 .banner h2 {
 	margin-left: 1em;
 	border-right: thin solid #eee;
 	font-size: 50pt;
+}
+
+.spotlight {
+    background-color: white;
+    margin-bottom: 1.2em;
+    padding-left: 0.7em;
+}
+
+
+#intro {
+    background-color: white;
+    padding-top: 6em;
+}
+
+#intro td{
+    padding: 7px 25px;
+}
+
+.wide100 {
+    max-width: 100%;
+}
+.wide90 {
+    max-width: 90%;
+}
+.wide80 {
+    max-width: 80%;
 }

@@ -1,9 +1,5 @@
 <!DOCTYPE HTML>
-<!--
-	Prism by TEMPLATED
-	templated.co @templatedco
-	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
--->
+
 <html>
 	<head>
         <title>{{title}}</title>
@@ -28,26 +24,27 @@
 	<body>
 
 		<!-- Banner -->
-			<section class="banner">
-				<div class="row">
-					<div class="one-half column">
-						<h2>FACT RTA</h2>
-					</div>
-					<div class="one-half column">
-						<p> This page collects live data from the FACT telescope.
-                            It display current data rates and event counts.
-                            A few selected events from the camera are also shown
-                        </p>
-
-					</div>
-				</div>
+			<section class="banner wide100">
+                <div class="container wide80">
+                    <div class="row">
+                        <div class="one-half column">
+                            <h2>FACT RTA</h2>
+                        </div>
+                        <div class="one-half column">
+                            <p> This page collects live data from the FACT telescope.
+                                It display current data rates and event counts.
+                                A few selected events from the camera are also shown
+                            </p>
+                        </div>
+                    </div>
+                </div>
 			</section>
 
 		<!-- One -->
 			<section id="intro">
                 <div class="container">
                     <div class="row">
-				    <section id="evetninfo" class="one-half column">
+				    <section id="eventinfo" class="one-half column">
 						<h2>Latest Event</h2>
 						<p>
                             Here you see the latest gamma-like event found by our analysis chain.
@@ -55,6 +52,12 @@
                             Additionally, a cut in its reconstructed position has been performed.
                         </p>
                         <table>
+                            <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Properties</th>
+                            </tr>
+                            </thead>
                             <tbody>
                             <tr>
                                 <td>Source</td>
@@ -85,15 +88,16 @@
 
                         </div>
 					</section>
-                </div>
-               </div>
+                 </div>
+				</div>
 			</section>
 
 		<!-- Two -->
 			<section class="content">
 				<div class="container">
-                        <div class="row">
-                            <div id="lightcurve" class="two-thirds column">
+
+                        <div class="row spotlight">
+                            <div id="lightcurve" class=" figure two-thirds column">
                                 <!--plot goes here-->
                             </div>
                             <div class="one-third column">
@@ -103,45 +107,46 @@
                                 </p>
                             </div>
                         </div>
-					</div>
-					<div class="row">
-						<div class="two-thirds column" id="datarate_chart">
-							<!-- Lecker data rate plot here -->
-						</div>
-						<div class="one-third column">
-							<h3>Data rates</h3>
-                            <p>
-                                The current datarate of the RTA process is <span id="datarate"> ... </span> events per second.
-                                This  is not the FACT trigger rate but merely the number of events
-                                per second the RTA is analyzing after the DAQ finished writing all data to the disk.
-                            </p>
-						</div>
-					</div>
 
-					<div class="row">
-						<div id="memory_chart" class="two-thirds column">
+						<div class="row spotlight">
+							<div class="figure two-thirds column" id="datarate_chart">
+								<!-- Lecker data rate plot here -->
+							</div>
+							<div class="one-third column">
+								<h3>Data rates</h3>
+								<p>
+									The current datarate of the RTA process is <span id="datarate"> ... </span> events per second.
+									This  is not the FACT trigger rate but merely the number of events
+									per second the RTA is analyzing after the DAQ finished writing all data to the disk.
+								</p>
+							</div>
+						</div>
 
+						<div class="row spotlight">
+							<div id="memory_chart" class="figure two-thirds column">
+
+							</div>
+							<div class="one-third column">
+								<h3>Machine status</h3>
+								<p>Basic information about the machine running the RTA. It's running at the experiment site.  </p>
+								<ul>
+									<li>Free disk space on machine: <span id="space">...</span>&thinsp;GB</li>
+									<li>Currently reserved memory:  <span id="memory">...</span>&thinsp;MB</li>
+									<li>Reserved CPU cores: <span id="cpus">...</span></li>
+								</ul>
+							</div>
 						</div>
-						<div class="one-third column">
-							<h3>Machine status</h3>
-							<p>Basic information about the machine running the RTA. It's running at the experiment site.  </p>
-                            <ul>
-                                <li>Free disk space on machine: <span id="space">...</span>&thinsp;GB</li>
-                                <li>Currently reserved memory:  <span id="memory">...</span>&thinsp;MB</li>
-                                <li>Reserved CPU cores: <span id="cpus">...</span></li>
-                            </ul>
+
+						<div class="row spotlight">
+							<div class="figure two-thirds column">
+								<img id="allskycam" src="images/hex-loader2.gif" alt="Sky over La Palma" />
+							</div>
+							<div class="one-third column">
+								<h3>Sky Image</h3>
+								<p>Image of the sky over La Palma. This is fetched from the All-Sky-Camera near the GTC Telescope.</p>
+								<a href="http://www.gtc.iac.es/multimedia/webcams.php" class="button alt">More Information</a>
+							</div>
 						</div>
-					</div>
-                    <div class="row">
-                        <div class="figure two-thirds column">
-                            <img id="allskycam" src="images/hex-loader2.gif" alt="Sky over La Palma" />
-                        </div>
-                        <div class="one-third column">
-                            <h3>Sky Image</h3>
-                            <p>Image of the sky over La Palma. This is fetched from the All-Sky-Camera near the GTC Telescope.</p>
-                            <a href="http://www.gtc.iac.es/multimedia/webcams.php" class="button alt">More Information</a>
-                        </div>
-                    </div>
 
 				</div>
 			</section>
