@@ -37,7 +37,7 @@ public class AuxFileService implements AuxiliaryService {
 
     Map<AuxiliaryServiceName, TreeSet<AuxPoint>> services = new HashMap<>();
 
-    @Parameter(required = false, description = "The path to the folder containing the auxilary data as .fits files")
+    @Parameter(required = true, description = "The path to the folder containing the auxilary data as .fits files")
     SourceURL auxFolder;
 
     boolean isInit = false;

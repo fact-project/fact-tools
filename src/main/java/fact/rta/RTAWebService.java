@@ -36,7 +36,7 @@ public class RTAWebService implements Service {
 
 
 
-    private final DBI dbi;
+    private DBI dbi;
 
     final private static Logger log = LoggerFactory.getLogger(RTAWebService.class);
 
@@ -70,19 +70,22 @@ public class RTAWebService implements Service {
     private TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve = TreeRangeMap.create();
 
     public RTAWebService(String path) throws SQLException {
-        Type type = new TypeToken<Range<DateTime>>() {}.getType();
+        this();
+        dbi = new DBI("jdbc:sqlite:" + path);
+    }
+
+    public RTAWebService() throws SQLException {
 
         gson = new GsonBuilder()
                 .enableComplexMapKeySerialization()
                 .registerTypeAdapter(Range.class, new RangeSerializer())
                 .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
                 .create();
-        //fuck this
+
         if (sqlitePath != null) {
             dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
-        } else {
-            dbi = new DBI("jdbc:sqlite:" + path);
         }
+
 
 
         Spark.staticFileLocation("/rta");
