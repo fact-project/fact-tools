@@ -1,10 +1,8 @@
 package fact.rta;
 
 import com.google.common.collect.Range;
-import com.google.common.collect.TreeRangeMap;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -13,8 +11,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
 
-import java.sql.Timestamp;
-import java.util.Map;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -41,18 +38,22 @@ public class RTAProcessor implements Processor {
     double thetaCut = 0.1;
     double predictionThreshold = 0.7;
     private Range<DateTime> edgesOfCurrentBin;
-    private SignalContainer container = new SignalContainer(0, 0, offRegions);
+    private SignalContainer container = new SignalContainer(0, 0, offRegions, predictionThreshold, thetaCut);
 
     public class SignalContainer{
         public Integer signalEvents = 0;
         public Integer backgroundEvents = 0;
 
         public final int numberOfOffRegions;
+        public final double predictionThreshold;
+        public final double thetaCut;
 
-        public SignalContainer(Integer signalEvents, Integer backgroundEvents, int numberOfOffRegions) {
+        public SignalContainer(Integer signalEvents, Integer backgroundEvents, int numberOfOffRegions, double predictionThreshold, double thetaCut) {
             this.signalEvents = signalEvents;
             this.backgroundEvents = backgroundEvents;
             this.numberOfOffRegions = numberOfOffRegions;
+            this.predictionThreshold = predictionThreshold;
+            this.thetaCut = thetaCut;
         }
     }
 
@@ -116,53 +117,39 @@ public class RTAProcessor implements Processor {
             return data;
         }
         updateWebService(data, eventTimeStamp);
+
         int background = background(data, thetaCut);
 
         //check if we have need a new bin.
-        if (edgesOfCurrentBin.contains(eventTimeStamp)){
+        if (edgesOfCurrentBin != null && edgesOfCurrentBin.contains(eventTimeStamp)){
             container.signalEvents += signal;
             container.backgroundEvents += background;
         } else {
             Range<DateTime> dateTimeRange = Range.closedOpen(eventTimeStamp, eventTimeStamp.plusMinutes(binning));
-            SignalContainer signalContainer = new SignalContainer(signal, background, offRegions);
 
-            webService.updateLightCurve(dateTimeRange, container, sourceName);
-
-            container = signalContainer;
+            container = new SignalContainer(signal, background, offRegions, predictionThreshold, thetaCut);
             edgesOfCurrentBin = dateTimeRange;
+
+            try {
+                log.info("Updating lc");
+                webService.updateLightCurve(dateTimeRange, container, sourceName);
+            } catch (IOException e) {
+                log.error("Error while updating webservice");
+                throw new RuntimeException("Error while updating webservice");
+            }
+
         }
 
         return data;
     }
 
     private void updateWebService(Data data, DateTime eventTimeStamp) {
-        double prediction = (double) data.get("signal:prediction");
-        if (prediction > 0.5){
-            System.out.println("updateing event");
-            double thetaSquare = (double) data.get("signal:thetasquare");
-            double[] photoncharges = (double[]) data.get("photoncharge");
-//            double estimatedEnergy = (double) data.get("estimatedEnergy");
-            double estimatedEnergy = Math.random();
-            double size = (double) data.get("Size");
-            String sourceName = (String) data.get("SourceName");
-            webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
-        }
-    }
-
-
-    public void setOffRegions(int offRegions) {
-        this.offRegions = offRegions;
-    }
-
-    public void setBinning(int binning) {
-        this.binning = binning;
-    }
-
-    public void setHistory(int history) {
-        this.history = history;
-    }
-
-    public void setWebService(RTAWebService webService) {
-        this.webService = webService;
+        System.out.println("updating event");
+        double thetaSquare = (double) data.get("signal:thetasquare");
+        double[] photoncharges = (double[]) data.get("photoncharge");
+        double estimatedEnergy = (double) data.get("energy");
+        double size = (double) data.get("Size");
+        String sourceName = (String) data.get("SourceName");
+        webService.updateEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
     }
 }

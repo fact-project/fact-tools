@@ -99,8 +99,10 @@ function init() {
     function LightCurve(binning) {
         console.log("loading LC");
 
-        $.getJSON('/lightcurve?hours=20', function (lightcurve) {
-            if (lightcurve) {
+        $.getJSON('/lightcurve?hours=10', function (lightcurve) {
+            if (lightcurve != null ) {
+                console.log(lightcurve);
+                console.log(lightcurve != null);
                 excessPlot(lightcurve, 5);
                 //$('#lightcurve').html(excess);
             }
@@ -108,15 +110,18 @@ function init() {
 
         function refresh(){
             console.log("loading LC");
-            $.getJSON('/lightcurve', function (lightcurve) {
-                if (lightcurve) {
+            $.getJSON('/lightcurve?hours=10', function (lightcurve) {
+                if (lightcurve != null) {
+                    console.log(lightcurve);
+                    console.log(lightcurve != null);
+                    //excessPlot(lightcurve, 5);
                     //$('#lightcurve').html(excess);
                 }
             });
         }
 
         function excessPlot(lightcurve, binning){
-
+            console.log(lightcurve);
             var formatter = d3.time.format("%Y-%m-%dT%H:%M:%S.%L");
 
             var data = _.map(lightcurve, function(v){
@@ -315,7 +320,6 @@ function init() {
             rs = ['usedMemory'].concat(rs);
 
             var ts  = _.keys(status_dict);
-            latestTimeStamp = ts[ts.length - 1];
             ts = ['t'].concat(ts);
             return {"time":ts, "value":rs};
         };
@@ -325,7 +329,7 @@ function init() {
             var latestStatus = rs[rs.length - 1];
 
             var ts  = _.keys(status_dict);
-            latestTimeStamp = ts[ts.length - 1];
+            var latestTimeStamp = ts[ts.length - 1];
             return {"time":latestTimeStamp, "value":latestStatus};
         };
 
@@ -355,12 +359,19 @@ function init() {
                         ratio: 1
                     }
                 },
+                legend: {
+                    show: false
+                },
                 axis: {
                     x: {
                         type: 'timeseries',
                         tick: {
                             format: '%H:%M:%S'
                         }
+                    },
+                    y:{
+                        min: 0 ,
+                        label: "Used Memory in MB"
                     }
                 }
             });
@@ -369,8 +380,11 @@ function init() {
 
         function load(){
             if(chart) {
-                console.log("request  " +  '/status?timestamp='+latestTimeStamp)
-                $.getJSON('/status?timestamp='+latestTimeStamp, function (status_dict) {
+                var url = '/status';
+                if (latestEntry){
+                    url = '/status?timestamp='+latestEntry.time;
+                }
+                $.getJSON(url, function (status_dict) {
                     if (status_dict) {
 
                         latestEntry = getLatestEntry(status_dict);
@@ -404,17 +418,19 @@ function init() {
 
         $.getJSON('/datarate', function(rates){
 
-            rs  = _.values(rates);
-            var currentRate = rs[rs.length - 1];
-            rs = ['rate'].concat(rs);
+            console.log(rates);
+            var rs = ['rate'];
+            var ts = ['t'];
+            if (rates && rates != null){
+                rs = rs.concat(_.values(rates));
+                ts = ts.concat(_.keys(rates));
+                if (ts.length > 1) {
+                    latestTimeStamp = ts[ts.length - 1];
+                }
+            }
 
-            ts  = _.keys(rates);
-            latestTimeStamp = ts[ts.length - 1];
-            ts = ['t'].concat(ts);
 
 
-            console.log(rs);
-            console.log(ts);
             chart = c3.generate({
                 size: {
                     height: 290,
@@ -426,9 +442,12 @@ function init() {
                     xFormat: '%Y-%m-%dT%H:%M:%S.%L',
                     y: 'rate',
                     columns:[
-                        ts,
-                        rs
+                        rs,
+                        ts
                     ]
+                },
+                legend: {
+                    show: false
                 },
                 axis: {
                     x: {
@@ -437,6 +456,10 @@ function init() {
                         tick: {
                             format: '%H:%M:%S'
                         }
+                    },
+                    y:{
+                        min: 0,
+                        label: "Events per Second"
                     }
                 }
             });
@@ -445,17 +468,21 @@ function init() {
 
         function load(){
             if(chart) {
-                $.getJSON('/datarate?timestamp='+latestTimeStamp, function (rates) {
-                    if (rates) {
-                        var rs  = _.values(rates);
-                        var currentRate = rs[rs.length - 1];
-                        rs = ['rate'].concat(rs);
+                var url = '/datarate';
+                if (latestTimeStamp){
+                    url = '/datarate?timestamp='+latestTimeStamp;
+                }
+                $.getJSON(url, function (rates) {
+                    if (rates != null) {
+                        var rs = ['rate'];
+                        var ts = ['t'];
+                        rs = rs.concat(_.values(rates));
+                        ts = ts.concat(_.keys(rates));
+                        if (ts.length > 1) {
+                            latestTimeStamp = ts[ts.length - 1];
+                        }
 
-                        var ts  = _.keys(rates)
-                        latestTimeStamp = ts[ts.length - 1];
-                        ts = ['t'].concat(ts);
-
-                        $('#datarate').html(numeral(currentRate).format('0.0'));
+                        $('#datarate').html(numeral(rs[rs.length - 1]).format('0.0'));
 
                         chart.flow({
                             columns: [

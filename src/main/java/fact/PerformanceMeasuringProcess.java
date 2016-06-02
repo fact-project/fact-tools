@@ -51,7 +51,7 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
 	private HashMap<String, DescriptiveStatistics> timeMap = new HashMap<>();
 
 	@Override
-	public void init(Context context) throws Exception {
+	public void init(ApplicationContext context) throws Exception {
 		super.init(context);
 
 		HashMap<String, Integer> numberOfUses = new HashMap<>();

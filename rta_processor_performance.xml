@@ -1,0 +1,139 @@
+<container>
+
+    <properties url="classpath:/default/settings.properties" />
+
+    <!-- Pathes to the input files -->
+    <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />-->
+    <property name="drsfile" value="src/main/resources/testDrsFile.drs.fits.gz" />
+
+
+    <property name="pmml" value="/Users/kai/rf.pmml" />
+    <property name="db" value="/Users/kai/drive_2014.sqlite" />
+
+    <!--<property name="pmml" value="/home/kai/rf.pmml" />-->
+    <!--<property name="db" value="/home/kai/drive_2014.sqlite" />-->
+
+    <property name="infile" value="/Users/kai/20140105_151.fits.fz" />
+    <!--<property name="drsfile" value="/Users/kai/fact_phido/raw/2014/01/05/20140105_141.drs.fits.gz" />-->
+
+
+    <!--<property name="infile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_096.fits.gz" />-->
+    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
+
+
+    <!--<property name="infile" value="/home/kai/20140105_093.fits.fz" />-->
+    <!--<property name="drsfile" value="/home/kai/20140105_088.drs.fits.gz" />-->
+
+
+    <!--<property name="infile" value="file:/Users/kai/fact_phido/simulated/ceres/proton_heinz_12/32917/00032917.917_D_MonteCarlo032_Events.fits.gz" />-->
+    <!--<property name="drsfile" value="file:/Users/kai/fact_phido/raw/2013/10/01/20131001_091.drs.fits.gz" />-->
+
+    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+    <!--<service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />-->
+    <service id="auxService" class="fact.auxservice.SqliteService" url="file:${db}" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+    <service id="rf" class="fact.PredictionService" url="file:${pmml}" />
+    <service id="rta_service" class="fact.rta.RTAWebService" />
+
+    <!-- Name of the stream and url to the input file -->
+    <!--<stream id="fact" class="fact.io.LoopStream" events="40">-->
+        <!--<stream id="_" class="fact.io.zfits.ZFitsStream"  url="${infile}" />-->
+    <!--</stream>-->
+    <!--<stream id="fact" class="fact.io.FactFileListMultiStream"   url="file:${input}">-->
+        <!--<stream class="fact.io.zfits.ZFitsStream" id="_" />-->
+    <!--</stream>-->
+
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}" />
+
+    <!--<Queue id="out_queue" />-->
+    <!-- Description of the process and the corresponding stream -->
+    <process input="fact" copies="1">
+        <fact.DataRate every="25"/>
+        <Delay time="500ms" />
+        <!-- prevEventAndSkip: -->
+        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
+        <include url="classpath:/default/data/prevEventAndSkip.xml" />
+        <!-- Output: Data -->
+
+        <fact.datacorrection.DrsCalibration
+                url="file:${drsfile}"
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                prevEventsKey="prevEvents"
+                startCellKey="StartCellData"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+        />
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+        />
+        <!--<fact.filter.DrsTimeCalibration-->
+                <!--outputKey="timeCalibConst"-->
+        <!--/>-->
+        <!--<fact.filter.ArrayTimeCorrection-->
+                <!--dataKey="DataCalibrated"-->
+                <!--timeCalibConstKey="timeCalibConst"-->
+                <!--outputKey="DataCalibrated"-->
+        <!--/>-->
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
+
+        <!-- Extraction -->
+        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
+        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
+        <include url="classpath:/default/data/extraction.xml" />
+        <!-- Output: photoncharge, arrivalTime -->
+
+        <!-- Cleaning -->
+        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
+        <include url="classpath:/default/data/cleaning.xml" />
+        <!-- Output: shower -->
+
+        <!-- Parameter calculation (only source independent) -->
+        <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
+        arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
+        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+        Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
+        ShowerSlope, Disp -->
+        <include url="classpath:/default/data/parameterCalc.xml" />
+        <!-- Output: source independent parameters -->
+
+        <!-- Parameter calculation (only source dependent) -->
+        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
+        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
+        <include url="classpath:/default/data/sourceParameter.xml" />
+
+        <Skip condition="%{data.numPixeInShower} &lt; 10" />
+
+            <fact.rta.Signal predictor="rf" />
+            <!--<fact.rta.Background predictor="rf"  />-->
+            <fact.rta.RTAProcessor webService="rta_service"/>
+
+            <!--<Enqueue queues="out_queue" />-->
+
+    </process>
+
+
+
+    <!--<process input="out_queue">-->
+        <!--<fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,@signal,@background,Leakage,Theta_Off_?,Theta,Alpha,Alpha_Off_?"/>-->
+    <!--</process>-->
+
+</container>
+

@@ -20,7 +20,7 @@ public class Energy implements Processor {
     public Data process(Data data) {
         Double estimatedEnergy = predictor.estimate(data);
         if (estimatedEnergy != null){
-            data.put("@energy", estimatedEnergy);
+            data.put("energy", estimatedEnergy);
         }
         return data;
     }

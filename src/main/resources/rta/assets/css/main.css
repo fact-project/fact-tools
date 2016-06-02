@@ -52,11 +52,13 @@ section {
     margin-bottom: 2em;
 }
 
-.content .row .figure{
+.spotlight .row .figure{
 	padding: 1em;
 }
-.content .row img {
+.spotlight .row img {
 	display: block;
+    padding: 1em;
+	/*width: 300px;*/
 }
 
 

@@ -21,17 +21,17 @@ public class JDBITest {
 
         RTASignalTable t = dbi.open(RTASignalTable.class);
         t.dropTable();
-        t.createSignalTable();
+        t.createSignalTableIfNotExists();
         DateTime now = DateTime.now();
-        t.insert(now.toString(), now.plusMinutes(5).toString(), "Crab", 12, 3);
-        t.insert(now.plusMinutes(5).toString(), now.plusMinutes(10).toString(), "Crab", 512, 13242);
-        t.insert(now.plusMinutes(10).toString(), now.plusMinutes(15).toString(), "Crab", 13432, 12);
+        t.insert(now.toString(), now.plusMinutes(5).toString(), "Crab", 12, 3, 0.5, 04);
+        t.insert(now.plusMinutes(5).toString(), now.plusMinutes(10).toString(), "Crab", 512, 13242, 0.5, 04);
+        t.insert(now.plusMinutes(10).toString(), now.plusMinutes(15).toString(), "Crab", 13432, 12, 0.5, 04);
 
         //print all entries
         h.createQuery("SELECT * FROM RTASignal").forEach((obj) -> System.out.println(String.valueOf(obj)));
 
         //insertt same prim key again
-        t.insert(now.plusMinutes(5).toString(), now.plusMinutes(10).toString(), "Crab", 512, 13242);
+        t.insert(now.plusMinutes(5).toString(), now.plusMinutes(10).toString(), "Crab", 512, 13242, 0.5, 04);
 
         h.close();
     }

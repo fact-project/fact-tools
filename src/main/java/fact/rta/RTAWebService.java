@@ -82,12 +82,6 @@ public class RTAWebService implements Service {
                 .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
                 .create();
 
-        if (sqlitePath != null) {
-            dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
-        }
-
-
-
         Spark.staticFileLocation("/rta");
         Spark.get("/", (request, response) -> {
             Map<String, Object> attributes = new HashMap<>();
@@ -209,7 +203,7 @@ public class RTAWebService implements Service {
     }
 
 
-    public void updateLightCurve(Range<DateTime> edgesOfCurrentBin, RTAProcessor.SignalContainer signalContainer, String source) {
+    public void updateLightCurve(Range<DateTime> edgesOfCurrentBin, RTAProcessor.SignalContainer signalContainer, String source) throws IOException {
         lightCurve.put(edgesOfCurrentBin, signalContainer);
         // remove old bins so we don't accumulate too many old results in memory
 
@@ -220,14 +214,20 @@ public class RTAWebService implements Service {
         persist(lightCurve, source);
     }
 
-    private void persist(TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve, String source) {
-        //its probably enough to just insert the lates entry here. I think. Anyways lets try and insert all of them.
+    private void persist(TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve, String source) throws IOException {
+        //its probably enough to just insert the latest entry here. I think. Anyways lets try and insert all of them.
+        log.info("Persisisting stuff to DB");
+        if (dbi == null && sqlitePath != null){
+            dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
+            RTASignalTable t = dbi.open(RTASignalTable.class);
+            t.createSignalTableIfNotExists();
+        } 
         RTASignalTable t = dbi.open(RTASignalTable.class);
         lightCurve.asDescendingMapOfRanges().forEach((dateTimeRange, signalContainer) -> {
 
             DateTime start = dateTimeRange.lowerEndpoint();
             DateTime end = dateTimeRange.upperEndpoint();
-            t.insertOrIgnore(start.toString(), end.toString(), source, signalContainer.signalEvents, signalContainer.backgroundEvents);
+            t.insertOrIgnore(start.toString(), end.toString(), source, signalContainer.signalEvents, signalContainer.backgroundEvents, signalContainer.predictionThreshold, signalContainer.thetaCut);
         });
     }
 

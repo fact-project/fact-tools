@@ -20,6 +20,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -126,7 +127,6 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public Data process(Data data) {
         Data item = DataFactory.create();
-
         for (String key: defaultKeys ){
             item.put(key, data.get(key));
         }
@@ -203,6 +203,7 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public void finish() throws Exception {
         try {
+            System.out.println("Finished called--------------");
             if(bw != null) {
                 bw.newLine();
                 if (!jsonl)
