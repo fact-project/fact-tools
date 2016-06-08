@@ -9,7 +9,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <streams.scope>compile</streams.scope>
-        <streams.version>0.9.25</streams.version>
+        <streams.version>0.9.26-SNAPSHOT</streams.version>
         <binary.name>fact-tools-${project.version}</binary.name>
         <skipTests>false</skipTests>
         <finalName>fact-tools-${project.version}</finalName>

@@ -6,6 +6,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import fact.hexmap.FactPixelMapping;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
@@ -182,7 +183,7 @@ public class RTAWebService implements Service {
 
         if(minusHours != null){
             Integer hours = Integer.parseInt(minusHours);
-            DateTime history = DateTime.now().minusSeconds(hours);
+            DateTime history = DateTime.now().minusHours(hours);
 
             Map<Range<DateTime>, RTAProcessor.SignalContainer> resultMap = new HashMap<>();
 
