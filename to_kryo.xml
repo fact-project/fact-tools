@@ -1,0 +1,26 @@
+<container>
+
+    <!--<service id="rta_service" class="fact.rta.RTAWebService" sqlitePath="file:/Users/kai/rta.sqlite"/>-->
+
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}" />
+    <property name="infile" value="/Users/kai/20140105_151.fits.fz" />
+    <!--<Queue id="out_queue" />-->
+    <!--<Queue id="performance_queue" />-->
+
+    <!-- Description of the process and the corresponding stream -->
+    <process input="fact">
+        <fact.io.KryoWriter url="file:fact_data.kryo" />
+    </process>
+
+    <!--<process input="performance_queue">-->
+        <!--<If condition="%{data.@datarate} != null" >-->
+            <!--<fact.io.JSONWriter url="file:./rta_performance.json" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
+        <!--</If>-->
+    <!--</process>-->
+
+    <!--<process input="out_queue">-->
+        <!--<fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,signal:*,energy,background:*"/>-->
+    <!--</process>-->
+
+</container>
+
