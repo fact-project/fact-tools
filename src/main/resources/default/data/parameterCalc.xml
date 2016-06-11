@@ -19,46 +19,64 @@
     outputKey="phChargeShower"
     pixelSetKey="shower"
     />
-<fact.statistics.ArrayStatistics 
-    key="arrivalTime" 
-    outputKey="arrTimeShower" 
-    pixelSetKey="shower" 
+<fact.statistics.ArrayStatistics
+    key="arrivalTime"
+    outputKey="arrTimeShower"
+    pixelSetKey="shower"
 />
-<fact.statistics.ArrayStatistics 
-    key="maxSlopes" 
-    outputKey="maxSlopesShower" 
-    pixelSetKey="shower" 
+<fact.statistics.ArrayStatistics
+    key="maxSlopes"
+    outputKey="maxSlopesShower"
+    pixelSetKey="shower"
 />
-<fact.statistics.ArrayStatistics 
-    key="arrivalTimePos" 
-    outputKey="arrTimePosShower" 
-    pixelSetKey="shower" 
+<fact.statistics.ArrayStatistics
+    key="arrivalTimePos"
+    outputKey="arrTimePosShower"
+    pixelSetKey="shower"
 />
-<fact.statistics.ArrayStatistics 
-    key="maxSlopesPos" 
-    outputKey="maxSlopesPosShower" 
-    pixelSetKey="shower" 
+<fact.statistics.ArrayStatistics
+    key="maxSlopesPos"
+    outputKey="maxSlopesPosShower"
+    pixelSetKey="shower"
 />
-<fact.statistics.ArrayStatistics 
-    key="maxPos" 
-    outputKey="maxPosShower" 
-    pixelSetKey="shower" 
+<fact.statistics.ArrayStatistics
+    key="maxPos"
+    outputKey="maxPosShower"
+    pixelSetKey="shower"
 />
-<fact.features.Size 
-    pixelSetKey="shower" 
-    photonChargeKey="photoncharge" 
-    outputKey="Size" 
-/>       
+<fact.features.Size
+    pixelSetKey="shower"
+    photonChargeKey="photoncharge"
+    outputKey="Size"
+/>
 <fact.features.DistributionFromShower
     weightsKey="photoncharge"
     pixelSetKey="shower"
     sizeKey="Size"
     outputKey="showerDistribution"
+    centerkeyx="centerx"
+    centerkeyy="centery"
+    deltakeyb='deltab'
 />
-<fact.features.M3Long 
+<fact.features.Charge
+    distribution="showerDistribution"
+    pixelSetKey="shower"
+    weights="photoncharge"
+    ChargeIDOutputKey="ChargePhotonID"
+    ChargmaxOutputKey="ChargePhotonmax"
+    NewAngleOutputKey="newDelta"
+/>
+<fact.features.GaussianFit2
+    pixelSetKey="shower"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltavorherKey="deltab"
+/>
+<fact.features.M3Long
     weightsKey="photoncharge"
-    pixelSetKey="shower" 
-    distributionKey="showerDistribution" 
+    pixelSetKey="shower"
+    distributionKey="showerDistribution"
     m3lOutputKey="m3l"
     m3tOutputKey="m3t"
 />
@@ -114,6 +132,8 @@
     weights="photoncharge"
     leakage1OutputKey="Leakage"
     leakage2OutputKey="Leakage2"
+    leakage3OutputKey="Leakage3"
+    leakage4OutputKey="Leakage4"
 />
 <fact.features.TimeSpread
     weightsKey="photoncharge"
