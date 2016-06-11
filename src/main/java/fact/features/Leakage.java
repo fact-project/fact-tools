@@ -22,6 +22,10 @@ public class Leakage implements Processor {
 	private String leakage1OutputKey;
     @Parameter(required = true)
 	private String leakage2OutputKey;
+    @Parameter(required = true)
+	private String leakage3OutputKey;
+    @Parameter(required = true)
+	private String leakage4OutputKey;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -31,38 +35,48 @@ public class Leakage implements Processor {
 
 		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
 		double[] photonCharge = (double[]) input.get(weights);
-		
-		
+
+
 		double size = 0;
-	
+		double size2 = 0;
+
 	    double leakageBorder          = 0;
 	    double leakageSecondBorder    = 0;
-
+			double leakageBorder1         = 0;
+	    double leakageSecondBorder1   = 0;
 	    for (CameraPixel pix: showerPixel.set)
 	    {
 	    	size += photonCharge[pix.id];
+				size2+= 1;
 	        if (isBorderPixel(pix.id) )
 	        {
 	            leakageBorder          += photonCharge[pix.id];
 	            leakageSecondBorder    += photonCharge[pix.id];
+							leakageBorder1         += 1;
+							leakageSecondBorder1   += 1;
 	        }
 	        else if (isSecondBorderPixel(pix.id))
 	        {
 	            leakageSecondBorder    += photonCharge[pix.id];
+							leakageSecondBorder1   += 1;
 	        }
 	    }
 	    leakageBorder          = leakageBorder        / size;
 	    leakageSecondBorder    = leakageSecondBorder  / size;
+			leakageBorder1          = leakageBorder1        / size2;
+	    leakageSecondBorder1    = leakageSecondBorder1  / size2;
 
-		
 		input.put(leakage1OutputKey , leakageBorder);
 		input.put(leakage2OutputKey , leakageSecondBorder);
+		input.put(leakage3OutputKey , leakageBorder1);
+		input.put(leakage4OutputKey , leakageSecondBorder1);
 		return input;
-		
-		
+
+
 	}
-	
+
 	//this is of course not the most efficient solution
+
 	boolean isSecondBorderPixel(int pix){
 		for(FactCameraPixel nPix: pixelMap.getNeighboursFromID(pix))
 		{
@@ -103,6 +117,20 @@ public class Leakage implements Processor {
 		this.leakage2OutputKey = leakage2OutputKey;
 	}
 
-	
+	public String getLeakage3OutputKey() {
+		return leakage3OutputKey;
+	}
+
+	public void setLeakage3OutputKey(String leakage3OutputKey) {
+		this.leakage3OutputKey = leakage3OutputKey;
+	}
+
+	public String getLeakage4OutputKey() {
+		return leakage4OutputKey;
+	}
+
+	public void setLeakage4OutputKey(String leakage4OutputKey) {
+		this.leakage4OutputKey = leakage4OutputKey;
+	}
 
 }
