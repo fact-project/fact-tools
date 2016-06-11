@@ -27,7 +27,7 @@ import stream.annotations.Parameter;
 /**
  * Created by thomno on 15.08.15.
  */
-public class GaussianFit2D implements StatefulProcessor {
+public class GaussianFit2Dskew implements StatefulProcessor {
     @Parameter(required = false, description = "Key containing the photoncharges", defaultValue = "photoncharge")
     private String photonchargeKey = "photoncharge";
     @Parameter(required = false, description = "The pixelSet on which the fit is performed", defaultValue = "shower")
