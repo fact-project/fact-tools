@@ -92,6 +92,30 @@ public class RTADataBase {
 //        @SqlBatch("insert into something (id, name) values (:id, :name)")
 //        @BatchChunkSize(1000)
 //        void insertAll(@BindBean Iterator<Something> somethings);
+
+        @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
+                "(night INTEGER NOT NULL, " +
+                "run_id INTEGER NOT NULL," +
+                "on_time FLOAT," +
+                "start_time VARCHAR(50)," +
+                "end_time VARCHAR(50)," +
+                "source varchar(50)," +
+                "PRIMARY KEY (night, run_id))")
+        void createRunTable();
+
+        @SqlUpdate("CREATE TABLE IF NOT EXISTS signal " +
+                "(timestamp VARCHAR(50) PRIMARY KEY, " +
+                "night INTEGER NOT NULL, " +
+                "run_id INTEGER NOT NULL," +
+                "prediction FLOAT NOT NULL," +
+                "theta_on FLOAT NOT NULL" +
+                "theta_off_1 FLOAT" +
+                "theta_off_2 FLOAT" +
+                "theta_off_3 FLOAT" +
+                "theta_off_4 FLOAT" +
+                "theta_off_5 FLOAT" +
+                "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id) NOT NULL")
+        void createSignalTable();
         /**
          * close with no args is used to close the connection
          */
