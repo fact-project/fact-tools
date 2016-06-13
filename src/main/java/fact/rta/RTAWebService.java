@@ -19,6 +19,8 @@ import spark.template.handlebars.HandlebarsTemplateEngine;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.service.Service;
+import streams.runtime.Hook;
+import streams.runtime.Signals;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -112,7 +114,7 @@ public class RTAWebService implements Service {
         //update systemstatus once per minute
         int MINUTE = 1000*60;
 
-        Timer t = new Timer();
+        final Timer t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -124,6 +126,7 @@ public class RTAWebService implements Service {
             }
         }, 0, 10000);
 
+        Signals.register(i -> t.cancel());
     }
 
 
