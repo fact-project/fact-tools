@@ -66,7 +66,7 @@
     ChargmaxOutputKey="ChargePhotonmax"
     NewAngleOutputKey="newDelta"
 />
-<fact.features.GaussianFit2
+<fact.features.GaussianFit2D
     pixelSetKey="shower"
     photonchargeKey="photoncharge"
     cogxKey="centerx"
