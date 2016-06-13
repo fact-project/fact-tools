@@ -1,47 +1,64 @@
 package fact.auxservice;
 
+import com.google.common.cache.*;
+import com.google.common.collect.HashBasedTable;
 import fact.auxservice.strategies.AuxPointStrategy;
 import fact.io.FitsStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
+import org.joda.time.MutableDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import stream.service.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 /**
  * This implements an AuxiliaryService {@link fact.auxservice.AuxiliaryService}  providing data from the auxiliary
  * files written by the telescopes data acquisition system.
  *
- * Given the path to the aux folder, that is the folder containing all the auxiliary file for a <bold>specific night</bold>,
- * via .xml this service will read the requested data and store them in a map of {@link fact.auxservice.AuxPoint}.
+ * Given the path to the aux folder, that is the folder containing all the auxiliary files for FACT.
+ * This service will read the requested data and store them in a map of {@link fact.auxservice.AuxPoint}.
  *
  * Created by kaibrugge on 07.10.14.
  */
 public class AuxFileService implements AuxiliaryService {
 
-    Logger log = LoggerFactory.getLogger(AuxFileService.class);
+    private Logger log = LoggerFactory.getLogger(AuxFileService.class);
 
-    Map<AuxiliaryServiceName, TreeSet<AuxPoint>> services = new HashMap<>();
 
     @Parameter(required = true, description = "The path to the folder containing the auxilary data as .fits files")
-    SourceURL auxFolder;
+    public SourceURL auxFolder;
 
-    boolean isInit = false;
-    private HashMap<AuxiliaryServiceName, SourceURL> auxFileUrls;
+    private LoadingCache<AuxCache.CacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterAccess(20, TimeUnit.MINUTES)
+            .removalListener(notification -> log.debug("Removing Data from cache for cause {}", notification.getCause()))
+            .build(new CacheLoader<AuxCache.CacheKey, TreeSet<AuxPoint>>() {
+                @Override
+                public TreeSet<AuxPoint> load(AuxCache.CacheKey key) throws Exception {
+                    return readDataFromFile(key);
+                }
+            });
+
+
+    private boolean isInit = false;
+    private HashBasedTable<Integer, AuxiliaryServiceName, Path> auxFileUrls;
 
     /**
      * This method returns an AuxPoint according to the strategy and the time stamp passed to this method.
@@ -53,40 +70,48 @@ public class AuxFileService implements AuxiliaryService {
      * @param serviceName The name of the service.
      * @param eventTimeStamp The time stamp of the current raw data event.
      * @param strategy One of the strategies provided.
-     * @return
+     * @return the auxpoint selected by the strategy if it exists.
      * @throws FileNotFoundException
      */
     @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws FileNotFoundException {
-        if(!isInit){
-            auxFileUrls = findAuxFileUrls(auxFolder);
+    public synchronized AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+        if(!isInit) {
+            AuxFileFinder auxFileFinder = new AuxFileFinder();
+            Path p = new File(auxFolder.getPath()).toPath();
+            Files.walkFileTree(p, auxFileFinder);
+            auxFileUrls = auxFileFinder.auxFileTable;
             isInit = true;
         }
-        if(!services.containsKey(serviceName)){
-            services.put(serviceName, readDataFromFile(auxFileUrls.get(serviceName)));
+        if(eventTimeStamp.isAfterNow()){
+            log.warn("The requested timestamp seems to be in the future.");
         }
-        TreeSet<AuxPoint> set = services.get(serviceName);
+        try {
 
-        DateTime firstTimeStamp = set.first().getTimeStamp();
-        DateTime lastTimeStamp = set.last().getTimeStamp();
-        if(firstTimeStamp.isAfter(eventTimeStamp) || lastTimeStamp.isBefore(eventTimeStamp))
-        {
-            log.warn("Provided event timestamp not in auxiliary File.");
+            AuxCache.CacheKey key = new AuxCache().new CacheKey(serviceName, AuxCache.dateTimeStampToFACTNight(eventTimeStamp));
+
+            TreeSet<AuxPoint> auxPoints = cache.get(key);
+            AuxPoint a = strategy.getPointFromTreeSet(auxPoints, eventTimeStamp);
+            if (a == null) {
+                throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
+            }
+            return a;
+
+        } catch (ExecutionException e) {
+            throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
         }
-
-        //TODO: load a new file in case we need stuff from the next day or night. I don't know whether this is ever a valid use case.
-        return strategy.getPointFromTreeSet(set, eventTimeStamp);
     }
 
 
-    /**
-     * Reads data from a file provided by the url and creates an AuxPoint for each event in the file.
-     * @param driveFileUrl url to the auxfile
-     * @return treeset containing auxpoints ordered by their timestamp
-     */
-    private TreeSet<AuxPoint>  readDataFromFile(SourceURL driveFileUrl){
+
+
+    private TreeSet<AuxPoint>  readDataFromFile(AuxCache.CacheKey key) throws Exception {
+        Path pathToFile = auxFileUrls.get(key.factNight, key.service);
+        if(pathToFile == null){
+            log.error("Could not load auxfile {} for night {}", key.service, key.factNight);
+            throw new IOException("Could not load auxfile for key " +  key);
+        }
         TreeSet<AuxPoint> result = new TreeSet<>();
-        FitsStream stream = new FitsStream(driveFileUrl);
+        FitsStream stream = new FitsStream(new SourceURL(pathToFile.toUri().toURL()));
         try {
             stream.init();
             Data slowData = stream.readNext();
@@ -106,56 +131,78 @@ public class AuxFileService implements AuxiliaryService {
     }
 
 
-    /**
-     * Finds all .fits file in the given folder that contain one of the values from AuxiliaryServiceName in their
-     * file name. This is public for unit testing purposes.
-     * @param auxFolder
-     * @return a mapping from a AuxiliaryServiceName to a SourceURL which points to a file.
-     * @throws java.io.FileNotFoundException in case the provided URL doesnt point to a readable folder.
-     */
-    public HashMap<AuxiliaryServiceName, SourceURL> findAuxFileUrls(SourceURL auxFolder) throws FileNotFoundException {
-
-        Path p = Paths.get(auxFolder.getPath());
-        File folder = p.toFile();
-
-        if(!folder.isDirectory() || !folder.exists()){
-            throw new FileNotFoundException("Could not enter folder. Does it exist?");
-        }
-        final HashMap<AuxiliaryServiceName, SourceURL> m = new HashMap<>();
-        folder.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (name.endsWith(".fits")) {
-                    try {
-                        //get name of aux file by removing the date string (first 9 characters) and the file ending
-                        String auxName = name.substring(9);
-                        auxName = auxName.substring(0, auxName.length() - 5);
-                        File f = new File(dir, name);
-                        m.put(AuxiliaryServiceName.valueOf(auxName), new SourceURL(f.toURI().toURL()));
-                    } catch (MalformedURLException e) {
-//                        e.printStackTrace();
-                        log.error("Could not create path to auxillary file " + dir + " " +name);
-                        return false;
-                    }catch (IllegalArgumentException e) {
-//                        e.printStackTrace();
-                        log.warn("The file " + dir + " " +name + " is not a recognized aux service. ");
-                        return false;
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-        return m;
-    }
-
     @Override
     public void reset() throws Exception {
     }
 
-    public void setAuxFolder(SourceURL auxFolder) {
-        this.auxFolder = auxFolder;
+
+
+    /**
+     * A {@code FileVisitor} that finds
+     * all files that match the specified pattern for aux files
+     * Auxfilenames are seperated by dots as in: date.servicename.fits
+     */
+    public class AuxFileFinder extends SimpleFileVisitor<Path> {
+
+        public HashBasedTable<Integer, AuxiliaryServiceName, Path> auxFileTable = HashBasedTable.create();
+
+        // Check file name for proper aux file naming scheme.
+        void matchAuxFile(Path file) {
+            try {
+                Path name = file.getFileName();
+                if (name != null) {
+                    String[] split = name.toString().split("\\.");
+                    //an aux file contains two dots.
+                    if (split.length != 3) {
+                        return;
+                    }
+                    //aux files have a fits extension
+                    if(!split[2].equals("fits")){
+                        return;
+                    }
+                    //get date string (night)
+                    int night = Integer.decode(split[0]);
+                    AuxiliaryServiceName serviceName = AuxiliaryServiceName.valueOf(split[1]);
+                    auxFileTable.put(night, serviceName, file);
+                }
+            } catch(NumberFormatException e){
+                log.warn("Cannot decode night from file with name: " + file.toString());
+            } catch(IllegalArgumentException e){
+                log.warn("The file " + file + " is not a recognized auxservice");
+            }
+        }
+
+
+        // Invoke the pattern matching
+        // method on each file.
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            matchAuxFile(file);
+            return CONTINUE;
+        }
+
+        //check whether the directory name only contains numbers
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+            if (dir.getFileName().toString().equals("aux")){
+                return CONTINUE;
+            }
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                Short.parseShort(dir.getFileName().toString());
+            } catch (NumberFormatException e) {
+                log.warn("Directory is not a valid aux directory with name: " + dir.toString() + ".  Skipping subtree.");
+                return SKIP_SUBTREE;
+            }
+            return CONTINUE;
+        }
+
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) {
+            log.error("An error occured while trying to read directories " + exc.getLocalizedMessage() +
+                    "\n Continuing with next file.");
+            return CONTINUE;
+        }
     }
-
-
 }

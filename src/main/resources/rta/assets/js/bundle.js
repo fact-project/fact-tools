@@ -146,7 +146,7 @@ function init() {
             var bars = d3_time.timeSecond.count(d3.min(dates), d3.max(dates));
 
             var margin = {top: 40, right: 40, bottom: 40, left:40},
-                width = 700,
+                width = 600,
                 height = 400;
 
             var domainWidth = width - margin.left - margin.right;
@@ -341,8 +341,8 @@ function init() {
             var columns = parseDataToColumns(status_dict);
             chart = c3.generate({
                 size: {
-                    height: 290,
-                    width: 450
+                    height: 400,
+                    width: 600
                 },
                 bindto: '#memory_chart',
                 data: {
@@ -434,8 +434,8 @@ function init() {
 
             chart = c3.generate({
                 size: {
-                    height: 290,
-                    width: 450
+                    height: 400,
+                    width: 600
                 },
                 bindto: '#datarate_chart',
                 data: {

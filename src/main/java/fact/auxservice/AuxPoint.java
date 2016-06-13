@@ -105,7 +105,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
 
 
-    //below you'll find the auto generated code needed to make this object hashable and comparable
+    //below you'll matchAuxFile the auto generated code needed to make this object hashable and comparable
 
     @Override
     public int compareTo(AuxPoint o) {

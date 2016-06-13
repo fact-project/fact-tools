@@ -1,21 +1,21 @@
 package fact.rta;
 
 import com.google.common.collect.Range;
-import com.google.common.collect.TreeRangeMap;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import fact.hexmap.FactPixelMapping;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
 import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.Spark;
 import spark.template.handlebars.HandlebarsTemplateEngine;
+import stream.Data;
+import stream.Keys;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.service.Service;
@@ -45,9 +45,11 @@ public class RTAWebService implements Service {
 
 
     final private Gson gson;
+    private boolean isInit = false;
 
+    private RTADataBase.FACTRun currentRun = null;
 
-    final private class RTAEvent{
+    final private class RTAEvent {
         final double[] photonCharges;
         final double estimatedEnergy;
         final double size;
@@ -55,27 +57,20 @@ public class RTAWebService implements Service {
         final String sourceName;
         final DateTime eventTimeStamp;
 
-        RTAEvent(double[] photonCharges, double estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
-
-            this.photonCharges = photonCharges;
-            this.estimatedEnergy = estimatedEnergy;
-            this.size = size;
-            this.thetaSquare = thetaSquare;
-            this.sourceName = sourceName;
+        RTAEvent(DateTime eventTimeStamp, Data item) {
+            this.thetaSquare = (double) item.get("signal:thetasquare");
+            this.estimatedEnergy = (double) item.get("energy");
+            this.size = (double) item.get("Size");
+            this.sourceName = (String) item.get("SourceName");
+            this.photonCharges = (double[]) item.get("photoncharge");
             this.eventTimeStamp = eventTimeStamp;
         }
     }
 
-
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
-    private TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve = TreeRangeMap.create();
-
-    public RTAWebService(String path) throws SQLException {
-        this();
-        dbi = new DBI("jdbc:sqlite:" + path);
-    }
+    private TreeMap<DateTime, RTADataBase.RTASignal> signalMap = new TreeMap<>();
 
     public RTAWebService() throws SQLException {
 
@@ -92,7 +87,7 @@ public class RTAWebService implements Service {
             return new ModelAndView(attributes, "rta/index.html");
         }, new HandlebarsTemplateEngine());
 
-        Spark.get("/lightcurve", (request, response) -> getLightCurve(request.queryParams("hours")), gson::toJson);
+//        Spark.get("/lightcurve", (request, response) -> getLightCurve(request.queryParams("hours")), gson::toJson);
 
         Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
@@ -112,7 +107,7 @@ public class RTAWebService implements Service {
 
 
         //update systemstatus once per minute
-        int MINUTE = 1000*60;
+        long MINUTE = 1000*60;
 
         final Timer t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
@@ -124,31 +119,105 @@ public class RTAWebService implements Service {
                     systemStatusMap.pollFirstEntry();
                 }
             }
-        }, 0, 10000);
+        }, 0, (long) (0.1*MINUTE));
 
         Signals.register(i -> t.cancel());
     }
 
+    public void init(){
+        dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
+        Handle h = dbi.open();
 
-    public void updateEvent(double[] photoncharges,double  estimatedEnergy, double size, double thetaSquare, String sourceName, DateTime eventTimeStamp){
-        RTAEvent event = new RTAEvent(photoncharges, estimatedEnergy, size, thetaSquare, sourceName, eventTimeStamp);
-        DateTime now = DateTime.now();
-        eventMap.put(now, event);
+        String createRunTable = "CREATE TABLE IF NOT EXISTS fact_run " +
+                "(night INTEGER NOT NULL, " +
+                "run_id INTEGER NOT NULL," +
+                "on_time FLOAT," +
+                "start_time VARCHAR(50)," +
+                "end_time VARCHAR(50)," +
+                "source varchar(50)," +
+                "PRIMARY KEY (night, run_id))";
+        h.execute(createRunTable);
 
-        Seconds delta = Seconds.secondsBetween(eventMap.firstKey(), eventMap.lastKey());
-        if(delta.isGreaterThan(Seconds.seconds(180))){
-            rateMap.pollFirstEntry();
+        String createSignalTable = "CREATE TABLE IF NOT EXISTS signal " +
+                "(timestamp VARCHAR(50) PRIMARY KEY, " +
+                "night INTEGER NOT NULL, " +
+                "run_id INTEGER NOT NULL," +
+                "prediction FLOAT NOT NULL," +
+                "theta_on FLOAT NOT NULL" +
+                "theta_off_1 FLOAT" +
+                "theta_off_2 FLOAT" +
+                "theta_off_3 FLOAT" +
+                "theta_off_4 FLOAT" +
+                "theta_off_5 FLOAT" +
+                "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id) NOT NULL";
+        h.execute(createSignalTable);
+
+        isInit = true;
+    }
+//    private int background(Data data, double thetaCut){
+//        int backGroundEvents = 0;
+//
+//        Keys offKeys = new Keys("Theta_Off_?");
+//        for (String key : offKeys.select(data)) {
+//            double offValue = (double) data.get(key);
+//            if (offValue > thetaCut){
+//                backGroundEvents += 1;
+//            }
+//        }
+//        return backGroundEvents;
+//    }
+//
+//    private int signal(Data data, double predictionThreshold, double thetaCut){
+//        double prediction = (double) data.get("signal:prediction");
+//        double theta = (double) data.get("signal:thetasquare");
+//        if (prediction <= predictionThreshold && theta <= thetaCut){
+//            return 1;
+//        }
+//        return 0;
+//    }
+
+    synchronized void updateEvent(DateTime eventTimeStamp, Data item){
+        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        if (currentRun == null || currentRun != run){
+            currentRun = run;
+        }
+
+        signalMap.put(DateTime.now(), new RTADataBase().new RTASignal(eventTimeStamp, item, run));
+        Seconds delta = Seconds.secondsBetween(signalMap.firstKey(), signalMap.lastKey());
+        if(delta.isGreaterThan(Seconds.seconds(10))){
+            persistEvents(signalMap);
+        }
+
+
+        eventMap.put(DateTime.now(), new RTAEvent(eventTimeStamp, item));
+        delta = Seconds.secondsBetween(eventMap.firstKey(), eventMap.lastKey());
+        if(delta.isGreaterThan(Seconds.seconds(10))){
+            eventMap.pollFirstEntry();
         }
     }
 
-    public RTAEvent getLatestEvent(){
+    private void persistEvents(TreeMap<DateTime, RTADataBase.RTASignal> signalMap) {
+        log.info("Saving stuff to DB");
+        if (!isInit){
+            init();
+        }
+        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
+        while(!signalMap.isEmpty()){
+            RTADataBase.RTASignal rtaSignal = signalMap.pollFirstEntry().getValue();
+            rtaTables.insertRun(rtaSignal.run);
+            rtaTables.insertSignal(rtaSignal.run, rtaSignal);
+        }
+        rtaTables.close();
+    }
+
+    private RTAEvent getLatestEvent(){
         if (!eventMap.isEmpty()) {
             return eventMap.lastEntry().getValue();
         }
         return null;
     }
 
-    public NavigableMap<DateTime, Double> getDataRates(String timeStamp){
+    private NavigableMap<DateTime, Double> getDataRates(String timeStamp){
         if (rateMap.isEmpty()){
             return null;
         }
@@ -178,28 +247,28 @@ public class RTAWebService implements Service {
         return systemStatusMap.descendingMap();
     }
 
-
-    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve(String minusHours) throws NumberFormatException{
-        if(lightCurve.asMapOfRanges().isEmpty()){
-            return null;
-        }
-
-        if(minusHours != null){
-            Integer hours = Integer.parseInt(minusHours);
-            DateTime history = DateTime.now().minusHours(hours);
-
-            Map<Range<DateTime>, RTAProcessor.SignalContainer> resultMap = new HashMap<>();
-
-            lightCurve.asDescendingMapOfRanges().forEach((range, container) ->{
-                if(range.lowerEndpoint().isAfter(history)){
-                    resultMap.put(range, container);
-                }
-            });
-
-            return resultMap;
-        }
-        return lightCurve.asDescendingMapOfRanges();
-    }
+//
+//    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve(String minusHours) throws NumberFormatException{
+//        if(lightCurve.asMapOfRanges().isEmpty()){
+//            return null;
+//        }
+//
+//        if(minusHours != null){
+//            Integer hours = Integer.parseInt(minusHours);
+//            DateTime history = DateTime.now().minusHours(hours);
+//
+//            Map<Range<DateTime>, RTAProcessor.SignalContainer> resultMap = new HashMap<>();
+//
+//            lightCurve.asDescendingMapOfRanges().forEach((range, container) ->{
+//                if(range.lowerEndpoint().isAfter(history)){
+//                    resultMap.put(range, container);
+//                }
+//            });
+//
+//            return resultMap;
+//        }
+//        return lightCurve.asDescendingMapOfRanges();
+//    }
 
     @Override
     public void reset() throws Exception {
@@ -207,35 +276,8 @@ public class RTAWebService implements Service {
     }
 
 
-    public void updateLightCurve(Range<DateTime> edgesOfCurrentBin, RTAProcessor.SignalContainer signalContainer, String source) throws IOException {
-        lightCurve.put(edgesOfCurrentBin, signalContainer);
-        // remove old bins so we don't accumulate too many old results in memory
 
-        Map.Entry<Range<DateTime>, RTAProcessor.SignalContainer> entry = lightCurve.getEntry(edgesOfCurrentBin.lowerEndpoint().minusHours(12));
-        if (entry != null){
-            lightCurve.remove(entry.getKey());
-        }
-        persist(lightCurve, source);
-    }
-
-    private void persist(TreeRangeMap<DateTime, RTAProcessor.SignalContainer> lightCurve, String source) throws IOException {
-        //its probably enough to just insert the latest entry here. I think. Anyways lets try and insert all of them.
-        log.info("Persisisting stuff to DB");
-        if (dbi == null && sqlitePath != null){
-            dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
-            RTASignalTable t = dbi.open(RTASignalTable.class);
-            t.createSignalTableIfNotExists();
-        } 
-        RTASignalTable t = dbi.open(RTASignalTable.class);
-        lightCurve.asDescendingMapOfRanges().forEach((dateTimeRange, signalContainer) -> {
-
-            DateTime start = dateTimeRange.lowerEndpoint();
-            DateTime end = dateTimeRange.upperEndpoint();
-            t.insertOrIgnore(start.toString(), end.toString(), source, signalContainer.signalEvents, signalContainer.backgroundEvents, signalContainer.predictionThreshold, signalContainer.thetaCut);
-        });
-    }
-
-    public static class DateTimeAdapter extends TypeAdapter<DateTime> {
+    private static class DateTimeAdapter extends TypeAdapter<DateTime> {
 
         @Override
         public void write(JsonWriter jsonWriter, DateTime dateTime) throws IOException {

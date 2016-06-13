@@ -4,6 +4,9 @@
 	margin: 20px 20px 15px 5px;
 }
 
+#fact_map {
+	margin-left:4em;
+}
 .axis path{
 	fill: none;
 	/* stroke: #000; */
@@ -26,7 +29,7 @@
 }
 
 body {
-    background-color: #fafafa;
+    background-color: #eee;
 }
 
 .tooltip {
@@ -52,15 +55,18 @@ section {
     margin-bottom: 2em;
 }
 
-.spotlight .row .figure{
-	padding: 1em;
+
+.spotlight   h3 {
+	margin-top: 0.2em;
+}
+.spotlight   p {
+	margin-right: 2em;
 }
 .spotlight .row img {
 	display: block;
     padding: 1em;
 	/*width: 300px;*/
 }
-
 
 .banner {
 	background-color: #224;
@@ -71,25 +77,27 @@ section {
 }
 
 .banner p {
-    margin-right: 20em;
+    margin-right: 13em;
+    padding-left: 3em;
 }
 
 .banner h2 {
-	margin-left: 1em;
 	border-right: thin solid #eee;
 	font-size: 50pt;
+	text-align:right;
+	padding-right:2.2em;
 }
 
 .spotlight {
     background-color: white;
     margin-bottom: 1.2em;
-    padding-left: 0.7em;
 }
 
 
 #intro {
     background-color: white;
     padding-top: 6em;
+    /* padding-left: 5em; */
 }
 
 #intro td{
@@ -104,4 +112,11 @@ section {
 }
 .wide80 {
     max-width: 80%;
+}
+
+#footer {
+	color:#eee;
+	background-color:#444;
+	margin:-0.6em;
+	padding:0;
 }
