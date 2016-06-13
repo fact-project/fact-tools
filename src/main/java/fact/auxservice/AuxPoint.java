@@ -11,21 +11,22 @@ import java.util.Map;
  * This can be a file or a database. The key passed to the getters has to be known beforehand of course.
  * Created by kai on 31.03.15.
  */
-public class AuxPoint implements Comparable<AuxPoint>{
+public class AuxPoint implements Comparable<AuxPoint> {
     private DateTime timeStamp;
     private ImmutableMap<String, Serializable> data;
 
-    public AuxPoint(DateTime timeStamp){
+    public AuxPoint(DateTime timeStamp) {
         this.timeStamp = new DateTime(timeStamp);
     }
 
 
     /**
      * Creates an AuxPoint from a Timestamp and a map containing key,value pairs as found in the slow control data.
+     *
      * @param timeStamp the timestamp specifying  when the auxiliary data was recorded.
-     * @param data a map containing the names and values from the .fits files as key values pairs.
+     * @param data      a map containing the names and values from the .fits files as key values pairs.
      */
-    public AuxPoint(DateTime timeStamp, Map<String, Serializable> data){
+    public AuxPoint(DateTime timeStamp, Map<String, Serializable> data) {
         this.data = new ImmutableMap.Builder<String, Serializable>().putAll(data).build();
         this.timeStamp = new DateTime(timeStamp);
     }
@@ -33,6 +34,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
 
     /**
      * The timestamp from when sensor recorded this AuxPoint.
+     *
      * @return the timestamp for this point.
      */
     public DateTime getTimeStamp() {
@@ -45,61 +47,86 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
 
     /**
-     * Returns the value for the key iff it exists and its a Double. Returns null otherwise.
+     * Returns the value for the key iff it exists and its a Double or a Float. Returns null otherwise.
+     *
      * @param key
      * @return the value or null
      */
-    public Double getDouble(String key){
+    public Double getDouble(String key) {
         try {
             return (Double) data.get(key);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
+
+            try {
+                return ((Float) data.get(key)).doubleValue();
+            } catch (ClassCastException e1) {
+                return null;
+            }
+
+        }
+    }
+
+    /**
+     * Returns the value for the key iff it exists and its a Float. Returns null otherwise.
+     *
+     * @param key
+     * @return the value or null
+     */
+    public Float getFloat(String key) {
+        try {
+            return (Float) data.get(key);
+        } catch (ClassCastException e) {
             return null;
         }
     }
+
 
     /**
      * Returns the value for the key iff it exists and its an Integer. Returns null otherwise.
+     *
      * @param key
      * @return the value or null
      */
-    public Integer getInteger(String key){
+    public Integer getInteger(String key) {
         try {
             return (Integer) data.get(key);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
             return null;
         }
     }
 
-    public String getString(String key){
+    public String getString(String key) {
         try {
             return (String) data.get(key);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
             return null;
         }
     }
 
     /**
      * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
+     *
      * @param key
      * @return the value or null
      */
-    public int[] getIntegerArray(String key){
+    public int[] getIntegerArray(String key) {
         try {
             return (int[]) data.get(key);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
             return null;
         }
     }
 
     /**
      * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
+     *
      * @param key
      * @return the value or null
      */
-    public double[] getDoubleArray(String key){
+    public double[] getDoubleArray(String key) {
         try {
             return (double[]) data.get(key);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
             return null;
         }
     }
@@ -133,7 +160,9 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "TimeStamp: " + timeStamp.toString() + data.toString();
     }
+
+
 }

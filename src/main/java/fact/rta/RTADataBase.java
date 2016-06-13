@@ -1,12 +1,16 @@
 package fact.rta;
 
 import org.joda.time.DateTime;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.BindBean;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.SQLStatement;
+import org.skife.jdbi.v2.sqlobject.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Keys;
 
+import java.lang.annotation.*;
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,11 +19,56 @@ import java.util.Set;
  */
 public class RTADataBase {
 
+    final private static Logger log = LoggerFactory.getLogger(RTADataBase.class);
 
-    final class FACTRun {
+    // our binding annotation
+    @BindingAnnotation(BindSignal.SignalBinderFactory.class)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.PARAMETER})
+    public @interface BindSignal
+    {
+
+        public static class SignalBinderFactory implements BinderFactory
+        {
+            public Binder build(Annotation annotation)
+            {
+                return new Binder<BindSignal, RTASignal>()
+                {
+                    public void bind(SQLStatement q, BindSignal bind, RTASignal s)
+                    {
+                        try {
+                            q.bind("night", s.run.night );
+                            q.bind("run_id", s.run.runID);
+                            Field[] fields = s.getClass().getDeclaredFields();
+                            for (Field f : fields){
+                                if(!f.getName().equals("run")) {
+                                    q.bind(f.getName(), f.get(s));
+                                }
+                            }
+                        } catch (IllegalAccessException e) {
+                            log.error("Could not access field value in statement: " + q.toString());
+//                            e.printStackTrace();
+                        }
+
+//                        (timestamp, night, run_id, prediction, theta_on. theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5
+                    }
+                };
+            }
+        }
+    }
+
+
+
+
+    public final class FACTRun {
+
+
         final String source;
         final int runID;
+
+
         final int night;
+
         final DateTime startTime;
         final DateTime endTime;
         final double onTime;
@@ -29,7 +78,7 @@ public class RTADataBase {
             this.source = (String) item.get("Source");
             this.runID = (int) item.get("RUNID");
             this.night = (int) item.get("NIGHT");
-            this.onTime = (double) item.get("onTime");
+            this.onTime = (double) item.get("OnTime");
             this.startTime = DateTime.parse((String) item.get("DATE-OBS"));
             this.endTime = DateTime.parse((String) item.get("DATE-END"));
         }
@@ -47,20 +96,45 @@ public class RTADataBase {
         public int hashCode() {
             return startTime.hashCode();
         }
+
+        public double getOnTime() {
+            return onTime;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public int getRunID() {
+            return runID;
+        }
+
+        public int getNight() {
+            return night;
+        }
+
+        public DateTime getStartTime() {
+            return startTime;
+        }
+
+        public DateTime getEndTime() {
+            return endTime;
+        }
+
     }
 
 
     final class RTASignal {
 
-        final FACTRun run;
-        final double prediction;
-        final double theta_off_1;
-        final double theta_off_2;
-        final double theta_off_3;
-        final double theta_off_4;
-        final double theta_off_5;
-        final double theta;
-        final DateTime eventTimeStamp;
+        public final FACTRun run;
+        public final double prediction;
+        public final double theta_off_1;
+        public final double theta_off_2;
+        public final double theta_off_3;
+        public final double theta_off_4;
+        public final double theta_off_5;
+        public final double theta;
+        public final DateTime eventTimeStamp;
 
         RTASignal(DateTime eventTimeStamp, Data item, FACTRun run) {
             this.run = run;
@@ -84,10 +158,13 @@ public class RTADataBase {
         @SqlUpdate("INSERT OR IGNORE INTO fact_run (night, run_id, start_time, end_time, on_time, source) values (:night, :runID, :startTime, :endTime, :onTime, :source)")
         void insertRun(@BindBean FACTRun run);
 
-        @SqlUpdate("INSERT OR IGNORE INTO signal (timestamp, night, run_id, prediction, theta_on. theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5) " +
-                "values (:r.timestamp, :s.run_id, :s.night, :r.prediction, :r.theta_on. :r.theta_off_1, :r.theta_off_2, :r.theta_off_3, :r.theta_off_4, :r.theta_off_5 )")
-        void insertSignal(@BindBean("r") FACTRun run, @BindBean("s") RTASignal signal );
+        @SqlUpdate("INSERT OR IGNORE INTO signal (timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5)" +
+                "values(:eventTimeStamp, :night, :run_id, :prediction, :theta, :theta_off_1, :theta_off_2, :theta_off_3, :theta_off_4, :theta_off_5)")
+        void insertSignal(@BindSignal() RTASignal signal );
 
+
+        @SqlQuery("SELECT * from signal")
+        List<String> getSignalEntries();
 
 //        @SqlBatch("insert into something (id, name) values (:id, :name)")
 //        @BatchChunkSize(1000)
@@ -108,13 +185,13 @@ public class RTADataBase {
                 "night INTEGER NOT NULL, " +
                 "run_id INTEGER NOT NULL," +
                 "prediction FLOAT NOT NULL," +
-                "theta_on FLOAT NOT NULL" +
-                "theta_off_1 FLOAT" +
-                "theta_off_2 FLOAT" +
-                "theta_off_3 FLOAT" +
-                "theta_off_4 FLOAT" +
-                "theta_off_5 FLOAT" +
-                "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id) NOT NULL")
+                "theta_on FLOAT NOT NULL," +
+                "theta_off_1 FLOAT," +
+                "theta_off_2 FLOAT," +
+                "theta_off_3 FLOAT," +
+                "theta_off_4 FLOAT," +
+                "theta_off_5 FLOAT," +
+                "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id))")
         void createSignalTable();
         /**
          * close with no args is used to close the connection

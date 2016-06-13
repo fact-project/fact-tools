@@ -1,8 +1,14 @@
 package fact.rta;
 
+import fact.auxservice.AuxPoint;
+import fact.auxservice.AuxiliaryService;
+import fact.auxservice.AuxiliaryServiceName;
+import fact.auxservice.strategies.Closest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.jpmml.evaluator.ProbabilityDistribution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.*;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
@@ -10,6 +16,7 @@ import stream.expressions.version2.AbstractExpression;
 import stream.expressions.version2.Condition;
 import stream.expressions.version2.ConditionFactory;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -18,6 +25,7 @@ import java.util.stream.IntStream;
  * Created by kai on 24.01.16.
  */
 public class Signal implements Processor {
+    private Logger log = LoggerFactory.getLogger(Signal.class);
 
     @Service(required = true)
     fact.PredictionService predictor;
@@ -27,6 +35,9 @@ public class Signal implements Processor {
 
     @Service(required = true)
     RTAWebService webService;
+
+    @Service(required = true)
+    AuxiliaryService auxService;
 
     public static double thetaDegreesToThetaSquaredInMM(double theta){
         double pixelsize = 9.5;
@@ -50,26 +61,37 @@ public class Signal implements Processor {
     }
 
     @Override
-    public Data process(Data data) {
+    public Data process(Data data)  {
 
         ProbabilityDistribution distribution = predictor.predict(data);
         if (distribution != null){
-            //put signal prediction and thetsquared into data item
-            data.put("signal:prediction", distribution.getProbability(signalClassName));
-            double theta = (double) data.get("Theta");
-            data.put("signal:thetasquare", thetaDegreesToThetaSquaredInMM(theta));
 
-            //put thetsquared for each offposition into the data item
-            Set<String> offKeys = new Keys("Theta_Off_?").select(data);
-            double[] thetaOffs = offKeys.stream().mapToDouble(s -> (double) data.get(s)).toArray();
 
-            for (int offPosition = 0; offPosition < offKeys.size(); offPosition++) {
-                data.put("background:thetasquare:"+offPosition , thetaDegreesToThetaSquaredInMM(thetaOffs[offPosition]));
+            try {
+                //put signal prediction and thetsquared into data item
+                data.put("signal:prediction", distribution.getProbability(signalClassName));
+                double theta = (double) data.get("Theta");
+                data.put("signal:thetasquare", thetaDegreesToThetaSquaredInMM(theta));
+
+                //put thetsquared for each offposition into the data item
+                Set<String> offKeys = new Keys("Theta_Off_?").select(data);
+                double[] thetaOffs = offKeys.stream().mapToDouble(s -> (double) data.get(s)).toArray();
+
+                for (int offPosition = 0; offPosition < offKeys.size(); offPosition++) {
+                    data.put("background:thetasquare:"+offPosition , thetaDegreesToThetaSquaredInMM(thetaOffs[offPosition]));
+                }
+                int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
+                DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
+                        orElseThrow(() -> new IllegalArgumentException("No valid eventTimeStamp in event."));
+
+                AuxPoint auxiliaryData = auxService.getAuxiliaryData(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, eventTimeStamp, new Closest());
+                System.out.println(auxiliaryData.getDouble("OnTime"));
+                data.put("OnTime",auxiliaryData.getDouble("OnTime"));
+                webService.updateEvent(eventTimeStamp, data );
+            } catch (IOException e) {
+                log.error("Could not get OnTime from FTM_CONTROL file");
+                throw new RuntimeException("Could not get OnTime from FTM_CONTROL file");
             }
-            int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
-            DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
-                    orElseThrow(() -> new IllegalArgumentException("No valid eventTimeStamp in event."));
-            webService.updateEvent(eventTimeStamp, data );
 
         }
         return data;
