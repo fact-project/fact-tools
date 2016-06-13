@@ -73,6 +73,13 @@
     cogyKey="centery"
     deltavorherKey="deltab"
 />
+<fact.features.GaussianFit2Dskew
+    pixelSetKey="shower"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltavorherKey="deltab"
+/>
 <fact.features.M3Long
     weightsKey="photoncharge"
     pixelSetKey="shower"

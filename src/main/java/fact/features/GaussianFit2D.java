@@ -129,7 +129,7 @@ public class GaussianFit2D implements StatefulProcessor {
 
 
         // Evaluation
-        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(array_x, array_y, photon);
+        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(array_x, array_y, photon, photon_max);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
         MaxEval maxEval = new MaxEval(10000000);
@@ -230,26 +230,21 @@ public class GaussianFit2D implements StatefulProcessor {
         return cogxKey;
     }
 
-
     public void setCogxKey(String cogxKey) {
         this.cogxKey = cogxKey;
     }
-
 
     public String getCogyKey() {
         return cogyKey;
     }
 
-
     public void setCogyKey(String cogyKey) {
         this.cogyKey = cogyKey;
     }
 
-
     public String getDeltavorherKey() {
         return deltavorherKey;
     }
-
 
     public void setDeltavorherKey(String deltavorherKey) {
         this.deltavorherKey = deltavorherKey;
@@ -285,7 +280,7 @@ public class GaussianFit2D implements StatefulProcessor {
         return matrixData;
     }
 
-      public double calculateDelta(EigenDecomposition eig) {
+    public double calculateDelta(EigenDecomposition eig) {
         // calculate the angle between the eigenvector and the camera axis.
         // So basicly the angle between the major-axis of the ellipse and the
         // camrera axis.
@@ -308,15 +303,17 @@ public class GaussianFit2D implements StatefulProcessor {
         private double[] array_x_log;
         private double[] array_y_log;
         private double[] photon_log;
+        private double photon_max;
 
         /**
          *
          * get from all Point in Shower x, y, and the photoncharge
          */
-        public GaussianNegLogLikelihood(double[] array_x,double[] array_y,double[] photon){
+        public GaussianNegLogLikelihood(double[] array_x,double[] array_y,double[] photon, double photon_max){
             this.array_x_log = array_x;
             this.array_y_log = array_y;
             this.photon_log = photon;
+            this.photon_max = photon_max;
         }
 
         /**
@@ -352,9 +349,12 @@ public class GaussianFit2D implements StatefulProcessor {
                 double y_1 = array_y_log[i] - y_0;
                 double term1 = 1 / 2 * Math.log(sigma_11 * sigma_22 - Math.pow(sigma_12, 2.0));
                 double term2 = 1 / 2 * 1 / (sigma_11 * sigma_22 - Math.pow(sigma_12, 2.0)) * (Math.pow(x_1, 2.0) * sigma_22 + Math.pow(y_1, 2.0) * sigma_11 - 2 * sigma_12 * x_1 * y_1);
-                if (photon_log[i] > 25){
+                /*
+                if (photon_log[i] > photon_max){
                     neg_ln_L += (term1 + term2) * photon_log[i] ;
                 }
+                */
+                neg_ln_L += (term1 + term2) * photon_log[i] ;
             }
             return neg_ln_L;
         }

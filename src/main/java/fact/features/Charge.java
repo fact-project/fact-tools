@@ -1,4 +1,4 @@
- package fact.features;
+package fact.features;
 
 import fact.Utils;
 import fact.hexmap.CameraPixel;
