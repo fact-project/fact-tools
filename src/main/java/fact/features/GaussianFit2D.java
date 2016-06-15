@@ -98,37 +98,15 @@ public class GaussianFit2D implements StatefulProcessor {
         */
 
         //Save all pixel vor python
-        int npix = Constants.NUMBEROFPIXEL;
-        double[] array_x = new double[npix];
-        double[] array_y = new double[npix];
-        double[] photon = new double[npix];
-
-        for (int pix = 0; pix < npix; pix++) {
-            array_x[pix] = 0;
-            array_y[pix] = 0;
-            photon[pix] = 0;
-        }
-        int zahl = 0;
-        double photon_x_max = 0;
-        double photon_y_max = 0;
-        double photon_max = -1000;
+        int maxPixelID = -1;
+        double maxPhotoncharge = -1000;
         System.out.println();
-        for (CameraPixel pix: pixelSet.set){
-            array_x[zahl] = getx(pix.id);
-            array_y[zahl] = gety(pix.id);
-            photon[zahl] = photoncharge[pix.id];
-            //System.out.println(photoncharge[pix.id]);
-            if (photon_max < photoncharge[pix.id]){
-                photon_max = photoncharge[pix.id];
-                photon_x_max = getx(pix.id);
-                photon_y_max = gety(pix.id);
+        for (CameraPixel pix: pixelSet.set) {
+            if (maxPhotoncharge < photoncharge[pix.id]) {
+                maxPhotoncharge = photoncharge[pix.id];
+                maxPixelID = pix.id;
             }
-            zahl = zahl + 1;
         }
-
-        data.put(outputKey + "wax", array_x);
-        data.put(outputKey + "way", array_y);
-        data.put(outputKey + "wapho", photon);
 
 
         // Evaluation
@@ -136,7 +114,7 @@ public class GaussianFit2D implements StatefulProcessor {
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
         MaxEval maxEval = new MaxEval(10000000);
-        InitialGuess start_values = new InitialGuess(new double[] {photon_x_max, photon_y_max, covarianceMatrix[0][0], covarianceMatrix[0][1], covarianceMatrix[1][1]});
+        InitialGuess start_values = new InitialGuess(new double[] {getx(maxPixelID), gety(maxPixelID), covarianceMatrix[0][0], covarianceMatrix[0][1], covarianceMatrix[1][1]});
         PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-2);
         PointValuePair result;
         try {
@@ -149,32 +127,29 @@ public class GaussianFit2D implements StatefulProcessor {
         // Get Data
         Double x = result_point[0];
         Double y = result_point[1];
-        Double sigma11 = result_point[2];
-        Double sigma12 = result_point[3];
-        Double sigma22 = result_point[4];
+        Double cov_11 = result_point[2];
+        Double cov_12 = result_point[3];
+        Double cov_22 = result_point[4];
 
         //Save Data
         data.put(outputKey + "x", x);
         data.put(outputKey + "y", y);
-        data.put(outputKey + "sigma11", sigma11);
-        data.put(outputKey + "sigma12", sigma12);
-        data.put(outputKey + "sigma22", sigma22);
+        data.put(outputKey + "cov_11", cov_11);
+        data.put(outputKey + "cov_12", cov_12);
+        data.put(outputKey + "cov_22", cov_22);
 
         //Continue if not NaN
         if (!x.isNaN()) {
             //create covarianceMatrix
-            double[][] matrixData = { { sigma11, sigma12 }, { sigma12, sigma22 } };
+            double[][] matrixData = { { cov_11, cov_12 }, { cov_12, cov_22 } };
 
             // create RealMatrix vor later
-            RealMatrix sigma_Matrix = MatrixUtils.createRealMatrix(matrixData);
+            RealMatrix sigmaMatrix = MatrixUtils.createRealMatrix(matrixData);
 
             //calculate EigenDecomposition
-            EigenDecomposition eig = new EigenDecomposition(sigma_Matrix);
+            EigenDecomposition eig = new EigenDecomposition(sigmaMatrix);
             double varianceLong = eig.getRealEigenvalue(0);
             double varianceTrans = eig.getRealEigenvalue(1);
-            //Division with size is not right and not wrong
-            //double varianceLong = eig.getRealEigenvalue(0);
-            //double varianceTrans = eig.getRealEigenvalue(1);
 
             //calculate length and width
             double length = Math.sqrt(varianceLong);
