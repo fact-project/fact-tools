@@ -3,6 +3,7 @@ package fact.features;
 import fact.Constants;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
+import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 import org.apache.commons.math3.analysis.MultivariateFunction;
@@ -20,7 +21,6 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import java.io.*;
 import fact.Utils;
 
 /*import fact.features.DistributionFromShower;*/
@@ -132,7 +132,7 @@ public class GaussianFit2D implements StatefulProcessor {
 
 
         // Evaluation
-        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(array_x, array_y, photon, photon_max);
+        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
         MaxEval maxEval = new MaxEval(10000000);
@@ -170,8 +170,8 @@ public class GaussianFit2D implements StatefulProcessor {
 
             //calculate EigenDecomposition
             EigenDecomposition eig = new EigenDecomposition(sigma_Matrix);
-            double varianceLong = eig.getRealEigenvalue(0) / size;
-            double varianceTrans = eig.getRealEigenvalue(1) / size;
+            double varianceLong = eig.getRealEigenvalue(0);
+            double varianceTrans = eig.getRealEigenvalue(1);
             //Division with size is not right and not wrong
             //double varianceLong = eig.getRealEigenvalue(0);
             //double varianceTrans = eig.getRealEigenvalue(1);
@@ -266,20 +266,22 @@ public class GaussianFit2D implements StatefulProcessor {
         double variance_xx = 0;
         double variance_yy = 0;
         double covariance_xy = 0;
-        int i = 0;
+        double sum_of_weights = 0;
+
         for (int pix : showerPixel) {
             double weight = photoncharge[pix];
             double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
             double posy = pixelMap.getPixelFromId(pix).getYPositionInMM();
 
+            sum_of_weights += weight;
+
             variance_xx += weight * (posx - cogx) * (posx - cogx);
             variance_yy += weight * (posy - cogy) * (posy - cogy);
             covariance_xy += weight * (posx - cogx) * (posy - cogy);
-
-            i++;
         }
 
-        double[][] matrixData = { { variance_xx, covariance_xy }, { covariance_xy, variance_yy } };
+        double[][] matrixData = {{ variance_xx / sum_of_weights, covariance_xy / sum_of_weights },
+                                 { covariance_xy / sum_of_weights, variance_yy / sum_of_weights }};
         return matrixData;
     }
 
@@ -303,20 +305,16 @@ public class GaussianFit2D implements StatefulProcessor {
     }
 
     public class GaussianNegLogLikelihood implements MultivariateFunction {
-        private double[] array_x_log;
-        private double[] array_y_log;
-        private double[] photon_log;
-        private double photon_max;
+        private double[] photoncharge;
+        private PixelSet pixelSet;
 
         /**
          *
          * get from all Point in Shower x, y, and the photoncharge
          */
-        public GaussianNegLogLikelihood(double[] array_x,double[] array_y,double[] photon, double photon_max){
-            this.array_x_log = array_x;
-            this.array_y_log = array_y;
-            this.photon_log = photon;
-            this.photon_max = photon_max;
+        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet){
+            this.photoncharge = photoncharge;
+            this.pixelSet = pixelSet;
         }
 
         /**
@@ -325,39 +323,21 @@ public class GaussianFit2D implements StatefulProcessor {
          * @return the negative log likelihood at this point for the given data
          */
         public double value(double[] point) {
-            double x_0 = point[0];
-            double y_0 = point[1];
-            double sigma_11 = point[2];
-            double sigma_12 = point[3];
-            double sigma_22 = point[4];
+            double mu_x = point[0];
+            double mu_y = point[1];
+            double cov_11 = point[2];
+            double cov_12 = point[3];
+            double cov_22 = point[4];
             double neg_ln_L = 0;
 
-            //Test
-            /*
-            for (CameraPixel pix: pixelSet.set) {
-                double x_1 = getx(pix.id) - x_0;
-                double y_1 = gety(pix.id) - y_0;
-                double term1 = 1 / 2 * Math.log(Math.pow(sigma_11, 2.0) * Math.pow(sigma_22, 2.0) - Math.pow(sigma_12, 2.0));
-                double term2 = 1 / 2 * 1 / (Math.pow(sigma_11, 2.0) * Math.pow(sigma_22, 2.0) - Math.pow(sigma_12, 2.0)) * (Math.pow(x_1, 2.0) * Math.pow(sigma_22, 2.0) + Math.pow(y_1, 2.0) * Math.pow(sigma_11, 2.0) - 2 * sigma_12 * x_1 * y_1);
-                neg_ln_L += (term1 + term2) * photoncharge[pix.id];
-            }
-            */
-            // Normal
-            int npix = Constants.NUMBEROFPIXEL;
-            for(int i=0; i<npix; i++){
-                if (array_x_log[i] == 0 && array_x_log[i + 1] == 0){
-                    break;
-                }
-                double x_1 = array_x_log[i] - x_0;
-                double y_1 = array_y_log[i] - y_0;
-                double term1 = 1 / 2 * Math.log(sigma_11 * sigma_22 - Math.pow(sigma_12, 2.0));
-                double term2 = 1 / 2 * 1 / (sigma_11 * sigma_22 - Math.pow(sigma_12, 2.0)) * (Math.pow(x_1, 2.0) * sigma_22 + Math.pow(y_1, 2.0) * sigma_11 - 2 * sigma_12 * x_1 * y_1);
-                /*
-                if (photon_log[i] > photon_max){
-                    neg_ln_L += (term1 + term2) * photon_log[i] ;
-                }
-                */
-                neg_ln_L += (term1 + term2) * photon_log[i] ;
+            for(CameraPixel pixel: pixelSet.set){
+
+                double x = getx(pixel.id)  - mu_x;
+                double y = gety(pixel.id) - mu_y;
+                double term1 = cov_11 * cov_22 - Math.pow(cov_12, 2.0);
+                double term2 = 0.5 / term1 * (Math.pow(x, 2.0) * cov_22 + Math.pow(y, 2.0) * cov_11 - 2 * cov_12 * x * y);
+
+                neg_ln_L += (0.5 * Math.log(term1) + term2) * photoncharge[pixel.id] ;
             }
             return neg_ln_L;
         }
