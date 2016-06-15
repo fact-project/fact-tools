@@ -21,6 +21,7 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import java.io.*;
+import fact.Utils;
 
 /*import fact.features.DistributionFromShower;*/
 
@@ -51,7 +52,9 @@ public class GaussianFit2D implements StatefulProcessor {
 
     @Override
     public Data process(Data data) {
-        double[] photoncharge = (double[]) data.get(photonchargeKey);
+        //double[] photoncharge = (double[]) data.get(photonchargeKey);
+        double[] photoncharge = Utils.toDoubleArray(data.get(photonchargeKey));
+
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
         double[] showerWeights = createShowerWeights(pixelSet.toIntArray(),
             photoncharge);
