@@ -30,3 +30,7 @@ to your package.json and then use it like this
 and then later to update this do
 
     camera.update(data, duration = 0.5);
+
+values are sorted by chid per default. This can be switched to softid like this:
+
+    var camera = new hexmap.hexmap(parentID, size, chid=false);

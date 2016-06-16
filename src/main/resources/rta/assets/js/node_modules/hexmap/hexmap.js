@@ -3,7 +3,7 @@
 const d3 = require('d3');
 const d3_scale = require('d3-scale');
 
-function Hexmap(parentID, size, radius) {
+function Hexmap(parentID, size, radius, chid=true) {
   //Get three variables, margin, width, height. width and height will be the dimensions of the svg container
   //this svg will be square.
   this.parentID = parentID;
@@ -19,7 +19,11 @@ function Hexmap(parentID, size, radius) {
             .attr('class', 'hexmap')
             .attr('id', 'hexmap');
 
-  d3.csv('./pixel_positions.csv')
+  var path = './pixel_positions.csv'
+  if(chid){
+    path = './pixel_positions_chid.csv'
+  }
+  d3.csv(path)
       .row(function (csvRow) {
         return csvRow;
       })

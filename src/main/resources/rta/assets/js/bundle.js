@@ -10438,7 +10438,39 @@ function init() {
   (factory((global.d3_interpolate = global.d3_interpolate || {}),global.d3_color));
 }(this, function (exports,d3Color) { 'use strict';
 
-  var version = "0.8.0";
+  var version = "0.8.3";
+
+  function basis(t1, v0, v1, v2, v3) {
+    var t2 = t1 * t1, t3 = t2 * t1;
+    return ((1 - 3 * t1 + 3 * t2 - t3) * v0
+        + (4 - 6 * t2 + 3 * t3) * v1
+        + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2
+        + t3 * v3) / 6;
+  }
+
+  function basis$1(values) {
+    var n = values.length - 1;
+    return function(t) {
+      var i = t <= 0 ? (t = 0) : t >= 1 ? (t = 1, n - 1) : Math.floor(t * n),
+          v1 = values[i],
+          v2 = values[i + 1],
+          v0 = i > 0 ? values[i - 1] : 2 * v1 - v2,
+          v3 = i < n - 1 ? values[i + 2] : 2 * v2 - v1;
+      return basis((t - i / n) * n, v0, v1, v2, v3);
+    };
+  }
+
+  function basisClosed(values) {
+    var n = values.length;
+    return function(t) {
+      var i = Math.floor(((t %= 1) < 0 ? ++t : t) * n),
+          v0 = values[(i + n - 1) % n],
+          v1 = values[i % n],
+          v2 = values[(i + 1) % n],
+          v3 = values[(i + 2) % n];
+      return basis((t - i / n) * n, v0, v1, v2, v3);
+    };
+  }
 
   function constant(x) {
     return function() {
@@ -10458,7 +10490,7 @@ function init() {
     };
   }
 
-  function interpolateHue(a, b) {
+  function hue(a, b) {
     var d = b - a;
     return d ? linear(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : constant(isNaN(a) ? b : a);
   }
@@ -10474,14 +10506,14 @@ function init() {
     return d ? linear(a, d) : constant(isNaN(a) ? b : a);
   }
 
-  var rgb$1 = (function gamma$$(y) {
-    var interpolateColor = gamma(y);
+  var rgb$1 = (function rgbGamma(y) {
+    var color = gamma(y);
 
-    function interpolateRgb(start, end) {
-      var r = interpolateColor((start = d3Color.rgb(start)).r, (end = d3Color.rgb(end)).r),
-          g = interpolateColor(start.g, end.g),
-          b = interpolateColor(start.b, end.b),
-          opacity = interpolateColor(start.opacity, end.opacity);
+    function rgb(start, end) {
+      var r = color((start = d3Color.rgb(start)).r, (end = d3Color.rgb(end)).r),
+          g = color(start.g, end.g),
+          b = color(start.b, end.b),
+          opacity = color(start.opacity, end.opacity);
       return function(t) {
         start.r = r(t);
         start.g = g(t);
@@ -10491,10 +10523,39 @@ function init() {
       };
     }
 
-    interpolateRgb.gamma = gamma$$;
+    rgb.gamma = rgbGamma;
 
-    return interpolateRgb;
+    return rgb;
   })(1);
+
+  function rgbSpline(spline) {
+    return function(colors) {
+      var n = colors.length,
+          r = new Array(n),
+          g = new Array(n),
+          b = new Array(n),
+          i, color;
+      for (i = 0; i < n; ++i) {
+        color = d3Color.rgb(colors[i]);
+        r[i] = color.r || 0;
+        g[i] = color.g || 0;
+        b[i] = color.b || 0;
+      }
+      r = spline(r);
+      g = spline(g);
+      b = spline(b);
+      color.opacity = 1;
+      return function(t) {
+        color.r = r(t);
+        color.g = g(t);
+        color.b = b(t);
+        return color + "";
+      };
+    };
+  }
+
+  var rgbBasis = rgbSpline(basis$1);
+  var rgbBasisClosed = rgbSpline(basisClosed);
 
   function array(a, b) {
     var nb = b ? b.length : 0,
@@ -10799,35 +10860,26 @@ function init() {
     return i;
   }
 
-  function interpolateHsl(start, end) {
-    var h = interpolateHue((start = d3Color.hsl(start)).h, (end = d3Color.hsl(end)).h),
-        s = nogamma(start.s, end.s),
-        l = nogamma(start.l, end.l),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.h = h(t);
-      start.s = s(t);
-      start.l = l(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
+  function hsl$1(hue) {
+    return function(start, end) {
+      var h = hue((start = d3Color.hsl(start)).h, (end = d3Color.hsl(end)).h),
+          s = nogamma(start.s, end.s),
+          l = nogamma(start.l, end.l),
+          opacity = nogamma(start.opacity, end.opacity);
+      return function(t) {
+        start.h = h(t);
+        start.s = s(t);
+        start.l = l(t);
+        start.opacity = opacity(t);
+        return start + "";
+      };
+    }
   }
 
-  function interpolateHslLong(start, end) {
-    var h = nogamma((start = d3Color.hsl(start)).h, (end = d3Color.hsl(end)).h),
-        s = nogamma(start.s, end.s),
-        l = nogamma(start.l, end.l),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.h = h(t);
-      start.s = s(t);
-      start.l = l(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
-  }
+  var hsl$2 = hsl$1(hue);
+  var hslLong = hsl$1(nogamma);
 
-  function interpolateLab(start, end) {
+  function lab$1(start, end) {
     var l = nogamma((start = d3Color.lab(start)).l, (end = d3Color.lab(end)).l),
         a = nogamma(start.a, end.a),
         b = nogamma(start.b, end.b),
@@ -10841,81 +10893,63 @@ function init() {
     };
   }
 
-  function interpolateHcl(start, end) {
-    var h = interpolateHue((start = d3Color.hcl(start)).h, (end = d3Color.hcl(end)).h),
-        c = nogamma(start.c, end.c),
-        l = nogamma(start.l, end.l),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.h = h(t);
-      start.c = c(t);
-      start.l = l(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
-  }
-
-  function interpolateHclLong(start, end) {
-    var h = nogamma((start = d3Color.hcl(start)).h, (end = d3Color.hcl(end)).h),
-        c = nogamma(start.c, end.c),
-        l = nogamma(start.l, end.l),
-        opacity = nogamma(start.opacity, end.opacity);
-    return function(t) {
-      start.h = h(t);
-      start.c = c(t);
-      start.l = l(t);
-      start.opacity = opacity(t);
-      return start + "";
-    };
-  }
-
-  var cubehelix$1 = (function gamma(y) {
-    y = +y;
-
-    function interpolateCubehelix(start, end) {
-      var h = interpolateHue((start = d3Color.cubehelix(start)).h, (end = d3Color.cubehelix(end)).h),
-          s = nogamma(start.s, end.s),
+  function hcl$1(hue) {
+    return function(start, end) {
+      var h = hue((start = d3Color.hcl(start)).h, (end = d3Color.hcl(end)).h),
+          c = nogamma(start.c, end.c),
           l = nogamma(start.l, end.l),
           opacity = nogamma(start.opacity, end.opacity);
       return function(t) {
         start.h = h(t);
-        start.s = s(t);
-        start.l = l(Math.pow(t, y));
+        start.c = c(t);
+        start.l = l(t);
         start.opacity = opacity(t);
         return start + "";
       };
     }
+  }
 
-    interpolateCubehelix.gamma = gamma;
+  var hcl$2 = hcl$1(hue);
+  var hclLong = hcl$1(nogamma);
 
-    return interpolateCubehelix;
-  })(1);
+  function cubehelix$1(hue) {
+    return (function cubehelixGamma(y) {
+      y = +y;
 
-  var cubehelixLong = (function gamma(y) {
-    y = +y;
+      function cubehelix(start, end) {
+        var h = hue((start = d3Color.cubehelix(start)).h, (end = d3Color.cubehelix(end)).h),
+            s = nogamma(start.s, end.s),
+            l = nogamma(start.l, end.l),
+            opacity = nogamma(start.opacity, end.opacity);
+        return function(t) {
+          start.h = h(t);
+          start.s = s(t);
+          start.l = l(Math.pow(t, y));
+          start.opacity = opacity(t);
+          return start + "";
+        };
+      }
 
-    function interpolateCubehelixLong(start, end) {
-      var h = nogamma((start = d3Color.cubehelix(start)).h, (end = d3Color.cubehelix(end)).h),
-          s = nogamma(start.s, end.s),
-          l = nogamma(start.l, end.l),
-          opacity = nogamma(start.opacity, end.opacity);
-      return function(t) {
-        start.h = h(t);
-        start.s = s(t);
-        start.l = l(Math.pow(t, y));
-        start.opacity = opacity(t);
-        return start + "";
-      };
-    }
+      cubehelix.gamma = cubehelixGamma;
 
-    interpolateCubehelixLong.gamma = gamma;
+      return cubehelix;
+    })(1);
+  }
 
-    return interpolateCubehelixLong;
-  })(1);
+  var cubehelix$2 = cubehelix$1(hue);
+  var cubehelixLong = cubehelix$1(nogamma);
+
+  function quantize(interpolate, n) {
+    var samples = new Array(n);
+    for (var i = 0; i < n; ++i) samples[i] = interpolate(i / (n - 1));
+    return samples;
+  }
 
   exports.version = version;
   exports.interpolate = value;
   exports.interpolateArray = array;
+  exports.interpolateBasis = basis$1;
+  exports.interpolateBasisClosed = basisClosed;
   exports.interpolateNumber = number;
   exports.interpolateObject = object;
   exports.interpolateRound = round;
@@ -10924,13 +10958,18 @@ function init() {
   exports.interpolateTransformSvg = interpolateTransformSvg;
   exports.interpolateZoom = zoom;
   exports.interpolateRgb = rgb$1;
-  exports.interpolateHsl = interpolateHsl;
-  exports.interpolateHslLong = interpolateHslLong;
-  exports.interpolateLab = interpolateLab;
-  exports.interpolateHcl = interpolateHcl;
-  exports.interpolateHclLong = interpolateHclLong;
-  exports.interpolateCubehelix = cubehelix$1;
+  exports.interpolateRgbBasis = rgbBasis;
+  exports.interpolateRgbBasisClosed = rgbBasisClosed;
+  exports.interpolateHsl = hsl$2;
+  exports.interpolateHslLong = hslLong;
+  exports.interpolateLab = lab$1;
+  exports.interpolateHcl = hcl$2;
+  exports.interpolateHclLong = hclLong;
+  exports.interpolateCubehelix = cubehelix$2;
   exports.interpolateCubehelixLong = cubehelixLong;
+  exports.quantize = quantize;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 },{"d3-color":5}],8:[function(require,module,exports){
@@ -10940,7 +10979,7 @@ function init() {
   (factory((global.d3_scale = global.d3_scale || {}),global.d3_array,global.d3_collection,global.d3_interpolate,global.d3_format,global.d3_time,global.d3_time_format,global.d3_color));
 }(this, function (exports,d3Array,d3Collection,d3Interpolate,d3Format,d3Time,d3TimeFormat,d3Color) { 'use strict';
 
-  var version = "0.7.1";
+  var version = "0.7.2";
 
   var array = Array.prototype;
 
@@ -11166,22 +11205,22 @@ function init() {
         range = unit,
         interpolate = d3Interpolate.interpolate,
         clamp = false,
+        piecewise,
         output,
         input;
 
     function rescale() {
-      var map = Math.min(domain.length, range.length) > 2 ? polymap : bimap;
-      output = map(domain, range, clamp ? deinterpolateClamp(deinterpolate$$) : deinterpolate$$, interpolate);
-      input = map(range, domain, deinterpolate, clamp ? reinterpolateClamp(reinterpolate) : reinterpolate);
+      piecewise = Math.min(domain.length, range.length) > 2 ? polymap : bimap;
+      output = input = null;
       return scale;
     }
 
     function scale(x) {
-      return output(+x);
+      return (output || (output = piecewise(domain, range, clamp ? deinterpolateClamp(deinterpolate$$) : deinterpolate$$, interpolate)))(+x);
     }
 
     scale.invert = function(y) {
-      return input(+y);
+      return (input || (input = piecewise(range, domain, deinterpolate, clamp ? reinterpolateClamp(reinterpolate) : reinterpolate)))(+y);
     };
 
     scale.domain = function(_) {
@@ -11861,6 +11900,7 @@ function init() {
   exports.scaleMagma = magma;
   exports.scaleInferno = inferno;
   exports.scalePlasma = plasma;
+  exports.scaleSequential = sequential;
 
 }));
 },{"d3-array":3,"d3-collection":4,"d3-color":5,"d3-format":6,"d3-interpolate":7,"d3-time":10,"d3-time-format":9}],9:[function(require,module,exports){
@@ -12704,6 +12744,8 @@ function init() {
   (factory((global.d3_time = global.d3_time || {})));
 }(this, function (exports) { 'use strict';
 
+  var version = "0.2.6";
+
   var t0 = new Date;
   var t1 = new Date;
   function newInterval(floori, offseti, count, field) {
@@ -12963,9 +13005,7 @@ function init() {
   var timeMonths = month.range;
   var timeYears = year.range;
 
-  var utcMillisecond = millisecond;
   var utcMilliseconds = timeMilliseconds;
-  var utcSecond = second;
   var utcSeconds = timeSeconds;
   var utcMinutes = utcMinute.range;
   var utcHours = utcHour.range;
@@ -12981,9 +13021,6 @@ function init() {
   var utcMonths = utcMonth.range;
   var utcYears = utcYear.range;
 
-  var version = "0.2.5";
-
-  exports.version = version;
   exports.timeMilliseconds = timeMilliseconds;
   exports.timeSeconds = timeSeconds;
   exports.timeMinutes = timeMinutes;
@@ -12999,9 +13036,7 @@ function init() {
   exports.timeWeeks = timeWeeks;
   exports.timeMonths = timeMonths;
   exports.timeYears = timeYears;
-  exports.utcMillisecond = utcMillisecond;
   exports.utcMilliseconds = utcMilliseconds;
-  exports.utcSecond = utcSecond;
   exports.utcSeconds = utcSeconds;
   exports.utcMinutes = utcMinutes;
   exports.utcHours = utcHours;
@@ -13031,6 +13066,8 @@ function init() {
   exports.timeWeek = sunday;
   exports.timeMonth = month;
   exports.timeYear = year;
+  exports.utcMillisecond = millisecond;
+  exports.utcSecond = second;
   exports.utcMinute = utcMinute;
   exports.utcHour = utcHour;
   exports.utcDay = utcDay;
@@ -13044,7 +13081,10 @@ function init() {
   exports.utcWeek = utcSunday;
   exports.utcMonth = utcMonth;
   exports.utcYear = utcYear;
+  exports.version = version;
   exports.timeInterval = newInterval;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 },{}],11:[function(require,module,exports){
@@ -22608,7 +22648,7 @@ function init() {
 const d3 = require('d3');
 const d3_scale = require('d3-scale');
 
-function Hexmap(parentID, size, radius) {
+function Hexmap(parentID, size, radius, chid=true) {
   //Get three variables, margin, width, height. width and height will be the dimensions of the svg container
   //this svg will be square.
   this.parentID = parentID;
@@ -22624,7 +22664,11 @@ function Hexmap(parentID, size, radius) {
             .attr('class', 'hexmap')
             .attr('id', 'hexmap');
 
-  d3.csv('./pixel_positions.csv')
+  var path = './pixel_positions.csv'
+  if(chid){
+    path = './pixel_positions_chid.csv'
+  }
+  d3.csv(path)
       .row(function (csvRow) {
         return csvRow;
       })
