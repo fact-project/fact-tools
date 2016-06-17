@@ -69,16 +69,16 @@
 <fact.features.GaussianFit2D
     pixelSetKey="shower"
     photonchargeKey="photoncharge"
-    cogxKey="centerx"
-    cogyKey="centery"
-    deltavorherKey="deltab"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltawithout2dgaus="deltab"
 />
 <fact.features.GaussianFit2Dskew
     pixelSetKey="shower"
     photonchargeKey="photoncharge"
-    cogxKey="centerx"
-    cogyKey="centery"
-    deltavorherKey="deltab"
+    cogxKey="COGx"
+    cogyKey="COGy"
+    deltawithout2dgaus="deltab"
 />
 <fact.features.M3Long
     weightsKey="photoncharge"

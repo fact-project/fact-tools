@@ -42,7 +42,7 @@ public class GaussianFit2D implements StatefulProcessor {
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
     private String cogyKey = null;
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
-    private String deltavorherKey = null;
+    private String deltawithout2dgaus = null;
 
     @Parameter(required = false, description = "Base name for the output keys", defaultValue = "Gaussian_2D_")
     private String outputKey = "Gaussian_2D_";
@@ -62,7 +62,7 @@ public class GaussianFit2D implements StatefulProcessor {
         //Get Center
         double cogx = (Double) data.get(cogxKey);
         double cogy = (Double) data.get(cogyKey);
-        double deltavorher = (Double) data.get(deltavorherKey);
+        double delta_bevor = (Double) data.get(deltawithout2dgaus);
 
 
         // Calculate size vor later
@@ -78,26 +78,6 @@ public class GaussianFit2D implements StatefulProcessor {
         data.put(outputKey + "sigma22_vorher", covarianceMatrix[1][1]);
         data.put(outputKey + "size", size);
 
-        /*
-        //Test ob funktionen stimmen sie stimmen also stimmt was in der Berechnung unten nicht
-        RealMatrix sigma_Matrix_test = MatrixUtils.createRealMatrix(covarianceMatrix);
-
-        //calculate EigenDecomposition
-        EigenDecomposition eig_Test = new EigenDecomposition(sigma_Matrix_test);
-        double varianceLong_Test = eig_Test.getRealEigenvalue(0) / size;
-        double varianceTrans_Test = eig_Test.getRealEigenvalue(1) / size;
-
-        //calculate length and width
-        double length_Test = Math.sqrt(varianceLong_Test);
-        double width_Test = Math.sqrt(varianceTrans_Test);
-
-        // calculate delta
-        double delta_Test = calculateDelta(eig_Test);
-        //data.put(outputKey + "overlay_1_Test", new EllipseOverlay(cogx, cogy, width_Test, length_Test, delta_Test));
-        //data.put(outputKey + "overlay_2_Test", new EllipseOverlay(cogx, cogy, 2*width_Test, 2*length_Test, delta_Test));
-        */
-
-        //Save all pixel vor python
         int maxPixelID = -1;
         double maxPhotoncharge = -1000;
         System.out.println();
@@ -113,7 +93,7 @@ public class GaussianFit2D implements StatefulProcessor {
         GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
-        MaxEval maxEval = new MaxEval(10000000);
+        MaxEval maxEval = new MaxEval(1000000000);
         InitialGuess start_values = new InitialGuess(new double[] {getx(maxPixelID), gety(maxPixelID), covarianceMatrix[0][0], covarianceMatrix[0][1], covarianceMatrix[1][1]});
         PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-2);
         PointValuePair result;
@@ -163,11 +143,10 @@ public class GaussianFit2D implements StatefulProcessor {
             data.put(outputKey + "width", width);
             data.put(outputKey + "length", length);
             data.put(outputKey + "delta", delta);
-            data.put(outputKey + "deltaunter", Math.abs(delta - deltavorher));
-            System.out.println(delta - deltavorher);
+            data.put(outputKey + "diffdelta", Math.abs(delta - delta_bevor));
             //System.out.println(outputKey + "deltaunter");
             //System.out.println(delta);
-            //System.out.println(deltavorher);
+            //System.out.println(delta_bevor);
             data.put(outputKey + "overlay_1", new EllipseOverlay(x, y, width, length, delta));
             data.put(outputKey + "overlay_2", new EllipseOverlay(x, y, 2*width, 2*length, delta));
 
@@ -220,12 +199,12 @@ public class GaussianFit2D implements StatefulProcessor {
         this.cogyKey = cogyKey;
     }
 
-    public String getDeltavorherKey() {
-        return deltavorherKey;
+    public String getDeltawithout2dgaus() {
+        return deltawithout2dgaus;
     }
 
-    public void setDeltavorherKey(String deltavorherKey) {
-        this.deltavorherKey = deltavorherKey;
+    public void setDeltawithout2dgaus(String deltawithout2dgaus) {
+        this.deltawithout2dgaus = deltawithout2dgaus;
     }
 
     public double[] createShowerWeights(int[] shower, double[] pixelWeights) {
