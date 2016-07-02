@@ -37,7 +37,7 @@ public class GaussianFit2Dskew implements StatefulProcessor {
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
     private String cogyKey = null;
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
-    private String deltawithout2dgaus = null;
+    private String deltabeforKey = null;
 
     @Parameter(required = false, description = "Base name for the output keys", defaultValue = "Gaussian_2D_")
     private String outputKey = "Gaussian_2D_skew_";
@@ -60,12 +60,13 @@ public class GaussianFit2Dskew implements StatefulProcessor {
         //Get Center
         double cogx = (Double) data.get(cogxKey);
         double cogy = (Double) data.get(cogyKey);
-        double delta_bevor = (Double) data.get(deltawithout2dgaus);
+        double deltabefor = (Double) data.get(deltabeforKey);
 
         // Calculate sigma
         double[][] covarianceMatrix = calculateCovarianceMatrix(pixelSet.toIntArray(), photoncharge, cogx, cogy);
         // System.out.println("Anzahl");
 
+        //Save all pixel vor python
         int maxPixelID = -1;
         double maxPhotoncharge = -1000;
         for (CameraPixel pix: pixelSet.set) {
@@ -75,11 +76,10 @@ public class GaussianFit2Dskew implements StatefulProcessor {
             }
         }
 
-
-        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet);
+        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet, maxPhotoncharge);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
-        MaxEval maxEval = new MaxEval(1000000000);
+        MaxEval maxEval = new MaxEval(10000000);
         InitialGuess start_values = new InitialGuess(new double[] {getx(maxPixelID), gety(maxPixelID), covarianceMatrix[0][0], covarianceMatrix[0][1], covarianceMatrix[1][1]});
         PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-2);
         PointValuePair result;
@@ -91,43 +91,48 @@ public class GaussianFit2Dskew implements StatefulProcessor {
         }
         double[] result_point = result.getPoint();
 
-        // Get Data
         Double x = result_point[0];
         Double y = result_point[1];
         Double cov_11 = result_point[2];
         Double cov_12 = result_point[3];
         Double cov_22 = result_point[4];
-
-        //Save Data
         data.put(outputKey + "x", x);
         data.put(outputKey + "y", y);
         data.put(outputKey + "cov_11", cov_11);
         data.put(outputKey + "cov_12", cov_12);
         data.put(outputKey + "cov_22", cov_22);
+        int ditit = 0;
         if (!x.isNaN()) {
+            ditit = 1;
+            //create covarianceMatrix
             double[][] matrixData = { { cov_11, cov_12 }, { cov_12, cov_22 } };
-            // System.out.println(sigma11);
-            // System.out.println(sigma12);
-            // System.out.println(sigma22);
-            RealMatrix sigma_Matrix = MatrixUtils.createRealMatrix(matrixData);
 
-            EigenDecomposition eig = new EigenDecomposition(sigma_Matrix);
-            // turns out the eigenvalues describe the variance in the eigenbasis of
-            // the covariance matrix
+            // create RealMatrix vor later
+            RealMatrix cov__Matrix = MatrixUtils.createRealMatrix(matrixData);
+
+            //calculate EigenDecomposition
+            EigenDecomposition eig = new EigenDecomposition(cov__Matrix);
             double varianceLong = eig.getRealEigenvalue(0);
             double varianceTrans = eig.getRealEigenvalue(1);
 
+            //calculate length and width
             double length = Math.sqrt(varianceLong);
             double width = Math.sqrt(varianceTrans);
 
+            // calculate delta
             double delta = calculateDelta(eig);
+
+            //save data 2
+
             data.put(outputKey + "width", width);
             data.put(outputKey + "length", length);
             data.put(outputKey + "delta", delta);
-            data.put(outputKey + "diffdelta", Math.abs(delta - delta_bevor));
+            data.put(outputKey + "deltadiff", Math.abs(delta - deltabefor));
             data.put(outputKey + "overlay_1", new EllipseOverlay(x, y, width, length, delta));
             data.put(outputKey + "overlay_2", new EllipseOverlay(x, y, 2*width, 2*length, delta));
+
         }
+        data.put(outputKey + "ditit", ditit);
         return data;
     }
 
@@ -176,12 +181,12 @@ public class GaussianFit2Dskew implements StatefulProcessor {
         this.cogyKey = cogyKey;
     }
 
-    public String getDeltawithout2dgaus() {
-        return deltawithout2dgaus;
+    public String getDeltabeforKey() {
+        return deltabeforKey;
     }
 
-    public void setDeltawithout2dgaus(String deltawithout2dgaus) {
-        this.deltawithout2dgaus = deltawithout2dgaus;
+    public void setDeltabeforKey(String deltabeforKey) {
+        this.deltabeforKey = deltabeforKey;
     }
 
     double getx (int id){
@@ -197,8 +202,8 @@ public class GaussianFit2Dskew implements StatefulProcessor {
         double variance_xx = 0;
         double variance_yy = 0;
         double covariance_xy = 0;
+        int i = 0;
         double sum_of_weights = 0;
-
         for (int pix : showerPixel) {
             double weight = photoncharge[pix];
             double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
@@ -209,10 +214,11 @@ public class GaussianFit2Dskew implements StatefulProcessor {
             variance_xx += weight * (posx - cogx) * (posx - cogx);
             variance_yy += weight * (posy - cogy) * (posy - cogy);
             covariance_xy += weight * (posx - cogx) * (posy - cogy);
+
+            i++;
         }
 
-        double[][] matrixData = {{ variance_xx / sum_of_weights, covariance_xy / sum_of_weights },
-                                 { covariance_xy / sum_of_weights, variance_yy / sum_of_weights }};
+        double[][] matrixData = { { variance_xx / sum_of_weights, covariance_xy / sum_of_weights}, { covariance_xy / sum_of_weights, variance_yy / sum_of_weights} };
         return matrixData;
     }
 
@@ -237,21 +243,23 @@ public class GaussianFit2Dskew implements StatefulProcessor {
     public class GaussianNegLogLikelihood implements MultivariateFunction {
         private double[] photoncharge;
         private PixelSet pixelSet;
+        private double maxPhotoncharge;
 
         /**
-        *
-        * get from all Point in Shower x, y, and the photoncharge
-        */
-        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet){
+         *
+         * get from all Point in Shower x, y, and the photoncharge
+         */
+        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet, double maxPhotoncharge){
             this.photoncharge = photoncharge;
             this.pixelSet = pixelSet;
+            this.maxPhotoncharge = maxPhotoncharge;
         }
 
         /**
-        *
-        * @param point a double array with length 5 containing x, y, sigma11, sigma12, sigma22  in this order
-        * @return the negative log likelihood at this point for the given data
-        */
+         *
+         * @param point a double array with length 5 containing x, y, cov_11, cov_12, cov_22  in this order
+         * @return the negative log likelihood at this point for the given data
+         */
         public double value(double[] point) {
             double mu_x = point[0];
             double mu_y = point[1];
@@ -259,16 +267,17 @@ public class GaussianFit2Dskew implements StatefulProcessor {
             double cov_12 = point[3];
             double cov_22 = point[4];
             double neg_ln_L = 0;
-
             for(CameraPixel pixel: pixelSet.set){
-
-                double x = getx(pixel.id)  - mu_x;
-                double y = gety(pixel.id) - mu_y;
+                double x_1 = getx(pixel.id)  - mu_x;
+                double y_1 = gety(pixel.id) - mu_y;
                 double term1 = cov_11 * cov_22 - Math.pow(cov_12, 2.0);
-                double term2 = 0.5 / term1 * (Math.pow(x, 2.0) * cov_22 + Math.pow(y, 2.0) * cov_11 - 2 * cov_12 * x * y);
-                double term3 = 0.5 * Math.log(1 + Erf.erf(Math.sqrt(term2)));
-
-                neg_ln_L += (0.5 * Math.log(term1) + term2 - term3) * photoncharge[pixel.id] ;
+                double term2 = 1 / 2 * 1 / term1 * (Math.pow(x_1, 2.0) * cov_22 + Math.pow(y_1, 2.0) * cov_11 - 2 * cov_12 * x_1 * y_1);
+                /*
+                if (photon_log[i] > photon_max){
+                    neg_ln_L += (term1 + term2) * photon_log[i] ;
+                }
+                */
+                neg_ln_L += (1 / 2 * Math.log(term1) + term2 + Math.log(1 + Erf.erf(Math.sqrt(term2)))) * photoncharge[pixel.id];
             }
             return neg_ln_L;
         }

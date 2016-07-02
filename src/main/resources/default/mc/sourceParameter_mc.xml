@@ -1,19 +1,19 @@
 <module>
-<fact.features.source.SourcePosition 
-    outputKey="sourcePosition" 
+<fact.features.source.SourcePosition
+    outputKey="sourcePosition"
     pointingZdKey="MPointingPos.fZd"
     pointingAzKey="MPointingPos.fAz"
     sourceZdKey="MSimSourcePos.fZd"
     sourceAzKey="MSimSourcePos.fAz"
 />
 <fact.features.source.AntiSourcePosition
-        sourcePositionKey="sourcePosition"
+    sourcePositionKey="sourcePosition"
     numberOfAntiSourcePositions="5"
     antiSourcePositionId="1"
     outputKey="antiSourcePosition_1"
 />
 <fact.features.source.AntiSourcePosition
-        sourcePositionKey="sourcePosition"
+    sourcePositionKey="sourcePosition"
     numberOfAntiSourcePositions="5"
     antiSourcePositionId="2"
     outputKey="antiSourcePosition_2"

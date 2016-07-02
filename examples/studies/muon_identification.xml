@@ -8,7 +8,7 @@
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxpath" value="file:src/main/resources/aux/" />
-    
+
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxpath}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -32,7 +32,7 @@
     <include url="classpath:/default/data/prevEventAndSkip.xml" />
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
-    <include url="classpath:/default/data/cleaning.xml" />     
+    <include url="classpath:/default/data/cleaning.xml" />
 
 
     <Skip condition="%{data.shower} == null" />
@@ -75,9 +75,9 @@
       pixelSetKey="shower"
       photonChargeKey="photoncharge"
       outputKey="Size"
-    />   
+    />
 
-    <fact.features.Concentration 
+    <fact.features.Concentration
       weights="photoncharge"
       pixelSetKey="shower"
       concOneOutputKey="conc1"
@@ -108,21 +108,23 @@
       weights="photoncharge"
       leakage1OutputKey="Leakage"
       leakage2OutputKey="Leakage2"
+      leakage3OutputKey="Leakage3"
+      leakage4OutputKey="Leakage4"
     />
-                    
+
     <fact.features.muon.HoughTransform
-      showRingKey="false"  
+      showRingKey="false"
       showMatrixKey="false"
       photonChargeKey="photoncharge"
       bestCircleKey="bestRing"
-      pixelSetKey="shower" 
+      pixelSetKey="shower"
       peaknessKey="houghPeakness"
       cleaningPercentageKey="houghCleaningPercentage"
       ringPercentageKey="houghRingPercentage"
       distanceKey="houghDistance"
       octantsHitKey="houghOctantsHit"
       bestRingPixelKey="bestRingPixel"
-      bestRadiusKey="bestR" 
+      bestRadiusKey="bestR"
       bestXKey="bestX"
       bestYKey="bestY"
     />
@@ -139,7 +141,7 @@
     />
 
     <fact.features.muon.CircularFit />
-    <fact.features.muon.GaussianFit 
+    <fact.features.muon.GaussianFit
       startXKey="circFitX"
       startYKey="circFitY"
       startRKey="circFitR"

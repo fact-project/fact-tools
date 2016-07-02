@@ -3,7 +3,6 @@ package fact.features;
 import fact.Constants;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 import org.apache.commons.math3.analysis.MultivariateFunction;
@@ -25,13 +24,14 @@ import fact.Utils;
 
 /*import fact.features.DistributionFromShower;*/
 
+
 /**
  * Created by thomno on 13.06.2016
  */
 public class GaussianFit2D implements StatefulProcessor {
     /*
-     * This Process calculate with a 2D Gaus new sigma and new x and y.
-     * With the new sigma Array it calculate the new Delta, Length and width
+     * This Process calculate with a 2D Gaus new cov_ and new x and y.
+     * With the new cov_ Array it calculate the new Delta, Length and width
      */
     @Parameter(required = false, description = "Key containing the photoncharges", defaultValue = "photoncharge")
     private String photonchargeKey = "photoncharge";
@@ -42,7 +42,9 @@ public class GaussianFit2D implements StatefulProcessor {
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
     private String cogyKey = null;
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
-    private String deltawithout2dgaus = null;
+    private String deltabeforKey = null;
+	@Parameter(required=true)
+	private int cutdouble;
 
     @Parameter(required = false, description = "Base name for the output keys", defaultValue = "Gaussian_2D_")
     private String outputKey = "Gaussian_2D_";
@@ -62,7 +64,7 @@ public class GaussianFit2D implements StatefulProcessor {
         //Get Center
         double cogx = (Double) data.get(cogxKey);
         double cogy = (Double) data.get(cogyKey);
-        double delta_bevor = (Double) data.get(deltawithout2dgaus);
+        double deltabefor = (Double) data.get(deltabeforKey);
 
 
         // Calculate size vor later
@@ -71,16 +73,19 @@ public class GaussianFit2D implements StatefulProcessor {
             size += v;
         }
 
-        // Calculate sigma
+        String cutstring = String.valueOf(cutdouble);
+        System.out.println(cutstring);
+
+        // Calculate cov_
         double[][] covarianceMatrix = calculateCovarianceMatrix(pixelSet.toIntArray(), photoncharge, cogx, cogy);
-        data.put(outputKey + "sigma11_vorher", covarianceMatrix[0][0]);
-        data.put(outputKey + "sigma12_vorher", covarianceMatrix[0][1]);
-        data.put(outputKey + "sigma22_vorher", covarianceMatrix[1][1]);
+        data.put(outputKey + "cov_11_vorher", covarianceMatrix[0][0]);
+        data.put(outputKey + "cov_12_vorher", covarianceMatrix[0][1]);
+        data.put(outputKey + "cov_22_vorher", covarianceMatrix[1][1]);
         data.put(outputKey + "size", size);
 
+        //Save all pixel vor python
         int maxPixelID = -1;
         double maxPhotoncharge = -1000;
-        System.out.println();
         for (CameraPixel pix: pixelSet.set) {
             if (maxPhotoncharge < photoncharge[pix.id]) {
                 maxPhotoncharge = photoncharge[pix.id];
@@ -88,12 +93,19 @@ public class GaussianFit2D implements StatefulProcessor {
             }
         }
 
-
+        String outkey = "Gaussian_2D_0." + cutstring;
+        if (cutdouble == 99){
+            outkey = "Gaussian_2D_all";
+        }
+        if (cutdouble == 98){
+            outkey = "Gaussian_2D_mc";
+        }
+        System.out.println(outkey);
         // Evaluation
-        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet);
+        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet, maxPhotoncharge);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
-        MaxEval maxEval = new MaxEval(1000000000);
+        MaxEval maxEval = new MaxEval(10000000);
         InitialGuess start_values = new InitialGuess(new double[] {getx(maxPixelID), gety(maxPixelID), covarianceMatrix[0][0], covarianceMatrix[0][1], covarianceMatrix[1][1]});
         PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-2);
         PointValuePair result;
@@ -112,24 +124,29 @@ public class GaussianFit2D implements StatefulProcessor {
         Double cov_22 = result_point[4];
 
         //Save Data
-        data.put(outputKey + "x", x);
-        data.put(outputKey + "y", y);
-        data.put(outputKey + "cov_11", cov_11);
-        data.put(outputKey + "cov_12", cov_12);
-        data.put(outputKey + "cov_22", cov_22);
+        data.put(outkey + "x", x);
+        data.put(outkey + "y", y);
+        data.put(outkey + "cov_11", cov_11);
+        data.put(outkey + "cov_12", cov_12);
+        data.put(outkey + "cov_22", cov_22);
 
         //Continue if not NaN
+        int ditit = 0;
         if (!x.isNaN()) {
+            ditit = 1;
             //create covarianceMatrix
             double[][] matrixData = { { cov_11, cov_12 }, { cov_12, cov_22 } };
 
             // create RealMatrix vor later
-            RealMatrix sigmaMatrix = MatrixUtils.createRealMatrix(matrixData);
+            RealMatrix cov__Matrix = MatrixUtils.createRealMatrix(matrixData);
 
             //calculate EigenDecomposition
-            EigenDecomposition eig = new EigenDecomposition(sigmaMatrix);
+            EigenDecomposition eig = new EigenDecomposition(cov__Matrix);
             double varianceLong = eig.getRealEigenvalue(0);
             double varianceTrans = eig.getRealEigenvalue(1);
+            //Division with size is not right and not wrong
+            //double varianceLong = eig.getRealEigenvalue(0);
+            //double varianceTrans = eig.getRealEigenvalue(1);
 
             //calculate length and width
             double length = Math.sqrt(varianceLong);
@@ -140,17 +157,19 @@ public class GaussianFit2D implements StatefulProcessor {
 
             //save data 2
 
-            data.put(outputKey + "width", width);
-            data.put(outputKey + "length", length);
-            data.put(outputKey + "delta", delta);
-            data.put(outputKey + "diffdelta", Math.abs(delta - delta_bevor));
-            //System.out.println(outputKey + "deltaunter");
+            data.put(outkey + "width", width);
+            data.put(outkey + "length", length);
+            data.put(outkey + "delta", delta);
+            data.put(outkey + "deltadiff", Math.abs(delta - deltabefor));
+            System.out.println(delta - deltabefor);
+            //System.out.println(outkey + "deltadiff");
             //System.out.println(delta);
-            //System.out.println(delta_bevor);
-            data.put(outputKey + "overlay_1", new EllipseOverlay(x, y, width, length, delta));
-            data.put(outputKey + "overlay_2", new EllipseOverlay(x, y, 2*width, 2*length, delta));
+            //System.out.println(deltabefor);
+            data.put(outkey + "overlay_1", new EllipseOverlay(x, y, width, length, delta));
+            data.put(outkey + "overlay_2", new EllipseOverlay(x, y, 2*width, 2*length, delta));
 
         }
+        data.put(outkey + "ditit", ditit);
         return data;
     }
 
@@ -199,13 +218,21 @@ public class GaussianFit2D implements StatefulProcessor {
         this.cogyKey = cogyKey;
     }
 
-    public String getDeltawithout2dgaus() {
-        return deltawithout2dgaus;
+    public String getDeltabeforKey() {
+        return deltabeforKey;
     }
 
-    public void setDeltawithout2dgaus(String deltawithout2dgaus) {
-        this.deltawithout2dgaus = deltawithout2dgaus;
+    public void setDeltabeforKey(String deltabeforKey) {
+        this.deltabeforKey = deltabeforKey;
     }
+
+	public int getCutdouble() {
+		return cutdouble;
+	}
+
+	public void setCutdouble(int cutdouble) {
+		this.cutdouble = cutdouble;
+	}
 
     public double[] createShowerWeights(int[] shower, double[] pixelWeights) {
         double[] weights = new double[shower.length];
@@ -220,8 +247,8 @@ public class GaussianFit2D implements StatefulProcessor {
         double variance_xx = 0;
         double variance_yy = 0;
         double covariance_xy = 0;
+        int i = 0;
         double sum_of_weights = 0;
-
         for (int pix : showerPixel) {
             double weight = photoncharge[pix];
             double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
@@ -232,10 +259,11 @@ public class GaussianFit2D implements StatefulProcessor {
             variance_xx += weight * (posx - cogx) * (posx - cogx);
             variance_yy += weight * (posy - cogy) * (posy - cogy);
             covariance_xy += weight * (posx - cogx) * (posy - cogy);
+
+            i++;
         }
 
-        double[][] matrixData = {{ variance_xx / sum_of_weights, covariance_xy / sum_of_weights },
-                                 { covariance_xy / sum_of_weights, variance_yy / sum_of_weights }};
+        double[][] matrixData = { { variance_xx / sum_of_weights, covariance_xy / sum_of_weights}, { covariance_xy / sum_of_weights, variance_yy / sum_of_weights} };
         return matrixData;
     }
 
@@ -261,19 +289,21 @@ public class GaussianFit2D implements StatefulProcessor {
     public class GaussianNegLogLikelihood implements MultivariateFunction {
         private double[] photoncharge;
         private PixelSet pixelSet;
+        private double maxPhotoncharge;
 
         /**
          *
          * get from all Point in Shower x, y, and the photoncharge
          */
-        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet){
+        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet, double maxPhotoncharge){
             this.photoncharge = photoncharge;
             this.pixelSet = pixelSet;
+            this.maxPhotoncharge = maxPhotoncharge;
         }
 
         /**
          *
-         * @param point a double array with length 5 containing x, y, sigma11, sigma12, sigma22  in this order
+         * @param point a double array with length 5 containing x, y, cov_11, cov_12, cov_22  in this order
          * @return the negative log likelihood at this point for the given data
          */
         public double value(double[] point) {
@@ -283,15 +313,17 @@ public class GaussianFit2D implements StatefulProcessor {
             double cov_12 = point[3];
             double cov_22 = point[4];
             double neg_ln_L = 0;
-
             for(CameraPixel pixel: pixelSet.set){
-
-                double x = getx(pixel.id)  - mu_x;
-                double y = gety(pixel.id) - mu_y;
+                double x_1 = getx(pixel.id)  - mu_x;
+                double y_1 = gety(pixel.id) - mu_y;
                 double term1 = cov_11 * cov_22 - Math.pow(cov_12, 2.0);
-                double term2 = 0.5 / term1 * (Math.pow(x, 2.0) * cov_22 + Math.pow(y, 2.0) * cov_11 - 2 * cov_12 * x * y);
-
-                neg_ln_L += (0.5 * Math.log(term1) + term2) * photoncharge[pixel.id] ;
+                double term2 = 1 / 2 * 1 / term1 * (Math.pow(x_1, 2.0) * cov_22 + Math.pow(y_1, 2.0) * cov_11 - 2 * cov_12 * x_1 * y_1);
+                /*
+                if (photon_log[i] > photon_max){
+                    neg_ln_L += (term1 + term2) * photon_log[i] ;
+                }
+                */
+                neg_ln_L += (1 / 2 * Math.log(term1) + term2) * photoncharge[pixel.id];
             }
             return neg_ln_L;
         }

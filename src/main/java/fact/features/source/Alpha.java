@@ -9,91 +9,91 @@ import stream.annotations.Parameter;
 /**
  * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution
  * (aka the shower ellipse) I have no idea.
- * 
+ *
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
+ *
  */
 public class Alpha implements Processor {
-	static Logger log = LoggerFactory.getLogger(Alpha.class);
-	@Parameter(required=true)
-	private String distribution = null;
-	@Parameter(required=true)
-	private String sourcePosition = null;
-	@Parameter(required=true)
-	private String outputKey = null;
-	
-	@Override
-	public Data process(Data input) {
-		PixelDistribution2D dist;
-		try{
-			dist = (PixelDistribution2D) input.get(distribution);
-			if(dist ==  null){
-				log.info("No showerpixel in this event. Not calculating alpha");
-				return input;
-			}
-		} catch (ClassCastException e){
-			log.error("distribution is not of type PixelDistribution2D. Aborting");
-			return null;
-		}
+    static Logger log = LoggerFactory.getLogger(Alpha.class);
+    @Parameter(required=true)
+    private String distribution = null;
+    @Parameter(required=true)
+    private String sourcePosition = null;
+    @Parameter(required=true)
+    private String outputKey = null;
+
+    @Override
+    public Data process(Data input) {
+        PixelDistribution2D dist;
+        try{
+            dist = (PixelDistribution2D) input.get(distribution);
+            if(dist ==  null){
+                log.info("No showerpixel in this event. Not calculating alpha");
+                return input;
+            }
+        } catch (ClassCastException e){
+            log.error("distribution is not of type PixelDistribution2D. Aborting");
+            return null;
+        }
 
 
-		double[] source = null;
-		try{
-			source  = (double[]) input.get(sourcePosition);
-			if(source ==  null){
-				throw new RuntimeException("This event didnt have a sourceposition. Eventnumber: " + input.get("EventNum"));
-			}
-		} catch (ClassCastException e){
-			log.error("wrong types" + e.toString());
-		}
+        double[] source = null;
+        try{
+            source  = (double[]) input.get(sourcePosition);
+            if(source ==  null){
+                throw new RuntimeException("This event didnt have a sourceposition. Eventnumber: " + input.get("EventNum"));
+            }
+        } catch (ClassCastException e){
+            log.error("wrong types" + e.toString());
+        }
 
-		double alpha = 0.0;
+        double alpha = 0.0;
         //TODO: this might throw an NPE for source[1]
-	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
-	
-	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;
-	
-	    alpha                  =  (dist.getAngle() - auxiliary_angle);
-	
-	    if (alpha > Math.PI / 2)
-	    {
-	        alpha              = alpha - Math.PI;
-	    }
-	    if (alpha < -Math.PI / 2)
-	    {
-	        alpha              = Math.PI + alpha;
-	    }
-	    input.put(outputKey, alpha);
-		return input;
-	}
+        double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
 
-	
-	
-	public String getDistribution() {
-		return distribution;
-	}
-	public void setDistribution(String distribution) {
-		this.distribution = distribution;
-	}
+        //auxiliary_angle         = auxiliary_angle / Math.PI * 180;
+
+        alpha =  (dist.getAngle() - auxiliary_angle);
+
+        if (alpha > Math.PI / 2)
+        {
+            alpha = alpha - Math.PI;
+        }
+        if (alpha < -Math.PI / 2)
+        {
+            alpha = Math.PI + alpha;
+        }
+        input.put(outputKey, alpha);
+        return input;
+    }
 
 
 
-	public String getSourcePosition() {
-		return sourcePosition;
-	}
-
-	public void setSourcePosition(String sourcePosition) {
-		this.sourcePosition = sourcePosition;
-	}
-
+    public String getDistribution() {
+        return distribution;
+    }
+    public void setDistribution(String distribution) {
+        this.distribution = distribution;
+    }
 
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+
+    public String getSourcePosition() {
+        return sourcePosition;
+    }
+
+    public void setSourcePosition(String sourcePosition) {
+        this.sourcePosition = sourcePosition;
+    }
+
+
+
+    public String getOutputKey() {
+        return outputKey;
+    }
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
 
 }

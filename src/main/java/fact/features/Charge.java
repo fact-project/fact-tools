@@ -33,6 +33,8 @@ public class Charge implements Processor {
     private String ChargmaxOutputKey;
     @Parameter(required = true)
     private String NewAngleOutputKey;
+    @Parameter(required=true, description="key to the yvalue of the cog of the shower")
+    private String deltabeforKey = null;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -42,6 +44,7 @@ public class Charge implements Processor {
 
         PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
         double[] photonCharge = (double[]) input.get(weights);
+        double deltabefor = (Double) input.get(deltabeforKey);
 
         int chargeID = 0;
         double chargemax = -10;
@@ -50,49 +53,51 @@ public class Charge implements Processor {
         for (CameraPixel pix: showerPixel.set){
             if (photonCharge[pix.id] > chargemax) {
                 chargeID = chargeID - chargeID + pix.id;
-                chargemax = photonCharge[pix.id];
+                chargemax = chargemax - chargemax + photonCharge[pix.id];
             }
         }
 
-        double maxx = getx(chargeID);
-        double maxy = gety(chargeID);
-        double maxr = 0;
-        double minr = 200000000;
-        int maxid = 0;
-        int minid = 0;
+        double x_pos_max = getx(chargeID);
+        double y_pos_max = gety(chargeID);
+        double differenz_max = 0;
+        double differenz_min = 200000000;
+        int id_max_ab = 0;
+        int id_min_ab = 0;
         double x_diff = 0;
         double y_diff = 0;
         double differen = 0;
         for (CameraPixel pix: showerPixel.set) {
-            int anzahl_neigh = 0;
+            int number_neighbours = 0;
             FactCameraPixel[] pixelsetneigh = pixelMap.getNeighboursFromID(pix.id);
             for (CameraPixel pix_zahl: pixelsetneigh){
                 if (java.util.Arrays.toString(showerPixel.toIntArray()).contains(Integer.toString(pix_zahl.id))){
-                    anzahl_neigh += 1;
+                    number_neighbours += 1;
                 }
             }
 
-            if (anzahl_neigh < 6){
-                x_diff = (maxx - getx(pix.id));
-                y_diff = (maxy - gety(pix.id));
+            if (number_neighbours < 6){
+                x_diff = (x_pos_max - getx(pix.id));
+                y_diff = (y_pos_max - gety(pix.id));
                 differen = (x_diff * x_diff + y_diff * y_diff);
-                if (differen > maxr){
-                    maxr = differen;
-                    maxid = pix.id;
+                if (differen > differenz_max){
+                    differenz_max = differen;
+                    id_max_ab = pix.id;
                 }
 
-                if (differen < minr){
-                    minr = differen;
-                    minid = pix.id;
+                if (differen < differenz_min){
+                    differenz_min = differen;
+                    id_min_ab = pix.id;
                 }
             }
         }
-        double anglenew = Math.atan((maxx - getx(maxid)) / (maxy - gety(maxid)));
-        input.put("Linemax", new LineOverlay(maxx, maxy, getx(maxid), gety(maxid)));
-        input.put("Linemin", new LineOverlay(maxx, maxy, getx(minid), gety(minid)));
+        double anglenew = Math.atan((x_pos_max - getx(id_max_ab)) / (y_pos_max - gety(id_max_ab)));
+        input.put("Linemax", new LineOverlay(x_pos_max, y_pos_max, getx(id_max_ab), gety(id_max_ab)));
+        input.put("Linemin", new LineOverlay(x_pos_max, y_pos_max, getx(id_min_ab), gety(id_min_ab)));
         input.put(ChargeIDOutputKey , (double)  chargeID);
         input.put(ChargmaxOutputKey , chargemax);
         input.put(NewAngleOutputKey , anglenew);
+        input.put("newdeltadiff", Math.abs(deltabefor - anglenew));
+        System.out.println(deltabefor - anglenew);
         return input;
 
     }
@@ -138,5 +143,13 @@ public class Charge implements Processor {
 
     public void setWeights(String weights) {
         this.weights = weights;
+    }
+
+    public String getDeltabeforKey() {
+        return deltabeforKey;
+    }
+
+    public void setDeltabeforKey(String deltabeforKey) {
+        this.deltabeforKey = deltabeforKey;
     }
 }

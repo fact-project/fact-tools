@@ -56,7 +56,6 @@
     outputKey="showerDistribution"
     centerkeyx="centerx"
     centerkeyy="centery"
-    deltakeyb='deltab'
 />
 <fact.features.Charge
     distribution="showerDistribution"
@@ -65,20 +64,86 @@
     ChargeIDOutputKey="ChargePhotonID"
     ChargmaxOutputKey="ChargePhotonmax"
     NewAngleOutputKey="newDelta"
+    deltabeforKey="Delta"
 />
+<fact.features.GaussianFit2D
+    pixelSetKey="showera"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="99"
+/>
+<Skip condition="%{data.Gaussian_2D_0.99ditit} == 0" />
 <fact.features.GaussianFit2D
     pixelSetKey="shower"
     photonchargeKey="photoncharge"
-    cogxKey="COGx"
-    cogyKey="COGy"
-    deltawithout2dgaus="deltab"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="0"
 />
+<Skip condition="%{data.Gaussian_2D_0.0ditit} == 0" />
+<fact.features.GaussianFit2D
+    pixelSetKey="shower01"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Gaussian_2D_0.0delta"
+    cutdouble="1"
+/>
+<Skip condition="%{data.Gaussian_2D_0.1ditit} == 0" />
+<fact.features.GaussianFit2D
+    pixelSetKey="shower02"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="2"
+/>
+<Skip condition="%{data.Gaussian_2D_0.2ditit} == 0" />
+<fact.features.GaussianFit2D2
+    pixelSetKey="shower025"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="25"
+/>
+<Skip condition="%{data.Gaussian_2D_0.25ditit} == 0" />
+<fact.features.GaussianFit2D
+    pixelSetKey="shower03"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="3"
+/>
+<Skip condition="%{data.Gaussian_2D_0.3ditit} == 0" />
+<fact.features.GaussianFit2D
+    pixelSetKey="shower04"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="4"
+/>
+<Skip condition="%{data.Gaussian_2D_0.4ditit} == 0" />
+<fact.features.GaussianFit2D
+    pixelSetKey="shower05"
+    photonchargeKey="photoncharge"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
+    cutdouble="5"
+/>
+<Skip condition="%{data.Gaussian_2D_0.5ditit} == 0" />
 <fact.features.GaussianFit2Dskew
     pixelSetKey="shower"
     photonchargeKey="photoncharge"
-    cogxKey="COGx"
-    cogyKey="COGy"
-    deltawithout2dgaus="deltab"
+    cogxKey="centerx"
+    cogyKey="centery"
+    deltabeforKey="Delta"
 />
 <fact.features.M3Long
     weightsKey="photoncharge"

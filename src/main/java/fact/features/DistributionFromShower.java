@@ -48,9 +48,6 @@ public class DistributionFromShower implements Processor {
 	private String centerkeyx = "centerx";
 	@Parameter(required = false, defaultValue="centery")
 	private String centerkeyy = "centery";
-	@Parameter(required = false, defaultValue="deltab")
-	private String deltakeyb = "deltab";
-
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	// A logger
@@ -169,7 +166,6 @@ public class DistributionFromShower implements Processor {
 		double[] center = calculateCenter(showerPixel);
     input.put(centerkeyx, center[0]);
 		input.put(centerkeyy, center[1]);
-		input.put(deltakeyb, delta);
 		input.put("2-sigma-ellipse", new EllipseOverlay(center[0], center[1], 2*width,
 				2*length, delta));
 		input.put("1-sigma-ellipse", new EllipseOverlay(center[0], center[1], width,
@@ -327,11 +323,6 @@ public class DistributionFromShower implements Processor {
 
 	public void setCenterkeyy(String centerkeyy) {
 		this.centerkeyy = centerkeyy;
-	}
-
-
-	public void setDeltakeyb(String deltakeyb) {
-		this.deltakeyb = deltakeyb;
 	}
 
 
