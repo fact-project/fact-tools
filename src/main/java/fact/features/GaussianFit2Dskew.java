@@ -32,6 +32,8 @@ public class GaussianFit2Dskew implements StatefulProcessor {
     private String photonchargeKey = "photoncharge";
     @Parameter(required = false, description = "The pixelSet on which the fit is performed", defaultValue = "shower")
     private String pixelSetKey = "shower";
+    @Parameter(required = false, description = "The pixelSet on which the fit is performed")
+    private String pixelforskewKey = null;
     @Parameter(required=false, description="key to the xvalue of the cog of the shower")
     private String cogxKey = null;
     @Parameter(required=false, description="key to the yvalue of the cog of the shower")
@@ -49,6 +51,7 @@ public class GaussianFit2Dskew implements StatefulProcessor {
     public Data process(Data data) {
         double[] photoncharge = (double[]) data.get(photonchargeKey);
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
+        PixelSet pixelforskew = (PixelSet) data.get(pixelforskewKey);
         double[] showerWeights = createShowerWeights(pixelSet.toIntArray(), photoncharge);
 
         // Calculate size vor later
@@ -106,7 +109,6 @@ public class GaussianFit2Dskew implements StatefulProcessor {
             ditit = 1;
             //create covarianceMatrix
             double[][] matrixData = { { cov_11, cov_12 }, { cov_12, cov_22 } };
-
             // create RealMatrix vor later
             RealMatrix cov__Matrix = MatrixUtils.createRealMatrix(matrixData);
 
@@ -189,6 +191,14 @@ public class GaussianFit2Dskew implements StatefulProcessor {
         this.deltabeforKey = deltabeforKey;
     }
 
+    public String getPixelforskewKey() {
+        return pixelforskewKey;
+    }
+
+    public void setPixelforskewKey(String pixelforskewKey) {
+        this.pixelforskewKey = pixelforskewKey;
+    }
+
     double getx (int id){
         return pixelMap.getPixelFromId(id).getXPositionInMM();
     }
@@ -268,16 +278,16 @@ public class GaussianFit2Dskew implements StatefulProcessor {
             double cov_22 = point[4];
             double neg_ln_L = 0;
             for(CameraPixel pixel: pixelSet.set){
-                double x_1 = getx(pixel.id)  - mu_x;
-                double y_1 = gety(pixel.id) - mu_y;
+                double x = getx(pixel.id)  - mu_x;
+                double y = gety(pixel.id) - mu_y;
                 double term1 = cov_11 * cov_22 - Math.pow(cov_12, 2.0);
-                double term2 = 1 / 2 * 1 / term1 * (Math.pow(x_1, 2.0) * cov_22 + Math.pow(y_1, 2.0) * cov_11 - 2 * cov_12 * x_1 * y_1);
+                double term2 = 0.5 / term1 * (Math.pow(x, 2.0) * cov_22 + Math.pow(y, 2.0) * cov_11 - 2 * cov_12 * x * y);
                 /*
                 if (photon_log[i] > photon_max){
                     neg_ln_L += (term1 + term2) * photon_log[i] ;
                 }
                 */
-                neg_ln_L += (1 / 2 * Math.log(term1) + term2 + Math.log(1 + Erf.erf(Math.sqrt(term2)))) * photoncharge[pixel.id];
+                neg_ln_L += (0.5 * Math.log(term1) + term2 + Math.log(1 + Erf.erf(Math.sqrt(term2)))) * photoncharge[pixel.id];
             }
             return neg_ln_L;
         }

@@ -74,7 +74,7 @@ public class GaussianFit2D implements StatefulProcessor {
         }
 
         String cutstring = String.valueOf(cutdouble);
-        System.out.println(cutstring);
+
 
         // Calculate cov_
         double[][] covarianceMatrix = calculateCovarianceMatrix(pixelSet.toIntArray(), photoncharge, cogx, cogy);
@@ -100,7 +100,6 @@ public class GaussianFit2D implements StatefulProcessor {
         if (cutdouble == 98){
             outkey = "Gaussian_2D_mc";
         }
-        System.out.println(outkey);
         // Evaluation
         GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet, maxPhotoncharge);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
@@ -138,10 +137,10 @@ public class GaussianFit2D implements StatefulProcessor {
             double[][] matrixData = { { cov_11, cov_12 }, { cov_12, cov_22 } };
 
             // create RealMatrix vor later
-            RealMatrix cov__Matrix = MatrixUtils.createRealMatrix(matrixData);
+            RealMatrix cov_Matrix = MatrixUtils.createRealMatrix(matrixData);
 
             //calculate EigenDecomposition
-            EigenDecomposition eig = new EigenDecomposition(cov__Matrix);
+            EigenDecomposition eig = new EigenDecomposition(cov_Matrix);
             double varianceLong = eig.getRealEigenvalue(0);
             double varianceTrans = eig.getRealEigenvalue(1);
             //Division with size is not right and not wrong
@@ -161,7 +160,7 @@ public class GaussianFit2D implements StatefulProcessor {
             data.put(outkey + "length", length);
             data.put(outkey + "delta", delta);
             data.put(outkey + "deltadiff", Math.abs(delta - deltabefor));
-            System.out.println(delta - deltabefor);
+            //System.out.println(delta - deltabefor);
             //System.out.println(outkey + "deltadiff");
             //System.out.println(delta);
             //System.out.println(deltabefor);
@@ -314,16 +313,16 @@ public class GaussianFit2D implements StatefulProcessor {
             double cov_22 = point[4];
             double neg_ln_L = 0;
             for(CameraPixel pixel: pixelSet.set){
-                double x_1 = getx(pixel.id)  - mu_x;
-                double y_1 = gety(pixel.id) - mu_y;
+                double x = getx(pixel.id)  - mu_x;
+                double y= gety(pixel.id) - mu_y;
                 double term1 = cov_11 * cov_22 - Math.pow(cov_12, 2.0);
-                double term2 = 1 / 2 * 1 / term1 * (Math.pow(x_1, 2.0) * cov_22 + Math.pow(y_1, 2.0) * cov_11 - 2 * cov_12 * x_1 * y_1);
+                double term2 = 0.5 / term1 * (Math.pow(x, 2.0) * cov_22 + Math.pow(y, 2.0) * cov_11 - 2 * cov_12 * x * y);
                 /*
                 if (photon_log[i] > photon_max){
                     neg_ln_L += (term1 + term2) * photon_log[i] ;
                 }
                 */
-                neg_ln_L += (1 / 2 * Math.log(term1) + term2) * photoncharge[pixel.id];
+                neg_ln_L += (0.5 * Math.log(term1) + term2) * photoncharge[pixel.id];
             }
             return neg_ln_L;
         }

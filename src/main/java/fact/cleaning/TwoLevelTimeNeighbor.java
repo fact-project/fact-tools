@@ -171,6 +171,27 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             }
             input.put(outputKey + "a", allpixle);
 
+            PixelSet testpixle = new PixelSet();
+            int numberpixleinnewshower = 0;
+            for (int i = 0; i < 1; i++) {
+                double x1 = pixelMap.getPixelFromId(391).getXPositionInMM();
+                double y1 = pixelMap.getPixelFromId(391).getYPositionInMM();
+                double x2 = pixelMap.getPixelFromId(1402).getXPositionInMM();
+                double y2 = pixelMap.getPixelFromId(1402).getYPositionInMM();
+                double r = Math.pow(x1-x2, 2.0) + Math.pow(y1-y2, 2.0);
+                for (int j = 0; j < 1440; j++){
+                    double xnow = pixelMap.getPixelFromId(j).getXPositionInMM();
+                    double ynow = pixelMap.getPixelFromId(j).getYPositionInMM();
+                    double distenznow = Math.pow(xnow-x1, 2.0) + Math.pow(ynow-y1, 2.0);
+                    if (distenznow < r){
+                        numberpixleinnewshower += 1;
+                        testpixle.addById(j);
+                    }
+                }
+            }
+            input.put(outputKey + "t", testpixle);
+            input.put(outputKey + "pix", numberpixleinnewshower);
+
             int maxPixelID = -1;
             double maxPhotoncharge = -1000;
             for (CameraPixel pix: cleanedPixelSet.set) {

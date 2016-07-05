@@ -58,15 +58,6 @@
     centerkeyy="centery"
 />
 <fact.features.GaussianFit2D
-    pixelSetKey="showera"
-    photonchargeKey="photoncharge"
-    cogxKey="centerx"
-    cogyKey="centery"
-    deltabeforKey="Delta"
-    cutdouble="99"
-/>
-<Skip condition="%{data.Gaussian_2D_0.99ditit} == 0" />
-<fact.features.GaussianFit2D
     pixelSetKey="shower"
     photonchargeKey="photoncharge"
     cogxKey="centerx"
@@ -93,7 +84,7 @@
     cutdouble="2"
 />
 <Skip condition="%{data.Gaussian_2D_0.2ditit} == 0" />
-<fact.features.GaussianFit2D2
+<fact.features.GaussianFit2D
     pixelSetKey="shower025"
     photonchargeKey="photoncharge"
     cogxKey="centerx"
@@ -138,6 +129,16 @@
     cutdouble="98"
 />
 <Skip condition="%{data.Gaussian_2D_mcditit} == 0" />
+<fact.features.mcdelta
+    pixelSetKey="shower"
+    photonchargeKey="photoncharge"
+    pointingZdKey="MPointingPos.fZd"
+    pointingAzKey="MPointingPos.fAz"
+    sourceZdKey="MSimSourcePos.fZd"
+    sourceAzKey="MSimSourcePos.fAz"
+    impactAzxKey="MCorsikaEvtHeader.fX"
+    impactAzyKey="MCorsikaEvtHeader.fY"
+/>
 <fact.features.M3Long
     weightsKey="photoncharge"
     pixelSetKey="shower"
