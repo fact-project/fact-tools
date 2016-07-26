@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.ElementWise;
 import fact.features.singlePulse.timeLineExtraction.Convolve;
-import fact.features.singlePulse.timeLineExtraction.SubstractMeanOfArray;
 
 public class SinglePulseExtractor {
 
