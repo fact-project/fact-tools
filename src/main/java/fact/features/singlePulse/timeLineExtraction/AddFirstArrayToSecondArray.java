@@ -3,19 +3,55 @@ package fact.features.singlePulse.timeLineExtraction;
 import java.util.Arrays;
 
 public class AddFirstArrayToSecondArray {
-    
-    public static void at(double[] f1, double[] f2, int at) {
-        if(at > f2.length) return;
-        if(at < 0) at = 0;
-        // endpoint of injection in f2: e2
-        int e2 = at + f1.length;
-        // naive endpoint of sampling in f1
-        int e1 = f1.length;
-        // e2 is limited to range of f2
-        if (e2 > f2.length) e2 = f2.length;
-        // correct sampling range in f1 if needed
-        if (e2-at < f1.length) e1 = e2-at;
-        for(int i=at; i<e2; i++)
-            f2[i] += f1[i-at];        
+
+    /**
+    * Adds the first array elementwise to the second array starting at a certain
+    * position. 
+    *
+    * @param first
+    *           The first array [N].
+    *
+    * @param second
+    *           The second array [M] is modified in place. The length M of the 
+    *           second array will not be changed.
+    *
+    * @param at
+    *           The starting position of the addition in the second array. 
+    *           Can be negative.
+    */    
+    public static void at(double[] first, double[] second, int at) {
+        
+        if(at > second.length) return;
+            // injection slice is behind second array's end. No overlap.
+            //                                     [...first...]
+            //                   [...second...]
+            //                                      ^at
+
+        int end = at + first.length;
+        if(end < 0) return;
+            // first array is completley before second. No overlap.
+            //    [...first...]
+            //                   [...second...]
+            //     ^at
+
+        if(end >= second.length) end = second.length;
+            // end is limited to length of second
+            // first array is completley before second. No overlap.
+            //    [.............first...................]
+            //                   [...second...]
+            //     ^at                                 ^end 
+
+        if(end > first.length + at) end = first.length + at;
+            //              [...first...]
+            //                   [...second...]
+            //               ^at
+
+        int start = at;
+        if(start < 0) start = 0;
+
+        for(int i=start; i<end; i++) {
+            int acc1 = i-at;
+            second[i] += first[acc1];        
+        }
     }     
 }
