@@ -48,7 +48,7 @@ public class SinglePulseExtraction implements Processor {
         double[] pulseToLookFor = TemplatePulse.factSinglePePulse(
             pulseToLookForLength);
 
-        int pulseToSubstractLength = roi;
+        int pulseToSubstractLength = 300;
         double[] pulseToSubstract = TemplatePulse.factSinglePePulse(
             pulseToSubstractLength);
 
@@ -63,7 +63,11 @@ public class SinglePulseExtraction implements Processor {
             int start = pix*roi+startSlice;
             int end = start + windowLength;
 
-            double[] pixelTimeLineInMv = Arrays.copyOfRange(timeLines, start, end);
+            double[] pixelTimeLineInMv = Arrays.copyOfRange(
+                timeLines,
+                start, 
+                end
+            );
             
             double[] pixelTimeLine = ElementWise.multiply(
                 pixelTimeLineInMv,
@@ -82,9 +86,7 @@ public class SinglePulseExtraction implements Processor {
         }
 
         addStartSliceOffset(pixel_arrival_slices);
-
         // printArrivalSlices(pixel_arrival_slices);
-
         input.put(outputKey, pixel_arrival_slices);
         input.put(outputKey+"Count", single_pe_count);
         return input;
