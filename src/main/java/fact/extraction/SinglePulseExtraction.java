@@ -18,16 +18,33 @@ public class SinglePulseExtraction implements Processor {
     @Parameter(required=true, description="")
     private String dataKey = null;
 
-    @Parameter(required=true, description="output key, a list of lists of arrival slices of photons found in each pixel")
+    @Parameter(
+        required = true, 
+        description =   "output key, a list of lists of arrival slices of "+ 
+                        "photons found in each pixel"
+    )
     private String outputKey = null;
 
-    @Parameter(required = false, description="start slice of extraction window", defaultValue="20")
+    @Parameter(
+        required = false, 
+        description = "start slice of extraction window", 
+        defaultValue = "20"
+    )
     protected int startSlice = 25;
 
-    @Parameter(required = false, description="extraction window length in slices", defaultValue="225")
+    @Parameter(
+        required = false, 
+        description = "extraction window length in slices", 
+        defaultValue = "225"
+    )
     protected int windowLength = 225;
 
-    @Parameter(required = false, description="max number of extraction tries on a single pixel's time line before abort", defaultValue="50")
+    @Parameter(
+        required = false, 
+        description =   "max number of extraction tries on a single pixel's "+
+                        "time line before abort", 
+        defaultValue = "50"
+    )
     protected int maxIterations = 50;
 
     private int npix = Constants.NUMBEROFPIXEL;
