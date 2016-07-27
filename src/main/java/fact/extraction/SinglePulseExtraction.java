@@ -12,7 +12,8 @@ import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
 
 /*
-Exttracts a list of arrival slices of photons for each pixel.
+* Extracts a list of arrival slice positions of photons for each pixel 
+* time line.
 */
 public class SinglePulseExtraction implements Processor {
     @Parameter(required=true, description="")
