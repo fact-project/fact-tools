@@ -22,36 +22,33 @@ public class AddFirstArrayToSecondArray {
     public static void at(double[] first, double[] second, int at) {
         
         if(at > second.length) return;
-            // injection slice is behind second array's end. No overlap.
-            //                                     [...first...]
+            // Injection slice (at) is behind second array's end (end2)
+            // No overlap.
+            //                                     [...first...
             //                   [...second...]
-            //                                      ^at
+            //                               ^end2  ^at
 
         int end = at + first.length;
         if(end < 0) return;
-            // first array is completley before second. No overlap.
-            //    [...first...]
+            // End of first array (end1) is before second array's start (start1)
+            // No overlap.
+            // [...first...]
             //                   [...second...]
-            //     ^at
+            //  ^at       ^end1   ^start2
 
         if(end >= second.length) end = second.length;
-            // end is limited to length of second
-            // first array is completley before second. No overlap.
-            //    [.............first...................]
-            //                   [...second...]
-            //     ^at                                 ^end 
-
-        if(end > first.length + at) end = first.length + at;
-            //              [...first...]
-            //                   [...second...]
-            //               ^at
+            // End of first array goes beyond first array's end
+            //                           ...first...]
+            //                    ...second...]
+            //                                     ^end1 
 
         int start = at;
         if(start < 0) start = 0;
+            //           [...first...
+            //                   [...second...
+            //            ^at     ^start2=0
 
-        for(int i=start; i<end; i++) {
-            int acc1 = i-at;
-            second[i] += first[acc1];        
-        }
+        for(int i=start; i<end; i++)
+            second[i] += first[i-at];        
     }     
 }
