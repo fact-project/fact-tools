@@ -46,7 +46,7 @@ public class SinglePulseExtractor {
         *           Amplitude of the single puls must be normalized to 1.0.
         * 
         * @param maxIterations       
-        *           The maximum iterations on atime line before abort.
+        *           The maximum iterations on a time line before abort.
         */
         arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
