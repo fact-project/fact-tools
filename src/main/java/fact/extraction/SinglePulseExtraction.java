@@ -27,6 +27,13 @@ public class SinglePulseExtraction implements Processor {
     private String outputKey = null;
 
     @Parameter(
+        required = true, 
+        description =   "max number of extraction tries on a single pixel's "+
+                        "time line before abort" 
+    )
+    protected int maxIterations;
+
+    @Parameter(
         required = false, 
         description = "start slice of extraction window", 
         defaultValue = "20"
@@ -39,14 +46,6 @@ public class SinglePulseExtraction implements Processor {
         defaultValue = "225"
     )
     protected int windowLength = 225;
-
-    @Parameter(
-        required = false, 
-        description =   "max number of extraction tries on a single pixel's "+
-                        "time line before abort", 
-        defaultValue = "50"
-    )
-    protected int maxIterations = 50;
 
     private int npix = Constants.NUMBEROFPIXEL;
     private int roi  = 300;
