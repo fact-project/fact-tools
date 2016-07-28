@@ -56,11 +56,24 @@ public class SinglePulseExtractor {
                 timeLine, 
                 templatePulse);
             final ArgMax am = new ArgMax(conv);
-            final int offsetSlices = 7;
+            final int offsetSlices = (int)((double)(templatePulse.length)*0.35);
+            // The offsetSlices are needed to comensate both the asymetric 
+            // convolution and the asymetric amplitude distribution in the 
+            // pulse template (mostly the rising edge of the pulse).
+            // These asymetries cause the maximum amplitude in conv not to 
+            // be the optimum position for the pulse substraction.
+            // The offsetSlices are chosen to correct for this and as a 
+            // first guide we provide here the magic factor: 
+            // offsetSlices = 0.35*templatePulse.length
+            // This indicates the dependency of offsetSlices of the 
+            // templatePulse.length 
+            // (offsetSlices = 7 for templatePulse.length = 20).
+            // It might be that offsetSlices can be optimized based on the
+            // maxResponse.
             final int maxSlice = am.arg - offsetSlices;
-            final double max_response = am.max;
+            final double maxResponse = am.max;
 
-            if(max_response > 0.5 && iteration < maxIterations) {
+            if(maxResponse > 0.5 && iteration < maxIterations) {
                 final double weight = 1.0;
                 final double[] sub = ElementWise.multiply(
                     substractionPulse, 
