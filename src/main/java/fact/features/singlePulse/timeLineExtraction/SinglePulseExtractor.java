@@ -10,6 +10,7 @@ public class SinglePulseExtractor {
 
     public static final int pulseToLookForLength = 20;
     public static final double[] pulseToLookFor;
+    public static final double pulseToLookForIntegral;
     /** A template time line of the pulse to look for. 
     *   For FACT pulses, it turned out best to mostly use 
     *   the rising edge of a pulse up to the maximum and 
@@ -32,6 +33,11 @@ public class SinglePulseExtractor {
             pulseToLookForLength);
         pulseToSubstract= TemplatePulse.factSinglePePulse(
             pulseToSubstractLength);
+
+        double sum = 0.0;
+        for(int i=0; i<pulseToLookFor.length; i++)
+            sum += pulseToLookFor[i];
+        pulseToLookForIntegral = sum;
     }
 
     public static ArrayList<Integer> getArrivalSlicesOnTimeline(
@@ -79,7 +85,7 @@ public class SinglePulseExtractor {
             // It might be that offsetSlices can be optimized based on the
             // maxResponse.
             final int maxSlice = am.arg - offsetSlices;
-            final double maxResponse = am.max;
+            final double maxResponse = am.max/pulseToLookForIntegral;
 
             if(maxResponse > 0.5) {
                 final double weight = 1.0;
@@ -100,7 +106,7 @@ public class SinglePulseExtractor {
         return arrival_slices;
     }
 
-    private static void applyAcCoupling(double[] timeLine) {
+    public static void applyAcCoupling(double[] timeLine) {
         /**  
         * Estimates the effect of FACT's AC coupling in between the 
         * photo-electric converter (SIPM) and the signal sampler (DRS4).
