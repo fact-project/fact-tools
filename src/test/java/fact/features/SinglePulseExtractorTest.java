@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeLineExtraction.ElementWise;
 import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
 
 public class SinglePulseExtractorTest {
