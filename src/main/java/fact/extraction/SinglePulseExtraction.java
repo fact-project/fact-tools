@@ -8,7 +8,6 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.ElementWise;
-import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
 
 /*
@@ -58,21 +57,9 @@ public class SinglePulseExtraction implements Processor {
 
         npix = (Integer) input.get("NPIX");
         roi = (Integer) input.get("NROI");
-
         double[] timeLines = (double[]) input.get(dataKey);
 
-        int pulseToLookForLength = 20;
-        double[] pulseToLookFor = TemplatePulse.factSinglePePulse(
-            pulseToLookForLength);
-
-        int pulseToSubstractLength = 300;
-        double[] pulseToSubstract = TemplatePulse.factSinglePePulse(
-            pulseToSubstractLength);
-
-        final double factSinglePeAmplitudeInMv = 10.0;
-
         double[] single_pe_count = new double[npix];
-
         ArrayList<ArrayList<Integer>> pixel_arrival_slices = 
             new ArrayList<ArrayList<Integer>>();
 
@@ -86,20 +73,20 @@ public class SinglePulseExtraction implements Processor {
                 end
             );
             
+            final double factSinglePeAmplitudeInMv = 10.0;
             double[] pixelTimeLine = ElementWise.multiply(
                 pixelTimeLineInMv,
                 1.0/factSinglePeAmplitudeInMv
             );
 
-            SinglePulseExtractor extractor = new SinglePulseExtractor(
-                pixelTimeLine, 
-                pulseToLookFor,
-                pulseToSubstract,
-                maxIterations
-            );
+            ArrayList<Integer> arrival_slices = SinglePulseExtractor.
+                getArrivalSlicesOnTimeline(
+                    pixelTimeLine, 
+                    maxIterations
+                );
 
-            single_pe_count[pix] = extractor.arrival_slices.size();
-            pixel_arrival_slices.add(extractor.arrival_slices);
+            single_pe_count[pix] = arrival_slices.size();
+            pixel_arrival_slices.add(arrival_slices);
         }
 
         addStartSliceOffset(pixel_arrival_slices);

@@ -4,23 +4,45 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.ElementWise;
 import fact.features.singlePulse.timeLineExtraction.Convolve;
+import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
 
 public class SinglePulseExtractor {
 
-    public ArrayList<Integer> arrival_slices;
+    public static final int pulseToLookForLength = 20;
+    public static final double[] pulseToLookFor;
+    /** A template time line of the pulse to look for. 
+    *   For FACT pulses, it turned out best to mostly use 
+    *   the rising edge of a pulse up to the maximum and 
+    *   only a small part of the falling edge, 
+    *   20 slices = 10ns.
+    *   Amplitude of the single puls ids normalized to 1.0.
+    */
 
-    public SinglePulseExtractor(
+    public static final int pulseToSubstractLength = 300;
+    public static final double[] pulseToSubstract;
+    /** The template time line of the pulse to be 
+    *   substracted from the time line. For FACT, this 
+    *   substraction pulse should be the full pulse with its 
+    *   long falling edge. 300 slices = 150ns.
+    *   Amplitude of the single puls is normalized to 1.0.
+    */
+
+    static {
+        pulseToLookFor = TemplatePulse.factSinglePePulse(
+            pulseToLookForLength);
+        pulseToSubstract= TemplatePulse.factSinglePePulse(
+            pulseToSubstractLength);
+    }
+
+    public static ArrayList<Integer> getArrivalSlicesOnTimeline(
         double[] timeLine, 
-        double[] templatePulse,
-        double[] substractionPulse,
         int maxIterations
     ) {
         /**  
         * Reconstructs the arrival slices of single photons on a timeline. 
-        * Only valid for small pulses up to 50 p.e. 
         * 
         * @return arrival_slices
-        *           A list of the arrival slices of photons found in 
+        *           A list of the arrival slices of photons found on 
         *           the time line.
         * 
         * @param timeLine 
@@ -30,33 +52,19 @@ public class SinglePulseExtractor {
         *           were substracted. 
         *           Amplitude of the single puls must be normalized to 1.0.
         * 
-        * @param templatePulse       
-        *           A template time line of the pulse to look for. 
-        *           For FACT pulses, it turned out best to mostly use 
-        *           the rising edge of a pulse up to the maximum and 
-        *           only a small part of the falling edge, 
-        *           20 slices = 10ns.
-        *           Amplitude of the single puls must be normalized to 1.0.
-        * 
-        * @param substractionPulse   
-        *           The template time line of the pulse to be 
-        *           substracted from the time line. For FACT, this 
-        *           substraction pulse should be the full pulse with its 
-        *           long falling edge. 300 slices = 150ns.
-        *           Amplitude of the single puls must be normalized to 1.0.
-        * 
         * @param maxIterations       
         *           The maximum iterations on a time line before abort.
         */
-        arrival_slices = new ArrayList<Integer>();
+        ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
-        while(true) {
+        while(iteration < maxIterations) {
             final double[] conv = Convolve.firstWithSecond(
                 timeLine, 
-                templatePulse);
+                pulseToLookFor);
             final ArgMax am = new ArgMax(conv);
-            final int offsetSlices = (int)((double)(templatePulse.length)*0.35);
+            final int offsetSlices = 
+                (int)((double)(pulseToLookFor.length)*0.35);
             // The offsetSlices are needed to comensate both the asymetric 
             // convolution and the asymetric amplitude distribution in the 
             // pulse template (mostly the rising edge of the pulse).
@@ -73,10 +81,10 @@ public class SinglePulseExtractor {
             final int maxSlice = am.arg - offsetSlices;
             final double maxResponse = am.max;
 
-            if(maxResponse > 0.5 && iteration < maxIterations) {
+            if(maxResponse > 0.5) {
                 final double weight = 1.0;
                 final double[] sub = ElementWise.multiply(
-                    substractionPulse, 
+                    pulseToSubstract, 
                     -weight);
                 
                 AddFirstArrayToSecondArray.at(sub, timeLine, maxSlice);
@@ -88,9 +96,11 @@ public class SinglePulseExtractor {
             }
             iteration++;
         }
+
+        return arrival_slices;
     }
 
-    private void applyAcCoupling(double[] timeLine) {
+    private static void applyAcCoupling(double[] timeLine) {
         /**  
         * Estimates the effect of FACT's AC coupling in between the 
         * photo-electric converter (SIPM) and the signal sampler (DRS4).
