@@ -7,7 +7,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
 import java.util.ArrayList;
-import fact.features.singlePulse.timeLineExtraction.ElementWise;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
 
 /*
@@ -60,7 +59,7 @@ public class SinglePulseExtraction implements Processor {
         double[] timeLines = (double[]) input.get(dataKey);
 
         double[] single_pe_count = new double[npix];
-        ArrayList<ArrayList<Integer>> pixel_arrival_slices = 
+        ArrayList<ArrayList<Integer>> pixelArrivalSlices = 
             new ArrayList<ArrayList<Integer>>();
 
         for (int pix = 0; pix < npix; pix++) {
@@ -73,25 +72,22 @@ public class SinglePulseExtraction implements Processor {
                 end
             );
             
-            final double factSinglePeAmplitudeInMv = 10.0;
-            double[] pixelTimeLine = ElementWise.multiply(
-                pixelTimeLineInMv,
-                1.0/factSinglePeAmplitudeInMv
-            );
+            double[] pixelTimeLine = SinglePulseExtractor. 
+                milliVoltToNormalizedSinglePulse(pixelTimeLineInMv);
 
-            ArrayList<Integer> arrival_slices = SinglePulseExtractor.
+            ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
                 getArrivalSlicesOnTimeline(
                     pixelTimeLine, 
                     maxIterations
                 );
 
-            single_pe_count[pix] = arrival_slices.size();
-            pixel_arrival_slices.add(arrival_slices);
+            single_pe_count[pix] = arrivalSlices.size();
+            pixelArrivalSlices.add(arrivalSlices);
         }
 
-        addStartSliceOffset(pixel_arrival_slices);
-        // printArrivalSlices(pixel_arrival_slices);
-        input.put(outputKey, pixel_arrival_slices);
+        addStartSliceOffset(pixelArrivalSlices);
+        // printArrivalSlices(pixelArrivalSlices);
+        input.put(outputKey, pixelArrivalSlices);
         input.put(outputKey+"Count", single_pe_count);
         return input;
     }

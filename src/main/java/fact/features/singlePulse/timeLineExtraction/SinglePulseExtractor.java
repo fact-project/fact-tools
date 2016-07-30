@@ -28,6 +28,8 @@ public class SinglePulseExtractor {
     *   Amplitude of the single puls is normalized to 1.0.
     */
 
+    public static final double factSinglePeAmplitudeInMv = 10.0;
+
     static {
         pulseToLookFor = TemplatePulse.factSinglePePulse(
             pulseToLookForLength);
@@ -89,11 +91,14 @@ public class SinglePulseExtractor {
 
             if(maxResponse > 0.5) {
                 final double weight = 1.0;
-                final double[] sub = ElementWise.multiply(
+                final double[] negativeSinglePulse = ElementWise.multiply(
                     pulseToSubstract, 
                     -weight);
                 
-                AddFirstArrayToSecondArray.at(sub, timeLine, maxSlice);
+                AddFirstArrayToSecondArray.at(
+                    negativeSinglePulse, 
+                    timeLine, 
+                    maxSlice);
 
                 applyAcCoupling(timeLine);
                 arrival_slices.add(am.arg);
@@ -125,5 +130,23 @@ public class SinglePulseExtractor {
         final double mean = sum/(double)(timeLine.length);
 
         timeLine = ElementWise.add(timeLine, -mean);
+    }
+
+    public static double[] milliVoltToNormalizedSinglePulse(
+        double[] timeLineInMv
+    ) {
+        /** 
+        * Convert time line amplitudes from mV to normalized amplitudes of 
+        * single photon pulses.
+        * 
+        * @return timeLineNormalizedSinglePulses
+        *           The amplitude of single pulses is 1.0 here.
+        *
+        * @param timeLineInMv
+        *           In milli Volts (single pulse amplitude about 10mV) 
+        */
+        return ElementWise.multiply(
+            timeLineInMv, 
+            1.0/factSinglePeAmplitudeInMv);
     }
 }

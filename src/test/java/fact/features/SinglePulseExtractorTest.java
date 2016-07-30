@@ -82,4 +82,44 @@ public class SinglePulseExtractorTest {
             );
         }
     }
+
+    @Test
+    public void testSeveralPulsesInARowNoNoise() {
+
+        double[] timeLine = new double[300];
+
+        AddFirstArrayToSecondArray.at(
+            TemplatePulse.factSinglePePulse(300),
+            timeLine,
+            50);
+
+        AddFirstArrayToSecondArray.at(
+            TemplatePulse.factSinglePePulse(300),
+            timeLine,
+            125);
+
+        AddFirstArrayToSecondArray.at(
+            TemplatePulse.factSinglePePulse(300),
+            timeLine,
+            200);
+
+        SinglePulseExtractor.applyAcCoupling(timeLine);
+
+        final int maxIterations = 100;
+        ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
+            getArrivalSlicesOnTimeline(
+                timeLine,
+                maxIterations);
+
+        Assert.assertEquals(3, arrivalSlices.size());
+
+        Assert.assertTrue((double)arrivalSlices.get(0) >= 200-2);
+        Assert.assertTrue((double)arrivalSlices.get(0) <= 200+2);
+
+        Assert.assertTrue((double)arrivalSlices.get(1) >= 125-2);
+        Assert.assertTrue((double)arrivalSlices.get(1) <= 125+2);
+
+        Assert.assertTrue((double)arrivalSlices.get(2) >=  50-2);
+        Assert.assertTrue((double)arrivalSlices.get(2) <=  50+2);
+    }
 }
