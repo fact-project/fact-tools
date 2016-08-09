@@ -31,6 +31,9 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(required = true)
     private URL url;
 
+    @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
+    private String extname = "Events";
+
     private final static String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
 
     public static final String TTYPE = "TTYPE";
@@ -98,6 +101,7 @@ public class FITSWriter implements StatefulProcessor {
                         naxis1.getValue());
             }
         }
+        basicHDU.getHeader().addValue("EXTNAME", extname, "name of extension table");
         fits.addHDU(basicHDU);
         fits.write(bf);
         bf.close();
@@ -198,10 +202,16 @@ public class FITSWriter implements StatefulProcessor {
     }
 
     public void setUrl(URL url) {
+
         this.url = url;
     }
 
     public void setKeys(Keys keys) {
         this.keys = keys;
     }
+
+    public void setExtname(String extname) {
+        this.extname = extname;
+    }
 }
+
