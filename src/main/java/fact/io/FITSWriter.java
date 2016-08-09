@@ -12,7 +12,6 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,9 +21,9 @@ import java.util.ArrayList;
  *
  * @author alexey
  */
-public class FitsWriter implements StatefulProcessor {
+public class FITSWriter implements StatefulProcessor {
 
-    static Logger log = LoggerFactory.getLogger(FitsWriter.class);
+    static Logger log = LoggerFactory.getLogger(FITSWriter.class);
 
     @Parameter(required = true)
     private Keys keys = new Keys("");
@@ -116,7 +115,7 @@ public class FitsWriter implements StatefulProcessor {
                 collectObjects(key, data.get(key));
             }
         } catch (Exception e) {
-            log.error("Collecting objects for FitsWriter thrown an exception." +
+            log.error("Collecting objects for FITSWriter thrown an exception." +
                     "Data will not be written.\nError message:{}", e.getMessage());
         }
 
@@ -196,5 +195,13 @@ public class FitsWriter implements StatefulProcessor {
                 names.add(key);
             }
         }
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
+    }
+
+    public void setKeys(Keys keys) {
+        this.keys = keys;
     }
 }
