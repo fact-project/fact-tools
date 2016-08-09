@@ -2,12 +2,11 @@ package fact.utils;
 
 import fact.Constants;
 import fact.Utils;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.doc.DocCommand;
+
 
 import java.util.Arrays;
 
@@ -26,7 +25,6 @@ public class DrsCellLastReadout implements StatefulProcessor {
     private String outputKey = "deltaT";
 
     double[][] lastReadOutTimes;
-    int[] t0 = null;
 
     @Override
     public Data process(Data item) {
@@ -42,7 +40,7 @@ public class DrsCellLastReadout implements StatefulProcessor {
 
         for (int pixel=0; pixel < Constants.NUMBEROFPIXEL; pixel++) {
             for (int sample = 0; sample < roi; sample++) {
-                int cell = sampleToCell(sample, startCells[pixel], 1024);
+                int cell = Utils.sampleToCell(sample, startCells[pixel], 1024);
                 deltaT[pixel][sample] = time - lastReadOutTimes[pixel][cell];
                 lastReadOutTimes[pixel][cell] = time;
             }
@@ -50,19 +48,6 @@ public class DrsCellLastReadout implements StatefulProcessor {
 
         item.put(outputKey, deltaT);
         return item;
-    }
-
-    /**
-     * Calculate the physical capacitor id (cell) for given sample id, start cell and total number of cells
-     *
-     * @param sample the position of the slice in the roi
-     * @param startCell the first read out slice
-     * @param numCells the total nubmer of cells per pixel
-     * @return the physical cell [0, numCells - 1]
-     */
-
-    public int sampleToCell(int sample, int startCell, int numCells){
-        return (startCell + sample) % numCells;
     }
 
     @Override
