@@ -38,8 +38,7 @@ public class FITSWriter implements StatefulProcessor {
 
     public static final String TTYPE = "TTYPE";
     public static final String TFORM = "TFORM";
-    public static final String NAXIS_1 = "NAXIS1";
-    static int counter = 0;
+    public static final String NAXIS1 = "NAXIS1";
     private Fits fits;
 
     static ArrayList<String> names = new ArrayList<>(0);
@@ -89,7 +88,7 @@ public class FITSWriter implements StatefulProcessor {
         table.fillHeader(header);
 
         // set true NAXIS1 value in the basic hdu used for writing
-        HeaderCard naxis1 = header.findCard(NAXIS_1);
+        HeaderCard naxis1 = header.findCard(NAXIS1);
         if (naxis1 != null) {
             try {
                 basicHDU.addValue(
@@ -108,15 +107,15 @@ public class FITSWriter implements StatefulProcessor {
     }
 
     @Override
-    public Data process (Data data) {
+    public Data process (Data item) {
         // process keys
         try {
             for (String key : defaultKeys) {
-                collectObjects(key, data.get(key));
+                collectObjects(key, item.get(key));
             }
 
-            for (String key : keys.select(data)) {
-                collectObjects(key, data.get(key));
+            for (String key : keys.select(item)) {
+                collectObjects(key, item.get(key));
             }
         } catch (Exception e) {
             log.error("Collecting objects for FITSWriter thrown an exception." +
@@ -129,7 +128,7 @@ public class FITSWriter implements StatefulProcessor {
         } catch (FitsException e) {
             e.printStackTrace();
         }
-        return null;
+        return item;
     }
 
     /**
