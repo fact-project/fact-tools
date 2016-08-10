@@ -70,7 +70,6 @@ public class StreamingFITSWriter implements StatefulProcessor {
                 log.info("Initialising output fits file");
                 initFITSFile(outputItem);
                 initialized = true;
-                log.info("done");
             } catch (FitsException e){
                 throw new RuntimeException("Could not initialize fits file", e);
             }
@@ -159,6 +158,7 @@ public class StreamingFITSWriter implements StatefulProcessor {
 
     private void addSerializableToArrayList(Serializable serializable, ArrayList<Object> arrayList) throws RuntimeException {
         Class<? extends Serializable> type = serializable.getClass();
+
         if (type.isArray()) {
             // add array of primitive values
             if (serializable instanceof int[]) {
@@ -219,7 +219,6 @@ public class StreamingFITSWriter implements StatefulProcessor {
             try {
                 addSerializableToArrayList(serializable, rowList);
                 columnNames.add(columnName);
-                log.info("Added column {}", columnName);
             } catch (RuntimeException e) {
                 log.debug("Key {} is not writable to FITS file, will be skipped", columnName);
             }
@@ -227,8 +226,13 @@ public class StreamingFITSWriter implements StatefulProcessor {
 
         Object[] row = rowList.toArray();
         rowSize = ArrayFuncs.computeLSize(row);
-        log.info("Row size is {}", rowSize);
-        bhdu = (BinaryTableHDU) FitsFactory.hduFactory(row);
+        log.info("Row size is {} bytes", rowSize);
+        BinaryTable table = new BinaryTable();
+        table.addRow(row);
+        Header header = new Header();
+        table.fillHeader(header);
+        bhdu = new BinaryTableHDU(header, table);
+        log.info("created bhdu with {} columns", bhdu.getData().getNCols());
         buffer = ByteBuffer.allocate((int) rowSize);
 
         for (int i=0; i < columnNames.size(); i++){

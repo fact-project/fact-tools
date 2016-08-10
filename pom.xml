@@ -215,7 +215,7 @@
     <dependency>
       <groupId>gov.nasa.gsfc.heasarc</groupId>
       <artifactId>nom-tam-fits</artifactId>
-      <version>1.14.0</version>
+      <version>1.14.3</version>
     </dependency>
   </dependencies>
 
@@ -245,7 +245,7 @@
         <version>2.1.2</version>
         <configuration>
           <finalName>${finalName}</finalName>
-          <!-- 
+          <!--
                                         <attach>false</attach>
                                          -->
         </configuration>
