@@ -24,7 +24,7 @@ public class DrsCellLastReadout implements StatefulProcessor {
     @Parameter(defaultValue = "deltaT", description = "Key for the time since the last readout of the cells")
     private String outputKey = "deltaT";
 
-    double[][] lastReadOutTimes;
+    double[] lastReadOutTimes;
 
     @Override
     public Data process(Data item) {
@@ -36,13 +36,13 @@ public class DrsCellLastReadout implements StatefulProcessor {
         short[] startCells = (short[]) item.get(startCellKey);
         double time = (double) item.get(timeKey);
 
-        double[][] deltaT = new double[Constants.NUMBEROFPIXEL][roi];
+        double[] deltaT = new double[Constants.NUMBEROFPIXEL * roi];
 
         for (int pixel=0; pixel < Constants.NUMBEROFPIXEL; pixel++) {
             for (int sample = 0; sample < roi; sample++) {
                 int cell = Utils.sampleToCell(sample, startCells[pixel], 1024);
-                deltaT[pixel][sample] = time - lastReadOutTimes[pixel][cell];
-                lastReadOutTimes[pixel][cell] = time;
+                deltaT[pixel * roi + sample] = time - lastReadOutTimes[pixel * roi + cell];
+                lastReadOutTimes[pixel * roi + cell] = time;
             }
         }
 
@@ -52,10 +52,8 @@ public class DrsCellLastReadout implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        lastReadOutTimes = new double[Constants.NUMBEROFPIXEL][1024];
-        for (double[] row: lastReadOutTimes) {
-            Arrays.fill(row, Double.NaN);
-        }
+        lastReadOutTimes = new double[Constants.NUMBEROFPIXEL * 1024];
+        Arrays.fill(lastReadOutTimes, Double.NaN);
     }
 
     @Override
