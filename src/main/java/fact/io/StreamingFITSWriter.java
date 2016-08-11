@@ -220,7 +220,7 @@ public class StreamingFITSWriter implements StatefulProcessor {
                 addSerializableToArrayList(serializable, rowList);
                 columnNames.add(columnName);
             } catch (RuntimeException e) {
-                log.debug("Key {} is not writable to FITS file, will be skipped", columnName);
+                log.warn("Key {} is not writable to FITS file, will be skipped", columnName);
             }
         }
 
