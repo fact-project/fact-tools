@@ -58,7 +58,7 @@ public class FITSWriter implements StatefulProcessor {
     private long numEventsWritten = 0;
 
     static ArrayList<String> columnNames = new ArrayList<>(0);
-    static HashMap<String, Integer> columnLength = new HashMap<>(0);
+    static HashMap<String, int[]> columnDimensions = new HashMap<>(0);
 
 
     @Override
@@ -84,7 +84,7 @@ public class FITSWriter implements StatefulProcessor {
 
         try {
             writeRow(outputItem);
-            numEventsWritten +=1;
+            numEventsWritten += 1;
         } catch (IOException e) {
             throw new RuntimeException("Error writing data to FITS file", e);
         }
@@ -95,95 +95,82 @@ public class FITSWriter implements StatefulProcessor {
     private void writeRow(Data item) throws IOException {
         buffer.clear();
         for (String columnName: columnNames){
-            Serializable elem = item.get(columnName);
-            Class<? extends Serializable> type = elem.getClass();
-            if (type.isArray()) {
-                if (elem instanceof int[]) {
-                    int[] arr = (int[]) elem;
-                    for (int val: arr){
-                        buffer.putInt(val);
-                    }
-                } else if (elem instanceof double[]) {
-                    double[] arr = (double[]) elem;
-                    for (double val: arr){
-                        buffer.putDouble(val);
-                    }
-                } else if (elem instanceof byte[]) {
-                    byte[] arr = (byte[]) elem;
-                    buffer.put(arr);
-                } else if (elem instanceof String[]) {
-                    String[] arr = (String[]) elem;
-                    for(String val: arr){
-                        buffer.put(val.getBytes());
-                    }
-                } else if (elem instanceof float[]) {
-                    float[] arr = (float[]) elem;
-                    for (float val: arr){
-                        buffer.putFloat(val);
-                    }
-                } else if (elem instanceof short[]) {
-                    short[] arr = (short[]) elem;
-                    for (short val: arr){
-                        buffer.putShort(val);
-                    }
-                } else if (elem instanceof long[]) {
-                    for (long val: (long[]) elem){
-                        buffer.putLong(val);
-                    }
-                } else if (elem instanceof boolean[]) {
-                    for(boolean val: (boolean[]) elem){
-                        buffer.put((byte) (val ? 1 : 0));
-                    }
-                } else {
-                    throw new RuntimeException("Serializable cannot be saved to FITS");
+            Serializable unwrappedElem = item.get(columnName);
+
+            Object elem = wrapInArray(unwrappedElem);
+
+            if(!Arrays.equals(columnDimensions.get(columnName), ArrayFuncs.getDimensions(elem))){
+                throw new RuntimeException("Dimensions of key " + columnName + " changed. FITSWriter does not support variable length arrays");
+            }
+
+            if (elem instanceof int[]) {
+                int[] arr = (int[]) elem;
+                for (int val: arr){
+                    buffer.putInt(val);
+                }
+            } else if (elem instanceof double[]) {
+                double[] arr = (double[]) elem;
+                for (double val: arr){
+                    buffer.putDouble(val);
+                }
+            } else if (elem instanceof byte[]) {
+                byte[] arr = (byte[]) elem;
+                buffer.put(arr);
+            } else if (elem instanceof String[]) {
+                String[] arr = (String[]) elem;
+                for(String val: arr){
+                    buffer.put(val.getBytes());
+                }
+            } else if (elem instanceof float[]) {
+                float[] arr = (float[]) elem;
+                for (float val: arr){
+                    buffer.putFloat(val);
+                }
+            } else if (elem instanceof short[]) {
+                short[] arr = (short[]) elem;
+                for (short val: arr){
+                    buffer.putShort(val);
+                }
+            } else if (elem instanceof long[]) {
+                for (long val: (long[]) elem){
+                    buffer.putLong(val);
+                }
+            } else if (elem instanceof boolean[]) {
+                for(boolean val: (boolean[]) elem){
+                    buffer.put((byte) (val ? 1 : 0));
                 }
             } else {
-                if (ClassUtils.isAssignable(type, String.class)) {
-                    buffer.put(((String) elem).getBytes());
-                } else if (ClassUtils.isAssignable(type, Integer.class)) {
-                    buffer.putInt((Integer) elem);
-                } else if (ClassUtils.isAssignable(type, Double.class)) {
-                    buffer.putDouble((Double) elem);
-                } else if (ClassUtils.isAssignable(type, Float.class)) {
-                    buffer.putFloat((Float) elem);
-                } else if (ClassUtils.isAssignable(type, Short.class)) {
-                    buffer.putShort((Short) elem);
-                } else if (ClassUtils.isAssignable(type, Long.class)) {
-                    buffer.putLong((Short) elem);
-                } else if (ClassUtils.isAssignable(type, Boolean.class)) {
-                    buffer.put((byte) ((Boolean) elem ? 1 : 0));
-                } else {
-                    throw new RuntimeException("Serializable cannot be saved to FITS");
-                }
+                throw new RuntimeException("Serializable cannot be saved to FITS");
             }
+
         }
 
         buffer.flip();
         bf.write(buffer.array());
     }
 
-    private void addSerializableToArrayList(Serializable serializable, ArrayList<Object> arrayList) throws RuntimeException {
+    private Object wrapInArray(Serializable serializable) throws RuntimeException {
         Class<? extends Serializable> type = serializable.getClass();
 
         // if the value is an array, we can directly add it
         if (type.isArray()) {
-            arrayList.add(serializable);
+            return serializable;
         } else {
             // primitive values need to be wrapped into an array of length 1
             if (ClassUtils.isAssignable(type, String.class)) {
-                arrayList.add(new String[]{(String) serializable});
+                return new String[]{(String) serializable};
             } else if (ClassUtils.isAssignable(type, Integer.class)) {
-                arrayList.add(new int[]{(int) serializable});
+                return new int[]{(int) serializable};
             } else if (ClassUtils.isAssignable(type, Double.class)) {
-                arrayList.add(new double[]{(double) serializable});
+                return new double[]{(double) serializable};
             } else if (ClassUtils.isAssignable(type, Float.class)) {
-                arrayList.add(new float[]{(float) serializable});
+                return new float[]{(float) serializable};
             } else if (ClassUtils.isAssignable(type, Short.class)) {
-                arrayList.add(new short[]{(short) serializable});
+                return new short[]{(short) serializable};
             } else if (ClassUtils.isAssignable(type, Long.class)) {
-                arrayList.add(new long[]{(long) serializable});
+                return new long[]{(long) serializable};
             } else if (ClassUtils.isAssignable(type, Boolean.class)) {
-                arrayList.add(new boolean[]{(boolean) serializable});
+                return new boolean[]{(boolean) serializable};
             } else {
                 throw new RuntimeException("Serializable cannot be saved to FITS");
             }
@@ -197,7 +184,9 @@ public class FITSWriter implements StatefulProcessor {
             Serializable serializable = item.get(columnName);
 
             try {
-                addSerializableToArrayList(serializable, rowList);
+                Object elem = wrapInArray(serializable);
+                rowList.add(elem);
+                columnDimensions.put(columnName, ArrayFuncs.getDimensions(elem));
                 columnNames.add(columnName);
             } catch (RuntimeException e) {
                 log.warn("Key {} is not writable to FITS file, will be skipped", columnName);
@@ -212,6 +201,7 @@ public class FITSWriter implements StatefulProcessor {
         Header header = new Header();
         table.fillHeader(header);
         bhdu = new BinaryTableHDU(header, table);
+
         log.info("created bhdu with {} columns", bhdu.getData().getNCols());
         buffer = ByteBuffer.allocate((int) rowSize);
 
@@ -220,6 +210,7 @@ public class FITSWriter implements StatefulProcessor {
         }
         bhdu.getHeader().addValue("EXTNAME", extname, "name of extension table");
         bhdu.getHeader().write(bf);
+
     }
 
 
