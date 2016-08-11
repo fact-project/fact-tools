@@ -1,8 +1,8 @@
 package fact.io;
 
 import nom.tam.fits.*;
+import nom.tam.util.ArrayFuncs;
 import nom.tam.util.BufferedFile;
-import nom.tam.util.Cursor;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,15 +11,29 @@ import stream.Keys;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.data.DataFactory;
+import stream.shell.Run;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+
 /**
- * Write data with given keys into fits file.
+ * Created by maxnoe on 10.08.16.
  *
- * @author alexey
+ * Write data to a FITS file sequentially. The advantage over FITSWriter is that not the whole
+ * BinaryTable has to be in memory until the end of the stream.
+ *
+ * This processor is able to serialize scalars and arrays of fixed length containing primitive types.
+ * Other data structures will be ignored or might lead to errors.
+ *
+ * The fits file is initialised using the given keys from first data item.
+ * All following items must have the same structure.
+ *
  */
 public class FITSWriter implements StatefulProcessor {
 
@@ -34,183 +48,242 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
     private String extname = "Events";
 
-    private final static String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
+    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
 
-    public static final String TTYPE = "TTYPE";
-    public static final String TFORM = "TFORM";
-    public static final String NAXIS1 = "NAXIS1";
-    private Fits fits;
-
-    static ArrayList<String> names = new ArrayList<>(0);
-    static ArrayList<Object> values = new ArrayList<>(0);
-    private BinaryTable table;
     private BufferedFile bf;
+    private ByteBuffer buffer;
+    private BinaryTableHDU bhdu;
+    private boolean initialized = false;
+    private long rowSize;
+    private long numEventsWritten = 0;
+
+    static ArrayList<String> columnNames = new ArrayList<>(0);
+
 
     @Override
-    public void init (ProcessContext processContext) throws Exception {
-        fits = new Fits();
-        table = new BinaryTable();
-        //TODO output selection
-        bf = new BufferedFile(url.getFile(), "rw");
-    }
+    public Data process(Data item) {
+        Data outputItem = DataFactory.create();
 
-    @Override
-    public void resetState () throws Exception {
-
-    }
-
-    @Override
-    public void finish () throws Exception {
-        //FIXME pcount is wrong
-        BasicHDU<?> basicHDU = FitsFactory.hduFactory(table.getData());
-        Cursor<String, HeaderCard> iterator = basicHDU.getHeader().iterator();
-        while (iterator.hasNext()) {
-            HeaderCard next = iterator.next();
-            if (next.getKey().startsWith(TFORM)) {
-                String key = next.getKey().toLowerCase();
-                String substring = key.substring(5);
-                int tformNumber = Integer.valueOf(substring);
-                HeaderCard headerCard = new HeaderCard(
-                        TTYPE + tformNumber, // 'TTYPE'+number
-                        names.get(tformNumber - 1), // ttype
-                        ""); // comment
-                basicHDU.getHeader().addLine(headerCard);
-            }
-
-            // remove information about dimensionality as it is described by TFORM
-            if (next.getKey().startsWith("TDIM")) {
-                basicHDU.getHeader().deleteKey(next.getKey());
-            }
+        for (String key: defaultKeys ){
+            outputItem.put(key, item.get(key));
+        }
+        for (String key: keys.select(item) ){
+            outputItem.put(key, item.get(key));
         }
 
-        // retrieve the true NAXIS1 value
-        Header header = new Header();
-        table.fillHeader(header);
-
-        // set true NAXIS1 value in the basic hdu used for writing
-        HeaderCard naxis1 = header.findCard(NAXIS1);
-        if (naxis1 != null) {
+        if (!initialized){
             try {
-                basicHDU.addValue(
-                        naxis1.getKey(),
-                        Integer.valueOf(naxis1.getValue()),
-                        naxis1.getComment());
-            } catch (NumberFormatException exc) {
-                log.error("{} couldn't have been converted to integer value.",
-                        naxis1.getValue());
+                log.info("Initialising output fits file");
+                initFITSFile(outputItem);
+                initialized = true;
+            } catch (FitsException e){
+                throw new RuntimeException("Could not initialize fits file", e);
             }
-        }
-        basicHDU.getHeader().addValue("EXTNAME", extname, "name of extension table");
-        fits.addHDU(basicHDU);
-        fits.write(bf);
-        bf.close();
-    }
-
-    @Override
-    public Data process (Data item) {
-        // process keys
-        try {
-            for (String key : defaultKeys) {
-                collectObjects(key, item.get(key));
-            }
-
-            for (String key : keys.select(item)) {
-                collectObjects(key, item.get(key));
-            }
-        } catch (Exception e) {
-            log.error("Collecting objects for FITSWriter thrown an exception." +
-                    "Data will not be written.\nError message:{}", e.getMessage());
         }
 
         try {
-            table.addRow(values.toArray());
-            values.clear();
-        } catch (FitsException e) {
-            e.printStackTrace();
+            writeRow(outputItem);
+            numEventsWritten +=1;
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing data to FITS file", e);
         }
+
         return item;
     }
 
-    /**
-     * Consider given serialized object and save it to array list of values if
-     * it has primitive JAVA type. Complex objects are escaped.
-     *
-     * @param key        object name
-     * @param serialized serialized object from data item
-     * @throws FitsException
-     */
-    private void collectObjects (String key, Serializable serialized)
-            throws FitsException {
-        Class<? extends Serializable> type = serialized.getClass();
-        // save number of values to decide afterwards if the key should be
-        // saved or not (some complex structures are ignored)
-        int oldValuesCount = values.size();
+    private void writeRow(Data item) throws IOException {
+        buffer.clear();
+        for (String columnName: columnNames){
+            Serializable elem = item.get(columnName);
+            Class<? extends Serializable> type = elem.getClass();
+            if (type.isArray()) {
+                if (elem instanceof int[]) {
+                    int[] arr = (int[]) elem;
+                    for (int val: arr){
+                        buffer.putInt(val);
+                    }
+                } else if (elem instanceof double[]) {
+                    double[] arr = (double[]) elem;
+                    for (double val: arr){
+                        buffer.putDouble(val);
+                    }
+                } else if (elem instanceof byte[]) {
+                    byte[] arr = (byte[]) elem;
+                    buffer.put(arr);
+                } else if (elem instanceof String[]) {
+                    String[] arr = (String[]) elem;
+                    for(String val: arr){
+                        buffer.put(val.getBytes());
+                    }
+                } else if (elem instanceof float[]) {
+                    float[] arr = (float[]) elem;
+                    for (float val: arr){
+                        buffer.putFloat(val);
+                    }
+                } else if (elem instanceof short[]) {
+                    short[] arr = (short[]) elem;
+                    for (short val: arr){
+                        buffer.putShort(val);
+                    }
+                } else if (elem instanceof long[]) {
+                    for (long val: (long[]) elem){
+                        buffer.putLong(val);
+                    }
+                } else if (elem instanceof boolean[]) {
+                    for(boolean val: (boolean[]) elem){
+                        buffer.put((byte) (val ? 1 : 0));
+                    }
+                } else {
+                    throw new RuntimeException("Serializable cannot be saved to FITS");
+                }
+            } else {
+                // add single primitive value as array of length 1
+                if (ClassUtils.isAssignable(type, String.class)) {
+                    buffer.put(((String) elem).getBytes());
+                } else if (ClassUtils.isAssignable(type, Integer.class)) {
+                    buffer.putInt((Integer) elem);
+                } else if (ClassUtils.isAssignable(type, Double.class)) {
+                    buffer.putDouble((Double) elem);
+                } else if (ClassUtils.isAssignable(type, Float.class)) {
+                    buffer.putFloat((Float) elem);
+                } else if (ClassUtils.isAssignable(type, Short.class)) {
+                    buffer.putShort((Short) elem);
+                } else if (ClassUtils.isAssignable(type, Long.class)) {
+                    buffer.putLong((Short) elem);
+                } else if (ClassUtils.isAssignable(type, Boolean.class)) {
+                    buffer.put((byte) ((Boolean) elem ? 1 : 0));
+                } else {
+                    throw new RuntimeException("Serializable cannot be saved to FITS");
+                }
+            }
+        }
+
+        buffer.flip();
+        bf.write(buffer.array());
+    }
+
+    private void addSerializableToArrayList(Serializable serializable, ArrayList<Object> arrayList) throws RuntimeException {
+        Class<? extends Serializable> type = serializable.getClass();
+
         if (type.isArray()) {
             // add array of primitive values
-            if (serialized instanceof int[]) {
-                int[] arr = (int[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof double[]) {
-                double[] arr = (double[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof byte[]) {
-                byte[] arr = (byte[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof String[]) {
-                String[] arr = (String[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof float[]) {
-                float[] arr = (float[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof short[]) {
-                short[] arr = (short[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof long[]) {
-                long[] arr = (long[]) serialized;
-                values.add(arr);
-            } else if (serialized instanceof boolean[]) {
-                boolean[] arr = (boolean[]) serialized;
-                values.add(arr);
+            if (serializable instanceof int[]) {
+                int[] arr = (int[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof double[]) {
+                double[] arr = (double[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof byte[]) {
+                byte[] arr = (byte[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof String[]) {
+                String[] arr = (String[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof float[]) {
+                float[] arr = (float[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof short[]) {
+                short[] arr = (short[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof long[]) {
+                long[] arr = (long[]) serializable;
+                arrayList.add(arr);
+            } else if (serializable instanceof boolean[]) {
+                boolean[] arr = (boolean[]) serializable;
+                arrayList.add(arr);
+            } else {
+                throw new RuntimeException("Serializable cannot be saved to FITS");
             }
         } else {
             // add single primitive value as array of length 1
             if (ClassUtils.isAssignable(type, String.class)) {
-                values.add(new String[]{(String) serialized});
+                arrayList.add(new String[]{(String) serializable});
             } else if (ClassUtils.isAssignable(type, Integer.class)) {
-                values.add(new int[]{(int) serialized});
+                arrayList.add(new int[]{(int) serializable});
             } else if (ClassUtils.isAssignable(type, Double.class)) {
-                values.add(new double[]{(double) serialized});
+                arrayList.add(new double[]{(double) serializable});
             } else if (ClassUtils.isAssignable(type, Float.class)) {
-                values.add(new float[]{(float) serialized});
+                arrayList.add(new float[]{(float) serializable});
             } else if (ClassUtils.isAssignable(type, Short.class)) {
-                values.add(new short[]{(short) serialized});
+                arrayList.add(new short[]{(short) serializable});
             } else if (ClassUtils.isAssignable(type, Long.class)) {
-                values.add(new long[]{(long) serialized});
+                arrayList.add(new long[]{(long) serializable});
             } else if (ClassUtils.isAssignable(type, Boolean.class)) {
-                values.add(new boolean[]{(boolean) serialized});
-            }
-        }
-
-        // add key to the list of object names if given object has been
-        // added to the list of values
-        if (oldValuesCount < values.size()) {
-            if (!names.contains(key)) {
-                names.add(key);
+                arrayList.add(new boolean[]{(boolean) serializable});
+            } else {
+                throw new RuntimeException("Serializable cannot be saved to FITS");
             }
         }
     }
 
-    public void setUrl(URL url) {
 
-        this.url = url;
+    private void initFITSFile(Data item) throws  FitsException{
+        ArrayList<Object> rowList = new ArrayList<>();
+        for (String columnName: item.keySet()) {
+            Serializable serializable = item.get(columnName);
+
+            try {
+                addSerializableToArrayList(serializable, rowList);
+                columnNames.add(columnName);
+            } catch (RuntimeException e) {
+                log.warn("Key {} is not writable to FITS file, will be skipped", columnName);
+            }
+        }
+
+        Object[] row = rowList.toArray();
+        rowSize = ArrayFuncs.computeLSize(row);
+        log.info("Row size is {} bytes", rowSize);
+        BinaryTable table = new BinaryTable();
+        table.addRow(row);
+        Header header = new Header();
+        table.fillHeader(header);
+        bhdu = new BinaryTableHDU(header, table);
+        log.info("created bhdu with {} columns", bhdu.getData().getNCols());
+        buffer = ByteBuffer.allocate((int) rowSize);
+
+        for (int i=0; i < columnNames.size(); i++){
+            bhdu.setColumnName(i, columnNames.get(i), null);
+        }
+        bhdu.getHeader().addValue("EXTNAME", extname, "name of extension table");
+        bhdu.getHeader().write(bf);
+    }
+
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+        FitsFactory.setUseAsciiTables(false);
+        bf = new BufferedFile(url.getFile(), "rw");
+        bf.setLength(0); // clear current file content
+
+        // We first have to write an empty header because a binary table cannot be the first hdu
+        BasicHDU.getDummyHDU().write(bf);
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+        FitsUtil.pad(bf, rowSize * numEventsWritten);
+        bf.close();
+        Fits fits = new Fits(url.getPath());
+        BinaryTableHDU bhdu = (BinaryTableHDU) fits.getHDU(1);
+        bhdu.getHeader().setNaxis(2, (int) numEventsWritten);
+        bhdu.getHeader().rewrite();
+
     }
 
     public void setKeys(Keys keys) {
         this.keys = keys;
     }
 
+    public void setUrl(URL url) {
+        this.url = url;
+    }
+
     public void setExtname(String extname) {
         this.extname = extname;
     }
 }
-
