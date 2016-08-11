@@ -18,6 +18,8 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 
 /**
@@ -26,7 +28,7 @@ import java.util.ArrayList;
  * Write data to a FITS file sequentially. The advantage over FITSWriter is that not the whole
  * BinaryTable has to be in memory until the end of the stream.
  *
- * This processor is able to serialize scalars and arrays of fixed length containing primitive types.
+ * This processor is able to serialize scalars and 1d-arrays of fixed length containing primitive types.
  * Other data structures will be ignored or might lead to errors.
  *
  * The fits file is initialised using the given keys from first data item.
@@ -56,6 +58,7 @@ public class FITSWriter implements StatefulProcessor {
     private long numEventsWritten = 0;
 
     static ArrayList<String> columnNames = new ArrayList<>(0);
+    static HashMap<String, Integer> columnLength = new HashMap<>(0);
 
 
     @Override
@@ -163,37 +166,11 @@ public class FITSWriter implements StatefulProcessor {
     private void addSerializableToArrayList(Serializable serializable, ArrayList<Object> arrayList) throws RuntimeException {
         Class<? extends Serializable> type = serializable.getClass();
 
+        // if the value is an array, we can directly add it
         if (type.isArray()) {
-            // add array of primitive values
-            if (serializable instanceof int[]) {
-                int[] arr = (int[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof double[]) {
-                double[] arr = (double[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof byte[]) {
-                byte[] arr = (byte[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof String[]) {
-                String[] arr = (String[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof float[]) {
-                float[] arr = (float[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof short[]) {
-                short[] arr = (short[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof long[]) {
-                long[] arr = (long[]) serializable;
-                arrayList.add(arr);
-            } else if (serializable instanceof boolean[]) {
-                boolean[] arr = (boolean[]) serializable;
-                arrayList.add(arr);
-            } else {
-                throw new RuntimeException("Serializable cannot be saved to FITS");
-            }
+            arrayList.add(serializable);
         } else {
-            // add single primitive value as array of length 1
+            // primitive values need to be wrapped into an array of length 1
             if (ClassUtils.isAssignable(type, String.class)) {
                 arrayList.add(new String[]{(String) serializable});
             } else if (ClassUtils.isAssignable(type, Integer.class)) {
