@@ -19,6 +19,6 @@
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
 
-    <fact.io.StreamingFITSWriter keys="photoncharge,arrivalTime" url="file:test.fits" />
+    <fact.io.FITSWriter keys="photoncharge,arrivalTime" url="file:test.fits" />
   </process>
 </container>
