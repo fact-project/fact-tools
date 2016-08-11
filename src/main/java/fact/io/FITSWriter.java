@@ -138,7 +138,6 @@ public class FITSWriter implements StatefulProcessor {
                     throw new RuntimeException("Serializable cannot be saved to FITS");
                 }
             } else {
-                // add single primitive value as array of length 1
                 if (ClassUtils.isAssignable(type, String.class)) {
                     buffer.put(((String) elem).getBytes());
                 } else if (ClassUtils.isAssignable(type, Integer.class)) {
