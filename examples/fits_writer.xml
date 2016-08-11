@@ -2,6 +2,7 @@
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+  <property name="outfile" value="file:test.fits" />
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
@@ -19,6 +20,6 @@
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
 
-    <fact.io.FITSWriter keys="photoncharge,arrivalTime" url="file:test.fits" />
+    <fact.io.FITSWriter keys="photoncharge,arrivalTime" url="${outfile}" />
   </process>
 </container>
