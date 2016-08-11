@@ -28,6 +28,12 @@ import java.util.ArrayList;
  * Write data to a FITS file sequentially. The advantage over FITSWriter is that not the whole
  * BinaryTable has to be in memory until the end of the stream.
  *
+ * This processor is able to serialize scalars and arrays of fixed length containing primitive types.
+ * Other data structures will be ignored or might lead to errors.
+ *
+ * The fits file is initialised using the given keys from first data item.
+ * All following items must have the same structure.
+ *
  */
 public class StreamingFITSWriter implements StatefulProcessor {
 
@@ -42,16 +48,16 @@ public class StreamingFITSWriter implements StatefulProcessor {
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
     private String extname = "Events";
 
+    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
+
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
-    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
     private boolean initialized = false;
     private long rowSize;
     private long numEventsWritten = 0;
 
     static ArrayList<String> columnNames = new ArrayList<>(0);
-    static ArrayList<Integer> shapes = new ArrayList<>(0);
 
 
     @Override
@@ -75,9 +81,8 @@ public class StreamingFITSWriter implements StatefulProcessor {
             }
         }
 
-        Object[] row = buildRow(outputItem);
         try {
-            writeRow(row);
+            writeRow(outputItem);
             numEventsWritten +=1;
         } catch (IOException e) {
             throw new RuntimeException("Error writing data to FITS file", e);
@@ -86,10 +91,11 @@ public class StreamingFITSWriter implements StatefulProcessor {
         return item;
     }
 
-    private void writeRow(Object[] row) throws IOException {
+    private void writeRow(Data item) throws IOException {
         buffer.clear();
-        for (Object elem: row){
-            Class<? extends Object> type = elem.getClass();
+        for (String columnName: columnNames){
+            Serializable elem = item.get(columnName);
+            Class<? extends Serializable> type = elem.getClass();
             if (type.isArray()) {
                 if (elem instanceof int[]) {
                     int[] arr = (int[]) elem;
@@ -241,16 +247,6 @@ public class StreamingFITSWriter implements StatefulProcessor {
         bhdu.getHeader().addValue("EXTNAME", extname, "name of extension table");
         bhdu.getHeader().write(bf);
     }
-
-    private Object[] buildRow(Data item){
-        ArrayList<Object> row = new ArrayList<>();
-
-        for (String columnName: columnNames) {
-            addSerializableToArrayList(item.get(columnName), row);
-        }
-        return row.toArray();
-    }
-
 
 
     @Override
