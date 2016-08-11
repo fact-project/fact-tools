@@ -253,6 +253,7 @@ public class StreamingFITSWriter implements StatefulProcessor {
     public void init(ProcessContext processContext) throws Exception {
         FitsFactory.setUseAsciiTables(false);
         bf = new BufferedFile(url.getFile(), "rw");
+        bf.setLength(0); // clear current file content
 
         // We first have to write an empty header because a binary table cannot be the first hdu
         BasicHDU.getDummyHDU().write(bf);
