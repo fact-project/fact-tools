@@ -29,24 +29,16 @@ public class NeighborPixDCR implements Processor {
             "if no pixelset is given, the whole camera is used", defaultValue = "")
     private String pixelSetKey = null;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "15")
-    private int skipFirst = 15;
+    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "30")
+    private int skipFirst = 30;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "100")
     private int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
-    private String correlationKey = "meanCorrelation";
+    private String neighborPixDcfKey = "neighborPixDcf";
 
-    @Parameter(required = false, description = "Outputkey for the mean covariance of neighbouring pixels")
-    private String covarianceKey = "meanCovariance";
-
-    @Parameter(required = false, description = "Outputkey for the covariance window marker")
-    private String markerKey = "covarianceWindow";
-
-    @Parameter(required = false, description = "Return scaled mean correlation (values between 0 and 1) if 'true'. Return absolute values if 'false'.", defaultValue = "false")
-    private boolean returnScaledCorrelation = false;
-
+    private int deltaTMax = 5;
 
     private int npix = 1440;
     private int roi = 300;
@@ -68,26 +60,40 @@ public class NeighborPixDCR implements Processor {
 
         roi = data.length / npix;
 
-        IntervalMarker[] m = new IntervalMarker[npix];
-
         //snip pixel Data to arrays without skipped slices
-        double[][] snippedPixelData = snipPixelData(data, skipFirst, skipLast);
+        double[][] snipedPixelData = snipPixelData(data, skipFirst, skipLast);
 
         //get mean and variance of the timeseries for each pixel
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(snippedPixelData);
+        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(snipedPixelData);
 
-        int deltaTMax = 0;
+        double[] meanPixDcf        = new double[npix];
+        double[] meanPixDcfDeltaT  = new double[npix];
+
+        double[] stdDevPixDcf        = new double[npix];
+        double[] stdDevPixDcfDeltaT  = new double[npix];
+
+        double[] maxPixDcf        = new double[npix];
+        double[] maxPixDcfDeltaT  = new double[npix];
+
+        double[] minPixDcf        = new double[npix];
+        double[] minPixDcfDeltaT  = new double[npix];
+
+        // TODO: 11.08.16 Make sure that each pair of pixels is only touched once
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
             FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
+
 
             double pixStdDev = pixelStatistics[pix].getStandardDeviation();
             double pixMean = pixelStatistics[pix].getMean();
 
             int numNeighbours = neighbours.length;
 
+            double[] maxNeighborDcf = new double[numNeighbours];
+            double[] maxNeighborDcfDeltaT = new double[numNeighbours];
 
+            int counter = 0;
             //Loop over all neighbour pixels to calculate the correlation with the given pixel
             for (CameraPixel neighbour : neighbours) {
 
@@ -111,22 +117,49 @@ public class NeighborPixDCR implements Processor {
 
                 double[] dcf = new double[2 * deltaTMax + 1];
 
+                double maxDcf = Double.MIN_VALUE;
+                int maxDcfDeltaT = Integer.MAX_VALUE;
+
                 for (int t : deltaT) {
-                    dcf[deltaTMax + t] = DCF(t, snippedPixelData[pix], snippedPixelData[neighbour.id], pixMean,
+                    dcf[deltaTMax + t] = DCF(t, snipedPixelData[pix], snipedPixelData[neighbour.id], pixMean,
                                                 neighbourMean, pixStdDev, neighbourStdDev, 0.0, 0.0);
+                    if (dcf[deltaTMax + t] > maxDcf){
+                        maxDcf       = dcf[deltaTMax + t];
+                        maxDcfDeltaT = deltaT[deltaTMax + t];
+                    }
                 }
 
-
+                maxNeighborDcf[counter] = maxDcf;
+                maxNeighborDcfDeltaT[counter] = Math.abs(maxDcfDeltaT);
+                counter++;
             }
 
+            DescriptiveStatistics dcfStatistics = new DescriptiveStatistics(maxNeighborDcf);
+            DescriptiveStatistics dcfDeltaTStatistics = new DescriptiveStatistics( maxNeighborDcfDeltaT);
 
-//            m[pix] = new IntervalMarker(skipFirst, roi - skipLast);
+            meanPixDcf[pix] = dcfStatistics.getMean();
+            meanPixDcfDeltaT[pix] = dcfDeltaTStatistics.getMean();
+
+            stdDevPixDcf[pix] = dcfStatistics.getStandardDeviation();
+            stdDevPixDcfDeltaT[pix] = dcfDeltaTStatistics.getStandardDeviation();
+
+            maxPixDcf[pix] = dcfStatistics.getMax();
+            maxPixDcfDeltaT[pix] = dcfDeltaTStatistics.getMax();
+
+            minPixDcf[pix] = dcfStatistics.getMin();
+            minPixDcfDeltaT[pix] = dcfDeltaTStatistics.getMin();
 
         }
 
 
-//        input.put(markerKey, m);
-//        input.put(covarianceKey, meanCovariance);
+        input.put(neighborPixDcfKey+"_mean", meanPixDcf);
+        input.put(neighborPixDcfKey+"_stdDev", stdDevPixDcf);
+        input.put(neighborPixDcfKey+"_max", maxPixDcf);
+        input.put(neighborPixDcfKey+"_min", minPixDcf);
+        input.put(neighborPixDcfKey+"_meanDeltaT", meanPixDcfDeltaT);
+        input.put(neighborPixDcfKey+"_stdDevDeltaT", stdDevPixDcfDeltaT);
+        input.put(neighborPixDcfKey+"_maxDeltaT", maxPixDcfDeltaT);
+        input.put(neighborPixDcfKey+"_minDeltaT", minPixDcfDeltaT);
 
         return input;
     }
@@ -145,7 +178,8 @@ public class NeighborPixDCR implements Processor {
         }
 
         for (int i = start; i < a.length && i + t < b.length; i++) {
-            dcf += UDCF(a[1], b[i + t], meanA, meanB, stdDevA, stdDevB, noiseA, noiseB);
+
+            dcf += UDCF(a[i], b[i + t], meanA, meanB, stdDevA, stdDevB, noiseA, noiseB);
             counter++;
         }
 
@@ -158,13 +192,13 @@ public class NeighborPixDCR implements Processor {
         double udcf = (a - meanA) * (b - meanB);
         udcf /= Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
 
-
         return udcf;
     }
 
     private int absPos(int pix, int slice) {
         return pix * roi + slice;
     }
+
 
     private double[][] snipPixelData(double[] data, int skipFirst, int skipLast){
 
@@ -184,6 +218,26 @@ public class NeighborPixDCR implements Processor {
             pixelStatistics[pix] = new DescriptiveStatistics(snippedPixelData[pix]);
         }
         return pixelStatistics;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
+    }
+
+    public void setSkipFirst(int skipFirst) {
+        this.skipFirst = skipFirst;
+    }
+
+    public void setSkipLast(int skipLast) {
+        this.skipLast = skipLast;
+    }
+
+    public void setNeighborPixDcfKey(String neighborPixDcfKey) {
+        this.neighborPixDcfKey = neighborPixDcfKey;
     }
 }
 
