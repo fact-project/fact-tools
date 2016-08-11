@@ -1,54 +1,70 @@
+
+/*datarate plot*/
+#datarate_chart .plot_dots {
+	fill: #666;
+}
+/*lightcurve plot*/
+
+#lightcurve .bar {
+    fill: steelblue;
+}
+
+#lightcurve .error {
+    fill: gray;
+    stroke: gray;
+}
+
+#lightcurve .tooltip {
+    position: absolute;
+    text-align: left;
+    width: 95px;
+    height: 45px;
+    padding: 3px;
+    font: 10px sans-serif;
+    background: white;
+    color: darkgray;
+    pointer-events: none;
+}
+
+#lightcurve .tooltip h1 {
+    font: 12px sans-serif;
+    color: steelblue;
+    padding: 0;
+    margin: 0;
+}
+
+/*all plots*/
+.axis line,
+.axis path {
+    shape-rendering: crispEdges;
+    stroke: lightgray;
+    fill: none;
+}
+
+.axis_label {
+    fill: #666;
+    font-size:9pt;
+}
+
+.axis text{
+    font-size: 8pt;
+}
+
+.axis text{
+    font-size: 8pt;
+}
+
+/*other stuff*/
 .chart {
-	font-family: Arial, sans-serif;
-	font-size: 10px;
 	margin: 20px 20px 15px 5px;
 }
 
 #fact_map {
 	margin-left:4em;
 }
-.axis path{
-	fill: none;
-	/* stroke: #000; */
-	shape-rendering: crispEdges;
-}
-
-.axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
-}
-
-.bar {
-	fill: steelblue;
-}
-
-.error {
-	fill: gray;
-	stroke: gray;
-}
 
 body {
     background-color: #eee;
-}
-
-.tooltip {
-	position: absolute;
-	text-align: left;
-	width: 95px;
-	height: 45px;
-	padding: 3px;
-	font: 10px sans-serif;
-	background: white;
-	color: darkgray;
-	pointer-events: none;
-}
-
-.tooltip h1 {
-	font: 12px sans-serif;
-	color: steelblue;
-	padding: 0;
-	margin: 0;
 }
 
 section {
@@ -77,7 +93,7 @@ section {
 }
 
 .banner p {
-    margin-right: 13em;
+    margin-right: 19em;
     padding-left: 3em;
 }
 
@@ -85,7 +101,7 @@ section {
 	border-right: thin solid #eee;
 	font-size: 50pt;
 	text-align:right;
-	padding-right:2.2em;
+	padding-right:2.4em;
 }
 
 .spotlight {

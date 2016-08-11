@@ -90,6 +90,7 @@ public class AuxFileService implements AuxiliaryService {
             AuxCache.CacheKey key = new AuxCache().new CacheKey(serviceName, AuxCache.dateTimeStampToFACTNight(eventTimeStamp));
 
             TreeSet<AuxPoint> auxPoints = cache.get(key);
+//            auxPoints.subSet()
             AuxPoint a = strategy.getPointFromTreeSet(auxPoints, eventTimeStamp);
             if (a == null) {
                 throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);

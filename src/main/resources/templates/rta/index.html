@@ -16,10 +16,9 @@
 
 
         <script src="assets/js/bundle.js"></script>
-		<link rel="stylesheet" href="assets/css/nomralize.css" />
+		<link rel="stylesheet" href="assets/css/normalize.css" />
 		<link rel="stylesheet" href="assets/css/skeleton.css" />
 		<link rel="stylesheet" href="assets/css/main.css" />
-        <link rel="stylesheet" href="assets/js/node_modules/c3/c3.min.css" />
 	</head>
 	<body>
 
@@ -103,13 +102,15 @@
                             <div class="one-third column">
                                 <h3>Excess Rates</h3>
                                 <p>
-                                    The plot shows excess rates of the currently analyzed source.
+                                    The plot shows excess rates of recently analyzed sources.
+									Excess is defined as the difference between background and signal events.
+									FACT uses 5 off-positions in the field of view to count background events.
                                 </p>
                             </div>
                         </div>
 
 						<div class="row spotlight">
-							<div class="figure two-thirds column" id="datarate_chart">
+							<div id="datarate_chart" class="two-thirds column" >
 								<!-- Lecker data rate plot here -->
 							</div>
 							<div class="one-third column">
@@ -124,7 +125,9 @@
 
 						<div class="row spotlight">
 							<div id="memory_chart" class="figure two-thirds column">
+								<svg>
 
+								</svg>
 							</div>
 							<div class="one-third column">
 								<h3>Machine status</h3>

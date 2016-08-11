@@ -1,15 +1,14 @@
 {
   "name": "rta",
   "version": "0.0.1",
-  "description": "Use d3 to diaply the camera of the FACT telescope",
+  "description": "Use d3 to disaply the camera of the FACT telescope",
   "main": "assets/js/main.js",
   "dependencies": {
     "zeptojs":"^1.1.4",
     "numeral":"^1.5.3",
-    "c3":"^0.4.11",
     "hexmap" : "https://github.com/mackaiver/hexmap",
     "d3-time": "^0.2.5",
-    "lodash" : "4.12.0"
+    "lodash" : "4.13.1"
   },
   "devDependencies": {},
   "scripts": {
@@ -27,6 +26,6 @@
   "author": "Kai Brügge",
   "license": "Beerware",
   "bugs": {
-    "url": "https://github.com/fact-procet/fact-tools"
+    "url": "https://github.com/fact-project/fact-tools"
   }
 }

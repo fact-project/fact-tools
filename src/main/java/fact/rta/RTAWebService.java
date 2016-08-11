@@ -8,18 +8,15 @@ import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
 import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.Spark;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 import stream.Data;
-import stream.Keys;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.service.Service;
-import streams.runtime.Hook;
 import streams.runtime.Signals;
 
 import java.io.IOException;
@@ -36,8 +33,6 @@ public class RTAWebService implements Service {
 
     @Parameter(required = true, description = "Path to the .sqlite file")
     SourceURL sqlitePath;
-
-
 
     private DBI dbi;
 
@@ -66,6 +61,17 @@ public class RTAWebService implements Service {
             this.eventTimeStamp = eventTimeStamp;
         }
     }
+
+    final private class RTADataRate {
+        final double rate;
+        final DateTime date;
+
+        RTADataRate(DateTime date, double rate) {
+            this.rate = rate;
+            this.date = date;
+        }
+    }
+
 
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
@@ -153,11 +159,39 @@ public class RTAWebService implements Service {
 //        return 0;
 //    }
 
-    synchronized void updateEvent(DateTime eventTimeStamp, Data item){
+    ArrayList<Double> relativeOnTimes = new ArrayList<>();
+    synchronized void updateEvent(DateTime eventTimeStamp, Data item, double relativeOnTime){
+
+        if (!isInit){
+            init();
+        }
+
+
+
         RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
-        if (currentRun == null || currentRun != run){
+        if (currentRun == null){
+            RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
+            rtaTables.insertRun(run);
             currentRun = run;
         }
+        else if (!currentRun.equals(run)){
+            RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
+            double average = relativeOnTimes.stream().mapToDouble(a -> a).average().orElse(0);
+            log.info("New run found. Relative on time of previous run was {}", average);
+            rtaTables.updateRunWithOnTime(average, currentRun.runID, currentRun.night);
+            if (average > 0){
+                log.info("Setting status of previous run to {}" , RTADataBase.HEALTH.OK);
+                rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
+            } else {
+                log.warn("RelativeOnTime of previous run was 0. Marking run status as UNKNOWN");
+                rtaTables.updateRunHealth(RTADataBase.HEALTH.UNKNOWN, currentRun.runID, currentRun.night);
+            }
+            //insert new run to db
+            rtaTables.insertRun(run);
+            currentRun = run;
+            relativeOnTimes.clear();
+        }
+        relativeOnTimes.add(relativeOnTime);
 
         signalMap.put(DateTime.now(), new RTADataBase().new RTASignal(eventTimeStamp, item, run));
         Seconds delta = Seconds.secondsBetween(signalMap.firstKey(), signalMap.lastKey());
@@ -194,14 +228,24 @@ public class RTAWebService implements Service {
         return null;
     }
 
-    private NavigableMap<DateTime, Double> getDataRates(String timeStamp){
-        if (rateMap.isEmpty()){
+    private ArrayList<RTADataRate> getDataRates(String timeStamp){
+        if (rateMap.isEmpty()) {
             return null;
         }
+
+        NavigableMap<DateTime, Double> resultMap;
         if (timeStamp != null) {
-            return rateMap.tailMap(DateTime.parse(timeStamp), false);
+            resultMap = rateMap.tailMap(DateTime.parse(timeStamp), false).descendingMap();
         }
-        return rateMap.descendingMap();
+        else {
+            resultMap = rateMap.descendingMap();
+        }
+
+        ArrayList<RTADataRate> rates = new ArrayList<>();
+        resultMap.forEach((k, v) ->{
+            rates.add(new RTADataRate(k, v));
+        });
+        return rates;
     }
 
     public void updateDataRate(DateTime timeStamp, Double dataRate){
@@ -226,6 +270,8 @@ public class RTAWebService implements Service {
 
 //
 //    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve(String minusHours) throws NumberFormatException{
+//        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
+//        rtaTables.
 //        if(lightCurve.asMapOfRanges().isEmpty()){
 //            return null;
 //        }

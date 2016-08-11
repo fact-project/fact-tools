@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -45,11 +46,8 @@ public class JDBITest {
         item.put("Theta_Off_4", 0.4);
         item.put("Theta_Off_5", 0.5);
         item.put("signal:prediction", 0.9);
+        item.put("signal:thetasquare", 0.1);
         item.put("energy", 123456.7);
-
-        //TODO; get a aux service to do this
-        item.put("onTime", 0.99);
-
         return item;
     }
 
@@ -74,6 +72,7 @@ public class JDBITest {
         DateTime eventTime = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
         RTADataBase.RTASignal s = new RTADataBase().new RTASignal(eventTime, item, run);
         rtaTables.insertSignal(s);
+        //second insert should be ignored
         rtaTables.insertSignal(s);
 
         List<String> signalEntries = rtaTables.getSignalEntries();
@@ -88,5 +87,60 @@ public class JDBITest {
 
         signalEntries = rtaTables.getSignalEntries();
         assertThat(signalEntries.size(), is(2));
+    }
+
+
+    @Test
+    public void testUpdateOnTime() throws Exception {
+
+        Data item = prepareNextItem();
+
+
+        File dbFile  = folder.newFile("data.sqlite");
+        DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
+        RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
+
+        rtaTables.createRunTable();
+        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        rtaTables.insertRun(run);
+
+        RTADataBase.FACTRun factRun = rtaTables.getRun(run.night, run.runID);
+        assertThat(factRun.relativeOnTime, is(0.0));
+
+        rtaTables.updateRunWithOnTime(0.99, run.runID, run.night);
+
+        factRun = rtaTables.getRun(run.night, run.runID);
+        assertThat(factRun.relativeOnTime, is(0.99));
+
+        System.out.println(factRun);
+    }
+
+
+
+    @Test
+    public void testUpdateHealth() throws Exception {
+
+        Data item = prepareNextItem();
+
+
+        File dbFile  = folder.newFile("data.sqlite");
+        System.out.println(dbFile);
+
+        DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
+        RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
+        rtaTables.createRunTable();
+
+        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        rtaTables.insertRun(run);
+        run = rtaTables.getRun(run.night, run.runID);
+        assertThat(run.health, is(RTADataBase.HEALTH.UNKNOWN));
+
+        rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, run.runID, run.night);
+        run = rtaTables.getRun(run.night, run.runID);
+        assertThat(run.health, is(RTADataBase.HEALTH.OK));
+
+        rtaTables.updateRunHealth(RTADataBase.HEALTH.BROKEN, run.runID, run.night);
+        run = rtaTables.getRun(run.night, run.runID);
+        assertThat(run.health, is(RTADataBase.HEALTH.BROKEN));
     }
 }

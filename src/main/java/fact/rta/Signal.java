@@ -85,9 +85,11 @@ public class Signal implements Processor {
                         orElseThrow(() -> new IllegalArgumentException("No valid eventTimeStamp in event."));
 
                 AuxPoint auxiliaryData = auxService.getAuxiliaryData(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, eventTimeStamp, new Closest());
-                System.out.println(auxiliaryData.getDouble("OnTime"));
-                data.put("OnTime",auxiliaryData.getDouble("OnTime"));
-                webService.updateEvent(eventTimeStamp, data );
+                double ellapsedTime = auxiliaryData.getDouble("ElapsedTime");
+                double onTime = auxiliaryData.getDouble("OnTime");
+                data.put("OnTime",onTime);
+                data.put("ElapsedTime",ellapsedTime);
+                webService.updateEvent(eventTimeStamp, data, onTime/ellapsedTime);
             } catch (IOException e) {
                 log.error("Could not get OnTime from FTM_CONTROL file");
                 throw new RuntimeException("Could not get OnTime from FTM_CONTROL file");

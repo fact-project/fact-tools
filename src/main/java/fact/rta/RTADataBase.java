@@ -1,15 +1,24 @@
 package fact.rta;
 
+import fact.rta.db.RunMapper;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.SQLStatement;
+import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.*;
+import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
+import org.skife.jdbi.v2.tweak.StatementCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.jdbc4.JDBC4PreparedStatement;
 import stream.Data;
 import stream.Keys;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +37,7 @@ public class RTADataBase {
     public @interface BindSignal
     {
 
-        public static class SignalBinderFactory implements BinderFactory
+        class SignalBinderFactory implements BinderFactory
         {
             public Binder build(Annotation annotation)
             {
@@ -47,10 +56,7 @@ public class RTADataBase {
                             }
                         } catch (IllegalAccessException e) {
                             log.error("Could not access field value in statement: " + q.toString());
-//                            e.printStackTrace();
                         }
-
-//                        (timestamp, night, run_id, prediction, theta_on. theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5
                     }
                 };
             }
@@ -71,34 +77,35 @@ public class RTADataBase {
 
         final DateTime startTime;
         final DateTime endTime;
-        final double onTime;
+        final Double relativeOnTime;
 
-        FACTRun(Data item) {
+
+        final HEALTH health;
+
+        public FACTRun(int night, int runID, String source, DateTime start, DateTime end, double relativeOnTime, HEALTH health){
+            this.source = source;
+            this.runID = runID;
+            this.night = night;
+            this.startTime = start;
+            this.endTime = end;
+            this.relativeOnTime = relativeOnTime;
+            this.health = health;
+        }
+
+        public FACTRun(Data item) {
 
             this.source = (String) item.get("Source");
             this.runID = (int) item.get("RUNID");
             this.night = (int) item.get("NIGHT");
-            this.onTime = (double) item.get("OnTime");
+            this.relativeOnTime = 0.0;
             this.startTime = DateTime.parse((String) item.get("DATE-OBS"));
             this.endTime = DateTime.parse((String) item.get("DATE-END"));
+            this.health = HEALTH.UNKNOWN;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
 
-            FACTRun factRun = (FACTRun) o;
-            return startTime.equals(factRun.startTime);
-        }
-
-        @Override
-        public int hashCode() {
-            return startTime.hashCode();
-        }
-
-        public double getOnTime() {
-            return onTime;
+        public double getRelativeOnTime() {
+            return relativeOnTime;
         }
 
         public String getSource() {
@@ -121,6 +128,40 @@ public class RTADataBase {
             return endTime;
         }
 
+        public HEALTH getHealth() {
+            return health;
+        }
+
+        @Override
+        public String toString() {
+            return "FACTRun{" +
+                    "source='" + source + '\'' +
+                    ", runID=" + runID +
+                    ", night=" + night +
+                    ", startTime=" + startTime +
+                    ", endTime=" + endTime +
+                    ", relativeOnTime=" + relativeOnTime +
+                    ", health=" + health +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof FACTRun)) return false;
+
+            FACTRun factRun = (FACTRun) o;
+
+            return runID == factRun.runID && night == factRun.night;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = runID;
+            result = 31 * result + night;
+            return result;
+        }
     }
 
 
@@ -153,9 +194,18 @@ public class RTADataBase {
         }
     }
 
+
+    public enum HEALTH {
+        OK,
+        BROKEN,
+        UNKNOWN,
+        IN_PROGRESS
+    }
+
+
     public interface DBInterface {
 
-        @SqlUpdate("INSERT OR IGNORE INTO fact_run (night, run_id, start_time, end_time, on_time, source) values (:night, :runID, :startTime, :endTime, :onTime, :source)")
+        @SqlUpdate("INSERT OR IGNORE INTO fact_run (night, run_id, start_time, end_time, relative_on_time, source, health) values (:night, :runID, :startTime, :endTime, :relativeOnTime, :source, :health)")
         void insertRun(@BindBean FACTRun run);
 
         @SqlUpdate("INSERT OR IGNORE INTO signal (timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5)" +
@@ -163,8 +213,26 @@ public class RTADataBase {
         void insertSignal(@BindSignal() RTASignal signal );
 
 
-        @SqlQuery("SELECT * from signal")
+        @SqlUpdate("UPDATE fact_run SET relative_on_time = :relative_on_time WHERE   night = :night AND run_id = :run_id")
+        void updateRunWithOnTime(@Bind("relative_on_time") double relativeOnTime, @Bind("run_id") int run_id, @Bind("night") int night);
+
+        @SqlQuery("SELECT * FROM signal")
         List<String> getSignalEntries();
+
+        @SqlUpdate("UPDATE fact_run SET health = :health WHERE   (night = :night AND run_id = :run_id)")
+        void updateRunHealth(@Bind("health") HEALTH health, @Bind("run_id") int run_id, @Bind("night") int night);
+
+
+
+//        SELECT * FROM run_id;
+//UPDATE fact_run SET health = 'asdasdadasdasdas' WHERE   night = 60 AND run_id = 20130102;
+//UPDATE fact_run SET relative_on_time = 0.4  WHERE   night = 60 AND run_id = 20130102
+
+
+
+        @SqlQuery("SELECT * from fact_run WHERE run_id = :run_id AND night = :night")
+        @RegisterMapper(RunMapper.class)
+        FACTRun getRun(@Bind("night") int night, @Bind("run_id") int runID);
 
 //        @SqlBatch("insert into something (id, name) values (:id, :name)")
 //        @BatchChunkSize(1000)
@@ -173,10 +241,11 @@ public class RTADataBase {
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +
                 "run_id INTEGER NOT NULL," +
-                "on_time FLOAT," +
+                "relative_on_time FLOAT," +
                 "start_time VARCHAR(50)," +
                 "end_time VARCHAR(50)," +
                 "source varchar(50)," +
+                "health varchar(50)," +
                 "PRIMARY KEY (night, run_id))")
         void createRunTable();
 
