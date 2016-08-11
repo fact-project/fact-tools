@@ -16,17 +16,14 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 
 /**
- * Calculate the average covariance and correlation of neighboring pixels to determine
- * the correlation of theire timeseries
+ * Calculate the Descrete Correlation Function for the Time Series of neigbouring pixels as a measure for their
+ * correllation
  *
- * Created by jebuss on 04.04.16.
+ * Created by jebuss on 10.08.16.
  */
 public class NeighborPixDCR implements Processor {
     @Parameter(required = true, description = "raw data array")
     private String key = null;
-
-    @Parameter(required = true, description = "array containing the positions of maximum amplitudes for each pixel")
-    private String amplitudePositionsKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used, " +
             "if no pixelset is given, the whole camera is used", defaultValue = "")
@@ -37,9 +34,6 @@ public class NeighborPixDCR implements Processor {
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipLast = 50;
-
-    @Parameter(required = false, description = "Outputkey for the scaled Data array")
-    private String scaledDataKey = "DataScaled";
 
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
     private String correlationKey = "meanCorrelation";
@@ -68,9 +62,7 @@ public class NeighborPixDCR implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
 
-        Utils.mapContainsKeys(input, key, amplitudePositionsKey);
         double[] data = (double[]) input.get(key);
-        int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
         int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
         log.debug("npix: " + pixels.length );
 
@@ -78,11 +70,8 @@ public class NeighborPixDCR implements Processor {
 
         IntervalMarker[] m = new IntervalMarker[npix];
 
-        //scale the data in the array to make it comparable
-        double[] scaledData      = scaleData(data, amplitudePositions);
-
         //get mean and variance of the timeseries for each pixel
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
+        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(data, skipFirst, skipLast);
 
         double[] meanCovariance     = new double[npix];
         double[] meanCorrelation    = new double[npix];
@@ -93,9 +82,6 @@ public class NeighborPixDCR implements Processor {
 
             double pixVariance  = pixelStatistics[pix].getVariance();
             double pixMean      = pixelStatistics[pix].getMean();
-
-            meanCovariance[pix]     = 0.;
-            meanCorrelation[pix]    = 0.;
 
             int numNeighbours = neighbours.length;
 
@@ -111,16 +97,10 @@ public class NeighborPixDCR implements Processor {
                 double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
                 double neighbourMean        = pixelStatistics[neighbour.id].getMean();
 
-                double covariance = calculateCovariance(scaledData, pix, pixMean,
-                                                        neighbour, neighbourMean, skipFirst, skipLast);
 
-                meanCovariance[pix]     += covariance;
-                meanCorrelation[pix]    += calculateCorrelation(pixVariance, neighbourVariance, covariance);
             }
 
-            // weight with number of neighbours, (necessary for pixel at the camera edges and faulty pixels)
-            meanCovariance[pix] /= numNeighbours;
-            meanCorrelation[pix] /= numNeighbours;
+
 
             m[pix] = new IntervalMarker(skipFirst,roi - skipLast);
 
@@ -136,27 +116,25 @@ public class NeighborPixDCR implements Processor {
 
         input.put(markerKey, m);
         input.put(covarianceKey, meanCovariance);
-        input.put(scaledDataKey, scaledData);
 
         return input;
     }
 
-    private double calculateCorrelation(double pixVariance, double neighbourVariance, double covariance) {
-        Double correlation = Math.abs(covariance) / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
-        return Math.abs(correlation);
+    private double DCF(double tau, double[] a, double[] b, double meanA, double meanB, double stdDevA, double stdDevB){
+
     }
 
-    private double calculateCovariance(double[] scaledData, int pix, double pixMean, CameraPixel neighbour,
-                                       double neighbourMean, int skipFirst, int skipLast) {
-        double covariance = 0.;
 
-        for (int slice = 0 + skipFirst; slice < roi - skipLast; slice++) {
-            double distancePixel        = scaledData[absPos(pix, slice)] - pixMean;
-            double distanceNeighbour    = scaledData[absPos(neighbour.id, slice)] - neighbourMean;
-            covariance += distancePixel * distanceNeighbour;
-        }
-        covariance /= roi;
-        return covariance;
+    private double UDCF(double a, double b, double meanA, double meanB, double stdDevA, double stdDevB,
+                        double noiseA, double noiseB) {
+        double udcf =  (a-meanA)*(b-meanB);
+        udcf /= Math.sqrt((stdDevA*stdDevA - noiseA*noiseA)*(stdDevB*stdDevB-noiseB*noiseB));
+
+        return udcf;
+    }
+
+    private double UDCF(double a, double b, double meanA, double meanB, double stdDevA, double stdDevB){
+        return UDCF(a, b, meanA, meanB, stdDevA, stdDevB, 0.0, 0.0);
     }
 
     private int absPos(int pix, int slice) {
@@ -173,28 +151,6 @@ public class NeighborPixDCR implements Processor {
             pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
         }
         return pixelStatistics;
-    }
-
-    private double[] scaleData(double[] data, int[] amplitudePositions) {
-        double[] scaledData = data.clone();
-        for (int pix = 0; pix < npix; pix++) {
-            int maxAmplPos = absPos(pix, amplitudePositions[pix]);
-            double maxAmpl = data[maxAmplPos];
-
-            //check if maxAmpl is 0 to avoid division by zero which leads to NaN values in scaledData. Quick and dirty solution: if maxAmpl is close to 0, add an arbitrary 10 to every slice.
-            //Other solution: do something with baseline. could be more elegant...
-            if(Math.abs(maxAmpl) < 0.1){
-                for (int slice = 0; slice < roi; slice++) {
-                    scaledData[absPos(pix, slice)] = (scaledData[absPos(pix, slice)] + 10) / (maxAmpl+10);
-                }
-            }
-            else {
-                for (int slice = 0; slice < roi; slice++) {
-                    scaledData[absPos(pix, slice)] = (scaledData[absPos(pix, slice)] / maxAmpl);
-                }
-            }
-        }
-        return scaledData;
     }
 
 
@@ -222,42 +178,3 @@ public class NeighborPixDCR implements Processor {
         return scaledCorrelation;
     }
 
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setAmplitudePositionsKey(String amplitudePositionsKey) {
-        this.amplitudePositionsKey = amplitudePositionsKey;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
-    }
-
-    public void setScaledDataKey(String scaledDataKey) {
-        this.scaledDataKey = scaledDataKey;
-    }
-
-    public void setCorrelationKey(String correlationKey) {
-        this.correlationKey = correlationKey;
-    }
-
-    public void setCovarianceKey(String covarianceKey) {
-        this.covarianceKey = covarianceKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setMarkerKey(String markerKey) {
-        this.markerKey = markerKey;
-    }
-
-    public void setReturnScaledCorrelation(boolean returnScaledCorrelation) {this.returnScaledCorrelation = returnScaledCorrelation;}
-}
