@@ -35,6 +35,7 @@
 
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="${num_copies}">
+        <Delay time="50ms" />
         <Skip condition="%{data.TriggerType} != 4" />
         <fact.DataRate every="40" webService="rta_service" logmemory="true"/>
 
