@@ -64,117 +64,126 @@ public class NeighborPixDCR implements Processor {
 
         double[] data = (double[]) input.get(key);
         int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
-        log.debug("npix: " + pixels.length );
+        log.debug("npix: " + pixels.length);
 
         roi = data.length / npix;
 
         IntervalMarker[] m = new IntervalMarker[npix];
 
-        //get mean and variance of the timeseries for each pixel
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(data, skipFirst, skipLast);
+        //snip pixel Data to arrays without skipped slices
+        double[][] snippedPixelData = snipPixelData(data, skipFirst, skipLast);
 
-        double[] meanCovariance     = new double[npix];
-        double[] meanCorrelation    = new double[npix];
+        //get mean and variance of the timeseries for each pixel
+        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(snippedPixelData);
+
+        int deltaTMax = 0;
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
             FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
 
-            double pixVariance  = pixelStatistics[pix].getVariance();
-            double pixMean      = pixelStatistics[pix].getMean();
+            double pixStdDev = pixelStatistics[pix].getStandardDeviation();
+            double pixMean = pixelStatistics[pix].getMean();
 
             int numNeighbours = neighbours.length;
+
 
             //Loop over all neighbour pixels to calculate the correlation with the given pixel
             for (CameraPixel neighbour : neighbours) {
 
                 //exclude pixel that are not contained in the pixel set             }
-                if (!ArrayUtils.contains(pixels, neighbour.id)   ){
+                if (!ArrayUtils.contains(pixels, neighbour.id)) {
                     numNeighbours -= 1;
                     continue;
                 }
 
-                double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
-                double neighbourMean        = pixelStatistics[neighbour.id].getMean();
+                double neighbourStdDev = pixelStatistics[neighbour.id].getStandardDeviation();
+                double neighbourMean = pixelStatistics[neighbour.id].getMean();
+
+                int[] deltaT = new int[2 * deltaTMax + 1];
+
+                for (int t = 0; t <= deltaTMax; t++) {
+                    deltaT[deltaTMax + t] = t;
+                    if (t > 0) {
+                        deltaT[deltaTMax - t] = -t;
+                    }
+                }
+
+                double[] dcf = new double[2 * deltaTMax + 1];
+
+                for (int t : deltaT) {
+                    dcf[deltaTMax + t] = DCF(t, snippedPixelData[pix], snippedPixelData[neighbour.id], pixMean,
+                                                neighbourMean, pixStdDev, neighbourStdDev, 0.0, 0.0);
+                }
 
 
             }
 
 
-
-            m[pix] = new IntervalMarker(skipFirst,roi - skipLast);
+//            m[pix] = new IntervalMarker(skipFirst, roi - skipLast);
 
         }
 
-        if (returnScaledCorrelation == true) {
-            double[] scaledCorrelation = scaleCorrelation(meanCorrelation);
-            input.put(correlationKey, scaledCorrelation);
-        }
-        else{
-            input.put(correlationKey, meanCorrelation);
-        }
 
-        input.put(markerKey, m);
-        input.put(covarianceKey, meanCovariance);
+//        input.put(markerKey, m);
+//        input.put(covarianceKey, meanCovariance);
 
         return input;
     }
 
-    private double DCF(double tau, double[] a, double[] b, double meanA, double meanB, double stdDevA, double stdDevB){
+    private double DCF(int t, double[] a, double[] b, double meanA, double meanB, double stdDevA, double stdDevB,
+                       double noiseA, double noiseB) {
 
+        double dcf = 0.;
+        int counter = 0;
+
+        // Start with first slice of array a
+        int start = 0;
+        // Start with first slice of array b if t is negative
+        if (t < 0) {
+            start = Math.abs(t);
+        }
+
+        for (int i = start; i < a.length && i + t < b.length; i++) {
+            dcf += UDCF(a[1], b[i + t], meanA, meanB, stdDevA, stdDevB, noiseA, noiseB);
+            counter++;
+        }
+
+        return dcf / counter;
     }
 
 
     private double UDCF(double a, double b, double meanA, double meanB, double stdDevA, double stdDevB,
                         double noiseA, double noiseB) {
-        double udcf =  (a-meanA)*(b-meanB);
-        udcf /= Math.sqrt((stdDevA*stdDevA - noiseA*noiseA)*(stdDevB*stdDevB-noiseB*noiseB));
+        double udcf = (a - meanA) * (b - meanB);
+        udcf /= Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
+
 
         return udcf;
     }
 
-    private double UDCF(double a, double b, double meanA, double meanB, double stdDevA, double stdDevB){
-        return UDCF(a, b, meanA, meanB, stdDevA, stdDevB, 0.0, 0.0);
-    }
-
     private int absPos(int pix, int slice) {
-        return pix*roi+slice;
+        return pix * roi + slice;
     }
 
-    private DescriptiveStatistics[] getTimeseriesStatistics(double[] data, int skipFirst, int skipLast) {
+    private double[][] snipPixelData(double[] data, int skipFirst, int skipLast){
+
+        double[][] pixelData = new double[npix][];
+        for (int pix = 0; pix < npix; pix++) {
+            pixelData[pix] = Arrays.copyOfRange(data, absPos(pix, skipFirst), absPos(pix + 1, (-1) * skipLast));
+        }
+
+        return pixelData;
+
+    }
+
+    private DescriptiveStatistics[] getTimeseriesStatistics(double[][] snippedPixelData) {
         DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
 
         for (int pix = 0; pix < npix; pix++) {
-            int left_edge   = absPos(pix, skipFirst);
-            int right_edge  = absPos(pix+1, (-1)*skipLast);
-            double[] scaledPixelData = Arrays.copyOfRange(data, left_edge, right_edge);
-            pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
+            pixelStatistics[pix] = new DescriptiveStatistics(snippedPixelData[pix]);
         }
         return pixelStatistics;
     }
-
-
-    private double[] scaleCorrelation(double[] correlation){
-
-        double[] scaledCorrelation = new double[1440];
-        double max = 0;
-        double min = 1000;
-        for(int i=0; i<1440; i++){
-            if(correlation[i] > max){
-                int maxIndex = i;
-                max = correlation[i];
-            }
-            if(correlation[i] < min){
-                int minIndex = i;
-                min = correlation[i];
-            }
-        }
-
-
-        for(int i=0; i<1440; i++){
-            scaledCorrelation[i] = (correlation[i] - min) / (max - min);
-        }
-
-        return scaledCorrelation;
-    }
+}
 
