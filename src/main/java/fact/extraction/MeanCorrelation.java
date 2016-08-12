@@ -38,9 +38,6 @@ public class MeanCorrelation implements Processor {
     @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
     private int skipLast = 50;
 
-    @Parameter(required = false, description = "Outputkey for the scaled Data array")
-    private String scaledDataKey = "DataScaled";
-
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
     private String correlationKey = "meanCorrelation";
 
@@ -181,7 +178,6 @@ public class MeanCorrelation implements Processor {
         input.put(covarianceKey+"_stdDev", covarianceStd);
         input.put(covarianceKey+"_Kurtosis", covarianceKurtosis);
         input.put(covarianceKey+"_Skewness", covarianceSkewness);
-        input.put(scaledDataKey, scaledData);
 
         return input;
     }
@@ -282,10 +278,6 @@ public class MeanCorrelation implements Processor {
 
     public void setSkipLast(int skipLast) {
         this.skipLast = skipLast;
-    }
-
-    public void setScaledDataKey(String scaledDataKey) {
-        this.scaledDataKey = scaledDataKey;
     }
 
     public void setCorrelationKey(String correlationKey) {
