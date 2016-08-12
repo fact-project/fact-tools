@@ -133,20 +133,20 @@ public class NeighborPixDCR implements Processor {
                 counter++;
             }
 
-            DescriptiveStatistics dcfStatistics = new DescriptiveStatistics(maxNeighborDcf);
-            DescriptiveStatistics dcfDeltaTStatistics = new DescriptiveStatistics( maxNeighborDcfDeltaT);
+            DescriptiveStatistics statisticsDCF = new DescriptiveStatistics(maxNeighborDcf);
+            DescriptiveStatistics statisticsDCFDeltaT = new DescriptiveStatistics( maxNeighborDcfDeltaT);
 
-            meanPixDCF[pix] = dcfStatistics.getMean();
-            meanPixDCFDeltaT[pix] = dcfDeltaTStatistics.getMean();
+            meanPixDCF[pix] = statisticsDCF.getMean();
+            meanPixDCFDeltaT[pix] = statisticsDCFDeltaT.getMean();
 
-            stdDevPixDCF[pix] = dcfStatistics.getStandardDeviation();
-            stdDevPixDCFDeltaT[pix] = dcfDeltaTStatistics.getStandardDeviation();
+            stdDevPixDCF[pix] = statisticsDCF.getStandardDeviation();
+            stdDevPixDCFDeltaT[pix] = statisticsDCFDeltaT.getStandardDeviation();
 
-            maxPixDCF[pix] = dcfStatistics.getMax();
-            maxPixDCFDeltaT[pix] = dcfDeltaTStatistics.getMax();
+            maxPixDCF[pix] = statisticsDCF.getMax();
+            maxPixDCFDeltaT[pix] = statisticsDCFDeltaT.getMax();
 
-            minPixDCF[pix] = dcfStatistics.getMin();
-            minPixDCFDeltaT[pix] = dcfDeltaTStatistics.getMin();
+            minPixDCF[pix] = statisticsDCF.getMin();
+            minPixDCFDeltaT[pix] = statisticsDCFDeltaT.getMin();
 
         }
 
