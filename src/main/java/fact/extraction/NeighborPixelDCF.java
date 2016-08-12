@@ -20,7 +20,7 @@ import java.util.Arrays;
  *
  * Created by jebuss on 10.08.16.
  */
-public class NeighborPixDCR implements Processor {
+public class NeighborPixelDCF implements Processor {
     @Parameter(required = true, description = "raw data array")
     private String key = null;
 
@@ -45,7 +45,7 @@ public class NeighborPixDCR implements Processor {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     // A logger
-    static Logger log = LoggerFactory.getLogger(NeighborPixDCR.class);
+    static Logger log = LoggerFactory.getLogger(NeighborPixelDCF.class);
 
     @Override
     public Data process(Data input) {
