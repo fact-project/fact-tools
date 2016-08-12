@@ -36,7 +36,7 @@ public class NeighborPixDCR implements Processor {
     private int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
-    private String neighborPixDcfKey = "neighborPixDcf";
+    private String neighborPixDCFKey = "neighborPixDCF";
 
     private int deltaTMax = 5;
 
@@ -66,17 +66,17 @@ public class NeighborPixDCR implements Processor {
         //get mean and variance of the timeseries for each pixel
         DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(snipedPixelData);
 
-        double[] meanPixDcf        = new double[npix];
-        double[] meanPixDcfDeltaT  = new double[npix];
+        double[] meanPixDCF        = new double[npix];
+        double[] meanPixDCFDeltaT  = new double[npix];
 
-        double[] stdDevPixDcf        = new double[npix];
-        double[] stdDevPixDcfDeltaT  = new double[npix];
+        double[] stdDevPixDCF        = new double[npix];
+        double[] stdDevPixDCFDeltaT  = new double[npix];
 
-        double[] maxPixDcf        = new double[npix];
-        double[] maxPixDcfDeltaT  = new double[npix];
+        double[] maxPixDCF        = new double[npix];
+        double[] maxPixDCFDeltaT  = new double[npix];
 
-        double[] minPixDcf        = new double[npix];
-        double[] minPixDcfDeltaT  = new double[npix];
+        double[] minPixDCF        = new double[npix];
+        double[] minPixDCFDeltaT  = new double[npix];
 
         // TODO: 11.08.16 Make sure that each pair of pixels is only touched once
 
@@ -137,29 +137,29 @@ public class NeighborPixDCR implements Processor {
             DescriptiveStatistics dcfStatistics = new DescriptiveStatistics(maxNeighborDcf);
             DescriptiveStatistics dcfDeltaTStatistics = new DescriptiveStatistics( maxNeighborDcfDeltaT);
 
-            meanPixDcf[pix] = dcfStatistics.getMean();
-            meanPixDcfDeltaT[pix] = dcfDeltaTStatistics.getMean();
+            meanPixDCF[pix] = dcfStatistics.getMean();
+            meanPixDCFDeltaT[pix] = dcfDeltaTStatistics.getMean();
 
-            stdDevPixDcf[pix] = dcfStatistics.getStandardDeviation();
-            stdDevPixDcfDeltaT[pix] = dcfDeltaTStatistics.getStandardDeviation();
+            stdDevPixDCF[pix] = dcfStatistics.getStandardDeviation();
+            stdDevPixDCFDeltaT[pix] = dcfDeltaTStatistics.getStandardDeviation();
 
-            maxPixDcf[pix] = dcfStatistics.getMax();
-            maxPixDcfDeltaT[pix] = dcfDeltaTStatistics.getMax();
+            maxPixDCF[pix] = dcfStatistics.getMax();
+            maxPixDCFDeltaT[pix] = dcfDeltaTStatistics.getMax();
 
-            minPixDcf[pix] = dcfStatistics.getMin();
-            minPixDcfDeltaT[pix] = dcfDeltaTStatistics.getMin();
+            minPixDCF[pix] = dcfStatistics.getMin();
+            minPixDCFDeltaT[pix] = dcfDeltaTStatistics.getMin();
 
         }
 
 
-        input.put(neighborPixDcfKey+"_mean", meanPixDcf);
-        input.put(neighborPixDcfKey+"_stdDev", stdDevPixDcf);
-        input.put(neighborPixDcfKey+"_max", maxPixDcf);
-        input.put(neighborPixDcfKey+"_min", minPixDcf);
-        input.put(neighborPixDcfKey+"_meanDeltaT", meanPixDcfDeltaT);
-        input.put(neighborPixDcfKey+"_stdDevDeltaT", stdDevPixDcfDeltaT);
-        input.put(neighborPixDcfKey+"_maxDeltaT", maxPixDcfDeltaT);
-        input.put(neighborPixDcfKey+"_minDeltaT", minPixDcfDeltaT);
+        input.put(neighborPixDCFKey +"_mean",meanPixDCF);
+        input.put(neighborPixDCFKey +"_stdDev", stdDevPixDCF);
+        input.put(neighborPixDCFKey +"_max", maxPixDCF);
+        input.put(neighborPixDCFKey +"_min", minPixDCF);
+        input.put(neighborPixDCFKey +"_meanDeltaT", meanPixDCFDeltaT);
+        input.put(neighborPixDCFKey +"_stdDevDeltaT", stdDevPixDCFDeltaT);
+        input.put(neighborPixDCFKey +"_maxDeltaT", maxPixDCFDeltaT);
+        input.put(neighborPixDCFKey +"_minDeltaT", minPixDCFDeltaT);
 
         return input;
     }
@@ -236,8 +236,8 @@ public class NeighborPixDCR implements Processor {
         this.skipLast = skipLast;
     }
 
-    public void setNeighborPixDcfKey(String neighborPixDcfKey) {
-        this.neighborPixDcfKey = neighborPixDcfKey;
+    public void setNeighborPixDCFKey(String neighborPixDCFKey) {
+        this.neighborPixDCFKey = neighborPixDCFKey;
     }
 }
 
