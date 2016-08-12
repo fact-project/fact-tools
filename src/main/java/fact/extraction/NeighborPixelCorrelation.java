@@ -38,16 +38,17 @@ public class NeighborPixelCorrelation implements Processor {
     @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
     private int skipLast = 50;
 
-    @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
-    private String correlationKey = "meanCorrelation";
+    @Parameter(required = false, description = "Outputkey for the correlation of neighbouring pixels")
+    private String correlationKey = "NPCor";
 
-    @Parameter(required = false, description = "Outputkey for the mean covariance of neighbouring pixels")
-    private String covarianceKey = "meanCovariance";
+    @Parameter(required = false, description = "Outputkey for the covariance of neighbouring pixels")
+    private String covarianceKey = "NPCov";
 
     @Parameter(required = false, description = "Outputkey for the covariance window marker")
     private String markerKey = "covarianceWindow";
 
-    @Parameter(required = false, description = "Return scaled mean correlation (values between 0 and 1) if 'true'. Return absolute values if 'false'.", defaultValue = "false")
+    @Parameter(required = false, description = "Return scaled mean correlation (values between 0 and 1) if 'true'." +
+            "Return absolute values if 'false'.", defaultValue = "false")
     private boolean returnScaledCorrelation = false;
 
 
