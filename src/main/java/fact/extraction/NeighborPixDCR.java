@@ -32,7 +32,7 @@ public class NeighborPixDCR implements Processor {
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "30")
     private int skipFirst = 30;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "100")
+    @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
     private int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
