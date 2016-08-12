@@ -6,7 +6,6 @@ import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -208,7 +207,6 @@ public class NeighborPixDCR implements Processor {
         }
 
         return pixelData;
-
     }
 
     private DescriptiveStatistics[] getTimeseriesStatistics(double[][] snippedPixelData) {
