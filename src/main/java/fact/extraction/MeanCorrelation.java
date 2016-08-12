@@ -21,7 +21,7 @@ import java.util.Arrays;
  *
  * Created by jebuss on 04.04.16.
  */
-public class AverageNeighborCorrelation implements Processor {
+public class MeanCorrelation implements Processor {
     @Parameter(required = true, description = "raw data array")
     private String key = null;
 
@@ -57,7 +57,7 @@ public class AverageNeighborCorrelation implements Processor {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     // A logger
-    static Logger log = LoggerFactory.getLogger(AverageNeighborCorrelation.class);
+    static Logger log = LoggerFactory.getLogger(MeanCorrelation.class);
 
     @Override
     public Data process(Data input) {
