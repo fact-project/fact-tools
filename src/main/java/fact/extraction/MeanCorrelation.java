@@ -35,7 +35,7 @@ public class MeanCorrelation implements Processor {
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "15")
     private int skipFirst = 15;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
     private int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the scaled Data array")
