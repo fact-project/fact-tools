@@ -12,8 +12,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Arrays;
-
 /**
  * Calculate the Descrete Correlation Function for the Time Series of neigbouring pixels as a measure for their
  * correllation
