@@ -9,8 +9,12 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+
+import java.util.Arrays;
 
 /**
  * Calculate the Descrete Correlation Function for the Time Series of neigbouring pixels as a measure for their
@@ -18,9 +22,12 @@ import stream.annotations.Parameter;
  *
  * Created by jebuss on 10.08.16.
  */
-public class NeighborPixelDCF implements Processor {
+public class NeighborPixelDCF implements StatefulProcessor {
     @Parameter(required = true, description = "raw data array")
     private String key = null;
+
+    @Parameter(required = false, description = "pixel array containing a noise estimation for each pixel")
+    private String noiseKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used, " +
             "if no pixelset is given, the whole camera is used", defaultValue = "")
@@ -45,6 +52,8 @@ public class NeighborPixelDCF implements Processor {
     // A logger
     static Logger log = LoggerFactory.getLogger(NeighborPixelDCF.class);
 
+    double[] default_noise;
+
     @Override
     public Data process(Data input) {
 
@@ -52,6 +61,11 @@ public class NeighborPixelDCF implements Processor {
         npix = (Integer) input.get("NPIX");
 
         double[] data = (double[]) input.get(key);
+        double[] noise = default_noise;
+        if ( noiseKey != null ){
+            noise = (double[]) input.get(noiseKey);
+        }
+
         int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
@@ -117,9 +131,11 @@ public class NeighborPixelDCF implements Processor {
                 double maxDcf = Double.MIN_VALUE;
                 int maxDcfDeltaT = Integer.MAX_VALUE;
 
+                double udcfNorm = UDCFNorm(pixStdDev, neighbourStdDev, noise[pix], noise[neighbour.id]);
+
                 for (int t : deltaT) {
-                    dcf[deltaTMax + t] = DCF(t, snipedPixelData[pix], snipedPixelData[neighbour.id], pixMean,
-                                                neighbourMean, pixStdDev, neighbourStdDev, 0.0, 0.0);
+                    dcf[deltaTMax + t] = DCF(t, snipedPixelData[pix], snipedPixelData[neighbour.id],
+                            pixMean, neighbourMean, udcfNorm);
                     if (dcf[deltaTMax + t] > maxDcf){
                         maxDcf       = dcf[deltaTMax + t];
                         maxDcfDeltaT = deltaT[deltaTMax + t];
@@ -161,8 +177,19 @@ public class NeighborPixelDCF implements Processor {
         return input;
     }
 
-    private double DCF(int t, double[] a, double[] b, double meanA, double meanB, double stdDevA, double stdDevB,
-                       double noiseA, double noiseB) {
+
+    /**
+     * Calculate the descrete correlation function for a pair of values
+     *
+     * @param t     shift of the arrays
+     * @param a     first array
+     * @param b     second array
+     * @param meanA     mean of a
+     * @param meanB     mean of b
+     * @param UDCFNorm
+     * @return descrete correlation
+     */
+    public double DCF(int t, double[] a, double[] b, double meanA, double meanB, double UDCFNorm) {
 
         double dcf = 0.;
         int counter = 0;
@@ -176,7 +203,7 @@ public class NeighborPixelDCF implements Processor {
 
         for (int i = start; i < a.length && i + t < b.length; i++) {
 
-            dcf += UDCF(a[i], b[i + t], meanA, meanB, stdDevA, stdDevB, noiseA, noiseB);
+            dcf += UDCF(a[i], b[i + t], meanA, meanB, UDCFNorm);
             counter++;
         }
 
@@ -184,12 +211,33 @@ public class NeighborPixelDCF implements Processor {
     }
 
 
-    private double UDCF(double a, double b, double meanA, double meanB, double stdDevA, double stdDevB,
-                        double noiseA, double noiseB) {
-        double udcf = (a - meanA) * (b - meanB);
-        udcf /= Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
+    /**
+     * Calculate the unbinned descrete correlation function for a pair of values
+     *
+     * @param a     first value
+     * @param b     second value
+     * @param meanA     mean of the a's origin
+     * @param meanB     mean of the b's origin
+     * @param UDCFNorm
+     * @return unbinned descrete correlation
+     */
+    public double UDCF(double a, double b, double meanA, double meanB, double UDCFNorm) {
+        // TODO: 15.08.16 if for some reason one of the UDCFNorm is zero you devide by zero
+        return (a - meanA) * (b - meanB) / UDCFNorm;
+    }
 
-        return udcf;
+
+    /**
+     * Calculate the norm for the unbinned descrete correlation function
+     *
+     * @param stdDevA   standard deviation of a
+     * @param stdDevB   standard deviation of b
+     * @param noiseA    noise of a
+     * @param noiseB    noise of b
+     * @return unbinned descrete correlation
+     */
+    public double UDCFNorm(double stdDevA, double stdDevB, double noiseA, double noiseB){
+        return Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
     }
 
     public void setKey(String key) {
@@ -198,6 +246,14 @@ public class NeighborPixelDCF implements Processor {
 
     public void setPixelSetKey(String pixelSetKey) {
         this.pixelSetKey = pixelSetKey;
+    }
+
+    public void setNoiseKey(String noiseKey) {
+        this.noiseKey = noiseKey;
+    }
+
+    public void setDeltaTMax(int deltaTMax) {
+        this.deltaTMax = deltaTMax;
     }
 
     public void setSkipFirst(int skipFirst) {
@@ -210,6 +266,22 @@ public class NeighborPixelDCF implements Processor {
 
     public void setNeighborPixDCFKey(String neighborPixDCFKey) {
         this.neighborPixDCFKey = neighborPixDCFKey;
+    }
+
+    @Override
+    public void init(ProcessContext context) throws Exception {
+        default_noise = new double[npix];
+        Arrays.fill(default_noise, 0.0);
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
     }
 }
 
