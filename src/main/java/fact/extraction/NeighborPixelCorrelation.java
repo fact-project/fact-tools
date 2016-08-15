@@ -83,7 +83,7 @@ public class NeighborPixelCorrelation implements Processor {
         double[][] snipedPixelData = Utils.snipPixelData(scaledData, skipFirst, skipLast, npix, roi);
 
         //get mean and variance of the timeseries for each pixel
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
+        DescriptiveStatistics[] pixelStatistics = Utils.calculateTimeseriesStatistics(snipedPixelData);
 
         double[] covarianceMean     = new double[npix];
         double[] correlationMean    = new double[npix];
@@ -202,22 +202,6 @@ public class NeighborPixelCorrelation implements Processor {
         }
         covariance /= roi;
         return covariance;
-    }
-
-    private int absPos(int pix, int slice) {
-        return pix*roi+slice;
-    }
-
-    private DescriptiveStatistics[] getTimeseriesStatistics(double[] data, int skipFirst, int skipLast) {
-        DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
-
-        for (int pix = 0; pix < npix; pix++) {
-            int left_edge   = absPos(pix, skipFirst);
-            int right_edge  = absPos(pix+1, (-1)*skipLast);
-            double[] scaledPixelData = Arrays.copyOfRange(data, left_edge, right_edge);
-            pixelStatistics[pix] = new DescriptiveStatistics( scaledPixelData );
-        }
-        return pixelStatistics;
     }
 
     private double[] scaleData(double[] data, int[] amplitudePositions) {

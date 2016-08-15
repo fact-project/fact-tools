@@ -7,12 +7,14 @@ import com.google.common.primitives.Ints;
 import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -468,7 +470,56 @@ public class Utils {
 			throw new RuntimeException(message);
 		}	
 	}
-	
 
+
+	/**
+	 * Absolute position in the data array by pixel and slice
+	 *
+	 * @param pix
+	 * @param slice
+	 * @return absolute array position
+	 */
+	public static int absPos(int pix, int slice, int roi) {
+		return pix * roi + slice;
+	}
+
+
+	/**
+	 * Convert the fact data array to a 2 dim array of pixels and slices and snip out an desired window of slices
+	 *
+	 * @param data
+	 * @param skipFirst
+	 * @param skipLast
+	 * @param npix
+	 * @return 2dim snipped data array
+	 */
+	public static double[][] snipPixelData(double[] data, int skipFirst, int skipLast, int npix, int roi){
+
+		double[][] pixelData = new double[npix][];
+		for (int pix = 0; pix < npix; pix++) {
+			int firstSlice = absPos(pix, skipFirst, roi);
+			int lastSlice  = absPos(pix + 1, (-1) * skipLast, roi);
+			pixelData[pix] = Arrays.copyOfRange(data, firstSlice, lastSlice);
+		}
+
+		return pixelData;
+	}
+
+	/**
+	 * Calculate the statistics of given 2 dim data array, where the first field
+	 * is the pixel Id and the second the slices.
+	 *
+	 * @param data
+	 * @return pixel array of Descriptive Statistics
+	 */
+	public static  DescriptiveStatistics[] calculateTimeseriesStatistics(double[][] data) {
+		int npix = data.length;
+		DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
+
+		for (int pix = 0; pix < npix; pix++) {
+			pixelStatistics[pix] = new DescriptiveStatistics(data[pix]);
+		}
+		return pixelStatistics;
+	}
 
 }

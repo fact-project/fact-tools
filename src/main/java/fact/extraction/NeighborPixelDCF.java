@@ -60,10 +60,10 @@ public class NeighborPixelDCF implements Processor {
         roi = data.length / npix;
 
         //snip pixel Data to arrays without skipped slices
-        double[][] snipedPixelData = snipPixelData(data, skipFirst, skipLast);
+        double[][] snipedPixelData = Utils.snipPixelData(data, skipFirst, skipLast, npix, roi);
 
         //get mean and variance of the timeseries for each pixel
-        DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(snipedPixelData);
+        DescriptiveStatistics[] pixelStatistics = Utils.calculateTimeseriesStatistics(snipedPixelData);
 
         double[] meanPixDCF        = new double[npix];
         double[] meanPixDCFDeltaT  = new double[npix];
@@ -192,30 +192,6 @@ public class NeighborPixelDCF implements Processor {
         udcf /= Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
 
         return udcf;
-    }
-
-    private int absPos(int pix, int slice) {
-        return pix * roi + slice;
-    }
-
-
-    private double[][] snipPixelData(double[] data, int skipFirst, int skipLast){
-
-        double[][] pixelData = new double[npix][];
-        for (int pix = 0; pix < npix; pix++) {
-            pixelData[pix] = Arrays.copyOfRange(data, absPos(pix, skipFirst), absPos(pix + 1, (-1) * skipLast));
-        }
-
-        return pixelData;
-    }
-
-    private DescriptiveStatistics[] getTimeseriesStatistics(double[][] snippedPixelData) {
-        DescriptiveStatistics[] pixelStatistics = new DescriptiveStatistics[npix];
-
-        for (int pix = 0; pix < npix; pix++) {
-            pixelStatistics[pix] = new DescriptiveStatistics(snippedPixelData[pix]);
-        }
-        return pixelStatistics;
     }
 
     public void setKey(String key) {
