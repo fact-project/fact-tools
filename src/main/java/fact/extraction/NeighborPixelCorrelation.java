@@ -13,8 +13,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Arrays;
-
 /**
  * Calculate the average covariance and correlation of neighboring pixels to determine
  * the correlation of theire timeseries
@@ -151,8 +149,6 @@ public class NeighborPixelCorrelation implements Processor {
             correlationStd[pix]      = statisticsCorrelation.getStandardDeviation();
             correlationKurtosis[pix] = statisticsCorrelation.getKurtosis();
             correlationSkewness[pix] = statisticsCorrelation.getSkewness();
-
-            correlationMean[pix] = statisticsCorrelation.getMean();
 
             m[pix] = new IntervalMarker(skipFirst,roi - skipLast);
 
