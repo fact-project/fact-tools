@@ -79,6 +79,9 @@ public class NeighborPixelCorrelation implements Processor {
         //scale the data in the array to make it comparable
         double[] scaledData      = scaleData(data, amplitudePositions);
 
+        //snip pixel Data to arrays without skipped slices
+        double[][] snipedPixelData = Utils.snipPixelData(scaledData, skipFirst, skipLast, npix, roi);
+
         //get mean and variance of the timeseries for each pixel
         DescriptiveStatistics[] pixelStatistics = getTimeseriesStatistics(scaledData, skipFirst, skipLast);
 
