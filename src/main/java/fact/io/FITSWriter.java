@@ -25,11 +25,10 @@ import java.util.HashMap;
 /**
  * Created by maxnoe on 10.08.16.
  *
- * Write data to a FITS file sequentially. The advantage over FITSWriter is that not the whole
- * BinaryTable has to be in memory until the end of the stream.
+ * Write data to a FITS file sequentially.
  *
  * This processor is able to serialize scalars and 1d-arrays of fixed length containing primitive types.
- * Other data structures will be ignored or might lead to errors.
+ * Other data structures will be ignored (complex objects) or lead to errors (variable length arrays).
  *
  * The fits file is initialised using the given keys from first data item.
  * All following items must have the same structure.
