@@ -21,6 +21,19 @@ import java.util.Arrays;
 
 /**
  * Created by maxnoe on 15.08.16.
+ *
+ * Calibrate the data using the timelapse method.
+ * Application on MAGIC data is described here: https://arxiv.org/pdf/1305.1007.pdf
+ *
+ * The code to generate the fits files with the calibration constants can be found here:
+ * https://github.com/fact-project/timelapse_calibration
+ *
+ * It seems that the drs4 cells have an offset which depends on the time since they were last read out of
+ * the following form: amplitude = a * deltaT^b * c
+ *
+ * This Processor also converts adc counts to mV after the calibration.
+ *
+ * The deltaTs need to be calculated using the fact.utils.DrsCellLastReadout processor
  */
 public class DrsTimelapseCalibration implements StatefulProcessor {
 
