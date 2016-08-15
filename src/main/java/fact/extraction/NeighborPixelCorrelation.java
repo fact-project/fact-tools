@@ -125,8 +125,9 @@ public class NeighborPixelCorrelation implements Processor {
                 double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
                 double neighbourMean        = pixelStatistics[neighbour.id].getMean();
 
-                double covariance  = calculateCovariance(scaledData, pix, pixMean,
-                                                        neighbour, neighbourMean, skipFirst, skipLast);
+                double covariance = calculateCovariance(snipedPixelData[pix], snipedPixelData[neighbour.id],
+                                                            pixMean, neighbourMean);
+
                 double correlation = calculateCorrelation(pixVariance, neighbourVariance, covariance);
 
 
@@ -182,19 +183,19 @@ public class NeighborPixelCorrelation implements Processor {
         return input;
     }
 
-    private double calculateCorrelation(double pixVariance, double neighbourVariance, double covariance) {
-        Double correlation = Math.abs(covariance) / Math.sqrt(pixVariance*pixVariance*neighbourVariance*neighbourVariance );
+    private double calculateCorrelation(double varianceA, double varianceB, double covariance) {
+        Double correlation = Math.abs(covariance) / Math.sqrt(varianceA*varianceA*varianceB*varianceB );
         return Math.abs(correlation);
     }
 
-    private double calculateCovariance(double[] scaledData, int pix, double pixMean, CameraPixel neighbour,
-                                       double neighbourMean, int skipFirst, int skipLast) {
+    private double calculateCovariance(double[] arrayA, double[] arrayB, double meanA, double meanB) {
         double covariance = 0.;
 
-        for (int slice = 0 + skipFirst; slice < roi - skipLast; slice++) {
-            double distancePixel        = scaledData[absPos(pix, slice)] - pixMean;
-            double distanceNeighbour    = scaledData[absPos(neighbour.id, slice)] - neighbourMean;
-            covariance += distancePixel * distanceNeighbour;
+        for (int slice = 0; slice < arrayA.length; slice++) {
+            double distanceA        = arrayA[slice] - meanA;
+            double distanceB        = arrayB[slice] - meanB;
+
+            covariance += distanceA * distanceB;
         }
         covariance /= roi;
         return covariance;
