@@ -204,7 +204,7 @@ public class NeighborPixelCorrelation implements Processor {
     private double[] scaleData(double[] data, int[] amplitudePositions) {
         double[] scaledData = data.clone();
         for (int pix = 0; pix < npix; pix++) {
-            int maxAmplPos = absPos(pix, amplitudePositions[pix]);
+            int maxAmplPos = Utils.absPos(pix, amplitudePositions[pix], roi);
             double maxAmpl = data[maxAmplPos];
 
             //check if maxAmpl is 0 to avoid division by zero which leads to NaN values in scaledData.
@@ -212,12 +212,12 @@ public class NeighborPixelCorrelation implements Processor {
             //Other solution: do something with baseline. could be more elegant...
             if(Math.abs(maxAmpl) < 0.1){
                 for (int slice = 0; slice < roi; slice++) {
-                    scaledData[absPos(pix, slice)] = (scaledData[absPos(pix, slice)] + 10) / (maxAmpl+10);
+                    scaledData[Utils.absPos(pix, slice, roi)] = (scaledData[Utils.absPos(pix, slice, roi)] + 10) / (maxAmpl+10);
                 }
             }
             else {
                 for (int slice = 0; slice < roi; slice++) {
-                    scaledData[absPos(pix, slice)] = (scaledData[absPos(pix, slice)] / maxAmpl);
+                    scaledData[Utils.absPos(pix, slice, roi)] = (scaledData[Utils.absPos(pix, slice, roi)] / maxAmpl);
                 }
             }
         }
