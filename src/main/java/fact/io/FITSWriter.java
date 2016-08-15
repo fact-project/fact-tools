@@ -38,10 +38,10 @@ public class FITSWriter implements StatefulProcessor {
 
     static Logger log = LoggerFactory.getLogger(FITSWriter.class);
 
-    @Parameter(required = true)
+    @Parameter(required = true, description = "Keys to write to the FITS file. Using streams.Keys")
     private Keys keys = new Keys("");
 
-    @Parameter(required = true)
+    @Parameter(required = true, description = "Url for the output file")
     private URL url;
 
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
