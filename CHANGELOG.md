@@ -1,6 +1,12 @@
 #Changelog for the fact-tools
 
 ## Version 0.16.0 -- 16.08.2016
+
+* FITSWriter
+  * Added new Processor to write data to FITS file: `fact.io.FITSWriter`
+  * Files can be read by fact-tools
+  * Can write out scalar values and 1d-Arrays of fixed length
+
 * Feature Extraction
   * New Feature: fact.extraction.NeighborPixelDCF calculates the Descrete correlation function of neighboring pixels
   * renamed fact.extraction.MeanCorrelation to fact.extraction.NeighborPixelCorrelation
