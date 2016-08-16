@@ -1,5 +1,11 @@
 #Changelog for the fact-tools
 
+## Version 0.15.1 -- 12.08.2016
+* Extraction
+  * New Feature: fact.extraction.NeighborPixelDCF calculates the Descrete correlation function of neighboring pixels
+  * renamed fact.extraction.MeanCorrelation to fact.extraction.NeighborPixelCorrelation
+  * New features in fact.extraction.NeighborPixelCorrelation: standard deviation, kurtosis, skewness, min and max are calculated additionally
+
 ## Version 0.15.0 -- 23.05.2016
 
 * Muon Analysis
