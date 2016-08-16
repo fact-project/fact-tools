@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * A class containing the information about the fitsheader.
- * 
+ *
  * @author Michael Bulinski
  */
 public class FitsHeader {
@@ -53,12 +53,12 @@ public class FitsHeader {
 			return type.cast(type);
 		}
 	}
-	
+
 	private Map<String, FitsHeaderEntry> keyMap = null;
 
 	/**
 	 * Returns the header entries. The keys of the map are the keys of the header and the values are the corresponding values of the entry.
-	 * @return The header entries of the fits header. 
+	 * @return The header entries of the fits header.
 	 */
 	public Map<String, FitsHeaderEntry> getKeyMap() {
 		return this.keyMap;
@@ -74,7 +74,7 @@ public class FitsHeader {
 		keyMap = new HashMap<String, FitsHeaderEntry>();
 		for (String line : block) {
 			ValueType type = ValueType.NONE;
-			
+
 			if (line.startsWith("COMMENT")) { //ignore comment only lines
 				continue;
 			} else if (line.startsWith("HISTORY")) { //ignore history lines
@@ -82,7 +82,7 @@ public class FitsHeader {
 			} else if (line.startsWith("        ")) { //ignore comment only lines
 				continue;
 			}
-			
+
 			line = line.trim();
 			//get the key and everything else
 			String[] tmp = line.split("=", 2);
@@ -91,17 +91,17 @@ public class FitsHeader {
 			}
 			String key = tmp[0].trim(); //key
 			line = tmp[1].trim(); //everything else
-			
+
 			//split the value and the comment from everything else
 			tmp = line.split("/", 2);
 			if (tmp.length==2) {
 				//String comment = tmp[1].trim(); //comment
 			}
 			String value = tmp[0].trim();
-			
+
 			//check the type of the value
 			if (value.startsWith("'")) { //we found a String
-				value = value.replaceAll("'", "");
+				value = value.replaceAll("'", "").trim();
 				type = ValueType.STRING;
 			} else {
 				if (value.isEmpty() || value.startsWith("T") || value.startsWith("F")) {
@@ -114,11 +114,11 @@ public class FitsHeader {
 					throw new ParseException("Unknown value while parsing tableheads: '"+value+"'");
 				}
 			}
-			
+
 			keyMap.put(key, new FitsHeaderEntry(type, value));
 		}
 	}
-	
+
 	/**
 	 * Checks if the key is present in the header
 	 * @param key The key to check.
@@ -160,7 +160,7 @@ public class FitsHeader {
 			return false;
 		return true;
 	}
-	
+
 
 	/**
 	 * Works just like {@link FitsHeader#check(String, ValueType)} but throws a Exception instead of returning an boolean.
@@ -192,7 +192,7 @@ public class FitsHeader {
 		if (!entry.getValue().equals(expectedValue))
 			throw new ParseException("Header entry: '"+key+"' got the wrong value: "+entry.getValue()+", expected: "+expectedValue);
 	}
-	
+
 	/**
 	 * Returns the value of a given key.
 	 * @param key The key to get the value from.
@@ -205,7 +205,7 @@ public class FitsHeader {
 			throw new NullPointerException("The key: '"+key+"' is missing in the header");
 		return entry.getValue();
 	}
-	
+
 	/**
 	 * Returns the value of a given key. If the key is missing returns to value of missingKeyValue.
 	 * @param key The key to get the value from.
@@ -218,9 +218,9 @@ public class FitsHeader {
 			return missingKeyValue;
 		return entry.getValue();
 	}
-	
+
 	/**
-	 * Returns a String representation of the header. 
+	 * Returns a String representation of the header.
 	 * @return The header as a string.
 	 */
 	public String toString() {
