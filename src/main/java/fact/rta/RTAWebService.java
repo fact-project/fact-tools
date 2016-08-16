@@ -90,8 +90,8 @@ public class RTAWebService implements Service {
         Spark.get("/", (request, response) -> {
             Map<String, Object> attributes = new HashMap<>();
             attributes.put("title", "FACT RTA - Real Time Analysis");
-            return new ModelAndView(attributes, "rta/index.html");
-        }, new HandlebarsTemplateEngine());
+            return new ModelAndView(attributes, "index.html");
+        }, new HandlebarsTemplateEngine("/rta"));
 
 //        Spark.get("/lightcurve", (request, response) -> getLightCurve(request.queryParams("hours")), gson::toJson);
 
