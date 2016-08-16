@@ -20,6 +20,12 @@
     <include url="classpath:/default/data/extraction.xml" />
     <include url="classpath:/default/data/cleaning.xml" />
 
+    <fact.extraction.SinglePulseExtraction 
+        dataKey="DataCalibrated"
+        outputKey="PhotonArrivals"
+        maxIterations="50"
+    />
+
     <fact.ShowViewer key="DataCalibrated" />
   </process>
 </container>

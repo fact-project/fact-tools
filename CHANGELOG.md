@@ -1,10 +1,17 @@
 #Changelog for the fact-tools
 
-## Version 0.15.1 -- 12.08.2016
-* Extraction
+## Version 0.16.0 -- 16.08.2016
+* Feature Extraction
   * New Feature: fact.extraction.NeighborPixelDCF calculates the Descrete correlation function of neighboring pixels
   * renamed fact.extraction.MeanCorrelation to fact.extraction.NeighborPixelCorrelation
   * New features in fact.extraction.NeighborPixelCorrelation: standard deviation, kurtosis, skewness, min and max are calculated additionally
+
+* Single Pulse Extractor
+  * A robust, baseline independent, extractor for single pulses on a sampling time line. It assumes that all amplitude variations on the time line are caused by single pulses of a FACT SIPM and reconstructs the arrival time slices of these pulses.
+  * SinglePulseExtractor (object) Calculates the arrival positions of pulses on a single time line.
+  * SinglePulseExtraction (processor) Applies the SinglePulseExtractor to all pixels and calculates a list of single pulse arrival time slices for each time line of a pixel.
+  * The algorithm was developed in a python toy simulation on https://github.com/fact-project/single_pulse_extractor
+
 
 ## Version 0.15.0 -- 23.05.2016
 
