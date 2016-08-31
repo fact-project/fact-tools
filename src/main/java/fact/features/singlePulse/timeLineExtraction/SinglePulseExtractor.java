@@ -1,11 +1,11 @@
 package fact.features.singlePulse.timeLineExtraction;
 
-import java.util.Arrays;
 import java.util.ArrayList;
-import fact.features.singlePulse.timeLineExtraction.ElementWise;
-import fact.features.singlePulse.timeLineExtraction.Convolve;
-import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
 
+/**
+ * The single pulse extractor by sebastian mueller acht.
+ * It extracts the arrival times of single photons recorded by the SiPMs.
+ */
 public class SinglePulseExtractor {
 
     public static final int pulseToLookForLength = 20;
@@ -37,32 +37,33 @@ public class SinglePulseExtractor {
             pulseToSubstractLength);
 
         double sum = 0.0;
-        for(int i=0; i<pulseToLookFor.length; i++)
-            sum += pulseToLookFor[i];
+        for (double aPulseToLookFor : pulseToLookFor){
+            sum += aPulseToLookFor;
+        }
         pulseToLookForIntegral = sum;
     }
 
+    /**
+     * Reconstructs the arrival slices of single photons on a timeline.
+     *
+     * @return arrival_slices
+     *           A list of the arrival slices of photons found on
+     *           the time line.
+     *
+     * @param timeLine
+     *           The time line to look for pulses in. The time line
+     *           is modified in place. When the extractor was
+     *           successfull, the time line is flat and all pulses
+     *           were substracted.
+     *           Amplitude of the single puls must be normalized to 1.0.
+     *
+     * @param maxIterations
+     *           The maximum iterations on a time line before abort.
+     */
     public static ArrayList<Integer> getArrivalSlicesOnTimeline(
         double[] timeLine, 
         int maxIterations
     ) {
-        /**  
-        * Reconstructs the arrival slices of single photons on a timeline. 
-        * 
-        * @return arrival_slices
-        *           A list of the arrival slices of photons found on 
-        *           the time line.
-        * 
-        * @param timeLine 
-        *           The time line to look for pulses in. The time line 
-        *           is modified in place. When the extractor was 
-        *           successfull, the time line is flat and all pulses 
-        *           were substracted. 
-        *           Amplitude of the single puls must be normalized to 1.0.
-        * 
-        * @param maxIterations       
-        *           The maximum iterations on a time line before abort.
-        */
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
@@ -111,40 +112,44 @@ public class SinglePulseExtractor {
         return arrival_slices;
     }
 
+    /**
+     * Estimates the effect of FACT's AC coupling in between the
+     * photo-electric converter (SIPM) and the signal sampler (DRS4).
+     * Here simply the mean of the time line is substracted from it.
+     *
+     * @param timeLine
+     *           The time line is modified inplace.
+     */
     public static void applyAcCoupling(double[] timeLine) {
-        /**  
-        * Estimates the effect of FACT's AC coupling in between the 
-        * photo-electric converter (SIPM) and the signal sampler (DRS4).
-        * Here simply the mean of the time line is substracted from it.
-        * 
-        * @param timeLine    
-        *           The time line is modified inplace. 
+        /**
         */
         if(timeLine.length == 0)
             return;
 
         double sum = 0.0;
-        for(int i=0; i<timeLine.length; i++)
-            sum += timeLine[i];
+        for (double aTimeLine : timeLine){
+            sum += aTimeLine;
+        }
 
         final double mean = sum/(double)(timeLine.length);
 
         timeLine = ElementWise.add(timeLine, -mean);
     }
 
+    /**
+     * Convert time line amplitudes from mV to normalized amplitudes of
+     * single photon pulses.
+     *
+     * @return timeLineNormalizedSinglePulses
+     *           The amplitude of single pulses is 1.0 here.
+     *
+     * @param timeLineInMv
+     *           In milli Volts (single pulse amplitude about 10mV)
+     */
     public static double[] milliVoltToNormalizedSinglePulse(
         double[] timeLineInMv
     ) {
-        /** 
-        * Convert time line amplitudes from mV to normalized amplitudes of 
-        * single photon pulses.
-        * 
-        * @return timeLineNormalizedSinglePulses
-        *           The amplitude of single pulses is 1.0 here.
-        *
-        * @param timeLineInMv
-        *           In milli Volts (single pulse amplitude about 10mV) 
-        */
+
         return ElementWise.multiply(
             timeLineInMv, 
             1.0/factSinglePeAmplitudeInMv);
