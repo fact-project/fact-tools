@@ -1,5 +1,7 @@
 package fact.features.singlePulse.timeLineExtraction;
 
+import com.google.common.math.DoubleMath;
+
 import java.util.ArrayList;
 
 /**
@@ -36,9 +38,10 @@ public class SinglePulseExtractor {
         pulseToSubstract= TemplatePulse.factSinglePePulse(
             pulseToSubstractLength);
 
+        
         double sum = 0.0;
-        for (double aPulseToLookFor : pulseToLookFor){
-            sum += aPulseToLookFor;
+        for (double slice : pulseToLookFor){
+            sum += slice;
         }
         pulseToLookForIntegral = sum;
     }
@@ -121,14 +124,12 @@ public class SinglePulseExtractor {
      *           The time line is modified inplace.
      */
     public static void applyAcCoupling(double[] timeLine) {
-        /**
-        */
         if(timeLine.length == 0)
             return;
 
         double sum = 0.0;
-        for (double aTimeLine : timeLine){
-            sum += aTimeLine;
+        for (double slice : timeLine){
+            sum += slice;
         }
 
         final double mean = sum/(double)(timeLine.length);
