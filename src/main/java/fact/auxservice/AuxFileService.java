@@ -6,7 +6,6 @@ import fact.auxservice.strategies.AuxPointStrategy;
 import fact.io.FitsStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.MutableDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -14,13 +13,9 @@ import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +66,7 @@ public class AuxFileService implements AuxiliaryService {
      * @param eventTimeStamp The time stamp of the current raw data event.
      * @param strategy One of the strategies provided.
      * @return the auxpoint selected by the strategy if it exists.
-     * @throws FileNotFoundException
+     * @throws IOException when no auxpoint can be found for given timestamp
      */
     @Override
     public synchronized AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
@@ -90,12 +85,11 @@ public class AuxFileService implements AuxiliaryService {
             AuxCache.CacheKey key = new AuxCache().new CacheKey(serviceName, AuxCache.dateTimeStampToFACTNight(eventTimeStamp));
 
             TreeSet<AuxPoint> auxPoints = cache.get(key);
-//            auxPoints.subSet()
-            AuxPoint a = strategy.getPointFromTreeSet(auxPoints, eventTimeStamp);
-            if (a == null) {
+            AuxPoint pointFromTreeSet = strategy.getPointFromTreeSet(auxPoints, eventTimeStamp);
+            if (pointFromTreeSet == null) {
                 throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
             }
-            return a;
+            return pointFromTreeSet;
 
         } catch (ExecutionException e) {
             throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
