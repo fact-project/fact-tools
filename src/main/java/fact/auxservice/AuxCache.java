@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
  * Created by kai on 12.06.16.
  */
 
-class AuxCache {
+public class AuxCache {
     class CacheKey {
         final AuxiliaryServiceName service;
         final Integer factNight;
@@ -48,7 +48,7 @@ class AuxCache {
         }
     }
 
-    static Integer dateTimeStampToFACTNight(DateTime timestamp){
+    public static Integer dateTimeStampToFACTNight(DateTime timestamp){
         DateTime offsetDate = timestamp.minusHours(12);
         String night = String.format("%1$d%2$02d%3$02d", offsetDate.getYear(), offsetDate.getMonthOfYear(), offsetDate.getDayOfMonth());
         return Integer.parseInt(night);

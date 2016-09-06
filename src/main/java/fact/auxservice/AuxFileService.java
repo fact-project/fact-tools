@@ -137,9 +137,9 @@ public class AuxFileService implements AuxiliaryService {
      * all files that match the specified pattern for aux files
      * Auxfilenames are seperated by dots as in: date.servicename.fits
      */
-    private class AuxFileFinder extends SimpleFileVisitor<Path> {
+    public class AuxFileFinder extends SimpleFileVisitor<Path> {
 
-        HashBasedTable<Integer, AuxiliaryServiceName, Path> auxFileTable = HashBasedTable.create();
+        public HashBasedTable<Integer, AuxiliaryServiceName, Path> auxFileTable = HashBasedTable.create();
 
         // Check file name for proper aux file naming scheme.
         void matchAuxFile(Path file) {
