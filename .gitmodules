@@ -1,0 +1,3 @@
+[submodule "src/main/resources/rta"]
+	path = src/main/resources/rta
+	url = git@github.com:fact-project/rta_frontend.git
