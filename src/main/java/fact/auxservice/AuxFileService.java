@@ -30,6 +30,8 @@ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
  * Given the path to the aux folder, that is the folder containing all the auxiliary files for FACT.
  * This service will read the requested data and store them in a map of {@link fact.auxservice.AuxPoint}.
  *
+ * So far only aux files newer than 2012 are supported!
+ *
  * Created by kaibrugge on 07.10.14.
  */
 public class AuxFileService implements AuxiliaryService {
@@ -37,8 +39,13 @@ public class AuxFileService implements AuxiliaryService {
     private Logger log = LoggerFactory.getLogger(AuxFileService.class);
 
 
+
     @Parameter(required = true, description = "The path to the folder containing the auxilary data as .fits files")
     public SourceURL auxFolder;
+    public void setAuxFolder(SourceURL auxFolder) {
+        this.auxFolder = auxFolder;
+    }
+
 
     private LoadingCache<AuxCache.CacheKey, TreeSet<AuxPoint>> cache = CacheBuilder.newBuilder()
             .maximumSize(100)
@@ -163,7 +170,7 @@ public class AuxFileService implements AuxiliaryService {
             } catch(NumberFormatException e){
                 log.warn("Cannot decode night from file with name: " + file.toString());
             } catch(IllegalArgumentException e){
-                log.warn("The file " + file + " is not a recognized auxservice");
+                log.info("The file " + file + " is not a recognized auxservice");
             }
         }
 
@@ -181,12 +188,16 @@ public class AuxFileService implements AuxiliaryService {
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
             if (dir.getFileName().toString().equals("aux")){
                 return CONTINUE;
+
             }
             try {
-                //noinspection ResultOfMethodCallIgnored
-                Short.parseShort(dir.getFileName().toString());
+                short number = Short.parseShort(dir.getFileName().toString());
+                if (number == 2011 || number == 2012){
+                    log.info("Aux files from 2011 and 2012 are not supported");
+                    throw new NumberFormatException();
+                }
             } catch (NumberFormatException e) {
-                log.warn("Directory is not a valid aux directory with name: " + dir.toString() + ".  Skipping subtree.");
+                log.info("Directory is not a valid aux directory with name: " + dir.toString() + ".  Skipping subtree.");
                 return SKIP_SUBTREE;
             }
             return CONTINUE;

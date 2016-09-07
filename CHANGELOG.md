@@ -1,5 +1,55 @@
 #Changelog for the fact-tools
 
+## Version 0.16.0 -- 16.08.2016
+
+* FITSWriter
+  * Added new Processor to write data to FITS file: `fact.io.FITSWriter`
+  * Files can be read by fact-tools
+  * Can write out scalar values and 1d-Arrays of fixed length
+
+* Feature Extraction
+  * New Feature: fact.extraction.NeighborPixelDCF calculates the Descrete correlation function of neighboring pixels
+  * renamed fact.extraction.MeanCorrelation to fact.extraction.NeighborPixelCorrelation
+  * New features in fact.extraction.NeighborPixelCorrelation: standard deviation, kurtosis, skewness, min and max are calculated additionally
+
+* Single Pulse Extractor
+  * A robust, baseline independent, extractor for single pulses on a sampling time line. It assumes that all amplitude variations on the time line are caused by single pulses of a FACT SIPM and reconstructs the arrival time slices of these pulses.
+  * SinglePulseExtractor (object) Calculates the arrival positions of pulses on a single time line.
+  * SinglePulseExtraction (processor) Applies the SinglePulseExtractor to all pixels and calculates a list of single pulse arrival time slices for each time line of a pixel.
+  * The algorithm was developed in a python toy simulation on https://github.com/fact-project/single_pulse_extractor
+
+
+## Version 0.15.0 -- 23.05.2016
+
+* Muon Analysis
+  * New Processor `RingStandardDeviationWithThreshold` to calculate Standard Deviation of the ArrivalTime on MyonRing pixels above a threshold.
+  * Update example xml for muon study (`examples/studies/muon_identification.xml`)
+  * `fact.features.muon.HoughTransform` now uses a `PixelSet` for the `BestRingPixels`
+  * Default outputkeys of `fact.features.muon.GaussianFit` and `fact.features.muon.CircularFit` now use CamelCase instead of snake_case.
+
+* Improved error handling in source position calculation and AuxServices. The process now properly stops in case an IO related error occurs.
+
+* New Features: Watershed
+  * New package Watershed, containing ClusterFellwalker, ClusterArrivalTimes, FactCluster
+  * ClusterFellwalker (Processor) creates new features based on a watershed algorithm called FellWalker. This algorithm groups camera pixels by their values for photoncharge or something else. From this clusters, new features based on number,
+    content, shape and position in camera are extracted.
+  * ClusterArrivalTimes (Processor) also creates new features, based on another algorithm (Region Growing). In this case, pixels are grouped by their arrival times. The extracted features are similar to ClusterFellwalker.
+  * FactCluster (Object) holds all features and information about a cluster; used by ClusterFellwalker and ClusterArrivaltimes
+
+* MotionCleaning
+  * Idea for a cleaning: Select all pixels which show a strong increase in brightness over the time series in a time window from slice 50 to slice 120.
+    This cleaning does not select shower as compact and exactly as standard cleanings!!! There are many more islands surviving the cleaning. Could be useful, but not for the standard analysis settings at the moment!!
+
+* CleaningPerformance
+  * Calculates performance values as precision, recall, accuracy true/false positive/negative for a cleaning.
+
+* SmoothBell
+  * Processor to smooths a camera image (not the time series of a pixel). Calculates the mean of six times the value of a pixel plus values of all neighbor pixels.
+
+* MeanCorrelation
+  * Bug fix: no more errors due to division by zero in case the time series contains zero.
+
+
 ## Version 0.14.1 -- 10.05.2016
 * Bug fix for the calculation of the source position in Monte Carlos:
   * Corsika, Ceres and FACT-Tools are using different definitions of the Zd/Az coordinate systen. In FACT-Tools 0.14.0 we change to the definition used by Astropy, but a bug was left in the coordinate transformation for MCs. Now this transformation was changed to fit the definition used in Astropy

@@ -37,7 +37,7 @@ public class GaussianFit implements StatefulProcessor {
     private String pixelSetKey = "shower";
 
     @Parameter(required = false, description = "Base name for the output keys", defaultValue = "gaussian_fit_")
-    private String outputKey = "gaussian_fit_";
+    private String outputKey = "gaussianFit";
 
     private double[] pixel_x;
     private double[] pixel_y;
@@ -84,14 +84,14 @@ public class GaussianFit implements StatefulProcessor {
         Double y = result_point[2];
         Double sigma = Math.abs(result_point[3]);
 
-        data.put(outputKey + "r", r);
-        data.put(outputKey + "x", x);
-        data.put(outputKey + "y", y);
-        data.put(outputKey + "sigma", sigma);
+        data.put(outputKey + "R", r);
+        data.put(outputKey + "X", x);
+        data.put(outputKey + "Y", y);
+        data.put(outputKey + "Sigma", sigma);
 
         if (!r.isNaN()) {
-            data.put(outputKey + "overlay_1", new EllipseOverlay(x, y, r + sigma, r + sigma, 0));
-            data.put(outputKey + "overlay_2", new EllipseOverlay(x, y, r - sigma, r - sigma, 0));
+            data.put(outputKey + "Overlay1", new EllipseOverlay(x, y, r + sigma, r + sigma, 0));
+            data.put(outputKey + "Overlay2", new EllipseOverlay(x, y, r - sigma, r - sigma, 0));
         }
         return data;
     }

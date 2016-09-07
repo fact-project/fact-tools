@@ -4,6 +4,10 @@ package fact.auxservice;
 import org.joda.time.DateTime;
 
 /**
+ * This class defines some classes needed for caching many {@link AuxPoint} into ram
+ * using an LRU cache. A specific auxfile is uniquely defined by its name and the 'FACT Night' string.
+ * You know...the typical 20160320-like string.
+ *
  * Created by kai on 12.06.16.
  */
 
@@ -12,7 +16,8 @@ public class AuxCache {
         final AuxiliaryServiceName service;
         final Integer factNight;
 
-        public CacheKey(AuxiliaryServiceName service, Integer factNight) {
+        CacheKey(AuxiliaryServiceName service, Integer factNight) {
+
             this.service = service;
             this.factNight = factNight;
         }
@@ -50,3 +55,4 @@ public class AuxCache {
         return Integer.parseInt(night);
     }
 }
+

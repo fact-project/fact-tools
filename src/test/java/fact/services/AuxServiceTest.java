@@ -5,25 +5,22 @@ import fact.auxservice.AuxCache;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.AuxFileService;
-import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import stream.io.SourceURL;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 
-import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+
 
 /**
  * Created by kaibrugge on 17.11.14.

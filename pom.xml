@@ -229,6 +229,11 @@
             <artifactId>maven-gpg-plugin</artifactId>
             <version>1.6</version>
         </dependency>
+        <dependency>
+          <groupId>gov.nasa.gsfc.heasarc</groupId>
+          <artifactId>nom-tam-fits</artifactId>
+          <version>1.15.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
