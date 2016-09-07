@@ -41,22 +41,18 @@ public class RTADataBase {
         {
             public Binder build(Annotation annotation)
             {
-                return new Binder<BindSignal, RTASignal>()
-                {
-                    public void bind(SQLStatement q, BindSignal bind, RTASignal s)
-                    {
-                        try {
-                            q.bind("night", s.run.night );
-                            q.bind("run_id", s.run.runID);
-                            Field[] fields = s.getClass().getDeclaredFields();
-                            for (Field f : fields){
-                                if(!f.getName().equals("run")) {
-                                    q.bind(f.getName(), f.get(s));
-                                }
+                return (Binder<BindSignal, RTASignal>) (q, bind, s) -> {
+                    try {
+                        q.bind("night", s.run.night );
+                        q.bind("run_id", s.run.runID);
+                        Field[] fields = s.getClass().getDeclaredFields();
+                        for (Field f : fields){
+                            if(!f.getName().equals("run")) {
+                                q.bind(f.getName(), f.get(s));
                             }
-                        } catch (IllegalAccessException e) {
-                            log.error("Could not access field value in statement: " + q.toString());
                         }
+                    } catch (IllegalAccessException e) {
+                        log.error("Could not access field value in statement: " + q.toString());
                     }
                 };
             }
@@ -205,7 +201,7 @@ public class RTADataBase {
 
     public interface DBInterface {
 
-        @SqlUpdate("INSERT OR IGNORE INTO fact_run (night, run_id, start_time, end_time, relative_on_time, source, health) values (:night, :runID, :startTime, :endTime, :relativeOnTime, :source, :health)")
+        @SqlUpdate("INSERT OR IGNORE INTO fact_run (night, run_id, start_time, end_time, on_time, source, health) values (:night, :runID, :startTime, :endTime, :onTime, :source, :health)")
         void insertRun(@BindBean FACTRun run);
 
         @SqlUpdate("INSERT OR IGNORE INTO signal (timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5)" +
@@ -213,7 +209,7 @@ public class RTADataBase {
         void insertSignal(@BindSignal() RTASignal signal );
 
 
-        @SqlUpdate("UPDATE fact_run SET relative_on_time = :relative_on_time WHERE   night = :night AND run_id = :run_id")
+        @SqlUpdate("UPDATE fact_run SET on_time = :on_time WHERE   night = :night AND run_id = :run_id")
         void updateRunWithOnTime(@Bind("relative_on_time") double relativeOnTime, @Bind("run_id") int run_id, @Bind("night") int night);
 
         @SqlQuery("SELECT * FROM signal")
@@ -224,24 +220,14 @@ public class RTADataBase {
 
 
 
-//        SELECT * FROM run_id;
-//UPDATE fact_run SET health = 'asdasdadasdasdas' WHERE   night = 60 AND run_id = 20130102;
-//UPDATE fact_run SET relative_on_time = 0.4  WHERE   night = 60 AND run_id = 20130102
-
-
-
         @SqlQuery("SELECT * from fact_run WHERE run_id = :run_id AND night = :night")
         @RegisterMapper(RunMapper.class)
         FACTRun getRun(@Bind("night") int night, @Bind("run_id") int runID);
 
-//        @SqlBatch("insert into something (id, name) values (:id, :name)")
-//        @BatchChunkSize(1000)
-//        void insertAll(@BindBean Iterator<Something> somethings);
-
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +
                 "run_id INTEGER NOT NULL," +
-                "relative_on_time FLOAT," +
+                "on_time FLOAT," +
                 "start_time VARCHAR(50)," +
                 "end_time VARCHAR(50)," +
                 "source varchar(50)," +

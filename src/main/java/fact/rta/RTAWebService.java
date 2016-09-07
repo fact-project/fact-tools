@@ -23,9 +23,15 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 
 /**
+ *
+ * TODO: use priority heap for multithreading. or add some way to know when the run has been completly processed.
+ *
+ * The Signal and DataRate Processors update stuff in ths service.
  * Created by kai on 24.01.16.
  */
 public class RTAWebService implements Service {
@@ -137,29 +143,9 @@ public class RTAWebService implements Service {
         rtaDBInterface.createSignalTable();
         isInit = true;
     }
-//    private int background(Data data, double thetaCut){
-//        int backGroundEvents = 0;
-//
-//        Keys offKeys = new Keys("Theta_Off_?");
-//        for (String key : offKeys.select(data)) {
-//            double offValue = (double) data.get(key);
-//            if (offValue > thetaCut){
-//                backGroundEvents += 1;
-//            }
-//        }
-//        return backGroundEvents;
-//    }
-//
-//    private int signal(Data data, double predictionThreshold, double thetaCut){
-//        double prediction = (double) data.get("signal:prediction");
-//        double theta = (double) data.get("signal:thetasquare");
-//        if (prediction <= predictionThreshold && theta <= thetaCut){
-//            return 1;
-//        }
-//        return 0;
-//    }
 
-    ArrayList<Double> relativeOnTimes = new ArrayList<>();
+
+    private ArrayList<Double> relativeOnTimes = new ArrayList<>();
     synchronized void updateEvent(DateTime eventTimeStamp, Data item, double relativeOnTime){
 
         if (!isInit){
@@ -176,14 +162,16 @@ public class RTAWebService implements Service {
         }
         else if (!currentRun.equals(run)){
             RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
-            double average = relativeOnTimes.stream().mapToDouble(a -> a).average().orElse(0);
-            log.info("New run found. Relative on time of previous run was {}", average);
-            rtaTables.updateRunWithOnTime(average, currentRun.runID, currentRun.night);
-            if (average > 0){
+
+            double sumOfOnTimeForRun = relativeOnTimes.stream().reduce(Double::sum).orElse(0.0);
+
+            log.info("New run found. OnTime of previous run was {}", sumOfOnTimeForRun);
+            rtaTables.updateRunWithOnTime(sumOfOnTimeForRun, currentRun.runID, currentRun.night);
+            if (sumOfOnTimeForRun > 0){
                 log.info("Setting status of previous run to {}" , RTADataBase.HEALTH.OK);
                 rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
             } else {
-                log.warn("RelativeOnTime of previous run was 0. Marking run status as UNKNOWN");
+                log.warn("OnTime of previous run was 0. Marking run status as UNKNOWN");
                 rtaTables.updateRunHealth(RTADataBase.HEALTH.UNKNOWN, currentRun.runID, currentRun.night);
             }
             //insert new run to db
