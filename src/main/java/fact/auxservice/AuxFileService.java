@@ -101,6 +101,8 @@ public class AuxFileService implements AuxiliaryService {
         } catch (ExecutionException e) {
             throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
         }
+
+
     }
 
 

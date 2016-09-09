@@ -2,13 +2,14 @@ package fact.rta;
 
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
+import fact.rta.db.FACTRun;
+import fact.rta.rest.RTASignal;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -65,27 +66,27 @@ public class JDBITest {
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
         rtaTables.createRunTable();
-        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        FACTRun run = new FACTRun(item);
         rtaTables.insertRun(run);
         rtaTables.createSignalTable();
 
         DateTime eventTime = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
-        RTADataBase.RTASignal s = new RTADataBase().new RTASignal(eventTime, item, run);
+        RTASignal s = new RTASignal(eventTime, DateTime.now(), item, run);
         rtaTables.insertSignal(s);
         //second insert should be ignored
         rtaTables.insertSignal(s);
 
-        List<String> signalEntries = rtaTables.getSignalEntries();
+        List<RTASignal> signalEntries = rtaTables.getSignalEntries("2013-01-01", "2014-01-01");
         assertThat(signalEntries.size(), is(1));
 
         item = prepareNextItem();
 
         eventTime = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
-        s = new RTADataBase().new RTASignal(eventTime, item, run);
+        s = new RTASignal(eventTime, DateTime.now(),item, run);
         rtaTables.insertSignal(s);
         rtaTables.insertSignal(s);
 
-        signalEntries = rtaTables.getSignalEntries();
+        signalEntries = rtaTables.getSignalEntries("2013-01-01", "2014-01-01");
         assertThat(signalEntries.size(), is(2));
     }
 
@@ -101,16 +102,16 @@ public class JDBITest {
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
         rtaTables.createRunTable();
-        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        FACTRun run = new FACTRun(item);
         rtaTables.insertRun(run);
 
-        RTADataBase.FACTRun factRun = rtaTables.getRun(run.night, run.runID);
-        assertThat(factRun.relativeOnTime, is(0.0));
+        FACTRun factRun = rtaTables.getRun(run.night, run.runID);
+        assertThat(factRun.onTime, is(0.0));
 
         rtaTables.updateRunWithOnTime(0.99, run.runID, run.night);
 
         factRun = rtaTables.getRun(run.night, run.runID);
-        assertThat(factRun.relativeOnTime, is(0.99));
+        assertThat(factRun.onTime, is(0.99));
 
         System.out.println(factRun);
     }
@@ -130,7 +131,7 @@ public class JDBITest {
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
         rtaTables.createRunTable();
 
-        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        FACTRun run = new FACTRun(item);
         rtaTables.insertRun(run);
         run = rtaTables.getRun(run.night, run.runID);
         assertThat(run.health, is(RTADataBase.HEALTH.UNKNOWN));

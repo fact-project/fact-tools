@@ -4,6 +4,9 @@ import com.google.common.collect.Range;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import fact.rta.db.FACTRun;
+import fact.rta.rest.LightCurveBin;
+import fact.rta.rest.RTASignal;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
@@ -23,7 +26,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 
@@ -48,8 +50,11 @@ public class RTAWebService implements Service {
     final private Gson gson;
     private boolean isInit = false;
 
-    private RTADataBase.FACTRun currentRun = null;
+    private FACTRun currentRun = null;
 
+    /**
+     * This will be propagated to the frontend
+     */
     final private class RTAEvent {
         final double[] photonCharges;
         final double estimatedEnergy;
@@ -68,6 +73,9 @@ public class RTAWebService implements Service {
         }
     }
 
+    /**
+     * datarate container for the frontend
+     */
     final private class RTADataRate {
         final double rate;
         final DateTime date;
@@ -82,7 +90,8 @@ public class RTAWebService implements Service {
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
-    private TreeMap<DateTime, RTADataBase.RTASignal> signalMap = new TreeMap<>();
+
+    private ArrayList<RTASignal> rtaSignals = new ArrayList<>();
 
     public RTAWebService() throws SQLException {
 
@@ -99,7 +108,13 @@ public class RTAWebService implements Service {
             return new ModelAndView(attributes, "index.html");
         }, new HandlebarsTemplateEngine("/rta"));
 
-//        Spark.get("/lightcurve", (request, response) -> getLightCurve(request.queryParams("hours")), gson::toJson);
+        Spark.get("/lightcurve", (request, response) -> {
+            DateTime start = DateTime.parse(request.queryParams("start"));
+            DateTime end = DateTime.parse(request.queryParams("end"));
+            Integer binning = Integer.parseInt(request.queryParams("binning"));
+
+            return getLightCurve(start, end, binning);
+        }, gson::toJson);
 
         Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
 
@@ -145,7 +160,6 @@ public class RTAWebService implements Service {
     }
 
 
-    private ArrayList<Double> relativeOnTimes = new ArrayList<>();
     synchronized void updateEvent(DateTime eventTimeStamp, Data item, double relativeOnTime){
 
         if (!isInit){
@@ -153,59 +167,49 @@ public class RTAWebService implements Service {
         }
 
 
-
-        RTADataBase.FACTRun run = new RTADataBase().new FACTRun(item);
+        FACTRun run = new FACTRun(item);
         if (currentRun == null){
             RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
             rtaTables.insertRun(run);
             currentRun = run;
         }
         else if (!currentRun.equals(run)){
+            log.info("New run found. OnTime of new run is: {} seconds.", run.onTime.getStandardSeconds());
+            //save signals to database
+            persistEvents(rtaSignals, currentRun);
+
             RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
+            rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
 
-            double sumOfOnTimeForRun = relativeOnTimes.stream().reduce(Double::sum).orElse(0.0);
-
-            log.info("New run found. OnTime of previous run was {}", sumOfOnTimeForRun);
-            rtaTables.updateRunWithOnTime(sumOfOnTimeForRun, currentRun.runID, currentRun.night);
-            if (sumOfOnTimeForRun > 0){
-                log.info("Setting status of previous run to {}" , RTADataBase.HEALTH.OK);
-                rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
-            } else {
-                log.warn("OnTime of previous run was 0. Marking run status as UNKNOWN");
-                rtaTables.updateRunHealth(RTADataBase.HEALTH.UNKNOWN, currentRun.runID, currentRun.night);
-            }
             //insert new run to db
             rtaTables.insertRun(run);
             currentRun = run;
-            relativeOnTimes.clear();
-        }
-        relativeOnTimes.add(relativeOnTime);
 
-        signalMap.put(DateTime.now(), new RTADataBase().new RTASignal(eventTimeStamp, item, run));
-        Seconds delta = Seconds.secondsBetween(signalMap.firstKey(), signalMap.lastKey());
-        if(delta.isGreaterThan(Seconds.seconds(10))){
-            persistEvents(signalMap);
         }
 
-
+        rtaSignals.add(new RTASignal(eventTimeStamp, DateTime.now(), item, currentRun));
         eventMap.put(DateTime.now(), new RTAEvent(eventTimeStamp, item));
-        delta = Seconds.secondsBetween(eventMap.firstKey(), eventMap.lastKey());
-        if(delta.isGreaterThan(Seconds.seconds(10))){
+
+
+        Seconds delta = Seconds.secondsBetween(eventMap.firstKey(), eventMap.lastKey());
+        if(delta.isGreaterThan(Seconds.seconds(60))){
             eventMap.pollFirstEntry();
         }
     }
 
-    private void persistEvents(TreeMap<DateTime, RTADataBase.RTASignal> signalMap) {
+    private void persistEvents(ArrayList<RTASignal> signals, FACTRun run) {
         log.info("Saving stuff to DB");
         if (!isInit){
             init();
         }
+
+        double onTimePerEvent = run.onTime.getStandardSeconds()/signals.size();
         RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
-        while(!signalMap.isEmpty()){
-            RTADataBase.RTASignal rtaSignal = signalMap.pollFirstEntry().getValue();
-            rtaTables.insertRun(rtaSignal.run);
-            rtaTables.insertSignal(rtaSignal);
-        }
+
+        signals.forEach(signal -> {
+                    signal.onTimePerEvent = onTimePerEvent;
+                    rtaTables.insertSignal(signal);
+                });
         rtaTables.close();
     }
 
@@ -256,30 +260,53 @@ public class RTAWebService implements Service {
         return systemStatusMap.descendingMap();
     }
 
-//
-//    private Map<Range<DateTime>, RTAProcessor.SignalContainer> getLightCurve(String minusHours) throws NumberFormatException{
-//        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
-//        rtaTables.
-//        if(lightCurve.asMapOfRanges().isEmpty()){
-//            return null;
-//        }
-//
-//        if(minusHours != null){
-//            Integer hours = Integer.parseInt(minusHours);
-//            DateTime history = DateTime.now().minusHours(hours);
-//
-//            Map<Range<DateTime>, RTAProcessor.SignalContainer> resultMap = new HashMap<>();
-//
-//            lightCurve.asDescendingMapOfRanges().forEach((range, container) ->{
-//                if(range.lowerEndpoint().isAfter(history)){
-//                    resultMap.put(range, container);
-//                }
-//            });
-//
-//            return resultMap;
-//        }
-//        return lightCurve.asDescendingMapOfRanges();
-//    }
+
+
+    private List<LightCurveBin> getLightCurve(DateTime startTime, DateTime endTime, int binningInMinutes) throws NumberFormatException{
+        double alpha = 0.2;
+        double predictionThreshold = 0.95;
+        double thetaThreshold = 0.04;
+
+        ArrayList<LightCurveBin> lc = new ArrayList<>();
+
+        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
+        final List<RTASignal> signalEntries = rtaTables.getSignalEntries(startTime.toString("YYYY-MM-dd HH:mm:ss"), endTime.toString("YYYY-MM-dd HH:mm:ss"));
+
+        //fill a treemap
+        TreeMap<DateTime, RTASignal> dateTimeRTASignalTreeMap = new TreeMap<>();
+        signalEntries.forEach(a -> dateTimeRTASignalTreeMap.put(a.eventTimestamp, a));
+
+        //iterate over all the bins
+        for (int bin = 0; bin < binningInMinutes; bin++) {
+            //get all entries in bin
+            SortedMap<DateTime, RTASignal> subMap = dateTimeRTASignalTreeMap.subMap(startTime, startTime.plusMinutes(bin));
+            Stream<RTASignal> rtaSignalStream = subMap.entrySet().stream().map(Map.Entry::getValue);
+
+            //get on time in this bin by summing the ontimes per event in each row
+            double onTimeInBin = rtaSignalStream.mapToDouble(a -> a.onTimePerEvent).sum();
+
+            //select gamma like events and seperate signal and backgorund region
+            Stream<RTASignal> gammaLike = rtaSignalStream.filter(s -> s.prediction > predictionThreshold);
+
+            int signal = (int) gammaLike
+                    .filter(s -> s.theta < thetaThreshold)
+                    .count();
+
+            int background = (int) gammaLike
+                    .filter(s-> (
+                            s.theta_off_1 < thetaThreshold ||
+                            s.theta_off_2 < thetaThreshold ||
+                            s.theta_off_3 < thetaThreshold ||
+                            s.theta_off_4 < thetaThreshold ||
+                            s.theta_off_5 < thetaThreshold
+                    ))
+                    .count();
+            LightCurveBin lightCurveBin = new LightCurveBin(startTime, startTime.plusMinutes(bin), background, signal, alpha, onTimeInBin);
+            lc.add(lightCurveBin);
+
+        }
+        return lc;
+    }
 
     @Override
     public void reset() throws Exception {

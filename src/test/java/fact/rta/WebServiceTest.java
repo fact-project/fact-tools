@@ -1,8 +1,8 @@
 package fact.rta;
 
-import com.google.common.collect.Range;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
+import fact.rta.db.FACTRun;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,12 +11,9 @@ import org.junit.rules.TemporaryFolder;
 import org.skife.jdbi.v2.DBI;
 import stream.Data;
 import stream.io.SourceURL;
-import stream.run;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Random;
 
@@ -99,8 +96,8 @@ public class WebServiceTest {
         }
 
 
-        RTADataBase.FACTRun factRun = rtaTables.getRun(night, runID);
-        assertThat(factRun.relativeOnTime, is(0.0));
+        FACTRun factRun = rtaTables.getRun(night, runID);
+        assertThat(factRun.onTime, is(0.0));
         assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
         //create new run artificially to trigger updating of db entry
         item = prepareNextItem();
@@ -110,7 +107,7 @@ public class WebServiceTest {
         s.updateEvent(utc.orElseThrow(Exception::new), item, 0.5);
 
         factRun = rtaTables.getRun(night, runID);
-        assertThat(factRun.relativeOnTime, is(0.9));
+        assertThat(factRun.onTime, is(0.9));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
         //now create a few more items for new run
         for (int i = 0; i < 5; i++) {
@@ -122,7 +119,7 @@ public class WebServiceTest {
         }
 
         factRun = rtaTables.getRun(night, runID + 1);
-        assertThat(factRun.relativeOnTime, is(0.0));
+        assertThat(factRun.onTime, is(0.0));
         assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
         //create new run artificially to trigger updating of db entry
         item = prepareNextItem();
@@ -133,7 +130,7 @@ public class WebServiceTest {
 
 
         factRun = rtaTables.getRun(night, runID + 1);
-        assertThat(factRun.relativeOnTime, is(0.5));
+        assertThat(factRun.onTime, is(0.5));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
 
     }

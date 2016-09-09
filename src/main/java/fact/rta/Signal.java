@@ -82,7 +82,7 @@ public class Signal implements Processor {
                 }
                 int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
                 DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
-                        orElseThrow(() -> new IllegalArgumentException("No valid eventTimeStamp in event."));
+                        orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
                 AuxPoint auxiliaryData = auxService.getAuxiliaryData(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, eventTimeStamp, new Closest());
                 double ellapsedTime = auxiliaryData.getDouble("ElapsedTime");
