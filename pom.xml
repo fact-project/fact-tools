@@ -4,7 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-  <version>0.16.0</version>
+  <version>0.16.1</version>
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -18,7 +18,7 @@
     <streams.version>0.9.23</streams.version>
     <binary.name>fact-tools-${project.version}</binary.name>
     <skipTests>false</skipTests>
-    <finalName>fact-tools-${project.version}</finalName>
+    <finalName>fact-tools-v${project.version}</finalName>
   </properties>
 
   <licenses>
