@@ -81,6 +81,12 @@ public class ZFitsStream extends AbstractStream{
             throw new FileNotFoundException("Cannot read file");
         }
 
+        //check file size. if its below 5k we simply return
+        if (f.length() < 5000){
+            log.warn("File is small (below 5KB) and probably empty. File size in bytes: " + f.length());
+            return;
+        }
+
         DataInputStream dataStream = new DataInputStream(new BufferedInputStream(url.openStream(), bufferSize));
         dataStream.mark(3000000);
         //read the header and output some information
@@ -186,9 +192,11 @@ public class ZFitsStream extends AbstractStream{
     @Override
     public Data readNext() throws Exception {
 
+        //no data in header. no initialization took place.
         if (this.tableReader == null) {
-            throw new NullPointerException("Didn't initialize the reader, should never happen.");
+            return null;
         }
+
         //get the next row of data. When its null the file has ended
         byte[][] dataRow = this.tableReader.readNextRow();
         if (dataRow == null) {
