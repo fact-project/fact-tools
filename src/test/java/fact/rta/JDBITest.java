@@ -1,5 +1,8 @@
 package fact.rta;
 
+
+import fact.auxservice.AuxiliaryService;
+
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import fact.rta.db.Run;
@@ -94,7 +97,8 @@ public class JDBITest {
 
         rtaTables.createSignalTable();
 
-        DateTime eventTime = fact.rta.Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
+
+        DateTime eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
         Signal s = new Signal(eventTime, DateTime.now(), item, run);
         rtaTables.insertSignal(s);
         //second insert should be ignored
@@ -105,7 +109,9 @@ public class JDBITest {
 
         item = prepareNextItem();
 
-        eventTime = fact.rta.Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
+
+        eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
+
         s = new Signal(eventTime, DateTime.now(),item, run);
         rtaTables.insertSignal(s);
         rtaTables.insertSignal(s);

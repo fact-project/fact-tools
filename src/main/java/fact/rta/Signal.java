@@ -21,6 +21,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+<<<<<<< Updated upstream
+=======
+import static fact.auxservice.AuxiliaryService.unixTimeUTCToDateTime;
+
+>>>>>>> Stashed changes
 /**
  * Created by kai on 24.01.16.
  */
@@ -45,20 +50,6 @@ public class Signal implements Processor {
         return Math.pow(theta*(fovPerPixel/pixelsize), 2);
     }
 
-    /**
-     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
-     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
-     *
-     * @param eventTime the UnixTimeUTC array as found in the FITS file.
-     * @return an Optional containing the Datetime instance
-     */
-    public  static Optional<DateTime> unixTimeUTCToDateTime(int [] eventTime){
-        if(eventTime != null && eventTime.length == 2) {
-            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
-            return Optional.of(timeStamp);
-        }
-        return Optional.empty();
-    }
 
     @Override
     public Data process(Data data)  {
@@ -80,8 +71,8 @@ public class Signal implements Processor {
                 for (int offPosition = 0; offPosition < offKeys.size(); offPosition++) {
                     data.put("background:thetasquare:"+offPosition , thetaDegreesToThetaSquaredInMM(thetaOffs[offPosition]));
                 }
-                int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
-                DateTime eventTimeStamp = unixTimeUTCToDateTime(unixTimeUTC).
+
+                DateTime eventTimeStamp = AuxiliaryService.unixTimeUTCToDateTime(item).
                         orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
                 AuxPoint auxiliaryData = auxService.getAuxiliaryData(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, eventTimeStamp, new Closest());
