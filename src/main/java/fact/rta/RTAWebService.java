@@ -160,7 +160,7 @@ public class RTAWebService implements Service {
     }
 
 
-    synchronized void updateEvent(DateTime eventTimeStamp, Data item, double relativeOnTime){
+    synchronized void updateEvent(DateTime eventTimeStamp, Data item){
 
         if (!isInit){
             init();
@@ -174,7 +174,12 @@ public class RTAWebService implements Service {
             currentRun = run;
         }
         else if (!currentRun.equals(run)){
+            log.info("New run found. Fetching ontime.");
+            //fetch ontime from rundb?
             log.info("New run found. OnTime of new run is: {} seconds.", run.onTime.getStandardSeconds());
+
+
+
             //save signals to database
             persistEvents(signals, currentRun);
 
