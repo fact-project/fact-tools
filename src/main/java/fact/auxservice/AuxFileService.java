@@ -41,6 +41,7 @@ public class AuxFileService implements AuxiliaryService {
 
     private Logger log = LoggerFactory.getLogger(AuxFileService.class);
 
+    private DateTime lastRefresh = DateTime.now();
 
 
     @Parameter(required = true, description = "The path to the folder containing the auxilary data as .fits files")
@@ -57,6 +58,9 @@ public class AuxFileService implements AuxiliaryService {
             .build(new CacheLoader<AuxCache.CacheKey, TreeSet<AuxPoint>>() {
                 @Override
                 public TreeSet<AuxPoint> load(AuxCache.CacheKey key) throws Exception {
+                    if(lastRefresh.plusHours(12).isAfter(DateTime.now())){
+                        init();
+                    }
                     return readDataFromFile(key);
                 }
             });
