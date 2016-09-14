@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  *
  * Created by kai on 01.03.15.
  */
+@Deprecated
 public class SqliteService implements AuxiliaryService {
 
     static Logger log = LoggerFactory.getLogger(SqliteService.class);
