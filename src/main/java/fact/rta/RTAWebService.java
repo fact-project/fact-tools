@@ -5,10 +5,12 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+import fact.auxservice.AuxPoint;
 import fact.rta.db.Run;
 import fact.rta.rest.LightCurveBin;
 import fact.rta.db.Signal;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
 import org.skife.jdbi.v2.DBI;
@@ -91,6 +93,7 @@ public class RTAWebService implements Service {
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
+    Set<AuxPoint> FTMPoints = new HashSet<>();
 
     private ArrayList<Signal> signals = new ArrayList<>();
 
@@ -161,8 +164,12 @@ public class RTAWebService implements Service {
     }
 
 
-    synchronized void updateEvent(DateTime eventTimeStamp, Data item){
+    public synchronized void addFTMPoint(AuxPoint FTMPoint){
+        FTMPoints.add(FTMPoint);
+    }
 
+    synchronized void updateEvent(DateTime eventTimeStamp, Data item){
+        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
         if (!isInit){
             init();
         }
@@ -170,21 +177,22 @@ public class RTAWebService implements Service {
 
         Run run = new Run(item);
         if (currentRun == null){
-            RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
             rtaTables.insertRun(run);
             currentRun = run;
         }
         else if (!currentRun.equals(run)){
             log.info("New run found. Fetching ontime.");
             //fetch ontime from rundb?
-            log.info("New run found. OnTime of new run is: {} seconds.", run.onTime.getStandardSeconds());
+            double onTimeInSeconds = FTMPoints.stream().mapToDouble(p -> p.getFloat("OnTime")).sum();
+            FTMPoints.clear();
+            rtaTables.updateRunWithOnTime(currentRun, onTimeInSeconds);
+            log.info("New run found. OnTime of old run was: {} seconds.", onTimeInSeconds);
 
 
 
             //save signals to database
             persistEvents(signals, currentRun);
 
-            RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
             rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
 
             //insert new run to db

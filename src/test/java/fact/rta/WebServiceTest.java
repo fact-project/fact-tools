@@ -1,5 +1,6 @@
 package fact.rta;
 
+import fact.auxservice.AuxiliaryService;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import fact.rta.db.Run;
@@ -69,7 +70,7 @@ public class WebServiceTest {
             Thread.sleep(1100);
 
             DateTime now = DateTime.now();
-            s.updateEvent(now, prepareNextItem(),0.99);
+            s.updateEvent(now, prepareNextItem());
             s.updateDataRate(now , new Random().nextDouble()*15 + 80);
         }
         fail();
@@ -91,8 +92,8 @@ public class WebServiceTest {
         int runID = (int) item.get("RUNID");
         for (int i = 0; i < 5; i++) {
             item = prepareNextItem();
-            Optional<DateTime> utc = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC"));
-            s.updateEvent(utc.orElseThrow(Exception::new), item, 0.9);
+            Optional<DateTime> utc = AuxiliaryService.unixTimeUTCToDateTime(item);
+            s.updateEvent(utc.orElseThrow(Exception::new), item);
         }
 
 
@@ -103,8 +104,8 @@ public class WebServiceTest {
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 1);
-        Optional<DateTime> utc = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC"));
-        s.updateEvent(utc.orElseThrow(Exception::new), item, 0.5);
+        Optional<DateTime> utc = AuxiliaryService.unixTimeUTCToDateTime(item);
+        s.updateEvent(utc.orElseThrow(Exception::new), item);
 
         factRun = rtaTables.getRun(night, runID);
         assertThat(factRun.onTime, is(0.9));
@@ -114,8 +115,8 @@ public class WebServiceTest {
             item = prepareNextItem();
             item.put("NIGHT", night);
             item.put("RUNID", runID + 1);
-            utc = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC"));
-            s.updateEvent(utc.orElseThrow(Exception::new), item, 0.5);
+            utc = AuxiliaryService.unixTimeUTCToDateTime(item);
+            s.updateEvent(utc.orElseThrow(Exception::new), item);
         }
 
         factRun = rtaTables.getRun(night, runID + 1);
@@ -125,8 +126,8 @@ public class WebServiceTest {
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 2);
-        utc = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC"));
-        s.updateEvent(utc.orElseThrow(Exception::new), item, 0.89);
+        utc = AuxiliaryService.unixTimeUTCToDateTime(item);
+        s.updateEvent(utc.orElseThrow(Exception::new), item);
 
 
         factRun = rtaTables.getRun(night, runID + 1);

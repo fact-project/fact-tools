@@ -62,7 +62,7 @@ public class RTADataBase {
         void updateRunHealth(@Bind("health") HEALTH health, @Bind("run_id") int run_id, @Bind("night") int night);
 
         @SqlUpdate("UPDATE fact_run SET on_time = :on_time WHERE   night = :night AND run_id = :run_id")
-        void updateRunWithOnTime(@Bind("on_time") long onTime, @Bind("run_id") int run_id, @Bind("night") int night);
+        void updateRunWithOnTime(@Run.BindRun Run run, @Bind("on_time") double onTime);
 
 
         @SqlQuery("SELECT * from fact_run WHERE run_id = :run_id AND night = :night")
@@ -72,7 +72,7 @@ public class RTADataBase {
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +
                 "run_id INTEGER NOT NULL," +
-                "on_time INTEGER," +
+                "on_time FLOAT," +
                 "start_time VARCHAR(50)," +
                 "end_time VARCHAR(50)," +
                 "source varchar(50)," +

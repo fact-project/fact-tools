@@ -24,8 +24,6 @@ import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -179,7 +177,7 @@ public class JDBITest {
 
         Run factRun = rtaTables.getRun(run.night, run.runID);
         assertThat(factRun.onTime, is(Duration.ZERO));
-        rtaTables.updateRunWithOnTime(290, run.runID, run.night);
+        rtaTables.updateRunWithOnTime(run, 290.0);
 
         factRun = rtaTables.getRun(run.night, run.runID);
         assertThat(factRun.onTime.toStandardSeconds(), is(Seconds.seconds(290)));
