@@ -48,6 +48,6 @@
         <include url="classpath:/default/mc/sourceParameter_mc.xml" /> 
         <!-- Output: source dependent parameters -->
         
-        <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
+        <!--<fact.io.JSONWriter url="${outfile}" keys="${keysForOutput}" />-->
     </process>
 </container>

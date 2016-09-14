@@ -54,7 +54,7 @@ __/default/data/sourceParameter.xml:__
  > All source dependent parameters are calculated (see list of parameters)
  
 
-You can output all the important parameters by uncommenting the `fact.io.RootASCIIWriter`.
+You can output all the important parameters by uncommenting the `fact.io.JSONWriter`.
 
 ## Differences between real- and simulated data 
 
@@ -95,7 +95,7 @@ You can also add own your processors to the process  (for example new parameter 
 You can add parameters to the output file by appending the parameter name to the keys parameter of the RootASCIIWriter:
     
     [...]
-    <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput},awesomeParameter" />
+    <fact.io.JSONWriter url="${outfile}" keys="${keysForOutput},awesomeParameter" />
     [...]
 
 
