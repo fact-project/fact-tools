@@ -2,9 +2,12 @@ package fact.auxservice;
 
 import fact.auxservice.strategies.AuxPointStrategy;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import stream.Data;
 import stream.service.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * The service should provide the ability to get the aux data from some data source.
@@ -26,4 +29,32 @@ public interface AuxiliaryService extends Service {
      * @throws IOException
      */
     public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
+
+    /**
+     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
+     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
+     *
+     * @param eventTime the UnixTimeUTC array as found in the FITS file.
+     * @return an Optional containing the Datetime instance
+     */
+    public  static Optional<DateTime> unixTimeUTCToDateTime(int [] eventTime){
+        if(eventTime != null && eventTime.length == 2) {
+            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+            return Optional.of(timeStamp);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC from the Data Item and converts it to a DateTime
+     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
+     *
+     * @param item A data item from the stream of raw FACT data
+     * @return an Optional containing the Datetime instance
+     */
+    public  static Optional<DateTime> unixTimeUTCToDateTime(Data item){
+        int[] eventTime = (int[]) item.get("UnixTimeUTC");
+        return unixTimeUTCToDateTime(eventTime);
+    }
+
 }
