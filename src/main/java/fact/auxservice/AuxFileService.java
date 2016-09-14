@@ -3,7 +3,9 @@ package fact.auxservice;
 import com.google.common.cache.*;
 import com.google.common.collect.HashBasedTable;
 import fact.auxservice.strategies.AuxPointStrategy;
+import fact.auxservice.strategies.Closest;
 import fact.io.FitsStream;
+import fact.io.zfits.ZFitsStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +65,14 @@ public class AuxFileService implements AuxiliaryService {
     private boolean isInit = false;
     private HashBasedTable<Integer, AuxiliaryServiceName, Path> auxFileUrls;
 
+    private void init() throws IOException {
+        AuxFileFinder auxFileFinder = new AuxFileFinder();
+        Path p = new File(auxFolder.getPath()).toPath();
+        Files.walkFileTree(p, auxFileFinder);
+        auxFileUrls = auxFileFinder.auxFileTable;
+        isInit = true;
+    }
+
     /**
      * This method returns an AuxPoint according to the strategy and the time stamp passed to this method.
      * This is useful for getting the source position from the drive files for example. It can work like this:
@@ -78,17 +89,12 @@ public class AuxFileService implements AuxiliaryService {
     @Override
     public synchronized AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         if(!isInit) {
-            AuxFileFinder auxFileFinder = new AuxFileFinder();
-            Path p = new File(auxFolder.getPath()).toPath();
-            Files.walkFileTree(p, auxFileFinder);
-            auxFileUrls = auxFileFinder.auxFileTable;
-            isInit = true;
+            init();
         }
         if(eventTimeStamp.isAfterNow()){
             log.warn("The requested timestamp seems to be in the future.");
         }
         try {
-
             AuxCache.CacheKey key = new AuxCache().new CacheKey(serviceName, AuxCache.dateTimeStampToFACTNight(eventTimeStamp));
 
             TreeSet<AuxPoint> auxPoints = cache.get(key);
@@ -106,7 +112,36 @@ public class AuxFileService implements AuxiliaryService {
     }
 
 
+    /**
+     * This method returns an AuxPoint according to the strategy and the time stamp passed to this method.
+     * This is useful for getting the source position from the drive files for example. It can work like this:
+     *
+     *      AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+     *      double ra = trackingPoint.getDouble("Ra");
+     *
+     * @throws IOException when no auxpoint can be found for given timestamp
+     */
+    public synchronized SortedSet<AuxPoint> getAuxiliaryDataForWholeNight(AuxiliaryServiceName serviceName, DateTime night) throws IOException {
+        if(!isInit) {
+            init();
+        }
+        Integer factNight = AuxCache.dateTimeStampToFACTNight(night);
+        try {
+            AuxCache.CacheKey key = new AuxCache().new CacheKey(serviceName, factNight);
 
+            TreeSet<AuxPoint> auxPoints = cache.get(key);
+            if (auxPoints.isEmpty()){
+                throw new IOException("No auxpoints found for the given night" + factNight);
+            }
+            return auxPoints;
+
+        } catch (ExecutionException e) {
+            throw new IOException("No auxpoints found for the given night" + factNight);
+        } catch (IllegalArgumentException e){
+            throw new IOException("From DateTime needs to be earlier than To DateTime");
+        }
+
+    }
 
     private TreeSet<AuxPoint>  readDataFromFile(AuxCache.CacheKey key) throws Exception {
         Path pathToFile = auxFileUrls.get(key.factNight, key.service);
@@ -115,7 +150,8 @@ public class AuxFileService implements AuxiliaryService {
             throw new IOException("Could not load auxfile for key " +  key);
         }
         TreeSet<AuxPoint> result = new TreeSet<>();
-        FitsStream stream = new FitsStream(new SourceURL(pathToFile.toUri().toURL()));
+        ZFitsStream stream = new ZFitsStream(new SourceURL(pathToFile.toUri().toURL()));
+        stream.setTableName(key.service.name());
         try {
             stream.init();
             Data slowData = stream.readNext();
@@ -130,7 +166,7 @@ public class AuxFileService implements AuxiliaryService {
             return result;
         } catch (Exception e) {
             log.error("Failed to load data from AUX file: {}", e.getMessage());
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

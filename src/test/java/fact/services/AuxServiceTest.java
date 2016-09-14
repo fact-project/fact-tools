@@ -14,6 +14,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.SortedSet;
 
 
 import static org.hamcrest.core.Is.is;
@@ -79,6 +80,20 @@ public class AuxServiceTest {
         AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, DateTime.parse("2013-01-02T23:30:21"), new Closest());
         assertThat(auxiliaryData, is(not(nullValue())));
         assertThat(auxiliaryData.getDouble("Ra"), is(not(nullValue())));
+    }
+
+    @Test
+    public void testToGetAllPointsForNight() throws Exception {
+        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
+//        SourceURL url = new SourceURL(u);
+        AuxFileService s = new AuxFileService();
+        s.auxFolder = new SourceURL(u);
+        SortedSet<AuxPoint> auxiliaryData = s.getAuxiliaryDataForWholeNight(
+                AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION,
+                DateTime.parse("2013-01-02T23:30:21")
+        );
+
+        assertThat(auxiliaryData, not(auxiliaryData.isEmpty()));
     }
 
 }
