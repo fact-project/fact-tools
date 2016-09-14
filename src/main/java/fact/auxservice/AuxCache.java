@@ -48,6 +48,14 @@ public class AuxCache {
         }
     }
 
+    /**
+     * Takes a dateTime object and returns the appropriate FACT night number.
+     * Entering some datetime for 9:30 in the morning, e.g. 2016-01-03 09:30:12, returns 20160102.
+     * The intervall goes to 12:00 noon before its switched to the next night.
+     *
+     * @param timestamp the timestamp to get the night for
+     * @return a FACT night number.
+     */
     public static Integer dateTimeStampToFACTNight(DateTime timestamp){
         DateTime offsetDate = timestamp.minusHours(12);
         String night = String.format("%1$d%2$02d%3$02d", offsetDate.getYear(), offsetDate.getMonthOfYear(), offsetDate.getDayOfMonth());
