@@ -2,7 +2,7 @@ package fact.rta;
 
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-import fact.rta.db.FACTRun;
+import fact.rta.db.Run;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -96,7 +96,7 @@ public class WebServiceTest {
         }
 
 
-        FACTRun factRun = rtaTables.getRun(night, runID);
+        Run factRun = rtaTables.getRun(night, runID);
         assertThat(factRun.onTime, is(0.0));
         assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
         //create new run artificially to trigger updating of db entry

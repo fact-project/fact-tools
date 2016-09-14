@@ -4,9 +4,9 @@ import com.google.common.collect.Range;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import fact.rta.db.FACTRun;
+import fact.rta.db.Run;
 import fact.rta.rest.LightCurveBin;
-import fact.rta.rest.RTASignal;
+import fact.rta.db.Signal;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
@@ -50,7 +50,7 @@ public class RTAWebService implements Service {
     final private Gson gson;
     private boolean isInit = false;
 
-    private FACTRun currentRun = null;
+    private Run currentRun = null;
 
     /**
      * This will be propagated to the frontend
@@ -91,7 +91,7 @@ public class RTAWebService implements Service {
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
 
-    private ArrayList<RTASignal> rtaSignals = new ArrayList<>();
+    private ArrayList<Signal> signals = new ArrayList<>();
 
     public RTAWebService() throws SQLException {
 
@@ -167,7 +167,7 @@ public class RTAWebService implements Service {
         }
 
 
-        FACTRun run = new FACTRun(item);
+        Run run = new Run(item);
         if (currentRun == null){
             RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
             rtaTables.insertRun(run);
@@ -176,7 +176,7 @@ public class RTAWebService implements Service {
         else if (!currentRun.equals(run)){
             log.info("New run found. OnTime of new run is: {} seconds.", run.onTime.getStandardSeconds());
             //save signals to database
-            persistEvents(rtaSignals, currentRun);
+            persistEvents(signals, currentRun);
 
             RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
             rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
@@ -187,7 +187,7 @@ public class RTAWebService implements Service {
 
         }
 
-        rtaSignals.add(new RTASignal(eventTimeStamp, DateTime.now(), item, currentRun));
+        signals.add(new Signal(eventTimeStamp, DateTime.now(), item, currentRun));
         eventMap.put(DateTime.now(), new RTAEvent(eventTimeStamp, item));
 
 
@@ -197,7 +197,7 @@ public class RTAWebService implements Service {
         }
     }
 
-    private void persistEvents(ArrayList<RTASignal> signals, FACTRun run) {
+    private void persistEvents(ArrayList<Signal> signals, Run run) {
         log.info("Saving stuff to DB");
         if (!isInit){
             init();
@@ -270,23 +270,23 @@ public class RTAWebService implements Service {
         ArrayList<LightCurveBin> lc = new ArrayList<>();
 
         RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
-        final List<RTASignal> signalEntries = rtaTables.getSignalEntries(startTime.toString("YYYY-MM-dd HH:mm:ss"), endTime.toString("YYYY-MM-dd HH:mm:ss"));
+        final List<Signal> signalEntries = rtaTables.getSignalEntriesBetweenDates(startTime.toString("YYYY-MM-dd HH:mm:ss"), endTime.toString("YYYY-MM-dd HH:mm:ss"));
 
         //fill a treemap
-        TreeMap<DateTime, RTASignal> dateTimeRTASignalTreeMap = new TreeMap<>();
+        TreeMap<DateTime, Signal> dateTimeRTASignalTreeMap = new TreeMap<>();
         signalEntries.forEach(a -> dateTimeRTASignalTreeMap.put(a.eventTimestamp, a));
 
         //iterate over all the bins
         for (int bin = 0; bin < binningInMinutes; bin++) {
             //get all entries in bin
-            SortedMap<DateTime, RTASignal> subMap = dateTimeRTASignalTreeMap.subMap(startTime, startTime.plusMinutes(bin));
-            Stream<RTASignal> rtaSignalStream = subMap.entrySet().stream().map(Map.Entry::getValue);
+            SortedMap<DateTime, Signal> subMap = dateTimeRTASignalTreeMap.subMap(startTime, startTime.plusMinutes(bin));
+            Stream<Signal> rtaSignalStream = subMap.entrySet().stream().map(Map.Entry::getValue);
 
             //get on time in this bin by summing the ontimes per event in each row
             double onTimeInBin = rtaSignalStream.mapToDouble(a -> a.onTimePerEvent).sum();
 
             //select gamma like events and seperate signal and backgorund region
-            Stream<RTASignal> gammaLike = rtaSignalStream.filter(s -> s.prediction > predictionThreshold);
+            Stream<Signal> gammaLike = rtaSignalStream.filter(s -> s.prediction > predictionThreshold);
 
             int signal = (int) gammaLike
                     .filter(s -> s.theta < thetaThreshold)

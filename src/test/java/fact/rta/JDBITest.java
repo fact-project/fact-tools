@@ -2,9 +2,11 @@ package fact.rta;
 
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
-import fact.rta.db.FACTRun;
-import fact.rta.rest.RTASignal;
+import fact.rta.db.Run;
+import fact.rta.db.Signal;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Seconds;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +57,27 @@ public class JDBITest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
+    /**
+     * test whether we can isnert a run into a database
+     * @throws Exception
+     */
+    @Test
+    public void testInsertRun() throws Exception {
+        Data item = prepareNextItem();
+
+        File dbFile  = folder.newFile("data.sqlite");
+        DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
+        RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
+
+        rtaTables.createRunTable();
+        Run run = new Run(item);
+        rtaTables.insertRun(run);
+    }
+
+    /**
+     * Test if we can add a run and then add signal entries to that run
+     * @throws Exception
+     */
     @Test
     public void testInsert() throws Exception {
 
@@ -66,28 +89,71 @@ public class JDBITest {
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
         rtaTables.createRunTable();
-        FACTRun run = new FACTRun(item);
+        Run run = new Run(item);
         rtaTables.insertRun(run);
+
         rtaTables.createSignalTable();
 
-        DateTime eventTime = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
-        RTASignal s = new RTASignal(eventTime, DateTime.now(), item, run);
+        DateTime eventTime = fact.rta.Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
+        Signal s = new Signal(eventTime, DateTime.now(), item, run);
         rtaTables.insertSignal(s);
         //second insert should be ignored
         rtaTables.insertSignal(s);
 
-        List<RTASignal> signalEntries = rtaTables.getSignalEntries("2013-01-01", "2014-01-01");
+        List<Signal> signalEntries = rtaTables.getAllSignalEntries();
         assertThat(signalEntries.size(), is(1));
 
         item = prepareNextItem();
 
-        eventTime = Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
-        s = new RTASignal(eventTime, DateTime.now(),item, run);
+        eventTime = fact.rta.Signal.unixTimeUTCToDateTime((int[]) item.get("UnixTimeUTC")).orElseThrow(RuntimeException::new);
+        s = new Signal(eventTime, DateTime.now(),item, run);
         rtaTables.insertSignal(s);
         rtaTables.insertSignal(s);
 
-        signalEntries = rtaTables.getSignalEntries("2013-01-01", "2014-01-01");
+        signalEntries = rtaTables.getAllSignalEntries();
         assertThat(signalEntries.size(), is(2));
+    }
+
+    /**
+     * Test if we can add a run and then add signal entries to that run
+     * @throws Exception
+     */
+    @Test
+    public void testDBTimestamps() throws Exception {
+
+        Data item = prepareNextItem();
+
+
+        File dbFile  = folder.newFile("data.sqlite");
+        DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
+        RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
+
+        rtaTables.createRunTable();
+        Run run = new Run(item);
+        rtaTables.insertRun(run);
+
+        rtaTables.createSignalTable();
+        for (int i = 1; i < 11; i++) {
+            DateTime eventTime = DateTime.parse(String.format("2016-01-%1$02dT00:33:22", i ));
+            Signal s = new Signal(eventTime, DateTime.now(), item, run);
+            rtaTables.insertSignal(s);
+        }
+
+        List<Signal> signalEntries = rtaTables.getSignalEntriesBetweenDates("2016-01-01", "2016-01-30");
+        assertThat(signalEntries.size(), is(10));
+
+        signalEntries = rtaTables.getSignalEntriesBetweenDates("2016-01-01", "2016-01-06");
+        assertThat(signalEntries.size(), is(5));
+
+        rtaTables.createSignalTable();
+        for (int i = 1; i < 60; i++) {
+            DateTime eventTime = DateTime.parse(String.format("2016-02-01T00:%1$02d:22", i ));
+            Signal s = new Signal(eventTime, DateTime.now(), item, run);
+            rtaTables.insertSignal(s);
+        }
+
+        signalEntries = rtaTables.getSignalEntriesBetweenDates("2016-01-01", "2016-01-06");
+        assertThat(signalEntries.size(), is(5));
     }
 
 
@@ -102,18 +168,15 @@ public class JDBITest {
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
         rtaTables.createRunTable();
-        FACTRun run = new FACTRun(item);
+        Run run = new Run(item);
         rtaTables.insertRun(run);
 
-        FACTRun factRun = rtaTables.getRun(run.night, run.runID);
-        assertThat(factRun.onTime, is(0.0));
-
-        rtaTables.updateRunWithOnTime(0.99, run.runID, run.night);
+        Run factRun = rtaTables.getRun(run.night, run.runID);
+        assertThat(factRun.onTime, is(Duration.ZERO));
+        rtaTables.updateRunWithOnTime(290, run.runID, run.night);
 
         factRun = rtaTables.getRun(run.night, run.runID);
-        assertThat(factRun.onTime, is(0.99));
-
-        System.out.println(factRun);
+        assertThat(factRun.onTime.toStandardSeconds(), is(Seconds.seconds(290)));
     }
 
 
@@ -131,7 +194,7 @@ public class JDBITest {
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
         rtaTables.createRunTable();
 
-        FACTRun run = new FACTRun(item);
+        Run run = new Run(item);
         rtaTables.insertRun(run);
         run = rtaTables.getRun(run.night, run.runID);
         assertThat(run.health, is(RTADataBase.HEALTH.UNKNOWN));

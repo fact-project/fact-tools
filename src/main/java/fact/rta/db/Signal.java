@@ -1,0 +1,140 @@
+package fact.rta.db;
+
+
+import org.joda.time.DateTime;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.sqlobject.Binder;
+import org.skife.jdbi.v2.sqlobject.BinderFactory;
+import org.skife.jdbi.v2.sqlobject.BindingAnnotation;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.Keys;
+
+import java.lang.annotation.*;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Set;
+
+public class Signal {
+
+    final private static Logger log = LoggerFactory.getLogger(Signal.class);
+
+    public static class SignalMapper implements ResultSetMapper<Signal>
+    {
+        public Signal map(int index, ResultSet r, StatementContext ctx) throws SQLException
+        {
+            DateTime eventTimestamp = DateTime.parse(r.getString("event_timestamp"));
+            DateTime analyisTimestamp = DateTime.parse(r.getString("analysis_timestamp"));
+            double theta_on = r.getDouble("theta_on");
+            double theta_off_1 = r.getDouble("theta_off_1");
+            double theta_off_2 = r.getDouble("theta_off_2");
+            double theta_off_3 = r.getDouble("theta_off_3");
+            double theta_off_4 = r.getDouble("theta_off_4");
+            double theta_off_5 = r.getDouble("theta_off_5");
+            double prediction = r.getDouble("prediction");
+            Run run = new Run.RunMapper().map(index, r, ctx);
+
+            return new Signal(eventTimestamp,
+                    analyisTimestamp,
+                    theta_on,
+                    theta_off_1,
+                    theta_off_2,
+                    theta_off_3,
+                    theta_off_4,
+                    theta_off_5,
+                    prediction,
+                    run);
+        }
+
+    }
+
+
+
+
+    // our binding annotation
+    @BindingAnnotation(BindSignal.SignalBinderFactory.class)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.PARAMETER})
+    public @interface BindSignal
+    {
+
+        class SignalBinderFactory implements BinderFactory
+        {
+            public Binder build(Annotation annotation)
+            {
+                return (Binder<BindSignal, Signal>) (q, bind, s) -> {
+                    q.bind("night", s.run.night );
+                    q.bind("run_id", s.run.runID);
+                    q.bind("prediction", s.prediction);
+                    q.bind("theta", s.theta);
+                    q.bind("theta_off_1", s.theta_off_1);
+                    q.bind("theta_off_2", s.theta_off_2);
+                    q.bind("theta_off_3", s.theta_off_3);
+                    q.bind("theta_off_4", s.theta_off_4);
+                    q.bind("theta_off_5", s.theta_off_5);
+                    q.bind("on_time_per_event", s.onTimePerEvent);
+                    q.bind("event_timestamp" ,s.eventTimestamp.toString());
+                    q.bind("analysis_timestamp" ,s.analysisTimestamp.toString());
+                };
+            }
+        }
+    }
+
+    public final Run run;
+    public final double prediction;
+    public final double theta_off_1;
+    public final double theta_off_2;
+    public final double theta_off_3;
+    public final double theta_off_4;
+    public final double theta_off_5;
+    public final double theta;
+    public final DateTime eventTimestamp;
+    public final DateTime analysisTimestamp;
+
+    public double onTimePerEvent;
+
+    public Signal(DateTime eventTimestamp, DateTime analysisTimestamp, Data item, Run run) {
+
+        this.run = run;
+        this.theta = (double) item.get("Theta");
+        Set<String> offKeys = new Keys("Theta_Off_?").select(item);
+        double[] thetaOffs = offKeys.stream().mapToDouble(s -> (double) item.get(s)).toArray();
+        this.theta_off_1 = thetaOffs[0];
+        this.theta_off_2 = thetaOffs[1];
+        this.theta_off_3 = thetaOffs[2];
+        this.theta_off_4 = thetaOffs[3];
+        this.theta_off_5 = thetaOffs[4];
+        this.prediction = (double) item.get("signal:prediction");
+
+        this.eventTimestamp = eventTimestamp;
+        this.analysisTimestamp = analysisTimestamp;
+    }
+
+    public Signal(DateTime eventTimestamp,
+                  DateTime analysisTimestamp,
+                  double theta,
+                  double theta_off_1,
+                  double theta_off_2,
+                  double theta_off_3,
+                  double theta_off_4,
+                  double theta_off_5,
+                  double prediction,
+                  Run run) {
+
+        this.run = run;
+        this.analysisTimestamp = analysisTimestamp;
+        this.theta = theta;
+        this.theta_off_1 = theta_off_1;
+        this.theta_off_2 = theta_off_2;
+        this.theta_off_3 = theta_off_3;
+        this.theta_off_4 = theta_off_4;
+        this.theta_off_5 = theta_off_5;
+        this.prediction = prediction;
+        this.eventTimestamp = eventTimestamp;
+    }
+
+
+}

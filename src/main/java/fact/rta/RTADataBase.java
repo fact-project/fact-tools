@@ -1,16 +1,10 @@
 package fact.rta;
 
-import fact.rta.db.FACTRun;
-import fact.rta.db.RTASignalMapper;
-import fact.rta.rest.RTASignal;
-import fact.rta.db.RunMapper;
+import fact.rta.db.Run;
+import fact.rta.db.Signal;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.*;
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -31,16 +25,16 @@ public class RTADataBase {
 
         @SqlUpdate("INSERT OR IGNORE INTO fact_run " +
                 "(night, run_id, start_time, end_time, on_time, source, health) " +
-                "values (:night, :runID, :startTime, :endTime, :onTime, :source, :health)")
-        void insertRun(@FACTRun.BindRun FACTRun run);
+                "values (:night, :run_id, :start_time, :end_time, :on_time, :source, :health)")
+        void insertRun(@Run.BindRun Run run);
 
         @SqlUpdate("INSERT OR IGNORE INTO signal " +
                 "(event_timestamp, analysis_timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5, on_time_per_event)" +
                 "values " +
-                "(:eventTimestamp," +
-                " :analysisTimestamp," +
+                "(:event_timestamp," +
+                " :analysis_timestamp," +
                 " :night," +
-                " :runId," +
+                " :run_id," +
                 " :prediction," +
                 " :theta," +
                 " :theta_off_1," +
@@ -50,23 +44,30 @@ public class RTADataBase {
                 " :theta_off_5," +
                 " :on_time_per_event)"
         )
-        void insertSignal(@RTASignal.BindSignal() RTASignal signal);
+        void insertSignal(@Signal.BindSignal() Signal signal);
 
 
-        @SqlQuery("SELECT * FROM signal JOIN fact_run USING (run_id,night)  WHERE timestamp BETWEEN :start AND :end")
-        @RegisterMapper(RTASignalMapper.class)
-        List<RTASignal> getSignalEntries(@Bind("start") String start, @Bind("end") String end );
+        @SqlQuery("SELECT * FROM signal JOIN fact_run USING (run_id,night)  WHERE event_timestamp BETWEEN :start AND :end")
+        @RegisterMapper(Signal.SignalMapper.class)
+        List<Signal> getSignalEntriesBetweenDates(@Bind("start") String start, @Bind("end") String end );
+
+
+        @SqlQuery("SELECT * FROM signal JOIN fact_run USING (run_id,night)")
+        @RegisterMapper(Signal.SignalMapper.class)
+        List<Signal> getAllSignalEntries();
+
+
 
         @SqlUpdate("UPDATE fact_run SET health = :health WHERE   (night = :night AND run_id = :run_id)")
         void updateRunHealth(@Bind("health") HEALTH health, @Bind("run_id") int run_id, @Bind("night") int night);
 
         @SqlUpdate("UPDATE fact_run SET on_time = :on_time WHERE   night = :night AND run_id = :run_id")
-        void updateRunWithOnTime(@Bind("on_time") double onTime, @Bind("run_id") int run_id, @Bind("night") int night);
+        void updateRunWithOnTime(@Bind("on_time") long onTime, @Bind("run_id") int run_id, @Bind("night") int night);
 
 
         @SqlQuery("SELECT * from fact_run WHERE run_id = :run_id AND night = :night")
-        @RegisterMapper(RunMapper.class)
-        FACTRun getRun(@Bind("night") int night, @Bind("run_id") int runID);
+        @RegisterMapper(Run.RunMapper.class)
+        Run getRun(@Bind("night") int night, @Bind("run_id") int runID);
 
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +
@@ -78,6 +79,7 @@ public class RTADataBase {
                 "health varchar(50)," +
                 "PRIMARY KEY (night, run_id))")
         void createRunTable();
+
 
         @SqlUpdate("CREATE TABLE IF NOT EXISTS signal " +
                 "(" +
