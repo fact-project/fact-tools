@@ -29,11 +29,7 @@ public class FTMProcessor implements Processor{
             Closest c = new Closest();
             DateTime dT = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
             AuxPoint auxPoint = auxiliaryService.getAuxiliaryData(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, dT, c);
-
-
-            float onTime =auxPoint.getFloat("OnTime");
-            float elapsedTime = auxPoint.getFloat("ElapsedTime");
-
+            rtaWebService.addFTMPoint(auxPoint);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

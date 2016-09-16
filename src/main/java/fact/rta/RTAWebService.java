@@ -10,7 +10,6 @@ import fact.rta.db.Run;
 import fact.rta.rest.LightCurveBin;
 import fact.rta.db.Signal;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
 import org.skife.jdbi.v2.DBI;
@@ -93,7 +92,7 @@ public class RTAWebService implements Service {
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
-    Set<AuxPoint> FTMPoints = new HashSet<>();
+    private Set<AuxPoint> FTMPoints = new HashSet<>();
 
     private ArrayList<Signal> signals = new ArrayList<>();
 
@@ -189,9 +188,10 @@ public class RTAWebService implements Service {
             log.info("New run found. OnTime of old run was: {} seconds.", onTimeInSeconds);
 
 
+            double onTimePerEvent = onTimeInSeconds/signals.size();
 
             //save signals to database
-            persistEvents(signals, currentRun);
+            persistEvents(signals, currentRun, onTimePerEvent);
 
             rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
 
@@ -211,13 +211,12 @@ public class RTAWebService implements Service {
         }
     }
 
-    private void persistEvents(ArrayList<Signal> signals, Run run) {
+    private void persistEvents(ArrayList<Signal> signals, Run run, double onTimePerEvent) {
         log.info("Saving stuff to DB");
         if (!isInit){
             init();
         }
 
-        double onTimePerEvent = run.onTime.getStandardSeconds()/signals.size();
         RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
 
         signals.forEach(signal -> {

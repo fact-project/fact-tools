@@ -41,7 +41,7 @@ public class JDBITest {
         stream.init();
     }
 
-    Data prepareNextItem() throws Exception {
+    private Data prepareNextItem() throws Exception {
         Data item = stream.read();
         item.put("Theta", 0.0);
         item.put("Theta_Off_1", 0.1);

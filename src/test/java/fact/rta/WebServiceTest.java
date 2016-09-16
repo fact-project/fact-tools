@@ -1,10 +1,12 @@
 package fact.rta;
 
+import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.io.FitsStream;
 import fact.io.FitsStreamTest;
 import fact.rta.db.Run;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,7 +16,10 @@ import stream.Data;
 import stream.io.SourceURL;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -60,7 +65,7 @@ public class WebServiceTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-    @Test
+//    @Test
     public void startServer() throws Exception {
         URL resource = JDBITest.class.getResource("/data.sqlite");
         RTAWebService s = new RTAWebService();
@@ -83,6 +88,9 @@ public class WebServiceTest {
         RTAWebService s = new RTAWebService();
         File dbFile  = folder.newFile("data.sqlite");
         s.sqlitePath = new SourceURL("file:" + String.valueOf(dbFile));
+        s.init();
+
+
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
@@ -90,48 +98,59 @@ public class WebServiceTest {
         Data item = prepareNextItem();
         int night = (int) item.get("NIGHT");
         int runID = (int) item.get("RUNID");
+        Map<String, Serializable> map = new HashMap<>();
+        map.put("OnTime", 4.0f);
+
         for (int i = 0; i < 5; i++) {
             item = prepareNextItem();
-            Optional<DateTime> utc = AuxiliaryService.unixTimeUTCToDateTime(item);
-            s.updateEvent(utc.orElseThrow(Exception::new), item);
+            DateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+            s.addFTMPoint(new AuxPoint(utc, map));
+            s.updateEvent(utc, item);
+
         }
 
 
         Run factRun = rtaTables.getRun(night, runID);
-        assertThat(factRun.onTime, is(0.0));
+        assertThat(factRun.onTime, is(Duration.ZERO));
         assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
         //create new run artificially to trigger updating of db entry
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 1);
-        Optional<DateTime> utc = AuxiliaryService.unixTimeUTCToDateTime(item);
-        s.updateEvent(utc.orElseThrow(Exception::new), item);
+        DateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+        s.updateEvent(utc, item);
 
         factRun = rtaTables.getRun(night, runID);
-        assertThat(factRun.onTime, is(0.9));
+        assertThat(factRun.onTime, is(Duration.standardSeconds(20)));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
+
+
+
         //now create a few more items for new run
+        map.put("OnTime", 2.0f);
         for (int i = 0; i < 5; i++) {
             item = prepareNextItem();
             item.put("NIGHT", night);
             item.put("RUNID", runID + 1);
-            utc = AuxiliaryService.unixTimeUTCToDateTime(item);
-            s.updateEvent(utc.orElseThrow(Exception::new), item);
+
+            utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+            s.addFTMPoint(new AuxPoint(utc, map));
+            s.updateEvent(utc, item);
         }
 
         factRun = rtaTables.getRun(night, runID + 1);
-        assertThat(factRun.onTime, is(0.0));
+        assertThat(factRun.onTime, is(Duration.ZERO));
         assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
         //create new run artificially to trigger updating of db entry
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 2);
-        utc = AuxiliaryService.unixTimeUTCToDateTime(item);
-        s.updateEvent(utc.orElseThrow(Exception::new), item);
+        utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+        s.updateEvent(utc, item);
 
 
         factRun = rtaTables.getRun(night, runID + 1);
-        assertThat(factRun.onTime, is(0.5));
+        assertThat(factRun.onTime, is(Duration.standardSeconds(10)));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
 
     }
