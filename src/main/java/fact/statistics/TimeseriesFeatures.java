@@ -19,7 +19,7 @@ import stream.annotations.Parameter;
  * @author F. Temme
  *
  */
-public class TimerowFeatures implements Processor {
+public class TimeseriesFeatures implements Processor {
 	
 	@Parameter(required=true,description="key to the data array")
 	private String dataKey = null;
