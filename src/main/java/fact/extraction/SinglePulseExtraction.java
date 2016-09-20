@@ -2,6 +2,7 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -62,6 +63,8 @@ public class SinglePulseExtraction implements Processor {
         ArrayList<ArrayList<Integer>> pixelArrivalSlices = 
             new ArrayList<ArrayList<Integer>>();
 
+        double[] reducedTimeline = new double[timeLines.length];
+
         for (int pix = 0; pix < npix; pix++) {
             int start = pix*roi+startSlice;
             int end = start + windowLength;
@@ -83,11 +86,18 @@ public class SinglePulseExtraction implements Processor {
 
             single_pe_count[pix] = arrivalSlices.size();
             pixelArrivalSlices.add(arrivalSlices);
+
+            for (int i = 0; i < windowLength; i++) {
+                reducedTimeline[start+i] = SinglePulseExtractor.factSinglePeAmplitudeInMv*pixelTimeLine[i];
+            }
         }
+
+
 
         addStartSliceOffset(pixelArrivalSlices);
         // printArrivalSlices(pixelArrivalSlices);
         input.put(outputKey, pixelArrivalSlices);
+        input.put(outputKey+"TL", reducedTimeline);
         input.put(outputKey+"Count", single_pe_count);
         return input;
     }
