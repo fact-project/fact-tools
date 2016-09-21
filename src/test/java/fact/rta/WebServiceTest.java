@@ -32,16 +32,16 @@ import static org.junit.Assert.fail;
  */
 public class WebServiceTest {
 
-    URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
-    SourceURL url = new SourceURL(dataUrl);
-    FitsStream stream = new FitsStream(url);
+    private URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+    private SourceURL url = new SourceURL(dataUrl);
+    private FitsStream stream = new FitsStream(url);
 
     @Before
     public void setup() throws Exception {
         stream.init();
     }
 
-    Data prepareNextItem() throws Exception {
+    private Data prepareNextItem() throws Exception {
         Data item = stream.readNext();
         if (item == null){
             stream.init();

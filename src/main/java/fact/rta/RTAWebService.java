@@ -163,7 +163,7 @@ public class RTAWebService implements Service {
     }
 
 
-    public synchronized void addFTMPoint(AuxPoint FTMPoint){
+    synchronized void addFTMPoint(AuxPoint FTMPoint){
         FTMPoints.add(FTMPoint);
     }
 
@@ -174,12 +174,12 @@ public class RTAWebService implements Service {
         }
 
 
-        Run run = new Run(item);
+        Run newRun = new Run(item);
         if (currentRun == null){
-            rtaTables.insertRun(run);
-            currentRun = run;
+            rtaTables.insertRun(newRun);
+            currentRun = newRun;
         }
-        else if (!currentRun.equals(run)){
+        else if (!currentRun.equals(newRun)){
             log.info("New run found. Fetching ontime.");
             //fetch ontime from rundb?
             double onTimeInSeconds = FTMPoints.stream().mapToDouble(p -> p.getFloat("OnTime")).sum();
@@ -191,13 +191,14 @@ public class RTAWebService implements Service {
             double onTimePerEvent = onTimeInSeconds/signals.size();
 
             //save signals to database
-            persistEvents(signals, currentRun, onTimePerEvent);
-
+            persistEvents(signals, onTimePerEvent);
             rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
 
+
             //insert new run to db
-            rtaTables.insertRun(run);
-            currentRun = run;
+            rtaTables.insertRun(newRun);
+            rtaTables.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, currentRun.runID, currentRun.night);
+            currentRun = newRun;
 
         }
 
@@ -211,7 +212,7 @@ public class RTAWebService implements Service {
         }
     }
 
-    private void persistEvents(ArrayList<Signal> signals, Run run, double onTimePerEvent) {
+    private void persistEvents(ArrayList<Signal> signals, double onTimePerEvent) {
         log.info("Saving stuff to DB");
         if (!isInit){
             init();
