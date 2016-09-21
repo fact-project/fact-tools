@@ -2,6 +2,7 @@ package fact.rta;
 
 import fact.rta.db.Run;
 import fact.rta.db.Signal;
+import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
@@ -13,6 +14,16 @@ import java.util.List;
  */
 public class RTADataBase {
 
+    private static RTADataBase instance;
+    private RTADataBase(){}
+
+    public static synchronized RTADataBase getInstance(){
+        if(instance == null){
+           instance = new RTADataBase();
+        }
+        return instance;
+    }
+
     public enum HEALTH {
         OK,
         BROKEN,
@@ -20,6 +31,8 @@ public class RTADataBase {
         IN_PROGRESS
     }
 
+    private DBI dbi = new DBI("jdbc:sqlite:./test.sqlite");
+    public RTADataBase.DBInterface dataBaseInterface = dbi.open(RTADataBase.DBInterface.class);
 
     public interface DBInterface {
 
