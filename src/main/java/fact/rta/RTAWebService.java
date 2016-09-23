@@ -20,7 +20,6 @@ import spark.Spark;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 import stream.Data;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 import stream.service.Service;
 import streams.runtime.Signals;
 
@@ -41,10 +40,10 @@ import java.util.stream.Stream;
 public class RTAWebService implements Service {
 
 
-    @Parameter(required = true, description = "Path to the .sqlite file")
-    SourceURL sqlitePath;
+    public RTADataBase.DBInterface dbInterface;
 
-    private DBI dbi;
+    @Parameter(required = true, description = "Path to the .sqlite file")
+    String jdbcConnection;
 
     final private static Logger log = LoggerFactory.getLogger(RTAWebService.class);
 
@@ -53,6 +52,8 @@ public class RTAWebService implements Service {
     private boolean isInit = false;
 
     private Run currentRun = null;
+
+
 
     /**
      * This will be propagated to the frontend
@@ -151,14 +152,17 @@ public class RTAWebService implements Service {
             }
         }, 0, (long) (0.1*MINUTE));
 
+
+
         Signals.register(i -> t.cancel());
     }
 
     public void init(){
-        dbi = new DBI("jdbc:sqlite:" + sqlitePath.getPath());
-        RTADataBase.DBInterface rtaDBInterface = dbi.open(RTADataBase.DBInterface.class);
-        rtaDBInterface.createRunTable();
-        rtaDBInterface.createSignalTable();
+
+        dbInterface = new DBI(this.jdbcConnection).open(RTADataBase.DBInterface.class);
+
+        dbInterface.createRunTable();
+        dbInterface.createSignalTable();
         isInit = true;
     }
 
@@ -168,7 +172,6 @@ public class RTAWebService implements Service {
     }
 
     synchronized void updateEvent(DateTime eventTimeStamp, Data item){
-        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
         if (!isInit){
             init();
         }
@@ -176,7 +179,7 @@ public class RTAWebService implements Service {
 
         Run newRun = new Run(item);
         if (currentRun == null){
-            rtaTables.insertRun(newRun);
+            dbInterface.insertRun(newRun);
             currentRun = newRun;
         }
         else if (!currentRun.equals(newRun)){
@@ -184,7 +187,7 @@ public class RTAWebService implements Service {
             //fetch ontime from rundb?
             double onTimeInSeconds = FTMPoints.stream().mapToDouble(p -> p.getFloat("OnTime")).sum();
             FTMPoints.clear();
-            rtaTables.updateRunWithOnTime(currentRun, onTimeInSeconds);
+            dbInterface.updateRunWithOnTime(currentRun, onTimeInSeconds);
             log.info("New run found. OnTime of old run was: {} seconds.", onTimeInSeconds);
 
 
@@ -192,14 +195,13 @@ public class RTAWebService implements Service {
 
             //save signals to database
             persistEvents(signals, onTimePerEvent);
-            rtaTables.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
+            dbInterface.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
 
 
             //insert new run to db
-            rtaTables.insertRun(newRun);
-            rtaTables.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, currentRun.runID, currentRun.night);
+            dbInterface.insertRun(newRun);
+            dbInterface.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, newRun.runID, newRun.night);
             currentRun = newRun;
-
         }
 
         signals.add(new Signal(eventTimeStamp, DateTime.now(), item, currentRun));
@@ -218,13 +220,11 @@ public class RTAWebService implements Service {
             init();
         }
 
-        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
 
         signals.forEach(signal -> {
                     signal.onTimePerEvent = onTimePerEvent;
-                    rtaTables.insertSignal(signal);
+                    dbInterface.insertSignal(signal);
                 });
-        rtaTables.close();
     }
 
     private RTAEvent getLatestEvent(){
@@ -248,9 +248,7 @@ public class RTAWebService implements Service {
         }
 
         ArrayList<RTADataRate> rates = new ArrayList<>();
-        resultMap.forEach((k, v) ->{
-            rates.add(new RTADataRate(k, v));
-        });
+        resultMap.forEach((k, v) -> rates.add(new RTADataRate(k, v)));
         return rates;
     }
 
@@ -283,8 +281,7 @@ public class RTAWebService implements Service {
 
         ArrayList<LightCurveBin> lc = new ArrayList<>();
 
-        RTADataBase.DBInterface rtaTables = this.dbi.open(RTADataBase.DBInterface.class);
-        final List<Signal> signalEntries = rtaTables.getSignalEntriesBetweenDates(startTime.toString("YYYY-MM-dd HH:mm:ss"), endTime.toString("YYYY-MM-dd HH:mm:ss"));
+        final List<Signal> signalEntries = dbInterface.getSignalEntriesBetweenDates(startTime.toString("YYYY-MM-dd HH:mm:ss"), endTime.toString("YYYY-MM-dd HH:mm:ss"));
 
         //fill a treemap
         TreeMap<DateTime, Signal> dateTimeRTASignalTreeMap = new TreeMap<>();
@@ -324,7 +321,7 @@ public class RTAWebService implements Service {
 
     @Override
     public void reset() throws Exception {
-
+        dbInterface.close();
     }
 
 

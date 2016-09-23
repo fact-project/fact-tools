@@ -3,7 +3,9 @@ package fact.rta;
 import fact.io.FitsStreamTest;
 import fact.rta.io.RTAStream;
 import nom.tam.fits.*;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -20,13 +23,22 @@ import static org.junit.Assert.assertThat;
  */
 public class RTAStreamTest {
 
+    @Rule
+    public TemporaryFolder folder= new TemporaryFolder();
+
     @Test
-    public void testFileMatching() throws FitsException, IOException, URISyntaxException {
+    public void testFileMatching() throws FitsException, IOException, URISyntaxException, SQLException {
         URL resource = FitsStreamTest.class.getResource("/./");
+        File dbFile = folder.newFile("test.sqlite");
+
         RTAStream rtaStream = new RTAStream();
+        rtaStream.webService = new RTAWebService();
+        rtaStream.webService.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
+        rtaStream.webService.init();
+
         Files.walkFileTree(Paths.get(resource.toURI()), rtaStream.new RegexVisitor("\\d{8}_\\d{3}.(fits|zfits)(.gz)?"));
         //there are 3 valid test files at the moment
-        assertThat(rtaStream.files.size(), is(3));
+        assertThat(rtaStream.fileQueue.size(), is(3));
     }
 
 

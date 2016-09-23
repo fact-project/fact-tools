@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 import static org.hamcrest.core.Is.is;
@@ -28,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
+ * Check some functions of the webserive. E.g. what happens when a new wild run suddenly appears in the tall grass.
  * Created by kai on 20.05.16.
  */
 public class WebServiceTest {
@@ -67,9 +67,8 @@ public class WebServiceTest {
 
 //    @Test
     public void startServer() throws Exception {
-        URL resource = JDBITest.class.getResource("/data.sqlite");
         RTAWebService s = new RTAWebService();
-        s.sqlitePath = new SourceURL(resource);
+        s.jdbcConnection = "jdbc:sqlite:./test.sqlite";
 
         for (int i = 0; i < 3600; i++) {
             Thread.sleep(1100);
@@ -87,12 +86,11 @@ public class WebServiceTest {
         //initialize db connection
         RTAWebService s = new RTAWebService();
         File dbFile  = folder.newFile("data.sqlite");
-        s.sqlitePath = new SourceURL("file:" + String.valueOf(dbFile));
+        s.jdbcConnection = "jdbc:sqlite:"+dbFile.getCanonicalPath();
         s.init();
 
 
-        DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
-        RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
+        RTADataBase.DBInterface rtaTables = s.dbInterface;
 
         //create a few dummy items
         Data item = prepareNextItem();
@@ -140,7 +138,7 @@ public class WebServiceTest {
 
         factRun = rtaTables.getRun(night, runID + 1);
         assertThat(factRun.onTime, is(Duration.ZERO));
-        assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
+        assertThat(factRun.health, is(RTADataBase.HEALTH.IN_PROGRESS));
         //create new run artificially to trigger updating of db entry
         item = prepareNextItem();
         item.put("NIGHT", night);

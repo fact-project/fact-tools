@@ -1,8 +1,8 @@
 package fact.rta.io;
 
 import fact.rta.RTADataBase;
+import fact.rta.RTAWebService;
 import fact.rta.db.Run;
-import org.joda.time.Minutes;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
@@ -15,11 +15,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
-
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
 /**
  *
@@ -27,16 +23,17 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
  */
 public class RTAStream extends AbstractMultiStream {
 
-    WatchService watchService;
 
     @Parameter(required = true, description = "Path to folder thats being watched")
-    String pathName;
+    private String pathName;
 
 
-    RTADataBase rtaDataBase = RTADataBase.getInstance();
     private AbstractStream stream;
 
-    private BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
+    public BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
+
+    @Service
+    public RTAWebService webService;
 
     private Updater updater = new Updater();
 
@@ -73,10 +70,11 @@ public class RTAStream extends AbstractMultiStream {
             Path name = file.getFileName();
             if (name != null && attr.isRegularFile()) {
                 if (matcher.matches(name)){
-                    int night = filenameToRunID(file.getFileName().toString()).orElse(0);
+                    int night = filenameToFACTNight(file.getFileName().toString()).orElse(0);
                     int runid = filenameToRunID(file.getFileName().toString()).orElse(0);
-                    Run run = rtaDataBase.dataBaseInterface.getRun(night, runid);
-                    if (run.health == RTADataBase.HEALTH.UNKNOWN){
+                    Run run = webService.dbInterface.getRun(night, runid);
+                    //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
+                    if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN){
                         if (!fileQueue.contains(file)) {
                             fileQueue.add(file);
                         }
@@ -90,7 +88,7 @@ public class RTAStream extends AbstractMultiStream {
 
         @Override
         public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-            log.error("Could not visit file: {}", file);
+            log.error("Could not visit file: {}. Continuing.", file);
             return FileVisitResult.CONTINUE;
         }
     }
@@ -110,7 +108,7 @@ public class RTAStream extends AbstractMultiStream {
         public void run() {
             Path dir = Paths.get(pathName);
             try {
-                Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|zfits)"));
+                Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|zfits|fits\\.gz)$"));
             } catch (IOException e) {
                 throw new RuntimeException();
             }
@@ -121,16 +119,20 @@ public class RTAStream extends AbstractMultiStream {
     @Override
     public synchronized Data readNext() throws Exception {
         if (stream == null) {
-            //get the first stream inside this mulltistream.
+            //get the first stream inside this multistream.
             stream = (AbstractStream) streams.get(additionOrder.get(0));
             String path = fileQueue.take().toFile().getAbsolutePath();
             stream.setUrl(new SourceURL(path));
-
+            stream.init();
         }
+
         Data data = stream.readNext();
         if(data == null){
-
+            String path = fileQueue.take().toFile().getAbsolutePath();
+            stream.setUrl(new SourceURL(path));
+            stream.init();
+            return stream.readNext();
         }
-        return null;
+        return data;
     }
 }

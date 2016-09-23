@@ -9,32 +9,47 @@ import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 import java.util.List;
 
 /**
- * JDBI interface to describe the signal table for sql operations
+ * A singleton wrapping the dbi. don't know whether that's a good idea yet.
  * Created by kai on 24.05.16.
  */
 public class RTADataBase {
 
-    private static RTADataBase instance;
-    private RTADataBase(){}
-
-    public static synchronized RTADataBase getInstance(){
-        if(instance == null){
-           instance = new RTADataBase();
-        }
-        return instance;
-    }
-
+//    private static RTADataBase instance;
+//    private String jdbcConnection;
+//
+//    private RTADataBase(String jdbcConnection){
+//
+//        this.jdbcConnection = jdbcConnection;
+//    }
+//
+//    /**
+//     * Get an instance of this database object holding a connection to the database with the jdbconnecitons tring passed to this method.
+//     * As in "jdbc:sqlite:./test.sqlite" which will return the RTADatabase Object connected to that particular database.
+//     * @param jdbcConnection a jdbc string describing the connection to the db
+//     * @return an instance of the RTADataBase class.
+//     */
+//    public static synchronized RTADataBase getInstance(String jdbcConnection){
+//        if(instance == null){
+//           instance = new RTADataBase(jdbcConnection);
+//        }
+//        return instance;
+//    }
+//
     public enum HEALTH {
         OK,
         BROKEN,
         UNKNOWN,
         IN_PROGRESS
     }
+//
+//    private DBI dbi = new DBI(jdbcConnection);
+//    public RTADataBase.DBInterface dbInterface = dbi.open(RTADataBase.DBInterface.class);
 
-    private DBI dbi = new DBI("jdbc:sqlite:./test.sqlite");
-    public RTADataBase.DBInterface dataBaseInterface = dbi.open(RTADataBase.DBInterface.class);
-
-    public interface DBInterface {
+    /**
+     * JDBI interface to describe the signal table for sql operations
+     * Created by kai on 24.05.16.
+     */
+    public static interface DBInterface {
 
         @SqlUpdate("INSERT OR IGNORE INTO fact_run " +
                 "(night, run_id, start_time, end_time, on_time, source, health) " +
