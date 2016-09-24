@@ -321,7 +321,9 @@ public class RTAWebService implements Service {
 
     @Override
     public void reset() throws Exception {
-        dbInterface.close();
+        if(dbInterface != null) {
+            dbInterface.close();
+        }
     }
 
 
