@@ -3,6 +3,7 @@ package fact.rta.io;
 import fact.rta.RTADataBase;
 import fact.rta.RTAWebService;
 import fact.rta.db.Run;
+import org.skife.jdbi.v2.DBI;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
@@ -25,17 +26,17 @@ public class RTAStream extends AbstractMultiStream {
 
 
     @Parameter(required = true, description = "Path to folder thats being watched")
-    private String pathName;
+    private String folder;
 
+    @Parameter
+    public String jdbcConnection;
 
     private AbstractStream stream;
 
     public BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
 
-    @Service
-    public RTAWebService webService;
-
     private Updater updater = new Updater();
+    private RTADataBase.DBInterface dbInterface;
 
 
     public static Optional<Integer> filenameToRunID(String filename){
@@ -72,7 +73,7 @@ public class RTAStream extends AbstractMultiStream {
                 if (matcher.matches(name)){
                     int night = filenameToFACTNight(file.getFileName().toString()).orElse(0);
                     int runid = filenameToRunID(file.getFileName().toString()).orElse(0);
-                    Run run = webService.dbInterface.getRun(night, runid);
+                    Run run = dbInterface.getRun(night, runid);
                     //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
                     if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN){
                         fileQueue.add(file);
@@ -94,7 +95,11 @@ public class RTAStream extends AbstractMultiStream {
 
     @Override
     public void init() throws Exception {
-        super.init();
+
+        DBI dbi = new DBI(jdbcConnection);
+        dbInterface = dbi.open(RTADataBase.DBInterface.class);
+        dbInterface.createRunTable();
+        dbInterface.createSignalTable();
 
         long MINUTE = 60 * 1000;
         new Timer().scheduleAtFixedRate(updater, 0, 10* MINUTE);
@@ -104,9 +109,9 @@ public class RTAStream extends AbstractMultiStream {
 
         @Override
         public void run() {
-            Path dir = Paths.get(pathName);
+            Path dir = Paths.get(folder);
             try {
-                Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|zfits|fits\\.gz)$"));
+                Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|fits.fz|fits\\.gz)$"));
             } catch (IOException e) {
                 throw new RuntimeException();
             }
@@ -120,16 +125,17 @@ public class RTAStream extends AbstractMultiStream {
             //get the first stream inside this multistream.
             stream = (AbstractStream) streams.get(additionOrder.get(0));
             String path = fileQueue.take().toFile().getAbsolutePath();
-            stream.setUrl(new SourceURL(path));
+            stream.setUrl(new SourceURL("file:" + path));
             stream.init();
         }
 
-        Data data = stream.readNext();
+        Data data = stream.read();
         if(data == null){
+            this.count = 0L;
             String path = fileQueue.take().toFile().getAbsolutePath();
-            stream.setUrl(new SourceURL(path));
+            stream.setUrl(new SourceURL("file:" + path));
             stream.init();
-            return stream.readNext();
+            return stream.read();
         }
         return data;
     }

@@ -57,13 +57,10 @@ public class PredictionService implements Service {
         try (InputStream is = url.openStream()) {
             Source transformedSource = ImportFilter.apply(new InputSource(is));
             pmml = JAXBUtil.unmarshalPMML(transformedSource);
-        } catch (SAXException ex) {
+        } catch (SAXException | IOException | JAXBException ex) {
             log.error("Could not load model from file provided at" + url);
             ex.printStackTrace();
             throw  new RuntimeException(ex);
-        } catch (IOException | JAXBException e) {
-            e.printStackTrace();
-            throw  new RuntimeException(e);
         }
 
         //build a model evaluator from the loaded pmml file

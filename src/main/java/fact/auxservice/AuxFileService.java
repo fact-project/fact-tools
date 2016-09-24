@@ -80,7 +80,10 @@ public class AuxFileService implements AuxiliaryService {
 
         if (auxFolder.getProtocol().equals(SourceURL.PROTOCOL_CLASSPATH)){
             URL resource = this.getClass().getResource(auxFolder.getPath());
-
+            if (resource == null){
+                log.error("Path does not exist: " + auxFolder);
+                throw new IOException("Path does not exist: " + auxFolder);
+            }
             Path p = new File(resource.getPath()).toPath();
             Files.walkFileTree(p, auxFileFinder);
 

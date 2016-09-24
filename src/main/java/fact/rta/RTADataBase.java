@@ -37,14 +37,14 @@ public class RTADataBase {
 //        }
 //        return instance;
 //    }
-//
+
     public enum HEALTH {
         OK,
         BROKEN,
         UNKNOWN,
         IN_PROGRESS
     }
-//
+
 //    private DBI dbi = new DBI(jdbcConnection);
 //    public RTADataBase.DBInterface dbInterface = dbi.open(RTADataBase.DBInterface.class);
 

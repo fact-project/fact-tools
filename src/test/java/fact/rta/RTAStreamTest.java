@@ -31,9 +31,7 @@ public class RTAStreamTest {
         File dbFile = temporaryFolder.newFile("test.sqlite");
 
         RTAStream rtaStream = new RTAStream();
-        rtaStream.webService = new RTAWebService();
-        rtaStream.webService.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
-        rtaStream.webService.init();
+        rtaStream.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
 
         Files.walkFileTree(Paths.get(resource.toURI()), rtaStream.new RegexVisitor("\\d{8}_\\d{3}.(fits|zfits)(.gz)?"));
         //there are 3 valid test files at the moment

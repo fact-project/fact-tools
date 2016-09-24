@@ -3,41 +3,41 @@
     <properties url="classpath:/default/settings.properties" />
 
     <!-- Paths to the input files -->
-    <property name="separator" value="/Users/kai/Development/ma/data/separation_output/separation_model.pmml" />
-    <property name="estimator" value="/Users/kai/Development/ma/data/separation_output/estimator.pmml" />
-    <property name="db" value="/Users/kai/drive_2014.sqlite" />
-    <property name="infile" value="/Users/kai/20140105_151.fits.fz" />
-    <property name="drsfile" value="file:/Users/kai/20140105_141.drs.fits.gz" />
-
-
-    <property name="num_copies" value="1" />
+    <property name="separator" value="file:src/test/resources/prediction_test_files/model.pmml.gz" />
+    <property name="estimator" value="file:src/test/resources/prediction_test_files/estimator.pmml.gz" />
+    <property name="infile" value="/home/kai/phido_fact/raw/2015/12/" />
+    <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
+    <property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />
 
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
     <!--<service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />-->
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/Users/kai/aux/" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/home/kai/phido_fact/aux/2015/12/" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <service id="rf" class="fact.PredictionService" url="file:${separator}" />
-    <service id="regressor" class="fact.PredictionService" url="file:${estimator}" />
+    <service id="rf" class="fact.PredictionService" url="${separator}" />
+    <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
-    <service id="rta_service" class="fact.rta.RTAWebService" sqlitePath="file:/Users/kai/rta.sqlite"/>
+    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
 
-    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream"  url="file:${infile}" />-->
-
-    <stream id="fact" class="fact.io.KryoStream"  url="file:./fact_data.kryo" />
+    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
+        <stream id="_" class="fact.io.zfits.ZFitsStream"  limit="120" />
+    </stream>
+    <!--<stream id="fact" class="fact.io.KryoStream"  url="file:./fact_data.kryo" />-->
 
     <!--<Queue id="out_queue" />-->
     <!--<Queue id="performance_queue" />-->
 
     <!-- Description of the process and the corresponding stream -->
-    <process input="fact" copies="${num_copies}">
-        <Delay time="50ms" />
+    <process input="fact" copies="1">
+        <!--<Delay time="50ms" />-->
+        <fact.DataRate every="50" webService="rta_service" logmemory="true"/>
+        <fact.rta.FTMProcessor auxService="auxService" webService="rta_service" />
         <Skip condition="%{data.TriggerType} != 4" />
-        <fact.DataRate every="40" webService="rta_service" logmemory="true"/>
+        <!--<PrintData/>-->
 
         <Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>
 
@@ -60,7 +60,6 @@
         PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
         <include url="classpath:/default/data/extraction.xml" />
         <!-- Output: photoncharge, arrivalTime -->
-
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
         <include url="classpath:/default/data/cleaning.xml" />
@@ -82,6 +81,7 @@
 
 
         <Skip condition="%{data.numPixeInShower} &lt; 9" />
+
             <fact.rta.Energy predictor="regressor" />
             <fact.rta.Signal predictor="rf" webService="rta_service" auxService="auxService"/>
             <!--<fact.rta.RTAProcessor webService="rta_service"/>-->
