@@ -34,7 +34,8 @@ import java.util.stream.Stream;
  *
  * TODO: use priority heap for multithreading. or add some way to know when the run has been completly processed.
  *
- * The Signal and DataRate Processors update stuff in ths service.
+ *
+ * The Signal and DataRate Processors update stuff in the service.
  * Created by kai on 24.01.16.
  */
 public class RTAWebService implements Service {

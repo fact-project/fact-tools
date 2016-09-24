@@ -16,6 +16,7 @@ import stream.io.SourceURL;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.SortedSet;
@@ -58,7 +59,12 @@ public class AuxFileService implements AuxiliaryService {
             .build(new CacheLoader<AuxCache.CacheKey, TreeSet<AuxPoint>>() {
                 @Override
                 public TreeSet<AuxPoint> load(AuxCache.CacheKey key) throws Exception {
+                    //this refresh is executed for one special use case:
+                    // Automatic processing of new data in some cluster or on the island.
+                    // If this process runs for long times (longer than one night) there might be new auxfiles
+                    // and folders in the filesystem. we simply refresh the list of files every 12 hours.
                     if(lastRefresh.plusHours(12).isAfter(DateTime.now())){
+                        lastRefresh = DateTime.now();
                         init();
                     }
                     return readDataFromFile(key);
@@ -71,8 +77,20 @@ public class AuxFileService implements AuxiliaryService {
 
     private void init() throws IOException {
         AuxFileFinder auxFileFinder = new AuxFileFinder();
-        Path p = new File(auxFolder.getPath()).toPath();
-        Files.walkFileTree(p, auxFileFinder);
+
+        if (auxFolder.getProtocol().equals(SourceURL.PROTOCOL_CLASSPATH)){
+            URL resource = this.getClass().getResource(auxFolder.getPath());
+
+            Path p = new File(resource.getPath()).toPath();
+            Files.walkFileTree(p, auxFileFinder);
+
+        } else if(auxFolder.getProtocol().equals(SourceURL.PROTOCOL_FILE)){
+            Path p = new File(auxFolder.getPath()).toPath();
+            Files.walkFileTree(p, auxFileFinder);
+        } else {
+            log.error("Only file:  and classpath: protocoll supported for this service");
+            throw new  IllegalArgumentException();
+        }
         auxFileUrls = auxFileFinder.auxFileTable;
         isInit = true;
     }
@@ -109,7 +127,7 @@ public class AuxFileService implements AuxiliaryService {
             return pointFromTreeSet;
 
         } catch (ExecutionException e) {
-            throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
+            throw new IOException("No auxpoint found for the given timestamp: " + eventTimeStamp + " and service: " + serviceName);
         }
 
 

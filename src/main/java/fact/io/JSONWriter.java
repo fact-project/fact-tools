@@ -203,7 +203,6 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public void finish() throws Exception {
         try {
-            System.out.println("Finished called--------------");
             if(bw != null) {
                 bw.newLine();
                 if (!jsonl)
@@ -211,12 +210,12 @@ public class JSONWriter implements StatefulProcessor {
                     bw.write("]");
                 }
             }
-        } catch (IOException e){
-            // ignore stream bw was closed apparently
-        } finally {
+
             if (bw != null){
                 bw.close();
             }
+        } catch (IOException e){
+            // ignore stream bw was closed apparently
         }
     }
 

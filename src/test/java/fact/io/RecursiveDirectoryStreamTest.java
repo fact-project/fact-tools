@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * This tests creates a dummy file tree in a temporary folder. It will then run against a number of glob patterns
+ * This tests creates a dummy file tree in a temporary temporaryFolder. It will then run against a number of glob patterns
  * Created by kai on 16.12.15.
  */
 public class RecursiveDirectoryStreamTest {

@@ -4,7 +4,7 @@
 
     <!-- Paths to the input files -->
     <property name="separator" value="classpath:/prediction_test_files/model.pmml.gz" />
-    <property name="estimator" value="/Users/kai/Development/ma/data/separation_output/estimator.pmml" />
+    <property name="estimator" value="classpath:/prediction_test_files/estimator.pmml.gz" />
     <property name="infile" value="classpath:/testDataFile.fits.gz" />
     <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
 
@@ -17,12 +17,12 @@
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <service id="rf" class="fact.PredictionService" url="file:${separator}" />
-    <service id="regressor" class="fact.PredictionService" url="file:${estimator}" />
+    <service id="rf" class="fact.PredictionService" url="${separator}" />
+    <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
-    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="classpath:/rta.sqlite"/>
+    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="jdbc:sqlite:./test.sqlite"/>
 
-    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
+    <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" limit="15" />
 
     <!--<stream id="fact" class="fact.io.KryoStream"  url="file:./fact_data.kryo" />-->
 

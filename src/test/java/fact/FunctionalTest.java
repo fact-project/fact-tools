@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Test some of the provided example xmls in the examples folder.
+ * Test some of the provided example xmls in the examples temporaryFolder.
  * Created by kai on 28.02.15.
  */
 public class FunctionalTest {

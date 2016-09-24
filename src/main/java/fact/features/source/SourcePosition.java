@@ -252,7 +252,7 @@ public class SourcePosition implements StatefulProcessor {
         } catch (IOException e) {
             log.error("SourcePosition could not be calculated. Stopping stream.");
             e.printStackTrace();
-            return null;
+            throw new RuntimeException();
         }
 
         return data;

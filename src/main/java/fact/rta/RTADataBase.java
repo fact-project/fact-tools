@@ -6,7 +6,10 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A singleton wrapping the dbi. don't know whether that's a good idea yet.
@@ -96,6 +99,12 @@ public class RTADataBase {
         @SqlQuery("SELECT * from fact_run WHERE run_id = :run_id AND night = :night")
         @RegisterMapper(Run.RunMapper.class)
         Run getRun(@Bind("night") int night, @Bind("run_id") int runID);
+
+
+
+        @SqlQuery("SELECT * from fact_run")
+        @RegisterMapper(Run.RunMapper.class)
+        Set<Run> getAllRuns();
 
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +

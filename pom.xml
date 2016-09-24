@@ -3,7 +3,7 @@
     <groupId>de.sfb876</groupId>
     <artifactId>fact-tools</artifactId>
     <name>fact-tools</name>
-    <version>0.14.2</version>
+    <version>0.17.0</version>
     <url>http://sfb876.de/fact-tools/</url>
     <description>The FACT telescope is a Cherenkov telescope on the island of La Palma. This set of tools is dedicated to read, parse and process raw data produced by the FACT telescope.</description>
     <properties>
@@ -197,7 +197,7 @@
         <dependency>
             <groupId>org.jpmml</groupId>
             <artifactId>pmml-evaluator</artifactId>
-            <version>1.2.11</version>
+            <version>1.3.1</version>
         </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>

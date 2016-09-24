@@ -23,30 +23,34 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
+ * Given a pmml file this service provides two synchronized methods for predicting catagorial targets variable and
+ * regression problems
+ *
  * Created by kai on 02.02.16.
  */
 public class PredictionService implements Service {
-    static Logger log = LoggerFactory.getLogger(PredictionService.class);
+    private static Logger log = LoggerFactory.getLogger(PredictionService.class);
 
-    PMML pmml;
+    private PMML pmml;
     //arguments to pass to the decision function
-    Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
+    private Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
     private ModelEvaluator<? extends Model> modelEvaluator;
 
     private FieldName targetName;
 
     //fields used while training the model
-    private List<FieldName> activeFields;
+    private List<InputField> activeFields;
 
     @Parameter(required = true, description = "URL point to the .pmml model")
-    SourceURL url;
+    private SourceURL url;
 
-    @Parameter(required = false, description = "Names for the labels which should be put into the data item")
-    String[] labelNames = {"background", "signal"};
-
-    @Parameter(required = false, description = "Names for the classes in the model")
-    String[] classNames = {"0", "1"};
+//    @Parameter(required = false, description = "Names for the labels which should be put into the data item")
+//    private String[] labelNames = {"background", "signal"};
+//
+//    @Parameter(required = false, description = "Names for the classes in the model")
+//    private String[] classNames = {"0", "1"};
 
     public void init() {
         log.info("Loading pmml model from url: " + url);
@@ -57,17 +61,14 @@ public class PredictionService implements Service {
             log.error("Could not load model from file provided at" + url);
             ex.printStackTrace();
             throw  new RuntimeException(ex);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw  new RuntimeException(e);
-        } catch (JAXBException e) {
+        } catch (IOException | JAXBException e) {
             e.printStackTrace();
             throw  new RuntimeException(e);
         }
 
-        //build a modelevaluator from the loaded pmml file
+        //build a model evaluator from the loaded pmml file
         ModelEvaluatorFactory modelEvaluatorFactory = ModelEvaluatorFactory.newInstance();
-        modelEvaluator = modelEvaluatorFactory.newModelManager(pmml);
+        modelEvaluator = modelEvaluatorFactory.newModelEvaluator(pmml);
 
 
         log.info("Loaded model requires the following fields: " + modelEvaluator.getActiveFields().toString());
@@ -78,7 +79,7 @@ public class PredictionService implements Service {
             throw new IllegalArgumentException("Provided pmml model has more than 1 target variable. This is unsupported");
         }
 
-        targetName = modelEvaluator.getTargetField();
+        targetName = modelEvaluator.getTargetField().getName();
         activeFields = modelEvaluator.getActiveFields();
     }
 
@@ -87,20 +88,19 @@ public class PredictionService implements Service {
         if (modelEvaluator == null){
             init();
         }
-        for(FieldName activeField : activeFields){
+        for(InputField activeField : activeFields){
 
-            Object rawValue = data.get(activeField.toString());
+            Object rawValue = data.get(activeField.getName().toString());
 
-            FieldValue activeValue = modelEvaluator.prepare(activeField, rawValue);
+            FieldValue activeValue = activeField.prepare(rawValue);
 
-            arguments.put(activeField, activeValue);
+            arguments.put(activeField.getName(), activeValue);
         }
         try {
 
             Map<FieldName, ?> results = modelEvaluator.evaluate(arguments);
             Object targetValue = results.get(targetName);
-            ProbabilityDistribution pD = (ProbabilityDistribution) targetValue;
-            return pD;
+            return (ProbabilityDistribution) targetValue;
 
         } catch (MissingFieldException e){
             log.warn("Event had missing fields or missing field values. Skipping to next event.");
@@ -117,23 +117,26 @@ public class PredictionService implements Service {
         if (modelEvaluator == null){
             init();
         }
-        for(FieldName activeField : activeFields){
+        for(InputField activeField : activeFields){
 
-            Object rawValue = data.get(activeField.toString());
+            Object rawValue = data.get(activeField.getName().toString());
 
-            FieldValue activeValue = modelEvaluator.prepare(activeField, rawValue);
+            if(rawValue == null){
+                throw new MissingFieldException(activeField.getName());
+            }
 
-            arguments.put(activeField, activeValue);
+            FieldValue activeValue = activeField.prepare(rawValue);
+
+            arguments.put(activeField.getName(), activeValue);
         }
         try {
 
             Map<FieldName, ?> results = modelEvaluator.evaluate(arguments);
             Object targetValue = results.get(targetName);
-            Double target = (Double) targetValue;
-            return target;
+            return (Double) targetValue;
 
         } catch (MissingFieldException e){
-            log.warn("Event had missing fields or missing field values. Skipping to next event.");
+            log.warn("Event had missing fields or missing field values for field. Skipping to next event.");
             return null;
         } catch (ClassCastException e){
             log.error("The model did not return a double as target");
@@ -149,13 +152,5 @@ public class PredictionService implements Service {
 
     public void setUrl(SourceURL url) {
         this.url = url;
-    }
-
-    public void setLabelNames(String[] labelNames) {
-        this.labelNames = labelNames;
-    }
-
-    public void setClassNames(String[] classNames) {
-        this.classNames = classNames;
     }
 }

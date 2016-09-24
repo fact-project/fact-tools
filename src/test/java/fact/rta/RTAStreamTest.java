@@ -1,6 +1,5 @@
 package fact.rta;
 
-import fact.io.FitsStreamTest;
 import fact.rta.io.RTAStream;
 import nom.tam.fits.*;
 import org.junit.Rule;
@@ -24,12 +23,12 @@ import static org.junit.Assert.assertThat;
 public class RTAStreamTest {
 
     @Rule
-    public TemporaryFolder folder= new TemporaryFolder();
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void testFileMatching() throws FitsException, IOException, URISyntaxException, SQLException {
-        URL resource = FitsStreamTest.class.getResource("/./");
-        File dbFile = folder.newFile("test.sqlite");
+        URL resource = RTAStreamTest.class.getResource("/./");
+        File dbFile = temporaryFolder.newFile("test.sqlite");
 
         RTAStream rtaStream = new RTAStream();
         rtaStream.webService = new RTAWebService();

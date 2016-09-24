@@ -65,7 +65,7 @@ public class WebServiceTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-//    @Test
+    @Test
     public void startServer() throws Exception {
         RTAWebService s = new RTAWebService();
         s.jdbcConnection = "jdbc:sqlite:./test.sqlite";

@@ -13,19 +13,7 @@ import static org.junit.Assert.fail;
  * Created by kai on 23.09.16.
  */
 public class XMLTest {
-//
-//    @Before
-//    public void setup(){
-//        org.apache.log4j.Logger root = org.apache.log4j.Logger.getRootLogger();
-//        l = root.getLevel();
-//        root.setLevel(Level.ERROR);
-//    }
-//
-//    @After
-//    public void tearDown(){
-//        org.apache.log4j.Logger root = org.apache.log4j.Logger.getRootLogger();
-//        root.setLevel(l);
-//    }
+
     @Test
     public void rtaXML() {
         try {

@@ -20,7 +20,9 @@ import stream.io.SourceURL;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -210,5 +212,26 @@ public class JDBITest {
         rtaTables.updateRunHealth(RTADataBase.HEALTH.BROKEN, run.runID, run.night);
         run = rtaTables.getRun(run.night, run.runID);
         assertThat(run.health, is(RTADataBase.HEALTH.BROKEN));
+    }
+
+
+    @Test
+    public  void getAllRuns() throws Exception {
+        File dbFile  = folder.newFile("data.sqlite");
+        DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
+        RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
+
+        rtaTables.createRunTable();
+
+        for (int i = 0; i < 15; i++) {
+            Data item = prepareNextItem();
+            item.put("RUNID", i);
+            Run run = new Run(item);
+            rtaTables.insertRun(run);
+        }
+
+        Set<Run> allRuns = rtaTables.getAllRuns();
+        assertThat(allRuns.size(), is(15));
+
     }
 }

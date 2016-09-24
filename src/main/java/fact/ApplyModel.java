@@ -3,10 +3,7 @@ package fact;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
-import org.jpmml.evaluator.FieldValue;
-import org.jpmml.evaluator.ModelEvaluator;
-import org.jpmml.evaluator.ModelEvaluatorFactory;
-import org.jpmml.evaluator.ProbabilityDistribution;
+import org.jpmml.evaluator.*;
 import org.jpmml.model.ImportFilter;
 import org.jpmml.model.JAXBUtil;
 import org.slf4j.Logger;
@@ -33,29 +30,26 @@ import java.util.Map;
  * Created by kai on 03.12.15.
  */
 public class ApplyModel implements StatefulProcessor{
-    static Logger log = LoggerFactory.getLogger(ApplyModel.class);
+    private static Logger log = LoggerFactory.getLogger(ApplyModel.class);
 
-    PMML pmml;
+    private PMML pmml;
     //arguments to pass to the decision function
-    Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
+    private Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
     private ModelEvaluator<? extends Model> modelEvaluator;
 
     private FieldName targetName;
 
     //fields used while training the model
-    private List<FieldName> activeFields;
+    private List<InputField> activeFields;
 
     @Parameter(required = true, description = "URL point to the .pmml model")
-    SourceURL url;
+    private    SourceURL url;
 
     @Parameter(required = false, description = "Prediction threshold")
-    double predictionThreshold = 0.5;
+    private double predictionThreshold = 0.5;
 
     @Parameter(required = false, description = "Names for the labels which should be put into the data item")
-    String[] labelNames = {"background", "signal"};
-
-    @Parameter(required = false, description = "Names for the classes in the model")
-    String[] classNames = {"0", "1"};
+    private    String[] labelNames = {"background", "signal"};
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
@@ -69,7 +63,7 @@ public class ApplyModel implements StatefulProcessor{
         }
         //build a modelevaluator from the loaded pmml file
         ModelEvaluatorFactory modelEvaluatorFactory = ModelEvaluatorFactory.newInstance();
-        modelEvaluator = modelEvaluatorFactory.newModelManager(pmml);
+        modelEvaluator = modelEvaluatorFactory.newModelEvaluator(pmml);
 
 
         log.info("Loaded model requires the following fields: " + modelEvaluator.getActiveFields().toString());
@@ -80,7 +74,7 @@ public class ApplyModel implements StatefulProcessor{
             throw new IllegalArgumentException("Provided pmml model has more than 1 target variable. This is unsupported");
         }
 
-        targetName = modelEvaluator.getTargetField();
+        targetName = modelEvaluator.getTargetField().getName();
         activeFields = modelEvaluator.getActiveFields();
     }
 
@@ -97,13 +91,13 @@ public class ApplyModel implements StatefulProcessor{
     @Override
     public Data process(Data data) {
 
-        for(FieldName activeField : activeFields){
+        for(InputField activeField : activeFields){
 
             Object rawValue = data.get(activeField.toString());
 
-            FieldValue activeValue = modelEvaluator.prepare(activeField, rawValue);
+            FieldValue activeValue = activeField.prepare(rawValue);
 
-            arguments.put(activeField, activeValue);
+            arguments.put(activeField.getName(), activeValue);
         }
 
         Map<FieldName, ?> results = modelEvaluator.evaluate(arguments);
@@ -120,28 +114,11 @@ public class ApplyModel implements StatefulProcessor{
                 data.put("@label",labelNames[0]);
             }
         } catch (ClassCastException e){
-//            log.warn("Cannot cast target type to serializable type");
+            log.warn("Prediction did not contain a  ProbabilityDistribution object");
             data.put(targetName.getValue(), targetValue.toString());
         }
 
         return data;
     }
 
-
-
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
-    public void setPredictionThreshold(double predictionThreshold) {
-        this.predictionThreshold = predictionThreshold;
-    }
-
-    public void setLabelNames(String[] labelNames) {
-        this.labelNames = labelNames;
-    }
-
-    public void setClassNames(String[] classNames) {
-        this.classNames = classNames;
-    }
 }
