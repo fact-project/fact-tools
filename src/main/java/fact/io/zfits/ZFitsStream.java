@@ -74,11 +74,14 @@ public class ZFitsStream extends AbstractStream{
     public void init() throws Exception {
         super.init();
         this.count = 0L;
-        log.info("Reading file: {}", this.url.getFile());
-        File f = new File(this.url.getFile());
-        if (!f.canRead()){
-            log.error("Cannot read file. Wrong path? ");
-            throw new FileNotFoundException("Cannot read file");
+
+        if (url.getProtocol().equals(SourceURL.PROTOCOL_FILE)){
+            File f = new File(this.url.getFile());
+            if(!f.canRead()) {
+                log.error("Cannot read file. Wrong path? ");
+                throw new FileNotFoundException("Cannot read file with url: " + url.toString());
+            }
+            log.info("Reading file: {}", this.url.getFile());
         }
 
         DataInputStream dataStream = new DataInputStream(new BufferedInputStream(url.openStream(), bufferSize));
