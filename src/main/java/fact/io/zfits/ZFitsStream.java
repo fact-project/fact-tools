@@ -37,7 +37,7 @@ public class ZFitsStream extends AbstractStream{
     @Parameter(required = false, description = "This value defines which table of the ZFitsfile should be read.", defaultValue = "Events")
     public String tableName = "Events";
 
-    private Data headerItem = DataFactory.create();
+    public Data headerItem = DataFactory.create();
 
 
     private ZFitsTable fitsTable = null;

@@ -63,9 +63,9 @@ public class AuxFileService implements AuxiliaryService {
                     // Automatic processing of new data in some cluster or on the island.
                     // If this process runs for long times (longer than one night) there might be new auxfiles
                     // and folders in the filesystem. we simply refresh the list of files every 12 hours.
-                    if(lastRefresh.plusHours(12).isAfter(DateTime.now())){
+                    if(DateTime.now().isAfter(lastRefresh.plusHours(12))){
                         lastRefresh = DateTime.now();
-                        init();
+                        isInit = false;
                     }
                     return readDataFromFile(key);
                 }
@@ -75,7 +75,7 @@ public class AuxFileService implements AuxiliaryService {
     private boolean isInit = false;
     private HashBasedTable<Integer, AuxiliaryServiceName, Path> auxFileUrls;
 
-    private void init() throws IOException {
+    private synchronized void init() throws IOException {
         AuxFileFinder auxFileFinder = new AuxFileFinder();
 
         if (auxFolder.getProtocol().equals(SourceURL.PROTOCOL_CLASSPATH)){

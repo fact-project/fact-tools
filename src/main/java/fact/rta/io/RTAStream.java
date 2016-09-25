@@ -1,12 +1,11 @@
 package fact.rta.io;
 
+import fact.io.zfits.ZFitsStream;
 import fact.rta.RTADataBase;
-import fact.rta.RTAWebService;
 import fact.rta.db.Run;
 import org.skife.jdbi.v2.DBI;
 import stream.Data;
 import stream.annotations.Parameter;
-import stream.annotations.Service;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
 import stream.io.multi.AbstractMultiStream;
@@ -118,24 +117,44 @@ public class RTAStream extends AbstractMultiStream {
         }
     }
 
-    //TODO: Maybe just get the latest non analysed file from hte db and start working on that. seems much simpler.
+    private void checkStream() throws Exception {
+        String path = fileQueue.take().toFile().getAbsolutePath();
+        stream.setUrl(new SourceURL("file:" + path));
+        stream.init();
+        try{
+            ZFitsStream zstream = (ZFitsStream) stream;
+            if(zstream.headerItem.containsKey("RUNTYPE")){
+                String runtype = zstream.headerItem.get("RUNTYPE").toString();
+                if(!runtype.equals("data")){
+                    //not a data run. skip
+                    log.info("Skipping run with type: " + runtype);
+                    checkStream();
+                }
+            }
+        } catch (ClassCastException e){
+            //pass
+            log.warn("not using a zfits stream as inner stream. this will not skip non-data runs.");
+        }
+    }
+
+    //TODO: Maybe just get the latest non analysed file from the db and start working on that. seems much simpler.
+    /**
+     * This will read all FACT raw files it finds within a folder (recursively). It tries to skip non 'data' runs.
+     * This works as long as the inner stream is a ZFitsStream.
+     * @return a data item from a raw data file.
+     * @throws Exception
+     */
     @Override
     public synchronized Data readNext() throws Exception {
         if (stream == null) {
             //get the first stream inside this multistream.
             stream = (AbstractStream) streams.get(additionOrder.get(0));
-            String path = fileQueue.take().toFile().getAbsolutePath();
-            stream.setUrl(new SourceURL("file:" + path));
-            stream.init();
+            checkStream();
         }
-
         Data data = stream.read();
         if(data == null){
-            this.count = 0L;
-            String path = fileQueue.take().toFile().getAbsolutePath();
-            stream.setUrl(new SourceURL("file:" + path));
-            stream.init();
-            return stream.read();
+            checkStream();
+            data = stream.read();
         }
         return data;
     }

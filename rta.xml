@@ -5,7 +5,7 @@
     <!-- Paths to the input files -->
     <property name="separator" value="file:src/test/resources/prediction_test_files/model.pmml.gz" />
     <property name="estimator" value="file:src/test/resources/prediction_test_files/estimator.pmml.gz" />
-    <property name="infile" value="/home/kai/phido_fact/raw/2015/12/" />
+    <property name="infile" value="/home/kai/phido_fact/raw/2015/12/15" />
     <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
     <property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />
 
@@ -24,7 +24,7 @@
     <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
-        <stream id="_" class="fact.io.zfits.ZFitsStream"  limit="120" />
+        <stream id="_" class="fact.io.zfits.ZFitsStream"  limit="200" />
     </stream>
     <!--<stream id="fact" class="fact.io.KryoStream"  url="file:./fact_data.kryo" />-->
 
