@@ -48,9 +48,9 @@ public class DataRate implements StatefulProcessor {
     String output = "@datarate";
 
 
-    @Service(required = false, description = "If a RTAwebservice is provided this will update the " +
-            "datarate for the webservice to display")
-    RTAWebService webService;
+//    @Service(required = false, description = "If a RTAwebservice is provided this will update the " +
+//            "datarate for the webservice to display")
+//    RTAWebService webService;
 
     SummaryStatistics statistics = new SummaryStatistics();
     private Stopwatch stopwatch;
@@ -92,9 +92,9 @@ public class DataRate implements StatefulProcessor {
             input.put("@thread", Thread.currentThread().getName());
             input.put(output, dataRatePerSecond);
 
-            if(webService != null){
-                webService.updateDataRate(DateTime.now(), dataRatePerSecond);
-            }
+//            if(webService != null){
+//                webService.updateDataRate(DateTime.now(), dataRatePerSecond);
+//            }
 
             stopwatch.reset();
             stopwatch.start();

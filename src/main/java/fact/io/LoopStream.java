@@ -60,7 +60,7 @@ public class LoopStream extends AbstractMultiStream {
     public Data readNext() throws Exception {
         Data item = items.get(idx % items.size());
         idx = (idx + 1) % items.size();
-        return item;
+        return item.createCopy();
     }
 
 
