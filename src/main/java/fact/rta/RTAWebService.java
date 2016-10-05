@@ -53,7 +53,7 @@ public class RTAWebService implements Service {
     private boolean isInit = false;
 
     private Run currentRun = null;
-
+    private StatusContainer currentStatus = StatusContainer.create();
 
 
     /**
@@ -125,7 +125,7 @@ public class RTAWebService implements Service {
 
         Spark.get("/event", (request, response) -> getLatestEvent(), gson::toJson);
 
-        Spark.get("/status",  (request, response) -> getSystemStatus(request.queryParams("timestamp")), gson::toJson);
+        Spark.get("/status",  (request, response) -> currentStatus, gson::toJson);
 
         Spark.exception(NumberFormatException.class, (e, req, res) ->{
             res.status(400);
@@ -145,13 +145,9 @@ public class RTAWebService implements Service {
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                systemStatusMap.put(DateTime.now(), StatusContainer.create());
-                Minutes deltaT = Minutes.minutesBetween(systemStatusMap.firstKey(), systemStatusMap.lastKey());
-                if(deltaT.isGreaterThan(Minutes.minutes(30))){
-                    systemStatusMap.pollFirstEntry();
-                }
+                currentStatus = StatusContainer.create();
             }
-        }, 0, (long) (0.1*MINUTE));
+        }, (long) (0.1 * MINUTE), (long) (0.5*MINUTE));
 
 
 
@@ -263,15 +259,15 @@ public class RTAWebService implements Service {
 
 
 
-    private NavigableMap<DateTime, StatusContainer> getSystemStatus(String timeStamp){
-        if(systemStatusMap.isEmpty()){
-            return null;
-        }
-        if (timeStamp != null) {
-            return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
-        }
-        return systemStatusMap.descendingMap();
-    }
+//    private NavigableMap<DateTime, StatusContainer> getSystemStatus(String timeStamp){
+//        if(systemStatusMap.isEmpty()){
+//            return null;
+//        }
+//        if (timeStamp != null) {
+//            return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
+//        }
+//        return systemStatusMap.descendingMap();
+//    }
 
 
 
