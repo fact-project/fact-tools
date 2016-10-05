@@ -5,16 +5,18 @@
     <!-- Paths to the input files -->
     <property name="separator" value="file:src/test/resources/prediction_test_files/model.pmml.gz" />
     <property name="estimator" value="file:src/test/resources/prediction_test_files/estimator.pmml.gz" />
-    <property name="infile" value="/home/kai/phido_fact/raw/2015/12/15" />
+    <property name="infile" value="/Users/mackaiver/fact_phido/raw/2015/12/" />
     <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
-    <property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />
+    <!--<property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />-->
+
+    <property name="jdbc" value="jdbc:sqlite:./../rta.sqlite" />
 
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
     <!--<service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />-->
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/home/kai/phido_fact/aux/2015/12/" />
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/Users/mackaiver/fact_phido/aux/2015/12/" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -30,6 +32,10 @@
 
     <!--<Queue id="out_queue" />-->
     <!--<Queue id="performance_queue" />-->
+
+
+    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream" url="file:/Users/mackaiver/20140105_151.fits.fz"/>-->
+
 
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">

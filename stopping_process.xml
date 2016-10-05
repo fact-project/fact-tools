@@ -1,0 +1,23 @@
+<container>
+
+    <stream class="fact.io.LoopStream" id="fact" events="10" >
+        <stream id="fact" class="fact.io.zfits.ZFitsStream" url="classpath:/testDataFile.fits.gz"/>
+    </stream>
+    <property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />
+
+    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
+
+
+    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream" url="file:/Users/mackaiver/20140105_151.fits.fz"/>-->
+
+    <process id="1" input="fact" copies="1">
+        <fact.DataRate every="500" logmemory="true"/>
+        <If condition="%{data.@datarate} != null">
+            <Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory,EVENTNUM,NROI"/>
+        </If>
+    </process>
+
+    <process input="performance_queue" id="egal" >
+        <PrintData/>
+    </process>
+</container>
