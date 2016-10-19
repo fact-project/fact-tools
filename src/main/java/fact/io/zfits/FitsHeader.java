@@ -97,10 +97,16 @@ public class FitsHeader {
 		}
 	}
 
+    /**
+     * This method returns the ValueType for the keyword value given.
+     * Complex Numbers are not supported here. The fits standard does however.
+     *
+     * @param value a value from the fits header keyword,value pair
+     * @return the valuetype that fits that value
+     * @throws ParseException in case the right cannot be found.
+     */
     public ValueType getTypeFromValueString(String value) throws ParseException {
-
-        if (value.startsWith("'")) { //we found a String
-//            value = value.replaceAll("'", "").trim();
+        if (value.startsWith("'")) {
             return ValueType.STRING;
         }
         if (value.isEmpty() || value.startsWith("T") || value.startsWith("F")) {
