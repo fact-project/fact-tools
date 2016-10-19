@@ -18,7 +18,7 @@
     <streams.version>0.9.23</streams.version>
     <binary.name>fact-tools-${project.version}</binary.name>
     <skipTests>false</skipTests>
-    <finalName>fact-tools-${project.version}</finalName>
+    <finalName>fact-tools-v${project.version}</finalName>
   </properties>
 
   <licenses>

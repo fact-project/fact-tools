@@ -143,6 +143,9 @@ public class FactFileListMultiStream extends AbstractMultiStream {
                 stream.init();
 
                 data = stream.readNext();
+                if(data == null){
+                    throw new IOException("New file did not return data. Possibly empty file");
+                }
                 data.put("@drsFile", dataDrsPair.drsFile);
                 filesCounter++;
             }
