@@ -27,14 +27,29 @@ public class TestZFitsStream {
 		log.info( "size of data array: {}",
 				((short[]) item.get("Data")).length 
 				);
-		int i = 1;
-        //the test file contains just 15 valid events.
-		while (i < 15) {
-			item = stream.read();
-            log.debug("Item  {} has {} elements",i,  item.size());
-            i++;
-		}
+        printItemsInStream(stream, item);
 	}
+
+
+    /**
+     * Test whether zfits fits files containing raw data can be read correctly
+     * @throws Exception
+     */
+    @Test
+    public void testReadZFits() throws Exception {
+        URL u =  TestZFitsStream.class.getResource("/testDataFile.fits.fz");
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+        Data item = stream.read();
+        log.info( "size of data array: {}",
+                ((short[]) item.get("Data")).length
+        );
+        printItemsInStream(stream, item);
+    }
+
+
     /**
      * Test whether gzippe fits files containing MC data can be read correctly
      * @throws Exception
