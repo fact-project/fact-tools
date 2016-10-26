@@ -86,8 +86,8 @@ public class FunctionalTest {
             }
         }
 
-        log.info("\n\n" + counter + " of " + size + " files in " + folder.getName() + " failed to execute");
-        log.info(Arrays.toString(failedFilesList.toArray()));
+        log.debug("\n\n" + counter + " of " + size + " files in " + folder.getName() + " failed to execute");
+        log.debug(Arrays.toString(failedFilesList.toArray()));
         assertThat(failedFilesList.size(), is(0));
     }
 }
