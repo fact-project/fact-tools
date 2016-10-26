@@ -139,7 +139,11 @@ public class AuxFileService implements AuxiliaryService {
                         log.error("Could not create path to auxillary file " + dir + " " +name);
                         return false;
                     }catch (IllegalArgumentException e) {
-                        log.warn("The file " + dir + " " +name + " is not a recognized aux service. ");
+                        log.warn("The file " + dir + "/" +name + " is not a recognized aux service. ");
+                        return false;
+                    }catch (IndexOutOfBoundsException e){
+                        log.warn("The file " + dir + "/" +name + " is not a recognized aux service. " +
+                                 "Could not parse file name into a recognized service.");
                         return false;
                     }
                     return true;
