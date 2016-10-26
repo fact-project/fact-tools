@@ -1,5 +1,11 @@
 #Changelog for the fact-tools
 
+## Version 0.16.2 -- 26.10.2016
+
+* ZFitsStream
+    * Fixed a bug that prevented some small files (more columns than rows) from being read
+    * Fixed a bug that prevented parsing of floats in scientific notation in the header of fits files
+
 ## Version 0.16.1 -- 17.10.2016
 
 * AuxFileService
