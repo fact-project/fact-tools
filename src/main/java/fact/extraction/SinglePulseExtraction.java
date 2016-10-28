@@ -111,32 +111,17 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
-    public String getDataKey() {
-        return dataKey;
-    }
 
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
     }
 
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }
 
-    public int getStartSlice() {
-        return startSlice;
-    }
-
     public void setStartSlice(int startSlice) {
         this.startSlice = startSlice;
-    }
-
-    public int getWindowLength() {
-        return windowLength;
     }
 
     public void setWindowLength(int windowLength) {
@@ -147,7 +132,4 @@ public class SinglePulseExtraction implements Processor {
         this.maxIterations = maxIterations;
     }
 
-    public int getMaxIterations() {
-        return maxIterations;
-    }
 }
