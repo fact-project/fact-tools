@@ -11,6 +11,42 @@ import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
 public class SinglePulseExtractorTest {
 
     @Test
+    public void testApplyAcCoupling() {
+
+        double[] timeLine = {0, 5, 10, 0, 15, 0};
+        double[] timeLine_expected = {-5, 0, 5, -5, 10, -5};
+
+        double[] shifted_timeline = SinglePulseExtractor.applyAcCoupling(timeLine);
+
+        Assert.assertEquals(shifted_timeline.length, timeLine_expected.length);
+
+        for (int i = 0; i < timeLine_expected.length; i++) {
+            Assert.assertEquals(shifted_timeline[i], timeLine_expected[i]);
+        }
+    }
+
+    @Test
+    public void testApplyAcCouplingLength() {
+
+        double[] timeLine = {0, 5, 10, 0, 15, 0};
+
+        double[] shifted_timeline = SinglePulseExtractor.applyAcCoupling(timeLine);
+
+        Assert.assertEquals(timeLine.length, shifted_timeline.length);
+    }
+
+    @Test
+    public void testApplyAcCouplingEmpty() {
+
+        double[] timeLine = new double[0];
+
+        double[] shifted_timeline = SinglePulseExtractor.applyAcCoupling(timeLine);
+
+        Assert.assertEquals(shifted_timeline.length, 0);
+        Assert.assertEquals(timeLine.length, 0);
+    }
+
+    @Test
     public void testEmptyTimeLineNoNoise() {
 
         double[] timeLine = new double[300];
