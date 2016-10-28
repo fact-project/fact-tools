@@ -16,12 +16,12 @@ public class SinglePulseExtractorTest {
         double[] timeLine = {0, 5, 10, 0, 15, 0};
         double[] timeLine_expected = {-5, 0, 5, -5, 10, -5};
 
-        SinglePulseExtractor.applyAcCoupling(timeLine);
+        double[] shifted_timeline = SinglePulseExtractor.applyAcCoupling(timeLine);
 
-        Assert.assertEquals(timeLine.length, timeLine_expected.length);
+        Assert.assertEquals(shifted_timeline.length, timeLine_expected.length);
 
         for (int i = 0; i < timeLine_expected.length; i++) {
-            Assert.assertEquals(timeLine[i], timeLine_expected[i]);
+            Assert.assertEquals(shifted_timeline[i], timeLine_expected[i]);
         }
     }
 
@@ -30,9 +30,9 @@ public class SinglePulseExtractorTest {
 
         double[] timeLine = {0, 5, 10, 0, 15, 0};
 
-        SinglePulseExtractor.applyAcCoupling(timeLine);
+        double[] shifted_timeline = SinglePulseExtractor.applyAcCoupling(timeLine);
 
-        Assert.assertEquals(timeLine.length, 6);
+        Assert.assertEquals(timeLine.length, shifted_timeline.length);
     }
 
     @Test
@@ -40,8 +40,9 @@ public class SinglePulseExtractorTest {
 
         double[] timeLine = new double[0];
 
-        SinglePulseExtractor.applyAcCoupling(timeLine);
+        double[] shifted_timeline = SinglePulseExtractor.applyAcCoupling(timeLine);
 
+        Assert.assertEquals(shifted_timeline.length, 0);
         Assert.assertEquals(timeLine.length, 0);
     }
 
