@@ -70,7 +70,6 @@ public class SinglePulseExtractor {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
-        applyAcCoupling(timeLine);
         while(iteration < maxIterations) {
             final double[] conv = Convolve.firstWithSecond(
                 timeLine, 
