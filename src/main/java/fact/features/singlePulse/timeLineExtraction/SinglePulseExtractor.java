@@ -1,6 +1,7 @@
 package fact.features.singlePulse.timeLineExtraction;
 
 import com.google.common.math.DoubleMath;
+import fact.Utils;
 
 import java.util.ArrayList;
 
@@ -63,7 +64,7 @@ public class SinglePulseExtractor {
      * @param maxIterations
      *           The maximum iterations on a time line before abort.
      */
-    public static ArrayList<Integer> getArrivalSlicesOnTimeline(
+    public static int[] getArrivalSlicesOnTimeline(
         double[] timeLine, 
         int maxIterations
     ) {
@@ -111,8 +112,8 @@ public class SinglePulseExtractor {
             }
             iteration++;
         }
+        return Utils.arrayListToInt(arrival_slices);
 
-        return arrival_slices;
     }
 
     /**
