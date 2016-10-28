@@ -60,8 +60,8 @@ public class SinglePulseExtraction implements Processor {
         double[] timeLines = (double[]) input.get(dataKey);
 
         double[] single_pe_count = new double[npix];
-        ArrayList<ArrayList<Integer>> pixelArrivalSlices = 
-            new ArrayList<ArrayList<Integer>>();
+        ArrayList<int[]> pixelArrivalSlices =
+            new ArrayList<>();
 
         double[] reducedTimeline = new double[timeLines.length];
 
@@ -78,13 +78,13 @@ public class SinglePulseExtraction implements Processor {
             double[] pixelTimeLine = SinglePulseExtractor. 
                 milliVoltToNormalizedSinglePulse(pixelTimeLineInMv);
 
-            ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
+            int[] arrivalSlices = SinglePulseExtractor.
                 getArrivalSlicesOnTimeline(
-                    pixelTimeLine, 
+                    pixelTimeLine,
                     maxIterations
                 );
 
-            single_pe_count[pix] = arrivalSlices.size();
+            single_pe_count[pix] = arrivalSlices.length;
             pixelArrivalSlices.add(arrivalSlices);
 
             for (int i = 0; i < windowLength; i++) {
@@ -102,11 +102,11 @@ public class SinglePulseExtraction implements Processor {
         return input;
     }
 
-    private void addStartSliceOffset(ArrayList<ArrayList<Integer>> arr) {
+    private void addStartSliceOffset(ArrayList<int[]> arr) {
         for(int pix=0; pix<arr.size(); pix++) {
-            for(int ph=0; ph<arr.get(pix).size(); ph++) {
-                int slice_with_offset = arr.get(pix).get(ph);
-                arr.get(pix).set(ph, slice_with_offset + startSlice);
+            for(int ph=0; ph<arr.get(pix).length; ph++) {
+                int slice_with_offset = arr.get(pix)[ph];
+                arr.get(pix)[ph] = slice_with_offset + startSlice;
             }
         }
     }
