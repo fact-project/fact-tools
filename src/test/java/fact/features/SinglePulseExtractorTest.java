@@ -51,12 +51,12 @@ public class SinglePulseExtractorTest {
         double[] timeLine = new double[300];
 
         final int maxIterations = 50;
-        ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
+        int[] arrivalSlices = SinglePulseExtractor.
             getArrivalSlicesOnTimeline(
                 timeLine,
                 maxIterations);
 
-        Assert.assertEquals(0, arrivalSlices.size());
+        Assert.assertEquals(0, arrivalSlices.length);
     }
 
     @Test
@@ -74,16 +74,16 @@ public class SinglePulseExtractorTest {
             SinglePulseExtractor.applyAcCoupling(timeLine);
 
             final int maxIterations = 50;
-            ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
+            int[] arrivalSlices = SinglePulseExtractor.
                 getArrivalSlicesOnTimeline(
                     timeLine,
                     maxIterations);
 
-            Assert.assertEquals(1, arrivalSlices.size());
+            Assert.assertEquals(1, arrivalSlices.length);
 
             Assert.assertTrue(
-                arrivalSlices.get(0) <= injectionSlice+2 && 
-                arrivalSlices.get(0) >= injectionSlice-2
+                arrivalSlices[0] <= injectionSlice+2 &&
+                arrivalSlices[0] >= injectionSlice-2
             );
         }
     }
@@ -106,14 +106,14 @@ public class SinglePulseExtractorTest {
             SinglePulseExtractor.applyAcCoupling(timeLine);
 
             final int maxIterations = 100;
-            ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
+            int[]  arrivalSlices = SinglePulseExtractor.
                 getArrivalSlicesOnTimeline(
                     timeLine,
                     maxIterations);
 
             Assert.assertTrue(
-                (double)arrivalSlices.size() <= amplitude+amplitude*0.15 &&
-                (double)arrivalSlices.size() >= amplitude-amplitude*0.15
+                (double)arrivalSlices.length <= amplitude+amplitude*0.15 &&
+                (double)arrivalSlices.length >= amplitude-amplitude*0.15
             );
         }
     }
@@ -141,20 +141,20 @@ public class SinglePulseExtractorTest {
         SinglePulseExtractor.applyAcCoupling(timeLine);
 
         final int maxIterations = 100;
-        ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
+        int[]  arrivalSlices = SinglePulseExtractor.
             getArrivalSlicesOnTimeline(
                 timeLine,
                 maxIterations);
 
-        Assert.assertEquals(3, arrivalSlices.size());
+        Assert.assertEquals(3, arrivalSlices.length);
 
-        Assert.assertTrue((double)arrivalSlices.get(0) >= 200-2);
-        Assert.assertTrue((double)arrivalSlices.get(0) <= 200+2);
+        Assert.assertTrue((double)arrivalSlices[0] >= 200-2);
+        Assert.assertTrue((double)arrivalSlices[0] <= 200+2);
 
-        Assert.assertTrue((double)arrivalSlices.get(1) >= 125-2);
-        Assert.assertTrue((double)arrivalSlices.get(1) <= 125+2);
+        Assert.assertTrue((double)arrivalSlices[1] >= 125-2);
+        Assert.assertTrue((double)arrivalSlices[1] <= 125+2);
 
-        Assert.assertTrue((double)arrivalSlices.get(2) >=  50-2);
-        Assert.assertTrue((double)arrivalSlices.get(2) <=  50+2);
+        Assert.assertTrue((double)arrivalSlices[2] >=  50-2);
+        Assert.assertTrue((double)arrivalSlices[2] <=  50+2);
     }
 }
