@@ -111,15 +111,6 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
-    private void printArrivalSlices(ArrayList<ArrayList<Integer>> arr) {
-        for(int pix=0; pix<arr.size(); pix++) {
-            System.out.print("pix "+pix+": ");
-            for(int ph=0; ph<arr.get(pix).size(); ph++)
-                System.out.print(arr.get(pix).get(ph)+" ");
-            System.out.print("\n");
-        }
-    }
-
     public String getDataKey() {
         return dataKey;
     }
