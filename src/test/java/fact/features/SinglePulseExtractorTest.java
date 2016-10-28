@@ -103,7 +103,7 @@ public class SinglePulseExtractorTest {
                     timeLine,
                     injectionSlice);
 
-            SinglePulseExtractor.applyAcCoupling(timeLine);
+//            SinglePulseExtractor.applyAcCoupling(timeLine);
 
             final int maxIterations = 100;
             int[]  arrivalSlices = SinglePulseExtractor.
@@ -138,7 +138,7 @@ public class SinglePulseExtractorTest {
             timeLine,
             200);
 
-        SinglePulseExtractor.applyAcCoupling(timeLine);
+//        SinglePulseExtractor.applyAcCoupling(timeLine);
 
         final int maxIterations = 100;
         int[]  arrivalSlices = SinglePulseExtractor.
