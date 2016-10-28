@@ -70,7 +70,6 @@ public class SinglePulseExtractor {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
-        timeLine = applyAcCoupling(timeLine);
         while(iteration < maxIterations) {
             final double[] conv = Convolve.firstWithSecond(
                 timeLine, 
@@ -104,7 +103,8 @@ public class SinglePulseExtractor {
                     negativeSinglePulse, 
                     timeLine, 
                     maxSlice);
-                timeLine = applyAcCoupling(timeLine);
+
+                applyAcCoupling(timeLine);
                 arrival_slices.add(am.arg);
             }else{
                 break;
@@ -123,9 +123,9 @@ public class SinglePulseExtractor {
      * @param timeLine
      *           The time line is modified inplace.
      */
-    public static double[] applyAcCoupling(double[] timeLine) {
+    public static void applyAcCoupling(double[] timeLine) {
         if(timeLine.length == 0)
-            return timeLine;
+            return;
 
         double sum = 0.0;
         for (double slice : timeLine){
@@ -134,7 +134,7 @@ public class SinglePulseExtractor {
 
         final double mean = sum/(double)(timeLine.length);
 
-        return ElementWise.add(timeLine, -mean);
+        timeLine = ElementWise.add(timeLine, -mean);
     }
 
     /**
@@ -156,4 +156,3 @@ public class SinglePulseExtractor {
             1.0/factSinglePeAmplitudeInMv);
     }
 }
-
