@@ -104,7 +104,7 @@ public class SinglePulseExtractor {
                     timeLine, 
                     maxSlice);
 
-                applyAcCoupling(timeLine);
+//                applyAcCoupling(timeLine);
                 arrival_slices.add(am.arg);
             }else{
                 break;
@@ -134,7 +134,9 @@ public class SinglePulseExtractor {
 
         final double mean = sum/(double)(timeLine.length);
 
-        timeLine = ElementWise.add(timeLine, -mean);
+        for (int i = 0; i<timeLine.length; i++) {
+            timeLine[i] = timeLine[i] - mean;
+        }
     }
 
     /**
