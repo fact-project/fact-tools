@@ -75,6 +75,8 @@ public class SinglePulseExtractor {
                     pulseToSubstract, 
                     -1.0);
 
+        subtractMinimum(timeLine);
+
         while(iteration < maxIterations) {
             final double[] conv = Convolve.firstWithSecond(
                 timeLine, 
@@ -112,7 +114,6 @@ public class SinglePulseExtractor {
             iteration++;
         }
         return Utils.arrayListToInt(arrival_slices);
-
     }
 
     /**
@@ -136,6 +137,28 @@ public class SinglePulseExtractor {
 
         for (int i = 0; i<timeLine.length; i++) {
             timeLine[i] = timeLine[i] - mean;
+        }
+    }
+
+    /**
+     * Subtract the minimum amplitude on a timeline from the whole timeline.
+     *
+     * @param timeLine
+     *           The time line is modified inplace.
+     */
+    public static void subtractMinimum(double[] timeLine) {
+        if(timeLine.length == 0)
+            return;
+
+        double min = timeLine[0];
+        for (int i = 0; i<timeLine.length; i++) {
+            if (timeLine[i] < min) {
+                min = timeLine[i];
+            }
+        }
+
+        for (int i = 0; i<timeLine.length; i++) {
+            timeLine[i] = timeLine[i] - min;
         }
     }
 
