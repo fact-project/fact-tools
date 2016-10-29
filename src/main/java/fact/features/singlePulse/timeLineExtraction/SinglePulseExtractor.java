@@ -71,6 +71,10 @@ public class SinglePulseExtractor {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
+        final double[] negativeSinglePulse = ElementWise.multiply(
+                    pulseToSubstract, 
+                    -1.0);
+
         while(iteration < maxIterations) {
             final double[] conv = Convolve.firstWithSecond(
                 timeLine, 
@@ -95,11 +99,6 @@ public class SinglePulseExtractor {
             final double maxResponse = am.max/pulseToLookForIntegral;
 
             if(maxResponse > 0.5) {
-                final double weight = 1.0;
-                final double[] negativeSinglePulse = ElementWise.multiply(
-                    pulseToSubstract, 
-                    -weight);
-                
                 AddFirstArrayToSecondArray.at(
                     negativeSinglePulse, 
                     timeLine, 
