@@ -79,8 +79,6 @@ public class SinglePulseExtractor {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
-        subtractMinimum(timeLine);
-
         while(iteration < maxIterations) {
 
             final double[] conv = Convolve.firstWithSecond(
@@ -121,7 +119,6 @@ public class SinglePulseExtractor {
                     timeLine, 
                     maxSlice);
 
-//                applyAcCoupling(timeLine);
                 arrival_slices.add(am.arg);
             }else{
                 break;
@@ -131,29 +128,6 @@ public class SinglePulseExtractor {
         return Utils.arrayListToInt(arrival_slices);
     }
 
-    /**
-     * Estimates the effect of FACT's AC coupling in between the
-     * photo-electric converter (SIPM) and the signal sampler (DRS4).
-     * Here simply the mean of the time line is subtracted from it.
-     *
-     * @param timeLine
-     *           The time line is modified inplace.
-     */
-    public static void applyAcCoupling(double[] timeLine) {
-        if(timeLine.length == 0)
-            return;
-
-        double sum = 0.0;
-        for (double slice : timeLine){
-            sum += slice;
-        }
-
-        final double mean = sum/(double)(timeLine.length);
-
-        for (int i = 0; i<timeLine.length; i++) {
-            timeLine[i] = timeLine[i] - mean;
-        }
-    }
 
     /**
      * Subtract the minimum amplitude on a timeline from the whole timeline.
@@ -176,6 +150,7 @@ public class SinglePulseExtractor {
             timeLine[i] = timeLine[i] - min;
         }
     }
+
 
     /**
      * Convert time line amplitudes from mV to normalized amplitudes of

@@ -30,41 +30,6 @@ public class SinglePulseExtractorTest {
     }
 
     @Test
-    public void testApplyAcCoupling() {
-
-        double[] timeLine = {0, 5, 10, 0, 15, 0};
-        double[] timeLine_expected = {-5, 0, 5, -5, 10, -5};
-
-        SinglePulseExtractor.applyAcCoupling(timeLine);
-
-        Assert.assertEquals(timeLine.length, timeLine_expected.length);
-
-        for (int i = 0; i < timeLine_expected.length; i++) {
-            Assert.assertEquals(timeLine[i], timeLine_expected[i]);
-        }
-    }
-
-    @Test
-    public void testApplyAcCouplingLength() {
-
-        double[] timeLine = {0, 5, 10, 0, 15, 0};
-
-        SinglePulseExtractor.applyAcCoupling(timeLine);
-
-        Assert.assertEquals(timeLine.length, 6);
-    }
-
-    @Test
-    public void testApplyAcCouplingEmpty() {
-
-        double[] timeLine = new double[0];
-
-        SinglePulseExtractor.applyAcCoupling(timeLine);
-
-        Assert.assertEquals(timeLine.length, 0);
-    }
-
-    @Test
     public void testEmptyTimeLineNoNoise() {
 
         double[] timeLine = new double[300];
@@ -89,8 +54,6 @@ public class SinglePulseExtractorTest {
                 TemplatePulse.factSinglePePulse(300),
                 timeLine,
                 injectionSlice);
-
-            SinglePulseExtractor.applyAcCoupling(timeLine);
 
             final int maxIterations = 50;
             int[] arrivalSlices = SinglePulseExtractor.
@@ -121,8 +84,6 @@ public class SinglePulseExtractorTest {
                     TemplatePulse.factSinglePePulse(300),
                     timeLine,
                     injectionSlice);
-
-//            SinglePulseExtractor.applyAcCoupling(timeLine);
 
             final int maxIterations = 100;
             int[]  arrivalSlices = SinglePulseExtractor.
@@ -156,8 +117,6 @@ public class SinglePulseExtractorTest {
             TemplatePulse.factSinglePePulse(300),
             timeLine,
             200);
-
-//        SinglePulseExtractor.applyAcCoupling(timeLine);
 
         final int maxIterations = 100;
         int[]  arrivalSlices = SinglePulseExtractor.
