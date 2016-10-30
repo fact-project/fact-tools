@@ -22,8 +22,8 @@ public class SinglePulseExtractor {
     *   Amplitude of the single puls ids normalized to 1.0.
     */
 
-    public static final int pulseToSubstractLength = 300;
-    public static final double[] pulseToSubstract;
+    public static final int negativePulseLength = 300;
+    public static final double[] negativePulse;
     /** The template time line of the pulse to be 
     *   substracted from the time line. For FACT, this 
     *   substraction pulse should be the full pulse with its 
@@ -36,10 +36,10 @@ public class SinglePulseExtractor {
     static {
         pulseToLookFor = TemplatePulse.factSinglePePulse(
             pulseToLookForLength);
-        pulseToSubstract= TemplatePulse.factSinglePePulse(
-            pulseToSubstractLength);
+        double[] pulseToSubstract = TemplatePulse.factSinglePePulse(
+            negativePulseLength);
+        negativePulse = ElementWise.multiply(pulseToSubstract, -1.0);
 
-        
         double sum = 0.0;
         for (double slice : pulseToLookFor){
             sum += slice;
@@ -71,10 +71,6 @@ public class SinglePulseExtractor {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
-        final double[] negativeSinglePulse = ElementWise.multiply(
-                    pulseToSubstract, 
-                    -1.0);
-
         subtractMinimum(timeLine);
 
         while(iteration < maxIterations) {
@@ -102,7 +98,7 @@ public class SinglePulseExtractor {
 
             if(maxResponse > 0.5) {
                 AddFirstArrayToSecondArray.at(
-                    negativeSinglePulse, 
+                    negativePulse, 
                     timeLine, 
                     maxSlice);
 
