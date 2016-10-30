@@ -21,6 +21,7 @@ public class SinglePulseExtractor {
     *   20 slices = 10ns.
     *   Amplitude of the single puls ids normalized to 1.0.
     */
+    public static final double[] baselineKernel;
 
     public static final int negativePulseLength = 300;
     public static final double[] negativePulse;
@@ -45,6 +46,13 @@ public class SinglePulseExtractor {
             sum += slice;
         }
         pulseToLookForIntegral = sum;
+
+        double[] baseline = new double[pulseToLookForLength];
+        for (int i=0; i<baseline.length; i++) {
+            baseline[i] = 1.0;
+        }
+
+        baselineKernel = baseline;
     }
 
     /**
@@ -74,12 +82,23 @@ public class SinglePulseExtractor {
         subtractMinimum(timeLine);
 
         while(iteration < maxIterations) {
+
             final double[] conv = Convolve.firstWithSecond(
                 timeLine, 
                 pulseToLookFor);
-            final ArgMax am = new ArgMax(conv);
-            final int offsetSlices = 
-                (int)((double)(pulseToLookFor.length)*0.35);
+
+            final double[] base = Convolve.firstWithSecond(
+                timeLine, 
+                baselineKernel);
+
+            double[] response = new double[conv.length];
+            for (int i=0; i<conv.length; i++) {
+                response[i] = conv[i] - base[i]; 
+            }
+
+            final ArgMax am = new ArgMax(response);
+            final int offsetSlices = 3;
+                //(int)((double)(pulseToLookFor.length)*0.35);
             // The offsetSlices are needed to comensate both the asymetric 
             // convolution and the asymetric amplitude distribution in the 
             // pulse template (mostly the rising edge of the pulse).
