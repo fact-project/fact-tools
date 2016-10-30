@@ -25,8 +25,8 @@ public class SinglePulseExtractor {
     public static final int negativePulseLength = 300;
     public static final double[] negativePulse;
     /** The template time line of the pulse to be 
-    *   substracted from the time line. For FACT, this 
-    *   substraction pulse should be the full pulse with its 
+    *   subtracted from the time line. For FACT, this 
+    *   subtraction pulse should be the full pulse with its 
     *   long falling edge. 300 slices = 150ns.
     *   Amplitude of the single puls is normalized to 1.0.
     */
@@ -36,9 +36,9 @@ public class SinglePulseExtractor {
     static {
         pulseToLookFor = TemplatePulse.factSinglePePulse(
             pulseToLookForLength);
-        double[] pulseToSubstract = TemplatePulse.factSinglePePulse(
+        double[] pulseToSubtract = TemplatePulse.factSinglePePulse(
             negativePulseLength);
-        negativePulse = ElementWise.multiply(pulseToSubstract, -1.0);
+        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);
 
         double sum = 0.0;
         for (double slice : pulseToLookFor){
@@ -58,7 +58,7 @@ public class SinglePulseExtractor {
      *           The time line to look for pulses in. The time line
      *           is modified in place. When the extractor was
      *           successfull, the time line is flat and all pulses
-     *           were substracted.
+     *           were subtracted.
      *           Amplitude of the single puls must be normalized to 1.0.
      *
      * @param maxIterations
@@ -84,7 +84,7 @@ public class SinglePulseExtractor {
             // convolution and the asymetric amplitude distribution in the 
             // pulse template (mostly the rising edge of the pulse).
             // These asymetries cause the maximum amplitude in conv not to 
-            // be the optimum position for the pulse substraction.
+            // be the optimum position for the pulse subtraction.
             // The offsetSlices are chosen to correct for this and as a 
             // first guide we provide here the magic factor: 
             // offsetSlices = 0.35*templatePulse.length
@@ -115,7 +115,7 @@ public class SinglePulseExtractor {
     /**
      * Estimates the effect of FACT's AC coupling in between the
      * photo-electric converter (SIPM) and the signal sampler (DRS4).
-     * Here simply the mean of the time line is substracted from it.
+     * Here simply the mean of the time line is subtracted from it.
      *
      * @param timeLine
      *           The time line is modified inplace.
