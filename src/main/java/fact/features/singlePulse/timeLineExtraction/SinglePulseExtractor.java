@@ -158,23 +158,4 @@ public class SinglePulseExtractor {
             timeLineInMv, 
             1.0/factSinglePeAmplitudeInMv);
     }
-
-    /**
-     * Convert normalized time line amplitudes of
-     * single photon pulses to mV.
-     *
-     * @return normalizedSinglePulseToMilliVolt
-     *           The amplitude of single pulses is 1.0 here.
-     *
-     * @param normalizedTimeLine
-     *           In milli Volts (single pulse amplitude about 10mV)
-     */
-    public static double[] normalizedSinglePulseToMilliVolt(
-            double[] normalizedTimeLine
-    ) {
-
-        return ElementWise.multiply(
-                normalizedTimeLine,
-                factSinglePeAmplitudeInMv);
-    }
 }
