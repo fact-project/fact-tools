@@ -75,7 +75,7 @@ public class SinglePulseExtractorTest {
 
         final int injectionSlice = 50;
 
-        for(double amplitude = 0.0; amplitude<50.0; amplitude++) {
+        for(double amplitude = 0.0; amplitude<15.0; amplitude++) {
          
             double[] timeLine = new double[300];
 
@@ -92,8 +92,8 @@ public class SinglePulseExtractorTest {
                     maxIterations);
 
             Assert.assertTrue(
-                (double)arrivalSlices.length <= amplitude+amplitude*0.15 &&
-                (double)arrivalSlices.length >= amplitude-amplitude*0.15
+                (double)arrivalSlices.length <= amplitude+amplitude*0.25 &&
+                (double)arrivalSlices.length >= amplitude-amplitude*0.25
             );
         }
     }
@@ -126,13 +126,13 @@ public class SinglePulseExtractorTest {
 
         Assert.assertEquals(3, arrivalSlices.length);
 
-        Assert.assertTrue((double)arrivalSlices[0] >= 200-2);
-        Assert.assertTrue((double)arrivalSlices[0] <= 200+2);
+        Assert.assertTrue((double)arrivalSlices[0] >= 50-2);
+        Assert.assertTrue((double)arrivalSlices[0] <= 50+2);
 
         Assert.assertTrue((double)arrivalSlices[1] >= 125-2);
         Assert.assertTrue((double)arrivalSlices[1] <= 125+2);
 
-        Assert.assertTrue((double)arrivalSlices[2] >=  50-2);
-        Assert.assertTrue((double)arrivalSlices[2] <=  50+2);
+        Assert.assertTrue((double)arrivalSlices[2] >= 200-2);
+        Assert.assertTrue((double)arrivalSlices[2] <= 200+2);
     }
 }
