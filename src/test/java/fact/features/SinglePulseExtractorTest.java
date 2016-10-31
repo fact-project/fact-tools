@@ -11,25 +11,6 @@ import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
 public class SinglePulseExtractorTest {
 
     @Test
-    public void testSubtractMinimumEmpty() {
-
-        double[] timeLine = new double[0];
-        SinglePulseExtractor.subtractMinimum(timeLine);
-        Assert.assertEquals(timeLine.length, 0);
-    }
-
-    @Test
-    public void testSubtractMinimum() {
-
-        double[] timeLine =          {13, 5, 10, 4, 15, 12};
-        double[] timeLine_expected = { 9, 1,  6, 0, 11,  8};
-        SinglePulseExtractor.subtractMinimum(timeLine);
-        Assert.assertEquals(timeLine.length, 6);
-        for (int i=0; i<timeLine.length; i++)
-            Assert.assertEquals(timeLine[i], timeLine_expected[i]);
-    }
-
-    @Test
     public void testEmptyTimeLineNoNoise() {
 
         double[] timeLine = new double[300];

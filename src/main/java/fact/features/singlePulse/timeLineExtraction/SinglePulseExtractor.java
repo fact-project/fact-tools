@@ -139,29 +139,6 @@ public class SinglePulseExtractor {
 
 
     /**
-     * Subtract the minimum amplitude on a timeline from the whole timeline.
-     *
-     * @param timeLine
-     *           The time line is modified inplace.
-     */
-    public static void subtractMinimum(double[] timeLine) {
-        if(timeLine.length == 0)
-            return;
-
-        double min = timeLine[0];
-        for (int i = 0; i<timeLine.length; i++) {
-            if (timeLine[i] < min) {
-                min = timeLine[i];
-            }
-        }
-
-        for (int i = 0; i<timeLine.length; i++) {
-            timeLine[i] = timeLine[i] - min;
-        }
-    }
-
-
-    /**
      * Convert time line amplitudes from mV to normalized amplitudes of
      * single photon pulses.
      *
