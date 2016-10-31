@@ -4,6 +4,7 @@ import fact.Utils;
 import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
+import fact.features.singlePulse.timeLineExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sin;
 import stream.Data;
@@ -45,6 +46,10 @@ public class ConvertSinglePulses2Timeseries implements Processor {
 
             timeseries = (double[]) ArrayUtils.addAll(timeseries, current_timeseries);
         }
+
+        timeseries = ElementWise.multiply(
+            timeseries, 
+            SinglePulseExtractor.factSinglePeAmplitudeInMv);
 
         input.put(timeseriesKey, timeseries);
 
