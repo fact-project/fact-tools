@@ -37,7 +37,7 @@ public class SinglePulseExtraction implements Processor {
         description = "start slice of extraction window", 
         defaultValue = "20"
     )
-    protected int startSlice = 25;
+    protected int startSlice = 20;
 
     @Parameter(
         required = false, 
