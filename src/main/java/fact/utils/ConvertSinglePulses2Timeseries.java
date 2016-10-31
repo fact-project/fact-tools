@@ -30,8 +30,7 @@ public class ConvertSinglePulses2Timeseries implements Processor {
 
         int[][] singlePulses = (int[][]) input.get(singlePulsesKey);
 
-        double[] pulseTemplate =
-                SinglePulseExtractor.normalizedSinglePulseToMilliVolt(TemplatePulse.factSinglePePulse(roi));
+        double[] pulseTemplate = TemplatePulse.factSinglePePulse(roi);
 
         double[] timeseries = new double[0];
 
