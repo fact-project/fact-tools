@@ -23,7 +23,7 @@
     <fact.extraction.SinglePulseExtraction 
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"
-        maxIterations="50"
+        maxIterations="1000"
     />
 
     <fact.ShowViewer key="DataCalibrated" />
