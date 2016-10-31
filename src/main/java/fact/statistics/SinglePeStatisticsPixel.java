@@ -1,16 +1,13 @@
 package fact.statistics;
 
 import fact.Utils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.rank.Percentile;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -19,7 +16,7 @@ import java.util.Arrays;
  * @author Jens Buss
  *
  */
-public class PixelStatistics implements Processor {
+public class SinglePeStatisticsPixel implements Processor {
 	
 	@Parameter(required=true,description="key to the data array")
 	private String dataKey = null;
@@ -35,7 +32,7 @@ public class PixelStatistics implements Processor {
 		
 		Utils.mapContainsKeys(input, dataKey);
 
-		ArrayList<ArrayList<Integer>> data = (ArrayList<ArrayList<Integer>>) input.get(dataKey);
+        int[][] data = (int[][]) input.get(dataKey);
 		
 		double[] mean = new double[npix];
 		double[] median = new double[npix];
@@ -49,9 +46,7 @@ public class PixelStatistics implements Processor {
 		double[] quantil75 = new double[npix];
 		
 		for (int pix = 0 ; pix < npix ; pix++){
-			ArrayList<Integer> list = data.get(pix);
-			int[] intArray = ArrayUtils.toPrimitive(list.toArray(new Integer[list.size()]));
-			double[] values = Arrays.stream(intArray).asDoubleStream().toArray();
+            double[] values = Utils.toDoubleArray(data[pix]);
 
 			if (values.length == 0){
 				continue;
