@@ -48,6 +48,8 @@ public class SinglePeStatisticsPixel implements Processor {
 		for (int pix = 0 ; pix < npix ; pix++){
             double[] values = Utils.toDoubleArray(data[pix]);
 
+
+            ///FIXME: fill nans instead of continue
 			if (values.length == 0){
 				continue;
 			}
