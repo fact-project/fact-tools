@@ -1,17 +1,13 @@
 package fact.statistics;
 
 import fact.Utils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.rank.Percentile;
+
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.IntStream;
 
 
 /**
