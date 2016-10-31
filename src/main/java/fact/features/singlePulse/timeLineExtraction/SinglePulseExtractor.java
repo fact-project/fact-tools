@@ -21,7 +21,9 @@ public class SinglePulseExtractor {
     *   20 slices = 10ns.
     *   Amplitude of the single puls ids normalized to 1.0.
     */
-    public static final double[] baselineKernel;
+    public static final double[] plateauToLookFor;
+    public static final double plateauIntegral;
+
 
     public static final int negativePulseLength = 300;
     public static final double[] negativePulse;
@@ -32,14 +34,19 @@ public class SinglePulseExtractor {
     *   Amplitude of the single puls is normalized to 1.0.
     */
 
+    public static final int offsetSlices = 7;
     public static final double factSinglePeAmplitudeInMv = 10.0;
 
     static {
-        pulseToLookFor = TemplatePulse.factSinglePePulse(
-            pulseToLookForLength);
-        double[] pulseToSubtract = TemplatePulse.factSinglePePulse(
-            negativePulseLength);
-        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);
+        // PulseToLookFor
+        // --------------
+        double[] pulse = new double[pulseToLookForLength+offsetSlices];
+        AddFirstArrayToSecondArray.at(
+            TemplatePulse.factSinglePePulse(pulseToLookForLength),
+            pulse,
+            offsetSlices
+        );
+        pulseToLookFor = pulse;
 
         double sum = 0.0;
         for (double slice : pulseToLookFor){
@@ -47,12 +54,27 @@ public class SinglePulseExtractor {
         }
         pulseToLookForIntegral = sum;
 
-        double[] baseline = new double[pulseToLookForLength];
-        for (int i=0; i<baseline.length; i++) {
-            baseline[i] = 1.0;
+        // PlateauToLookFor
+        // ----------------
+        double[] plateau = new double[pulseToLookForLength+offsetSlices];
+        double plateau_sum = 0.0;
+        for (int i=0; i<pulseToLookFor.length; i++) {
+            if (i<offsetSlices) {
+                plateau[i] = 1.0;
+                plateau_sum += plateau[i];
+            }else{
+                plateau[i] = 0.0;
+            }
         }
+        plateauToLookFor = plateau;
+        plateauIntegral = plateau_sum;
 
-        baselineKernel = baseline;
+        // PulseToSubtract
+        // ---------------
+        double[] pulseToSubtract = TemplatePulse.factSinglePePulse(
+            negativePulseLength);
+        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);
+
     }
 
     /**
@@ -81,45 +103,32 @@ public class SinglePulseExtractor {
 
         while(iteration < maxIterations) {
 
-            final double[] conv = Convolve.firstWithSecond(
+            final double[] pulseResponse = Convolve.firstWithSecond(
                 timeLine, 
                 pulseToLookFor);
 
-            final double[] base = Convolve.firstWithSecond(
-                timeLine, 
-                baselineKernel);
+            final double[] baselineResponse = Convolve.firstWithSecond(
+                timeLine,
+                plateauToLookFor);
 
-            double[] response = new double[conv.length];
-            for (int i=0; i<conv.length; i++) {
-                response[i] = conv[i] - base[i]; 
+            double response[] = new double[pulseResponse.length];
+            for (int i=0; i<pulseResponse.length; i++) {
+                response[i] = pulseResponse[i]/pulseToLookForIntegral - 
+                    baselineResponse[i]/plateauIntegral;
             }
 
             final ArgMax am = new ArgMax(response);
-            final int offsetSlices = 3;
-                //(int)((double)(pulseToLookFor.length)*0.35);
-            // The offsetSlices are needed to comensate both the asymetric 
-            // convolution and the asymetric amplitude distribution in the 
-            // pulse template (mostly the rising edge of the pulse).
-            // These asymetries cause the maximum amplitude in conv not to 
-            // be the optimum position for the pulse subtraction.
-            // The offsetSlices are chosen to correct for this and as a 
-            // first guide we provide here the magic factor: 
-            // offsetSlices = 0.35*templatePulse.length
-            // This indicates the dependency of offsetSlices of the 
-            // templatePulse.length 
-            // (offsetSlices = 7 for templatePulse.length = 20).
-            // It might be that offsetSlices can be optimized based on the
-            // maxResponse.
-            final int maxSlice = am.arg - offsetSlices;
-            final double maxResponse = am.max/pulseToLookForIntegral;
+            final int maxSlice = am.arg + offsetSlices;
+            final double maxResponse = am.max;
 
-            if(maxResponse > 0.5) {
+            if(maxResponse > 0.65) {
                 AddFirstArrayToSecondArray.at(
                     negativePulse, 
                     timeLine, 
                     maxSlice);
 
-                arrival_slices.add(am.arg);
+                if(maxSlice >= 1)
+                    arrival_slices.add(maxSlice);
             }else{
                 break;
             }
