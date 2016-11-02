@@ -58,13 +58,9 @@ public class SinglePulseExtractor {
         // ----------------
         double[] plateau = new double[pulseToLookForLength+offsetSlices];
         double plateau_sum = 0.0;
-        for (int i=0; i<pulseToLookFor.length; i++) {
-            if (i<offsetSlices) {
+        for (int i=0; i<offsetSlices; i++) {
                 plateau[i] = 1.0;
                 plateau_sum += plateau[i];
-            }else{
-                plateau[i] = 0.0;
-            }
         }
         plateauToLookFor = plateau;
         plateauIntegral = plateau_sum;
