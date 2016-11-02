@@ -36,4 +36,38 @@ public class ElementWise {
             out[i] = arr[i]+scalar;
         return out;
     }
+
+    /**
+     * Add two arrays of same length.
+     * @param arr1
+     *           First input array [N]
+     * @param arr2
+     *           Second input array [N]
+     * @return out
+     *           The elementwise sum of arr1 and arr2.
+     */
+    public static double[] addFirstToSecond(double[] arr1, double[] arr2) {
+        assert arr1.length == arr2.length;
+        double[] out = new double[arr1.length];
+        for(int i=0; i<arr1.length; i++)
+            out[i] = arr1[i] + arr2[i];
+        return out;
+    }
+
+    /**
+     * Subtract two arrays of same length.
+     * @param arr1
+     *           First input array [N]
+     * @param arr2
+     *           Second input array [N]
+     * @return out
+     *           The elementwise difference fo arr2 and arr1.
+     */
+    public static double[] subtractFirstFromSecond(double[] arr1, double[] arr2) {
+        assert arr1.length == arr2.length;
+        double[] out = new double[arr1.length];
+        for(int i=0; i<arr1.length; i++)
+            out[i] = arr2[i] - arr1[i];
+        return out;
+    }
 }

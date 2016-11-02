@@ -46,13 +46,13 @@ public class SinglePulseExtractor {
             pulse,
             offsetSlices
         );
-        pulseToLookFor = pulse;
-
         double sum = 0.0;
-        for (double slice : pulseToLookFor){
+        for (double slice: pulse){
             sum += slice;
         }
         pulseToLookForIntegral = sum;
+        pulseToLookFor = ElementWise.multiply(pulse, 1.0/pulseToLookForIntegral);
+
 
         // PlateauToLookFor
         // ----------------
@@ -62,8 +62,8 @@ public class SinglePulseExtractor {
                 plateau[i] = 1.0;
                 plateau_sum += plateau[i];
         }
-        plateauToLookFor = plateau;
         plateauIntegral = plateau_sum;
+        plateauToLookFor = ElementWise.multiply(plateau, 1.0/plateauIntegral);
 
         // PulseToSubtract
         // ---------------
@@ -107,11 +107,9 @@ public class SinglePulseExtractor {
                 timeLine,
                 plateauToLookFor);
 
-            double response[] = new double[pulseResponse.length];
-            for (int i=0; i<pulseResponse.length; i++) {
-                response[i] = pulseResponse[i]/pulseToLookForIntegral - 
-                    baselineResponse[i]/plateauIntegral;
-            }
+            final double[] response = ElementWise.subtractFirstFromSecond(
+                baselineResponse,
+                pulseResponse); 
 
             final ArgMax am = new ArgMax(response);
             final int maxSlice = am.arg + offsetSlices;
