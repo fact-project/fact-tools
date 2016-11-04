@@ -1,7 +1,6 @@
 package fact.io.hdureader;
 
 import com.google.common.base.Splitter;
-import com.google.common.io.CountingInputStream;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -36,7 +35,8 @@ public class HDU {
 
     String history = "";
 
-    public int size = 0;
+    //size of header in bytes
+    public int headerSizeInBytes = 0;
 
 
     /**
@@ -72,7 +72,7 @@ public class HDU {
                     .anyMatch(a -> a.matches("END$"));
 
             //store how many blocks are in this hdu
-            size = blockNumber*2880;
+            headerSizeInBytes = (blockNumber + 1)*2880;
 
             if(hasEndKeyWord){
                 break;
@@ -141,6 +141,14 @@ public class HDU {
         return Optional.ofNullable(header.get(key));
     }
 
+    public Optional<Integer> getInt(String key){
+        try {
+            HDULine line = header.get(key);
+            return Optional.of(Integer.parseInt(line.value));
+        } catch (NumberFormatException| NullPointerException e){
+            return Optional.empty();
+        }
+    }
     public Optional<String> get(String key){
         if(!header.containsKey(key)){
             return Optional.empty();
