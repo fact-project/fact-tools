@@ -1,6 +1,7 @@
 package fact.io;
 
 import com.google.common.io.ByteStreams;
+import fact.io.hdureader.BinTable;
 import fact.io.hdureader.Fits;
 import fact.io.hdureader.HDU;
 
@@ -12,6 +13,11 @@ import java.io.*;
 import java.net.URL;
 
 import java.util.zip.GZIPInputStream;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -58,7 +64,7 @@ public class HDUReaderTest {
     }
 
     @Test
-    public void testFits() throws IOException {
+    public void testZFits() throws Exception {
         URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
 
         Fits f = new Fits(u);
@@ -68,7 +74,70 @@ public class HDUReaderTest {
 
         InputStream inputStreamForHDUData = f.getInputStreamForHDUData(zDrsCellOffsets);
         int b = new DataInputStream(inputStreamForHDUData).read();
-        System.out.println(b);
+//
+//
+//        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+//        stream.tableName = "Events";
+//        stream.init();
+//
+//        Data item = stream.read();
+//        System.out.println(b);
+////        int read = inputStreamForHDUData.read();
+////        System.out.println(read);
+    }
+
+
+    @Test
+    public void testGzip() throws IOException {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+
+        byte[] header = new byte[2];
+        u.openStream().read(header);
+
+        assertTrue(Fits.isGzippedCompressed(header));
+
+
+        u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+
+        header = new byte[2];
+        u.openStream().read(header);
+
+        assertFalse(Fits.isGzippedCompressed(header));
+    }
+
+    @Test
+    public void testFits() throws Exception {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+
+        Fits f = new Fits(u);
+
+        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
+
+        DataInputStream inputStreamForHDUData = f.getInputStreamForHDUData(events);
+
+        int eventNum = inputStreamForHDUData.readInt();
+
+        assertThat(eventNum, is(1));
+
+        BinTable b = new BinTable(events, inputStreamForHDUData);
+////        int read = inputStreamForHDUData.read();
+////        System.out.println(read);
+    }
+
+
+    @Test
+    public void testFitsBinTable() throws Exception {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+
+        Fits f = new Fits(u);
+
+        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
+
+        DataInputStream stream = f.getInputStreamForHDUData(events);
+
+        BinTable b = new BinTable(events, stream);
+        assertThat(b.numberOfRowsInTable, is(10749));
+
 ////        int read = inputStreamForHDUData.read();
 ////        System.out.println(read);
     }
