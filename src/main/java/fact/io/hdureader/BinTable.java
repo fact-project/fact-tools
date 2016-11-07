@@ -1,18 +1,31 @@
 package fact.io.hdureader;
 
+import fact.io.FitsStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 /**
+ * A BinTable representation.
  * Created by kai on 04.11.16.
  */
 public class BinTable {
 
+    static Logger log = LoggerFactory.getLogger(BinTable.class);
+
+
+    /**
+     * This enum maps the type characters in the header to the fits types.
+     * Not all types from the fits standard are supported here.
+     *
+     * TODO: support variable length arrays.
+     *
+     */
     public enum ColumnType {
         BOOLEAN("L"),
         STRING("A"),
@@ -23,10 +36,6 @@ public class BinTable {
         FLOAT("E"),
         DOUBLE("D"),
         NONE("");
-//        COMPLEX('C', 8),
-//        BIT(),
-//        DOUBLE_COMPLEX('M', 16)
-
 
         String typeString;
         ColumnType(String typeString) {
@@ -43,32 +52,32 @@ public class BinTable {
 
     }
 
-    public class TableColumn{
+    private class TableColumn{
 
-        public TableColumn(HDULine tform, HDULine ttype){
+        TableColumn(HDULine tform, HDULine ttype){
             Matcher matcher = Pattern.compile("(\\d+)([LABIJKED])").matcher(tform.value);
             if (matcher.matches()){
                 repeatCount = Integer.parseInt(matcher.group(1));
-                e = ColumnType.typeForChar(matcher.group(2));
+                type = ColumnType.typeForChar(matcher.group(2));
             }
             this.name = ttype.key;
 
         }
         public int repeatCount = 0;
-        public ColumnType e;
+        public ColumnType type;
         public String name;
     }
 
-    List<TableColumn> l = new ArrayList<>();
+    private List<TableColumn> columns = new ArrayList<>();
 
     public Integer numberOfRowsInTable = 0;
 
-    public BinTable(HDU hdu, DataInputStream inputStream){
+    public BinTable(HDU hdu, DataInputStream inputStream) throws IllegalArgumentException{
 
         Iterator<HDULine> tforms = hdu.header
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getKey().matches("TFORM\\d?"))
+                .filter(entry -> entry.getKey().matches("TFORM\\d+"))
                 .map(Map.Entry::getValue)
                 .iterator();
 
@@ -76,17 +85,30 @@ public class BinTable {
         Iterator<HDULine> ttypes = hdu.header
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getKey().matches("TTYPE\\d?"))
+                .filter(entry -> entry.getKey().matches("TTYPE\\d+"))
                 .map(Map.Entry::getValue)
                 .iterator();
 
+
+
         //no zipping in java yet. this make me sad :(
         while (ttypes.hasNext() && tforms.hasNext()){
-            l.add(new TableColumn(tforms.next(), ttypes.next()));
+            columns.add(new TableColumn(tforms.next(), ttypes.next()));
         }
 
         numberOfRowsInTable = hdu.getInt("NAXIS2").orElse(0);
 
+        int tfields = hdu.getInt("TFIELDS").orElseThrow(() -> {
+            log.error("The TFIELDS keyword cannot be found in the BinTable. " +
+                    "Its mandatory. See section 7.2.1 of the Fits 3.0 standard");
+            return new IllegalArgumentException("Missing TFIELD keyword");
+        });
+
+        if(columns.size() != tfields){
+            log.error("The value of TFIELDS: {} does not match the number of TTYPEn,TBCOLn,TFORMn tuples {}" +
+                    "\n See section 7.2.1 of the Fits 3.0 standard", tfields, columns.size());
+            throw new IllegalArgumentException("Number of TFIELDS does not match number of TFORMn entries.");
+        }
 
     }
 
