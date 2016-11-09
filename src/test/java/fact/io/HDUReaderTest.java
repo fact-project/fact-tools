@@ -10,6 +10,8 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.Data;
+import stream.io.SourceURL;
 
 import java.io.*;
 import java.net.URL;
@@ -18,9 +20,7 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -156,9 +156,33 @@ public class HDUReaderTest {
         assertThat(unixtime.length , is(2));
 
         DateTime date = new DateTime((long) (unixtime[0]* 1000.0 + unixtime[1]/ 1000.0),  DateTimeZone.UTC);
-        System.out.println(date);
+        assertThat(date.getYear(), is(2013));
+        assertThat(date.getMonthOfYear(), is(1));
+        assertThat(date.getDayOfMonth(), is(2));
+        assertThat(date.getHourOfDay(), is(21));
+        assertThat(date.getMinuteOfHour(), is(46));
+    }
 
-//        row.forEach((k, v) -> System.out.println(k + ", " + v));
+    @Test
+    public void compareReaders() throws Exception {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 
+        Fits f = new Fits(u);
+        BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
+        BinTable.Reader reader = b.reader;
+        Map<String, Serializable> row = reader.getNextRow();
+
+        short[] datFromBintable = (short[]) row.get("Data");
+
+
+
+        FitsStream stream = new FitsStream(new SourceURL(u));
+        stream.init();
+        Data item = stream.read();
+
+        short[] dataFromOldStream = (short[]) item.get("Data");
+
+
+        assertArrayEquals(dataFromOldStream, datFromBintable);
     }
 }
