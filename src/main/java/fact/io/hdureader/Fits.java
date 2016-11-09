@@ -100,6 +100,21 @@ public class Fits {
         return getInputStreamForHDUData(hduNames.get(hduExtName));
     }
 
+    public Optional<BinTable> getBinTableByName(String hduExtName) {
+        if(!hduNames.containsKey(hduExtName)){
+            return Optional.empty();
+        }
+        HDU hdu = hduNames.get(hduExtName);
+        try {
+            DataInputStream inputStream = getInputStreamForHDUData(hdu);
+            return Optional.of(new BinTable(hdu, inputStream));
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+
+    }
+
+
     /**
      *
      * @param hdu

@@ -56,4 +56,8 @@ public class HDULine {
             }
         }
 
+    @Override
+    public String toString() {
+        return "Key: " + key + ", Value: " + value + ", Comment: " + comment;
+    }
 }
