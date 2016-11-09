@@ -5,6 +5,8 @@ import fact.io.hdureader.BinTable;
 import fact.io.hdureader.Fits;
 import fact.io.hdureader.HDU;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URL;
 
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import static org.hamcrest.core.Is.is;
@@ -26,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 public class HDUReaderTest {
 
     static Logger log = LoggerFactory.getLogger(HDUReaderTest.class);
-
 
 
     @Test
@@ -74,16 +76,7 @@ public class HDUReaderTest {
 
         InputStream inputStreamForHDUData = f.getInputStreamForHDUData(zDrsCellOffsets);
         int b = new DataInputStream(inputStreamForHDUData).read();
-//
-//
-//        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
-//        stream.tableName = "Events";
-//        stream.init();
-//
-//        Data item = stream.read();
-//        System.out.println(b);
-////        int read = inputStreamForHDUData.read();
-////        System.out.println(read);
+
     }
 
 
@@ -119,9 +112,7 @@ public class HDUReaderTest {
 
         assertThat(eventNum, is(1));
 
-        BinTable b = new BinTable(events, inputStreamForHDUData);
-////        int read = inputStreamForHDUData.read();
-////        System.out.println(read);
+
     }
 
 
@@ -131,14 +122,43 @@ public class HDUReaderTest {
 
         Fits f = new Fits(u);
 
-        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
+        BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
 
-        DataInputStream stream = f.getInputStreamForHDUData(events);
+//        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
 
-        BinTable b = new BinTable(events, stream);
+//        BinTable b = new BinTable(events, f.getInputStreamForHDUData(events));
         assertThat(b.numberOfRowsInTable, is(10749));
+        assertThat(b.numberOfColumnsInTable, is(12));
+    }
 
-////        int read = inputStreamForHDUData.read();
-////        System.out.println(read);
+
+    @Test
+    public void testBinTableReader() throws Exception {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+
+        Fits f = new Fits(u);
+
+        BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
+        BinTable.Reader reader = b.reader;
+
+        Map<String, Serializable> row = reader.getNextRow();
+        assertThat(row.size() , is(b.numberOfColumnsInTable));
+
+        short[] data = (short[]) row.get("Data");
+        assertThat(data.length , is(1440*300));
+
+
+        int[] boardTime = (int[]) row.get("BoardTime");
+        assertThat(boardTime.length , is(40));
+
+
+        int[] unixtime = (int[]) row.get("UnixTimeUTC");
+        assertThat(unixtime.length , is(2));
+
+        DateTime date = new DateTime((long) (unixtime[0]* 1000.0 + unixtime[1]/ 1000.0),  DateTimeZone.UTC);
+        System.out.println(date);
+
+//        row.forEach((k, v) -> System.out.println(k + ", " + v));
+
     }
 }
