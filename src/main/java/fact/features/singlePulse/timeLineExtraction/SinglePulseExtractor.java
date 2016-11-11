@@ -73,9 +73,7 @@ public class SinglePulseExtractor {
      *           were subtracted.
      *           Amplitude of the single puls must be normalized to 1.0.
      */
-    public int[] getArrivalSlicesOnTimeline(
-        double[] timeLine
-    ) {
+    public int[] getArrivalSlicesOnTimeline(double[] timeLine) {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
