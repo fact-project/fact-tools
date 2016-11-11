@@ -11,13 +11,31 @@ import java.util.ArrayList;
  */
 public class SinglePulseExtractor {
 
-    public final double[] pulseToLookFor;
-    public final double pulseToLookForIntegral;
-    public final double[] plateauToLookFor;
-    public final double plateauIntegral;
-    public final double[] negativePulse;
+    public static class Config {
+        public int pulseToLookForLength;
+        public int offsetSlices;
+        public int negativePulseLength;
+        public double factSinglePeAmplitudeInMv;
+        public int maxIterations;
+
+        public Config() {
+            pulseToLookForLength = 20;
+            offsetSlices = 7;
+            negativePulseLength = 300;
+            factSinglePeAmplitudeInMv = 10.0;
+            maxIterations = 250;
+        }       
+    }
 
     public final Config config;
+
+    public final double[] pulseToLookFor;
+    public final double pulseToLookForIntegral;
+
+    public final double[] plateauToLookFor;
+    public final double plateauIntegral;
+
+    public final double[] negativePulse;
 
     public SinglePulseExtractor(Config config) {
         this.config = config;

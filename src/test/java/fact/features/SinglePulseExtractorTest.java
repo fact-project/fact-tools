@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeLineExtraction.Config;
 import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
 
 public class SinglePulseExtractorTest {
@@ -16,7 +15,7 @@ public class SinglePulseExtractorTest {
 
         double[] timeLine = new double[300];
 
-        Config config = new Config();
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         SinglePulseExtractor spe = new SinglePulseExtractor(config);
         int[] arrivalSlices = spe.getArrivalSlicesOnTimeline(timeLine);
         Assert.assertEquals(0, arrivalSlices.length);
@@ -25,7 +24,7 @@ public class SinglePulseExtractorTest {
     @Test
     public void testOnePulseNoNoise() {
 
-        Config config = new Config();
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         SinglePulseExtractor spe = new SinglePulseExtractor(config);        
 
         for(int injectionSlice = 50; injectionSlice< 250; injectionSlice++) {
@@ -51,7 +50,7 @@ public class SinglePulseExtractorTest {
     @Test
     public void testSeveralPulsesOnTopOfEachOtherNoNoise() {
 
-        Config config = new Config();
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = 100;
         SinglePulseExtractor spe = new SinglePulseExtractor(config);  
 
@@ -79,7 +78,7 @@ public class SinglePulseExtractorTest {
     @Test
     public void testSeveralPulsesInARowNoNoise() {
 
-        Config config = new Config();
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = 100;
         SinglePulseExtractor spe = new SinglePulseExtractor(config); 
 

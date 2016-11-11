@@ -9,7 +9,6 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeLineExtraction.Config;
 import fact.features.singlePulse.timeLineExtraction.ElementWise;
 
 /*
@@ -66,7 +65,7 @@ public class SinglePulseExtraction implements Processor {
 
         double[] reducedTimeline = new double[timeLines.length];
 
-        Config config = new Config();
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = maxIterations;
         SinglePulseExtractor spe = new SinglePulseExtractor(config);  
 
