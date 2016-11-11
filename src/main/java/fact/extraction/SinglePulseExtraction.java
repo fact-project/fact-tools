@@ -9,6 +9,8 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 import java.util.ArrayList;
 import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeLineExtraction.Config;
+import fact.features.singlePulse.timeLineExtraction.ElementWise;
 
 /*
 * Extracts a list of arrival slice positions of photons for each pixel 
@@ -64,6 +66,10 @@ public class SinglePulseExtraction implements Processor {
 
         double[] reducedTimeline = new double[timeLines.length];
 
+        Config config = new Config();
+        config.maxIterations = maxIterations;
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
+
         for (int pix = 0; pix < npix; pix++) {
             int start = pix*roi+startSlice;
             int end = start + windowLength;
@@ -74,20 +80,16 @@ public class SinglePulseExtraction implements Processor {
                 end
             );
             
-            double[] pixelTimeLine = SinglePulseExtractor. 
-                milliVoltToNormalizedSinglePulse(pixelTimeLineInMv);
+            double[] pixelTimeLine = ElementWise.multiply(
+                pixelTimeLineInMv, 1.0/config.factSinglePeAmplitudeInMv);
 
-            int[] arrivalSlices = SinglePulseExtractor.
-                getArrivalSlicesOnTimeline(
-                    pixelTimeLine,
-                    maxIterations
-                );
+            int[] arrivalSlices = spe.getArrivalSlicesOnTimeline(pixelTimeLine);
 
             single_pe_count[pix] = arrivalSlices.length;
             pixelArrivalSlices[pix] = arrivalSlices;
 
             for (int i = 0; i < windowLength; i++) {
-                reducedTimeline[start+i] = SinglePulseExtractor.factSinglePeAmplitudeInMv*pixelTimeLine[i];
+                reducedTimeline[start+i] = config.factSinglePeAmplitudeInMv*pixelTimeLine[i];
             }
         }
 
