@@ -3,6 +3,7 @@ package fact.io.hdureader;
 import com.google.common.base.Splitter;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  * Created by mackaiver on 03/11/16.
  */
 public class HDU {
-    //Maximum length a HDU header can have in blocks of 2880 bytes.
+    //Maximum length the header of this HDU can have in blocks of 2880 bytes.
     private final int blockLimit = 100;
 
     public enum XTENSION {
@@ -38,18 +39,24 @@ public class HDU {
     //size of header in bytes
     public int headerSizeInBytes = 0;
 
+    public final long hduOffset;
+
+    private BinTable binTable = null;
+
 
     /**
      * Here is how this works:
      *  1. Read blocks of 2880 bytes and add lines of 80 chars to a list until the END keyword is found.
      *  2. Iterate over the list of lines and parse the strings into a hashmap.
      * @param inputStream The stream of the fits file
-     * @throws IOException in case an error occurs when reading the bytes
+     * @param url
+     * @param hduOffset the offset the HDU has from the beginning of the file. In bytes.  @throws IOException in case an error occurs when reading the bytes
      */
-    public HDU(DataInputStream inputStream) throws IOException {
+    protected HDU(DataInputStream inputStream, URL url, long hduOffset) throws IOException {
+
+        this.hduOffset = hduOffset;
 
         List<String> lines = new ArrayList<>();
-
         for (int blockNumber = 0; blockNumber < blockLimit; blockNumber++) {
 
             //read a block aka 2880 bytes.
@@ -111,15 +118,52 @@ public class HDU {
             String xtension = header.get("XTENSION").value;
             extension = XTENSION.valueOf(xtension);
         }
+
+
+        if (extension == XTENSION.BINTABLE){
+
+            DataInputStream tableDataStream = Fits.getDecompressedDataStream(url);
+            long skippedBytes = tableDataStream.skipBytes((int) (hduOffset + headerSizeInBytes));
+            if(skippedBytes != hduOffset + headerSizeInBytes){
+                throw new IOException("Could not skip all bytes to data area in this HDU.");
+            }
+
+
+
+            Integer naxis1 = header.get("NAXIS1").getInt().orElse(0);
+            Integer naxis2 = header.get("NAXIS2").getInt().orElse(0);
+            Integer theap  = header.get("THEAP").getInt().orElse(naxis1 * naxis2);
+
+            int bytesToSkip = (int) (hduOffset + headerSizeInBytes + theap);
+
+            DataInputStream heapDataStream = Fits.getDecompressedDataStream(url);
+            skippedBytes = heapDataStream.skipBytes(bytesToSkip);
+
+            if(skippedBytes != bytesToSkip){
+                throw new IOException("Could not skip all bytes to data area in this HDU.");
+            }
+
+            String tableName = header.get("EXTNAME").value;
+
+            this.binTable = new BinTable(header, tableName, tableDataStream, heapDataStream);
+        }
+
     }
 
-    /**
-     * Returns whether if there is data attached to this HDU.
-     * @return true iff data is attached to this HDU
-     */
-    public boolean hasData(){
-        return sizeOfDataArea() > 0;
+
+
+    public Optional<BinTable> getBinTable(){
+        return Optional.of(this.binTable);
     }
+
+
+//    /**
+//     * Returns whether if there is data attached to this HDU.
+//     * @return true iff data is attached to this HDU
+//     */
+//    public boolean hasData(){
+//        return sizeOfDataArea() > 0;
+//    }
 
     /**
      * According to the FITS standard a header can contain a DATE keyword. This method returns a LocalDateTime
@@ -137,9 +181,9 @@ public class HDU {
         return Optional.of(LocalDateTime.parse(dateString));
     }
 
-    public Optional<HDULine> getHeaderLine(String key){
-        return Optional.ofNullable(header.get(key));
-    }
+//    public Optional<HDULine> getHeaderLine(String key){
+//        return Optional.ofNullable(header.get(key));
+//    }
 
     public Optional<Integer> getInt(String key){
         try {
@@ -157,19 +201,19 @@ public class HDU {
     }
 
     /**
-     * Get the number of bytes you need to skip in order to jump to the next HDU.
+     * Get the number of bytes you need to skip in order to jump from the end of the last block in the header
+     * of this HDU to the beginning of the header block of the next HDU in the file.
      * From the size of the data block after the header we calculate the offset to
      * either the next hdu or the end of the file. This are multiples of 2880 bytes.
      *
      * @return the number of bytes to skip to hte next hdu.
      */
     public long offsetToNextHDU(){
-        if(!hasData()){
+        if(sizeOfDataArea() == 0){
             return 0;
         }
         long numberOfBlocks = sizeOfDataArea() / 2880;
         return 2880 * numberOfBlocks + 2880;
-
     }
 
     /**

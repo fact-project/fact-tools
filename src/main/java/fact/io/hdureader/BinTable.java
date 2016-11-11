@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,12 +81,20 @@ public class BinTable {
 
     public Integer numberOfRowsInTable = 0;
     public Integer numberOfColumnsInTable = 0;
-    public Reader reader;
+    public final TableReader tableReader;
+    public final ZFitsReader zFitsReader;
+    public final String name;
 
 
-    BinTable(HDU hdu, DataInputStream inputStreamForHDUData) throws IllegalArgumentException{
+    BinTable(Map<String, HDULine> header,
+             String tableName,
+             DataInputStream inputStreamForHDUData,
+             DataInputStream heapDataStream
+    ) throws IllegalArgumentException{
 
-        Iterator<HDULine> tforms = hdu.header
+        this.name = tableName;
+
+        Iterator<HDULine> tforms = header
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().matches("TFORM\\d+"))
@@ -93,7 +103,7 @@ public class BinTable {
                 .iterator();
 
 
-        Iterator<HDULine> ttypes = hdu.header
+        Iterator<HDULine> ttypes = header
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().matches("TTYPE\\d+"))
@@ -107,66 +117,78 @@ public class BinTable {
             columns.add(new TableColumn(tforms.next(), ttypes.next()));
         }
 
-        sanityChecks(hdu);
-
-        numberOfRowsInTable = hdu.getInt("NAXIS2").orElse(0);
+        numberOfRowsInTable = header.get("NAXIS2").getInt().orElse(0);
         numberOfColumnsInTable = columns.size();
 
-        reader = new Reader(inputStreamForHDUData);
-    }
-
-    /**
-     * Perform some sanity checks on the bintable.
-     *  1. The TFIELDS keyword must exist.
-     *  2. The number of columns stored in the TFIELD line has to fit the number
-     *     of TTPYE fields
-     *  3. Make sure the NAXIS2 keyword exists. It gives the number of rows.
-     *  4. NAXIS2 needs to be non-negative.
-     *
-     * @param hdu the hdu to check
-     */
-    private void sanityChecks(HDU hdu) {
-        int tfields = hdu.getInt("TFIELDS").orElseThrow(() -> {
-            log.error("The TFIELDS keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.2.1 of the Fits 3.0 standard");
-            return new IllegalArgumentException("Missing TFIELD keyword");
-        });
-
-        if(columns.size() != tfields){
-            log.error("The value of TFIELDS: {} does not match the number of TTYPEn,TBCOLn,TFORMn tuples {}" +
-                    "\nSee section 7.2.1 of the Fits 3.0 standard", tfields, columns.size());
-            throw new IllegalArgumentException("Number of TFIELDS does not match number of TFORMn entries.");
-        }
-
-
-        int naxis2 = hdu.getInt("NAXIS2").orElseThrow(() -> {
-            log.error("The TFIELDS keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.2.1 of the Fits 3.0 standard");
-            return new IllegalArgumentException("Missing TFIELD keyword");
-        });
-
-        if(naxis2 < 0){
-            throw new IllegalArgumentException("Number of rows (NAXIS2) is negative.");
-        }
-
+        tableReader = new TableReader(inputStreamForHDUData);
+        zFitsReader = new ZFitsReader(heapDataStream);
     }
 
 
-    public final class Reader{
+
+    public final class ZFitsReader {
         final DataInputStream stream;
 
-        private Reader(DataInputStream stream) {
+        private ZFitsReader(DataInputStream stream) {
             this.stream = stream;
         }
 
 
-        public Map<String, Serializable> getNextRow() throws IOException {
-            HashMap<String, Serializable> map = new HashMap<>();
+        private void readTileHeader(byte[] bytes){
+            String s = new String(bytes,0, 4, StandardCharsets.US_ASCII);
+            ByteBuffer buffer = ByteBuffer.wrap(bytes, 4, 16-4).order(ByteOrder.LITTLE_ENDIAN);
+            int numberOfRows= buffer.getInt();
+            long size= buffer.getLong();
+            return;
+        }
+
+
+        private void readBlockHeader(byte[] bytes) {
+            ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+            long size = buffer.getLong();
+            String ordering = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
+            byte numProcs = buffer.get();
+            return;
+        }
+
+        public MapMapper<String, Serializable> getNextRow() throws IOException {
+            MapMapper<String, Serializable> map = new MapMapper<>();
+            //read first tile header
+            //see figure 6 of zfits paper
+            byte[] tileHeader = new byte[16];
+            stream.readFully(tileHeader);
+
+            readTileHeader(tileHeader);
+
+            byte[] blockHeader = new byte[16];
+            stream.readFully(blockHeader);
+
+            readBlockHeader(blockHeader);
+//            stream.skipBytes((int) size);
+            return  map;
+        }
+
+
+    }
+
+
+    public final class TableReader{
+        final DataInputStream stream;
+
+        private TableReader(DataInputStream stream) {
+            this.stream = stream;
+        }
+
+
+        public MapMapper<String, Serializable> getNextRow() throws IOException {
+            MapMapper<String, Serializable> map = new MapMapper<>();
             for(TableColumn c : columns){
                 if(c.repeatCount > 1){
                     map.put(c.name, readArrayFromStream(c, stream));
-                } else {
+                } else if(c.repeatCount == 1) {
                     map.put(c.name, readSingleValueFromStream(c, stream));
+                } else if(c.repeatCount == 0){
+                    map.put(c.name, null);
                 }
             }
             return  map;
