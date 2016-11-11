@@ -92,10 +92,7 @@ public class SinglePulseExtraction implements Processor {
             }
         }
 
-
-
         addStartSliceOffset(pixelArrivalSlices);
-        // printArrivalSlices(pixelArrivalSlices);
         input.put(outputKey, pixelArrivalSlices);
         input.put(outputKey+"TL", reducedTimeline);
         input.put(outputKey+"Count", single_pe_count);
