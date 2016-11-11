@@ -12,69 +12,78 @@ import java.util.ArrayList;
 public class SinglePulseExtractor {
 
     public static class Config {
+        /**
+         * An input configurstion for a SinglePulseExtractor instance
+         */
         public int pulseToLookForLength;
-        public int offsetSlices;
+        public int plateauLength;
         public int negativePulseLength;
         public double factSinglePeAmplitudeInMv;
         public int maxIterations;
 
         public Config() {
+            /**
+             * Default values suitable for FACT's 2GHz standart DRS sampling.
+             */
             pulseToLookForLength = 20;
-            offsetSlices = 7;
+            plateauLength = 7;
             negativePulseLength = 300;
             factSinglePeAmplitudeInMv = 10.0;
             maxIterations = 250;
         }       
     }
 
-    public final Config config;
+    public Config config;
 
-    public final double[] pulseToLookFor;
-    public final double pulseToLookForIntegral;
+    public double[] pulseToLookFor;
+    public double pulseToLookForIntegral;
 
-    public final double[] plateauToLookFor;
-    public final double plateauIntegral;
+    public double[] plateauToLookFor;
+    public double plateauIntegral;
 
-    public final double[] negativePulse;
+    public double[] negativePulse;
 
     public SinglePulseExtractor(Config config) {
         this.config = config;
+        initPulseToLookFor();
+        initPlateau();
+        initNegativePulse();
+    }
 
-        // PulseToLookFor
-        // --------------
+    void initPulseToLookFor() {
         double[] pulse = new double[
-            config.pulseToLookForLength + config.offsetSlices];
+            config.pulseToLookForLength + config.plateauLength];
 
         AddFirstArrayToSecondArray.at(
             TemplatePulse.factSinglePePulse(config.pulseToLookForLength),
             pulse,
-            config.offsetSlices
+            config.plateauLength
         );
         double sum = 0.0;
         for (double slice: pulse){
             sum += slice;
         }
         pulseToLookForIntegral = sum;
-        pulseToLookFor = ElementWise.multiply(pulse, 1.0/pulseToLookForIntegral);
+        pulseToLookFor = ElementWise.multiply(pulse, 1.0/pulseToLookForIntegral);  
+    }
 
-        // PlateauToLookFor
-        // ----------------
+    void initPlateau() {
         double[] plateau = new double[
-            config.pulseToLookForLength + config.offsetSlices];
+            config.pulseToLookForLength + config.plateauLength];
 
         double plateau_sum = 0.0;
-        for (int i=0; i<config.offsetSlices; i++) {
+        for (int i=0; i<config.plateauLength; i++) {
                 plateau[i] = 1.0;
                 plateau_sum += plateau[i];
         }
         plateauIntegral = plateau_sum;
         plateauToLookFor = ElementWise.multiply(plateau, 1.0/plateauIntegral);
+    }
 
-        // PulseToSubtract
-        // ---------------
+    void initNegativePulse() {
         double[] pulseToSubtract = TemplatePulse.factSinglePePulse(
             config.negativePulseLength);
-        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);
+        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);        
     }
 
     /**
@@ -110,7 +119,7 @@ public class SinglePulseExtractor {
                 pulseResponse); 
 
             final ArgMax am = new ArgMax(response);
-            final int maxSlice = am.arg + config.offsetSlices;
+            final int maxSlice = am.arg + config.plateauLength;
             final double maxResponse = am.max;
 
             if(maxResponse > 0.65) {
