@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeLineExtraction;
+package fact.features.singlePulse.timeSeriesExtraction;
 
 import com.google.common.math.DoubleMath;
 import fact.Utils;
@@ -107,32 +107,32 @@ public class SinglePulseExtractor {
     }
 
     /**
-     * Reconstructs the arrival slices of single photons on a timeline.
+     * Reconstructs the arrival slices of single photons on a time series.
      *
      * @return result
      *           A class containing:
      *           - pulseArrivalSlices
      *           - timeSeriesAfterExtraction
      *
-     * @param timeLine
+     * @param timeSeries
      *           The time line to look for pulses in. The time line
      *           is modified in place. When the extractor was
      *           successfull, the time line is flat and all pulses
      *           were subtracted.
      *           Amplitude of the single puls must be normalized to 1.0.
      */
-    public Result extractFromTimeline(double[] timeLine) {
+    public Result extractFromTimeSeries(double[] timeSeries) {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
         while(iteration < config.maxIterations) {
 
             final double[] pulseResponse = Convolve.firstWithSecond(
-                timeLine, 
+                timeSeries, 
                 pulseToLookFor);
 
             final double[] baselineResponse = Convolve.firstWithSecond(
-                timeLine,
+                timeSeries,
                 plateauToLookFor);
 
             final double[] response = ElementWise.subtractFirstFromSecond(
@@ -146,7 +146,7 @@ public class SinglePulseExtractor {
             if(maxResponse > 0.65) {
                 AddFirstArrayToSecondArray.at(
                     negativePulse, 
-                    timeLine, 
+                    timeSeries, 
                     maxSlice);
 
                 if(maxSlice >= 1)
@@ -158,7 +158,7 @@ public class SinglePulseExtractor {
         }
 
         Result result = new Result();
-        result.timeSeriesAfterExtraction = timeLine;
+        result.timeSeriesAfterExtraction = timeSeries;
         result.pulseArrivalSlices = Utils.arrayListToInt(arrival_slices);
         return result;
     }

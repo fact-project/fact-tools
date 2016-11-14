@@ -1,10 +1,10 @@
 package fact.utils;
 
 import fact.Utils;
-import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
-import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
-import fact.features.singlePulse.timeLineExtraction.ElementWise;
+import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
+import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sin;
 import stream.Data;

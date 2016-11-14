@@ -4,39 +4,39 @@ import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
 import java.util.ArrayList;
-import fact.features.singlePulse.timeLineExtraction.TemplatePulse;
-import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeLineExtraction.AddFirstArrayToSecondArray;
+import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
+import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
 
 public class SinglePulseExtractorTest {
 
     @Test
-    public void testEmptyTimeLineNoNoise() {
+    public void testEmptytimeSeriesNoNoise() {
 
-        double[] timeLine = new double[300];
+        double[] timeSeries = new double[300];
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         SinglePulseExtractor spe = new SinglePulseExtractor(config);
         
-        SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+        SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
         Assert.assertEquals(0, result.pulseArrivalSlices.length);
         Assert.assertEquals(0, result.numberOfPulses());
     }
 
 
     @Test
-    public void testFlatTimeLineBaseLine() {
+    public void testFlatTimeSeriesBaseLine() {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         SinglePulseExtractor spe = new SinglePulseExtractor(config);  
 
         for(double baseLine=-50.0; baseLine<50; baseLine++) {
 
-            double[] timeLine = new double[300];
-            for(int i=0; i<timeLine.length; i++)
-                timeLine[i] = baseLine;
+            double[] timeSeries = new double[300];
+            for(int i=0; i<timeSeries.length; i++)
+                timeSeries[i] = baseLine;
 
-            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
             Assert.assertEquals(0, result.numberOfPulses());
             Assert.assertTrue(
@@ -54,16 +54,16 @@ public class SinglePulseExtractorTest {
 
         for(double baseLine=-50.0; baseLine<50; baseLine++) {
 
-            double[] timeLine = new double[300];
-            for(int i=0; i<timeLine.length; i++)
-                timeLine[i] = baseLine;
+            double[] timeSeries = new double[300];
+            for(int i=0; i<timeSeries.length; i++)
+                timeSeries[i] = baseLine;
 
             AddFirstArrayToSecondArray.at(
                 TemplatePulse.factSinglePePulse(300),
-                timeLine,
+                timeSeries,
                 50);
 
-            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
             Assert.assertEquals(1, result.numberOfPulses());
             Assert.assertTrue(
@@ -81,14 +81,14 @@ public class SinglePulseExtractorTest {
 
         for(int injectionSlice = 50; injectionSlice< 250; injectionSlice++) {
 
-            double[] timeLine = new double[300];
+            double[] timeSeries = new double[300];
 
             AddFirstArrayToSecondArray.at(
                 TemplatePulse.factSinglePePulse(300),
-                timeLine,
+                timeSeries,
                 injectionSlice);
 
-            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
             Assert.assertEquals(1, result.pulseArrivalSlices.length);
             Assert.assertEquals(1, result.numberOfPulses());
@@ -111,15 +111,15 @@ public class SinglePulseExtractorTest {
 
         for(double amplitude = 0.0; amplitude<15.0; amplitude++) {
          
-            double[] timeLine = new double[300];
+            double[] timeSeries = new double[300];
 
             for(int i=0; i<(int)amplitude; i++)
                 AddFirstArrayToSecondArray.at(
                     TemplatePulse.factSinglePePulse(300),
-                    timeLine,
+                    timeSeries,
                     injectionSlice);
 
-            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
             Assert.assertTrue(
                 (double)result.numberOfPulses() <= amplitude+amplitude*0.25 &&
@@ -135,24 +135,24 @@ public class SinglePulseExtractorTest {
         config.maxIterations = 100;
         SinglePulseExtractor spe = new SinglePulseExtractor(config); 
 
-        double[] timeLine = new double[300];
+        double[] timeSeries = new double[300];
 
         AddFirstArrayToSecondArray.at(
             TemplatePulse.factSinglePePulse(300),
-            timeLine,
+            timeSeries,
             50);
 
         AddFirstArrayToSecondArray.at(
             TemplatePulse.factSinglePePulse(300),
-            timeLine,
+            timeSeries,
             125);
 
         AddFirstArrayToSecondArray.at(
             TemplatePulse.factSinglePePulse(300),
-            timeLine,
+            timeSeries,
             200);
 
-        SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+        SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
 
         Assert.assertEquals(3, result.pulseArrivalSlices.length);

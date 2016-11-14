@@ -8,8 +8,8 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
 import java.util.ArrayList;
-import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeLineExtraction.ElementWise;
+import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 
 /*
 * Extracts a list of arrival slice positions of photons for each pixel 
@@ -58,7 +58,7 @@ public class SinglePulseExtraction implements Processor {
 
         npix = (Integer) input.get("NPIX");
         roi = (Integer) input.get("NROI");
-        double[] timeLines = (double[]) input.get(dataKey);
+        double[] timeSerieses = (double[]) input.get(dataKey);
 
         double[] numberOfPulses = new double[npix];
         int[][] pixelArrivalSlices = new int[npix][];
@@ -73,17 +73,17 @@ public class SinglePulseExtraction implements Processor {
             int start = pix*roi+startSlice;
             int end = start + windowLength;
 
-            double[] pixelTimeLineInMv = Arrays.copyOfRange(
-                timeLines,
+            double[] pixelTimeSeriesInMv = Arrays.copyOfRange(
+                timeSerieses,
                 start, 
                 end
             );
             
-            double[] pixelTimeLine = ElementWise.multiply(
-                pixelTimeLineInMv, 1.0/config.factSinglePeAmplitudeInMv);
+            double[] pixelTimeSeries = ElementWise.multiply(
+                pixelTimeSeriesInMv, 1.0/config.factSinglePeAmplitudeInMv);
 
-            SinglePulseExtractor.Result result = spe.extractFromTimeline(
-                pixelTimeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
+                pixelTimeSeries);
 
             numberOfPulses[pix] = result.numberOfPulses();
             pixelArrivalSlices[pix] = result.pulseArrivalSlices;

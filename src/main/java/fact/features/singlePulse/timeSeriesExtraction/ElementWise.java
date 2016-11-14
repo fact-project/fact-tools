@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeLineExtraction;
+package fact.features.singlePulse.timeSeriesExtraction;
 
 /**
  * A collection of element-wise operations on double[] arrays with a scalar.
