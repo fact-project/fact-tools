@@ -59,7 +59,7 @@ public class ConvertSinglePulses2Timeseries implements Processor {
             // Add the baseline to the time series
             currentTimeSeries = ElementWise.add(currentTimeSeries, baseLine[pix]);
 
-            timeSeries = (double[]) ArrayUtils.addAll(timeSeries, currentTimeSeries);
+            timeSeries = ArrayUtils.addAll(timeSeries, currentTimeSeries);
         }
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
