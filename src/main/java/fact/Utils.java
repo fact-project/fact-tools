@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.DoubleStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 /**
@@ -528,23 +529,9 @@ public class Utils {
 	 */
 
 	public static double[] flattenMatrix2d(double[][] matrix2d) {
-		if(matrix2d.length > 0) {
-			if(matrix2d[0].length > 0) {
-				double[] flat = new double[matrix2d.length*matrix2d[0].length];
-				int k = 0;
-				for(int i=0; i<matrix2d.length; i++) {
-					for(int j=0; j<matrix2d[0].length; j++) {
-						flat[k] = matrix2d[i][j];
-						k++;
-					}
-				}
-				return flat;
-			}else{
-				return new double[0];
-			}
-		}else{
-			return new double[0];
-		}
+		return Arrays.stream(matrix2d)
+				.flatMapToDouble(Arrays::stream)
+				.toArray();
 	}
 
 }
