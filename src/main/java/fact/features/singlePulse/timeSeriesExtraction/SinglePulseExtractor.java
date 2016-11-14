@@ -1,6 +1,5 @@
 package fact.features.singlePulse.timeSeriesExtraction;
 
-import com.google.common.math.DoubleMath;
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
