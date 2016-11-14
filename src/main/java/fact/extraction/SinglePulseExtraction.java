@@ -96,7 +96,7 @@ public class SinglePulseExtraction implements Processor {
         addStartSliceOffset(pixelArrivalSlices);
 
         input.put(outputKey, pixelArrivalSlices);
-        input.put(outputKey+"TimeSeriesAfterExtraction", Utils.flattenMatrix2d(timeSeriesAfterExtraction));
+        input.put(outputKey+"TimeSeriesAfterExtraction", Utils.flatten2dArray(timeSeriesAfterExtraction));
         input.put(outputKey+"NumberOfPulses", numberOfPulses);
         input.put(outputKey+"BaseLine", baseLine);
         return input;

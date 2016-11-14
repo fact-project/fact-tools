@@ -528,7 +528,7 @@ public class Utils {
 	 *
 	 */
 
-	public static double[] flattenMatrix2d(double[][] matrix2d) {
+	public static double[] flatten2dArray(double[][] matrix2d) {
 		return Arrays.stream(matrix2d)
 				.flatMapToDouble(Arrays::stream)
 				.toArray();
