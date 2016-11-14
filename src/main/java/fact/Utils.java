@@ -526,6 +526,9 @@ public class Utils {
 
 	/**
 	 * Flatten a 2d array
+     *
+     * @param array2d 2dim double array
+     * @return flattend double array
 	 */
 	public static double[] flatten2dArray(double[][] array2d) {
 		return Arrays.stream(array2d)
