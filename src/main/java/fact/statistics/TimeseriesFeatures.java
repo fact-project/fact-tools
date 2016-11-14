@@ -8,6 +8,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import java.util.Arrays;
 
 
 /**
@@ -52,11 +53,18 @@ public class TimeseriesFeatures implements Processor {
 		
 		Utils.checkWindow(searchWindowLeft, searchWindowRight-searchWindowLeft, 0, roi);
 		
-		Utils.mapContainsKeys(input, dataKey, movingAverageKey);
+		Utils.mapContainsKeys(input, dataKey);
 		
 		double[] data = (double[]) input.get(dataKey);
-		double[] movingAverage = (double[]) input.get(movingAverageKey);
-		
+
+		double[] movingAverage;
+
+		if (movingAverageKey != null){
+			movingAverage = (double[]) input.get(movingAverageKey);
+		} else {
+			movingAverage = new double[data.length];
+		}
+
 		
 		double[] mean = new double[npix];
 		double[] median = new double[npix];
