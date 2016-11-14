@@ -96,7 +96,7 @@ public class SinglePulseExtraction implements Processor {
         addStartSliceOffset(pixelArrivalSlices);
 
         input.put(outputKey, pixelArrivalSlices);
-        input.put(outputKey+"TimeSeriesAfterExtraction", flatten(timeSeriesAfterExtraction));
+        input.put(outputKey+"TimeSeriesAfterExtraction", Utils.flatten(timeSeriesAfterExtraction));
         input.put(outputKey+"NumberOfPulses", numberOfPulses);
         input.put(outputKey+"BaseLine", baseLine);
         return input;
@@ -111,25 +111,7 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
-    private double[] flatten(double[][] matrix2d) {
-        if(matrix2d.length > 0) {
-            if(matrix2d[0].length > 0) {
-                double[] flat = new double[matrix2d.length*matrix2d[0].length];
-                int k = 0; 
-                for(int i=0; i<matrix2d.length; i++) {
-                    for(int j=0; j<matrix2d[0].length; j++) {
-                        flat[k] = matrix2d[i][j];
-                        k++;
-                    }
-                }
-                return flat;
-            }else{
-                return new double[0];
-            }
-        }else{
-            return new double[0];
-        }
-    }
+
 
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
