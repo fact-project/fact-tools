@@ -46,20 +46,20 @@ public class ConvertSinglePulses2Timeseries implements Processor {
         for (int pix = 0; pix < singlePulses.length; pix++) {
 
             // create empty time series of length roi
-            double[] current_timeseries = new double[roi];
+            double[] currentTimeSeries = new double[roi];
 
             // Add the single pulses to the time series
             for (int pulse = 0; pulse < singlePulses[pix].length; pulse++) {
                 AddFirstArrayToSecondArray.at(
                     pulseTemplate, 
-                    current_timeseries, 
+                    currentTimeSeries, 
                     singlePulses[pix][pulse]);
             }
 
             // Add the baseline to the time series
-            current_timeseries = ElementWise.add(current_timeseries, baseLine[pix]);
+            currentTimeSeries = ElementWise.add(currentTimeSeries, baseLine[pix]);
 
-            timeSeries = (double[]) ArrayUtils.addAll(timeSeries, current_timeseries);
+            timeSeries = (double[]) ArrayUtils.addAll(timeSeries, currentTimeSeries);
         }
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
