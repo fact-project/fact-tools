@@ -60,10 +60,10 @@ public class SinglePulseExtraction implements Processor {
         roi = (Integer) input.get("NROI");
         double[] timeLines = (double[]) input.get(dataKey);
 
-        double[] single_pe_count = new double[npix];
+        double[] numberOfPulses = new double[npix];
         int[][] pixelArrivalSlices = new int[npix][];
 
-        double[] reducedTimeline = new double[timeLines.length];
+        double[][] timeSeriesAfterExtraction = new double[npix][];
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = maxIterations;
@@ -82,20 +82,21 @@ public class SinglePulseExtraction implements Processor {
             double[] pixelTimeLine = ElementWise.multiply(
                 pixelTimeLineInMv, 1.0/config.factSinglePeAmplitudeInMv);
 
-            int[] arrivalSlices = spe.getArrivalSlicesOnTimeline(pixelTimeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeline(
+                pixelTimeLine);
 
-            single_pe_count[pix] = arrivalSlices.length;
-            pixelArrivalSlices[pix] = arrivalSlices;
-
-            for (int i = 0; i < windowLength; i++) {
-                reducedTimeline[start+i] = config.factSinglePeAmplitudeInMv*pixelTimeLine[i];
-            }
+            numberOfPulses[pix] = result.numberOfPulses();
+            pixelArrivalSlices[pix] = result.pulseArrivalSlices;
+            timeSeriesAfterExtraction[pix] = ElementWise.multiply(
+                result.timeSeriesAfterExtraction, 
+                config.factSinglePeAmplitudeInMv);
         }
 
         addStartSliceOffset(pixelArrivalSlices);
+
         input.put(outputKey, pixelArrivalSlices);
-        input.put(outputKey+"TL", reducedTimeline);
-        input.put(outputKey+"Count", single_pe_count);
+        input.put(outputKey+"TimeSeriesAfterExtraction", flatten(timeSeriesAfterExtraction));
+        input.put(outputKey+"NumberOfPulses", numberOfPulses);
         return input;
     }
 
@@ -108,6 +109,25 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
+    private double[] flatten(double[][] matrix2d) {
+        if(matrix2d.length > 0) {
+            if(matrix2d[0].length > 0) {
+                double[] flat = new double[matrix2d.length*matrix2d[0].length];
+                int k = 0; 
+                for(int i=0; i<matrix2d.length; i++) {
+                    for(int j=0; j<matrix2d[0].length; j++) {
+                        flat[k] = matrix2d[i][j];
+                        k++;
+                    }
+                }
+                return flat;
+            }else{
+                return new double[0];
+            }
+        }else{
+            return new double[0];
+        }
+    }
 
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;

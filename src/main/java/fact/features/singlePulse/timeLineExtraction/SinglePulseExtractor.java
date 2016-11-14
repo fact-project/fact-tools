@@ -33,6 +33,22 @@ public class SinglePulseExtractor {
         }       
     }
 
+    public static class Result {
+        public int[] pulseArrivalSlices;
+        public double[] timeSeriesAfterExtraction;
+
+        public int numberOfPulses() {
+            return pulseArrivalSlices.length;
+        }
+
+        public double timeSeriesBaseLine() {
+            double sum = 0.0;
+            for(int i=0; i<timeSeriesAfterExtraction.length; i++)
+                sum += timeSeriesAfterExtraction[i];
+            return sum/timeSeriesAfterExtraction.length;
+        }    
+    }
+
     public Config config;
 
     public double[] pulseToLookFor;
@@ -89,9 +105,10 @@ public class SinglePulseExtractor {
     /**
      * Reconstructs the arrival slices of single photons on a timeline.
      *
-     * @return arrival_slices
-     *           A list of the arrival slices of photons found on
-     *           the time line.
+     * @return result
+     *           A class containing:
+     *           - pulseArrivalSlices
+     *           - timeSeriesAfterExtraction
      *
      * @param timeLine
      *           The time line to look for pulses in. The time line
@@ -100,7 +117,7 @@ public class SinglePulseExtractor {
      *           were subtracted.
      *           Amplitude of the single puls must be normalized to 1.0.
      */
-    public int[] getArrivalSlicesOnTimeline(double[] timeLine) {
+    public Result extractFromTimeline(double[] timeLine) {
         ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
         int iteration = 0;
 
@@ -135,6 +152,10 @@ public class SinglePulseExtractor {
             }
             iteration++;
         }
-        return Utils.arrayListToInt(arrival_slices);
+
+        Result result = new Result();
+        result.timeSeriesAfterExtraction = timeLine;
+        result.pulseArrivalSlices = Utils.arrayListToInt(arrival_slices);
+        return result;
     }
 }

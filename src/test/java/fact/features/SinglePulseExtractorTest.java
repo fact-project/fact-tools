@@ -17,8 +17,60 @@ public class SinglePulseExtractorTest {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         SinglePulseExtractor spe = new SinglePulseExtractor(config);
-        int[] arrivalSlices = spe.getArrivalSlicesOnTimeline(timeLine);
-        Assert.assertEquals(0, arrivalSlices.length);
+        
+        SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+        Assert.assertEquals(0, result.pulseArrivalSlices.length);
+        Assert.assertEquals(0, result.numberOfPulses());
+    }
+
+
+    @Test
+    public void testFlatTimeLineBaseLine() {
+
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
+
+        for(double baseLine=-50.0; baseLine<50; baseLine++) {
+
+            double[] timeLine = new double[300];
+            for(int i=0; i<timeLine.length; i++)
+                timeLine[i] = baseLine;
+
+            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+
+            Assert.assertEquals(0, result.numberOfPulses());
+            Assert.assertTrue(
+                result.timeSeriesBaseLine() <= baseLine+1.0 &&
+                result.timeSeriesBaseLine() >= baseLine-1.0
+            );
+        }
+    }
+
+    @Test
+    public void testOnePulseBaseLine() {
+
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);        
+
+        for(double baseLine=-50.0; baseLine<50; baseLine++) {
+
+            double[] timeLine = new double[300];
+            for(int i=0; i<timeLine.length; i++)
+                timeLine[i] = baseLine;
+
+            AddFirstArrayToSecondArray.at(
+                TemplatePulse.factSinglePePulse(300),
+                timeLine,
+                50);
+
+            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
+
+            Assert.assertEquals(1, result.numberOfPulses());
+            Assert.assertTrue(
+                result.timeSeriesBaseLine() <= baseLine+1.0 &&
+                result.timeSeriesBaseLine() >= baseLine-1.0
+            );
+        }
     }
 
     @Test
@@ -36,13 +88,14 @@ public class SinglePulseExtractorTest {
                 timeLine,
                 injectionSlice);
 
-            int[] arrivalSlices = spe.getArrivalSlicesOnTimeline(timeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
 
-            Assert.assertEquals(1, arrivalSlices.length);
+            Assert.assertEquals(1, result.pulseArrivalSlices.length);
+            Assert.assertEquals(1, result.numberOfPulses());
 
             Assert.assertTrue(
-                arrivalSlices[0] <= injectionSlice+2 &&
-                arrivalSlices[0] >= injectionSlice-2
+                result.pulseArrivalSlices[0] <= injectionSlice+2 &&
+                result.pulseArrivalSlices[0] >= injectionSlice-2
             );
         }
     }
@@ -66,11 +119,11 @@ public class SinglePulseExtractorTest {
                     timeLine,
                     injectionSlice);
 
-            int[]  arrivalSlices = spe.getArrivalSlicesOnTimeline(timeLine);
+            SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
 
             Assert.assertTrue(
-                (double)arrivalSlices.length <= amplitude+amplitude*0.25 &&
-                (double)arrivalSlices.length >= amplitude-amplitude*0.25
+                (double)result.numberOfPulses() <= amplitude+amplitude*0.25 &&
+                (double)result.numberOfPulses() >= amplitude-amplitude*0.25
             );
         }
     }
@@ -99,17 +152,18 @@ public class SinglePulseExtractorTest {
             timeLine,
             200);
 
-        int[]  arrivalSlices = spe.getArrivalSlicesOnTimeline(timeLine);
+        SinglePulseExtractor.Result result = spe.extractFromTimeline(timeLine);
 
-        Assert.assertEquals(3, arrivalSlices.length);
 
-        Assert.assertTrue((double)arrivalSlices[0] >= 50-2);
-        Assert.assertTrue((double)arrivalSlices[0] <= 50+2);
+        Assert.assertEquals(3, result.pulseArrivalSlices.length);
 
-        Assert.assertTrue((double)arrivalSlices[1] >= 125-2);
-        Assert.assertTrue((double)arrivalSlices[1] <= 125+2);
+        Assert.assertTrue((double)result.pulseArrivalSlices[0] >= 50-2);
+        Assert.assertTrue((double)result.pulseArrivalSlices[0] <= 50+2);
 
-        Assert.assertTrue((double)arrivalSlices[2] >= 200-2);
-        Assert.assertTrue((double)arrivalSlices[2] <= 200+2);
+        Assert.assertTrue((double)result.pulseArrivalSlices[1] >= 125-2);
+        Assert.assertTrue((double)result.pulseArrivalSlices[1] <= 125+2);
+
+        Assert.assertTrue((double)result.pulseArrivalSlices[2] >= 200-2);
+        Assert.assertTrue((double)result.pulseArrivalSlices[2] <= 200+2);
     }
 }
