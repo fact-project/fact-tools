@@ -525,11 +525,10 @@ public class Utils {
 
 
 	/**
-	 *
+	 * Flatten a 2d array
 	 */
-
-	public static double[] flatten2dArray(double[][] matrix2d) {
-		return Arrays.stream(matrix2d)
+	public static double[] flatten2dArray(double[][] array2d) {
+		return Arrays.stream(array2d)
 				.flatMapToDouble(Arrays::stream)
 				.toArray();
 	}
