@@ -2,12 +2,10 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
-import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
-import java.util.ArrayList;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 
