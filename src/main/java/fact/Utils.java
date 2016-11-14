@@ -527,7 +527,7 @@ public class Utils {
 	 *
 	 */
 
-	public static double[] flatten(double[][] matrix2d) {
+	public static double[] flattenMatrix2d(double[][] matrix2d) {
 		if(matrix2d.length > 0) {
 			if(matrix2d[0].length > 0) {
 				double[] flat = new double[matrix2d.length*matrix2d[0].length];
