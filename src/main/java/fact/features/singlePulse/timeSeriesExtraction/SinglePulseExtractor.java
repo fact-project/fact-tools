@@ -121,7 +121,7 @@ public class SinglePulseExtractor {
      *           Amplitude of the single puls must be normalized to 1.0.
      */
     public Result extractFromTimeSeries(double[] timeSeries) {
-        ArrayList<Integer> arrival_slices = new ArrayList<Integer>();
+        ArrayList<Integer> arrival_slices = new ArrayList<>();
         int iteration = 0;
 
         while(iteration < config.maxIterations) {
