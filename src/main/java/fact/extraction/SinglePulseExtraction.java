@@ -2,17 +2,18 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
-import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
-import java.util.ArrayList;
-import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 
-/*
-* Extracts a list of arrival slice positions of photons for each pixel 
-* time line.
+/**
+ * Extracts a list of arrival slice positions of photons for each pixel
+ * time line.
+ *
+ * Created by Seabstian Mueller
 */
 public class SinglePulseExtraction implements Processor {
     @Parameter(required=true, description="")
@@ -57,47 +58,47 @@ public class SinglePulseExtraction implements Processor {
 
         npix = (Integer) input.get("NPIX");
         roi = (Integer) input.get("NROI");
-        double[] timeLines = (double[]) input.get(dataKey);
+        double[] timeSerieses = (double[]) input.get(dataKey);
 
-        double[] single_pe_count = new double[npix];
+        double[] numberOfPulses = new double[npix];
         int[][] pixelArrivalSlices = new int[npix][];
+        double[] baseLine = new double[npix];
+        double[][] timeSeriesAfterExtraction = new double[npix][];
 
-        double[] reducedTimeline = new double[timeLines.length];
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
+        config.maxIterations = maxIterations;
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
 
         for (int pix = 0; pix < npix; pix++) {
             int start = pix*roi+startSlice;
             int end = start + windowLength;
 
-            double[] pixelTimeLineInMv = Arrays.copyOfRange(
-                timeLines,
+            double[] pixelTimeSeriesInMv = Arrays.copyOfRange(
+                timeSerieses,
                 start, 
                 end
             );
             
-            double[] pixelTimeLine = SinglePulseExtractor. 
-                milliVoltToNormalizedSinglePulse(pixelTimeLineInMv);
+            double[] pixelTimeSeries = ElementWise.multiply(
+                pixelTimeSeriesInMv, 1.0/config.factSinglePeAmplitudeInMv);
 
-            int[] arrivalSlices = SinglePulseExtractor.
-                getArrivalSlicesOnTimeline(
-                    pixelTimeLine,
-                    maxIterations
-                );
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
+                pixelTimeSeries);
 
-            single_pe_count[pix] = arrivalSlices.length;
-            pixelArrivalSlices[pix] = arrivalSlices;
-
-            for (int i = 0; i < windowLength; i++) {
-                reducedTimeline[start+i] = SinglePulseExtractor.factSinglePeAmplitudeInMv*pixelTimeLine[i];
-            }
+            numberOfPulses[pix] = result.numberOfPulses();
+            pixelArrivalSlices[pix] = result.pulseArrivalSlices;
+            timeSeriesAfterExtraction[pix] = ElementWise.multiply(
+                result.timeSeriesAfterExtraction, 
+                config.factSinglePeAmplitudeInMv);
+            baseLine[pix] = result.timeSeriesBaseLine();
         }
 
-
-
         addStartSliceOffset(pixelArrivalSlices);
-        // printArrivalSlices(pixelArrivalSlices);
+
         input.put(outputKey, pixelArrivalSlices);
-        input.put(outputKey+"TL", reducedTimeline);
-        input.put(outputKey+"Count", single_pe_count);
+        input.put(outputKey+"TimeSeriesAfterExtraction", Utils.flatten2dArray(timeSeriesAfterExtraction));
+        input.put(outputKey+"NumberOfPulses", numberOfPulses);
+        input.put(outputKey+"BaseLine", baseLine);
         return input;
     }
 
@@ -109,6 +110,7 @@ public class SinglePulseExtraction implements Processor {
             }
         }
     }
+
 
 
     public void setDataKey(String dataKey) {

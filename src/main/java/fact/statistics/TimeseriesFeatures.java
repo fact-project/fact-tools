@@ -133,48 +133,27 @@ public class TimeseriesFeatures implements Processor {
 		return binNumber;
 	}
 
-	public String getDataKey() {
-		return dataKey;
-	}
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-	public String getMovingAverageKey() {
-		return movingAverageKey;
-	}
+
 
 	public void setMovingAverageKey(String movingAverageKey) {
 		this.movingAverageKey = movingAverageKey;
-	}
-
-	public int getSearchWindowLeft() {
-		return searchWindowLeft;
 	}
 
 	public void setSearchWindowLeft(int searchWindowLeft) {
 		this.searchWindowLeft = searchWindowLeft;
 	}
 
-	public int getSearchWindowRight() {
-		return searchWindowRight;
-	}
-
 	public void setSearchWindowRight(int searchWindowRight) {
 		this.searchWindowRight = searchWindowRight;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
-	}
-
-	public int getNumberOfBins() {
-		return numberOfBins;
 	}
 
 	public void setNumberOfBins(int numberOfBins) {

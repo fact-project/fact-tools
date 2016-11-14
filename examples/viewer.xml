@@ -26,6 +26,12 @@
         maxIterations="1000"
     />
 
+    <fact.utils.ConvertSinglePulses2Timeseries 
+      singlePulsesKey="PhotonArrivals"
+      baseLineKey="PhotonArrivalsBaseLine"
+      timeSeriesKey="ReconstructedDataCalibrated"
+    />
+
     <fact.ShowViewer key="DataCalibrated" />
   </process>
 </container>
