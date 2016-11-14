@@ -21,7 +21,7 @@ public class ConvertSinglePulses2Timeseries implements Processor {
     private String singlePulsesKey = null;
 
     @Parameter(required = true, description = "The reconstruted time series.")
-    private String timeseriesKey = null;
+    private String timeSeriesKey = null;
 
     @Parameter(required = false, description = "The region of interest to be reconstructed.")
     private int roi = 300;
@@ -67,7 +67,7 @@ public class ConvertSinglePulses2Timeseries implements Processor {
             timeSeries, 
             config.factSinglePeAmplitudeInMv);
 
-        input.put(timeseriesKey, timeSeries);
+        input.put(timeSeriesKey, timeSeries);
 
         return input;
     }
@@ -76,8 +76,8 @@ public class ConvertSinglePulses2Timeseries implements Processor {
         this.singlePulsesKey = singlePulsesKey;
     }
 
-    public void setTimeseriesKey(String timeseriesKey) {
-        this.timeseriesKey = timeseriesKey;
+    public void settimeSeriesKey(String timeSeriesKey) {
+        this.timeSeriesKey = timeSeriesKey;
     }
 
     public void setBaseLineKey(String baseLineKey) {

@@ -29,7 +29,7 @@
     <fact.utils.ConvertSinglePulses2Timeseries 
       singlePulsesKey="PhotonArrivals"
       baseLineKey="PhotonArrivalsBaseLine"
-      timeseriesKey="ReconstructedDataCalibrated"
+      timeSeriesKey="ReconstructedDataCalibrated"
     />
 
     <fact.ShowViewer key="DataCalibrated" />
