@@ -2,6 +2,7 @@ package fact.features.singlePulse.timeLineExtraction;
 
 import com.google.common.math.DoubleMath;
 import fact.Utils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.ArrayList;
 
@@ -13,7 +14,8 @@ public class SinglePulseExtractor {
 
     public static class Config {
         /**
-         * An input configurstion for a SinglePulseExtractor instance
+         * An input configuration to steer the behaviour of a 
+         * SinglePulseExtractor instance.
          */
         public int pulseToLookForLength;
         public int plateauLength;
@@ -34,6 +36,9 @@ public class SinglePulseExtractor {
     }
 
     public static class Result {
+        /**
+         * A result container to bundle the output of the SinglePulseExtractor.
+         */
         public int[] pulseArrivalSlices;
         public double[] timeSeriesAfterExtraction;
 
@@ -42,10 +47,9 @@ public class SinglePulseExtractor {
         }
 
         public double timeSeriesBaseLine() {
-            double sum = 0.0;
-            for(int i=0; i<timeSeriesAfterExtraction.length; i++)
-                sum += timeSeriesAfterExtraction[i];
-            return sum/timeSeriesAfterExtraction.length;
+            DescriptiveStatistics statistics = 
+                new DescriptiveStatistics(timeSeriesAfterExtraction);
+            return statistics.getMean();
         }    
     }
 
