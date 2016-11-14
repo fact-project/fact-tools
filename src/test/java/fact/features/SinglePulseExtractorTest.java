@@ -1,9 +1,7 @@
 package fact.features;
 
-import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import java.util.ArrayList;
 import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
