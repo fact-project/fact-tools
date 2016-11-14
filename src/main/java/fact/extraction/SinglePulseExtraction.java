@@ -9,9 +9,11 @@ import java.util.Arrays;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 
-/*
-* Extracts a list of arrival slice positions of photons for each pixel 
-* time line.
+/**
+ * Extracts a list of arrival slice positions of photons for each pixel
+ * time line.
+ *
+ * Created by Seabstian Mueller
 */
 public class SinglePulseExtraction implements Processor {
     @Parameter(required=true, description="")
