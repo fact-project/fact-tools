@@ -1,8 +1,6 @@
 package fact.io.zfits;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -15,21 +13,39 @@ public class TestZFitsStream {
      * Test whether gzipped fits files containing raw data can be read correctly
      * @throws Exception
      */
-	@Test
-	public void testReadFits() throws Exception {
-		URL u =  TestZFitsStream.class.getResource("/testDataFile.fits.gz");
-		ZFitsStream stream = new ZFitsStream(new SourceURL(u));
-		stream.tableName = "Events";
-		stream.init();
-		
-		Data item = stream.read();
-		int i = 1;
+    @Test
+    public void testReadFits() throws Exception {
+        URL u =  TestZFitsStream.class.getResource("/testDataFile.fits.gz");
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+        
+        Data item = stream.read();
+        int i = 1;
         //the test file contains just 15 valid events.
-		while (i < 15) {
-			item = stream.read();
+        while (i < 15) {
+            item = stream.read();
             i++;
-		}
-	}
+        }
+    }
+
+
+    /**
+     * Test whether zfits fits files containing raw data can be read correctly
+     * @throws Exception
+     */
+    @Test
+    public void testReadZFits() throws Exception {
+        URL u =  TestZFitsStream.class.getResource("/testDataFile.fits.fz");
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+        Data item = stream.read();
+        printItemsInStream(stream, item);
+    }
+
+
     /**
      * Test whether gzippe fits files containing MC data can be read correctly
      * @throws Exception
