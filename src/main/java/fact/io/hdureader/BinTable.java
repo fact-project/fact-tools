@@ -7,8 +7,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,7 +80,7 @@ public class BinTable {
     public Integer numberOfRowsInTable = 0;
     public Integer numberOfColumnsInTable = 0;
     public final TableReader tableReader;
-    public final ZFitsReader zFitsReader;
+    public final ZFitsHeapReader zFitsHeapReader;
     public final String name;
 
 
@@ -121,54 +119,7 @@ public class BinTable {
         numberOfColumnsInTable = columns.size();
 
         tableReader = new TableReader(inputStreamForHDUData);
-        zFitsReader = new ZFitsReader(heapDataStream);
-    }
-
-
-
-    public final class ZFitsReader {
-        final DataInputStream stream;
-
-        private ZFitsReader(DataInputStream stream) {
-            this.stream = stream;
-        }
-
-
-        private void readTileHeader(byte[] bytes){
-            String s = new String(bytes,0, 4, StandardCharsets.US_ASCII);
-            ByteBuffer buffer = ByteBuffer.wrap(bytes, 4, 16-4).order(ByteOrder.LITTLE_ENDIAN);
-            int numberOfRows= buffer.getInt();
-            long size= buffer.getLong();
-            return;
-        }
-
-
-        private void readBlockHeader(byte[] bytes) {
-            ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
-            long size = buffer.getLong();
-            String ordering = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
-            byte numProcs = buffer.get();
-            return;
-        }
-
-        public MapMapper<String, Serializable> getNextRow() throws IOException {
-            MapMapper<String, Serializable> map = new MapMapper<>();
-            //read first tile header
-            //see figure 6 of zfits paper
-            byte[] tileHeader = new byte[16];
-            stream.readFully(tileHeader);
-
-            readTileHeader(tileHeader);
-
-            byte[] blockHeader = new byte[16];
-            stream.readFully(blockHeader);
-
-            readBlockHeader(blockHeader);
-//            stream.skipBytes((int) size);
-            return  map;
-        }
-
-
+        zFitsHeapReader = new ZFitsHeapReader(heapDataStream);
     }
 
 

@@ -1,8 +1,6 @@
 package fact.io;
 
-import fact.io.hdureader.BinTable;
-import fact.io.hdureader.Fits;
-import fact.io.hdureader.HDU;
+import fact.io.hdureader.*;
 
 import fact.io.zfits.ZFitsStream;
 import org.joda.time.DateTime;
@@ -190,13 +188,13 @@ public class HDUReaderTest {
         HDU events = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
 
         BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
-        BinTable.ZFitsReader heapReader = binTable.zFitsReader;
+        ZFitsHeapReader heapReader = binTable.zFitsHeapReader;
         heapReader.getNextRow();
     }
 
     @Test
     public void testOldZFitsHeap() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
 
         //init the old fitstream
         ZFitsStream stream = new ZFitsStream(new SourceURL(u));
@@ -204,5 +202,28 @@ public class HDUReaderTest {
         stream.init();
         Data data = stream.readNext();
         System.out.println(data);
+    }
+
+    @Test
+    public void trieTest() throws Exception {
+        BitWiseTrie t = new BitWiseTrie();
+
+        BitWiseTrie.insert(t, 42, 1337);
+        Integer foundSymbol = BitWiseTrie.find(t, 42).value;
+        assertThat(foundSymbol, is(1337));
+
+//        log.info("-------------------------------------");
+        BitWiseTrie.insert(t, 22, 1336);
+        foundSymbol = BitWiseTrie.find(t, 22).value;
+        assertThat(foundSymbol, is(1336));
+
+//        log.info("-------------------------------------");
+        BitWiseTrie.insert(t, 128, 8008);
+        foundSymbol = BitWiseTrie.find(t, 128).value;
+        assertThat(foundSymbol, is(8008));
+
+        //look for unknown entry
+        foundSymbol = BitWiseTrie.find(t, 48).value;
+        assertNull(foundSymbol);
     }
 }
