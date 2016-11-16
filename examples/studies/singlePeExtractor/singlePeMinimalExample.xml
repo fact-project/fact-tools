@@ -43,42 +43,15 @@
         <fact.utils.ConvertSinglePulses2Timeseries
                 singlePulsesKey="PhotonArrivals"
                 baseLineKey="PhotonArrivalsBaseLine"
-                timeSeriesKey="DataCalibrated"
+                timeSeriesKey="DataReconstructed"
         />
-
-
-        <!-- Extraction -->
-        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
-        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
-        <include url="classpath:/default/data/extraction.xml" />
-        <!-- Output: photoncharge, arrivalTime -->
-
-        <!-- Cleaning -->
-        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-        <include url="classpath:/default/data/cleaning.xml" />
-        <!-- Output: shower -->
-
-        <!-- Parameter calculation (only source independent) -->
-        <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
-        arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
-        Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
-        ShowerSlope, Disp -->
-        <include url="classpath:/default/data/parameterCalc.xml" />
-        <!-- Output: source independent parameters -->
-
-        <!-- Parameter calculation (only source dependent) -->
-        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
-        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <include url="classpath:/default/data/sourceParameter.xml" />
-        <!-- Output: source dependent parameters -->
 
         <!--<fact.ShowViewer key="DataCalibrated" />-->
 
-        <fact.io.JSONWriter keys="${keysForOutput}"
-                            url="${output}"
-                            writeListOfItems="True"
-                            pixelSetsAsInt="True"
-        />
+        <!--<fact.io.JSONWriter keys="${keysForOutput}"-->
+                            <!--url="${output}"-->
+                            <!--writeListOfItems="True"-->
+                            <!--pixelSetsAsInt="True"-->
+        <!--/>-->
     </process>
 </container>
