@@ -206,24 +206,70 @@ public class HDUReaderTest {
 
     @Test
     public void trieTest() throws Exception {
-        BitWiseTrie t = new BitWiseTrie();
+//        BitWiseTrie t = new BitWiseTrie();
+//
+//
+//        // insert codeword 42 for symbol 1
+//        BitWiseTrie.insert(t, 42, 1);
+//        Integer foundSymbol = BitWiseTrie.find(t, 42).value;
+//        assertThat(foundSymbol, is(1));
+//
+//
+//        // insert codeword with same prefix (bitwise) 43 for symbol 2
+//        BitWiseTrie.insert(t, 43, 2);
+//        foundSymbol = BitWiseTrie.find(t, 43).value;
+//        assertThat(foundSymbol, is(2));
+//
+//        //log.info("-------------------------------------");
+//        BitWiseTrie.insert(t, 22, 1336);
+//        foundSymbol = BitWiseTrie.find(t, 22).value;
+//        assertThat(foundSymbol, is(1336));
+//
+//        //log.info("-------------------------------------");
+//        BitWiseTrie.insert(t, 128, 8008);
+//        foundSymbol = BitWiseTrie.find(t, 128).value;
+//        assertThat(foundSymbol, is(8008));
+//
+//        //look for unknown entry
+//        foundSymbol = BitWiseTrie.find(t, 48).value;
+//        assertNull(foundSymbol);
+//
+//        //from the old zfitsreader I know that the symbol -1848 corresponds to the humman encoded byte 46.
+//        BitWiseTrie.insert(t, 46, -1848);
+//        foundSymbol = BitWiseTrie.find(t, 46).value;
+//        assertThat(foundSymbol, is(-1848));
 
-        BitWiseTrie.insert(t, 42, 1337);
-        Integer foundSymbol = BitWiseTrie.find(t, 42).value;
-        assertThat(foundSymbol, is(1337));
+    }
 
-//        log.info("-------------------------------------");
-        BitWiseTrie.insert(t, 22, 1336);
-        foundSymbol = BitWiseTrie.find(t, 22).value;
-        assertThat(foundSymbol, is(1336));
+    @Test
+    public void bitQueueTest(){
+        ZFitsHeapReader.BitQueue q = new ZFitsHeapReader.BitQueue();
 
-//        log.info("-------------------------------------");
-        BitWiseTrie.insert(t, 128, 8008);
-        foundSymbol = BitWiseTrie.find(t, 128).value;
-        assertThat(foundSymbol, is(8008));
 
-        //look for unknown entry
-        foundSymbol = BitWiseTrie.find(t, 48).value;
-        assertNull(foundSymbol);
+        q.addByte(Byte.parseByte("00110011", 2));
+        assertThat(q.bitString(), is("00000000"+"00110011"));
+        assertThat(q.queueLength, is(8));
+
+        q.addByte(Byte.parseByte("00000000", 2));
+        assertThat(q.bitString(), is("00000000" + "00110011"));
+        assertThat(q.queueLength, is(16));
+
+        q.remove(2);
+        assertThat(q.bitString(), is("00000000" + "00001100"));
+        assertThat(q.queueLength, is(14));
+
+        q.remove(8);
+        assertThat(q.bitString(), is("00000000" + "00000000"));
+        assertThat(q.queueLength, is(6));
+
+        q.addByte(Byte.parseByte("01010101", 2));
+        assertThat(q.bitString(), is("00010101" + "01000000"));
+        assertThat(q.queueLength, is(14));
+
+
+
+        assertThat(q.bitString(), is("00010101" + "01000000"));
+//        System.out.println(Integer.toBinaryString(q.peek(11)));
+
     }
 }

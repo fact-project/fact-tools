@@ -1,8 +1,7 @@
 package fact.io.hdureader;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
-import fact.io.zfits.ZFitsUtil;
+import com.google.common.collect.MinMaxPriorityQueue;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +13,9 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 
 /**
  * Created by mackaiver on 14/11/16.
@@ -136,7 +136,7 @@ public final class ZFitsHeapReader {
     private void decompressRow(byte[] row) throws IOException {
         //first 8 bytes is the size of the decompressed data
         ByteBuffer buffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
-        BitWiseTrie huffmanTrie = new BitWiseTrie();
+//        BitWiseTrie<BitWiseTrie.Symbol> huffmanTrie = new BitWiseTrie<>();
 
         byte processingType = buffer.get();
         if (processingType != 2) {
@@ -152,6 +152,9 @@ public final class ZFitsHeapReader {
 
         long numberOfSymbols = buffer.getLong();
 
+
+//        MinMaxPriorityQueue<HuffmannTree.Symbol> m = MinMaxPriorityQueue.expectedSize(Math.toIntExact(numberOfSymbols));
+        ByteWisething huffmanTrie = new ByteWisething();
         //read all entries and create the decoding tree
         for (long i = 0; i < numberOfSymbols; i++) {
             // first two bytes are the symbol
@@ -178,71 +181,83 @@ public final class ZFitsHeapReader {
 
             int bits = ByteBuffer.wrap(huffmanCode).order(ByteOrder.LITTLE_ENDIAN).getInt();
             // convert byte array to an int
-//            int bits = ZFitsUtil.wrap(huffmanCode).getInt();
             log.info("Sym: '{}', '{}', '{}', '{}', as int: {}", symbol, codeLengthInBits, codeLengthInBytes, String.format("%" + codeLengthInBits + "s", Integer.toBinaryString(bits)).replace(' ', '0'), bits);
-            BitWiseTrie.insert(huffmanTrie, bits, symbol);
-//            tree.insertSymbol(symbol, codeLengthInBits, bits);
+            ByteWisething.insert(huffmanTrie, bits, codeLengthInBits,new ByteWisething.Symbol(symbol, codeLengthInBits, codeLengthInBytes, bits) );
+//            huffmanTrie.insert(bits, new BitWiseTrie.Symbol(symbol, codeLengthInBits, codeLengthInBytes, bits));
         }
 
 
-//        System.out.println(huffmanTrie);
+        ArrayList<Short> symbols = Lists.newArrayList();
 
-        int bitQueue = 0;
-        int queueLength = 0;
-        ArrayList<Integer> symbols = Lists.newArrayList();
-
-        BitWiseTrie currentNode = huffmanTrie;
+//        BitWiseTrie<BitWiseTrie.Symbol> currentNode = huffmanTrie;
         int position = buffer.position();
 
         long bytesRead = 0;
+        BitQueue q = new BitQueue();
+        ByteWisething currentNode = huffmanTrie;
+        int depth = 0;
         try {
             while (bytesRead < compressedSize - position) {
-                if(queueLength < 8) {
-                    bitQueue |= (buffer.get() & 0xFF) << queueLength;
-                    bytesRead++;
-                    queueLength += 8;
+
+                if(q.queueLength < 16) {
+                    short data  = buffer.getShort();
+                    q.addShort(data);
                 }
 
+              ByteWisething node = currentNode.children[q.peekByte()];
+                if (node.isLeaf) {
+                    symbols.add(node.payload.symbol);
+                    log.info("Numbits in node: {}  for symbol {}", node.payload.codeLengthInBits, node.payload.symbol);
+                    q.remove(node.payload.codeLengthInBits - depth*8);
 
-
-                BitWiseTrie node = BitWiseTrie.find(currentNode, bitQueue);
-                if (node.isLeaf()) {
-                    symbols.add(node.value);
-
-                    bitQueue >>= node.depth;
-                    queueLength -= node.depth;
                     //reset traversal to root node.
+                    depth = 0;
                     currentNode = huffmanTrie;
 
                 } else {
                     currentNode = node;
-                    bitQueue >>= 8; //gow much
-                    queueLength -= 8;
+                    depth++;
+                    q.remove(8);
                 }
             }
         } catch (BufferUnderflowException e){
             log.error("Bytes read: {}, compressed size was: {}, number of symbols was {}", bytesRead, compressedSize, numberOfSymbols);
         }
-
-//        System.out.println(symbols);
     }
 
-//
-//    class BitQueue{
-//
-//        int queue = 0;
-//        int queueLength = 0;
-//
-//        public void addByte(byte b){
-//            queue |= b << queueLength;
-//            queueLength += 8;
-//        }
-//
-//        public void remove(int n){
-//            queue   >>= n;
-//            queueLength -= n;
-//        }
-//    }
+
+
+
+
+
+public static class BitQueue{
+
+        public int queueAsInt = 0;
+        public int queueLength = 0;
+
+        public void addByte(byte b){
+            queueAsInt |= (b & 0xFF) << queueLength;
+            queueLength += 8;
+        }
+
+        public void addShort(short s){
+            queueAsInt |= (s & 0xFFFF) << queueLength;
+            queueLength += 16;
+        }
+
+        public  void remove(int n){
+            queueAsInt >>=  n;
+            queueLength -= n;
+        }
+
+        public int peekByte(){
+            return queueAsInt & 0x00FF;
+        }
+
+        public String bitString(){
+            return String.format("%"+16+"s",Integer.toBinaryString(queueAsInt)).replace(' ', '0');
+        }
+}
 //            if (bufferPosition+1==bufferSize) {
 //                data = (short)(buffer.get(bufferPosition)&0x00FF);
 //            } else {
