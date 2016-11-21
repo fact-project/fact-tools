@@ -3,8 +3,7 @@ package fact.auxservice;
 import com.google.common.cache.*;
 import com.google.common.collect.HashBasedTable;
 import fact.auxservice.strategies.AuxPointStrategy;
-import fact.auxservice.strategies.Closest;
-import fact.io.FitsStream;
+
 import fact.io.zfits.ZFitsStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

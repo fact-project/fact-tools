@@ -71,9 +71,8 @@ public class FitsHeader {
 	 */
 	public FitsHeader(List<String> block) throws ParseException {
 		//log.info("Block size: "+block.size());
-		keyMap = new HashMap<String, FitsHeaderEntry>();
+		keyMap = new HashMap<>();
 		for (String line : block) {
-			ValueType type = ValueType.NONE;
 
 			if (line.startsWith("COMMENT")) { //ignore comment only lines
 				continue;
@@ -83,41 +82,50 @@ public class FitsHeader {
 				continue;
 			}
 
-			line = line.trim();
-			//get the key and everything else
-			String[] tmp = line.split("=", 2);
-			if (tmp.length != 2) {
-				throw new ParseException("The card does not contain a key value pair: '"+line+"'");
-			}
-			String key = tmp[0].trim(); //key
-			line = tmp[1].trim(); //everything else
+            String[] tokens = line.split("=|/");
 
-			//split the value and the comment from everything else
-			tmp = line.split("/", 2);
-			if (tmp.length==2) {
-				//String comment = tmp[1].trim(); //comment
-			}
-			String value = tmp[0].trim();
+            String key = tokens[0].trim();
+            String value = tokens[1].trim();
+//            String comment = tokens[2].trim();
 
-			//check the type of the value
-			if (value.startsWith("'")) { //we found a String
-				value = value.replaceAll("'", "").trim();
-				type = ValueType.STRING;
-			} else {
-				if (value.isEmpty() || value.startsWith("T") || value.startsWith("F")) {
-					type = ValueType.BOOLEAN;
-				} else if (value.matches("\\d*\\.\\d*")) {
-					type = ValueType.FLOAT;
-				} else if (value.matches("\\d+")) {
-					type = ValueType.INT;
-				} else {
-					throw new ParseException("Unknown value while parsing tableheads: '"+value+"'");
-				}
-			}
+            ValueType type = getTypeFromValueString(value);
+            if(type == ValueType.STRING){
+                value = value.replaceAll("'", "").trim();
+            }
 
 			keyMap.put(key, new FitsHeaderEntry(type, value));
 		}
 	}
+
+    /**
+     * This method returns the ValueType for the keyword value given.
+     * Complex Numbers are not supported here. The fits standard does however.
+     *
+     * @param value a value from the fits header keyword,value pair
+     * @return the valuetype that fits that value
+     * @throws ParseException in case the right cannot be found.
+     */
+    public ValueType getTypeFromValueString(String value) throws ParseException {
+        if (value.startsWith("'")) {
+            return ValueType.STRING;
+        }
+        if (value.isEmpty() || value.startsWith("T") || value.startsWith("F")) {
+            return ValueType.BOOLEAN;
+        }
+        try {
+            Integer.parseInt(value);
+            return ValueType.INT;
+        } catch (NumberFormatException e) {
+
+            try {
+                Float.parseFloat(value);
+                return ValueType.FLOAT;
+            } catch (NumberFormatException c) {
+                throw new ParseException("Unknown value while parsing tableheads: '"+value+"'");
+            }
+
+        }
+    }
 
 	/**
 	 * Checks if the key is present in the header
