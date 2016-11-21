@@ -7,10 +7,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * FITS files are split into things called HDUs. This is a simple representation of one.
@@ -19,29 +16,27 @@ import java.util.stream.Collectors;
  * Created by mackaiver on 03/11/16.
  */
 public class HDU {
-    //Maximum length the header of this HDU can have in blocks of 2880 bytes.
-    private final int blockLimit = 100;
+
+    int headerSizeInBytes = 0;
 
     public enum XTENSION {
         IMAGE, BINTABLE, TABLE, NONE
     }
 
-    public Map<String, HDULine> header = new HashMap<>();
 
-    XTENSION extension = XTENSION.NONE;
+    public XTENSION extension = XTENSION.NONE;
 
-    boolean isPrimaryHDU = false;
+    public boolean isPrimaryHDU = false;
 
-    String comment = "";
-
-    String history = "";
 
     //size of header in bytes
-    public int headerSizeInBytes = 0;
+//    int headerSizeInBytes = 0;
 
-    public final long hduOffset;
 
     private BinTable binTable = null;
+
+
+    public final Header header;
 
 
     /**
@@ -49,14 +44,16 @@ public class HDU {
      *  1. Read blocks of 2880 bytes and add lines of 80 chars to a list until the END keyword is found.
      *  2. Iterate over the list of lines and parse the strings into a hashmap.
      * @param inputStream The stream of the fits file
-     * @param url
-     * @param hduOffset the offset the HDU has from the beginning of the file. In bytes.  @throws IOException in case an error occurs when reading the bytes
+     * @param url the url to the fits file to read.
+     * @param hduOffset the offset the HDU has from the beginning of the file. In bytes.
+     * @throws IOException in case an error occurs when reading the bytes
      */
-    protected HDU(DataInputStream inputStream, URL url, long hduOffset) throws IOException {
+    HDU(DataInputStream inputStream, URL url, long hduOffset) throws IOException {
 
-        this.hduOffset = hduOffset;
+//        this.hduOffset = hduOffset;
 
-        List<String> lines = new ArrayList<>();
+        List<String> headerLines = new ArrayList<>();
+        int blockLimit = 100;
         for (int blockNumber = 0; blockNumber < blockLimit; blockNumber++) {
 
             //read a block aka 2880 bytes.
@@ -71,7 +68,7 @@ public class HDU {
                     .trimResults()
                     .splitToList(block);
 
-            lines.addAll(blockLines);
+            headerLines.addAll(blockLines);
 
 
             boolean hasEndKeyWord = blockLines
@@ -87,65 +84,20 @@ public class HDU {
         }
 
 
-
-        //get all interesting information
-        header = lines.stream()
-                 .filter(a -> !a.matches("COMMENT\\s.+|HISTORY\\s.+|END$"))
-                 .map(HDULine::fromString)
-                 .collect(Collectors.toMap(
-                            hduline -> hduline.key,
-                            Function.identity()
-                         )
-                 );
-
-        comment = lines.stream()
-                .filter(a -> a.matches("COMMENT.+"))
-                .map(a -> a.substring("COMMENT ".length()))
-                .collect(Collectors.joining(" \n "));
-
-        history = lines.stream()
-                .filter(a -> a.matches("HISTORY.+"))
-                .map(a -> a.substring("HISTORY ".length()))
-                .collect(Collectors.joining(" \n "));
-
-
-        isPrimaryHDU = lines.stream()
+        isPrimaryHDU = headerLines.stream()
                 .anyMatch(a -> a.matches("SIMPLE\\s+=\\s+T.*"));
 
+        header = new Header(headerLines);
 
-
-        if (header.containsKey("XTENSION")){
-            String xtension = header.get("XTENSION").value;
-            extension = XTENSION.valueOf(xtension);
-        }
-
+        header.get("XTENSION")
+                .ifPresent(xtensionValue -> extension = XTENSION.valueOf(xtensionValue));
 
         if (extension == XTENSION.BINTABLE){
 
-            DataInputStream tableDataStream = Fits.getDecompressedDataStream(url);
-            long skippedBytes = tableDataStream.skipBytes((int) (hduOffset + headerSizeInBytes));
-            if(skippedBytes != hduOffset + headerSizeInBytes){
-                throw new IOException("Could not skip all bytes to data area in this HDU.");
-            }
+            this.binTable = new BinTable(header, hduOffset, headerSizeInBytes, url); //tableName, tableDataStream, heapDataStream);
 
-
-
-            Integer naxis1 = header.get("NAXIS1").getInt().orElse(0);
-            Integer naxis2 = header.get("NAXIS2").getInt().orElse(0);
-            Integer theap  = header.get("THEAP").getInt().orElse(naxis1 * naxis2);
-
-            int bytesToSkip = (int) (hduOffset + headerSizeInBytes + theap);
-
-            DataInputStream heapDataStream = Fits.getDecompressedDataStream(url);
-            skippedBytes = heapDataStream.skipBytes(bytesToSkip);
-
-            if(skippedBytes != bytesToSkip){
-                throw new IOException("Could not skip all bytes to data area in this HDU.");
-            }
-
-            String tableName = header.get("EXTNAME").value;
-
-            this.binTable = new BinTable(header, tableName, tableDataStream, heapDataStream);
+//            tableReader = new BinTable.TableReader(binTable, tableDataStream);
+//            zFitsHeapReader = new ZFitsHeapReader(heapDataStream);
         }
 
     }
@@ -157,49 +109,6 @@ public class HDU {
     }
 
 
-//    /**
-//     * Returns whether if there is data attached to this HDU.
-//     * @return true iff data is attached to this HDU
-//     */
-//    public boolean hasData(){
-//        return sizeOfDataArea() > 0;
-//    }
-
-    /**
-     * According to the FITS standard a header can contain a DATE keyword. This method returns a LocalDateTime
-     * if a date can be found in the header.
-     *
-     * @return date stored in the HDU header
-     */
-    public Optional<LocalDateTime> date(){
-        if (!header.containsKey("DATE")){
-            return Optional.empty();
-        }
-
-        String dateString = header.get("DATE").value;
-        LocalDateTime.parse(dateString);
-        return Optional.of(LocalDateTime.parse(dateString));
-    }
-
-//    public Optional<HDULine> getHeaderLine(String key){
-//        return Optional.ofNullable(header.get(key));
-//    }
-
-    public Optional<Integer> getInt(String key){
-        try {
-            HDULine line = header.get(key);
-            return Optional.of(Integer.parseInt(line.value));
-        } catch (NumberFormatException| NullPointerException e){
-            return Optional.empty();
-        }
-    }
-    public Optional<String> get(String key){
-        if(!header.containsKey(key)){
-            return Optional.empty();
-        }
-        return Optional.ofNullable(header.get(key).value);
-    }
-
     /**
      * Get the number of bytes you need to skip in order to jump from the end of the last block in the header
      * of this HDU to the beginning of the header block of the next HDU in the file.
@@ -208,7 +117,7 @@ public class HDU {
      *
      * @return the number of bytes to skip to hte next hdu.
      */
-    public long offsetToNextHDU(){
+    long offsetToNextHDU(){
         if(sizeOfDataArea() == 0){
             return 0;
         }
@@ -223,21 +132,22 @@ public class HDU {
      *
      * @return size of the data area in  bytes.
      */
-    public long sizeOfDataArea(){
-        long factorNAXIS = header.entrySet().stream()
+    long sizeOfDataArea(){
+        Map<String, HeaderLine> headerMap = header.headerMap;
+        long factorNAXIS = headerMap.entrySet().stream()
                 .filter(e -> e.getKey().matches("NAXIS\\d+"))
                 .mapToLong(e -> e.getValue().getInt().orElse(1))
                 .reduce((a, b) -> a * b)
                 .orElse(0);
 
-        int bitpix = Math.abs(header.get("BITPIX").getInt().orElse(0));
+        int bitpix = Math.abs(headerMap.get("BITPIX").getInt().orElse(0));
 
 
         //calculate size according to equation 1.
         if(!isPrimaryHDU){
-            int gcount = header.get("GCOUNT").getInt().orElse(0);
+            int gcount = headerMap.get("GCOUNT").getInt().orElse(0);
 
-            int pcount = header.get("PCOUNT").getInt().orElse(0);
+            int pcount = headerMap.get("PCOUNT").getInt().orElse(0);
 
             return bitpix * gcount * (pcount + factorNAXIS)/8;
         }
@@ -248,15 +158,17 @@ public class HDU {
 
     @Override
     public String toString() {
+        Map<String, HeaderLine> headerMap = header.headerMap;
         return "HDU{" +
-
-                "header=" + header.entrySet().stream()
+                "header=" + headerMap.entrySet().stream()
                 .map(e -> "(" + e.getKey() + ", " + e.getValue().value + ")")
                 .reduce((a, b) -> a + "\n " + b)
                 .orElse(" ") + "\n" +
 
                 "size=" + sizeOfDataArea() + "\n" +
-                "date=" + date().toString() +
+                "date=" + header.date().toString() + "\n" +
+                "extension=" + extension + "\n" +
+                "data=" + sizeOfDataArea() +" bytes \n" +
                 '}'
                 ;
     }

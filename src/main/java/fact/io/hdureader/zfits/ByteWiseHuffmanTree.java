@@ -1,29 +1,29 @@
-package fact.io.hdureader;
+package fact.io.hdureader.zfits;
 
 /**
  * Created by mackaiver on 16/11/16.
  */
-public class ByteWisething {
+public class ByteWiseHuffmanTree {
 
     public Symbol payload = null;
-    ByteWisething[] children;
+    public ByteWiseHuffmanTree[] children;
 
     public boolean isLeaf = false;
 
 
 
-    public static void insert(ByteWisething rootNode, int bits, int codeLengthInBits, Symbol symbol){
+    public static void insert(ByteWiseHuffmanTree rootNode, int bits, int codeLengthInBits, Symbol symbol){
          if(rootNode.children == null) {
-             rootNode.children =new ByteWisething[256];
+             rootNode.children =new ByteWiseHuffmanTree[256];
          }
 
 
         // the alias symbol is bigger then 8 bits we need to extend it
         if (codeLengthInBits > 8) {
             if (rootNode.children[bits & 0xFF] == null) {
-                rootNode.children[bits & 0xFF] = new ByteWisething();
+                rootNode.children[bits & 0xFF] = new ByteWiseHuffmanTree();
             }
-            ByteWisething.insert(rootNode.children[bits & 0xFF], bits >> 8, codeLengthInBits - 8, symbol);
+            ByteWiseHuffmanTree.insert(rootNode.children[bits & 0xFF], bits >> 8, codeLengthInBits - 8, symbol);
 //            rootNode.children[bits & 0xFF].insertSymbol(symbol, (byte) (numBits - 8), bits >> 8);
             return;
         }
@@ -35,14 +35,14 @@ public class ByteWisething {
         for (int i = 0; i < numCombination; i++) {
             int key = (bits | (i << codeLengthInBits))&0xFF;
 
-            ByteWisething node = new ByteWisething();
+            ByteWiseHuffmanTree node = new ByteWiseHuffmanTree();
             node.payload = symbol;
             node.isLeaf = true;
             rootNode.children[key] = node;
         }
     }
 
-//    public static Symbol getFromNode(ByteWisething node, int code){
+//    public static Symbol getFromNode(ByteWiseHuffmanTree node, int code){
 //        return node.children[code];
 //    }
 //

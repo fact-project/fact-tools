@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +19,9 @@ public class BinTable {
 
     private static Logger log = LoggerFactory.getLogger(BinTable.class);
 
+    final DataInputStream tableDataStream;
+    DataInputStream heapDataStream = null;
+
 
     /**
      * This enum maps the type characters in the header to the fits types.
@@ -28,7 +30,7 @@ public class BinTable {
      * TODO: support variable length arrays.
      *
      */
-    private enum ColumnType {
+    enum ColumnType {
         BOOLEAN("L", Boolean.class, 1),
         CHAR("A", Character.class, 1),
         BYTE("B", Byte.class, 1),
@@ -59,9 +61,19 @@ public class BinTable {
 
     }
 
-    private class TableColumn{
 
-        TableColumn(HDULine tform, HDULine ttype){
+    /**
+     * Representation of column meta data for a bintable.
+     * Keeps information like the repeatcount, type and name of the column.
+     */
+    class TableColumn{
+
+        /**
+         * Create a TableColumn from the tform and ttype header information.
+         * @param tform the headerline specifying the type of the data.
+         * @param ttype the headerline specifying the name of the column.
+         */
+        TableColumn(HeaderLine tform, HeaderLine ttype){
             Matcher matcher = Pattern.compile("(\\d+)([LABIJKED])").matcher(tform.value);
             if (matcher.matches()){
                 repeatCount = Integer.parseInt(matcher.group(1));
@@ -70,29 +82,26 @@ public class BinTable {
             this.name = ttype.value;
 
         }
-        public int repeatCount = 0;
-        public ColumnType type;
-        public String name;
+        int repeatCount = 0;
+        ColumnType type;
+        String name;
     }
 
-    private List<TableColumn> columns = new ArrayList<>();
+    List<TableColumn> columns = new ArrayList<>();
 
     public Integer numberOfRowsInTable = 0;
     public Integer numberOfColumnsInTable = 0;
-    public final TableReader tableReader;
-    public final ZFitsHeapReader zFitsHeapReader;
     public final String name;
 
 
-    BinTable(Map<String, HDULine> header,
-             String tableName,
-             DataInputStream inputStreamForHDUData,
-             DataInputStream heapDataStream
-    ) throws IllegalArgumentException{
+    BinTable(Header header, long hduOffset, long headerSizeInBytes, URL url) throws IllegalArgumentException, IOException {
 
-        this.name = tableName;
+        binTableSanityCheck(header);
 
-        Iterator<HDULine> tforms = header
+        this.name = header.get("EXTNAME").orElse("");
+
+
+        Iterator<HeaderLine> tforms = header.headerMap
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().matches("TFORM\\d+"))
@@ -101,7 +110,7 @@ public class BinTable {
                 .iterator();
 
 
-        Iterator<HDULine> ttypes = header
+        Iterator<HeaderLine> ttypes = header.headerMap
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().matches("TTYPE\\d+"))
@@ -115,111 +124,115 @@ public class BinTable {
             columns.add(new TableColumn(tforms.next(), ttypes.next()));
         }
 
-        numberOfRowsInTable = header.get("NAXIS2").getInt().orElse(0);
+        numberOfRowsInTable = header.getInt("NAXIS2").orElse(0);
         numberOfColumnsInTable = columns.size();
 
-        tableReader = new TableReader(inputStreamForHDUData);
-        zFitsHeapReader = new ZFitsHeapReader(heapDataStream);
+
+        // create readers for the data in this table
+        //create stream for data in table area of the bintable extension
+        DataInputStream stream = Fits.getDecompressedDataStream(url);
+
+        long skippedBytes = stream.skipBytes((int) (hduOffset + headerSizeInBytes));
+        if(skippedBytes != hduOffset + headerSizeInBytes){
+            throw new IOException("Could not skip all bytes to table data in this HDU.");
+        }
+        this.tableDataStream = stream;
+
+
+        //check if this bintable has data following after the table. See section 7.3.1 in the fits standard
+        Integer pcount = header.getInt("PCOUNT").orElse(0);
+
+        if (pcount > 0) {
+            Integer naxis1 = header.getInt("NAXIS1").orElse(0);
+            Integer naxis2 = header.getInt("NAXIS2").orElse(0);
+            Integer theap = header.getInt("THEAP").orElse(naxis1 * naxis2);
+
+            int bytesToSkip = Math.toIntExact((hduOffset + headerSizeInBytes + theap));
+
+            DataInputStream hStream = Fits.getDecompressedDataStream(url);
+            skippedBytes = hStream.skipBytes(bytesToSkip);
+
+            if (skippedBytes != bytesToSkip) {
+                throw new IOException("Could not skip all bytes to heap area of the bintable in this HDU.");
+            }
+            this.heapDataStream = hStream;
+        }
     }
 
 
-    public final class TableReader{
-        final DataInputStream stream;
+    /**
+     * Perform some sanity checks on the bintable.
+     *  1. The TFIELDS keyword must exist.
+     *  2. The number of columns stored in the TFIELD line has to fit the number
+     *     of TTPYE fields
+     *  3. Make sure the NAXIS2 keyword exists. It gives the number of rows.
+     *  4. NAXIS2 needs to be non-negative.
+     *
+     * @param header the header to check
+     */
+    private void binTableSanityCheck(Header header) {
+        int tfields = header.getInt("TFIELDS").orElseThrow(() -> {
+            log.error("The TFIELDS keyword cannot be found in the BinTable. " +
+                    "Its mandatory.\nSee section 7.2.1 of the Fits 3.0 standard");
+            return new IllegalArgumentException("Missing TFIELD keyword");
+        });
+//
+//        if(columns.size() != tfields){
+//            log.error("The value of TFIELDS: {} does not match the number of TTYPEn,TBCOLn,TFORMn tuples {}" +
+//                    "\nSee section 7.2.1 of the Fits 3.0 standard", tfields, columns.size());
+//            throw new IllegalArgumentException("Number of TFIELDS does not match number of TFORMn entries.");
+//        }
+//
 
-        private TableReader(DataInputStream stream) {
-            this.stream = stream;
+        int naxis1 = header.getInt("NAXIS1").orElseThrow(() -> {
+            log.error("The NAXIS1 keyword cannot be found in the BinTable. " +
+                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+            return new IllegalArgumentException("Missing NAXIS2 keyword");
+        });
+
+        if(naxis1 < 0){
+            throw new IllegalArgumentException("Number of rows (NAXIS1) is negative.");
         }
 
+        int naxis2 = header.getInt("NAXIS2").orElseThrow(() -> {
+            log.error("The NAXIS2 keyword cannot be found in the BinTable. " +
+                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+            return new IllegalArgumentException("Missing NAXIS2 keyword");
+        });
 
-        public MapMapper<String, Serializable> getNextRow() throws IOException {
-            MapMapper<String, Serializable> map = new MapMapper<>();
-            for(TableColumn c : columns){
-                if(c.repeatCount > 1){
-                    map.put(c.name, readArrayFromStream(c, stream));
-                } else if(c.repeatCount == 1) {
-                    map.put(c.name, readSingleValueFromStream(c, stream));
-                } else if(c.repeatCount == 0){
-                    map.put(c.name, null);
-                }
-            }
-            return  map;
+        if(naxis2 < 0){
+            throw new IllegalArgumentException("Number of rows (NAXIS2) is negative.");
         }
 
+        int pcount = header.getInt("PCOUNT").orElseThrow(() -> {
+            log.error("The PCOUNT keyword cannot be found in the BinTable. " +
+                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+            return new IllegalArgumentException("Missing PCOUNT keyword");
 
-        private Serializable readSingleValueFromStream(TableColumn c, DataInputStream stream) throws IOException {
-            Serializable b = null;
-            switch (c.type){
-                case BOOLEAN:
-                    b =  stream.readBoolean();
-                    break;
-                case CHAR:
-                    b =  stream.readUTF();
-                    break;
-                case BYTE:
-                    b = stream.readByte();
-                    break;
-                case SHORT:
-                    b = stream.readShort();
-                    break;
-                case INT:
-                    b = stream.readInt();
-                    break;
-                case LONG:
-                    b = stream.readLong();
-                    break;
-                case FLOAT:
-                    b = stream.readFloat();
-                    break;
-                case DOUBLE:
-                    b = stream.readDouble();
-                    break;
-            }
-            return b;
+        });
+
+        if(pcount < 0){
+            throw new IllegalArgumentException("Number of bytes in Heap (PCOUNT) is negative.");
         }
 
-        private Serializable readArrayFromStream(TableColumn c, DataInputStream stream) throws IOException {
+        if (pcount > 0){
+            int theap = header.getInt("THEAP").orElseThrow(() -> {
+                log.error("The THEAP keyword cannot be found in the BinTable. " +
+                        "Its mandatory when PCOUNT is larger than 0.\nSee section 7.3.2 of the Fits 3.0 standard");
+                return new IllegalArgumentException("Missing THEAP keyword");
 
-            if(c.type == ColumnType.BOOLEAN){
-                boolean[] bools = new boolean[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    bools[i] = stream.readBoolean();
-                }
-                return bools;
+            });
+
+            if(theap < 0){
+                throw new IllegalArgumentException("Number of bytes in to skip to the heap (THEAP) is negative.");
             }
 
-            byte[] b = new byte[c.repeatCount*c.type.byteSize];
-            stream.readFully(b);
-
-            switch (c.type){
-                case CHAR:
-                    char[] chars = new char[c.repeatCount];
-                    ByteBuffer.wrap(b).asCharBuffer().get(chars);
-                    return chars;
-                case BYTE:
-                    return b;
-                case SHORT:
-                    short[] shorts = new short[c.repeatCount];
-                    ByteBuffer.wrap(b).asShortBuffer().get(shorts);
-                    return shorts;
-                case INT:
-                    int[] ints = new int[c.repeatCount];
-                    ByteBuffer.wrap(b).asIntBuffer().get(ints);
-                    return ints;
-                case LONG:
-                    long[] longs = new long[c.repeatCount];
-                    ByteBuffer.wrap(b).asLongBuffer().get(longs);
-                    return longs;
-                case FLOAT:
-                    float[] floats = new float[c.repeatCount];
-                    ByteBuffer.wrap(b).asFloatBuffer().get(floats);
-                    return floats;
-                case DOUBLE:
-                    double[] doubles = new double[c.repeatCount];
-                    ByteBuffer.wrap(b).asDoubleBuffer().get(doubles);
-                    return doubles;
+            int desiredTheap = naxis1*naxis2 + (naxis1 * naxis2) % 2880;
+            if(theap == desiredTheap){
+                throw new IllegalArgumentException("The value for THEAP should be equal to (NAXIS1*NAXIS2 + padding to 2880 blocks)." +
+                        "\nSee section 7.3.2 of the Fits 3.0 standard");
             }
-            return null;
         }
-
     }
+
 }

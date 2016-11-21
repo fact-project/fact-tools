@@ -2,6 +2,7 @@ package fact.io;
 
 import fact.io.hdureader.*;
 
+import fact.io.hdureader.zfits.BitQueue;
 import fact.io.zfits.ZFitsStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -34,19 +35,19 @@ public class HDUReaderTest {
         Fits f = new Fits(u);
 
         HDU events = f.getHDU("Events").orElseThrow(IOException::new);
-        assertThat(events.get("EXTNAME").orElse("WRONG"), is("Events"));
+
+        assertThat(events.header.get("EXTNAME").orElse("WRONG"), is("Events"));
 
         HDU zDrsCellOffsets = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
 
         InputStream inputStreamForHDUData = f.getInputStreamForHDUData(zDrsCellOffsets);
-        int b = new DataInputStream(inputStreamForHDUData).read();
-        System.out.println(b);
 
     }
 
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
-    public void testGzip() throws IOException {
+    public void testGzipCheck() throws IOException {
         URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 
         byte[] header = new byte[2];
@@ -99,7 +100,7 @@ public class HDUReaderTest {
         Fits f = new Fits(u);
 
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
-        BinTable.TableReader reader = b.tableReader;
+        TableReader reader = TableReader.forBinTable(b);
 
 
         Map<String, Serializable> row = reader.getNextRow();
@@ -131,7 +132,7 @@ public class HDUReaderTest {
         //create a new fits file object and get the bin table
         Fits f = new Fits(u);
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
-        BinTable.TableReader reader = b.tableReader;
+        TableReader reader = TableReader.forBinTable(b);
 
         //init the old fitstream
         FitsStream stream = new FitsStream(new SourceURL(u));
@@ -160,7 +161,7 @@ public class HDUReaderTest {
         //create a new fits file object and get the bin table
         Fits f = new Fits(u);
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
-        BinTable.TableReader reader = b.tableReader;
+        TableReader reader = TableReader.forBinTable(b);
 
         //init the old fitstream
         FitsStream stream = new FitsStream(new SourceURL(u));
@@ -179,6 +180,53 @@ public class HDUReaderTest {
     }
 
 
+
+    @Test
+    public void compareZCalibOffsets() throws Exception {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+
+
+        //new zfitsreader
+        Fits f = new Fits(u);
+        HDU events = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
+        BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        NullableMap<String, Serializable> row = heapReader.getNextRow();
+
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+
+        assertArrayEquals((short[]) row.get("OffsetCalibration"), stream.calibrationConstants);
+    }
+
+
+    @Test
+    public void compareEvents() throws Exception {
+        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+
+
+        //new zfitsreader
+        Fits f = new Fits(u);
+        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
+        BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        NullableMap<String, Serializable> row = heapReader.getNextRow();
+        System.out.println(row);
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+        Data data = stream.readNext();
+        System.out.println(data);
+
+    }
+
+
     @Test
     public void testZFitsHeapReader() throws Exception {
         URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
@@ -188,8 +236,9 @@ public class HDUReaderTest {
         HDU events = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
 
         BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
-        ZFitsHeapReader heapReader = binTable.zFitsHeapReader;
-        heapReader.getNextRow();
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        NullableMap<String, Serializable> row = heapReader.getNextRow();
+        System.out.println(row);
     }
 
     @Test
@@ -201,50 +250,12 @@ public class HDUReaderTest {
         stream.tableName = "Events";
         stream.init();
         Data data = stream.readNext();
-        System.out.println(data);
-    }
-
-    @Test
-    public void trieTest() throws Exception {
-//        BitWiseTrie t = new BitWiseTrie();
-//
-//
-//        // insert codeword 42 for symbol 1
-//        BitWiseTrie.insert(t, 42, 1);
-//        Integer foundSymbol = BitWiseTrie.find(t, 42).value;
-//        assertThat(foundSymbol, is(1));
-//
-//
-//        // insert codeword with same prefix (bitwise) 43 for symbol 2
-//        BitWiseTrie.insert(t, 43, 2);
-//        foundSymbol = BitWiseTrie.find(t, 43).value;
-//        assertThat(foundSymbol, is(2));
-//
-//        //log.info("-------------------------------------");
-//        BitWiseTrie.insert(t, 22, 1336);
-//        foundSymbol = BitWiseTrie.find(t, 22).value;
-//        assertThat(foundSymbol, is(1336));
-//
-//        //log.info("-------------------------------------");
-//        BitWiseTrie.insert(t, 128, 8008);
-//        foundSymbol = BitWiseTrie.find(t, 128).value;
-//        assertThat(foundSymbol, is(8008));
-//
-//        //look for unknown entry
-//        foundSymbol = BitWiseTrie.find(t, 48).value;
-//        assertNull(foundSymbol);
-//
-//        //from the old zfitsreader I know that the symbol -1848 corresponds to the humman encoded byte 46.
-//        BitWiseTrie.insert(t, 46, -1848);
-//        foundSymbol = BitWiseTrie.find(t, 46).value;
-//        assertThat(foundSymbol, is(-1848));
 
     }
 
-    @Test
+      @Test
     public void bitQueueTest(){
-        ZFitsHeapReader.BitQueue q = new ZFitsHeapReader.BitQueue();
-
+        BitQueue q = new BitQueue();
 
         q.addByte(Byte.parseByte("00110011", 2));
         assertThat(q.bitString(), is("00000000"+"00110011"));
@@ -265,11 +276,7 @@ public class HDUReaderTest {
         q.addByte(Byte.parseByte("01010101", 2));
         assertThat(q.bitString(), is("00010101" + "01000000"));
         assertThat(q.queueLength, is(14));
-
-
-
         assertThat(q.bitString(), is("00010101" + "01000000"));
-//        System.out.println(Integer.toBinaryString(q.peek(11)));
 
     }
 }

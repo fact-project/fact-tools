@@ -8,13 +8,12 @@ import java.util.Optional;
 /**
  * Created by mackaiver on 03/11/16.
  */
-
-public class HDULine {
+public class HeaderLine {
         public final String value;
         public final String key;
         public final String comment;
 
-        public static HDULine fromString(String line){
+        static HeaderLine fromString(String line){
             List<String> split = Splitter.onPattern("=|\\/").trimResults().splitToList(line);
 
             String key = split.get(0);
@@ -30,11 +29,11 @@ public class HDULine {
                 comment = split.get(2);
             }
 
-            return new HDULine(key, value, comment);
+            return new HeaderLine(key, value, comment);
 
         }
 
-        private HDULine(String key, String value, String comment) {
+        private HeaderLine(String key, String value, String comment) {
             this.value = value;
             this.key = key;
             this.comment = comment;
