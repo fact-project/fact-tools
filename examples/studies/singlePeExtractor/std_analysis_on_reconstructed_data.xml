@@ -36,7 +36,6 @@
         <fact.extraction.SinglePulseExtraction
                 dataKey="DataCalibrated"
                 outputKey="PhotonArrivals"
-                maxIterations="4000"
         />
 
         <!-- Data Time Series Reconstruction from Single Pe Data -->
