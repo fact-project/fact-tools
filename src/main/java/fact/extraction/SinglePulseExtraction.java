@@ -30,9 +30,10 @@ public class SinglePulseExtraction implements Processor {
     @Parameter(
         required = false,
         description =   "max number of extraction tries on a single pixel's "+
-                        "time line before abort" 
+                        "time line before abort",
+        defaultValue = "4000"
     )
-    protected int maxIterations;
+    protected int maxIterations = 4000;
 
     @Parameter(
         required = false, 
