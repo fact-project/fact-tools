@@ -6,7 +6,7 @@
         
 
     <process input="rnd">
-        <PrintData />
+        <!--<PrintData />-->
     </process>
     
 </container>

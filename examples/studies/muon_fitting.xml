@@ -37,11 +37,11 @@
           startRKey="circFitR"
           />
 
-        <fact.io.JSONWriter
-          keys="*R,*X,*Y,*Sigma"
-          url="file:test.json"
-          specialDoubleValuesAsString="true"
-          doubleSignDigits="6"
-          />
+        <!--<fact.io.JSONWriter-->
+          <!--keys="*R,*X,*Y,*Sigma"-->
+          <!--url="file:test.json"-->
+          <!--specialDoubleValuesAsString="true"-->
+          <!--doubleSignDigits="6"-->
+          <!--/>-->
     </process>
 </container>
