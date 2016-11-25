@@ -6,7 +6,10 @@
    * No more static API, now several instances of the SinglePulseExtractor can run in parallel with different settings.
    * No more static (global) variable to steer the behaviour of the SinglePulseExtractor.
    * Reconstruction of amplitude time series from the photon stream (`fact.utils.ConvertSinglePulses2Timeseries`).
+   * Added example XML `singlePeMinimalExample.xml`
    * Use Java 8
+* Refactoring
+  * Renamed `fact.statistics.TimerowFeatures` to `fact.statistics.TimeseriesFeatures`
 
 ## Version 0.16.2 -- 26.10.2016
 
