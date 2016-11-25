@@ -101,6 +101,7 @@ public class SinglePulseExtraction implements Processor {
         input.put(outputKey+"TimeSeriesAfterExtraction", Utils.flatten2dArray(timeSeriesAfterExtraction));
         input.put(outputKey+"NumberOfPulses", numberOfPulses);
         input.put(outputKey+"BaseLine", baseLine);
+        input.put(outputKey+"MaxIterations", maxIterations);
         return input;
     }
 
