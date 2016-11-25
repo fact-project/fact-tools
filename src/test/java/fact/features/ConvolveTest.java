@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeLineExtraction.Convolve;
+import fact.features.singlePulse.timeSeriesExtraction.Convolve;
 
 public class ConvolveTest {
 

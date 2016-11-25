@@ -13,6 +13,7 @@ docs.idx
 
 #intellij stuff
 .idea/
+.project
 
 out/
 
