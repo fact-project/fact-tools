@@ -1,17 +1,14 @@
 package fact.utils;
 
-import fact.Utils;
 import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.analysis.function.Sin;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import javax.rmi.CORBA.Util;
 
 /**
  * Created by jebuss on 28.10.16.
