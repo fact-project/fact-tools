@@ -23,7 +23,6 @@
     <fact.extraction.SinglePulseExtraction 
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"
-        maxIterations="1000"
     />
 
     <fact.utils.ConvertSinglePulses2Timeseries 
