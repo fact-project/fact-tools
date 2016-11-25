@@ -28,7 +28,7 @@ public class SinglePulseExtraction implements Processor {
     private String outputKey = null;
 
     @Parameter(
-        required = true, 
+        required = false,
         description =   "max number of extraction tries on a single pixel's "+
                         "time line before abort" 
     )
