@@ -13,7 +13,8 @@ import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
  * Extracts a list of arrival slice positions of photons for each pixel
  * time line.
  *
- * Created by Seabstian Mueller
+ * Created by Sebastian Mueller
+ * and some modifications from Jens Buss
 */
 public class SinglePulseExtraction implements Processor {
     @Parameter(required=true, description="")
