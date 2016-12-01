@@ -1,5 +1,10 @@
 #Changelog for the fact-tools
 
+## Version 0.17.1 -- 29.11.2016
+
+* Fix a null pointer exception that was thrown in `FITSWriter.finish` in case no
+data item was ever written
+
 ## Version 0.17.0 -- 21.11.2016
 
 * Improvements on Single Pulse Extractor
