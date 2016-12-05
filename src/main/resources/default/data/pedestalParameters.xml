@@ -13,9 +13,9 @@
     <fact.extraction.WaveformFluctuation 
         key="DataCalibrated"
         pixelSetKey="pedestal"
-        outputKey="Ped" 
+        outputKey="ped"
         skipFirst="35" 
-        skipLast="100" 
+        skipLast="50"
         windowSize="30" 
     />
 
