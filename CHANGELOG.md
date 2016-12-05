@@ -1,5 +1,11 @@
 #Changelog for the fact-tools
 
+# Version 0.17.2 -- 05.12.2016
+
+* Reduced noise in `WaveformFluctuations`
+* added pedestal parameters to stdAnalysis 
+
+
 ## Version 0.17.1 -- 29.11.2016
 
 * Fix a null pointer exception that was thrown in `FITSWriter.finish` in case no
