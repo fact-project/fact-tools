@@ -30,7 +30,7 @@ public class WaveformFluctuation implements Processor {
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 35;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
     private int skipLast = 100;
 
     @Parameter(description = "Size of the integration window", defaultValue = "30")

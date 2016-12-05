@@ -4,7 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-  <version>0.16.2</version>
+  <version>0.17.1</version>
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -328,6 +328,14 @@
         <configuration>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>

@@ -8,6 +8,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import java.util.Arrays;
 
 
 /**
@@ -19,7 +20,7 @@ import stream.annotations.Parameter;
  * @author F. Temme
  *
  */
-public class TimerowFeatures implements Processor {
+public class TimeseriesFeatures implements Processor {
 	
 	@Parameter(required=true,description="key to the data array")
 	private String dataKey = null;
@@ -52,11 +53,18 @@ public class TimerowFeatures implements Processor {
 		
 		Utils.checkWindow(searchWindowLeft, searchWindowRight-searchWindowLeft, 0, roi);
 		
-		Utils.mapContainsKeys(input, dataKey, movingAverageKey);
+		Utils.mapContainsKeys(input, dataKey);
 		
 		double[] data = (double[]) input.get(dataKey);
-		double[] movingAverage = (double[]) input.get(movingAverageKey);
-		
+
+		double[] movingAverage;
+
+		if (movingAverageKey != null){
+			movingAverage = (double[]) input.get(movingAverageKey);
+		} else {
+			movingAverage = new double[data.length];
+		}
+
 		
 		double[] mean = new double[npix];
 		double[] median = new double[npix];
@@ -125,48 +133,27 @@ public class TimerowFeatures implements Processor {
 		return binNumber;
 	}
 
-	public String getDataKey() {
-		return dataKey;
-	}
 
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
 
-	public String getMovingAverageKey() {
-		return movingAverageKey;
-	}
+
 
 	public void setMovingAverageKey(String movingAverageKey) {
 		this.movingAverageKey = movingAverageKey;
-	}
-
-	public int getSearchWindowLeft() {
-		return searchWindowLeft;
 	}
 
 	public void setSearchWindowLeft(int searchWindowLeft) {
 		this.searchWindowLeft = searchWindowLeft;
 	}
 
-	public int getSearchWindowRight() {
-		return searchWindowRight;
-	}
-
 	public void setSearchWindowRight(int searchWindowRight) {
 		this.searchWindowRight = searchWindowRight;
 	}
 
-	public String getOutputKey() {
-		return outputKey;
-	}
-
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
-	}
-
-	public int getNumberOfBins() {
-		return numberOfBins;
 	}
 
 	public void setNumberOfBins(int numberOfBins) {
