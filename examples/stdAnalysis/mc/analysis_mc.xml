@@ -6,8 +6,6 @@
 	<property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
 	
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
-    
-    <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -51,7 +49,6 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/mc/sourceParameter_mc.xml" /> 
         <!-- Output: source dependent parameters -->
-        
-        <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
+
     </process>
 </container>

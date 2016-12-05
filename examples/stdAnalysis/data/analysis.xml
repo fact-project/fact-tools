@@ -7,8 +7,6 @@
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
-    
-    <property name="outfile" value="file:/home/fabian/testoutfile.txt" />
 
     <property name="auxFolder" value="file:src/main/resources/aux/" />
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
@@ -61,7 +59,6 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/data/sourceParameter.xml" /> 
         <!-- Output: source dependent parameters -->
-
-        <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
+        
     </process>
 </container>
