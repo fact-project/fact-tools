@@ -23,7 +23,62 @@
             pixelSetKey="pedestal"
             outputKey="numPixelInPedestal"
     />
-    <Skip condition="%{data.numPixelInShower} &lt; 5" />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_mean"
+            outputKey="ped_mean"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_std"
+            outputKey="ped_std"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_var"
+            outputKey="ped_var"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_kurtosis"
+            outputKey="ped_kurtosis"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_max"
+            outputKey="ped_max"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_min"
+            outputKey="ped_min"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_skewness"
+            outputKey="ped_skewness"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_median"
+            outputKey="ped_median"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_sum"
+            outputKey="ped_sum"
+            pixelSetKey="pedestal"
+    />
+
+    <!--<Skip condition="%{data.numPixelInShower} &lt; 5" />-->
     <fact.statistics.ArrayStatistics
             key="photoncharge"
             outputKey="phChargePedestal"
