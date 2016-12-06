@@ -78,7 +78,6 @@
             pixelSetKey="pedestal"
     />
 
-    <!--<Skip condition="%{data.numPixelInShower} &lt; 5" />-->
     <fact.statistics.ArrayStatistics
             key="photoncharge"
             outputKey="phChargePedestal"
@@ -120,9 +119,7 @@
             pixelSetKey="pedestal"
             outputKey="pedestalTimespread"
     />
-
-    <!--<Skip condition="%{data.numPixelInShower} &lt; 5" />-->
-
+    
     <fact.statistics.ArrayStatistics
             key="ped_mean"
             outputKey="fluct_mean"
