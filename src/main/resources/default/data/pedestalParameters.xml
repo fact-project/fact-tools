@@ -121,4 +121,61 @@
             outputKey="pedestalTimespread"
     />
 
+    <!--<Skip condition="%{data.numPixelInShower} &lt; 5" />-->
+
+    <fact.statistics.ArrayStatistics
+            key="ped_mean"
+            outputKey="fluct_mean"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_std"
+            outputKey="fluct_std"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_var"
+            outputKey="fluct_var"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_kurtosis"
+            outputKey="fluct_kurtosis"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_max"
+            outputKey="fluct_max"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_min"
+            outputKey="fluct_min"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_skewness"
+            outputKey="fluct_skewness"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_median"
+            outputKey="fluct_median"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_sum"
+            outputKey="fluct_sum"
+            pixelSetKey="shower"
+    />
+
+
 </module>
