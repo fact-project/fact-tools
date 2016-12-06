@@ -19,6 +19,8 @@
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
     <include url="classpath:/default/data/cleaning.xml" />
+    <include url="classpath:/default/data/pedestalParameters.xml" />
+
 
     <fact.extraction.SinglePulseExtraction 
         dataKey="DataCalibrated"

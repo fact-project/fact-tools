@@ -52,7 +52,7 @@ public class WaveformFluctuation implements Processor {
         npix = (Integer) input.get("NPIX");
 
         int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
-        log.info("npix: " + pixels.length );
+        log.debug("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
 
@@ -72,7 +72,7 @@ public class WaveformFluctuation implements Processor {
 
         int bound = roi - skipLast - skipFirst;
         int iterations = bound/windowSize;
-        log.info("Iterations: " + iterations );
+        log.debug("Iterations: " + iterations );
 
         double[][] charge = new double[npix][iterations];
 
