@@ -20,6 +20,11 @@
     <include url="classpath:/default/data/extraction.xml" />
     <include url="classpath:/default/data/cleaning.xml" />
 
+    <!-- pedestal parameters -->
+    <!-- WaveformFluctuation on non-cleaning pixels-->
+    <include url="classpath:/default/data/pedestalParameters.xml" />
+
+
     <fact.extraction.SinglePulseExtraction 
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"
