@@ -4,7 +4,7 @@
 
 * Reduced noise in `WaveformFluctuations`
 * added pedestal parameters to stdAnalysis 
-
+* added WaveformFluctuations on shower pixel to the ouput of the standard analysis 
 
 ## Version 0.17.1 -- 29.11.2016
 
