@@ -19,6 +19,7 @@
     <include url="classpath:/default/mc/calibration_mc.xml" />
     <include url="classpath:/default/mc/extraction_mc.xml" />
     <include url="classpath:/default/mc/cleaning_mc.xml" />
+    <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
 
     <fact.ShowViewer key="DataCalibrated" />
   </process>
