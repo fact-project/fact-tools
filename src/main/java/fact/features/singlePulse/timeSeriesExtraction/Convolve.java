@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeLineExtraction;
+package fact.features.singlePulse.timeSeriesExtraction;
 
 /**
  * Utility class containing a method for convolving two arrays.

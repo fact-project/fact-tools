@@ -230,13 +230,16 @@ public class FITSWriter implements StatefulProcessor {
 
     @Override
     public void finish() throws Exception {
-        FitsUtil.pad(bf, rowSize * numEventsWritten);
-        bf.close();
-        Fits fits = new Fits(url.getPath());
-        BinaryTableHDU bhdu = (BinaryTableHDU) fits.getHDU(1);
-        bhdu.getHeader().setNaxis(2, (int) numEventsWritten);
-        bhdu.getHeader().rewrite();
-
+        if (initialized) {
+            FitsUtil.pad(bf, rowSize * numEventsWritten);
+            bf.close();
+            Fits fits = new Fits(url.getPath());
+            BinaryTableHDU bhdu = (BinaryTableHDU) fits.getHDU(1);
+            bhdu.getHeader().setNaxis(2, (int) numEventsWritten);
+            bhdu.getHeader().rewrite();
+        } else {
+            bf.close();
+        }
     }
 
     public void setKeys(Keys keys) {
@@ -249,5 +252,9 @@ public class FITSWriter implements StatefulProcessor {
 
     public void setExtname(String extname) {
         this.extname = extname;
+    }
+
+    public long getNumEventsWritten() {
+        return numEventsWritten;
     }
 }
