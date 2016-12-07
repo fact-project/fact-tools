@@ -14,13 +14,17 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.SortedSet;
 
 
+import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -53,22 +57,72 @@ public class AuxServiceTest {
 
 
     @Test
+    public void testDateTimeToFACTPath(){
+        Path factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-02T23:55:02"));
+
+        assertThat(factNight, is(Paths.get("2014", "01", "02")));
+
+        //now test what happens after 00:00
+        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-03T00:55:02"));
+        assertThat(factNight, is(Paths.get("2014", "01", "02")));
+
+        //now test the next day
+        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-03T12:00:01"));
+        assertThat(factNight, is(Paths.get("2014", "01", "03")));
+
+        //now test what happens after newyears
+        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-01T00:55:02"));
+        assertThat(factNight, is(Paths.get("2013", "12", "31")));
+
+        //now test my birfday!!
+        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("1987-09-20T20:55:02"));
+        assertThat(factNight, is(Paths.get("1987", "09", "20")));
+    }
+
+
+    @Test
     public void testAuxFileFinder() throws Exception {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
 //        SourceURL url = new SourceURL(u);
-        AuxFileService.AuxFileFinder auxFileFinder = new AuxFileService().new AuxFileFinder();
-        Files.walkFileTree(new File(u.getFile()).toPath(), auxFileFinder);
-        HashBasedTable<Integer, AuxiliaryServiceName, Path> table = auxFileFinder.auxFileTable;
+        AuxFileService auxFileService = new AuxFileService();
+        auxFileService.auxFolder = new SourceURL(u);
 
-        assertThat(table.size(), is(24));
+        DateTime night = DateTime.parse("2016-09-20T20:55:02");
+        AuxCache.CacheKey key = new AuxCache().new CacheKey(AuxiliaryServiceName.FTM_CONTROL_STATE, night);
+        Path path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
 
-        assertThat(table.contains(20140920, AuxiliaryServiceName.FTM_CONTROL_STATE), is(true));
+        assertFalse(path.toFile().exists());
 
-        assertThat(table.contains(20130102, AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION), is(true));
 
-        assertThat(table.contains(20140920, AuxiliaryServiceName.DRIVE_CONTROL_POINTING_POSITION), is(false));
 
-        assertThat(table.contains(19870920, AuxiliaryServiceName.FTM_CONTROL_STATE), is(false));
+        night = DateTime.parse("2014-09-20T20:55:02");
+        key = new AuxCache().new CacheKey(AuxiliaryServiceName.FTM_CONTROL_STATE, night);
+        path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
+
+        assertTrue(path.toFile().exists());
+
+
+        night = DateTime.parse("2014-09-20T20:55:02");
+        key = new AuxCache().new CacheKey(AuxiliaryServiceName.RATE_SCAN_PROCESS_DATA, night);
+        path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
+
+        assertTrue(path.toFile().exists());
+
+
+
+        night = DateTime.parse("2013-01-02T20:55:02");
+        key = new AuxCache().new CacheKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, night);
+        path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
+
+        assertTrue(path.toFile().exists());
+
+
+
+        night = DateTime.parse("2014-09-20T20:55:02");
+        key = new AuxCache().new CacheKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, night);
+        path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
+
+        assertFalse(path.toFile().exists());
     }
 
     @Test
@@ -93,7 +147,7 @@ public class AuxServiceTest {
                 DateTime.parse("2013-01-02T23:30:21")
         );
 
-        assertThat(auxiliaryData, not(auxiliaryData.isEmpty()));
+        assertFalse(auxiliaryData.isEmpty());
     }
 
 }
