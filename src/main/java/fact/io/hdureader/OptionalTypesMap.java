@@ -5,9 +5,10 @@ import com.google.common.collect.ForwardingMap;
 import java.util.*;
 
 /**
+ * A map which can returns values of the appropriate type or an empty optional.
  * Created by mackaiver on 10/11/16.
  */
-public class NullableMap<K, V> extends ForwardingMap<K, V>{
+public class OptionalTypesMap<K, V> extends ForwardingMap<K, V>{
     private  final Map<K, V> delegateMap = new HashMap<K, V>();
 
     public Optional<Short> getShort(K key){
@@ -61,6 +62,14 @@ public class NullableMap<K, V> extends ForwardingMap<K, V>{
     public Optional<Float> getFloat(K key){
         try {
             return Optional.ofNullable((Float) delegate().get(key));
+        } catch (ClassCastException e){
+            return Optional.empty();
+        }
+    }
+
+    public Optional<float[]> getFloatArray(K key){
+        try {
+            return Optional.ofNullable((float[]) delegate().get(key));
         } catch (ClassCastException e){
             return Optional.empty();
         }

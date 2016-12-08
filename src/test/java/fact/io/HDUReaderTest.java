@@ -34,11 +34,11 @@ public class HDUReaderTest {
 
         Fits f = new Fits(u);
 
-        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
+        HDU events = f.getHDU("Events");
 
         assertThat(events.header.get("EXTNAME").orElse("WRONG"), is("Events"));
 
-        HDU zDrsCellOffsets = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
+        HDU zDrsCellOffsets = f.getHDU("ZDrsCellOffsets");
 
         InputStream inputStreamForHDUData = f.getInputStreamForHDUData(zDrsCellOffsets);
 
@@ -70,7 +70,7 @@ public class HDUReaderTest {
 
         Fits f = new Fits(u);
 
-        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
+        HDU events = f.getHDU("Events");
 
         DataInputStream inputStreamForHDUData = f.getInputStreamForHDUData(events);
 
@@ -188,10 +188,10 @@ public class HDUReaderTest {
 
         //new zfitsreader
         Fits f = new Fits(u);
-        HDU events = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
-        BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
+        HDU events = f.getHDU("ZDrsCellOffsets");
+        BinTable binTable = events.getBinTable();
         ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
-        NullableMap<String, Serializable> row = heapReader.getNextRow();
+        OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
 
 
         //init the old Zfitstream
@@ -211,10 +211,10 @@ public class HDUReaderTest {
 
         //new zfitsreader
         Fits f = new Fits(u);
-        HDU events = f.getHDU("Events").orElseThrow(IOException::new);
-        BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
+        HDU events = f.getHDU("Events");
+        BinTable binTable = events.getBinTable();
         ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
-        NullableMap<String, Serializable> row = heapReader.getNextRow();
+        OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
         System.out.println(row);
 
         //init the old Zfitstream
@@ -233,11 +233,11 @@ public class HDUReaderTest {
 
         Fits f = new Fits(u);
 
-        HDU events = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
+        HDU events = f.getHDU("ZDrsCellOffsets");
 
-        BinTable binTable = events.getBinTable().orElseThrow(IOException::new);
+        BinTable binTable = events.getBinTable();
         ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
-        NullableMap<String, Serializable> row = heapReader.getNextRow();
+        OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
         System.out.println(row);
     }
 
