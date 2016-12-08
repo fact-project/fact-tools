@@ -36,6 +36,10 @@ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
  *
  * Simply provide the 'auxFolder' url to the basepath of the aux files e.g. '/fact/aux/'
  *
+ * Because one might want read from multiple sources at once, and many streams are accessing this service at once, or
+ * one simply wants to access many different aux files the data from one file is cached into a guava cache.
+ * This saves us the overhead of keeping tracks of different files in some custom structure.
+ *
  * Created by kaibrugge on 07.10.14.
  */
 public class AuxFileService implements AuxiliaryService {
