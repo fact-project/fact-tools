@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
+ * Test some things about the AuxFileService
  * Created by kaibrugge on 17.11.14.
  */
 public class AuxServiceTest {
@@ -90,7 +91,7 @@ public class AuxServiceTest {
         DateTime night = DateTime.parse("2016-09-20T20:55:02");
         AuxCache.CacheKey key = new AuxCache().new CacheKey(AuxiliaryServiceName.FTM_CONTROL_STATE, night);
         Path path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
-
+        //file should not exist
         assertFalse(path.toFile().exists());
 
 
@@ -121,14 +122,13 @@ public class AuxServiceTest {
         night = DateTime.parse("2014-09-20T20:55:02");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
-
+        //file should not exist
         assertFalse(path.toFile().exists());
     }
 
     @Test
     public void testAuxFileService() throws Exception {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
-//        SourceURL url = new SourceURL(u);
         AuxFileService s = new AuxFileService();
         s.auxFolder = new SourceURL(u);
         AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, DateTime.parse("2013-01-02T23:30:21"), new Closest());
@@ -139,7 +139,6 @@ public class AuxServiceTest {
     @Test
     public void testToGetAllPointsForNight() throws Exception {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
-//        SourceURL url = new SourceURL(u);
         AuxFileService s = new AuxFileService();
         s.auxFolder = new SourceURL(u);
         SortedSet<AuxPoint> auxiliaryData = s.getAuxiliaryDataForWholeNight(
