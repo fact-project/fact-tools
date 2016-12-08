@@ -6,12 +6,15 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
-import java.util.ArrayList;
-import fact.features.singlePulse.timeLineExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 
-/*
-* Extracts a list of arrival slice positions of photons for each pixel 
-* time line.
+/**
+ * Extracts a list of arrival slice positions of photons for each pixel
+ * time line.
+ *
+ * Created by Sebastian Mueller
+ * and some modifications from Jens Buss
 */
 public class SinglePulseExtraction implements Processor {
     @Parameter(required=true, description="")
@@ -25,18 +28,19 @@ public class SinglePulseExtraction implements Processor {
     private String outputKey = null;
 
     @Parameter(
-        required = true, 
+        required = false,
         description =   "max number of extraction tries on a single pixel's "+
-                        "time line before abort" 
+                        "time line before abort",
+        defaultValue = "4000"
     )
-    protected int maxIterations;
+    protected int maxIterations = 4000;
 
     @Parameter(
         required = false, 
         description = "start slice of extraction window", 
         defaultValue = "20"
     )
-    protected int startSlice = 25;
+    protected int startSlice = 20;
 
     @Parameter(
         required = false, 
@@ -56,86 +60,72 @@ public class SinglePulseExtraction implements Processor {
 
         npix = (Integer) input.get("NPIX");
         roi = (Integer) input.get("NROI");
-        double[] timeLines = (double[]) input.get(dataKey);
+        double[] timeSerieses = (double[]) input.get(dataKey);
 
-        double[] single_pe_count = new double[npix];
-        ArrayList<ArrayList<Integer>> pixelArrivalSlices = 
-            new ArrayList<ArrayList<Integer>>();
+        double[] numberOfPulses = new double[npix];
+        int[][] pixelArrivalSlices = new int[npix][];
+        double[] baseLine = new double[npix];
+        double[][] timeSeriesAfterExtraction = new double[npix][];
+
+        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
+        config.maxIterations = maxIterations;
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
 
         for (int pix = 0; pix < npix; pix++) {
             int start = pix*roi+startSlice;
             int end = start + windowLength;
 
-            double[] pixelTimeLineInMv = Arrays.copyOfRange(
-                timeLines,
+            double[] pixelTimeSeriesInMv = Arrays.copyOfRange(
+                timeSerieses,
                 start, 
                 end
             );
             
-            double[] pixelTimeLine = SinglePulseExtractor. 
-                milliVoltToNormalizedSinglePulse(pixelTimeLineInMv);
+            double[] pixelTimeSeries = ElementWise.multiply(
+                pixelTimeSeriesInMv, 1.0/config.factSinglePeAmplitudeInMv);
 
-            ArrayList<Integer> arrivalSlices = SinglePulseExtractor.
-                getArrivalSlicesOnTimeline(
-                    pixelTimeLine, 
-                    maxIterations
-                );
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
+                pixelTimeSeries);
 
-            single_pe_count[pix] = arrivalSlices.size();
-            pixelArrivalSlices.add(arrivalSlices);
+            numberOfPulses[pix] = result.numberOfPulses();
+            pixelArrivalSlices[pix] = result.pulseArrivalSlices;
+            timeSeriesAfterExtraction[pix] = ElementWise.multiply(
+                result.timeSeriesAfterExtraction, 
+                config.factSinglePeAmplitudeInMv);
+            baseLine[pix] = result.timeSeriesBaseLine();
         }
 
         addStartSliceOffset(pixelArrivalSlices);
-        // printArrivalSlices(pixelArrivalSlices);
+
         input.put(outputKey, pixelArrivalSlices);
-        input.put(outputKey+"Count", single_pe_count);
+        input.put(outputKey+"TimeSeriesAfterExtraction", Utils.flatten2dArray(timeSeriesAfterExtraction));
+        input.put(outputKey+"NumberOfPulses", numberOfPulses);
+        input.put(outputKey+"BaseLine", baseLine);
+        input.put(outputKey+"MaxIterations", maxIterations);
         return input;
     }
 
-    private void addStartSliceOffset(ArrayList<ArrayList<Integer>> arr) {
-        for(int pix=0; pix<arr.size(); pix++) {
-            for(int ph=0; ph<arr.get(pix).size(); ph++) {
-                int slice_with_offset = arr.get(pix).get(ph);
-                arr.get(pix).set(ph, slice_with_offset + startSlice);
+    private void addStartSliceOffset(int[][] arr) {
+        for(int pix=0; pix<arr.length; pix++) {
+            for(int ph=0; ph<arr[pix].length; ph++) {
+                int slice_with_offset = arr[pix][ph];
+                arr[pix][ph] = slice_with_offset + startSlice;
             }
         }
     }
 
-    private void printArrivalSlices(ArrayList<ArrayList<Integer>> arr) {
-        for(int pix=0; pix<arr.size(); pix++) {
-            System.out.print("pix "+pix+": ");
-            for(int ph=0; ph<arr.get(pix).size(); ph++)
-                System.out.print(arr.get(pix).get(ph)+" ");
-            System.out.print("\n");
-        }
-    }
 
-    public String getDataKey() {
-        return dataKey;
-    }
 
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
     }
 
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }
 
-    public int getStartSlice() {
-        return startSlice;
-    }
-
     public void setStartSlice(int startSlice) {
         this.startSlice = startSlice;
-    }
-
-    public int getWindowLength() {
-        return windowLength;
     }
 
     public void setWindowLength(int windowLength) {
@@ -146,7 +136,4 @@ public class SinglePulseExtraction implements Processor {
         this.maxIterations = maxIterations;
     }
 
-    public int getMaxIterations() {
-        return maxIterations;
-    }
 }

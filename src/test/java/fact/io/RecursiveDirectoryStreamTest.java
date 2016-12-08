@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This tests creates a dummy file tree in a temporary folder. It will then run against a number of glob patterns
@@ -44,7 +45,7 @@ public class RecursiveDirectoryStreamTest {
         r.setPattern(pattern);
         r.init();
 
-        log.info("Found files: {}", r.files);
+        assertTrue(r.files.size() > 0);
     }
 
     @Test
@@ -58,8 +59,6 @@ public class RecursiveDirectoryStreamTest {
         String pattern = "/**/*DRIVE_CONTROL_{TRACKING,POINTING}_POSITION.fits";
         r.setPattern(pattern);
         r.init();
-
-        log.info("Found files: {}", r.files);
         assertThat(r.files.size(), is(4));
     }
 
@@ -75,7 +74,6 @@ public class RecursiveDirectoryStreamTest {
         r.setPattern(pattern);
         r.init();
 
-        log.info("Found files: {}", r.files);
         assertThat(r.files.size(), is(4));
     }
 
@@ -91,7 +89,6 @@ public class RecursiveDirectoryStreamTest {
         r.setPattern(pattern);
         r.init();
 
-        log.info("Found files: {}", r.files);
         assertThat(r.files.size(), is(2));
     }
 
@@ -105,10 +102,9 @@ public class RecursiveDirectoryStreamTest {
         //no files in this directory
         String pattern = "/*DRIVE_CONTROL_SOURCE_POSITION.fits";
         r.setPattern(pattern);
+        //this should throw a runtime exception
         r.init();
 
-        log.info("Found files: {}", r.files);
-        assertThat(r.files.size(), is(0));
     }
 
     @Test(expected = RuntimeException.class)
@@ -118,12 +114,11 @@ public class RecursiveDirectoryStreamTest {
         SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
+        //this is not a valid pattern
         String pattern = "/**/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
         r.setPattern(pattern);
+        //should throw an exception
         r.init();
-
-        log.info("Found files: {}", r.files);
-        assertThat(r.files.size(), is(0));
     }
 
 

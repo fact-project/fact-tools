@@ -16,20 +16,18 @@ import java.util.Map;
  * @author chris
  * 
  */
-public class ExpectedDataTypes {
+class ExpectedDataTypes {
 
-	static Logger log = LoggerFactory.getLogger(ExpectedDataTypes.class);
-	Map<String, Serializable> types = new LinkedHashMap<String, Serializable>();
+	private static Logger log = LoggerFactory.getLogger(ExpectedDataTypes.class);
+	private Map<String, Serializable> types = new LinkedHashMap<String, Serializable>();
 
-	public ExpectedDataTypes() {
-	}
 
-	public void addType(String key, Serializable typeValue) {
+	void addType(String key, Serializable typeValue) {
 		types.put(key, typeValue);
 	}
 
-	public boolean check(Data item) {
-		log.info("Checking {} types for item {}", types.keySet().size(), item);
+	boolean check(Data item) {
+		log.debug("Checking {} types for item {}", types.keySet().size(), item);
 		for (String key : types.keySet()) {
 			if (!item.containsKey(key)) {
 				log.error("Missing key '{}' in item {}!", key, item);
@@ -47,8 +45,8 @@ public class ExpectedDataTypes {
 		return true;
 	}
 
-	protected boolean checkValues(String key, Serializable exp,
-			Serializable found) {
+	private boolean checkValues(String key, Serializable exp,
+								Serializable found) {
 
 		if (!valuesMatch(exp, found)) {
 			log.error("Value mismatch for key '{}'", key);
@@ -96,7 +94,7 @@ public class ExpectedDataTypes {
 			return false;
 		}
 
-		log.info("Arrays equal.");
+		log.debug("Arrays equal.");
 		return true;
 	}
 }

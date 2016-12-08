@@ -20,6 +20,6 @@
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
 
-    <fact.io.FITSWriter keys="photoncharge,arrivalTime" url="${outfile}" />
+    <!--<fact.io.FITSWriter keys="photoncharge,arrivalTime" url="${outfile}" />-->
   </process>
 </container>
