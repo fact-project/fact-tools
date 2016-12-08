@@ -1,6 +1,6 @@
 package fact.services;
 
-import com.google.common.collect.HashBasedTable;
+
 import fact.auxservice.AuxCache;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryServiceName;
@@ -10,15 +10,12 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import stream.io.SourceURL;
 
-import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.SortedSet;
 
 
-import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
