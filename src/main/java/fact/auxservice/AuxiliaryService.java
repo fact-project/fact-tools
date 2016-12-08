@@ -22,11 +22,11 @@ public interface AuxiliaryService extends Service {
      * Providing the timestamp of the event, the name of the service
      * and some strategy, this method should return an AuxPoint.
      *
-     * @param serviceName
-     * @param eventTimeStamp
-     * @param strategy
-     * @return
-     * @throws IOException
+     * @param serviceName the name of the aux data to access. This is written in the filename 20130112.<serviceName>.fits
+     * @param eventTimeStamp the DateTime of the event you need the aux data for.
+     * @param strategy one of the strategies implemented for fetcvhing aux points
+     * @return the auxpoint according to the strategy
+     * @throws IOException in case something goes wrong while trying to access the aux data. Be it a file or a database.
      */
     public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
 
