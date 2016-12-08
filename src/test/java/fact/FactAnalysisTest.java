@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 
 public class FactAnalysisTest {
 
-	static Logger log = LoggerFactory.getLogger(FactAnalysisTest.class);
 
 
 	public void factExampleXML() {

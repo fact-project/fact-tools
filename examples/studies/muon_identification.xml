@@ -147,7 +147,7 @@
 
     <fact.features.muon.RingStandardDeviationWithThreshold threshold="8" />
 
-    <fact.io.JSONWriter  url="file:${outfile}" keys="${outputKeys}" />
+    <!--<fact.io.JSONWriter  url="file:${outfile}" keys="${outputKeys}" />-->
     <!-- <fact.ShowViewer key="DataCalibrated"/> -->
   </process>
 </container>

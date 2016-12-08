@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
  */
 public class FitsStreamTest {
 
-	static Logger log = LoggerFactory.getLogger(FitsStreamTest.class);
 
 	@Test
 	public void testFitsStream() {
@@ -31,9 +30,6 @@ public class FitsStreamTest {
 			stream.init();
 
 			Data item = stream.read();
-			log.info( "size of data array: {}",
-					((short[]) item.get("Data")).length 
-					);
 			while (item != null) {
 				item = stream.read();
 			}
@@ -59,7 +55,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -90,7 +85,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -119,7 +113,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch(ClassCastException e){
 			fail("Wrong data types in the drs file");
@@ -150,7 +143,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch(ClassCastException e){
 			fail("Wrong data types in the drs file");
