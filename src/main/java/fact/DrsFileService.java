@@ -3,25 +3,26 @@ package fact;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
+import fact.io.hdureader.*;
+import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Created by mackaiver on 08/12/16.
@@ -32,8 +33,8 @@ public class DrsFileService implements Service {
 
     @Parameter(required = true, description = "The url pointing to the path containing the FACT raw data " +
             "in FACTS canonical folder structure." )
-    public SourceURL rawDataFolder;
-    public void setAuxFolder(SourceURL rawDataFolder) {
+    private SourceURL rawDataFolder;
+    public void setRawDataFolder(SourceURL rawDataFolder) {
         this.rawDataFolder = rawDataFolder;
     }
 
@@ -44,27 +45,64 @@ public class DrsFileService implements Service {
             .build(new CacheLoader<DrsCacheKey, CalibrationInfo>() {
                 @Override
                 public CalibrationInfo load(DrsCacheKey key) throws Exception {
-                    Path p = findDrsFile(key);
-                    return readDrsInfos(p);
+                    return readDrsInfos(key);
                 }
             });
 
-    private Path findDrsFile(DrsCacheKey key) throws IOException {
+
+
+    public CalibrationInfo getCalibrationConstantsForDataItem(Data item) throws IOException {
+        LocalDateTime observationDate = LocalDateTime.parse(item.get("DATE-OBS").toString());
+        int runId = (int) item.get("RUNID");
+        try {
+            return cache.get(new DrsCacheKey(observationDate, runId));
+        } catch (ExecutionException e) {
+            throw new IOException("Could not load DRS data into cache. " + e.getMessage());
+        }
+    }
+
+
+    private LocalDateTime getObservationDate(Path p) {
+        Fits fits = Fits.fromPath(p);
+        HDU hdu = fits.getHDU("DrsCalibration");
+        return hdu.header.date().orElse(LocalDateTime.MIN);
+    }
+
+
+    private CalibrationInfo readDrsInfos(DrsCacheKey key) throws IOException {
         Path pathToFolder = Paths.get(rawDataFolder.getPath(),  key.partialPathToFolder.toString());
 
-        return Files
+        //find drsfile closest in time to the observationdate
+        Path pathToClosestDrsFile = Files
                 .list(pathToFolder)
-                .filter(p -> p.endsWith(".drs.fits.gz"))
-                .min((lhs, rhs) -> getObservationDate(lhs).compareTo(key.observationDate))
-                .orElseThrow(IOException::new);
+                .filter(p -> p.getFileName().toString().endsWith(".drs.fits.gz"))
+                .reduce((a, b) -> {
+                    long toA = ChronoUnit.SECONDS.between(getObservationDate(a), key.observationDate);
+                    long toB = ChronoUnit.SECONDS.between(getObservationDate(b), key.observationDate);
+                    return toA < toB ? a : b;
+                })
+                .orElseThrow(()-> new IOException("No files found matching *.drs.fits.gz in " + pathToFolder));
 
-    }
 
-    private LocalDateTime getObservationDate(Path p){
-        return LocalDateTime.now();
-    }
-    private CalibrationInfo readDrsInfos(Path p){
-        return null;
+        Fits fits = new Fits(pathToClosestDrsFile.toUri().toURL());
+        HDU calibrationHDU = fits.getHDU("DrsCalibration");
+        BinTable binTable = calibrationHDU.getBinTable();
+
+        OptionalTypesMap<String, Serializable> row = TableReader.forBinTable(binTable).getNextRow();
+
+        float[] baselineMean = row.getFloatArray("BaselineMean")
+                .orElseThrow(()-> new IOException("BaseLineMean not found in BinTable"));
+
+        float[] triggerOffsetMean = row.getFloatArray("TriggerOffsetMean")
+                .orElseThrow(()-> new IOException("TriggerOffsetMean not found in BinTable"));
+
+        float[] gainMean = row.getFloatArray("GainMean")
+                .orElseThrow(()-> new IOException("GainMean not found in BinTable"));
+
+        LocalDateTime calibrationDateTime = calibrationHDU.header.date()
+                .orElseThrow(()-> new IOException("Date of calibration not found in BinTable"));
+
+        return new CalibrationInfo(calibrationDateTime, baselineMean, gainMean, triggerOffsetMean);
     }
 
     private class DrsCacheKey {
@@ -76,29 +114,31 @@ public class DrsFileService implements Service {
         final LocalDateTime observationDate;
         final Path partialPathToFolder;
 
-        DrsCacheKey(LocalDateTime dateTime, int runId) {
-            month = dateTime.getMonthValue();
-            day = dateTime.getDayOfMonth();
-            year = dateTime.getYear();
-            partialPathToFolder = dateTimeStampToFACTPath(dateTime);
-            observationDate = dateTime;
+        DrsCacheKey(LocalDateTime observationDateTime, int runId) {
+            month = observationDateTime.getMonthValue();
+            day = observationDateTime.getDayOfMonth();
+            year = observationDateTime.getYear();
+            partialPathToFolder = dateTimeStampToFACTPath(observationDateTime);
+            observationDate = observationDateTime;
             this.runId = runId;
-
         }
 
-//        /**
-//         * Takes a year, month, day and returns the partial canonical path.
-//         * For example 2016-01-03 09:30:12 returns a path to "2016/01/02" while
-//         * 2016-01-03 13:30:12 would return "2016/01/03"
-//         *
-//         * @param year the year
-//         * @param month the month of year {1-12}
-//         * @param day the day of the month {1-31}
-//         * @return a partial path starting with the year.
-//         */
-//        public Path dateTimeStampToFACTPath(int year, int month, int day){
-//            return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));
-//        }
+        /**
+         * Takes a dateTime object and returns the canonical path to an aux or data file.
+         * For example 2016-01-03 09:30:12 returns a path to "2016/01/02" while
+         * 2016-01-03 13:30:12 would return "2016/01/03"
+         *
+         * @param timeStamp the timestamp to get the night for
+         * @return a partial path starting with the year.
+         */
+        private Path dateTimeStampToFACTPath(LocalDateTime timeStamp){
+            LocalDateTime offsetDate = timeStamp.minusHours(12);
+            int year = offsetDate.getYear();
+            int month = offsetDate.getMonthValue();
+            int day = offsetDate.getDayOfMonth();
+
+            return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));
+        }
     }
 
 
@@ -121,22 +161,7 @@ public class DrsFileService implements Service {
     }
 
 
-    /**
-     * Takes a dateTime object and returns the canonical path to an aux or data file.
-     * For example 2016-01-03 09:30:12 returns a path to "2016/01/02" while
-     * 2016-01-03 13:30:12 would return "2016/01/03"
-     *
-     * @param timeStamp the timestamp to get the night for
-     * @return a partial path starting with the year.
-     */
-    public Path dateTimeStampToFACTPath(LocalDateTime timeStamp){
-        LocalDateTime offsetDate = timeStamp.minusHours(12);
-        int year = offsetDate.getYear();
-        int month = offsetDate.getMonthValue();
-        int day = offsetDate.getDayOfMonth();
 
-        return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));
-    }
 
 
 
