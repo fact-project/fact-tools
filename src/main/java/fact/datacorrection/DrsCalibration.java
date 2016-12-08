@@ -24,7 +24,7 @@ import java.net.MalformedURLException;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  */
 public class DrsCalibration implements StatefulProcessor {
-	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
+	private static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 
 	private String outputKey = "DataCalibrated";
@@ -36,19 +36,14 @@ public class DrsCalibration implements StatefulProcessor {
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
     private SourceURL url = null;
 
-    Data drsData = null;
-
     private File currentDrsFile = new File("");
 
-	float[] drsBaselineMean;
-	float[] drsBaselineRms;
-	float[] drsGainMean;
-	float[] drsGainRms;
-	float[] drsTriggerOffsetMean;
-	float[] drsTriggerOffsetRms;
+	private float[] drsBaselineMean;
+	private float[] drsGainMean;
+	private float[] drsTriggerOffsetMean;
 
-	// The following keys are required to exist in the DRS data
-	final static String[] drsKeys = new String[] { "RunNumberBaseline",
+    // The following keys are required to exist in the DRS data
+	private final static String[] drsKeys = new String[] { "RunNumberBaseline",
 			"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
 			"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
 			"TriggerOffsetRms" };
@@ -64,8 +59,9 @@ public class DrsCalibration implements StatefulProcessor {
 	 * @param in
 	 *            sourceurl to be loaded
 	 */
-	protected void loadDrsData(SourceURL in) {
-		try {
+    private void loadDrsData(SourceURL in) {
+        Data drsData = null;
+        try {
 			FitsStream stream = new FitsStream(in);
 			stream.init();
 			drsData = stream.readNext();
@@ -82,13 +78,10 @@ public class DrsCalibration implements StatefulProcessor {
 			}
 
 			this.drsBaselineMean = (float[]) drsData.get("BaselineMean");
-			this.drsBaselineRms = (float[]) drsData.get("BaselineRms");
 			this.drsTriggerOffsetMean = (float[]) drsData
 					.get("TriggerOffsetMean");
-			this.drsTriggerOffsetRms = (float[]) drsData
-					.get("TriggerOffsetRms");
+
 			this.drsGainMean = (float[]) drsData.get("GainMean");
-			this.drsGainRms = (float[]) drsData.get("GainRms");
 
 		} catch (Exception e) {
 
@@ -96,7 +89,6 @@ public class DrsCalibration implements StatefulProcessor {
 			if (log.isDebugEnabled())
 				e.printStackTrace();
 
-			this.drsData = null;
 			this.drsBaselineMean = null;
 			this.drsTriggerOffsetMean = null;
 
@@ -156,8 +148,7 @@ public class DrsCalibration implements StatefulProcessor {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output,
-				startCell);
+		double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
 		data.put(outputKey, calibrated);
 
 		// add color value if set
@@ -165,8 +156,7 @@ public class DrsCalibration implements StatefulProcessor {
 		return data;
 	}
 
-	public double[] applyDrsCalibration(double[] data, double[] destination,
-			short[] startCellVector) {
+	private double[] applyDrsCalibration(double[] data, double[] destination, short[] startCellVector) {
 
 		if (destination == null || destination.length != data.length)
 			destination = new double[data.length];
@@ -305,7 +295,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     }
 
-	// -----------setter---------------------
+
 	public void setKey(String key) {
 		this.key = key;
 	}
