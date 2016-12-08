@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -24,6 +26,18 @@ public class Fits {
 
     public HDU primaryHDU;
 
+    /**
+     * Creates a fits instance from a path object without throwing checked exceptions immediately.
+     * @param path The path to the fits file
+     * @return a Fits object
+     */
+    public static Fits fromPath(Path path)  {
+        try {
+            return new Fits(path.toUri().toURL());
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+    }
 
     public Fits(URL  url) throws IOException {
         this.url = url;
@@ -46,7 +60,7 @@ public class Fits {
 
             }
         } catch (EOFException e){
-            log.info("A total of {} HDUs were found in the file", url, hdus.size());
+            log.info("A total of {} HDUs were found in the file.", hdus.size());
         }
 
         primaryHDU = hdus.get(0);
@@ -68,7 +82,7 @@ public class Fits {
 
         //check if matches standard gzip magic number
         if(isGzippedCompressed(header)) {
-            log.info("Getting gzipped stream");
+            log.debug("Getting gzipped stream");
             return new DataInputStream(new BufferedInputStream(new GZIPInputStream(stream)));
         }else {
             return new DataInputStream(new BufferedInputStream(stream));
@@ -91,8 +105,8 @@ public class Fits {
      * @param extname the HDU to get.
      * @return the HDU with the passed EXTNAME value
      */
-    public Optional<HDU> getHDU(String extname){
-        return Optional.ofNullable(hduNames.get(extname));
+    public HDU getHDU(String extname){
+        return hduNames.get(extname);
     }
 
 
@@ -101,7 +115,7 @@ public class Fits {
             return Optional.empty();
         }
         HDU hdu = hduNames.get(hduExtName);
-        return hdu.getBinTable();
+        return Optional.ofNullable(hdu.getBinTable());
     }
 
 

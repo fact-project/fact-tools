@@ -24,8 +24,8 @@ public class TableReader {
         }
 
 
-        public NullableMap<String, Serializable> getNextRow() throws IOException {
-            NullableMap<String, Serializable> map = new NullableMap<>();
+        public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
+            OptionalTypesMap<String, Serializable> map = new OptionalTypesMap<>();
             for(BinTable.TableColumn c : columns){
                 if(c.repeatCount > 1){
                     map.put(c.name, readArrayFromStream(c, stream));

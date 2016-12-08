@@ -104,8 +104,8 @@ public class HDU {
 
 
 
-    public Optional<BinTable> getBinTable(){
-        return Optional.of(this.binTable);
+    public BinTable getBinTable(){
+        return this.binTable;
     }
 
 

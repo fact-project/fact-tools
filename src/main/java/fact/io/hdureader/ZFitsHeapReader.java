@@ -1,6 +1,5 @@
 package fact.io.hdureader;
 
-import com.google.common.collect.Lists;
 import fact.io.hdureader.zfits.BitQueue;
 import fact.io.hdureader.zfits.ByteWiseHuffmanTree;
 import org.apache.commons.lang3.NotImplementedException;
@@ -14,7 +13,6 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,8 +36,8 @@ public final class ZFitsHeapReader {
         return new ZFitsHeapReader(binTable);
     }
 
-    public NullableMap<String, Serializable> getNextRow() throws IOException {
-        NullableMap<String, Serializable> map = new NullableMap<>();
+    public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
+        OptionalTypesMap<String, Serializable> map = new OptionalTypesMap<>();
 
         //read first tile header in this row
         //see figure 6 of zfits paper
