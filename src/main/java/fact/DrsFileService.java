@@ -79,9 +79,9 @@ public class DrsFileService implements Service {
                 .reduce((a, b) -> {
                     long toA = ChronoUnit.SECONDS.between(getObservationDate(a), key.observationDate);
                     long toB = ChronoUnit.SECONDS.between(getObservationDate(b), key.observationDate);
-                    return toA < toB ? a : b;
+                    return Math.abs(toA) < Math.abs(toB) ? a : b;
                 })
-                .orElseThrow(()-> new IOException("No files found matching *.drs.fits.gz in " + pathToFolder));
+                .orElseThrow(()-> new IOException("No files found matching *.drs.fits.gz or no dates in FITS header."));
 
 
         Fits fits = new Fits(pathToClosestDrsFile.toUri().toURL());
@@ -143,15 +143,15 @@ public class DrsFileService implements Service {
 
 
     public class CalibrationInfo{
-        final float[] drsBaselineMean;
-        final float[] drsGainMean;
-        final float[] drsTriggerOffsetMean;
-        final LocalDateTime timeOfCalibration;
+        public final float[] drsBaselineMean;
+        public final float[] drsGainMean;
+        public final float[] drsTriggerOffsetMean;
+        public final LocalDateTime timeOfCalibration;
 
-        public CalibrationInfo(LocalDateTime timeOfCalibration,
-                               float[] drsBaselineMean,
-                               float[] drsGainMean,
-                               float[] drsTriggerOffsetMean)
+        CalibrationInfo(LocalDateTime timeOfCalibration,
+                        float[] drsBaselineMean,
+                        float[] drsGainMean,
+                        float[] drsTriggerOffsetMean)
         {
             this.drsBaselineMean = drsBaselineMean;
             this.drsGainMean = drsGainMean;

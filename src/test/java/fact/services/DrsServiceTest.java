@@ -10,31 +10,19 @@ import stream.Data;
 import stream.io.SourceURL;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Find the right folder and drsfile in the dummy raw files test resources.
+ * The correct file for the testdatafile is 20130102_040.drs.fits.gz
+ *
  * Created by kaibrugge on 17.11.14.
  */
 public class DrsServiceTest {
-
-
-    /**
-     * Tests what happens when the folder to the datestring exists but the files in that folder
-     * don't have the right datestring. We expect an empty map in response.
-     * @throws Exception
-     */
-//    @Test
-//    public void testWrongFilename() throws Exception {
-//        URL u = DrsServiceTest.class.getResource("/dummy_files/aux/2015/09/");
-//        AuxFileService s = new AuxFileService();
-//        //supply a wrong datestring
-////        String dateString = "20150921";
-//        HashMap<AuxiliaryServiceName, SourceURL> m =  s.findAuxFileUrls(new SourceURL(u));
-//        assertTrue(m.isEmpty());
-//    }
-
 
     @Test
     public void testDrsFileFinder() throws Exception {
@@ -51,8 +39,7 @@ public class DrsServiceTest {
         DrsFileService.CalibrationInfo info = s.getCalibrationConstantsForDataItem(item);
 
         assertTrue(info != null);
-
-//        assertTrue(m.containsKey("DRIVE_CONTROL_POINTING_POSITION"));
+        assertTrue(info.timeOfCalibration.isEqual(LocalDateTime.parse("2013-01-02T21:59:00")));
     }
 
 }

@@ -19,8 +19,7 @@ import static org.junit.Assert.fail;
  */
 public class DrsCalibrationTest {
 
-    URL drsUrl =  DrsCalibrationTest.class.getResource("/testDrsFile.drs.fits.gz");
-    URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+    private URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
 
     private FitsStream stream;
 
@@ -34,31 +33,16 @@ public class DrsCalibrationTest {
     public void testMissingURLParameter() throws Exception{
         DrsCalibration pr = new DrsCalibration();
         pr.setOutputKey("test");
-        pr.init(null);
-
-        Data item = stream.readNext();
-
         try {
+            pr.init(null);
+
+            Data item = stream.readNext();
+
             pr.process(item);
         } catch (IllegalArgumentException e){
             return;
         }
         fail("Expected an IllegalArgumentException.");
-    }
-
-    @Test
-    public void testDrsURLinStream() throws Exception{
-
-        DrsCalibration pr = new DrsCalibration();
-        pr.setOutputKey("test");
-        pr.init(null);
-
-        Data item = stream.readNext();
-        item.put("@drsFile", new File(drsUrl.getFile()));
-
-        item = pr.process(item);
-        assertThat(item.containsKey("test"), is(true));
-
     }
 
 }

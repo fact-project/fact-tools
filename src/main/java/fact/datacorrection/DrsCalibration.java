@@ -1,8 +1,6 @@
-/**
- * 
- */
 package fact.datacorrection;
 
+import fact.DrsFileService;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +10,7 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 
 /**
  *
@@ -29,14 +26,19 @@ public class DrsCalibration implements StatefulProcessor {
 
 	private String outputKey = "DataCalibrated";
 
-    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
+    @Parameter(description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
-    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
-			defaultValue = "Null. Will try to find path to drsFile from the stream.")
+    @Parameter(description = "A URL to the DRS calibration data (in FITS formats). " +
+            "Set either this or the drsService")
     private SourceURL url = null;
 
-    private File currentDrsFile = new File("");
+    @Parameter(description = "A DrsFileService which helps to find drs files automagically." +
+            " Either this or the url must be set.")
+    private DrsFileService drsService;
+    public void setDrsService(DrsFileService drsService) {
+        this.drsService = drsService;
+    }
 
 	private float[] drsBaselineMean;
 	private float[] drsGainMean;
@@ -60,7 +62,7 @@ public class DrsCalibration implements StatefulProcessor {
 	 *            sourceurl to be loaded
 	 */
     private void loadDrsData(SourceURL in) {
-        Data drsData = null;
+        Data drsData;
         try {
 			FitsStream stream = new FitsStream(in);
 			stream.init();
@@ -102,23 +104,19 @@ public class DrsCalibration implements StatefulProcessor {
 	@Override
 	public Data process(Data data) {
 
-        if( this.url == null){
-			//file not loaded yet. try to find by magic.
-            File drsFile = (File) data.get("@drsFile");
-            if( drsFile != null){
-                if (!drsFile.equals(currentDrsFile)) {
-                    currentDrsFile = drsFile;
-                    try {
-                        log.info("Using .drs File " + drsFile.getAbsolutePath());
-                        loadDrsData(new SourceURL(drsFile.toURI().toURL()));
-                    } catch (MalformedURLException e) {
-                        //pass.
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException("No drs file set or no @drsFile key in data stream");
+        if( this.url == null && this.drsService != null){
+			//file not loaded yet. try to find through service
+            try {
+
+                DrsFileService.CalibrationInfo calibrationInfo = drsService.getCalibrationConstantsForDataItem(data);
+                this.drsBaselineMean = calibrationInfo.drsBaselineMean;
+                this.drsGainMean = calibrationInfo.drsGainMean;
+                this.drsTriggerOffsetMean = calibrationInfo.drsTriggerOffsetMean;
+
+            } catch (NullPointerException | IOException e) {
+                throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
             }
-		}
+        }
 
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
@@ -271,10 +269,11 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-//        if(url == null && drsService == null){
-//            log.error("Url and Service are not set. You need to set one of those");
-//            throw new IllegalArgumentException("Wrong parameter");
-//        }
+        if(url == null && drsService == null){
+            log.error("Url and Service are not set. You need to set one of those");
+            throw new IllegalArgumentException("Wrong parameter");
+        }
+
         if (url != null) {
             try {
                 loadDrsData(url);
