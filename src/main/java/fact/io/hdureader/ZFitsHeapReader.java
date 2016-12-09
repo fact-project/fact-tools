@@ -63,7 +63,7 @@ public final class ZFitsHeapReader {
             map.put(columns.get(columnIndex).name, shorts);
 
             bytesRead += block.size;
-            log.info("Tilesize - 16 : {}  BlockSize {}, BytesRead {}", tile.size - 16, block.size, bytesRead);
+//            log.info("Tilesize - 16 : {}  BlockSize {}, BytesRead {}", tile.size - 16, block.size, bytesRead);
         }
 
 
@@ -126,7 +126,7 @@ public final class ZFitsHeapReader {
 
         ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(buffer, numberOfSymbols);
 
-        int position = buffer.position();
+//        int position = buffer.position();
 
         BitQueue q = new BitQueue();
         ByteWiseHuffmanTree currentNode = huffmanTree;
