@@ -39,6 +39,22 @@ public class Fits {
         }
     }
 
+    /**
+     * Creates a fits instance from a File object without throwing checked exceptions immediately.
+     * @param file the fits file
+     * @return a Fits object
+     */
+    public static Fits fromFile(File file)  {
+        if (!file.canRead()){
+            throw new RuntimeException("File " + file.toString() +  " is not readable");
+        }
+        try {
+            return new Fits(file.toURI().toURL());
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+    }
+
     public Fits(URL  url) throws IOException {
         this.url = url;
         DataInputStream stream = getDecompressedDataStream(url);
@@ -59,11 +75,13 @@ public class Fits {
                 ByteStreams.skipFully(stream, h.offsetToNextHDU());
 
             }
-        } catch (EOFException e){
-            log.info("A total of {} HDUs were found in the file.", hdus.size());
-        }
 
-        primaryHDU = hdus.get(0);
+        } catch (EOFException e){
+            primaryHDU = hdus.get(0);
+            stream.close();
+
+            log.debug("A total of {} HDUs were found in the file.", hdus.size());
+        }
     }
 
     static DataInputStream getDecompressedDataStream(URL url) throws IOException {
