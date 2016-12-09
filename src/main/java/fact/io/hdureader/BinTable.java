@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -68,23 +69,32 @@ public class BinTable {
      */
     class TableColumn{
 
+        int repeatCount = 0;
+        ColumnType type;
+        String name;
+
         /**
          * Create a TableColumn from the tform and ttype header information.
          * @param tform the headerline specifying the type of the data.
          * @param ttype the headerline specifying the name of the column.
          */
-        TableColumn(HeaderLine tform, HeaderLine ttype){
-            Matcher matcher = Pattern.compile("(\\d+)([LABIJKED])").matcher(tform.value);
-            if (matcher.matches()){
-                repeatCount = Integer.parseInt(matcher.group(1));
-                type = ColumnType.typeForChar(matcher.group(2));
+        TableColumn(HeaderLine zform, HeaderLine tform, HeaderLine ttype){
+            if (zform != null) {
+                setTypeAndCount(zform);
+            } else {
+                setTypeAndCount(tform);
             }
             this.name = ttype.value;
-
         }
-        int repeatCount = 0;
-        ColumnType type;
-        String name;
+        private void setTypeAndCount(HeaderLine form){
+            Matcher matcher = Pattern.compile("(\\d+)([LABIJKED])").matcher(form.value);
+            if (matcher.matches()){
+                this.repeatCount = Integer.parseInt(matcher.group(1));
+                this.type = ColumnType.typeForChar(matcher.group(2));
+            }
+        }
+
+
     }
 
     List<TableColumn> columns = new ArrayList<>();
@@ -100,29 +110,31 @@ public class BinTable {
 
         this.name = header.get("EXTNAME").orElse("");
 
+        Set<Map.Entry<String, HeaderLine>> entries = header.headerMap.entrySet();
 
-        Iterator<HeaderLine> tforms = header.headerMap
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().matches("TFORM\\d+"))
-                .sorted(Comparator.comparing(e -> Integer.parseInt(e.getKey().substring(5))))
-                .map(Map.Entry::getValue)
-                .iterator();
-
-
-        Iterator<HeaderLine> ttypes = header.headerMap
-                .entrySet()
-                .stream()
+        List<Map.Entry<String, HeaderLine>> ttypes = entries.stream()
                 .filter(entry -> entry.getKey().matches("TTYPE\\d+"))
-                .sorted(Comparator.comparing(e -> Integer.parseInt(e.getKey().substring(5))))
-                .map(Map.Entry::getValue)
-                .iterator();
-//
+                .collect(Collectors.toList());
 
-        //no zipping in java yet. this make me sad :(
-        while (ttypes.hasNext() && tforms.hasNext()){
-            columns.add(new TableColumn(tforms.next(), ttypes.next()));
-        }
+
+        ttypes.forEach(entry -> {
+            final int n = Integer.parseInt(entry.getKey().substring(5));
+            HeaderLine zform = entries.stream()
+                    .filter(e -> e.getKey().matches("ZFORM" + n))
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
+
+            HeaderLine tform = entries.stream()
+                    .filter(e -> e.getKey().matches("TFORM" + n))
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
+
+
+            columns.add(new TableColumn(zform, tform, entry.getValue()));
+        });
+
 
         numberOfRowsInTable = header.getInt("NAXIS2").orElse(0);
         numberOfColumnsInTable = columns.size();
@@ -145,7 +157,8 @@ public class BinTable {
         if (pcount > 0) {
             Integer naxis1 = header.getInt("NAXIS1").orElse(0);
             Integer naxis2 = header.getInt("NAXIS2").orElse(0);
-            Integer theap = header.getInt("THEAP").orElse(naxis1 * naxis2);
+
+            int theap = header.getInt("ZHEAPPTR").orElseGet(() -> header.getInt("THEAP").orElse(naxis1*naxis2));
 
             int bytesToSkip = Math.toIntExact((hduOffset + headerSizeInBytes + theap));
 
