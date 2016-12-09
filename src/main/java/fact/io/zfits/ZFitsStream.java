@@ -43,7 +43,7 @@ public class ZFitsStream extends AbstractStream{
 
     private TableReader tableReader = null;
 
-    private short[] calibrationConstants =  null;
+    public short[] calibrationConstants =  null;
 
     public void applyDrsOffsetCalib(int numSlices, int numChannel, short[] data, short[] startCellData, short[] calibrationConstants) throws IllegalArgumentException {
         if (data==null || data.length != numSlices*numChannel)
