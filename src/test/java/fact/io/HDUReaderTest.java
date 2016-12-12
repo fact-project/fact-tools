@@ -1,5 +1,7 @@
 package fact.io;
 
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Shorts;
 import fact.io.hdureader.*;
 
 import fact.io.hdureader.zfits.BitQueue;
@@ -14,6 +16,7 @@ import stream.io.SourceURL;
 import java.io.*;
 import java.net.URL;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
@@ -218,26 +221,131 @@ public class HDUReaderTest {
 
 
     @Test
-    public void compareEvents() throws Exception {
+    public void compareFirstZfitsEvent() throws Exception {
         URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
         //init the old Zfitstream
         ZFitsStream stream = new ZFitsStream(new SourceURL(u));
         stream.tableName = "Events";
         stream.init();
-        Data data = stream.readNext();
-        Serializable eventNum = data.get("EventNum");
-        System.out.println(eventNum);
-
+        Data dataFromOldStream = stream.readNext();
 
         //new zfitsreader
         Fits f = new Fits(u);
         HDU events = f.getHDU("Events");
         BinTable binTable = events.getBinTable();
         ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
-        OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
+        OptionalTypesMap<String, Serializable> data = heapReader.getNextRow();
 
-        assertTrue(row.size() > 0);
+        assertTrue(data.size() > 0);
+        assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+        assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+        assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+
+    }
+
+
+    @Test
+    public void compareFirstItemFromZfitsStreams() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+
+        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        newStream.init();
+
+        Data dataFromOldStream = stream.readNext();
+
+        Data data = newStream.readNext();
+
+
+        assertTrue(data.size() > 0);
+        assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+        assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+        assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+        assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
+    }
+
+    @Test
+    public void compareZfitsStreams() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+
+        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        newStream.init();
+
+        while(true) {
+            Data dataFromOldStream = stream.readNext();
+
+            Data data = newStream.readNext();
+
+            if (dataFromOldStream == null && data == null){
+                break;
+            }
+
+            assertTrue(data.size() > 0);
+            assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+            assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+            assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+            assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
+        }
+
+    }
+
+
+    @Test
+    public void testHeapIterator() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        Fits f = new Fits(u);
+        HDU events = f.getHDU("Events");
+        BinTable binTable = events.getBinTable();
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+
+        for(OptionalTypesMap p : heapReader){
+            assertTrue(p.containsKey("Data"));
+            assertTrue(p.size() == 9);
+        }
+
+    }
+
+
+    @Test
+    public void compareAllZfitsEvents() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+        //new zfitsreader
+        Fits f = new Fits(u);
+        HDU events = f.getHDU("Events");
+        BinTable binTable = events.getBinTable();
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+
+        for (int i = 0; i < 5; i++) {
+
+            Data dataFromOldStream = stream.readNext();
+
+            OptionalTypesMap<String, Serializable> data = heapReader.getNextRow();
+
+            assertTrue(data.size() > 0);
+            assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+            assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+            assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+
+        }
 
     }
 

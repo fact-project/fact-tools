@@ -15,27 +15,51 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by mackaiver on 14/11/16.
  */
-public final class ZFitsHeapReader {
+public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterable<OptionalTypesMap> {
 
     private final DataInputStream stream;
     private final List<BinTable.TableColumn> columns;
+    private final Integer numberOfRowsInTable;
+    private int numberOfRowsRead = 0;
 
     private static Logger log = LoggerFactory.getLogger(ZFitsHeapReader.class);
 
 
 
     private ZFitsHeapReader(BinTable binTable) {
+        this.numberOfRowsInTable = binTable.numberOfRowsInTable;
         this.stream = binTable.heapDataStream;
         this.columns = binTable.columns;
     }
 
     public static ZFitsHeapReader forTable(BinTable binTable){
         return new ZFitsHeapReader(binTable);
+    }
+
+
+    @Override
+    public boolean hasNext() {
+        return numberOfRowsRead < numberOfRowsInTable;
+    }
+
+    @Override
+    public OptionalTypesMap next() {
+        try {
+            return getNextRow();
+        } catch (IOException e) {
+            throw new RuntimeException("IO Error occured. " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Iterator<OptionalTypesMap> iterator() {
+        return this;
     }
 
     public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
@@ -55,27 +79,29 @@ public final class ZFitsHeapReader {
         //read bytes until all bytes in this tile have been read.
         for (BinTable.TableColumn column : columns) {
 
-            BlockHeader block = new BlockHeader(tileBuffer);
-            if (block.numberOfProcessings > 1) {
-                throw new NotImplementedException("Ich glaub es hackt!");
+            if (column.repeatCount == 0){
+                continue;
             }
-            System.out.println(tileBuffer.position());
-//
-//            byte[] row = new byte[Math.toIntExact(block.size)];
-//            stream.readFully(row);
-            byte processingType = tileBuffer.get();
 
-            if (processingType == 2) {
+            BlockHeader block = new BlockHeader(tileBuffer);
+
+
+            if (isCompressed(block, tileBuffer)) {
                 short[] shorts = decompressRow(tileBuffer);
                 map.put(column.name, shorts);
             } else {
                 if(column.repeatCount == 1){
-                    byte uselessByteHereForSomeReason = tileBuffer.get();
+
                     map.put(column.name, readSingleValueFromStream(column, tileBuffer));
                 } else {
+
+                    int offsetAfterReadingBytes = tileBuffer.position() + column.repeatCount * column.type.byteSize;
                     ByteBuffer bufferView = ByteBuffer.wrap(    tileBuffer.array(),
                                                                 tileBuffer.position(),
-                                                                tileBuffer.position() + column.repeatCount * column.type.byteSize);
+                                                                tileBuffer.position() + column.repeatCount * column.type.byteSize)
+                                                        .order(ByteOrder.LITTLE_ENDIAN);
+
+                    tileBuffer.position(offsetAfterReadingBytes);
                     map.put(column.name, readArrayFromStream(column, bufferView));
 
                 }
@@ -84,8 +110,39 @@ public final class ZFitsHeapReader {
 //            log.info("Tilesize - 16 : {}  BlockSize {}, BytesRead {}", tile.size - 16, block.size, bytesRead);
         }
 
-
+        numberOfRowsRead++;
         return map;
+    }
+
+    private boolean isCompressed(BlockHeader block, ByteBuffer buffer){
+
+        if (block.numberOfProcessings == 1) {
+            byte processingType = buffer.get();
+            //skip weird zero byte here:
+            buffer.get();
+
+            return processingType > 0;
+        }
+        if (block.numberOfProcessings == 2) {
+            byte processingType = buffer.get();
+
+            //skip weird zero byte here:
+            buffer.get();
+
+            processingType += buffer.get();
+            //skip weird zero byte here:
+            buffer.get();
+
+            if (processingType != 3){
+                throw new NotImplementedException("Ich glaub es hackt");
+            }
+
+            return true;
+        }
+        if (block.numberOfProcessings > 2){
+            throw new NotImplementedException("Ich glaub es hackt");
+        }
+        return false;
     }
 
     /**
@@ -123,17 +180,6 @@ public final class ZFitsHeapReader {
      * @throws IOException in case the buffer ends before all bytes are read
      */
     private short[] decompressRow(ByteBuffer buffer) throws IOException {
-//        ByteBuffer buffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
-
-//        byte processingType = buffer.get();
-//        if (processingType != 2) {
-//            throw new NotImplementedException("Nein!");
-//        }
-
-        //there is one zero byte here. I dont know why
-        byte paddingByteMaybe = buffer.get();
-
-
         //start reading the huffman tree definition
         long compressedBytes = buffer.getInt(); //size is stored in num of shorts
 
@@ -229,6 +275,8 @@ public final class ZFitsHeapReader {
         }
         return huffmanTree;
     }
+
+
 
 
     private static class TileHeader{
