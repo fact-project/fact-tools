@@ -1,5 +1,6 @@
 package fact.io;
 
+
 import fact.io.hdureader.*;
 
 import fact.io.hdureader.zfits.BitQueue;
@@ -7,13 +8,13 @@ import fact.io.zfits.ZFitsStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.io.SourceURL;
 
 import java.io.*;
 import java.net.URL;
+
 
 import java.util.Map;
 
@@ -22,15 +23,15 @@ import static org.junit.Assert.*;
 
 
 /**
+ * Tests several aspects of the hdu reader.
  * Created by mackaiver on 28/10/16.
  */
 public class HDUReaderTest {
 
-    static Logger log = LoggerFactory.getLogger(HDUReaderTest.class);
 
     @Test
     public void testZFits() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
         Fits f = new Fits(u);
 
@@ -40,7 +41,7 @@ public class HDUReaderTest {
 
         HDU zDrsCellOffsets = f.getHDU("ZDrsCellOffsets");
 
-        InputStream inputStreamForHDUData = f.getInputStreamForHDUData(zDrsCellOffsets);
+        f.getInputStreamForHDUData(zDrsCellOffsets);
 
     }
 
@@ -48,7 +49,7 @@ public class HDUReaderTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     public void testGzipCheck() throws IOException {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
 
         byte[] header = new byte[2];
         u.openStream().read(header);
@@ -56,7 +57,7 @@ public class HDUReaderTest {
         assertTrue(Fits.isGzippedCompressed(header));
 
 
-        u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+        u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
         header = new byte[2];
         u.openStream().read(header);
@@ -66,7 +67,7 @@ public class HDUReaderTest {
 
     @Test
     public void testFits() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
 
         Fits f = new Fits(u);
 
@@ -80,9 +81,23 @@ public class HDUReaderTest {
     }
 
 
+
+    @Test
+    public void testPrimaryHDU() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
+
+        Fits f = new Fits(u);
+
+        HDU primaryHDU = f.primaryHDU;
+
+        String checkSum = primaryHDU.header.get("CHECKSUM").orElse("Wrong");
+
+        assertThat(checkSum, is("4AcB48bA4AbA45bA"));
+    }
+
     @Test
     public void testFitsBinTable() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
 
         Fits f = new Fits(u);
 
@@ -95,7 +110,7 @@ public class HDUReaderTest {
 
     @Test
     public void testBinTableReader() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
 
         Fits f = new Fits(u);
 
@@ -127,7 +142,7 @@ public class HDUReaderTest {
 
     @Test
     public void compareReaders() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
 
         //create a new fits file object and get the bin table
         Fits f = new Fits(u);
@@ -156,7 +171,7 @@ public class HDUReaderTest {
 
     @Test
     public void compareAllEventsFromReaders() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.gz");
 
         //create a new fits file object and get the bin table
         Fits f = new Fits(u);
@@ -183,7 +198,7 @@ public class HDUReaderTest {
 
     @Test
     public void compareZCalibOffsets() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
 
         //new zfitsreader
@@ -205,31 +220,140 @@ public class HDUReaderTest {
 
 
     @Test
-    public void compareEvents() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+    public void compareFirstZfitsEvent() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+        Data dataFromOldStream = stream.readNext();
 
         //new zfitsreader
         Fits f = new Fits(u);
         HDU events = f.getHDU("Events");
         BinTable binTable = events.getBinTable();
         ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
-        OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
-        System.out.println(row);
+
+        OptionalTypesMap<String, Serializable> data = heapReader.getNextRow();
+
+        assertTrue(data.size() > 0);
+        assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+        assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+        assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+
+    }
+
+
+    @Test
+    public void compareFirstItemFromZfitsStreams() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
         //init the old Zfitstream
         ZFitsStream stream = new ZFitsStream(new SourceURL(u));
         stream.tableName = "Events";
         stream.init();
-        Data data = stream.readNext();
-        System.out.println(data);
+
+
+        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        newStream.init();
+
+        Data dataFromOldStream = stream.readNext();
+
+        Data data = newStream.readNext();
+
+
+        assertTrue(data.size() > 0);
+        assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+        assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+        assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+        assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
+    }
+
+    @Test
+    public void compareZfitsStreams() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+
+        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        newStream.init();
+
+        while(true) {
+            Data dataFromOldStream = stream.readNext();
+
+            Data data = newStream.readNext();
+
+            if (dataFromOldStream == null && data == null){
+                break;
+            }
+
+            assertTrue(data.size() > 0);
+            assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+            assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+            assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+            assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
+        }
+
+    }
+
+
+    @Test
+    public void testHeapIterator() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        Fits f = new Fits(u);
+        HDU events = f.getHDU("Events");
+        BinTable binTable = events.getBinTable();
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+
+
+        for(OptionalTypesMap p : heapReader){
+            assertTrue(p.containsKey("Data"));
+            assertTrue(p.size() == 9);
+        }
+
+    }
+
+
+    @Test
+    public void compareAllZfitsEvents() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+        //new zfitsreader
+        Fits f = new Fits(u);
+        HDU events = f.getHDU("Events");
+        BinTable binTable = events.getBinTable();
+        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+
+        for (int i = 0; i < 5; i++) {
+
+            Data dataFromOldStream = stream.readNext();
+
+            OptionalTypesMap<String, Serializable> data = heapReader.getNextRow();
+
+            assertTrue(data.size() > 0);
+            assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+            assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+            assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+
+        }
 
     }
 
 
     @Test
     public void testZFitsHeapReader() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
+        URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
         Fits f = new Fits(u);
 
@@ -238,22 +362,13 @@ public class HDUReaderTest {
         BinTable binTable = events.getBinTable();
         ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
         OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
-        System.out.println(row);
+        assertTrue(row.size() > 0);
+        assertTrue(row.containsKey("OffsetCalibration"));
+
     }
+
 
     @Test
-    public void testOldZFitsHeap() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.fz");
-
-        //init the old fitstream
-        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
-        stream.tableName = "Events";
-        stream.init();
-        Data data = stream.readNext();
-
-    }
-
-      @Test
     public void bitQueueTest(){
         BitQueue q = new BitQueue();
 
