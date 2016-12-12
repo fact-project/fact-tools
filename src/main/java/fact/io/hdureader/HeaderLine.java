@@ -47,6 +47,14 @@ public class HeaderLine {
             }
         }
 
+        public Optional<Long> getLong(){
+            try {
+                return Optional.of(Long.parseLong(value));
+            } catch (NumberFormatException e){
+                return Optional.empty();
+            }
+        }
+
         public Optional<Double> getDouble(){
             try {
                 return Optional.of(Double.parseDouble(value));

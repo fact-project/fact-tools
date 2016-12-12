@@ -145,11 +145,11 @@ public class HDU {
 
         //calculate size according to equation 1.
         if(!isPrimaryHDU){
-            int gcount = headerMap.get("GCOUNT").getInt().orElse(0);
+            long gcount = headerMap.get("GCOUNT").getLong().orElse(0L);
 
-            int pcount = headerMap.get("PCOUNT").getInt().orElse(0);
+            long pcount = headerMap.get("PCOUNT").getLong().orElse(0L);
 
-            return bitpix * gcount * (pcount + factorNAXIS)/8;
+            return bitpix * gcount * (pcount + factorNAXIS)/8L;
         }
 
         return bitpix*factorNAXIS/8;

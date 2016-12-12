@@ -153,7 +153,7 @@ public class BinTable {
 
 
         //check if this bintable has data following after the table. See section 7.3.1 in the fits standard
-        Integer pcount = header.getInt("PCOUNT").orElse(0);
+        long pcount = header.getLong("PCOUNT").orElse(0L);
 
         if (pcount > 0) {
             Integer naxis1 = header.getInt("NAXIS1").orElse(0);
@@ -218,7 +218,7 @@ public class BinTable {
             throw new IllegalArgumentException("Number of rows (NAXIS2) is negative.");
         }
 
-        int pcount = header.getInt("PCOUNT").orElseThrow(() -> {
+        long pcount = header.getLong("PCOUNT").orElseThrow(() -> {
             log.error("The PCOUNT keyword cannot be found in the BinTable. " +
                     "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
             return new IllegalArgumentException("Missing PCOUNT keyword");

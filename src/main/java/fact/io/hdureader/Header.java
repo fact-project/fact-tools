@@ -69,6 +69,15 @@ public class Header {
         }
     }
 
+    public Optional<Long> getLong(String key){
+        try {
+            HeaderLine line = headerMap.get(key);
+            return Optional.of(Long.parseLong(line.value));
+        } catch (NumberFormatException| NullPointerException e){
+            return Optional.empty();
+        }
+    }
+
     public Optional<Float> getFloat(String key){
         try {
             HeaderLine line = headerMap.get(key);

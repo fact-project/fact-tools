@@ -3,8 +3,6 @@ package fact.io.hdureader;
 import fact.io.hdureader.zfits.BitQueue;
 import fact.io.hdureader.zfits.ByteWiseHuffmanTree;
 import org.apache.commons.lang3.NotImplementedException;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,9 +74,10 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
 
         ByteBuffer tileBuffer = ByteBuffer.wrap(tileData).order(ByteOrder.LITTLE_ENDIAN);
 
-        //read bytes until all bytes in this tile have been read.
+        //iterate over columns in the row
         for (BinTable.TableColumn column : columns) {
 
+            //sometimes there is no data. We do nothing then.
             if (column.repeatCount == 0){
                 continue;
             }
@@ -86,19 +85,26 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
             BlockHeader block = new BlockHeader(tileBuffer);
 
 
-            if (isCompressed(block, tileBuffer)) {
-                short[] shorts = decompressRow(tileBuffer);
-                map.put(column.name, shorts);
-            } else {
-                if(column.repeatCount == 1){
+            if (block.compression == BlockHeader.Compression.HUFFMAN) {
 
+                short[] shorts = huffmanDecompression(tileBuffer);
+                map.put(column.name, shorts);
+
+            } else if( block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING){
+
+                short[] shorts = huffmanDecompression(tileBuffer);
+                unsmooth(shorts);
+                map.put(column.name, shorts);
+
+            }else {
+                if(column.repeatCount == 1){
                     map.put(column.name, readSingleValueFromStream(column, tileBuffer));
                 } else {
 
                     int offsetAfterReadingBytes = tileBuffer.position() + column.repeatCount * column.type.byteSize;
                     ByteBuffer bufferView = ByteBuffer.wrap(    tileBuffer.array(),
                                                                 tileBuffer.position(),
-                                                                tileBuffer.position() + column.repeatCount * column.type.byteSize)
+                                                                offsetAfterReadingBytes)
                                                         .order(ByteOrder.LITTLE_ENDIAN);
 
                     tileBuffer.position(offsetAfterReadingBytes);
@@ -114,39 +120,20 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
         return map;
     }
 
-    private boolean isCompressed(BlockHeader block, ByteBuffer buffer){
-
-        if (block.numberOfProcessings == 1) {
-            byte processingType = buffer.get();
-            //skip weird zero byte here:
-            buffer.get();
-
-            return processingType > 0;
+    /**
+     * Unsmooth the data according to "the zfits standard".
+     * See the first equation on page three of https://arxiv.org/pdf/1506.06045v1.pdf
+     *
+     * @param data the data to unsmooth
+     */
+    private void unsmooth(short[] data){
+        for (int i = 2; i < data.length; i++) {
+            data[i] = (short) (data[i] + (data[i-1] +  data[i-2])/2 );
         }
-        if (block.numberOfProcessings == 2) {
-            byte processingType = buffer.get();
-
-            //skip weird zero byte here:
-            buffer.get();
-
-            processingType += buffer.get();
-            //skip weird zero byte here:
-            buffer.get();
-
-            if (processingType != 3){
-                throw new NotImplementedException("Ich glaub es hackt");
-            }
-
-            return true;
-        }
-        if (block.numberOfProcessings > 2){
-            throw new NotImplementedException("Ich glaub es hackt");
-        }
-        return false;
     }
 
     /**
-     * This mehtods starts by building a huffman tree from the symbol table in the data.
+     * This methods starts by building a huffman tree from the symbol table in the data.
      * Once build it will be used to map code words to the symbols.
      * Here goes the code from huffman.h in FACT++ which describes how the symbol table is written to the data.
      * apparently this is the only documentation about that.
@@ -179,7 +166,7 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
      * @param buffer the coplet tile buffer (with blockheaders, but without the tile headers.)
      * @throws IOException in case the buffer ends before all bytes are read
      */
-    private short[] decompressRow(ByteBuffer buffer) throws IOException {
+    private short[] huffmanDecompression(ByteBuffer buffer) throws IOException {
         //start reading the huffman tree definition
         long compressedBytes = buffer.getInt(); //size is stored in num of shorts
 
@@ -298,15 +285,48 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
         }
     }
 
+
+
     private static class BlockHeader{
+        enum Compression{
+            RAW,
+            SMOOTHING,
+            HUFFMAN,
+            HUFFMAN_AND_SMOOTHING,
+        }
+
         private final long size;
         private final String order;
         private final byte numberOfProcessings;
+        private final Compression compression;
 
-        public BlockHeader(ByteBuffer buffer) {
+        BlockHeader(ByteBuffer buffer) {
             size = buffer.getLong();
             order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
             numberOfProcessings = buffer.get();
+
+            byte processingType = 0;
+            for (int n = 0; n < numberOfProcessings; n++) {
+                processingType += buffer.get();
+                //skip weird zero byte here:
+                buffer.get();
+            }
+
+            switch (processingType){
+                case 1:
+                    this.compression = Compression.SMOOTHING;
+                    break;
+                case 2:
+                    this.compression = Compression.HUFFMAN;
+                    break;
+                case 3:
+                    this.compression = Compression.HUFFMAN_AND_SMOOTHING;
+                    break;
+                default:
+                    this.compression = Compression.RAW;
+                    break;
+            }
+
         }
 
     }
