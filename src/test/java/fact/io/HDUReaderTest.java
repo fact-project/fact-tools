@@ -221,6 +221,14 @@ public class HDUReaderTest {
     public void compareEvents() throws Exception {
         URL u =  HDUReaderTest.class.getResource("/testDataFile.fits.fz");
 
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+        Data data = stream.readNext();
+        Serializable eventNum = data.get("EventNum");
+        System.out.println(eventNum);
+
 
         //new zfitsreader
         Fits f = new Fits(u);
@@ -230,14 +238,6 @@ public class HDUReaderTest {
         OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
 
         assertTrue(row.size() > 0);
-
-
-        //init the old Zfitstream
-        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
-        stream.tableName = "Events";
-        stream.init();
-        stream.readNext();
-
 
     }
 
