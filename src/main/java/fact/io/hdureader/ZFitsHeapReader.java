@@ -3,6 +3,8 @@ package fact.io.hdureader;
 import fact.io.hdureader.zfits.BitQueue;
 import fact.io.hdureader.zfits.ByteWiseHuffmanTree;
 import org.apache.commons.lang3.NotImplementedException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,30 +41,46 @@ public final class ZFitsHeapReader {
     public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
         OptionalTypesMap<String, Serializable> map = new OptionalTypesMap<>();
 
-        //read first tile header in this row
+        //Tile header in this row
         //see figure 6 of zfits paper
         TileHeader tile = TileHeader.fromStream(stream);
 
-        //read bytes until all bytes in this tile have been read.
-        //The tileheader itself has 16 bytes.
+        //The tile header itself has 16 bytes.
         //Hence we subtract 16 bytes from the total number of bytes in this tile.
-        long bytesRead = 0;
-        int columnIndex = 0;
-        while (bytesRead < tile.size - 16) {
+        byte[] tileData = new byte[Math.toIntExact(tile.size - 16)];
+        stream.readFully(tileData);
 
-            BlockHeader block = BlockHeader.fromStream(stream);
-            if(block.numberOfProcessings > 1 || !block.order.equals("R") ){
+        ByteBuffer tileBuffer = ByteBuffer.wrap(tileData).order(ByteOrder.LITTLE_ENDIAN);
+
+        //read bytes until all bytes in this tile have been read.
+        for (BinTable.TableColumn column : columns) {
+
+            BlockHeader block = new BlockHeader(tileBuffer);
+            if (block.numberOfProcessings > 1) {
                 throw new NotImplementedException("Ich glaub es hackt!");
             }
+            System.out.println(tileBuffer.position());
+//
+//            byte[] row = new byte[Math.toIntExact(block.size)];
+//            stream.readFully(row);
+            byte processingType = tileBuffer.get();
 
-            //read one row into memory (because now comes the little endian?)
-            byte[] row = new byte[Math.toIntExact(block.size)];
-            stream.readFully(row);
+            if (processingType == 2) {
+                short[] shorts = decompressRow(tileBuffer);
+                map.put(column.name, shorts);
+            } else {
+                if(column.repeatCount == 1){
+                    byte uselessByteHereForSomeReason = tileBuffer.get();
+                    map.put(column.name, readSingleValueFromStream(column, tileBuffer));
+                } else {
+                    ByteBuffer bufferView = ByteBuffer.wrap(    tileBuffer.array(),
+                                                                tileBuffer.position(),
+                                                                tileBuffer.position() + column.repeatCount * column.type.byteSize);
+                    map.put(column.name, readArrayFromStream(column, bufferView));
 
-            short[] shorts = decompressRow(row);
-            map.put(columns.get(columnIndex).name, shorts);
+                }
+            }
 
-            bytesRead += block.size;
 //            log.info("Tilesize - 16 : {}  BlockSize {}, BytesRead {}", tile.size - 16, block.size, bytesRead);
         }
 
@@ -101,19 +119,20 @@ public final class ZFitsHeapReader {
      *
      *
      * The raw data is stored as shorts. So one symbol is two bytes long.
-     * @param row byte of a full row (without blockheaders or tile headers.)
+     * @param buffer the coplet tile buffer (with blockheaders, but without the tile headers.)
      * @throws IOException in case the buffer ends before all bytes are read
      */
-    private short[] decompressRow(byte[] row) throws IOException {
-        ByteBuffer buffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
+    private short[] decompressRow(ByteBuffer buffer) throws IOException {
+//        ByteBuffer buffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
 
-        byte processingType = buffer.get();
-        if (processingType != 2) {
-            throw new NotImplementedException("Nein!");
-        }
+//        byte processingType = buffer.get();
+//        if (processingType != 2) {
+//            throw new NotImplementedException("Nein!");
+//        }
 
         //there is one zero byte here. I dont know why
         byte paddingByteMaybe = buffer.get();
+
 
         //start reading the huffman tree definition
         long compressedBytes = buffer.getInt(); //size is stored in num of shorts
@@ -137,11 +156,19 @@ public final class ZFitsHeapReader {
             while (index < numberOfShorts) {
 
                 if(q.queueLength < 16) {
-                    short data  = buffer.getShort();
-                    q.addShort(data);
+                    if (buffer.remaining() > 2) {
+                        q.addShort(buffer.getShort());
+                    }
+                    if (buffer.remaining() == 1) {
+                        q.addByte(buffer.get());
+                        q.addByte((byte) 0);
+                    }
+                    if (buffer.remaining() == 0) {
+                        q.addShort((short) 0);
+                    }
                 }
 
-              ByteWiseHuffmanTree node = currentNode.children[q.peekByte()];
+                ByteWiseHuffmanTree node = currentNode.children[q.peekByte()];
                 if (node.isLeaf) {
                     symbols[index] = node.payload.symbol;
                     index++;
@@ -228,18 +255,87 @@ public final class ZFitsHeapReader {
         private final String order;
         private final byte numberOfProcessings;
 
-        private BlockHeader(byte[] bytes) {
-            ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+        public BlockHeader(ByteBuffer buffer) {
             size = buffer.getLong();
             order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
             numberOfProcessings = buffer.get();
         }
 
-        static BlockHeader fromStream(DataInputStream stream) throws IOException {
-            byte[] headerBytes = new byte[10];
-            stream.readFully(headerBytes);
-            return  new BlockHeader(headerBytes);
+    }
+
+    private Serializable readSingleValueFromStream(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
+
+        Serializable b = null;
+        switch (c.type){
+            case BOOLEAN:
+                b = buffer.get() > 0;
+                break;
+            case CHAR:
+                b =  buffer.asCharBuffer().toString();
+                break;
+            case BYTE:
+                b = buffer.get();
+                break;
+            case SHORT:
+                b = buffer.getShort();
+                break;
+            case INT:
+                b = buffer.getInt();
+                break;
+            case LONG:
+                b = buffer.getLong();
+                break;
+            case FLOAT:
+                b = buffer.getFloat();
+                break;
+            case DOUBLE:
+                b = buffer.getDouble();
+                break;
         }
+        return b;
+    }
+
+    private Serializable readArrayFromStream(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
+
+        if(c.type == BinTable.ColumnType.BOOLEAN){
+            boolean[] bools = new boolean[c.repeatCount];
+            for (int i = 0; i < c.repeatCount; i++) {
+                bools[i] = buffer.get() > 0;
+            }
+            return bools;
+        }
+
+        switch (c.type){
+            case CHAR:
+                char[] chars = new char[c.repeatCount];
+                buffer.asCharBuffer().get(chars);
+                return chars;
+            case BYTE:
+                byte[] b = new byte[c.repeatCount];
+                buffer.get(b);
+                return b;
+            case SHORT:
+                short[] shorts = new short[c.repeatCount];
+                buffer.asShortBuffer().get(shorts);
+                return shorts;
+            case INT:
+                int[] ints = new int[c.repeatCount];
+                buffer.asIntBuffer().get(ints);
+                return ints;
+            case LONG:
+                long[] longs = new long[c.repeatCount];
+                buffer.asLongBuffer().get(longs);
+                return longs;
+            case FLOAT:
+                float[] floats = new float[c.repeatCount];
+                buffer.asFloatBuffer().get(floats);
+                return floats;
+            case DOUBLE:
+                double[] doubles = new double[c.repeatCount];
+                buffer.asDoubleBuffer().get(doubles);
+                return doubles;
+        }
+        return null;
     }
 
 }

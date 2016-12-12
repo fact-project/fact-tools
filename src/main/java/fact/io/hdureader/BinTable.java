@@ -114,6 +114,7 @@ public class BinTable {
 
         List<Map.Entry<String, HeaderLine>> ttypes = entries.stream()
                 .filter(entry -> entry.getKey().matches("TTYPE\\d+"))
+                .sorted(Comparator.comparing(e -> Integer.parseInt(e.getKey().substring(5))))
                 .collect(Collectors.toList());
 
 
