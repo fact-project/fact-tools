@@ -197,6 +197,33 @@ public class HDUReaderTest {
     }
 
 
+    @Test
+    public void compareAllEventsFromReadersForMcFile() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testMcFile.fits.gz");
+
+        //create a new fits file object and get the bin table
+        Fits f = new Fits(u);
+        BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
+        BinTableReader reader = BinTableReader.forBinTable(b);
+
+        //init the old fitstream
+        FitsStream stream = new FitsStream(new SourceURL(u));
+        stream.init();
+
+        for (int i = 0; i < 15; i++) {
+            Map<String, Serializable> row = reader.getNextRow();
+            Data item = stream.read();
+
+
+            short[] dataFromBintable = (short[]) row.get("Data");
+            short[] dataFromOldStream = (short[]) item.get("Data");
+
+            assertArrayEquals(dataFromOldStream, dataFromBintable);
+        }
+
+    }
+
+
 
     @Test
     public void compareZCalibOffsets() throws Exception {
@@ -267,10 +294,7 @@ public class HDUReaderTest {
         assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
         assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
         assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
-
-        short[] newShorts = Arrays.copyOfRange((short[]) data.get("Data"), 0, 431700);
-        short[] oldShorts = Arrays.copyOfRange((short[]) dataFromOldStream.get("Data"), 0, 431700);
-        assertArrayEquals(oldShorts, newShorts);
+        assertArrayEquals((short[]) dataFromOldStream.get("Data"), (short[]) data.get("Data"));
     }
 
     @Test
@@ -296,6 +320,14 @@ public class HDUReaderTest {
                 break;
             }
 
+            //compare header items
+            assertEquals(1.0, data.get("EXTREL"));
+
+            assertEquals(1440, data.get("NPIX"));
+            assertEquals(dataFromOldStream.get("NPIX"), data.get("NPIX"));
+
+
+            //compare data
             assertTrue(data.size() > 0);
             assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
             assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
@@ -342,6 +374,19 @@ public class HDUReaderTest {
 
     }
 
+    @Test
+    public void testBinTableIteratorForMCs() throws Exception {
+        URL u =  HDUReaderTest.class.getResource("/testMcFile.fits.gz");
+
+        Fits f = new Fits(u);
+        BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
+
+
+        for(OptionalTypesMap p : BinTableReader.forBinTable(events)){
+            assertTrue(p.containsKey("Data"));
+        }
+
+    }
 
     @Test
     public void compareAllZfitsEvents() throws Exception {
