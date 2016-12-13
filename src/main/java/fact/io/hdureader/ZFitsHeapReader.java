@@ -99,7 +99,7 @@ public final class ZFitsHeapReader implements
     }
 
     /**
-     * get the iterator for this heapreader. This is useful for iterator style for loops i.e. for(map m : reader){...}
+     * get the iterator for this heapreader. This is useful for iterator style for loops i.e. for(Map m : reader){...}
      *
      * @return the iterator for this reader.
      */
