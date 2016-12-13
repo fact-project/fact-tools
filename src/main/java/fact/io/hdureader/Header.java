@@ -16,12 +16,11 @@ import java.util.stream.Collectors;
 public class Header {
 
     final Map<String, HeaderLine> headerMap;
-    public  final String comment;
-    public final int headerSizeInBytes;
-    public final String history;
 
-    //the first HDU in  fits file contains a primary header. This flag inidcates whther this is the primary flag.
-    public final boolean isPrimaryHeader;
+    final int headerSizeInBytes;
+
+    public  final String comment;
+    public final String history;
 
     Header(List<String> headerLines, int headerSizeInBytes){
         this.headerSizeInBytes = headerSizeInBytes;
@@ -44,10 +43,6 @@ public class Header {
                 .filter(a -> a.matches("HISTORY.+"))
                 .map(a -> a.substring("HISTORY ".length()))
                 .collect(Collectors.joining(" \n "));
-
-
-        isPrimaryHeader = headerLines.stream()
-                .anyMatch(a -> a.matches("SIMPLE\\s+=\\s+T.*"));
 
     }
 
