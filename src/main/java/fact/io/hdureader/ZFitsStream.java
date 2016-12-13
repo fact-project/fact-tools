@@ -8,8 +8,15 @@ import stream.io.SourceURL;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
+ * The ZFitsStream can read FITS files containing raw data as recorded by the FACT telescope DAQ.
+ * It also reads FITS files written by the Monte Carlo simulation program CERES.
+ * It can decompress binary tables which have been compressed according to
+ * the ZFITS standard. See http://arxiv.org/abs/1506.06045.
+ *
  * Created by mackaiver on 12/12/16.
  */
 public class ZFitsStream extends AbstractStream {
@@ -17,8 +24,8 @@ public class ZFitsStream extends AbstractStream {
     private short[] offsetCalibrationsConstants;
     private ZFitsHeapReader zFitsHeapReader;
 
-    private Fits fits;
     private HDU eventHDU;
+    private Map<String, Serializable> fitsHeader = new HashMap<>();
 
     public ZFitsStream(SourceURL url){
         this.url = url;
@@ -30,10 +37,10 @@ public class ZFitsStream extends AbstractStream {
 
         //create a fits object
         URL url = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
-        fits = new Fits(url);
+        Fits fits = new Fits(url);
 
 
-        //get calibration constants
+        //get calibration constants they are stored in the first (and only) row of this hdu.
         HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
         OptionalTypesMap<String, Serializable> row = ZFitsHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
 
@@ -46,25 +53,34 @@ public class ZFitsStream extends AbstractStream {
         eventHDU = fits.getHDU("Events");
         BinTable eventsTable = eventHDU.getBinTable();
 
+        //read each headerline and try to get the right datatype
+        //from smallest to largest datatype
+        //if no number can be found simply save the string.
+        Header header = eventHDU.header;
+        header.headerMap.forEach((s, headerLine) -> {
+            headerLine.getDouble().ifPresent(v -> fitsHeader.put(s, v));
+            headerLine.getLong().ifPresent(v -> fitsHeader.put(s, v));
+            headerLine.getInt().ifPresent(v -> fitsHeader.put(s, v));
+
+            //if no numbers are present simply put the string here.
+            if (!fitsHeader.containsKey(s)){
+                fitsHeader.put(s, headerLine.value);
+            }
+        });
+
+
         zFitsHeapReader = ZFitsHeapReader.forTable(eventsTable);
     }
 
 
-    private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants) throws IllegalArgumentException {
+
+    private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants){
         int numChannel = 1440;
 
         for (int ch=0; ch<numChannel; ch++) {
-            // if the startCellData[ch] is negative ignore the calibration step for the channel
-//            if (startCellData[ch]<0) {
-////                log.warn("Start Cell for channel : " + ch + " is negative");
-//                continue;
-//            }
-            //get the startCell
             int startCell = startCellData[ch];
             for (int sliceNum=0; sliceNum<numSlices; sliceNum++) {
-                // the cells we look at are going roundabout
                 int curCell = (startCell+sliceNum)%1024;
-
                 data[ch*numSlices+sliceNum] += calibrationConstants[ ch*1024 + curCell ];
             }
         }
@@ -88,6 +104,9 @@ public class ZFitsStream extends AbstractStream {
 
         nextRow.put("Data", data);
 
-        return DataFactory.create(nextRow);
+        Data item = DataFactory.create(nextRow);
+        item.putAll(fitsHeader);
+
+        return item;
     }
 }

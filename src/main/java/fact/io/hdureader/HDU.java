@@ -126,6 +126,8 @@ public class HDU {
      */
     long sizeOfDataArea(){
         Map<String, HeaderLine> headerMap = header.headerMap;
+
+        //get NAXIS1*NAXIS2*NAXIS3....
         long factorNAXIS = headerMap.entrySet().stream()
                 .filter(e -> e.getKey().matches("NAXIS\\d+"))
                 .mapToLong(e -> e.getValue().getInt().orElse(1))
