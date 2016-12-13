@@ -15,20 +15,102 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
+ * This reader can interpret the bytes in the heap of a bintable that has been stored in the ZFits format.
+ * Some specification of that format can be found on arxiv : https://arxiv.org/pdf/1506.06045v1.pdf
+ *
+ * This class implements the iterable and iterator interfaces which allow for such nice things as
+ *
+ *        for(OptionalTypesMap p : heapReader){
+ *              assertTrue(p.containsKey("Data"));
+ *              assertTrue(p.size() == 9);
+ *         }
+ *
+ *
+ * The next() and the getNextRow() methods deliver a map with the data from one row in the heap.
+ *
+ * Reading the heap in a ZFits bintable works as follows:
+ *
+ * The heap data starts at the offset stored in the 'ZHEAPTR' variable in the header.
+ * This is wrong according to the FITS standard. It should be the 'THEAP' variable.
+ *
+ * Each heap contains one TileHeader for each row with one BlockHeader for each column in the row.
+ * Information about the data in the columns can be read from the 'ZFORMn' keywords in the header.
+ *
+ * Data in the tiles is in Little Endian byte order.
+ *
+ * The data from one tile is read completely into one bytebuffer.
+ * @see ZFitsHeapReader#getNextRow()
+ *
+ *
+ * Then for each column the appropriate compression type is parsed from the block header.
+ * @see BlockHeader#fromBuffer
+ *
+ * When a column is huffman compressed, the definition of the huffmann tree will be stored in the first couple of bytes
+ * in that row. This is documented exactly nowhere!
+ *
+ * [(int) numberOfCompressedBytes, (long) numberOfShortsAfterDecompression, (long) numberOfSymbolsUsedInCompression]
+ *
+ *
+ *
+ *
  * Created by mackaiver on 14/11/16.
  */
-public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterable<OptionalTypesMap> {
+public final class ZFitsHeapReader implements
+        Iterator<OptionalTypesMap<String, Serializable>>,
+        Iterable<OptionalTypesMap<String, Serializable>> {
 
     private final DataInputStream stream;
     private final List<BinTable.TableColumn> columns;
     private final Integer numberOfRowsInTable;
     private int numberOfRowsRead = 0;
 
+
+    /**
+     * Check whether there is another row to return from this heap
+     * @return true iff another row can be read.
+     */
+    @Override
+    public boolean hasNext() {
+        return numberOfRowsRead < numberOfRowsInTable;
+    }
+
+    /**
+     * Get the data from the next row. The columns in the row can be accessed by their name in the resulting
+     * map that is returned by this method. The resulting map comes with convenience methods for accessing data of
+     * predefined types.
+     *
+     * This method overwrites the next() method of the iterable interface and is similar to the
+     * @see ZFitsHeapReader#getNextRow() method but throws a runtime exception when an IO error occurs.
+     *
+     * @return a map containing the the data from the rows columns.
+     * @throws NoSuchElementException iff hasNext() is false
+     */
+    @Override
+    public OptionalTypesMap<String, Serializable> next() throws NoSuchElementException {
+        try {
+            return getNextRow();
+        }
+        catch (IOException e) {
+            throw new RuntimeException("IO Error occured. " + e.getMessage());
+        }
+    }
+
+    /**
+     * get the iterator for this heapreader. This is useful for iterator style for loops i.e. for(map m : reader){...}
+     *
+     * @return the iterator for this reader.
+     */
+    @Override
+    public Iterator<OptionalTypesMap<String, Serializable>> iterator() {
+        return this;
+    }
+
+
+
     private static Logger log = LoggerFactory.getLogger(ZFitsHeapReader.class);
-
-
 
     private ZFitsHeapReader(BinTable binTable) {
         this.numberOfRowsInTable = binTable.numberOfRowsInTable;
@@ -36,31 +118,31 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
         this.columns = binTable.columns;
     }
 
+
+    /**
+     * Creates a ZFitsHeapReader for a given binary table. This reader is iterable and provides a @see next() method which
+     * will yield the column data for each row.
+     *
+     * @param binTable the binary table which contains a zfits heap.
+     * @return the ZFitsHeapReader for the given table.
+     */
     public static ZFitsHeapReader forTable(BinTable binTable){
         return new ZFitsHeapReader(binTable);
     }
 
 
-    @Override
-    public boolean hasNext() {
-        return numberOfRowsRead < numberOfRowsInTable;
-    }
-
-    @Override
-    public OptionalTypesMap next() {
-        try {
-            return getNextRow();
-        } catch (IOException e) {
-            throw new RuntimeException("IO Error occured. " + e.getMessage());
-        }
-    }
-
-    @Override
-    public Iterator<OptionalTypesMap> iterator() {
-        return this;
-    }
-
+    /**
+     * Get the data from the next row. The columns in the row can be accessed by their name in the resulting
+     * map that is returned by this method. The resulting map comes with convenience methods for accessing data of
+     * predefined types.
+     *
+     * @return a map containing the the data from the rows columns.
+     * @throws NoSuchElementException iff hasNext() is false
+     */
     public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
+        if(!hasNext()){
+           throw new NoSuchElementException();
+        }
         OptionalTypesMap<String, Serializable> map = new OptionalTypesMap<>();
 
         //Tile header in this row
@@ -82,8 +164,8 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
                 continue;
             }
 
-            BlockHeader block = new BlockHeader(tileBuffer);
 
+            BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
             if (block.compression == BlockHeader.Compression.HUFFMAN) {
 
@@ -98,22 +180,23 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
 
             }else {
                 if(column.repeatCount == 1){
-                    map.put(column.name, readSingleValueFromStream(column, tileBuffer));
+                    map.put(column.name, readSingleValueFromBuffer(column, tileBuffer));
                 } else {
 
                     int offsetAfterReadingBytes = tileBuffer.position() + column.repeatCount * column.type.byteSize;
+
+                    //This creates a view of the byte buffer. No copying will take place. I think.
                     ByteBuffer bufferView = ByteBuffer.wrap(    tileBuffer.array(),
                                                                 tileBuffer.position(),
                                                                 offsetAfterReadingBytes)
                                                         .order(ByteOrder.LITTLE_ENDIAN);
 
                     tileBuffer.position(offsetAfterReadingBytes);
-                    map.put(column.name, readArrayFromStream(column, bufferView));
+                    map.put(column.name, readArrayFromBuffer(column, bufferView));
 
                 }
             }
 
-//            log.info("Tilesize - 16 : {}  BlockSize {}, BytesRead {}", tile.size - 16, block.size, bytesRead);
         }
 
         numberOfRowsRead++;
@@ -178,8 +261,6 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
 
         ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(buffer, numberOfSymbols);
 
-//        int position = buffer.position();
-
         BitQueue q = new BitQueue();
         ByteWiseHuffmanTree currentNode = huffmanTree;
 
@@ -189,14 +270,12 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
             while (index < numberOfShorts) {
 
                 if(q.queueLength < 16) {
-                    if (buffer.remaining() > 2) {
+                    if (buffer.remaining() >= 2) {
                         q.addShort(buffer.getShort());
-                    }
-                    if (buffer.remaining() == 1) {
+                    } else if (buffer.remaining() == 1) {
                         q.addByte(buffer.get());
                         q.addByte((byte) 0);
-                    }
-                    if (buffer.remaining() == 0) {
+                    }else if (buffer.remaining() == 0) {
                         q.addShort((short) 0);
                     }
                 }
@@ -205,7 +284,6 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
                 if (node.isLeaf) {
                     symbols[index] = node.payload.symbol;
                     index++;
-//                    log.info("Numbits in node: {}  for symbol {}", node.payload.codeLengthInBits, node.payload.symbol);
                     q.remove(node.payload.codeLengthInBits - depth*8);
 
                     //reset traversal to root node.
@@ -224,7 +302,13 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
         return symbols;
     }
 
-
+    /**
+     * Construct a huffmann tree from the symbol table stored for each huffmann compressed column
+     *
+     * @param buffer the buffer containing the bytes in the column
+     * @param numberOfSymbols the number of symbols this table contains
+     * @return a ByteWiseHuffmanTree from the symbol table in the buffer
+     */
     private ByteWiseHuffmanTree constructHuffmanTreeFromBytes(ByteBuffer buffer, long numberOfSymbols){
         ByteWiseHuffmanTree huffmanTree = new ByteWiseHuffmanTree();
         //read all entries and create the decoding tree
@@ -255,7 +339,6 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
             // convert byte array to an int
             int bits = ByteBuffer.wrap(huffmanCode).order(ByteOrder.LITTLE_ENDIAN).getInt();
 
-//            log.info("Sym: '{}', '{}', '{}', '{}', as int: {}", symbol, codeLengthInBits, codeLengthInBytes, String.format("%" + codeLengthInBits + "s", Integer.toBinaryString(bits)).replace(' ', '0'), bits);
 
             // add the symbol to the huffmanntree
             ByteWiseHuffmanTree.insert(huffmanTree, bits, codeLengthInBits, new ByteWiseHuffmanTree.Symbol(symbol, codeLengthInBits, codeLengthInBytes, bits) );
@@ -264,8 +347,11 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
     }
 
 
-
-
+    /**
+     * According to https://arxiv.org/pdf/1506.06045v1.pdf the heap contains Tiles which in turn contain the column data.
+     * One tile can contain many rows according to 'the spec' however we don't support this and
+     * I haven't encountered this case yet
+     */
     private static class TileHeader{
         private final long size;
         private final int numberOfRows;
@@ -278,15 +364,33 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
             size = buffer.getLong();
         }
 
+        /**
+         * Creates a TileHeader object. This method reads 16 bytes from the stream as described in
+         * figure 6 in 'the spec'.
+         * A TileHeader always should start with the letters TILE. If that is not the case the
+         * this method will throw an IOException
+         *
+         * @param stream the DataInputStream that is reading the  bytes from the heap.
+         * @return a TileHeader object created from bytes in the stream.
+         * @throws IOException when the tileheader cannot be created
+         */
         static TileHeader fromStream(DataInputStream stream) throws IOException {
             byte[] tileHeaderBytes = new byte[16];
             stream.readFully(tileHeaderBytes);
-            return new TileHeader(tileHeaderBytes);
+
+            TileHeader tileHeader = new TileHeader(tileHeaderBytes);
+            if (!tileHeader.definitionString.equals("TILE")){
+                throw new IOException("Tile header did not begin with word 'TILE'");
+            }
+
+            return tileHeader;
         }
     }
 
 
-
+    /**
+     * Each tile contains a number of blockheaders. The blockheader describes how the data was compressed and how many bytes it contains.
+     */
     private static class BlockHeader{
         enum Compression{
             RAW,
@@ -297,41 +401,59 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
 
         private final long size;
         private final String order;
-        private final byte numberOfProcessings;
         private final Compression compression;
 
-        BlockHeader(ByteBuffer buffer) {
-            size = buffer.getLong();
-            order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
-            numberOfProcessings = buffer.get();
+        private BlockHeader(long size, String order, Compression compression) {
+            this.size = size;
+            this.order = order;
+            this.compression = compression;
+        }
+
+        /**
+         * Create a blockheader from the bytebuffer passed.
+         * @param buffer the buffer to read.
+         * @return the blockheader form the bytes in the buffer
+         * @throws IOException in case the ordering is wrong
+         */
+        static BlockHeader fromBuffer(ByteBuffer buffer) throws IOException{
+
+            long size = buffer.getLong();
+            String order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
+
+            if(! (order.equals("R") || order.equals("C")) ){
+                throw new IOException("Block header was not ordered by 'R' or 'C' but " + order);
+            }
+
+            byte numberOfProcessings = buffer.get();
 
             byte processingType = 0;
             for (int n = 0; n < numberOfProcessings; n++) {
                 processingType += buffer.get();
-                //skip weird zero byte here:
+                //skip weird zero byte here. This is not documented correctly in 'the spec'
                 buffer.get();
             }
 
+            Compression compression;
             switch (processingType){
                 case 1:
-                    this.compression = Compression.SMOOTHING;
+                    compression = Compression.SMOOTHING;
                     break;
                 case 2:
-                    this.compression = Compression.HUFFMAN;
+                    compression = Compression.HUFFMAN;
                     break;
                 case 3:
-                    this.compression = Compression.HUFFMAN_AND_SMOOTHING;
+                    compression = Compression.HUFFMAN_AND_SMOOTHING;
                     break;
                 default:
-                    this.compression = Compression.RAW;
+                    compression = Compression.RAW;
                     break;
             }
-
+            return new BlockHeader(size, order, compression);
         }
 
     }
 
-    private Serializable readSingleValueFromStream(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
+    private Serializable readSingleValueFromBuffer(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
 
         Serializable b = null;
         switch (c.type){
@@ -363,7 +485,7 @@ public final class ZFitsHeapReader implements Iterator<OptionalTypesMap>, Iterab
         return b;
     }
 
-    private Serializable readArrayFromStream(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
+    private Serializable readArrayFromBuffer(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
 
         if(c.type == BinTable.ColumnType.BOOLEAN){
             boolean[] bools = new boolean[c.repeatCount];

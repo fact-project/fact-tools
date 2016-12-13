@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class HDU {
 
-    int headerSizeInBytes = 0;
+//    int headerSizeInBytes = 0;
 
     public enum XTENSION {
         IMAGE, BINTABLE, TABLE, NONE
@@ -27,10 +27,6 @@ public class HDU {
     public XTENSION extension = XTENSION.NONE;
 
     public boolean isPrimaryHDU = false;
-
-
-    //size of header in bytes
-//    int headerSizeInBytes = 0;
 
 
     private BinTable binTable = null;
@@ -50,7 +46,7 @@ public class HDU {
      */
     HDU(DataInputStream inputStream, URL url, long hduOffset) throws IOException {
 
-//        this.hduOffset = hduOffset;
+        int headerSizeInBytes = 0;
 
         List<String> headerLines = new ArrayList<>();
         int blockLimit = 100;
@@ -87,17 +83,13 @@ public class HDU {
         isPrimaryHDU = headerLines.stream()
                 .anyMatch(a -> a.matches("SIMPLE\\s+=\\s+T.*"));
 
-        header = new Header(headerLines);
+        header = new Header(headerLines, headerSizeInBytes);
 
         header.get("XTENSION")
                 .ifPresent(xtensionValue -> extension = XTENSION.valueOf(xtensionValue));
 
         if (extension == XTENSION.BINTABLE){
-
-            this.binTable = new BinTable(header, hduOffset, headerSizeInBytes, url); //tableName, tableDataStream, heapDataStream);
-
-//            tableReader = new BinTable.TableReader(binTable, tableDataStream);
-//            zFitsHeapReader = new ZFitsHeapReader(heapDataStream);
+            this.binTable = new BinTable(header, hduOffset, url); //tableName, tableDataStream, heapDataStream);
         }
 
     }

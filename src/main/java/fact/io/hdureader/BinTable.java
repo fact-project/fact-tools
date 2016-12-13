@@ -13,7 +13,18 @@ import java.util.stream.Collectors;
 
 
 /**
- * A BinTable representation.
+ * A BinTable representation. The rows and column in BinTables are described by the header keys in the HDU.
+ * The name of this table and the number of rows and columns in this table are accessible via public members
+ * name, numberOfRowsInTable and numberOfColumnsInTable.
+ *
+ * The data in this table can be read using a TableReader instance.
+ * @see BinTableReader
+ *
+ * A BinTable is created from a Header object, the offset the of the HDU this table belongs to and  the URL of the file
+ * so new  inputStreams can be created.
+ *
+ * Note: Not all things in the FITS standard are supported e.g. complex numbers !
+ *
  * Created by kai on 04.11.16.
  */
 public class BinTable {
@@ -28,7 +39,7 @@ public class BinTable {
      * This enum maps the type characters in the header to the fits types.
      * Not all types from the fits standard are supported here.
      *
-     * TODO: support variable length arrays.
+     * Note: support variable length arrays.
      *
      */
     enum ColumnType {
@@ -104,7 +115,7 @@ public class BinTable {
     public final String name;
 
 
-    BinTable(Header header, long hduOffset, long headerSizeInBytes, URL url) throws IllegalArgumentException, IOException {
+    BinTable(Header header, long hduOffset, URL url) throws IllegalArgumentException, IOException {
 
         binTableSanityCheck(header);
 
@@ -145,8 +156,8 @@ public class BinTable {
         //create stream for data in table area of the bintable extension
         DataInputStream stream = Fits.getDecompressedDataStream(url);
 
-        long skippedBytes = stream.skipBytes((int) (hduOffset + headerSizeInBytes));
-        if(skippedBytes != hduOffset + headerSizeInBytes){
+        long skippedBytes = stream.skipBytes((int) (hduOffset + header.headerSizeInBytes));
+        if(skippedBytes != hduOffset + header.headerSizeInBytes){
             throw new IOException("Could not skip all bytes to table data in this HDU.");
         }
         this.tableDataStream = stream;
@@ -161,7 +172,7 @@ public class BinTable {
 
             int theap = header.getInt("ZHEAPPTR").orElseGet(() -> header.getInt("THEAP").orElse(naxis1*naxis2));
 
-            int bytesToSkip = Math.toIntExact((hduOffset + headerSizeInBytes + theap));
+            int bytesToSkip = Math.toIntExact((hduOffset + header.headerSizeInBytes + theap));
 
             DataInputStream hStream = Fits.getDecompressedDataStream(url);
             skippedBytes = hStream.skipBytes(bytesToSkip);
@@ -190,13 +201,6 @@ public class BinTable {
                     "Its mandatory.\nSee section 7.2.1 of the Fits 3.0 standard");
             return new IllegalArgumentException("Missing TFIELD keyword");
         });
-//
-//        if(columns.size() != tfields){
-//            log.error("The value of TFIELDS: {} does not match the number of TTYPEn,TBCOLn,TFORMn tuples {}" +
-//                    "\nSee section 7.2.1 of the Fits 3.0 standard", tfields, columns.size());
-//            throw new IllegalArgumentException("Number of TFIELDS does not match number of TFORMn entries.");
-//        }
-//
 
         int naxis1 = header.getInt("NAXIS1").orElseThrow(() -> {
             log.error("The NAXIS1 keyword cannot be found in the BinTable. " +
