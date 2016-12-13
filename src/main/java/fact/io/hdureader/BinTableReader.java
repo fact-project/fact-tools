@@ -7,20 +7,31 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
+ * A reader for a FITS binary table.
+ *
+ * This class implements the iterable and iterator interfaces which allow for such nice things as
+ *
+ *        for(OptionalTypesMap p : binTableReader){
+ *              assertTrue(p.containsKey("Data"));
+ *         }
+ *
+ *
+ * The next() and the getNextRow() methods deliver a map with the data from one row in the table.
+ *
  * Created by mackaiver on 18/11/16.
  */
-public class TableReader {
+public class BinTableReader {
         private final DataInputStream stream;
         private final List<BinTable.TableColumn> columns;
 
 
-        private TableReader(BinTable binTable) {
+        private BinTableReader(BinTable binTable) {
                 this.stream = binTable.tableDataStream;
                 this.columns = binTable.columns;
         }
 
-        public static TableReader forBinTable(BinTable binTable){
-            return new TableReader(binTable);
+        public static BinTableReader forBinTable(BinTable binTable){
+            return new BinTableReader(binTable);
         }
 
 
