@@ -58,9 +58,7 @@ import java.util.NoSuchElementException;
  *
  * Created by mackaiver on 14/11/16.
  */
-public final class ZFitsHeapReader implements
-        Iterator<OptionalTypesMap<String, Serializable>>,
-        Iterable<OptionalTypesMap<String, Serializable>> {
+public final class ZFitsHeapReader implements Reader {
 
     private final DataInputStream stream;
     private final List<BinTable.TableColumn> columns;
@@ -77,36 +75,7 @@ public final class ZFitsHeapReader implements
         return numberOfRowsRead < numberOfRowsInTable;
     }
 
-    /**
-     * Get the data from the next row. The columns in the row can be accessed by their name in the resulting
-     * map that is returned by this method. The resulting map comes with convenience methods for accessing data of
-     * predefined types.
-     *
-     * This method overwrites the next() method of the iterable interface and is similar to the
-     * @see ZFitsHeapReader#getNextRow() method but throws a runtime exception when an IO error occurs.
-     *
-     * @return a map containing the the data from the rows columns.
-     * @throws NoSuchElementException iff hasNext() is false
-     */
-    @Override
-    public OptionalTypesMap<String, Serializable> next() throws NoSuchElementException {
-        try {
-            return getNextRow();
-        }
-        catch (IOException e) {
-            throw new RuntimeException("IO Error occured. " + e.getMessage());
-        }
-    }
 
-    /**
-     * get the iterator for this heapreader. This is useful for iterator style for loops i.e. for(Map m : reader){...}
-     *
-     * @return the iterator for this reader.
-     */
-    @Override
-    public Iterator<OptionalTypesMap<String, Serializable>> iterator() {
-        return this;
-    }
 
 
 
