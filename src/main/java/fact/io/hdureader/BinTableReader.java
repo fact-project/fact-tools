@@ -26,7 +26,7 @@ public class BinTableReader implements Reader {
 
         /**
          * Check whether there is another row to return from this heap
-         * @return true iff another row can be read.
+         * @return true if another row can be read.
          */
         @Override
         public boolean hasNext() {
