@@ -51,8 +51,13 @@ import java.util.NoSuchElementException;
  * When a column is huffman compressed, the definition of the huffmann tree will be stored in the first couple of bytes
  * in that row. This is documented exactly nowhere!
  *
+ * First we start with
+ *
  * [(int) numberOfCompressedBytes, (long) numberOfShortsAfterDecompression, (long) numberOfSymbolsUsedInCompression]
  *
+ * after that for each symbol (numberOfSymbolsUsedInCompression)
+ *
+ * [(short) symbol, (byte) codeLengthInBits, the codeword stored in codeLengthInBits-rounded-up-to-bytes bytes (max 4 bytes)]
  *
  *
  *
