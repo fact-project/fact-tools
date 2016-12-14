@@ -108,6 +108,22 @@ public class Header {
 
 
     /**
+     * Get the value for the keyword in the header as float if it exists and the value is parseable as float.
+     *
+     * @return float value for the key
+     */
+    public Optional<Boolean> getBoolean(String key){
+        try {
+            HeaderLine line = headerMap.get(key);
+            Boolean b = line.value.equals("T");
+            return Optional.of(b);
+        } catch (NumberFormatException| NullPointerException e){
+            return Optional.empty();
+        }
+    }
+
+
+    /**
      * Get the value for the keyword in the header as Double if it exists and the value is parseable as double.
      *
      * @return Double value for the key

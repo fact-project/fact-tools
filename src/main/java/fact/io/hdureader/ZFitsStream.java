@@ -22,7 +22,7 @@ import java.util.Map;
 public class ZFitsStream extends AbstractStream {
 
     private short[] offsetCalibrationsConstants;
-    private ZFitsHeapReader zFitsHeapReader;
+    private Reader reader;
 
     private HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
@@ -39,14 +39,16 @@ public class ZFitsStream extends AbstractStream {
         URL url = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
         Fits fits = new Fits(url);
 
-
         //get calibration constants they are stored in the first (and only) row of this hdu.
         HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
-        OptionalTypesMap<String, Serializable> row = ZFitsHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
+        if (offsetHDU != null){
+            OptionalTypesMap<String, Serializable> row = ZFitsHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
 
-        offsetCalibrationsConstants = row
-                .getShortArray("OffsetCalibration")
-                .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
+            offsetCalibrationsConstants = row
+                    .getShortArray("OffsetCalibration")
+                    .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
+
+        }
 
 
         //create a refrence to the events hdu
@@ -68,8 +70,12 @@ public class ZFitsStream extends AbstractStream {
             }
         });
 
-
-        zFitsHeapReader = ZFitsHeapReader.forTable(eventsTable);
+        Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+        if (ztable) {
+            reader = ZFitsHeapReader.forTable(eventsTable);
+        } else {
+            reader = BinTableReader.forBinTable(eventsTable);
+        }
     }
 
 
@@ -89,20 +95,21 @@ public class ZFitsStream extends AbstractStream {
     @Override
     public Data readNext() throws Exception {
 
-        if(!zFitsHeapReader.hasNext()){
+        if(!reader.hasNext()){
             return null;
         }
 
-        OptionalTypesMap<String, Serializable> nextRow = zFitsHeapReader.getNextRow();
+        OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
 
         short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
         short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
         Integer roi = eventHDU.header.getInt("NROI").orElse(300);
-
-        applyDrsOffsetCalib(roi, data, startCellData, offsetCalibrationsConstants );
-
-        nextRow.put("Data", data);
+        
+        if (offsetCalibrationsConstants !=  null) {
+            applyDrsOffsetCalib(roi, data, startCellData, offsetCalibrationsConstants);
+            nextRow.put("Data", data);
+        }
 
         Data item = DataFactory.create(nextRow);
         item.putAll(fitsHeader);
