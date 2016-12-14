@@ -183,7 +183,7 @@ public class CompareOldAndNewReaders {
     }
 
     @Test
-    public void compareZfitsStreams() throws Exception {
+    public void compareStreamsForZFitsFiles() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
 
         //init the old Zfitstream
@@ -203,6 +203,42 @@ public class CompareOldAndNewReaders {
             if (dataFromOldStream == null && data == null){
                 break;
             }
+
+            //compare header items
+            assertEquals(1.0, data.get("EXTREL"));
+
+            assertEquals(1440, data.get("NPIX"));
+            assertEquals(dataFromOldStream.get("NPIX"), data.get("NPIX"));
+
+
+            //compare data
+            assertTrue(data.size() > 0);
+            assertArrayEquals((int[]) data.get("BoardTime"), (int[]) dataFromOldStream.get("BoardTime"));
+            assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
+            assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
+
+            assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
+        }
+
+    }
+
+    @Test
+    public void compareStreamsForFitsFiles() throws Exception {
+        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+
+        //init the old Zfitstream
+        ZFitsStream stream = new ZFitsStream(new SourceURL(u));
+        stream.tableName = "Events";
+        stream.init();
+
+
+        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        newStream.init();
+
+        for (int i = 0; i < 15; i++) {
+            Data dataFromOldStream = stream.readNext();
+
+            Data data = newStream.readNext();
 
             //compare header items
             assertEquals(1.0, data.get("EXTREL"));

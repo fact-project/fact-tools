@@ -59,6 +59,8 @@ import java.util.NoSuchElementException;
  *
  * [(short) symbol, (byte) codeLengthInBits, the codeword stored in codeLengthInBits-rounded-up-to-bytes bytes (max 4 bytes)]
  *
+ * From these symbols and codewords the tree can be build see the ByteWiseHuffmanTree for details.
+ * @see ByteWiseHuffmanTree
  *
  *
  * Created by mackaiver on 14/11/16.
