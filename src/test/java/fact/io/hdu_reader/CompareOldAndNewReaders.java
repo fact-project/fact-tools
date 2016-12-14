@@ -167,7 +167,7 @@ public class CompareOldAndNewReaders {
         stream.init();
 
 
-        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        fact.io.hdureader.FitsStream newStream = new fact.io.hdureader.FitsStream(new SourceURL(u));
         newStream.init();
 
         Data dataFromOldStream = stream.readNext();
@@ -192,7 +192,7 @@ public class CompareOldAndNewReaders {
         stream.init();
 
 
-        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        fact.io.hdureader.FitsStream newStream = new fact.io.hdureader.FitsStream(new SourceURL(u));
         newStream.init();
         int i = 0;
         while(true) {
@@ -232,7 +232,7 @@ public class CompareOldAndNewReaders {
         stream.init();
 
 
-        fact.io.hdureader.ZFitsStream newStream = new fact.io.hdureader.ZFitsStream(new SourceURL(u));
+        fact.io.hdureader.FitsStream newStream = new fact.io.hdureader.FitsStream(new SourceURL(u));
         newStream.init();
 
         for (int i = 0; i < 15; i++) {

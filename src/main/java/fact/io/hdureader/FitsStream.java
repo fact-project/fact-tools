@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * Created by mackaiver on 12/12/16.
  */
-public class ZFitsStream extends AbstractStream {
+public class FitsStream extends AbstractStream {
 
     private short[] offsetCalibrationsConstants;
     private Reader reader;
@@ -27,7 +27,7 @@ public class ZFitsStream extends AbstractStream {
     private HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
 
-    public ZFitsStream(SourceURL url){
+    public FitsStream(SourceURL url){
         this.url = url;
     }
 
