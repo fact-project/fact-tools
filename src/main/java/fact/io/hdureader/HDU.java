@@ -130,18 +130,18 @@ public class HDU {
         //get NAXIS1*NAXIS2*NAXIS3....
         long factorNAXIS = headerMap.entrySet().stream()
                 .filter(e -> e.getKey().matches("NAXIS\\d+"))
-                .mapToLong(e -> e.getValue().getInt().orElse(1))
+                .mapToLong(e -> Long.parseLong(e.getValue().value))
                 .reduce((a, b) -> a * b)
                 .orElse(0);
 
-        int bitpix = Math.abs(headerMap.get("BITPIX").getInt().orElse(0));
+        int bitpix = Math.abs(header.getInt("BITPIX").orElse(0));
 
 
         //calculate size according to equation 1.
         if(!isPrimaryHDU){
-            long gcount = headerMap.get("GCOUNT").getLong().orElse(0L);
+            long gcount = header.getLong("GCOUNT").orElse(0L);
 
-            long pcount = headerMap.get("PCOUNT").getLong().orElse(0L);
+            long pcount = header.getLong("PCOUNT").orElse(0L);
 
             return bitpix * gcount * (pcount + factorNAXIS)/8L;
         }

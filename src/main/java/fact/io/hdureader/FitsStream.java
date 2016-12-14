@@ -59,16 +59,7 @@ public class FitsStream extends AbstractStream {
         //from smallest to largest datatype
         //if no number can be found simply save the string.
         Header header = eventHDU.header;
-        header.headerMap.forEach((s, headerLine) -> {
-            headerLine.getDouble().ifPresent(v -> fitsHeader.put(s, v));
-            headerLine.getLong().ifPresent(v -> fitsHeader.put(s, v));
-            headerLine.getInt().ifPresent(v -> fitsHeader.put(s, v));
-
-            //if no numbers are present simply put the string here.
-            if (!fitsHeader.containsKey(s)){
-                fitsHeader.put(s, headerLine.value);
-            }
-        });
+        fitsHeader = header.asMapOfSerializables();
 
         Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
         if (ztable) {

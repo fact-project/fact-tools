@@ -10,7 +10,7 @@ import java.util.Optional;
  *
  * Created by mackaiver on 03/11/16.
  */
-public class HeaderLine {
+class HeaderLine {
         public final String value;
         public final String key;
         public final String comment;
@@ -44,30 +44,6 @@ public class HeaderLine {
         this.value = value;
         this.key = key;
         this.comment = comment;
-    }
-
-    public Optional<Integer> getInt(){
-        try {
-            return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException e){
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Long> getLong(){
-        try {
-            return Optional.of(Long.parseLong(value));
-        } catch (NumberFormatException e){
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Double> getDouble(){
-        try {
-            return Optional.of(Double.parseDouble(value));
-        } catch (NumberFormatException e){
-            return Optional.empty();
-        }
     }
 
     @Override

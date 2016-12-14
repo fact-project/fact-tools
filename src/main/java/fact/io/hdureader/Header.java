@@ -1,6 +1,8 @@
 package fact.io.hdureader;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +49,27 @@ public class Header {
     }
 
     /**
+     * This converts this Header into a map of key value pairs of type <String, Serializable>.
+     *
+     * @return a HashMap containing the key value pairs.
+     */
+    Map<String, Serializable> asMapOfSerializables(){
+        Map<String, Serializable> m = new HashMap<>();
+        date().ifPresent(d -> m.put("DATE" , d));
+
+        headerMap.forEach((k, v ) -> {
+            getDouble(k).ifPresent(d -> m.put(k, d));
+            getLong(k).ifPresent(d -> m.put(k, d));
+            getInt(k).ifPresent(d -> m.put(k, d));
+
+            if(!m.containsKey(k)){
+                m.put(k, v.value);
+            }
+        });
+        return m;
+    }
+
+    /**
      * According to the FITS standard a header can contain a DATE keyword. This method returns a LocalDateTime
      * if a date can be found in the header.
      *
@@ -58,7 +81,6 @@ public class Header {
         }
 
         String dateString = headerMap.get("DATE").value;
-        LocalDateTime.parse(dateString);
         return Optional.of(LocalDateTime.parse(dateString));
     }
 
