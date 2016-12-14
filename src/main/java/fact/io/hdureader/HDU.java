@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class HDU {
 
-    int headerSizeInBytes = 0;
+//    int headerSizeInBytes = 0;
 
     public enum XTENSION {
         IMAGE, BINTABLE, TABLE, NONE
@@ -27,10 +27,6 @@ public class HDU {
     public XTENSION extension = XTENSION.NONE;
 
     public boolean isPrimaryHDU = false;
-
-
-    //size of header in bytes
-//    int headerSizeInBytes = 0;
 
 
     private BinTable binTable = null;
@@ -50,7 +46,7 @@ public class HDU {
      */
     HDU(DataInputStream inputStream, URL url, long hduOffset) throws IOException {
 
-//        this.hduOffset = hduOffset;
+        int headerSizeInBytes = 0;
 
         List<String> headerLines = new ArrayList<>();
         int blockLimit = 100;
@@ -87,17 +83,13 @@ public class HDU {
         isPrimaryHDU = headerLines.stream()
                 .anyMatch(a -> a.matches("SIMPLE\\s+=\\s+T.*"));
 
-        header = new Header(headerLines);
+        header = new Header(headerLines, headerSizeInBytes);
 
         header.get("XTENSION")
                 .ifPresent(xtensionValue -> extension = XTENSION.valueOf(xtensionValue));
 
         if (extension == XTENSION.BINTABLE){
-
-            this.binTable = new BinTable(header, hduOffset, headerSizeInBytes, url); //tableName, tableDataStream, heapDataStream);
-
-//            tableReader = new BinTable.TableReader(binTable, tableDataStream);
-//            zFitsHeapReader = new ZFitsHeapReader(heapDataStream);
+            this.binTable = new BinTable(header, hduOffset, url); //tableName, tableDataStream, heapDataStream);
         }
 
     }
@@ -134,22 +126,24 @@ public class HDU {
      */
     long sizeOfDataArea(){
         Map<String, HeaderLine> headerMap = header.headerMap;
+
+        //get NAXIS1*NAXIS2*NAXIS3....
         long factorNAXIS = headerMap.entrySet().stream()
                 .filter(e -> e.getKey().matches("NAXIS\\d+"))
-                .mapToLong(e -> e.getValue().getInt().orElse(1))
+                .mapToLong(e -> Long.parseLong(e.getValue().value))
                 .reduce((a, b) -> a * b)
                 .orElse(0);
 
-        int bitpix = Math.abs(headerMap.get("BITPIX").getInt().orElse(0));
+        int bitpix = Math.abs(header.getInt("BITPIX").orElse(0));
 
 
         //calculate size according to equation 1.
         if(!isPrimaryHDU){
-            int gcount = headerMap.get("GCOUNT").getInt().orElse(0);
+            long gcount = header.getLong("GCOUNT").orElse(0L);
 
-            int pcount = headerMap.get("PCOUNT").getInt().orElse(0);
+            long pcount = header.getLong("PCOUNT").orElse(0L);
 
-            return bitpix * gcount * (pcount + factorNAXIS)/8;
+            return bitpix * gcount * (pcount + factorNAXIS)/8L;
         }
 
         return bitpix*factorNAXIS/8;

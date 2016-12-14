@@ -1,5 +1,9 @@
 #Changelog for the fact-tools
 
+# Version 0.18.0 --14.12.2016
+
+* A new reader for FITS and ZFITS files was added.
+
 # Version 0.17.2 -- 05.12.2016
 
 * Reduced noise in `WaveformFluctuations`

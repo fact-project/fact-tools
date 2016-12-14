@@ -1,18 +1,41 @@
 package fact.io.hdureader;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 /**
+ *
+ * A Fits object containing all HDUs in a given file.
+ * HDUs can be accessed by their name.
+ *
+ *    Fits f = Fits.fromPath(p)
+ *    HDU events = f.getHDU("ZDrsCellOffsets");
+ *    BinTable binTable = events.getBinTable();
+ *
+ * BinTables can also directly be accessed by name if they exist.
+ *
+ *    Fits.fromPath(p).getBinTableByName("Events")
+ *                    .ifPresent(binTable -> {
+ *                        //do something with bintable
+ *                    })
+ *
+ * Data from the BinTable can be read using the BinTableReader and ZFitsHeapReader classes.
+ *
+ *    Fits f = new Fits(u);
+ *    BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
+ *
+ *    for(OptionalTypesMap<String, Serializable> p : BinTableReader.forBinTable(events)){
+ *      assertTrue(p.containsKey("Data"));
+ *    }
+ *
+ *
  * Created by mackaiver on 03/11/16.
  */
 public class Fits {
@@ -66,7 +89,7 @@ public class Fits {
         try {
             while (true) {
                 HDU h = new HDU(stream, url, absoluteHduOffsetInFile);
-                absoluteHduOffsetInFile += h.headerSizeInBytes + h.offsetToNextHDU();
+                absoluteHduOffsetInFile += h.header.headerSizeInBytes + h.offsetToNextHDU();
 
                 hdus.add(h);
 
@@ -146,7 +169,7 @@ public class Fits {
 
 
     /**
-     * Provides a datastream to the data artea of the given hdu.
+     * Provides a datastream to the data area of the given hdu.
      * This method is useful when reading custom data extensions that are present in the fits file.
      * @param hdu the HDU of interest.
      * @return a DataInputStream providing data from the data section of the given hdu.
@@ -159,10 +182,10 @@ public class Fits {
         long bytesToSkip = 0;
         for(HDU h : hdus){
             if(h.equals(hdu)){
-                bytesToSkip += h.headerSizeInBytes;
+                bytesToSkip += h.header.headerSizeInBytes;
                 break;
             }
-            bytesToSkip += h.headerSizeInBytes + h.sizeOfDataArea();
+            bytesToSkip += h.header.headerSizeInBytes + h.sizeOfDataArea();
         }
 
 

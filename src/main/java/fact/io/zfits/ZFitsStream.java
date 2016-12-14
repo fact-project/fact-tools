@@ -39,6 +39,9 @@ public class ZFitsStream extends AbstractStream{
     private Data headerItem = DataFactory.create();
 
 
+    public boolean applyOffsetCalibration = true;
+
+
     private ZFitsTable fitsTable = null;
 
     private TableReader tableReader = null;
@@ -206,7 +209,9 @@ public class ZFitsStream extends AbstractStream{
             int roi = (Integer) item.get("NROI");
             int numberOfPixel = (Integer) item.get("NPIX");
 
-            applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
+            if (applyOffsetCalibration) {
+                applyDrsOffsetCalib(roi, numberOfPixel, data, startCellData, this.calibrationConstants);
+            }
 
             item.put("Data", data);
         }
