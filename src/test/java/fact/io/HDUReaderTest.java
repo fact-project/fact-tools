@@ -15,7 +15,6 @@ import stream.io.SourceURL;
 import java.io.*;
 import java.net.URL;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
@@ -311,7 +310,6 @@ public class HDUReaderTest {
         newStream.init();
         int i = 0;
         while(true) {
-//            System.out.println("checking event number: " + i++);
             Data dataFromOldStream = stream.readNext();
 
             Data data = newStream.readNext();
@@ -333,12 +331,7 @@ public class HDUReaderTest {
             assertArrayEquals((short[]) data.get("StartCellTimeMarker"), (short[]) dataFromOldStream.get("StartCellTimeMarker"));
             assertArrayEquals((short[]) data.get("StartCellData"), (short[]) dataFromOldStream.get("StartCellData"));
 
-//            assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
-
-            short[] newShorts = Arrays.copyOfRange((short[]) data.get("Data"), 0, 431700);
-            short[] oldShorts = Arrays.copyOfRange((short[]) dataFromOldStream.get("Data"), 0, 431700);
-            assertArrayEquals(oldShorts, newShorts);
-
+            assertArrayEquals((short[]) data.get("Data"), (short[]) dataFromOldStream.get("Data"));
         }
 
     }
