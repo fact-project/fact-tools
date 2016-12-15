@@ -58,6 +58,18 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
 
     /**
+     * Returns the value for the key iff it exists and its a Double. Returns null otherwise.
+     * @param key
+     * @return the value or null
+     */
+    public Float getFloat(String key){
+        try {
+            return (Float) data.get(key);
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+    /**
      * Returns the value for the key iff it exists and its an Integer. Returns null otherwise.
      * @param key
      * @return the value or null
