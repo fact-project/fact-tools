@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 
 /**
  *
- * TODO: use priority heap for multithreading. or add some way to know when the run has been completly processed.
+ * TODO: use priority heap for multithreading via xml stream stuff.
  *
  *
  * The Signal and DataRate Processors update stuff in the service.
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 public class RTAWebService implements Service {
 
 
-    public RTADataBase.DBInterface dbInterface;
+    RTADataBase.DBInterface dbInterface;
 
     @Parameter(required = true, description = "Path to the .sqlite file")
     String jdbcConnection;
@@ -94,7 +94,7 @@ public class RTAWebService implements Service {
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
     private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
-    private Set<AuxPoint> FTMPoints = new HashSet<>();
+
 
     private ArrayList<Signal> signals = new ArrayList<>();
 
@@ -150,7 +150,6 @@ public class RTAWebService implements Service {
         }, (long) (0.1 * MINUTE), (long) (0.5*MINUTE));
 
 
-
         Signals.register(i -> t.cancel());
     }
 
@@ -164,11 +163,7 @@ public class RTAWebService implements Service {
     }
 
 
-    synchronized void addFTMPoint(AuxPoint FTMPoint){
-        FTMPoints.add(FTMPoint);
-    }
-
-    synchronized void updateEvent(DateTime eventTimeStamp, Data item){
+    synchronized void updateEvent(DateTime eventTimeStamp, Data item, Set<AuxPoint> ftmPointsForNight){
         if (!isInit){
             init();
         }
@@ -180,10 +175,19 @@ public class RTAWebService implements Service {
             currentRun = newRun;
         }
         else if (!currentRun.equals(newRun)){
+
             log.info("New run found. Fetching ontime.");
             //fetch ontime from rundb?
-            double onTimeInSeconds = FTMPoints.stream().mapToDouble(p -> p.getFloat("OnTime")).sum();
-            FTMPoints.clear();
+            double onTimeInSeconds = ftmPointsForNight
+                    .stream()
+                    .filter(p -> {
+                        boolean after = p.getTimeStamp().isAfter(currentRun.startTime);
+                        boolean before = p.getTimeStamp().isBefore(currentRun.endTime);
+                        return after && before;
+                    })
+                    .mapToDouble(p -> p.getFloat("OnTime"))
+                    .sum();
+
             dbInterface.updateRunWithOnTime(currentRun, onTimeInSeconds);
             log.info("New run found. OnTime of old run was: {} seconds.", onTimeInSeconds);
 
@@ -204,19 +208,18 @@ public class RTAWebService implements Service {
         signals.add(new Signal(eventTimeStamp, DateTime.now(), item, currentRun));
         eventMap.put(DateTime.now(), new RTAEvent(eventTimeStamp, item));
 
-
         Seconds delta = Seconds.secondsBetween(eventMap.firstKey(), eventMap.lastKey());
         if(delta.isGreaterThan(Seconds.seconds(60))){
             eventMap.pollFirstEntry();
         }
     }
 
+
     private void persistEvents(ArrayList<Signal> signals, double onTimePerEvent) {
         log.info("Saving stuff to DB");
         if (!isInit){
             init();
         }
-
 
         signals.forEach(signal -> {
                     signal.onTimePerEvent = onTimePerEvent;
@@ -293,7 +296,7 @@ public class RTAWebService implements Service {
             //get on time in this bin by summing the ontimes per event in each row
             double onTimeInBin = rtaSignalStream.mapToDouble(a -> a.onTimePerEvent).sum();
 
-            //select gamma like events and seperate signal and backgorund region
+            //select gamma like events and seperate signal and background region
             Stream<Signal> gammaLike = rtaSignalStream.filter(s -> s.prediction > predictionThreshold);
 
             int signal = (int) gammaLike

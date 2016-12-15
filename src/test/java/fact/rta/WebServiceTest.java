@@ -18,9 +18,7 @@ import stream.io.SourceURL;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -65,20 +63,20 @@ public class WebServiceTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-    @Test
-    public void startServer() throws Exception {
-        RTAWebService s = new RTAWebService();
-        s.jdbcConnection = "jdbc:sqlite:./test.sqlite";
-
-        for (int i = 0; i < 3600; i++) {
-            Thread.sleep(1100);
-
-            DateTime now = DateTime.now();
-            s.updateEvent(now, prepareNextItem());
-            s.updateDataRate(now , new Random().nextDouble()*15 + 80);
-        }
-        fail();
-    }
+//    @Test
+//    public void startServer() throws Exception {
+//        RTAWebService s = new RTAWebService();
+//        s.jdbcConnection = "jdbc:sqlite:./test.sqlite";
+//
+//        for (int i = 0; i < 3600; i++) {
+//            Thread.sleep(1100);
+//
+//            DateTime now = DateTime.now();
+//            s.updateEvent(now, prepareNextItem());
+//            s.updateDataRate(now , new Random().nextDouble()*15 + 80);
+//        }
+//        fail();
+//    }
 
 
     @Test
@@ -90,21 +88,25 @@ public class WebServiceTest {
         s.init();
 
 
+
         RTADataBase.DBInterface rtaTables = s.dbInterface;
 
         //create a few dummy items
         Data item = prepareNextItem();
         int night = (int) item.get("NIGHT");
         int runID = (int) item.get("RUNID");
-        Map<String, Serializable> map = new HashMap<>();
-        map.put("OnTime", 4.0f);
+
+        Set<AuxPoint> ftmPoints = new HashSet<>();
+
 
         for (int i = 0; i < 5; i++) {
             item = prepareNextItem();
             DateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-            s.addFTMPoint(new AuxPoint(utc, map));
-            s.updateEvent(utc, item);
+            Map<String, Serializable> map = new HashMap<>();
+            map.put("OnTime", 4.0f);
 
+            ftmPoints.add(new AuxPoint(utc, map));
+            s.updateEvent(utc, item, ftmPoints);
         }
 
 
@@ -116,24 +118,28 @@ public class WebServiceTest {
         item.put("NIGHT", night);
         item.put("RUNID", runID + 1);
         DateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-        s.updateEvent(utc, item);
+        s.updateEvent(utc, item, ftmPoints);
+
+
 
         factRun = rtaTables.getRun(night, runID);
-        assertThat(factRun.onTime, is(Duration.standardSeconds(20)));
+        assertThat(factRun.onTime, is(Duration.standardSeconds(20L)));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
 
-
-
+        ftmPoints.clear();
         //now create a few more items for new run
-        map.put("OnTime", 2.0f);
+
         for (int i = 0; i < 5; i++) {
             item = prepareNextItem();
             item.put("NIGHT", night);
             item.put("RUNID", runID + 1);
 
             utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-            s.addFTMPoint(new AuxPoint(utc, map));
-            s.updateEvent(utc, item);
+            Map<String, Serializable> map = new HashMap<>();
+            map.put("OnTime", 4.0f);
+            ftmPoints.add(new AuxPoint(utc, map));
+
+            s.updateEvent(utc, item, ftmPoints);
         }
 
         factRun = rtaTables.getRun(night, runID + 1);
@@ -144,12 +150,11 @@ public class WebServiceTest {
         item.put("NIGHT", night);
         item.put("RUNID", runID + 2);
         utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-        s.updateEvent(utc, item);
+        s.updateEvent(utc, item, ftmPoints);
 
 
         factRun = rtaTables.getRun(night, runID + 1);
-        assertThat(factRun.onTime, is(Duration.standardSeconds(10)));
+        assertThat(factRun.onTime, is(Duration.standardSeconds(20L)));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
-
     }
 }

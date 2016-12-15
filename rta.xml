@@ -2,28 +2,32 @@
 
     <properties url="classpath:/default/settings.properties" />
 
-    <!-- Paths to the input files -->
-    <property name="separator" value="file:src/test/resources/prediction_test_files/model.pmml.gz" />
-    <property name="estimator" value="file:src/test/resources/prediction_test_files/estimator.pmml.gz" />
-    <property name="infile" value="/Users/mackaiver/fact_phido/raw/2015/12/" />
-    <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
-    <!--<property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />-->
+
+    <property name="infile" value="/Users/mackaiver/fhgfs/raw/2015/12/" />
+
+
+
 
     <property name="jdbc" value="jdbc:sqlite:./../rta.sqlite" />
-
+    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <!--<service id="auxService" class="fact.auxservice.SqliteService" url="file:/Users/kai/drive_2014.sqlite" />-->
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/Users/mackaiver/fact_phido/aux/2015/12/" />
 
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/Users/mackaiver/fhgfs/aux/" />
+    <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/Users/mackaiver/fhgfs/raw/" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
+
+    <property name="separator" value="file:src/test/resources/prediction_test_files/model.pmml.gz" />
     <service id="rf" class="fact.PredictionService" url="${separator}" />
+
+    <property name="estimator" value="file:src/test/resources/prediction_test_files/estimator.pmml.gz" />
     <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
-    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
+
+
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
         <stream id="_" class="fact.io.zfits.ZFitsStream"  limit="200" />
@@ -40,12 +44,12 @@
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
         <!--<Delay time="50ms" />-->
-        <fact.DataRate every="50" webService="rta_service" logmemory="true"/>
-        <fact.rta.FTMProcessor auxService="auxService" webService="rta_service" />
+        <fact.DataRate every="50" logmemory="true"  webService="rta_service"/>
+
         <Skip condition="%{data.TriggerType} != 4" />
         <!--<PrintData/>-->
 
-        <Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>
+        <!--<Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
 
         <!--        <Delay time="500ms" /> -->
 
@@ -57,7 +61,40 @@
         <!-- Calibration: -->
         <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
         DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
-        <include url="classpath:/default/data/calibration.xml" />
+        <fact.datacorrection.DrsCalibration
+                drsService="drsService"
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                prevEventsKey="prevEvents"
+                startCellKey="StartCellData"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+        />
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+        />
+        <fact.filter.DrsTimeCalibration
+                outputKey="timeCalibConst"
+        />
+        <fact.filter.ArrayTimeCorrection
+                dataKey="DataCalibrated"
+                timeCalibConstKey="timeCalibConst"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
         <!-- Output: DataCalibrated -->
 
 
@@ -94,11 +131,11 @@
             <!--<Enqueue queues="out_queue" />-->
     </process>
 
-    <process input="performance_queue">
-        <If condition="%{data.@datarate} != null" >
-            <fact.io.JSONWriter url="file:./rta_performance.json" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>
-        </If>
-    </process>
+    <!--<process input="performance_queue">-->
+        <!--<If condition="%{data.@datarate} != null" >-->
+            <!--<fact.io.JSONWriter url="file:./rta_performance.json" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
+        <!--</If>-->
+    <!--</process>-->
 
     <!--<process input="out_queue">-->
         <!--<fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,signal:*,energy,background:*"/>-->

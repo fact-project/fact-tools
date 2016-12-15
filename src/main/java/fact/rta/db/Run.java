@@ -2,6 +2,7 @@ package fact.rta.db;
 
 import fact.rta.RTADataBase;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Binder;
@@ -16,6 +17,7 @@ import java.lang.annotation.*;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 /**
  * Created by mackaiver on 07/09/16.
@@ -32,8 +34,8 @@ public class Run {
                     r.getInt("night"),
                     r.getInt("run_id"),
                     r.getString("source"),
-                    DateTime.parse(r.getString("start_time")),
-                    DateTime.parse(r.getString("end_time")),
+                    DateTime.parse(r.getString("start_time")).withZone(DateTimeZone.UTC),
+                    DateTime.parse(r.getString("end_time")).withZone(DateTimeZone.UTC),
                     Duration.standardSeconds(r.getLong("on_time")),
                     RTADataBase.HEALTH.valueOf(r.getString("health"))
             );
@@ -96,8 +98,9 @@ public class Run {
         this.runID = (int) item.get("RUNID");
         this.night = (int) item.get("NIGHT");
         this.onTime = Duration.ZERO;
-        this.startTime = DateTime.parse((String) item.get("DATE-OBS"));
-        this.endTime = DateTime.parse((String) item.get("DATE-END"));
+
+        this.startTime = DateTime.parse((String) item.get("DATE-OBS")).withZoneRetainFields(DateTimeZone.UTC);
+        this.endTime = DateTime.parse((String) item.get("DATE-END")).withZoneRetainFields(DateTimeZone.UTC);
         this.health = RTADataBase.HEALTH.UNKNOWN;
     }
 

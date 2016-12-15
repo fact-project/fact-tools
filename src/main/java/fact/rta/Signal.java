@@ -1,7 +1,10 @@
 package fact.rta;
 
+import fact.auxservice.AuxFileService;
+import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 
+import fact.auxservice.AuxiliaryServiceName;
 import org.joda.time.DateTime;
 
 import org.jpmml.evaluator.ProbabilityDistribution;
@@ -10,7 +13,9 @@ import stream.annotations.Parameter;
 import stream.annotations.Service;
 
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.SortedSet;
 
 
 /**
@@ -27,6 +32,9 @@ public class Signal implements Processor {
     @Service(required = true)
     private  RTAWebService webService;
 
+    @Service(required = true)
+    private AuxFileService auxService;
+
 
     private static double thetaDegreesToThetaSquaredInMM(double theta){
         double pixelsize = 9.5;
@@ -36,7 +44,18 @@ public class Signal implements Processor {
 
 
     @Override
-    public Data process(Data data)  {
+    public Data process(Data data){
+        DateTime dT = AuxiliaryService
+                .unixTimeUTCToDateTime(data)
+                .orElseThrow(() -> new RuntimeException("Could not get time stamp from current event."));
+
+        SortedSet<AuxPoint> points;
+        try {
+            points = auxService.getAuxiliaryDataForWholeNight(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, dT);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not get auxPoints from file " + e.getMessage());
+        }
+
 
         ProbabilityDistribution distribution = predictor.predict(data);
         if (distribution != null){
@@ -58,7 +77,7 @@ public class Signal implements Processor {
                     orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
 
-            webService.updateEvent(eventTimeStamp, data);
+            webService.updateEvent(eventTimeStamp, data, points);
 
         }
         return data;
