@@ -4,9 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-
   <version>0.20.0</version>
-
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -162,19 +160,19 @@
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-core</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-plotter</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-runtime</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>

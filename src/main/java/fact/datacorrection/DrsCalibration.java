@@ -1,8 +1,6 @@
-/**
- * 
- */
 package fact.datacorrection;
 
+import fact.DrsFileService;
 import fact.io.FitsStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +10,7 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 
 /**
  *
@@ -24,31 +21,31 @@ import java.net.MalformedURLException;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  */
 public class DrsCalibration implements StatefulProcessor {
-	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
+	private static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 
 	private String outputKey = "DataCalibrated";
 
-    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
+    @Parameter(description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
-    @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
-			defaultValue = "Null. Will try to find path to drsFile from the stream.")
+    @Parameter(description = "A URL to the DRS calibration data (in FITS formats). " +
+            "Set either this or the drsService")
     private SourceURL url = null;
 
-    Data drsData = null;
+    @Parameter(description = "A DrsFileService which helps to find drs files automagically." +
+            " Either this or the url must be set.")
+    private DrsFileService drsService;
+    public void setDrsService(DrsFileService drsService) {
+        this.drsService = drsService;
+    }
 
-    private File currentDrsFile = new File("");
+	private float[] drsBaselineMean;
+	private float[] drsGainMean;
+	private float[] drsTriggerOffsetMean;
 
-	float[] drsBaselineMean;
-	float[] drsBaselineRms;
-	float[] drsGainMean;
-	float[] drsGainRms;
-	float[] drsTriggerOffsetMean;
-	float[] drsTriggerOffsetRms;
-
-	// The following keys are required to exist in the DRS data
-	final static String[] drsKeys = new String[] { "RunNumberBaseline",
+    // The following keys are required to exist in the DRS data
+	private final static String[] drsKeys = new String[] { "RunNumberBaseline",
 			"RunNumberGain", "RunNumberTriggerOffset", "BaselineMean",
 			"BaselineRms", "GainMean", "GainRms", "TriggerOffsetMean",
 			"TriggerOffsetRms" };
@@ -64,8 +61,9 @@ public class DrsCalibration implements StatefulProcessor {
 	 * @param in
 	 *            sourceurl to be loaded
 	 */
-	protected void loadDrsData(SourceURL in) {
-		try {
+    private void loadDrsData(SourceURL in) {
+        Data drsData;
+        try {
 			FitsStream stream = new FitsStream(in);
 			stream.init();
 			drsData = stream.readNext();
@@ -82,13 +80,10 @@ public class DrsCalibration implements StatefulProcessor {
 			}
 
 			this.drsBaselineMean = (float[]) drsData.get("BaselineMean");
-			this.drsBaselineRms = (float[]) drsData.get("BaselineRms");
 			this.drsTriggerOffsetMean = (float[]) drsData
 					.get("TriggerOffsetMean");
-			this.drsTriggerOffsetRms = (float[]) drsData
-					.get("TriggerOffsetRms");
+
 			this.drsGainMean = (float[]) drsData.get("GainMean");
-			this.drsGainRms = (float[]) drsData.get("GainRms");
 
 		} catch (Exception e) {
 
@@ -96,7 +91,6 @@ public class DrsCalibration implements StatefulProcessor {
 			if (log.isDebugEnabled())
 				e.printStackTrace();
 
-			this.drsData = null;
 			this.drsBaselineMean = null;
 			this.drsTriggerOffsetMean = null;
 
@@ -110,23 +104,19 @@ public class DrsCalibration implements StatefulProcessor {
 	@Override
 	public Data process(Data data) {
 
-        if( this.url == null){
-			//file not loaded yet. try to find by magic.
-            File drsFile = (File) data.get("@drsFile");
-            if( drsFile != null){
-                if (!drsFile.equals(currentDrsFile)) {
-                    currentDrsFile = drsFile;
-                    try {
-                        log.info("Using .drs File " + drsFile.getAbsolutePath());
-                        loadDrsData(new SourceURL(drsFile.toURI().toURL()));
-                    } catch (MalformedURLException e) {
-                        //pass.
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException("No drs file set or no @drsFile key in data stream");
+        if( this.url == null && this.drsService != null){
+			//file not loaded yet. try to find through service
+            try {
+
+                DrsFileService.CalibrationInfo calibrationInfo = drsService.getCalibrationConstantsForDataItem(data);
+                this.drsBaselineMean = calibrationInfo.drsBaselineMean;
+                this.drsGainMean = calibrationInfo.drsGainMean;
+                this.drsTriggerOffsetMean = calibrationInfo.drsTriggerOffsetMean;
+
+            } catch (NullPointerException | IOException e) {
+                throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
             }
-		}
+        }
 
 		log.debug("Processing Data item by applying DRS calibration...");
 		short[] rawData = (short[]) data.get(key);
@@ -156,8 +146,7 @@ public class DrsCalibration implements StatefulProcessor {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output,
-				startCell);
+		double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
 		data.put(outputKey, calibrated);
 
 		// add color value if set
@@ -165,8 +154,7 @@ public class DrsCalibration implements StatefulProcessor {
 		return data;
 	}
 
-	public double[] applyDrsCalibration(double[] data, double[] destination,
-			short[] startCellVector) {
+	private double[] applyDrsCalibration(double[] data, double[] destination, short[] startCellVector) {
 
 		if (destination == null || destination.length != data.length)
 			destination = new double[data.length];
@@ -281,10 +269,11 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-//        if(url == null && drsService == null){
-//            log.error("Url and Service are not set. You need to set one of those");
-//            throw new IllegalArgumentException("Wrong parameter");
-//        }
+        if(url == null && drsService == null){
+            log.error("Url and Service are not set. You need to set one of those");
+            throw new IllegalArgumentException("Wrong parameter");
+        }
+
         if (url != null) {
             try {
                 loadDrsData(url);
@@ -305,7 +294,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     }
 
-	// -----------setter---------------------
+
 	public void setKey(String key) {
 		this.key = key;
 	}
