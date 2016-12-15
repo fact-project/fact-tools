@@ -25,6 +25,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
+ *
+ * This is a service which, provided a data item from the telescopes data stream,
+ * this returns the proper drs calibration constants.
+ * By 'proper' I mean the drs constants which have been taken closest in time to the run the event was taken from.
+ * The url should point to the usual raw data folder containing the canonical file structure e.g. 2016/12/20/...
+ *
  * Created by mackaiver on 08/12/16.
  */
 public class DrsFileService implements Service {
@@ -50,7 +56,16 @@ public class DrsFileService implements Service {
             });
 
 
-
+    /**
+     * This method returns the calibration info for the given data item. This item should contain a key
+     * called DATE-OBS. Which is the beginning of the observation. If the drs calibration constants have not been loaded
+     * into the cache, all drs files in the folder of the current run are parsed for their date. The constants
+     * in the file closest to DATE-OBS are read and returned here.
+     *
+     * @param item a data item with FACT data
+     * @return a CalibrationInfo instance which holds the calibration constants
+     * @throws IOException if no file with drs constant can be found or an error occurs while reading it.
+     */
     public CalibrationInfo getCalibrationConstantsForDataItem(Data item) throws IOException {
         LocalDateTime observationDate = LocalDateTime.parse(item.get("DATE-OBS").toString());
         int runId = (int) item.get("RUNID");
@@ -88,7 +103,7 @@ public class DrsFileService implements Service {
         HDU calibrationHDU = fits.getHDU("DrsCalibration");
         BinTable binTable = calibrationHDU.getBinTable();
 
-        OptionalTypesMap<String, Serializable> row = TableReader.forBinTable(binTable).getNextRow();
+        OptionalTypesMap<String, Serializable> row = BinTableReader.forBinTable(binTable).getNextRow();
 
         float[] baselineMean = row.getFloatArray("BaselineMean")
                 .orElseThrow(()-> new IOException("BaseLineMean not found in BinTable"));
@@ -123,6 +138,26 @@ public class DrsFileService implements Service {
             this.runId = runId;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DrsCacheKey that = (DrsCacheKey) o;
+
+            return runId == that.runId && month == that.month && day == that.day && year == that.year;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = runId;
+            result = 31 * result + month;
+            result = 31 * result + day;
+            result = 31 * result + year;
+            return result;
+        }
+
         /**
          * Takes a dateTime object and returns the canonical path to an aux or data file.
          * For example 2016-01-03 09:30:12 returns a path to "2016/01/02" while
@@ -141,7 +176,10 @@ public class DrsFileService implements Service {
         }
     }
 
-
+    /**
+     * A class to hold the calibrations constants needed to apply the infamous drs calibration
+     * to FACT raw data.
+     */
     public class CalibrationInfo{
         public final float[] drsBaselineMean;
         public final float[] drsGainMean;
