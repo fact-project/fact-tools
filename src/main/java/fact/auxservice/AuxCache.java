@@ -3,6 +3,9 @@ package fact.auxservice;
 
 import org.joda.time.DateTime;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * This class defines some classes needed for caching many {@link AuxPoint} into ram
  * using an LRU cache. A specific auxfile is uniquely defined by its name and the 'FACT Night' string.
@@ -12,14 +15,18 @@ import org.joda.time.DateTime;
  */
 
 public class AuxCache {
-    class CacheKey {
+    public class CacheKey {
         final AuxiliaryServiceName service;
         final Integer factNight;
+        public final Path path;
 
-        CacheKey(AuxiliaryServiceName service, Integer factNight) {
 
+        public CacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
             this.service = service;
-            this.factNight = factNight;
+            this.factNight = dateTimeStampToFACTNight(timeStamp);
+
+            String name = factNight + "." + service + ".fits";
+            this.path = Paths.get(dateTimeStampToFACTPath(timeStamp).toString(), name);
         }
 
         @Override
@@ -62,5 +69,23 @@ public class AuxCache {
         String night = String.format("%1$d%2$02d%3$02d", offsetDate.getYear(), offsetDate.getMonthOfYear(), offsetDate.getDayOfMonth());
         return Integer.parseInt(night);
     }
-}
 
+
+    /**
+     * Takes a dateTime object and returns the canonical path to an aux or data file.
+     * For example 2016-01-03 09:30:12 returns a path to "2016/01/02" while
+     * 2016-01-03 13:30:12 would return "2016/01/03"
+     *
+     * @param timeStamp the timestamp to get the night for
+     * @return a partial path starting with the year.
+     */
+    public static Path dateTimeStampToFACTPath(DateTime timeStamp){
+        DateTime offsetDate = timeStamp.minusHours(12);
+
+        int year = offsetDate.getYear();
+        int month = offsetDate.getMonthOfYear();
+        int day = offsetDate.getDayOfMonth();
+
+        return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));
+    }
+}
