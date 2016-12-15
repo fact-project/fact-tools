@@ -8,6 +8,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 import stream.io.SourceURL;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class DrsCalibration implements StatefulProcessor {
             "Set either this or the drsService")
     private SourceURL url = null;
 
-    @Parameter(description = "A DrsFileService which helps to find drs files automagically." +
+    @Service(description = "A DrsFileService which helps to find drs files automagically." +
             " Either this or the url must be set.")
     private DrsFileService drsService;
     public void setDrsService(DrsFileService drsService) {
