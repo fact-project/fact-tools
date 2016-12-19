@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -77,7 +79,8 @@ public class BinTableReader implements Reader {
                     b =  stream.readBoolean();
                     break;
                 case CHAR:
-                    b =  stream.readUTF();
+                    byte[] s =  new byte[]{stream.readByte()};
+                    b = new String(s, StandardCharsets.US_ASCII);
                     break;
                 case BYTE:
                     b = stream.readByte();
@@ -116,9 +119,7 @@ public class BinTableReader implements Reader {
 
             switch (c.type){
                 case CHAR:
-                    char[] chars = new char[c.repeatCount];
-                    ByteBuffer.wrap(b).asCharBuffer().get(chars);
-                    return chars;
+                    return new String(b, StandardCharsets.US_ASCII).replace("\u0000", "");
                 case BYTE:
                     return b;
                 case SHORT:
@@ -144,6 +145,4 @@ public class BinTableReader implements Reader {
             }
             return null;
         }
-
-
 }
