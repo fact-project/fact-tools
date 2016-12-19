@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * this returns the proper drs calibration constants.
  * By 'proper' I mean the drs constants which have been taken closest in time to the run the event was taken from.
  * The url should point to the usual raw data folder containing the canonical file structure e.g. /fact/raw on the isdc.
- * 
+ *
  *
  * Created by mackaiver on 08/12/16.
  */
@@ -106,6 +106,7 @@ public class DrsFileService implements Service {
 
         OptionalTypesMap<String, Serializable> row = BinTableReader.forBinTable(binTable).getNextRow();
 
+        //get the arrays needed for calibration. if one is missing throw an exception.
         float[] baselineMean = row.getFloatArray("BaselineMean")
                 .orElseThrow(()-> new IOException("BaseLineMean not found in BinTable"));
 
