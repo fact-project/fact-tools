@@ -18,6 +18,55 @@ import java.io.IOException;
  * either as File or URL and will read the DRS data from that. This data is then
  * applied to all FactEvents processed by this class.
  *
+ * Original comments written by someone who sounds like DNeise.
+ *
+ * We do not entirely know how the calibration constants, which are saved in a filename.drs.fits file
+ * were calculated, so it is not fully clear how they should be applied
+ * to the raw data for calibration.
+ * Apparently the calibration constants were transformed to the unit mV,
+ * which means we have to do the same to the raw data prior to apply the calibration
+ * on the FAD board, there is a 12bit ADC, with a 2.0V range, so the factor between ADC units and mV is
+ * ADC2mV = 2000/4096. = 0.48828125 (numerically exact) from the schematic of the FAD we learned,
+ * that the voltage at the ADC should be 1907.35 mV when the calibration DAC is set to 50000.
+ * One would further assume that the calibration constants are calculated like this:
+ * The DRS Offset of each bin in each channel is the mean value in this very bin,
+ * obtained from so called DRS pedestal data
+ * Its value is about -1820 ADC units or -910mV.
+ * In order to obtain the DRS Gain of each bin of each channel again data is takes,
+ * with the calibration DAC set to 50000.
+ * This is called DRS calibration data.
+ * We assume the DRS Offset is already subtracted from the DRS calibration data
+ * so the typical value is assumed to be ~3600 ADC units oder ~1800mV
+ * As mentioned before, the value *should* be 1907.35 mV
+ * So one might assume that the Gain is a number, which actually
+ * converts ~3600 ADC units into 1907.35mV for each bin of each channel.
+ * So that the calibration procedure looks like this
+ * TrueValue = (RawValue - Offset) * Gain
+ *
+ * The numerical value of Gain would differ slightly from the theoretical value of 2000/4096.
+ * But this is apparently not the case.
+ * The Gain, as it is stored in the DRS calibration file of FACT++ has numerical values around +1800.
+ * So it seems one should calibrate like this:
+ * TrueValue = (RawValue - Offset) / Gain * 1907.35
+ *
+ * When these calibrations are done, one ends up with a quite nice calibrated voltage.
+ * But it turns out that, if one returns the first measurement, and calculates the mean voltages
+ * in each bin of the now *logical* DRS pipeline, the mean voltage is
+ * not zero, but slightly varies
+ * So one can store these systematical deviations from zero in the
+ * logical pipeline as well, and subtract them.
+ * The remaining question is, when to subtract them.
+ * I assume, in the process of measuring this third calibration
+ * constant, the first two calibrations are already applied to the raw data.
+ * So the calculation of the calibrated voltage from some raw voltage
+ * works like this:
+ * Assume the raw voltage is the s'th sample in channel c. While the Trigger made the DRS stopp in its t'th cell.
+ * note, that the DRS pipeline is always 1024 bins long. This is constant of the DRS4 chip.
+ *
+ * TrueValue[c][s] = ( RawValue[c][s] - Offset[c][ (c+t)%1024 ] ) /
+ * Gain[c][ (c+t)%1024 ] * 1907.35 - TriggerOffset[c][s]
+
+ *
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  */
 public class DrsCalibration implements StatefulProcessor {
@@ -160,71 +209,6 @@ public class DrsCalibration implements StatefulProcessor {
 			destination = new double[data.length];
 		int roi = data.length / 1440;
 
-		// We do not entirely know how the calibration constants, which are
-		// saved in a filename.drs.fits file
-		// were calculated, so it is not fully clear how they should be applied
-		// to the raw data for calibration.
-		// apparently the calibration constants were transformed to the unit mV,
-		// which means we have to do the same to
-		// the raw data prior to apply the calibration
-		//
-		// on the FAD board, there is a 12bit ADC, with a 2.0V range, so the
-		// factor between ADC units and mV is
-		// ADC2mV = 2000/4096. = 0.48828125 (numerically exact)
-		//
-		// from the schematic of the FAD we learned, that the voltage at the ADC
-		// should be 1907.35 mV when the calibration DAC is set to 50000.
-		//
-		// One would further assume that the calibration constants are
-		// calculated like this:
-
-		// The DRS Offset of each bin in each channel is the mean value in this
-		// very bin,
-		// obtained from so called DRS pedestal data
-		// Its value is about -1820 ADC units or -910mV
-
-		// In order to obtain the DRS Gain of each bin of each channel
-		// again data is takes, with the calibration DAC set to 50000
-		// This is called DRS calibration data.
-		// We assume the DRS Offset is already subtracted from the DRS
-		// calibration data
-		// so the typical value is assumed to be ~3600 ADC units oder ~1800mV
-		// As mentioned before, the value *should* be 1907.35 mV
-		// So one might assume that the Gain is a number, which actually
-		// converts ~3600 ADC units into 1907.35mV for each bin of each channel.
-		// So that the calibration procedure looks like this
-		// TrueValue = (RawValue - Offset) * Gain
-		// The numerical value of Gain would differ slightly from the
-		// theoretical value of 2000/4096.
-		// But this is apparently not the case.
-		// The Gain, as it is stored in the DRS calibration file of FACT++ has
-		// numerical values
-		// around +1800.
-		// So it seems one should calibrate like this:
-		// TrueValue = (RawValue - Offset) / Gain * 1907.35
-
-		// When these calibrations are done, one ends up with a quite nice
-		// calibrated voltage.
-		// But it turns out that, if one returns the first measurement, and
-		// calculates the mean voltages
-		// in each bin of the now *logical* DRS pipeline, the mean voltage is
-		// not zero, but slightly varies
-		// So one can store these systematical deviations from zero in the
-		// logical pipeline as well, and subtract them.
-		// The remaining question is, when to subtract them.
-		// I assume, in the process of measuring this third calibration
-		// constant, the first two
-		// calibrations are already applied to the raw data.
-
-		// So the calculation of the calibrated volatage from some raw voltage
-		// works like this:
-		// assume the raw voltage is the s'th sample in channel c. While the
-		// Trigger made the DRS stopp in its t'th cell.
-		// note, that the DRS pipeline is always 1024 bins long. This is
-		// constant of the DRS4 chip.
-
-		// TrueValue[c][s] = ( RawValue[c][s] - Offset[c][ (c+t)%1024 ] ) /
-		// Gain[c][ (c+t)%1024 ] * 1907.35 - TriggerOffset[c][s]
 
 		double dconv = 2000.0f / 4096.0f;
 		double vraw;
