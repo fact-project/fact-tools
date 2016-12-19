@@ -16,8 +16,8 @@ import java.util.zip.GZIPInputStream;
  * HDUs can be accessed by their name.
  *
  *    Fits f = Fits.fromPath(p)
- *    HDU events = f.getHDU("ZDrsCellOffsets");
- *    BinTable binTable = events.getBinTable();
+ *    HDU offsets = f.getHDU("ZDrsCellOffsets");
+ *    BinTable binTable = offsets.getBinTable();
  *
  * BinTables can also directly be accessed by name if they exist.
  *
@@ -80,7 +80,7 @@ public class Fits {
 
     public Fits(URL  url) throws IOException {
         this.url = url;
-        DataInputStream stream = getDecompressedDataStream(url);
+        DataInputStream stream = getUnGzippedDataStream(url);
         long absoluteHduOffsetInFile = 0;
 
         try {
@@ -107,7 +107,7 @@ public class Fits {
         }
     }
 
-    static DataInputStream getDecompressedDataStream(URL url) throws IOException {
+    static DataInputStream getUnGzippedDataStream(URL url) throws IOException {
         InputStream stream = url.openStream();
 
         byte[] header = new byte[2];
@@ -168,7 +168,7 @@ public class Fits {
      * @throws IOException in case the stream cannot be opened
      */
     public DataInputStream getInputStreamForHDUData(HDU hdu) throws IOException {
-        DataInputStream stream = getDecompressedDataStream(url);
+        DataInputStream stream = getUnGzippedDataStream(url);
 
 
         long bytesToSkip = 0;

@@ -195,7 +195,7 @@ public final class ZFitsHeapReader implements Reader {
      * This methods starts by building a huffman tree from the symbol table in the data.
      * Once build it will be used to map code words to the symbols.
      * Here goes the code from huffman.h in FACT++ which describes how the symbol table is written to the data.
-     * apparently this is the only documentation about that.
+     * apparently this is the only 'documentation' about that.
      *
      *     void WriteCodeTable(std::string &out) const {
      *           out.append((char*)&count, sizeof(size_t));

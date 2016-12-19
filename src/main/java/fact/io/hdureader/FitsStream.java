@@ -35,7 +35,8 @@ public class FitsStream extends AbstractStream {
     public void init() throws Exception {
         super.init();
 
-        //create a fits object
+        //create a fits object from the SourceURL this AbstractStream contains.
+        //The FITs object does not know SourceURL so this fits reader is decoupled entirely from the streams framework
         URL url = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
         Fits fits = new Fits(url);
 
