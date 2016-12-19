@@ -87,11 +87,6 @@ public class Run {
         this.health = health;
     }
 
-    private Duration fetchOnTimeFromSomeWhere() {
-        //TODO: fetch this from rundb or something
-        return Duration.standardSeconds(290);
-    }
-
     public Run(Data item) {
 
         this.source = (String) item.get("Source");

@@ -1,4 +1,4 @@
-package fact.rta;
+package fact.rta.rest;
 
 import java.io.File;
 

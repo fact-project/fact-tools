@@ -7,10 +7,10 @@ import com.google.gson.stream.JsonWriter;
 
 import fact.auxservice.AuxPoint;
 import fact.rta.db.Run;
-import fact.rta.rest.LightCurveBin;
+import fact.rta.rest.LightCurve;
 import fact.rta.db.Signal;
+import fact.rta.rest.StatusContainer;
 import org.joda.time.DateTime;
-import org.joda.time.Minutes;
 import org.joda.time.Seconds;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
@@ -93,7 +93,6 @@ public class RTAWebService implements Service {
 
     private TreeMap<DateTime, RTAEvent> eventMap = new TreeMap<>();
     private TreeMap<DateTime, Double> rateMap = new TreeMap<>();
-    private TreeMap<DateTime, StatusContainer> systemStatusMap = new TreeMap<>();
 
 
     private ArrayList<Signal> signals = new ArrayList<>();
@@ -113,19 +112,32 @@ public class RTAWebService implements Service {
             return new ModelAndView(attributes, "index.html");
         }, new HandlebarsTemplateEngine("/rta"));
 
-        Spark.get("/lightcurve", (request, response) -> {
-            DateTime start = DateTime.parse(request.queryParams("start"));
-            DateTime end = DateTime.parse(request.queryParams("end"));
-            Integer binning = Integer.parseInt(request.queryParams("binning"));
+        Spark.get("/lightcurve", (request, response) ->
+                {
+                    DateTime start = DateTime.parse(request.queryParams("start"));
+                    DateTime end = DateTime.parse(request.queryParams("end"));
+                    Integer binning = Integer.parseInt(request.queryParams("binning"));
 
-            return getLightCurve(start, end, binning);
-        }, gson::toJson);
+                    return new LightCurve.LightCurveFromDB(dbInterface)
+                            .withBinning(binning)
+                            .withStartTime(start)
+                            .withEndTime(end)
+                            .create();
 
-        Spark.get("/datarate",  (request, response) -> getDataRates(request.queryParams("timestamp")), gson::toJson);
+                },
+                gson::toJson);
 
-        Spark.get("/event", (request, response) -> getLatestEvent(), gson::toJson);
+        Spark.get("/datarate",  (request, response) ->
+                {
+                    DateTime timestamp = DateTime.parse(request.queryParams("timestamp"));
+                    return getDataRates(timestamp);
+                },
+                gson::toJson);
 
-        Spark.get("/status",  (request, response) -> currentStatus, gson::toJson);
+
+        Spark.get("/event",  (request, response) -> getLatestEvent(), gson::toJson);
+
+        Spark.get("/status", (request, response) -> currentStatus, gson::toJson);
 
         Spark.exception(NumberFormatException.class, (e, req, res) ->{
             res.status(400);
@@ -150,7 +162,7 @@ public class RTAWebService implements Service {
         }, (long) (0.1 * MINUTE), (long) (0.5*MINUTE));
 
 
-        Signals.register(i -> t.cancel());
+//        Signals.register(i -> t.cancel());
     }
 
     public void init(){
@@ -176,8 +188,9 @@ public class RTAWebService implements Service {
         }
         else if (!currentRun.equals(newRun)){
 
-            log.info("New run found. Fetching ontime.");
-            //fetch ontime from rundb?
+            log.info("New run found. Fetching ontime of previous run.");
+
+            //I underestimate the actual ontime this way. One could interpolate between the points between two runs.
             double onTimeInSeconds = ftmPointsForNight
                     .stream()
                     .filter(p -> {
@@ -234,14 +247,14 @@ public class RTAWebService implements Service {
         return null;
     }
 
-    private ArrayList<RTADataRate> getDataRates(String timeStamp){
+    private ArrayList<RTADataRate> getDataRates(DateTime timeStamp){
         if (rateMap.isEmpty()) {
             return null;
         }
 
         NavigableMap<DateTime, Double> resultMap;
         if (timeStamp != null) {
-            resultMap = rateMap.tailMap(DateTime.parse(timeStamp), false).descendingMap();
+            resultMap = rateMap.tailMap(timeStamp, false).descendingMap();
         }
         else {
             resultMap = rateMap.descendingMap();
@@ -260,64 +273,6 @@ public class RTAWebService implements Service {
         }
     }
 
-
-
-//    private NavigableMap<DateTime, StatusContainer> getSystemStatus(String timeStamp){
-//        if(systemStatusMap.isEmpty()){
-//            return null;
-//        }
-//        if (timeStamp != null) {
-//            return systemStatusMap.tailMap(DateTime.parse(timeStamp), false);
-//        }
-//        return systemStatusMap.descendingMap();
-//    }
-
-
-
-    private List<LightCurveBin> getLightCurve(DateTime startTime, DateTime endTime, int binningInMinutes) throws NumberFormatException{
-        double alpha = 0.2;
-        double predictionThreshold = 0.95;
-        double thetaThreshold = 0.04;
-
-        ArrayList<LightCurveBin> lc = new ArrayList<>();
-
-        final List<Signal> signalEntries = dbInterface.getSignalEntriesBetweenDates(startTime.toString("YYYY-MM-dd HH:mm:ss"), endTime.toString("YYYY-MM-dd HH:mm:ss"));
-
-        //fill a treemap
-        TreeMap<DateTime, Signal> dateTimeRTASignalTreeMap = new TreeMap<>();
-        signalEntries.forEach(a -> dateTimeRTASignalTreeMap.put(a.eventTimestamp, a));
-
-        //iterate over all the bins
-        for (int bin = 0; bin < binningInMinutes; bin++) {
-            //get all entries in bin
-            SortedMap<DateTime, Signal> subMap = dateTimeRTASignalTreeMap.subMap(startTime, startTime.plusMinutes(bin));
-            Stream<Signal> rtaSignalStream = subMap.entrySet().stream().map(Map.Entry::getValue);
-
-            //get on time in this bin by summing the ontimes per event in each row
-            double onTimeInBin = rtaSignalStream.mapToDouble(a -> a.onTimePerEvent).sum();
-
-            //select gamma like events and seperate signal and background region
-            Stream<Signal> gammaLike = rtaSignalStream.filter(s -> s.prediction > predictionThreshold);
-
-            int signal = (int) gammaLike
-                    .filter(s -> s.theta < thetaThreshold)
-                    .count();
-
-            int background = (int) gammaLike
-                    .filter(s-> (
-                            s.theta_off_1 < thetaThreshold ||
-                            s.theta_off_2 < thetaThreshold ||
-                            s.theta_off_3 < thetaThreshold ||
-                            s.theta_off_4 < thetaThreshold ||
-                            s.theta_off_5 < thetaThreshold
-                    ))
-                    .count();
-            LightCurveBin lightCurveBin = new LightCurveBin(startTime, startTime.plusMinutes(bin), background, signal, alpha, onTimeInBin);
-            lc.add(lightCurveBin);
-
-        }
-        return lc;
-    }
 
     @Override
     public void reset() throws Exception {
