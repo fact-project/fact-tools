@@ -115,7 +115,7 @@ public class RTADataBase {
                 "source varchar(50)," +
                 "health varchar(50)," +
                 "PRIMARY KEY (night, run_id))")
-        void createRunTable();
+        void createRunTableIfNotExists();
 
 
         @SqlUpdate("CREATE TABLE IF NOT EXISTS signal " +
@@ -134,7 +134,7 @@ public class RTADataBase {
                     "on_time_per_event FLOAT," +
                     "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id)" +
                 ")")
-        void createSignalTable();
+        void createSignalTableIfNotExists();
 
         /**
          * close with no args is used to close the connection

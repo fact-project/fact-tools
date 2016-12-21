@@ -17,10 +17,11 @@ import org.junit.rules.TemporaryFolder;
 import org.skife.jdbi.v2.DBI;
 import stream.Data;
 import stream.io.SourceURL;
+import sun.awt.image.OffScreenImage;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashSet;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -72,7 +73,7 @@ public class JDBITest {
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
-        rtaTables.createRunTable();
+        rtaTables.createRunTableIfNotExists();
         Run run = new Run(item);
         rtaTables.insertRun(run);
     }
@@ -91,15 +92,15 @@ public class JDBITest {
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
-        rtaTables.createRunTable();
+        rtaTables.createRunTableIfNotExists();
         Run run = new Run(item);
         rtaTables.insertRun(run);
 
-        rtaTables.createSignalTable();
+        rtaTables.createSignalTableIfNotExists();
 
 
-        DateTime eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
-        Signal s = new Signal(eventTime, DateTime.now(), item, run);
+        OffsetDateTime eventTime = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(RuntimeException::new);
+        Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
         rtaTables.insertSignal(s);
         //second insert should be ignored
         rtaTables.insertSignal(s);
@@ -110,9 +111,9 @@ public class JDBITest {
         item = prepareNextItem();
 
 
-        eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
+        eventTime = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(RuntimeException::new);
 
-        s = new Signal(eventTime, DateTime.now(),item, run);
+        s = new Signal(eventTime, OffsetDateTime.now(),item, run);
         rtaTables.insertSignal(s);
         rtaTables.insertSignal(s);
 
@@ -134,14 +135,14 @@ public class JDBITest {
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
-        rtaTables.createRunTable();
+        rtaTables.createRunTableIfNotExists();
         Run run = new Run(item);
         rtaTables.insertRun(run);
 
-        rtaTables.createSignalTable();
+        rtaTables.createSignalTableIfNotExists();
         for (int i = 1; i < 11; i++) {
-            DateTime eventTime = DateTime.parse(String.format("2016-01-%1$02dT00:33:22", i ));
-            Signal s = new Signal(eventTime, DateTime.now(), item, run);
+            OffsetDateTime eventTime = OffsetDateTime.parse(String.format("2016-01-%1$02dT00:33:22+00:00", i ));
+            Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
             rtaTables.insertSignal(s);
         }
 
@@ -151,10 +152,10 @@ public class JDBITest {
         signalEntries = rtaTables.getSignalEntriesBetweenDates("2016-01-01", "2016-01-06");
         assertThat(signalEntries.size(), is(5));
 
-        rtaTables.createSignalTable();
+        rtaTables.createSignalTableIfNotExists();
         for (int i = 1; i < 60; i++) {
-            DateTime eventTime = DateTime.parse(String.format("2016-02-01T00:%1$02d:22", i ));
-            Signal s = new Signal(eventTime, DateTime.now(), item, run);
+            OffsetDateTime eventTime = OffsetDateTime.parse(String.format("2016-02-01T00:%1$02d:22+00:00", i ));
+            Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
             rtaTables.insertSignal(s);
         }
 
@@ -173,7 +174,7 @@ public class JDBITest {
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
-        rtaTables.createRunTable();
+        rtaTables.createRunTableIfNotExists();
         Run run = new Run(item);
         rtaTables.insertRun(run);
 
@@ -198,7 +199,7 @@ public class JDBITest {
 
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
-        rtaTables.createRunTable();
+        rtaTables.createRunTableIfNotExists();
 
         Run run = new Run(item);
         rtaTables.insertRun(run);
@@ -221,7 +222,7 @@ public class JDBITest {
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());
         RTADataBase.DBInterface rtaTables = dbi.open(RTADataBase.DBInterface.class);
 
-        rtaTables.createRunTable();
+        rtaTables.createRunTableIfNotExists();
 
         for (int i = 0; i < 15; i++) {
             Data item = prepareNextItem();

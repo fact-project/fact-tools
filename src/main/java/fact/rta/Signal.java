@@ -7,6 +7,7 @@ import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
 import org.joda.time.DateTime;
 
+import org.joda.time.format.DateTimeFormatter;
 import org.jpmml.evaluator.ProbabilityDistribution;
 import stream.*;
 import stream.annotations.Parameter;
@@ -14,6 +15,8 @@ import stream.annotations.Service;
 
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -77,7 +80,9 @@ public class Signal implements Processor {
                     orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
 
-            webService.updateEvent(eventTimeStamp, data, points);
+
+
+            webService.updateEvent(OffsetDateTime.parse(eventTimeStamp.toString()), data, points);
 
         }
         return data;

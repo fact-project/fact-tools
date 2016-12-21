@@ -17,7 +17,11 @@ import java.lang.annotation.*;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Created by mackaiver on 07/09/16.
@@ -34,8 +38,8 @@ public class Run {
                     r.getInt("night"),
                     r.getInt("run_id"),
                     r.getString("source"),
-                    DateTime.parse(r.getString("start_time")).withZone(DateTimeZone.UTC),
-                    DateTime.parse(r.getString("end_time")).withZone(DateTimeZone.UTC),
+                    OffsetDateTime.parse(r.getString("start_time")).withOffsetSameInstant(ZoneOffset.UTC),
+                    OffsetDateTime.parse(r.getString("end_time")).withOffsetSameInstant(ZoneOffset.UTC),
                     Duration.standardSeconds(r.getLong("on_time")),
                     RTADataBase.HEALTH.valueOf(r.getString("health"))
             );
@@ -66,18 +70,18 @@ public class Run {
     }
 
 
-    final String source;
+    public final String source;
     public final int runID;
     public final int night;
-    public final DateTime startTime;
-    public final DateTime endTime;
+    public final OffsetDateTime startTime;
+    public final OffsetDateTime endTime;
     public final Duration onTime;
 
 
 
     public final RTADataBase.HEALTH health;
 
-    public Run(int night, int runID, String source, DateTime start, DateTime end, Duration onTime, RTADataBase.HEALTH health) {
+    public Run(int night, int runID, String source, OffsetDateTime  start, OffsetDateTime  end, Duration onTime, RTADataBase.HEALTH health) {
         this.source = source;
         this.runID = runID;
         this.night = night;
@@ -94,8 +98,8 @@ public class Run {
         this.night = (int) item.get("NIGHT");
         this.onTime = Duration.ZERO;
 
-        this.startTime = DateTime.parse((String) item.get("DATE-OBS")).withZoneRetainFields(DateTimeZone.UTC);
-        this.endTime = DateTime.parse((String) item.get("DATE-END")).withZoneRetainFields(DateTimeZone.UTC);
+        this.startTime = LocalDateTime.parse((String) item.get("DATE-OBS")).atOffset(ZoneOffset.UTC);
+        this.endTime = LocalDateTime.parse((String) item.get("DATE-END")).atOffset(ZoneOffset.UTC);
         this.health = RTADataBase.HEALTH.UNKNOWN;
     }
 

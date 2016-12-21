@@ -1,7 +1,6 @@
 package fact.rta.db;
 
 
-import org.joda.time.DateTime;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Binder;
 import org.skife.jdbi.v2.sqlobject.BinderFactory;
@@ -13,9 +12,9 @@ import stream.Data;
 import stream.Keys;
 
 import java.lang.annotation.*;
-import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 public class Signal {
@@ -26,8 +25,8 @@ public class Signal {
     {
         public Signal map(int index, ResultSet r, StatementContext ctx) throws SQLException
         {
-            DateTime eventTimestamp = DateTime.parse(r.getString("event_timestamp"));
-            DateTime analyisTimestamp = DateTime.parse(r.getString("analysis_timestamp"));
+            OffsetDateTime eventTimestamp = OffsetDateTime.parse(r.getString("event_timestamp"));
+            OffsetDateTime analyisTimestamp = OffsetDateTime.parse(r.getString("analysis_timestamp"));
             double theta_on = r.getDouble("theta_on");
             double theta_off_1 = r.getDouble("theta_off_1");
             double theta_off_2 = r.getDouble("theta_off_2");
@@ -91,12 +90,12 @@ public class Signal {
     public final double theta_off_4;
     public final double theta_off_5;
     public final double theta;
-    public final DateTime eventTimestamp;
-    public final DateTime analysisTimestamp;
+    public final OffsetDateTime eventTimestamp;
+    public final OffsetDateTime analysisTimestamp;
 
     public double onTimePerEvent;
 
-    public Signal(DateTime eventTimestamp, DateTime analysisTimestamp, Data item, Run run) {
+    public Signal(OffsetDateTime eventTimestamp, OffsetDateTime analysisTimestamp, Data item, Run run) {
 
         this.run = run;
         this.theta = (double) item.get("Theta");
@@ -113,8 +112,8 @@ public class Signal {
         this.analysisTimestamp = analysisTimestamp;
     }
 
-    public Signal(DateTime eventTimestamp,
-                  DateTime analysisTimestamp,
+    public Signal(OffsetDateTime eventTimestamp,
+                  OffsetDateTime analysisTimestamp,
                   double theta,
                   double theta_off_1,
                   double theta_off_2,

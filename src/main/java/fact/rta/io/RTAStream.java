@@ -97,8 +97,8 @@ public class RTAStream extends AbstractMultiStream {
 
         DBI dbi = new DBI(jdbcConnection);
         dbInterface = dbi.open(RTADataBase.DBInterface.class);
-        dbInterface.createRunTable();
-        dbInterface.createSignalTable();
+        dbInterface.createRunTableIfNotExists();
+        dbInterface.createSignalTableIfNotExists();
 
         long MINUTE = 60 * 1000;
         new Timer().scheduleAtFixedRate(updater, 0, 10* MINUTE);

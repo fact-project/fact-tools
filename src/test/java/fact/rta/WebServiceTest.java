@@ -18,6 +18,8 @@ import stream.io.SourceURL;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static org.hamcrest.core.Is.is;
@@ -48,12 +50,12 @@ public class WebServiceTest {
         item.put("Theta", 0.005);
         item.put("Theta_Off_1", 0.1);
         item.put("Theta_Off_2", 0.3);
-        item.put("Theta_Off_3", 0.6);
+        item.put("Theta_Off_3", 0.6*Math.random());
         item.put("Theta_Off_4", 0.7);
-        item.put("Theta_Off_5", 0.1);
+        item.put("Theta_Off_5", 0.1*Math.random());
         item.put("Size", 540.1);
-        item.put("signal:prediction", 0.9);
-        item.put("signal:thetasquare", 0.1);
+        item.put("signal:prediction", 3*Math.random());
+        item.put("signal:thetasquare", 0.05*Math.random());
         item.put("energy", 21356.7);
         item.put("SourceName", "Test Source");
         item.put("photoncharge", new Random().doubles(1440, 0.0, 5000.0).toArray());
@@ -63,20 +65,44 @@ public class WebServiceTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-//    @Test
-//    public void startServer() throws Exception {
-//        RTAWebService s = new RTAWebService();
-//        s.jdbcConnection = "jdbc:sqlite:./test.sqlite";
-//
-//        for (int i = 0; i < 3600; i++) {
-//            Thread.sleep(1100);
-//
-//            DateTime now = DateTime.now();
-//            s.updateEvent(now, prepareNextItem());
-//            s.updateDataRate(now , new Random().nextDouble()*15 + 80);
-//        }
-//        fail();
-//    }
+    @Test
+    public void startServer() throws Exception {
+        RTAWebService s = new RTAWebService();
+        File dbFile  = folder.newFile("data.sqlite");
+        s.jdbcConnection = "jdbc:sqlite:"+dbFile.getCanonicalPath();
+
+
+        Set<AuxPoint> ftmPoints = new HashSet<>();
+
+        DateTime dateTime = DateTime.parse("2013-01-21T00:30:00+00:00");
+
+        for (int run = 1; run < 100; run++) {
+            DateTime startTime = dateTime.plusMinutes(5 * (run - 1));
+            DateTime endTime = dateTime.plusMinutes(5 * run);
+            for (int i = 0; i < 300; i++) {
+
+                Data item = prepareNextItem();
+                item.put("RUNID", run);
+                item.put("DATE-OBS", startTime.toLocalDateTime().toString());
+                item.put("DATE-END", endTime.toLocalDateTime().toString());
+
+                DateTime utc = startTime.plusSeconds(i);
+                Map<String, Serializable> map = new HashMap<>();
+                map.put("OnTime", 4.0f);
+                ftmPoints.add(new AuxPoint(utc, map));
+//            ftmPoints.add(new AuxPoint(utc.plusMillis(500), map));
+
+                s.updateEvent(OffsetDateTime.parse(utc.toString()), item, ftmPoints);
+                OffsetDateTime now = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+                s.updateDataRate(now , new Random().nextDouble()*15 + 80);
+
+                Thread.sleep(10);
+            }
+        }
+
+
+        fail();
+    }
 
 
     @Test
@@ -106,7 +132,7 @@ public class WebServiceTest {
             map.put("OnTime", 4.0f);
 
             ftmPoints.add(new AuxPoint(utc, map));
-            s.updateEvent(utc, item, ftmPoints);
+            s.updateEvent(OffsetDateTime.parse(utc.toString()), item, ftmPoints);
         }
 
 
@@ -117,7 +143,7 @@ public class WebServiceTest {
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 1);
-        DateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+        OffsetDateTime utc = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(Exception::new);
         s.updateEvent(utc, item, ftmPoints);
 
 
@@ -134,10 +160,10 @@ public class WebServiceTest {
             item.put("NIGHT", night);
             item.put("RUNID", runID + 1);
 
-            utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+            utc = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(Exception::new);
             Map<String, Serializable> map = new HashMap<>();
             map.put("OnTime", 4.0f);
-            ftmPoints.add(new AuxPoint(utc, map));
+            ftmPoints.add(new AuxPoint(AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new), map));
 
             s.updateEvent(utc, item, ftmPoints);
         }
@@ -149,7 +175,7 @@ public class WebServiceTest {
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 2);
-        utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+        utc = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(Exception::new);
         s.updateEvent(utc, item, ftmPoints);
 
 
