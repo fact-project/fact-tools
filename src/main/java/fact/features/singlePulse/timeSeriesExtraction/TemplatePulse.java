@@ -44,14 +44,10 @@ public class TemplatePulse {
     */
     public static double[] factSinglePePulse(int lengthInSlices) {
 
-        final double periodeSliceInNs = 0.5;
+        final double[] time = timeSeries(lengthInSlices);
 
-        final double[] time = new double[lengthInSlices];
-        for (int i = 0; i < time.length; i++) {time[i] = i*periodeSliceInNs;}
-
-        double[] template = new double[lengthInSlices];
-        for (int i = 0; i < time.length; i++) {
-
+        final double[] template = new double[lengthInSlices];
+        for (int i=0; i<time.length; i++) {
             final double amplitude = 
                 1.626*
                 (1.0-Math.exp(-0.3803*time[i]))
@@ -64,5 +60,37 @@ public class TemplatePulse {
             }
         }
         return template;
+    }
+
+
+    public static double [] performancePaper(int lengthInSlices) {
+
+        final double[] time = timeSeries(lengthInSlices);
+        // from the FACT performance paper:
+        // Calibration and performance of the photon sensor
+        // response of FACT — the first G-APD Cherenkov telescope
+        // doi:10.1088/1748-0221/9/10/P10012
+        // Equation 2.7 and Table 5:
+        final double c = 1.57;
+        final double t0 = 2.7;
+        final double tau = 0.9;
+        final double lambda = 19;
+
+        final double normalization = 0.7707; // ensure the max pulse amplitude is 1.0
+
+        final double[] template = new double[lengthInSlices];
+        for (int i=0; i<time.length; i++) {
+            template[i] = normalization * 
+                c*(1.0 - 1.0/(1.0 + Math.exp((time[i] - t0)/tau))) *  
+                Math.exp(-((time[i] - t0)/lambda));
+        }
+        return template;        
+    }
+
+    public static double [] timeSeries(int lengthInSlices) {
+        final double slicePeriodeInNs = 0.5;
+        final double[] time = new double[lengthInSlices];
+        for (int i=0; i<time.length; i++) {time[i] = i*slicePeriodeInNs;}
+        return time;   
     }
 }
