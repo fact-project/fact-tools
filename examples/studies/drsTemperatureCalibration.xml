@@ -1,0 +1,36 @@
+<container>
+  <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
+  <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+  <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
+  <property name="fitValueFile" value="file:src/main/resources/aux/fitValuesData.fits" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+  <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
+
+  <!-- Description of the process and the corresponding stream -->
+  <process id="2" input="fact">
+
+  <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
+
+  <fact.datacorrection.DrsTemperatureCalibration
+    auxService="auxService"
+    url_fitValueFile="${fitValueFile}"
+    key="Data"
+    outputKey="DataCalibratedDRS_Temp"
+    />
+
+  <fact.datacorrection.DrsCalibration
+    url="${drsfile}"
+    key="Data"
+    outputKey="DataCalibratedDRS"
+  />
+
+    <fact.ShowViewer key="DataCalibratedDRS_Temp" />
+  </process>
+</container>
