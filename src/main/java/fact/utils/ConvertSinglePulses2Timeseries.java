@@ -31,9 +31,9 @@ public class ConvertSinglePulses2Timeseries implements Processor {
 
         int[][] singlePulses = (int[][]) input.get(singlePulsesKey);
 
-        double[] baseLine = new double[singlePulses.length];
+        int[] centiBaseLines = new int[singlePulses.length];
         if(baseLineKey != null) {
-            baseLine = (double[]) input.get(baseLineKey);
+            centiBaseLines = (int[]) input.get(baseLineKey);
         }
 
         double[] pulseTemplate = TemplatePulse.factSinglePePulse(roi);
@@ -48,20 +48,22 @@ public class ConvertSinglePulses2Timeseries implements Processor {
             // Add the single pulses to the time series
             for (int pulse = 0; pulse < singlePulses[pix].length; pulse++) {
                 AddFirstArrayToSecondArray.at(
-                    pulseTemplate, 
-                    currentTimeSeries, 
+                    pulseTemplate,
+                    currentTimeSeries,
                     singlePulses[pix][pulse]);
             }
 
             // Add the baseline to the time series
-            currentTimeSeries = ElementWise.add(currentTimeSeries, baseLine[pix]);
+            currentTimeSeries = ElementWise.add(
+                currentTimeSeries,
+                ((double)centiBaseLines[pix]) / 100.);
 
             timeSeries = ArrayUtils.addAll(timeSeries, currentTimeSeries);
         }
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         timeSeries = ElementWise.multiply(
-            timeSeries, 
+            timeSeries,
             config.factSinglePeAmplitudeInMv);
 
         input.put(timeSeriesKey, timeSeries);
