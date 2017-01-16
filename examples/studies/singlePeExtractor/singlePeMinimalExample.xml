@@ -41,7 +41,7 @@
         <!-- Data Time Series Reconstruction from Single Pe Data -->
         <fact.utils.ConvertSinglePulses2Timeseries
                 singlePulsesKey="PhotonArrivals"
-                baseLineKey="PhotonArrivalsBaseLine"
+                baseLineKey="PhotonArrivalsCentiBaseLines"
                 timeSeriesKey="DataReconstructed"
         />
 
