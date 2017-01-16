@@ -64,7 +64,7 @@ public class SinglePulseExtraction implements Processor {
 
         double[] numberOfPulses = new double[npix];
         int[][] pixelArrivalSlices = new int[npix][];
-        double[] baseLine = new double[npix];
+        int[] baseLine = new int[npix];
         double[][] timeSeriesAfterExtraction = new double[npix][];
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
@@ -92,7 +92,7 @@ public class SinglePulseExtraction implements Processor {
             timeSeriesAfterExtraction[pix] = ElementWise.multiply(
                 result.timeSeriesAfterExtraction, 
                 config.factSinglePeAmplitudeInMv);
-            baseLine[pix] = result.timeSeriesBaseLine();
+            baseLine[pix] = (int) Math.round(result.timeSeriesBaseLine() * 100);
         }
 
         addStartSliceOffset(pixelArrivalSlices);
