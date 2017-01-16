@@ -13,6 +13,23 @@ import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
  * Extracts a list of arrival slice positions of photons for each pixel
  * time line.
  *
+ * Only a fraction of the whole time series is analysed, this is
+ * called extraction window.
+ * Artifacts of the *extraction window* borders are removed from
+ * the lists of found single pulses. This is implemented by introducing
+ * the *output window*.
+ *
+ * slices:
+ *                        whole time series
+ * |.......................................................................|
+ * |                                                                       |
+ * |         |................ extraction window .................|        |
+ * |         | <---------- length = 225 ------------------------> |        |
+ * |         |                                                    |        |
+ * |         |       |.. output window ..|                        |        |
+ * 0        20       | <- length=100 ->  |                       245      300
+ *                  30                  130
+ *
  * Created by Sebastian Mueller
  * and some modifications from Jens Buss
 */
@@ -21,8 +38,8 @@ public class SinglePulseExtraction implements Processor {
     private String dataKey = null;
 
     @Parameter(
-        required = true, 
-        description =   "output key, a list of lists of arrival slices of "+ 
+        required = true,
+        description =   "output key, a list of lists of arrival slices of "+
                         "photons found in each pixel"
     )
     private String outputKey = null;
@@ -36,18 +53,32 @@ public class SinglePulseExtraction implements Processor {
     protected int maxIterations = 4000;
 
     @Parameter(
-        required = false, 
-        description = "start slice of extraction window", 
+        required = false,
+        description = "start slice of extraction window",
         defaultValue = "20"
     )
-    protected int startSlice = 20;
+    protected int startSliceExtractionWindow = 20;
 
     @Parameter(
-        required = false, 
-        description = "extraction window length in slices", 
+        required = false,
+        description = "start slice of output window",
+        defaultValue = "30"
+    )
+    protected int startSliceOutputWindow = 30;
+
+    @Parameter(
+        required = false,
+        description = "output window length in slices",
+        defaultValue = "100"
+    )
+    protected int outputWindowLengthInSlices = 100;
+
+    @Parameter(
+        required = false,
+        description = "extraction window length in slices",
         defaultValue = "225"
     )
-    protected int windowLength = 225;
+    protected int extractionWindowLengthInSlices = 225;
 
     private int npix = Constants.NUMBEROFPIXEL;
     private int roi  = 300;
@@ -69,18 +100,19 @@ public class SinglePulseExtraction implements Processor {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = maxIterations;
-        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
+
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         for (int pix = 0; pix < npix; pix++) {
-            int start = pix*roi+startSlice;
-            int end = start + windowLength;
+            int start = pix*roi+startSliceExtractionWindow;
+            int end = start + extractionWindowLengthInSlices;
 
             double[] pixelTimeSeriesInMv = Arrays.copyOfRange(
                 timeSerieses,
-                start, 
+                start,
                 end
             );
-            
+
             double[] pixelTimeSeries = ElementWise.multiply(
                 pixelTimeSeriesInMv, 1.0/config.factSinglePeAmplitudeInMv);
 
@@ -88,9 +120,11 @@ public class SinglePulseExtraction implements Processor {
                 pixelTimeSeries);
 
             numberOfPulses[pix] = result.numberOfPulses();
-            pixelArrivalSlices[pix] = result.pulseArrivalSlices;
+            pixelArrivalSlices[pix] = result.pulseArrivalSlicesInRange(
+                startSliceOutputWindow - startSliceExtractionWindow,
+                outputWindowLengthInSlices);
             timeSeriesAfterExtraction[pix] = ElementWise.multiply(
-                result.timeSeriesAfterExtraction, 
+                result.timeSeriesAfterExtraction,
                 config.factSinglePeAmplitudeInMv);
             baseLine[pix] = result.timeSeriesBaseLine();
         }
@@ -109,7 +143,7 @@ public class SinglePulseExtraction implements Processor {
         for(int pix=0; pix<arr.length; pix++) {
             for(int ph=0; ph<arr[pix].length; ph++) {
                 int slice_with_offset = arr[pix][ph];
-                arr[pix][ph] = slice_with_offset + startSlice;
+                arr[pix][ph] = slice_with_offset + startSliceExtractionWindow;
             }
         }
     }
@@ -124,12 +158,20 @@ public class SinglePulseExtraction implements Processor {
         this.outputKey = outputKey;
     }
 
-    public void setStartSlice(int startSlice) {
-        this.startSlice = startSlice;
+    public void setStartSliceExtractionWindow(int startSliceExtractionWindow) {
+        this.startSliceExtractionWindow = startSliceExtractionWindow;
     }
 
-    public void setWindowLength(int windowLength) {
-        this.windowLength = windowLength;
+    public void setStartSliceOutputWindow( int startSliceOutputWindow){
+        this.startSliceOutputWindow = startSliceOutputWindow;
+    }
+
+    public void setOutputWindowLengthInSlices( int outputWindowLengthInSlices){
+        this.outputWindowLengthInSlices = outputWindowLengthInSlices;
+    }
+
+    public void setExtractionWindowLengthInSlices(int extractionWindowLengthInSlices) {
+        this.extractionWindowLengthInSlices = extractionWindowLengthInSlices;
     }
 
     public void setMaxIterations(int maxIterations) {
