@@ -39,8 +39,8 @@ public class SinglePulseExtraction implements Processor {
 
     @Parameter(
         required = true,
-        description =   "output key, a list of lists of arrival slices of "+
-                        "photons found in each pixel"
+        description =   "output key: The value is a 2dim int array [1440][variable length]" +
+                        "of arrival slices of photons found in each pixel"
     )
     private String outputKey = null;
 
