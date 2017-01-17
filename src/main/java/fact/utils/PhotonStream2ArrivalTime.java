@@ -23,11 +23,15 @@ public class PhotonStream2ArrivalTime implements Processor {
         double[] arrivalTimes = new double[singlePulses.length];
 
         for (int pix = 0; pix < singlePulses.length; pix++) {
-            DescriptiveStatistics stat = new DescriptiveStatistics();
-            for (int slice: singlePulses[pix]){
-                stat.addValue((double) slice);
+            if (singlePulses[pix].length == 0){
+                arrivalTimes[pix] = 0.; // use zero instead of NaN - plotter likes no NaN
+            } else {
+                DescriptiveStatistics stat = new DescriptiveStatistics();
+                for (int slice: singlePulses[pix]){
+                    stat.addValue((double) slice);
+                }
+                arrivalTimes[pix] = stat.getPercentile(50);
             }
-            arrivalTimes[pix] = stat.getPercentile(50);
         }
         input.put(arrivalTimeKey, arrivalTimes);
         return input;
