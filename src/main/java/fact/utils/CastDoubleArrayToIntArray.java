@@ -23,8 +23,9 @@ public class CastDoubleArrayToIntArray implements Processor {
         double[] doubleArray = (double[]) input.get(inputKey);
         int[] intArray = new int[doubleArray.length];
 
-        for (int i=0; i<intArray.length; ++i)
+        for (int i=0; i<intArray.length; ++i){
             intArray[i] = (int) Math.round(doubleArray[i]);
+        }
 
         input.put(outputKey, intArray);
         return input;
