@@ -4,6 +4,7 @@ import java.util.Arrays;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class PhotonStream2ArrivalTime implements Processor {
     @Parameter(
@@ -22,26 +23,14 @@ public class PhotonStream2ArrivalTime implements Processor {
         double[] arrivalTimes = new double[singlePulses.length];
 
         for (int pix = 0; pix < singlePulses.length; pix++) {
-            arrivalTimes[pix] = this.getMedian(singlePulses[pix]);
+            DescriptiveStatistics stat = new DescriptiveStatistics();
+            for (int slice: singlePulses[pix]){
+                stat.addValue((double) slice);
+            }
+            arrivalTimes[pix] = stat.getPercentile(50);
         }
         input.put(arrivalTimeKey, arrivalTimes);
         return input;
-    }
-
-    public double getMedian(int[] pulses){
-        double median;
-        Arrays.sort(pulses);  // acts in place, but I guess this is no problem.
-
-        int len = pulses.length;
-        if (len == 0){
-            return 0; // The plot does not like Double.NaN, so I use 0.
-        }
-        if (len%2 == 1 ){
-            median =  pulses[(len - 1) / 2];
-        } else {
-            median =(pulses[len/2] + pulses[len/2 - 1]) / 2.;
-        }
-        return median;
     }
 
     public void setSinglePulsesKey(String singlePulsesKey) {
