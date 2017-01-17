@@ -52,7 +52,14 @@ public class SinglePulseExtractor {
         }
 
         /**
-         * @param: startSlice is with respect to extraction window start.
+         * Returns an int[] with arrivalSlices within the given range only.
+         *
+         * @param  startSlice      with respect to extraction window start.
+         * @param  lengthInSlices  the length in slices.
+         * @return      an int[] with arrivalSlices within the given range.
+         */
+        /**
+         * @param:
          */
         public int[] pulseArrivalSlicesInRange(
             int startSlice,
