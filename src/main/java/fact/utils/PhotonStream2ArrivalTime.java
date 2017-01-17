@@ -33,6 +33,9 @@ public class PhotonStream2ArrivalTime implements Processor {
         Arrays.sort(pulses);  // acts in place, but I guess this is no problem.
 
         int len = pulses.length;
+        if (len == 0){
+            return 0; // The plot does not like Double.NaN, so I use 0.
+        }
         if (len%2 == 1 ){
             median =  pulses[(len - 1) / 2];
         } else {
