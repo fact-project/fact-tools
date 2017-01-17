@@ -15,7 +15,7 @@ public class ElementwiseMultiplyDoubleArray implements Processor {
 
     @Parameter(
         required = true,
-        description = "Key to the output integer array."
+        description = "Key to the output double array."
     )
     protected String outputKey;
 
