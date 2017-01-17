@@ -1,6 +1,6 @@
 #Changelog for the fact-tools
 
-# Version 0.17.3 -- 17.01.2016
+# Version 0.17.3 -- 17.01.2017
 
 * output window: Cut out artifacts of SinglePulseExtractor.
 * add fact.utils.CastDoubleArrayToIntArray
