@@ -1,5 +1,10 @@
 #Changelog for the fact-tools
 
+# Version 0.17.4 -- 17.01.2017
+
+* add fact.utils.PhotonStream2ArrivalTime
+* add fact.utils.PhotonStream2NumberOfPhotons
+
 # Version 0.17.3 -- 17.01.2017
 
 * output window: Cut out artifacts of SinglePulseExtractor.
