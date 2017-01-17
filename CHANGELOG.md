@@ -3,6 +3,8 @@
 # Version 0.17.3 -- 17.01.2016
 
 * output window: Cut out artifacts of SinglePulseExtractor.
+* add fact.utils.CastDoubleArrayToIntArray
+* add fact.utils.ElementwiseMultiplyDoubleArray
 
 # Version 0.17.2 -- 05.12.2016
 
