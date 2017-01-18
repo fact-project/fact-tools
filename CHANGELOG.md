@@ -1,5 +1,9 @@
 #Changelog for the fact-tools
 
+# Version 0.17.4 -- 18.01.2017
+
+* No more default keys for the output writers (FITS and JSON). The former default keys are now among others set in 'src/main/resources/default/settings.properties'. 
+
 # Version 0.17.3 -- 17.01.2017
 
 * output window: Cut out artifacts of SinglePulseExtractor.
