@@ -1,5 +1,9 @@
 #Changelog for the fact-tools
 
+# Version 0.17.5 -- 18.01.2017
+
+* Always export the list of saturated pixel IDs to the data item instead of exporting it only if the list is not empty. 
+
 # Version 0.17.4 -- 18.01.2017
 
 * No more default keys for the output writers (FITS and JSON). The former default keys are now among others set in 'src/main/resources/default/settings.properties'. 
