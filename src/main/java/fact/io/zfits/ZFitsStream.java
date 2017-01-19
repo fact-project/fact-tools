@@ -27,6 +27,7 @@ import java.util.Map;
  * standard. See http://arxiv.org/abs/1506.06045.
  *
  */
+@Deprecated
 public class ZFitsStream extends AbstractStream{
     static Logger log = LoggerFactory.getLogger(ZFitsStream.class);
 

@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+@Deprecated
 public class FitsStream extends AbstractStream {
 	static Logger log = LoggerFactory.getLogger(FitsStream.class);
 
