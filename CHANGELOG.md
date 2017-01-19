@@ -1,4 +1,9 @@
-#Changelog for the fact-tools
+# Changelog for the fact-tools
+
+# Version 0.18.0 -- 19.01.2017
+
+* add fact.utils.PhotonStream2ArrivalTime
+* add fact.utils.PhotonStream2NumberOfPhotons
 
 # Version 0.17.5 -- 18.01.2017
 
