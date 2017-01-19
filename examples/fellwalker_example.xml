@@ -11,7 +11,7 @@
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <stream id="fact" class="fact.io.FitsStream"  url="${infile}"/>
+    <stream id="fact" class="fact.io.FITSStream" url="${infile}"/>
 
     <process id="2" input="fact">
 

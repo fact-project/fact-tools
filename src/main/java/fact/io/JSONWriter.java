@@ -119,17 +119,12 @@ public class JSONWriter implements StatefulProcessor {
     private Gson gson;
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
-    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
     
     boolean isFirstLine = true;
 
     @Override
     public Data process(Data data) {
         Data item = DataFactory.create();
-
-        for (String key: defaultKeys ){
-            item.put(key, data.get(key));
-        }
 
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));

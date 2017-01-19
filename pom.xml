@@ -4,9 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-
   <version>0.18.0</version>
-
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
