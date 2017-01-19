@@ -13,7 +13,7 @@ Simple configuration file can look as following:
 
 
 	<application>
-	  <stream id="fact" class="fact.io.FitsStream" 
+	  <stream id="fact" class="fact.io.FITSStream" 
 	  		url="classpath:/testDataFile.fits.gz"/>
 	
 	  <process input="fact">

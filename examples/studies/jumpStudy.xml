@@ -7,8 +7,8 @@
   <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
   <!-- Name des Streams und pfad zu dem Daten-File -->
-  <!-- <stream id="fact" class="fact.io.FitsStream"  url="file:${infile}" limit="100"/> -->
-  <stream id="fact" class="fact.io.FitsStream" url="${infile}" />
+  <!-- <stream id="fact" class="fact.io.FITSStream"  url="file:${infile}" limit="100"/> -->
+  <stream id="fact" class="fact.io.FITSStream" url="${infile}" />
   <process id="2" input="fact">
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5" />
     <!--         <fact.utils.CreateFakeStartCells outputKey="FStartCells" />
@@ -30,7 +30,7 @@
 			leftBorder="10"
 			signalFlankLimit="0.63"
 			lengthForFFT="32"
-			lengthAfterPosForFFT="10" 
+			lengthAfterPosForFFT="10"
 			ringingPeriode="11"
 			freqCompAmplLimit="2.0"
 			leftRingingFreq="0.18"
