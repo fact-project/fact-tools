@@ -2,8 +2,8 @@ package fact.features;
 
 import fact.extraction.BasicExtraction;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.FITSStream;
+import fact.io.FITSStreamTest;
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;
@@ -15,16 +15,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BasicExtractionTest {
-	
+
 	private DrsCalibration pr;
 	private BasicExtraction extraction;
-	
+
 	private final String positionsKey = "maxPositions";
 	private final String photonChargeKey = "photoncharge";
-	
+
 	@Before
 	public void setup() throws Exception {
-		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+		URL drsUrl =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
         pr.setUrl(new SourceURL(drsUrl));
         pr.setOutputKey("test");
@@ -33,7 +33,7 @@ public class BasicExtractionTest {
         extraction.setDataKey("test");
         extraction.setOutputKeyMaxAmplPos(positionsKey);
         extraction.setOutputKeyPhotonCharge(photonChargeKey);
-        extraction.setUrl(new SourceURL(FitsStreamTest.class
+        extraction.setUrl(new SourceURL(FITSStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 	}
 
@@ -41,9 +41,9 @@ public class BasicExtractionTest {
 	public void dataTypes() {
 		try
 		{
-			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+			URL dataUrl =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 			Data item = stream.read();
 			pr.init(null);
@@ -57,7 +57,7 @@ public class BasicExtractionTest {
 			fail("Could not read stream");
 		}
 	}
-	
+
 	@Test
 	public void maximum() {
 		double[] mockNegatives = {-12.0, -11.1, -0.2, -0.2};
@@ -67,7 +67,7 @@ public class BasicExtractionTest {
 		pos = extraction.calculateMaxPosition(0, 0, mockPositives.length, mockPositives.length, mockPositives);
 		assertTrue("Position should be array element 3, pos: " + pos,pos == 3);
 	}
-	
+
 	@Test
 	public void extraction() {
 		double[] data = {0.5,2.0,10.0,12.0,9.0,5.0,4.0};

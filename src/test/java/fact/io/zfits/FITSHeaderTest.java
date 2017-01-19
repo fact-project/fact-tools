@@ -5,17 +5,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import stream.io.SourceURL;
 import stream.util.parser.ParseException;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 
-public class FitsHeaderTest {
-	static Logger log = LoggerFactory.getLogger(FitsHeaderTest.class);
+public class FITSHeaderTest {
+	static Logger log = LoggerFactory.getLogger(FITSHeaderTest.class);
 
     List<String> headerStrings = new ArrayList<>();
 

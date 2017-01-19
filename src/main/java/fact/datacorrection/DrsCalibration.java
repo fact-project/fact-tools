@@ -1,9 +1,9 @@
 /**
- * 
+ *
  */
 package fact.datacorrection;
 
-import fact.io.FitsStream;
+import fact.io.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -55,18 +55,18 @@ public class DrsCalibration implements StatefulProcessor {
 
 	/**
 	 * This method reads the DRS calibration values from the given data source.
-	 * The datasource is expected to be a Fits file that provides at least one
+	 * The datasource is expected to be a FITS file that provides at least one
 	 * data item/row (only the first will be read).
-	 * 
+	 *
 	 * That item/row in turn is expected to contain a set of variables, e.g. the
 	 * BaselineMean, BaselineRms,...
-	 * 
+	 *
 	 * @param in
 	 *            sourceurl to be loaded
 	 */
 	protected void loadDrsData(SourceURL in) {
 		try {
-			FitsStream stream = new FitsStream(in);
+			FITSStream stream = new FITSStream(in);
 			stream.init();
 			drsData = stream.readNext();
 			log.debug("Read DRS data: {}", drsData);

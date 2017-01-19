@@ -1,7 +1,7 @@
 package fact.datacorrection;
 
 import fact.hexmap.FactPixelMapping;
-import fact.io.FitsStream;
+import fact.io.FITSStream;
 import fact.utils.LinearTimeCorrectionKernel;
 import stream.Data;
 import stream.ProcessContext;
@@ -124,7 +124,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
     protected double[] loadDrsTimeCalibConstants(SourceURL  in) {
         try {
 
-            FitsStream stream = new FitsStream(in);
+            FITSStream stream = new FITSStream(in);
             stream.init();
             drsTimeData = stream.readNext();
 

@@ -1,6 +1,6 @@
 package fact.io.zfits;
 
-import fact.io.FitsStream;
+import fact.io.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -13,7 +13,7 @@ import java.net.URL;
 public class TestFz implements Processor {
 	static Logger log = LoggerFactory.getLogger(TestFz.class);
 
-	private FitsStream compareStream = null;
+	private FITSStream compareStream = null;
 	private int currentEvent = 0;
 
 	@Override
@@ -31,13 +31,13 @@ public class TestFz implements Processor {
 		short[] dataCompare = ((short[])inputCompare.get("Data")).clone();
 		short[] startCellData = (short[])input.get("StartCellData");
 		short[] startCellDataCompare = (short[])inputCompare.get("StartCellData");
-		
+
 		int numSlices = ((Integer)input.get("NROI")).intValue();
 		int numSlicesCompare = ((Integer)inputCompare.get("NROI")).intValue();
 		if (numSlices!=numSlicesCompare) {
 			throw new RuntimeException("Slice number are diffrent. Event: "+this.currentEvent);
 		}
-		
+
 		int numChannel = ((Integer)input.get("NPIX")).intValue();
 		int numChannelCompare = ((Integer)inputCompare.get("NPIX")).intValue();
 		if (numChannel!=numChannelCompare) {
@@ -64,9 +64,9 @@ public class TestFz implements Processor {
 		this.currentEvent++;
 		return input;
 	}
-	
+
 	public void initCompareDataFile(SourceURL url) throws Exception {
-		this.compareStream = new FitsStream(url);
+		this.compareStream = new FITSStream(url);
 		this.compareStream.init();
 	}
 

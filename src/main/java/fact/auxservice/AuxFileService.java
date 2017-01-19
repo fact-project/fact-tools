@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
@@ -125,16 +124,23 @@ public class AuxFileService implements AuxiliaryService {
         ZFitsStream stream = new ZFitsStream(new SourceURL(pathToFile.toUri().toURL()));
         stream.setTableName(key.service.name());
         try {
-            stream.init();
-            Data slowData = stream.readNext();
-            while (slowData != null) {
-                double time = Double.parseDouble(slowData.get("Time").toString()) * 86400;// + 2440587.5;
-                DateTime t = new DateTime((long)(time*1000), DateTimeZone.UTC);
-                AuxPoint p = new AuxPoint(t, slowData);
-                result.add(p);
-                slowData = stream.readNext();
+            URL url = new URL(auxFileUrl.getProtocol(), auxFileUrl.getHost(), auxFileUrl.getPort(), auxFileUrl.getFile());
+            FITS fits = new FITS(url);
+            BinTable auxDataBinTable = fits.getBinTableByName(extname)
+                                           .orElseThrow(
+                                               () -> new RuntimeException("BinTable '" + extname + "' not in aux file")
+                                           );
+            BinTableReader auxDataBinTableReader = BinTableReader.forBinTable(auxDataBinTable);
+
+            while (auxDataBinTableReader.hasNext()) {
+                OptionalTypesMap<String, Serializable> auxData = auxDataBinTableReader.getNextRow();
+
+                auxData.getDouble("Time").ifPresent(time -> {
+                    DateTime t = new DateTime((long) (time * 24 * 60 * 60 * 1000), DateTimeZone.UTC);
+                    AuxPoint p = new AuxPoint(t, auxData);
+                    result.add(p);
+                });
             }
-            stream.close();
             return result;
         } catch (Exception e) {
             log.error("Failed to load data from AUX file: {}", e.getMessage());
