@@ -1,27 +1,4 @@
-# Changelog for the fact-tools
-
-# Version 0.18.0 -- 19.01.2017
-
-* A new reader for FITS and ZFITS files was added.
-* fact.io.zfits.ZFitsStream and fact.io.FITSStream are deprecated now in
-favour of the new fact.io.hdureader.FITSStream
-* add fact.utils.PhotonStream2ArrivalTime
-* add fact.utils.PhotonStream2NumberOfPhotons
-
-# Version 0.17.5 -- 18.01.2017
-
-* Always export the list of saturated pixel IDs to the data item instead of exporting it only if the list is not empty. 
-
-# Version 0.17.4 -- 18.01.2017
-
-* No more default keys for the output writers (FITS and JSON). The former default keys are now among others set in 'src/main/resources/default/settings.properties'. 
-
-# Version 0.17.3 -- 17.01.2017
-
-* output window: Cut out artifacts of SinglePulseExtractor.
-* add fact.utils.CastDoubleArrayToIntArray
-* add fact.utils.ElementwiseMultiplyDoubleArray
-
+#Changelog for the fact-tools
 
 # Version 0.17.2 -- 05.12.2016
 
