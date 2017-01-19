@@ -10,11 +10,11 @@ favour of the new fact.io.hdureader.FITSStream
 
 # Version 0.17.5 -- 18.01.2017
 
-* Always export the list of saturated pixel IDs to the data item instead of exporting it only if the list is not empty.
+* Always export the list of saturated pixel IDs to the data item instead of exporting it only if the list is not empty. 
 
 # Version 0.17.4 -- 18.01.2017
 
-* No more default keys for the output writers (FITS and JSON). The former default keys are now among others set in 'src/main/resources/default/settings.properties'.
+* No more default keys for the output writers (FITS and JSON). The former default keys are now among others set in 'src/main/resources/default/settings.properties'. 
 
 # Version 0.17.3 -- 17.01.2017
 
@@ -26,8 +26,8 @@ favour of the new fact.io.hdureader.FITSStream
 # Version 0.17.2 -- 05.12.2016
 
 * Reduced noise in `WaveformFluctuations`
-* added pedestal parameters to stdAnalysis
-* added WaveformFluctuations on shower pixel to the ouput of the standard analysis
+* added pedestal parameters to stdAnalysis 
+* added WaveformFluctuations on shower pixel to the ouput of the standard analysis 
 
 ## Version 0.17.1 -- 29.11.2016
 
@@ -132,11 +132,11 @@ data item was ever written
 ## Version 0.13.2 -- 06.04.2016
 
 * new Processor: `fact.extraction.TimeOverThresholdTL` allows to calculate the time over Threshold for a given window on the Timeline
-* `fact.features.singlePulse.FWHMPulses` now uses Doubles instead of Ints and throws NaNs in case of out-of-boundary issues
+* `fact.features.singlePulse.FWHMPulses` now uses Doubles instead of Ints and throws NaNs in case of out-of-boundary issues 
 
 ## Version 0.13.1 -- 06.04.2016
 
-* new Processor `fact.extraction.MeanCorrelation` to calculate the average covariance and correlation of the time series of neighboring pixels
+* new Processor `fact.extraction.MeanCorrelation` to calculate the average covariance and correlation of the time series of neighboring pixels 
 
 
 ## Version 0.13.0 -- 16.02.2016
@@ -144,10 +144,10 @@ data item was ever written
 * new package `fact.features.muon`
   * move `fact.features.MuonHoughTransform` to `fact.features.muon.HoughTransform`
   * new Processor `fact.features.muon.CircularFit` to fit a circle to the light distribution
-  * new Processor `fact.feautures.muon.GaussianFit` to fit a gaussian to the radial light
+  * new Processor `fact.feautures.muon.GaussianFit` to fit a gaussian to the radial light 
   distribution
   * example xml to show how these work: examples/studies/muon_fitting.xml
-* exceptions occuring in the functional tests are now logged
+* exceptions occuring in the functional tests are now logged 
 * new Processor `UnixTimeUTC2DateTime` to convert from a tuple of (seconds, microsends)
 to a DateTime object
 * new TypeAdapter in `JSONWriter` to write out `DateTime` objects as ISO string
@@ -155,7 +155,7 @@ to a DateTime object
 
 ## Version 0.12.3
 
-* `JSONWriter` now supports directly writing gzipped files with the
+* `JSONWriter` now supports directly writing gzipped files with the 
 option `gzip="true"`
 
 ## Version 0.12.2
@@ -170,16 +170,16 @@ Changes:
 ## Version 0.12.1
 Other changes:
 
-* Deleted unused xml files in project root.
+* Deleted unused xml files in project root. 
 * Fixed a bug in the SQLiteService which only allowed for data taken in January.
 * Replaced empty test sqlite file with real one.
 
-Changes in `fact.io.JSONWriter`
+Changes in `fact.io.JSONWriter` 
 
 * `json` format by default, optional `jsonl` format by using `jsonl="true"` in the `xml`
 * New `append` option, default is false, so existing files are overwritten.
 * The `keys` key is now evaluated using the `stream.Keys` class, so glob patterns now work.
-* Add flag `specialDoubleValuesAsString` to write special Double as strings for strict json compatability. See Issue #92 for more details. Via default special values are converted to `Infinity`, `-Infinity` and `NaN`.
+* Add flag `specialDoubleValuesAsString` to write special Double as strings for strict json compatability. See Issue #92 for more details. Via default special values are converted to `Infinity`, `-Infinity` and `NaN`. 
 
 
 No xmls in the example folder needed to be changed, although they are no behaving differently (output is `json`, not `jsonl` now).
@@ -250,7 +250,7 @@ How to adapt the xml files:
 The new pixel set package allows to perform set operations (union, intersection, difference,...) on sets of pixels. These processors allow to take the set of pixels after cleaning and e.g. calculate the set of non shower pixel without broken pixels.
 There is now also a pixelsets.Length processor, calculating the length of a pixelsets and replacing the NumberOfPixelInShower processor
 
-### PixelSetOverlay instead of int array
+### PixelSetOverlay instead of int array 
 All processors that work on a set of pixels or have a pixel set as result where changed such that:
 - Instead of an int array a PixelSetOverlay is stored in the data item
 - The so far used int array with cleaned pixels was removed.
@@ -262,7 +262,7 @@ The WaveformFluctuationsPixelSample processor is changed that way that it is pos
 
 ### Miscellaneous changes:
 
-- The impact parameter is now added to the outputfile in the standard mc analysis
+- The impact parameter is now added to the outputfile in the standard mc analysis    
 
 
 ## Version 0.9.7
@@ -306,7 +306,7 @@ Therefore a few changes were made in comparison to the previous version:
 SourcePosition operator:
 - The operator now uses the whole timestamp not only the seconds of the event time for calculating
  the source position and the correct tracking report
-- The operator uses the earlier strategy to find the tracking report from the aux file. (This is for reproducibility,
+- The operator uses the earlier strategy to find the tracking report from the aux file. (This is for reproducibility, 
  it will be changed in version 0.9.0 to the closest strategy)
 
 cleaning.xml in the classpath:
@@ -321,16 +321,16 @@ stdAnalysis:
 - The old delay file is used (This is for reproducibility, it will be changed in version 0.9.0)
 
 ## Version 0.8.8
-Added a replacement process to measure the performance of individual Processors.
+Added a replacement process to measure the performance of individual Processors. 
 You can use it like this:
-
+        
         <process class="fact.PerformanceMeasuringProcess" url="file:./measured_runtime.json" id="1" input="fact"
                 warmupIterations="33">
 
 ## Version 0.8.6
 
 A new tutorial package has been added. It contains some simple processors that hopefully help to understand the basic concepts
-of the analysis.
+of the analysis. 
 
 
 ## Version 0.8.0
@@ -338,7 +338,7 @@ of the analysis.
 
 The `ZFitsCalibration` processor does no longer exist. Its being handled by the `ZfitsStream` itsself.
 For reading good old .fits files (or ceres output) you still need the `fact.io.FitsStream`.
-
+ 
 To use any kind of data from an AuxFile you should now use the `AuxFileService` Service. (See the website for more details)
 
 The DrsCalibration processor now resides in the `fact.datacorrection` package along with such processors as
@@ -349,7 +349,7 @@ auxiliary files through the new AuxService. This fixes some bugs which would occ
 
 The SourcePosition operator now supports wobbled MonteCarlos (Ceres revision > 18159) and the output has been cleaned up.
 
-The major steps of the standard analysis have been grouped into .xml files which reside in classpath of the project.
+The major steps of the standard analysis have been grouped into .xml files which reside in classpath of the project. 
 (you can find them under ./src/main/resources/default/...)
 
 Cleaned up all the .xmls from the examples folder. All are checked by tests except for the GUI
@@ -382,10 +382,10 @@ Removed dependencies to old streams versions by removing all code depending on t
  `fact-tools/src/main/resources/long_term_constants_median.time.drs.fits`
 
 ## Version 0.7.5
-
+ 
  The Camera and Plotting Windows in the viewer can now also show Arrays of types other than double.
  We also implemented a new DrsTimeCalibration which you call as follows:
-
+ 
            <fact.datacorrection.DrsTimeCalibration
                    dataKey="DataCalibrated"
                    outputKey="DataCalibrationNeu"
