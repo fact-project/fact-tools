@@ -8,6 +8,16 @@ favour of the new fact.io.hdureader.FITSStream
 * add fact.utils.PhotonStream2ArrivalTime
 * add fact.utils.PhotonStream2NumberOfPhotons
 
+The AuxFileService now works looks like this 
+    
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/fact/aux/" />
+    .
+    .
+    .
+    <fact.features.source.SourcePosition    outputKey="sourcePosition"    auxService="auxService" />
+
+You just provide the path to the folder containing the aux files in the canonical file structure (year/month/day)
+    
 # Version 0.17.5 -- 18.01.2017
 
 * Always export the list of saturated pixel IDs to the data item instead of exporting it only if the list is not empty. 
