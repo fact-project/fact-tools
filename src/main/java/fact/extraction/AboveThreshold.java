@@ -30,7 +30,7 @@ public class AboveThreshold implements Processor {
         required = true,
         description = "Threshold value to be exceeded"
     )
-    protected short threshold = 1800;
+    protected double threshold = 1800;
 
     @Override
     public Data process(Data input) {
@@ -38,12 +38,12 @@ public class AboveThreshold implements Processor {
         final int npix = (Integer) input.get("NPIX");
         final int roi = (Integer) input.get("NROI");
         final short[] timeSerieses = (short[]) input.get(dataKey);
-
+        final short thresholdShort = (short)threshold;
         ArrayList<Integer> pixelsAboveThresholdList = new ArrayList<>();
         for (int pix=0; pix<npix; pix++) {
             for(int slice=0; slice<roi; slice++) {
                 final int pos = pix*roi + slice;
-                if(timeSerieses[pos] > threshold) {
+                if(timeSerieses[pos] > thresholdShort) {
                     pixelsAboveThresholdList.add(pix);
                     break;
                 }
@@ -67,7 +67,7 @@ public class AboveThreshold implements Processor {
         this.outputKey = outputKey;
     }
 
-    public void setThreshold(short threshold) {
+    public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
 }

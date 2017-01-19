@@ -23,7 +23,7 @@ public class AboveThresholdTest {
         AboveThreshold above = new AboveThreshold();
         above.setDataKey("data");
         above.setOutputKey("output");
-        above.setThreshold((short)1);
+        above.setThreshold(1);
         above.process(data);
         int[] pixelsAboveThreshold = (int[]) data.get("output");
         double ratio = (double) data.get("outputRatio");
@@ -57,7 +57,7 @@ public class AboveThresholdTest {
         AboveThreshold above = new AboveThreshold();
         above.setDataKey("data");
         above.setOutputKey("output");
-        above.setThreshold((short)5);
+        above.setThreshold(5);
         above.process(data);
 
         int[] pixelsAboveThreshold = (int[]) data.get("output");
@@ -88,7 +88,7 @@ public class AboveThresholdTest {
         AboveThreshold above = new AboveThreshold();
         above.setDataKey("data");
         above.setOutputKey("output");
-        above.setThreshold((short)5);
+        above.setThreshold(5);
         above.process(data);
 
         int[] pixelsAboveThreshold = (int[]) data.get("output");
@@ -118,7 +118,7 @@ public class AboveThresholdTest {
         AboveThreshold at = new AboveThreshold();
         at.setDataKey("data");
         at.setOutputKey("output");
-        at.setThreshold((short)10);
+        at.setThreshold(10);
         at.process(data);
 
         int[] pixelsAboveThreshold = (int[]) data.get("output");
@@ -131,7 +131,7 @@ public class AboveThresholdTest {
         AboveThreshold at2 = new AboveThreshold();
         at2.setDataKey("data");
         at2.setOutputKey("output");
-        at2.setThreshold((short)9);
+        at2.setThreshold(9);
         at2.process(data);
 
         pixelsAboveThreshold = (int[]) data.get("output");
