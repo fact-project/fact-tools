@@ -55,6 +55,7 @@ public class AboveThreshold implements Processor {
 
         input.put(outputKey, pixelsAboveThreshold);
         input.put(outputKey+"Ratio", ratioOfPixels);
+        input.put(outputKey+"Count", pixelsAboveThreshold.length);
         return input;
     }
 

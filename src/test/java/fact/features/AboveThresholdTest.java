@@ -27,6 +27,8 @@ public class AboveThresholdTest {
         above.process(data);
         int[] pixelsAboveThreshold = (int[]) data.get("output");
         double ratio = (double) data.get("outputRatio");
+        int count = (int) data.get("outputCount");
+        Assert.assertEquals(0, count);
         Assert.assertEquals(0.0, ratio);
         Assert.assertEquals(0, pixelsAboveThreshold.length);
     }
@@ -60,6 +62,8 @@ public class AboveThresholdTest {
 
         int[] pixelsAboveThreshold = (int[]) data.get("output");
         double ratio = (double) data.get("outputRatio");
+        int count = (int) data.get("outputCount");
+        Assert.assertEquals(3, count);
         Assert.assertEquals(3.0/1440.0, ratio);
         Assert.assertEquals(3, pixelsAboveThreshold.length);
         Assert.assertEquals(42, pixelsAboveThreshold[0]);
@@ -89,6 +93,8 @@ public class AboveThresholdTest {
 
         int[] pixelsAboveThreshold = (int[]) data.get("output");
         double ratio = (double) data.get("outputRatio");
+        int count = (int) data.get("outputCount");
+        Assert.assertEquals(1440, count);
         Assert.assertEquals(1440.0/1440.0, ratio);
         Assert.assertEquals(1440, pixelsAboveThreshold.length);
 
@@ -117,6 +123,8 @@ public class AboveThresholdTest {
 
         int[] pixelsAboveThreshold = (int[]) data.get("output");
         double ratio = (double) data.get("outputRatio");
+        int count = (int) data.get("outputCount");
+        Assert.assertEquals(0, count);
         Assert.assertEquals(0.0, ratio);
         Assert.assertEquals(0, pixelsAboveThreshold.length);
 
@@ -128,6 +136,8 @@ public class AboveThresholdTest {
 
         pixelsAboveThreshold = (int[]) data.get("output");
         ratio = (double) data.get("outputRatio");
+        count = (int) data.get("outputCount");
+        Assert.assertEquals(1, count);
         Assert.assertEquals(1.0, ratio);
         Assert.assertEquals(1, pixelsAboveThreshold.length);
     }
