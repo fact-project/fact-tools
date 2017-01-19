@@ -1,7 +1,7 @@
 package fact.parameter;
 
 import fact.extraction.BasicExtraction;
-import fact.io.FitsStreamTest;
+import fact.io.FITSStreamTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,9 +10,9 @@ import stream.io.SourceURL;
 import static org.junit.Assert.assertTrue;
 
 /**
- * 
+ *
  * @author bruegge
- * 
+ *
  */
 public class PhotonChargeParameterTest extends ParameterTest {
 
@@ -32,7 +32,7 @@ public class PhotonChargeParameterTest extends ParameterTest {
 		extraction.setDataKey(key);
 		extraction.setOutputKeyMaxAmplPos(positions);
 		extraction.setOutputKeyPhotonCharge(outputKey);
-		extraction.setUrl(new SourceURL(FitsStreamTest.class
+		extraction.setUrl(new SourceURL(FITSStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 		extraction.process(item);
 		assertTrue("Expecteds output not in data item but it should be there",

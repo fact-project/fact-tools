@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * Created by mackaiver on 12/12/16.
  */
-public class FitsStream extends AbstractStream {
+public class FITSStream extends AbstractStream {
 
     private short[] offsetCalibrationsConstants;
     private Reader reader;
@@ -27,7 +27,7 @@ public class FitsStream extends AbstractStream {
     private HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
 
-    public FitsStream(SourceURL url){
+    public FITSStream(SourceURL url){
         this.url = url;
     }
 
@@ -38,12 +38,12 @@ public class FitsStream extends AbstractStream {
         //create a fits object from the SourceURL this AbstractStream contains.
         //The FITs object does not know SourceURL so this fits reader is decoupled entirely from the streams framework
         URL url = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
-        Fits fits = new Fits(url);
+        FITS fits = new FITS(url);
 
         //get calibration constants they are stored in the first (and only) row of this hdu.
         HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
         if (offsetHDU != null){
-            OptionalTypesMap<String, Serializable> row = ZFitsHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
+            OptionalTypesMap<String, Serializable> row = ZFITSHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
 
             offsetCalibrationsConstants = row
                     .getShortArray("OffsetCalibration")
@@ -64,7 +64,7 @@ public class FitsStream extends AbstractStream {
 
         Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
         if (ztable) {
-            reader = ZFitsHeapReader.forTable(eventsTable);
+            reader = ZFITSHeapReader.forTable(eventsTable);
         } else {
             reader = BinTableReader.forBinTable(eventsTable);
         }
@@ -97,7 +97,7 @@ public class FitsStream extends AbstractStream {
         short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
         Integer roi = eventHDU.header.getInt("NROI").orElse(300);
-        
+
         if (offsetCalibrationsConstants !=  null) {
             applyDrsOffsetCalib(roi, data, startCellData, offsetCalibrationsConstants);
             nextRow.put("Data", data);

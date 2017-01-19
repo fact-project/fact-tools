@@ -2,7 +2,7 @@ package fact.io.hdu_reader;
 
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
-import fact.io.hdureader.Fits;
+import fact.io.hdureader.FITS;
 import fact.io.hdureader.OptionalTypesMap;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class ReadAuxFiles {
     public void testBinTableIteratorForMCs() throws Exception {
         URL u =  ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         BinTable b = f.getBinTableByName("DRIVE_CONTROL_SOURCE_POSITION").orElseThrow(IOException::new);
 
@@ -41,7 +41,7 @@ public class ReadAuxFiles {
     public void testBinTableReader() throws Exception {
         URL u =  ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         BinTable b = f.getBinTableByName("DRIVE_CONTROL_SOURCE_POSITION").orElseThrow(IOException::new);
         BinTableReader reader = BinTableReader.forBinTable(b);

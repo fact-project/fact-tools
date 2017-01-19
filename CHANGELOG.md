@@ -2,6 +2,9 @@
 
 # Version 0.18.0 -- 19.01.2017
 
+* A new reader for FITS and ZFITS files was added.
+* fact.io.zfits.ZFitsStream and fact.io.FITSStream are deprecated now in
+favour of the new fact.io.hdureader.FITSStream
 * add fact.utils.PhotonStream2ArrivalTime
 * add fact.utils.PhotonStream2NumberOfPhotons
 
@@ -19,9 +22,6 @@
 * add fact.utils.CastDoubleArrayToIntArray
 * add fact.utils.ElementwiseMultiplyDoubleArray
 
-# Version 0.18.0 --14.12.2016
-
-* A new reader for FITS and ZFITS files was added.
 
 # Version 0.17.2 -- 05.12.2016
 
@@ -337,7 +337,7 @@ of the analysis.
 
 
 The `ZFitsCalibration` processor does no longer exist. Its being handled by the `ZfitsStream` itsself.
-For reading good old .fits files (or ceres output) you still need the `fact.io.FitsStream`.
+For reading good old .fits files (or ceres output) you still need the `fact.io.FITSStream`.
 
 To use any kind of data from an AuxFile you should now use the `AuxFileService` Service. (See the website for more details)
 

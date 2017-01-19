@@ -1,5 +1,5 @@
 <container>
-  <stream id="fact" class="fact.io.FitsStream" url="${data}" />
+  <stream id="fact" class="fact.io.FITSStream" url="${data}" />
   <process input="fact">
     <fact.filter.DrsCalibration url="${dataDRS}" key="data" outputKey="DataCalibrated" />
     <fact.utils.CutSlices start="22" end="220" />

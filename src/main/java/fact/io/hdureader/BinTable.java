@@ -163,7 +163,7 @@ public class BinTable {
 
         // create readers for the data in this table
         //create stream for data in table area of the bintable extension
-        DataInputStream stream = Fits.getUnGzippedDataStream(url);
+        DataInputStream stream = FITS.getUnGzippedDataStream(url);
 
         long skippedBytes = stream.skipBytes((int) (hduOffset + header.headerSizeInBytes));
         if(skippedBytes != hduOffset + header.headerSizeInBytes){
@@ -186,7 +186,7 @@ public class BinTable {
 
             int bytesToSkip = Math.toIntExact((hduOffset + header.headerSizeInBytes + theap));
 
-            DataInputStream hStream = Fits.getUnGzippedDataStream(url);
+            DataInputStream hStream = FITS.getUnGzippedDataStream(url);
             skippedBytes = hStream.skipBytes(bytesToSkip);
 
             if (skippedBytes != bytesToSkip) {
@@ -210,7 +210,7 @@ public class BinTable {
 
         int naxis1 = header.getInt("NAXIS1").orElseThrow(() -> {
             log.error("The NAXIS1 keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+                    "Its mandatory.\nSee section 7.3.1 of the FITS 3.0 standard");
             return new IllegalArgumentException("Missing NAXIS2 keyword");
         });
 
@@ -220,7 +220,7 @@ public class BinTable {
 
         int naxis2 = header.getInt("NAXIS2").orElseThrow(() -> {
             log.error("The NAXIS2 keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+                    "Its mandatory.\nSee section 7.3.1 of the FITS 3.0 standard");
             return new IllegalArgumentException("Missing NAXIS2 keyword");
         });
 
@@ -230,7 +230,7 @@ public class BinTable {
 
         long pcount = header.getLong("PCOUNT").orElseThrow(() -> {
             log.error("The PCOUNT keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+                    "Its mandatory.\nSee section 7.3.1 of the FITS 3.0 standard");
             return new IllegalArgumentException("Missing PCOUNT keyword");
 
         });
@@ -242,7 +242,7 @@ public class BinTable {
         if (pcount > 0){
             int theap = header.getInt("THEAP").orElseThrow(() -> {
                 log.error("The THEAP keyword cannot be found in the BinTable. " +
-                        "Its mandatory when PCOUNT is larger than 0.\nSee section 7.3.2 of the Fits 3.0 standard");
+                        "Its mandatory when PCOUNT is larger than 0.\nSee section 7.3.2 of the FITS 3.0 standard");
                 return new IllegalArgumentException("Missing THEAP keyword");
 
             });
@@ -254,7 +254,7 @@ public class BinTable {
             int desiredTheap = naxis1*naxis2 + (naxis1 * naxis2) % 2880;
             if(theap == desiredTheap){
                 throw new IllegalArgumentException("The value for THEAP should be equal to (NAXIS1*NAXIS2 + padding to 2880 blocks)." +
-                        "\nSee section 7.3.2 of the Fits 3.0 standard");
+                        "\nSee section 7.3.2 of the FITS 3.0 standard");
             }
         }
     }

@@ -12,23 +12,23 @@ import java.util.zip.GZIPInputStream;
 
 /**
  *
- * A Fits object containing all HDUs in a given file.
+ * A FITS object containing all HDUs in a given file.
  * HDUs can be accessed by their name.
  *
- *    Fits f = Fits.fromPath(p)
+ *    FITS f = FITS.fromPath(p)
  *    HDU offsets = f.getHDU("ZDrsCellOffsets");
  *    BinTable binTable = offsets.getBinTable();
  *
  * BinTables can also directly be accessed by name if they exist.
  *
- *    Fits.fromPath(p).getBinTableByName("Events")
+ *    FITS.fromPath(p).getBinTableByName("Events")
  *                    .ifPresent(binTable -> {
  *                        //do something with bintable
  *                    })
  *
- * Data from the BinTable can be read using the BinTableReader and ZFitsHeapReader classes.
+ * Data from the BinTable can be read using the BinTableReader and ZFITSHeapReader classes.
  *
- *    Fits f = new Fits(u);
+ *    FITS f = new FITS(u);
  *    BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
  *
  *    for(OptionalTypesMap<String, Serializable> p : BinTableReader.forBinTable(events)){
@@ -38,8 +38,8 @@ import java.util.zip.GZIPInputStream;
  *
  * Created by mackaiver on 03/11/16.
  */
-public class Fits {
-    private static Logger log = LoggerFactory.getLogger(Fits.class);
+public class FITS {
+    private static Logger log = LoggerFactory.getLogger(FITS.class);
 
 
     private final URL url;
@@ -52,11 +52,11 @@ public class Fits {
     /**
      * Creates a fits instance from a path object without throwing checked exceptions immediately.
      * @param path The path to the fits file
-     * @return a Fits object
+     * @return a FITS object
      */
-    public static Fits fromPath(Path path)  {
+    public static FITS fromPath(Path path)  {
         try {
-            return new Fits(path.toUri().toURL());
+            return new FITS(path.toUri().toURL());
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -65,20 +65,20 @@ public class Fits {
     /**
      * Creates a fits instance from a File object without throwing checked exceptions immediately.
      * @param file the fits file
-     * @return a Fits object
+     * @return a FITS object
      */
-    public static Fits fromFile(File file)  {
+    public static FITS fromFile(File file)  {
         if (!file.canRead()){
             throw new RuntimeException("File " + file.toString() +  " is not readable");
         }
         try {
-            return new Fits(file.toURI().toURL());
+            return new FITS(file.toURI().toURL());
         } catch (IOException e) {
             throw new RuntimeException();
         }
     }
 
-    public Fits(URL  url) throws IOException {
+    public FITS(URL  url) throws IOException {
         this.url = url;
         DataInputStream stream = getUnGzippedDataStream(url);
         long absoluteHduOffsetInFile = 0;

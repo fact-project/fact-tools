@@ -90,7 +90,7 @@ public class AuxFileService implements AuxiliaryService {
         //create a fits object
         try {
             URL url = new URL(auxFileUrl.getProtocol(), auxFileUrl.getHost(), auxFileUrl.getPort(), auxFileUrl.getFile());
-            Fits fits = new Fits(url);
+            FITS fits = new FITS(url);
             BinTable auxDataBinTable = fits.getBinTableByName(extname)
                                            .orElseThrow(
                                                () -> new RuntimeException("BinTable '" + extname + "' not in aux file")

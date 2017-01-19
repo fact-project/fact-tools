@@ -13,7 +13,6 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -42,7 +41,7 @@ import java.util.NoSuchElementException;
  * Data in the tiles is in Little Endian byte order.
  *
  * The data from one tile is read completely into one bytebuffer.
- * @see ZFitsHeapReader#getNextRow()
+ * @see ZFITSHeapReader#getNextRow()
  *
  *
  * Then for each column the appropriate compression type is parsed from the block header.
@@ -65,7 +64,7 @@ import java.util.NoSuchElementException;
  *
  * Created by mackaiver on 14/11/16.
  */
-public final class ZFitsHeapReader implements Reader {
+public final class ZFITSHeapReader implements Reader {
 
     private final DataInputStream stream;
     private final List<BinTable.TableColumn> columns;
@@ -86,9 +85,9 @@ public final class ZFitsHeapReader implements Reader {
 
 
 
-    private static Logger log = LoggerFactory.getLogger(ZFitsHeapReader.class);
+    private static Logger log = LoggerFactory.getLogger(ZFITSHeapReader.class);
 
-    private ZFitsHeapReader(BinTable binTable) {
+    private ZFITSHeapReader(BinTable binTable) {
         this.numberOfRowsInTable = binTable.numberOfRowsInTable;
         this.stream = binTable.heapDataStream;
         this.columns = binTable.columns;
@@ -96,14 +95,14 @@ public final class ZFitsHeapReader implements Reader {
 
 
     /**
-     * Creates a ZFitsHeapReader for a given binary table. This reader is iterable and provides a @see next() method which
+     * Creates a ZFITSHeapReader for a given binary table. This reader is iterable and provides a @see next() method which
      * will yield the column data for each row.
      *
      * @param binTable the binary table which contains a zfits heap.
-     * @return the ZFitsHeapReader for the given table.
+     * @return the ZFITSHeapReader for the given table.
      */
-    public static ZFitsHeapReader forTable(BinTable binTable){
-        return new ZFitsHeapReader(binTable);
+    public static ZFITSHeapReader forTable(BinTable binTable){
+        return new ZFITSHeapReader(binTable);
     }
 
 

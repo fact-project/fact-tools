@@ -2,7 +2,7 @@ package fact.io.hdu_reader;
 
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
-import fact.io.hdureader.Fits;
+import fact.io.hdureader.FITS;
 import fact.io.hdureader.OptionalTypesMap;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -27,7 +27,7 @@ public class BinTableTests {
     public void testBinTableIterator() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
 
 
@@ -41,7 +41,7 @@ public class BinTableTests {
     public void testBinTableIteratorForMCs() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testMcFile.fits.gz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
 
 
@@ -58,7 +58,7 @@ public class BinTableTests {
     public void testBinTableReader() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
         BinTableReader reader = BinTableReader.forBinTable(b);
@@ -90,7 +90,7 @@ public class BinTableTests {
     public void testFitsBinTable() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
 

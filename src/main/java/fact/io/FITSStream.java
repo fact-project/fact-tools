@@ -14,8 +14,8 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 @Deprecated
-public class FitsStream extends AbstractStream {
-	static Logger log = LoggerFactory.getLogger(FitsStream.class);
+public class FITSStream extends AbstractStream {
+	static Logger log = LoggerFactory.getLogger(FITSStream.class);
 
 	int numberOfPixel;
 	int blockSize;
@@ -30,11 +30,11 @@ public class FitsStream extends AbstractStream {
 	@Parameter(required = false, description = "This value defines the size of the buffer of the BufferedInputStream", defaultValue = "8*1024")
 	private int bufferSize = 8 * 1024;
 
-	public FitsStream(SourceURL url) {
+	public FITSStream(SourceURL url) {
 		super(url);
 	}
 
-	public FitsStream() {
+	public FITSStream() {
 		super();
 	}
 
@@ -85,7 +85,7 @@ public class FitsStream extends AbstractStream {
 		}
 		log.debug("File has {} fields.", numberOfFields);
 		if (numberOfFields == 0) {
-			throw new IOException("Fits file appears to have 0 fields");
+			throw new IOException("FITS file appears to have 0 fields");
 		}
 		typeArray = new String[numberOfFields];
 		nameArray = new String[numberOfFields];
