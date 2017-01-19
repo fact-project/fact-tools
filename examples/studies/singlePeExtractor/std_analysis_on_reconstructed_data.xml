@@ -74,10 +74,10 @@
 
         <!--<fact.ShowViewer key="DataCalibrated" />-->
 
-        <fact.io.JSONWriter keys="${keysForOutput}"
-                            url="${output}"
-                            writeListOfItems="True"
-                            pixelSetsAsInt="True"
-        />
+        <!--<fact.io.JSONWriter keys="${keysForOutput}"-->
+                            <!--url="${output}"-->
+                            <!--writeListOfItems="True"-->
+                            <!--pixelSetsAsInt="True"-->
+        <!--/>-->
     </process>
 </container>

@@ -15,7 +15,7 @@ public class SinglePulseExtractorTest {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         SinglePulseExtractor spe = new SinglePulseExtractor(config);
-        
+
         SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
         Assert.assertEquals(0, result.pulseArrivalSlices.length);
         Assert.assertEquals(0, result.numberOfPulses());
@@ -26,7 +26,7 @@ public class SinglePulseExtractorTest {
     public void testFlatTimeSeriesBaseLine() {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
-        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         for(double baseLine=-50.0; baseLine<50; baseLine++) {
 
@@ -48,7 +48,7 @@ public class SinglePulseExtractorTest {
     public void testOnePulseBaseLine() {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
-        SinglePulseExtractor spe = new SinglePulseExtractor(config);        
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         for(double baseLine=-50.0; baseLine<50; baseLine++) {
 
@@ -75,7 +75,7 @@ public class SinglePulseExtractorTest {
     public void testOnePulseNoNoise() {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
-        SinglePulseExtractor spe = new SinglePulseExtractor(config);        
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         for(int injectionSlice = 50; injectionSlice< 250; injectionSlice++) {
 
@@ -103,12 +103,12 @@ public class SinglePulseExtractorTest {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = 100;
-        SinglePulseExtractor spe = new SinglePulseExtractor(config);  
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         final int injectionSlice = 50;
 
         for(double amplitude = 0.0; amplitude<15.0; amplitude++) {
-         
+
             double[] timeSeries = new double[300];
 
             for(int i=0; i<(int)amplitude; i++)
@@ -131,7 +131,7 @@ public class SinglePulseExtractorTest {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         config.maxIterations = 100;
-        SinglePulseExtractor spe = new SinglePulseExtractor(config); 
+        SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         double[] timeSeries = new double[300];
 
@@ -163,5 +163,25 @@ public class SinglePulseExtractorTest {
 
         Assert.assertTrue((double)result.pulseArrivalSlices[2] >= 200-2);
         Assert.assertTrue((double)result.pulseArrivalSlices[2] <= 200+2);
+    }
+
+    @Test
+    public void testResultPulseArrivalSlicesInRangeEmpty() {
+        SinglePulseExtractor.Result result = new SinglePulseExtractor.Result();
+        result.pulseArrivalSlices = new int[0];
+
+        int[] myPulses = result.pulseArrivalSlicesInRange(0, 1000);
+        Assert.assertEquals(0, myPulses.length);
+    }
+
+    @Test
+    public void testResultPulseArrivalSlicesInRange() {
+        SinglePulseExtractor.Result result = new SinglePulseExtractor.Result();
+        result.pulseArrivalSlices = new int[]{10, 50, 100, 550, 1000};
+
+        int[] myPulses = result.pulseArrivalSlicesInRange(50, 500);
+        Assert.assertEquals(2, myPulses.length);
+        Assert.assertEquals(50, myPulses[0]);
+        Assert.assertEquals(100, myPulses[1]);
     }
 }
