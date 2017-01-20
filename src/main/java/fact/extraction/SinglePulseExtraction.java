@@ -8,6 +8,11 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import stream.io.SourceURL;
+import stream.io.CsvStream;
+
 
 /**
  * Extracts a list of arrival slice positions of photons for each pixel
@@ -34,6 +39,9 @@ import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
  * and some modifications from Jens Buss
 */
 public class SinglePulseExtraction implements Processor {
+
+    static Logger log = LoggerFactory.getLogger(SinglePulseExtraction.class);
+
     @Parameter(required=true, description="")
     private String dataKey = null;
 
@@ -83,6 +91,15 @@ public class SinglePulseExtraction implements Processor {
     private int npix = Constants.NUMBEROFPIXEL;
     private int roi  = 300;
 
+    @Parameter(
+        required = false,
+        description = "The url to the inputfiles for the gain calibration constants",
+        defaultValue="classpath:/default/gain_sorted_20131127.csv"
+    )
+    protected SourceURL url = null;
+
+    protected double[] integralGains = null;
+
     @Override
     public Data process(Data input) {
 
@@ -114,7 +131,7 @@ public class SinglePulseExtraction implements Processor {
             );
 
             double[] pixelTimeSeries = ElementWise.multiply(
-                pixelTimeSeriesInMv, 1.0/config.factSinglePeAmplitudeInMv);
+                pixelTimeSeriesInMv, 24.37/integralGains[pix]);
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
                 pixelTimeSeries);
@@ -148,6 +165,40 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
+    public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
+        double[] integralGains = new double[npix];
+        Data integralGainData = null;
+        try {
+            CsvStream stream = new CsvStream(inputUrl, " ");
+            stream.setHeader(false);
+            stream.init();
+            integralGainData = stream.readNext();
+
+            for (int i = 0 ; i < npix ; i++){
+                String key = "column:" + (i);
+                integralGains[i] = (Double) integralGainData.get(key);
+            }
+            return integralGains;
+
+        } catch (Exception e) {
+            log.error("Failed to load integral Gain data: {}", e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void setUrl(SourceURL url) {
+        try {
+            integralGains = loadIntegralGainFile(url,log);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        this.url = url;
+    }
+
+    public SourceURL getUrl() {
+        return url;
+    }
 
 
     public void setDataKey(String dataKey) {
