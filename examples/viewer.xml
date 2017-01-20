@@ -22,7 +22,7 @@
     <include url="classpath:/default/data/pedestalParameters.xml" />
 
 
-    <fact.extraction.SinglePulseExtraction
+    <fact.photonstream.SinglePulseExtraction
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"
     />
