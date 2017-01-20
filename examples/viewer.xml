@@ -27,7 +27,7 @@
         outputKey="PhotonArrivals"
     />
 
-    <fact.utils.ConvertSinglePulses2Timeseries
+    <fact.photonstream.ConvertSinglePulses2Timeseries
       singlePulsesKey="PhotonArrivals"
       baseLineKey="PhotonArrivalsBaseLine"
       timeSeriesKey="ReconstructedDataCalibrated"
