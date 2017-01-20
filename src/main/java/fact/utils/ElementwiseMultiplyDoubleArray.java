@@ -3,7 +3,7 @@ package fact.utils;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.photonstream.singlePulse.timeSeriesExtraction.ElementWise;
 
 public class ElementwiseMultiplyDoubleArray implements Processor {
 

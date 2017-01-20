@@ -1,9 +1,9 @@
 package fact.photonstream;
 
-import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
-import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
-import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.photonstream.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.photonstream.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.photonstream.singlePulse.timeSeriesExtraction.TemplatePulse;
+import fact.photonstream.singlePulse.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
 import stream.Processor;
