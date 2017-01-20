@@ -1,4 +1,4 @@
-package fact.photonstream.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 /**
 * Finds the maximum on an array and stores its position (arg)

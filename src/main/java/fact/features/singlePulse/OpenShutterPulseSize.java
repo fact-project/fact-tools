@@ -1,7 +1,7 @@
 /**
  *
  */
-package fact.photonstream.singlePulse;
+package fact.features.singlePulse;
 
 import fact.Utils;
 import org.slf4j.Logger;

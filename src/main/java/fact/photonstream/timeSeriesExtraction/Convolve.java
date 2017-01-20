@@ -1,4 +1,4 @@
-package fact.photonstream.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 /**
  * Utility class containing a method for convolving two arrays.

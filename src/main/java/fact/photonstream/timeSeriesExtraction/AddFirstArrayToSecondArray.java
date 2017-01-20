@@ -1,4 +1,4 @@
-package fact.photonstream.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 /**
  * Utility class for adding elements of two arrays

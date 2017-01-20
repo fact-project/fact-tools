@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.photonstream.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.photonstream.timeSeriesExtraction.ElementWise;
 
 public class ElementWiseTest {
 

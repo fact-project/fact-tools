@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.photonstream.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
 
 public class AddFirstArrayToSecondArrayTest {
 
