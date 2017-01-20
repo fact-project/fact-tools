@@ -1,4 +1,4 @@
-package fact.utils;
+package fact.photonstream;
 
 import stream.Data;
 import stream.Processor;

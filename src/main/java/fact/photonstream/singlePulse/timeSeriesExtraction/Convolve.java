@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.singlePulse.timeSeriesExtraction;
 
 /**
  * Utility class containing a method for convolving two arrays.
@@ -33,5 +33,5 @@ public class Convolve {
             conv[i] = sum;
         }
         return conv;
-    }   
+    }
 }

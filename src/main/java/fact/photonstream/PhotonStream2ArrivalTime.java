@@ -1,4 +1,4 @@
-package fact.utils;
+package fact.photonstream;
 
 import java.util.Arrays;
 import stream.Data;

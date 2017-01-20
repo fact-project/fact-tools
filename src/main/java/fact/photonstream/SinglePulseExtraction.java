@@ -1,4 +1,4 @@
-package fact.extraction;
+package fact.photonstream;
 
 import fact.Constants;
 import fact.Utils;
