@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.photonstream.singlePulse.timeSeriesExtraction.ElementWise;
 
 public class ElementWiseTest {
 
@@ -40,7 +40,7 @@ public class ElementWiseTest {
             Assert.assertEquals(ones.length, result.length);
 
             for(int j=0; j<ones.length; j++)
-                Assert.assertEquals(scalar, result[j]);       
+                Assert.assertEquals(scalar, result[j]);
         }
     }
 

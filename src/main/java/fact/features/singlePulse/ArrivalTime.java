@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package fact.features.singlePulse;
+package fact.photonstream.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
@@ -14,11 +14,11 @@ import stream.annotations.Parameter;
 import java.util.ArrayList;
 
 /**
- * Finds pulse arrival time by searching the 25 slices prior to the maximum and taking the time slice where the amplitude is equal to or just larger than 1/2 the max. 
+ * Finds pulse arrival time by searching the 25 slices prior to the maximum and taking the time slice where the amplitude is equal to or just larger than 1/2 the max.
  *  * Input and output are both arrays of size NUMBEROFPIXEL with lists of positions for each pixel.
- * 
+ *
  *@author Katie Gray &lt;kathryn.gray@tu-dortmund.de&gt;
- * 
+ *
  */
 public class ArrivalTime implements Processor {
     static Logger log = LoggerFactory.getLogger(ArrivalTime.class);
@@ -46,11 +46,11 @@ public class ArrivalTime implements Processor {
         int[][] arrivalTimes =  new int[npix][];
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
-        
+
         for(int i = 0; i < data.length; i++){
             visualizePositions[i] = 0;
         }
-        
+
         //for each pixel
         for (int pix = 0; pix < npix; pix++) {
 	    arrivalTimes[pix] = new int[maxAmpPositions.length];
@@ -70,9 +70,9 @@ public class ArrivalTime implements Processor {
      * @param data the array which to check
      * @return
      */
-	
+
     public int[] findArrivalTimes(int pix, int roi, double[] data, int[][] maxAmpPositions, double[] visualizePositions){
-      
+
         ArrayList<Integer> positions = new ArrayList<Integer>();
 
         if(maxAmpPositions[pix].length > 0){
@@ -85,7 +85,7 @@ public class ArrivalTime implements Processor {
                        int pos = pix * roi + slice;
                        if(end - 25 < 0) {continue;}
                        double value = data[pos];
-                       if(slice > 0 && slice + 80 < roi && end - slice < 15){  
+                       if(slice > 0 && slice + 80 < roi && end - slice < 15){
                            if(value <= data[endPos]/2){
                                Position = slice;
                                break;
@@ -101,8 +101,8 @@ public class ArrivalTime implements Processor {
 
         return Utils.arrayListToInt(positions);
     }
-          
-     
+
+
     /*
      * Getters and Setters
      */

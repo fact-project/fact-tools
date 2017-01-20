@@ -1,9 +1,9 @@
-package fact.utils;
+package fact.photonstream;
 
-import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
-import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
-import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.photonstream.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.photonstream.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.photonstream.singlePulse.timeSeriesExtraction.TemplatePulse;
+import fact.photonstream.singlePulse.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
 import stream.Processor;
@@ -48,8 +48,8 @@ public class ConvertSinglePulses2Timeseries implements Processor {
             // Add the single pulses to the time series
             for (int pulse = 0; pulse < singlePulses[pix].length; pulse++) {
                 AddFirstArrayToSecondArray.at(
-                    pulseTemplate, 
-                    currentTimeSeries, 
+                    pulseTemplate,
+                    currentTimeSeries,
                     singlePulses[pix][pulse]);
             }
 
@@ -61,7 +61,7 @@ public class ConvertSinglePulses2Timeseries implements Processor {
 
         SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
         timeSeries = ElementWise.multiply(
-            timeSeries, 
+            timeSeries,
             config.factSinglePeAmplitudeInMv);
 
         input.put(timeSeriesKey, timeSeries);

@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package fact.features.singlePulse;
+package fact.photonstream.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
@@ -14,10 +14,10 @@ import stream.annotations.Parameter;
 import java.util.ArrayList;
 
 /**
- * Finds sum of slice amplitudes starting at pulse arrival time 
- * 
+ * Finds sum of slice amplitudes starting at pulse arrival time
+ *
  *@author Katie Gray &lt;kathryn.gray@tu-dortmund.de&gt;
- * 
+ *
  */
 public class PulseSizeCalculator implements Processor {
     static Logger log = LoggerFactory.getLogger(PulseSizeCalculator.class);
@@ -29,7 +29,7 @@ public class PulseSizeCalculator implements Processor {
         //size of pulse
     @Parameter(required = true)
     private String arrivalTimeKey;
-        //positions of arrival times 
+        //positions of arrival times
     @Parameter(required = true)
     private int width;
     	//number of slices over which we integrate
@@ -54,7 +54,7 @@ public class PulseSizeCalculator implements Processor {
 		}
         input.put(outputKey, pulseSizes);
 
-        
+
 //       System.out.println(Arrays.toString(pulseSizes));
 //       System.out.println(singlePixelPulses);
 
@@ -67,11 +67,11 @@ public class PulseSizeCalculator implements Processor {
      * @param data the array which to check
      * @return
      */
-	
+
     public double[] calculateSizes(int pix, int roi, double[] data, int[][] arrivalTimes){
-      
+
 		ArrayList<Double> sizes = new ArrayList<Double>();
-    	
+
         if(arrivalTimes[pix].length > 0){
         	int numberPulses = arrivalTimes[pix].length;
         	for(int i = 0; i < numberPulses; i++){
@@ -82,12 +82,12 @@ public class PulseSizeCalculator implements Processor {
 					integral += data[pos];
 				}
 				sizes.add(integral);
-        	}		
+        	}
         }
         return Utils.arrayListToDouble(sizes);
     }
-          
-     
+
+
     /*
      * Getters and Setters
      */

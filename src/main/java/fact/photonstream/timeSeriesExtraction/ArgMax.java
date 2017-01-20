@@ -1,7 +1,7 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.singlePulse.timeSeriesExtraction;
 
 /**
-* Finds the maximum on an array and stores its position (arg) 
+* Finds the maximum on an array and stores its position (arg)
 * and its value (max).
 */
 public class ArgMax {
@@ -15,12 +15,12 @@ public class ArgMax {
     */
     public ArgMax(double[] arr) {
         arg = 0;
-        max = arr[0];;        
+        max = arr[0];;
         for(int i=0; i<arr.length; i++) {
             if(arr[i] > max) {
                 max = arr[i];
                 arg = i;
             }
         }
-    }        
+    }
 }

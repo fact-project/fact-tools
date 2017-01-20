@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package fact.features.singlePulse;
+package fact.photonstream.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
@@ -18,12 +18,12 @@ import java.util.ArrayList;
  * of a Signal. The Threshold is given by the Amplitude in a given start slice (Arrival Time) . The Processor can get an
  * array of arrival times.
  *
- * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a> 
+ * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a>
  *
  */
 public class TimeOverThresholdArray implements Processor {
 	static Logger log = LoggerFactory.getLogger(TimeOverThresholdArray.class);
-	
+
 	@Parameter(required = true, description = "key of data array")
 	private String dataKey = null;
 	@Parameter(required = true, description = "key of array containing arrival times")
@@ -34,7 +34,7 @@ public class TimeOverThresholdArray implements Processor {
     private String visualizationKey = null;
 
 	public Data process(Data input) {
-		
+
 		Utils.isKeyValid(input, dataKey, double[].class);
 		Utils.isKeyValid(input, positionsKey, int[][].class);
 

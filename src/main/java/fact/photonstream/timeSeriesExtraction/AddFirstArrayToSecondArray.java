@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.singlePulse.timeSeriesExtraction;
 
 /**
  * Utility class for adding elements of two arrays
@@ -8,7 +8,7 @@ public class AddFirstArrayToSecondArray {
     /**
      *
      * Adds the first array element-wise to the second array starting at a certain
-     * position. 
+     * position.
      *
      * @param first
      *           The first array [N].
@@ -22,7 +22,7 @@ public class AddFirstArrayToSecondArray {
      *           Can be negative.
      */
     public static void at(double[] first, double[] second, int at) {
-        
+
         if(at > second.length){
             return;
         }
@@ -48,7 +48,7 @@ public class AddFirstArrayToSecondArray {
             // End of first array goes beyond first array's end
             //                           ...first...]
             //                    ...second...]
-            //                                     ^end1 
+            //                                     ^end1
 
         int start = at;
         if(start < 0){
@@ -61,5 +61,5 @@ public class AddFirstArrayToSecondArray {
         for(int i=start; i<end; i++) {
             second[i] += first[i - at];
         }
-    }     
+    }
 }

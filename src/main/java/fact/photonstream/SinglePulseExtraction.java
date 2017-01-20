@@ -1,4 +1,4 @@
-package fact.extraction;
+package fact.photonstream;
 
 import fact.Constants;
 import fact.Utils;
@@ -6,8 +6,8 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
-import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.photonstream.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
+import fact.photonstream.singlePulse.timeSeriesExtraction.ElementWise;
 
 /**
  * Extracts a list of arrival slice positions of photons for each pixel
