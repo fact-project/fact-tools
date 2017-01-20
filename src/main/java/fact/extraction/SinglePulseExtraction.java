@@ -8,6 +8,7 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
+import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.io.SourceURL;
@@ -99,6 +100,7 @@ public class SinglePulseExtraction implements Processor {
     protected SourceURL url = null;
 
     protected double[] integralGains = null;
+    protected double factSinglePePulseIntegral;
 
     @Override
     public Data process(Data input) {
@@ -131,7 +133,10 @@ public class SinglePulseExtraction implements Processor {
             );
 
             double[] pixelTimeSeries = ElementWise.multiply(
-                pixelTimeSeriesInMv, 24.37/integralGains[pix]);
+                pixelTimeSeriesInMv,
+                factSinglePePulseIntegral /
+                    integralGains[pix]
+            );
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
                 pixelTimeSeries);
@@ -166,6 +171,8 @@ public class SinglePulseExtraction implements Processor {
     }
 
     public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
+        factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
+
         double[] integralGains = new double[npix];
         Data integralGainData = null;
         try {

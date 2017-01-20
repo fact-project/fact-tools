@@ -25,6 +25,7 @@
     <fact.extraction.SinglePulseExtraction
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"
+        url="${integralGainFile}"
     />
 
     <fact.utils.ConvertSinglePulses2Timeseries
