@@ -6,6 +6,7 @@
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
   <!-- Name des Streams und pfad zu dem Daten-File -->
   <!-- <stream id="fact" class="fact.io.FITSStream"  url="file:${infile}" limit="100"/> -->
   <stream id="fact" class="fact.io.FITSStream" url="${infile}" />

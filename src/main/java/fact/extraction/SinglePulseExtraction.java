@@ -3,17 +3,15 @@ package fact.extraction;
 import fact.Constants;
 import fact.Utils;
 import stream.Data;
-import stream.Processor;
+import stream.StatefulProcessor;
+import stream.ProcessContext;
 import stream.annotations.Parameter;
 import java.util.Arrays;
+import java.net.URL;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
 import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import stream.io.SourceURL;
-import stream.io.CsvStream;
-
+import fact.calibrationservice.SinglePulseGainCalibService;
 
 /**
  * Extracts a list of arrival slice positions of photons for each pixel
@@ -39,9 +37,7 @@ import stream.io.CsvStream;
  * Created by Sebastian Mueller
  * and some modifications from Jens Buss
 */
-public class SinglePulseExtraction implements Processor {
-
-    static Logger log = LoggerFactory.getLogger(SinglePulseExtraction.class);
+public class SinglePulseExtraction implements StatefulProcessor {
 
     @Parameter(required=true, description="")
     private String dataKey = null;
@@ -89,24 +85,39 @@ public class SinglePulseExtraction implements Processor {
     )
     protected int extractionWindowLengthInSlices = 225;
 
-    private int npix = Constants.NUMBEROFPIXEL;
-    private int roi  = 300;
-
     @Parameter(
-        required = false,
-        description = "The url to the inputfiles for the gain calibration constants",
-        defaultValue="classpath:/default/gain_sorted_20131127.csv"
-    )
-    protected SourceURL url = null;
+        required = false, 
+        description = "The calibration service for the integral single pulse gain",
+        defaultValue = "null")
+    SinglePulseGainCalibService gainService = null;
 
-    protected double[] integralGains = null;
+    protected double[] gainCorrection = null;
     protected double factSinglePePulseIntegral;
+    private int npix = Constants.NUMBEROFPIXEL;
+    private int roi = 300;
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+
+        factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
+        
+        if(gainService == null) {
+            gainCorrection = new double[npix];
+            for(int i=0; i<npix; i++) {gainCorrection[i] = 1.0;}
+        }else {
+            gainCorrection = gainService.getIntegralSinglePulseGain();
+            for(int i=0; i<npix; i++) {gainCorrection[i] /= factSinglePePulseIntegral;}
+        }
+    }
+
+    @Override
+    public void resetState() throws Exception {}
+
+    @Override
+    public void finish() throws Exception {}
 
     @Override
     public Data process(Data input) {
-
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        Utils.mapContainsKeys(input, dataKey,  "NPIX");
 
         npix = (Integer) input.get("NPIX");
         roi = (Integer) input.get("NROI");
@@ -134,8 +145,7 @@ public class SinglePulseExtraction implements Processor {
 
             double[] pixelTimeSeries = ElementWise.multiply(
                 pixelTimeSeriesInMv,
-                factSinglePePulseIntegral /
-                    integralGains[pix]
+                1.0/config.factSinglePeAmplitudeInMv * gainCorrection[pix]
             );
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
@@ -170,43 +180,9 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
-    public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
-        factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
-
-        double[] integralGains = new double[npix];
-        Data integralGainData = null;
-        try {
-            CsvStream stream = new CsvStream(inputUrl, " ");
-            stream.setHeader(false);
-            stream.init();
-            integralGainData = stream.readNext();
-
-            for (int i = 0 ; i < npix ; i++){
-                String key = "column:" + (i);
-                integralGains[i] = (Double) integralGainData.get(key);
-            }
-            return integralGains;
-
-        } catch (Exception e) {
-            log.error("Failed to load integral Gain data: {}", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
+    public void setGainService(SinglePulseGainCalibService gainService) {
+        this.gainService = gainService;
     }
-
-    public void setUrl(SourceURL url) {
-        try {
-            integralGains = loadIntegralGainFile(url,log);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        this.url = url;
-    }
-
-    public SourceURL getUrl() {
-        return url;
-    }
-
 
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
@@ -235,5 +211,4 @@ public class SinglePulseExtraction implements Processor {
     public void setMaxIterations(int maxIterations) {
         this.maxIterations = maxIterations;
     }
-
 }

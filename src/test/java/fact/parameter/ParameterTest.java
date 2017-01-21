@@ -9,6 +9,7 @@ import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FITSStream;
 import fact.io.FITSStreamTest;
+import fact.calibrationservice.SinglePulseGainCalibService;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,12 +70,14 @@ public class ParameterTest {
         pr.init(null);
 		pr.process(item);
 
+        SinglePulseGainCalibService igs = new SinglePulseGainCalibService();
+        igs.setIntegralGainFile(new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv")));
+
 		BasicExtraction bE = new BasicExtraction();
 		bE.setDataKey(key);
 		bE.setOutputKeyMaxAmplPos(positions);
 		bE.setOutputKeyPhotonCharge(photonCharge);
-		bE.setUrl(new SourceURL(FITSStreamTest.class
-				.getResource("/defaultIntegralGains.csv")));
+		bE.setGainService(igs);
 		bE.process(item);
 
 		RisingEdgeForPositions pR = new RisingEdgeForPositions();

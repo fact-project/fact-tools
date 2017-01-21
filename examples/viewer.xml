@@ -8,6 +8,7 @@
   <property name="auxFolder" value="file:src/main/resources/aux/" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+  <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
@@ -25,7 +26,7 @@
     <fact.extraction.SinglePulseExtraction
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"
-        url="${integralGainFile}"
+        gainService="gainService"
     />
 
     <fact.utils.ConvertSinglePulses2Timeseries
