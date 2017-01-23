@@ -24,15 +24,12 @@ public class IntervallMarkerKeySelector extends KeySelector {
         for (String key : item.keySet()) {
             try {
                 IntervalMarker[] i = (IntervalMarker[]) item.get(key);
-                if(i.length == 1440) {
+                if(i != null && i.length == 1440) {
                     newItems.add(new SeriesKeySelectorItem(key, Color.LIGHT_GRAY, this));
                 }
             } catch (ClassCastException e){
                 continue;
-            } catch (RuntimeException e) {
-                continue;
             }
-
         }
         return newItems;
     }
