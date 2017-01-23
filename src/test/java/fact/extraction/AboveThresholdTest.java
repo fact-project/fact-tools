@@ -1,20 +1,26 @@
-package fact.features;
+package fact.extraction;
 
-import fact.extraction.AboveThreshold;
-import fact.Utils;
+import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
+import fact.hexmap.PixelMapping;
 import stream.data.DataFactory;
 import stream.Data;
 import junit.framework.Assert;
 import org.junit.Test;
+import streams.tikz.Pixel;
 
 
 public class AboveThresholdTest {
+
+    FactPixelMapping pixelMapping = FactPixelMapping.getInstance();
 
     @Test
     public void testAboveThresholdAllZero() {
 
         Data data = DataFactory.create();
-        short[] raw_fact_data = new short[1440*300];
+        short[] raw_fact_data = new short[1440 * 300];
 
         data.put("data", raw_fact_data);
         data.put("NROI", 300);
@@ -25,12 +31,18 @@ public class AboveThresholdTest {
         above.setOutputKey("output");
         above.setThreshold(1);
         above.process(data);
-        int[] pixelsAboveThreshold = (int[]) data.get("output");
-        double ratio = (double) data.get("outputRatio");
-        int count = (int) data.get("outputCount");
-        Assert.assertEquals(0, count);
-        Assert.assertEquals(0.0, ratio);
-        Assert.assertEquals(0, pixelsAboveThreshold.length);
+
+        PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
+        double pixelRatio = (double) data.get("outputPixelRatio");
+        double sliceRatio = (double) data.get("outputSliceRatio");
+        int pixelCount = (int) data.get("outputPixelCount");
+        int sliceCount = (int) data.get("outputSliceCount");
+
+        Assert.assertEquals(0, pixelCount);
+        Assert.assertEquals(0, sliceCount);
+        Assert.assertEquals(0.0, pixelRatio);
+        Assert.assertEquals(0.0, sliceRatio);
+        Assert.assertEquals(0, pixelsAboveThreshold.set.size());
     }
 
     @Test
@@ -39,10 +51,15 @@ public class AboveThresholdTest {
         Data data = DataFactory.create();
         short[] raw_fact_data = new short[1440*300];
 
+        PixelSet testPixels = new PixelSet();
+        testPixels.addById(42);
+        testPixels.addById(314);
+        testPixels.addById(1337);
+
         for(int pix=0; pix<1440; pix++) {
             for(int slice=0; slice<300; slice++) {
                 final int pos = pix*300 + slice;
-                if(pix==42 || pix==314 || pix==1337) {
+                if((pix==42 || pix==314 || pix==1337) && (slice == 271 || slice == 256)) {
                     raw_fact_data[pos] = 2000;
                 }else{
                     raw_fact_data[pos] = 2;
@@ -60,15 +77,16 @@ public class AboveThresholdTest {
         above.setThreshold(5);
         above.process(data);
 
-        int[] pixelsAboveThreshold = (int[]) data.get("output");
-        double ratio = (double) data.get("outputRatio");
-        int count = (int) data.get("outputCount");
-        Assert.assertEquals(3, count);
-        Assert.assertEquals(3.0/1440.0, ratio);
-        Assert.assertEquals(3, pixelsAboveThreshold.length);
-        Assert.assertEquals(42, pixelsAboveThreshold[0]);
-        Assert.assertEquals(314, pixelsAboveThreshold[1]);
-        Assert.assertEquals(1337, pixelsAboveThreshold[2]);
+        PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
+
+        Assert.assertEquals(3, (int) data.get("outputPixelCount"));
+        Assert.assertEquals(6, (int) data.get("outputSliceCount"));
+        Assert.assertEquals(3.0/1440.0, data.get("outputPixelRatio"));
+        Assert.assertEquals(6.0/(1440.0 * 300.0), data.get("outputSliceRatio"));
+
+        Assert.assertEquals(3, pixelsAboveThreshold.set.size());
+        Assert.assertTrue(pixelsAboveThreshold.set.equals(testPixels.set));
+
     }
 
     @Test
@@ -91,16 +109,11 @@ public class AboveThresholdTest {
         above.setThreshold(5);
         above.process(data);
 
-        int[] pixelsAboveThreshold = (int[]) data.get("output");
-        double ratio = (double) data.get("outputRatio");
-        int count = (int) data.get("outputCount");
-        Assert.assertEquals(1440, count);
-        Assert.assertEquals(1440.0/1440.0, ratio);
-        Assert.assertEquals(1440, pixelsAboveThreshold.length);
+        PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
+        Assert.assertEquals(1440, (int) data.get("outputPixelCount"));
+        Assert.assertEquals(1440.0/1440.0, data.get("outputPixelRatio"));
+        Assert.assertEquals(1440, pixelsAboveThreshold.set.size());
 
-        for(int i=0; i<1440; i++) {
-            Assert.assertEquals(i, pixelsAboveThreshold[i]);
-        }
     }
 
     @Test
@@ -121,12 +134,11 @@ public class AboveThresholdTest {
         at.setThreshold(10);
         at.process(data);
 
-        int[] pixelsAboveThreshold = (int[]) data.get("output");
-        double ratio = (double) data.get("outputRatio");
-        int count = (int) data.get("outputCount");
-        Assert.assertEquals(0, count);
-        Assert.assertEquals(0.0, ratio);
-        Assert.assertEquals(0, pixelsAboveThreshold.length);
+        PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
+
+        Assert.assertEquals(0, (int) data.get("outputPixelCount"));
+        Assert.assertEquals(0.0, data.get("outputPixelRatio"));
+        Assert.assertEquals(0, pixelsAboveThreshold.set.size());
 
         AboveThreshold at2 = new AboveThreshold();
         at2.setDataKey("data");
@@ -134,11 +146,9 @@ public class AboveThresholdTest {
         at2.setThreshold(9);
         at2.process(data);
 
-        pixelsAboveThreshold = (int[]) data.get("output");
-        ratio = (double) data.get("outputRatio");
-        count = (int) data.get("outputCount");
-        Assert.assertEquals(1, count);
-        Assert.assertEquals(1.0, ratio);
-        Assert.assertEquals(1, pixelsAboveThreshold.length);
+        pixelsAboveThreshold = (PixelSet) data.get("output");
+        Assert.assertEquals(1, (int) data.get("outputPixelCount"));
+        Assert.assertEquals(1.0, data.get("outputPixelRatio"));
+        Assert.assertEquals(1, pixelsAboveThreshold.set.size());
     }
 }
