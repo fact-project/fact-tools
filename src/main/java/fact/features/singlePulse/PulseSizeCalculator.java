@@ -1,7 +1,7 @@
 /**
  *
  */
-package fact.photonstream.singlePulse;
+package fact.features.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
