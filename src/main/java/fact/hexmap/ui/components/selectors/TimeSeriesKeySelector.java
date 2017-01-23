@@ -16,7 +16,6 @@ import java.util.Set;
  */
 public class TimeSeriesKeySelector extends KeySelector {
 
-
     @Override
     public void selectionUpdate() {
 
@@ -28,12 +27,14 @@ public class TimeSeriesKeySelector extends KeySelector {
     public Set<SeriesKeySelectorItem> filterItems(Data item) {
         Set<SeriesKeySelectorItem> newItems = new HashSet<>();
         for (String key : item.keySet()) {
-            double[] series = Utils.toDoubleArray(item.get(key));
-//                double[] series = (double[]) item.get(key);
-            if (series !=  null &&(series.length > 1440) && (series.length % 1440 == 0)){
-                SeriesKeySelectorItem newSelectorItem = new SeriesKeySelectorItem(key, Color.GRAY, this);
-                //newSelectorItem.setSelector(this);
-                newItems.add(newSelectorItem);
+            try {
+                double[] series = Utils.toDoubleArray(item.get(key));
+                if (series != null && (series.length > 1440) && (series.length % 1440 == 0)) {
+                    SeriesKeySelectorItem newSelectorItem = new SeriesKeySelectorItem(key, Color.GRAY, this);
+                    newItems.add(newSelectorItem);
+                }
+            } catch(RuntimeException e) {
+                continue;
             }
         }
         return newItems;

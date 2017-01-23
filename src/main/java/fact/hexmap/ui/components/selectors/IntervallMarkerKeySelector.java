@@ -29,6 +29,8 @@ public class IntervallMarkerKeySelector extends KeySelector {
                 }
             } catch (ClassCastException e){
                 continue;
+            } catch (RuntimeException e) {
+                continue;
             }
 
         }
