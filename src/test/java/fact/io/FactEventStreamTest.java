@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.io;
 
@@ -21,7 +21,7 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * @author chris
- * 
+ *
  */
 public class FactEventStreamTest {
 
@@ -66,10 +66,10 @@ public class FactEventStreamTest {
 	@Test
 	public void testRead() throws Exception {
 
-		URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+		URL u =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
 		SourceURL url = new SourceURL(u);
 		log.info("Reading FITS events from {}", url);
-		FitsStream fits = new FitsStream(url);
+		FITSStream fits = new FITSStream(url);
 
 		fits.init();
 

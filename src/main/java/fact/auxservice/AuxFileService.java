@@ -1,21 +1,21 @@
 package fact.auxservice;
 
 import fact.auxservice.strategies.AuxPointStrategy;
-import fact.io.FitsStream;
+
+import fact.io.hdureader.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import stream.service.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -63,7 +63,7 @@ public class AuxFileService implements AuxiliaryService {
             isInit = true;
         }
         if(!services.containsKey(serviceName)){
-            services.put(serviceName, readDataFromFile(auxFileUrls.get(serviceName)));
+            services.put(serviceName, readDataFromFile(auxFileUrls.get(serviceName), serviceName.toString()));
         }
         TreeSet<AuxPoint> set = services.get(serviceName);
 
@@ -81,27 +81,35 @@ public class AuxFileService implements AuxiliaryService {
 
     /**
      * Reads data from a file provided by the url and creates an AuxPoint for each event in the file.
-     * @param driveFileUrl url to the auxfile
+     * @param auxFileUrl url to the auxfile
      * @return treeset containing auxpoints ordered by their timestamp
      */
-    private TreeSet<AuxPoint>  readDataFromFile(SourceURL driveFileUrl){
+    private TreeSet<AuxPoint>  readDataFromFile(SourceURL auxFileUrl, String extname) {
         TreeSet<AuxPoint> result = new TreeSet<>();
-        FitsStream stream = new FitsStream(driveFileUrl);
+
+        //create a fits object
         try {
-            stream.init();
-            Data slowData = stream.readNext();
-            while (slowData != null) {
-                double time = Double.parseDouble(slowData.get("Time").toString()) * 86400;// + 2440587.5;
-                DateTime t = new DateTime((long)(time*1000), DateTimeZone.UTC);
-                AuxPoint p = new AuxPoint(t, slowData);
-                result.add(p);
-                slowData = stream.readNext();
+            URL url = new URL(auxFileUrl.getProtocol(), auxFileUrl.getHost(), auxFileUrl.getPort(), auxFileUrl.getFile());
+            FITS fits = new FITS(url);
+            BinTable auxDataBinTable = fits.getBinTableByName(extname)
+                                           .orElseThrow(
+                                               () -> new RuntimeException("BinTable '" + extname + "' not in aux file")
+                                           );
+            BinTableReader auxDataBinTableReader = BinTableReader.forBinTable(auxDataBinTable);
+
+            while (auxDataBinTableReader.hasNext()) {
+                OptionalTypesMap<String, Serializable> auxData = auxDataBinTableReader.getNextRow();
+
+                auxData.getDouble("Time").ifPresent(time -> {
+                    DateTime t = new DateTime((long) (time * 24 * 60 * 60 * 1000), DateTimeZone.UTC);
+                    AuxPoint p = new AuxPoint(t, auxData);
+                    result.add(p);
+                });
             }
-            stream.close();
             return result;
         } catch (Exception e) {
             log.error("Failed to load data from AUX file: {}", e.getMessage());
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
