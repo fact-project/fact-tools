@@ -3,15 +3,11 @@ package fact.extraction;
 import fact.Constants;
 import fact.Utils;
 import stream.Data;
-import stream.StatefulProcessor;
-import stream.ProcessContext;
+import stream.Processor;
 import stream.annotations.Parameter;
 import java.util.Arrays;
-import java.net.URL;
 import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
 import fact.features.singlePulse.timeSeriesExtraction.ElementWise;
-import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
-import fact.calibrationservice.SinglePulseGainCalibService;
 
 /**
  * Extracts a list of arrival slice positions of photons for each pixel
@@ -37,7 +33,7 @@ import fact.calibrationservice.SinglePulseGainCalibService;
  * Created by Sebastian Mueller
  * and some modifications from Jens Buss
 */
-public class SinglePulseExtraction implements StatefulProcessor {
+public class SinglePulseExtraction implements Processor {
 
     @Parameter(required=true, description="")
     private String dataKey = null;
@@ -85,36 +81,9 @@ public class SinglePulseExtraction implements StatefulProcessor {
     )
     protected int extractionWindowLengthInSlices = 225;
 
-    @Parameter(
-        required = false, 
-        description = "The calibration service for the integral single pulse gain",
-        defaultValue = "null")
-    SinglePulseGainCalibService gainService = null;
 
-    protected double[] gainCorrection = null;
-    protected double factSinglePePulseIntegral;
     private int npix = Constants.NUMBEROFPIXEL;
     private int roi = 300;
-
-    @Override
-    public void init(ProcessContext processContext) throws Exception {
-
-        factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
-        
-        if(gainService == null) {
-            gainCorrection = new double[npix];
-            for(int i=0; i<npix; i++) {gainCorrection[i] = 1.0;}
-        }else {
-            gainCorrection = gainService.getIntegralSinglePulseGain();
-            for(int i=0; i<npix; i++) {gainCorrection[i] /= factSinglePePulseIntegral;}
-        }
-    }
-
-    @Override
-    public void resetState() throws Exception {}
-
-    @Override
-    public void finish() throws Exception {}
 
     @Override
     public Data process(Data input) {
@@ -134,22 +103,11 @@ public class SinglePulseExtraction implements StatefulProcessor {
         SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         for (int pix = 0; pix < npix; pix++) {
-            int start = pix*roi+startSliceExtractionWindow;
+            int start = pix*roi + startSliceExtractionWindow;
             int end = start + extractionWindowLengthInSlices;
 
-            double[] pixelTimeSeriesInMv = Arrays.copyOfRange(
-                timeSerieses,
-                start,
-                end
-            );
-
-            double[] pixelTimeSeries = ElementWise.multiply(
-                pixelTimeSeriesInMv,
-                1.0/config.factSinglePeAmplitudeInMv * gainCorrection[pix]
-            );
-
-            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
-                pixelTimeSeries);
+            double[] pixelTimeSeries = Arrays.copyOfRange(timeSerieses, start, end);
+            SinglePulseExtractor.Result result = spe.extractFromTimeSeries(pixelTimeSeries);
 
             numberOfPulses[pix] = result.numberOfPulses();
             pixelArrivalSlices[pix] = result.pulseArrivalSlicesInRange(
@@ -178,10 +136,6 @@ public class SinglePulseExtraction implements StatefulProcessor {
                 arr[pix][ph] = slice_with_offset + startSliceExtractionWindow;
             }
         }
-    }
-
-    public void setGainService(SinglePulseGainCalibService gainService) {
-        this.gainService = gainService;
     }
 
     public void setDataKey(String dataKey) {
