@@ -38,7 +38,6 @@ public class BasicExtractionTest {
         extraction.setDataKey("test");
         extraction.setOutputKeyMaxAmplPos(positionsKey);
         extraction.setOutputKeyPhotonCharge(photonChargeKey);
-        extraction.setGainService(igs);
 	}
 
 	@Test

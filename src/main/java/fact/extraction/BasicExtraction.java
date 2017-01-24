@@ -2,12 +2,13 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
-import fact.calibrationservice.SinglePulseGainCalibService;
+import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
-import stream.Processor;
+import stream.ProcessContext;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
 /**
@@ -22,7 +23,7 @@ import stream.annotations.Parameter;
  * @author Fabian Temme
  *
  */
-public class BasicExtraction implements Processor {
+public class BasicExtraction implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(BasicExtraction.class);
 	@Parameter(required = true, description="key to the data array")
 	protected String dataKey = null;
@@ -30,8 +31,6 @@ public class BasicExtraction implements Processor {
 	protected String outputKeyMaxAmplPos = null;
 	@Parameter(required = true, description="outputKey for the calculated photoncharge")
 	protected String outputKeyPhotonCharge = null;
-    @Parameter(required = true, description = "The calibration service for the integral single pulse gain")
-    SinglePulseGainCalibService gainService;
 	@Parameter(required = false, description="start slice of the search window for the max amplitude", defaultValue="35")
 	protected int startSearchWindow = 35;
 	@Parameter(required = false, description="range of the search window for the max amplitude", defaultValue="90")
@@ -46,6 +45,7 @@ public class BasicExtraction implements Processor {
 	protected double[] integralGains = null;
 	
 	private int npix = Constants.NUMBEROFPIXEL;
+	public double factSinglePePulseIntegral;
 	
 	@Override
 	public Data process(Data input) {
@@ -53,7 +53,6 @@ public class BasicExtraction implements Processor {
 		
 		int roi = (Integer) input.get("NROI");
 		npix = (Integer) input.get("NPIX");
-		integralGains = gainService.getIntegralSinglePulseGain();
 		
 		double[] data = (double[]) input.get(dataKey);
 		
@@ -67,11 +66,11 @@ public class BasicExtraction implements Processor {
         for (int pix = 0; pix < npix; pix++) {
 			positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow+rangeSearchWindow, roi, data);
 			mPositions[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
-			
+
 			int halfHeightPos = calculatePositionHalfHeight(pix, positions[pix],positions[pix]-rangeHalfHeightWindow, roi, data);
 			
 			Utils.checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
-			photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / integralGains[pix];
+			photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / factSinglePePulseIntegral;
 			mPhotonCharge[pix] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
         input.put(outputKeyMaxAmplPos, positions);
@@ -141,10 +140,6 @@ public class BasicExtraction implements Processor {
 		this.dataKey = dataKey;
 	}
 
-    public void setGainService(SinglePulseGainCalibService gainService) {
-        this.gainService = gainService;
-    }
-
 	public String getOutputKeyMaxAmplPos() {
 		return outputKeyMaxAmplPos;
 	}
@@ -201,4 +196,19 @@ public class BasicExtraction implements Processor {
 	public void setValidMinimalSlice(int validMinimalSlice) {
 		this.validMinimalSlice = validMinimalSlice;
 	}
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+        factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();  // unit: SinglePulseAmplitude * slices
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
+    }
 }
