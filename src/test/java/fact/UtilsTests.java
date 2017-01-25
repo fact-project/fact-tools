@@ -14,4 +14,24 @@ public class UtilsTests {
         Assert.assertEquals(result.length, 0);
     }
 
+
+    @Test
+    public void flattenSomeArrays(){
+
+        final int num_arrays = 10;
+        final int array_length = 2;
+        double[][] someNumbers = new double[num_arrays][array_length];
+        for (int i=0; i<num_arrays; i++) {
+            for (int j=0; j<array_length; j++){
+                someNumbers[i][j] = i*array_length + j;
+            }
+        }
+
+        double[] result = Utils.flatten2dArray(someNumbers);
+
+        Assert.assertEquals(result.length, num_arrays * array_length);
+        for (int i=0; i<result.length; i++){
+            Assert.assertEquals(result[i], (double)i);
+        }
+    }
 }
