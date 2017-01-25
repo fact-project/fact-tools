@@ -1,6 +1,7 @@
 package fact.utils;
 
-import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
+
+import fact.photonstream.timeSeriesExtraction.TemplatePulse;
 import junit.framework.Assert;
 import org.junit.Test;
 

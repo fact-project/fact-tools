@@ -2,6 +2,7 @@ package fact.photonstream;
 
 import fact.Constants;
 import fact.Utils;
+import fact.photonstream.timeSeriesExtraction.TemplatePulse;
 import stream.Data;
 import stream.StatefulProcessor;
 import stream.ProcessContext;
