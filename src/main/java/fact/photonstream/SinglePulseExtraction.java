@@ -87,7 +87,7 @@ public class SinglePulseExtraction implements StatefulProcessor {
 
     @Service(
         required = false,
-        description = "The calibration service for the integral single pulse gain",
+        description = "The calibration service for the integral single pulse gain"
     )
     SinglePulseGainCalibService gainService = null;
 
