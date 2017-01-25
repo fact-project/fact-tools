@@ -20,12 +20,12 @@ public class SinglePulseGainCalibService implements CalibrationService {
     public double[] integralSinglePulseGain;
 
     @Parameter(
-    	required = false, 
-    	description = "The path to the integral single pulse gain file."
+        required = false,
+        description = "The path to the integral single pulse gain file."
     )
     SourceURL integralGainFile;
-	
-	public void init() {
+
+    public void init() {
         integralSinglePulseGain = new double[Constants.NUMBEROFPIXEL];
         Data integralGainData = null;
         try {
@@ -41,19 +41,19 @@ public class SinglePulseGainCalibService implements CalibrationService {
 
         } catch (Exception e) {
             log.error(
-            	"Failed to load the integral single pulse gain file: {}", 
-            	e.getMessage());
+                "Failed to load the integral single pulse gain file: {}",
+                e.getMessage());
             e.printStackTrace();
         }
     }
 
-	public double[] getIntegralSinglePulseGain() {
-		if (isInit == false){
-			init();
-			isInit = true;
-		}
-		return integralSinglePulseGain;
-	}
+    public double[] getIntegralSinglePulseGain() {
+        if (isInit == false){
+            init();
+            isInit = true;
+        }
+        return integralSinglePulseGain;
+    }
 
     @Override
     public void reset() throws Exception {
@@ -63,7 +63,7 @@ public class SinglePulseGainCalibService implements CalibrationService {
         this.integralGainFile = integralGainFile;
     }
 
-	public int[] getBadPixel(DateTime eventTimeStamp) {return new int[0];}
-	
-	public int[] getNotUsablePixels(DateTime eventTimeStamp) {return new int[0];}
+    public int[] getBadPixel(DateTime eventTimeStamp) {return new int[0];}
+
+    public int[] getNotUsablePixels(DateTime eventTimeStamp) {return new int[0];}
 }
