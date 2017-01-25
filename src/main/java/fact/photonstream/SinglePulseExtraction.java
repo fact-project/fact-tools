@@ -157,7 +157,7 @@ public class SinglePulseExtraction implements StatefulProcessor {
                 outputWindowLengthInSlices);
             timeSeriesAfterExtraction[pix] = ElementWise.multiply(
                 result.timeSeriesAfterExtraction,
-                config.factSinglePeAmplitudeInMv);
+                gainCorrection[pix]);
             baseLine[pix] = result.timeSeriesBaseLine();
         }
 
