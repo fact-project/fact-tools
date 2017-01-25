@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 /**
  * The pulse shape of FACTs SiPMs. This class contains a single function returning

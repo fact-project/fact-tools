@@ -34,13 +34,13 @@
         <!-- Output: DataCalibrated -->
 
         <!-- Single Pe Extraction -->
-        <fact.extraction.SinglePulseExtraction
+        <fact.photonstream.SinglePulseExtraction
                 dataKey="DataCalibrated"
                 outputKey="PhotonArrivals"
         />
 
         <!-- Data Time Series Reconstruction from Single Pe Data -->
-        <fact.utils.ConvertSinglePulses2Timeseries
+        <fact.photonstream.ConvertSinglePulses2Timeseries
                 singlePulsesKey="PhotonArrivals"
                 baseLineKey="PhotonArrivalsBaseLine"
                 timeSeriesKey="DataReconstructed"

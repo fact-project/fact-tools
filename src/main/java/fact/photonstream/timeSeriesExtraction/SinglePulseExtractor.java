@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

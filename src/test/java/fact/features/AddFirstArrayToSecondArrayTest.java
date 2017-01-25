@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
 
 public class AddFirstArrayToSecondArrayTest {
 
@@ -29,7 +29,7 @@ public class AddFirstArrayToSecondArrayTest {
         double[] first = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
         double[] second = {};
         int slice = 0;
-        
+
         Assert.assertEquals(6, first.length);
         Assert.assertEquals(0, second.length);
 
@@ -52,7 +52,7 @@ public class AddFirstArrayToSecondArrayTest {
         double[] first = {};
         double[] second = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
         int slice = 0;
-        
+
         Assert.assertEquals(0, first.length);
         Assert.assertEquals(6, second.length);
 
@@ -75,7 +75,7 @@ public class AddFirstArrayToSecondArrayTest {
         double[] first = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         double[] second = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         int slice = 0;
-        
+
         Assert.assertEquals(7, first.length);
         Assert.assertEquals(10, second.length);
 
@@ -95,10 +95,10 @@ public class AddFirstArrayToSecondArrayTest {
 
         double[] first = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         double[] second = new double[10];
-        for(int i=0; i<second.length; i++) 
+        for(int i=0; i<second.length; i++)
             second[i] = (double)(i);
         int slice = 0;
-        
+
         Assert.assertEquals(7, first.length);
         Assert.assertEquals(10, second.length);
 
@@ -109,7 +109,7 @@ public class AddFirstArrayToSecondArrayTest {
 
         for(int i=0; i<first.length; i++)
             Assert.assertEquals(0.0, first[i]);
-        for(int i=0; i<second.length; i++) 
+        for(int i=0; i<second.length; i++)
             Assert.assertEquals((double)(i), second[i]);
     }
 
@@ -124,7 +124,7 @@ public class AddFirstArrayToSecondArrayTest {
 
             Assert.assertEquals(1.0, first[0]);
 
-            for(int i=0; i<second.length; i++) 
+            for(int i=0; i<second.length; i++)
                 if(i == slice)
                     Assert.assertEquals(1.0, second[i]);
                 else
@@ -143,7 +143,7 @@ public class AddFirstArrayToSecondArrayTest {
 
         Assert.assertEquals(1.0, first[0]);
 
-        for(int i=0; i<second.length; i++) 
+        for(int i=0; i<second.length; i++)
             Assert.assertEquals(1.0, second[i]);
     }
 

@@ -2,9 +2,9 @@ package fact.features;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeSeriesExtraction.TemplatePulse;
-import fact.features.singlePulse.timeSeriesExtraction.SinglePulseExtractor;
-import fact.features.singlePulse.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.photonstream.timeSeriesExtraction.TemplatePulse;
+import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
+import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
 
 public class SinglePulseExtractorTest {
 
