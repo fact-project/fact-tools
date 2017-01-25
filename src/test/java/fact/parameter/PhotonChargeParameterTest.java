@@ -2,6 +2,7 @@ package fact.parameter;
 
 import fact.extraction.BasicExtraction;
 import fact.io.FITSStreamTest;
+import fact.calibrationservice.SinglePulseGainCalibService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,12 +29,15 @@ public class PhotonChargeParameterTest extends ParameterTest {
 		// //start processor with the correct parameter
 		assertTrue("Expecteds output already in data item",
 				!item.containsKey(outputKey));
+
+        SinglePulseGainCalibService igs = new SinglePulseGainCalibService();
+        igs.setIntegralGainFile(new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv")));
+
 		BasicExtraction extraction = new BasicExtraction();
 		extraction.setDataKey(key);
 		extraction.setOutputKeyMaxAmplPos(positions);
 		extraction.setOutputKeyPhotonCharge(outputKey);
-		extraction.setUrl(new SourceURL(FITSStreamTest.class
-				.getResource("/defaultIntegralGains.csv")));
+		extraction.setGainService(igs);
 		extraction.process(item);
 		assertTrue("Expecteds output not in data item but it should be there",
 				item.containsKey(outputKey));

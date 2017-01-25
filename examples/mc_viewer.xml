@@ -8,6 +8,7 @@
 
 	<!-- The calibration service delivers aux data to the processors -->
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
 
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.FITSStream" url="${infile}" />

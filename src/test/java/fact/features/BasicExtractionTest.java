@@ -4,6 +4,8 @@ import fact.extraction.BasicExtraction;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FITSStream;
 import fact.io.FITSStreamTest;
+import fact.calibrationservice.SinglePulseGainCalibService;
+
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;
@@ -29,12 +31,14 @@ public class BasicExtractionTest {
         pr.setUrl(new SourceURL(drsUrl));
         pr.setOutputKey("test");
 
+        SinglePulseGainCalibService igs = new SinglePulseGainCalibService();
+        igs.setIntegralGainFile(new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv")));
+
         extraction = new BasicExtraction();
         extraction.setDataKey("test");
         extraction.setOutputKeyMaxAmplPos(positionsKey);
         extraction.setOutputKeyPhotonCharge(photonChargeKey);
-        extraction.setUrl(new SourceURL(FITSStreamTest.class
-				.getResource("/defaultIntegralGains.csv")));
+        extraction.setGainService(igs);
 	}
 
 	@Test

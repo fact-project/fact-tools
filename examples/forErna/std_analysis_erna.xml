@@ -11,6 +11,7 @@
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
     <service id="auxService" class="fact.auxservice.SqliteService" url="${db}" />
+    <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
     
     <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->

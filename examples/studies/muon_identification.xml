@@ -10,6 +10,7 @@
   <property name="auxpath" value="file:src/main/resources/aux/" />
     
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxpath}" />
+  <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
   <property name="outfile" value="facttools.json" />
