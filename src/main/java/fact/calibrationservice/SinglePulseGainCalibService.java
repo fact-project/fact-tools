@@ -2,17 +2,17 @@ package fact.calibrationservice;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.joda.time.DateTime;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.io.CsvStream;
 import stream.Data;
 import fact.Constants;
+import stream.service.Service;
 
 /**
  *
  **/
-public class SinglePulseGainCalibService implements CalibrationService {
+public class SinglePulseGainCalibService implements Service {
 
     Logger log = LoggerFactory.getLogger(SinglePulseGainCalibService.class);
 
@@ -63,7 +63,4 @@ public class SinglePulseGainCalibService implements CalibrationService {
         this.integralGainFile = integralGainFile;
     }
 
-    public int[] getBadPixel(DateTime eventTimeStamp) {return new int[0];}
-
-    public int[] getNotUsablePixels(DateTime eventTimeStamp) {return new int[0];}
 }
