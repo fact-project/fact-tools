@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 /**
  * This processor performs a basic extraction on the data array. It contains three steps:
@@ -30,7 +31,7 @@ public class BasicExtraction implements Processor {
 	protected String outputKeyMaxAmplPos = null;
 	@Parameter(required = true, description="outputKey for the calculated photoncharge")
 	protected String outputKeyPhotonCharge = null;
-    @Parameter(required = true, description = "The calibration service for the integral single pulse gain")
+    @Service(required = true, description = "The calibration service for the integral single pulse gain")
     SinglePulseGainCalibService gainService;
 	@Parameter(required = false, description="start slice of the search window for the max amplitude", defaultValue="35")
 	protected int startSearchWindow = 35;
