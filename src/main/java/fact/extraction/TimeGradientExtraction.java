@@ -69,7 +69,7 @@ public class TimeGradientExtraction extends BasicExtraction {
 			int halfHeightPos = calculatePositionHalfHeight(px, positions[px],positions[px]-rangeHalfHeightWindow, roi, data);
 			
 			Utils.checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
-			photonCharge[px] = calculateIntegral(px, halfHeightPos, integrationWindow, roi, data) / factSinglePePulseIntegral;
+			photonCharge[px] = calculateIntegral(px, halfHeightPos, integrationWindow, roi, data) / integralGains[px];
 			mPhotonCharge[px] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
 		}
 		

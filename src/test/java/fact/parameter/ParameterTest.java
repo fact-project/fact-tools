@@ -2,7 +2,6 @@ package fact.parameter;
 
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
-import fact.datacorrection.SinglePulseGainCalibration;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
@@ -63,47 +62,42 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-        URL drsUrl = FITSStreamTest.class
-                .getResource("/testDrsFile.drs.fits.gz");
-        DrsCalibration pr = new DrsCalibration();
-        pr.setUrl(new SourceURL(drsUrl));
-        pr.setOutputKey(key);
+		URL drsUrl = FITSStreamTest.class
+				.getResource("/testDrsFile.drs.fits.gz");
+		DrsCalibration pr = new DrsCalibration();
+		pr.setUrl(new SourceURL(drsUrl));
+		pr.setOutputKey(key);
         pr.init(null);
-        pr.process(item);
+		pr.process(item);
 
         SinglePulseGainCalibService igs = new SinglePulseGainCalibService();
         igs.setIntegralGainFile(new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv")));
 
-        SinglePulseGainCalibration spgc = new SinglePulseGainCalibration();
-        spgc.setGainService(igs);
-        spgc.setDataKey(key);
-        spgc.setOutputKey(key);
-        spgc.init(null);
-        spgc.process(item);
+		BasicExtraction bE = new BasicExtraction();
+		bE.setDataKey(key);
+		bE.setOutputKeyMaxAmplPos(positions);
+		bE.setOutputKeyPhotonCharge(photonCharge);
+		bE.setGainService(igs);
+		bE.process(item);
 
-        BasicExtraction bE = new BasicExtraction();
-        bE.setDataKey(key);
-        bE.setOutputKeyMaxAmplPos(positions);
-        bE.setOutputKeyPhotonCharge(photonCharge);
-        bE.init(null);
-        bE.process(item);
+		RisingEdgeForPositions pR = new RisingEdgeForPositions();
+		pR.setDataKey(key);
+		pR.setAmplitudePositionsKey(positions);
+		pR.setOutputKey(arrivalTime);
+		pR.process(item);
 
-        RisingEdgeForPositions pR = new RisingEdgeForPositions();
-        pR.setDataKey(key);
-        pR.setAmplitudePositionsKey(positions);
-        pR.setOutputKey(arrivalTime);
-        pR.process(item);
+		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
+		poser.setCalibService(calibService);
+		poser.setPhotonChargeKey(photonCharge);
+		poser.setArrivalTimeKey(arrivalTime);
+		poser.setOutputKey(shower);
+		poser.setCorePixelThreshold(1);
+		poser.setNeighborPixelThreshold(0.1);
+		poser.setMinNumberOfPixel(1);
+		poser.setTimeLimit(40);
+		poser.process(item);
 
-        TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
-        poser.setCalibService(calibService);
-        poser.setPhotonChargeKey(photonCharge);
-        poser.setArrivalTimeKey(arrivalTime);
-        poser.setOutputKey(shower);
-        poser.setCorePixelThreshold(1);
-        poser.setNeighborPixelThreshold(0.1);
-        poser.setMinNumberOfPixel(1);
-        poser.setTimeLimit(40);
-        poser.process(item);
+
 
         DistributionFromShower dist = new DistributionFromShower();
         dist.setPixelSetKey(shower);
