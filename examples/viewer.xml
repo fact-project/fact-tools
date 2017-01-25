@@ -33,6 +33,7 @@
       singlePulsesKey="PhotonArrivals"
       baseLineKey="PhotonArrivalsBaseLine"
       timeSeriesKey="ReconstructedDataCalibrated"
+      gainService="gainService"
     />
 
     <fact.ShowViewer key="DataCalibrated" />

@@ -1,19 +1,22 @@
 package fact.photonstream;
 
+import fact.Constants;
+import fact.calibrationservice.SinglePulseGainCalibService;
 import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
-import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
 import fact.photonstream.timeSeriesExtraction.TemplatePulse;
 import fact.photonstream.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
 import stream.Data;
-import stream.Processor;
+import stream.ProcessContext;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 
 /**
  * Created by jebuss on 28.10.16.
  */
-public class ConvertSinglePulses2Timeseries implements Processor {
+public class ConvertSinglePulses2Timeseries implements StatefulProcessor {
     @Parameter(required = true, description = "The arrival slices of the single pulses.")
     private String singlePulsesKey = null;
 
@@ -25,6 +28,14 @@ public class ConvertSinglePulses2Timeseries implements Processor {
 
     @Parameter(required = false, description = "The reconstructed baseline of the original time series.")
     private String baseLineKey = null;
+
+    @Service(
+            required = false,
+            description = "The calibration service for the integral single pulse gain"
+    )
+    SinglePulseGainCalibService gainService = null;
+    protected double[] gainCorrection = null;
+    private int npix = Constants.NUMBEROFPIXEL;
 
     @Override
     public Data process(Data input) {
@@ -57,12 +68,11 @@ public class ConvertSinglePulses2Timeseries implements Processor {
             currentTimeSeries = ElementWise.add(currentTimeSeries, baseLine[pix]);
 
             timeSeries = ArrayUtils.addAll(timeSeries, currentTimeSeries);
-        }
 
-        SinglePulseExtractor.Config config = new SinglePulseExtractor.Config();
-        timeSeries = ElementWise.multiply(
-            timeSeries,
-            config.factSinglePeAmplitudeInMv);
+            timeSeries = ElementWise.multiply(
+                    timeSeries,
+                    gainCorrection[pix]);
+        }
 
         input.put(timeSeriesKey, timeSeries);
 
@@ -83,5 +93,29 @@ public class ConvertSinglePulses2Timeseries implements Processor {
 
     public void setRoi(int roi) {
         this.roi = roi;
+    }
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+
+        double factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
+
+        if(gainService == null) {
+            gainCorrection = new double[npix];
+            for(int i=0; i<npix; i++) {gainCorrection[i] = 1.0;}
+        }else {
+            gainCorrection = gainService.getIntegralSinglePulseGain();
+            for(int i=0; i<npix; i++) {gainCorrection[i] /= factSinglePePulseIntegral;}
+        }
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
     }
 }
