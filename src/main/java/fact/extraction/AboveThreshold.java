@@ -35,15 +35,15 @@ public class AboveThreshold implements Processor {
         required = true,
         description = "Threshold value to be exceeded"
     )
-    protected double threshold = 1800;
+    protected double threshold = 0;
 
     @Override
     public Data process(Data input) {
 
         final int npix = (Integer) input.get("NPIX");
         final int roi = (Integer) input.get("NROI");
-        final short[] timeSeries = (short[]) input.get(dataKey);
-        final short thresholdShort = (short)threshold;
+        final double[] timeSeries = Utils.toDoubleArray(input.get(dataKey));
+        final short thresholdShort = (short) threshold;
 
         int numSlicesAboveThreshold = 0;
         PixelSet pixelsAboveThreshold = new PixelSet();
