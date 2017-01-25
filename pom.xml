@@ -58,6 +58,13 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
+      <name>Sebastian Müller</name>
+      <email>sebmuell@phys.ethz.ch</email>
+      <organization>Departement of physics, ETH Zurich</organization>
+      <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
       <name>Fabian Temme</name>
       <email>fabian.temme@tu-dortmund.de</email>
       <organization>Physik E5b, TU Dortmund</organization>
