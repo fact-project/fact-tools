@@ -145,7 +145,7 @@ public class SinglePulseExtraction implements StatefulProcessor {
 
             double[] pixelTimeSeries = ElementWise.multiply(
                 pixelTimeSeriesInMv,
-                1.0/config.factSinglePeAmplitudeInMv * gainCorrection[pix]
+                1.0/gainCorrection[pix]
             );
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
