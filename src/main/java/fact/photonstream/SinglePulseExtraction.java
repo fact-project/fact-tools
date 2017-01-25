@@ -11,6 +11,7 @@ import java.util.Arrays;
 import fact.calibrationservice.SinglePulseGainCalibService;
 import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
 import fact.photonstream.timeSeriesExtraction.ElementWise;
+import stream.annotations.Service;
 
 /**
  * Extracts a list of arrival slice positions of photons for each pixel
@@ -84,10 +85,10 @@ public class SinglePulseExtraction implements StatefulProcessor {
     )
     protected int extractionWindowLengthInSlices = 225;
 
-    @Parameter(
-        required = false, 
+    @Service(
+        required = false,
         description = "The calibration service for the integral single pulse gain",
-        defaultValue = "null")
+    )
     SinglePulseGainCalibService gainService = null;
 
     protected double[] gainCorrection = null;
@@ -99,7 +100,7 @@ public class SinglePulseExtraction implements StatefulProcessor {
     public void init(ProcessContext processContext) throws Exception {
 
         factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
-        
+
         if(gainService == null) {
             gainCorrection = new double[npix];
             for(int i=0; i<npix; i++) {gainCorrection[i] = 1.0;}
