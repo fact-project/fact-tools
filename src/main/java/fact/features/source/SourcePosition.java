@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+import stream.annotations.Service;
 import stream.annotations.Parameter;
 
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class SourcePosition implements StatefulProcessor {
         this.auxService = auxService;
     }
 
-    @Parameter(required = false, description = "Name of the service that provides aux files")
+    @Service(required = false, description = "Name of the service that provides aux files")
     private AuxiliaryService auxService;
 
     @Parameter(required = false)

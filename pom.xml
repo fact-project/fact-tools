@@ -5,7 +5,8 @@
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
 
-  <version>0.18.0</version>
+  <version>0.18.1</version>
+
 
   <url>http://sfb876.de/fact-tools/</url>
 
@@ -17,7 +18,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
-    <streams.version>0.9.23</streams.version>
+    <streams.version>1.0.0</streams.version>
     <binary.name>fact-tools-${project.version}</binary.name>
     <skipTests>false</skipTests>
     <finalName>fact-tools-${project.version}</finalName>
@@ -55,6 +56,13 @@
     <developer>
       <name>Dominik Neise</name>
       <email>neised@phys.ethz.ch</email>
+      <organization>Departement of physics, ETH Zurich</organization>
+      <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Sebastian Müller</name>
+      <email>sebmuell@phys.ethz.ch</email>
       <organization>Departement of physics, ETH Zurich</organization>
       <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
       <timezone>+1</timezone>
@@ -162,19 +170,19 @@
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-core</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-plotter</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-runtime</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>

@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -13,7 +13,7 @@ public class SinglePulseExtractor {
 
     public static class Config {
         /**
-         * An input configuration to steer the behaviour of a 
+         * An input configuration to steer the behaviour of a
          * SinglePulseExtractor instance.
          */
         public int pulseToLookForLength;
@@ -31,7 +31,7 @@ public class SinglePulseExtractor {
             negativePulseLength = 300;
             factSinglePeAmplitudeInMv = 10.0;
             maxIterations = 250;
-        }       
+        }
     }
 
     public static class Result {
@@ -46,10 +46,35 @@ public class SinglePulseExtractor {
         }
 
         public double timeSeriesBaseLine() {
-            DescriptiveStatistics statistics = 
+            DescriptiveStatistics statistics =
                 new DescriptiveStatistics(timeSeriesAfterExtraction);
             return statistics.getMean();
-        }    
+        }
+
+        /**
+         * Returns an int[] with arrivalSlices within the given range only.
+         *
+         * @param  startSlice      with respect to extraction window start.
+         * @param  lengthInSlices  the length in slices.
+         * @return      an int[] with arrivalSlices within the given range.
+         */
+        /**
+         * @param:
+         */
+        public int[] pulseArrivalSlicesInRange(
+            int startSlice,
+            int lengthInSlices)
+        {
+            ArrayList<Integer> pulses = new ArrayList<>();
+            for (int pulse: pulseArrivalSlices){
+                if ((pulse >= startSlice) &&
+                    (pulse < startSlice + lengthInSlices))
+                {
+                    pulses.add(pulse);
+                }
+            }
+            return Utils.arrayListToInt(pulses);
+        }
     }
 
     public Config config;
@@ -83,7 +108,7 @@ public class SinglePulseExtractor {
             sum += slice;
         }
         pulseToLookForIntegral = sum;
-        pulseToLookFor = ElementWise.multiply(pulse, 1.0/pulseToLookForIntegral);  
+        pulseToLookFor = ElementWise.multiply(pulse, 1.0/pulseToLookForIntegral);
     }
 
     void initPlateau() {
@@ -102,7 +127,7 @@ public class SinglePulseExtractor {
     void initNegativePulse() {
         double[] pulseToSubtract = TemplatePulse.factSinglePePulse(
             config.negativePulseLength);
-        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);        
+        negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);
     }
 
     /**
@@ -127,7 +152,7 @@ public class SinglePulseExtractor {
         while(iteration < config.maxIterations) {
 
             final double[] pulseResponse = Convolve.firstWithSecond(
-                timeSeries, 
+                timeSeries,
                 pulseToLookFor);
 
             final double[] baselineResponse = Convolve.firstWithSecond(
@@ -136,7 +161,7 @@ public class SinglePulseExtractor {
 
             final double[] response = ElementWise.subtractFirstFromSecond(
                 baselineResponse,
-                pulseResponse); 
+                pulseResponse);
 
             final ArgMax am = new ArgMax(response);
             final int maxSlice = am.arg + config.plateauLength;
@@ -144,13 +169,13 @@ public class SinglePulseExtractor {
 
             if(maxResponse > 0.65) {
                 AddFirstArrayToSecondArray.at(
-                    negativePulse, 
-                    timeSeries, 
+                    negativePulse,
+                    timeSeries,
                     maxSlice);
 
-                if(maxSlice >= 1)
+                if (maxSlice >= 1)
                     arrival_slices.add(maxSlice);
-            }else{
+            } else {
                 break;
             }
             iteration++;

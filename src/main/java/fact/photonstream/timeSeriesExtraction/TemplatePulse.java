@@ -1,4 +1,4 @@
-package fact.features.singlePulse.timeSeriesExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
 /**
  * The pulse shape of FACTs SiPMs. This class contains a single function returning
@@ -52,11 +52,11 @@ public class TemplatePulse {
         double[] template = new double[lengthInSlices];
         for (int i = 0; i < time.length; i++) {
 
-            final double amplitude = 
+            final double amplitude =
                 1.626*
                 (1.0-Math.exp(-0.3803*time[i]))
                 *Math.exp(-0.0649*time[i]);
-            
+
             if(amplitude < 0.0) {
                 template[i] = 0.0;
             }else{
