@@ -18,19 +18,19 @@
 
   <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
 
-  <fact.datacorrection.DrsTemperatureCalibration
-    auxService="auxService"
-    url_fitValueFile="${fitValueFile}"
-    key="Data"
-    outputKey="DataCalibratedDRS_Temp"
-    />
-
   <fact.datacorrection.DrsCalibration
     url="${drsfile}"
     key="Data"
-    outputKey="DataCalibratedDRS"
+    outputKey="DrsCalibratedData"
   />
 
-    <fact.ShowViewer key="DataCalibratedDRS_Temp" />
+  <fact.datacorrection.DrsTemperatureCalibration
+    auxService="auxService"
+    drsFitFilePath="${fitValueFile}"
+    key="Data"
+    outputKey="DrsCalibratedData_Temp"
+    />
+
+    <fact.ShowViewer key="DrsCalibratedData_Temp" />
   </process>
 </container>

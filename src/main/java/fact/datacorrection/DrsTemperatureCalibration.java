@@ -1,6 +1,7 @@
 package fact.datacorrection;
 
 import com.google.common.collect.ImmutableMap;
+import fact.Utils;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
@@ -15,14 +16,10 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.time.format.DateTimeFormatter;
 import java.time.*;
 import java.util.Date;
-
 
 
 import org.joda.time.DateTime; // TODO remove when no longer needed
@@ -33,28 +30,7 @@ import org.joda.time.DateTimeZone; // TODO remove when no longer needed
  */
 public class DrsTemperatureCalibration implements StatefulProcessor {
 
-    private Logger log = LoggerFactory.getLogger(DrsTemperatureCalibration.class);
-
-    /******************************************************************************************************************/
-    @Override
-    public void init(ProcessContext processContext_) throws Exception {
-        log.debug("----- init -----");
-
-        if (this.url_fitValueFile != null) {
-            try {
-                loadDrsFitParameter(this.url_fitValueFile);
-            } catch (Exception e) {
-                log.error("Could not load file specified in the url_fitValueFile.");
-                throw new RuntimeException(e.getMessage());
-            }
-        } else {
-            log.error("this.url_fitValueFile == null");
-        }
-
-        this.pixelCount = 1440;//(int) data_.get("NPIX"); //TODO get from file
-        this.cellCount = 1024;//(int) data_.get("NCELLS"); //TODO get from file
-        this.ROI = 300;//(int) data_.get("NCELLS"); //TODO get from file
-    }
+    private final static Logger log = LoggerFactory.getLogger(DrsTemperatureCalibration.class);
 
     /******************************************************************************************************************/
     @Parameter(required = false, description = "Key to the Data array to be calibrated", defaultValue = "Data")
@@ -72,15 +48,13 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
     }
 
     /******************************************************************************************************************/
-    @Parameter(required = false, description = "A URL to the DRS-FitValue data (in FITS formats)",
-            defaultValue = "Null. Will try to find path to DRS-FitValueFile from the stream.")
-    private SourceURL url_fitValueFile = null;
+    @Parameter(required = true, description = "A URL to the DRS-FitValue data (in FITS formats)",
+               defaultValue = "Null. Will try to find path to DRS-FitValueFile from the stream.")
+    private SourceURL drsFitFilePath = null;
 
-    public void setUrl_fitValueFile(SourceURL url_fitValueFile) {
-        this.url_fitValueFile = url_fitValueFile;
+    public void setDrsFitFilePath(SourceURL drsFitFilePath_) { this.drsFitFilePath = drsFitFilePath_;
     }
 
-    private File currentFitValueFile = new File("");
     Data fitValueData = null;
 
     /******************************************************************************************************************/
@@ -91,136 +65,112 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         this.auxService = auxService;
     }
 
-    private AuxPointStrategy auxPointStrategy = new Closest();
-    /******************************************************************************************************************/
-
-    private int pixelCount = 0;
-    private int cellCount = 0;
-    private int ROI = 0;
+    private final static AuxPointStrategy auxPointStrategy = new Closest();
 
     /******************************************************************************************************************/
     //Just for temporary storage
-    private float[] baselineGradient = null;
+    private float[] baselineSlope = null;
     private float[] baselineOffset = null;
-    private float[] gainGradient = null;
+    private float[] gainSlope = null;
     private float[] gainOffset = null;
 
     /******************************************************************************************************************/
     // The following keys are required to exist in the DRS-FitValue data
-    private final static String[] fitValueKeys = new String[]{"gradient", "offset"};
+    private final static String[] fitValueKeys = new String[]{"slope", "offset"};
 
     /******************************************************************************************************************/
     // The following keys are required to exist in the raw data
-    private final static String[] dataKeys = new String[]{"DATE-OBS", "DATE-END"};//, "NPIX", "NCELLS"}; //element of the header
+    private final static String[] dataKeys = new String[]{"UnixTimeUTC", "NPIX", "NCELLS", "NROI"};
+
 
     /******************************************************************************************************************/
-    private  void loadDrsFitParameter(SourceURL url_fitValueFile_)
+    @Override
+    public void init(ProcessContext processContext_) throws Exception {
+        log.debug("----- init -----");
+
+        if (this.drsFitFilePath != null) {
+            try {
+                loadDrsFitParameter(this.drsFitFilePath);
+            } catch (Exception e) {
+                log.error("Could not load file specified in the url_fitValueFile.");
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
+            log.error("drsFitFilePath == null");
+        }
+    }
+
+    /******************************************************************************************************************/
+    private  void loadDrsFitParameter(SourceURL drsFitFilePath)
     {
         log.debug("----- loadDrsFitParameter -----");
         try {
-            ZFitsStream stream = new ZFitsStream(url_fitValueFile_);
+            final ZFitsStream stream = new ZFitsStream(drsFitFilePath);
 
-            stream.tableName = "BASELINE";
+            stream.tableName = "Baseline";
             stream.init();
-            fitValueData = stream.readNext();
+            this.fitValueData = stream.readNext();
 
-            log.debug("Read DRS-fitValueData data: {}", fitValueData);
+            log.debug("Read DRS-fitValueData data: {}", this.fitValueData);
 
             // this for-loop is simply a check that fires an exception if any
             // of the expected keys is missing in table 'BASELINE'
-            //
-            for (String key : fitValueKeys) {
-                if (!fitValueData.containsKey(key)) {
-                    throw new RuntimeException("DRS-FitValue data('BASELINE') is missing key '"
-                            + key + "'!");
-                }
-            }
 
-            this.baselineGradient = ((float[]) fitValueData.get("gradient"));
-            this.baselineOffset = ((float[]) fitValueData.get("offset"));
+            Utils.mapContainsKeys(this.fitValueData, this.fitValueKeys);
 
-            log.debug("baselineGradient data: {}", baselineGradient);
-            log.debug("baselineOffset data: {}", baselineOffset);
+            this.baselineSlope = ((float[]) this.fitValueData.get("slope"));
+            this.baselineOffset = ((float[]) this.fitValueData.get("offset"));
 
-            stream.tableName = "GAIN";
+            log.debug("baselineSlope data: {}", this.baselineSlope);
+            log.debug("baselineOffset data: {}", this.baselineOffset);
+
+            stream.tableName = "Gain";
             stream.init();
-            fitValueData = stream.readNext();
+            this.fitValueData = stream.readNext();
 
             // this for-loop is simply a check that fires an exception if any
             // of the expected keys is missing in table 'GAIN'
-            //
-            for (String key : fitValueKeys) {
-                if (!fitValueData.containsKey(key)) {
-                    throw new RuntimeException("DRS-FitValue data('GAIN') is missing key '"
-                            + key + "'!");
-                }
-            }
-            this.gainGradient = ((float[]) fitValueData.get("gradient"));
-            this.gainOffset = ((float[]) fitValueData.get("offset"));
 
-            log.debug("gainGradient data: {}", gainGradient);
-            log.debug("gainOffset data: {}", gainOffset);
+            Utils.mapContainsKeys(this.fitValueData, this.fitValueKeys);
+
+            this.gainSlope = ((float[]) this.fitValueData.get("slope"));
+            this.gainOffset = ((float[]) this.fitValueData.get("offset"));
+
+            log.debug("gainSlope data: {}", this.gainSlope);
+            log.debug("gainOffset data: {}", this.gainOffset);
 
         } catch (Exception e) {
 
             log.error("Failed to load DRS data: {}", e.getMessage());
             if (log.isDebugEnabled())
                 e.printStackTrace();
-
-            this.fitValueData = null; //TODO check is neseccary to set to 0
-
             throw new RuntimeException(e.getMessage());
         }
     }
 
+    int eventCounter = 0;
     /******************************************************************************************************************/
     @Override
     public Data process(Data data) {
         log.debug("----- process -----");
 
-        if (this.url_fitValueFile == null) { //TODO check needed
-            //file not loaded yet. try to find by magic.
-            File fitValueFile = (File) data.get("@fitValueFile");
-            if (fitValueFile != null) {
-                if (!fitValueFile.equals(this.currentFitValueFile)) {
-                    this.currentFitValueFile = fitValueFile;
-                    try {
-                        log.debug("Using File " + fitValueFile.getAbsolutePath());
-                        loadDrsFitParameter(new SourceURL(fitValueFile.toURI().toURL()));
-                    } catch (MalformedURLException e) {
-                        //pass.
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException("No DRS-FitValue File set or no @fitValueFile key in data stream");
-            }
+        this.eventCounter ++;
+
+        if(eventCounter % 100 == 0) {
+            log.info("eventNr: {}", this.eventCounter);
         }
 
-        for (String key : dataKeys) {
-            if (!data.containsKey(key)) {
-                throw new RuntimeException("data is missing key '" + key + "'!");
-            }
-        }
+        Utils.mapContainsKeys(data, this.dataKeys);
 
         log.debug("Get patchTemperaure from AuxiliaryService with AuxPointStrategy {}", this.auxPointStrategy );
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;//ofPattern("YYYY-MM-dd'T'HH:mm:ss.SSSnnn") dosent work
-
-        Instant timestamp_beg = LocalDateTime.parse((String) data.get("DATE-OBS"), formatter).toInstant(ZoneOffset.UTC);
-        Instant timestamp_end = LocalDateTime.parse((String) data.get("DATE-END"), formatter).toInstant(ZoneOffset.UTC);
-
-        long timeDifferenceInNanosec = (long)(((long)timestamp_beg.getNano() + (long)timestamp_end.getNano())/2 +
-                                              (timestamp_beg.getEpochSecond() + timestamp_end.getEpochSecond())/2 * Math.pow(10,9));
-
-        Instant timestamp_middle = Instant.ofEpochSecond((timeDifferenceInNanosec) / (long) Math.pow(10,9),
-                                                         (timeDifferenceInNanosec) % (long) Math.pow(10,9));
-
-        DateTime dateTime_middle = new DateTime(Date.from(timestamp_middle)).withZoneRetainFields(DateTimeZone.UTC); // TODO remove when no longer needed
-        dateTime_middle = dateTime_middle.minusHours(2); // TODO remove when no longer needed
+        int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
+        Instant instant = Instant.ofEpochSecond(unixTimeUTC[0], unixTimeUTC[1] * 1000);
+        DateTime dateTime = new DateTime(Date.from(instant)).withZoneRetainFields(DateTimeZone.UTC);
 
         AuxPoint auxPoint;
         try {
-            auxPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.FAD_CONTROL_TEMPERATURE, dateTime_middle, this.auxPointStrategy);
+            auxPoint = this.auxService.getAuxiliaryData(AuxiliaryServiceName.FAD_CONTROL_TEMPERATURE, dateTime, this.auxPointStrategy);
         } catch (IOException e) {
             log.error("Could not read aux data {}", e.toString());
             throw new RuntimeException(e);
@@ -233,8 +183,19 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
                                                 String.valueOf(patchTemperatures.length)+"'");
         }
 
+        double[] calibrated = applyDrsCalibration(data, patchTemperatures);
+        data.put(this.outputKey, calibrated); //TODO check move into applyDrsCalibration
 
-        log.debug("Processing Data item by applying DRS calibration...");
+        return data;
+    }
+
+    /******************************************************************************************************************/
+    private double[] applyDrsCalibration(Data data,  float[] patchTemperatures){
+        log.debug("----- applyDrsCalibration -----");
+
+        int pixelCount = (int) data.get("NPIX");
+        int cellCount = (int) data.get("NCELLS");
+        int ROI = (int) data.get("NROI");
 
         short[] startCellVector = (short[]) data.get("StartCellData");
         if (startCellVector == null) {
@@ -242,30 +203,13 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
             return null;
         }
 
-        short[] rawData = (short[]) data.get(this.dataKey);
+        double[] rawData = Utils.toDoubleArray(data.get(this.dataKey));
         if (rawData == null) {
-            log.error(" data .fits file did not contain the value for the key "
-                    + this.dataKey + ". cannot apply drsCalibration");
-            throw new RuntimeException(
-                    " data .fits file did not contain the value for the key \"" + this.dataKey + "\". Cannot apply drs calibration)");
+            String errString = " data .fits file did not contain the value for the key "
+                               + this.dataKey + ". cannot apply drsCalibration";
+            log.error(errString);
+            throw new RuntimeException(errString);
         }
-
-        double[] rawfloatData = new double[rawData.length];
-        // System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
-        for (int i = 0; i < rawData.length; i++) {
-            rawfloatData[i] = rawData[i];
-        }
-
-        double[] calibrated = applyDrsCalibration(rawfloatData, startCellVector, patchTemperatures);
-        data.put(this.outputKey, calibrated);
-
-
-        return data;
-    }
-
-    /******************************************************************************************************************/
-    private double[] applyDrsCalibration(double[] rawData, short[] startCellVector, float[] patchTemperatures){
-        log.debug("----- applyDrsCalibration -----");
 
         //TODO update text
 
@@ -339,26 +283,24 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         double vraw;
         double[] calibrated = new double[rawData.length];
         int pos, totalPos, startCell;
-        for (int pixel = 0; pixel < this.pixelCount; pixel++) {
-            for (int slice = 0; slice < this.ROI; slice++) {
+        for (int pixel = 0; pixel < pixelCount; pixel++) {
+            for (int slice = 0; slice < ROI; slice++) {
 
                 startCell = 0;
                 if (startCellVector[pixel] != -1) {
                     startCell = startCellVector[pixel];
                 }
-                pos = pixel * this.ROI + slice;
-                totalPos = pixel * this.cellCount + ((startCell + slice) % (this.cellCount));
+                pos = pixel * ROI + slice;
+                totalPos = pixel * cellCount + ((startCell + slice) % (cellCount));
 
                 vraw = rawData[pos] * dconv;
-                vraw -= (this.baselineGradient[totalPos] * patchTemperatures[pixel/9] + this.baselineOffset[totalPos]);
-                vraw /= (this.gainGradient[totalPos] * patchTemperatures[pixel/9] + this.gainOffset[totalPos]);
+                vraw -= (this.baselineSlope[totalPos] * patchTemperatures[pixel/9] + this.baselineOffset[totalPos]);
+                vraw /= (this.gainSlope[totalPos] * patchTemperatures[pixel/9] + this.gainOffset[totalPos]);
                 vraw *= 1907.35;
 
                 calibrated[pos] = vraw;
-
             }
         }
-        log.debug("destination.length {} elements", calibrated.length);
         return calibrated;
     }
 
