@@ -157,7 +157,7 @@ public class BinTable {
         });
 
 
-        numberOfRowsInTable = header.getInt("NAXIS2").orElse(0);
+        numberOfRowsInTable = header.getInt("ZNAXIS2").orElse(getInt("NAXIS2").orElse(0));
         numberOfColumnsInTable = columns.size();
 
 
