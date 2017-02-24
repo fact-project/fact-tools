@@ -98,7 +98,7 @@ public class SourcePosition implements StatefulProcessor {
     private final double telescopeLongitudeDeg = -17.890701389;
     private final double telescopeLatitudeDeg = 28.761795;
     //Distance from earth center
-    private final double distanceToEarthCenter = 4889.0;
+    private final double focalLength = 4889.0;
 
     // reference datetime
     DateTime gstReferenceDateTime = new DateTime(2000, 1, 1, 12, 0, DateTimeZone.UTC);
@@ -348,8 +348,8 @@ public class SourcePosition implements StatefulProcessor {
         double z_rot =  Math.cos(-pzd) * z - Math.sin(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
 
         double[] r = new double[2];
-        r[0] = x_rot * (-distanceToEarthCenter) / z_rot;
-        r[1] = - y_rot * (-distanceToEarthCenter) / z_rot;
+        r[0] = x_rot * (-focalLength) / z_rot;
+        r[1] = - y_rot * (-focalLength) / z_rot;
 
         return r;
     }
