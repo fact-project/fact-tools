@@ -158,7 +158,7 @@ public class SourcePosition implements StatefulProcessor {
             double[] source = {x, y};
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
-            
+
             data.put("AzTracking", 0);
             data.put("ZdTracking", 0);
 
@@ -183,7 +183,7 @@ public class SourcePosition implements StatefulProcessor {
         	// Now we can calculate the source position from the zd,az coordinates for pointing and source
         	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
         	data.put(outputKey, sourcePosition);
-        	
+
             data.put("AzTracking", pointingAz);
             data.put("ZdTracking", pointingZd);
 
@@ -259,9 +259,9 @@ public class SourcePosition implements StatefulProcessor {
     }
 
     /**
-     * Convert a DateTime object to greenwhich sidereal time according to 
+     * Convert a DateTime object to greenwhich sidereal time according to
      * https://en.wikipedia.org/wiki/Sidereal_time#Definition
-     * @param datetime 
+     * @param datetime
      * @return gst in radians
      */
     public double datetimeToGST(DateTime datetime){
@@ -275,16 +275,16 @@ public class SourcePosition implements StatefulProcessor {
     }
 
     /**
-     * Implementation of the formulas from 
+     * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
-     * 
+     *
      * @param ra in decimal arc hours (e.g. 5h and 30 minutes : ra = 5.5)
      * @param dec in decimal degrees (e.g. 21 degrees and 30 arc minutes : zd = 21.5)
      * @param datetime DateTime of the event
      * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
      */
     public double[] equatorialToHorizontal(double ra, double dec, DateTime datetime){
-        if (ra >= 24.0 || ra < 0.0 || dec >= 360.0 || dec < 0 ){
+        if (ra >= 24.0 || ra < 0.0 || dec >= 90.0 || dec <= -90 ){
             throw new RuntimeException("Ra or Dec values are invalid. They should be given in decimal arc hours and decimal degree");
         }
 
@@ -292,13 +292,13 @@ public class SourcePosition implements StatefulProcessor {
 
         ra = ra / 12. * Math.PI;
         dec = Math.toRadians(dec);
-        
+
         double telLatRad = Math.toRadians(telescopeLatitudeDeg);
         double telLonRad = Math.toRadians(telescopeLongitudeDeg);
 
         // wikipedia assumes longitude positive in west direction
         double hourAngle = gst + telLonRad - ra;
-        
+
         double altitude = Math.asin(
                 Math.sin(telLatRad) * Math.sin(dec) +
                 Math.cos(telLatRad) * Math.cos(dec) * Math.cos(hourAngle)
@@ -314,7 +314,7 @@ public class SourcePosition implements StatefulProcessor {
         if (azimuth <= - Math.PI){
             azimuth += 2 * Math.PI;
         }
-        
+
         return new double[]{Math.toDegrees(azimuth), 90 - Math.toDegrees(altitude)};
     }
 
