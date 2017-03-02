@@ -1,10 +1,10 @@
 package fact.auxservice;
 
 import fact.auxservice.strategies.AuxPointStrategy;
-import org.joda.time.DateTime;
 import stream.service.Service;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 
 /**
  * The service should provide the ability to get the aux data from some data source.
@@ -25,5 +25,5 @@ public interface AuxiliaryService extends Service {
      * @return
      * @throws IOException
      */
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
 }

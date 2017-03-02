@@ -1,8 +1,8 @@
 package fact.calibrationservice;
 
-import org.joda.time.DateTime;
-
 import stream.service.Service;
+
+import java.time.OffsetDateTime;
 
 /**
  * A CalibrationService provides informations about the hardware status of the camera for the current processed event.
@@ -25,7 +25,7 @@ public interface CalibrationService extends Service {
 	 * @param eventTimeStamp
 	 * @return array of chids
 	 */
-	public int[] getBadPixel(DateTime eventTimeStamp);
+	public int[] getBadPixel(OffsetDateTime eventTimeStamp);
 	
 	/**
 	 * Returns an array, listing the chids of the pixels not usable for cleaning for the given event time stamp
@@ -33,6 +33,6 @@ public interface CalibrationService extends Service {
 	 * @param eventTimeStamp
 	 * @return array of chids, or null if doesn't exist
 	 */
-	public int[] getNotUsablePixels(DateTime eventTimeStamp);
+	public int[] getNotUsablePixels(OffsetDateTime eventTimeStamp);
 
 }

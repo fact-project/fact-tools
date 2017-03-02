@@ -1,17 +1,18 @@
 package fact.calibrationservice;
 
-import org.joda.time.DateTime;
+
+import java.time.*;
 
 public class HardwareConfiguration implements Comparable<HardwareConfiguration> {
 	
-	private DateTime startTime;
+	private OffsetDateTime startTime;
 	
 	private int[] badPixels;
 	
 	private int[] notUsablePixels;
 	
-	public HardwareConfiguration(DateTime startTime){
-		this.startTime = new DateTime(startTime);
+	public HardwareConfiguration(OffsetDateTime startTime){
+		this.startTime = OffsetDateTime.of(startTime.toLocalDate(),startTime.toLocalTime(), ZoneOffset.of("+00:00"));
 	}
 
 	@Override
@@ -33,11 +34,11 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
         return true;
     }
 
-	public DateTime getStartTime() {
+	public OffsetDateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(DateTime startTime) {
+	public void setStartTime(OffsetDateTime startTime) {
 		this.startTime = startTime;
 	}
 

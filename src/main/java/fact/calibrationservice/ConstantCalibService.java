@@ -1,8 +1,9 @@
 package fact.calibrationservice;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.TreeSet;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ import fact.hexmap.FactPixelMapping;
  * @author ftemme
  **/
 public class ConstantCalibService implements CalibrationService {
-	
+
 	Logger log = LoggerFactory.getLogger(ConstantCalibService.class);
 		
 	TreeSet<HardwareConfiguration> set;
@@ -60,15 +61,15 @@ public class ConstantCalibService implements CalibrationService {
 		FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 		set = new TreeSet<HardwareConfiguration>();
 		
-		
-		HardwareConfiguration config1 = new HardwareConfiguration(new DateTime(1970, 1, 1, 0, 0));
+
+		HardwareConfiguration config1 = new HardwareConfiguration(OffsetDateTime.of(1970, 1, 1, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelFromBeginning = {863,868,297,927,80,873,1093,1094,527,528,721,722};
 		config1.setBadPixels(badPixelFromBeginning);
 		config1.setNotUsablePixels(null);
 		
 		
 		
-		HardwareConfiguration config2 = new HardwareConfiguration(new DateTime(2014, 11, 15, 0, 0));
+		HardwareConfiguration config2 = new HardwareConfiguration(OffsetDateTime.of(2014, 11, 15, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] brokenDrsBoard = {
 				pixelMap.getChidFromSoftID(1193),
 				pixelMap.getChidFromSoftID(1194),
@@ -83,34 +84,34 @@ public class ConstantCalibService implements CalibrationService {
 		config2.setBadPixels(badPixelFromBeginning);
 		config2.setNotUsablePixels(brokenDrsBoard);
 		
-		HardwareConfiguration config3 = new HardwareConfiguration(new DateTime(2015, 01, 8, 0, 0));
+		HardwareConfiguration config3 = new HardwareConfiguration(OffsetDateTime.of(2015, 01, 8, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelInJanuary1 = {863,868,297,927,80,873,1093,1094,527,528,721,722,750,729};
 		config3.setBadPixels(badPixelInJanuary1);
 		config3.setNotUsablePixels(brokenDrsBoard);
 
-		HardwareConfiguration config4 = new HardwareConfiguration(new DateTime(2015, 01, 9, 0, 0));
+		HardwareConfiguration config4 = new HardwareConfiguration(OffsetDateTime.of(2015, 01, 9, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelInJanuary2 = {863,868,297,927,80,873,1093,1094,527,528,721,722,750};
 		config4.setBadPixels(badPixelInJanuary2);
 		config4.setNotUsablePixels(brokenDrsBoard);
 		
-		HardwareConfiguration config5 = new HardwareConfiguration(new DateTime(2015, 01, 31, 0, 0));
+		HardwareConfiguration config5 = new HardwareConfiguration(OffsetDateTime.of(2015, 01, 31, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config5.setBadPixels(badPixelFromBeginning);
 		config5.setNotUsablePixels(brokenDrsBoard);
 		
-		HardwareConfiguration config6 = new HardwareConfiguration(new DateTime(2015, 2, 6, 0, 0));
+		HardwareConfiguration config6 = new HardwareConfiguration(OffsetDateTime.of(2015, 2, 6, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelWithDeadBiasBord = {863,868,297,927,80,873,1093,1094,527,528,721,722,171,172,173,174};
 		config6.setBadPixels(badPixelWithDeadBiasBord);
 		config6.setNotUsablePixels(brokenDrsBoard);
 		
-		HardwareConfiguration config7 = new HardwareConfiguration(new DateTime(2015, 2, 12, 0, 0));
+		HardwareConfiguration config7 = new HardwareConfiguration(OffsetDateTime.of(2015, 2, 12, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config7.setBadPixels(badPixelFromBeginning);
 		config7.setNotUsablePixels(brokenDrsBoard);
 		
-		HardwareConfiguration config8 = new HardwareConfiguration(new DateTime(2015, 2, 16, 0, 0));
+		HardwareConfiguration config8 = new HardwareConfiguration(OffsetDateTime.of(2015, 2, 16, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config8.setBadPixels(badPixelWithDeadBiasBord);
 		config8.setNotUsablePixels(brokenDrsBoard);
 		
-		HardwareConfiguration config9 = new HardwareConfiguration(new DateTime(2015, 5, 26, 0, 0));
+		HardwareConfiguration config9 = new HardwareConfiguration(OffsetDateTime.of(2015, 5, 26, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config9.setBadPixels(badPixelWithDeadBiasBord);
 		config9.setNotUsablePixels(null);
 		set.add(config1);
@@ -125,10 +126,10 @@ public class ConstantCalibService implements CalibrationService {
 	}
 
 	/**
-	 * @see CalibrationService#getBadPixel(DateTime)
+	 * @see CalibrationService#getBadPixel(OffsetDateTime)
 	 */
 	@Override
-	public int[] getBadPixel(DateTime eventTimeStamp) {
+	public int[] getBadPixel(OffsetDateTime eventTimeStamp) {
 		if (isInit == false){
 			init();
 			isInit = true;
@@ -138,10 +139,10 @@ public class ConstantCalibService implements CalibrationService {
 	}
 
 	/**
-	 * @see CalibrationService#getNotUsablePixels(DateTime)
+	 * @see CalibrationService#getNotUsablePixels(OffsetDateTime)
 	 */
 	@Override
-	public int[] getNotUsablePixels(DateTime eventTimeStamp) {
+	public int[] getNotUsablePixels(OffsetDateTime eventTimeStamp) {
 		if (isInit == false){
 			init();
 			isInit = true;
@@ -150,7 +151,7 @@ public class ConstantCalibService implements CalibrationService {
 		return currentConfiguration.getNotUsablePixels();
 	}
 	
-	private HardwareConfiguration getHardwareConfiguration(DateTime eventTimeStamp) {
+	private HardwareConfiguration getHardwareConfiguration(OffsetDateTime eventTimeStamp) {
 		// Create a new dummyConfiguration with the current eventTimeStamp and use the set.floor method to get the correct configuration
 		HardwareConfiguration dummyConfiguration = new HardwareConfiguration(eventTimeStamp);
 		return set.floor(dummyConfiguration);

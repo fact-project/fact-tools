@@ -2,9 +2,6 @@ package fact.auxservice;
 
 import com.google.common.cache.*;
 import fact.auxservice.strategies.AuxPointStrategy;
-import org.joda.time.*;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.sqljet.core.SqlJetException;
@@ -16,6 +13,7 @@ import stream.io.SourceURL;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -58,23 +56,20 @@ public class SqliteService implements AuxiliaryService {
 
     public class AuxDataCacheKey {
         private final AuxiliaryServiceName service;
-        private final DateTime roundedTimeStamp;
+        private final OffsetDateTime roundedTimeStamp;
 
-        public AuxDataCacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
+        public AuxDataCacheKey(AuxiliaryServiceName service, OffsetDateTime timeStamp) {
             this.service = service;
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
         }
 
-        public DateTime floorToQuarterHour(DateTime time){
+        public OffsetDateTime floorToQuarterHour(OffsetDateTime time){
+            OffsetDateTime t = OffsetDateTime.of(time.toLocalDate(),time.toLocalTime(), ZoneOffset.of("+00:00")).withSecond(0);
 
-            MutableDateTime t = time.toMutableDateTime();
-            t.setMillisOfSecond(0);
-            t.setSecondOfMinute(0);
-
-            int oldMinute = t.getMinuteOfHour();
+            int oldMinute = t.getMinute();
             int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
-            t.setMinuteOfHour(newMinute);
-            return new DateTime(t);
+
+            return t.withMinute(newMinute);
         }
 
         @Override
@@ -105,7 +100,7 @@ public class SqliteService implements AuxiliaryService {
      * @param time the time stamp of the data event
      * @return the TreeSet containing the AuxPoints
      */
-    public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, DateTime time){
+    public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, OffsetDateTime time){
         TreeSet<AuxPoint> result = new TreeSet<>();
 
         try {
@@ -119,15 +114,31 @@ public class SqliteService implements AuxiliaryService {
                 db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
                 try {
                     if(service == AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION){
-                        String earlier = time.minusHours(4).toString("YYYY-MM-dd HH:mm:ss");
-                        String later = time.plusMinutes(window).toString("YYYY-MM-dd HH:mm:ss");
+
+
+                        String earlierTime=time.minusHours(4).toString();
+                        String [] dateAndTime=earlierTime.split("T");
+                        String [] timeSplitZone=dateAndTime[1].split("Z");
+                        String earlier=dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
+
+                        String laterTime=time.plusMinutes(window).toString();
+                        dateAndTime=laterTime.split("T");
+                        timeSplitZone=dateAndTime[1].split("Z");
+                        String later = dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
 
                         cursor = table.scope("ix_DRIVE_CONTROL_TRACKING_POSITION_Time", new Object[]{earlier}, new Object[]{later});
                         result = getTrackingDataFromCursor(cursor);
                     } else if(service == AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION){
                         //source position is slower. get data from several hours ago.
-                        String earlier = time.minusHours(4).toString("YYYY-MM-dd HH:mm:ss");
-                        String later = time.plusMinutes(window).toString("YYYY-MM-dd HH:mm:ss");
+                        String earlierTime=time.minusHours(4).toString();
+                        String [] dateAndTime=earlierTime.split("T");
+                        String [] timeSplitZone=dateAndTime[1].split("Z");
+                        String earlier=dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
+
+                        String laterTime=time.plusMinutes(window).toString();
+                        dateAndTime=laterTime.split("T");
+                        timeSplitZone=dateAndTime[1].split("Z");
+                        String later = dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
 
                         cursor = table.scope("ix_DRIVE_CONTROL_SOURCE_POSITION_Time", new Object[]{earlier}, new Object[]{later});
                         result = getSourceDataFromCursor(cursor);
@@ -166,9 +177,10 @@ public class SqliteService implements AuxiliaryService {
                 // m.put("Dec_cmd", cursor.getFloat("Dec_cmd"));
                 m.put("Offset", cursor.getFloat("Offset"));
 
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss.SSSSSS");
-                DateTime t = DateTime.parse(cursor.getString("Time"), formatter).withZone(DateTimeZone.UTC);
-
+                String tempTime=cursor.getString("Time");
+                tempTime=tempTime.concat("+00:00");
+                tempTime=tempTime.replace(" ","T");
+                OffsetDateTime t = OffsetDateTime.parse(tempTime);
                 result.add(new AuxPoint(t, m));
             } while (cursor.next());
         }
@@ -190,8 +202,13 @@ public class SqliteService implements AuxiliaryService {
                 m.put("dAz", cursor.getFloat("dAz"));
                 m.put("dev", cursor.getFloat("dev"));
 
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss.SSSSSS");
-                DateTime t = DateTime.parse(cursor.getString("Time"), formatter).withZone(DateTimeZone.UTC);
+
+                String tempTime=cursor.getString("Time");
+                tempTime=tempTime.concat("+00:00");
+                tempTime=tempTime.replace(" ","T");
+
+
+                OffsetDateTime t = OffsetDateTime.parse(tempTime);
 
                 result.add(new AuxPoint(t, m));
             } while (cursor.next());
@@ -207,7 +224,7 @@ public class SqliteService implements AuxiliaryService {
      * @return the data closest to the eventtimestamp which is found in the database according to the strategy.
      */
     @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         try {
             AuxDataCacheKey key = new AuxDataCacheKey(service, eventTimeStamp);
             //this set might not contain the data we need
@@ -216,8 +233,10 @@ public class SqliteService implements AuxiliaryService {
             if (a == null){
                 throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
             }
-            Seconds seconds = Seconds.secondsBetween(eventTimeStamp, a.getTimeStamp());
-            log.debug("Seconds between event and {} auxpoint : {}", service,  seconds.getSeconds());
+            TimeUnit tu=TimeUnit.SECONDS;
+            long difference=eventTimeStamp.toEpochSecond()-a.getTimeStamp().toEpochSecond();
+            long seconds = tu.toSeconds(difference);
+            log.debug("Seconds between event and {} auxpoint : {}", service,  seconds);
             return strategy.getPointFromTreeSet(set, eventTimeStamp);
 
         } catch (ExecutionException e) {

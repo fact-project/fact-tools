@@ -5,8 +5,6 @@ import fact.Utils;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +13,8 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -76,17 +76,18 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 	public Data process(Data input) {
 		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 		Utils.isKeyValid(input, photonChargeKey, double[].class);
-		
-		DateTime timeStamp = null;
+
+		OffsetDateTime timeStamp = null;
 		if (input.containsKey("UnixTimeUTC") == true){
     		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
     		int[] eventTime = (int[]) input.get("UnixTimeUTC");
-        	timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+			long seconds=(long)((eventTime[0] + eventTime[1] / 1000000.) * 1000);
+			timeStamp = Instant.ofEpochSecond(seconds).atOffset(ZoneOffset.UTC);
     	}
     	else {
     		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
     		// => The 12 bad pixels we have from the beginning on are used.
-    		timeStamp = new DateTime(2000, 1, 1, 0, 0);
+    		timeStamp = OffsetDateTime.of(2000, 1, 1, 0, 0,0,0,ZoneOffset.of("+00:00"));
     	}
 
 		double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));

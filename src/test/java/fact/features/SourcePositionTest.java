@@ -1,11 +1,15 @@
 package fact.features;
 
 import fact.features.source.SourcePosition;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -48,7 +52,7 @@ public class SourcePositionTest {
     @Test
     public void testRaDecToAltZenithForMrk421(){
         SourcePosition sourcePosition = new SourcePosition();
-        DateTime dateTime = new DateTime(2014, 3, 25, 00, 42, 29, DateTimeZone.UTC);
+        OffsetDateTime dateTime = OffsetDateTime.of(2014, 3, 25, 00, 42, 29,0, ZoneOffset.of("+00:00"));
         double ra = 11.074266;
         double dec = 38.208801;
         double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
@@ -60,7 +64,7 @@ public class SourcePositionTest {
     @Test
     public void testRaDecToAltZenithForMrk501(){
         SourcePosition sourcePosition = new SourcePosition();
-        DateTime dateTime = new DateTime(2013, 2, 25, 22, 42, 29, DateTimeZone.UTC);
+        OffsetDateTime dateTime = OffsetDateTime.of(2013, 2, 25, 22, 42, 29,0,ZoneOffset.of("+00:00"));
         double ra = 16.8978379666666;
         double dec = 39.76016913;
         double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
@@ -71,7 +75,7 @@ public class SourcePositionTest {
     @Test
     public void testRaDecToAltZenithForCrab(){
         SourcePosition sourcePosition = new SourcePosition();
-        DateTime dateTime = new DateTime(2015, 11, 25, 22, 42, 29, DateTimeZone.UTC);
+        OffsetDateTime dateTime = OffsetDateTime.of(2015, 11, 25, 22, 42, 29,0,ZoneOffset.of("+00:00"));
         double ra = 5.57553886;
         double dec = 22.0145;
         double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
@@ -82,7 +86,7 @@ public class SourcePositionTest {
     @Test
     public void testRaDecToAltZenithFor1ES2344514(){
         SourcePosition sourcePosition = new SourcePosition();
-        DateTime dateTime = new DateTime(2015, 10, 01, 04, 00, 29, DateTimeZone.UTC);
+        OffsetDateTime dateTime = OffsetDateTime.of(2015, 10, 01, 04, 00, 29,0,ZoneOffset.of("+00:00"));
         double ra = 23.784676866666672;
         double dec = 51.704967;
         double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);
@@ -96,7 +100,7 @@ public class SourcePositionTest {
         // 6th of April in 2004 at 21:00 o clock
         // alt az coordinates from http://www.convertalot.com/celestial_horizon_co-ordinates_calculator.html
         SourcePosition sourcePosition = new SourcePosition();
-        DateTime dateTime = new DateTime(2004, 4, 6, 21, 0, 0, DateTimeZone.UTC);
+        OffsetDateTime dateTime = OffsetDateTime.of(2004, 4, 6, 21, 0, 0,0,ZoneOffset.of("+00:00"));
         double ra = 3.0;
         double dec = 24.0;
         double[] azAlt = sourcePosition.equatorialToHorizontal(ra, dec, dateTime);

@@ -4,9 +4,10 @@ import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import stream.annotations.Parameter;
+import sun.text.resources.JavaTimeSupplementary;
+
+import java.time.*;
 
 /**
  * This Processor converts the FACT UnixTime {seconds, microseconds} to a DateTime instance.
@@ -30,7 +31,9 @@ public class UnixTimeUTC2DateTime implements Processor {
         long seconds = unixTimeUTC[0];
         long microseconds = unixTimeUTC[1];
 
-        DateTime date = new DateTime((long) (seconds * 1000.0 + microseconds / 1000.0),  DateTimeZone.UTC);
+        Instant unixMilli=Instant.ofEpochMilli((long)(seconds * 1000.0 + microseconds / 1000.0));
+        OffsetDateTime date = unixMilli.atOffset(ZoneOffset.UTC);
+
         data.put(outputKey, date);
 
         return data;

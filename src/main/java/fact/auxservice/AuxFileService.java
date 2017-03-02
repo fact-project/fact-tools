@@ -1,10 +1,9 @@
 package fact.auxservice;
 
+import com.sun.scenario.effect.Offset;
 import fact.auxservice.strategies.AuxPointStrategy;
 
 import fact.io.hdureader.*;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.annotations.Parameter;
@@ -18,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -57,7 +57,7 @@ public class AuxFileService implements AuxiliaryService {
      * @throws FileNotFoundException
      */
     @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws FileNotFoundException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws FileNotFoundException {
         if(!isInit){
             auxFileUrls = findAuxFileUrls(auxFolder);
             isInit = true;
@@ -67,8 +67,8 @@ public class AuxFileService implements AuxiliaryService {
         }
         TreeSet<AuxPoint> set = services.get(serviceName);
 
-        DateTime firstTimeStamp = set.first().getTimeStamp();
-        DateTime lastTimeStamp = set.last().getTimeStamp();
+        OffsetDateTime firstTimeStamp = set.first().getTimeStamp();
+        OffsetDateTime lastTimeStamp = set.last().getTimeStamp();
         if(firstTimeStamp.isAfter(eventTimeStamp) || lastTimeStamp.isBefore(eventTimeStamp))
         {
             log.warn("Provided event timestamp not in auxiliary File.");
@@ -101,7 +101,9 @@ public class AuxFileService implements AuxiliaryService {
                 OptionalTypesMap<String, Serializable> auxData = auxDataBinTableReader.getNextRow();
 
                 auxData.getDouble("Time").ifPresent(time -> {
-                    DateTime t = new DateTime((long) (time * 24 * 60 * 60 * 1000), DateTimeZone.UTC);
+                    long value=(long)(time * 24 * 60 * 60 *1000 );
+                    Instant insMill=Instant.ofEpochMilli(value);
+                    OffsetDateTime t = insMill.atOffset(ZoneOffset.UTC);
                     AuxPoint p = new AuxPoint(t, auxData);
                     result.add(p);
                 });

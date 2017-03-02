@@ -1,9 +1,8 @@
 package fact.auxservice.strategies;
 
 import fact.auxservice.AuxPoint;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
+import java.time.OffsetDateTime;
 import java.util.TreeSet;
 
 /**
@@ -19,7 +18,7 @@ public class Earlier implements AuxPointStrategy {
      * @return an AuxPoint according to the concrete strategy implementation or null if it doesn't exist.
      */
     @Override
-    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, DateTime eventTimeStamp) {
+    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, OffsetDateTime eventTimeStamp) {
         AuxPoint dummyPoint = new AuxPoint(eventTimeStamp);
         return set.floor(dummyPoint);
     }

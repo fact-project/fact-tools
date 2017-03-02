@@ -3,8 +3,6 @@ package fact.auxservice;
 import com.google.common.cache.*;
 import com.google.gson.*;
 import fact.auxservice.strategies.AuxPointStrategy;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.annotations.Parameter;
@@ -15,6 +13,7 @@ import us.monoid.web.Resty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -59,9 +58,9 @@ public class AuxWebService implements AuxiliaryService {
 
     private class CacheKey{
         private AuxiliaryServiceName service;
-        private DateTime roundedTimeStamp;
+        private OffsetDateTime roundedTimeStamp;
 
-        public CacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
+        public CacheKey(AuxiliaryServiceName service, OffsetDateTime timeStamp) {
             this.service = service;
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
         }
@@ -90,7 +89,9 @@ public class AuxWebService implements AuxiliaryService {
         public AuxPoint deserialize(JsonElement json, Type typeOfT,
                                     JsonDeserializationContext context) throws JsonParseException {
             long value = (long) (((JsonObject) json).get("Time").getAsDouble()* 1000*24*3600);
-            DateTime timeStamp = new DateTime(value, DateTimeZone.UTC);
+            Instant insMill=Instant.ofEpochMilli(value);
+            OffsetDateTime timeStamp = insMill.atOffset(ZoneOffset.UTC);
+
             Map<String, Serializable> data = new HashMap<>();
             data = new Gson().fromJson(json, data.getClass());
             return new AuxPoint(timeStamp, data);
@@ -99,7 +100,7 @@ public class AuxWebService implements AuxiliaryService {
 
 
 
-    private TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, DateTime time){
+    private TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, OffsetDateTime time){
         try {
             log.info("Querying Database for " + service.toString() + " data for time " + time.toString());
             TreeSet<AuxPoint> result = new TreeSet<>();
@@ -125,7 +126,7 @@ public class AuxWebService implements AuxiliaryService {
      * @param eventTimeStamp The timestamp of your current event.
      * @return the data closest to the eventtimestamp which is found in the database.
      */
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         try {
             CacheKey key = new CacheKey(service, eventTimeStamp);
             //this set might not contain the data we need
@@ -139,9 +140,9 @@ public class AuxWebService implements AuxiliaryService {
     }
 
 
-    public static DateTime floorToQuarterHour(DateTime time){
-        DateTime t = time.secondOfMinute().setCopy(0);
-        int oldMinute = t.getMinuteOfHour();
+    public static OffsetDateTime floorToQuarterHour(OffsetDateTime time){
+        OffsetDateTime t=OffsetDateTime.of(time.toLocalDate(),time.toLocalTime(),ZoneOffset.of("+00:00")).withSecond(0);
+        int oldMinute = t.getMinute();
         int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
         return t.plusMinutes(newMinute - oldMinute);
     }

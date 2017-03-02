@@ -1,9 +1,10 @@
 package fact.auxservice.strategies;
 
 import fact.auxservice.AuxPoint;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.TreeSet;
 
 /**
@@ -18,7 +19,7 @@ public class Closest implements AuxPointStrategy {
      * @return an AuxPoint according to the concrete strategy implementation, or null if it doesn't exist.
      */
     @Override
-    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, DateTime eventTimeStamp) {
+    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, OffsetDateTime eventTimeStamp) {
         AuxPoint dummyPoint = new AuxPoint(eventTimeStamp);
         AuxPoint floorPoint = set.floor(dummyPoint);
         AuxPoint ceilPoint = set.ceiling(dummyPoint);
@@ -26,10 +27,12 @@ public class Closest implements AuxPointStrategy {
         AuxPoint retVal = null;
 
         if (floorPoint != null && ceilPoint != null ) {
-            Duration durationFloor = new Duration(floorPoint.getTimeStamp(), eventTimeStamp);
-            Duration durationCeil = new Duration(eventTimeStamp,  ceilPoint.getTimeStamp());
+            Duration durationFloor=Duration.between(floorPoint.getTimeStamp(), eventTimeStamp);
+            Duration durationCeil = Duration.between(eventTimeStamp,  ceilPoint.getTimeStamp());
 
-            if (durationCeil.isShorterThan(durationFloor)){
+            //Duration durationFloor = new Duration(floorPoint.getTimeStamp(), eventTimeStamp);
+            //Duration durationCeil = new Duration(eventTimeStamp,  ceilPoint.getTimeStamp());
+            if ((durationCeil.compareTo(durationFloor))<0){
                 retVal=  ceilPoint;
             } else {
                 retVal=  floorPoint;
