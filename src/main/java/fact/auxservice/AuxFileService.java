@@ -1,6 +1,6 @@
 package fact.auxservice;
 
-import com.sun.scenario.effect.Offset;
+//import com.sun.scenario.effect.Offset;
 import fact.auxservice.strategies.AuxPointStrategy;
 
 import fact.io.hdureader.*;
