@@ -1,0 +1,67 @@
+<container>
+  <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
+  <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+  <property name="outfile" value="file:test_out.fits" />
+  <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
+  <property name="fitValueFile" value="file:src/main/resources/aux/fitValuesData.fits" />
+  <property name="fitValueFileInterval" value="file:src/main/resources/aux/fitValuesData.fits" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+  <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
+
+  <!-- Description of the process and the corresponding stream -->
+  <process id="2" input="fact">
+
+  <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
+
+  <fact.datacorrection.DrsCalibration
+    url="${drsfile}"
+    key="Data"
+    outputKey="DRSCalibratedData"
+  />
+
+  <fact.features.TimeSeriesNoise
+      dataKey="DRSCalibratedData"
+      outputKey="DRSCalibratedDataNoise"
+  />
+
+  <fact.datacorrection.DrsTemperatureCalibration
+    auxService="auxService"
+    drsFitFilePath="${fitValueFile}"
+    key="Data"
+    outputKey="DRSCalibratedData_Temp"
+  />
+
+  <fact.features.TimeSeriesNoise
+      dataKey="DRSCalibratedData_Temp"
+      outputKey="DRSCalibratedData_TempNoise"
+  />
+
+  <fact.datacorrection.DrsTemperatureCalibration
+    auxService="auxService"
+    drsFitFilePath="${fitValueFileInterval}"
+    key="Data"
+    outputKey="DRSCalibratedData_TempInterval"
+  />
+
+  <fact.features.TimeSeriesNoise
+      dataKey="DRSCalibratedData_TempInterval"
+      outputKey="DRSCalibratedData_TempIntervalNoise"
+  />
+
+  <fact.io.FITSWriter
+    url="${outfile}"
+    keys="DRSCalibratedDataNoise, DRSCalibratedData_TempNoise, DRSCalibratedData_TempIntervalNoise"
+    extname="StdPerPixel"
+    comment="comment1"
+  />
+
+    <!-- <fact.ShowViewer key="DataCalibratedDRS_Temp" /> -->
+  </process>
+</container>
