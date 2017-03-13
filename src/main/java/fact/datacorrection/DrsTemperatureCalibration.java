@@ -76,7 +76,7 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
 
     /******************************************************************************************************************/
     // The following keys are required to exist in the DRS-FitValue data
-    private final static String[] fitValueKeys = new String[]{"slope", "offset"};
+    private final static String[] fitValueKeys = new String[]{"Slope", "Offset"};
 
     /******************************************************************************************************************/
     // The following keys are required to exist in the raw data
@@ -92,7 +92,7 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
             try {
                 loadDrsFitParameter(this.drsFitFilePath);
             } catch (Exception e) {
-                log.error("Could not load file specified in the url_fitValueFile.");
+                log.error("Could not load file '"+this.drsFitFilePath+"' specified in the url_fitValueFile.");
                 throw new RuntimeException(e.getMessage());
             }
         } else {
@@ -118,8 +118,8 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
 
             Utils.mapContainsKeys(this.fitValueData, this.fitValueKeys);
 
-            this.baselineSlope = ((float[]) this.fitValueData.get("slope"));
-            this.baselineOffset = ((float[]) this.fitValueData.get("offset"));
+            this.baselineSlope = ((float[]) this.fitValueData.get("Slope"));
+            this.baselineOffset = ((float[]) this.fitValueData.get("Offset"));
 
             log.debug("baselineSlope data: {}", this.baselineSlope);
             log.debug("baselineOffset data: {}", this.baselineOffset);
@@ -133,8 +133,8 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
 
             Utils.mapContainsKeys(this.fitValueData, this.fitValueKeys);
 
-            this.gainSlope = ((float[]) this.fitValueData.get("slope"));
-            this.gainOffset = ((float[]) this.fitValueData.get("offset"));
+            this.gainSlope = ((float[]) this.fitValueData.get("Slope"));
+            this.gainOffset = ((float[]) this.fitValueData.get("Offset"));
 
             log.debug("gainSlope data: {}", this.gainSlope);
             log.debug("gainOffset data: {}", this.gainOffset);
