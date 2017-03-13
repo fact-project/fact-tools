@@ -1,5 +1,5 @@
 <application>
-  <stream id="fact" class="fact.io.FitsStream" url="classpath:/testDataFile.fits.gz"/>
+  <stream id="fact" class="fact.io.FITSStream" url="classpath:/testDataFile.fits.gz"/>
   <process input="fact">
     <PrintData/>
   </process>

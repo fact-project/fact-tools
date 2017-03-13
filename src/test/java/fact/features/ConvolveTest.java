@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeSeriesExtraction.Convolve;
+import fact.photonstream.timeSeriesExtraction.Convolve;
 
 public class ConvolveTest {
 
@@ -13,7 +13,7 @@ public class ConvolveTest {
         double[] deltaSpike = {1.0};
 
         double[] box = {
-            0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
+            0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
             1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0};
 
         double[] result = Convolve.firstWithSecond(box, deltaSpike);
@@ -29,9 +29,9 @@ public class ConvolveTest {
 
         double[] triangle = {0.5, 1.0, 0.5};
         double[] box = {
-        //       0    1    2    3    4    5    6    7  
+        //       0    1    2    3    4    5    6    7
             0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-        //  8    9   10   11   12   13    14   15      
+        //  8    9   10   11   12   13    14   15
             1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0
         };
 
@@ -61,9 +61,9 @@ public class ConvolveTest {
 
         double[] zeros = {0.0, 0.0, 0.0};
         double[] box = {
-        //       0    1    2    3    4    5    6    7  
+        //       0    1    2    3    4    5    6    7
             0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-        //  8    9   10   11   12   13    14   15      
+        //  8    9   10   11   12   13    14   15
             1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0
         };
 
@@ -71,7 +71,7 @@ public class ConvolveTest {
 
         Assert.assertEquals(18-3+1, result.length);
 
-        for(int i=0; i<16; i++) 
+        for(int i=0; i<16; i++)
             Assert.assertEquals(0.0, result[i]);
     }
 }

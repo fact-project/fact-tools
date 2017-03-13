@@ -4,7 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-  <version>0.17.2</version>
+  <version>0.18.0</version>
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -15,7 +15,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
-    <streams.version>0.9.23</streams.version>
+    <streams.version>1.0.0</streams.version>
     <binary.name>fact-tools-${project.version}</binary.name>
     <skipTests>false</skipTests>
     <finalName>fact-tools-${project.version}</finalName>
@@ -53,6 +53,13 @@
     <developer>
       <name>Dominik Neise</name>
       <email>neised@phys.ethz.ch</email>
+      <organization>Departement of physics, ETH Zurich</organization>
+      <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Sebastian Müller</name>
+      <email>sebmuell@phys.ethz.ch</email>
       <organization>Departement of physics, ETH Zurich</organization>
       <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
       <timezone>+1</timezone>
@@ -160,19 +167,19 @@
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-core</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-plotter</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
-      <groupId>org.jwall</groupId>
+      <groupId>de.sfb876</groupId>
       <artifactId>streams-runtime</artifactId>
       <version>${streams.version}</version>
       <scope>${streams.scope}</scope>
@@ -215,7 +222,7 @@
     <dependency>
       <groupId>gov.nasa.gsfc.heasarc</groupId>
       <artifactId>nom-tam-fits</artifactId>
-      <version>1.14.3</version>
+      <version>1.15.1</version>
     </dependency>
   </dependencies>
 
@@ -225,8 +232,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -328,14 +335,6 @@
         <configuration>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>

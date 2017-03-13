@@ -22,7 +22,7 @@ FITS data file and applies the DRS calibration:
 
      <container>
 
-        <Stream id="fact-data" class="fact.io.FitsStream"
+        <Stream id="fact-data" class="fact.io.FITSStream"
                 url="file:///tmp/fact-data.fits.gz" />
 
 
