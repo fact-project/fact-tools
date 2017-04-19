@@ -476,6 +476,19 @@ public class Utils {
 
 
 	/**
+	 * Calculate the physical capacitor id (cell) for given sample id, start cell and total number of cells
+	 *
+	 * @param sample the position of the slice in the roi
+	 * @param startCell the first read out slice
+	 * @param numCells the total number of cells per pixel
+	 * @return the physical cell [0, numCells - 1]
+	 */
+	public static int sampleToCell(int sample, int startCell, int numCells){
+		return (startCell + sample) % numCells;
+	}
+
+
+	/**
 	 * Absolute position in the data array by pixel and slice
 	 *
 	 * @param pix
