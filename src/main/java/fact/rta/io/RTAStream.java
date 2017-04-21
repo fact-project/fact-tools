@@ -25,7 +25,7 @@ public class RTAStream extends AbstractMultiStream {
 
 
     @Parameter(required = true, description = "Path to folder thats being watched")
-    private String folder;
+    public String folder;
 
     @Parameter
     public String jdbcConnection;

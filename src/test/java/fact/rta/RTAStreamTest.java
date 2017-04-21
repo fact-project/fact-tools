@@ -26,12 +26,14 @@ public class RTAStreamTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void testFileMatching() throws FitsException, IOException, URISyntaxException, SQLException {
+    public void testFileMatching() throws Exception {
         URL resource = RTAStreamTest.class.getResource("/./");
         File dbFile = temporaryFolder.newFile("test.sqlite");
 
         RTAStream rtaStream = new RTAStream();
         rtaStream.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
+        rtaStream.folder = temporaryFolder.newFolder("empty").getAbsolutePath();
+        rtaStream.init();
 
         Files.walkFileTree(Paths.get(resource.toURI()), rtaStream.new RegexVisitor("\\d{8}_\\d{3}.(fits|zfits)(.gz)?"));
         //there are 3 valid test files at the moment

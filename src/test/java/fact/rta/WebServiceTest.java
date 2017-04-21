@@ -2,8 +2,7 @@ package fact.rta;
 
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.hdureader.FITSStream;
 import fact.rta.db.Run;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -32,9 +31,9 @@ import static org.junit.Assert.fail;
  */
 public class WebServiceTest {
 
-    private URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+    private URL dataUrl =  WebServiceTest.class.getResource("/testDataFile.fits.gz");
     private SourceURL url = new SourceURL(dataUrl);
-    private FitsStream stream = new FitsStream(url);
+    private FITSStream stream = new FITSStream(url);
 
     @Before
     public void setup() throws Exception {
@@ -65,7 +64,6 @@ public class WebServiceTest {
     @Rule
     public TemporaryFolder folder= new TemporaryFolder();
 
-    @Test
     public void startServer() throws Exception {
         RTAWebService s = new RTAWebService();
         File dbFile  = folder.newFile("data.sqlite");
@@ -143,7 +141,7 @@ public class WebServiceTest {
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 1);
-        OffsetDateTime utc = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(Exception::new);
+        OffsetDateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
         s.updateEvent(utc, item, ftmPoints);
 
 
@@ -160,7 +158,7 @@ public class WebServiceTest {
             item.put("NIGHT", night);
             item.put("RUNID", runID + 1);
 
-            utc = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(Exception::new);
+            utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
             Map<String, Serializable> map = new HashMap<>();
             map.put("OnTime", 4.0f);
             ftmPoints.add(new AuxPoint(AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new), map));
@@ -175,7 +173,7 @@ public class WebServiceTest {
         item = prepareNextItem();
         item.put("NIGHT", night);
         item.put("RUNID", runID + 2);
-        utc = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(Exception::new);
+        utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
         s.updateEvent(utc, item, ftmPoints);
 
 

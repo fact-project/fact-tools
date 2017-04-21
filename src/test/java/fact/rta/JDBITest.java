@@ -3,8 +3,7 @@ package fact.rta;
 
 import fact.auxservice.AuxiliaryService;
 
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.hdureader.FITSStream;
 import fact.rta.db.Run;
 import fact.rta.db.Signal;
 import org.joda.time.DateTime;
@@ -17,7 +16,6 @@ import org.junit.rules.TemporaryFolder;
 import org.skife.jdbi.v2.DBI;
 import stream.Data;
 import stream.io.SourceURL;
-import sun.awt.image.OffScreenImage;
 
 import java.io.File;
 import java.net.URL;
@@ -35,9 +33,9 @@ import static org.junit.Assert.assertThat;
  */
 public class JDBITest {
 
-    URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+    URL dataUrl =  JDBITest.class.getResource("/testDataFile.fits.gz");
     SourceURL url = new SourceURL(dataUrl);
-    FitsStream stream = new FitsStream(url);
+    FITSStream stream = new FITSStream(url);
 
     @Before
     public void setup() throws Exception {
@@ -98,8 +96,7 @@ public class JDBITest {
 
         rtaTables.createSignalTableIfNotExists();
 
-
-        OffsetDateTime eventTime = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(RuntimeException::new);
+        OffsetDateTime eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
         Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
         rtaTables.insertSignal(s);
         //second insert should be ignored
@@ -111,7 +108,7 @@ public class JDBITest {
         item = prepareNextItem();
 
 
-        eventTime = AuxiliaryService.unixTimeUTCToOffsetDateTime(item).orElseThrow(RuntimeException::new);
+        eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
 
         s = new Signal(eventTime, OffsetDateTime.now(),item, run);
         rtaTables.insertSignal(s);
@@ -154,7 +151,7 @@ public class JDBITest {
 
         rtaTables.createSignalTableIfNotExists();
         for (int i = 1; i < 60; i++) {
-            OffsetDateTime eventTime = OffsetDateTime.parse(String.format("2016-02-01T00:%1$02d:22+00:00", i ));
+            OffsetDateTime eventTime = DateTime.parse(String.format("2016-02-01T00:%1$02d:22+00:00", i )).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
             Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
             rtaTables.insertSignal(s);
         }

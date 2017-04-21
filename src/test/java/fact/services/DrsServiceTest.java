@@ -1,10 +1,7 @@
 package fact.services;
 
 import fact.DrsFileService;
-import fact.auxservice.AuxFileService;
-import fact.auxservice.AuxiliaryServiceName;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.hdureader.FITSStream;
 import org.junit.Test;
 import stream.Data;
 import stream.io.SourceURL;
@@ -32,7 +29,7 @@ public class DrsServiceTest {
         s.setRawDataFolder(new SourceURL(u));
 
         u =  DrsServiceTest.class.getResource("/testDataFile.fits.gz");
-        FitsStream stream = new FitsStream(new SourceURL(u));
+        FITSStream stream = new FITSStream(new SourceURL(u));
         stream.init();
         Data item = stream.read();
 

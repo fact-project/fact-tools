@@ -78,7 +78,7 @@ public class DrsFileService implements Service {
 
 
     private LocalDateTime getObservationDate(Path p) {
-        Fits fits = Fits.fromPath(p);
+        FITS fits = FITS.fromPath(p);
         HDU hdu = fits.getHDU("DrsCalibration");
         return hdu.header.date().orElse(LocalDateTime.MIN);
     }
@@ -99,7 +99,7 @@ public class DrsFileService implements Service {
                 .orElseThrow(()-> new IOException("No files found matching *.drs.fits.gz or no dates in FITS header."));
 
 
-        Fits fits = new Fits(pathToClosestDrsFile.toUri().toURL());
+        FITS fits = new FITS(pathToClosestDrsFile.toUri().toURL());
         HDU calibrationHDU = fits.getHDU("DrsCalibration");
         BinTable binTable = calibrationHDU.getBinTable();
 
