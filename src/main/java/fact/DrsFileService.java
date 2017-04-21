@@ -91,13 +91,13 @@ public class DrsFileService implements Service {
         //find drsfile closest in time to the observationdate
         Path pathToClosestDrsFile = Files
                 .list(pathToFolder)
-                .filter(p -> p.getFileName().toString().endsWith(".drs.fits.gz"))
+                .filter(p -> p.getFileName().toString().contains(".drs.fits"))
                 .reduce((a, b) -> {
                     long toA = ChronoUnit.SECONDS.between(getObservationDate(a), key.observationDate);
                     long toB = ChronoUnit.SECONDS.between(getObservationDate(b), key.observationDate);
                     return Math.abs(toA) < Math.abs(toB) ? a : b;
                 })
-                .orElseThrow(()-> new IOException("No files found matching *.drs.fits.gz or no dates in FITS header."));
+                .orElseThrow(()-> new IOException("No files found matching *.drs.fits* or no dates in FITS header."));
 
 
         FITS fits = new FITS(pathToClosestDrsFile.toUri().toURL());
