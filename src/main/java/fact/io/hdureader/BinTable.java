@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
  * The data in this table can be read using a TableReader instance.
  * @see BinTableReader
  *
- * A BinTable is created from a Header object, the offset the of the HDU this table belongs to and  the URL of the file
- * so new  inputStreams can be created.
+ * A BinTable is created from a Header object, the offset of the HDU this table belongs to and the URL of the file
+ * so new inputStreams can be created.
  *
  * Note: Not all things in the FITS standard are supported e.g. complex numbers !
  *
@@ -38,13 +38,16 @@ public class BinTable {
     /**
      * This enum maps the type characters in the header to the fits types.
      * Not all types from the fits standard are supported here.
+     *The first letter denotes the datatype according to the fits standard
+     *The second entry maps these types to java types
+     *The third entry gives the number of bytes the data type uses in the FITS standard.
      *
-     * Note: support variable length arrays.
+     * Note: variable length arrays are not supported.
      *
      */
     enum ColumnType {
         BOOLEAN("L", Boolean.class, 1),
-        CHAR("A", Character.class, 1),
+        CHAR("A", Character.class, 1),// this is one ASCII byte in FITS. A char however is two bytes in java.
         BYTE("B", Byte.class, 1),
         SHORT("I", Short.class, 2),
         INT("J", Integer.class, 4),
@@ -76,7 +79,7 @@ public class BinTable {
 
     /**
      * Representation of column meta data for a bintable.
-     * Keeps information like the repeatcount, type and name of the column.
+     * Keeps information like the repeatCount, type and name of the column.
      */
     class TableColumn{
 
@@ -86,6 +89,12 @@ public class BinTable {
 
         /**
          * Create a TableColumn from the tform and ttype header information.
+         * In FITS files that are compressed according to the TILE compression convention
+         * the compressed columns have their type stored in a key called ZFORM.
+         * The ZFits file format also uses these keys. Since this implementation only supports
+         * plain old Binary Tables and ZFITs files (so far) we use the type stored in the ZFORM key
+         * if it exits.
+         *
          * @param tform the headerline specifying the type of the data.
          * @param ttype the headerline specifying the name of the column.
          */
@@ -148,17 +157,20 @@ public class BinTable {
         });
 
 
-        numberOfRowsInTable = header.getInt("NAXIS2").orElse(0);
+        numberOfRowsInTable = header.getInt("ZNAXIS2").orElse(header.getInt("NAXIS2").orElse(0));
         numberOfColumnsInTable = columns.size();
 
 
         // create readers for the data in this table
         //create stream for data in table area of the bintable extension
-        DataInputStream stream = Fits.getDecompressedDataStream(url);
+        DataInputStream stream = FITS.getUnGzippedDataStream(url);
 
         long skippedBytes = stream.skipBytes((int) (hduOffset + header.headerSizeInBytes));
         if(skippedBytes != hduOffset + header.headerSizeInBytes){
-            throw new IOException("Could not skip all bytes to table data in this HDU.");
+            throw new IOException("Tried to skip to table data in this HDU. Should have skipped to byte" +
+                    (int) (hduOffset + header.headerSizeInBytes) + " but only skipped " + skippedBytes + " in total. " +
+                    "Either the files has been truncated after the header of this HDU was written or something went " +
+                    "wrong while reading the file from the file system.");
         }
         this.tableDataStream = stream;
 
@@ -174,7 +186,7 @@ public class BinTable {
 
             int bytesToSkip = Math.toIntExact((hduOffset + header.headerSizeInBytes + theap));
 
-            DataInputStream hStream = Fits.getDecompressedDataStream(url);
+            DataInputStream hStream = FITS.getUnGzippedDataStream(url);
             skippedBytes = hStream.skipBytes(bytesToSkip);
 
             if (skippedBytes != bytesToSkip) {
@@ -187,24 +199,18 @@ public class BinTable {
 
     /**
      * Perform some sanity checks on the bintable.
-     *  1. The TFIELDS keyword must exist.
-     *  2. The number of columns stored in the TFIELD line has to fit the number
-     *     of TTPYE fields
-     *  3. Make sure the NAXIS2 keyword exists. It gives the number of rows.
-     *  4. NAXIS2 needs to be non-negative.
+     *  1. Make sure the NAXIS1 and NAXIS2 keywords exists.
+     *  2. NAXIS1 and NAXIS2 need to be non-negative.
+     *  3. Check whether PCOUNT exists.
+     *  4. If PCOUNT > 0 check whether THEAP contains the right values according to standard.
      *
      * @param header the header to check
      */
     private void binTableSanityCheck(Header header) {
-        int tfields = header.getInt("TFIELDS").orElseThrow(() -> {
-            log.error("The TFIELDS keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.2.1 of the Fits 3.0 standard");
-            return new IllegalArgumentException("Missing TFIELD keyword");
-        });
 
         int naxis1 = header.getInt("NAXIS1").orElseThrow(() -> {
             log.error("The NAXIS1 keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+                    "Its mandatory.\nSee section 7.3.1 of the FITS 3.0 standard");
             return new IllegalArgumentException("Missing NAXIS2 keyword");
         });
 
@@ -214,7 +220,7 @@ public class BinTable {
 
         int naxis2 = header.getInt("NAXIS2").orElseThrow(() -> {
             log.error("The NAXIS2 keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+                    "Its mandatory.\nSee section 7.3.1 of the FITS 3.0 standard");
             return new IllegalArgumentException("Missing NAXIS2 keyword");
         });
 
@@ -224,7 +230,7 @@ public class BinTable {
 
         long pcount = header.getLong("PCOUNT").orElseThrow(() -> {
             log.error("The PCOUNT keyword cannot be found in the BinTable. " +
-                    "Its mandatory.\nSee section 7.3.1 of the Fits 3.0 standard");
+                    "Its mandatory.\nSee section 7.3.1 of the FITS 3.0 standard");
             return new IllegalArgumentException("Missing PCOUNT keyword");
 
         });
@@ -236,19 +242,19 @@ public class BinTable {
         if (pcount > 0){
             int theap = header.getInt("THEAP").orElseThrow(() -> {
                 log.error("The THEAP keyword cannot be found in the BinTable. " +
-                        "Its mandatory when PCOUNT is larger than 0.\nSee section 7.3.2 of the Fits 3.0 standard");
+                        "Its mandatory when PCOUNT is larger than 0.\nSee section 7.3.2 of the FITS 3.0 standard");
                 return new IllegalArgumentException("Missing THEAP keyword");
 
             });
 
             if(theap < 0){
-                throw new IllegalArgumentException("Number of bytes in to skip to the heap (THEAP) is negative.");
+                throw new IllegalArgumentException("Number of bytes to skip to the heap (THEAP) is negative.");
             }
 
             int desiredTheap = naxis1*naxis2 + (naxis1 * naxis2) % 2880;
             if(theap == desiredTheap){
                 throw new IllegalArgumentException("The value for THEAP should be equal to (NAXIS1*NAXIS2 + padding to 2880 blocks)." +
-                        "\nSee section 7.3.2 of the Fits 3.0 standard");
+                        "\nSee section 7.3.2 of the FITS 3.0 standard");
             }
         }
     }

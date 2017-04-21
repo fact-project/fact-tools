@@ -47,8 +47,6 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
     private String extname = "Events";
 
-    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
-
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
@@ -64,9 +62,6 @@ public class FITSWriter implements StatefulProcessor {
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
 
-        for (String key: defaultKeys ){
-            outputItem.put(key, item.get(key));
-        }
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
         }

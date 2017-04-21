@@ -13,7 +13,7 @@
   <!-- Open Shutter Data: -->
   <!-- <property name="data" value="/local/data/kgray/test/20130104_095.fits.gz" />  -->
   <!-- <property name="dataDRS" value="/local/data/kgray/test/20130104_076.drs.fits.gz" /> -->
-  <stream id="fact" class="fact.io.FitsStream" url="${infile}" />
+  <stream id="fact" class="fact.io.FITSStream" url="${infile}" />
 
   <process input="fact">
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5" />

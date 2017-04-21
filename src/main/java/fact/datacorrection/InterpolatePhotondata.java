@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Service;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
 

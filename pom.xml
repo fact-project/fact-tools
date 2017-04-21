@@ -15,7 +15,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
-    <streams.version>0.9.26-SNAPSHOT</streams.version>
+    <streams.version>1.0.0</streams.version>
     <binary.name>fact-tools-${project.version}</binary.name>
     <skipTests>false</skipTests>
     <finalName>fact-tools-${project.version}</finalName>
@@ -53,6 +53,13 @@
     <developer>
       <name>Dominik Neise</name>
       <email>neised@phys.ethz.ch</email>
+      <organization>Departement of physics, ETH Zurich</organization>
+      <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Sebastian Müller</name>
+      <email>sebmuell@phys.ethz.ch</email>
       <organization>Departement of physics, ETH Zurich</organization>
       <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
       <timezone>+1</timezone>

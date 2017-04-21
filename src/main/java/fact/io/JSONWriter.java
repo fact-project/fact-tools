@@ -20,7 +20,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -120,16 +119,12 @@ public class JSONWriter implements StatefulProcessor {
     private Gson gson;
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
-    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
     
     boolean isFirstLine = true;
 
     @Override
     public Data process(Data data) {
         Data item = DataFactory.create();
-        for (String key: defaultKeys ){
-            item.put(key, data.get(key));
-        }
 
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));
@@ -210,12 +205,12 @@ public class JSONWriter implements StatefulProcessor {
                     bw.write("]");
                 }
             }
-
+        } catch (IOException e){
+            // ignore stream bw was closed apparently
+        } finally {
             if (bw != null){
                 bw.close();
             }
-        } catch (IOException e){
-            // ignore stream bw was closed apparently
         }
     }
 
@@ -251,7 +246,7 @@ public class JSONWriter implements StatefulProcessor {
         this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
-    public static class DateTimeAdapter extends TypeAdapter<DateTime>{
+    public class DateTimeAdapter extends TypeAdapter<DateTime>{
 
         @Override
         public void write(JsonWriter jsonWriter, DateTime dateTime) throws IOException {

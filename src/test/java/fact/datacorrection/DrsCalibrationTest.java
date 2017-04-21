@@ -1,7 +1,7 @@
 package fact.datacorrection;
 
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.FITSStream;
+import fact.io.FITSStreamTest;
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;
@@ -19,13 +19,14 @@ import static org.junit.Assert.fail;
  */
 public class DrsCalibrationTest {
 
-    private URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+    URL drsUrl =  DrsCalibrationTest.class.getResource("/testDrsFile.drs.fits.gz");
+    URL dataUrl =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
 
-    private FitsStream stream;
+    private FITSStream stream;
 
     @Before
     public void setup() throws Exception {
-        stream = new FitsStream(new SourceURL(dataUrl));
+        stream = new FITSStream(new SourceURL(dataUrl));
         stream.init();
     }
 
@@ -33,16 +34,31 @@ public class DrsCalibrationTest {
     public void testMissingURLParameter() throws Exception{
         DrsCalibration pr = new DrsCalibration();
         pr.setOutputKey("test");
+        pr.init(null);
+
+        Data item = stream.readNext();
+
         try {
-            pr.init(null);
-
-            Data item = stream.readNext();
-
             pr.process(item);
         } catch (IllegalArgumentException e){
             return;
         }
         fail("Expected an IllegalArgumentException.");
+    }
+
+    @Test
+    public void testDrsURLinStream() throws Exception{
+
+        DrsCalibration pr = new DrsCalibration();
+        pr.setOutputKey("test");
+        pr.init(null);
+
+        Data item = stream.readNext();
+        item.put("@drsFile", new File(drsUrl.getFile()));
+
+        item = pr.process(item);
+        assertThat(item.containsKey("test"), is(true));
+
     }
 
 }

@@ -2,8 +2,8 @@ package fact.features;
 
 import fact.extraction.MaxAmplitude;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.FITSStream;
+import fact.io.FITSStreamTest;
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;
@@ -24,7 +24,7 @@ public class MaxAmplitudeTest {
     @Before
 	public void setup() throws Exception{
 
-		URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+		URL drsUrl =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
 		pr.setUrl(new SourceURL(drsUrl));
 		pr.setOutputKey("test");
@@ -34,16 +34,16 @@ public class MaxAmplitudeTest {
 		maxAmp.setKey("test");
 		maxAmp.setOutputKey(outputKey);
 
-		
+
 	}
-	
+
 	@Test
 	public void dataTypes() {
 
 		try {
-			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+			URL dataUrl =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(dataUrl);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 			Data item = stream.read();
             pr.init(null);
