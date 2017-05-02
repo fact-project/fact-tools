@@ -1,6 +1,6 @@
 package fact.io.hdu_reader;
 
-import fact.io.hdureader.Fits;
+import fact.io.hdureader.FITS;
 import fact.io.hdureader.HDU;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test the Fits object
+ * Test the FITS object
  * Created by mackaiver on 14/12/16.
  */
 public class FitsHDUTests {
@@ -23,7 +23,7 @@ public class FitsHDUTests {
     public void testToOpenInputStream() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         HDU events = f.getHDU("Events");
 
@@ -44,7 +44,7 @@ public class FitsHDUTests {
         byte[] header = new byte[2];
         u.openStream().read(header);
 
-        assertTrue(Fits.isGzippedCompressed(header));
+        assertTrue(FITS.isGzippedCompressed(header));
 
 
         u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
@@ -52,14 +52,14 @@ public class FitsHDUTests {
         header = new byte[2];
         u.openStream().read(header);
 
-        assertFalse(Fits.isGzippedCompressed(header));
+        assertFalse(FITS.isGzippedCompressed(header));
     }
 
     @Test
     public void testInputStreamFromFitsFile() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         HDU events = f.getHDU("Events");
 
@@ -74,7 +74,7 @@ public class FitsHDUTests {
     public void testPrimaryHDU() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         HDU primaryHDU = f.primaryHDU;
 

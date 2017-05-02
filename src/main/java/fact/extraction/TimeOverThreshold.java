@@ -123,9 +123,7 @@ public class TimeOverThreshold implements Processor {
 
         //Add totPixelSet only to data item if it is not empty
         totPixelSet = pixelSet.toIntArray();
-        if (totPixelSet.length != 0){
-            input.put(outputKey+"Set", pixelSet.toIntArray());
-        }
+        input.put(outputKey+"Set", pixelSet.toIntArray());
         return input;
 	}
 

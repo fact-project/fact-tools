@@ -1,7 +1,7 @@
 package fact.io.hdu_reader;
 
 
-import fact.io.FitsStream;
+import fact.io.FITSStream;
 import fact.io.hdureader.*;
 
 import fact.io.zfits.ZFitsStream;
@@ -32,12 +32,12 @@ public class CompareOldAndNewReaders {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
         //create a new fits file object and get the bin table
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
         BinTableReader reader = BinTableReader.forBinTable(b);
 
         //init the old fitstream
-        FitsStream stream = new FitsStream(new SourceURL(u));
+        FITSStream stream = new FITSStream(new SourceURL(u));
         stream.init();
 
 
@@ -61,12 +61,12 @@ public class CompareOldAndNewReaders {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
 
         //create a new fits file object and get the bin table
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
         BinTableReader reader = BinTableReader.forBinTable(b);
 
         //init the old fitstream
-        FitsStream stream = new FitsStream(new SourceURL(u));
+        FITSStream stream = new FITSStream(new SourceURL(u));
         stream.init();
 
         for (int i = 0; i < 15; i++) {
@@ -87,12 +87,12 @@ public class CompareOldAndNewReaders {
         URL u =  CompareOldAndNewReaders.class.getResource("/testMcFile.fits.gz");
 
         //create a new fits file object and get the bin table
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
         BinTableReader reader = BinTableReader.forBinTable(b);
 
         //init the old fitstream
-        FitsStream stream = new FitsStream(new SourceURL(u));
+        FITSStream stream = new FITSStream(new SourceURL(u));
         stream.init();
 
         for (int i = 0; i < 15; i++) {
@@ -116,10 +116,10 @@ public class CompareOldAndNewReaders {
 
 
         //new zfitsreader
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         HDU events = f.getHDU("ZDrsCellOffsets");
         BinTable binTable = events.getBinTable();
-        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
         OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
 
 
@@ -144,10 +144,10 @@ public class CompareOldAndNewReaders {
         Data dataFromOldStream = stream.readNext();
 
         //new zfitsreader
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         HDU events = f.getHDU("Events");
         BinTable binTable = events.getBinTable();
-        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
         OptionalTypesMap<String, Serializable> data = heapReader.getNextRow();
 
         assertTrue(data.size() > 0);
@@ -167,7 +167,7 @@ public class CompareOldAndNewReaders {
         stream.init();
 
 
-        fact.io.hdureader.FitsStream newStream = new fact.io.hdureader.FitsStream(new SourceURL(u));
+        fact.io.hdureader.FITSStream newStream = new fact.io.hdureader.FITSStream(new SourceURL(u));
         newStream.init();
 
         Data dataFromOldStream = stream.readNext();
@@ -192,7 +192,7 @@ public class CompareOldAndNewReaders {
         stream.init();
 
 
-        fact.io.hdureader.FitsStream newStream = new fact.io.hdureader.FitsStream(new SourceURL(u));
+        fact.io.hdureader.FITSStream newStream = new fact.io.hdureader.FITSStream(new SourceURL(u));
         newStream.init();
         int i = 0;
         while(true) {
@@ -232,7 +232,7 @@ public class CompareOldAndNewReaders {
         stream.init();
 
 
-        fact.io.hdureader.FitsStream newStream = new fact.io.hdureader.FitsStream(new SourceURL(u));
+        fact.io.hdureader.FITSStream newStream = new fact.io.hdureader.FITSStream(new SourceURL(u));
         newStream.init();
 
         for (int i = 0; i < 15; i++) {
@@ -272,10 +272,10 @@ public class CompareOldAndNewReaders {
         stream.init();
 
         //new zfitsreader
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
         HDU events = f.getHDU("Events");
         BinTable binTable = events.getBinTable();
-        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
 
         for (int i = 0; i < 5; i++) {
             Data dataFromOldStream = stream.readNext();
@@ -296,12 +296,12 @@ public class CompareOldAndNewReaders {
     public void testZFitsHeapReader() throws Exception {
         URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
 
-        Fits f = new Fits(u);
+        FITS f = new FITS(u);
 
         HDU events = f.getHDU("ZDrsCellOffsets");
 
         BinTable binTable = events.getBinTable();
-        ZFitsHeapReader heapReader = ZFitsHeapReader.forTable(binTable);
+        ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
         OptionalTypesMap<String, Serializable> row = heapReader.getNextRow();
         assertTrue(row.size() > 0);
         assertTrue(row.containsKey("OffsetCalibration"));

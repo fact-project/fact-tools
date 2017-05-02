@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * For example:
  *
  *     <stream id="fact" class="fact.io.RecursiveDirectoryStream"   url="file:/some/folder" pattern="**&#47;*_Events.fits.gz*" >
- *            <stream class="fact.io.FitsStream" id="_"/>
+ *            <stream class="fact.io.FITSStream" id="_"/>
  *     </stream>
  *
  * finds all files below (recursively) /some/folder with their names matching the pattern. See unix globs for more

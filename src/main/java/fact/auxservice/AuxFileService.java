@@ -1,7 +1,6 @@
 package fact.auxservice;
 
 import com.google.common.cache.*;
-import com.google.common.collect.HashBasedTable;
 import fact.auxservice.strategies.AuxPointStrategy;
 
 import fact.io.zfits.ZFitsStream;
@@ -13,17 +12,12 @@ import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 /**
  * This implements an AuxiliaryService {@link fact.auxservice.AuxiliaryService}  providing data from

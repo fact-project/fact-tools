@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * A common interface for Readers for Fits and ZFitsTables.
+ * A common interface for Readers for FITS and ZFitsTables.
  * Readers (at least for bintables and zfits heaps) should implement methods for getting single rows from the file.
  *
  * The Readers should be iterable so we have default methods for having nice for loops and things.

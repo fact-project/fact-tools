@@ -8,7 +8,6 @@ import fact.rta.db.Run;
 import fact.rta.rest.*;
 import fact.rta.db.Signal;
 
-import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,9 +160,10 @@ public class RTAWebService implements Service {
             double onTimeInSeconds = ftmPointsForNight
                     .stream()
                     .filter(p -> {
-                        DateTime t = p.getTimeStamp();
-                        boolean after = OffsetDateTime.parse(t.toString()).isAfter(currentRun.startTime);
-                        boolean before = OffsetDateTime.parse(t.toString()).isAfter(currentRun.endTime);
+                        OffsetDateTime t = p.getTimeStamp().toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
+
+                        boolean after = t.isAfter(currentRun.startTime);
+                        boolean before = t.isAfter(currentRun.endTime);
                         return after && before;
                     })
                     .mapToDouble(p -> p.getFloat("OnTime"))

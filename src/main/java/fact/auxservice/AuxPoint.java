@@ -46,7 +46,8 @@ public class AuxPoint implements Comparable<AuxPoint>{
 
     /**
      * Returns the value for the key iff it exists and its a Double. Returns null otherwise.
-     * @param key
+     *
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
      * @return the value or null
      */
     public Double getDouble(String key){
@@ -59,7 +60,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
 
     /**
      * Returns the value for the key iff it exists and its a Double. Returns null otherwise.
-     * @param key
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
      * @return the value or null
      */
     public Float getFloat(String key){
@@ -71,7 +72,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
     /**
      * Returns the value for the key iff it exists and its an Integer. Returns null otherwise.
-     * @param key
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
      * @return the value or null
      */
     public Integer getInteger(String key){
@@ -82,6 +83,11 @@ public class AuxPoint implements Comparable<AuxPoint>{
         }
     }
 
+    /**
+     * Returns the value for the key iff it exists and its a String. Returns null otherwise.
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
+     * @return the value or null
+     */
     public String getString(String key){
         try {
             return (String) data.get(key);
@@ -92,7 +98,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
 
     /**
      * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
-     * @param key
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
      * @return the value or null
      */
     public int[] getIntegerArray(String key){
@@ -105,7 +111,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
 
     /**
      * Returns the value for the key iff it exists and its an int[]. Returns null otherwise.
-     * @param key
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
      * @return the value or null
      */
     public double[] getDoubleArray(String key){

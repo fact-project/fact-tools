@@ -33,7 +33,7 @@ by the simulation program Ceres.
         
             <stream id="fact:${copy.id}" class="fact.io.RecursiveDirectoryStream"
                     pattern="_Events.fits.gz" copies="${num_copies}" url="${infile}">
-                <stream class="fact.io.FitsStream" id="_" limit="10"/>
+                <stream class="fact.io.FITSStream" id="_" limit="10"/>
             </stream>
         
             <!-- Description of the process and the corresponding stream -->

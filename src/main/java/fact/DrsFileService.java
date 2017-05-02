@@ -29,7 +29,8 @@ import java.util.concurrent.TimeUnit;
  * This is a service which, provided a data item from the telescopes data stream,
  * this returns the proper drs calibration constants.
  * By 'proper' I mean the drs constants which have been taken closest in time to the run the event was taken from.
- * The url should point to the usual raw data folder containing the canonical file structure e.g. 2016/12/20/...
+ * The url should point to the usual raw data folder containing the canonical file structure e.g. /fact/raw on the isdc.
+ *
  *
  * Created by mackaiver on 08/12/16.
  */
@@ -78,7 +79,7 @@ public class DrsFileService implements Service {
 
 
     private LocalDateTime getObservationDate(Path p) {
-        Fits fits = Fits.fromPath(p);
+        FITS fits = FITS.fromPath(p);
         HDU hdu = fits.getHDU("DrsCalibration");
         return hdu.header.date().orElse(LocalDateTime.MIN);
     }
@@ -90,21 +91,22 @@ public class DrsFileService implements Service {
         //find drsfile closest in time to the observationdate
         Path pathToClosestDrsFile = Files
                 .list(pathToFolder)
-                .filter(p -> p.getFileName().toString().endsWith(".drs.fits.gz"))
+                .filter(p -> p.getFileName().toString().contains(".drs.fits"))
                 .reduce((a, b) -> {
                     long toA = ChronoUnit.SECONDS.between(getObservationDate(a), key.observationDate);
                     long toB = ChronoUnit.SECONDS.between(getObservationDate(b), key.observationDate);
                     return Math.abs(toA) < Math.abs(toB) ? a : b;
                 })
-                .orElseThrow(()-> new IOException("No files found matching *.drs.fits.gz or no dates in FITS header."));
+                .orElseThrow(()-> new IOException("No files found matching *.drs.fits* or no dates in FITS header."));
 
 
-        Fits fits = new Fits(pathToClosestDrsFile.toUri().toURL());
+        FITS fits = new FITS(pathToClosestDrsFile.toUri().toURL());
         HDU calibrationHDU = fits.getHDU("DrsCalibration");
         BinTable binTable = calibrationHDU.getBinTable();
 
         OptionalTypesMap<String, Serializable> row = BinTableReader.forBinTable(binTable).getNextRow();
 
+        //get the arrays needed for calibration. if one is missing throw an exception.
         float[] baselineMean = row.getFloatArray("BaselineMean")
                 .orElseThrow(()-> new IOException("BaseLineMean not found in BinTable"));
 
