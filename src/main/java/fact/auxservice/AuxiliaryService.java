@@ -7,6 +7,9 @@ import stream.Data;
 import stream.service.Service;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 /**
@@ -55,6 +58,35 @@ public interface AuxiliaryService extends Service {
     public  static Optional<DateTime> unixTimeUTCToDateTime(Data item){
         int[] eventTime = (int[]) item.get("UnixTimeUTC");
         return unixTimeUTCToDateTime(eventTime);
+    }
+
+
+    /**
+     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
+     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
+     *
+     * @param eventTime the UnixTimeUTC array as found in the FITS file.
+     * @return an Optional containing the Datetime instance
+     */
+    public  static Optional<OffsetDateTime> unixTimeUTCToOffsetDateTime(int [] eventTime){
+        if(eventTime != null && eventTime.length == 2) {
+            OffsetDateTime offsetDateTime = Instant.ofEpochMilli((long) ((eventTime[0] + eventTime[1] / 1000000.) * 1000)).atOffset(ZoneOffset.UTC);
+            return Optional.of(offsetDateTime);
+        }
+        return Optional.empty();
+    }
+
+
+    /**
+     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC from the Data Item and converts it to a DateTime
+     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
+     *
+     * @param item A data item from the stream of raw FACT data
+     * @return an Optional containing the Datetime instance
+     */
+    public  static Optional<OffsetDateTime> unixTimeUTCToOffsetDateTime(Data item){
+        int[] eventTime = (int[]) item.get("UnixTimeUTC");
+        return unixTimeUTCToOffsetDateTime(eventTime);
     }
 
 }
