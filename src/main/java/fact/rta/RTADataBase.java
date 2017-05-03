@@ -72,8 +72,7 @@ public class RTADataBase {
                 " :theta_off_2," +
                 " :theta_off_3," +
                 " :theta_off_4," +
-                " :theta_off_5," +
-                " :on_time_per_event)"
+                " :theta_off_5" + ")"
         )
         void insertSignal(@Signal.BindSignal() Signal signal);
 

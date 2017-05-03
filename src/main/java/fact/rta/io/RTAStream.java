@@ -86,6 +86,7 @@ public class RTAStream extends AbstractMultiStream {
 
         @Override
         public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            exc.printStackTrace();
             log.error("Could not visit file: {}. Continuing.", file);
             return FileVisitResult.CONTINUE;
         }

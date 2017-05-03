@@ -1,7 +1,6 @@
 package fact.rta.db;
 
 
-import org.joda.time.DateTime;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Binder;
 import org.skife.jdbi.v2.sqlobject.BinderFactory;
@@ -18,10 +17,21 @@ import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
+
+/**
+ * The Signal object which contains the information which will be saved in the database for every
+ * 'signal-like' event.
+ */
 public class Signal {
 
     final private static Logger log = LoggerFactory.getLogger(Signal.class);
 
+
+    /**
+     * The SignalMapper is needed by the JDBI library to be able to save this object into the database.
+     * This would work autmatically except for the DateTime objects which we need to parse
+     * using the appropriate methods since JDBI doesn't do that by itself.
+     */
     public static class SignalMapper implements ResultSetMapper<Signal>
     {
         public Signal map(int index, ResultSet r, StatementContext ctx) throws SQLException
@@ -52,9 +62,10 @@ public class Signal {
     }
 
 
-
-
-    // our binding annotation
+    /**
+     * The binding annotations maps member names to coliumn names in the database.
+     * Maybe this can work automatically? I've seen this work in Google GSON.
+     */
     @BindingAnnotation(BindSignal.SignalBinderFactory.class)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER})
@@ -75,7 +86,6 @@ public class Signal {
                     q.bind("theta_off_3", s.theta_off_3);
                     q.bind("theta_off_4", s.theta_off_4);
                     q.bind("theta_off_5", s.theta_off_5);
-                    q.bind("on_time_per_event", s.onTimePerEvent);
                     q.bind("event_timestamp" ,s.eventTimestamp.toString());
                     q.bind("analysis_timestamp" ,s.analysisTimestamp.toString());
                 };
