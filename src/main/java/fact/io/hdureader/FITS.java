@@ -159,6 +159,16 @@ public class FITS {
         return Optional.ofNullable(hdu.getBinTable());
     }
 
+    public String[] getTableNames(){
+        String[] keys = new String[hduNames.keySet().size()];
+        int i = 0;
+        for (String key: hduNames.keySet()){
+            keys[i] = key;
+            i++;
+        }
+        return keys;
+    }
+
 
     /**
      * Provides a datastream to the data area of the given hdu.
