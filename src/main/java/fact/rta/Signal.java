@@ -62,7 +62,9 @@ public class Signal implements Processor {
                     orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
             try {
-                webService.updateEvent(OffsetDateTime.parse(eventTimeStamp.toString()), data);
+                if(distribution.getProbability(signalClassName) > 0.5) {
+                    webService.updateEvent(OffsetDateTime.parse(eventTimeStamp.toString()), data);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Error while trying to update event.");

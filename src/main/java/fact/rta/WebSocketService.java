@@ -1,7 +1,5 @@
 package fact.rta;
 
-import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import fact.auxservice.AuxFileService;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
@@ -9,7 +7,9 @@ import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.strategies.AuxPointStrategy;
 import fact.rta.db.*;
 import fact.rta.db.Signal;
-import org.eclipse.jetty.websocket.api.Session;
+
+import fact.rta.rest.Event;
+import fact.rta.rest.StatusContainer;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
@@ -32,43 +32,39 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
 
     final private static Logger log = LoggerFactory.getLogger(WebSocketService.class);
 
-    static Set<Session> sessions = Sets.newConcurrentHashSet();
-    RTADataBase.DBInterface dbInterface;
+    private RTADataBase.DBInterface dbInterface;
     private Run currentRun = null;
-    Deque<Signal> signals = new ArrayDeque<>();
+    private Deque<Signal> signals = new ArrayDeque<>();
     private boolean isInit = false;
     private AuxFileService auxService;
-
+    private MessageHandler messageHandler = new MessageHandler();
 
 
     @Parameter(required = true, description = "Path to the .sqlite file")
     String jdbcConnection;
 
     @Parameter(required = true, description = "The url pointing to the path containing a the auxilary " +
-            "data in FACTS canonical folder structure." )
+            "data in FACTs canonical folder structure." )
     public SourceURL auxFolder;
 
-    public WebSocketService(String args){}
-
     public WebSocketService(){
-        Spark.webSocket("/datarate", DataRateWebSocketHandler.class);
+        Spark.webSocket("/rta", WebSocket.class);
+
         Spark.staticFiles.location("/rta/");
         Spark.init();
-    }
 
-    public void updateDataRate(OffsetDateTime timeStamp, Double dataRate){
+        //update systemstatus once per minute
+        long MINUTE = 1000*60;
 
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("timestamp", timeStamp.toString());
-        jsonObject.addProperty("rate", dataRate);
-        sessions.stream().filter(Session::isOpen).forEach(session -> {
-            try {
-                session.getRemote().sendString(jsonObject.toString());
-            } catch (IOException e) {
-                log.error("Error sending datarate to session " + session);
+        final Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                messageHandler.sendStatus(StatusContainer.create());
             }
-        });
+        }, (long) (0.1 * MINUTE), MINUTE);
     }
+
 
     /**
      * I need an init method here since streams does not have a proper lifecycle for service objects.
@@ -89,17 +85,19 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
     }
 
 
+    public void updateDataRate(OffsetDateTime timeStamp, Double dataRate){
+        messageHandler.sendDataRate(timeStamp, dataRate);
+    }
+
     /**
      * This method should be called for each 'gamma-like' event in the stream. It will update the appropriate
      * information in the database and calculate 'ontime' for new runs.
-     *
      *
      * @param eventTimeStamp a timestamp by which to identify this event
      * @param item the data item for the event
      */
     @Override
     public void updateEvent(OffsetDateTime eventTimeStamp, Data item) throws IOException {
-
         DateTime dT = AuxiliaryService
                 .unixTimeUTCToDateTime(item)
                 .orElseThrow(() -> new RuntimeException("Could not get time stamp from current event."));
@@ -107,10 +105,12 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
         SortedSet<AuxPoint> ftmPointsForNight = auxService.getAuxiliaryDataForWholeNight(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, dT);
 
 
-
         Run newRun = new Run(item);
         if (currentRun == null){
             dbInterface.insertRun(newRun);
+
+            log.info("Sending runinfo to clients");
+            messageHandler.sendRunInfo(newRun);
             currentRun = newRun;
         }
         else if (!currentRun.equals(newRun)) {
@@ -134,19 +134,24 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
             dbInterface.insertRun(newRun);
             dbInterface.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, newRun.runID, newRun.night);
 
-            currentRun = newRun;
+            //send information about the new run around.
+            log.info("Sending runinfo to clients");
+            messageHandler.sendRunInfo(newRun);
 
+            currentRun = newRun;
         }
 
         signals.add(new Signal(eventTimeStamp, OffsetDateTime.now(ZoneOffset.UTC), item, currentRun));
+
+        log.info("Send event");
+        messageHandler.sendEvent(new Event(eventTimeStamp, item));
     }
 
     /**
      * Calculate the 'ontime' for a given run from the provided set of AuxPoints from the
      * FTM aux file.
-     * Note that still is an approximation. Its a glorified version of summmin
+     * Note that still is an approximation. Its a glorified version of summing
      * up all "OnTime" points in the aux file between "RunStart" and "RunEnd"
-     *
      *
      * @param run The run to calculate the 'ontime' for
      * @param ftmPoints Collection of AuxPoints containing the FTM measurements taken during the run

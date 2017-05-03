@@ -60,7 +60,7 @@ public class RTADataBase {
         void insertRun(@Run.BindRun Run run);
 
         @SqlUpdate("INSERT OR IGNORE INTO signal " +
-                "(event_timestamp, analysis_timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5, on_time_per_event)" +
+                "(event_timestamp, analysis_timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5)" +
                 "values " +
                 "(:event_timestamp," +
                 " :analysis_timestamp," +
@@ -130,7 +130,6 @@ public class RTADataBase {
                     "theta_off_3 FLOAT," +
                     "theta_off_4 FLOAT," +
                     "theta_off_5 FLOAT," +
-                    "on_time_per_event FLOAT," +
                     "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id)" +
                 ")")
         void createSignalTableIfNotExists();

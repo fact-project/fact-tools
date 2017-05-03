@@ -29,7 +29,7 @@
 
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
-        <stream id="_" class="fact.io.zfits.ZFitsStream" />
+        <stream id="_" class="fact.io.zfits.ZFitsStream" limit="200" />
     </stream>
 
 
@@ -117,7 +117,7 @@
         <Skip condition="%{data.numPixeInShower} &lt; 9" />
 
             <fact.rta.Energy predictor="regressor" />
-            <!--<fact.rta.Signal predictor="rf" webService="rta_service" auxService="auxService"/>-->
+            <fact.rta.Signal predictor="rf" webService="rta_service"/>
             <!--<Enqueue queues="out_queue" />-->
     </process>
 

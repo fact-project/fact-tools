@@ -92,7 +92,6 @@ public class DataRate implements StatefulProcessor {
             input.put(output, dataRatePerSecond);
 
             if(webService != null){
-                System.out.println("Print blab alasldasda");
                 webService.updateDataRate(OffsetDateTime.now(), dataRatePerSecond);
             }
 
