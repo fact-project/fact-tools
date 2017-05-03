@@ -3,7 +3,7 @@
     outputKey="Cetatauri"
     sourceRightAscension="5.627416667"
     sourceDeclination="21.1425"
-    auxService="auxService"
+    auxService="${auxService}"
 />
 
 <fact.cleaning.TwoLevelTimeNeighbor
