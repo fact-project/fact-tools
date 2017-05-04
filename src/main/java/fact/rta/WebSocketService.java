@@ -62,7 +62,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
             public void run() {
                 messageHandler.sendStatus(StatusContainer.create());
             }
-        }, (long) (0.1 * MINUTE), MINUTE);
+        }, (long) (0.05 * MINUTE), (long) (0.1 * MINUTE));
     }
 
 
@@ -142,8 +142,6 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
         }
 
         signals.add(new Signal(eventTimeStamp, OffsetDateTime.now(ZoneOffset.UTC), item, currentRun));
-
-        log.info("Send event");
         messageHandler.sendEvent(new Event(eventTimeStamp, item));
     }
 

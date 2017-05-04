@@ -29,7 +29,7 @@
 
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
-        <stream id="_" class="fact.io.zfits.ZFitsStream" limit="200" />
+        <stream id="_" class="fact.io.zfits.ZFitsStream" limit="2000" />
     </stream>
 
 

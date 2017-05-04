@@ -44,6 +44,7 @@ class MessageHandler {
     void sendDataRate(OffsetDateTime timeStamp, double dataRate){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("timestamp", timeStamp.toString());
+        jsonObject.addProperty("date", timeStamp.toString());
         jsonObject.addProperty("rate", dataRate);
         jsonObject.addProperty("topic", "DATA_RATE");
 
