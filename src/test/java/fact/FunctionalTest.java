@@ -52,22 +52,22 @@ public class FunctionalTest {
             fail("Could not run the example_process.xml");
         }
     }
-
+/*
     @Test
     public void analysisXML() {
         try {
-            File arg = new File("examples/stdAnalysis/data/analysis.xml");
+            File arg = new File("examples/stdAnalysis/analysis.xml");
             ProcessContainer container = new ProcessContainer(arg.toURI().toURL());
             container.run();
         } catch (Exception e) {
             fail("Could not run the analysis.xml");
         }
     }
-
+*/
     @Test
     public void analysis_mcXML() {
         try {
-            String[] args = {"examples/stdAnalysis/mc/analysis_mc.xml"};
+            String[] args = {"examples/stdAnalysis/analysis.xml"};
             stream.run.main(args);
         } catch (Exception e) {
             fail("Could not run the analysis_mc.xml");
