@@ -1,7 +1,6 @@
 <container>
 
     <properties url="classpath:/default/settings.properties" />
-
     <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
     <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
@@ -23,13 +22,51 @@
     <process id="2" input="fact">
         <!-- prevEventAndSkip: -->
         <!-- PreviousEventInfo, Skip(no Data Trigger) -->
-        <include url="classpath:/default/data/prevEventAndSkip.xml" />
+        <fact.utils.PreviousEventInfo
+                startCellKey="StartCellData"
+                outputKey="prevEvents"
+                limitEvents="${prevEvents_limitEvents}"
+        />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <!-- Output: Data -->
 
         <!-- Calibration: -->
         <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
         DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
-        <include url="classpath:/default/data/calibration.xml" />
+        <fact.datacorrection.DrsCalibration
+                url="${drsfile}"
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                prevEventsKey="prevEvents"
+                startCellKey="StartCellData"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+        />
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+        />
+        <fact.filter.DrsTimeCalibration
+                outputKey="timeCalibConst"
+        />
+        <fact.filter.ArrayTimeCorrection
+                dataKey="DataCalibrated"
+                timeCalibConstKey="timeCalibConst"
+                outputKey="DataCalibrated"
+        />
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
         <!-- Output: DataCalibrated -->
 
         <!-- Single Pe Extraction -->

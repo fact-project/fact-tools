@@ -9,6 +9,39 @@
   <!-- Description of the process and the corresponding stream -->
   <process input="fact" copies="1">
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
-    <include url="classpath:/default/data/calibration.xml" />
+    <fact.datacorrection.DrsCalibration
+            url="${drsfile}"
+            key="Data"
+            outputKey="DataCalibrated"
+    />
+    <fact.datacorrection.PatchJumpRemoval
+            dataKey="DataCalibrated"
+            outputKey="DataCalibrated"
+            prevEventsKey="prevEvents"
+            startCellKey="StartCellData"
+            jumpLimit="${patchJumpRemoval_jumpLimit}"
+    />
+    <fact.datacorrection.RemoveSpikes
+            dataKey="DataCalibrated"
+            outputKey="DataCalibrated"
+            startCellKey="StartCellData"
+            leftBorder="${removeSpikes_leftBorder}"
+            spikeLimit="${removeSpikes_spikeLimit}"
+            topSlopeLimit="${removeSpikes_topSlopeLimit}"
+            maxSpikeLength="${removeSpikes_maxSpikeLength}"
+    />
+    <fact.filter.DrsTimeCalibration
+            outputKey="timeCalibConst"
+    />
+    <fact.filter.ArrayTimeCorrection
+            dataKey="DataCalibrated"
+            timeCalibConstKey="timeCalibConst"
+            outputKey="DataCalibrated"
+    />
+    <fact.datacorrection.InterpolateTimeSeries
+            calibService="calibService"
+            dataKey="DataCalibrated"
+            dataOutputKey="DataCalibrated"
+    />
   </process>
 </container>

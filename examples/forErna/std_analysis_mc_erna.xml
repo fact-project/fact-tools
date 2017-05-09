@@ -3,7 +3,7 @@
     This Process contains the standard analysis for FACT, with modifications to be used with the SGE/TORQUE cluster
     execution tool ERNA (Easy RuN Access) https://github.com/fact-project/erna
     -->
-    <properties url="classpath:/default/settings_mc.properties" />
+    <properties url="classpath:/default/settings.properties" />
 
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
 
@@ -47,17 +47,259 @@
         <!-- Extraction -->
         <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
         PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
-        <include url="classpath:/default/mc/extraction_mc.xml" />
+        <fact.extraction.BasicExtraction
+                dataKey="DataCalibrated"
+                outputKeyMaxAmplPos="maxPos"
+                outputKeyPhotonCharge="photoncharge"
+                url="${integralGainFile}"
+                startSearchWindow="${basicExtraction_startSearchWindow}"
+                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+        />
+        <fact.extraction.EstimateBaseline
+                dataKey="DataCalibrated"
+                outputKey="baseline"
+                firstSlice="10"
+                range="30"
+        />
+        <fact.extraction.TimeOverThreshold
+                dataKey="DataCalibrated"
+                outputKey="timeOverThreshold"
+                firstSliceOverThresholdOutputKey="arrivalTimeTOT"
+                positionsKey="maxPos"
+                threshold="1800"
+                thresholdOutputKey="thresholdForToT"
+        />
+        <fact.datacorrection.CorrectSaturation
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                totKey="timeOverThreshold"
+                firstSliceOverThresholdKey="arrivalTimeTOT"
+                threshold="1800"
+                maxPosKey="maxPos"
+                baselineKey="baseline"
+        />
+        <fact.extraction.BasicExtraction
+                dataKey="DataCalibrated"
+                outputKeyMaxAmplPos="maxPos"
+                outputKeyPhotonCharge="photoncharge"
+                url="${integralGainFile}"
+                startSearchWindow="${basicExtraction_startSearchWindow}"
+                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+        />
+        <fact.extraction.RisingEdgeForPositions
+                dataKey="DataCalibrated"
+                amplitudePositionsKey="maxPos"
+                outputKey="arrivalTimePos"
+                maxSlopesKey="maxSlopesPos"
+        />
+        <fact.extraction.RisingEdgePolynomFit
+                dataKey="DataCalibrated"
+                risingEdgeKey="arrivalTimePos"
+                outputKey="arrivalTime"
+                numberOfPoints="${risingEdgePolynomFit_numberOfPoints}"
+                maxSlopesKey="maxSlopes"
+        />
+        <fact.datacorrection.InterpolatePhotondata
+                calibService="calibService"
+                photonChargeKey="photoncharge"
+                photonChargeOutputKey="photoncharge"
+                arrivalTimeKey="arrivalTime"
+                arrivalTimeOutputKey="arrivalTime"
+        />
         <!-- Output: photoncharge, arrivalTime -->
 
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-        <include url="classpath:/default/mc/cleaning_mc.xml" />
+        <fact.cleaning.TwoLevelTimeNeighbor
+                calibService="calibService"
+                photonChargeKey="photoncharge"
+                outputKey="shower"
+                arrivalTimeKey="arrivalTime"
+                corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
+                neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
+                timeLimit="${twoLevelTimeNeighbor_timeLimit}"
+                minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+        />
         <!-- Output: shower -->
 
         <!-- pedestal parameters -->
         <!-- WaveformFluctuation on non-cleaning pixels-->
-        <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
+        <fact.pixelsets.Invert
+                insetKey="badPixel"
+                outsetKey="goodPixel"
+        />
+
+        <fact.pixelsets.Difference
+                setUKey="goodPixel"
+                setAKey="shower"
+                outsetKey="pedestal"
+        />
+
+        <fact.extraction.WaveformFluctuation
+                key="DataCalibrated"
+                pixelSetKey="goodPixel"
+                outputKey="ped"
+                skipFirst="35"
+                skipLast="50"
+                windowSize="30"
+        />
+
+        <fact.pixelsets.Length
+                pixelSetKey="pedestal"
+                outputKey="numPixelInPedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_mean"
+                outputKey="ped_mean"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_std"
+                outputKey="ped_std"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_var"
+                outputKey="ped_var"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_kurtosis"
+                outputKey="ped_kurtosis"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_max"
+                outputKey="ped_max"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_min"
+                outputKey="ped_min"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_skewness"
+                outputKey="ped_skewness"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_median"
+                outputKey="ped_median"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_sum"
+                outputKey="ped_sum"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="photoncharge"
+                outputKey="phChargePedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="arrivalTime"
+                outputKey="arrTimePedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="maxSlopes"
+                outputKey="maxSlopesPedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="arrivalTimePos"
+                outputKey="arrTimePosPedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="maxSlopesPos"
+                outputKey="maxSlopesPosPedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="maxPos"
+                outputKey="maxPosPedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.features.Size
+                pixelSetKey="pedestal"
+                photonChargeKey="photoncharge"
+                outputKey="pedestalSize"
+        />
+        <fact.features.TimeSpread
+                weightsKey="photoncharge"
+                arrivalTimeKey="arrivalTime"
+                pixelSetKey="pedestal"
+                outputKey="pedestalTimespread"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_mean"
+                outputKey="fluct_mean"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_std"
+                outputKey="fluct_std"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_var"
+                outputKey="fluct_var"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_kurtosis"
+                outputKey="fluct_kurtosis"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_max"
+                outputKey="fluct_max"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_min"
+                outputKey="fluct_min"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_skewness"
+                outputKey="fluct_skewness"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_median"
+                outputKey="fluct_median"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_sum"
+                outputKey="fluct_sum"
+                pixelSetKey="shower"
+        />
 
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
@@ -65,13 +307,356 @@
         Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
         Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
         ShowerSlope, Disp -->
-        <include url="classpath:/default/mc/parameterCalc_mc.xml" />
+        <Skip condition="%{data.shower} == null" />
+        <fact.pixelsets.Length
+                pixelSetKey="shower"
+                outputKey="numPixelInShower"
+        />
+        <Skip condition="%{data.numPixelInShower} &lt; 5" />
+
+        <fact.statistics.ArrayMean
+                key="photoncharge"
+                outputKey="photonchargeMean"
+        />
+        <fact.statistics.ArrayMean
+                key="arrivalTime"
+                outputKey="arrivalTimeMean"
+        />
+        <fact.statistics.ArrayStatistics
+                key="photoncharge"
+                outputKey="phChargeShower"
+                pixelSetKey="shower"
+        />
+        <fact.statistics.ArrayStatistics
+                key="arrivalTime"
+                outputKey="arrTimeShower"
+                pixelSetKey="shower"
+        />
+        <fact.statistics.ArrayStatistics
+                key="maxSlopes"
+                outputKey="maxSlopesShower"
+                pixelSetKey="shower"
+        />
+        <fact.statistics.ArrayStatistics
+                key="arrivalTimePos"
+                outputKey="arrTimePosShower"
+                pixelSetKey="shower"
+        />
+        <fact.statistics.ArrayStatistics
+                key="maxSlopesPos"
+                outputKey="maxSlopesPosShower"
+                pixelSetKey="shower"
+        />
+        <fact.statistics.ArrayStatistics
+                key="maxPos"
+                outputKey="maxPosShower"
+                pixelSetKey="shower"
+        />
+        <fact.features.Size
+                pixelSetKey="shower"
+                photonChargeKey="photoncharge"
+                outputKey="Size"
+        />
+        <fact.features.DistributionFromShower
+                weightsKey="photoncharge"
+                pixelSetKey="shower"
+                sizeKey="Size"
+                outputKey="showerDistribution"
+        />
+        <fact.features.M3Long
+                weightsKey="photoncharge"
+                pixelSetKey="shower"
+                distributionKey="showerDistribution"
+                m3lOutputKey="m3l"
+                m3tOutputKey="m3t"
+        />
+        <fact.features.Length
+                distribution="showerDistribution"
+                outputKey="Length"
+        />
+        <fact.features.Width
+                distribution="showerDistribution"
+                outputKey="Width"
+        />
+        <fact.features.NumberOfIslands
+                pixelSetKey="shower"
+                outputKey="numIslands"
+        />
+        <fact.features.TimeGradient
+                pixelSetKey="shower"
+                arrivalTimeKey="arrivalTime"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKeySlope="timeGradientSlope"
+                outputKeyIntercept="timeGradientIntercept"
+                outputKeySumSquaredErrors="timeGradientSSE"
+        />
+        <fact.features.Concentration
+                weights="photoncharge"
+                pixelSetKey="shower"
+                concOneOutputKey="Concentration_onePixel"
+                concTwoOutputKey="Concentration_twoPixel"
+        />
+        <fact.features.ConcentrationCore
+                cogxKey="COGx"
+                cogyKey="COGy"
+                pixelSetKey="shower"
+                photonChargeKey="photoncharge"
+                sizeKey="Size"
+                widthKey="Width"
+                lengthKey="Length"
+                deltaKey="Delta"
+                outputKey="ConcCore"
+        />
+        <fact.features.ConcentrationAtCenterOfGravity
+                photonChargeKey="photoncharge"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                sizeKey="Size"
+                outputKey="concCOG"
+        />
+        <fact.features.Leakage
+                distribution="showerDistribution"
+                pixelSetKey="shower"
+                weights="photoncharge"
+                leakage1OutputKey="Leakage"
+                leakage2OutputKey="Leakage2"
+        />
+        <fact.features.TimeSpread
+                weightsKey="photoncharge"
+                arrivalTimeKey="arrivalTime"
+                pixelSetKey="shower"
+                outputKey="Timespread"
+        />
+        <fact.features.ShowerSlope
+                photonChargeKey="photoncharge"
+                arrivalTimeKey="arrivalTime"
+                pixelSetKey="shower"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                slopeLongOutputKey="Slope_long"
+                slopeTransOutputKey="Slope_trans"
+                slopeSpreadOutputKey="Slope_spread"
+                slopeSpreadWeightedOutputKey="Slope_spread_weighted"
+        />
+        <fact.features.Disp
+                widthKey="Width"
+                lengthKey="Length"
+                c0="117.94"
+                outputKey="Disp"
+        />
         <!-- Output: source independent parameters -->
 
         <!-- Parameter calculation (only source dependent) -->
         <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <include url="classpath:/default/mc/sourceParameter_mc.xml" />
+        <fact.features.source.SourcePosition
+                outputKey="sourcePosition"
+                pointingZdKey="MPointingPos.fZd"
+                pointingAzKey="MPointingPos.fAz"
+                sourceZdKey="MSimSourcePos.fZd"
+                sourceAzKey="MSimSourcePos.fAz"
+        />
+        <fact.features.source.AntiSourcePosition
+                sourcePositionKey="sourcePosition"
+                numberOfAntiSourcePositions="5"
+                antiSourcePositionId="1"
+                outputKey="antiSourcePosition_1"
+        />
+        <fact.features.source.AntiSourcePosition
+                sourcePositionKey="sourcePosition"
+                numberOfAntiSourcePositions="5"
+                antiSourcePositionId="2"
+                outputKey="antiSourcePosition_2"
+        />
+        <fact.features.source.AntiSourcePosition
+                sourcePositionKey="sourcePosition"
+                numberOfAntiSourcePositions="5"
+                antiSourcePositionId="3"
+                outputKey="antiSourcePosition_3"
+        />
+        <fact.features.source.AntiSourcePosition
+                sourcePositionKey="sourcePosition"
+                numberOfAntiSourcePositions="5"
+                antiSourcePositionId="4"
+                outputKey="antiSourcePosition_4"
+        />
+        <fact.features.source.AntiSourcePosition
+                sourcePositionKey="sourcePosition"
+                numberOfAntiSourcePositions="5"
+                antiSourcePositionId="5"
+                outputKey="antiSourcePosition_5"
+        />
+        <fact.features.source.Alpha
+                distribution="showerDistribution"
+                sourcePosition="sourcePosition"
+                outputKey="Alpha"
+        />
+        <fact.features.source.Distance
+                distribution="showerDistribution"
+                sourcePosition="sourcePosition"
+                outputKey="Distance"
+        />
+        <fact.features.source.Alpha
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_1"
+                outputKey="Alpha_Off_1"
+        />
+        <fact.features.source.Distance
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_1"
+                outputKey="Distance_Off_1"
+        />
+        <fact.features.source.Alpha
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_2"
+                outputKey="Alpha_Off_2"
+        />
+        <fact.features.source.Distance
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_2"
+                outputKey="Distance_Off_2"
+        />
+        <fact.features.source.Alpha
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_3"
+                outputKey="Alpha_Off_3"
+        />
+        <fact.features.source.Distance
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_3"
+                outputKey="Distance_Off_3"
+        />
+        <fact.features.source.Alpha
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_4"
+                outputKey="Alpha_Off_4"
+        />
+        <fact.features.source.Distance
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_4"
+                outputKey="Distance_Off_4"
+        />
+        <fact.features.source.Alpha
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_5"
+                outputKey="Alpha_Off_5"
+        />
+        <fact.features.source.Distance
+                distribution="showerDistribution"
+                sourcePosition="antiSourcePosition_5"
+                outputKey="Distance_Off_5"
+        />
+        <fact.features.source.CosDeltaAlpha
+                sourcePositionKey="sourcePosition"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKey="CosDeltaAlpha"
+        />
+        <fact.features.source.CosDeltaAlpha
+                sourcePositionKey="antiSourcePosition_1"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKey="CosDeltaAlpha_Off_1"
+        />
+        <fact.features.source.CosDeltaAlpha
+                sourcePositionKey="antiSourcePosition_2"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKey="CosDeltaAlpha_Off_2"
+        />
+        <fact.features.source.CosDeltaAlpha
+                sourcePositionKey="antiSourcePosition_3"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKey="CosDeltaAlpha_Off_3"
+        />
+        <fact.features.source.CosDeltaAlpha
+                sourcePositionKey="antiSourcePosition_4"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKey="CosDeltaAlpha_Off_4"
+        />
+        <fact.features.source.CosDeltaAlpha
+                sourcePositionKey="antiSourcePosition_5"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                outputKey="CosDeltaAlpha_Off_5"
+        />
+        <fact.features.source.Theta
+                sourcePositionKey="sourcePosition"
+                dispKey="Disp"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                m3lKey="m3l"
+                cosDeltaAlphaKey="CosDeltaAlpha"
+                signM3lConstant="-200"
+                outputKey="Theta"
+        />
+        <fact.features.source.Theta
+                sourcePositionKey="antiSourcePosition_1"
+                dispKey="Disp"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                m3lKey="m3l"
+                cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
+                signM3lConstant="-200"
+                outputKey="Theta_Off_1"
+        />
+        <fact.features.source.Theta
+                sourcePositionKey="antiSourcePosition_2"
+                dispKey="Disp"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                m3lKey="m3l"
+                cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
+                signM3lConstant="-200"
+                outputKey="Theta_Off_2"
+        />
+        <fact.features.source.Theta
+                sourcePositionKey="antiSourcePosition_3"
+                dispKey="Disp"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                m3lKey="m3l"
+                cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
+                signM3lConstant="-200"
+                outputKey="Theta_Off_3"
+        />
+        <fact.features.source.Theta
+                sourcePositionKey="antiSourcePosition_4"
+                dispKey="Disp"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                m3lKey="m3l"
+                cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
+                signM3lConstant="-200"
+                outputKey="Theta_Off_4"
+        />
+        <fact.features.source.Theta
+                sourcePositionKey="antiSourcePosition_5"
+                dispKey="Disp"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                deltaKey="Delta"
+                m3lKey="m3l"
+                cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
+                signM3lConstant="-200"
+                outputKey="Theta_Off_5"
+        />
         <!-- Output: source dependent parameters -->
 
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->

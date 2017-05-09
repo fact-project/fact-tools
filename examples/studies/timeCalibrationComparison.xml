@@ -20,8 +20,91 @@
     <fact.filter.DrsTimeCalibration outputKey="timeCalibConst" />
     <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />
     <fact.datacorrection.InterpolateTimeSeries calibService="calibService" interpolateTimeLine="True" dataKey="DataCalibrated" dataOutputKey="DataCalibrated" showBadPixel="True" />
-    <include url="classpath:/default/data/extraction.xml" />
-    <include url="classpath:/default/data/cleaning.xml" />
+    <fact.extraction.BasicExtraction
+            dataKey="DataCalibrated"
+            outputKeyMaxAmplPos="maxPos"
+            outputKeyPhotonCharge="photoncharge"
+            url="${integralGainFile}"
+            startSearchWindow="${basicExtraction_startSearchWindow}"
+            rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+            rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+    />
+    <fact.extraction.EstimateBaseline
+            dataKey="DataCalibrated"
+            outputKey="baseline"
+            firstSlice="10"
+            range="30"
+    />
+    <fact.extraction.TimeOverThreshold
+            dataKey="DataCalibrated"
+            outputKey="timeOverThreshold"
+            firstSliceOverThresholdOutputKey="arrivalTimeTOT"
+            positionsKey="maxPos"
+            threshold="1800"
+            thresholdOutputKey="thresholdForToT"
+    />
+    <fact.datacorrection.CorrectSaturation
+            dataKey="DataCalibrated"
+            outputKey="DataCalibrated"
+            totKey="timeOverThreshold"
+            firstSliceOverThresholdKey="arrivalTimeTOT"
+            threshold="1800"
+            maxPosKey="maxPos"
+            baselineKey="baseline"
+    />
+    <fact.extraction.BasicExtraction
+            dataKey="DataCalibrated"
+            outputKeyMaxAmplPos="maxPos"
+            outputKeyPhotonCharge="photoncharge"
+            url="${integralGainFile}"
+            startSearchWindow="${basicExtraction_startSearchWindow}"
+            rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+            rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+    />
+    <fact.extraction.RisingEdgeForPositions
+            dataKey="DataCalibrated"
+            amplitudePositionsKey="maxPos"
+            outputKey="arrivalTimePos"
+            maxSlopesKey="maxSlopesPos"
+    />
+    <fact.extraction.RisingEdgePolynomFit
+            dataKey="DataCalibrated"
+            risingEdgeKey="arrivalTimePos"
+            outputKey="arrivalTime"
+            numberOfPoints="11"
+            maxSlopesKey="maxSlopes"
+    />
+    <fact.datacorrection.CorrectPixelDelays
+            arrivalTimeKey="arrivalTime"
+            outputKey="arrivalTime"
+            url="${pixelDelayFile}"
+    />
+    <fact.datacorrection.InterpolatePhotondata
+            calibService="calibService"
+            photonChargeKey="photoncharge"
+            photonChargeOutputKey="photoncharge"
+            arrivalTimeKey="arrivalTime"
+            arrivalTimeOutputKey="arrivalTime"
+    />
+    <fact.features.source.SourcePosition
+            outputKey="Cetatauri"
+            sourceRightAscension="5.627416667"
+            sourceDeclination="21.1425"
+            auxService="auxService"
+    />
+
+    <fact.cleaning.TwoLevelTimeNeighbor
+            calibService="calibService"
+            photonChargeKey="photoncharge"
+            outputKey="shower"
+            arrivalTimeKey="arrivalTime"
+            corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
+            neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
+            timeLimit="${twoLevelTimeNeighbor_timeLimit}"
+            minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+            starPositionKeys="Cetatauri"
+            starRadiusInCamera="11.0"
+    />
     <!-- <Skip condition="%{data.shower} == null" /> -->
     <!--<fact.ShowViewer key="DataCalibrated"/>-->
   </process>

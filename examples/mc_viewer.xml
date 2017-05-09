@@ -1,5 +1,5 @@
 <container>
-  <properties url="classpath:/default/settings_mc.properties" />
+  <properties url="classpath:/default/settings.properties" />
 
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
@@ -16,10 +16,280 @@
   <process id="2" input="fact">
 
 		<!-- Use standard calibration, extraction and cleaning -->
-    <include url="classpath:/default/mc/calibration_mc.xml" />
-    <include url="classpath:/default/mc/extraction_mc.xml" />
-    <include url="classpath:/default/mc/cleaning_mc.xml" />
-    <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
+    <fact.utils.Remapping
+            key="Data"
+            outputKey="Data"
+    />
+    <fact.utils.RemappingKeys
+            keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+    />
+    <fact.datacorrection.DrsCalibration
+            url="${drsfile}"
+            key="Data"
+            outputKey="DataCalibrated"
+    />
+    <fact.datacorrection.RemoveSpikes
+            dataKey="DataCalibrated"
+            outputKey="DataCalibrated"
+            startCellKey="StartCellData"
+            leftBorder="${removeSpikes_leftBorder}"
+            spikeLimit="${removeSpikes_spikeLimit}"
+            topSlopeLimit="${removeSpikes_topSlopeLimit}"
+            maxSpikeLength="${removeSpikes_maxSpikeLength}"
+    />
+    <fact.datacorrection.InterpolateTimeSeries
+            calibService="calibService"
+            dataKey="DataCalibrated"
+            dataOutputKey="DataCalibrated"
+    />
+
+    <fact.extraction.BasicExtraction
+            dataKey="DataCalibrated"
+            outputKeyMaxAmplPos="maxPos"
+            outputKeyPhotonCharge="photoncharge"
+            url="${integralGainFile}"
+            startSearchWindow="${basicExtraction_startSearchWindow}"
+            rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+            rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+    />
+    <fact.extraction.EstimateBaseline
+            dataKey="DataCalibrated"
+            outputKey="baseline"
+            firstSlice="10"
+            range="30"
+    />
+    <fact.extraction.TimeOverThreshold
+            dataKey="DataCalibrated"
+            outputKey="timeOverThreshold"
+            firstSliceOverThresholdOutputKey="arrivalTimeTOT"
+            positionsKey="maxPos"
+            threshold="1800"
+            thresholdOutputKey="thresholdForToT"
+    />
+    <fact.datacorrection.CorrectSaturation
+            dataKey="DataCalibrated"
+            outputKey="DataCalibrated"
+            totKey="timeOverThreshold"
+            firstSliceOverThresholdKey="arrivalTimeTOT"
+            threshold="1800"
+            maxPosKey="maxPos"
+            baselineKey="baseline"
+    />
+    <fact.extraction.BasicExtraction
+            dataKey="DataCalibrated"
+            outputKeyMaxAmplPos="maxPos"
+            outputKeyPhotonCharge="photoncharge"
+            url="${integralGainFile}"
+            startSearchWindow="${basicExtraction_startSearchWindow}"
+            rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+            rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+    />
+    <fact.extraction.RisingEdgeForPositions
+            dataKey="DataCalibrated"
+            amplitudePositionsKey="maxPos"
+            outputKey="arrivalTimePos"
+            maxSlopesKey="maxSlopesPos"
+    />
+    <fact.extraction.RisingEdgePolynomFit
+            dataKey="DataCalibrated"
+            risingEdgeKey="arrivalTimePos"
+            outputKey="arrivalTime"
+            numberOfPoints="${risingEdgePolynomFit_numberOfPoints}"
+            maxSlopesKey="maxSlopes"
+    />
+    <fact.datacorrection.InterpolatePhotondata
+            calibService="calibService"
+            photonChargeKey="photoncharge"
+            photonChargeOutputKey="photoncharge"
+            arrivalTimeKey="arrivalTime"
+            arrivalTimeOutputKey="arrivalTime"
+    />
+
+    <fact.cleaning.TwoLevelTimeNeighbor
+            calibService="calibService"
+            photonChargeKey="photoncharge"
+            outputKey="shower"
+            arrivalTimeKey="arrivalTime"
+            corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
+            neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
+            timeLimit="${twoLevelTimeNeighbor_timeLimit}"
+            minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+    />
+
+    <fact.pixelsets.Invert
+            insetKey="badPixel"
+            outsetKey="goodPixel"
+    />
+
+    <fact.pixelsets.Difference
+            setUKey="goodPixel"
+            setAKey="shower"
+            outsetKey="pedestal"
+    />
+
+    <fact.extraction.WaveformFluctuation
+            key="DataCalibrated"
+            pixelSetKey="goodPixel"
+            outputKey="ped"
+            skipFirst="35"
+            skipLast="50"
+            windowSize="30"
+    />
+
+    <fact.pixelsets.Length
+            pixelSetKey="pedestal"
+            outputKey="numPixelInPedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_mean"
+            outputKey="ped_mean"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_std"
+            outputKey="ped_std"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_var"
+            outputKey="ped_var"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_kurtosis"
+            outputKey="ped_kurtosis"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_max"
+            outputKey="ped_max"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_min"
+            outputKey="ped_min"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_skewness"
+            outputKey="ped_skewness"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_median"
+            outputKey="ped_median"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_sum"
+            outputKey="ped_sum"
+            pixelSetKey="pedestal"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="photoncharge"
+            outputKey="phChargePedestal"
+            pixelSetKey="pedestal"
+    />
+    <fact.statistics.ArrayStatistics
+            key="arrivalTime"
+            outputKey="arrTimePedestal"
+            pixelSetKey="pedestal"
+    />
+    <fact.statistics.ArrayStatistics
+            key="maxSlopes"
+            outputKey="maxSlopesPedestal"
+            pixelSetKey="pedestal"
+    />
+    <fact.statistics.ArrayStatistics
+            key="arrivalTimePos"
+            outputKey="arrTimePosPedestal"
+            pixelSetKey="pedestal"
+    />
+    <fact.statistics.ArrayStatistics
+            key="maxSlopesPos"
+            outputKey="maxSlopesPosPedestal"
+            pixelSetKey="pedestal"
+    />
+    <fact.statistics.ArrayStatistics
+            key="maxPos"
+            outputKey="maxPosPedestal"
+            pixelSetKey="pedestal"
+    />
+    <fact.features.Size
+            pixelSetKey="pedestal"
+            photonChargeKey="photoncharge"
+            outputKey="pedestalSize"
+    />
+    <fact.features.TimeSpread
+            weightsKey="photoncharge"
+            arrivalTimeKey="arrivalTime"
+            pixelSetKey="pedestal"
+            outputKey="pedestalTimespread"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_mean"
+            outputKey="fluct_mean"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_std"
+            outputKey="fluct_std"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_var"
+            outputKey="fluct_var"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_kurtosis"
+            outputKey="fluct_kurtosis"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_max"
+            outputKey="fluct_max"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_min"
+            outputKey="fluct_min"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_skewness"
+            outputKey="fluct_skewness"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_median"
+            outputKey="fluct_median"
+            pixelSetKey="shower"
+    />
+
+    <fact.statistics.ArrayStatistics
+            key="ped_sum"
+            outputKey="fluct_sum"
+            pixelSetKey="shower"
+    />
 
     <fact.ShowViewer key="DataCalibrated" />
   </process>

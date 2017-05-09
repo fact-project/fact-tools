@@ -1,5 +1,5 @@
 <container>
-  <properties url="classpath:/default/settings_mc.properties" />
+  <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
