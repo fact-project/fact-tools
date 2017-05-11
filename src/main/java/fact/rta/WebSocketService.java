@@ -60,6 +60,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                log.debug("Sending status");
                 messageHandler.sendStatus(StatusContainer.create());
             }
         }, (long) (0.05 * MINUTE), (long) (0.1 * MINUTE));

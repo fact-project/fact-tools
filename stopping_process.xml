@@ -5,7 +5,7 @@
     </stream>
     <property name="jdbc" value="jdbc:sqlite:/home/kai/rta.sqlite" />
 
-    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
+    <service id="rta_service" class="fact.rta.RestWebService" jdbcConnection="${jdbc}"/>
 
 
     <!--<stream id="fact" class="fact.io.zfits.ZFitsStream" url="file:/Users/mackaiver/20140105_151.fits.fz"/>-->

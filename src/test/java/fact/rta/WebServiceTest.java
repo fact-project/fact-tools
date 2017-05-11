@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.skife.jdbi.v2.DBI;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -65,7 +64,7 @@ public class WebServiceTest {
     public TemporaryFolder folder= new TemporaryFolder();
 
     public void startServer() throws Exception {
-        RTAWebService s = new RTAWebService();
+        RestWebService s = new RestWebService();
         File dbFile  = folder.newFile("data.sqlite");
         s.jdbcConnection = "jdbc:sqlite:"+dbFile.getCanonicalPath();
 
@@ -106,7 +105,7 @@ public class WebServiceTest {
     @Test
     public void testRunChange() throws Exception {
         //initialize db connection
-        RTAWebService s = new RTAWebService();
+        RestWebService s = new RestWebService();
         File dbFile  = folder.newFile("data.sqlite");
         s.jdbcConnection = "jdbc:sqlite:"+dbFile.getCanonicalPath();
         s.init();

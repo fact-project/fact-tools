@@ -37,7 +37,7 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <service id="rf" class="fact.PredictionService" url="file:${pmml}" />
-    <service id="rta_service" class="fact.rta.RTAWebService" />
+    <service id="rta_service" class="fact.rta.RestWebService" />
 
     <!-- Name of the stream and url to the input file -->
     <!--<stream id="fact" class="fact.io.LoopStream" events="40">-->

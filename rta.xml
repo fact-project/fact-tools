@@ -8,7 +8,7 @@
 
 
     <property name="jdbc" value="jdbc:sqlite:/scratch/rta.sqlite" />
-    <service id="rta_service" class="fact.rta.RTAWebService" jdbcConnection="${jdbc}"/>
+    <service id="rta_service" class="fact.rta.RestWebService" jdbcConnection="${jdbc}"/>
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
@@ -124,7 +124,6 @@
 
             <fact.rta.Energy predictor="regressor" />
             <fact.rta.Signal predictor="rf" webService="rta_service" auxService="auxService"/>
-            <!--<fact.rta.RTAProcessor webService="rta_service"/>-->
             <!--<Enqueue queues="out_queue" />-->
     </process>
 
