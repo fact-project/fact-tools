@@ -45,6 +45,7 @@ public class Signal {
             double theta_off_4 = r.getDouble("theta_off_4");
             double theta_off_5 = r.getDouble("theta_off_5");
             double prediction = r.getDouble("prediction");
+            double estimated_energy = r.getDouble("estimated_energy");
             Run run = new Run.RunMapper().map(index, r, ctx);
 
             return new Signal(eventTimestamp,
@@ -56,6 +57,7 @@ public class Signal {
                     theta_off_4,
                     theta_off_5,
                     prediction,
+                    estimated_energy,
                     run);
         }
 
@@ -80,6 +82,7 @@ public class Signal {
                     q.bind("night", s.run.night );
                     q.bind("run_id", s.run.runID);
                     q.bind("prediction", s.prediction);
+                    q.bind("estimated_energy", s.estimated_energy);
                     q.bind("theta", s.theta);
                     q.bind("theta_off_1", s.theta_off_1);
                     q.bind("theta_off_2", s.theta_off_2);
@@ -95,6 +98,7 @@ public class Signal {
 
     public final Run run;
     public final double prediction;
+    public final double estimated_energy;
     public final double theta_off_1;
     public final double theta_off_2;
     public final double theta_off_3;
@@ -118,6 +122,7 @@ public class Signal {
         this.theta_off_4 = thetaOffs[3];
         this.theta_off_5 = thetaOffs[4];
         this.prediction = (double) item.get("signal:prediction");
+        this.estimated_energy= (double) item.get("energy");
 
         this.eventTimestamp = eventTimestamp;
         this.analysisTimestamp = analysisTimestamp;
@@ -132,6 +137,7 @@ public class Signal {
                   double theta_off_4,
                   double theta_off_5,
                   double prediction,
+                  double estimated_energy,
                   Run run) {
 
         this.run = run;
@@ -143,6 +149,7 @@ public class Signal {
         this.theta_off_4 = theta_off_4;
         this.theta_off_5 = theta_off_5;
         this.prediction = prediction;
+        this.estimated_energy= estimated_energy;
         this.eventTimestamp = eventTimestamp;
     }
 

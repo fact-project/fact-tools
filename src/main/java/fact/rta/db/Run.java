@@ -46,7 +46,6 @@ public class Run {
         }
     }
 
-    // our binding annotation
     @BindingAnnotation(Run.BindRun.RunBinderFactory.class)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER})
@@ -60,8 +59,8 @@ public class Run {
                     q.bind("night", argument.night);
                     q.bind("run_id", argument.runID);
                     q.bind("source", argument.source);
-                    q.bind("end_time", argument.endTime.toString());
-                    q.bind("start_time", argument.startTime.toString());
+                    q.bind("end_time", argument.endTime);
+                    q.bind("start_time", argument.startTime);
                     q.bind("on_time", argument.onTime.getStandardSeconds());
                     q.bind("health", argument.health);
                 };
@@ -93,7 +92,7 @@ public class Run {
 
     public Run(Data item) {
 
-        this.source = (String) item.get("Source");
+        this.source = ((String) item.get("SourceName")).trim();
         this.runID = (int) item.get("RUNID");
         this.night = (int) item.get("NIGHT");
         this.onTime = Duration.ZERO;

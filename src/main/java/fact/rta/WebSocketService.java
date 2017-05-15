@@ -163,9 +163,9 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
                 .filter(p -> {
                     OffsetDateTime t = p.getTimeStamp().toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
 
-                    boolean after = t.isAfter(run.startTime);
-                    boolean before = t.isAfter(run.endTime);
-                    return after && before;
+                    boolean afterStart = t.isAfter(run.startTime);
+                    boolean beforeEnd = t.isBefore(run.endTime);
+                    return afterStart && beforeEnd;
                 })
                 .mapToDouble(p -> p.getFloat("OnTime"))
                 .sum() * 1000;

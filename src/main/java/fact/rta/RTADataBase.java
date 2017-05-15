@@ -17,26 +17,6 @@ import java.util.Set;
  */
 public class RTADataBase {
 
-//    private static RTADataBase instance;
-//    private String jdbcConnection;
-//
-//    private RTADataBase(String jdbcConnection){
-//
-//        this.jdbcConnection = jdbcConnection;
-//    }
-//
-//    /**
-//     * Get an instance of this database object holding a connection to the database with the jdbconnecitons tring passed to this method.
-//     * As in "jdbc:sqlite:./test.sqlite" which will return the RTADatabase Object connected to that particular database.
-//     * @param jdbcConnection a jdbc string describing the connection to the db
-//     * @return an instance of the RTADataBase class.
-//     */
-//    public static synchronized RTADataBase getInstance(String jdbcConnection){
-//        if(instance == null){
-//           instance = new RTADataBase(jdbcConnection);
-//        }
-//        return instance;
-//    }
 
     public enum HEALTH {
         OK,
@@ -45,8 +25,6 @@ public class RTADataBase {
         IN_PROGRESS
     }
 
-//    private DBI dbi = new DBI(jdbcConnection);
-//    public RTADataBase.DBInterface dbInterface = dbi.open(RTADataBase.DBInterface.class);
 
     /**
      * JDBI interface to describe the signal table for sql operations
@@ -60,13 +38,14 @@ public class RTADataBase {
         void insertRun(@Run.BindRun Run run);
 
         @SqlUpdate("INSERT OR IGNORE INTO signal " +
-                "(event_timestamp, analysis_timestamp, night, run_id, prediction, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5)" +
+                "(event_timestamp, analysis_timestamp, night, run_id, prediction,estimated_energy, theta_on, theta_off_1, theta_off_2, theta_off_3, theta_off_4, theta_off_5)" +
                 "values " +
                 "(:event_timestamp," +
                 " :analysis_timestamp," +
                 " :night," +
                 " :run_id," +
                 " :prediction," +
+                " :estimated_energy," +
                 " :theta," +
                 " :theta_off_1," +
                 " :theta_off_2," +
@@ -108,9 +87,9 @@ public class RTADataBase {
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +
                 "run_id INTEGER NOT NULL," +
-                "on_time FLOAT," +
-                "start_time VARCHAR(50)," +
-                "end_time VARCHAR(50)," +
+                "on_time REAL," +
+                "start_time DATETIME," +
+                "end_time DATETIME," +
                 "source varchar(50)," +
                 "health varchar(50)," +
                 "PRIMARY KEY (night, run_id))")
@@ -119,17 +98,18 @@ public class RTADataBase {
 
         @SqlUpdate("CREATE TABLE IF NOT EXISTS signal " +
                 "(" +
-                    "event_timestamp VARCHAR(50) PRIMARY KEY, " +
-                    "analysis_timestamp VARCHAR(50)," +
+                    "event_timestamp DATETIME PRIMARY KEY, " +
+                    "analysis_timestamp DATETIME," +
                     "night INTEGER NOT NULL, " +
                     "run_id INTEGER NOT NULL," +
-                    "prediction FLOAT NOT NULL," +
-                    "theta_on FLOAT NOT NULL," +
-                    "theta_off_1 FLOAT," +
-                    "theta_off_2 FLOAT," +
-                    "theta_off_3 FLOAT," +
-                    "theta_off_4 FLOAT," +
-                    "theta_off_5 FLOAT," +
+                    "prediction REAL NOT NULL," +
+                    "estimated_energy REAL NOT NULL," +
+                    "theta_on REAL NOT NULL," +
+                    "theta_off_1 REAL," +
+                    "theta_off_2 REAL," +
+                    "theta_off_3 REAL," +
+                    "theta_off_4 REAL," +
+                    "theta_off_5 REAL," +
                     "FOREIGN KEY(night, run_id) REFERENCES fact_run(night, run_id)" +
                 ")")
         void createSignalTableIfNotExists();
