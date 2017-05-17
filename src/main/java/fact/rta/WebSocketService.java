@@ -50,7 +50,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
     public WebSocketService(){
         Spark.webSocket("/rta", WebSocket.class);
 
-        Spark.staticFiles.location("/rta/");
+        Spark.staticFiles.location("/rta/static/");
         Spark.init();
 
         //update systemstatus once per minute
