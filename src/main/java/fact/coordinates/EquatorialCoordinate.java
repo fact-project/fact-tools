@@ -70,6 +70,13 @@ public class EquatorialCoordinate {
         return new HorizontalCoordinate(Math.PI / 2.0 - altitude, azimuth);
     }
 
+    public double greatCircleDistance(EquatorialCoordinate other) {
+        return Utils.greatCircleDistance(
+                this.getDeclinationRad(), this.getRightAscensionRad(),
+                other.getDeclinationRad(), other.getRightAscensionRad()
+        );
+    }
+
     public double getRightAscensionRad() {
         return rightAscensionRad;
     }

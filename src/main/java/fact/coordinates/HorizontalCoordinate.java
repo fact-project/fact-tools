@@ -19,6 +19,14 @@ public class HorizontalCoordinate {
         return new HorizontalCoordinate(Math.toRadians(zenithDeg), Math.toRadians(azimuthDeg));
     }
 
+    public double greatCircleDistance(HorizontalCoordinate other) {
+        return Utils.greatCircleDistance(
+                this.getAltitudeRad(), this.getAzimuthRad(),
+                other.getAltitudeRad(), other.getAzimuthRad()
+        );
+    }
+
+
     /**
      * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal

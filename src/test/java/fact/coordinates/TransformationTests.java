@@ -1,20 +1,14 @@
 package fact.coordinates;
 
-import fact.FactAnalysisTest;
-import fact.features.source.SourcePosition;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-public class CoordinatesTests {
+public class TransformationTests {
     //Adjust the precision for the equatorialToHorizontal (raDec to AzimuthZenith) conversion here.
     double precision = 0.35;
 
