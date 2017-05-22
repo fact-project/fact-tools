@@ -64,10 +64,10 @@ public class HorizontalCoordinate {
     public CameraCoordinate toCamera(HorizontalCoordinate pointingPosition, double focalLength)
     {
 
-        double paz = Math.toRadians(pointingPosition.getAzimuthRad());
-        double pzd = Math.toRadians(pointingPosition.getZenithRad());
-        double saz = Math.toRadians(this.getAzimuthRad());
-        double szd = Math.toRadians(this.getZenithRad());
+        double paz = pointingPosition.getAzimuthRad();
+        double pzd = pointingPosition.getZenithRad();
+        double saz = this.getAzimuthRad();
+        double szd = this.getZenithRad();
 
         double x = Math.sin(szd) * Math.cos(saz);
         double y = Math.sin(szd) * Math.sin(saz);

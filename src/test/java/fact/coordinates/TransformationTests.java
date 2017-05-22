@@ -120,4 +120,22 @@ public class TransformationTests {
         assertEquals(horizontalCoordinate.getZenithDeg(), 90 - 13.234937521900273, precision);
     }
 
+
+
+    @Test
+    public void testSouthOrientation()
+    {
+
+        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(0.6, 0.0);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(0.0, 0.0);
+
+        CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
+
+        assertEquals("Calculated position for source in (zd=0.6°,az=0.0) for pointing in(zd=0.0°,az=0.0) is wrong " +
+                "Calculated position: (\"+r[0]+\",\"+r[1]+\") \n" +
+                "sought position: (51.20983219603325,-0.0)", 51.20983219603325, cameraCoordinate.getxMM(), 0.015 );
+        assertEquals("Calculated position for source in (zd=0.6°,az=0.0) for pointing in(zd=0.0°,az=0.0) is wrong " +
+                "Calculated position: (\"+r[0]+\",\"+r[1]+\") \n" +
+                "sought position: (51.20983219603325,-0.0)", 0.0, cameraCoordinate.getyMM(), 0.0001 );
+    }
 }
