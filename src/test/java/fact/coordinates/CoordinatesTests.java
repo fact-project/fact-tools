@@ -59,6 +59,19 @@ public class CoordinatesTests {
     }
 
     @Test
+    public void testRaDecRoundTripForMrk421() {
+        ZonedDateTime observationTime = ZonedDateTime.of(2014, 3, 25, 00, 42, 29, 0, ZoneOffset.UTC);
+        EarthLocation FACTLocation = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+
+        EquatorialCoordinate equatorialCoordinate1 = EquatorialCoordinate.fromHourAngleAndDegrees(11.074266, 38.208801);
+        HorizontalCoordinate horizontalCoordinate = equatorialCoordinate1.toHorizontal(observationTime, FACTLocation);
+        EquatorialCoordinate equatorialCoordinate2 = horizontalCoordinate.toEquatorial(observationTime, FACTLocation);
+
+        assertEquals("RA", equatorialCoordinate1.getRightAscensionRad(), equatorialCoordinate2.getRightAscensionRad(), 0.01);
+        assertEquals("DEC", equatorialCoordinate1.getDeclinationRad(), equatorialCoordinate2.getDeclinationRad(), 0.01);
+    }
+
+    @Test
     public void testRaDecToAltZenithForMrk501() {
 
         ZonedDateTime observationTime = ZonedDateTime.of(2013, 2, 25, 22, 42, 29, 0, ZoneOffset.UTC);

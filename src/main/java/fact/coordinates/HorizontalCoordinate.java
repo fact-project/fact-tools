@@ -1,5 +1,7 @@
 package fact.coordinates;
 
+import java.time.ZonedDateTime;
+
 /**
  * Created by maxnoe on 22.05.17.
  */
@@ -15,6 +17,35 @@ public class HorizontalCoordinate {
 
     public static HorizontalCoordinate fromDegrees(double zenithDeg, double azimuthDeg) {
         return new HorizontalCoordinate(Math.toRadians(zenithDeg), Math.toRadians(azimuthDeg));
+    }
+
+    /**
+     * Implementation of the formulas from
+     * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+     *
+     * @param observationTime
+     * @param earthLocation
+     * @return HorizontalCoordinate for given time and location;
+     */
+    public EquatorialCoordinate toEquatorial(ZonedDateTime observationTime, EarthLocation earthLocation) {
+
+        double gst = Utils.datetimeToGST(observationTime);
+        double azimuthSouth = this.getAzimuthRad() - Math.PI;
+        double alt = this.getAltitudeRad();
+
+        double lat = earthLocation.getLatitudeRad();
+        double lon = earthLocation.getLongitudeRad();
+
+        double hourAngle = Math.atan2(
+                Math.sin(azimuthSouth),
+                Math.cos(azimuthSouth) * Math.sin(lat) + Math.tan(alt) * Math.cos(lat)
+        );
+
+        double declination = Math.asin(Math.sin(lat) * Math.sin(alt) - Math.cos(lat) * Math.cos(alt) * Math.cos(azimuthSouth));
+
+        double ra = gst + lon - hourAngle;
+
+        return new EquatorialCoordinate(ra, declination);
     }
 
     /**
