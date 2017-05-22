@@ -1,6 +1,7 @@
 package fact.coordinates;
 
 
+import fact.features.source.SourcePosition;
 import org.junit.Test;
 
 import java.time.ZoneOffset;
@@ -125,17 +126,143 @@ public class TransformationTests {
     @Test
     public void testSouthOrientation()
     {
-
-        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(0.6, 0.0);
-        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(0.0, 0.0);
+        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(10.6, 0.0);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(10.0, 0.0);
 
         CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
 
-        assertEquals("Calculated position for source in (zd=0.6°,az=0.0) for pointing in(zd=0.0°,az=0.0) is wrong " +
-                "Calculated position: (\"+r[0]+\",\"+r[1]+\") \n" +
-                "sought position: (51.20983219603325,-0.0)", 51.20983219603325, cameraCoordinate.getxMM(), 0.015 );
-        assertEquals("Calculated position for source in (zd=0.6°,az=0.0) for pointing in(zd=0.0°,az=0.0) is wrong " +
-                "Calculated position: (\"+r[0]+\",\"+r[1]+\") \n" +
-                "sought position: (51.20983219603325,-0.0)", 0.0, cameraCoordinate.getyMM(), 0.0001 );
+        SourcePosition sourcePositionProcessor = new SourcePosition();
+        sourcePositionProcessor.setOutputKey("test");
+        double[] r = sourcePositionProcessor.getSourcePosition(
+                pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
+                sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
+        );
+
+        assertEquals(r[0], cameraCoordinate.getXMM(), 0.015 );
+        assertEquals(r[1], cameraCoordinate.getYMM(), 0.0001 );
     }
+
+    @Test
+    public void testHorizontalToCamera1()
+    {
+        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(10, 0.0);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(10.6, 0.0);
+
+        CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
+
+        SourcePosition sourcePositionProcessor = new SourcePosition();
+        sourcePositionProcessor.setOutputKey("test");
+        double[] r = sourcePositionProcessor.getSourcePosition(
+                pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
+                sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
+        );
+
+        assertEquals(r[0], cameraCoordinate.getXMM(), 0.015 );
+        assertEquals(r[1], cameraCoordinate.getYMM(), 0.0001 );
+    }
+
+    @Test
+    public void testHorizontalToCamera2()
+    {
+
+        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(90.0, 0.6);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(90.0, 0.0);
+
+        CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
+
+        SourcePosition sourcePositionProcessor = new SourcePosition();
+        sourcePositionProcessor.setOutputKey("test");
+        double[] r = sourcePositionProcessor.getSourcePosition(
+                pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
+                sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
+        );
+
+        assertEquals(r[0], cameraCoordinate.getXMM(), 0.0001 );
+        assertEquals(r[1], cameraCoordinate.getYMM(), 0.015 );
+    }
+
+    @Test
+    public void testHorizontalToCamera3()
+    {
+
+        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(10, 45);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(11, 40);
+
+        CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
+
+        SourcePosition sourcePositionProcessor = new SourcePosition();
+        sourcePositionProcessor.setOutputKey("test");
+        double[] r = sourcePositionProcessor.getSourcePosition(
+                pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
+                sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
+        );
+
+        assertEquals(r[0], cameraCoordinate.getXMM(), 0.0001 );
+        assertEquals(r[1], cameraCoordinate.getYMM(), 0.015 );
+    }
+
+    @Test
+    public void testCameraToHHorizontal() {
+
+        HorizontalCoordinate sourcePosition = HorizontalCoordinate.fromDegrees(10, 45);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(11, 40);
+
+        CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
+        HorizontalCoordinate trafoPosition = cameraCoordinate.toHorizontal(pointingPosition, 4.889e3);
+
+        assertEquals(trafoPosition.getAzimuthRad(), sourcePosition.getAzimuthRad(), 0.0001);
+        assertEquals(trafoPosition.getZenithRad(), sourcePosition.getZenithRad(), 0.0001);
+    }
+
+    @Test
+    public void testRoundTripMrk421() {
+        ZonedDateTime observationTime = ZonedDateTime.of(2014, 3, 25, 00, 42, 29, 0, ZoneOffset.UTC);
+        EarthLocation FACTLocation = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(11.0, -35.0);
+
+        EquatorialCoordinate mrk421Equatorial = EquatorialCoordinate.fromHourAngleAndDegrees(11.074266, 38.208801);
+
+        HorizontalCoordinate mrk421Horizontal = mrk421Equatorial.toHorizontal(observationTime, FACTLocation);
+        CameraCoordinate mrk421Camera = mrk421Horizontal.toCamera(pointingPosition, 4.889e3);
+        HorizontalCoordinate mrk421HorizontalBack = mrk421Camera.toHorizontal(pointingPosition, 4.889e3);
+        EquatorialCoordinate mrk421EquatorialBack = mrk421HorizontalBack.toEquatorial(observationTime, FACTLocation);
+
+        assertEquals(0.0, mrk421HorizontalBack.greatCircleDistance(mrk421Horizontal),   1e-12);
+        assertEquals(0.0, mrk421EquatorialBack.greatCircleDistance(mrk421Equatorial), 1e-12);
+    }
+
+    @Test
+    public void testRoundTripMrk501() {
+        ZonedDateTime observationTime = ZonedDateTime.of(2013, 2, 25, 22, 42, 29, 0, ZoneOffset.UTC);
+        EarthLocation FACTLocation = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(99.0, 33.0);
+
+        EquatorialCoordinate mrk501Equatorial = EquatorialCoordinate.fromHourAngleAndDegrees(16.8978379666666, 39.76016913);
+
+        HorizontalCoordinate mrk501Horizontal = mrk501Equatorial.toHorizontal(observationTime, FACTLocation);
+        CameraCoordinate mrk501Camera = mrk501Horizontal.toCamera(pointingPosition, 4.889e3);
+        HorizontalCoordinate mrk501HorizontalBack = mrk501Camera.toHorizontal(pointingPosition, 4.889e3);
+        EquatorialCoordinate mrk501EquatorialBack = mrk501HorizontalBack.toEquatorial(observationTime, FACTLocation);
+
+        assertEquals(0.0, mrk501HorizontalBack.greatCircleDistance(mrk501Horizontal), 1e-12);
+        assertEquals(0.0, mrk501EquatorialBack.greatCircleDistance(mrk501Equatorial), 1e-12);
+    }
+
+    @Test
+    public void testRoundTripCrab() {
+        ZonedDateTime observationTime = ZonedDateTime.of(2015, 11, 25, 22, 42, 29, 0, ZoneOffset.UTC);
+        EarthLocation FACTLocation = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(52.0, 85.0);
+
+        EquatorialCoordinate crabEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(5.57553886, 22.0145);
+
+        HorizontalCoordinate crabHorizontal = crabEquatorial.toHorizontal(observationTime, FACTLocation);
+        CameraCoordinate crabCamera = crabHorizontal.toCamera(pointingPosition, 4.889e3);
+        HorizontalCoordinate crabHorizontalBack = crabCamera.toHorizontal(pointingPosition, 4.889e3);
+        EquatorialCoordinate crabEquatorialBack = crabHorizontalBack.toEquatorial(observationTime, FACTLocation);
+
+        assertEquals(0.0, crabHorizontalBack.greatCircleDistance(crabHorizontal), 1e-12);
+        assertEquals(0.0, crabEquatorialBack.greatCircleDistance(crabEquatorial), 1e-12);
+    }
+
 }

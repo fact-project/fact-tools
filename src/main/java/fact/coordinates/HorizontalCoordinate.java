@@ -1,5 +1,8 @@
 package fact.coordinates;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+
 import java.time.ZonedDateTime;
 
 /**
@@ -69,15 +72,20 @@ public class HorizontalCoordinate {
         double saz = this.getAzimuthRad();
         double szd = this.getZenithRad();
 
-        double x = Math.sin(szd) * Math.cos(saz);
-        double y = Math.sin(szd) * Math.sin(saz);
-        double z = Math.cos(szd);
+        Vector3D vec = new Vector3D(Math.sin(szd) * Math.cos(saz), Math.sin(szd) * Math.sin(saz), Math.cos(szd));
 
-        double x_rot = -Math.sin(-pzd) * z - Math.cos(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
-        double y_rot =  Math.sin(-paz) * x + Math.cos(-paz) * y;
-        double z_rot =  Math.cos(-pzd) * z - Math.sin(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
+        Rotation rotZAz = new Rotation(new Vector3D(0.0, 0.0, 1.0), -paz);
+        Rotation rotYZd = new Rotation(new Vector3D(0.0, 1.0, 0.0), -pzd);
 
-        return new CameraCoordinate(x_rot * (-focalLength) / z_rot, - y_rot * (-focalLength) / z_rot);
+        Vector3D rotVec = rotYZd.applyTo(rotZAz.applyTo(vec));
+
+        double x = rotVec.getX();
+        double y = rotVec.getY();
+        double z = rotVec.getZ();
+
+        CameraCoordinate cameraCoordinate = new CameraCoordinate(x * (focalLength) / z, y * (focalLength) / z);
+
+        return cameraCoordinate;
     }
 
     public double getAltitudeRad() {
