@@ -3,10 +3,12 @@ package fact.coordinates;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import java.io.Serializable;
+
 /**
  * Created by maxnoe on 22.05.17.
  */
-public class CameraCoordinate {
+public class CameraCoordinate implements Serializable {
     private final double xMM;
     private final double yMM;
 

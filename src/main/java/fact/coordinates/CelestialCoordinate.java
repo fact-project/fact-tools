@@ -1,9 +1,11 @@
 package fact.coordinates;
 
+import java.io.Serializable;
+
 /**
  * Created by maxnoe on 23.05.17.
  */
-public interface CelestialCoordinate {
+public interface CelestialCoordinate extends Serializable {
 
     /**
      * Great circle distance using the more complicated but numerically more
