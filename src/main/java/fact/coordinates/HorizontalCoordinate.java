@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by maxnoe on 22.05.17.
  */
-public class HorizontalCoordinate {
+public class HorizontalCoordinate implements CelestialCoordinate {
 
     private final double zenithRad;
     private final double azimuthRad;
@@ -23,7 +23,7 @@ public class HorizontalCoordinate {
     }
 
     public double greatCircleDistance(HorizontalCoordinate other) {
-        return Utils.greatCircleDistance(
+        return CelestialCoordinate.greatCircleDistance(
                 this.getAltitudeRad(), this.getAzimuthRad(),
                 other.getAltitudeRad(), other.getAzimuthRad()
         );
@@ -40,7 +40,7 @@ public class HorizontalCoordinate {
      */
     public EquatorialCoordinate toEquatorial(ZonedDateTime observationTime, EarthLocation earthLocation) {
 
-        double gst = Utils.datetimeToGST(observationTime);
+        double gst = CoordinateUtils.datetimeToGST(observationTime);
         double azimuthSouth = this.getAzimuthRad() - Math.PI;
         double alt = this.getAltitudeRad();
 

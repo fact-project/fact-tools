@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by maxnoe on 24.02.17.
  */
-public class Utils {
+public class CoordinateUtils {
     // reference datetime
     private static final ZonedDateTime gstReferenceDateTime = ZonedDateTime.of(2000, 1, 1, 12, 0, 0, 0, ZoneId.of("UTC"));
 

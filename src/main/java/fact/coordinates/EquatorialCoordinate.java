@@ -5,7 +5,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by maxnoe on 22.05.17.
  */
-public class EquatorialCoordinate {
+public class EquatorialCoordinate implements CelestialCoordinate {
 
     private final double rightAscensionRad;
     private final double declinationRad;
@@ -40,7 +40,7 @@ public class EquatorialCoordinate {
      */
     public HorizontalCoordinate toHorizontal(ZonedDateTime observationTime, EarthLocation earthLocation) {
 
-        double gst = Utils.datetimeToGST(observationTime);
+        double gst = CoordinateUtils.datetimeToGST(observationTime);
 
         double ra = this.getRightAscensionRad();
         double dec = this.getDeclinationRad();
@@ -75,7 +75,7 @@ public class EquatorialCoordinate {
     }
 
     public double greatCircleDistance(EquatorialCoordinate other) {
-        return Utils.greatCircleDistance(
+        return CelestialCoordinate.greatCircleDistance(
                 this.getDeclinationRad(), this.getRightAscensionRad(),
                 other.getDeclinationRad(), other.getRightAscensionRad()
         );
@@ -91,6 +91,10 @@ public class EquatorialCoordinate {
 
     public double getRightAscensionDeg() {
         return Math.toDegrees(rightAscensionRad);
+    }
+
+    public double getRightAscensionHA() {
+        return rightAscensionRad / Math.PI * 12;
     }
 
     public double getDeclinationDeg() {
