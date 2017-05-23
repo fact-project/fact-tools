@@ -48,6 +48,13 @@ public class CameraCoordinate implements Serializable {
         return new HorizontalCoordinate(zenith, azimuth);
     }
 
+    public double euclideanDistance(CameraCoordinate other) {
+        double dx = this.getXMM() - other.getXMM();
+        double dy = this.getYMM() - other.getYMM();
+        return Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0));
+    }
+
+
 
     public String toString(){
         return String.format("CameraCoordinate(x=%.4f mm, y=%.4f mm)", this.xMM, this.yMM);
