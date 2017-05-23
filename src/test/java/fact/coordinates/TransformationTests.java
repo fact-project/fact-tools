@@ -265,4 +265,22 @@ public class TransformationTests {
         assertEquals(0.0, crabEquatorialBack.greatCircleDistance(crabEquatorial), 1e-12);
     }
 
+
+    @Test
+    public void testRoundTripGC() {
+        ZonedDateTime observationTime = ZonedDateTime.of(2013, 7 , 25, 21, 42, 29, 0, ZoneOffset.UTC);
+        EarthLocation FACTLocation = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+        HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(58, 165);
+
+        EquatorialCoordinate gcEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(17.7533, -29.01);
+
+        HorizontalCoordinate gcHorizontal = gcEquatorial.toHorizontal(observationTime, FACTLocation);
+        CameraCoordinate gcCamera = gcHorizontal.toCamera(pointingPosition, 4.889e3);
+        HorizontalCoordinate gcHorizontalBack = gcCamera.toHorizontal(pointingPosition, 4.889e3);
+        EquatorialCoordinate gcEquatorialBack = gcHorizontalBack.toEquatorial(observationTime, FACTLocation);
+
+        assertEquals(0.0, gcHorizontalBack.greatCircleDistance(gcHorizontal), 1e-12);
+        assertEquals(0.0, gcEquatorialBack.greatCircleDistance(gcEquatorial), 1e-12);
+    }
+
 }
