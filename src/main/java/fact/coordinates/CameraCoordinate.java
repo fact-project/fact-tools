@@ -48,6 +48,6 @@ public class CameraCoordinate {
 
 
     public String toString(){
-        return "CameraCoordinate(x=" + this.xMM + ", y=" + this.yMM + ")";
+        return String.format("CameraCoordinate(x=%.4f mm, y=%.4f mm)", this.xMM, this.yMM);
     }
 }

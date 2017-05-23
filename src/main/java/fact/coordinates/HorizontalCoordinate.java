@@ -88,6 +88,10 @@ public class HorizontalCoordinate {
         return cameraCoordinate;
     }
 
+    public String toString(){
+        return String.format("HorizontalCoordinate(zd=%.4f°, az=%.4f°)", this.getZenithDeg(), this.getAzimuthDeg());
+    }
+
     public double getAltitudeRad() {
         return Math.PI / 2 - zenithRad;
     }

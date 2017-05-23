@@ -70,6 +70,10 @@ public class EquatorialCoordinate {
         return new HorizontalCoordinate(Math.PI / 2.0 - altitude, azimuth);
     }
 
+    public String toString(){
+        return String.format("HorizontalCoordinate(ra=%.4f ha, dec=%.4f°)", this.getRightAscensionHA(), this.getDeclinationDeg());
+    }
+
     public double greatCircleDistance(EquatorialCoordinate other) {
         return Utils.greatCircleDistance(
                 this.getDeclinationRad(), this.getRightAscensionRad(),
