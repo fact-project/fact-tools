@@ -1,7 +1,7 @@
 package fact.coordinates;
 
 
-import fact.features.source.SourcePosition;
+import fact.features.source.SourcePositionOld;
 import org.junit.Test;
 
 import java.time.ZoneOffset;
@@ -131,9 +131,9 @@ public class TransformationTests {
 
         CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
 
-        SourcePosition sourcePositionProcessor = new SourcePosition();
-        sourcePositionProcessor.setOutputKey("test");
-        double[] r = sourcePositionProcessor.getSourcePosition(
+        SourcePositionOld sourcePositionOldProcessor = new SourcePositionOld();
+        sourcePositionOldProcessor.setOutputKey("test");
+        double[] r = sourcePositionOldProcessor.getSourcePosition(
                 pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
@@ -150,9 +150,9 @@ public class TransformationTests {
 
         CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
 
-        SourcePosition sourcePositionProcessor = new SourcePosition();
-        sourcePositionProcessor.setOutputKey("test");
-        double[] r = sourcePositionProcessor.getSourcePosition(
+        SourcePositionOld sourcePositionOldProcessor = new SourcePositionOld();
+        sourcePositionOldProcessor.setOutputKey("test");
+        double[] r = sourcePositionOldProcessor.getSourcePosition(
                 pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
@@ -170,9 +170,9 @@ public class TransformationTests {
 
         CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
 
-        SourcePosition sourcePositionProcessor = new SourcePosition();
-        sourcePositionProcessor.setOutputKey("test");
-        double[] r = sourcePositionProcessor.getSourcePosition(
+        SourcePositionOld sourcePositionOldProcessor = new SourcePositionOld();
+        sourcePositionOldProcessor.setOutputKey("test");
+        double[] r = sourcePositionOldProcessor.getSourcePosition(
                 pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
@@ -190,9 +190,9 @@ public class TransformationTests {
 
         CameraCoordinate cameraCoordinate = sourcePosition.toCamera(pointingPosition, 4.889e3);
 
-        SourcePosition sourcePositionProcessor = new SourcePosition();
-        sourcePositionProcessor.setOutputKey("test");
-        double[] r = sourcePositionProcessor.getSourcePosition(
+        SourcePositionOld sourcePositionOldProcessor = new SourcePositionOld();
+        sourcePositionOldProcessor.setOutputKey("test");
+        double[] r = sourcePositionOldProcessor.getSourcePosition(
                 pointingPosition.getAzimuthDeg(), pointingPosition.getZenithDeg(),
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );

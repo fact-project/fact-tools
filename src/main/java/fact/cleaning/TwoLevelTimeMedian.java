@@ -2,6 +2,7 @@ package fact.cleaning;
 
 import fact.Constants;
 import fact.Utils;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.FactPixelMapping;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -46,7 +47,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
             "previously identified corePixel")
 	private  double neighborPixelThreshold;
 
-    @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" + 
+    @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" +
     		", which a pixel is alound to have after cleaning")
 	private  double timeLimit;
 
@@ -60,20 +61,20 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
     private String[] starPositionKeys = null;
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
 	private double starRadiusInCamera = Constants.PIXEL_SIZE;
-    
+
     private boolean showDifferentCleaningSets = false;
 
     private PixelSet cleanedPixelSet;
-	
+
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Override
 	public Data process(Data input) {
 //		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 //		Utils.isKeyValid(input, photonChargeKey, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);	
-		npix = (Integer) input.get("NPIX");	
-		
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+		npix = (Integer) input.get("NPIX");
+
 		DateTime timeStamp = null;
 		if (input.containsKey("UnixTimeUTC") == true){
     		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
@@ -85,30 +86,30 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
     		// => The 12 bad pixels we have from the beginning on are used.
     		timeStamp = new DateTime(2000, 1, 1, 0, 0);
     	}
-			
+
 		double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));
 		double[] arrivalTimes = Utils.toDoubleArray(input.get(arrivalTimeKey));
-		
+
 		ArrayList<Integer> showerPixel= new ArrayList<>();
-		
+
 		showerPixel = addCorePixel(showerPixel, photonCharge, corePixelThreshold, timeStamp);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level1", input);
 		}
-		
+
 		showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level2", input);
 		}
-		
+
 		showerPixel = addNeighboringPixels(showerPixel, photonCharge, neighborPixelThreshold, timeStamp);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level3", input);
 		}
-		
+
 		if (notUsablePixelSet != null){
 			input.put("notUsablePixelSet", notUsablePixelSet);
 		}
@@ -117,7 +118,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
         if(showerPixel.size() == 0){
             return input;
         }
-        
+
         // Hacky method to increase the timeLimit for larger showers (which could have a larger spread in the arrival times):
         double currentTimeThreshold = timeLimit;
         if (showerPixel.size() > 50){
@@ -141,10 +142,10 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
             PixelSet starSet = new PixelSet();
             for (String starPositionKey : starPositionKeys)
             {
-                Utils.isKeyValid(input, starPositionKey, double[].class);
-                double[] starPosition = (double[]) input.get(starPositionKey);
+                Utils.isKeyValid(input, starPositionKey, CameraCoordinate.class);
+                CameraCoordinate starPosition = (CameraCoordinate) input.get(starPositionKey);
 
-                showerPixel = removeStarIslands(showerPixel,starPosition,starSet,starRadiusInCamera, log);
+                showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true)
                 {
                     addLevelToDataItem(showerPixel, outputKey + "_level6", input);
@@ -164,7 +165,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 
 		return input;
 	}
-	
+
 	/**
 	 * Remove pixels with a difference in the arrivalTime to the median of the arrivalTimes of all pixels, larger than the timeLimit
 	 * @param showerPixel
@@ -173,7 +174,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 	 * @return
 	 */
 	public ArrayList<Integer> applyTimeMedianCleaning(ArrayList<Integer> showerPixel,double[] arrivalTime, double timeThreshold) {
-		
+
 		double[] showerArrivals = new double[showerPixel.size()];
 		int i = 0;
 		for (int pixel : showerPixel){
@@ -181,17 +182,17 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 			i++;
 		}
 		double median = calculateMedian(showerArrivals);
-		
+
 		ArrayList<Integer> newList= new ArrayList<Integer>();
 		for(int pixel: showerPixel){
 			if(Math.abs(arrivalTime[pixel] - median) < timeThreshold){
 				newList.add(pixel);
 			}
-		}		
+		}
 		return newList;
 	}
-	
-	
+
+
 	private double calculateMedian(double[] showerArrivals)
 	{
 		double median = 0.0;
@@ -204,8 +205,8 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 		}
 		return median;
 	}
-	
-	
+
+
 	public String getPhotonChargeKey() {
 		return photonChargeKey;
 	}
@@ -285,7 +286,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 	public void setShowDifferentCleaningSets(boolean showDifferentCleaningSets) {
 		this.showDifferentCleaningSets = showDifferentCleaningSets;
 	}
-	
+
 	/*
 	 * Getter and Setter
 	 */

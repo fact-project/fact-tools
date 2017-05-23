@@ -1,5 +1,6 @@
 package fact.features.source;
 
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,18 +27,17 @@ public class AntiSourcePosition implements Processor {
 			log.error("No source position in data item. Can not calculate anti source position!");
 			throw new RuntimeException("Missing parameter. Enter valid sourcePositionKey");
 		}
-		double[] source  = (double[]) input.get(sourcePositionKey);
-		
-		double[] antisource = {0,0};
-		
-		double rotAngle = 2 * Math.PI * antiSourcePositionId / (numberOfAntiSourcePositions + 1);
-		antisource[0] = source[0] * Math.cos(rotAngle) - source[1] * Math.sin(rotAngle);
-		antisource[1] = source[0] * Math.sin(rotAngle) + source[1] * Math.cos(rotAngle);
-		
-		//input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
+		CameraCoordinate source  = (CameraCoordinate) input.get(sourcePositionKey);
 
-		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antisource));
-		input.put(outputKey, antisource);
+		double rotAngle = 2 * Math.PI * antiSourcePositionId / (numberOfAntiSourcePositions + 1);
+
+		CameraCoordinate antiSource = new CameraCoordinate(
+			source.getXMM() * Math.cos(rotAngle) - source.getYMM() * Math.sin(rotAngle),
+			source.getXMM() * Math.sin(rotAngle) + source.getYMM() * Math.cos(rotAngle)
+		);
+
+		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antiSource));
+		input.put(outputKey, antiSource);
 		return input;
 	}
 
@@ -73,5 +73,5 @@ public class AntiSourcePosition implements Processor {
 		this.outputKey = outputKey;
 	}
 
-	
+
 }

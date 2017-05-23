@@ -4,18 +4,13 @@ import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxWebService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.SqliteService;
-import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
-import fact.auxservice.strategies.Later;
-import fact.features.source.SourcePosition;
-import org.hamcrest.core.IsNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import stream.io.SourceURL;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;

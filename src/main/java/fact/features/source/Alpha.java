@@ -1,6 +1,7 @@
 package fact.features.source;
 
 import fact.container.PixelDistribution2D;
+import fact.coordinates.CameraCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -9,9 +10,9 @@ import stream.annotations.Parameter;
 /**
  * This feature is supposed to be the angle between the line defined by the major axis of the 2D distribution
  * (aka the shower ellipse) I have no idea.
- * 
+ *
  *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
+ *
  */
 public class Alpha implements Processor {
 	static Logger log = LoggerFactory.getLogger(Alpha.class);
@@ -21,7 +22,7 @@ public class Alpha implements Processor {
 	private String sourcePosition = null;
 	@Parameter(required=true)
 	private String outputKey = null;
-	
+
 	@Override
 	public Data process(Data input) {
 		PixelDistribution2D dist;
@@ -37,9 +38,9 @@ public class Alpha implements Processor {
 		}
 
 
-		double[] source = null;
+		CameraCoordinate source = null;
 		try{
-			source  = (double[]) input.get(sourcePosition);
+			source  = (CameraCoordinate) input.get(sourcePosition);
 			if(source ==  null){
 				throw new RuntimeException("This event didnt have a sourceposition. Eventnumber: " + input.get("EventNum"));
 			}
@@ -47,14 +48,10 @@ public class Alpha implements Processor {
 			log.error("wrong types" + e.toString());
 		}
 
-		double alpha = 0.0;
-        //TODO: this might throw an NPE for source[1]
-	    double auxiliary_angle  = Math.atan( (source[1] - dist.getCenterY() )/(source[0] - dist.getCenterX()) );
-	
-	    //auxiliary_angle         = auxiliary_angle / Math.PI * 180;
-	
-	    alpha                  =  (dist.getAngle() - auxiliary_angle);
-	
+		double auxiliary_angle  = Math.atan((source.getYMM() - dist.getCenterY()) / (source.getXMM() - dist.getCenterX()));
+
+	    double alpha = dist.getAngle() - auxiliary_angle;
+
 	    if (alpha > Math.PI / 2)
 	    {
 	        alpha              = alpha - Math.PI;
@@ -67,8 +64,8 @@ public class Alpha implements Processor {
 		return input;
 	}
 
-	
-	
+
+
 	public String getDistribution() {
 		return distribution;
 	}
