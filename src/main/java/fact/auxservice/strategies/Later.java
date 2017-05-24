@@ -2,7 +2,7 @@ package fact.auxservice.strategies;
 
 import fact.auxservice.AuxPoint;
 
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.TreeSet;
 
 /**
@@ -18,7 +18,7 @@ public class Later implements AuxPointStrategy {
      * @return an AuxPoint according to the concrete strategy implementation, or null if it doesn't exist.
      */
     @Override
-    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, OffsetDateTime eventTimeStamp) {
+    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, ZonedDateTime eventTimeStamp) {
         AuxPoint dummyPoint = new AuxPoint(eventTimeStamp);
         return set.ceiling(dummyPoint);
     }

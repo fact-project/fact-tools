@@ -2,7 +2,7 @@ package fact.auxservice.strategies;
 
 import fact.auxservice.AuxPoint;
 
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.time.ZonedDateTime;
 import java.util.TreeSet;
 
@@ -20,5 +20,5 @@ public interface AuxPointStrategy {
      * @param eventTimeStamp the timestamp for which you want the auxiliary data
      * @return an AuxPoint according to the concrete strategy implementation.
      */
-    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, OffsetDateTime eventTimeStamp);
+    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, ZonedDateTime eventTimeStamp);
 }

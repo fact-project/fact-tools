@@ -3,7 +3,7 @@ package fact.auxservice.strategies;
 import fact.auxservice.AuxPoint;
 
 import java.time.Duration;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.time.ZonedDateTime;
 import java.util.TreeSet;
 
@@ -19,7 +19,7 @@ public class Closest implements AuxPointStrategy {
      * @return an AuxPoint according to the concrete strategy implementation, or null if it doesn't exist.
      */
     @Override
-    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, OffsetDateTime eventTimeStamp) {
+    public AuxPoint getPointFromTreeSet(TreeSet<AuxPoint> set, ZonedDateTime eventTimeStamp) {
         AuxPoint dummyPoint = new AuxPoint(eventTimeStamp);
         AuxPoint floorPoint = set.floor(dummyPoint);
         AuxPoint ceilPoint = set.ceiling(dummyPoint);

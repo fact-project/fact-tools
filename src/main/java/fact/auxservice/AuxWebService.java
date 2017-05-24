@@ -58,9 +58,9 @@ public class AuxWebService implements AuxiliaryService {
 
     private class CacheKey{
         private AuxiliaryServiceName service;
-        private OffsetDateTime roundedTimeStamp;
+        private ZonedDateTime roundedTimeStamp;
 
-        public CacheKey(AuxiliaryServiceName service, OffsetDateTime timeStamp) {
+        public CacheKey(AuxiliaryServiceName service, ZonedDateTime timeStamp) {
             this.service = service;
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
         }
@@ -88,9 +88,11 @@ public class AuxWebService implements AuxiliaryService {
     private class AuxPointDeserializer implements JsonDeserializer<AuxPoint> {
         public AuxPoint deserialize(JsonElement json, Type typeOfT,
                                     JsonDeserializationContext context) throws JsonParseException {
-            long value = (long) (((JsonObject) json).get("Time").getAsDouble()* 1000*24*3600);
-            Instant insMill=Instant.ofEpochMilli(value);
-            OffsetDateTime timeStamp = insMill.atOffset(ZoneOffset.UTC);
+
+            long value = (long) (((JsonObject) json).get("Time").getAsDouble() * 1000 * 24 * 3600);
+
+            Instant insMill = Instant.ofEpochMilli(value);
+            ZonedDateTime timeStamp = ZonedDateTime.ofInstant(insMill, ZoneOffset.UTC);
 
             Map<String, Serializable> data = new HashMap<>();
             data = new Gson().fromJson(json, data.getClass());
@@ -100,7 +102,7 @@ public class AuxWebService implements AuxiliaryService {
 
 
 
-    private TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, OffsetDateTime time){
+    private TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, ZonedDateTime time){
         try {
             log.info("Querying Database for " + service.toString() + " data for time " + time.toString());
             TreeSet<AuxPoint> result = new TreeSet<>();
@@ -126,7 +128,7 @@ public class AuxWebService implements AuxiliaryService {
      * @param eventTimeStamp The timestamp of your current event.
      * @return the data closest to the eventtimestamp which is found in the database.
      */
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         try {
             CacheKey key = new CacheKey(service, eventTimeStamp);
             //this set might not contain the data we need
@@ -140,8 +142,8 @@ public class AuxWebService implements AuxiliaryService {
     }
 
 
-    public static OffsetDateTime floorToQuarterHour(OffsetDateTime time){
-        OffsetDateTime t=OffsetDateTime.of(time.toLocalDate(),time.toLocalTime(),ZoneOffset.of("+00:00")).withSecond(0);
+    public static ZonedDateTime floorToQuarterHour(ZonedDateTime time){
+        ZonedDateTime t = time.withZoneSameInstant(ZoneOffset.UTC).withSecond(0);
         int oldMinute = t.getMinute();
         int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
         return t.plusMinutes(newMinute - oldMinute);

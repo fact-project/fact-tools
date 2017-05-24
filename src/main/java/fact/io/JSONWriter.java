@@ -19,7 +19,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -119,7 +119,7 @@ public class JSONWriter implements StatefulProcessor {
     private Gson gson;
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
-    
+
     boolean isFirstLine = true;
 
     @Override
@@ -165,7 +165,7 @@ public class JSONWriter implements StatefulProcessor {
 
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
         gsonBuilder.enableComplexMapKeySerialization();
-        gsonBuilder.registerTypeAdapter(OffsetDateTime.class, new DateTimeAdapter());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeAdapter());
 
         if (specialDoubleValuesAsString){
             SpecialDoubleValuesAdapter specialDoubleValuesAdapter = new SpecialDoubleValuesAdapter();
@@ -246,10 +246,10 @@ public class JSONWriter implements StatefulProcessor {
         this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
-    public class DateTimeAdapter extends TypeAdapter<OffsetDateTime>{
+    public class DateTimeAdapter extends TypeAdapter<ZonedDateTime>{
 
         @Override
-        public void write(JsonWriter jsonWriter, OffsetDateTime dateTime) throws IOException {
+        public void write(JsonWriter jsonWriter, ZonedDateTime dateTime) throws IOException {
             if (dateTime == null){
                 jsonWriter.nullValue();
             }
@@ -259,7 +259,7 @@ public class JSONWriter implements StatefulProcessor {
         }
 
         @Override
-        public OffsetDateTime read(JsonReader jsonReader) throws IOException {
+        public ZonedDateTime read(JsonReader jsonReader) throws IOException {
             return null;
         }
     }

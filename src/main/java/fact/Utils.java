@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,6 +29,11 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public class Utils {
 	static Logger log = LoggerFactory.getLogger(Utils.class);
+
+	public static ZonedDateTime unixTimeUTCToZonedDateTime(int[] unixTimeUTC) {
+		return Instant.ofEpochSecond(unixTimeUTC[0], unixTimeUTC[1] * 1000).atZone(ZoneOffset.UTC);
+	}
+
 
 	/**
 	 * Return a 2D array

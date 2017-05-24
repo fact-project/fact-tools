@@ -4,22 +4,22 @@ package fact.calibrationservice;
 import java.time.*;
 
 public class HardwareConfiguration implements Comparable<HardwareConfiguration> {
-	
-	private OffsetDateTime startTime;
-	
+
+	private ZonedDateTime startTime;
+
 	private int[] badPixels;
-	
+
 	private int[] notUsablePixels;
-	
-	public HardwareConfiguration(OffsetDateTime startTime){
-		this.startTime = OffsetDateTime.of(startTime.toLocalDate(),startTime.toLocalTime(), ZoneOffset.of("+00:00"));
+
+	public HardwareConfiguration(ZonedDateTime startTime){
+		this.startTime = startTime.withZoneSameInstant(ZoneOffset.UTC);
 	}
 
 	@Override
 	public int compareTo(HardwareConfiguration o) {
 		return this.startTime.compareTo(o.getStartTime());
 	}
-	
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -34,11 +34,11 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
         return true;
     }
 
-	public OffsetDateTime getStartTime() {
+	public ZonedDateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(OffsetDateTime startTime) {
+	public void setStartTime(ZonedDateTime startTime) {
 		this.startTime = startTime;
 	}
 
@@ -57,7 +57,7 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
 	public void setNotUsablePixels(int[] notUsablePixels) {
 		this.notUsablePixels = notUsablePixels;
 	}
-	
-	
+
+
 
 }
