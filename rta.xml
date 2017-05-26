@@ -3,48 +3,41 @@
     <properties url="classpath:/default/settings.properties" />
 
 
-    <property name="infile" value="/scratch/raw/" />
+    <property name="jdbc" value="jdbc:sqlite:./rta.sqlite" />
+    <property name="auxfolder" value="file:/fhgfs/groups/app/fact/aux" />
 
+    <service id="rta_service" class="fact.rta.WebSocketService" auxFolder="${auxfolder}"  jdbcConnection="${jdbc}"/>
 
+    <property name="auxService" value="rta_service" />
 
-    <property name="jdbc" value="jdbc:sqlite:/scratch/rta.sqlite" />
-    <service id="rta_service" class="fact.rta.RestWebService" jdbcConnection="${jdbc}"/>
+    <property name="jdbc" value="jdbc:sqlite:rta.sqlite" />
+
+    <property name="infile" value="/fhgfs/groups/app/fact/raw/2013/11/08/"/>
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/scratch/aux/" />
-    <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/scratch/raw/" />
+    <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
 
     <property name="separator" value="classpath:/prediction_test_files/model.pmml.gz" />
     <service id="rf" class="fact.PredictionService" url="${separator}" />
 
-    <property name="estimator" value="file:classpath:/prediction_test_files/estimator.pmml.gz" />
+    <property name="estimator" value="classpath:/prediction_test_files/estimator.pmml.gz" />
     <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
-        <stream id="_" class="fact.io.zfits.ZFitsStream" />
+        <stream id="_" class="fact.io.hdureader.FITSStream" limit="1000" />
     </stream>
-    <!--<stream id="fact" class="fact.io.KryoStream"  url="file:./fact_data.kryo" />-->
-
-    <!--<Queue id="out_queue" />-->
-    <!--<Queue id="performance_queue" />-->
-
-
-    <!--<stream id="fact" class="fact.io.zfits.ZFitsStream" url="file:/Users/mackaiver/20140105_151.fits.fz"/>-->
 
 
     <!-- Description of the process and the corresponding stream -->
     <process input="fact" copies="1">
         <!--<Delay time="50ms" />-->
         <fact.DataRate every="50" logmemory="true"  webService="rta_service"/>
-
         <Skip condition="%{data.TriggerType} != 4" />
-        <!--<PrintData/>-->
 
         <!--<Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
 
@@ -119,11 +112,11 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/data/sourceParameter.xml" />
 
-
+        <!--<PrintData/>-->
         <Skip condition="%{data.numPixeInShower} &lt; 9" />
 
             <fact.rta.Energy predictor="regressor" />
-            <fact.rta.Signal predictor="rf" webService="rta_service" auxService="auxService"/>
+            <fact.rta.Signal predictor="rf" webService="rta_service"/>
             <!--<Enqueue queues="out_queue" />-->
     </process>
 
