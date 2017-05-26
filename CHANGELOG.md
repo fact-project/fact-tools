@@ -1,5 +1,11 @@
 # Changelog for the fact-tools
 
+# Version 0.18.1 -- 26.05.2017
+
+* The HDU reader (new fits stream implementation) now ignores 
+erroneous tile headers that appear in some files.
+
+
 # Version 0.18.0 -- 19.01.2017
 
 * A new reader for FITS and ZFITS files was added.
