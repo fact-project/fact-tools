@@ -1,6 +1,6 @@
 package fact.rta.io;
 
-import fact.io.zfits.ZFitsStream;
+import fact.io.hdureader.FITSStream;
 import fact.rta.RTADataBase;
 import fact.rta.db.Run;
 import org.skife.jdbi.v2.DBI;
@@ -118,23 +118,23 @@ public class RTAStream extends AbstractMultiStream {
         }
     }
 
-    private void checkStream() throws Exception {
+    private void checkNextFile() throws Exception {
         String path = fileQueue.take().toFile().getAbsolutePath();
+        log.info("Opening file " + path);
         stream.setUrl(new SourceURL("file:" + path));
         stream.init();
         try{
-            ZFitsStream zstream = (ZFitsStream) stream;
-            if(zstream.headerItem.containsKey("RUNTYPE")){
-                String runtype = zstream.headerItem.get("RUNTYPE").toString();
-                if(!runtype.equals("data")){
-                    //not a data run. skip
-                    log.info("Skipping run with type: " + runtype);
-                    checkStream();
-                }
+            FITSStream zstream = (FITSStream) stream;
+            String runtype = zstream.eventHDUHeader.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
+
+            if(!runtype.equals("data")){
+                //not a data run. skip
+                log.info("Skipping run with type: " + runtype);
+                checkNextFile();
             }
         } catch (ClassCastException e){
             //pass
-            log.warn("not using a zfits stream as inner stream. this will not skip non-data runs.");
+            log.warn("Not using a zfits stream as inner stream. this will not skip non-data runs.");
         }
     }
 
@@ -150,11 +150,11 @@ public class RTAStream extends AbstractMultiStream {
         if (stream == null) {
             //get the first stream inside this multistream.
             stream = (AbstractStream) streams.get(additionOrder.get(0));
-            checkStream();
+            checkNextFile();
         }
         Data data = stream.read();
         if(data == null){
-            checkStream();
+            checkNextFile();
             data = stream.read();
         }
         return data;
