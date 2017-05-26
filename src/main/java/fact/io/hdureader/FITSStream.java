@@ -8,8 +8,6 @@ import stream.io.SourceURL;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The ZFitsStream can read FITS files containing raw data as recorded by the FACT telescope DAQ.
@@ -25,7 +23,7 @@ public class FITSStream extends AbstractStream {
     private Reader reader;
 
     private HDU eventHDU;
-    private Map<String, Serializable> fitsHeader = new HashMap<>();
+    public Header eventHDUHeader;
 
     public FITSStream(SourceURL url){
         this.url = url;
@@ -36,6 +34,7 @@ public class FITSStream extends AbstractStream {
     @Override
     public void init() throws Exception {
         super.init();
+        this.count= 0L;
 
         //create a fits object from the SourceURL this AbstractStream contains.
         //The FITs object does not know SourceURL so this fits reader is decoupled entirely from the streams framework
@@ -63,8 +62,7 @@ public class FITSStream extends AbstractStream {
         //read each headerline and try to get the right datatype
         //from smallest to largest datatype
         //if no number can be found simply save the string.
-        Header header = eventHDU.header;
-        fitsHeader = header.asMapOfSerializables();
+        eventHDUHeader = eventHDU.header;
 
         Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
         if (ztable) {
@@ -108,7 +106,7 @@ public class FITSStream extends AbstractStream {
         }
 
         Data item = DataFactory.create(nextRow);
-        item.putAll(fitsHeader);
+        item.putAll(eventHDUHeader.asMapOfSerializables());
 
         return item;
     }
