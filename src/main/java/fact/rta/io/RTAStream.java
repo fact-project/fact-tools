@@ -2,6 +2,7 @@ package fact.rta.io;
 
 import fact.io.hdureader.FITSStream;
 import fact.rta.RTADataBase;
+import fact.rta.WebSocketService;
 import fact.rta.db.Run;
 import org.skife.jdbi.v2.DBI;
 import stream.Data;
@@ -24,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class RTAStream extends AbstractMultiStream {
 
 
-    @Parameter(required = true, description = "Path to folder thats being watched")
+    @Parameter(required = true, description = "Path to folder that is being watched")
     public String folder;
 
     @Parameter
@@ -111,7 +112,17 @@ public class RTAStream extends AbstractMultiStream {
         public void run() {
             Path dir = Paths.get(folder);
             try {
+                WebSocketService s = WebSocketService.getService();
+                if(s != null){
+                    s.messageHandler.sendDataStatus("Checking for new data.");
+                    log.info("Checking file system for new data.");
+                }
                 Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|fits.fz|fits\\.gz)$"));
+                if (s != null && fileQueue.isEmpty()){
+                    s.messageHandler.sendDataStatus("No new data present.");
+                    log.info("No new data present.");
+                }
+
             } catch (IOException e) {
                 throw new RuntimeException();
             }
@@ -119,7 +130,16 @@ public class RTAStream extends AbstractMultiStream {
     }
 
     private void checkNextFile() throws Exception {
+        WebSocketService s = WebSocketService.getService();
+        if(fileQueue.isEmpty() && s != null){
+            s.messageHandler.sendDataStatus("Waiting for new data.");
+        }
+        if(fileQueue.isEmpty()){
+            log.info("FileQueue is empty. Waiting for new data. ");
+        }
+
         String path = fileQueue.take().toFile().getAbsolutePath();
+
         log.info("Opening file " + path);
         stream.setUrl(new SourceURL("file:" + path));
         stream.init();
@@ -147,6 +167,13 @@ public class RTAStream extends AbstractMultiStream {
      */
     @Override
     public synchronized Data readNext() throws Exception {
+        if (this.count % 128 == 0){
+            WebSocketService s = WebSocketService.getService();
+            if(s != null){
+               s.messageHandler.sendDataStatus("Currently streaming data.");
+            }
+        }
+
         if (stream == null) {
             //get the first stream inside this multistream.
             stream = (AbstractStream) streams.get(additionOrder.get(0));

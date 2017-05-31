@@ -37,7 +37,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
     private Deque<Signal> signals = new ArrayDeque<>();
     private boolean isInit = false;
     private AuxFileService auxService;
-    private MessageHandler messageHandler = new MessageHandler();
+    public MessageHandler messageHandler = new MessageHandler();
 
 
     @Parameter(required = true, description = "Path to the .sqlite file")
@@ -46,6 +46,16 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
     @Parameter(required = true, description = "The url pointing to the path containing a the auxilary " +
             "data in FACTs canonical folder structure." )
     public SourceURL auxFolder;
+
+
+    //behold the most ugly workaround in history.
+    private static WebSocketService service;
+    public static WebSocketService getService(){
+        if (service == null){
+            return null;
+        }
+        return service;
+    }
 
     public WebSocketService(){
         Spark.webSocket("/rta", WebSocket.class);
@@ -74,6 +84,9 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
      *
      */
     public void init(){
+        //see workaround above.
+        service = this;
+
         dbInterface = new DBI(this.jdbcConnection).open(RTADataBase.DBInterface.class);
 
         dbInterface.createRunTableIfNotExists();

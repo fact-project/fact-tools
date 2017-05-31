@@ -2,10 +2,7 @@ package fact.rta;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import fact.rta.db.Run;
 import fact.rta.rest.Event;
 import fact.rta.rest.Serializer;
@@ -21,7 +18,7 @@ import java.util.Set;
 /**
  * Created by mackaiver on 03/05/17.
  */
-class MessageHandler {
+public class MessageHandler {
 //
 //    public enum Topics{
 //        RUN_INFO("RUN_INFO"),
@@ -72,7 +69,24 @@ class MessageHandler {
 
     void sendStatus(StatusContainer status){
         JsonElement element = gson.toJsonTree(status);
-        element.getAsJsonObject().addProperty("topic", "STATUS");
+        element.getAsJsonObject().addProperty("topic", "MACHINE_STATUS");
+
+        sessions.stream().filter(Session::isOpen).forEach(session -> {
+            try {
+                session.getRemote().sendString(gson.toJson(element));
+            } catch (IOException e) {
+                log.error("Error sending event to session " + session);
+                e.printStackTrace();
+            } catch (IllegalStateException e){
+                log.error("Error sending event to session. Illegal State in session:" + session);
+                e.printStackTrace();
+            }
+        });
+    }
+
+    void sendEvent(Event event){
+        JsonElement element = gson.toJsonTree(event);
+        element.getAsJsonObject().addProperty("topic", "EVENT");
 
         sessions.stream().filter(Session::isOpen).forEach(session -> {
             try {
@@ -83,9 +97,11 @@ class MessageHandler {
         });
     }
 
-    void sendEvent(Event event){
-        JsonElement element = gson.toJsonTree(event);
-        element.getAsJsonObject().addProperty("topic", "EVENT");
+
+    public void sendDataStatus(String s) {
+        JsonElement element = new JsonObject();
+        element.getAsJsonObject().addProperty("topic", "DATA_STATUS");
+        element.getAsJsonObject().addProperty("status", s);
 
         sessions.stream().filter(Session::isOpen).forEach(session -> {
             try {

@@ -20,7 +20,6 @@
     <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-
     <property name="separator" value="classpath:/prediction_test_files/model.pmml.gz" />
     <service id="rf" class="fact.PredictionService" url="${separator}" />
 
@@ -28,8 +27,8 @@
     <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
 
-    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" >
-        <stream id="_" class="fact.io.hdureader.FITSStream" limit="1000" />
+    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" rtaService="rta_service">
+        <stream id="_" class="fact.io.hdureader.FITSStream" limit="30" />
     </stream>
 
 
