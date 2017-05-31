@@ -3,9 +3,7 @@ package fact;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
-import org.jpmml.evaluator.FieldValue;
-import org.jpmml.evaluator.ModelEvaluator;
-import org.jpmml.evaluator.ModelEvaluatorFactory;
+import org.jpmml.evaluator.*;
 import org.jpmml.model.ImportFilter;
 import org.jpmml.model.JAXBUtil;
 import org.slf4j.Logger;
@@ -43,7 +41,7 @@ public class ApplyModel implements StatefulProcessor{
     //name of the target variable
     private FieldName targetName;
     //fields used while training the model
-    private List<FieldName> activeFields;
+    private List<InputField> activeFields;
 
     @Parameter(required = true, description = "URL point to the .pmml model")
     SourceURL url;
@@ -60,7 +58,7 @@ public class ApplyModel implements StatefulProcessor{
         }
         //build a modelevaluator from the loaded pmml file
         ModelEvaluatorFactory modelEvaluatorFactory = ModelEvaluatorFactory.newInstance();
-        modelEvaluator = modelEvaluatorFactory.newModelManager(pmml);
+        modelEvaluator = modelEvaluatorFactory.newModelEvaluator(pmml);
 
 
         log.info("Loaded model requires the following fields: " + modelEvaluator.getActiveFields().toString());
@@ -70,7 +68,7 @@ public class ApplyModel implements StatefulProcessor{
             log.error("Only models with one target variable are supported for now");
         }
 
-        targetName = modelEvaluator.getTargetField();
+        targetName = modelEvaluator.getTargetFieldName();
         activeFields = modelEvaluator.getActiveFields();
     }
 
@@ -87,14 +85,16 @@ public class ApplyModel implements StatefulProcessor{
     @Override
     public Data process(Data data) {
 
-        for(FieldName activeField : activeFields){
+        for(InputField activeField : activeFields){
 
             Object rawValue = data.get(activeField.toString());
 
             // The raw value is passed through: type conversion or any other transofrmations applied in sklearn
-            FieldValue activeValue = modelEvaluator.prepare(activeField, rawValue);
+            FieldValue activeValue =activeField.prepare(rawValue);
 
-            arguments.put(activeField, activeValue);
+            FieldName activeFieldName=activeField.getName();
+
+            arguments.put(activeFieldName, activeValue);
         }
 
         Map<FieldName, ?> results = modelEvaluator.evaluate(arguments);
