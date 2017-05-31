@@ -1,8 +1,7 @@
-package fact.io.hdu_reader;
+package fact.io.hdureader;
 
 
 import fact.io.FITSStream;
-import fact.io.hdureader.*;
 
 import fact.io.zfits.ZFitsStream;
 import org.junit.Test;

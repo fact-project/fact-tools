@@ -1,7 +1,5 @@
-package fact.io.hdu_reader;
+package fact.io.hdureader;
 
-import fact.io.hdureader.FITS;
-import fact.io.hdureader.HDU;
 import org.junit.Test;
 
 import java.io.DataInputStream;
