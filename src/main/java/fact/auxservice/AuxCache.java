@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 
 /**
  * This class defines some classes needed for caching many {@link AuxPoint} into ram
@@ -21,7 +22,7 @@ public class AuxCache {
         public final Path path;
 
 
-        public CacheKey(AuxiliaryServiceName service, DateTime timeStamp) {
+        public CacheKey(AuxiliaryServiceName service, ZonedDateTime timeStamp) {
             this.service = service;
             this.factNight = dateTimeStampToFACTNight(timeStamp);
 
@@ -64,9 +65,9 @@ public class AuxCache {
      * @param timestamp the timestamp to get the night for
      * @return a FACT night number.
      */
-    public static Integer dateTimeStampToFACTNight(DateTime timestamp){
-        DateTime offsetDate = timestamp.minusHours(12);
-        String night = String.format("%1$d%2$02d%3$02d", offsetDate.getYear(), offsetDate.getMonthOfYear(), offsetDate.getDayOfMonth());
+    public static Integer dateTimeStampToFACTNight(ZonedDateTime timestamp){
+        ZonedDateTime offsetDate = timestamp.minusHours(12);
+        String night = String.format("%1$d%2$02d%3$02d", offsetDate.getYear(), offsetDate.getMonthValue(), offsetDate.getDayOfMonth());
         return Integer.parseInt(night);
     }
 
@@ -79,11 +80,11 @@ public class AuxCache {
      * @param timeStamp the timestamp to get the night for
      * @return a partial path starting with the year.
      */
-    public static Path dateTimeStampToFACTPath(DateTime timeStamp){
-        DateTime offsetDate = timeStamp.minusHours(12);
+    public static Path dateTimeStampToFACTPath(ZonedDateTime timeStamp){
+        ZonedDateTime offsetDate = timeStamp.minusHours(12);
 
         int year = offsetDate.getYear();
-        int month = offsetDate.getMonthOfYear();
+        int month = offsetDate.getMonthValue();
         int day = offsetDate.getDayOfMonth();
 
         return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));

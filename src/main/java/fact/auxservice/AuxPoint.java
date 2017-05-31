@@ -1,9 +1,10 @@
 package fact.auxservice;
 
 import com.google.common.collect.ImmutableMap;
-import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -12,11 +13,11 @@ import java.util.Map;
  * Created by kai on 31.03.15.
  */
 public class AuxPoint implements Comparable<AuxPoint>{
-    private DateTime timeStamp;
+    private ZonedDateTime timeStamp;
     private ImmutableMap<String, Serializable> data;
 
-    public AuxPoint(DateTime timeStamp){
-        this.timeStamp = new DateTime(timeStamp);
+    public AuxPoint(ZonedDateTime timeStamp){
+        this.timeStamp = timeStamp.withZoneSameInstant(ZoneOffset.UTC);
     }
 
 
@@ -25,9 +26,9 @@ public class AuxPoint implements Comparable<AuxPoint>{
      * @param timeStamp the timestamp specifying  when the auxiliary data was recorded.
      * @param data a map containing the names and values from the .fits files as key values pairs.
      */
-    public AuxPoint(DateTime timeStamp, Map<String, Serializable> data){
+    public AuxPoint(ZonedDateTime timeStamp, Map<String, Serializable> data){
         this.data = new ImmutableMap.Builder<String, Serializable>().putAll(data).build();
-        this.timeStamp = new DateTime(timeStamp);
+        this.timeStamp = timeStamp.withZoneSameInstant(ZoneOffset.UTC);
     }
 
 
@@ -35,7 +36,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
      * The timestamp from when sensor recorded this AuxPoint.
      * @return the timestamp for this point.
      */
-    public DateTime getTimeStamp() {
+    public ZonedDateTime getTimeStamp() {
         return timeStamp;
     }
 

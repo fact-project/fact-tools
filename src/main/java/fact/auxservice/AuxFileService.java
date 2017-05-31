@@ -1,19 +1,25 @@
 package fact.auxservice;
 
-import com.google.common.cache.*;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import fact.auxservice.strategies.AuxPointStrategy;
-
-import fact.io.zfits.ZFitsStream;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -74,9 +80,8 @@ public class AuxFileService implements AuxiliaryService {
      * @throws IOException when no auxpoint can be found for given timestamp
      */
     @Override
-    public synchronized AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
-
-        if(eventTimeStamp.isAfterNow()){
+    public synchronized AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+        if(eventTimeStamp.isAfter(ZonedDateTime.now())){
             log.warn("The requested timestamp seems to be in the future.");
         }
         try {
@@ -100,7 +105,7 @@ public class AuxFileService implements AuxiliaryService {
      *
      * @throws IOException when no auxpoint can be found for given night
      */
-    public synchronized SortedSet<AuxPoint> getAuxiliaryDataForWholeNight(AuxiliaryServiceName serviceName, DateTime night) throws IOException {
+    public synchronized SortedSet<AuxPoint> getAuxiliaryDataForWholeNight(AuxiliaryServiceName serviceName, ZonedDateTime night) throws IOException {
         try {
             AuxCache.CacheKey key = new AuxCache().new CacheKey(serviceName, night);
 
@@ -116,30 +121,36 @@ public class AuxFileService implements AuxiliaryService {
     }
 
     private TreeSet<AuxPoint>  readDataFromFile(AuxCache.CacheKey key) throws Exception {
+        TreeSet<AuxPoint> result = new TreeSet<>();
+
         Path pathToFile = Paths.get(auxFolder.getPath(), key.path.toString());
+
         if(pathToFile == null){
             log.error("Could not load auxfile {} for night {}", key.service, key.factNight);
             throw new IOException("Could not load auxfile for key " +  key);
         }
-        TreeSet<AuxPoint> result = new TreeSet<>();
-        ZFitsStream stream = new ZFitsStream(new SourceURL(pathToFile.toUri().toURL()));
-        stream.setTableName(key.service.name());
-        try {
-            stream.init();
-            Data slowData = stream.readNext();
-            while (slowData != null) {
-                double time = Double.parseDouble(slowData.get("Time").toString()) * 86400;// + 2440587.5;
-                DateTime t = new DateTime((long)(time*1000), DateTimeZone.UTC);
-                AuxPoint p = new AuxPoint(t, slowData);
+
+        FITS fits = FITS.fromPath(pathToFile);
+        String extname = key.service.name();
+
+        BinTable auxDataBinTable = fits.getBinTableByName(extname)
+                                       .orElseThrow(
+                                           () -> new RuntimeException("BinTable '" + extname + "' not in aux file")
+                                       );
+        BinTableReader auxDataBinTableReader = BinTableReader.forBinTable(auxDataBinTable);
+
+        while (auxDataBinTableReader.hasNext()) {
+            OptionalTypesMap<String, Serializable> auxData = auxDataBinTableReader.getNextRow();
+
+            auxData.getDouble("Time").ifPresent(time -> {
+                long value = (long) (time * 24 * 60 * 60 *1000 );
+                ZonedDateTime t = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
+                AuxPoint p = new AuxPoint(t, auxData);
                 result.add(p);
-                slowData = stream.readNext();
-            }
-            stream.close();
-            return result;
-        } catch (Exception e) {
-            log.error("Failed to load data from AUX file: {}", e.getMessage());
-            throw new RuntimeException(e);
+            });
+
         }
+        return result;
     }
 
 
