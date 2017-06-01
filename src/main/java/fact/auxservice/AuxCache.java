@@ -1,8 +1,6 @@
 package fact.auxservice;
 
 
-import org.joda.time.DateTime;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
