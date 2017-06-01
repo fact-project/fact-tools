@@ -36,6 +36,8 @@ import java.util.concurrent.TimeUnit;
  *
  * Simply provide the 'auxFolder' url to the basepath of the aux files e.g. '/fact/aux/'
  *
+ * Optionally you can also provide the path to the folder containing the aux data for that specific night e.g. '/fact/aux/2013/01/02/'
+ *
  * Because one might want read from multiple sources at once, and many streams are accessing this service at once, or
  * one simply wants to access many different aux files the data from one file is cached into a guava cache.
  * This saves us the overhead of keeping tracks of different files in some custom structure.
@@ -126,16 +128,26 @@ public class AuxFileService implements AuxiliaryService {
         Path pathToFile = Paths.get(auxFolder.getPath(), key.path.toString());
 
         if(pathToFile == null){
-            log.error("Could not load auxfile {} for night {}", key.service, key.factNight);
-            throw new IOException("Could not load auxfile for key " +  key);
+            log.error("Could not load aux file {} for night {}", key.service, key.factNight);
+            throw new IOException("Could not load aux file for key " +  key);
         }
 
-        FITS fits = FITS.fromPath(pathToFile);
-        String extname = key.service.name();
+        //test whether file is in current directory. this ensures compatibility to fact-tools version < 18.0
+        if (!pathToFile.toFile().canRead()){
+            pathToFile = Paths.get(auxFolder.getPath(), key.filename);
 
-        BinTable auxDataBinTable = fits.getBinTableByName(extname)
+            if (!pathToFile.toFile().canRead()){
+                log.error("Could not load aux file in given directory {}", auxFolder);
+            }
+        }
+
+
+        FITS fits = FITS.fromPath(pathToFile);
+        String extName = key.service.name();
+
+        BinTable auxDataBinTable = fits.getBinTableByName(extName)
                                        .orElseThrow(
-                                           () -> new RuntimeException("BinTable '" + extname + "' not in aux file")
+                                           () -> new RuntimeException("BinTable '" + extName + "' not in aux file")
                                        );
         BinTableReader auxDataBinTableReader = BinTableReader.forBinTable(auxDataBinTable);
 

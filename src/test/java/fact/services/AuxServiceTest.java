@@ -134,6 +134,19 @@ public class AuxServiceTest {
         assertThat(auxiliaryData.getDouble("Ra"), is(not(nullValue())));
     }
 
+    /**
+     * Test whether files in the specific aux folder are found
+     */
+    @Test
+    public void testAuxFileServiceForSpecificLocation() throws Exception {
+        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/2013/01/02");
+        AuxFileService s = new AuxFileService();
+        s.auxFolder = new SourceURL(u);
+        AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, ZonedDateTime.parse("2013-01-02T23:30:21Z"), new Closest());
+        assertThat(auxiliaryData, is(not(nullValue())));
+        assertThat(auxiliaryData.getDouble("Ra"), is(not(nullValue())));
+    }
+
     @Test
     public void testToGetAllPointsForNight() throws Exception {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");

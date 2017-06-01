@@ -20,14 +20,15 @@ public class AuxCache {
         final AuxiliaryServiceName service;
         final Integer factNight;
         public final Path path;
+        public final String filename;
 
 
         public CacheKey(AuxiliaryServiceName service, ZonedDateTime timeStamp) {
             this.service = service;
             this.factNight = dateTimeStampToFACTNight(timeStamp);
 
-            String name = factNight + "." + service + ".fits";
-            this.path = Paths.get(dateTimeStampToFACTPath(timeStamp).toString(), name);
+            filename = factNight + "." + service + ".fits";
+            this.path = Paths.get(dateTimeStampToFACTPath(timeStamp).toString(), filename);
         }
 
         @Override
