@@ -13,6 +13,7 @@ import stream.io.SourceURL;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.SortedSet;
 
 
@@ -33,47 +34,47 @@ public class AuxServiceTest {
 
     @Test
     public void testDateTimeToFACTNight(){
-        Integer factNight = AuxCache.dateTimeStampToFACTNight(DateTime.parse("2014-01-02T23:55:02"));
+        Integer factNight = AuxCache.dateTimeStampToFACTNight(ZonedDateTime.parse("2014-01-02T23:55:02Z"));
         assertThat(factNight, is(20140102));
 
         //now test what happens after 00:00
-        factNight = AuxCache.dateTimeStampToFACTNight(DateTime.parse("2014-01-03T00:55:02"));
+        factNight = AuxCache.dateTimeStampToFACTNight(ZonedDateTime.parse("2014-01-03T00:55:02Z"));
         assertThat(factNight, is(20140102));
 
         //now test the next day
-        factNight = AuxCache.dateTimeStampToFACTNight(DateTime.parse("2014-01-03T12:00:01"));
+        factNight = AuxCache.dateTimeStampToFACTNight(ZonedDateTime.parse("2014-01-03T12:00:01Z"));
         assertThat(factNight, is(20140103));
 
         //now test what happens after newyears
-        factNight = AuxCache.dateTimeStampToFACTNight(DateTime.parse("2014-01-01T00:55:02"));
+        factNight = AuxCache.dateTimeStampToFACTNight(ZonedDateTime.parse("2014-01-01T00:55:02Z"));
         assertThat(factNight, is(20131231));
 
         //now test my birfday!!
-        factNight = AuxCache.dateTimeStampToFACTNight(DateTime.parse("1987-09-20T20:55:02"));
+        factNight = AuxCache.dateTimeStampToFACTNight(ZonedDateTime.parse("1987-09-20T20:55:02Z"));
         assertThat(factNight, is(19870920));
     }
 
 
     @Test
     public void testDateTimeToFACTPath(){
-        Path factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-02T23:55:02"));
+        Path factNight = AuxCache.dateTimeStampToFACTPath(ZonedDateTime.parse("2014-01-02T23:55:02Z"));
 
         assertThat(factNight, is(Paths.get("2014", "01", "02")));
 
         //now test what happens after 00:00
-        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-03T00:55:02"));
+        factNight = AuxCache.dateTimeStampToFACTPath(ZonedDateTime.parse("2014-01-03T00:55:02Z"));
         assertThat(factNight, is(Paths.get("2014", "01", "02")));
 
         //now test the next day
-        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-03T12:00:01"));
+        factNight = AuxCache.dateTimeStampToFACTPath(ZonedDateTime.parse("2014-01-03T12:00:01Z"));
         assertThat(factNight, is(Paths.get("2014", "01", "03")));
 
         //now test what happens after newyears
-        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("2014-01-01T00:55:02"));
+        factNight = AuxCache.dateTimeStampToFACTPath(ZonedDateTime.parse("2014-01-01T00:55:02Z"));
         assertThat(factNight, is(Paths.get("2013", "12", "31")));
 
         //now test my birfday!!
-        factNight = AuxCache.dateTimeStampToFACTPath(DateTime.parse("1987-09-20T20:55:02"));
+        factNight = AuxCache.dateTimeStampToFACTPath(ZonedDateTime.parse("1987-09-20T20:55:02Z"));
         assertThat(factNight, is(Paths.get("1987", "09", "20")));
     }
 
@@ -85,7 +86,7 @@ public class AuxServiceTest {
         AuxFileService auxFileService = new AuxFileService();
         auxFileService.auxFolder = new SourceURL(u);
 
-        DateTime night = DateTime.parse("2016-09-20T20:55:02");
+        ZonedDateTime night = ZonedDateTime.parse("2016-09-20T20:55:02Z");
         AuxCache.CacheKey key = new AuxCache().new CacheKey(AuxiliaryServiceName.FTM_CONTROL_STATE, night);
         Path path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
         //file should not exist
@@ -93,14 +94,14 @@ public class AuxServiceTest {
 
 
 
-        night = DateTime.parse("2014-09-20T20:55:02");
+        night = ZonedDateTime.parse("2014-09-20T20:55:02Z");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.FTM_CONTROL_STATE, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
 
         assertTrue(path.toFile().exists());
 
 
-        night = DateTime.parse("2014-09-20T20:55:02");
+        night = ZonedDateTime.parse("2014-09-20T20:55:02Z");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.RATE_SCAN_PROCESS_DATA, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
 
@@ -108,7 +109,7 @@ public class AuxServiceTest {
 
 
 
-        night = DateTime.parse("2013-01-02T20:55:02");
+        night = ZonedDateTime.parse("2013-01-02T20:55:02Z");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
 
@@ -116,7 +117,7 @@ public class AuxServiceTest {
 
 
 
-        night = DateTime.parse("2014-09-20T20:55:02");
+        night = ZonedDateTime.parse("2014-09-20T20:55:02Z");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
         //file should not exist
@@ -128,7 +129,7 @@ public class AuxServiceTest {
         URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
         AuxFileService s = new AuxFileService();
         s.auxFolder = new SourceURL(u);
-        AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, DateTime.parse("2013-01-02T23:30:21"), new Closest());
+        AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, ZonedDateTime.parse("2013-01-02T23:30:21Z"), new Closest());
         assertThat(auxiliaryData, is(not(nullValue())));
         assertThat(auxiliaryData.getDouble("Ra"), is(not(nullValue())));
     }
@@ -140,7 +141,7 @@ public class AuxServiceTest {
         s.auxFolder = new SourceURL(u);
         SortedSet<AuxPoint> auxiliaryData = s.getAuxiliaryDataForWholeNight(
                 AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION,
-                DateTime.parse("2013-01-02T23:30:21")
+                ZonedDateTime.parse("2013-01-02T23:30:21Z")
         );
 
         assertFalse(auxiliaryData.isEmpty());
