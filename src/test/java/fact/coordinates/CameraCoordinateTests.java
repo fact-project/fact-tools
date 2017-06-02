@@ -26,13 +26,13 @@ public class CameraCoordinateTests {
 
         c = new CameraCoordinate(50.0, 0.0);
 
-        h = c.toHorizontal(pointing, Constants.focalLength);
+        h = c.toHorizontal(pointing, Constants.FOCAL_LENGTH_MM);
 
         assertTrue(h.getZenithDeg() > 90);
         assertEquals(0.0, h.getAzimuthDeg(), 1e-12);
 
         c = new CameraCoordinate(0, 50.0);
-        h = c.toHorizontal(pointing, Constants.focalLength);
+        h = c.toHorizontal(pointing, Constants.FOCAL_LENGTH_MM);
 
         assertEquals(90.0, h.getZenithDeg(), 1e-12);
         assertTrue(h.getAzimuthDeg() > 0);

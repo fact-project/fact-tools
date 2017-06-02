@@ -14,7 +14,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -63,8 +62,8 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 
     @Parameter(required = false)
     private String[] starPositionKeys = null;
-    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-	private double starRadiusInCamera = Constants.PIXEL_SIZE;
+    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE_MM")
+	private double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     private boolean showDifferentCleaningSets = false;
 

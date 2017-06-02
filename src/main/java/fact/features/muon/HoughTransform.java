@@ -1,6 +1,5 @@
 package fact.features.muon;
 
-import com.google.common.primitives.Ints;
 import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactCameraPixel;
@@ -12,7 +11,6 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import streams.tikz.Pixel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -220,7 +218,7 @@ public class HoughTransform implements StatefulProcessor {
 
             double distance = euclidean_distance2d(pix_x, pix_y, best_x[0], best_y[0]);
 
-            if(Math.abs(distance - best_r[0]) <= fact.Constants.PIXEL_SIZE)
+            if(Math.abs(distance - best_r[0]) <= fact.Constants.PIXEL_SIZE_MM)
             {
                 onRingPixel += 1;
 
@@ -268,7 +266,7 @@ public class HoughTransform implements StatefulProcessor {
                     double pix_x = p.getXPositionInMM();
                     double pix_y = p.getYPositionInMM();
                     distance = euclidean_distance2d(pix_x, pix_y, best_x[i], best_y[i]);
-                    if (Math.abs(distance - best_r[i]) <= fact.Constants.PIXEL_SIZE) {
+                    if (Math.abs(distance - best_r[i]) <= fact.Constants.PIXEL_SIZE_MM) {
                         CirclePixelSet.addById(pix);
                     }
                 }
@@ -328,7 +326,7 @@ public class HoughTransform implements StatefulProcessor {
                 for (int x = 0; x < circle_x.length; x++) {
                     for (int y = 0; y < circle_y.length; y++) {
                         double distance = euclidean_distance2d(pix_x, pix_y, circle_x[x], circle_y[y]);
-                        if (Math.abs(distance - circle_r[r]) <= fact.Constants.PIXEL_SIZE) {
+                        if (Math.abs(distance - circle_r[r]) <= fact.Constants.PIXEL_SIZE_MM) {
                             int[] idx = {r, x, y};
                             RingId ring = new RingId(r, x, y);
                             chid2circles[chid].add(idx);
