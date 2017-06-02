@@ -10,7 +10,7 @@ import stream.annotations.Parameter;
  */
 public class TimeSeriesNoise implements Processor {
 
-    @Parameter(required = true, description = "Input key, should have length npix * roi")
+    @Parameter(required = true, description = "Input key, should have length NPIC * NROI")
     String dataKey = null;
 
     @Parameter(required = true, description = "Output key")
