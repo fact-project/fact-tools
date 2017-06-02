@@ -7,6 +7,10 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import java.time.ZonedDateTime;
 
 /**
+ * Represents a coordinate in the horizontal coordinate.
+ *
+ * Provides a method to transform into the equatorial and camera frame.
+ *
  * Created by maxnoe on 22.05.17.
  */
 public class HorizontalCoordinate implements CelestialCoordinate {
@@ -14,9 +18,13 @@ public class HorizontalCoordinate implements CelestialCoordinate {
     private final double zenithRad;
     private final double azimuthRad;
 
-    public HorizontalCoordinate(double zenithRad, double azimuthRad) {
+    private HorizontalCoordinate(double zenithRad, double azimuthRad) {
         this.zenithRad = zenithRad;
         this.azimuthRad = azimuthRad;
+    }
+
+    public static HorizontalCoordinate fromRad(double zenithRad, double azimuthRad) {
+        return new HorizontalCoordinate(zenithRad, azimuthRad);
     }
 
     public static HorizontalCoordinate fromDegrees(double zenithDeg, double azimuthDeg) {
@@ -32,6 +40,9 @@ public class HorizontalCoordinate implements CelestialCoordinate {
 
 
     /**
+     * Transform this HorizontalCoordinate into the equatorial coordinate frame
+     * for given observation time and location.
+     *
      * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
      *
@@ -57,13 +68,14 @@ public class HorizontalCoordinate implements CelestialCoordinate {
 
         double ra = gst + lon - hourAngle;
 
-        return new EquatorialCoordinate(ra, declination);
+        return EquatorialCoordinate.fromRad(ra, declination);
     }
 
     /**
-     * Returns position of the source in the camera from the given pointing position
-     * Code by M. Nöthe
-     * @return
+     * Transform this horizontal coordinate to the camera frame for the given pointing position and focal length.
+     * @param pointingPosition Pointing of the telescope
+     * @param focalLength focalLength of the telescope
+     * @return coordinate transformed into the camera frame
      */
     public CameraCoordinate toCamera(HorizontalCoordinate pointingPosition, double focalLength)
     {

@@ -8,6 +8,11 @@ import java.io.Serializable;
 
 /**
  * Created by maxnoe on 22.05.17.
+ *
+ * This class represents a coordinate in the camera frame using
+ * euclidean coordinates in mm.
+ *
+ * It provides a method toHorizontal to transform from camera frame to telescope frame
  */
 public class CameraCoordinate implements Serializable {
     private final double xMM;
@@ -26,7 +31,14 @@ public class CameraCoordinate implements Serializable {
         return yMM;
     }
 
-
+    /**
+     * Transform this CameraCoordinate from camera frame to telescope (horizontal coordinates) frame
+     * for the given PointingPosition.
+     *
+     * @param pointingPosition the telescope's pointing position
+     * @param focalLength the focal length of the telescope
+     * @return the camera coordinate transformed into the horizontal coordinate frame
+     */
     public HorizontalCoordinate toHorizontal(HorizontalCoordinate pointingPosition, double focalLength){
 
         double paz = pointingPosition.getAzimuthRad();
