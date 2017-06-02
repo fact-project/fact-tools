@@ -7,13 +7,12 @@
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxFolder" value="file:src/main/resources/aux/" />
-  <property name="fitValueFile" value="file:src/main/resources/aux/fitValuesData.fits" />
-  <property name="fitValueFileInterval" value="file:src/main/resources/aux/fitValuesData.fits" />
+  <property name="fitParameterFile" value="file:src/main/resources/default/drsFitParameter.fits" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-  <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
+  <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}"/>
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
@@ -26,6 +25,24 @@
     outputKey="DRSCalibratedData"
   />
 
+  <fact.datacorrection.PatchJumpRemoval
+      dataKey="DRSCalibratedData"
+      outputKey="DRSCalibratedData"
+      prevEventsKey="prevEvents"
+      startCellKey="StartCellData"
+      jumpLimit="${patchJumpRemoval_jumpLimit}"
+  />
+
+  <fact.datacorrection.RemoveSpikes
+      dataKey="DRSCalibratedData"
+      outputKey="DRSCalibratedData"
+      startCellKey="StartCellData"
+      leftBorder="${removeSpikes_leftBorder}"
+      spikeLimit="${removeSpikes_spikeLimit}"
+      topSlopeLimit="${removeSpikes_topSlopeLimit}"
+      maxSpikeLength="${removeSpikes_maxSpikeLength}"
+  />
+
   <fact.features.TimeSeriesNoise
       dataKey="DRSCalibratedData"
       outputKey="DRSCalibratedDataNoise"
@@ -33,35 +50,39 @@
 
   <fact.datacorrection.DrsTemperatureCalibration
     auxService="auxService"
-    drsFitFilePath="${fitValueFile}"
+    drsFitFilePath="${fitParameterFile}"
     key="Data"
     outputKey="DRSCalibratedData_Temp"
   />
 
+  <fact.datacorrection.PatchJumpRemoval
+      dataKey="DRSCalibratedData_Temp"
+      outputKey="DRSCalibratedData_Temp"
+      prevEventsKey="prevEvents"
+      startCellKey="StartCellData"
+      jumpLimit="${patchJumpRemoval_jumpLimit}"
+  />
+  <fact.datacorrection.RemoveSpikes
+      dataKey="DRSCalibratedData_Temp"
+      outputKey="DRSCalibratedData_Temp"
+      startCellKey="StartCellData"
+      leftBorder="${removeSpikes_leftBorder}"
+      spikeLimit="${removeSpikes_spikeLimit}"
+      topSlopeLimit="${removeSpikes_topSlopeLimit}"
+      maxSpikeLength="${removeSpikes_maxSpikeLength}"
+  />
+
   <fact.features.TimeSeriesNoise
       dataKey="DRSCalibratedData_Temp"
-      outputKey="DRSCalibratedData_TempNoise"
-  />
-
-  <fact.datacorrection.DrsTemperatureCalibration
-    auxService="auxService"
-    drsFitFilePath="${fitValueFileInterval}"
-    key="Data"
-    outputKey="DRSCalibratedData_TempInterval"
-  />
-
-  <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData_TempInterval"
-      outputKey="DRSCalibratedData_TempIntervalNoise"
+      outputKey="DRSCalibratedDataNoise_Temp"
   />
 
   <fact.io.FITSWriter
     url="${outfile}"
-    keys="DRSCalibratedDataNoise, DRSCalibratedData_TempNoise, DRSCalibratedData_TempIntervalNoise"
+    keys="DRSCalibratedDataNoise, DRSCalibratedDataNoise_Temp"
     extname="StdPerPixel"
-    comment="comment1"
   />
 
-    <!-- <fact.ShowViewer key="DataCalibratedDRS_Temp" /> -->
+    <!-- <fact.ShowViewer key="DataCalibratedDRS_Temp" />         keys="DRSCalibratedDataNoise, DRSCalibratedData_TempNoise, DRSCalibratedData_TempIntervalNoise" -->
   </process>
 </container>
