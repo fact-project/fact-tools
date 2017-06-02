@@ -1,7 +1,5 @@
 package fact;
 
-import fact.coordinates.EarthLocation;
-
 public class Constants {
 
 
