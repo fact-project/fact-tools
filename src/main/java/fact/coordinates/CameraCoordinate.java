@@ -58,7 +58,7 @@ public class CameraCoordinate implements Serializable {
         double zenith = Math.acos(rotVec.getZ());
         double azimuth = Math.atan2(rotVec.getY(), rotVec.getX());
 
-        return new HorizontalCoordinate(zenith, azimuth);
+        return HorizontalCoordinate.fromRad(zenith, azimuth);
     }
 
     public double euclideanDistance(CameraCoordinate other) {
