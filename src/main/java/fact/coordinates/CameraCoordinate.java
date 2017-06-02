@@ -1,6 +1,7 @@
 package fact.coordinates;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
+import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.io.Serializable;
@@ -37,8 +38,8 @@ public class CameraCoordinate implements Serializable {
 
         Vector3D vec = new Vector3D(x, y, z);
 
-        Rotation rotZAz = new Rotation(new Vector3D(0.0, 0.0, 1.0), -paz);
-        Rotation rotYZd = new Rotation(new Vector3D(0.0, 1.0, 0.0), -pzd);
+        Rotation rotZAz = new Rotation(new Vector3D(0.0, 0.0, 1.0), -paz, RotationConvention.VECTOR_OPERATOR);
+        Rotation rotYZd = new Rotation(new Vector3D(0.0, 1.0, 0.0), -pzd, RotationConvention.VECTOR_OPERATOR);
 
         Vector3D rotVec = rotZAz.applyInverseTo(rotYZd.applyInverseTo(vec));
 
