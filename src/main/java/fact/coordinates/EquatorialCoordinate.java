@@ -40,7 +40,7 @@ public class EquatorialCoordinate implements CelestialCoordinate {
      */
     public HorizontalCoordinate toHorizontal(ZonedDateTime observationTime, EarthLocation earthLocation) {
 
-        double gst = CoordinateUtils.datetimeToGST(observationTime);
+        double gst = CelestialCoordinate.datetimeToGST(observationTime);
 
         double ra = this.getRightAscensionRad();
         double dec = this.getDeclinationRad();
