@@ -14,6 +14,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.SortedSet;
 
 
@@ -132,6 +133,18 @@ public class AuxServiceTest {
         AuxPoint auxiliaryData = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, ZonedDateTime.parse("2013-01-02T23:30:21Z"), new Closest());
         assertThat(auxiliaryData, is(not(nullValue())));
         assertThat(auxiliaryData.getDouble("Ra"), is(not(nullValue())));
+    }
+
+
+
+    @Test
+    public void testAuxPointGenericValue() throws Exception {
+        URL u = AuxServiceTest.class.getResource("/dummy_files/aux/");
+        AuxFileService s = new AuxFileService();
+        s.auxFolder = new SourceURL(u);
+        AuxPoint point = s.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, ZonedDateTime.parse("2013-01-02T21:30:21Z"), new Closest());
+        Optional<Double> ra = point.getValue("Ra", Double.class);
+        ra.orElseThrow(() -> new RuntimeException("Value is missing"));
     }
 
     /**

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This is a class to create immutable container holding data from some source providing auxiliary data.
@@ -60,7 +61,7 @@ public class AuxPoint implements Comparable<AuxPoint>{
     }
 
     /**
-     * Returns the value for the key iff it exists and its a Double. Returns null otherwise.
+     * Returns the value for the key iff it exists and its a Float. Returns null otherwise.
      * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
      * @return the value or null
      */
@@ -123,6 +124,24 @@ public class AuxPoint implements Comparable<AuxPoint>{
         }
     }
 
+
+    /**
+     * Returns an Optional containing the value with the given class iff it exists. Otherwise its empty.
+     * @param key the name of the aux data you want to access. e.g. the name of the column in the aux fits file
+     * @param cls the data type you expect the value to be in
+     * @return an optional containing the value or an empty optional.
+     */
+    public <T> Optional<T> getValue(String key, Class<T> cls){
+        Serializable s = data.get(key);
+        if (s ==  null){
+            return Optional.empty();
+        }
+        if (cls.isInstance(s)){
+            return Optional.of(cls.cast(s));
+        } else{
+            return Optional.empty();
+        }
+    }
 
     //below you'll find the auto generated code needed to make this object hashable and comparable
 
