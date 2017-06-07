@@ -103,9 +103,9 @@ public class AuxFileService implements AuxiliaryService {
 
 
     /**
-     * This method returns an AuxPoints for a whole night according to the strategy and the time stamp passed to this method.
+     * This method returns all AuxPoints for the whole night given by the 'night' timestamp.
      *
-     * @throws IOException when no auxpoint can be found for given night
+     * @throws IOException when no auxpoint can be found for the given night
      */
     public synchronized SortedSet<AuxPoint> getAuxiliaryDataForWholeNight(AuxiliaryServiceName serviceName, ZonedDateTime night) throws IOException {
         try {
