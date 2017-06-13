@@ -47,8 +47,6 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
     private String extname = "Events";
 
-    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
-
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
@@ -64,9 +62,6 @@ public class FITSWriter implements StatefulProcessor {
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
 
-        for (String key: defaultKeys ){
-            outputItem.put(key, item.get(key));
-        }
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
         }
@@ -230,13 +225,16 @@ public class FITSWriter implements StatefulProcessor {
 
     @Override
     public void finish() throws Exception {
-        FitsUtil.pad(bf, rowSize * numEventsWritten);
-        bf.close();
-        Fits fits = new Fits(url.getPath());
-        BinaryTableHDU bhdu = (BinaryTableHDU) fits.getHDU(1);
-        bhdu.getHeader().setNaxis(2, (int) numEventsWritten);
-        bhdu.getHeader().rewrite();
-
+        if (initialized) {
+            FitsUtil.pad(bf, rowSize * numEventsWritten);
+            bf.close();
+            Fits fits = new Fits(url.getPath());
+            BinaryTableHDU bhdu = (BinaryTableHDU) fits.getHDU(1);
+            bhdu.getHeader().setNaxis(2, (int) numEventsWritten);
+            bhdu.getHeader().rewrite();
+        } else {
+            bf.close();
+        }
     }
 
     public void setKeys(Keys keys) {
@@ -249,5 +247,9 @@ public class FITSWriter implements StatefulProcessor {
 
     public void setExtname(String extname) {
         this.extname = extname;
+    }
+
+    public long getNumEventsWritten() {
+        return numEventsWritten;
     }
 }

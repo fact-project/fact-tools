@@ -1,8 +1,6 @@
 package fact;
 
-import fact.io.FitsStreamTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import fact.io.FITSStreamTest;
 
 import java.net.URL;
 
@@ -11,18 +9,17 @@ import static org.junit.Assert.fail;
 
 public class FactAnalysisTest {
 
-	static Logger log = LoggerFactory.getLogger(FactAnalysisTest.class);
 
 
 	public void factExampleXML() {
 
 		try {
 			URL url = FactAnalysisTest.class.getResource("/fact_example.xml");
-			URL drsUrl =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
-			URL dataUrl =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
-			URL driveURL = FitsStreamTest.class.getResource("/testDriveFile.fits");
-			URL integralGainsUrl = FitsStreamTest.class.getResource("/defaultIntegralGains.csv");
-			URL outFile = FitsStreamTest.class.getResource("/outFileAscii.txt");
+			URL drsUrl =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+			URL dataUrl =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
+			URL driveURL = FITSStreamTest.class.getResource("/testDriveFile.fits");
+			URL integralGainsUrl = FITSStreamTest.class.getResource("/defaultIntegralGains.csv");
+			URL outFile = FITSStreamTest.class.getResource("/outFileAscii.txt");
 			String[] args = {url.toString(), "-Ddata="+dataUrl.toString(), "-DdataDRS="+drsUrl.toString(), "-Ddrive_file="+driveURL.toString(),"-DintegralGainsFile="+integralGainsUrl.toString(), "-Doutfile="+outFile.toString()};
 			stream.run.main(args);
 		} catch (Exception e) {

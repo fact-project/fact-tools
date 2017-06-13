@@ -1,7 +1,9 @@
-package fact.features.singlePulse.timeLineExtraction;
+package fact.photonstream.timeSeriesExtraction;
 
-import java.util.Arrays;
-
+/**
+ * The pulse shape of FACTs SiPMs. This class contains a single function returning
+ * an array of amplitudes.
+ */
 public class TemplatePulse {
 
     /**
@@ -9,7 +11,7 @@ public class TemplatePulse {
     *
     *           amplitude
     *                |
-    *           1.0 _|_        ___  
+    *           1.0 _|_        ___
     *                |        /   \
     *                |       /     |
     *                |      |       \
@@ -24,18 +26,18 @@ public class TemplatePulse {
     *           The length of the template puls to be returned.
     *
     * @return template
-    *           An array [lengthInSlices] with the amplitudes of the 
+    *           An array [lengthInSlices] with the amplitudes of the
     *           template pulse.
     *
     *           amplitude
     *                |
-    *           1.0 _|_        ___  
+    *           1.0 _|_        ___
     *                |        /   \
     *                |       /     |
     *                |      |       \
-    *                |      |        
-    *                |      /         
-    *                |     |          
+    *                |      |
+    *                |      /
+    *                |     |
     *           0.0 _|_____|________|_____________________\ slices
     *                      |        |                     /
     *                      0   lengthInSlices
@@ -50,11 +52,11 @@ public class TemplatePulse {
         double[] template = new double[lengthInSlices];
         for (int i = 0; i < time.length; i++) {
 
-            final double amplitude = 
+            final double amplitude =
                 1.626*
                 (1.0-Math.exp(-0.3803*time[i]))
                 *Math.exp(-0.0649*time[i]);
-            
+
             if(amplitude < 0.0) {
                 template[i] = 0.0;
             }else{

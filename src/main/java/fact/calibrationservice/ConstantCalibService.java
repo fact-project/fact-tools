@@ -1,8 +1,9 @@
 package fact.calibrationservice;
 
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 import java.util.TreeSet;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,59 +17,59 @@ import fact.hexmap.FactPixelMapping;
  * CHIDs: 863,297,868
  * 6 twin pixels:
  * CHIDs: 1093,1094,527,528,721,722
- * 
+ *
  * All this bad pixels can be interpolated and are all usable for cleaning (so there are no
  * NotUsablePixels)
- * 
+ *
  * During the period between 2014/11/15 and 2015/05/26 there was a drs board broken:
- * SOFTIDs: 1193,1194,1195,1391,1392,1393,1304,1305,1306 
+ * SOFTIDs: 1193,1194,1195,1391,1392,1393,1304,1305,1306
  * CHIDs:    720, 721, 722, 723, 724, 725, 726, 727, 728 (not the same order as the SOFTIDs!)
  * The whole patch cannot be interpolated and therefore all pixels are not usable for cleaning.
- * 
+ *
  * On the 8.1.2015 two more pixels showed no signal and had to be interpolated:
  * CHIDs: 729,750
- * 
+ *
  * On the 9.1.2015 only one more pixel showed no signal and had to be interpolated:
  * CHID: 750
- * 
+ *
  * On the 31.1.2015 pixel (CHID 750) recovered.
- * 
+ *
  * With beginning of February 2015 two bias patches got some problems:
  * The bias patch for the pixels (CHIDs: 171,172,173,174) were dead (so the pixels showed no signal)
  * between 6.2. and 11.2 (included) and from 16.2. (included) until now
- * 
- * There were also some days (12.2. - 14.2.) were the pixels showed two small signals (so maybe 
+ *
+ * There were also some days (12.2. - 14.2.) were the pixels showed two small signals (so maybe
  * the bias voltage was too low), but on the other hand on the 15.2. they show normal signals
- * 
+ *
  * The bias patch for the pixels (CHIDs: 184,185,186,187,188) showed sometimes also a lowered bias voltage
  * (so signals were smaller) but no clear timewindow could be found
- * 
+ *
  * Concerning the bad pixel list, the days with only lowered bias voltage are not interpolated, for the days
  * with no bias voltage the pixels are interpolated.
- * 
+ *
  * @author ftemme
  **/
 public class ConstantCalibService implements CalibrationService {
-	
+
 	Logger log = LoggerFactory.getLogger(ConstantCalibService.class);
-		
+
 	TreeSet<HardwareConfiguration> set;
-	
+
 	boolean isInit = false;
-		
+
 	public void init(){
 		FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-		set = new TreeSet<HardwareConfiguration>();
-		
-		
-		HardwareConfiguration config1 = new HardwareConfiguration(new DateTime(1970, 1, 1, 0, 0));
+		set = new TreeSet<>();
+
+
+		HardwareConfiguration config1 = new HardwareConfiguration(ZonedDateTime.of(1970, 1, 1, 0, 0,0,0, ZoneOffset.UTC));
 		int[] badPixelFromBeginning = {863,868,297,927,80,873,1093,1094,527,528,721,722};
 		config1.setBadPixels(badPixelFromBeginning);
 		config1.setNotUsablePixels(null);
-		
-		
-		
-		HardwareConfiguration config2 = new HardwareConfiguration(new DateTime(2014, 11, 15, 0, 0));
+
+
+
+		HardwareConfiguration config2 = new HardwareConfiguration(ZonedDateTime.of(2014, 11, 15, 0, 0,0,0, ZoneOffset.UTC));
 		int[] brokenDrsBoard = {
 				pixelMap.getChidFromSoftID(1193),
 				pixelMap.getChidFromSoftID(1194),
@@ -82,35 +83,35 @@ public class ConstantCalibService implements CalibrationService {
 				};
 		config2.setBadPixels(badPixelFromBeginning);
 		config2.setNotUsablePixels(brokenDrsBoard);
-		
-		HardwareConfiguration config3 = new HardwareConfiguration(new DateTime(2015, 01, 8, 0, 0));
+
+		HardwareConfiguration config3 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 8, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelInJanuary1 = {863,868,297,927,80,873,1093,1094,527,528,721,722,750,729};
 		config3.setBadPixels(badPixelInJanuary1);
 		config3.setNotUsablePixels(brokenDrsBoard);
 
-		HardwareConfiguration config4 = new HardwareConfiguration(new DateTime(2015, 01, 9, 0, 0));
+		HardwareConfiguration config4 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 9, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelInJanuary2 = {863,868,297,927,80,873,1093,1094,527,528,721,722,750};
 		config4.setBadPixels(badPixelInJanuary2);
 		config4.setNotUsablePixels(brokenDrsBoard);
-		
-		HardwareConfiguration config5 = new HardwareConfiguration(new DateTime(2015, 01, 31, 0, 0));
+
+		HardwareConfiguration config5 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 31, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config5.setBadPixels(badPixelFromBeginning);
 		config5.setNotUsablePixels(brokenDrsBoard);
-		
-		HardwareConfiguration config6 = new HardwareConfiguration(new DateTime(2015, 2, 6, 0, 0));
+
+		HardwareConfiguration config6 = new HardwareConfiguration(ZonedDateTime.of(2015, 2, 6, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		int[] badPixelWithDeadBiasBord = {863,868,297,927,80,873,1093,1094,527,528,721,722,171,172,173,174};
 		config6.setBadPixels(badPixelWithDeadBiasBord);
 		config6.setNotUsablePixels(brokenDrsBoard);
-		
-		HardwareConfiguration config7 = new HardwareConfiguration(new DateTime(2015, 2, 12, 0, 0));
+
+		HardwareConfiguration config7 = new HardwareConfiguration(ZonedDateTime.of(2015, 2, 12, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config7.setBadPixels(badPixelFromBeginning);
 		config7.setNotUsablePixels(brokenDrsBoard);
-		
-		HardwareConfiguration config8 = new HardwareConfiguration(new DateTime(2015, 2, 16, 0, 0));
+
+		HardwareConfiguration config8 = new HardwareConfiguration(ZonedDateTime.of(2015, 2, 16, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config8.setBadPixels(badPixelWithDeadBiasBord);
 		config8.setNotUsablePixels(brokenDrsBoard);
-		
-		HardwareConfiguration config9 = new HardwareConfiguration(new DateTime(2015, 5, 26, 0, 0));
+
+		HardwareConfiguration config9 = new HardwareConfiguration(ZonedDateTime.of(2015, 5, 26, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config9.setBadPixels(badPixelWithDeadBiasBord);
 		config9.setNotUsablePixels(null);
 		set.add(config1);
@@ -125,10 +126,10 @@ public class ConstantCalibService implements CalibrationService {
 	}
 
 	/**
-	 * @see CalibrationService#getBadPixel(DateTime)
+	 * @see CalibrationService#getBadPixel(ZonedDateTime)
 	 */
 	@Override
-	public int[] getBadPixel(DateTime eventTimeStamp) {
+	public int[] getBadPixel(ZonedDateTime eventTimeStamp) {
 		if (isInit == false){
 			init();
 			isInit = true;
@@ -138,10 +139,10 @@ public class ConstantCalibService implements CalibrationService {
 	}
 
 	/**
-	 * @see CalibrationService#getNotUsablePixels(DateTime)
+	 * @see CalibrationService#getNotUsablePixels(ZonedDateTime)
 	 */
 	@Override
-	public int[] getNotUsablePixels(DateTime eventTimeStamp) {
+	public int[] getNotUsablePixels(ZonedDateTime eventTimeStamp) {
 		if (isInit == false){
 			init();
 			isInit = true;
@@ -149,15 +150,15 @@ public class ConstantCalibService implements CalibrationService {
 		HardwareConfiguration currentConfiguration = getHardwareConfiguration(eventTimeStamp);
 		return currentConfiguration.getNotUsablePixels();
 	}
-	
-	private HardwareConfiguration getHardwareConfiguration(DateTime eventTimeStamp) {
+
+	private HardwareConfiguration getHardwareConfiguration(ZonedDateTime eventTimeStamp) {
 		// Create a new dummyConfiguration with the current eventTimeStamp and use the set.floor method to get the correct configuration
 		HardwareConfiguration dummyConfiguration = new HardwareConfiguration(eventTimeStamp);
 		return set.floor(dummyConfiguration);
 	}
-	
+
 	@Override
 	public void reset() throws Exception {
 	}
-	
+
 }

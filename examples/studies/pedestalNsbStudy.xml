@@ -8,7 +8,7 @@
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
   <!-- Name des Streams und pfad zu dem Daten-File -->
-  <stream id="fact" class="fact.io.FitsStream" url="${infile}" limit="3" />
+  <stream id="fact" class="fact.io.FITSStream" url="${infile}" limit="3" />
   <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
   <process id="2" input="fact">
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="20" />
@@ -23,7 +23,7 @@
     <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
     <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
     <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmothed" length="5" />
-    <fact.statistics.TimerowFeatures dataKey="DataCalibrated" movingAverageKey="DataSmothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
+    <fact.statistics.TimeseriesFeatures dataKey="DataCalibrated" movingAverageKey="DataSmothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
     <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
     <!---->
     <fact.extraction.WaveformFluctuation key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />

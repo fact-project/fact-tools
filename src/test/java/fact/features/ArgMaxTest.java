@@ -3,17 +3,17 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeLineExtraction.ArgMax;
+import fact.photonstream.timeSeriesExtraction.ArgMax;
 
 public class ArgMaxTest {
 
     @Test
-    public void testArgMaxEmptyTimeLine() {
+    public void testArgMaxEmptyTimeSeries() {
 
         Throwable e = null;
         try {
-            double[] emptyTimeLine = {};
-            ArgMax am = new ArgMax(emptyTimeLine);
+            double[] emptyTimeSeries = {};
+            ArgMax am = new ArgMax(emptyTimeSeries);
         }catch(Throwable ex) {
             e = ex;
         }
@@ -21,19 +21,19 @@ public class ArgMaxTest {
     }
 
     @Test
-    public void testArgMaxZeroTimeLine(){
+    public void testArgMaxZeroTimeSeries(){
 
-        double[] zeroTimeLine = {
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+        double[] zeroTimeSeries = {
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-        ArgMax am = new ArgMax(zeroTimeLine);
+        ArgMax am = new ArgMax(zeroTimeSeries);
         Assert.assertEquals(0, am.arg);
         Assert.assertEquals(0.0, am.max);
     }
 
     @Test
-    public void testArgMaxSingleMaxTimeLine(){
+    public void testArgMaxSingleMaxTimeSeries(){
 
         double[] trianglePulse = {
             0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0};

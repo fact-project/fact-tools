@@ -3,7 +3,7 @@ package fact.features;
 import fact.Utils;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.features.singlePulse.timeLineExtraction.ElementWise;
+import fact.photonstream.timeSeriesExtraction.ElementWise;
 
 public class ElementWiseTest {
 
@@ -40,7 +40,7 @@ public class ElementWiseTest {
             Assert.assertEquals(ones.length, result.length);
 
             for(int j=0; j<ones.length; j++)
-                Assert.assertEquals(scalar, result[j]);       
+                Assert.assertEquals(scalar, result[j]);
         }
     }
 
@@ -65,5 +65,33 @@ public class ElementWiseTest {
 
         for(int i=0; i<zeros.length; i++)
             Assert.assertEquals(1.0, result[i]);
+    }
+
+    @Test
+    public void testAddArrays(){
+
+        double[] arr1 = {0.0, 2.0, 0.0, 4.0, 2.5};
+        double[] arr2 = {1.0, 0.0, 3.0, 0.0, 2.5};
+        double[] expected_result = {1.0, 2.0, 3.0, 4.0, 5.0};
+
+        double[] result = ElementWise.addFirstToSecond(arr1, arr2);
+        Assert.assertEquals(expected_result.length, result.length);
+
+        for(int i=0; i<result.length; i++)
+            Assert.assertEquals(expected_result[i], result[i]);
+    }
+
+    @Test
+    public void testSubtractArrays(){
+
+        double[] arr1 = {0.0, 0.5, 1.0, 1.5, 2.0};
+        double[] arr2 = {2.0, 2.0, 2.0, 2.0, 2.0};
+        double[] expected_result = {2.0, 1.5, 1.0, 0.5, 0.0};
+
+        double[] result = ElementWise.subtractFirstFromSecond(arr1, arr2);
+        Assert.assertEquals(expected_result.length, result.length);
+
+        for(int i=0; i<result.length; i++)
+            Assert.assertEquals(expected_result[i], result[i]);
     }
 }

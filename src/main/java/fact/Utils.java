@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,12 +23,17 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 /**
- * 
+ *
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
+ *
  */
 public class Utils {
 	static Logger log = LoggerFactory.getLogger(Utils.class);
+
+	public static ZonedDateTime unixTimeUTCToZonedDateTime(int[] unixTimeUTC) {
+		return Instant.ofEpochSecond(unixTimeUTC[0], unixTimeUTC[1] * 1000).atZone(ZoneOffset.UTC);
+	}
+
 
 	/**
 	 * Return a 2D array
@@ -70,7 +78,7 @@ public class Utils {
 	 * This takes a data array (of length pixels * roi) and returns an
 	 * array(length = roi) in which each entry is the average over all the
 	 * values of the other pixels in that slice.
-	 * 
+	 *
 	 * @param data
 	 *            array of length pixels*region of interest
 	 * @param roi
@@ -100,7 +108,7 @@ public class Utils {
 	 * list of lists. Each list containing one separate set. Does a BFs search.
 	 * See the wikipedia article on BFS. This version is not as memory efficient
 	 * as it could be.
-	 * 
+	 *
 	 * @param showerPixel
 	 *            the list to search in
 	 * @return A list of lists.
@@ -214,6 +222,9 @@ public class Utils {
 	 * @return can be null!
 	 */
 	public static double[] toDoubleArray(Serializable arr) {
+		if (arr == null) {
+			return null;
+		}
 		if (arr.getClass().isArray()) {
 			Class<?> clazz = arr.getClass().getComponentType();
 			if (clazz.equals(float.class)) {
@@ -262,7 +273,7 @@ public class Utils {
 	 * data item. If one of the keys is not in the item a RuntimeException will
 	 * be thrown containing a message detailing which processor is causing the
 	 * error
-	 * 
+	 *
 	 * @param item
 	 * @param keys
 	 */
@@ -296,7 +307,7 @@ public class Utils {
 	 * This method tries to find the key in the data item and tries to cast them
 	 * into the type given by the type parameter. If it fails it will throw a
 	 * RuntimeException with a message containing information about the error.
-	 * 
+	 *
 	 * @param item
 	 * @param key
 	 * @param type
@@ -331,7 +342,7 @@ public class Utils {
 	 * ellipse coordinates (l, t). The ellipse coordinate system is defined by
 	 * the center of gravity (x,y) and the angle between the major axis and the
 	 * camera x-axis (delta in radians).
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param cogX
@@ -356,20 +367,20 @@ public class Utils {
 
 		return c;
 	}
-    
+
     public static double calculateDistancePointToShowerAxis(double cogx, double cogy, double delta, double x, double y){
     	double distance = 0;
-    	
+
     	double r0 = (x-cogx)*Math.cos(delta)+(y-cogy)*Math.sin(delta);
-    	
+
     	distance = Math.sqrt( Math.pow(cogx-x+r0*Math.cos(delta),2)+Math.pow(cogy-y+r0*Math.sin(delta),2) );
-    	
+
     	return distance;
     }
 
 	/**
 	 * Sum up array
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
@@ -390,7 +401,7 @@ public class Utils {
 
 	/**
 	 * Elementwise multiplication of arrays
-	 * 
+	 *
 	 * @param a
 	 * @param b
 	 * @return double array containing a[i] * b[i]
@@ -416,7 +427,7 @@ public class Utils {
 
 		return ret;
 	}
-	
+
 	public static int[] getValidWindow(int start, int size, int validLeft, int validRight)
 	{
 		if (size < 0)
@@ -428,7 +439,7 @@ public class Utils {
 			throw new RuntimeException("validLeft > validRight! validLeft: "+ validLeft + " validRight: " + validRight);
 		}
 		int[] window = {start,start+size};
-		
+
 		if (start > validRight)
 		{
 			window[0] = validRight;
@@ -451,10 +462,10 @@ public class Utils {
 		}
 		return window;
 	}
-	
-	
+
+
 	public static void checkWindow(int start, int size, int validLeft, int validRight)
-	{	
+	{
 		if (size < 0)
 		{
 			throw new RuntimeException("Size for window < 0! size: "+ size);
@@ -468,7 +479,7 @@ public class Utils {
 		{
 			String message = "start + size > validRight. start+size/validRight: " + (start+size) + "/" + validRight;
 			throw new RuntimeException(message);
-		}	
+		}
 	}
 
 
@@ -533,6 +544,19 @@ public class Utils {
 			pixelStatistics[pix] = new DescriptiveStatistics(data[pix]);
 		}
 		return pixelStatistics;
+	}
+
+
+	/**
+	 * Flatten a 2d array
+     *
+     * @param array2d 2dim double array
+     * @return flattend double array
+	 */
+	public static double[] flatten2dArray(double[][] array2d) {
+		return Arrays.stream(array2d)
+				.flatMapToDouble(Arrays::stream)
+				.toArray();
 	}
 
 }

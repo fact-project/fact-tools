@@ -30,7 +30,7 @@ public class WaveformFluctuation implements Processor {
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
     private int skipFirst = 35;
 
-    @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
+    @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
     private int skipLast = 100;
 
     @Parameter(description = "Size of the integration window", defaultValue = "30")
@@ -52,7 +52,7 @@ public class WaveformFluctuation implements Processor {
         npix = (Integer) input.get("NPIX");
 
         int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
-        log.info("npix: " + pixels.length );
+        log.debug("npix: " + pixels.length );
 
         double[] data        = (double[]) input.get(key);
 
@@ -72,7 +72,7 @@ public class WaveformFluctuation implements Processor {
 
         int bound = roi - skipLast - skipFirst;
         int iterations = bound/windowSize;
-        log.info("Iterations: " + iterations );
+        log.debug("Iterations: " + iterations );
 
         double[][] charge = new double[npix][iterations];
 

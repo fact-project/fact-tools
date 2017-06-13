@@ -2,7 +2,7 @@ package fact.filter;
 
 import fact.Utils;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FitsStream;
+import fact.io.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -11,12 +11,10 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
-import java.net.URL;
-
 
 public class DrsTimeCalibration implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
-	
+
 	@Parameter(required=false,description="Key of the StartCellData in the data fits file",defaultValue="StartCellData")
 	private String startCellKey = "StartCellData";
 	@Parameter(required=true,description="Key of the time calibration constants (relative to the start cell of each pixel)")
@@ -50,7 +48,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	public Data process(Data input) {
 		Utils.isKeyValid(input, "NPIX", Integer.class);
 		Utils.mapContainsKeys(input, startCellKey, "NROI");
-		
+
 		npix = (Integer) input.get("NPIX");
 		int roi = (Integer) input.get("NROI");
 		short[] startCell = (short[]) input.get(startCellKey);
@@ -66,19 +64,19 @@ public class DrsTimeCalibration implements StatefulProcessor{
 				relativeTimeOffsets[px*roi+slice] = absoluteTimeOffsets[cell]-offsetAtStartCell;
 			}
 		}
-		
+
 		input.put(outputKey, relativeTimeOffsets);
 		return input;
 	}
-		
+
 	protected void loadDrsTimeCalibConstants(SourceURL  in) {
 		try {
 
-			FitsStream stream = new FitsStream(in);
+			FITSStream stream = new FITSStream(in);
 			stream.init();
 			drsTimeData = stream.readNext();
 			log.debug("Read DRS Time data: {}", drsTimeData);
-			
+
 			if (!drsTimeData.containsKey(drsTimeKey))
 			{
 				throw new RuntimeException("Drs time data is missing key + " + drsTimeKey + "!");

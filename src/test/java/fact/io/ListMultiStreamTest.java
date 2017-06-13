@@ -1,8 +1,6 @@
 package fact.io;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -32,11 +30,11 @@ public class ListMultiStreamTest {
 
     @Test
     public void testDrsInjection() throws Exception {
-        URL u =  FitsStreamTest.class.getResource("/dummy_files/file_drs_list.json");
+        URL u =  FITSStreamTest.class.getResource("/dummy_files/file_drs_list.json");
         FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
         multiStream.setUrl(new SourceURL(u));
 
-        FitsStream m = new FitsStream();
+        FITSStream m = new FITSStream();
         multiStream.addStream("test", m);
 
         multiStream.init();

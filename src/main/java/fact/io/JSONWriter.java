@@ -8,7 +8,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import fact.container.PixelSet;
-import org.joda.time.DateTime;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -20,6 +19,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -119,17 +119,12 @@ public class JSONWriter implements StatefulProcessor {
     private Gson gson;
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
-    private String[] defaultKeys = {"EventNum", "TriggerType", "NROI", "NPIX"};
-    
+
     boolean isFirstLine = true;
 
     @Override
     public Data process(Data data) {
         Data item = DataFactory.create();
-
-        for (String key: defaultKeys ){
-            item.put(key, data.get(key));
-        }
 
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));
@@ -170,7 +165,7 @@ public class JSONWriter implements StatefulProcessor {
 
         GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
         gsonBuilder.enableComplexMapKeySerialization();
-        gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeAdapter());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeAdapter());
 
         if (specialDoubleValuesAsString){
             SpecialDoubleValuesAdapter specialDoubleValuesAdapter = new SpecialDoubleValuesAdapter();
@@ -251,10 +246,10 @@ public class JSONWriter implements StatefulProcessor {
         this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
-    public class DateTimeAdapter extends TypeAdapter<DateTime>{
+    public class DateTimeAdapter extends TypeAdapter<ZonedDateTime>{
 
         @Override
-        public void write(JsonWriter jsonWriter, DateTime dateTime) throws IOException {
+        public void write(JsonWriter jsonWriter, ZonedDateTime dateTime) throws IOException {
             if (dateTime == null){
                 jsonWriter.nullValue();
             }
@@ -264,7 +259,7 @@ public class JSONWriter implements StatefulProcessor {
         }
 
         @Override
-        public DateTime read(JsonReader jsonReader) throws IOException {
+        public ZonedDateTime read(JsonReader jsonReader) throws IOException {
             return null;
         }
     }

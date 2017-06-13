@@ -7,8 +7,8 @@ import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FitsStream;
-import fact.io.FitsStreamTest;
+import fact.io.FITSStream;
+import fact.io.FITSStreamTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +33,7 @@ public class ParameterTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    protected FitsStream stream;
+    protected FITSStream stream;
     protected Data item;
     final String distribution = "dist";
     final String sourcePosition = "pos";
@@ -46,12 +46,12 @@ public class ParameterTest {
 
     @Before
     public void setUp() throws Exception {
-        URL dataUrl = FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+        URL dataUrl = FITSStreamTest.class.getResource("/testDataFile.fits.gz");
         SourceURL url = new SourceURL(dataUrl);
-        
-        
 
-        stream = new FitsStream(url);
+
+
+        stream = new FITSStream(url);
 
         try {
             stream.init();
@@ -61,22 +61,22 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-		URL drsUrl = FitsStreamTest.class
+		URL drsUrl = FITSStreamTest.class
 				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
 		pr.setUrl(new SourceURL(drsUrl));
 		pr.setOutputKey(key);
         pr.init(null);
 		pr.process(item);
-		
+
 		BasicExtraction bE = new BasicExtraction();
 		bE.setDataKey(key);
 		bE.setOutputKeyMaxAmplPos(positions);
 		bE.setOutputKeyPhotonCharge(photonCharge);
-		bE.setUrl(new SourceURL(FitsStreamTest.class
+		bE.setUrl(new SourceURL(FITSStreamTest.class
 				.getResource("/defaultIntegralGains.csv")));
 		bE.process(item);
-		
+
 		RisingEdgeForPositions pR = new RisingEdgeForPositions();
 		pR.setDataKey(key);
 		pR.setAmplitudePositionsKey(positions);

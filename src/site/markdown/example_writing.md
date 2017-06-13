@@ -39,7 +39,7 @@ To calculate the mean from an array you can use the `ArrayMean` processor in the
 
      <container>
 
-        <Stream id="fact-data" class="fact.io.FitsStream"
+        <Stream id="fact-data" class="fact.io.FITSStream"
                 url="file:///tmp/fact-data.fits.gz" />
 
 
@@ -114,4 +114,3 @@ of more complex data types you could use the JSONWriter.
 
 
 	
-	  

@@ -1,11 +1,9 @@
 /**
- * 
+ *
  */
 package fact.io;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -15,25 +13,21 @@ import static org.junit.Assert.fail;
 
 /**
  * @author kai
- * 
+ *
  */
-public class FitsStreamTest {
+public class FITSStreamTest {
 
-	static Logger log = LoggerFactory.getLogger(FitsStreamTest.class);
 
 	@Test
 	public void testFitsStream() {
 
 		try {
-			URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+			URL u =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(u);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 
 			Data item = stream.read();
-			log.info( "size of data array: {}",
-					((short[]) item.get("Data")).length 
-					);
 			while (item != null) {
 				item = stream.read();
 			}
@@ -47,9 +41,9 @@ public class FitsStreamTest {
 	public void testFitsKeys() {
 
 		try {
-			URL u =  FitsStreamTest.class.getResource("/testDataFile.fits.gz");
+			URL u =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
 			SourceURL url = new SourceURL(u);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 
 			Data item = stream.read();
@@ -59,7 +53,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -70,9 +63,9 @@ public class FitsStreamTest {
 	@Test
 	public void testDRSKeys(){
 		try {
-			URL u =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+			URL u =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 			SourceURL url = new SourceURL(u);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 
 			// The following keys are required to exist in the DRS data
@@ -90,7 +83,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -101,9 +93,9 @@ public class FitsStreamTest {
 	@Test
 	public void testDrsTypes(){
 		try{
-			URL u =  FitsStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
+			URL u =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
 			SourceURL url = new SourceURL(u);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 
 			String[] requiredFloatArrayKeys = {"BaselineMean","BaselineRms","TriggerOffsetMean","TriggerOffsetRms","GainMean","GainRms"};
@@ -119,7 +111,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch(ClassCastException e){
 			fail("Wrong data types in the drs file");
@@ -132,9 +123,9 @@ public class FitsStreamTest {
 	@Test
 	public void testDriveFile(){
 		try{
-			URL u =  FitsStreamTest.class.getResource("/testDriveFile.fits");
+			URL u =  FITSStreamTest.class.getResource("/testDriveFile.fits");
 			SourceURL url = new SourceURL(u);
-			FitsStream stream = new FitsStream(url);
+			FITSStream stream = new FITSStream(url);
 			stream.init();
 
 			String[] requiredDoubleKeys = {"dev","dZd","dAz","Zd","Dec","Time", "Az"};
@@ -150,7 +141,6 @@ public class FitsStreamTest {
 				}
 				item = stream.read();
 			}
-			log.info("Read all the required keys");
 
 		} catch(ClassCastException e){
 			fail("Wrong data types in the drs file");

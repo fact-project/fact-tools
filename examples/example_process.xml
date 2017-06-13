@@ -5,7 +5,7 @@
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
   <!-- Name of the stream and url to the input file -->
-  <stream id="fact" class="fact.io.FitsStream" url="${infile}" />
+  <stream id="fact" class="fact.io.FITSStream" url="${infile}" />
   <!-- Description of the process and the corresponding stream -->
   <process input="fact" copies="1">
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />

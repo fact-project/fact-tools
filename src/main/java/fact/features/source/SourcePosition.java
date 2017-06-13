@@ -1,6 +1,7 @@
 package fact.features.source;
 
 
+//import com.sun.scenario.effect.Offset;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
@@ -9,9 +10,6 @@ import fact.auxservice.strategies.Closest;
 import fact.auxservice.strategies.Earlier;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
 
 import fact.Utils;
 
@@ -21,9 +19,11 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
+import stream.annotations.Service;
 import stream.annotations.Parameter;
 
 import java.io.IOException;
+import java.time.*;
 
 
 /**
@@ -61,7 +61,7 @@ public class SourcePosition implements StatefulProcessor {
         this.auxService = auxService;
     }
 
-    @Parameter(required = false, description = "Name of the service that provides aux files")
+    @Service(required = false, description = "Name of the service that provides aux files")
     private AuxiliaryService auxService;
 
     @Parameter(required = false)
@@ -97,10 +97,10 @@ public class SourcePosition implements StatefulProcessor {
     private final double telescopeLongitudeDeg = -17.890701389;
     private final double telescopeLatitudeDeg = 28.761795;
     //Distance from earth center
-    private final double distanceToEarthCenter = 4889.0;
+    private final double focalLength = 4889.0;
 
     // reference datetime
-    DateTime gstReferenceDateTime = new DateTime(2000, 1, 1, 12, 0, DateTimeZone.UTC);
+    ZonedDateTime gstReferenceDateTime = ZonedDateTime.of(2000, 1, 1, 12, 0, 0, 0, ZoneOffset.UTC);
 
 
     @Override
@@ -157,7 +157,7 @@ public class SourcePosition implements StatefulProcessor {
             double[] source = {x, y};
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
-            
+
             data.put("AzTracking", 0);
             data.put("ZdTracking", 0);
 
@@ -182,7 +182,7 @@ public class SourcePosition implements StatefulProcessor {
         	// Now we can calculate the source position from the zd,az coordinates for pointing and source
         	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
         	data.put(outputKey, sourcePosition);
-        	
+
             data.put("AzTracking", pointingAz);
             data.put("ZdTracking", pointingZd);
 
@@ -203,8 +203,7 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            double unixTime = eventTime[0] + (eventTime[1] / 1000000.0);
-            DateTime timeStamp = new DateTime((long) (1000 * unixTime), DateTimeZone.UTC);
+            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
@@ -258,15 +257,15 @@ public class SourcePosition implements StatefulProcessor {
     }
 
     /**
-     * Convert a DateTime object to greenwhich sidereal time according to 
+     * Convert a DateTime object to greenwhich sidereal time according to
      * https://en.wikipedia.org/wiki/Sidereal_time#Definition
-     * @param datetime 
+     * @param datetime
      * @return gst in radians
      */
-    public double datetimeToGST(DateTime datetime){
+    public double datetimeToGST(ZonedDateTime datetime){
 
-    	Duration difference = new Duration(gstReferenceDateTime, datetime);
-    	double gst = 18.697374558 + 24.06570982441908 * (difference.getMillis() / 86400000.0);
+    	Duration difference = Duration.between(gstReferenceDateTime, datetime);
+    	double gst = 18.697374558 + 24.06570982441908 * (difference.toMillis() / 86400000.0);
 
         // normalize to [0, 24] and convert to radians
         gst = (gst % 24) / 12.0 * Math.PI;
@@ -274,16 +273,17 @@ public class SourcePosition implements StatefulProcessor {
     }
 
     /**
-     * Implementation of the formulas from 
+     * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
-     * 
+     *
      * @param ra in decimal arc hours (e.g. 5h and 30 minutes : ra = 5.5)
      * @param dec in decimal degrees (e.g. 21 degrees and 30 arc minutes : zd = 21.5)
      * @param datetime DateTime of the event
      * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
      */
-    public double[] equatorialToHorizontal(double ra, double dec, DateTime datetime){
-        if (ra >= 24.0 || ra < 0.0 || dec >= 360.0 || dec < 0 ){
+
+    public double[] equatorialToHorizontal(double ra, double dec, ZonedDateTime datetime){
+        if (ra >= 24.0 || ra < 0.0 || dec >= 90.0 || dec <= -90 ){
             throw new RuntimeException("Ra or Dec values are invalid. They should be given in decimal arc hours and decimal degree");
         }
 
@@ -291,13 +291,13 @@ public class SourcePosition implements StatefulProcessor {
 
         ra = ra / 12. * Math.PI;
         dec = Math.toRadians(dec);
-        
+
         double telLatRad = Math.toRadians(telescopeLatitudeDeg);
         double telLonRad = Math.toRadians(telescopeLongitudeDeg);
 
         // wikipedia assumes longitude positive in west direction
         double hourAngle = gst + telLonRad - ra;
-        
+
         double altitude = Math.asin(
                 Math.sin(telLatRad) * Math.sin(dec) +
                 Math.cos(telLatRad) * Math.cos(dec) * Math.cos(hourAngle)
@@ -313,7 +313,7 @@ public class SourcePosition implements StatefulProcessor {
         if (azimuth <= - Math.PI){
             azimuth += 2 * Math.PI;
         }
-        
+
         return new double[]{Math.toDegrees(azimuth), 90 - Math.toDegrees(altitude)};
     }
 
@@ -347,8 +347,8 @@ public class SourcePosition implements StatefulProcessor {
         double z_rot =  Math.cos(-pzd) * z - Math.sin(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
 
         double[] r = new double[2];
-        r[0] = x_rot * (-distanceToEarthCenter) / z_rot;
-        r[1] = - y_rot * (-distanceToEarthCenter) / z_rot;
+        r[0] = x_rot * (-focalLength) / z_rot;
+        r[1] = - y_rot * (-focalLength) / z_rot;
 
         return r;
     }

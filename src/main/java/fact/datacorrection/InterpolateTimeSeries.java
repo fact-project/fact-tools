@@ -8,14 +8,15 @@ import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Service;
 import stream.annotations.Parameter;
+
+import java.time.*;
 
 /**
  *
@@ -25,8 +26,8 @@ import stream.annotations.Parameter;
  */
 public class InterpolateTimeSeries implements Processor {
     static Logger log = LoggerFactory.getLogger(InterpolateTimeSeries.class);
-    
-    @Parameter(required = true, description = "The calibration service which provides the information about the bad pixels")
+
+    @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
     @Parameter(required = true, description = "The data key to work on")
     private String dataKey = null;
@@ -35,27 +36,27 @@ public class InterpolateTimeSeries implements Processor {
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue="3")
     private int minPixelToInterpolate = 3;
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-    
+
     private int npix = Constants.NUMBEROFPIXEL;
-    
+
     @Override
     public Data process(Data item) {
     	Utils.isKeyValid(item, "NPIX", Integer.class);
 		Utils.isKeyValid(item, dataKey, double[].class);
     	npix = (Integer) item.get("NPIX");
 		double[] data = (double[]) item.get(dataKey);
-    	
-    	DateTime timeStamp = null;
-    	
+
+		ZonedDateTime timeStamp = null;
+
     	if (item.containsKey("UnixTimeUTC") == true){
     		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
     		int[] eventTime = (int[]) item.get("UnixTimeUTC");
-        	timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+			timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
     	}
     	else {
     		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
     		// => The 12 bad pixels we have from the beginning on are used.
-    		timeStamp = new DateTime(2000, 1, 1, 0, 0);
+    		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     	}
 
     	int[] badChIds = calibService.getBadPixel(timeStamp);
@@ -63,7 +64,7 @@ public class InterpolateTimeSeries implements Processor {
 		for (int px: badChIds){
 			badPixelsSet.addById(px);
 		}
-    	
+
 		if(!dataKey.equals(dataOutputKey)){
 			double[] newdata = new double[data.length];
 			System.arraycopy(data,0, newdata, 0, data.length);
@@ -71,12 +72,12 @@ public class InterpolateTimeSeries implements Processor {
 		} else {
 			data = interpolateTimeLine(data, badChIds);
 		}
-		
+
 		item.put(dataOutputKey, data);
 		item.put("badPixel", badPixelsSet);
         return item;
     }
-    
+
 	public double[] interpolateTimeLine(double[] data, int[] badChIds) {
         int roi = data.length / npix;
 
@@ -112,8 +113,8 @@ public class InterpolateTimeSeries implements Processor {
 		}
 		if (numNeighbours < minPixelToInterpolate)
 		{
-			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there are only " 
-					+ numNeighbours + " valid neighboring pixel to interpolate.\n" + 
+			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there are only "
+					+ numNeighbours + " valid neighboring pixel to interpolate.\n" +
 					"Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
 		}
 	}
