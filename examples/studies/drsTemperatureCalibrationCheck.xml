@@ -1,7 +1,7 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
-  <property name="infile" value="file:src/test/resources/testDataFile2.fits.gz" />
+  <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
   <property name="outfile" value="file:test_out.fits" />
   <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
@@ -77,11 +77,13 @@
       outputKey="DRSCalibratedDataNoise_Temp"
   />
 
+  <!--
   <fact.io.FITSWriter
     url="${outfile}"
     keys="DRSCalibratedDataNoise, DRSCalibratedDataNoise_Temp"
     extname="StdPerPixel"
   />
+  -->
 
     <!-- <fact.ShowViewer key="DataCalibratedDRS_Temp" />         keys="DRSCalibratedDataNoise, DRSCalibratedData_TempNoise, DRSCalibratedData_TempIntervalNoise" -->
   </process>
