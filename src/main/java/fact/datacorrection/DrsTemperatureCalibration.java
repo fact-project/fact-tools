@@ -30,13 +30,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-
-import org.joda.time.DateTime; // TODO remove when no longer needed
-import org.joda.time.DateTimeZone; // TODO remove when no longer needed
 
 /**
  * Created by florian on 06.12.16.
@@ -228,8 +223,6 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         Instant instant = Instant.ofEpochSecond(unixTimeUTC[0],unixTimeUTC[1] * 1000);
         ZonedDateTime dateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"));
 
-        DateTime dateTimeJoda = new DateTime(Date.from(instant)).withZoneRetainFields(DateTimeZone.UTC).minusHours(2);
-
         ZonedDateTime intervalDateTimeKey = null;
         for ( ZonedDateTime dateTimeKey : this.intervalFitParameterMap.keySet() ) {
             if (dateTime.compareTo(dateTimeKey) > 0) {
@@ -246,7 +239,7 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         log.debug("Get patchTemperaure from AuxiliaryService with AuxPointStrategy {}", this.auxPointStrategy );
         AuxPoint auxPoint;
         try {
-            auxPoint = this.auxService.getAuxiliaryData(AuxiliaryServiceName.FAD_CONTROL_TEMPERATURE, dateTimeJoda, this.auxPointStrategy);
+            auxPoint = this.auxService.getAuxiliaryData(AuxiliaryServiceName.FAD_CONTROL_TEMPERATURE, dateTime, this.auxPointStrategy);
         } catch (IOException e) {
             log.error("Could not read aux data {}", e.toString());
             throw new RuntimeException(e);
