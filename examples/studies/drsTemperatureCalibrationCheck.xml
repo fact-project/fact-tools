@@ -1,12 +1,12 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
-  <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+  <property name="infile" value="file:src/test/resources/testDataFile2.fits.gz" />
   <property name="outfile" value="file:test_out.fits" />
-  <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+  <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
-  <property name="auxFolder" value="file:src/main/resources/aux/" />
+  <property name="auxFolder" value="file:src/test/resources/aux/" />
   <property name="fitParameterFile" value="file:src/main/resources/default/drsFitParameter.fits" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
