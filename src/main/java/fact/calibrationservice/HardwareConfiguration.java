@@ -1,24 +1,25 @@
 package fact.calibrationservice;
 
-import org.joda.time.DateTime;
+
+import java.time.*;
 
 public class HardwareConfiguration implements Comparable<HardwareConfiguration> {
-	
-	private DateTime startTime;
-	
+
+	private ZonedDateTime startTime;
+
 	private int[] badPixels;
-	
+
 	private int[] notUsablePixels;
-	
-	public HardwareConfiguration(DateTime startTime){
-		this.startTime = new DateTime(startTime);
+
+	public HardwareConfiguration(ZonedDateTime startTime){
+		this.startTime = startTime.withZoneSameInstant(ZoneOffset.UTC);
 	}
 
 	@Override
 	public int compareTo(HardwareConfiguration o) {
 		return this.startTime.compareTo(o.getStartTime());
 	}
-	
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -33,11 +34,11 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
         return true;
     }
 
-	public DateTime getStartTime() {
+	public ZonedDateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(DateTime startTime) {
+	public void setStartTime(ZonedDateTime startTime) {
 		this.startTime = startTime;
 	}
 
@@ -56,7 +57,7 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
 	public void setNotUsablePixels(int[] notUsablePixels) {
 		this.notUsablePixels = notUsablePixels;
 	}
-	
-	
+
+
 
 }
