@@ -4,7 +4,7 @@
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
   <property name="outfile" value="file:timelapse_data.fits" />
 
-  <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
+  <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}"/>
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
