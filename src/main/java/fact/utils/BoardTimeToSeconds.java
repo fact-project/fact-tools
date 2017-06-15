@@ -18,7 +18,7 @@ public class BoardTimeToSeconds implements Processor {
 
     private int[] t0 = null;
 
-    public double secondsPerCount = 100e-6; // according to Dom there are 100 microseconds per count
+    public float secondsPerCount = 100e-6f; // according to Dom there are 100 microseconds per count
 
 
     @Override
@@ -36,10 +36,10 @@ public class BoardTimeToSeconds implements Processor {
             }
         }
 
-        double time = 0.0;
+        float time = 0.0f;
         for (int i=0; i < boardTime.length; i++){
             // one count of the counter is equivalent to 100 microseconds
-            time += (boardTime[i] - t0[i]) * 100e-6;
+            time += (boardTime[i] - t0[i]) * this.secondsPerCount;
         }
         time /= boardTime.length;
 
