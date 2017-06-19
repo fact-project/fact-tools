@@ -1,5 +1,6 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
   <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
   <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />

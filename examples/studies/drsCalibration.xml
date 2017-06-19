@@ -1,5 +1,6 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
   <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
   <property name="fitParameterFile_temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
   <property name="fitParameterFile_time" value="file:src/main/resources/default/drsTimeCalib_FitParameter.fits" />
@@ -15,10 +16,10 @@
     <fact.io.PrintKeysOnConsole keys="EventNum" />
 
     <fact.datacorrection.DrsTemperatureCalibration
-      auxService="auxService"
-      fitParameterFile="${fitParameterFile_temp}"
       dataKey="Data"
       outputKey="Data"
+      fitParameterFile="${fitParameterFile_temp}"
+      auxService="auxService"
     />
 
     <fact.utils.BoardTimeToSeconds
@@ -29,10 +30,10 @@
     />
 
     <fact.datacorrection.DrsTimelapseCalibration
-      fitParameterFile="${fitParameterFile_time}"
       dataKey="Data"
-      deltaTKey="deltaT"
       outputKey="Data"
+      fitParameterFile="${fitParameterFile_time}"
+      deltaTKey="deltaT"
     />
 
     <!--

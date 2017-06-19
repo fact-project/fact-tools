@@ -1,5 +1,6 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
   <property name="outfile" value="file:timelapse_data.fits" />
 
