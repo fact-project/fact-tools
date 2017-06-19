@@ -29,14 +29,14 @@
     />
     <fact.datacorrection.PatchJumpRemoval
       dataKey="DRSCalibratedData"
-      outputKey="DRSCalibratedData_Jremoval"
+      outputKey="DRSCalibratedData_Jremoved"
       prevEventsKey="prevEvents"
       startCellKey="StartCellData"
       jumpLimit="${patchJumpRemoval_jumpLimit}"
     />
     <fact.datacorrection.RemoveSpikes
-      dataKey="DRSCalibratedData_J"
-      outputKey="DRSCalibratedData_JSremoval"
+      dataKey="DRSCalibratedData_Jremoved"
+      outputKey="DRSCalibratedData_JSremoved"
       startCellKey="StartCellData"
       leftBorder="${removeSpikes_leftBorder}"
       spikeLimit="${removeSpikes_spikeLimit}"
@@ -44,8 +44,8 @@
       maxSpikeLength="${removeSpikes_maxSpikeLength}"
     />
     <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData_JSremoval"
-      outputKey="DRSCalibratedData_JSremoval_Noise"
+      dataKey="DRSCalibratedData_JSremoved"
+      outputKey="DRSCalibratedData_JSremoved_Noise"
     />
 
     <fact.datacorrection.DrsTemperatureCalibration
@@ -56,14 +56,14 @@
     />
     <fact.datacorrection.PatchJumpRemoval
       dataKey="DRSCalibratedData_Temp"
-      outputKey="DRSCalibratedData_Temp_Jremoval"
+      outputKey="DRSCalibratedData_Temp_Jremoved"
       prevEventsKey="prevEvents"
       startCellKey="StartCellData"
       jumpLimit="${patchJumpRemoval_jumpLimit}"
     />
     <fact.datacorrection.RemoveSpikes
-      dataKey="DRSCalibratedData_Temp_Jremoval"
-      outputKey="DRSCalibratedData_Temp_JSremoval"
+      dataKey="DRSCalibratedData_Temp_Jremoved"
+      outputKey="DRSCalibratedData_Temp_JSremoved"
       startCellKey="StartCellData"
       leftBorder="${removeSpikes_leftBorder}"
       spikeLimit="${removeSpikes_spikeLimit}"
@@ -71,8 +71,8 @@
       maxSpikeLength="${removeSpikes_maxSpikeLength}"
     />
     <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData_Temp_JSremoval"
-      outputKey="DRSCalibratedData_Temp_JSremoval_Noise"
+      dataKey="DRSCalibratedData_Temp_JSremoved"
+      outputKey="DRSCalibratedData_Temp_JSremoved_Noise"
     />
 
     <fact.utils.BoardTimeToSeconds outputKey="eventTime" />
@@ -80,7 +80,7 @@
     <fact.datacorrection.DrsTimelapseCalibration
       dataKey="DRSCalibratedData_Temp"
       outputKey="DRSCalibratedData_TempTime"
-      fitParameterFile="${fitParameterFile_time}"
+      fitParameterFile="${fitParameterFile_Time}"
       deltaTKey="deltaT"
     />
 
