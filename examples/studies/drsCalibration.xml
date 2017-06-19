@@ -1,0 +1,42 @@
+<container>
+  <properties url="classpath:/default/settings.properties" />
+  <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
+  <property name="fitParameterFile_temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
+  <property name="fitParameterFile_time" value="file:src/main/resources/default/drsTimeCalib_Fitparameter.fits" />
+  <property name="auxFolder" value="file:src/test/resources/aux/" />
+  <property name="outfile" value="file:drsCalibration_data.fits" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
+
+  <!-- Description of the process and the corresponding stream -->
+  <process id="2" input="fact">
+    <fact.io.PrintKeysOnConsole keys="EventNum" />
+
+    <fact.datacorrection.DrsTemperatureCalibration
+      auxService="auxService"
+      fitParameterFile="${fitParameterFile_temp}"
+      dataKey="Data"
+      outputKey="Data"
+    />
+
+    <fact.utils.BoardTimeToSeconds
+      outputKey="eventTime"
+    />
+    <fact.utils.DrsCellLastReadout
+      outputKey="deltaT"
+    />
+
+    <fact.datacorrection.DrsTimelapseCalibration
+      fitParameterFile="${fitParameterFile_time}"
+      dataKey="Data"
+      deltaTKey="deltaT"
+      outputKey="Data"
+    />
+
+    <!--
+    <fact.io.FITSWrifitParameterFile url="${outfile}" keys="deltaT, Data, cellIDs"/>
+    -->
+  </process>
+</container>
