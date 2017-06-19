@@ -70,7 +70,7 @@ public class DrsTimelapseCalibration implements StatefulProcessor {
         int ROI = (int) data.get("NROI");
         double[] rawData = (double[]) data.get(dataKey);
         short[] startcells = (short[]) data.get(startCellKey);
-        double[] deltaT = (double[]) data.get(deltaTKey); // float or double?
+        float[] deltaT = (float[]) data.get(deltaTKey);
 
         double[] dataCalibrated = new double[rawData.length];
         int startCell, sample_idx, cell_idx;
@@ -91,12 +91,12 @@ public class DrsTimelapseCalibration implements StatefulProcessor {
         return data;
     }
 
-    private static double calculateOffset(double deltaT, float[] constants){
+    private static double calculateOffset(float deltaT, float[] constants){
 
-        if(Double.isNaN(deltaT)) {
+        if(Float.isNaN(deltaT)) {
             return 0.0;
         }
-        return constants[0] * Math.pow(deltaT, constants[1]);
+        return (double) constants[0] * Math.pow(deltaT, constants[1]);
     }
 
     @Override
