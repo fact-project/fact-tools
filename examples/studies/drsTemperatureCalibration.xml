@@ -1,35 +1,29 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
-  <!-- Pathes to the input files -->
   <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
   <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />
   <property name="fitParameterFile" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-  <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}"/>
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
+    <fact.io.PrintKeysOnConsole keys="EventNum" />
 
-  <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
-
-  <fact.datacorrection.DrsCalibration
-    url="${drsfile}"
-    key="Data"
-    outputKey="DrsCalibratedData"
-  />
-
-  <fact.datacorrection.DrsTemperatureCalibration
-    auxService="auxService"
-    drsFitFilePath="${fitParameterFile}"
-    key="Data"
-    outputKey="DrsCalibratedData_Temp"
+    <fact.datacorrection.DrsCalibration
+      url="${drsfile}"
+      key="Data"
+      outputKey="DrsCalibratedData"
     />
-    <!--<fact.ShowViewer key="DrsCalibratedData_Temp"/>-->
+    <fact.datacorrection.DrsTemperatureCalibration
+      dataKey="Data"
+      outputKey="DrsCalibratedData_Temp"
+      fitParameterFile="${fitParameterFile}"
+      auxService="auxService"
+      />
+      <!--<fact.ShowViewer key="DrsCalibratedData_Temp"/>-->
   </process>
 </container>

@@ -2,89 +2,105 @@
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
-  <property name="outfile" value="file:test_out.fits" />
   <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />
-  <property name="fitParameterFile" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
+  <property name="fitParameterFile_Temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
+  <property name="fitParameterFile_Time" value="file:src/main/resources/default/drsTimeCalib_FitParameter.fits" />
+  <property name="outfile" value="file:test_out.fits" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-  <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}"/>
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
+    <fact.io.PrintKeysOnConsole keys="EventNum" />
 
-  <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
+    <fact.utils.PreviousEventInfo
+      startCellKey="StartCellData"
+      outputKey="prevEvents"
+      limitEvents="10"
+    />
 
-  <fact.datacorrection.DrsCalibration
-    url="${drsfile}"
-    key="Data"
-    outputKey="DRSCalibratedData"
-  />
-
-  <fact.datacorrection.PatchJumpRemoval
-      dataKey="DRSCalibratedData"
+    <fact.datacorrection.DrsCalibration
+      url="${drsfile}"
+      key="Data"
       outputKey="DRSCalibratedData"
-      prevEventsKey="prevEvents"
-      startCellKey="StartCellData"
-      jumpLimit="${patchJumpRemoval_jumpLimit}"
-  />
+    />
+    <fact.datacorrection.PatchJumpRemoval
+        dataKey="DRSCalibratedData"
+        outputKey="DRSCalibratedData_Jremoval"
+        prevEventsKey="prevEvents"
+        startCellKey="StartCellData"
+        jumpLimit="${patchJumpRemoval_jumpLimit}"
+    />
+    <fact.datacorrection.RemoveSpikes
+        dataKey="DRSCalibratedData_J"
+        outputKey="DRSCalibratedData_JSremoval"
+        startCellKey="StartCellData"
+        leftBorder="${removeSpikes_leftBorder}"
+        spikeLimit="${removeSpikes_spikeLimit}"
+        topSlopeLimit="${removeSpikes_topSlopeLimit}"
+        maxSpikeLength="${removeSpikes_maxSpikeLength}"
+    />
+    <fact.features.TimeSeriesNoise
+        dataKey="DRSCalibratedData_JSremoval"
+        outputKey="DRSCalibratedData_JSremoval_Noise"
+    />
 
-  <fact.datacorrection.RemoveSpikes
-      dataKey="DRSCalibratedData"
-      outputKey="DRSCalibratedData"
-      startCellKey="StartCellData"
-      leftBorder="${removeSpikes_leftBorder}"
-      spikeLimit="${removeSpikes_spikeLimit}"
-      topSlopeLimit="${removeSpikes_topSlopeLimit}"
-      maxSpikeLength="${removeSpikes_maxSpikeLength}"
-  />
-
-  <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData"
-      outputKey="DRSCalibratedDataNoise"
-  />
-
-  <fact.datacorrection.DrsTemperatureCalibration
-    auxService="auxService"
-    drsFitFilePath="${fitParameterFile}"
-    key="Data"
-    outputKey="DRSCalibratedData_Temp"
-  />
-
-  <fact.datacorrection.PatchJumpRemoval
-      dataKey="DRSCalibratedData_Temp"
+    <fact.datacorrection.DrsTemperatureCalibration
+      dataKey="Data"
       outputKey="DRSCalibratedData_Temp"
-      prevEventsKey="prevEvents"
-      startCellKey="StartCellData"
-      jumpLimit="${patchJumpRemoval_jumpLimit}"
-  />
-  <fact.datacorrection.RemoveSpikes
+      fitParameterFile="${fitParameterFile_Temp}"
+      auxService="auxService"
+    />
+    <fact.datacorrection.PatchJumpRemoval
+        dataKey="DRSCalibratedData_Temp"
+        outputKey="DRSCalibratedData_Temp_Jremoval"
+        prevEventsKey="prevEvents"
+        startCellKey="StartCellData"
+        jumpLimit="${patchJumpRemoval_jumpLimit}"
+    />
+    <fact.datacorrection.RemoveSpikes
+        dataKey="DRSCalibratedData_Temp_Jremoval"
+        outputKey="DRSCalibratedData_Temp_JSremoval"
+        startCellKey="StartCellData"
+        leftBorder="${removeSpikes_leftBorder}"
+        spikeLimit="${removeSpikes_spikeLimit}"
+        topSlopeLimit="${removeSpikes_topSlopeLimit}"
+        maxSpikeLength="${removeSpikes_maxSpikeLength}"
+    />
+    <fact.features.TimeSeriesNoise
+        dataKey="DRSCalibratedData_Temp_JSremoval"
+        outputKey="DRSCalibratedData_Temp_JSremoval_Noise"
+    />
+
+    <fact.utils.BoardTimeToSeconds outputKey="eventTime"/>
+    <fact.utils.DrsCellLastReadout outputKey="deltaT"/>
+    <fact.datacorrection.DrsTimelapseCalibration
       dataKey="DRSCalibratedData_Temp"
-      outputKey="DRSCalibratedData_Temp"
-      startCellKey="StartCellData"
-      leftBorder="${removeSpikes_leftBorder}"
-      spikeLimit="${removeSpikes_spikeLimit}"
-      topSlopeLimit="${removeSpikes_topSlopeLimit}"
-      maxSpikeLength="${removeSpikes_maxSpikeLength}"
-  />
+      outputKey="DRSCalibratedData_TempTime"
+      fitParameterFile="${fitParameterFile_time}"
+      deltaTKey="deltaT"
+    />
 
-  <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData_Temp"
-      outputKey="DRSCalibratedDataNoise_Temp"
-  />
+    <fact.features.TimeSeriesNoise
+        dataKey="DRSCalibratedData_TempTime"
+        outputKey="DRSCalibratedData_TempTime_Noise"
+    />
 
-  <!--
-  <fact.io.FITSWriter
-    url="${outfile}"
-    keys="DRSCalibratedDataNoise, DRSCalibratedDataNoise_Temp"
-    extname="StdPerPixel"
-  />
-  -->
+    <!--
+    <fact.io.FITSWriter
+      url="${outfile}"
+      keys="DRSCalibratedData_JSremoval_Noise, DRSCalibratedData_Temp_JSremoval_Noise, DRSCalibratedData_TempTime_Noise"
+      extname="StdPerPixel"
+    />
+    -->
 
-    <!-- <fact.ShowViewer key="DataCalibratedDRS_Temp" />         keys="DRSCalibratedDataNoise, DRSCalibratedData_TempNoise, DRSCalibratedData_TempIntervalNoise" -->
+    <!--
+    <fact.ShowViewer key="DataCalibratedDRS_Temp" />
+    -->
+    <!-- keys="DRSCalibratedData_JSremoval, DRSCalibratedData_Temp_JSremoval, DRSCalibratedData_TempTime" -->
+
   </process>
 </container>
