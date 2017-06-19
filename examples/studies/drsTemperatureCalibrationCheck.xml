@@ -7,7 +7,7 @@
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />
-  <property name="fitParameterFile" value="file:src/main/resources/default/drsFitParameter.fits" />
+  <property name="fitParameterFile" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
