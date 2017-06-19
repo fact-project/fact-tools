@@ -1,14 +1,8 @@
 package fact.datacorrection;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
-import fact.Constants;
 import fact.Utils;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
-import nom.tam.util.ArrayFuncs;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.DoubleArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -16,8 +10,6 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
-
-import java.util.Arrays;
 
 /**
  * Created by maxnoe on 15.08.16.
@@ -29,93 +21,101 @@ import java.util.Arrays;
  * https://github.com/fact-project/timelapse_calibration
  *
  * It seems that the drs4 cells have an offset which depends on the time since they were last read out of
- * the following form: amplitude = a * deltaT^b * c
+ * the following form: amplitude = a * deltaT^b
  *
  * This Processor also converts adc counts to mV after the calibration.
  *
  * The deltaTs need to be calculated using the fact.utils.DrsCellLastReadout processor
  */
+
 public class DrsTimelapseCalibration implements StatefulProcessor {
 
     private Logger log = LoggerFactory.getLogger(DrsTimelapseCalibration.class);
 
-    @Parameter(required = true, description = "Fits file with the calibration constants")
-    private SourceURL url = null;
+    private double adcCountsToMilliVolt = 2000.0 / 4096.0;
 
     @Parameter(description = "Data to calibrate", defaultValue = "Data")
     private String dataKey = "Data";
 
-    @Parameter(description = "Key to time since last readout of drscells", defaultValue = "deltaT")
-    private String deltaTKey = "deltaT";
-
-    @Parameter(description = "Key to the startcell data", defaultValue = "StartCellData")
-    private String startCellKey = "StartCellData";
-
     @Parameter(description = "OutputKey", defaultValue = "DataCalibrated")
     private String outputKey = "DataCalibrated";
 
+    @Parameter(required = true, description = "Fits file with the calibration constants",
+               defaultValue = "Null. Will try to find path to fitParameterFile from the stream.")
+    private SourceURL fitParameterFile = null;
+
+    @Parameter(description = "Key to time since last readout of drscells", defaultValue = "deltaT")
+    private String deltaTKey = "deltaT";
+
+    @Parameter(description = "Key to the startcell data", defaultValue = "StartCellData") // why, is not a constant?
+    private String startCellKey = "StartCellData";
+
+    // The following keys are required to exist in the fit-parameter data
+    private final static String[] fitParameterKeys = new String[]{"Multiplier", "Exponent"};
+
     private float[][] calibrationConstants;
 
-    private int num_cells = 1024;
-
-    private double adcCountsToMilliVolt = 2000.0 / 4096.0;
+    // The following keys are required to exist in the raw data
+    private final static String[] dataKeys = new String[]{"NPIX", "NCELLS", "NROI"};
 
     @Override
-    public Data process(Data item) {
-        Utils.mapContainsKeys(item, deltaTKey, dataKey, "NROI");
-        int roi = (int) item.get("NROI");
-        short[] data = (short[]) item.get(dataKey);
-        short[] startcells = (short[]) item.get(startCellKey);
-        double[] deltaT = (double[]) item.get(deltaTKey);
+    public Data process(Data data) {
+        log.debug("----- process -----");
 
-        double[] dataCalibrated = new double[data.length];
+        Utils.mapContainsKeys(data, dataKeys);
+        Utils.mapContainsKeys(data, dataKey, deltaTKey); // startCellKey/StartCellData ?
 
-        for (int pixel=0; pixel < Constants.NUMBEROFPIXEL; pixel++){
-            for (int sample = 0; sample < roi ; sample++) {
+        int NRCHIDS = (int) data.get("NPIX");
+        int NRCELLS = (int) data.get("NCELLS");
+        int ROI = (int) data.get("NROI");
+        double[] rawData = (double[]) data.get(dataKey);
+        short[] startcells = (short[]) data.get(startCellKey);
+        double[] deltaT = (double[]) data.get(deltaTKey); // float or double?
 
-                int cell = Utils.sampleToCell(sample, startcells[pixel], num_cells);
-                int sample_idx = pixel * roi + sample;
-                int cell_idx = pixel * num_cells + cell;
+        double[] dataCalibrated = new double[rawData.length];
+        int startCell, sample_idx, cell_idx;
+        for (int chid = 0; chid < NRCHIDS; chid++){
+            for (int sample = 0; sample < ROI ; sample++) {
 
-                float[] constants = calibrationConstants[cell_idx];
+                startCell = Utils.sampleToCell(sample, startcells[chid], NRCELLS);
+                sample_idx = chid * ROI + sample;
+                cell_idx = chid * NRCELLS + startCell;
+
+                double cellOffset = calculateOffset(deltaT[sample_idx], calibrationConstants[cell_idx]);
 
 
-                dataCalibrated[sample_idx] = ((double) data[sample_idx] - offset(deltaT[sample_idx], constants)) * adcCountsToMilliVolt;
+                dataCalibrated[sample_idx] = (rawData[sample_idx] - cellOffset) * adcCountsToMilliVolt;
             }
         }
-        item.put(outputKey, dataCalibrated);
-        return item;
+        data.put(outputKey, dataCalibrated);
+        return data;
     }
 
-    private static double test(double deltaT, float[] constants){
-        if(Double.isNaN(deltaT)) {
-            return constants[2];
-        }
-        return 0.0;
-    }
-
-    private static double offset(double deltaT, float[] constants){
+    private static double calculateOffset(double deltaT, float[] constants){
 
         if(Double.isNaN(deltaT)) {
-            return constants[2];
+            return 0.0;
         }
-        return constants[0] * Math.pow(deltaT, constants[1]) + constants[2];
+        return constants[0] * Math.pow(deltaT, constants[1]);
     }
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        calibrationConstants = new float[Constants.NUMBEROFPIXEL * num_cells][3];
+        int NRCHIDS_ = 1440;
+        int NRCELLS_ = 1024;
+        int nrOfConstants = 2;
+        calibrationConstants = new float[NRCHIDS_ * NRCELLS_][nrOfConstants];
 
-        log.info("Reading timelapse calibration constants from {}", url.getPath());
-        Fits fits = new Fits(url.getFile());
+        log.info("Reading timelapse calibration constants from {}", fitParameterFile.getPath());
+        Fits fits = new Fits(fitParameterFile.getFile());
         BinaryTableHDU table = (BinaryTableHDU) fits.getHDU(1);
 
-        for (int pixel=0; pixel < Constants.NUMBEROFPIXEL; pixel++){
-            for(int cell=0; cell < num_cells; cell++){
-                int idx = pixel * num_cells + cell;
-                Object[] row =  table.getRow(pixel * num_cells + cell);
+        for (int pixel=0; pixel < NRCHIDS_; pixel++){
+            for(int cell=0; cell < NRCELLS_; cell++){
+                int idx = pixel * NRCELLS_ + cell;
+                Object[] row =  table.getRow(pixel * NRCELLS_ + cell);
 
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < nrOfConstants; i++) {
                     calibrationConstants[idx][i] = ((float[]) row[i])[0];
                 }
             }
@@ -132,20 +132,18 @@ public class DrsTimelapseCalibration implements StatefulProcessor {
 
     }
 
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
     }
 
-    public void setDeltaTKey(String deltaTKey) {
-        this.deltaTKey = deltaTKey;
-    }
-
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
+    }
+
+    public void setFitParameterFile(SourceURL fitParameterFile) { this.fitParameterFile = fitParameterFile; }
+
+    public void setDeltaTKey(String deltaTKey) {
+        this.deltaTKey = deltaTKey;
     }
 
     public void setStartCellKey(String startCellKey) {
