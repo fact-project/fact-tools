@@ -2,7 +2,7 @@
   <properties url="classpath:/default/settings.properties" />
   <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
   <property name="fitParameterFile_temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
-  <property name="fitParameterFile_time" value="file:src/main/resources/default/drsTimeCalib_Fitparameter.fits" />
+  <property name="fitParameterFile_time" value="file:src/main/resources/default/drsTimeCalib_FitParameter.fits" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />
   <property name="outfile" value="file:drsCalibration_data.fits" />
 
