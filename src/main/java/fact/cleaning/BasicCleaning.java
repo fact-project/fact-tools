@@ -8,13 +8,13 @@ import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.joda.time.DateTime;
 import fact.container.PixelSet;
 import org.slf4j.Logger;
 
 import stream.Data;
 import stream.annotations.Parameter;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class BasicCleaning {
 	 * @param corePixelThreshold
 	 * @return
 	 */
-	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold, DateTime eventTimeStamp) {
+	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold, ZonedDateTime eventTimeStamp) {
 		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
 		if (notUsablePixel != null)
 		{
@@ -69,7 +69,7 @@ public class BasicCleaning {
 	 * @param photonCharge
 	 * @return
 	 */
-	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel, double[] photonCharge, double neighborPixelThreshold, DateTime eventTimeStamp)
+	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel, double[] photonCharge, double neighborPixelThreshold, ZonedDateTime eventTimeStamp)
 	{
 		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
 		ArrayList<Integer> newList = new ArrayList<>();

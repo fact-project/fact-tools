@@ -2,16 +2,24 @@ package fact.coordinates;
 
 /**
  * Created by maxnoe on 22.05.17.
+ *
+ * Represents a position on Earth using latitude, longitude and height above sea level
  */
 public class EarthLocation {
     final private double latitudeRad;
     final private double longitudeRad;
     final private double altitudeMeter;
 
-    public EarthLocation(double latitudeRad, double longitudeRad, double altitudeMeter) {
+    final static public EarthLocation FACT = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+
+    private EarthLocation(double latitudeRad, double longitudeRad, double altitudeMeter) {
         this.latitudeRad = latitudeRad;
         this.longitudeRad = longitudeRad;
         this.altitudeMeter = altitudeMeter;
+    }
+
+    public EarthLocation fromRad(double latitudeRad, double longitudeRad, double altitudeMeter) {
+        return new EarthLocation(latitudeRad, longitudeRad, altitudeMeter);
     }
 
     public static EarthLocation fromDegrees(double latitudeDeg, double longitudeDeg, double altitudeMeter) {

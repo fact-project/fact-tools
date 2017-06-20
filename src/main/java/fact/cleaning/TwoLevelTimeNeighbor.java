@@ -6,8 +6,6 @@ import fact.coordinates.CameraCoordinate;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +14,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import java.time.*;
 import java.util.ArrayList;
 
 /**
@@ -64,8 +63,8 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 
     @Parameter(required = false)
     private String[] starPositionKeys = null;
-    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-	private double starRadiusInCamera = Constants.PIXEL_SIZE;
+    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE_MM")
+	private double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     private boolean showDifferentCleaningSets = false;
 
@@ -78,16 +77,16 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 		Utils.isKeyValid(input, arrivalTimeKey, double[].class);
 		Utils.isKeyValid(input, photonChargeKey, double[].class);
 
-		DateTime timeStamp = null;
+		ZonedDateTime timeStamp = null;
 		if (input.containsKey("UnixTimeUTC") == true){
     		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
     		int[] eventTime = (int[]) input.get("UnixTimeUTC");
-        	timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+			timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
     	}
     	else {
     		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
     		// => The 12 bad pixels we have from the beginning on are used.
-    		timeStamp = new DateTime(2000, 1, 1, 0, 0);
+    		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
     	}
 
 		double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));

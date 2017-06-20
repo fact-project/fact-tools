@@ -47,6 +47,7 @@ public class FITS {
 
     private Map<String, HDU> hduNames = new HashMap<>();
 
+    //stores the primary HDU for convinience access from the outside.
     public HDU primaryHDU;
 
     /**
@@ -84,6 +85,8 @@ public class FITS {
         long absoluteHduOffsetInFile = 0;
 
         try {
+            //Since all file are finite this loop will end at some point. Here we disable inspection checks for the statement
+            //noinspection InfiniteLoopStatement
             while (true) {
                 HDU h = new HDU(stream, url, absoluteHduOffsetInFile);
                 absoluteHduOffsetInFile += h.header.headerSizeInBytes + h.offsetToNextHDU();
@@ -94,9 +97,7 @@ public class FITS {
                     hduNames.put(name, h);
                 });
 
-
                 ByteStreams.skipFully(stream, h.offsetToNextHDU());
-
             }
 
         } catch (EOFException e){
@@ -136,7 +137,7 @@ public class FITS {
      * @param header byte[] containing the first two bytes of any file/stream
      * @return true iff stream is gzipped.
      */
-    public static boolean isGzippedCompressed(byte[] header){
+    static boolean isGzippedCompressed(byte[] header){
         return header[0] == (byte) GZIPInputStream.GZIP_MAGIC  && header[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
     }
 
@@ -151,6 +152,22 @@ public class FITS {
     }
 
 
+    /**
+     * Get the a mapping of HDU names to all HDU objects in the file.
+     *
+     * @return a map of names to HDUs
+     */
+    public Map<String, HDU> getHDUs() {
+        return hduNames;
+    }
+
+    /**
+     * Returns the binary data table which is in the HDU by the given name.
+     * If the HDU exists and it contains a table.
+     *
+     * @param hduExtName the name of the hdu which contains the bintable
+     * @return the bintable for the specified hdu
+     */
     public Optional<BinTable> getBinTableByName(String hduExtName) {
         if(!hduNames.containsKey(hduExtName)){
             return Optional.empty();
@@ -163,6 +180,7 @@ public class FITS {
     /**
      * Provides a datastream to the data area of the given hdu.
      * This method is useful when reading custom data extensions that are present in the fits file.
+     *
      * @param hdu the HDU of interest.
      * @return a DataInputStream providing data from the data section of the given hdu.
      * @throws IOException in case the stream cannot be opened

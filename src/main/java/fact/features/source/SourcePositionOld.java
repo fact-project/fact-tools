@@ -27,6 +27,7 @@ import stream.annotations.Service;
 import stream.annotations.Parameter;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 
 /**
@@ -210,13 +211,13 @@ public class SourcePositionOld implements StatefulProcessor {
 
             double unixTime = eventTime[0] + (eventTime[1] / 1000000.0);
             DateTime timeStamp = new DateTime((long) (1000 * unixTime), DateTimeZone.UTC);
-
+            ZonedDateTime zonedDateTime = Utils.unixTimeUTCToZonedDateTime(eventTime);
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
-            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
+            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, zonedDateTime, earlier);
 
             //We want to get the tracking point which is closest to the current event.
-            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, zonedDateTime, closest);
 
             double ra = trackingPoint.getDouble("Ra");
             double dec = trackingPoint.getDouble("Dec");

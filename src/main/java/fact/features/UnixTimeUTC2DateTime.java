@@ -4,8 +4,6 @@ import fact.Utils;
 import stream.Data;
 import stream.Processor;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import stream.annotations.Parameter;
 
 /**
@@ -25,13 +23,9 @@ public class UnixTimeUTC2DateTime implements Processor {
     public Data process(Data data) {
 
         Utils.mapContainsKeys(data, inputKey);
+
         int[] unixTimeUTC = (int[]) data.get(inputKey);
-
-        long seconds = unixTimeUTC[0];
-        long microseconds = unixTimeUTC[1];
-
-        DateTime date = new DateTime((long) (seconds * 1000.0 + microseconds / 1000.0),  DateTimeZone.UTC);
-        data.put(outputKey, date);
+        data.put(outputKey, Utils.unixTimeUTCToZonedDateTime(unixTimeUTC));
 
         return data;
     }

@@ -1,12 +1,18 @@
 package fact.coordinates;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
+import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.io.Serializable;
 
 /**
  * Created by maxnoe on 22.05.17.
+ *
+ * This class represents a coordinate in the camera frame using
+ * euclidean coordinates in mm.
+ *
+ * It provides a method toHorizontal to transform from camera frame to telescope frame
  */
 public class CameraCoordinate implements Serializable {
     private final double xMM;
@@ -25,7 +31,14 @@ public class CameraCoordinate implements Serializable {
         return yMM;
     }
 
-
+    /**
+     * Transform this CameraCoordinate from camera frame to telescope (horizontal coordinates) frame
+     * for the given PointingPosition.
+     *
+     * @param pointingPosition the telescope's pointing position
+     * @param focalLength the focal length of the telescope
+     * @return the camera coordinate transformed into the horizontal coordinate frame
+     */
     public HorizontalCoordinate toHorizontal(HorizontalCoordinate pointingPosition, double focalLength){
 
         double paz = pointingPosition.getAzimuthRad();
@@ -37,15 +50,15 @@ public class CameraCoordinate implements Serializable {
 
         Vector3D vec = new Vector3D(x, y, z);
 
-        Rotation rotZAz = new Rotation(new Vector3D(0.0, 0.0, 1.0), -paz);
-        Rotation rotYZd = new Rotation(new Vector3D(0.0, 1.0, 0.0), -pzd);
+        Rotation rotZAz = new Rotation(new Vector3D(0.0, 0.0, 1.0), -paz, RotationConvention.VECTOR_OPERATOR);
+        Rotation rotYZd = new Rotation(new Vector3D(0.0, 1.0, 0.0), -pzd, RotationConvention.VECTOR_OPERATOR);
 
         Vector3D rotVec = rotZAz.applyInverseTo(rotYZd.applyInverseTo(vec));
 
         double zenith = Math.acos(rotVec.getZ());
         double azimuth = Math.atan2(rotVec.getY(), rotVec.getX());
 
-        return new HorizontalCoordinate(zenith, azimuth);
+        return HorizontalCoordinate.fromRad(zenith, azimuth);
     }
 
     public double euclideanDistance(CameraCoordinate other) {
@@ -53,8 +66,6 @@ public class CameraCoordinate implements Serializable {
         double dy = this.getYMM() - other.getYMM();
         return Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0));
     }
-
-
 
     public String toString(){
         return String.format("CameraCoordinate(x=%.4f mm, y=%.4f mm)", this.xMM, this.yMM);

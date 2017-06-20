@@ -36,8 +36,8 @@ public class DistanceTests {
     @Test
     public void EquatorialDistance1() {
 
-        EquatorialCoordinate crab = new EquatorialCoordinate(1.459674920399749, 0.38422481179392015);
-        EquatorialCoordinate mrk501 = new EquatorialCoordinate(4.423843636547886, 0.6939458636900399);
+        EquatorialCoordinate crab = EquatorialCoordinate.fromRad(1.459674920399749, 0.38422481179392015);
+        EquatorialCoordinate mrk501 = EquatorialCoordinate.fromRad(4.423843636547886, 0.6939458636900399);
 
         assertEquals(2.050766865003829, crab.greatCircleDistance(mrk501), 1e-9);
 
@@ -46,8 +46,8 @@ public class DistanceTests {
     @Test
     public void TransformationDistance1() {
 
-        EquatorialCoordinate crab = new EquatorialCoordinate(1.459674920399749, 0.38422481179392015);
-        EquatorialCoordinate mrk501 = new EquatorialCoordinate(4.423843636547886, 0.6939458636900399);
+        EquatorialCoordinate crab = EquatorialCoordinate.fromRad(1.459674920399749, 0.38422481179392015);
+        EquatorialCoordinate mrk501 = EquatorialCoordinate.fromRad(4.423843636547886, 0.6939458636900399);
 
         ZonedDateTime observationTime = ZonedDateTime.of(2014, 3, 25, 00, 42, 29, 0, ZoneOffset.UTC);
         EarthLocation FACTLocation = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);

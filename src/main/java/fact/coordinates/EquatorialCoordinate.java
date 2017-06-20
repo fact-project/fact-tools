@@ -4,15 +4,24 @@ import java.time.ZonedDateTime;
 
 /**
  * Created by maxnoe on 22.05.17.
+ *
+ * Represents a celestial coordinate in the equatorial coordinate frame
+ * using right ascension and declination.
+ *
+ * Provides a method to convert to the horizontal coordinate frame
  */
 public class EquatorialCoordinate implements CelestialCoordinate {
 
     private final double rightAscensionRad;
     private final double declinationRad;
 
-    public EquatorialCoordinate(double rightAscensionRad, double declinationRad) {
+    private EquatorialCoordinate(double rightAscensionRad, double declinationRad) {
         this.rightAscensionRad = rightAscensionRad;
         this.declinationRad = declinationRad;
+    }
+
+    public static EquatorialCoordinate fromRad(double rightAscensionRad, double declinationRad) {
+        return new EquatorialCoordinate(rightAscensionRad, declinationRad);
     }
 
     public static EquatorialCoordinate fromDegrees(double rightAscensionDeg, double declinationDeg) {
@@ -31,6 +40,9 @@ public class EquatorialCoordinate implements CelestialCoordinate {
 
 
     /**
+     * Transform this EquatorialCoordinate into the horizontal coordinate frame
+     * for given observation time and location.
+     *
      * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
      *
@@ -40,7 +52,7 @@ public class EquatorialCoordinate implements CelestialCoordinate {
      */
     public HorizontalCoordinate toHorizontal(ZonedDateTime observationTime, EarthLocation earthLocation) {
 
-        double gst = CoordinateUtils.datetimeToGST(observationTime);
+        double gst = CelestialCoordinate.datetimeToGST(observationTime);
 
         double ra = this.getRightAscensionRad();
         double dec = this.getDeclinationRad();
@@ -67,13 +79,19 @@ public class EquatorialCoordinate implements CelestialCoordinate {
             azimuth += 2 * Math.PI;
         }
 
-        return new HorizontalCoordinate(Math.PI / 2.0 - altitude, azimuth);
+        return HorizontalCoordinate.fromRad(Math.PI / 2.0 - altitude, azimuth);
     }
 
     public String toString(){
         return String.format("HorizontalCoordinate(ra=%.4f ha, dec=%.4f°)", this.getRightAscensionHA(), this.getDeclinationDeg());
     }
 
+    /**
+     * Return the angular great circle distance in radians
+     * between this EquatorialCoordinate and another
+     * @param other
+     * @return Angular great circle distance in radians
+     */
     public double greatCircleDistance(EquatorialCoordinate other) {
         return CelestialCoordinate.greatCircleDistance(
                 this.getDeclinationRad(), this.getRightAscensionRad(),

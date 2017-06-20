@@ -9,11 +9,11 @@ import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
 import fact.auxservice.strategies.Earlier;
 import fact.coordinates.CameraCoordinate;
+import fact.coordinates.EarthLocation;
 import fact.coordinates.EquatorialCoordinate;
 import fact.coordinates.HorizontalCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -23,10 +23,7 @@ import stream.annotations.Parameter;
 import stream.annotations.Service;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-
+import java.time.*;
 
 /**
  *  This calculates the position of the source in the camera. The Telescope usually does not look
@@ -179,7 +176,7 @@ public class SourcePosition implements StatefulProcessor {
             sourceHorizontal = HorizontalCoordinate.fromDegrees(sourceZd, sourceAz);
 
         	// Now we can calculate the source position from the zd,az coordinates for pointing and source
-        	sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.focalLength);
+        	sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
         	data.put(outputKey, sourceCamera);
 
             data.put("AzTracking", pointingAz);
@@ -202,22 +199,20 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            Instant unixTime = Instant.ofEpochSecond(unixTimeUTC[0], 1000 * unixTimeUTC[1]);
-            ZonedDateTime timeStamp = ZonedDateTime.ofInstant(unixTime, ZoneOffset.UTC);
-            DateTime jodaTimeStamp = new DateTime(unixTime.toEpochMilli(), DateTimeZone.UTC);
+            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
-            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, jodaTimeStamp, earlier);
+            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
             //We want to get the tracking point which is closest to the current event.
-            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, jodaTimeStamp, closest);
+            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
 
             pointingEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(
                     trackingPoint.getDouble("Ra"), trackingPoint.getDouble("Dec")
             );
 
-            pointingHorizontal = pointingEquatorial.toHorizontal(timeStamp, Constants.FACTLocation);
+            pointingHorizontal = pointingEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
 
             if (sourceDeclination != null && sourceRightAscension != null)
             {
@@ -229,8 +224,8 @@ public class SourcePosition implements StatefulProcessor {
                 );
             }
 
-            sourceHorizontal = sourceEquatorial.toHorizontal(timeStamp, Constants.FACTLocation);
-            sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.focalLength);
+            sourceHorizontal = sourceEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
+            sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
             String sourceName = sourcePoint.getString("Name");
             data.put("SourceName", sourceName);
