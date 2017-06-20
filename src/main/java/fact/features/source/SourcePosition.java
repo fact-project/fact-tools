@@ -224,7 +224,7 @@ public class SourcePosition implements StatefulProcessor {
 
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
-            data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(auxZd, auxAz);
+            data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(auxZd, auxAz));
             data.put("pointingPosition", pointingHorizontal);
             data.put("sourcePositionHorizontal", sourceHorizontal);
 
