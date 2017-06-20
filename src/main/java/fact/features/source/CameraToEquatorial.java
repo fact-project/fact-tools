@@ -47,6 +47,8 @@ public class CameraToEquatorial implements Processor {
         EquatorialCoordinate cameraCoordinateEquatorial = cameraCoordinateHorizontal.toEquatorial(timeStamp, EarthLocation.FACT);
 
         item.put(outputKey, cameraCoordinateEquatorial);
+        item.put(outputKey + "RaHA", cameraCoordinateEquatorial.getRightAscensionHA());
+        item.put(outputKey + "DecDeg", cameraCoordinateEquatorial.getDeclinationDeg());
         return item;
     }
 }
