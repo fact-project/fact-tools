@@ -150,14 +150,9 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
             data.put(outputKey, sourceCamera);
 
-            data.put("AzTracking", 0);
-            data.put("ZdTracking", 0);
-
-            data.put("AzPointing", 0);
-            data.put("ZdPointing", 0);
-
-            data.put("AzSourceCalc", 0);
-            data.put("ZdSourceCalc", 0);
+            data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(0, 0));
+            data.put("pointingPosition",  HorizontalCoordinate.fromDegrees(0, 0));
+            data.put("sourcePositionHorizontal", HorizontalCoordinate.fromDegrees(0, 0));
             return data;
         }
 
@@ -179,14 +174,10 @@ public class SourcePosition implements StatefulProcessor {
         	sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
         	data.put(outputKey, sourceCamera);
 
-            data.put("AzTracking", pointingAz);
-            data.put("ZdTracking", pointingZd);
-
-            data.put("AzPointing", pointingAz);
-            data.put("ZdPointing", pointingZd);
-
-            data.put("AzSourceCalc", sourceAz);
-            data.put("ZdSourceCalc", sourceZd);
+        	HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(pointingZd, pointingZd);
+            data.put("pointingPosition", pointingPosition);
+            data.put("auxPointingPosition", pointingPosition);
+            data.put("sourcePositionHorizontal", HorizontalCoordinate.fromDegrees(sourceZd, sourceAz));
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
             return data;
@@ -231,19 +222,16 @@ public class SourcePosition implements StatefulProcessor {
             data.put("SourceName", sourceName);
             data.put(outputKey, sourceCamera);
 
-            data.put("AzTracking", trackingPoint.getDouble("Az"));
-            data.put("ZdTracking", trackingPoint.getDouble("Zd"));
-
-            data.put("AzPointing", pointingHorizontal.getAzimuthDeg());
-            data.put("ZdPointing", pointingHorizontal.getZenithDeg());
-
-            data.put("AzSourceCalc", sourceHorizontal.getAzimuthDeg());
-            data.put("ZdSourceCalc", sourceHorizontal.getZenithDeg());
+            Double auxZd = trackingPoint.getDouble("Zd");
+            Double auxAz = trackingPoint.getDouble("Az");
+            data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(auxZd, auxAz);
+            data.put("pointingPosition", pointingHorizontal);
+            data.put("sourcePositionHorizontal", sourceHorizontal);
 
             data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
 
         } catch (IOException e) {
-            log.error("SourcePositionOld could not be calculated. Stopping stream.");
+            log.error("SourcePosition could not be calculated. Stopping stream.");
             e.printStackTrace();
             return null;
         }
