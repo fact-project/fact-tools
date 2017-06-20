@@ -10,7 +10,7 @@ public class EarthLocation {
     final private double longitudeRad;
     final private double altitudeMeter;
 
-    final private EarthLocation FACT = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
+    final static public EarthLocation FACT = EarthLocation.fromDegrees(28.761795, -17.890701389, 2200);
 
     private EarthLocation(double latitudeRad, double longitudeRad, double altitudeMeter) {
         this.latitudeRad = latitudeRad;
