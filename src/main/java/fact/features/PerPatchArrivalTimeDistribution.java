@@ -11,13 +11,13 @@ import stream.annotations.Parameter;
  *
  */
 public class PerPatchArrivalTimeDistribution implements Processor {
-	
+
 	String key;
 	public String getKey() {
 		return key;
 	}
 
-	@Parameter(required=true, description="Key to an arrivaltime array.", defaultValue="arrivalTime")
+	@Parameter(required=true, description="Key to an arrivaltime array.", defaultValue="arrival_time")
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -26,13 +26,13 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 		return outputKey;
 	}
 
-	@Parameter(required = true, description = "Outputkey", defaultValue="perPatchArrivalTime")
+	@Parameter(required = true, description = "Outputkey", defaultValue="per_patch_arrival_time")
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
 
 	String outputKey;
-	
+
 	private int npix;
 
 	@Override
@@ -40,7 +40,7 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 		Utils.isKeyValid(input, "NPIX", Integer.class);
 		Utils.mapContainsKeys( input, key);
 		npix = (Integer) input.get("NPIX");
-		
+
 		double[] arrivalTimeArray = Utils.toDoubleArray(input.get(key));
 		//try{
 		double[] perPatchMean = new double[npix/9];
@@ -67,7 +67,7 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 			input.put(outputKey + "_var", null);
 			return input;
 		}*/
-		
+
 		return input;
 	}
 

@@ -52,7 +52,7 @@ public class FunctionalTest {
             fail("Could not run the example_process.xml");
         }
     }
-/*
+
     @Test
     public void analysisXML() {
         try {
@@ -63,7 +63,7 @@ public class FunctionalTest {
             fail("Could not run the analysis.xml");
         }
     }
-*/
+
     @Test
     public void analysis_mcXML() {
         try {
@@ -78,7 +78,7 @@ public class FunctionalTest {
     @Test
     public void studiesXMLs() throws IOException {
         int counter = 0;
-        List<Path> pathList = Files.walk(Paths.get("examples/studies"))
+        List<Path> pathList = Files.walk(Paths.get("examples/studies/"))
                 .filter(Files::isRegularFile)
                 .collect(Collectors.toList());
 

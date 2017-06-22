@@ -53,8 +53,8 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel). Used to keep/remove cluster if areaKey=null.")
     protected String showerKey = null;
 
-    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
-    protected String arrivaltimePosKey = "arrivalTimePos";
+    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrival_time_pos")
+    protected String arrivaltimePosKey = "arrival_time_pos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
     protected String photonchargeKey = "photoncharge";
@@ -62,8 +62,8 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = false, description = "Value chosen for clustering. Could be photoncharge, arrival times or mean correlation.", defaultValue = "photoncharge")
     protected String morphologyKey = photonchargeKey;
 
-    @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePosition")
-    protected String sourcePositionKey = "sourcePosition" ;
+    @Parameter(required = false, description = "Input key for soure position", defaultValue = "source_position")
+    protected String sourcePositionKey = "source_position" ;
 
     @Parameter(required = false, description = "Pixel set to cluster. If null, cluster all camera pixel; in that case decide which clusters should be kept via pixelSetKey", defaultValue = "null")
     protected String areaKey = null;
@@ -87,8 +87,8 @@ public class ClusterFellwalker implements Processor {
         //same for COGxy, needed for distanceCog, but not in the example xml
 
         double [] sourcePosition = (double[]) data.get(sourcePositionKey);
-        double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");
+        double cogX = (double) data.get("cog_x");
+        double cogY = (double) data.get("cog_y");
 
 
         //get 'shower' as int array with pixel id's3System.out.println();
@@ -161,10 +161,10 @@ public class ClusterFellwalker implements Processor {
 //                            currentPixel = brightestNeighbourIDLarge;
 //                        }
 //                    } else {
-                        pathToNewCluster(clusterID, aktuellerPfad, cluster);
-                        cluster++;
-                        pathend = true;
-                //    }
+                    pathToNewCluster(clusterID, aktuellerPfad, cluster);
+                    cluster++;
+                    pathend = true;
+                    //    }
 
                 } else {
                     if (clusterID[highestNeighbourID] != 0) {
@@ -304,44 +304,44 @@ public class ClusterFellwalker implements Processor {
             double stdNumpixel = stdNumPixel(showerCluster);
 
 
-            data.put("boundRatio", ratio);
-            data.put("idealBoundDiff", idealBoundDiff);
-            data.put("boundAngle", boundAngleSum);
-            data.put("distanceCenter", distanceCenterSum);
+            data.put("bound_ratio", ratio);
+            data.put("ideal_bound_diff", idealBoundDiff);
+            data.put("bound_angle", boundAngleSum);
+            data.put("distance_center", distanceCenterSum);
 
-            data.put("distanceCog", distanceCog);
-            data.put("distanceSource", distanceSource);
+            data.put("distance_cog", distanceCog);
+            data.put("distance_source", distanceSource);
 
-            data.put("neighborCluster", numNeighborCluster);
-            data.put("chargeMax", chargeMaxClusterRatio);
-            data.put("maxClusterNumPixel", numPixelMaxCluster);
-            data.put("numClusterPixel", numClusterPixel);
-            data.put("stdNumPixel", stdNumpixel);
+            data.put("neighbor_cluster", numNeighborCluster);
+            data.put("charge_max", chargeMaxClusterRatio);
+            data.put("max_cluster_num_pixel", numPixelMaxCluster);
+            data.put("num_cluster_pixel", numClusterPixel);
+            data.put("std_num_pixel", stdNumpixel);
             data.put("convexity", convexity);
 
 
         }
         else{
-            data.put("boundRatio", null);
-            data.put("idealBoundDiff", null);
-            data.put("boundAngle", null);
-            data.put("distanceCenter", null);
-            data.put("distanceCog", null);
-            data.put("distanceSource", null);
-            data.put("neighborCluster", null);
-            data.put("chargeMax", null);
-            data.put("maxClusterNumPixel", null);
-            data.put("numClusterPixel", null);
-            data.put("stdNumPixel", null);
+            data.put("bound_ratio", null);
+            data.put("ideal_bound_diff", null);
+            data.put("bound_angle", null);
+            data.put("distance_center", null);
+            data.put("distance_cog", null);
+            data.put("distance_source", null);
+            data.put("neighbor_cluster", null);
+            data.put("charge_max", null);
+            data.put("max_cluster_num_pixel", null);
+            data.put("num_cluster_pixel", null);
+            data.put("std_num_pixel", null);
             data.put("convexity", null);
 
 
         }
 
-        data.put("AllClusterID", clusterID);
-        data.put(morphologyKey + "ClusterID", showerClusterID);
-        data.put("clusterNoCleaning", cluster);
-        data.put("numCluster", numCluster);
+        data.put("all_cluster_id", clusterID);
+        data.put(morphologyKey + "_cluster_id", showerClusterID);
+        data.put("cluster_no_cleaning", cluster);
+        data.put("num_cluster", numCluster);
 
 
 /*        PrintWriter writer = null;
@@ -464,7 +464,7 @@ public class ClusterFellwalker implements Processor {
     public static void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
         for(FactCluster c : clusterSet){
             if(c.getShowerLabel()){
-            ArrayList<Integer> boundPixel = c.findBoundaryNaive();
+                ArrayList<Integer> boundPixel = c.findBoundaryNaive();
                 showerClusterID[boundPixel.get(0)] = -1;
                 for (int i=1; i<boundPixel.size(); i++){
 
@@ -554,9 +554,9 @@ public class ClusterFellwalker implements Processor {
 
 
     /** Method to search for all neighbor clusters of all clusters in the camera image. Two clusters are neighbors if there are no air pixels on the line between their cog's.
-    * "Air pixels" are the pixel on this line that don't belong to any shower-cluster. From the number of air-pixel one can conclude
-    * whether the clusters are neighbors, and, if not, how large the distance is between them.
-    * At the moment two clusters are marked as neighbors if there are no air-pixels between them.
+     * "Air pixels" are the pixel on this line that don't belong to any shower-cluster. From the number of air-pixel one can conclude
+     * whether the clusters are neighbors, and, if not, how large the distance is between them.
+     * At the moment two clusters are marked as neighbors if there are no air-pixels between them.
      * Keep in mind that currently clusters are marked as neighbors even if they are "indirect neighbors" (means they have a third cluster between them). In this case there are also no air pixel on the line
      * between their cog's, because all pixel on this line belongs to a cluster.
      * But maybe this is an opportunity to define another parameter for the whole image, something like "convexity". If there are no air pixel in the image at all, the group of clusters could be defined as convex.
@@ -565,26 +565,26 @@ public class ClusterFellwalker implements Processor {
      *
      * Maybe it's not necessary to fill the distances between the clusters in lists... the resulting 'number of neighbors' from this method isn't really a number of neighbors (as found in findNeighbors);
      * it's more like an estimation for the compactness of the clusters (how many clusters build a compact/connected group in the image). Therefore 'neighborDistance' and 'neighborClusters' could be misleading...
-    */
+     */
     public int searchForCompactGroups(FactCluster [] showerCluster, int [] showerClusterID){
         //int[][] map = new int [showerCluster.length][showerCluster.length];
-            //int [] viewer = showerClusterID.clone();
+        //int [] viewer = showerClusterID.clone();
         int sumAirpixel = 0;
-            for(int i=0; i<showerCluster.length; i++){
-                for(int j=i+1; j<showerCluster.length; j++){
-                    int airPixel = countAirPixel(mapping.line(showerCluster[i].cogId(), showerCluster[j].cogId()), showerClusterID);
-                    showerCluster[i].addAirDistance(airPixel);
-                    showerCluster[j].addAirDistance(airPixel);
-                    if(airPixel == 0){
-                        showerCluster[i].addCompactCluster(showerCluster[j].getClusterID());
-                        showerCluster[j].addCompactCluster(showerCluster[i].getClusterID());
-                    }
-                    else{sumAirpixel += airPixel;
-                        //System.out.println(sumAirpixel);
-                        }
-
+        for(int i=0; i<showerCluster.length; i++){
+            for(int j=i+1; j<showerCluster.length; j++){
+                int airPixel = countAirPixel(mapping.line(showerCluster[i].cogId(), showerCluster[j].cogId()), showerClusterID);
+                showerCluster[i].addAirDistance(airPixel);
+                showerCluster[j].addAirDistance(airPixel);
+                if(airPixel == 0){
+                    showerCluster[i].addCompactCluster(showerCluster[j].getClusterID());
+                    showerCluster[j].addCompactCluster(showerCluster[i].getClusterID());
                 }
+                else{sumAirpixel += airPixel;
+                    //System.out.println(sumAirpixel);
+                }
+
             }
+        }
 
         return sumAirpixel;
     }

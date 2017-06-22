@@ -41,8 +41,8 @@ public class ClusterArrivalTimes implements Processor {
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
     protected String showerKey = null;
 
-    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
-    protected String arrivaltimePosKey = "arrivalTimePos";
+    @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrival_time_pos")
+    protected String arrivaltimePosKey = "arrival_time_pos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
     protected String photonchargeKey = "photoncharge";
@@ -126,8 +126,8 @@ public class ClusterArrivalTimes implements Processor {
                 if (minDiff < threshold) {
                     clusterID[current] = minClusterID;
                 } else {
-                        cluster++;
-                        clusterID[current] = cluster;
+                    cluster++;
+                    clusterID[current] = cluster;
                 }
             }
 
@@ -165,13 +165,13 @@ public class ClusterArrivalTimes implements Processor {
         double stdNumpixel = ClusterFellwalker.stdNumPixel(clusterSet);
 
 
-        data.put("boundRatioAT", boundRatioAT);
-        data.put("idealBoundDiffAT", idealBoundDiffAT);
-        data.put("distanceCenterAT", distanceCenterAT);
-        data.put("chargeMaxAT", chargeMaxClusterRatioAT);
-        data.put("stdNumPixelAT", stdNumpixel);
-        data.put("ArrrialTimeClusterID", clusterID);
-        data.put("numClusterAT", cluster);
+        data.put("bound_ratio_at", boundRatioAT);
+        data.put("ideal_bound_diff_at", idealBoundDiffAT);
+        data.put("distance_center_at", distanceCenterAT);
+        data.put("charge_max_at", chargeMaxClusterRatioAT);
+        data.put("std_num_pixel_at", stdNumpixel);
+        data.put("arrrival_time_cluster_id", clusterID);
+        data.put("num_cluster_at", cluster);
 
 
         return data;
@@ -259,7 +259,7 @@ public class ClusterArrivalTimes implements Processor {
         }
 
         if(minID == -1){
-           int [] temp = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray);
+            int [] temp = findNextSeed(shower,clusterID,cluster,arrivalTime, showerArray);
 
             minID = temp[0];
             cluster = temp[1];

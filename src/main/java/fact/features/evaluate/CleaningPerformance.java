@@ -69,13 +69,13 @@ public class CleaningPerformance implements Processor {
         }
 
 
-        data.put(pixelSetKey + "_confusionMatrix", performance);
+        data.put(pixelSetKey + "_confusion_matrix", performance);
         data.put(pixelSetKey + "_recall", recall);
         data.put(pixelSetKey + "_precision", precision);
         data.put(pixelSetKey + "_accuracy", accuracy);
         data.put(pixelSetKey + "_specificity", specificity);
-        data.put(pixelSetKey + "_FPR", fpr);
-        data.put(pixelSetKey + "_FNR", fnr);
+        data.put(pixelSetKey + "_fpr", fpr);
+        data.put(pixelSetKey + "_fnr", fnr);
 
 
         return data;

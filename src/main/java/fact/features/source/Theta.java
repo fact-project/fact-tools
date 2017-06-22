@@ -25,7 +25,7 @@ public class Theta implements Processor {
 	private String outputKey = null;
 	@Parameter(required=true)
 	private double signM3lConstant = 0;
-	
+
 	private double[] sourcePosition = null;
 	private double disp;
 	private double cogx;
@@ -36,7 +36,7 @@ public class Theta implements Processor {
 
 	public Data process(Data input) {
 		Utils.mapContainsKeys(input, sourcePositionKey,dispKey,cogxKey,cogyKey,deltaKey,cosDeltaAlphaKey);
-		
+
 		sourcePosition = (double[]) input.get(sourcePositionKey);
 		disp = (Double) input.get(dispKey);
 		cogx = (Double) input.get(cogxKey);
@@ -44,31 +44,31 @@ public class Theta implements Processor {
 		delta = (Double) input.get(deltaKey);
 		m3l = (Double) input.get(m3lKey);
 		cosDeltaAlpha = (Double) input.get(cosDeltaAlphaKey);
-		
+
 		double[] recPosition = CalculateRecPosition();
 		double theta = Math.sqrt( Math.pow(recPosition[0]-sourcePosition[0], 2)
-								+ Math.pow(recPosition[1]-sourcePosition[1], 2) );
+				+ Math.pow(recPosition[1]-sourcePosition[1], 2) );
 
-        input.put("@reconstructedPostion" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
-        input.put(outputKey + "_recPos",  recPosition);
-        input.put(outputKey, theta);
-		
+		input.put("@reconstructedPostion" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
+		input.put(outputKey + "_rec_pos",  recPosition);
+		input.put(outputKey, theta);
+
 		return input;
 	}
 
 	private double[] CalculateRecPosition() {
-		
+
 		double[] result = new double[2];
-		
+
 		// The orientation of the reconstructed source position depends on the third moment
 		// (relativ to the suspected source position, m3l*sign(cosDeltaAlpha)) of the shower:
-		// If it is larger than a constant (default -200) the reconstructed source position is 
+		// If it is larger than a constant (default -200) the reconstructed source position is
 		// orientated towards the suspected source position
 		double sign = - Math.signum(cosDeltaAlpha) * Math.signum(m3l*Math.signum(cosDeltaAlpha)-signM3lConstant);
-		
+
 		result[0] = cogx + disp * Math.cos(delta) * sign;
 		result[1] = cogy + disp * Math.sin(delta) * sign;
-		
+
 		return result;
 	}
 

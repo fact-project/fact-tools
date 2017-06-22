@@ -26,41 +26,38 @@ public class DistributionFromShower implements Processor {
 	// the in and outputkeys
 	@Parameter(required = true)
 	private String outputKey = null;
-	@Parameter(required = false, defaultValue="M3Long")
-	private String m3longKey = "M3Long";
-	@Parameter(required = false, defaultValue="M3Trans")
-	private String m3transKey = "M3Trans";
-	@Parameter(required = false, defaultValue="M4Long")
-	private String m4longKey = "M4Long";
-	@Parameter(required = false, defaultValue="M4Trans")
-	private String m4transKey = "M4Trans";
-	@Parameter(required = false, defaultValue="COGx")
-	private String cogxKey = "COGx";
-	@Parameter(required = false, defaultValue="COGy")
-	private String cogyKey = "COGy";
-	@Parameter(required = false, defaultValue="Length")
-	private String lengthKey = "Length";
-	@Parameter(required = false, defaultValue="Width")
-	private String widthKey = "Width";
-	@Parameter(required = false, defaultValue="Delta")
-	private String deltaKey = "Delta";
+	@Parameter(required = false, defaultValue="m3_long")
+	private String m3longKey = "m3_long";
+	@Parameter(required = false, defaultValue="m3_trans")
+	private String m3transKey = "m3_trans";
+	@Parameter(required = false, defaultValue="m4_long")
+	private String m4longKey = "m4_long";
+	@Parameter(required = false, defaultValue="m4_trans")
+	private String m4transKey = "m4_trans";
+	@Parameter(required = false, defaultValue="cog_x")
+	private String cogxKey = "cog_x";
+	@Parameter(required = false, defaultValue="cog_y")
+	private String cogyKey = "cog_y";
+	@Parameter(required = false, defaultValue="length")
+	private String lengthKey = "length";
+	@Parameter(required = false, defaultValue="width")
+	private String widthKey = "width";
+	@Parameter(required = false, defaultValue="delta")
+	private String deltaKey = "delta";
 	@Parameter(required=true, defaultValue="117.94")
 	private double c0 = 117.94;
-	@Parameter(required = false, defaultValue="numIslands")
-	private String numIslandsKey = "numIslands";
-	@Parameter(required = false, defaultValue="Size")
-	private String sizeKey = "Size";
-	@Parameter(required = false, defaultValue="Disp")
-	private String dispKey = "Disp";
+	@Parameter(required = false, defaultValue="num_islands")
+	private String numIslandsKey = "num_islands";
+	@Parameter(required = false, defaultValue="size")
+	private String sizeKey = "size";
+	@Parameter(required = false, defaultValue="disp")
+	private String dispKey = "disp";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	// A logger
 	static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
-
-
 	double sumWeights = 0;
-
 	@Override
 	public Data process(Data input) {
 		// get the required stuff from the getColorFromValue
@@ -77,6 +74,7 @@ public class DistributionFromShower implements Processor {
 		if (!input.containsKey(weightsKey)) {
 			return input;
 		}
+
 
 		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 		Utils.isKeyValid(input, weightsKey, double[].class);
@@ -220,6 +218,7 @@ public class DistributionFromShower implements Processor {
 
 	public double calculateMoment(int moment, double mean, double[] values,
 								  double[] weights) {
+
 		double m = 0;
 		for (int i = 0; i < values.length; i++) {
 			sumWeights += weights[i];

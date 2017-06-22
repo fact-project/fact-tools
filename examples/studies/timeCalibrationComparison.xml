@@ -3,106 +3,106 @@
   <!-- Pathes to the input files -->
   <property name="infile" value="src/test/resources/testDataFile.fits.gz" />
   <property name="drsfile" value="src/test/resources/testDrsFile.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
-  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <property name="integral_gain_file" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixel_delay_file" value="classpath:/default/delays_20141114.csv" />
+  <service id="aux_service" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.FITSStream" url="file:${infile}" />
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
-    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
-    <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data" outputKey="DataCalibrated" />
-    <fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="${patchJumpRemoval_jumpLimit}" />
-    <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="${removeSpikes_leftBorder}" spikeLimit="${removeSpikes_spikeLimit}" topSlopeLimit="${removeSpikes_topSlopeLimit}"
-    maxSpikeLength="${removeSpikes_maxSpikeLength}" />
-    <fact.datacorrection.DrsTimeCalibration dataKey="DataCalibrated" outputKey="DataNewTimeCalibrated" />
-    <fact.filter.DrsTimeCalibration outputKey="timeCalibConst" />
-    <fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />
-    <fact.datacorrection.InterpolateTimeSeries calibService="calibService" interpolateTimeLine="True" dataKey="DataCalibrated" dataOutputKey="DataCalibrated" showBadPixel="True" />
+    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prev_events" limitEvents="10" />
+    <fact.datacorrection.DrsCalibration url="file:${drsfile}" key="Data" outputKey="data_calibrated" />
+    <fact.datacorrection.PatchJumpRemoval dataKey="data_calibrated" outputKey="data_calibrated" prevEventsKey="prev_events" startCellKey="StartCellData" jumpLimit="${patch_jump_removal_jump_limit}" />
+    <fact.datacorrection.RemoveSpikes dataKey="data_calibrated" outputKey="data_calibrated" startCellKey="StartCellData" leftBorder="${remove_spikes_left_border}" spikeLimit="${remove_spikes_spike_limit}" topSlopeLimit="${remove_spikes_top_slope_limit}"
+                                      maxSpikeLength="${remove_spikes_max_spike_length}" />
+    <fact.datacorrection.DrsTimeCalibration dataKey="data_calibrated" outputKey="data_new_time_calibrated" />
+    <fact.filter.DrsTimeCalibration outputKey="time_calib_const" />
+    <fact.filter.ArrayTimeCorrection dataKey="data_calibrated" timeCalibConstKey="time_calib_const" outputKey="data_calibrated" />
+    <fact.datacorrection.InterpolateTimeSeries calibService="calib_service" interpolateTimeLine="True" dataKey="data_calibrated" dataOutputKey="data_calibrated" showBadPixel="True" />
     <fact.extraction.BasicExtraction
-            dataKey="DataCalibrated"
-            outputKeyMaxAmplPos="maxPos"
+            dataKey="data_calibrated"
+            outputKeyMaxAmplPos="max_pos"
             outputKeyPhotonCharge="photoncharge"
-            url="${integralGainFile}"
-            startSearchWindow="${basicExtraction_startSearchWindow}"
-            rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-            rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+            url="${integral_gain_file}"
+            startSearchWindow="${basic_extraction_start_search_window}"
+            rangeSearchWindow="${basic_extraction_range_search_window}"
+            rangeHalfHeightWindow="${basic_extraction_range_half_heigth_window}"
     />
     <fact.extraction.EstimateBaseline
-            dataKey="DataCalibrated"
+            dataKey="data_calibrated"
             outputKey="baseline"
             firstSlice="10"
             range="30"
     />
     <fact.extraction.TimeOverThreshold
-            dataKey="DataCalibrated"
-            outputKey="timeOverThreshold"
-            firstSliceOverThresholdOutputKey="arrivalTimeTOT"
-            positionsKey="maxPos"
+            dataKey="data_calibrated"
+            outputKey="time_over_threshold"
+            firstSliceOverThresholdOutputKey="arrival_time_tot"
+            positionsKey="max_pos"
             threshold="1800"
-            thresholdOutputKey="thresholdForToT"
+            thresholdOutputKey="threshold_for_tot"
     />
     <fact.datacorrection.CorrectSaturation
-            dataKey="DataCalibrated"
-            outputKey="DataCalibrated"
-            totKey="timeOverThreshold"
-            firstSliceOverThresholdKey="arrivalTimeTOT"
+            dataKey="data_calibrated"
+            outputKey="data_calibrated"
+            totKey="time_over_threshold"
+            firstSliceOverThresholdKey="arrival_time_tot"
             threshold="1800"
-            maxPosKey="maxPos"
+            maxPosKey="max_pos"
             baselineKey="baseline"
     />
     <fact.extraction.BasicExtraction
-            dataKey="DataCalibrated"
-            outputKeyMaxAmplPos="maxPos"
+            dataKey="data_calibrated"
+            outputKeyMaxAmplPos="max_pos"
             outputKeyPhotonCharge="photoncharge"
-            url="${integralGainFile}"
-            startSearchWindow="${basicExtraction_startSearchWindow}"
-            rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-            rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+            url="${integral_gain_file}"
+            startSearchWindow="${basic_extraction_start_search_window}"
+            rangeSearchWindow="${basic_extraction_range_search_window}"
+            rangeHalfHeightWindow="${basic_extraction_range_half_heigth_window}"
     />
     <fact.extraction.RisingEdgeForPositions
-            dataKey="DataCalibrated"
-            amplitudePositionsKey="maxPos"
-            outputKey="arrivalTimePos"
-            maxSlopesKey="maxSlopesPos"
+            dataKey="data_calibrated"
+            amplitudePositionsKey="max_pos"
+            outputKey="arrival_time_pos"
+            maxSlopesKey="max_slopes_pos"
     />
     <fact.extraction.RisingEdgePolynomFit
-            dataKey="DataCalibrated"
-            risingEdgeKey="arrivalTimePos"
-            outputKey="arrivalTime"
+            dataKey="data_calibrated"
+            risingEdgeKey="arrival_time_pos"
+            outputKey="arrival_time"
             numberOfPoints="11"
-            maxSlopesKey="maxSlopes"
+            maxSlopesKey="max_slopes"
     />
     <fact.datacorrection.CorrectPixelDelays
-            arrivalTimeKey="arrivalTime"
-            outputKey="arrivalTime"
-            url="${pixelDelayFile}"
+            arrivalTimeKey="arrival_time"
+            outputKey="arrival_time"
+            url="${pixel_delay_file}"
     />
     <fact.datacorrection.InterpolatePhotondata
-            calibService="calibService"
+            calibService="calib_service"
             photonChargeKey="photoncharge"
             photonChargeOutputKey="photoncharge"
-            arrivalTimeKey="arrivalTime"
-            arrivalTimeOutputKey="arrivalTime"
+            arrivalTimeKey="arrival_time"
+            arrivalTimeOutputKey="arrival_time"
     />
     <fact.features.source.SourcePosition
-            outputKey="Cetatauri"
+            outputKey="cetatauri"
             sourceRightAscension="5.627416667"
             sourceDeclination="21.1425"
-            auxService="auxService"
+            auxService="aux_service"
     />
 
     <fact.cleaning.TwoLevelTimeNeighbor
-            calibService="calibService"
+            calibService="calib_service"
             photonChargeKey="photoncharge"
             outputKey="shower"
-            arrivalTimeKey="arrivalTime"
-            corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
-            neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
-            timeLimit="${twoLevelTimeNeighbor_timeLimit}"
-            minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
-            starPositionKeys="Cetatauri"
+            arrivalTimeKey="arrival_time"
+            corePixelThreshold="${two_level_time_neighbor_core_threshold}"
+            neighborPixelThreshold="${two_level_time_neighbor_neighbor_threshold}"
+            timeLimit="${two_level_time_neighbor_time_limit}"
+            minNumberOfPixel="${two_level_time_neighbor_min_number_of_pixel}"
+            starPositionKeys="cetatauri"
             starRadiusInCamera="11.0"
     />
     <!-- <Skip condition="%{data.shower} == null" /> -->

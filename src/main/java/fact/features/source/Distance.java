@@ -15,11 +15,11 @@ import stream.annotations.Parameter;
  */
 public class Distance implements Processor {
 	static Logger log = LoggerFactory.getLogger(Distance.class);
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String distribution;
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String sourcePosition;
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String outputKey;
 	/**
 	 * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid 
@@ -38,10 +38,10 @@ public class Distance implements Processor {
 		double x = source[0];
 		double y = source[1];
 
-		input.put(outputKey, 
+		input.put(outputKey,
 				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
 						+ (dist.getCenterX() - x) * (dist.getCenterX() - x) )
-				);
+		);
 		return input;
 	}
 

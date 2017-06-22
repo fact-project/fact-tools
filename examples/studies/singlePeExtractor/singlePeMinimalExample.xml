@@ -4,15 +4,15 @@
     <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
     <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
 
-    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+    <property name="integral_gain_file" value="classpath:/default/gain_sorted_20131127.csv" />
+    <property name="pixel_delay_file" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
     <property name="output" value="file:testoutfile.json" />
 
-    <property name="auxFolder" value="file:src/main/resources/aux/" />
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+    <property name="aux_folder" value="file:src/main/resources/aux/" />
+    <service id="aux_service" class="fact.auxservice.AuxFileService" auxFolder="${aux_folder}" />
 
-    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
 
     <!--In case you want to analyze .zfits files.-->
     <!-- <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/> -->
@@ -24,8 +24,8 @@
         <!-- PreviousEventInfo, Skip(no Data Trigger) -->
         <fact.utils.PreviousEventInfo
                 startCellKey="StartCellData"
-                outputKey="prevEvents"
-                limitEvents="${prevEvents_limitEvents}"
+                outputKey="prev_events"
+                limitEvents="${prev_events_limit_events}"
         />
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <!-- Output: Data -->
@@ -36,42 +36,42 @@
         <fact.datacorrection.DrsCalibration
                 url="${drsfile}"
                 key="Data"
-                outputKey="DataCalibrated"
+                outputKey="data_calibrated"
         />
         <fact.datacorrection.PatchJumpRemoval
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                prevEventsKey="prevEvents"
+                dataKey="data_calibrated"
+                outputKey="data_calibrated"
+                prevEventsKey="prev_events"
                 startCellKey="StartCellData"
-                jumpLimit="${patchJumpRemoval_jumpLimit}"
+                jumpLimit="${patch_jump_removal_jump_limit}"
         />
         <fact.datacorrection.RemoveSpikes
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
+                dataKey="data_calibrated"
+                outputKey="data_calibrated"
                 startCellKey="StartCellData"
-                leftBorder="${removeSpikes_leftBorder}"
-                spikeLimit="${removeSpikes_spikeLimit}"
-                topSlopeLimit="${removeSpikes_topSlopeLimit}"
-                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+                leftBorder="${remove_spikes_left_border}"
+                spikeLimit="${remove_spikes_spike_limit}"
+                topSlopeLimit="${remove_spikes_top_slope_limit}"
+                maxSpikeLength="${remove_spikes_max_spike_length}"
         />
         <fact.filter.DrsTimeCalibration
-                outputKey="timeCalibConst"
+                outputKey="time_calib_const"
         />
         <fact.filter.ArrayTimeCorrection
-                dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
-                outputKey="DataCalibrated"
+                dataKey="data_calibrated"
+                timeCalibConstKey="time_calib_const"
+                outputKey="data_calibrated"
         />
         <fact.datacorrection.InterpolateTimeSeries
-                calibService="calibService"
-                dataKey="DataCalibrated"
-                dataOutputKey="DataCalibrated"
+                calibService="calib_service"
+                dataKey="data_calibrated"
+                dataOutputKey="data_calibrated"
         />
         <!-- Output: DataCalibrated -->
 
         <!-- Single Pe Extraction -->
         <fact.photonstream.SinglePulseExtraction
-                dataKey="DataCalibrated"
+                dataKey="data_calibrated"
                 outputKey="PhotonArrivals"
         />
 
@@ -82,12 +82,12 @@
                 timeSeriesKey="DataReconstructed"
         />
 
-        <!--<fact.ShowViewer key="DataCalibrated" />-->
+        <!--<fact.ShowViewer key="data_calibrated" />-->
 
-        <!--<fact.io.JSONWriter keys="${keysForOutput}"-->
-                            <!--url="${output}"-->
-                            <!--writeListOfItems="True"-->
-                            <!--pixelSetsAsInt="True"-->
+        <!--<fact.io.JSONWriter keys="${keys_for_output}"-->
+        <!--url="${output}"-->
+        <!--writeListOfItems="True"-->
+        <!--pixelSetsAsInt="True"-->
         <!--/>-->
     </process>
 </container>

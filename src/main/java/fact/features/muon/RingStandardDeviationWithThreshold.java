@@ -19,10 +19,10 @@ public class RingStandardDeviationWithThreshold implements Processor {
     private String photonchargeKey = "photoncharge";
 
     @Parameter(description = "Key containing the arrivalTime array", defaultValue = "arrivalTime")
-    private String arrivalTimeKey = "arrivalTime";
+    private String arrivalTimeKey = "arrival_time";
 
     @Parameter(description = "Key for the ring pixelset", defaultValue = "bestRingPixel")
-    private String ringPixelSetKey = "bestRingPixel";
+    private String ringPixelSetKey = "best_ring_pixel";
 
     @Parameter(description = "Key for the cleaning pixelset", defaultValue = "shower")
     private String cleaningPixelSetKey = "shower";
@@ -37,7 +37,7 @@ public class RingStandardDeviationWithThreshold implements Processor {
     public Data process(Data item) {
 
         if (outputKey == null){
-            outputKey = "StdDevTime" + String.valueOf(threshold);
+            outputKey = "std_dev_time" + String.valueOf(threshold);
         }
 
         Utils.mapContainsKeys(item, photonchargeKey, arrivalTimeKey, ringPixelSetKey, cleaningPixelSetKey);
@@ -59,7 +59,7 @@ public class RingStandardDeviationWithThreshold implements Processor {
         }
 
         item.put(outputKey, stats.getStandardDeviation());
-        item.put("numPixel" + outputKey, stats.getN());
+        item.put("num_pixel" + outputKey, stats.getN());
         return item;
     }
 

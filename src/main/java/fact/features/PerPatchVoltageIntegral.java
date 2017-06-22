@@ -13,7 +13,7 @@ public class PerPatchVoltageIntegral implements Processor {
 	public String getKey() {
 		return key;
 	}
-	
+
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -26,14 +26,14 @@ public class PerPatchVoltageIntegral implements Processor {
 		this.outputKey = outputKey;
 	}
 
-	@Parameter(required = true, defaultValue = "dataCalibrated", description = "The input key")
+	@Parameter(required = true, defaultValue = "data_calibrated", description = "The input key")
 	private String key = "";
 
-	@Parameter(required = true, defaultValue = "perPatchVoltageIntegral", description = "The output key")
+	@Parameter(required = true, defaultValue = "per_patch_voltage_integral", description = "The output key")
 	private String outputKey;
-	
+
 	private int npix;
-	
+
 	@Override
 	public Data process(Data input) {
 		Utils.isKeyValid(input, "NPIX", Integer.class);
@@ -42,7 +42,7 @@ public class PerPatchVoltageIntegral implements Processor {
 		double[] dataCalibratedArray = (double[]) input.get(key);
 		int roi = dataCalibratedArray.length / npix;
 		double[] perPatchVoltageIntegral = new double[160];
-		
+
 		int patch = 0;
 
 		for(int chid = 0; chid < npix; chid++)
@@ -53,7 +53,7 @@ public class PerPatchVoltageIntegral implements Processor {
 				perPatchVoltageIntegral[patch] += 0.5 * dataCalibratedArray[chid * roi + slice]; // 0.5 ns per slice
 			}
 		}
-		
+
 		input.put(outputKey, perPatchVoltageIntegral);
 
 		return input;

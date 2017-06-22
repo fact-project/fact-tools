@@ -3,30 +3,30 @@
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
-  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <property name="integral_gain_file" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixel_delay_file" value="classpath:/default/delays_20141114.csv" />
+  <service id="aux_service" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
   <!-- Name des Streams und pfad zu dem Daten-File -->
   <stream id="fact" class="fact.io.FITSStream" url="${infile}" limit="3" />
   <!-- Beschreibung des zu bearbeitenden Prozesses und zu welchem Stream dieser gehört -->
   <process id="2" input="fact">
-    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="20" />
+    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prev_events" limitEvents="20" />
     <!--<stream.flow.Skip condition="%{data.TriggerType} != 4" />-->
-    <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="DataCalibrated" />
-    <!--<fact.datacorrection.PatchJumpRemoval dataKey="DataCalibrated" outputKey="DataCalibrated" prevEventsKey="prevEvents" startCellKey="StartCellData" jumpLimit="2.0" />-->
-    <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" />
-    <!--<fact.filter.ArrayTimeCorrection dataKey="DataCalibrated" timeCalibConstKey="timeCalibConst" outputKey="DataCalibrated" />-->
-    <fact.datacorrection.InterpolateTimeSeries calibService="calibService" interpolateTimeLine="True" dataKey="DataCalibrated" dataOutputKey="DataCalibrated" />
-    <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
-    rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
-    <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
-    <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
-    <fact.filter.MovingAverage key="DataCalibrated" outputKey="DataSmothed" length="5" />
-    <fact.statistics.TimeseriesFeatures dataKey="DataCalibrated" movingAverageKey="DataSmothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
+    <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="data_calibrated" />
+    <!--<fact.datacorrection.PatchJumpRemoval dataKey="data_calibrated" outputKey="data_calibrated" prevEventsKey="prev_events" startCellKey="StartCellData" jumpLimit="2.0" />-->
+    <fact.datacorrection.RemoveSpikes dataKey="data_calibrated" outputKey="data_calibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" />
+    <!--<fact.filter.ArrayTimeCorrection dataKey="data_calibrated" timeCalibConstKey="timeCalibConst" outputKey="data_calibrated" />-->
+    <fact.datacorrection.InterpolateTimeSeries calibService="calib_service" interpolateTimeLine="True" dataKey="data_calibrated" dataOutputKey="data_calibrated" />
+    <fact.extraction.BasicExtraction dataKey="data_calibrated" outputKeyMaxAmplPos="max_pos" outputKeyPhotonCharge="photoncharge" url="${integral_gain_file}" startSearchWindow="${basic_extraction_start_search_window}"
+                                     rangeSearchWindow="${basic_extraction_range_search_window}" rangeHalfHeightWindow="25" />
+    <fact.extraction.RisingEdgeForPositions dataKey="data_calibrated" amplitudePositionsKey="max_pos" outputKey="arrival_time_pos" maxSlopesKey="max_slopes_pos" />
+    <fact.extraction.RisingEdgePolynomFit dataKey="data_calibrated" risingEdgeKey="arrival_time_pos" outputKey="arrival_time" numberOfPoints="11" maxSlopesKey="max_slopes" />
+    <fact.filter.MovingAverage key="data_calibrated" outputKey="data_smothed" length="5" />
+    <fact.statistics.TimeseriesFeatures dataKey="data_calibrated" movingAverageKey="data_smothed" searchWindowLeft="35" searchWindowRight="200" outputKey="voltages" />
     <!--<fact.features.TimeSpread weightsKey="photoncharge" arrivalTimeKey="arrivalTime" showerKey="shower" outputKey="Timespread" />-->
     <!---->
-    <fact.extraction.WaveformFluctuation key="DataCalibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
+    <fact.extraction.WaveformFluctuation key="data_calibrated" outputKey="Nsb" skipFirst="35" skipLast="100" windowSize="30" />
     <fact.utils.SelectValueByChid key="Nsb_std" chid="286" outputKey="Nsb_rms_1" />
     <!--<fact.plotter.HistogramPlotter key="Nsb_rms_1" binWidth="1" logAxis="true" color="#666699" />-->
     <fact.utils.SelectValueByChid key="Nsb_mean" chid="286" outputKey="Nsb_mean_1" />
@@ -38,7 +38,7 @@
     <!--<fact.plotter.HistogramArrayPlotter key="photoncharge" binWidth="1" logAxis="true" color="#666699" />-->
     <fact.utils.SelectValueByChid key="voltages_mean" chid="286" outputKey="voltages_mean_1" />
     <!--<fact.plotter.HistogramPlotter key="voltages_mean_1" binWidth="1" logAxis="true" color="#666699" />-->
-    <!--<fact.ShowViewer key="DataCalibrated"/>-->
+    <!--<fact.ShowViewer key="data_calibrated"/>-->
     <!--<fact.io.JSONWriter url="file:${outfile}" keys="Nsb,Nsb_mean,Nsb_rms"/>-->
   </process>
 </container>

@@ -30,7 +30,7 @@ public class CircularFit implements StatefulProcessor {
     @Parameter(required = false, description = "PixelSet to perform the fit on", defaultValue = "shower")
     private String pixelSetKey = "shower";
     @Parameter(required = false, description = "Base for the Outputkeys, outputs are radius, x, y", defaultValue = "circfit_")
-    private String outputKey = "circFit";
+    private String outputKey = "circ_fit";
 
     private FactPixelMapping mapping = FactPixelMapping.getInstance();
     private int npix = Constants.NUMBEROFPIXEL;
@@ -86,10 +86,10 @@ public class CircularFit implements StatefulProcessor {
 
         double radius = Math.sqrt(numerator / photoncharge_sum);
 
-        item.put(outputKey + "R", radius);
-        item.put(outputKey + "X", center_x);
-        item.put(outputKey + "Y", center_y);
-        item.put(outputKey + "Circle", new EllipseOverlay(center_x, center_y, radius, radius, 0));
+        item.put(outputKey + "_r", radius);
+        item.put(outputKey + "_x", center_x);
+        item.put(outputKey + "_y", center_y);
+        item.put(outputKey + "_circle", new EllipseOverlay(center_x, center_y, radius, radius, 0));
 
         return item;
     }

@@ -181,7 +181,7 @@ public class HillasTest {
         //test 2nd moment (variance)
         int moment = 2;
         double result = poser.calculateMoment(moment, s.getMean(), valuesNotWeighted, weights);
-        Assert.assertEquals(s.getPopulationVariance(), result);
+        Assert.assertEquals(s.getPopulationVariance(), result);//resutl ist falsch
     }
 
     @Test

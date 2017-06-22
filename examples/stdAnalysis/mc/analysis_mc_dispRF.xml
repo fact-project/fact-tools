@@ -4,13 +4,13 @@
 
     <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
 	<property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
-	<property name="dispRFfile" value="file:/home/mknoetig/doctorate/programming/ara/DispRegressor_v1.pmml"/>
+	<property name="disp_rf_file" value="file:/home/mknoetig/doctorate/programming/ara/DispRegressor_v1.pmml"/>
 
-    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+    <property name="integral_gain_file" value="classpath:/default/defaultIntegralGains.csv" />
 
     <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
-    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
 
     <stream id="fact" class="fact.io.FITSStream" url="${infile}"/>
 
@@ -30,21 +30,21 @@
         <fact.datacorrection.DrsCalibration
                 url="${drsfile}"
                 key="Data"
-                outputKey="DataCalibrated"
+                outputKey="data_calibrated"
         />
         <fact.datacorrection.RemoveSpikes
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
+                dataKey="data_calibrated"
+                outputKey="data_calibrated"
                 startCellKey="StartCellData"
-                leftBorder="${removeSpikes_leftBorder}"
-                spikeLimit="${removeSpikes_spikeLimit}"
-                topSlopeLimit="${removeSpikes_topSlopeLimit}"
-                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+                leftBorder="${remove_spikes_left_border}"
+                spikeLimit="${remove_spikes_spike_limit}"
+                topSlopeLimit="${remove_spikes_top_slope_limit}"
+                maxSpikeLength="${remove_spikes_max_spike_length}"
         />
         <fact.datacorrection.InterpolateTimeSeries
-                calibService="calibService"
-                dataKey="DataCalibrated"
-                dataOutputKey="DataCalibrated"
+                calibService="calib_service"
+                dataKey="data_calibrated"
+                dataOutputKey="data_calibrated"
         />
         <!-- Output: DataCalibrated -->
 
@@ -52,79 +52,81 @@
         <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
         PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
         <fact.extraction.BasicExtraction
-                dataKey="DataCalibrated"
-                outputKeyMaxAmplPos="maxPos"
+                dataKey="data_calibrated"
+                outputKeyMaxAmplPos="max_pos"
                 outputKeyPhotonCharge="photoncharge"
-                url="${integralGainFile}"
-                startSearchWindow="${basicExtraction_startSearchWindow}"
-                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+                url="${integral_gain_file}"
+                startSearchWindow="${basic_extraction_start_search_window}"
+                rangeSearchWindow="${basic_extraction_range_search_window}"
+                rangeHalfHeightWindow="${basic_extraction_range_half_heigth_window}"
         />
         <fact.extraction.EstimateBaseline
-                dataKey="DataCalibrated"
+                dataKey="data_calibrated"
                 outputKey="baseline"
                 firstSlice="10"
                 range="30"
         />
         <fact.extraction.TimeOverThreshold
-                dataKey="DataCalibrated"
-                outputKey="timeOverThreshold"
-                firstSliceOverThresholdOutputKey="arrivalTimeTOT"
-                positionsKey="maxPos"
+                dataKey="data_calibrated"
+                outputKey="time_over_threshold"
+                firstSliceOverThresholdOutputKey="arrival_time_tot"
+                positionsKey="max_pos"
                 threshold="1800"
-                thresholdOutputKey="thresholdForToT"
+                thresholdOutputKey="threshold_for_tot"
         />
         <fact.datacorrection.CorrectSaturation
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                totKey="timeOverThreshold"
-                firstSliceOverThresholdKey="arrivalTimeTOT"
+                dataKey="data_calibrated"
+                outputKey="data_calibrated"
+                totKey="time_over_threshold"
+                firstSliceOverThresholdKey="arrival_time_tot"
                 threshold="1800"
-                maxPosKey="maxPos"
+                maxPosKey="max_pos"
                 baselineKey="baseline"
         />
         <fact.extraction.BasicExtraction
-                dataKey="DataCalibrated"
-                outputKeyMaxAmplPos="maxPos"
+                dataKey="data_calibrated"
+                outputKeyMaxAmplPos="max_pos"
                 outputKeyPhotonCharge="photoncharge"
-                url="${integralGainFile}"
-                startSearchWindow="${basicExtraction_startSearchWindow}"
-                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+                url="${integral_gain_file}"
+                startSearchWindow="${basic_extraction_start_search_window}"
+                rangeSearchWindow="${basic_extraction_range_search_window}"
+                rangeHalfHeightWindow="${basic_extraction_range_half_heigth_window}"
         />
         <fact.extraction.RisingEdgeForPositions
-                dataKey="DataCalibrated"
-                amplitudePositionsKey="maxPos"
-                outputKey="arrivalTimePos"
-                maxSlopesKey="maxSlopesPos"
+                dataKey="data_calibrated"
+                amplitudePositionsKey="max_pos"
+                outputKey="arrival_time_pos"
+                maxSlopesKey="max_slopes_pos"
         />
+
+
         <fact.extraction.RisingEdgePolynomFit
-                dataKey="DataCalibrated"
-                risingEdgeKey="arrivalTimePos"
-                outputKey="arrivalTime"
-                numberOfPoints="${risingEdgePolynomFit_numberOfPoints}"
-                maxSlopesKey="maxSlopes"
+                dataKey="data_calibrated"
+                risingEdgeKey="arrival_time_pos"
+                outputKey="arrival_time"
+                numberOfPoints="11"
+                maxSlopesKey="max_slopes"
         />
         <fact.datacorrection.InterpolatePhotondata
-                calibService="calibService"
+                calibService="calib_service"
                 photonChargeKey="photoncharge"
                 photonChargeOutputKey="photoncharge"
-                arrivalTimeKey="arrivalTime"
-                arrivalTimeOutputKey="arrivalTime"
+                arrivalTimeKey="arrival_time"
+                arrivalTimeOutputKey="arrival_time"
         />
         <!-- Output: photoncharge, arrivalTime -->
 
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
         <fact.cleaning.TwoLevelTimeNeighbor
-                calibService="calibService"
+                calibService="calib_service"
                 photonChargeKey="photoncharge"
                 outputKey="shower"
-                arrivalTimeKey="arrivalTime"
-                corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
-                neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
-                timeLimit="${twoLevelTimeNeighbor_timeLimit}"
-                minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
+                arrivalTimeKey="arrival_time"
+                corePixelThreshold="${two_level_time_neighbor_core_threshold}"
+                neighborPixelThreshold="${two_level_time_neighbor_neighbor_threshold}"
+                timeLimit="${two_level_time_neighbor_time_limit}"
+                minNumberOfPixel="${two_level_time_neighbor_min_number_of_pixel}"
         />
         <!-- Output: shower -->
 
@@ -137,9 +139,9 @@
         <Skip condition="%{data.shower} == null" />
         <fact.pixelsets.Length
                 pixelSetKey="shower"
-                outputKey="numPixelInShower"
+                outputKey="num_pixel_in_shower"
         />
-        <Skip condition="%{data.numPixelInShower} &lt; 5" />
+        <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
 
         <fact.statistics.ArrayMean
                 key="photoncharge"
@@ -151,7 +153,7 @@
         />
         <fact.statistics.ArrayStatistics
                 key="photoncharge"
-                outputKey="phChargeShower"
+                outputKey="ph_charge_shower"
                 pixelSetKey="shower"
         />
         <fact.statistics.ArrayStatistics
@@ -182,84 +184,84 @@
         <fact.features.DistributionFromShower
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
-                outputKey="showerDistribution"
-                m3longKey="M3Long"
-                m3transKey="M3Trans"
-                m4longKey="M4Long"
-                m4transKey="M4Trans"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                lengthKey="Length"
-                widthKey="Width"
-                deltaKey="Delta"
-                numIslandsKey = "numIslands"
-                sizeKey="Size"
+                outputKey="shower_distribution"
+                m3longKey="m3_long"
+                m3transKey="m3_trans"
+                m4longKey="m4_long"
+                m4transKey="m4_trans"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                lengthKey="length"
+                widthKey="width"
+                deltaKey="delta"
+                sizeKey="size"
                 c0="117.94"
-                dispKey="Disp"
+                dispKey="disp"
         />
+
         <fact.features.TimeGradient
                 pixelSetKey="shower"
-                arrivalTimeKey="arrivalTime"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKeySlope="timeGradientSlope"
-                outputKeyIntercept="timeGradientIntercept"
-                outputKeySumSquaredErrors="timeGradientSSE"
+                arrivalTimeKey="arrival_time"
+                cogxKey="cog_y"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKeySlope="time_gradient_slope"
+                outputKeyIntercept="time_gradient_intercept"
+                outputKeySumSquaredErrors="time_gradient_sse"
         />
         <fact.features.Concentration
                 weights="photoncharge"
                 pixelSetKey="shower"
-                concOneOutputKey="Concentration_onePixel"
-                concTwoOutputKey="Concentration_twoPixel"
+                concOneOutputKey="concentration_one_pixel"
+                concTwoOutputKey="concentration_two_pixel"
         />
         <fact.features.ConcentrationCore
-                cogxKey="COGx"
-                cogyKey="COGy"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
                 pixelSetKey="shower"
                 photonChargeKey="photoncharge"
-                sizeKey="Size"
-                widthKey="Width"
-                lengthKey="Length"
-                deltaKey="Delta"
-                outputKey="ConcCore"
+                sizeKey="size"
+                widthKey="width"
+                lengthKey="length"
+                deltaKey="delta"
+                outputKey="conc_core"
         />
         <fact.features.ConcentrationAtCenterOfGravity
                 photonChargeKey="photoncharge"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                sizeKey="Size"
-                outputKey="concCOG"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                sizeKey="size"
+                outputKey="conc_cog"
         />
         <fact.features.Leakage
-                distribution="showerDistribution"
+                distribution="shower_distribution"
                 pixelSetKey="shower"
                 weights="photoncharge"
-                leakage1OutputKey="Leakage"
-                leakage2OutputKey="Leakage2"
+                leakage1OutputKey="leakage"
+                leakage2OutputKey="leakage2"
         />
         <fact.features.TimeSpread
                 weightsKey="photoncharge"
-                arrivalTimeKey="arrivalTime"
+                arrivalTimeKey="arrival_time"
                 pixelSetKey="shower"
-                outputKey="Timespread"
+                outputKey="timespread"
         />
         <fact.features.ShowerSlope
                 photonChargeKey="photoncharge"
-                arrivalTimeKey="arrivalTime"
+                arrivalTimeKey="arrival_time"
                 pixelSetKey="shower"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                slopeLongOutputKey="Slope_long"
-                slopeTransOutputKey="Slope_trans"
-                slopeSpreadOutputKey="Slope_spread"
-                slopeSpreadWeightedOutputKey="Slope_spread_weighted"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                slopeLongOutputKey="slope_long"
+                slopeTransOutputKey="slope_trans"
+                slopeSpreadOutputKey="slope_spread"
+                slopeSpreadWeightedOutputKey="slope_spread_weighted"
         />
         <!-- Output: source independent parameters -->
 
         <!-- test the pmml file implementation -->
-        <fact.ApplyModel url="${dispRFfile}" />
+        <fact.ApplyModel url="${disp_rf_file}" />
 
         <!-- Parameter calculation (only source dependent) -->
         <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
@@ -471,7 +473,7 @@
         />
         <!-- Output: source dependent parameters -->
 
-         <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
+         <fact.io.PrintKeysOnConsole keys="${keys_for_output}" />
 
         <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
 

@@ -1,13 +1,13 @@
 <container>
 
-	<properties url="classpath:/default/settings.properties" />
+    <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
     <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
-  	<property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
 
-    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
-    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    <property name="integral_gain_file" value="classpath:/default/defaultIntegralGains.csv" />
+    <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
 
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.FITSStream" url="${infile}"/>
@@ -24,109 +24,109 @@
         <fact.datacorrection.DrsCalibration
                 url="${drsfile}"
                 key="Data"
-                outputKey="DataCalibrated"
+                outputKey="data_calibrated"
         />
         <fact.datacorrection.RemoveSpikes
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
+                dataKey="data_calibrated"
+                outputKey="data_calibrated"
                 startCellKey="StartCellData"
-                leftBorder="${removeSpikes_leftBorder}"
-                spikeLimit="${removeSpikes_spikeLimit}"
-                topSlopeLimit="${removeSpikes_topSlopeLimit}"
-                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+                leftBorder="${remove_spikes_left_border}"
+                spikeLimit="${remove_spikes_spike_limit}"
+                topSlopeLimit="${remove_spikes_top_slope_limit}"
+                maxSpikeLength="${remove_spikes_max_spike_length}"
         />
         <fact.datacorrection.InterpolateTimeSeries
-                calibService="calibService"
-                dataKey="DataCalibrated"
-                dataOutputKey="DataCalibrated"
+                calibService="calib_service"
+                dataKey="data_calibrated"
+                dataOutputKey="data_calibrated"
         />
         <fact.extraction.BasicExtraction
-                dataKey="DataCalibrated"
-                outputKeyMaxAmplPos="maxPos"
+                dataKey="data_calibrated"
+                outputKeyMaxAmplPos="max_pos"
                 outputKeyPhotonCharge="photoncharge"
-                url="${integralGainFile}"
-                startSearchWindow="${basicExtraction_startSearchWindow}"
-                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+                url="${integral_gain_file}"
+                startSearchWindow="${basic_extraction_start_search_window}"
+                rangeSearchWindow="${basic_extraction_range_search_window}"
+                rangeHalfHeightWindow="${basic_extraction_range_half_heigth_window}"
         />
         <fact.extraction.EstimateBaseline
-                dataKey="DataCalibrated"
+                dataKey="data_calibrated"
                 outputKey="baseline"
                 firstSlice="10"
                 range="30"
         />
         <fact.extraction.TimeOverThreshold
-                dataKey="DataCalibrated"
-                outputKey="timeOverThreshold"
-                firstSliceOverThresholdOutputKey="arrivalTimeTOT"
-                positionsKey="maxPos"
+                dataKey="data_calibrated"
+                outputKey="time_over_threshold"
+                firstSliceOverThresholdOutputKey="arrival_time_tot"
+                positionsKey="max_pos"
                 threshold="1800"
-                thresholdOutputKey="thresholdForToT"
+                thresholdOutputKey="threshold_for_tot"
         />
         <fact.datacorrection.CorrectSaturation
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                totKey="timeOverThreshold"
-                firstSliceOverThresholdKey="arrivalTimeTOT"
+                dataKey="data_calibrated"
+                outputKey="data_calibrated"
+                totKey="time_over_threshold"
+                firstSliceOverThresholdKey="arrival_time_tot"
                 threshold="1800"
-                maxPosKey="maxPos"
+                maxPosKey="max_pos"
                 baselineKey="baseline"
         />
         <fact.extraction.BasicExtraction
-                dataKey="DataCalibrated"
-                outputKeyMaxAmplPos="maxPos"
+                dataKey="data_calibrated"
+                outputKeyMaxAmplPos="max_pos"
                 outputKeyPhotonCharge="photoncharge"
-                url="${integralGainFile}"
-                startSearchWindow="${basicExtraction_startSearchWindow}"
-                rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
-                rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+                url="${integral_gain_file}"
+                startSearchWindow="${basic_extraction_start_search_window}"
+                rangeSearchWindow="${basic_extraction_range_search_window}"
+                rangeHalfHeightWindow="${basic_extraction_range_half_heigth_window}"
         />
         <fact.extraction.RisingEdgeForPositions
-                dataKey="DataCalibrated"
-                amplitudePositionsKey="maxPos"
-                outputKey="arrivalTimePos"
-                maxSlopesKey="maxSlopesPos"
+                dataKey="data_calibrated"
+                amplitudePositionsKey="max_pos"
+                outputKey="arrival_time_pos"
+                maxSlopesKey="max_slopes_pos"
         />
         <fact.extraction.RisingEdgePolynomFit
-                dataKey="DataCalibrated"
-                risingEdgeKey="arrivalTimePos"
-                outputKey="arrivalTime"
-                numberOfPoints="${risingEdgePolynomFit_numberOfPoints}"
-                maxSlopesKey="maxSlopes"
+                dataKey="data_calibrated"
+                risingEdgeKey="arrival_time_pos"
+                outputKey="arrival_time"
+                numberOfPoints="${rising_edge_polynom_fit_number_of_points}"
+                maxSlopesKey="max_slopes"
         />
         <fact.datacorrection.InterpolatePhotondata
-                calibService="calibService"
+                calibService="calib_service"
                 photonChargeKey="photoncharge"
                 photonChargeOutputKey="photoncharge"
-                arrivalTimeKey="arrivalTime"
-                arrivalTimeOutputKey="arrivalTime"
+                arrivalTimeKey="arrival_time"
+                arrivalTimeOutputKey="arrival_time"
         />
 
         <fact.cleaning.TwoLevelTimeNeighbor
-            calibService="calibService"
-            photonChargeKey="photoncharge"
-            outputKey="shower"
-            arrivalTimeKey="arrivalTime"
-            corePixelThreshold="4.0"
-            neighborPixelThreshold="2.0"
-            timeLimit="6"
-            minNumberOfPixel="2"
+                calibService="calib_service"
+                photonChargeKey="photoncharge"
+                outputKey="shower"
+                arrivalTimeKey="arrival_time"
+                corePixelThreshold="4.0"
+                neighborPixelThreshold="2.0"
+                timeLimit="6"
+                minNumberOfPixel="2"
         />
 
         <Skip condition="%{data.shower} == null" />
 
         <fact.features.muon.CircularFit />
         <fact.features.muon.GaussianFit
-          startXKey="circFitX"
-          startYKey="circFitY"
-          startRKey="circFitR"
-          />
+                startXKey="circ_fit_x"
+                startYKey="circ_fit_y"
+                startRKey="circ_fit_r"
+        />
 
         <!--<fact.io.JSONWriter-->
-          <!--keys="*R,*X,*Y,*Sigma"-->
-          <!--url="file:test.json"-->
-          <!--specialDoubleValuesAsString="true"-->
-          <!--doubleSignDigits="6"-->
-          <!--/>-->
+        <!--keys="*R,*X,*Y,*Sigma"-->
+        <!--url="file:test.json"-->
+        <!--specialDoubleValuesAsString="true"-->
+        <!--doubleSignDigits="6"-->
+        <!--/>-->
     </process>
 </container>

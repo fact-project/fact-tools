@@ -3,45 +3,45 @@
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.FITSStream" url="${infile}" />
   <!-- Description of the process and the corresponding stream -->
   <process input="fact" copies="1">
-    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
+    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prev_events" limitEvents="10" />
     <fact.datacorrection.DrsCalibration
             url="${drsfile}"
             key="Data"
-            outputKey="DataCalibrated"
+            outputKey="data_calibrated"
     />
     <fact.datacorrection.PatchJumpRemoval
-            dataKey="DataCalibrated"
-            outputKey="DataCalibrated"
-            prevEventsKey="prevEvents"
+            dataKey="data_calibrated"
+            outputKey="data_calibrated"
+            prevEventsKey="prev_events"
             startCellKey="StartCellData"
-            jumpLimit="${patchJumpRemoval_jumpLimit}"
+            jumpLimit="${patch_jump_removal_jump_limit}"
     />
     <fact.datacorrection.RemoveSpikes
-            dataKey="DataCalibrated"
-            outputKey="DataCalibrated"
+            dataKey="data_calibrated"
+            outputKey="data_calibrated"
             startCellKey="StartCellData"
-            leftBorder="${removeSpikes_leftBorder}"
-            spikeLimit="${removeSpikes_spikeLimit}"
-            topSlopeLimit="${removeSpikes_topSlopeLimit}"
-            maxSpikeLength="${removeSpikes_maxSpikeLength}"
+            leftBorder="${remove_spikes_left_border}"
+            spikeLimit="${remove_spikes_spike_limit}"
+            topSlopeLimit="${remove_spikes_top_slope_limit}"
+            maxSpikeLength="${remove_spikes_max_spike_length}"
     />
     <fact.filter.DrsTimeCalibration
-            outputKey="timeCalibConst"
+            outputKey="time_calib_const"
     />
     <fact.filter.ArrayTimeCorrection
-            dataKey="DataCalibrated"
-            timeCalibConstKey="timeCalibConst"
-            outputKey="DataCalibrated"
+            dataKey="data_calibrated"
+            timeCalibConstKey="time_calib_const"
+            outputKey="data_calibrated"
     />
     <fact.datacorrection.InterpolateTimeSeries
-            calibService="calibService"
-            dataKey="DataCalibrated"
-            dataOutputKey="DataCalibrated"
+            calibService="calib_service"
+            dataKey="data_calibrated"
+            dataOutputKey="data_calibrated"
     />
   </process>
 </container>
