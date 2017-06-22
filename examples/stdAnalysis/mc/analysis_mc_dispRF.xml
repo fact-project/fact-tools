@@ -143,11 +143,11 @@
 
         <fact.statistics.ArrayMean
                 key="photoncharge"
-                outputKey="photonchargeMean"
+                outputKey="photoncharge_mean"
         />
         <fact.statistics.ArrayMean
-                key="arrivalTime"
-                outputKey="arrivalTimeMean"
+                key="arrival_time"
+                outputKey="arrival_time_mean"
         />
         <fact.statistics.ArrayStatistics
                 key="photoncharge"
@@ -155,59 +155,47 @@
                 pixelSetKey="shower"
         />
         <fact.statistics.ArrayStatistics
-                key="arrivalTime"
-                outputKey="arrTimeShower"
+                key="arrival_time"
+                outputKey="arr_time_shower"
                 pixelSetKey="shower"
         />
         <fact.statistics.ArrayStatistics
-                key="maxSlopes"
-                outputKey="maxSlopesShower"
+                key="max_slopes"
+                outputKey="max_slopes_shower"
                 pixelSetKey="shower"
         />
         <fact.statistics.ArrayStatistics
-                key="arrivalTimePos"
-                outputKey="arrTimePosShower"
+                key="arrival_time_pos"
+                outputKey="arr_time_pos_shower"
                 pixelSetKey="shower"
         />
         <fact.statistics.ArrayStatistics
-                key="maxSlopesPos"
-                outputKey="maxSlopesPosShower"
+                key="max_slopes_pos"
+                outputKey="max_slopes_pos_shower"
                 pixelSetKey="shower"
         />
         <fact.statistics.ArrayStatistics
-                key="maxPos"
-                outputKey="maxPosShower"
+                key="max_pos"
+                outputKey="max_pos_shower"
                 pixelSetKey="shower"
-        />
-        <fact.features.Size
-                pixelSetKey="shower"
-                photonChargeKey="photoncharge"
-                outputKey="Size"
         />
         <fact.features.DistributionFromShower
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
-                sizeKey="Size"
                 outputKey="showerDistribution"
-        />
-        <fact.features.M3Long
-                weightsKey="photoncharge"
-                pixelSetKey="shower"
-                distributionKey="showerDistribution"
-                m3lOutputKey="m3l"
-                m3tOutputKey="m3t"
-        />
-        <fact.features.Length
-                distribution="showerDistribution"
-                outputKey="Length"
-        />
-        <fact.features.Width
-                distribution="showerDistribution"
-                outputKey="Width"
-        />
-        <fact.features.NumberOfIslands
-                pixelSetKey="shower"
-                outputKey="numIslands"
+                m3longKey="M3Long"
+                m3transKey="M3Trans"
+                m4longKey="M4Long"
+                m4transKey="M4Trans"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                lengthKey="Length"
+                widthKey="Width"
+                deltaKey="Delta"
+                numIslandsKey = "numIslands"
+                sizeKey="Size"
+                c0="117.94"
+                dispKey="Disp"
         />
         <fact.features.TimeGradient
                 pixelSetKey="shower"
@@ -284,202 +272,202 @@
                 sourceAzKey="MSimSourcePos.fAz"
         />
         <fact.features.source.AntiSourcePosition
-                sourcePositionKey="sourcePosition"
+                sourcePositionKey="source_position"
                 numberOfAntiSourcePositions="5"
                 antiSourcePositionId="1"
-                outputKey="antiSourcePosition_1"
+                outputKey="anti_source_position_1"
         />
         <fact.features.source.AntiSourcePosition
-                sourcePositionKey="sourcePosition"
+                sourcePositionKey="source_position"
                 numberOfAntiSourcePositions="5"
                 antiSourcePositionId="2"
-                outputKey="antiSourcePosition_2"
+                outputKey="anti_source_position_2"
         />
         <fact.features.source.AntiSourcePosition
-                sourcePositionKey="sourcePosition"
+                sourcePositionKey="source_position"
                 numberOfAntiSourcePositions="5"
                 antiSourcePositionId="3"
-                outputKey="antiSourcePosition_3"
+                outputKey="anti_source_position_3"
         />
         <fact.features.source.AntiSourcePosition
-                sourcePositionKey="sourcePosition"
+                sourcePositionKey="source_position"
                 numberOfAntiSourcePositions="5"
                 antiSourcePositionId="4"
-                outputKey="antiSourcePosition_4"
+                outputKey="anti_source_position_4"
         />
         <fact.features.source.AntiSourcePosition
-                sourcePositionKey="sourcePosition"
+                sourcePositionKey="source_position"
                 numberOfAntiSourcePositions="5"
                 antiSourcePositionId="5"
-                outputKey="antiSourcePosition_5"
+                outputKey="anti_source_position_5"
         />
         <fact.features.source.Alpha
-                distribution="showerDistribution"
-                sourcePosition="sourcePosition"
-                outputKey="Alpha"
+                distribution="shower_distribution"
+                sourcePosition="source_position"
+                outputKey="alpha"
         />
         <fact.features.source.Distance
-                distribution="showerDistribution"
-                sourcePosition="sourcePosition"
-                outputKey="Distance"
+                distribution="shower_distribution"
+                sourcePosition="source_position"
+                outputKey="distance"
         />
         <fact.features.source.Alpha
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_1"
-                outputKey="Alpha_Off_1"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_1"
+                outputKey="alpha_off_1"
         />
         <fact.features.source.Distance
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_1"
-                outputKey="Distance_Off_1"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_1"
+                outputKey="distance_off_1"
         />
         <fact.features.source.Alpha
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_2"
-                outputKey="Alpha_Off_2"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_2"
+                outputKey="alpha_off_2"
         />
         <fact.features.source.Distance
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_2"
-                outputKey="Distance_Off_2"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_2"
+                outputKey="distance_off_2"
         />
         <fact.features.source.Alpha
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_3"
-                outputKey="Alpha_Off_3"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_3"
+                outputKey="alpha_off_3"
         />
         <fact.features.source.Distance
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_3"
-                outputKey="Distance_Off_3"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_3"
+                outputKey="distance_off_3"
         />
         <fact.features.source.Alpha
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_4"
-                outputKey="Alpha_Off_4"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_4"
+                outputKey="alpha_off_4"
         />
         <fact.features.source.Distance
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_4"
-                outputKey="Distance_Off_4"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_4"
+                outputKey="distance_off_4"
         />
         <fact.features.source.Alpha
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_5"
-                outputKey="Alpha_Off_5"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_5"
+                outputKey="alpha_off_5"
         />
         <fact.features.source.Distance
-                distribution="showerDistribution"
-                sourcePosition="antiSourcePosition_5"
-                outputKey="Distance_Off_5"
+                distribution="shower_distribution"
+                sourcePosition="anti_source_position_5"
+                outputKey="distance_off_5"
         />
         <fact.features.source.CosDeltaAlpha
-                sourcePositionKey="sourcePosition"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKey="CosDeltaAlpha"
+                sourcePositionKey="source_position"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKey="cos_delta_alpha"
         />
         <fact.features.source.CosDeltaAlpha
-                sourcePositionKey="antiSourcePosition_1"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKey="CosDeltaAlpha_Off_1"
+                sourcePositionKey="anti_source_position_1"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKey="cos_delta_alpha_off_1"
         />
         <fact.features.source.CosDeltaAlpha
-                sourcePositionKey="antiSourcePosition_2"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKey="CosDeltaAlpha_Off_2"
+                sourcePositionKey="anti_source_position_2"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKey="cos_delta_alpha_off_2"
         />
         <fact.features.source.CosDeltaAlpha
-                sourcePositionKey="antiSourcePosition_3"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKey="CosDeltaAlpha_Off_3"
+                sourcePositionKey="anti_source_position_3"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKey="cos_delta_alpha_off_3"
         />
         <fact.features.source.CosDeltaAlpha
-                sourcePositionKey="antiSourcePosition_4"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKey="CosDeltaAlpha_Off_4"
+                sourcePositionKey="anti_source_position_4"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKey="cos_delta_alpha_off_4"
         />
         <fact.features.source.CosDeltaAlpha
-                sourcePositionKey="antiSourcePosition_5"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                outputKey="CosDeltaAlpha_Off_5"
+                sourcePositionKey="anti_source_position_5"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                outputKey="cos_delta_alpha_off_5"
         />
         <fact.features.source.Theta
-                sourcePositionKey="sourcePosition"
-                dispKey="Disp"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                m3lKey="m3l"
-                cosDeltaAlphaKey="CosDeltaAlpha"
+                sourcePositionKey="source_position"
+                dispKey="disp"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                m3lKey="m3_long"
+                cosDeltaAlphaKey="cos_delta_alpha"
                 signM3lConstant="-200"
-                outputKey="Theta"
+                outputKey="theta"
         />
         <fact.features.source.Theta
-                sourcePositionKey="antiSourcePosition_1"
-                dispKey="Disp"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                m3lKey="m3l"
-                cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
+                sourcePositionKey="anti_source_position_1"
+                dispKey="disp"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                m3lKey="m3_long"
+                cosDeltaAlphaKey="cos_delta_alpha_off_1"
                 signM3lConstant="-200"
-                outputKey="Theta_Off_1"
+                outputKey="theta_off_1"
         />
         <fact.features.source.Theta
-                sourcePositionKey="antiSourcePosition_2"
-                dispKey="Disp"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                m3lKey="m3l"
-                cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
+                sourcePositionKey="anti_source_position_2"
+                dispKey="disp"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                m3lKey="m3_long"
+                cosDeltaAlphaKey="cos_delta_alpha_off_2"
                 signM3lConstant="-200"
-                outputKey="Theta_Off_2"
+                outputKey="theta_off_2"
         />
         <fact.features.source.Theta
-                sourcePositionKey="antiSourcePosition_3"
-                dispKey="Disp"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                m3lKey="m3l"
-                cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
+                sourcePositionKey="anti_source_position_3"
+                dispKey="disp"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                m3lKey="m3_long"
+                cosDeltaAlphaKey="cos_delta_alpha_off_3"
                 signM3lConstant="-200"
-                outputKey="Theta_Off_3"
+                outputKey="theta_off_3"
         />
         <fact.features.source.Theta
-                sourcePositionKey="antiSourcePosition_4"
-                dispKey="Disp"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                m3lKey="m3l"
-                cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
+                sourcePositionKey="anti_source_position_4"
+                dispKey="disp"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                m3lKey="m3_long"
+                cosDeltaAlphaKey="cos_delta_alpha_off_4"
                 signM3lConstant="-200"
-                outputKey="Theta_Off_4"
+                outputKey="theta_off_4"
         />
         <fact.features.source.Theta
-                sourcePositionKey="antiSourcePosition_5"
-                dispKey="Disp"
-                cogxKey="COGx"
-                cogyKey="COGy"
-                deltaKey="Delta"
-                m3lKey="m3l"
-                cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
+                sourcePositionKey="anti_source_position_5"
+                dispKey="disp"
+                cogxKey="cog_x"
+                cogyKey="cog_y"
+                deltaKey="delta"
+                m3lKey="m3_long"
+                cosDeltaAlphaKey="cos_delta_alpha_off_5"
                 signM3lConstant="-200"
-                outputKey="Theta_Off_5"
+                outputKey="theta_off_5"
         />
         <!-- Output: source dependent parameters -->
 

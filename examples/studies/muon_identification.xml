@@ -8,7 +8,7 @@
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxpath" value="file:src/main/resources/aux/" />
-    
+
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxpath}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -164,110 +164,111 @@
     <Skip condition="%{data.NumPixelAfterCleaning} &lt; 15" />
 
     <fact.features.DistributionFromShower
-      weightsKey="photoncharge"
-      pixelSetKey="shower"
-      sizeKey="Size"
-      outputKey="showerDistribution"
+            weightsKey="photoncharge"
+            pixelSetKey="shower"
+            outputKey="showerDistribution"
+            m3longKey="M3Long"
+            m3transKey="M3Trans"
+            m4longKey="M4Long"
+            m4transKey="M4Trans"
+            cogxKey="COGx"
+            cogyKey="COGy"
+            lengthKey="Length"
+            widthKey="Width"
+            deltaKey="Delta"
+            numIslandsKey = "numIslands"
+            sizeKey="Size"
+            c0="117.94"
+            dispKey="Disp"
     />
 
     <fact.statistics.ArrayStatistics
-      key="photoncharge"
-      outputKey="photonchargeStatistics"
+            key="photoncharge"
+            outputKey="photonchargeStatistics"
     />
     <fact.statistics.ArrayStatistics
-      key="arrivalTime"
-      outputKey="arrivalTimeStatistics"
+            key="arrivalTime"
+            outputKey="arrivalTimeStatistics"
     />
 
     <fact.statistics.ArrayStatistics
-      key="photoncharge"
-      outputKey="photonchargeCleaningStatistics"
-      pixelSetKey="shower"
+            key="photoncharge"
+            outputKey="photonchargeCleaningStatistics"
+            pixelSetKey="shower"
     />
     <fact.statistics.ArrayStatistics
-      key="arrivalTime"
-      outputKey="arrivalTimeCleaningStatistics"
-      pixelSetKey="shower"
+            key="arrivalTime"
+            outputKey="arrivalTimeCleaningStatistics"
+            pixelSetKey="shower"
     />
 
-    <fact.features.NumberOfIslands
-      pixelSetKey="shower"
-      outputKey="numIslands"
-    />
-
-    <fact.features.Size
-      pixelSetKey="shower"
-      photonChargeKey="photoncharge"
-      outputKey="Size"
-    />   
-
-    <fact.features.Concentration 
-      weights="photoncharge"
-      pixelSetKey="shower"
-      concOneOutputKey="conc1"
-      concTwoOutputKey="conc2"
+    <fact.features.Concentration
+            weights="photoncharge"
+            pixelSetKey="shower"
+            concOneOutputKey="conc1"
+            concTwoOutputKey="conc2"
     />
 
     <fact.features.ConcentrationCore
-      cogxKey="COGx"
-      cogyKey="COGy"
-      pixelSetKey="shower"
-      photonChargeKey="photoncharge"
-      sizeKey="Size"
-      widthKey="Width"
-      lengthKey="Length"
-      deltaKey="Delta"
-      outputKey="ConcCore"
+            cogxKey="COGx"
+            cogyKey="COGy"
+            pixelSetKey="shower"
+            photonChargeKey="photoncharge"
+            sizeKey="Size"
+            widthKey="Width"
+            lengthKey="Length"
+            deltaKey="Delta"
+            outputKey="ConcCore"
     />
     <fact.features.ConcentrationAtCenterOfGravity
-      photonChargeKey="photoncharge"
-      cogxKey="COGx"
-      cogyKey="COGy"
-      sizeKey="Size"
-      outputKey="concCOG"
+            photonChargeKey="photoncharge"
+            cogxKey="COGx"
+            cogyKey="COGy"
+            sizeKey="Size"
+            outputKey="concCOG"
     />
     <fact.features.Leakage
-      distribution="showerDistribution"
-      pixelSetKey="shower"
-      weights="photoncharge"
-      leakage1OutputKey="Leakage"
-      leakage2OutputKey="Leakage2"
+            distribution="showerDistribution"
+            pixelSetKey="shower"
+            weights="photoncharge"
+            leakage1OutputKey="Leakage"
+            leakage2OutputKey="Leakage2"
     />
-                    
+
     <fact.features.muon.HoughTransform
-      showRingKey="false"  
-      showMatrixKey="false"
-      photonChargeKey="photoncharge"
-      bestCircleKey="bestRing"
-      pixelSetKey="shower" 
-      peaknessKey="houghPeakness"
-      cleaningPercentageKey="houghCleaningPercentage"
-      ringPercentageKey="houghRingPercentage"
-      distanceKey="houghDistance"
-      octantsHitKey="houghOctantsHit"
-      bestRingPixelKey="bestRingPixel"
-      bestRadiusKey="bestR" 
-      bestXKey="bestX"
-      bestYKey="bestY"
+            showRingKey="false"
+            showMatrixKey="false"
+            photonChargeKey="photoncharge"
+            bestCircleKey="bestRing"
+            pixelSetKey="shower"
+            peaknessKey="houghPeakness"
+            cleaningPercentageKey="houghCleaningPercentage"
+            ringPercentageKey="houghRingPercentage"
+            distanceKey="houghDistance"
+            octantsHitKey="houghOctantsHit"
+            bestRingPixelKey="bestRingPixel"
+            bestRadiusKey="bestR"
+            bestXKey="bestX"
+            bestYKey="bestY"
     />
 
     <fact.features.source.SourcePosition
-      outputKey="sourcePosition"
-      auxService="auxService"
+            outputKey="sourcePosition"
+            auxService="auxService"
     />
 
     <fact.features.source.Distance
-      distribution="showerDistribution"
-      sourcePosition="sourcePosition"
-      outputKey="Distance"
+            distribution="showerDistribution"
+            sourcePosition="sourcePosition"
+            outputKey="Distance"
     />
 
     <fact.features.muon.CircularFit />
-    <fact.features.muon.GaussianFit 
-      startXKey="circFitX"
-      startYKey="circFitY"
-      startRKey="circFitR"
-      />
+    <fact.features.muon.GaussianFit
+            startXKey="circFitX"
+            startYKey="circFitY"
+            startRKey="circFitR"
+    />
 
     <fact.features.muon.RingStandardDeviationWithThreshold threshold="8" />
 

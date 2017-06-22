@@ -438,35 +438,23 @@
                 outputKey="maxPosShower"
                 pixelSetKey="shower"
         />
-        <fact.features.Size
-                pixelSetKey="shower"
-                photonChargeKey="photoncharge"
-                outputKey="Size"
-        />
         <fact.features.DistributionFromShower
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
-                sizeKey="Size"
                 outputKey="showerDistribution"
-        />
-        <fact.features.M3Long
-                weightsKey="photoncharge"
-                pixelSetKey="shower"
-                distributionKey="showerDistribution"
-                m3lOutputKey="m3l"
-                m3tOutputKey="m3t"
-        />
-        <fact.features.Length
-                distribution="showerDistribution"
-                outputKey="Length"
-        />
-        <fact.features.Width
-                distribution="showerDistribution"
-                outputKey="Width"
-        />
-        <fact.features.NumberOfIslands
-                pixelSetKey="shower"
-                outputKey="numIslands"
+                m3longKey="M3Long"
+                m3transKey="M3Trans"
+                m4longKey="M4Long"
+                m4transKey="M4Trans"
+                cogxKey="COGx"
+                cogyKey="COGy"
+                lengthKey="Length"
+                widthKey="Width"
+                deltaKey="Delta"
+                numIslandsKey = "numIslands"
+                sizeKey="Size"
+                c0="117.94"
+                dispKey="Disp"
         />
         <fact.features.TimeGradient
                 pixelSetKey="shower"
@@ -526,12 +514,6 @@
                 slopeTransOutputKey="Slope_trans"
                 slopeSpreadOutputKey="Slope_spread"
                 slopeSpreadWeightedOutputKey="Slope_spread_weighted"
-        />
-        <fact.features.Disp
-                widthKey="Width"
-                lengthKey="Length"
-                c0="117.94"
-                outputKey="Disp"
         />
         <!-- Output: source independent parameters -->
 
@@ -695,7 +677,7 @@
                 cogxKey="COGx"
                 cogyKey="COGy"
                 deltaKey="Delta"
-                m3lKey="m3l"
+                m3lKey="M3Long"
                 cosDeltaAlphaKey="CosDeltaAlpha"
                 signM3lConstant="-200"
                 outputKey="Theta"
@@ -706,7 +688,7 @@
                 cogxKey="COGx"
                 cogyKey="COGy"
                 deltaKey="Delta"
-                m3lKey="m3l"
+                m3lKey="M3Long"
                 cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
                 signM3lConstant="-200"
                 outputKey="Theta_Off_1"
@@ -717,7 +699,7 @@
                 cogxKey="COGx"
                 cogyKey="COGy"
                 deltaKey="Delta"
-                m3lKey="m3l"
+                m3lKey="M3Long"
                 cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
                 signM3lConstant="-200"
                 outputKey="Theta_Off_2"
@@ -728,7 +710,7 @@
                 cogxKey="COGx"
                 cogyKey="COGy"
                 deltaKey="Delta"
-                m3lKey="m3l"
+                m3lKey="M3Long"
                 cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
                 signM3lConstant="-200"
                 outputKey="Theta_Off_3"
@@ -739,7 +721,7 @@
                 cogxKey="COGx"
                 cogyKey="COGy"
                 deltaKey="Delta"
-                m3lKey="m3l"
+                m3lKey="M3Long"
                 cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
                 signM3lConstant="-200"
                 outputKey="Theta_Off_4"
@@ -750,7 +732,7 @@
                 cogxKey="COGx"
                 cogyKey="COGy"
                 deltaKey="Delta"
-                m3lKey="m3l"
+                m3lKey="M3Long"
                 cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
                 signM3lConstant="-200"
                 outputKey="Theta_Off_5"

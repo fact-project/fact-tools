@@ -44,11 +44,22 @@ public class DistributionFromShower implements Processor {
 	private String widthKey = "Width";
 	@Parameter(required = false, defaultValue="Delta")
 	private String deltaKey = "Delta";
+	@Parameter(required=true, defaultValue="117.94")
+	private double c0 = 117.94;
+	@Parameter(required = false, defaultValue="numIslands")
+	private String numIslandsKey = "numIslands";
+	@Parameter(required = false, defaultValue="Size")
+	private String sizeKey = "Size";
+	@Parameter(required = false, defaultValue="Disp")
+	private String dispKey = "Disp";
 
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	// A logger
 	static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
+
+
+	double sumWeights = 0;
 
 	@Override
 	public Data process(Data input) {
@@ -57,6 +68,9 @@ public class DistributionFromShower implements Processor {
 		// original input.
 
 		if (!input.containsKey(pixelSetKey)) {
+			input.put("@size", 0);
+			input.put(sizeKey, 0);
+			input.put(numIslandsKey, 0);
 			return input;
 		}
 
@@ -132,21 +146,30 @@ public class DistributionFromShower implements Processor {
 			maxTransCoord = Math.max(maxTransCoord, l);
 		}
 
+
 		double m3Long = calculateMoment(3, 0, longitudinalCoords, showerWeights);
-		m3Long /= Math.pow(length, 3);
+		m3Long*=sumWeights;
 		double m3Trans = calculateMoment(3, 0, transversalCoords, showerWeights);
-		m3Trans /= Math.pow(width, 3);
+		m3Long*=sumWeights;
 
 		double m4Long = calculateMoment(4, 0, longitudinalCoords, showerWeights);
 		m4Long /= Math.pow(length, 4);
 		double m4Trans = calculateMoment(4, 0, transversalCoords, showerWeights);
 		m4Trans /= Math.pow(width, 4);
 
+
 		PixelDistribution2D dist = new PixelDistribution2D(
 				covarianceMatrix.getEntry(0, 0),
 				covarianceMatrix.getEntry(1, 1),
 				covarianceMatrix.getEntry(0, 1), cog[0], cog[1], varianceLong,
-				varianceTrans, m3Long, m3Trans, m4Long, m4Trans, delta, size);
+				varianceTrans, m3Long/ Math.pow(length, 3), m3Trans/Math.pow(width, 3), m4Long, m4Trans, delta, size);
+
+		m3Long = Math.cbrt(m3Long);
+		m3Trans = Math.cbrt(m3Trans);
+
+		double disp = c0 * (1 - width / length);
+
+		int numIslands = Utils.breadthFirstSearch(showerPixel.toArrayList()).size();
 
 		// add calculated shower parameters to data item
 		input.put(outputKey, dist);
@@ -158,16 +181,21 @@ public class DistributionFromShower implements Processor {
 		input.put(cogyKey, cog[1]);
 		input.put(lengthKey, length);
 		input.put(widthKey, width);
+		input.put(numIslandsKey, numIslands);
 		input.put(deltaKey, delta);
+		input.put(sizeKey, size);
+		input.put("@size", size);
 
 		double[] center = calculateCenter(showerPixel);
-		input.put("2-sigma-ellipse", new EllipseOverlay(center[0], center[1], 2*width,
+		input.put("2_sigma_ellipse", new EllipseOverlay(center[0], center[1], 2*width,
 				2*length, delta));
-		input.put("1-sigma-ellipse", new EllipseOverlay(center[0], center[1], width,
+		input.put("1_sigma_ellipse", new EllipseOverlay(center[0], center[1], width,
 				length, delta));
 
 		input.put("@width", width);
 		input.put("@length", length);
+		input.put(dispKey, disp);
+
 
 		return input;
 	}
@@ -191,18 +219,17 @@ public class DistributionFromShower implements Processor {
 	}
 
 	public double calculateMoment(int moment, double mean, double[] values,
-			double[] weights) {
-		double sumWeights = 0;
+								  double[] weights) {
 		double m = 0;
 		for (int i = 0; i < values.length; i++) {
 			sumWeights += weights[i];
 			m += weights[i] * Math.pow(values[i] - mean, moment);
 		}
-		return m / sumWeights;
+		return m/sumWeights;
 	}
 
 	public double[] calculateCog(double[] weights, int[] showerPixel,
-			double size) {
+								 double size) {
 
 		double[] cog = { 0, 0 };
 		// find weighted center of the shower pixels.
@@ -231,7 +258,7 @@ public class DistributionFromShower implements Processor {
 	}
 
 	public RealMatrix calculateCovarianceMatrix(int[] showerPixel,
-			double[] showerWeights, double[] cog) {
+												double[] showerWeights, double[] cog) {
 		double variance_xx = 0;
 		double variance_yy = 0;
 		double covariance_xy = 0;
@@ -260,7 +287,7 @@ public class DistributionFromShower implements Processor {
 	public void setPixelSetKey(String pixelSetKey) {
 		this.pixelSetKey = pixelSetKey;
 	}
-	
+
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
@@ -309,7 +336,7 @@ public class DistributionFromShower implements Processor {
 	public void setDeltaKey(String deltaKey) {
 		this.deltaKey = deltaKey;
 	}
-	
-	
+
+
 
 }
