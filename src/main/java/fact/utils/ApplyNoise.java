@@ -40,6 +40,11 @@ public class ApplyNoise implements Processor{
     @Parameter(required = true, description = "The files containing the noise.")
     private String[] noiseFiles;
 
+    @Parameter(required = false, defaultValue = "64", description = "The default precision for the noise data to be written")
+    private int floatPrecision;
+
+    private int bytes;
+
     private int[] noiseFileEventCount; //Amount of noise events per file
     private int totalNoiseEventCount = 0;
 	
@@ -79,10 +84,15 @@ public class ApplyNoise implements Processor{
         try {
             DataInputStream dr = new DataInputStream(new FileInputStream(choosenFile));
             // skip all the unwanted noise events
-            dr.skipBytes(r * 432000 * 8);
+            dr.skipBytes(r * 1440*300*this.bytes);
             //insert into last element
-            for (int j = 0; j < 432000; j++) {
-                this.noiseDataCache[this.newElem][j] = dr.readDouble();
+            for (int j = 0; j < 1440*300*this.bytes; j++) {
+                if (this.floatPrecision==64)
+                    this.noiseDataCache[this.newElem][j] = dr.readDouble();
+                else if (this.floatPrecision==32)
+                    this.noiseDataCache[this.newElem][j] = (double)dr.readFloat();
+                else
+                    this.noiseDataCache[this.newElem][j] = dr.readDouble();
             }
         } catch(Exception e){
             log.error("Error generating noise from file: "+choosenFile);
@@ -109,6 +119,7 @@ public class ApplyNoise implements Processor{
     public void setMaxCountNoiseCache(int value) {
         this.maxCountNoiseCache = value;
     }
+    public void setFloatPrecision(int pre) { this.floatPrecision = pre; this.bytes=this.floatPrecision/8; }
 
     public void setSeed(long seed) {
         this.seed = seed;
@@ -127,8 +138,8 @@ public class ApplyNoise implements Processor{
             String noiseFile = this.noiseFiles[i];
             File f = new File(noiseFile);
             long size = f.length();
-            int count = (int)(size /(1440*300*8));
-            if (size%(1440*300*8)!=0) {
+            int count = (int)(size /(1440*300*this.bytes));
+            if (size%(1440*300*this.bytes)!=0) {
                 log.info(String.format("Size: %d Count: %d", size, count));
                 log.error("File: "+noiseFile+" is broken.");
                 throw new Exception("One of the noisefiles is broken");

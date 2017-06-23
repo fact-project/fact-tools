@@ -27,6 +27,9 @@ public class BinaryNoiseWriter implements StatefulProcessor {
     @Parameter(required = true)
     private URL url;
 
+    @Parameter(required = false, defaultValue = "64", description = "The default precision for the noise data to be written")
+    private int floatPrecision;
+
     private StringBuffer b = new StringBuffer();
     private DataOutputStream dw;
 
@@ -36,7 +39,12 @@ public class BinaryNoiseWriter implements StatefulProcessor {
         try {
             double[] darr = (double[])data.get(datakey);
             for (double d : darr) {
-                dw.writeDouble(d);
+                if (this.floatPrecision==64)
+                    dw.writeDouble(d);
+                else if (this.floatPrecision==32)
+                    dw.writeFloat((float)d);
+                else
+                    dw.writeDouble(d);
             }
         } catch (IOException ioex) {
             ioex.printStackTrace();
@@ -65,6 +73,8 @@ public class BinaryNoiseWriter implements StatefulProcessor {
             dw.close();
         }
     }
+
+    public void setFloatPrecision(int pre) { this.floatPrecision = pre; }
 
     public void setDatakey(String datakey) {
         this.datakey = datakey;
