@@ -33,13 +33,13 @@ public class BinaryNoiseWriter implements StatefulProcessor {
     private StringBuffer b = new StringBuffer();
     private DataOutputStream dw;
 
-    private final String[] posKeys = {"AzPointing", "ZdPointing"};
+    private final String[] posKeys = {"AzTracking", "ZdTracking", "AzPointing", "ZdPointing"};
 
     @Override
     public Data process(Data data) {
         Utils.isKeyValid(data, datakey, double[].class);
         for (String key : posKeys) {
-            Utils.isKeyValid(data, key, double.class);
+            Utils.isKeyValid(data, key, Double.class);
         }
         Utils.isKeyValid(data, "UnixTimeUTC",int[].class);
         try {
@@ -56,7 +56,7 @@ public class BinaryNoiseWriter implements StatefulProcessor {
             }
             // Write Position Data
             for (String key : posKeys) {
-                dw.writeDouble((double)data.get(key));
+                dw.writeDouble((Double)data.get(key));
             }
             // Write Time
             int[] UTCtime = (int[])data.get("UnixTimeUTC");
