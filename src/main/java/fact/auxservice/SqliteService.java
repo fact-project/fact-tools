@@ -56,15 +56,15 @@ public class SqliteService implements AuxiliaryService {
 
     public class AuxDataCacheKey {
         private final AuxiliaryServiceName service;
-        private final OffsetDateTime roundedTimeStamp;
+        private final ZonedDateTime roundedTimeStamp;
 
-        public AuxDataCacheKey(AuxiliaryServiceName service, OffsetDateTime timeStamp) {
+        public AuxDataCacheKey(AuxiliaryServiceName service, ZonedDateTime timeStamp) {
             this.service = service;
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
         }
 
-        public OffsetDateTime floorToQuarterHour(OffsetDateTime time){
-            OffsetDateTime t = OffsetDateTime.of(time.toLocalDate(),time.toLocalTime(), ZoneOffset.of("+00:00")).withSecond(0);
+        public ZonedDateTime floorToQuarterHour(ZonedDateTime time){
+            ZonedDateTime t = time.withZoneSameInstant(ZoneOffset.UTC).withSecond(0);
 
             int oldMinute = t.getMinute();
             int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
@@ -100,7 +100,7 @@ public class SqliteService implements AuxiliaryService {
      * @param time the time stamp of the data event
      * @return the TreeSet containing the AuxPoints
      */
-    public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, OffsetDateTime time){
+    public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, ZonedDateTime time){
         TreeSet<AuxPoint> result = new TreeSet<>();
 
         try {
@@ -177,10 +177,10 @@ public class SqliteService implements AuxiliaryService {
                 // m.put("Dec_cmd", cursor.getFloat("Dec_cmd"));
                 m.put("Offset", cursor.getFloat("Offset"));
 
-                String tempTime=cursor.getString("Time");
-                tempTime=tempTime.concat("+00:00");
-                tempTime=tempTime.replace(" ","T");
-                OffsetDateTime t = OffsetDateTime.parse(tempTime);
+                String tempTime = cursor.getString("Time");
+                tempTime = tempTime.concat("+00:00");
+                tempTime = tempTime.replace(" ","T");
+                ZonedDateTime t = ZonedDateTime.parse(tempTime);
                 result.add(new AuxPoint(t, m));
             } while (cursor.next());
         }
@@ -208,7 +208,7 @@ public class SqliteService implements AuxiliaryService {
                 tempTime=tempTime.replace(" ","T");
 
 
-                OffsetDateTime t = OffsetDateTime.parse(tempTime);
+                ZonedDateTime t = ZonedDateTime.parse(tempTime);
 
                 result.add(new AuxPoint(t, m));
             } while (cursor.next());
@@ -224,7 +224,7 @@ public class SqliteService implements AuxiliaryService {
      * @return the data closest to the eventtimestamp which is found in the database according to the strategy.
      */
     @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName service, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         try {
             AuxDataCacheKey key = new AuxDataCacheKey(service, eventTimeStamp);
             //this set might not contain the data we need

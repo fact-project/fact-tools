@@ -4,7 +4,7 @@ import fact.auxservice.strategies.AuxPointStrategy;
 import stream.service.Service;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * The service should provide the ability to get the aux data from some data source.
@@ -25,5 +25,5 @@ public interface AuxiliaryService extends Service {
      * @return
      * @throws IOException
      */
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
 }

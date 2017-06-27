@@ -18,22 +18,22 @@ public class AuxWebServiceTest {
 
     @Test
     public void testTimeFlooring() throws IOException {
-        OffsetDateTime time = OffsetDateTime.of(1987, 9, 20, 12, 40, 34,0, ZoneOffset.of("+00:00"));
-        OffsetDateTime roundedTime = AuxWebService.floorToQuarterHour(time);
+        ZonedDateTime time = ZonedDateTime.of(1987, 9, 20, 12, 40, 34, 0, ZoneOffset.UTC);
+        ZonedDateTime roundedTime = AuxWebService.floorToQuarterHour(time);
 
-        assertThat(roundedTime, is(OffsetDateTime.of(1987, 9, 20, 12, 30, 00,0,ZoneOffset.of("+00:00"))));
+        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 12, 30, 00,0,ZoneOffset.UTC)));
 
 
-        time = OffsetDateTime.of(1987, 9, 20, 23, 59, 59,0,ZoneOffset.of("+00:00"));
+        time = ZonedDateTime.of(1987, 9, 20, 23, 59, 59,0,ZoneOffset.UTC);
         roundedTime = AuxWebService.floorToQuarterHour(time);
 
-        assertThat(roundedTime, is(OffsetDateTime.of(1987, 9, 20, 23, 45, 00,0,ZoneOffset.of("+00:00"))));
+        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 23, 45, 00,0,ZoneOffset.UTC)));
 
 
-        time = OffsetDateTime.of(1987, 9, 20, 00, 00, 01,0,ZoneOffset.of("+00:00"));
+        time = ZonedDateTime.of(1987, 9, 20, 00, 00, 01,0,ZoneOffset.UTC);
         roundedTime = AuxWebService.floorToQuarterHour(time);
 
-        assertThat(roundedTime, is(OffsetDateTime.of(1987, 9, 20, 00, 00, 00,0,ZoneOffset.of("+00:00"))));
+        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 00, 00, 00,0,ZoneOffset.UTC)));
     }
 
 }

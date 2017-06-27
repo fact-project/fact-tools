@@ -57,7 +57,7 @@ public class AuxFileService implements AuxiliaryService {
      * @throws FileNotFoundException
      */
     @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, OffsetDateTime eventTimeStamp, AuxPointStrategy strategy) throws FileNotFoundException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws FileNotFoundException {
         if(!isInit){
             auxFileUrls = findAuxFileUrls(auxFolder);
             isInit = true;
@@ -67,8 +67,8 @@ public class AuxFileService implements AuxiliaryService {
         }
         TreeSet<AuxPoint> set = services.get(serviceName);
 
-        OffsetDateTime firstTimeStamp = set.first().getTimeStamp();
-        OffsetDateTime lastTimeStamp = set.last().getTimeStamp();
+        ZonedDateTime firstTimeStamp = set.first().getTimeStamp();
+        ZonedDateTime lastTimeStamp = set.last().getTimeStamp();
         if(firstTimeStamp.isAfter(eventTimeStamp) || lastTimeStamp.isBefore(eventTimeStamp))
         {
             log.warn("Provided event timestamp not in auxiliary File.");
@@ -101,9 +101,8 @@ public class AuxFileService implements AuxiliaryService {
                 OptionalTypesMap<String, Serializable> auxData = auxDataBinTableReader.getNextRow();
 
                 auxData.getDouble("Time").ifPresent(time -> {
-                    long value=(long)(time * 24 * 60 * 60 *1000 );
-                    Instant insMill=Instant.ofEpochMilli(value);
-                    OffsetDateTime t = insMill.atOffset(ZoneOffset.UTC);
+                    long value = (long) (time * 24 * 60 * 60 *1000 );
+                    ZonedDateTime t = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
                     AuxPoint p = new AuxPoint(t, auxData);
                     result.add(p);
                 });
