@@ -219,6 +219,11 @@
       <artifactId>nom-tam-fits</artifactId>
       <version>1.15.1</version>
     </dependency>
+    <dependency>
+      <groupId>net.time4j</groupId>
+      <artifactId>time4j-core</artifactId>
+      <version>4.27.2</version>
+    </dependency>
   </dependencies>
 
   <build>

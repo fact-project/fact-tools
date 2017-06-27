@@ -13,6 +13,8 @@ import fact.hexmap.ui.overlays.SourcePositionOverlay;
 
 import fact.Utils;
 
+import net.time4j.Moment;
+import net.time4j.SI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -259,13 +261,16 @@ public class SourcePosition implements StatefulProcessor {
     /**
      * Convert a DateTime object to greenwhich sidereal time according to
      * https://en.wikipedia.org/wiki/Sidereal_time#Definition
-     * @param datetime
+     * @param datetime the datetime to convert into gst
      * @return gst in radians
      */
     public double datetimeToGST(ZonedDateTime datetime){
+        Moment moment = Moment.from(datetime.toInstant());
+        Moment refrenceMoment = Moment.from(gstReferenceDateTime.toInstant());
 
-    	Duration difference = Duration.between(gstReferenceDateTime, datetime);
-    	double gst = 18.697374558 + 24.06570982441908 * (difference.toMillis() / 86400000.0);
+        long differenceInMillis= refrenceMoment.until(moment, SI.SECONDS) * 1000;
+
+    	double gst = 18.697374558 + 24.06570982441908 * (differenceInMillis / 86400000.0);
 
         // normalize to [0, 24] and convert to radians
         gst = (gst % 24) / 12.0 * Math.PI;
