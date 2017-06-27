@@ -33,10 +33,18 @@ public class BinaryNoiseWriter implements StatefulProcessor {
     private StringBuffer b = new StringBuffer();
     private DataOutputStream dw;
 
+    private final String[] posKeys = {"AzTracking", "ZdTracking", "AzPointing", "ZdPointing"};
+
     @Override
     public Data process(Data data) {
         Utils.isKeyValid(data, datakey, double[].class);
+        for (String key : posKeys) {
+            Utils.isKeyValid(data, key, double.class);
+        }
+        Utils.isKeyValid(data, "UnixTimeUTC",int[].class);
         try {
+            dw.writeInt(this.floatPrecision);
+            // Write Noise Data
             double[] darr = (double[])data.get(datakey);
             for (double d : darr) {
                 if (this.floatPrecision==64)
@@ -46,6 +54,14 @@ public class BinaryNoiseWriter implements StatefulProcessor {
                 else
                     dw.writeDouble(d);
             }
+            // Write Position Data
+            for (String key : posKeys) {
+                dw.writeDouble((double)data.get(key));
+            }
+            // Write Time
+            int[] UTCtime = (int[])data.get("UnixTimeUTC");
+            dw.writeInt(UTCtime[0]);
+            dw.writeInt(UTCtime[1]);
         } catch (IOException ioex) {
             ioex.printStackTrace();
         }
