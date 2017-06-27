@@ -33,7 +33,7 @@ public class BinaryNoiseWriter implements StatefulProcessor {
     private StringBuffer b = new StringBuffer();
     private DataOutputStream dw;
 
-    private final String[] posKeys = {"AzTracking", "ZdTracking", "AzPointing", "ZdPointing"};
+    private final String[] posKeys = {"AzPointing", "ZdPointing"};
 
     @Override
     public Data process(Data data) {
