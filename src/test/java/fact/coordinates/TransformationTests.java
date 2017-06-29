@@ -138,8 +138,8 @@ public class TransformationTests {
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
 
-        assertEquals(r[0], cameraCoordinate.getXMM(), 0.015 );
-        assertEquals(r[1], cameraCoordinate.getYMM(), 0.0001 );
+        assertEquals(r[0], cameraCoordinate.xMM, 0.015 );
+        assertEquals(r[1], cameraCoordinate.yMM, 0.0001 );
     }
 
     @Test
@@ -157,8 +157,8 @@ public class TransformationTests {
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
 
-        assertEquals(r[0], cameraCoordinate.getXMM(), 0.015 );
-        assertEquals(r[1], cameraCoordinate.getYMM(), 0.0001 );
+        assertEquals(r[0], cameraCoordinate.xMM, 0.015 );
+        assertEquals(r[1], cameraCoordinate.yMM, 0.0001 );
     }
 
     @Test
@@ -177,8 +177,8 @@ public class TransformationTests {
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
 
-        assertEquals(r[0], cameraCoordinate.getXMM(), 0.0001 );
-        assertEquals(r[1], cameraCoordinate.getYMM(), 0.015 );
+        assertEquals(r[0], cameraCoordinate.xMM, 0.0001 );
+        assertEquals(r[1], cameraCoordinate.yMM, 0.015 );
     }
 
     @Test
@@ -197,8 +197,8 @@ public class TransformationTests {
                 sourcePosition.getAzimuthDeg(), sourcePosition.getZenithDeg()
         );
 
-        assertEquals(r[0], cameraCoordinate.getXMM(), 0.0001 );
-        assertEquals(r[1], cameraCoordinate.getYMM(), 0.015 );
+        assertEquals(r[0], cameraCoordinate.xMM, 0.0001 );
+        assertEquals(r[1], cameraCoordinate.yMM, 0.015 );
     }
 
     @Test

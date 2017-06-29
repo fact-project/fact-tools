@@ -40,8 +40,8 @@ public class CosDeltaAlpha implements Processor{
 		double cogy = (double) input.get(cogyKey);
 		double delta = (double) input.get(deltaKey);
 
-		double sx = cogx - sourcePosition.getXMM();
-		double sy = cogy - sourcePosition.getYMM();
+		double sx = cogx - sourcePosition.xMM;
+		double sy = cogy - sourcePosition.yMM;
 		double dist = Math.sqrt(sx*sx + sy*sy);
 
 		if(dist == 0) {

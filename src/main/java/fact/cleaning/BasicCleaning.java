@@ -120,7 +120,7 @@ public class BasicCleaning {
 	 */
 	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, CameraCoordinate starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
 
-        FactCameraPixel pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.getXMM(), starPosition.getYMM());
+        FactCameraPixel pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
         if (pixel == null){
 			log.debug("Star not in camera window. No star islands are removed");
 			return showerPixel;
@@ -134,7 +134,7 @@ public class BasicCleaning {
 
 		for (FactCameraPixel px: pixelMap.getNeighboursFromID(chidOfPixelOfStar))
 		{
-				if (calculateDistance(px.id, starPosition.getXMM(), starPosition.getYMM()) < starRadiusInCamera)
+				if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera)
 				{
 					starSet.add(px);
 					starChidList.add(px.id);

@@ -36,8 +36,8 @@ public class Distance implements Processor {
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
 		CameraCoordinate source  = (CameraCoordinate) input.get(sourcePosition);
 
-		double dx = dist.getCenterX() - source.getXMM();
-		double dy = dist.getCenterY() - source.getYMM();
+		double dx = dist.getCenterX() - source.xMM;
+		double dy = dist.getCenterY() - source.yMM;
 
 		input.put(outputKey, Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0)));
 		return input;

@@ -48,7 +48,7 @@ public class Alpha implements Processor {
 			log.error("wrong types" + e.toString());
 		}
 
-		double auxiliary_angle  = Math.atan((source.getYMM() - dist.getCenterY()) / (source.getXMM() - dist.getCenterX()));
+		double auxiliary_angle  = Math.atan((source.yMM - dist.getCenterY()) / (source.xMM - dist.getCenterX()));
 
 	    double alpha = dist.getAngle() - auxiliary_angle;
 

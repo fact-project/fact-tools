@@ -42,7 +42,7 @@ public class SourcePositionOverlay implements CameraMapOverlay {
         g2.setColor(color);
 
         //lets draw a star symbol
-        g2.translate(source.getXMM() * scalingX, source.getYMM() * scalingY);
+        g2.translate(source.xMM * scalingX, source.yMM * scalingY);
         Polygon p  = new Polygon(pointsx, pointsy, 3);
         g2.fill(p);
 

@@ -12,8 +12,8 @@ import java.time.ZonedDateTime;
  */
 public class EquatorialCoordinate implements CelestialCoordinate {
 
-    private final double rightAscensionRad;
-    private final double declinationRad;
+    public final double rightAscensionRad;
+    public final double declinationRad;
 
     private EquatorialCoordinate(double rightAscensionRad, double declinationRad) {
         this.rightAscensionRad = rightAscensionRad;

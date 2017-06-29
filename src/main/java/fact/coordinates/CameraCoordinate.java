@@ -15,21 +15,14 @@ import java.io.Serializable;
  * It provides a method toHorizontal to transform from camera frame to telescope frame
  */
 public class CameraCoordinate implements Serializable {
-    private final double xMM;
-    private final double yMM;
+    public final double xMM;
+    public final double yMM;
 
     public CameraCoordinate(double xMM, double yMM){
         this.xMM = xMM;
         this.yMM = yMM;
     }
 
-    public double getXMM() {
-        return xMM;
-    }
-
-    public double getYMM() {
-        return yMM;
-    }
 
     /**
      * Transform this CameraCoordinate from camera frame to telescope (horizontal coordinates) frame
@@ -44,9 +37,9 @@ public class CameraCoordinate implements Serializable {
         double paz = pointingPosition.getAzimuthRad();
         double pzd = pointingPosition.getZenithRad();
 
-        double z = 1 / Math.sqrt(1 + Math.pow(this.getXMM() / focalLength, 2.0) + Math.pow(this.getYMM() / focalLength, 2.0));
-        double x = this.getXMM() * z / focalLength;
-        double y = this.getYMM() * z / focalLength;
+        double z = 1 / Math.sqrt(1 + Math.pow(xMM / focalLength, 2.0) + Math.pow(yMM / focalLength, 2.0));
+        double x = xMM * z / focalLength;
+        double y = yMM * z / focalLength;
 
         Vector3D vec = new Vector3D(x, y, z);
 
@@ -62,8 +55,8 @@ public class CameraCoordinate implements Serializable {
     }
 
     public double euclideanDistance(CameraCoordinate other) {
-        double dx = this.getXMM() - other.getXMM();
-        double dy = this.getYMM() - other.getYMM();
+        double dx = xMM - other.yMM;
+        double dy = xMM - other.yMM;
         return Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0));
     }
 

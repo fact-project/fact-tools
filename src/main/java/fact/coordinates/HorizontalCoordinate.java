@@ -15,8 +15,8 @@ import java.time.ZonedDateTime;
  */
 public class HorizontalCoordinate implements CelestialCoordinate {
 
-    private final double zenithRad;
-    private final double azimuthRad;
+    public final double zenithRad;
+    public final double azimuthRad;
 
     private HorizontalCoordinate(double zenithRad, double azimuthRad) {
         this.zenithRad = zenithRad;
