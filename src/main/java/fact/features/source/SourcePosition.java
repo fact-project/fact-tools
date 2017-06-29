@@ -221,6 +221,8 @@ public class SourcePosition implements StatefulProcessor {
             String sourceName = sourcePoint.getString("Name");
             data.put("SourceName", sourceName);
             data.put(outputKey, sourceCamera);
+            data.put(outputKey + "_x", sourceCamera.getXMM());
+            data.put(outputKey + "_y", sourceCamera.getYMM());
 
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
