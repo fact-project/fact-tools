@@ -68,6 +68,12 @@ public class HorizontalCoordinate implements CelestialCoordinate {
 
         double ra = gst + lon - hourAngle;
 
+        if(ra < 0.0) {
+            ra += 2 * Math.PI;
+        } else if (ra > 2 * Math.PI) {
+            ra -= 2 * Math.PI;
+        }
+
         return EquatorialCoordinate.fromRad(ra, declination);
     }
 

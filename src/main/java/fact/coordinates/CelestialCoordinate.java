@@ -57,6 +57,9 @@ public interface CelestialCoordinate extends Serializable {
         double gst = 18.697374558 + 24.06570982441908 * (difference_seconds / 86400.0);
 
         // normalize to [0, 24] and convert to radians
+        while (gst < 0) {
+            gst += 24;
+        }
         gst = (gst % 24) / 12.0 * Math.PI;
         return gst;
     }
