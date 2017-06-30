@@ -12,7 +12,14 @@ import java.nio.file.Paths;
 
 
 /**
- * Created by Kai on 27.06.17.
+ * When pointing this stream to the usual ceres output fits file ( XXX_Events.fits )
+ * it will look for the XXX_RunHeaders.fits in the same folder and add the data from the corsika run header
+ * and adds them to each data item.
+ *
+ * Use like that:
+ *  <stream id="fact" class="fact.io.CeresStream" url="file:XXX_Events.fits"/>
+ *
+ * The stream will read the XXX_RunHeaders.fits in the same folder.
  */
 public class CeresStream extends AbstractStream {
 
