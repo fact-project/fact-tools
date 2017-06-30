@@ -6,6 +6,7 @@ import stream.io.SourceURL;
 
 import java.net.URL;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -25,6 +26,30 @@ public class CeresStreamTest {
 
             Data item = stream.read();
             while (item != null) {
+                item = stream.read();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Could not read FitsFile");
+        }
+    }
+
+    @Test
+    public void testRunHeaderKeys() {
+
+        try {
+            URL u =  FITSStreamTest.class.getResource("/ceres_output/18000/00018000.000_D_MonteCarlo018_Events.fits.gz");
+            SourceURL url = new SourceURL(u);
+
+            CeresStream stream = new CeresStream(url);
+            stream.init();
+
+            Data item = stream.read();
+            while (item != null) {
+                assertTrue(item.get("MCorsikaRunHeader.fParticleID") != null);
+                assertTrue(item.get("MCorsikaRunHeader.fNumReuse") != null);
+                assertTrue(item.get("MCorsikaRunHeader.fImpactMax") != null);
                 item = stream.read();
             }
 
