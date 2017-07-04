@@ -39,11 +39,6 @@
             />
         </stream.flow.If>
 
-        <!--<fact.features.source.SourcePosition-->
-            <!--outputKey="sourcePosition"-->
-            <!--auxService="auxService"-->
-        <!--/>-->
-
         <fact.utils.ElementwiseMultiplyDoubleArray
             inputKey="PhotonArrivalsBaseLine"
             outputKey="CentiBaseLines"
