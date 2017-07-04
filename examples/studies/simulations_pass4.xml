@@ -7,9 +7,6 @@
 
     <property name="out_path_basename" value="test_ceres" />
 
-    <property name="aux_dir" value="file:src/main/resources/aux/" />
-    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${aux_dir}" />
-
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <!--<stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>-->
