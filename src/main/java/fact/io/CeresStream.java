@@ -7,6 +7,7 @@ import stream.io.AbstractStream;
 import stream.io.SourceURL;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -33,10 +34,17 @@ public class CeresStream extends AbstractStream {
     @Override
     public void init() throws Exception {
         super.init();
-        fitsstream = new FITSStream(url);
+        URL expandedURL;
+        if (this.url.getProtocol().equals("classpath")){
+            expandedURL = FITSStream.class.getResource(this.url.getPath());
+        } else {
+            expandedURL = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
+        }
+
+        fitsstream = new FITSStream(new SourceURL(expandedURL));
         fitsstream.init();
 
-        Path path = Paths.get(url.getPath());
+        Path path = Paths.get(expandedURL.getPath());
         String runHeaderFileName = path.getFileName().toString().replace("_Events", "_RunHeaders");
 
         Path runHeaderPath = Paths.get(path.getParent().toString(), runHeaderFileName);
