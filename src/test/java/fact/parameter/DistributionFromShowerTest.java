@@ -1,6 +1,6 @@
 package fact.parameter;
 
-import fact.features.DistributionFromShower;
+import fact.features.HillasParameter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -24,7 +24,7 @@ public class DistributionFromShowerTest extends ParameterTest {
 	public void testValidParameter() throws Exception{
 //		//start processor with the correct parameter
 		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
-		DistributionFromShower poser = new DistributionFromShower();
+		HillasParameter poser = new HillasParameter();
 		poser.setPixelSetKey(shower);
 		poser.setWeightsKey(photonCharge);
 		poser.setOutputKey(outputKey);

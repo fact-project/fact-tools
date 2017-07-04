@@ -167,7 +167,7 @@
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
         arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+        Size, HillasParameter, M3Long, Length, Width, NumberOfIslands, TimeGraident,
         Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
         ShowerSlope, Disp -->
         <Skip condition="%{data.shower} == null" />
@@ -215,7 +215,7 @@
                 outputKey="max_pos_shower"
                 pixelSetKey="shower"
         />
-        <fact.features.DistributionFromShower
+        <fact.features.HillasParameter
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
                 outputKey="shower_distribution"

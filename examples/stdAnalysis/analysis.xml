@@ -439,7 +439,7 @@
                 pixelSetKey="shower"
         />
 
-        <fact.features.DistributionFromShower
+        <fact.features.HillasParameter
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
                 outputKey="shower_distribution"

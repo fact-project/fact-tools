@@ -15,7 +15,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-public class DistributionFromShower implements Processor {
+public class HillasParameter implements Processor {
 
 	@Parameter(required = true)
 	private String weightsKey = null;
@@ -56,7 +56,7 @@ public class DistributionFromShower implements Processor {
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	// A logger
-	static Logger log = LoggerFactory.getLogger(DistributionFromShower.class);
+	static Logger log = LoggerFactory.getLogger(HillasParameter.class);
 	double sumWeights = 0;
 	@Override
 	public Data process(Data input) {

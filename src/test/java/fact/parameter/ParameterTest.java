@@ -4,7 +4,7 @@ import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
-import fact.features.DistributionFromShower;
+import fact.features.HillasParameter;
 import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FITSStream;
@@ -96,7 +96,7 @@ public class ParameterTest {
 
 
 
-        DistributionFromShower dist = new DistributionFromShower();
+        HillasParameter dist = new HillasParameter();
         dist.setPixelSetKey(shower);
         dist.setWeightsKey(photonCharge);
         dist.setOutputKey(distribution);

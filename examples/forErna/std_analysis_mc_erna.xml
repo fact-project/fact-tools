@@ -352,7 +352,7 @@
                 outputKey="max_pos_shower"
                 pixelSetKey="shower"
         />
-        <fact.features.DistributionFromShower
+        <fact.features.HillasParameter
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
                 outputKey="shower_distribution"
