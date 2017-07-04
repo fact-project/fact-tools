@@ -1,5 +1,5 @@
 <container>
-    <properties url="classpath:/default/settings.properties" />
+    <properties url="classpath:/default/settings_mc.properties" />
 
     <property name="infile" value="file:src/test/resources/ceres_output/18000/00018000.000_D_MonteCarlo018_Events.fits.gz" />
     <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
