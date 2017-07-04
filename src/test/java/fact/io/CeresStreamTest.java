@@ -50,6 +50,7 @@ public class CeresStreamTest {
                 assertTrue(item.get("MCorsikaRunHeader.fParticleID") != null);
                 assertTrue(item.get("MCorsikaRunHeader.fNumReuse") != null);
                 assertTrue(item.get("MCorsikaRunHeader.fImpactMax") != null);
+                assertTrue(item.get("MCorsikaRunHeader.fRunNumber") != null);
                 item = stream.read();
             }
 
