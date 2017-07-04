@@ -2,7 +2,7 @@
     <properties url="classpath:/default/settings.properties" />
 
     <property name="infile" value="file:src/test/resources/ceres_output/18000/00018000.000_D_MonteCarlo018_Events.fits.gz" />
-    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
