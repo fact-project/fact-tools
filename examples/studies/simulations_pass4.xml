@@ -60,46 +60,37 @@
             outputKey="CentiBaseLines"
         />
 
-        <stream.data.RenameKey from="RUNID" to="Run"/>
-        <stream.data.RenameKey from="EventNum" to="Event"/>
-        <stream.data.RenameKey from="AzPointing" to="Az_deg"/>
-        <stream.data.RenameKey from="ZdPointing" to="Zd_deg"/>
         <stream.data.RenameKey from="PhotonArrivals" to="PhotonArrivals_500ps"/>
         <stream.data.RenameKey from="Saturation" to="SaturatedPixels"/>
+        <stream.data.RenameKey from="AzPointing" to="Az_deg"/>
+        <stream.data.RenameKey from="ZdPointing" to="Zd_deg"/>
 
-        <stream.data.RenameKey from="MCorsikaRunHeader.fNumReuse" to="Reuse"/>
-        <stream.data.RenameKey from="MCorsikaEvtHeader.fTotalEnergy" to="Energy_gev"/>
-        <stream.data.RenameKey from="MMcCorsikaRunHeader.fRunNumber" to="Run"/>
-        <stream.data.RenameKey from="MCorsikaRunHeader.fParticleID" to="Particle"/>
-        <stream.data.RenameKey from="MMcEvtBasic.fPhi" to="Phi_deg"/>
-        <stream.data.RenameKey from="MMcEvtBasic.fTheta" to="Theta_deg"/>
-        <stream.data.RenameKey from="MCorsikaRunHeader.fImpactMax" to="MaxImpact_m"/>
-
-
+        <stream.data.RenameKey from="MCorsikaRunHeader.fRunNumber" to="Run"/>
+        <stream.data.RenameKey from="MCorsikaEvtHeader.fEvtNumber" to="Event"/>
+        <stream.data.RenameKey from="MMcEvt.fEventReuse" to="Reuse"/>
+ 
         <fact.io.JSONWriter
-                keys="Run,
-                      Event,
-                      Reuse,
-                      Az_deg,
-                      Zd_deg,
-                      PhotonArrivals_500ps,
-                      SaturatedPixels,
-                      Particle,
-                      Energy_GeV,
-                      Phi_deg,
-                      Theta_deg,
-                      MaxImpact_m,
-                      McCherPhotWeight,
-                      McCherPhotNumber,
-                      McMuonCherPhotWeight,
-                      McMuonCherPhotNumber,
-                      McNoisePhotWeight,
-                      McCherArrTimeMean,
-                      McCherArrTimeVar,
-                      McCherArrTimeMin,
-                      McCherArrTimeMax,
-                      MSimSourcePos.fZd,
-                      MSimSourcePos.fAz"
+                keys="
+                    Run,
+                    Event,
+                    Reuse,
+                    Az_deg,
+                    Zd_deg,
+                    PhotonArrivals_500ps,
+                    SaturatedPixels,
+                    ${mc_truth},
+                    McCherPhotWeight,
+                    McCherPhotNumber,
+                    McMuonCherPhotWeight,
+                    McMuonCherPhotNumber,
+                    McNoisePhotWeight,
+                    McCherArrTimeMean,
+                    McCherArrTimeVar,
+                    McCherArrTimeMin,
+                    McCherArrTimeMax,
+                    MSimSourcePos.fZd,
+                    MSimSourcePos.fAz
+                "
                 url="${out_path_basename}.phs.jsonl.gz"
                 writeListOfItems="true"
                 pixelSetsAsInt="true"
