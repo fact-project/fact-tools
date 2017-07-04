@@ -67,19 +67,7 @@
                     Az_deg,
                     Zd_deg,
                     PhotonArrivals_500ps,
-                    SaturatedPixels,
-                    ${mc_truth},
-                    McCherPhotWeight,
-                    McCherPhotNumber,
-                    McMuonCherPhotWeight,
-                    McMuonCherPhotNumber,
-                    McNoisePhotWeight,
-                    McCherArrTimeMean,
-                    McCherArrTimeVar,
-                    McCherArrTimeMin,
-                    McCherArrTimeMax,
-                    MSimSourcePos.fZd,
-                    MSimSourcePos.fAz
+                    SaturatedPixels
                 "
                 url="${out_path_basename}.phs.jsonl.gz"
                 writeListOfItems="true"
