@@ -13,7 +13,6 @@
 
     <process id="2" input="fact">
 
-
         <include url="classpath:/default/mc/calibration_mc.xml" />
         <include url="classpath:/default/mc/extraction_mc.xml" />
 
@@ -51,8 +50,8 @@
 
         <stream.data.RenameKey from="PhotonArrivals" to="PhotonArrivals_500ps"/>
         <stream.data.RenameKey from="Saturation" to="SaturatedPixels"/>
-        <stream.data.RenameKey from="AzPointing" to="Az_deg"/>
-        <stream.data.RenameKey from="ZdPointing" to="Zd_deg"/>
+        <stream.data.RenameKey from="MPointingPos.fAz" to="Az_deg"/>
+        <stream.data.RenameKey from="MPointingPos.fZd" to="Zd_deg"/>
 
         <stream.data.RenameKey from="MCorsikaRunHeader.fRunNumber" to="Run"/>
         <stream.data.RenameKey from="MCorsikaEvtHeader.fEvtNumber" to="Event"/>
