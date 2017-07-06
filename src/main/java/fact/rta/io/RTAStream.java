@@ -69,16 +69,21 @@ public class RTAStream extends AbstractMultiStream {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
             Path name = file.getFileName();
-            if (name != null && attr.isRegularFile() && !fileQueue.contains(file)) {
-                if (matcher.matches(name)){
+            if (name != null && attr.isRegularFile()) {
+                //check whether we already looked at the file.
+                if (fileQueue.contains(file)) {
+                         return FileVisitResult.CONTINUE;
+                }
+                if (matcher.matches(name)) {
                     int night = filenameToFACTNight(file.getFileName().toString()).orElse(0);
                     int runid = filenameToRunID(file.getFileName().toString()).orElse(0);
                     Run run = dbInterface.getRun(night, runid);
                     //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
-                    if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN){
+                    if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN) {
                         fileQueue.add(file);
                     }
                 }
+
             } else {
                 log.info("Not a regular file: {} ", file);
             }
