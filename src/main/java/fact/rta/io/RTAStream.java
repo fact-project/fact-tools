@@ -159,7 +159,7 @@ public class RTAStream extends AbstractMultiStream {
             }
         } catch (ClassCastException e){
             //pass
-            log.warn("Not using a zfits stream as inner stream. this will not skip non-data runs.");
+            log.warn("Not using the hdureader as input stream. This won't skip non-data runs.");
         }
     }
 
