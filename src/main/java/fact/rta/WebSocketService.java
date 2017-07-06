@@ -133,7 +133,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
             Duration onTime = calculateOnTimeForRun(currentRun, ftmPointsForNight);
 
             dbInterface.updateRunWithOnTime(currentRun, onTime.getSeconds());
-            log.info("New run found. OnTime of old run was: {} seconds.", onTime);
+            log.info("New run found. OnTime of old run was: {} seconds.", onTime.getSeconds());
 
             //Save signals to database by looping over the collection and poping the elements
             //to remove them at the same time.
