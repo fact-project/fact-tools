@@ -3,16 +3,19 @@
     <properties url="classpath:/default/settings.properties" />
 
 
-    <property name="jdbc" value="jdbc:sqlite:./rta.sqlite" />
     <property name="auxfolder" value="file:/fhgfs/groups/app/fact/aux" />
+    <property name="estimator" value="classpath:/prediction_test_files/estimator.pmml.gz" />
+    <property name="separator" value="classpath:/prediction_test_files/model.pmml.gz" />
+    <property name="jdbc" value="jdbc:sqlite:rta.sqlite" />
+    <property name="infile" value="/fhgfs/groups/app/fact/raw/2013/11/08/"/>
 
-    <service id="rta_service" class="fact.rta.WebSocketService" auxFolder="${auxfolder}"  jdbcConnection="${jdbc}"/>
 
     <property name="auxService" value="rta_service" />
 
-    <property name="jdbc" value="jdbc:sqlite:rta.sqlite" />
+    <service id="rta_service" class="fact.rta.WebSocketService" auxFolder="${auxfolder}"  jdbcConnection="${jdbc}"/>
+    <service id="rf" class="fact.PredictionService" url="${separator}" />
+    <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
-    <property name="infile" value="/fhgfs/groups/app/fact/raw/2013/11/08/"/>
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
@@ -20,15 +23,9 @@
     <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <property name="separator" value="classpath:/prediction_test_files/model.pmml.gz" />
-    <service id="rf" class="fact.PredictionService" url="${separator}" />
-
-    <property name="estimator" value="classpath:/prediction_test_files/estimator.pmml.gz" />
-    <service id="regressor" class="fact.PredictionService" url="${estimator}" />
-
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" rtaService="rta_service">
-        <stream id="_" class="fact.io.hdureader.FITSStream" limit="30" />
+        <stream id="_" class="fact.io.hdureader.FITSStream" limit="300" />
     </stream>
 
 
@@ -40,16 +37,7 @@
 
         <!--<Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
 
-        <!--        <Delay time="500ms" /> -->
-
-        <!-- prevEventAndSkip: -->
-        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
-        <!-- Output: Data -->
-
-        <!-- Calibration: -->
-        <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
         <fact.datacorrection.DrsCalibration
                 drsService="drsService"
                 key="Data"
@@ -84,34 +72,11 @@
                 dataKey="DataCalibrated"
                 dataOutputKey="DataCalibrated"
         />
-        <!-- Output: DataCalibrated -->
-
-
-        <!-- Extraction -->
-        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
-        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
         <include url="classpath:/default/data/extraction.xml" />
-        <!-- Output: photoncharge, arrivalTime -->
-        <!-- Cleaning -->
-        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
         <include url="classpath:/default/data/cleaning.xml" />
-        <!-- Output: shower -->
-
-        <!-- Parameter calculation (only source independent) -->
-        <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
-        arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
-        Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
-        ShowerSlope, Disp -->
         <include url="classpath:/default/data/parameterCalc.xml" />
-        <!-- Output: source independent parameters -->
-
-        <!-- Parameter calculation (only source dependent) -->
-        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
-        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/data/sourceParameter.xml" />
 
-        <!--<PrintData/>-->
         <Skip condition="%{data.numPixeInShower} &lt; 9" />
 
             <fact.rta.Energy predictor="regressor" />
