@@ -9,7 +9,8 @@ public class EarthLocation {
     final private double latitudeRad;
     final private double longitudeRad;
     final private double altitudeMeter;
-
+    
+    // coordinates from google earth
     final static public EarthLocation FACT = EarthLocation.fromDegrees(28.761647, -17.891116, 2200);
 
     private EarthLocation(double latitudeRad, double longitudeRad, double altitudeMeter) {
