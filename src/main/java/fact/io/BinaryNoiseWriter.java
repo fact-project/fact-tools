@@ -42,6 +42,8 @@ public class BinaryNoiseWriter implements StatefulProcessor {
             Utils.isKeyValid(data, key, Double.class);
         }
         Utils.isKeyValid(data, "UnixTimeUTC",int[].class);
+        Utils.isKeyValid(data, "NIGHT", Integer.class);
+        Utils.isKeyValid(data, "RUNID", Integer.class);
         try {
             dw.writeInt(this.floatPrecision);
             // Write Noise Data
@@ -58,7 +60,9 @@ public class BinaryNoiseWriter implements StatefulProcessor {
             for (String key : posKeys) {
                 dw.writeDouble((Double)data.get(key));
             }
-            // Write Time
+            // Write Time, night and runid
+            dw.writeInt((Integer)data.get("NIGHT"));
+            dw.writeInt((Integer)data.get("RUNID"));
             int[] UTCtime = (int[])data.get("UnixTimeUTC");
             dw.writeInt(UTCtime[0]);
             dw.writeInt(UTCtime[1]);
