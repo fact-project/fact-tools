@@ -108,7 +108,8 @@ public class RTAStream extends AbstractMultiStream {
         dbInterface.createSignalTableIfNotExists();
 
         long MINUTE = 60 * 1000;
-        new Timer().scheduleAtFixedRate(updater, 0, 10* MINUTE);
+        log.info("Starting file system watcher with interval of 10 Minutes");
+        new Timer().scheduleAtFixedRate(updater, 0, 10 * MINUTE);
     }
 
     private class Updater extends TimerTask{
@@ -117,15 +118,18 @@ public class RTAStream extends AbstractMultiStream {
         public void run() {
             Path dir = Paths.get(folder);
             try {
+                log.info("Checking file system for new data.");
                 WebSocketService s = WebSocketService.getService();
                 if(s != null){
                     s.messageHandler.sendDataStatus("Checking for new data.");
-                    log.info("Checking file system for new data.");
                 }
                 Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|fits.fz|fits\\.gz)$"));
-                if (s != null && fileQueue.isEmpty()){
-                    s.messageHandler.sendDataStatus("No new data present.");
+
+                if (fileQueue.isEmpty()){
                     log.info("No new data present.");
+                    if (s!=null){
+                        s.messageHandler.sendDataStatus("No new data present.");
+                    }
                 }
 
             } catch (IOException e) {
@@ -136,11 +140,11 @@ public class RTAStream extends AbstractMultiStream {
 
     private void checkNextFile() throws Exception {
         WebSocketService s = WebSocketService.getService();
-        if(fileQueue.isEmpty() && s != null){
-            s.messageHandler.sendDataStatus("Waiting for new data.");
-        }
         if(fileQueue.isEmpty()){
             log.info("FileQueue is empty. Waiting for new data. ");
+            if (s != null){
+                    s.messageHandler.sendDataStatus("Waiting for new data.");
+            }
         }
 
         String path = fileQueue.take().toFile().getAbsolutePath();
