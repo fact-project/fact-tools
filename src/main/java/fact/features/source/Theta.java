@@ -1,14 +1,10 @@
 package fact.features.source;
 
-import fact.Constants;
 import fact.Utils;
 import fact.coordinates.CameraCoordinate;
-import fact.coordinates.HorizontalCoordinate;
-import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import sun.management.HotspotRuntimeMBean;
 
 public class Theta implements Processor {
 	@Parameter(required=true)
