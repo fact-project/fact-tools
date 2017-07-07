@@ -5,7 +5,7 @@ import fact.cleaning.TwoLevelTimeMedian;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
-import fact.features.source.SourcePositionOld;
+import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
 import fact.io.FITSStream;
 import fact.io.FITSStreamTest;
@@ -102,7 +102,7 @@ public class ParameterTest {
         dist.setOutputKey(distribution);
         dist.process(item);
 
-        SourcePositionOld pos = new SourcePositionOld();
+        SourcePosition pos = new SourcePosition();
         pos.setX(0.0);
         pos.setY(0.0);
         pos.setOutputKey(sourcePosition);

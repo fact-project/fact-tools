@@ -50,7 +50,7 @@ import java.time.*;
  *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt, Max Nöthe;
  */
 public class SourcePosition implements StatefulProcessor {
-    private static final Logger log = LoggerFactory.getLogger(SourcePositionOld.class);
+    private static final Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
 
     @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
