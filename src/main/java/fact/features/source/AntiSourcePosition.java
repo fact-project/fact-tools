@@ -32,12 +32,14 @@ public class AntiSourcePosition implements Processor {
 		double rotAngle = 2 * Math.PI * antiSourcePositionId / (numberOfAntiSourcePositions + 1);
 
 		CameraCoordinate antiSource = new CameraCoordinate(
-			source.xMM * Math.cos(rotAngle) - source.xMM * Math.sin(rotAngle),
-			source.yMM * Math.sin(rotAngle) + source.yMM * Math.cos(rotAngle)
+			source.xMM * Math.cos(rotAngle) - source.yMM * Math.sin(rotAngle),
+			source.xMM * Math.sin(rotAngle) + source.yMM * Math.cos(rotAngle)
 		);
 
 		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antiSource));
 		input.put(outputKey, antiSource);
+		input.put(outputKey + "_x", antiSource.xMM);
+		input.put(outputKey + "_y", antiSource.yMM);
 		return input;
 	}
 

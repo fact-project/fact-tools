@@ -222,13 +222,20 @@ public class SourcePosition implements StatefulProcessor {
             data.put("SourceName", sourceName);
             data.put(outputKey, sourceCamera);
             data.put(outputKey + "_x", sourceCamera.xMM);
-            data.put(outputKey + "_y", sourceCamera.xMM);
+            data.put(outputKey + "_y", sourceCamera.yMM);
 
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
             data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(auxZd, auxAz));
             data.put("pointingPosition", pointingHorizontal);
             data.put("sourcePositionHorizontal", sourceHorizontal);
+            data.put("sourcePositionZd", sourceHorizontal.getZenithDeg());
+            data.put("sourcePositionAz", sourceHorizontal.getAzimuthDeg());
+
+            data.put("auxPointingPositionZd", auxZd);
+            data.put("auxPointingPositionAz", auxAz);
+            data.put("pointingPositionZd", pointingHorizontal.getZenithDeg());
+            data.put("pointingPositionAz", pointingHorizontal.getAzimuthDeg());
 
             data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
 
