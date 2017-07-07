@@ -11,6 +11,7 @@
     <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
 
     <stream id="fact" class="fact.io.FITSStream" url="${infile}"/>
 

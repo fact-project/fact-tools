@@ -2,12 +2,16 @@ package fact.photonstream;
 
 import fact.Constants;
 import fact.Utils;
+import fact.photonstream.timeSeriesExtraction.TemplatePulse;
 import stream.Data;
-import stream.Processor;
+import stream.StatefulProcessor;
+import stream.ProcessContext;
 import stream.annotations.Parameter;
 import java.util.Arrays;
+import fact.calibrationservice.SinglePulseGainCalibService;
 import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
 import fact.photonstream.timeSeriesExtraction.ElementWise;
+import stream.annotations.Service;
 
 /**
  * Extracts a list of arrival slice positions of photons for each pixel
@@ -33,7 +37,8 @@ import fact.photonstream.timeSeriesExtraction.ElementWise;
  * Created by Sebastian Mueller
  * and some modifications from Jens Buss
 */
-public class SinglePulseExtraction implements Processor {
+public class SinglePulseExtraction implements StatefulProcessor {
+
     @Parameter(required=true, description="")
     private String dataKey = null;
 
@@ -80,14 +85,39 @@ public class SinglePulseExtraction implements Processor {
     )
     protected int extractionWindowLengthInSlices = 225;
 
+    @Service(
+        required = false,
+        description = "The calibration service for the integral single pulse gain"
+    )
+    SinglePulseGainCalibService gainService = null;
+
+    protected double[] gainCorrection = null;
+    protected double factSinglePePulseIntegral;
     private int npix = Constants.NUMBEROFPIXEL;
-    private int roi  = 300;
+    private int roi = 300;
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+
+        factSinglePePulseIntegral = TemplatePulse.factSinglePePulseIntegral();
+
+        if(gainService == null) {
+            gainCorrection = new double[npix];
+            for(int i=0; i<npix; i++) {gainCorrection[i] = 1.0;}
+        }else {
+            gainCorrection = gainService.getIntegralSinglePulseGain();
+            for(int i=0; i<npix; i++) {gainCorrection[i] /= factSinglePePulseIntegral;}
+        }
+    }
+
+    @Override
+    public void resetState() throws Exception {}
+
+    @Override
+    public void finish() throws Exception {}
 
     @Override
     public Data process(Data input) {
-
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        Utils.mapContainsKeys(input, dataKey,  "NPIX");
 
         npix = (Integer) input.get("NPIX");
         roi = (Integer) input.get("NROI");
@@ -114,7 +144,9 @@ public class SinglePulseExtraction implements Processor {
             );
 
             double[] pixelTimeSeries = ElementWise.multiply(
-                pixelTimeSeriesInMv, 1.0/config.factSinglePeAmplitudeInMv);
+                pixelTimeSeriesInMv,
+                1.0/gainCorrection[pix]
+            );
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(
                 pixelTimeSeries);
@@ -125,7 +157,7 @@ public class SinglePulseExtraction implements Processor {
                 outputWindowLengthInSlices);
             timeSeriesAfterExtraction[pix] = ElementWise.multiply(
                 result.timeSeriesAfterExtraction,
-                config.factSinglePeAmplitudeInMv);
+                gainCorrection[pix]);
             baseLine[pix] = result.timeSeriesBaseLine();
         }
 
@@ -148,7 +180,9 @@ public class SinglePulseExtraction implements Processor {
         }
     }
 
-
+    public void setGainService(SinglePulseGainCalibService gainService) {
+        this.gainService = gainService;
+    }
 
     public void setDataKey(String dataKey) {
         this.dataKey = dataKey;
@@ -177,5 +211,4 @@ public class SinglePulseExtraction implements Processor {
     public void setMaxIterations(int maxIterations) {
         this.maxIterations = maxIterations;
     }
-
 }

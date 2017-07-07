@@ -12,7 +12,7 @@
 
     <property name="auxFolder" value="file:src/main/resources/aux/" />
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
-
+    <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
     <!--In case you want to analyze .zfits files.-->

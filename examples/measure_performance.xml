@@ -7,6 +7,7 @@
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
   <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>

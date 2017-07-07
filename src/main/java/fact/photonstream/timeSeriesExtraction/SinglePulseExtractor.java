@@ -19,7 +19,6 @@ public class SinglePulseExtractor {
         public int pulseToLookForLength;
         public int plateauLength;
         public int negativePulseLength;
-        public double factSinglePeAmplitudeInMv;
         public int maxIterations;
 
         public Config() {
@@ -29,7 +28,6 @@ public class SinglePulseExtractor {
             pulseToLookForLength = 20;
             plateauLength = 7;
             negativePulseLength = 300;
-            factSinglePeAmplitudeInMv = 10.0;
             maxIterations = 250;
         }
     }

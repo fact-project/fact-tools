@@ -2,14 +2,14 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+import fact.calibrationservice.SinglePulseGainCalibService;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.io.CsvStream;
-import stream.io.SourceURL;
+import stream.annotations.Service;
 
 /**
  * This processor performs a basic extraction on the data array. It contains three steps:
@@ -31,9 +31,8 @@ public class BasicExtraction implements Processor {
 	protected String outputKeyMaxAmplPos = null;
 	@Parameter(required = true, description="outputKey for the calculated photoncharge")
 	protected String outputKeyPhotonCharge = null;
-	
-	@Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
-	protected SourceURL url = null;
+    @Service(required = true, description = "The calibration service for the integral single pulse gain")
+    SinglePulseGainCalibService gainService;
 	@Parameter(required = false, description="start slice of the search window for the max amplitude", defaultValue="35")
 	protected int startSearchWindow = 35;
 	@Parameter(required = false, description="range of the search window for the max amplitude", defaultValue="90")
@@ -55,6 +54,7 @@ public class BasicExtraction implements Processor {
 		
 		int roi = (Integer) input.get("NROI");
 		npix = (Integer) input.get("NPIX");
+		integralGains = gainService.getIntegralSinglePulseGain();
 		
 		double[] data = (double[]) input.get(dataKey);
 		
@@ -133,29 +133,6 @@ public class BasicExtraction implements Processor {
 		}
 		return integral;
 	}
-
-	
-	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
-		double[] integralGains = new double[npix];
-		Data integralGainData = null;
-		try {
-			CsvStream stream = new CsvStream(inputUrl, " ");
-			stream.setHeader(false);
-			stream.init();
-			integralGainData = stream.readNext();
-			
-			for (int i = 0 ; i < npix ; i++){
-				String key = "column:" + (i);
-				integralGains[i] = (Double) integralGainData.get(key);
-			}
-			return integralGains;
-			
-		} catch (Exception e) {
-			log.error("Failed to load integral Gain data: {}", e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
-	}
 	
 	public String getDataKey() {
 		return dataKey;
@@ -164,6 +141,10 @@ public class BasicExtraction implements Processor {
 	public void setDataKey(String dataKey) {
 		this.dataKey = dataKey;
 	}
+
+    public void setGainService(SinglePulseGainCalibService gainService) {
+        this.gainService = gainService;
+    }
 
 	public String getOutputKeyMaxAmplPos() {
 		return outputKeyMaxAmplPos;
@@ -221,19 +202,4 @@ public class BasicExtraction implements Processor {
 	public void setValidMinimalSlice(int validMinimalSlice) {
 		this.validMinimalSlice = validMinimalSlice;
 	}
-
-	public void setUrl(SourceURL url) {
-		try {
-			integralGains = loadIntegralGainFile(url,log);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		this.url = url;
-	}
-
-	public SourceURL getUrl() {
-		return url;
-	}
-
-
 }

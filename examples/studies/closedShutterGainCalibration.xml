@@ -8,6 +8,7 @@
   <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <service id="gainService" class="fact.calibrationservice.SinglePulseGainCalibService" integralGainFile="${integralGainFile}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
   <!-- Open Shutter Data: -->
