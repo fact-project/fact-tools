@@ -19,11 +19,7 @@ import java.util.Set;
  * Created by mackaiver on 03/05/17.
  */
 public class MessageHandler {
-//
-//    public enum Topics{
-//        RUN_INFO("RUN_INFO"),
-//        DATA_RATE("DATA_RATE"),
-//    }
+
 
     final private static Logger log = LoggerFactory.getLogger(WebSocketService.class);
     private Gson gson;
@@ -45,32 +41,34 @@ public class MessageHandler {
         jsonObject.addProperty("rate", dataRate);
         jsonObject.addProperty("topic", "DATA_RATE");
 
-        sessions.stream().filter(Session::isOpen).forEach(session -> {
-            try {
-                session.getRemote().sendString(jsonObject.toString());
-            } catch (IOException e) {
-                log.error("Error sending datarate to session " + session);
-            }
-        });
+        sendToOpenSessions(jsonObject);
     }
 
     void sendRunInfo(Run run){
         JsonElement element = gson.toJsonTree(run);
         element.getAsJsonObject().addProperty("topic", "RUN_INFO");
-
-        sessions.stream().filter(Session::isOpen).forEach(session -> {
-            try {
-                session.getRemote().sendString(gson.toJson(element));
-            } catch (IOException e) {
-                log.error("Error sending run infos to session " + session);
-            }
-        });
+        sendToOpenSessions(element);
     }
 
     void sendStatus(StatusContainer status){
         JsonElement element = gson.toJsonTree(status);
         element.getAsJsonObject().addProperty("topic", "MACHINE_STATUS");
+        sendToOpenSessions(element);
+    }
+    void sendEvent(Event event){
+        JsonElement element = gson.toJsonTree(event);
+        element.getAsJsonObject().addProperty("topic", "EVENT");
+        sendToOpenSessions(element);
+    }
 
+    public void sendDataStatus(String s) {
+        JsonElement element = new JsonObject();
+        element.getAsJsonObject().addProperty("topic", "DATA_STATUS");
+        element.getAsJsonObject().addProperty("status", s);
+        sendToOpenSessions(element);
+    }
+
+    private void sendToOpenSessions(JsonElement element) {
         sessions.stream().filter(Session::isOpen).forEach(session -> {
             try {
                 session.getRemote().sendString(gson.toJson(element));
@@ -84,31 +82,4 @@ public class MessageHandler {
         });
     }
 
-    void sendEvent(Event event){
-        JsonElement element = gson.toJsonTree(event);
-        element.getAsJsonObject().addProperty("topic", "EVENT");
-
-        sessions.stream().filter(Session::isOpen).forEach(session -> {
-            try {
-                session.getRemote().sendString(gson.toJson(element));
-            } catch (IOException e) {
-                log.error("Error sending event to session " + session);
-            }
-        });
-    }
-
-
-    public void sendDataStatus(String s) {
-        JsonElement element = new JsonObject();
-        element.getAsJsonObject().addProperty("topic", "DATA_STATUS");
-        element.getAsJsonObject().addProperty("status", s);
-
-        sessions.stream().filter(Session::isOpen).forEach(session -> {
-            try {
-                session.getRemote().sendString(gson.toJson(element));
-            } catch (IOException e) {
-                log.error("Error sending event to session " + session);
-            }
-        });
-    }
 }
