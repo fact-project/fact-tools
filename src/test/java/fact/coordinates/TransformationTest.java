@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 
 import static org.junit.Assert.*;
 
-public class TransformationTests {
+public class TransformationTest {
     //Adjust the precision for the equatorialToHorizontal (raDec to AzimuthZenith) conversion here.
     double precision = 0.35;
 

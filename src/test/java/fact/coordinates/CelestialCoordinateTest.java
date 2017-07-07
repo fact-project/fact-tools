@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by maxnoe on 29.06.17.
  */
-public class CelestialCoordinateTests {
+public class CelestialCoordinateTest {
 
     static Logger log = LoggerFactory.getLogger(CelestialCoordinate.class);
     private double precision = 1e-4;
@@ -22,7 +22,7 @@ public class CelestialCoordinateTests {
     @Test
     public void testGMST() {
 
-        InputStream testDataStream = EquatorialCoordinateTests.class.getResourceAsStream("/coordinates/gmst_test_data.json");
+        InputStream testDataStream = EquatorialCoordinateTest.class.getResourceAsStream("/coordinates/gmst_test_data.json");
 
         Gson gson = new Gson();
         JsonReader jsonReader = new JsonReader(new InputStreamReader(testDataStream));

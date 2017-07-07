@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by maxnoe on 23.05.17.
  */
-public class CameraCoordinateTests {
+public class CameraCoordinateTest {
 
     @Test
     public void euclideanDistanceTest(){

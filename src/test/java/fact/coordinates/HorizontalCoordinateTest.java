@@ -15,14 +15,14 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by maxnoe on 29.06.17.
  */
-public class HorizontalCoordinateTests {
-    static Logger log = LoggerFactory.getLogger(HorizontalCoordinateTests.class);
+public class HorizontalCoordinateTest {
+    static Logger log = LoggerFactory.getLogger(HorizontalCoordinateTest.class);
     private double precisionAngles = 0.25;
     private double precisionDistance = 0.005;
 
     @Test
     public void toHorizontalTest() throws Exception {
-        InputStream testData = EquatorialCoordinateTests.class.getResourceAsStream("/coordinates/test_data.json");
+        InputStream testData = EquatorialCoordinateTest.class.getResourceAsStream("/coordinates/test_data.json");
 
         Gson gson = new Gson();
         JsonReader jsonReader = new JsonReader(new InputStreamReader(testData));
@@ -38,9 +38,9 @@ public class HorizontalCoordinateTests {
             EquatorialCoordinate sourceEq = sourceHz.toEquatorial(obstime, EarthLocation.FACT);
 
             log.info("date: {}, deviation {}", obstime, astropyReference.greatCircleDistanceDeg(sourceEq));
-            assertEquals(0.0, astropyReference.greatCircleDistanceDeg(sourceEq), precisionDistance);
-            assertEquals(astropyReference.getRightAscensionDeg(), sourceEq.getRightAscensionDeg(), precisionAngles);
-            assertEquals(astropyReference.getDeclinationDeg(), sourceEq.getDeclinationDeg(), precisionAngles);
+            assertEquals("greatCircleDistance to reference to large", 0.0, astropyReference.greatCircleDistanceDeg(sourceEq), precisionDistance);
+            assertEquals("Difference in RA to large", astropyReference.getRightAscensionDeg(), sourceEq.getRightAscensionDeg(), precisionAngles);
+            assertEquals("Difference in Dec to large", astropyReference.getDeclinationDeg(), sourceEq.getDeclinationDeg(), precisionAngles);
         }
     }
 }

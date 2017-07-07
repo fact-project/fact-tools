@@ -57,15 +57,15 @@ if __name__ == '__main__':
 /**
  * Created by maxnoe on 29.06.17
  */
-public class EquatorialCoordinateTests {
+public class EquatorialCoordinateTest {
 
-    static Logger log = LoggerFactory.getLogger(EquatorialCoordinateTests.class);
+    static Logger log = LoggerFactory.getLogger(EquatorialCoordinateTest.class);
     private double precisionAngles = 0.25;
     private double precisionDistance = 0.005;
 
     @Test
     public void toHorizontalTest() throws Exception {
-        InputStream testData = EquatorialCoordinateTests.class.getResourceAsStream("/coordinates/test_data.json");
+        InputStream testData = EquatorialCoordinateTest.class.getResourceAsStream("/coordinates/test_data.json");
 
         Gson gson = new Gson();
         JsonReader jsonReader = new JsonReader(new InputStreamReader(testData));

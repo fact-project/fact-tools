@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by maxnoe on 22.05.17.
  */
-public class DistanceTests {
+public class DistanceTest {
 
     @Test
     public void HorizontalDistance1() {
