@@ -117,9 +117,12 @@ public class RTAStream extends AbstractMultiStream {
         @Override
         public void run() {
             Path dir = Paths.get(folder);
+            WebSocketService s = WebSocketService.getService();
+            if (s == null){
+                log.info("Could not get an instance of the websocket service");
+            }
             try {
                 log.info("Checking file system for new data.");
-                WebSocketService s = WebSocketService.getService();
                 if(s != null){
                     s.messageHandler.sendDataStatus("Checking for new data.");
                 }
