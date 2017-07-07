@@ -37,8 +37,9 @@ public class HorizontalCoordinateTests {
 
             EquatorialCoordinate sourceEq = sourceHz.toEquatorial(obstime, EarthLocation.FACT);
 
-            assertEquals(0.0, astropyReference.greatCircleDistance(sourceEq), precisionDistance);
-            assertEquals(astropyReference.getRightAscensionHA(), sourceEq.getRightAscensionHA(), precisionAngles);
+            log.info("date: {}, deviation {}", obstime, astropyReference.greatCircleDistanceDeg(sourceEq));
+            assertEquals(0.0, astropyReference.greatCircleDistanceDeg(sourceEq), precisionDistance);
+            assertEquals(astropyReference.getRightAscensionDeg(), sourceEq.getRightAscensionDeg(), precisionAngles);
             assertEquals(astropyReference.getDeclinationDeg(), sourceEq.getDeclinationDeg(), precisionAngles);
         }
     }

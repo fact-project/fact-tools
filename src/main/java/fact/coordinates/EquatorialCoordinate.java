@@ -92,8 +92,15 @@ public class EquatorialCoordinate implements CelestialCoordinate {
      * @param other
      * @return Angular great circle distance in radians
      */
-    public double greatCircleDistance(EquatorialCoordinate other) {
-        return CelestialCoordinate.greatCircleDistance(
+    public double greatCircleDistanceRad(EquatorialCoordinate other) {
+        return CelestialCoordinate.greatCircleDistanceRad(
+                this.getDeclinationRad(), this.getRightAscensionRad(),
+                other.getDeclinationRad(), other.getRightAscensionRad()
+        );
+    }
+
+    public double greatCircleDistanceDeg(EquatorialCoordinate other) {
+        return CelestialCoordinate.greatCircleDistanceDeg(
                 this.getDeclinationRad(), this.getRightAscensionRad(),
                 other.getDeclinationRad(), other.getRightAscensionRad()
         );

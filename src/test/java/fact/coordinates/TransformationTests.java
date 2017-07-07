@@ -227,8 +227,8 @@ public class TransformationTests {
         HorizontalCoordinate mrk421HorizontalBack = mrk421Camera.toHorizontal(pointingPosition, 4.889e3);
         EquatorialCoordinate mrk421EquatorialBack = mrk421HorizontalBack.toEquatorial(observationTime, FACTLocation);
 
-        assertEquals(0.0, mrk421HorizontalBack.greatCircleDistance(mrk421Horizontal),   1e-12);
-        assertEquals(0.0, mrk421EquatorialBack.greatCircleDistance(mrk421Equatorial), 1e-12);
+        assertEquals(0.0, mrk421HorizontalBack.greatCircleDistanceDeg(mrk421Horizontal),   1e-12);
+        assertEquals(0.0, mrk421EquatorialBack.greatCircleDistanceDeg(mrk421Equatorial), 1e-12);
     }
 
     @Test
@@ -244,8 +244,8 @@ public class TransformationTests {
         HorizontalCoordinate mrk501HorizontalBack = mrk501Camera.toHorizontal(pointingPosition, 4.889e3);
         EquatorialCoordinate mrk501EquatorialBack = mrk501HorizontalBack.toEquatorial(observationTime, FACTLocation);
 
-        assertEquals(0.0, mrk501HorizontalBack.greatCircleDistance(mrk501Horizontal), 1e-12);
-        assertEquals(0.0, mrk501EquatorialBack.greatCircleDistance(mrk501Equatorial), 1e-12);
+        assertEquals(0.0, mrk501HorizontalBack.greatCircleDistanceDeg(mrk501Horizontal), 1e-12);
+        assertEquals(0.0, mrk501EquatorialBack.greatCircleDistanceDeg(mrk501Equatorial), 1e-12);
     }
 
     @Test
@@ -261,8 +261,8 @@ public class TransformationTests {
         HorizontalCoordinate crabHorizontalBack = crabCamera.toHorizontal(pointingPosition, 4.889e3);
         EquatorialCoordinate crabEquatorialBack = crabHorizontalBack.toEquatorial(observationTime, FACTLocation);
 
-        assertEquals(0.0, crabHorizontalBack.greatCircleDistance(crabHorizontal), 1e-12);
-        assertEquals(0.0, crabEquatorialBack.greatCircleDistance(crabEquatorial), 1e-12);
+        assertEquals(0.0, crabHorizontalBack.greatCircleDistanceDeg(crabHorizontal), 1e-12);
+        assertEquals(0.0, crabEquatorialBack.greatCircleDistanceDeg(crabEquatorial), 1e-12);
     }
 
 
@@ -279,8 +279,8 @@ public class TransformationTests {
         HorizontalCoordinate gcHorizontalBack = gcCamera.toHorizontal(pointingPosition, 4.889e3);
         EquatorialCoordinate gcEquatorialBack = gcHorizontalBack.toEquatorial(observationTime, FACTLocation);
 
-        assertEquals(0.0, gcHorizontalBack.greatCircleDistance(gcHorizontal), 1e-12);
-        assertEquals(0.0, gcEquatorialBack.greatCircleDistance(gcEquatorial), 1e-12);
+        assertEquals(0.0, gcHorizontalBack.greatCircleDistanceDeg(gcHorizontal), 1e-12);
+        assertEquals(0.0, gcEquatorialBack.greatCircleDistanceDeg(gcEquatorial), 1e-12);
     }
 
 }

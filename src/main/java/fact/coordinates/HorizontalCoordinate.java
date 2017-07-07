@@ -31,8 +31,15 @@ public class HorizontalCoordinate implements CelestialCoordinate {
         return new HorizontalCoordinate(Math.toRadians(zenithDeg), Math.toRadians(azimuthDeg));
     }
 
-    public double greatCircleDistance(HorizontalCoordinate other) {
-        return CelestialCoordinate.greatCircleDistance(
+    public double greatCircleDistanceRad(HorizontalCoordinate other) {
+        return CelestialCoordinate.greatCircleDistanceRad(
+                this.getAltitudeRad(), this.getAzimuthRad(),
+                other.getAltitudeRad(), other.getAzimuthRad()
+        );
+    }
+
+    public double greatCircleDistanceDeg(HorizontalCoordinate other) {
+        return CelestialCoordinate.greatCircleDistanceDeg(
                 this.getAltitudeRad(), this.getAzimuthRad(),
                 other.getAltitudeRad(), other.getAzimuthRad()
         );

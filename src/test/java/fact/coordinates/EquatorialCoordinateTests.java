@@ -79,9 +79,9 @@ public class EquatorialCoordinateTests {
 
             HorizontalCoordinate sourceHz = sourceEq.toHorizontal(obstime, EarthLocation.FACT);
 
-            assertEquals(0.0, astropyReference.greatCircleDistance(sourceHz), precisionDistance);
-            assertEquals(astropyReference.getAzimuthDeg(), sourceHz.getAzimuthDeg(), precisionAngles);
-            assertEquals(astropyReference.getZenithDeg(), sourceHz.getZenithDeg(), precisionAngles);
+            assertEquals("Great Circle Distance to reference to large", 0.0, astropyReference.greatCircleDistanceDeg(sourceHz), precisionDistance);
+            assertEquals("Difference in Azimuth to large", astropyReference.getAzimuthDeg(), sourceHz.getAzimuthDeg(), precisionAngles);
+            assertEquals("Difference in Zenith to large", astropyReference.getZenithDeg(), sourceHz.getZenithDeg(), precisionAngles);
         }
     }
 }

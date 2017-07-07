@@ -27,7 +27,7 @@ public interface CelestialCoordinate extends Serializable {
      * @param lon2 Longitude of second point
      * @return Great circle distance between the two points
      */
-    static double greatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
+    static double greatCircleDistanceRad(double lat1, double lon1, double lat2, double lon2) {
 
         double deltaLon = lon1 - lon2;
 
@@ -40,6 +40,10 @@ public interface CelestialCoordinate extends Serializable {
         double denominator = t3 + t4;
 
         return Math.atan2(numerator, denominator);
+    }
+
+    static double greatCircleDistanceDeg(double lat1, double lon1, double lat2, double lon2) {
+        return Math.toDegrees(greatCircleDistanceRad(lat1, lon1, lat2, lon2));
     }
 
 
