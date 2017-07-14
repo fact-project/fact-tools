@@ -122,6 +122,7 @@ public class BinTable {
     public Integer numberOfRowsInTable = 0;
     public Integer numberOfColumnsInTable = 0;
     public final String name;
+    public Integer numberOfBytesPerRow = 0; // in header value: naxis1
 
 
     BinTable(Header header, long hduOffset, URL url) throws IllegalArgumentException, IOException {
@@ -157,6 +158,7 @@ public class BinTable {
         });
 
 
+        numberOfBytesPerRow = header.getInt("ZNAXIS1").orElse(header.getInt("NAXIS1").orElse(0));
         numberOfRowsInTable = header.getInt("ZNAXIS2").orElse(header.getInt("NAXIS2").orElse(0));
         numberOfColumnsInTable = columns.size();
 

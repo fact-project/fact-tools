@@ -71,6 +71,9 @@ public class FITSStream extends AbstractStream {
     }
 
 
+    public Reader getReader() {
+        return reader;
+    }
 
     private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants){
         int numChannel = 1440;
