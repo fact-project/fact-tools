@@ -3,6 +3,7 @@ package fact.utils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -39,6 +40,18 @@ public class RemappingTest {
         assertTrue("Remapping went wrong. Element should be 890", remappedData[1*roi] == 1419);
         //chid 0 is softid 393
         assertTrue("Remapping went wrong. Element should be 890", remappedData[393*roi] == 0);
+    }
+
+    @Test
+    public void testReRemapping() {
+        Remapping re = new Remapping();
+        int roi = data.length/1440;
+        assertTrue("First array element should contain 0", data[0] == 0);
+        re.remapFromSoftIdToChid(data, remappedData);
+        short[] reremappedData = new short[1440*300];
+        re.remapFromChidToSoftId(remappedData, reremappedData);
+
+        assertArrayEquals(data, reremappedData);
     }
 
 

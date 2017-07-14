@@ -15,7 +15,7 @@ import stream.annotations.Parameter;
 /**
  * This processors changes the order of the pixels in the data from SoftId to Chid
  *
- * @author kai
+ * @author kai , Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
  *
  */
 public class Remapping implements Processor{

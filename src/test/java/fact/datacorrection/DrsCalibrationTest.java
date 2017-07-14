@@ -11,6 +11,7 @@ import java.io.File;
 import java.net.URL;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -57,6 +58,30 @@ public class DrsCalibrationTest {
         item.put("@drsFile", new File(drsUrl.getFile()));
 
         item = pr.process(item);
+        assertThat(item.containsKey("test"), is(true));
+
+    }
+
+    @Test
+    public void testDrsRevertion() throws Exception{
+
+        DrsCalibration pr = new DrsCalibration();
+        pr.setOutputKey("test");
+        pr.init(null);
+
+        DrsCalibration revertPr = new DrsCalibration();
+        revertPr.setReverse(true);
+        revertPr.setKey("test");
+        revertPr.setOutputKey("test2");
+        revertPr.init(null);
+
+        Data item = stream.readNext();
+        item.put("@drsFile", new File(drsUrl.getFile()));
+
+        item = pr.process(item);
+        item = revertPr.process(item);
+
+        assertArrayEquals((short[])item.get("Data"), (short[])item.get("test2"));
         assertThat(item.containsKey("test"), is(true));
 
     }

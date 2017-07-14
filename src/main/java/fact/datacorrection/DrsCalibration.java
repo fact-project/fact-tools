@@ -3,6 +3,7 @@
  */
 package fact.datacorrection;
 
+import fact.Utils;
 import fact.io.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ import java.net.MalformedURLException;
  * either as File or URL and will read the DRS data from that. This data is then
  * applied to all FactEvents processed by this class.
  *
- * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
+ * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt; , Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
  */
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
@@ -35,6 +36,9 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
     private SourceURL url = null;
+
+	@Parameter(required =  false, description = "Whether to reverse the process.", defaultValue = "false")
+	private boolean reverse = false;
 
     Data drsData = null;
 
@@ -128,19 +132,25 @@ public class DrsCalibration implements StatefulProcessor {
             }
 		}
 
+		double[] rawfloatData;
 		log.debug("Processing Data item by applying DRS calibration...");
-		short[] rawData = (short[]) data.get(key);
-		if (rawData == null) {
-			log.error(" data .fits file did not contain the value for the key "
-					+ key + ". cannot apply drscalibration");
-			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
-		}
+        if (!reverse) {
+			short[] rawData = (short[]) data.get(key);
+			if (rawData == null) {
+				log.error(" data .fits file did not contain the value for the key "
+						+ key + ". cannot apply drscalibration");
+				throw new RuntimeException(
+						" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
+			}
 
-		double[] rawfloatData = new double[rawData.length];
-		// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
-		for (int i = 0; i < rawData.length; i++) {
-			rawfloatData[i] = rawData[i];
+			rawfloatData = new double[rawData.length];
+			// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
+			for (int i = 0; i < rawData.length; i++) {
+				rawfloatData[i] = rawData[i];
+			}
+		} else {
+			Utils.isKeyValid(data, key, double[].class);
+			rawfloatData = (double[]) data.get(key);
 		}
 
 		short[] startCell = (short[]) data.get("StartCellData");
@@ -148,19 +158,28 @@ public class DrsCalibration implements StatefulProcessor {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
 		}
-		log.debug("raw data has {} elements", rawData.length);
+		log.debug("raw data has {} elements", rawfloatData.length);
 		log.debug("StartCellData has {} elements", startCell.length);
 
 		double[] output = rawfloatData;
 		if (!key.equals(outputKey)) {
-			output = new double[rawData.length];
+			output = new double[rawfloatData.length];
 		}
 
 		double[] calibrated = applyDrsCalibration(rawfloatData, output,
 				startCell);
-		data.put(outputKey, calibrated);
+		if (!reverse)
+			data.put(outputKey, calibrated);
+		else {
+			short[] shortres = new short[calibrated.length];
+			// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
+			for (int i = 0; i < calibrated.length; i++) {
+				shortres[i] = (short)calibrated[i];
+			}
+			data.put(outputKey, shortres);
+		}
 
-		// add color value if set
+		//TODO add color value if set
 
 		return data;
 	}
@@ -256,11 +275,21 @@ public class DrsCalibration implements StatefulProcessor {
 				triggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
 						+ slice;
 
-				vraw = data[pos] * dconv;
-				vraw -= drsBaselineMean[offsetPos];
-				vraw -= drsTriggerOffsetMean[triggerOffsetPos];
-				vraw /= drsGainMean[offsetPos];
-				vraw *= 1907.35;
+				if (!reverse) {
+					vraw = data[pos];
+					vraw *= dconv;
+					vraw -= drsBaselineMean[offsetPos];
+					vraw -= drsTriggerOffsetMean[triggerOffsetPos];
+					vraw /= drsGainMean[offsetPos];
+					vraw *= 1907.35;
+				} else {
+					vraw = data[pos];
+					vraw /= 1907.35;
+					vraw *= drsGainMean[offsetPos];
+					vraw += drsTriggerOffsetMean[triggerOffsetPos];
+					vraw += drsBaselineMean[offsetPos];
+					vraw /= dconv;
+				}
 
 				// slice_pt = pixel_pt + sl;
 				// drs_cal_offset = ( sl + StartCellVector[ pixel ] ) %
@@ -316,6 +345,10 @@ public class DrsCalibration implements StatefulProcessor {
 
 	public void setUrl(SourceURL url) {
         this.url = url;
+	}
+
+	public void setReverse(boolean b) {
+		this.reverse = b;
 	}
 
 
