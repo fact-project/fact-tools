@@ -3,7 +3,7 @@
  */
 package fact.datacorrection;
 
-import fact.io.FITSStream;
+import fact.io.hdureader.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;

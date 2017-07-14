@@ -1,8 +1,8 @@
 package fact.datacorrection;
 
 import fact.hexmap.FactPixelMapping;
-import fact.io.FITSStream;
 import fact.utils.LinearTimeCorrectionKernel;
+import fact.io.hdureader.FITSStream;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;

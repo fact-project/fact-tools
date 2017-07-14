@@ -11,7 +11,7 @@
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-  <stream id="zfits" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
+  <stream id="zfits" class="fact.io.hdureader.FITSStream"  url="${infile}"/>
 
   <!-- Description of the process and the corresponding stream -->
   <process id="1" input="zfits">

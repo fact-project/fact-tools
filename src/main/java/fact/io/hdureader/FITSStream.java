@@ -31,6 +31,8 @@ public class FITSStream extends AbstractStream {
         this.url = url;
     }
 
+    public FITSStream() {    }
+
     @Override
     public void init() throws Exception {
         super.init();
