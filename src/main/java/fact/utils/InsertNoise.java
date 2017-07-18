@@ -113,19 +113,16 @@ public class InsertNoise implements Processor{
         int night = (int)dbItem.get("NIGHT");
         int runid = (int)dbItem.get("RUNID");
         int noiseNr = (int)dbItem.get("noiseNr");
-        double nsb = (double)dbItem.get("NSB");
+        double currents = (double)dbItem.get("currents");
+        String filename = (String)dbItem.get("filename");
 
-        String noiseFileStr = this.noiseFolder+"/"+Integer.toString(night)+"_"+Integer.toString(runid)+".fits";
-        File noiseFile = new File(noiseFileStr);
+        File noiseFile = new File(filename);
         if (!noiseFile.exists()) { //check if file is gzip file
-            noiseFileStr += ".gz";
-            noiseFile = new File(noiseFileStr);
-            if (!noiseFile.exists())
-                throw new RuntimeException("Couldn't find noisefile: "+noiseFileStr);
+            throw new RuntimeException("Couldn't find noisefile: "+filename);
         }
         Data item;
         try {
-            FITSStream fits = new FITSStream(new SourceURL(noiseFileStr));
+            FITSStream fits = new FITSStream(new SourceURL(filename));
             //skip to the event num
             BinTableReader bintable = (BinTableReader)fits.getReader();
             bintable.goToRow(noiseNr);
@@ -134,7 +131,7 @@ public class InsertNoise implements Processor{
             throw new RuntimeException(e);
         }
 
-        item.put("NSB", nsb);
+        item.put("currents", currents);
         item.put("noiseNr", noiseNr);
         return item;
     }
@@ -158,7 +155,7 @@ public class InsertNoise implements Processor{
                 // add index to the correct bin_index
                 double value = (double)item.get(this.dbBinningKey);
                 int binNum = this.getBin(value);
-                this.bins_index.get(binNum).get(this.database.size());
+                this.bins_index.get(binNum).add(this.database.size()-1);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -181,11 +178,14 @@ public class InsertNoise implements Processor{
         if (bins == null) {
             prepareNoiseDatabase();
         }
-        Utils.isKeyValid(input, "ZdTracking", Double.class);
-        double zd_input =(double)input.get("ZdTracking");
+        Utils.isKeyValid(input, this.itemBinningKey, Double.class);
+        double zd_input =(double)input.get(this.itemBinningKey);
 
         int binNum = this.getBin(zd_input);
-        Data item = this.getNoiseEvent(binNum);
+        int sampleSize = this.bins_index.get(binNum).size();
+        int rand = this.randGenerator.nextInt(sampleSize);
+        int index = this.bins_index.get(binNum).get(rand);
+        Data item = this.getNoiseEvent(index);
         // insert the result into the input item
         for (String s : item.keySet()) {
             input.put(this.prependKey+s, item.get(s));

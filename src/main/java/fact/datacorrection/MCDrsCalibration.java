@@ -22,7 +22,7 @@ import java.net.MalformedURLException;
  * either as File or URL and will read the DRS data from that. This data is then
  * applied to all FactEvents processed by this class.
  *
- * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
+ * @author Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
  */
 public class MCDrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(MCDrsCalibration.class);
@@ -35,6 +35,9 @@ public class MCDrsCalibration implements StatefulProcessor {
 
     @Parameter(required =  false, description = "Whether to reverse the process.", defaultValue = "false")
     private boolean reverse = false;
+
+	@Parameter(required =  false, description = "Add the startCellData into this key, when the calibration is reversed. if null nothing is done.", defaultValue = "null")
+	private String startCellKey = null;
 
 	/**
 	 * @see stream.Processor#process(Data)
@@ -58,6 +61,10 @@ public class MCDrsCalibration implements StatefulProcessor {
 				rawData[i] = (short)((calibData[i]-903.32031)*(4096/2000));
 			}
 
+			if (startCellKey!=null) {
+				short[] startCells = new short[1440];
+				data.put(startCellKey, startCells);
+			}
 			data.put(outputKey, rawData);
 		}
 
@@ -91,6 +98,10 @@ public class MCDrsCalibration implements StatefulProcessor {
 
 	public void setReverse(boolean rev) {
         this.reverse = rev;
+	}
+
+	public void setStartCellKey(String startCellKey) {
+		this.startCellKey = startCellKey;
 	}
 
 
