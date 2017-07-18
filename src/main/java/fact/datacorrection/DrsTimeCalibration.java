@@ -1,13 +1,19 @@
 package fact.datacorrection;
 
 import fact.hexmap.FactPixelMapping;
+import fact.io.hdureader.*;
 import fact.utils.LinearTimeCorrectionKernel;
-import fact.io.hdureader.FITSStream;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.data.DataFactory;
 import stream.io.SourceURL;
+
+import java.io.Serializable;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.google.common.primitives.Doubles.max;
 
@@ -53,7 +59,8 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
     private Data drsTimeData;
     public double[][] true_sampling_time;
-
+    private Map<String, Serializable> fitsHeader = new HashMap<>();
+    private Reader reader;
     private FactPixelMapping m;
     private LinearTimeCorrectionKernel linearTimeCorrectionKernel = new LinearTimeCorrectionKernel();
 
@@ -123,10 +130,34 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
     protected double[] loadDrsTimeCalibConstants(SourceURL  in) {
         try {
+            URL url=new URL(in.getProtocol(),in.getHost(),in.getPort(),in.getFile());
+            FITS fits = new FITS(url);
+            HDU eventHDU = fits.getHDU("DrsCellTimes");
+            if (eventHDU!=null) {
+                BinTable eventsTable = eventHDU.getBinTable();
 
-            FITSStream stream = new FITSStream(in);
-            stream.init();
-            drsTimeData = stream.readNext();
+                //read each headerline and try to get the right datatype
+                //from smallest to largest datatype
+                //if no number can be found simply save the string.
+                Header header = eventHDU.header;
+                fitsHeader = header.asMapOfSerializables();
+
+                Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+                if (ztable) {
+                    reader = ZFITSHeapReader.forTable(eventsTable);
+                } else {
+                    reader = BinTableReader.forBinTable(eventsTable);
+                }
+            }
+            if(!reader.hasNext()){
+                drsTimeData= null;
+            }
+
+            OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
+            Data item = DataFactory.create(nextRow);
+            item.putAll(fitsHeader);
+
+            drsTimeData= item;
 
             if (!drsTimeData.containsKey(drsTimeKey))
             {

@@ -3,17 +3,22 @@
  */
 package fact.datacorrection;
 
-import fact.io.hdureader.FITSStream;
+import fact.io.hdureader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.data.DataFactory;
 import stream.io.SourceURL;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -26,7 +31,8 @@ import java.net.MalformedURLException;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-
+	private Map<String, Serializable> fitsHeader = new HashMap<>();
+	private Reader reader;
 	private String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
@@ -66,9 +72,35 @@ public class DrsCalibration implements StatefulProcessor {
 	 */
 	protected void loadDrsData(SourceURL in) {
 		try {
-			FITSStream stream = new FITSStream(in);
-			stream.init();
-			drsData = stream.readNext();
+			URL url=new URL(in.getProtocol(),in.getHost(),in.getPort(),in.getFile());
+			FITS fits = new FITS(url);
+			HDU eventHDU = fits.getHDU("DrsCalibration");
+			if (eventHDU!=null) {
+				BinTable eventsTable = eventHDU.getBinTable();
+
+				//read each headerline and try to get the right datatype
+				//from smallest to largest datatype
+				//if no number can be found simply save the string.
+				Header header = eventHDU.header;
+				fitsHeader = header.asMapOfSerializables();
+
+				Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+				if (ztable) {
+					reader = ZFITSHeapReader.forTable(eventsTable);
+				} else {
+					reader = BinTableReader.forBinTable(eventsTable);
+				}
+			}
+			if(!reader.hasNext()){
+				drsData= null;
+			}
+
+			OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
+			Data item = DataFactory.create(nextRow);
+			item.putAll(fitsHeader);
+
+			drsData= item;
+
 			log.debug("Read DRS data: {}", drsData);
 
 			// this for-loop is simply a check that fires an exception if any
