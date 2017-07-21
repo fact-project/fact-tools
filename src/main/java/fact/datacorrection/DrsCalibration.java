@@ -292,18 +292,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     }
 
-	// -----------setter---------------------
-	public void setKey(String key) {
-		this.key = key;
-	}
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setUrl(URL url) {
-        this.url = url;
-	}
 
 
 }
