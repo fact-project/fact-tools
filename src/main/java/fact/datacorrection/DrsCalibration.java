@@ -10,15 +10,13 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.data.DataFactory;
 import stream.io.SourceURL;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -31,8 +29,6 @@ import java.util.Map;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	private Map<String, Serializable> fitsHeader = new HashMap<>();
-	private Reader reader;
 	private String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
@@ -40,7 +36,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
-    private SourceURL url = null;
+    private URL url = null;
 
     Data drsData = null;
 
@@ -70,70 +66,29 @@ public class DrsCalibration implements StatefulProcessor {
 	 * @param in
 	 *            sourceurl to be loaded
 	 */
-	protected void loadDrsData(SourceURL in) {
+	protected void loadDrsData(URL in) {
 		try {
-			URL url=new URL(in.getProtocol(),in.getHost(),in.getPort(),in.getFile());
-			FITS fits = new FITS(url);
-			HDU eventHDU = fits.getHDU("DrsCalibration");
-			if (eventHDU!=null) {
-				BinTable eventsTable = eventHDU.getBinTable();
+			FITS fits = new FITS(in);
+			BinTable calibrationTable = fits.getBinTableByName("DrsCalibration").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCalibration\""));
 
-				//read each headerline and try to get the right datatype
-				//from smallest to largest datatype
-				//if no number can be found simply save the string.
-				Header header = eventHDU.header;
-				fitsHeader = header.asMapOfSerializables();
+			BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
-				Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-				if (ztable) {
-					reader = ZFITSHeapReader.forTable(eventsTable);
-				} else {
-					reader = BinTableReader.forBinTable(eventsTable);
-				}
-			}
-			if(!reader.hasNext()){
-				drsData= null;
-			}
 
-			OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
-			Data item = DataFactory.create(nextRow);
-			item.putAll(fitsHeader);
+			OptionalTypesMap<String, Serializable> row = reader.getNextRow();
 
-			drsData= item;
+			this.drsBaselineMean = row.getFloatArray("BaselineMean").orElseThrow( ()-> new RuntimeException("File does not contain keyBaselineMean"));
+			this.drsBaselineRms = row.getFloatArray("BaselineRms").orElseThrow( ()-> new RuntimeException("File does not contain key BaselineRms"));
 
-			log.debug("Read DRS data: {}", drsData);
+			this.drsTriggerOffsetMean = row.getFloatArray("TriggerOffsetMean").orElseThrow( ()-> new RuntimeException("File does not contain key TriggerOffsetMean"));
+			this.drsTriggerOffsetRms = row.getFloatArray("TriggerOffsetRms").orElseThrow( ()-> new RuntimeException("File does not contain key TriggerOffsetRms"));
+			this.drsGainMean = row.getFloatArray("GainMean").orElseThrow( ()-> new RuntimeException("File does not contain key GainMean"));
+			this.drsGainRms = row.getFloatArray("GainRms").orElseThrow( ()-> new RuntimeException("File does not contain key GainRms"));
 
-			// this for-loop is simply a check that fires an exception if any
-			// of the expected keys is missing
-			//
-			for (String key : drsKeys) {
-				if (!drsData.containsKey(key)) {
-					throw new RuntimeException("DRS data is missing key '"
-							+ key + "'!");
-				}
-			}
-
-			this.drsBaselineMean = (float[]) drsData.get("BaselineMean");
-			this.drsBaselineRms = (float[]) drsData.get("BaselineRms");
-			this.drsTriggerOffsetMean = (float[]) drsData
-					.get("TriggerOffsetMean");
-			this.drsTriggerOffsetRms = (float[]) drsData
-					.get("TriggerOffsetRms");
-			this.drsGainMean = (float[]) drsData.get("GainMean");
-			this.drsGainRms = (float[]) drsData.get("GainRms");
-
-		} catch (Exception e) {
-
-			log.error("Failed to load DRS data: {}", e.getMessage());
-			if (log.isDebugEnabled())
-				e.printStackTrace();
-
-			this.drsData = null;
-			this.drsBaselineMean = null;
-			this.drsTriggerOffsetMean = null;
-
-			throw new RuntimeException(e.getMessage());
+		}catch(IOException e)
+		{
+			new IOException(e.getMessage());
 		}
+
 	}
 
 	/**
@@ -150,7 +105,7 @@ public class DrsCalibration implements StatefulProcessor {
                     currentDrsFile = drsFile;
                     try {
                         log.info("Using .drs File " + drsFile.getAbsolutePath());
-                        loadDrsData(new SourceURL(drsFile.toURI().toURL()));
+                        loadDrsData(drsFile.toURI().toURL());
                     } catch (MalformedURLException e) {
                         //pass.
                     }
@@ -346,7 +301,7 @@ public class DrsCalibration implements StatefulProcessor {
 		this.outputKey = outputKey;
 	}
 
-	public void setUrl(SourceURL url) {
+	public void setUrl(URL url) {
         this.url = url;
 	}
 

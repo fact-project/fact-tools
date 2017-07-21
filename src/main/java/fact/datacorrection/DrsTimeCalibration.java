@@ -7,13 +7,10 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.data.DataFactory;
 import stream.io.SourceURL;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.google.common.primitives.Doubles.max;
 
@@ -44,8 +41,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
 
     @Parameter(required = false, description = "", defaultValue = "The standard file provided in the jar")
-    SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
-
+    URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
     @Parameter(required = false, description = "")
     String outputKey = "DataCalibrated";
@@ -57,10 +53,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
     private String drsTimeKey = "CellOffset";
 
-    private Data drsTimeData;
     public double[][] true_sampling_time;
-    private Map<String, Serializable> fitsHeader = new HashMap<>();
-    private Reader reader;
     private FactPixelMapping m;
     private LinearTimeCorrectionKernel linearTimeCorrectionKernel = new LinearTimeCorrectionKernel();
 
@@ -128,42 +121,18 @@ public class DrsTimeCalibration implements StatefulProcessor{
         return data;
     }
 
-    protected double[] loadDrsTimeCalibConstants(SourceURL  in) {
+    protected double[] loadDrsTimeCalibConstants(URL in) {
         try {
-            URL url=new URL(in.getProtocol(),in.getHost(),in.getPort(),in.getFile());
-            FITS fits = new FITS(url);
-            HDU eventHDU = fits.getHDU("DrsCellTimes");
-            if (eventHDU!=null) {
-                BinTable eventsTable = eventHDU.getBinTable();
+            FITS fits = new FITS(in);
+            BinTable calibrationTable = fits.getBinTableByName("DrsCellTimes").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCellTimes\""));
 
-                //read each headerline and try to get the right datatype
-                //from smallest to largest datatype
-                //if no number can be found simply save the string.
-                Header header = eventHDU.header;
-                fitsHeader = header.asMapOfSerializables();
+            BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
-                Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-                if (ztable) {
-                    reader = ZFITSHeapReader.forTable(eventsTable);
-                } else {
-                    reader = BinTableReader.forBinTable(eventsTable);
-                }
-            }
-            if(!reader.hasNext()){
-                drsTimeData= null;
-            }
 
-            OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
-            Data item = DataFactory.create(nextRow);
-            item.putAll(fitsHeader);
+            OptionalTypesMap<String, Serializable> row = reader.getNextRow();
 
-            drsTimeData= item;
+            return(row.getDoubleArray(drsTimeKey).orElseThrow(()->new RuntimeException(drsTimeKey+"is not in the File")));
 
-            if (!drsTimeData.containsKey(drsTimeKey))
-            {
-                throw new RuntimeException("Drs time data is missing key + " + drsTimeKey + "!");
-            }
-            return (double[]) drsTimeData.get(drsTimeKey);
 
         } catch (Exception e) {
 
@@ -179,7 +148,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
     }
 
-    public void setUrl(SourceURL url) {
+    public void setUrl(URL url) {
         this.url = url;
     }
 
