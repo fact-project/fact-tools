@@ -1,6 +1,7 @@
 package fact.features.source;
 
 
+//import com.sun.scenario.effect.Offset;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
@@ -9,9 +10,6 @@ import fact.auxservice.strategies.Closest;
 import fact.auxservice.strategies.Earlier;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
 
 import fact.Utils;
 
@@ -26,6 +24,7 @@ import stream.annotations.Parameter;
 import stream.annotations.Service;
 
 import java.io.IOException;
+import java.time.*;
 
 
 /**
@@ -102,7 +101,7 @@ public class SourcePosition implements StatefulProcessor {
     private final double focalLength = 4889.0;
 
     // reference datetime
-    DateTime gstReferenceDateTime = new DateTime(2000, 1, 1, 12, 0, DateTimeZone.UTC);
+    ZonedDateTime gstReferenceDateTime = ZonedDateTime.of(2000, 1, 1, 12, 0, 0, 0, ZoneOffset.UTC);
 
 
     @Override
@@ -205,8 +204,7 @@ public class SourcePosition implements StatefulProcessor {
                 return null;
             }
 
-            double unixTime = eventTime[0] + (eventTime[1] / 1000000.0);
-            DateTime timeStamp = new DateTime((long) (1000 * unixTime), DateTimeZone.UTC);
+            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
@@ -265,10 +263,10 @@ public class SourcePosition implements StatefulProcessor {
      * @param datetime
      * @return gst in radians
      */
-    public double datetimeToGST(DateTime datetime){
+    public double datetimeToGST(ZonedDateTime datetime){
 
-    	Duration difference = new Duration(gstReferenceDateTime, datetime);
-    	double gst = 18.697374558 + 24.06570982441908 * (difference.getMillis() / 86400000.0);
+    	Duration difference = Duration.between(gstReferenceDateTime, datetime);
+    	double gst = 18.697374558 + 24.06570982441908 * (difference.toMillis() / 86400000.0);
 
         // normalize to [0, 24] and convert to radians
         gst = (gst % 24) / 12.0 * Math.PI;
@@ -284,7 +282,8 @@ public class SourcePosition implements StatefulProcessor {
      * @param datetime DateTime of the event
      * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
      */
-    public double[] equatorialToHorizontal(double ra, double dec, DateTime datetime){
+
+    public double[] equatorialToHorizontal(double ra, double dec, ZonedDateTime datetime){
         if (ra >= 24.0 || ra < 0.0 || dec >= 90.0 || dec <= -90 ){
             throw new RuntimeException("Ra or Dec values are invalid. They should be given in decimal arc hours and decimal degree");
         }

@@ -1,9 +1,5 @@
-package fact.io.hdu_reader;
+package fact.io.hdureader;
 
-import fact.io.hdureader.BinTable;
-import fact.io.hdureader.BinTableReader;
-import fact.io.hdureader.FITS;
-import fact.io.hdureader.OptionalTypesMap;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;

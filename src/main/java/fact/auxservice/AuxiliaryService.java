@@ -1,16 +1,15 @@
 package fact.auxservice;
 
 import fact.auxservice.strategies.AuxPointStrategy;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import stream.Data;
 import stream.service.Service;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Optional;
+
 
 /**
  * The service should provide the ability to get the aux data from some data source.
@@ -31,7 +30,7 @@ public interface AuxiliaryService extends Service {
      * @return the auxpoint according to the strategy
      * @throws IOException in case something goes wrong while trying to access the aux data. Be it a file or a database.
      */
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
+    AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException;
 
     /**
      * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
@@ -40,9 +39,10 @@ public interface AuxiliaryService extends Service {
      * @param eventTime the UnixTimeUTC array as found in the FITS file.
      * @return an Optional containing the Datetime instance
      */
-    public  static Optional<DateTime> unixTimeUTCToDateTime(int [] eventTime){
+     static Optional<ZonedDateTime> unixTimeUTCToDateTime(int [] eventTime){
         if(eventTime != null && eventTime.length == 2) {
-            DateTime timeStamp = new DateTime((long)((eventTime[0]+eventTime[1]/1000000.)*1000), DateTimeZone.UTC);
+            long value = (long)((eventTime[0]+eventTime[1]/1000000.)*1000);
+            ZonedDateTime timeStamp = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
             return Optional.of(timeStamp);
         }
         return Optional.empty();
@@ -55,38 +55,8 @@ public interface AuxiliaryService extends Service {
      * @param item A data item from the stream of raw FACT data
      * @return an Optional containing the Datetime instance
      */
-    public  static Optional<DateTime> unixTimeUTCToDateTime(Data item){
+    static Optional<ZonedDateTime> unixTimeUTCToDateTime(Data item){
         int[] eventTime = (int[]) item.get("UnixTimeUTC");
         return unixTimeUTCToDateTime(eventTime);
     }
-
-
-    /**
-     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC and converts it to a DateTime
-     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
-     *
-     * @param eventTime the UnixTimeUTC array as found in the FITS file.
-     * @return an Optional containing the Datetime instance
-     */
-    public  static Optional<OffsetDateTime> unixTimeUTCToOffsetDateTime(int [] eventTime){
-        if(eventTime != null && eventTime.length == 2) {
-            OffsetDateTime offsetDateTime = Instant.ofEpochMilli((long) ((eventTime[0] + eventTime[1] / 1000000.) * 1000)).atOffset(ZoneOffset.UTC);
-            return Optional.of(offsetDateTime);
-        }
-        return Optional.empty();
-    }
-
-
-    /**
-     * Takes the int[2] array found in the FITs files under the name UnixTimeUTC from the Data Item and converts it to a DateTime
-     * instance with time zone UTC. If the passed array cannot be converted the optional will be empty.
-     *
-     * @param item A data item from the stream of raw FACT data
-     * @return an Optional containing the Datetime instance
-     */
-    public  static Optional<OffsetDateTime> unixTimeUTCToOffsetDateTime(Data item){
-        int[] eventTime = (int[]) item.get("UnixTimeUTC");
-        return unixTimeUTCToOffsetDateTime(eventTime);
-    }
-
 }

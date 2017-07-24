@@ -1,4 +1,4 @@
-package fact.io.hdu_reader;
+package fact.io.hdureader;
 
 import fact.io.hdureader.zfits.BitQueue;
 import org.junit.Test;

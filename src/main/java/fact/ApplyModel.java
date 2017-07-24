@@ -74,7 +74,7 @@ public class ApplyModel implements StatefulProcessor{
             throw new IllegalArgumentException("Provided pmml model has more than 1 target variable. This is unsupported");
         }
 
-        targetName = modelEvaluator.getTargetField().getName();
+        targetName = modelEvaluator.getTargetFieldName();
         activeFields = modelEvaluator.getActiveFields();
     }
 
@@ -95,9 +95,12 @@ public class ApplyModel implements StatefulProcessor{
 
             Object rawValue = data.get(activeField.toString());
 
-            FieldValue activeValue = activeField.prepare(rawValue);
+            // The raw value is passed through: type conversion or any other transofrmations applied in sklearn
+            FieldValue activeValue =activeField.prepare(rawValue);
 
-            arguments.put(activeField.getName(), activeValue);
+            FieldName activeFieldName=activeField.getName();
+
+            arguments.put(activeFieldName, activeValue);
         }
 
         Map<FieldName, ?> results = modelEvaluator.evaluate(arguments);
