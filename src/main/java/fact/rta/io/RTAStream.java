@@ -154,8 +154,8 @@ public class RTAStream extends AbstractMultiStream {
 
         log.info("Opening file " + path);
         stream.setUrl(new SourceURL("file:" + path));
-        stream.init();
         try{
+            stream.init();
             FITSStream zstream = (FITSStream) stream;
             String runtype = zstream.eventHDUHeader.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
 
@@ -167,6 +167,9 @@ public class RTAStream extends AbstractMultiStream {
         } catch (ClassCastException e){
             //pass
             log.warn("Not using the hdureader as input stream. This won't skip non-data runs.");
+        } catch (Exception e){
+            log.warn("File failed to read. Skipping");
+            checkNextFile();
         }
     }
 
