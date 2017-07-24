@@ -16,6 +16,7 @@ public class Event {
     final double thetaSquare;
     final String sourceName;
     final ZonedDateTime eventTimeStamp;
+    final String dateString;
 
     public Event(ZonedDateTime eventTimeStamp, Map<String, Serializable> item) {
         this.thetaSquare = (double) item.get("signal:thetasquare");
@@ -24,6 +25,7 @@ public class Event {
         this.sourceName = (String) item.get("SourceName");
         this.photonCharges = (double[]) item.get("photoncharge");
         this.eventTimeStamp = eventTimeStamp;
+        this.dateString = eventTimeStamp.toString();
     }
 
     public static Event createEmptyEvent(){
