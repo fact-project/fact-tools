@@ -15,6 +15,7 @@ import stream.annotations.Service;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -31,7 +32,7 @@ public class Signal implements Processor {
     private String signalClassName = "1";
 
     @Service(required = true)
-    private RTAWebService webService;
+    private WebSocketService webService;
 
     private static double thetaDegreesToThetaSquaredInMM(double theta){
         double pixelsize = 9.5;
@@ -58,12 +59,12 @@ public class Signal implements Processor {
                 data.put("background:thetasquare:" + offPosition , thetaDegreesToThetaSquaredInMM(thetaOffs[offPosition]));
             }
 
-            DateTime eventTimeStamp = AuxiliaryService.unixTimeUTCToDateTime(data).
+            ZonedDateTime eventTimeStamp = AuxiliaryService.unixTimeUTCToDateTime(data).
                     orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
             try {
                 if(distribution.getProbability(signalClassName) > 0.5) {
-                    webService.updateEvent(OffsetDateTime.parse(eventTimeStamp.toString()), data);
+                    webService.updateEvent(ZonedDateTime.parse(eventTimeStamp.toString()), data);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

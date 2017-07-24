@@ -15,6 +15,7 @@ import java.lang.annotation.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 
@@ -36,8 +37,8 @@ public class Signal {
     {
         public Signal map(int index, ResultSet r, StatementContext ctx) throws SQLException
         {
-            OffsetDateTime eventTimestamp = OffsetDateTime.parse(r.getString("event_timestamp"));
-            OffsetDateTime analyisTimestamp = OffsetDateTime.parse(r.getString("analysis_timestamp"));
+            ZonedDateTime eventTimestamp = ZonedDateTime.parse(r.getString("event_timestamp"));
+            ZonedDateTime analyisTimestamp = ZonedDateTime.parse(r.getString("analysis_timestamp"));
             double theta_on = r.getDouble("theta_on");
             double theta_off_1 = r.getDouble("theta_off_1");
             double theta_off_2 = r.getDouble("theta_off_2");
@@ -105,12 +106,12 @@ public class Signal {
     public final double theta_off_4;
     public final double theta_off_5;
     public final double theta;
-    public final OffsetDateTime eventTimestamp;
-    public final OffsetDateTime analysisTimestamp;
+    public final ZonedDateTime eventTimestamp;
+    public final ZonedDateTime analysisTimestamp;
 
     public double onTimePerEvent;
 
-    public Signal(OffsetDateTime eventTimestamp, OffsetDateTime analysisTimestamp, Data item, Run run) {
+    public Signal(ZonedDateTime eventTimestamp, ZonedDateTime analysisTimestamp, Data item, Run run) {
 
         this.run = run;
         this.theta = (double) item.get("Theta");
@@ -128,8 +129,8 @@ public class Signal {
         this.analysisTimestamp = analysisTimestamp;
     }
 
-    public Signal(OffsetDateTime eventTimestamp,
-                  OffsetDateTime analysisTimestamp,
+    public Signal(ZonedDateTime eventTimestamp,
+                  ZonedDateTime analysisTimestamp,
                   double theta,
                   double theta_off_1,
                   double theta_off_2,

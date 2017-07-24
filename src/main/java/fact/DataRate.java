@@ -2,7 +2,7 @@ package fact;
 
 import com.google.common.base.Stopwatch;
 
-import fact.rta.RTAWebService;
+import fact.rta.WebSocketService;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class DataRate implements StatefulProcessor {
 
     @Service(required = true, description = "If a RTAwebservice is provided this will update the " +
             "datarate for the webservice to display")
-    RTAWebService webService;
+    WebSocketService webService;
 
     SummaryStatistics statistics = new SummaryStatistics();
     private Stopwatch stopwatch;
@@ -105,7 +105,7 @@ public class DataRate implements StatefulProcessor {
         return input;
     }
 
-    public void setWebService(RTAWebService webService) {
+    public void setWebService(WebSocketService webService) {
         this.webService = webService;
     }
 

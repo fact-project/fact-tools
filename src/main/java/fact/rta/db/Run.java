@@ -1,8 +1,6 @@
 package fact.rta.db;
 
 import fact.rta.RTADataBase;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Binder;
@@ -14,14 +12,11 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 
 import java.lang.annotation.*;
-import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 
 /**
  * Created by mackaiver on 07/09/16.
@@ -38,8 +33,8 @@ public class Run {
                     r.getInt("night"),
                     r.getInt("run_id"),
                     r.getString("source"),
-                    OffsetDateTime.parse(r.getString("start_time")).withOffsetSameInstant(ZoneOffset.UTC),
-                    OffsetDateTime.parse(r.getString("end_time")).withOffsetSameInstant(ZoneOffset.UTC),
+                    ZonedDateTime.parse(r.getString("start_time")).withZoneSameInstant(ZoneOffset.UTC),
+                    ZonedDateTime.parse(r.getString("end_time")).withZoneSameInstant(ZoneOffset.UTC),
                     Duration.standardSeconds(r.getLong("on_time")),
                     RTADataBase.HEALTH.valueOf(r.getString("health"))
             );
@@ -72,15 +67,15 @@ public class Run {
     public final String source;
     public final int runID;
     public final int night;
-    public final OffsetDateTime startTime;
-    public final OffsetDateTime endTime;
+    public final ZonedDateTime startTime;
+    public final ZonedDateTime endTime;
     public final Duration onTime;
 
 
 
     public final RTADataBase.HEALTH health;
 
-    public Run(int night, int runID, String source, OffsetDateTime  start, OffsetDateTime  end, Duration onTime, RTADataBase.HEALTH health) {
+    public Run(int night, int runID, String source, ZonedDateTime start, ZonedDateTime end, Duration onTime, RTADataBase.HEALTH health) {
         this.source = source;
         this.runID = runID;
         this.night = night;
@@ -97,8 +92,8 @@ public class Run {
         this.night = (int) item.get("NIGHT");
         this.onTime = Duration.ZERO;
 
-        this.startTime = LocalDateTime.parse((String) item.get("DATE-OBS")).atOffset(ZoneOffset.UTC);
-        this.endTime = LocalDateTime.parse((String) item.get("DATE-END")).atOffset(ZoneOffset.UTC);
+        this.startTime = LocalDateTime.parse((String) item.get("DATE-OBS")).atZone(ZoneOffset.UTC);
+        this.endTime = LocalDateTime.parse((String) item.get("DATE-END")).atZone(ZoneOffset.UTC);
         this.health = RTADataBase.HEALTH.UNKNOWN;
     }
 

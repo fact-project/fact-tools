@@ -20,6 +20,7 @@ import stream.io.SourceURL;
 import java.io.File;
 import java.net.URL;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -96,8 +97,8 @@ public class JDBITest {
 
         rtaTables.createSignalTableIfNotExists();
 
-        OffsetDateTime eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
-        Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
+        ZonedDateTime eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
+        Signal s = new Signal(eventTime, ZonedDateTime.now(), item, run);
         rtaTables.insertSignal(s);
         //second insert should be ignored
         rtaTables.insertSignal(s);
@@ -108,9 +109,9 @@ public class JDBITest {
         item = prepareNextItem();
 
 
-        eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
+        eventTime = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(RuntimeException::new);
 
-        s = new Signal(eventTime, OffsetDateTime.now(),item, run);
+        s = new Signal(eventTime, ZonedDateTime.now(),item, run);
         rtaTables.insertSignal(s);
         rtaTables.insertSignal(s);
 
@@ -138,8 +139,8 @@ public class JDBITest {
 
         rtaTables.createSignalTableIfNotExists();
         for (int i = 1; i < 11; i++) {
-            OffsetDateTime eventTime = OffsetDateTime.parse(String.format("2016-01-%1$02dT00:33:22+00:00", i ));
-            Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
+            ZonedDateTime eventTime = ZonedDateTime.parse(String.format("2016-01-%1$02dT00:33:22+00:00", i ));
+            Signal s = new Signal(eventTime, ZonedDateTime.now(), item, run);
             rtaTables.insertSignal(s);
         }
 
@@ -151,8 +152,8 @@ public class JDBITest {
 
         rtaTables.createSignalTableIfNotExists();
         for (int i = 1; i < 60; i++) {
-            OffsetDateTime eventTime = DateTime.parse(String.format("2016-02-01T00:%1$02d:22+00:00", i )).toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
-            Signal s = new Signal(eventTime, OffsetDateTime.now(), item, run);
+            ZonedDateTime eventTime = ZonedDateTime.parse(String.format("2016-02-01T00:%1$02d:22+00:00", i ));
+            Signal s = new Signal(eventTime, ZonedDateTime.now(), item, run);
             rtaTables.insertSignal(s);
         }
 
@@ -163,9 +164,7 @@ public class JDBITest {
 
     @Test
     public void testUpdateOnTime() throws Exception {
-
         Data item = prepareNextItem();
-
 
         File dbFile  = folder.newFile("data.sqlite");
         DBI dbi = new DBI("jdbc:sqlite:" + dbFile.getPath());

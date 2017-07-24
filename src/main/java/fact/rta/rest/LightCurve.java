@@ -3,14 +3,11 @@ package fact.rta.rest;
 import fact.rta.RTADataBase;
 import fact.rta.db.Signal;
 
-
-
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -22,8 +19,8 @@ public class LightCurve {
     double predictionThreshold = 0.95;
     double thetaThreshold = 0.04;
 
-    OffsetDateTime startTime = OffsetDateTime.parse("2011-10-01T00:00:00+00:00");
-    OffsetDateTime endTime= OffsetDateTime.now(ZoneOffset.UTC);
+    ZonedDateTime startTime = ZonedDateTime.parse("2011-10-01T00:00:00+00:00");
+    ZonedDateTime endTime= ZonedDateTime.now(ZoneOffset.UTC);
 
     int binningInMinutes = 5;
 
@@ -39,12 +36,12 @@ public class LightCurve {
 
         }
 
-        public LightCurveFromDB withStartTime(OffsetDateTime startTime){
+        public LightCurveFromDB withStartTime(ZonedDateTime startTime){
             lc.startTime = startTime;
             return this;
         }
 
-        public LightCurveFromDB withEndTime(OffsetDateTime endTime){
+        public LightCurveFromDB withEndTime(ZonedDateTime endTime){
             lc.endTime = endTime;
             return this;
         }
@@ -79,7 +76,7 @@ public class LightCurve {
 //            Map<String, List<Signal>> map = signalEntries.stream().collect(Collectors.groupingBy(s -> s.run.source));
 
             //fill a treemap
-            TreeMap<OffsetDateTime, Signal> dateTimeRTASignalTreeMap = new TreeMap<>();
+            TreeMap<ZonedDateTime, Signal> dateTimeRTASignalTreeMap = new TreeMap<>();
             signalEntries.forEach(a -> dateTimeRTASignalTreeMap.put(a.eventTimestamp, a));
 
             if(dateTimeRTASignalTreeMap.firstEntry() == null ||
@@ -92,7 +89,7 @@ public class LightCurve {
             //iterate over all the bins
             for (int bin = 0; lc.startTime.plusMinutes(bin).isBefore(lc.endTime); bin += lc.binningInMinutes) {
                 //get all entries in bin
-                SortedMap<OffsetDateTime, Signal> subMap = dateTimeRTASignalTreeMap.subMap(lc.startTime.plusMinutes(bin), lc.startTime.plusMinutes(bin + lc.binningInMinutes));
+                SortedMap<ZonedDateTime, Signal> subMap = dateTimeRTASignalTreeMap.subMap(lc.startTime.plusMinutes(bin), lc.startTime.plusMinutes(bin + lc.binningInMinutes));
 
                 Supplier<Stream<Signal>> streamSupplier = () -> subMap.entrySet().stream().map(Map.Entry::getValue);
 
@@ -132,8 +129,8 @@ public class LightCurve {
 
 
     private static class LightCurveBin {
-        public final OffsetDateTime startTime;
-        public final OffsetDateTime endTime;
+        public final ZonedDateTime startTime;
+        public final ZonedDateTime endTime;
         public final int backgroundEvents;
         public final int signalEvents;
         public final double alpha;
@@ -142,8 +139,8 @@ public class LightCurve {
         public final double excess;
 
 
-        public LightCurveBin(OffsetDateTime startTime,
-                             OffsetDateTime endTime,
+        public LightCurveBin(ZonedDateTime startTime,
+                             ZonedDateTime endTime,
                              int backgroundEvents,
                              int signalEvents,
                              double alpha,

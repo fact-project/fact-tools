@@ -23,16 +23,17 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
  *
  */
-public class WebSocketService extends RTAWebService implements AuxiliaryService {
+public class WebSocketService implements AuxiliaryService {
 
     final private static Logger log = LoggerFactory.getLogger(WebSocketService.class);
 
-    private RTADataBase.DBInterface dbInterface;
+    RTADataBase.DBInterface dbInterface;
     private Run currentRun = null;
     private Deque<Signal> signals = new ArrayDeque<>();
     private boolean isInit = false;
@@ -110,9 +111,8 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
      * @param eventTimeStamp a timestamp by which to identify this event
      * @param item the data item for the event
      */
-    @Override
-    public void updateEvent(OffsetDateTime eventTimeStamp, Data item) throws IOException {
-        DateTime dT = AuxiliaryService
+    public void updateEvent(ZonedDateTime eventTimeStamp, Data item) throws IOException {
+        ZonedDateTime dT = AuxiliaryService
                 .unixTimeUTCToDateTime(item)
                 .orElseThrow(() -> new RuntimeException("Could not get time stamp from current event."));
 
@@ -155,7 +155,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
             currentRun = newRun;
         }
 
-        signals.add(new Signal(eventTimeStamp, OffsetDateTime.now(ZoneOffset.UTC), item, currentRun));
+        signals.add(new Signal(eventTimeStamp, ZonedDateTime.now(ZoneOffset.UTC), item, currentRun));
         messageHandler.sendEvent(new Event(eventTimeStamp, item));
     }
 
@@ -174,7 +174,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
         double onTimeInMilliSeconds = ftmPoints
                 .stream()
                 .filter(p -> {
-                    OffsetDateTime t = p.getTimeStamp().toGregorianCalendar().toZonedDateTime().toOffsetDateTime();
+                    ZonedDateTime t = p.getTimeStamp();
 
                     boolean afterStart = t.isAfter(run.startTime);
                     boolean beforeEnd = t.isBefore(run.endTime);
@@ -195,7 +195,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
     /**
      * Delegating call to the method in the AuxFileService.
      *
-     * @see AuxiliaryService#getAuxiliaryData(AuxiliaryServiceName, DateTime, AuxPointStrategy)
+     * @see AuxiliaryService#getAuxiliaryData(AuxiliaryServiceName, ZonedDateTime, AuxPointStrategy)
      *
      * @param serviceName the name of the aux data to access. This is written in the filename 20130112.<serviceName>.fits
      * @param eventTimeStamp the DateTime of the event you need the aux data for.
@@ -204,7 +204,7 @@ public class WebSocketService extends RTAWebService implements AuxiliaryService 
      * @throws IOException propagates the exception of the underlying AuxFileService
      */
     @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, DateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
+    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
         if (!isInit){
             init();
         }

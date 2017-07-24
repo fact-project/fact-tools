@@ -15,9 +15,9 @@ public class Event {
     final double size;
     final double thetaSquare;
     final String sourceName;
-    final OffsetDateTime eventTimeStamp;
+    final ZonedDateTime eventTimeStamp;
 
-    public Event(OffsetDateTime eventTimeStamp, Map<String, Serializable> item) {
+    public Event(ZonedDateTime eventTimeStamp, Map<String, Serializable> item) {
         this.thetaSquare = (double) item.get("signal:thetasquare");
         this.estimatedEnergy = (double) item.get("energy");
         this.size = (double) item.get("Size");
@@ -28,7 +28,7 @@ public class Event {
 
     public static Event createEmptyEvent(){
 
-        OffsetDateTime eventTimeStamp = OffsetDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime eventTimeStamp = ZonedDateTime.now(ZoneOffset.UTC);
         double[] photons = new double[1440];
         for (int i = 0; i < photons.length; i++) {
             photons[i] = i;
