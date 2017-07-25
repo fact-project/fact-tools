@@ -99,7 +99,7 @@ public class DrsFileService implements Service {
                 })
                 .orElseThrow(()-> new IOException("No files found matching *.drs.fits* or no dates in FITS header."));
 
-
+        log.info("Loading DRS file {} for run id {}", pathToClosestDrsFile, key.runId);
         FITS fits = new FITS(pathToClosestDrsFile.toUri().toURL());
         HDU calibrationHDU = fits.getHDU("DrsCalibration");
         BinTable binTable = calibrationHDU.getBinTable();
