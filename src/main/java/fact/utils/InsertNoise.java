@@ -13,7 +13,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.expressions.version2.Condition;
 import stream.expressions.version2.ConditionFactory;
-import stream.io.JSONStream;
+import stream.io.CsvStream;
 import stream.io.SourceURL;
 import stream.shell.Run;
 
@@ -144,7 +144,7 @@ public class InsertNoise implements Processor{
             this.bins_index.add(new ArrayList<Integer>(100));
         }
         try {
-            JSONStream databaseStream = new JSONStream(new SourceURL(this.noiseDatabase));
+            CsvStream databaseStream = new CsvStream(new SourceURL(this.noiseDatabase));
             Data item = databaseStream.readNext();
             while(item!=null) {
                 Boolean b = (Boolean)this.condition.get(item);
