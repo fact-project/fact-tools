@@ -56,7 +56,7 @@ public class InsertNoise implements Processor{
 
     @Parameter(required = true, description="The binning of the zenith-angle. If single value: steplenght, bins into the given steplength"+
                                             "If multivalue: Each value is the length of a single step starting with zenith=0.")
-    private double[] binning;
+    private String[] binning;
 
     @Parameter(required = true, description = "The binning key of the double value from the noise database.")
     private String dbBinningKey;
@@ -80,17 +80,17 @@ public class InsertNoise implements Processor{
         this.prependKey = prependKey;
     }
 
-    public void setBinning(double[] binning) {
+    public void setBinning(String[] binning) {
         this.binning = binning;
         if (binning.length==1) { // single value
-            double steplength = this.binning[0];
+            double steplength = Double.parseDouble(this.binning[0]);
             int numBins = (int)ceil(90.0/steplength);
             this.bins = new double[numBins];
             for (int i=0; i<numBins; i++) {
                 this.bins[i] = steplength*(i+1);
             }
         } else {
-            this.bins = this.binning;
+            //this.bins = this.binning;
         }
     }
 
