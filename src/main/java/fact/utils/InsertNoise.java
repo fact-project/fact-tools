@@ -104,7 +104,7 @@ public class InsertNoise implements Processor{
             this.randGenerator = new Random(this.seed);
     }
 
-    public void setNoiseDatabase(String noiseDatabase) throws Exception {
+    public void setNoiseDatabase(String noiseDatabase) {
         this.noiseDatabase = noiseDatabase;
     }
 
@@ -144,6 +144,7 @@ public class InsertNoise implements Processor{
             this.bins_index.add(new ArrayList<Integer>(100));
         }
         try {
+	    log.info("Noise db: ",this.noiseDatabase);
             CsvStream databaseStream = new CsvStream(new SourceURL(this.noiseDatabase));
             Data item = databaseStream.readNext();
             while(item!=null) {
