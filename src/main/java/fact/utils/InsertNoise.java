@@ -68,6 +68,28 @@ public class InsertNoise implements Processor{
     List<Data> database; // The database containing index,NIGHT,RUN_ID,Zd,NSB
     double[] bins;     // The bins containing the max_values of the different bins
     List<List<Integer>> bins_index;// The indexes of the database that are in each bin
+    Random randGenerator;
+
+    @Override
+    public Data process(Data input) {
+        if (bins_index == null) {
+            prepareNoiseDatabase();
+        }
+        Utils.isKeyValid(input, this.itemBinningKey, Double.class);
+        double zd_input =(double)input.get(this.itemBinningKey);
+
+        int binNum = this.getBin(zd_input);
+        int sampleSize = this.bins_index.get(binNum).size();
+        int rand = this.randGenerator.nextInt(sampleSize);
+        int index = this.bins_index.get(binNum).get(rand);
+        Data item = this.getNoiseEvent(index);
+        // insert the result into the input item
+        for (String s : item.keySet()) {
+            input.put(this.prependKey+s, item.get(s));
+        }
+
+        return input;
+    }
 
 
     public void setNoiseCondition(String noiseCondition) {
@@ -75,10 +97,7 @@ public class InsertNoise implements Processor{
         ConditionFactory factory = new ConditionFactory();
         this.condition = factory.create(noiseCondition);
     }
-    
-    public void setPrependKey(String prependKey) {
-        this.prependKey = prependKey;
-    }
+
 
     public void setBinning(String[] binning) {
         this.binning = binning;
@@ -94,7 +113,6 @@ public class InsertNoise implements Processor{
         }
     }
 
-    Random randGenerator;
 
     public void setSeed(long seed) {
         this.seed = seed;
@@ -104,9 +122,6 @@ public class InsertNoise implements Processor{
             this.randGenerator = new Random(this.seed);
     }
 
-    public void setNoiseDatabase(String noiseDatabase) throws Exception {
-        this.noiseDatabase = noiseDatabase;
-    }
 
     private Data getNoiseEvent(int index) {
         Data dbItem = this.database.get(index);
@@ -180,25 +195,18 @@ public class InsertNoise implements Processor{
         throw new RuntimeException("Data has a value outside of the binning");
     }
 
-    @Override
-    public Data process(Data input) {
-        if (bins_index == null) {
-            prepareNoiseDatabase();
-        }
-        Utils.isKeyValid(input, this.itemBinningKey, Double.class);
-        double zd_input =(double)input.get(this.itemBinningKey);
 
-        int binNum = this.getBin(zd_input);
-        int sampleSize = this.bins_index.get(binNum).size();
-        int rand = this.randGenerator.nextInt(sampleSize);
-        int index = this.bins_index.get(binNum).get(rand);
-        Data item = this.getNoiseEvent(index);
-        // insert the result into the input item
-        for (String s : item.keySet()) {
-            input.put(this.prependKey+s, item.get(s));
-        }
 
-        return input;
+    public void setNoiseDatabase(String noiseDatabase) {
+        this.noiseDatabase = noiseDatabase;
+    }
+
+    public void setNoiseFolder(String noiseFolder) {
+        this.noiseFolder = noiseFolder;
+    }
+
+    public void setPrependKey(String prependKey) {
+        this.prependKey = prependKey;
     }
 
     public void setDbBinningKey(String dbBinningKey) {
