@@ -160,6 +160,9 @@ public class InsertNoise implements Processor{
                 item = databaseStream.readNext();
             }
             log.info("Database consists of: ",this.database.size()," Pedestals.");
+            for(int i=0;i<this.bins.length;i++){
+                log.info("Bin: ",i,", edge: ",this.bins[i], "size: ", this.bins_index.get(i).size());
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -179,7 +182,7 @@ public class InsertNoise implements Processor{
 
     @Override
     public Data process(Data input) {
-        if (bins == null) {
+        if (bins_index == null) {
             prepareNoiseDatabase();
         }
         Utils.isKeyValid(input, this.itemBinningKey, Double.class);
