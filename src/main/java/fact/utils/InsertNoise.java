@@ -156,7 +156,11 @@ public class InsertNoise implements Processor{
                 double value = (double)item.get(this.dbBinningKey);
                 int binNum = this.getBin(value);
                 this.bins_index.get(binNum).add(this.database.size()-1);
+                // get next item
+                item = databaseStream.readNext();
             }
+            log.info("Database consists of: ",this.database.size()," Pedestals.");
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
