@@ -113,4 +113,17 @@ public class FITSStream extends AbstractStream {
 
         return item;
     }
+
+    public Data readNextRaw() throws Exception {
+        if(!reader.hasNext()){
+            return null;
+        }
+
+        OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
+
+        Data item = DataFactory.create(nextRow);
+        item.putAll(fitsHeader);
+
+        return item;
+    }
 }

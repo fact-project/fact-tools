@@ -1,15 +1,15 @@
 package fact.io.hdureader;
 
 import org.junit.Test;
+import stream.io.SourceURL;
+import stream.Data;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URL;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test the FITS object
@@ -33,6 +33,27 @@ public class FitsHDUTests {
 
     }
 
+    @Test
+    public void testFitsSkip() throws Exception {
+        URL u = FitsHDUTests.class.getResource("/testDataFile.fits.gz");
+        FITSStream fits = new FITSStream(new SourceURL(u));
+        fits.init();
+        FITSStream fits2 = new FITSStream(new SourceURL(u));
+        fits2.init();
+        //read 3
+        fits.readNext();
+        fits.readNext();
+        Data item = fits.readNext();
+
+        BinTableReader bintable = (BinTableReader)fits2.getReader();
+        bintable.goToRow(2);
+        Data item2 = fits2.readNextRaw();
+
+
+        short[] data = (short[])item.get("Data");
+        short[] data2 = (short[])item2.get("Data");
+        assertArrayEquals(data, data2);
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test

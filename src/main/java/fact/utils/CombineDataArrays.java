@@ -28,7 +28,7 @@ public class CombineDataArrays implements Processor {
     @Parameter(required = true, description = "The operation to perform, (add, sub, mul, div)")
 	private String op;
     
-	private int npix;
+	private int npix = 1440*300;
     
 
 	/* (non-Javadoc)
@@ -36,29 +36,29 @@ public class CombineDataArrays implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(input, firstArrayKey, double[].class);
-		Utils.isKeyValid(input, secondArrayKey, double[].class);
-		
-		double[] resultArray =  new double[npix];
-		
-		double[] array1 	 = (double[]) input.get(firstArrayKey);
-		double[] array2 	 = (double[]) input.get(secondArrayKey);
+		Utils.isKeyValid(input, firstArrayKey, short[].class);
+		Utils.isKeyValid(input, secondArrayKey, short[].class);
 
-		if (op=="add") {
+		short[] resultArray =  new short[npix];
+
+		short[] array1 	 = (short[]) input.get(firstArrayKey);
+		short[] array2 	 = (short[]) input.get(secondArrayKey);
+
+		if (op.equals("add")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = array1[pix] + array2[pix];
+				resultArray[pix] = (short)(array1[pix] + array2[pix]);
 			}
-		} else if (op=="sub") {
+		} else if (op.equals("sub")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = array1[pix] - array2[pix];
+				resultArray[pix] = (short)(array1[pix] - array2[pix]);
 			}
-		} else if (op=="mul") {
+		} else if (op.equals("mul")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = array1[pix] * array2[pix];
+				resultArray[pix] = (short)(array1[pix] * array2[pix]);
 			}
-		} else if (op=="div") {
+		} else if (op.equals("div")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = array1[pix] / array2[pix];
+				resultArray[pix] = (short)(array1[pix] / array2[pix]);
 			}
 		} else {
 			throw new RuntimeException("The given operation op: "+op+" is not supported");

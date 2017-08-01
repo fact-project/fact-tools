@@ -9,12 +9,16 @@ import fact.io.hdureader.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
+import stream.ProcessContext;
 import stream.Processor;
+import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.expressions.version2.Condition;
 import stream.expressions.version2.ConditionFactory;
 import stream.io.CsvStream;
+import stream.io.JSONStream;
 import stream.io.SourceURL;
+import stream.io.Stream;
 import stream.shell.Run;
 
 import java.io.DataInputStream;
@@ -34,14 +38,14 @@ import static java.lang.Math.ceil;
  * @author mbulinski
  *
  */
-public class InsertNoise implements Processor{
+public class InsertNoise implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(InsertNoise.class);
 
     @Parameter(required = false, defaultValue="0", description = "The seed to make the results reproductable if desired.")
     private long seed;
 
     @Parameter(required = true, description = "The file containing the noise database for the noise to be used.")
-    private String noiseDatabase;
+    private SourceURL noiseDatabase;
 
     @Parameter(required = true, description = "The folder containing the noise files.")
     private String noiseFolder;
@@ -68,6 +72,29 @@ public class InsertNoise implements Processor{
     List<Data> database; // The database containing index,NIGHT,RUN_ID,Zd,NSB
     double[] bins;     // The bins containing the max_values of the different bins
     List<List<Integer>> bins_index;// The indexes of the database that are in each bin
+    Random randGenerator;
+
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, this.itemBinningKey, Double.class);
+        double zd_input =(double)input.get(this.itemBinningKey);
+
+        int binNum = this.getBin(zd_input);
+        int sampleSize = this.bins_index.get(binNum).size();
+        if (sampleSize==0) {
+            log.error("Samplesize of bin: "+binNum+" is too small");
+            return null;
+        }
+        int rand = this.randGenerator.nextInt(sampleSize);
+        int index = this.bins_index.get(binNum).get(rand);
+        Data item = this.getNoiseEvent(index);
+        // insert the result into the input item
+        for (String s : item.keySet()) {
+            input.put(this.prependKey+s, item.get(s));
+        }
+
+        return input;
+    }
 
 
     public void setNoiseCondition(String noiseCondition) {
@@ -75,10 +102,7 @@ public class InsertNoise implements Processor{
         ConditionFactory factory = new ConditionFactory();
         this.condition = factory.create(noiseCondition);
     }
-    
-    public void setPrependKey(String prependKey) {
-        this.prependKey = prependKey;
-    }
+
 
     public void setBinning(String[] binning) {
         this.binning = binning;
@@ -94,18 +118,9 @@ public class InsertNoise implements Processor{
         }
     }
 
-    Random randGenerator;
 
     public void setSeed(long seed) {
         this.seed = seed;
-        if (this.seed==0)
-            this.randGenerator = new Random();
-        else
-            this.randGenerator = new Random(this.seed);
-    }
-
-    public void setNoiseDatabase(String noiseDatabase) {
-        this.noiseDatabase = noiseDatabase;
     }
 
     private Data getNoiseEvent(int index) {
@@ -115,18 +130,19 @@ public class InsertNoise implements Processor{
         int noiseNr = (int)dbItem.get("noiseNr");
         double currents = (double)dbItem.get("currents");
         String filename = (String)dbItem.get("filename");
-
-        File noiseFile = new File(filename);
+        String fullpath = this.noiseFolder+"/"+filename;
+        File noiseFile = new File(fullpath);
         if (!noiseFile.exists()) { //check if file is gzip file
-            throw new RuntimeException("Couldn't find noisefile: "+filename);
+            throw new RuntimeException("Couldn't find noisefile: "+fullpath);
         }
         Data item;
         try {
-            FITSStream fits = new FITSStream(new SourceURL(filename));
+            FITSStream fits = new FITSStream(new SourceURL("file:"+fullpath));
+            fits.init();
             //skip to the event num
             BinTableReader bintable = (BinTableReader)fits.getReader();
             bintable.goToRow(noiseNr);
-            item = fits.readNext();
+            item = fits.readNextRaw();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -144,10 +160,11 @@ public class InsertNoise implements Processor{
             this.bins_index.add(new ArrayList<Integer>(100));
         }
         try {
-	    log.info("Noise db: ",this.noiseDatabase);
-            CsvStream databaseStream = new CsvStream(new SourceURL(this.noiseDatabase));
-            Data item = databaseStream.readNext();
-            while(item!=null) {
+	    log.info("Noise db: "+noiseDatabase.toString());
+            JSONStream databaseStream = new JSONStream(noiseDatabase);
+            databaseStream.init();
+
+            for(Data item = databaseStream.readNext(); item!=null; item = databaseStream.readNext()) {
                 Boolean b = (Boolean)this.condition.get(item);
                 if (b == null? false : !b.booleanValue()) // if condition doesn't applies ignore element
                     continue;
@@ -157,18 +174,15 @@ public class InsertNoise implements Processor{
                 double value = (double)item.get(this.dbBinningKey);
                 int binNum = this.getBin(value);
                 this.bins_index.get(binNum).add(this.database.size()-1);
-                // get next item
-                item = databaseStream.readNext();
             }
-            log.info("Database consists of: ",this.database.size()," Pedestals.");
+            log.info("Database consists of: "+this.database.size() + " Pedestals.");
             for(int i=0;i<this.bins.length;i++){
-                log.info("Bin: ",i,", edge: ",this.bins[i], "size: ", this.bins_index.get(i).size());
+                log.info("Bin: "+i+", edge: " + this.bins[i] + " Size: " + this.bins_index.get(i).size());
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private int getBin(double data) {
@@ -181,25 +195,12 @@ public class InsertNoise implements Processor{
         throw new RuntimeException("Data has a value outside of the binning");
     }
 
-    @Override
-    public Data process(Data input) {
-        if (bins_index == null) {
-            prepareNoiseDatabase();
-        }
-        Utils.isKeyValid(input, this.itemBinningKey, Double.class);
-        double zd_input =(double)input.get(this.itemBinningKey);
+    public void setNoiseFolder(String noiseFolder) {
+        this.noiseFolder = noiseFolder;
+    }
 
-        int binNum = this.getBin(zd_input);
-        int sampleSize = this.bins_index.get(binNum).size();
-        int rand = this.randGenerator.nextInt(sampleSize);
-        int index = this.bins_index.get(binNum).get(rand);
-        Data item = this.getNoiseEvent(index);
-        // insert the result into the input item
-        for (String s : item.keySet()) {
-            input.put(this.prependKey+s, item.get(s));
-        }
-
-        return input;
+    public void setPrependKey(String prependKey) {
+        this.prependKey = prependKey;
     }
 
     public void setDbBinningKey(String dbBinningKey) {
@@ -208,5 +209,26 @@ public class InsertNoise implements Processor{
 
     public void setItemBinningKey(String itemBinningKey) {
         this.itemBinningKey = itemBinningKey;
+    }
+
+    @Override
+    public void init(ProcessContext processContext) throws Exception {
+        log.info(this.noiseDatabase.toString());
+        if (this.seed==0) {
+            this.randGenerator = new Random();
+        } else {
+            this.randGenerator = new Random(this.seed);
+        }
+        prepareNoiseDatabase();
+    }
+
+    @Override
+    public void resetState() throws Exception {
+
+    }
+
+    @Override
+    public void finish() throws Exception {
+
     }
 }
