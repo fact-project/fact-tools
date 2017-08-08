@@ -22,10 +22,16 @@ public class CameraCoordinateTest {
     public void testToHorizontal(){
         CameraCoordinate c;
         HorizontalCoordinate h;
-        HorizontalCoordinate pointing = HorizontalCoordinate.fromDegrees(90, 0);
+        HorizontalCoordinate pointing = HorizontalCoordinate.fromDegrees(90, 90);
 
+        c = new CameraCoordinate(0.0, 0.0);
+        h = c.toHorizontal(pointing, Constants.FOCAL_LENGTH_MM);
+
+        assertEquals("Azimuth for CameraCoordinate(0,0) wrong", 90.0, h.getAzimuthDeg(), 1e-12);
+        assertEquals("Zenith for CameraCoordinate(0,0) wrong", 90.0, h.getZenithDeg(), 1e-12);
+
+        pointing = HorizontalCoordinate.fromDegrees(90, 0);
         c = new CameraCoordinate(50.0, 0.0);
-
         h = c.toHorizontal(pointing, Constants.FOCAL_LENGTH_MM);
 
         assertTrue(h.getZenithDeg() > 90);
@@ -36,5 +42,6 @@ public class CameraCoordinateTest {
 
         assertEquals(90.0, h.getZenithDeg(), 1e-12);
         assertTrue(h.getAzimuthDeg() > 0);
+
     }
 }
