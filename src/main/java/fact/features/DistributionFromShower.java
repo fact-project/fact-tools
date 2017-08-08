@@ -187,7 +187,7 @@ public class DistributionFromShower implements Processor {
 		// this will be written in radians.
 		double longitudinalComponent = eig.getEigenvector(0).getEntry(0);
 		double transversalComponent = eig.getEigenvector(0).getEntry(1);
-		return Math.atan(transversalComponent / longitudinalComponent);
+		return Math.atan2(transversalComponent, longitudinalComponent);
 	}
 
 	public double calculateMoment(int moment, double mean, double[] values,
@@ -260,7 +260,7 @@ public class DistributionFromShower implements Processor {
 	public void setPixelSetKey(String pixelSetKey) {
 		this.pixelSetKey = pixelSetKey;
 	}
-	
+
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
@@ -309,7 +309,7 @@ public class DistributionFromShower implements Processor {
 	public void setDeltaKey(String deltaKey) {
 		this.deltaKey = deltaKey;
 	}
-	
-	
+
+
 
 }
