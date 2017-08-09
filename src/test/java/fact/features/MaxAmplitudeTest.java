@@ -26,8 +26,8 @@ public class MaxAmplitudeTest {
 
 		URL drsUrl =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-		pr.setUrl(drsUrl);
-		pr.setOutputKey("test");
+		pr.url = drsUrl;
+		pr.outputKey = "test";
 
 
         maxAmp = new MaxAmplitude();

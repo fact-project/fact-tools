@@ -29,14 +29,14 @@ import java.net.URL;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-	private String outputKey = "DataCalibrated";
+	public String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
-    private URL url = null;
+	public URL url = null;
 
     Data drsData = null;
 
