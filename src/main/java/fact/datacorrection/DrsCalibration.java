@@ -3,7 +3,7 @@
  */
 package fact.datacorrection;
 
-import fact.io.FITSStream;
+import fact.io.hdureader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -13,7 +13,10 @@ import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  *
@@ -26,15 +29,14 @@ import java.net.MalformedURLException;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
-
-	private String outputKey = "DataCalibrated";
+	public String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
-    private SourceURL url = null;
+	public URL url = null;
 
     Data drsData = null;
 
@@ -64,44 +66,29 @@ public class DrsCalibration implements StatefulProcessor {
 	 * @param in
 	 *            sourceurl to be loaded
 	 */
-	protected void loadDrsData(SourceURL in) {
+	protected void loadDrsData(URL in) {
 		try {
-			FITSStream stream = new FITSStream(in);
-			stream.init();
-			drsData = stream.readNext();
-			log.debug("Read DRS data: {}", drsData);
+			FITS fits = new FITS(in);
+			BinTable calibrationTable = fits.getBinTableByName("DrsCalibration").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCalibration\""));
 
-			// this for-loop is simply a check that fires an exception if any
-			// of the expected keys is missing
-			//
-			for (String key : drsKeys) {
-				if (!drsData.containsKey(key)) {
-					throw new RuntimeException("DRS data is missing key '"
-							+ key + "'!");
-				}
-			}
+			BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
-			this.drsBaselineMean = (float[]) drsData.get("BaselineMean");
-			this.drsBaselineRms = (float[]) drsData.get("BaselineRms");
-			this.drsTriggerOffsetMean = (float[]) drsData
-					.get("TriggerOffsetMean");
-			this.drsTriggerOffsetRms = (float[]) drsData
-					.get("TriggerOffsetRms");
-			this.drsGainMean = (float[]) drsData.get("GainMean");
-			this.drsGainRms = (float[]) drsData.get("GainRms");
 
-		} catch (Exception e) {
+			OptionalTypesMap<String, Serializable> row = reader.getNextRow();
 
-			log.error("Failed to load DRS data: {}", e.getMessage());
-			if (log.isDebugEnabled())
-				e.printStackTrace();
+			this.drsBaselineMean = row.getFloatArray("BaselineMean").orElseThrow( ()-> new RuntimeException("File does not contain keyBaselineMean"));
+			this.drsBaselineRms = row.getFloatArray("BaselineRms").orElseThrow( ()-> new RuntimeException("File does not contain key BaselineRms"));
 
-			this.drsData = null;
-			this.drsBaselineMean = null;
-			this.drsTriggerOffsetMean = null;
+			this.drsTriggerOffsetMean = row.getFloatArray("TriggerOffsetMean").orElseThrow( ()-> new RuntimeException("File does not contain key TriggerOffsetMean"));
+			this.drsTriggerOffsetRms = row.getFloatArray("TriggerOffsetRms").orElseThrow( ()-> new RuntimeException("File does not contain key TriggerOffsetRms"));
+			this.drsGainMean = row.getFloatArray("GainMean").orElseThrow( ()-> new RuntimeException("File does not contain key GainMean"));
+			this.drsGainRms = row.getFloatArray("GainRms").orElseThrow( ()-> new RuntimeException("File does not contain key GainRms"));
 
-			throw new RuntimeException(e.getMessage());
+		}catch(IOException e)
+		{
+			new IOException(e.getMessage());
 		}
+
 	}
 
 	/**
@@ -118,7 +105,7 @@ public class DrsCalibration implements StatefulProcessor {
                     currentDrsFile = drsFile;
                     try {
                         log.info("Using .drs File " + drsFile.getAbsolutePath());
-                        loadDrsData(new SourceURL(drsFile.toURI().toURL()));
+                        loadDrsData(drsFile.toURI().toURL());
                     } catch (MalformedURLException e) {
                         //pass.
                     }
@@ -305,18 +292,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     }
 
-	// -----------setter---------------------
-	public void setKey(String key) {
-		this.key = key;
-	}
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setUrl(SourceURL url) {
-        this.url = url;
-	}
 
 
 }
