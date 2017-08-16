@@ -4,7 +4,6 @@
     pixelSetKey="shower"
     outputKey="numPixelInShower"
 />
-<PrintData/>
 
 <Skip condition="%{data.numPixelInShower} &lt; 5" />
 
