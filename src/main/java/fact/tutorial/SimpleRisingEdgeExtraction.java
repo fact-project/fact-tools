@@ -1,6 +1,5 @@
 package fact.tutorial;
 
-import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

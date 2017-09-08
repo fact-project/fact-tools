@@ -1,19 +1,12 @@
 package fact;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.gson.GsonBuilder;
-
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.StatefulProcessor;
@@ -21,6 +14,11 @@ import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.runtime.ApplicationContext;
 import stream.runtime.DefaultProcess;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This process is a replacement for the standard process from the streams

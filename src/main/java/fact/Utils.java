@@ -7,6 +7,7 @@ import com.google.common.primitives.Ints;
 import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-
-import org.apache.commons.lang3.ArrayUtils;
 /**
  *
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;

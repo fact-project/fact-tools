@@ -2,12 +2,9 @@ package fact.extraction;
 
 import fact.Utils;
 import fact.container.PixelSet;
-import fact.hexmap.CameraPixel;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import java.util.Arrays;
-import java.util.ArrayList;
 
 /**
  * Finds pixels above a certain threshold limit. If only a single slice of the

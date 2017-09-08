@@ -3,6 +3,7 @@
  */
 package fact.io;
 
+import fact.io.hdureader.FITSStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-import fact.io.hdureader.FITSStream;
 
 /**
  * @author chris

@@ -1,18 +1,16 @@
 package fact.features.muon;
 
-import com.google.common.primitives.Ints;
 import fact.Constants;
 import fact.Utils;
+import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import streams.tikz.Pixel;
 
 import java.util.ArrayList;
 import java.util.HashMap;

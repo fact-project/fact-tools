@@ -2,18 +2,16 @@ package fact.parameter;
 
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
+import fact.datacorrection.DrsCalibration;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
-import fact.datacorrection.DrsCalibration;
-import fact.io.hdureader.FITSStream;
 import fact.io.FITSStreamTest;
-
+import fact.io.hdureader.FITSStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-
 import stream.Data;
 import stream.io.SourceURL;
 
