@@ -1,13 +1,15 @@
 package fact.datacorrection;
 
 import fact.hexmap.FactPixelMapping;
-import fact.io.hdureader.*;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
 import fact.utils.LinearTimeCorrectionKernel;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
 import java.io.Serializable;
 import java.net.URL;
