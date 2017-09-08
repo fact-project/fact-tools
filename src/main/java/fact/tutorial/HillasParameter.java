@@ -111,7 +111,7 @@ public class HillasParameter implements Processor {
         // this will be written in radians.
         double longitudinalComponent = eig.getEigenvector(0).getEntry(0);
         double transversalComponent = eig.getEigenvector(0).getEntry(1);
-        return Math.atan(transversalComponent / longitudinalComponent);
+        return Math.atan2(transversalComponent, longitudinalComponent);
     }
 
 }

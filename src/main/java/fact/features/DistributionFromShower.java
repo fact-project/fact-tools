@@ -79,8 +79,7 @@ public class DistributionFromShower implements Processor {
 		double[] cog = calculateCog(showerWeights, showerPixel.toIntArray(), size);
 
 		// Calculate the weighted Empirical variance along the x and y axis.
-		RealMatrix covarianceMatrix = calculateCovarianceMatrix(showerPixel.toIntArray(),
-				showerWeights, cog);
+		RealMatrix covarianceMatrix = calculateCovarianceMatrix(showerPixel.toIntArray(), showerWeights, cog);
 
 		// get the eigenvalues and eigenvectors of the matrix and weigh them
 		// accordingly.
@@ -185,9 +184,9 @@ public class DistributionFromShower implements Processor {
 		// So basicly the angle between the major-axis of the ellipse and the
 		// camrera axis.
 		// this will be written in radians.
-		double longitudinalComponent = eig.getEigenvector(0).getEntry(0);
-		double transversalComponent = eig.getEigenvector(0).getEntry(1);
-		return Math.atan(transversalComponent / longitudinalComponent);
+		double x = eig.getEigenvector(0).getEntry(0);
+		double y = eig.getEigenvector(0).getEntry(1);
+		return Math.atan2(y, x);
 	}
 
 	public double calculateMoment(int moment, double mean, double[] values,
@@ -230,8 +229,7 @@ public class DistributionFromShower implements Processor {
 		return cog;
 	}
 
-	public RealMatrix calculateCovarianceMatrix(int[] showerPixel,
-			double[] showerWeights, double[] cog) {
+	public RealMatrix calculateCovarianceMatrix(int[] showerPixel, double[] showerWeights, double[] cog) {
 		double variance_xx = 0;
 		double variance_yy = 0;
 		double covariance_xy = 0;
@@ -260,7 +258,7 @@ public class DistributionFromShower implements Processor {
 	public void setPixelSetKey(String pixelSetKey) {
 		this.pixelSetKey = pixelSetKey;
 	}
-	
+
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
@@ -309,7 +307,7 @@ public class DistributionFromShower implements Processor {
 	public void setDeltaKey(String deltaKey) {
 		this.deltaKey = deltaKey;
 	}
-	
-	
+
+
 
 }
