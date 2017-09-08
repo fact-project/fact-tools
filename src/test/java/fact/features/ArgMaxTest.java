@@ -1,9 +1,8 @@
 package fact.features;
 
-import fact.Utils;
+import fact.photonstream.timeSeriesExtraction.ArgMax;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.photonstream.timeSeriesExtraction.ArgMax;
 
 public class ArgMaxTest {
 

@@ -1,10 +1,9 @@
 package fact.photonstream;
 
-import java.util.Arrays;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class PhotonStream2ArrivalTime implements Processor {
     @Parameter(

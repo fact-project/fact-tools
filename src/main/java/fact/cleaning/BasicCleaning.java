@@ -3,13 +3,11 @@ package fact.cleaning;
 import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
+import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-
 import org.apache.commons.lang3.ArrayUtils;
-import fact.container.PixelSet;
 import org.slf4j.Logger;
-
 import stream.Data;
 import stream.annotations.Parameter;
 

@@ -1,10 +1,9 @@
 package fact.pixelsets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fact.Utils;
 import fact.container.PixelSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

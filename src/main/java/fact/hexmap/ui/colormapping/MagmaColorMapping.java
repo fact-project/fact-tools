@@ -2,8 +2,6 @@ package fact.hexmap.ui.colormapping;
 
 import java.awt.*;
 
-import static java.lang.Math.round;
-
 
 /**
  * Map values to the matplotlib magma colormap

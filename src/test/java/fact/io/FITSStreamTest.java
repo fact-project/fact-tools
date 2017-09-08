@@ -3,10 +3,11 @@
  */
 package fact.io;
 
+import fact.io.hdureader.FITSStream;
 import org.junit.Test;
 import stream.Data;
 import stream.io.SourceURL;
-import fact.io.hdureader.FITSStream;
+
 import java.net.URL;
 
 import static org.junit.Assert.fail;

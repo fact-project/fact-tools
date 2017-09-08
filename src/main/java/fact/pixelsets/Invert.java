@@ -2,8 +2,8 @@ package fact.pixelsets;
 
 import com.google.common.collect.Sets;
 import fact.Utils;
-import fact.hexmap.CameraPixel;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;

@@ -1,19 +1,20 @@
 package fact.filter;
 
 import fact.Utils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
-import java.util.TreeMap;
 import java.util.ArrayList;
-import java.io.*;
+import java.util.TreeMap;
 
 /**
  * <p>
