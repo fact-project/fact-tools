@@ -49,6 +49,7 @@ public class FunctionalTest {
             String[] args = {"examples/example_process.xml"};
             stream.run.main(args);
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Could not run the example_process.xml");
         }
     }
@@ -60,6 +61,7 @@ public class FunctionalTest {
             ProcessContainer container = new ProcessContainer(arg.toURI().toURL());
             container.run();
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Could not run the analysis.xml");
         }
     }
@@ -70,6 +72,7 @@ public class FunctionalTest {
             String[] args = {"examples/stdAnalysis/mc/analysis_mc.xml"};
             stream.run.main(args);
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Could not run the analysis_mc.xml");
         }
     }
