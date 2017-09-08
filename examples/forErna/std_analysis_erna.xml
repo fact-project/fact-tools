@@ -15,7 +15,7 @@
     
     <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
     <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-        <stream class="fact.io.zfits.ZFitsStream" id="_" />
+        <stream class="fact.io.hdureader.FITSStream" id="_" />
     </stream>
 
     <process id="1" input="fact">

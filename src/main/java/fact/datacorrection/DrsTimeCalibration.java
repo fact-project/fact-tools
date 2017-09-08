@@ -1,13 +1,16 @@
 package fact.datacorrection;
 
 import fact.hexmap.FactPixelMapping;
-import fact.io.FITSStream;
+import fact.io.hdureader.*;
 import fact.utils.LinearTimeCorrectionKernel;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
+
+import java.io.Serializable;
+import java.net.URL;
 
 import static com.google.common.primitives.Doubles.max;
 
@@ -38,8 +41,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
 
     @Parameter(required = false, description = "", defaultValue = "The standard file provided in the jar")
-    SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
-
+    URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
     @Parameter(required = false, description = "")
     String outputKey = "DataCalibrated";
@@ -51,9 +53,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
     private String drsTimeKey = "CellOffset";
 
-    private Data drsTimeData;
     public double[][] true_sampling_time;
-
     private FactPixelMapping m;
     private LinearTimeCorrectionKernel linearTimeCorrectionKernel = new LinearTimeCorrectionKernel();
 
@@ -121,18 +121,18 @@ public class DrsTimeCalibration implements StatefulProcessor{
         return data;
     }
 
-    protected double[] loadDrsTimeCalibConstants(SourceURL  in) {
+    protected double[] loadDrsTimeCalibConstants(URL in) {
         try {
+            FITS fits = new FITS(in);
+            BinTable calibrationTable = fits.getBinTableByName("DrsCellTimes").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCellTimes\""));
 
-            FITSStream stream = new FITSStream(in);
-            stream.init();
-            drsTimeData = stream.readNext();
+            BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
-            if (!drsTimeData.containsKey(drsTimeKey))
-            {
-                throw new RuntimeException("Drs time data is missing key + " + drsTimeKey + "!");
-            }
-            return (double[]) drsTimeData.get(drsTimeKey);
+
+            OptionalTypesMap<String, Serializable> row = reader.getNextRow();
+
+            return(row.getDoubleArray(drsTimeKey).orElseThrow(()->new RuntimeException(drsTimeKey+"is not in the File")));
+
 
         } catch (Exception e) {
 
@@ -146,22 +146,6 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Override
     public void finish() throws Exception {
 
-    }
-
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setDrsTimeKey(String drsTimeKey) {
-        this.drsTimeKey = drsTimeKey;
     }
 
 }

@@ -6,7 +6,7 @@ import stream.io.SourceURL;
 
 import java.io.File;
 import java.net.URL;
-
+import fact.io.hdureader.FITSStream;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;

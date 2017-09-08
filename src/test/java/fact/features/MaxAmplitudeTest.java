@@ -2,7 +2,7 @@ package fact.features;
 
 import fact.extraction.MaxAmplitude;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FITSStream;
+import fact.io.hdureader.FITSStream;
 import fact.io.FITSStreamTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,8 +26,8 @@ public class MaxAmplitudeTest {
 
 		URL drsUrl =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey("test");
+		pr.url = drsUrl;
+		pr.outputKey = "test";
 
 
         maxAmp = new MaxAmplitude();

@@ -7,7 +7,7 @@ import fact.extraction.RisingEdgeForPositions;
 import fact.features.DistributionFromShower;
 import fact.features.source.SourcePosition;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FITSStream;
+import fact.io.hdureader.FITSStream;
 import fact.io.FITSStreamTest;
 
 import org.junit.Before;
@@ -64,8 +64,8 @@ public class ParameterTest {
 		URL drsUrl = FITSStreamTest.class
 				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey(key);
+		pr.url = drsUrl;
+		pr.outputKey = key;
         pr.init(null);
 		pr.process(item);
 

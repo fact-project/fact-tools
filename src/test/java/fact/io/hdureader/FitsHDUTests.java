@@ -19,7 +19,7 @@ public class FitsHDUTests {
 
     @Test
     public void testToOpenInputStream() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
+        URL u =  FitsHDUTests.class.getResource("/testDataFile.fits.fz");
 
         FITS f = new FITS(u);
 
@@ -37,7 +37,7 @@ public class FitsHDUTests {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     public void testGzipCheck() throws IOException {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+        URL u =  FitsHDUTests.class.getResource("/testDataFile.fits.gz");
 
         byte[] header = new byte[2];
         u.openStream().read(header);
@@ -45,7 +45,7 @@ public class FitsHDUTests {
         assertTrue(FITS.isGzippedCompressed(header));
 
 
-        u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
+        u =  FitsHDUTests.class.getResource("/testDataFile.fits.fz");
 
         header = new byte[2];
         u.openStream().read(header);
@@ -55,7 +55,7 @@ public class FitsHDUTests {
 
     @Test
     public void testInputStreamFromFitsFile() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+        URL u =  FitsHDUTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
 
@@ -70,7 +70,7 @@ public class FitsHDUTests {
 
     @Test
     public void testPrimaryHDU() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+        URL u =  FitsHDUTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
 
