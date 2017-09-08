@@ -1,6 +1,7 @@
 package fact.io.hdureader;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
@@ -24,9 +25,10 @@ public class FITSStream extends AbstractStream {
     private short[] offsetCalibrationsConstants;
     private Reader reader;
 
-    private HDU eventHDU;
+    public HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
 
+    @Parameter(required = false, description = "The name of the HDU to read the data from.", defaultValue = "Events")
     public String nameHDU="Events";
 
     public FITSStream(SourceURL url){

@@ -157,7 +157,8 @@ public class RTAStream extends AbstractMultiStream {
         try{
             stream.init();
             FITSStream zstream = (FITSStream) stream;
-            String runtype = zstream.eventHDUHeader.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
+
+            String runtype = zstream.eventHDU.header.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
 
             if(!runtype.equals("data")){
                 //not a data run. skip
