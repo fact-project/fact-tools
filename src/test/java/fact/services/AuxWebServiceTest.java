@@ -4,11 +4,11 @@ import fact.auxservice.AuxWebService;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.*;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**

@@ -17,7 +17,8 @@ public class ZFitsReaderTests {
 
     @Test
     public void testHeapIterator() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
+        //URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
+        URL u =  ZFitsReaderTests.class.getResource("/testDataFile.fits.fz");
 
         FITS f = new FITS(u);
         HDU events = f.getHDU("Events");
@@ -32,7 +33,7 @@ public class ZFitsReaderTests {
 
     @Test
     public void testEvenNumbers() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
+        URL u =  ZFitsReaderTests.class.getResource("/testDataFile.fits.fz");
 
         FITS f = new FITS(u);
         HDU events = f.getHDU("Events");

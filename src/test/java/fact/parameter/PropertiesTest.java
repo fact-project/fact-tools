@@ -3,11 +3,11 @@
  */
 package fact.parameter;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 import java.net.URL;
 
-import org.junit.Test;
+import static org.junit.Assert.fail;
 
 /**
  * @author chris

@@ -1,12 +1,7 @@
 package fact.extraction;
 
-import fact.container.PixelDistribution2D;
-import org.apache.commons.math3.linear.LUDecomposition;
 import fact.Utils;
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.linear.*;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 import stream.Processor;

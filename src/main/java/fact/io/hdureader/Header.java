@@ -53,7 +53,7 @@ public class Header {
      *
      * @return a HashMap containing the key value pairs.
      */
-    Map<String, Serializable> asMapOfSerializables(){
+    public Map<String, Serializable> asMapOfSerializables(){
         Map<String, Serializable> m = new HashMap<>();
         date().ifPresent(d -> m.put("DATE" , d));
 

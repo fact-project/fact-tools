@@ -10,9 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Created by kai on 06.01.16.
  */

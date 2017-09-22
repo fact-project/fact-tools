@@ -3,15 +3,12 @@
  */
 package fact.extraction;
 
-import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import javax.swing.text.Utilities;
 
 /**
  * This processor simply calculates the minimum value for all time slices in each Pixel.

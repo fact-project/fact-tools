@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
  *
  * Created by mackaiver on 14/12/16.
  */
-interface Reader extends
+public interface Reader extends
         Iterator<OptionalTypesMap<String, Serializable>>,
         Iterable<OptionalTypesMap<String, Serializable>> {
 
