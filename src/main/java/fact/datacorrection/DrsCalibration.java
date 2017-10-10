@@ -37,6 +37,10 @@ public class DrsCalibration implements StatefulProcessor {
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
     private SourceURL url = null;
 
+	@Parameter(required = false, description = "The name of the key that holds the drs filename.",
+			defaultValue = "@drsFile")
+	private String drsKey = "@drsFile";
+
 	@Parameter(required =  false, description = "Whether to reverse the process.", defaultValue = "false")
 	private boolean reverse = false;
 
@@ -116,7 +120,7 @@ public class DrsCalibration implements StatefulProcessor {
 
         if( this.url == null){
 			//file not loaded yet. try to find by magic.
-            File drsFile = (File) data.get("@drsFile");
+            File drsFile = (File) data.get(drsKey);
             if( drsFile != null){
                 if (!drsFile.equals(currentDrsFile)) {
                     currentDrsFile = drsFile;
@@ -349,6 +353,10 @@ public class DrsCalibration implements StatefulProcessor {
 
 	public void setReverse(boolean b) {
 		this.reverse = b;
+	}
+
+	public void setDrsKey(String drsKey) {
+		this.drsKey = drsKey;
 	}
 
 
