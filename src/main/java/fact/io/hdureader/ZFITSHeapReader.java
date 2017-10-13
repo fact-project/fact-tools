@@ -67,6 +67,8 @@ import java.util.NoSuchElementException;
 public final class ZFITSHeapReader implements Reader {
 
     private final DataInputStream stream;
+    private final DataInputStream catalogStream;
+    private final int zshrink;
     private final List<BinTable.TableColumn> columns;
     private final Integer numberOfRowsInTable;
     private int numberOfRowsRead = 0;
@@ -91,6 +93,8 @@ public final class ZFITSHeapReader implements Reader {
         this.numberOfRowsInTable = binTable.numberOfRowsInTable;
         this.stream = binTable.heapDataStream;
         this.columns = binTable.columns;
+        this.catalogStream = binTable.tableDataStream;
+        this.zshrink = binTable.getHeader().getInt("ZSHRINK").orElse(1);
     }
 
 
@@ -116,6 +120,29 @@ public final class ZFITSHeapReader implements Reader {
      */
     public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
         return getNextRow(false);
+    }
+
+    @Override
+    public void skipToRow(int num) throws IOException {
+        //calc zshrink problem
+        //num = num+1;
+        int numSkip = num-(num%zshrink); // the amount we can skip in the catalog due to zshrink
+        int skipMore = num - numSkip; // num%zshrink works too, the amount we have to skip with getNext
+
+        int colCount = columns.size();
+        long skipBytes = colCount*numSkip*(16)+8;//skip additinal 8 to get directly to the offset
+
+        // the catalog points to the first column so substract 16 to get to the tileheader
+        long skiped = this.catalogStream.skip(skipBytes);
+        long tileOffset = this.catalogStream.readLong()-16;
+
+        this.stream.skip(tileOffset);
+        this.numberOfRowsRead = numSkip;
+        
+        // skip the remaining rows
+        for (int i=0; i<skipMore; i++) {
+            getNextRow();
+        }
     }
 
 
@@ -378,7 +405,7 @@ public final class ZFITSHeapReader implements Reader {
             TileHeader tileHeader = new TileHeader(tileHeaderBytes);
             if (!tileHeader.definitionString.equals("TILE")){
                 if (!ignoreWrongHeader)
-                    throw new IOException("Tile header did not begin with word 'TILE'");
+                    throw new IOException("Tile header did not begin with word 'TILE' but : '"+tileHeader.definitionString+"'");
                 log.warn("Tile header did not begin with word 'TILE'. Ignoring error.");
             }
 

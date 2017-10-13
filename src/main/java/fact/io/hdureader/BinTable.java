@@ -34,6 +34,12 @@ public class BinTable {
     final DataInputStream tableDataStream;
     DataInputStream heapDataStream = null;
 
+    private final Header header;
+
+    public Header getHeader() {
+        return header;
+    }
+
 
     /**
      * This enum maps the type characters in the header to the fits types.
@@ -126,6 +132,7 @@ public class BinTable {
 
 
     BinTable(Header header, long hduOffset, URL url) throws IllegalArgumentException, IOException {
+        this.header = header;
 
         binTableSanityCheck(header);
 

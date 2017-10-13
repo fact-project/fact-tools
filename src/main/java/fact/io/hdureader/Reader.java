@@ -74,6 +74,11 @@ interface Reader extends
     OptionalTypesMap<String,Serializable> getNextRow() throws IOException;
 
 
-
-
+    /**
+     * Skips num rows.
+     *
+     * @param num The amount of rows to skip.
+     * @throws IOException
+     */
+    void skipToRow(int num) throws IOException;
 }

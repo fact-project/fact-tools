@@ -133,7 +133,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
             fits.init();
             //skip to the event num
             BinTableReader bintable = (BinTableReader)fits.getReader();
-            bintable.goToRow(noiseNr);
+            bintable.skipToRow(noiseNr);
             item = fits.readNextRaw();
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -72,14 +72,14 @@ public class BinTableReader implements Reader {
             return  map;
         }
 
-        public void goToRow(int num) throws IOException {
+        @Override
+        public void skipToRow(int num) throws IOException {
             if (num <= numberOfRowsInTable) {
                 new IndexOutOfBoundsException("Table has not enough rows to access row num: "+num);
             }
             stream.skipBytes(num*this.numberOfBytesPerRow);
             numberOfRowsRead = num;
         }
-
 
         private Serializable readSingleValueFromStream(BinTable.TableColumn c, DataInputStream stream) throws IOException {
 
