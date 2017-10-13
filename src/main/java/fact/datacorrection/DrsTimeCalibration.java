@@ -41,11 +41,13 @@ public class DrsTimeCalibration implements StatefulProcessor{
     SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
 
 
-    @Parameter(required = false, description = "")
+    @Parameter(required = false, description = "The name of the key, where the finished time calibrated data items are inserted.")
     String outputKey = "DataCalibrated";
 
+    @Parameter(required = false, description = "The name of the key with the startcelldata")
+    String startCellkey = "StartCellData";
 
-    @Parameter(required = false, description = "")
+    @Parameter(required = false, description = "The name of the key with the data")
     String dataKey = "DataCalibrated";
 
     @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
@@ -85,7 +87,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
     @Override
     public Data process(Data data) {
 
-        short[] startCells = (short[]) data.get("StartCellData");
+        short[] startCells = (short[]) data.get(startCellkey);
         double[] dataCalibrated = (double[]) data.get(dataKey);
         int npix = 1440;
         int roi = 300;
@@ -162,6 +164,10 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
     public void setDrsTimeKey(String drsTimeKey) {
         this.drsTimeKey = drsTimeKey;
+    }
+
+    public void setStartCellkey(String startCellkey) {
+        this.startCellkey = startCellkey;
     }
 
 }

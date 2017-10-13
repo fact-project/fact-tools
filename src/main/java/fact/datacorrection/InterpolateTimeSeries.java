@@ -35,6 +35,12 @@ public class InterpolateTimeSeries implements Processor {
     private String dataOutputKey = null;
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue="3")
     private int minPixelToInterpolate = 3;
+
+	@Parameter(required = false, description = "The key for the resulting badPixelSet.")
+	private String badPixelKey = "badPixel";
+	@Parameter(required = false, description = "The key to the unixTimeUTC of the Event.")
+	private String unixTimeKey = "UnixTimeUTC";
+
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     private int npix = Constants.NUMBEROFPIXEL;
@@ -48,9 +54,9 @@ public class InterpolateTimeSeries implements Processor {
 
 		ZonedDateTime timeStamp = null;
 
-    	if (item.containsKey("UnixTimeUTC") == true){
-    		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-    		int[] eventTime = (int[]) item.get("UnixTimeUTC");
+    	if (item.containsKey(unixTimeKey) == true){
+    		Utils.isKeyValid(item, unixTimeKey, int[].class);
+    		int[] eventTime = (int[]) item.get(unixTimeKey);
 			timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
     	}
     	else {
@@ -134,6 +140,10 @@ public class InterpolateTimeSeries implements Processor {
 
 	public void setMinPixelToInterpolate(int minPixelToInterpolate) {
 		this.minPixelToInterpolate = minPixelToInterpolate;
+	}
+
+	public void setBadPixelKey(String badPixelKey) {
+		this.badPixelKey = badPixelKey;
 	}
 
 }
