@@ -4,7 +4,6 @@
     pixelSetKey="shower"
     outputKey="numPixelInShower"
 />
-
 <Skip condition="%{data.numPixelInShower} &lt; 5" />
 
 <fact.statistics.ArrayMean

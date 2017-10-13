@@ -25,7 +25,7 @@ public class TimeSpread implements Processor {
 		double[] arrivalTime 	= (double[]) input.get(arrivalTimeKey);
 		double[] weights 		= (double[]) input.get(weightsKey);
 		int[] shower 			= ((PixelSet) input.get(pixelSetKey)).toIntArray();
-
+		
 		// NumberShowerPixel
 		int n = shower.length;
 		
