@@ -10,25 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 import stream.expressions.version2.Condition;
 import stream.expressions.version2.ConditionFactory;
-import stream.io.CsvStream;
 import stream.io.JSONStream;
 import stream.io.SourceURL;
-import stream.io.Stream;
-import stream.shell.Run;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 import static java.lang.Math.ceil;
 
@@ -38,8 +30,8 @@ import static java.lang.Math.ceil;
  * @author mbulinski
  *
  */
-public class InsertNoise implements StatefulProcessor {
-    static Logger log = LoggerFactory.getLogger(InsertNoise.class);
+public class SamplePedestalEvent implements StatefulProcessor {
+    static Logger log = LoggerFactory.getLogger(SamplePedestalEvent.class);
 
     @Parameter(required = false, defaultValue="0", description = "The seed to make the results reproductable if desired.")
     private long seed;
