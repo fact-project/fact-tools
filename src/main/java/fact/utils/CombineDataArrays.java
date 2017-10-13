@@ -23,7 +23,7 @@ public class CombineDataArrays implements Processor {
     private String firstArrayKey;
     @Parameter(required = true, description = "The key to your second array.")
     private String secondArrayKey;
-    @Parameter(required = false)
+    @Parameter(required = false, description = "The key for the resulting array.")
     private String outputKey;
     @Parameter(required = true, description = "The operation to perform, (add, sub, mul, div)")
 	private String op;
@@ -36,29 +36,29 @@ public class CombineDataArrays implements Processor {
 	 */
 	@Override
 	public Data process(Data input) {
-		Utils.isKeyValid(input, firstArrayKey, short[].class);
-		Utils.isKeyValid(input, secondArrayKey, short[].class);
+		Utils.isKeyValid(input, firstArrayKey, double[].class);
+		Utils.isKeyValid(input, secondArrayKey, double[].class);
 
-		short[] resultArray =  new short[npix];
+		double[] resultArray =  new double[npix];
 
-		short[] array1 	 = (short[]) input.get(firstArrayKey);
-		short[] array2 	 = (short[]) input.get(secondArrayKey);
+		double[] array1 	 = (double[]) input.get(firstArrayKey);
+		double[] array2 	 = (double[]) input.get(secondArrayKey);
 
 		if (op.equals("add")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = (short)(array1[pix] + array2[pix]);
+				resultArray[pix] = (double)(array1[pix] + array2[pix]);
 			}
 		} else if (op.equals("sub")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = (short)(array1[pix] - array2[pix]);
+				resultArray[pix] = (double)(array1[pix] - array2[pix]);
 			}
 		} else if (op.equals("mul")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = (short)(array1[pix] * array2[pix]);
+				resultArray[pix] = (double)(array1[pix] * array2[pix]);
 			}
 		} else if (op.equals("div")) {
 			for (int pix = 0; pix < npix; pix++) {
-				resultArray[pix] = (short)(array1[pix] / array2[pix]);
+				resultArray[pix] = (double)(array1[pix] / array2[pix]);
 			}
 		} else {
 			throw new RuntimeException("The given operation op: "+op+" is not supported");
