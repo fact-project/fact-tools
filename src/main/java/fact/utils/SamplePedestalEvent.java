@@ -154,6 +154,9 @@ public class SamplePedestalEvent implements StatefulProcessor {
 
     private Data getNoiseEvent(int index) {
         Data dbItem = this.database.get(index);
+        for(String key : dbItem.keySet()) {
+            System.out.println("Test: "+key);
+        }
         int night = (int)dbItem.get("NIGHT");
         int runid = (int)dbItem.get("RUNID");
         int noiseNr = (int)dbItem.get("noiseNr");
