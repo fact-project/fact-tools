@@ -125,16 +125,16 @@ public class SamplePedestalEvent implements StatefulProcessor {
 
     private String getPathWithExt(String fullpath) {
         // test .fz
-        File noiseFile = new File(fullpath+".fz");
+        File noiseFile = new File(fullpath+".fits.fz");
         if (noiseFile.exists()) {
             return fullpath+".fz";
         }
         // test .gz
-        noiseFile = new File(fullpath+".gz");
+        noiseFile = new File(fullpath+".fits.gz");
         if (noiseFile.exists()) {
             return fullpath+".gz";
         }
-        throw new RuntimeException("Couldn't find data file: "+fullpath+".*");
+        throw new RuntimeException("Couldn't find data file: "+fullpath+".fits.*");
     }
 
     private String getDrsPath(String startFolder, int night, int drs0, int drs1) {
