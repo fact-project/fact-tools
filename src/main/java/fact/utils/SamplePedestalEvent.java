@@ -120,7 +120,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
         String year = nightStr.substring(0,4);
         String month = nightStr.substring(4,6);
         String day = nightStr.substring(6,8);
-        return String.format("%4d/%02d/%02d/%d_%03d", year, month, day, night, runID);
+        return String.format("%s/%s/%s/%d_%03d", year, month, day, night, runID);
     }
 
     private String getPathWithExt(String fullpath) {
