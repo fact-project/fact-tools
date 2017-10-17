@@ -80,7 +80,7 @@ public class InterpolateTimeSeries implements Processor {
 		}
 
 		item.put(dataOutputKey, data);
-		item.put("badPixel", badPixelsSet);
+		item.put(badPixelKey, badPixelsSet);
         return item;
     }
 

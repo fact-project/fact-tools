@@ -16,7 +16,8 @@ public class PreviousEventInfo implements Processor {
 	String startCellKey = null;
 	@Parameter(required=true)
 	String outputKey=null;
-	
+
+	@Parameter(required = false, description = "Set the amount of events to buffer for the jumpremoval.")
 	int limitEvents=20;
 	
 	PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();

@@ -28,8 +28,6 @@ public class CombineDataArrays implements Processor {
     @Parameter(required = true, description = "The operation to perform, (add, sub, mul, div)")
 	private String op;
     
-	private int npix = 1440*300;
-    
 
 	/* (non-Javadoc)
 	 * @see stream.Processor#process(stream.Data)
@@ -39,25 +37,29 @@ public class CombineDataArrays implements Processor {
 		Utils.isKeyValid(input, firstArrayKey, double[].class);
 		Utils.isKeyValid(input, secondArrayKey, double[].class);
 
-		double[] resultArray =  new double[npix];
-
 		double[] array1 	 = (double[]) input.get(firstArrayKey);
 		double[] array2 	 = (double[]) input.get(secondArrayKey);
 
+		if (array1.length!=array2.length) {
+			throw new RuntimeException("Given arrays are different lengths");
+		}
+		double[] resultArray =  new double[array1.length];
+
+
 		if (op.equals("add")) {
-			for (int pix = 0; pix < npix; pix++) {
+			for (int pix = 0; pix < array1.length; pix++) {
 				resultArray[pix] = (double)(array1[pix] + array2[pix]);
 			}
 		} else if (op.equals("sub")) {
-			for (int pix = 0; pix < npix; pix++) {
+			for (int pix = 0; pix < array1.length; pix++) {
 				resultArray[pix] = (double)(array1[pix] - array2[pix]);
 			}
 		} else if (op.equals("mul")) {
-			for (int pix = 0; pix < npix; pix++) {
+			for (int pix = 0; pix < array1.length; pix++) {
 				resultArray[pix] = (double)(array1[pix] * array2[pix]);
 			}
 		} else if (op.equals("div")) {
-			for (int pix = 0; pix < npix; pix++) {
+			for (int pix = 0; pix < array1.length; pix++) {
 				resultArray[pix] = (double)(array1[pix] / array2[pix]);
 			}
 		} else {

@@ -8,8 +8,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Arrays;
-
 
 /**
  * This processor calculates several features of the timerow in a given timewindow:
@@ -32,8 +30,8 @@ public class TimeseriesFeatures implements Processor {
 	private int searchWindowRight = 250;
 	@Parameter(required=true,description="name of the key of the calculated features")
 	private String outputKey = null;
-	@Parameter(required=false, description="Whether to do the calculation with substraction of the avarageData.")
-	private boolean subMoving = false;
+	@Parameter(required=false, description="Whether to do the calculation with the substraction of the smoothed data.")
+	private boolean substractSmoothData = false;
 
 	private int numberOfBins = 200;
 	private double histogramMinBin = -10.0;
@@ -84,7 +82,7 @@ public class TimeseriesFeatures implements Processor {
 			for (int sl = searchWindowLeft ; sl < searchWindowRight ; sl++)
 			{
 				int slice = pix*roi + sl;
-				if(subMoving) {
+				if(substractSmoothData) {
 					values[sl-searchWindowLeft] = data[slice] - movingAverage[slice];
 				} else {
 					values[sl - searchWindowLeft] = data[slice];
@@ -181,7 +179,7 @@ public class TimeseriesFeatures implements Processor {
 		this.histogramMaxBin = histogramMaxBin;
 	}
 
-	public void setSubMoving(boolean subMoving) {
-		this.subMoving = subMoving;
+	public void setSubstractSmoothData(boolean substractSmoothData) {
+		this.substractSmoothData = substractSmoothData;
 	}
 }
