@@ -127,7 +127,7 @@ public final class ZFITSHeapReader implements Reader {
         //calc zshrink problem
         //num = num+1;
         int numSkip = num-(num%zshrink); // the amount we can skip in the catalog due to zshrink
-        int skipMore = num - numSkip; // num%zshrink works too, the amount we have to skip with getNext
+        int numRowsSkip = num - numSkip; // num%zshrink works too, the amount we have to skip with getNext
 
         int colCount = columns.size();
         long skipBytes = colCount*numSkip*(16)+8;//skip additinal 8 to get directly to the offset
@@ -140,7 +140,7 @@ public final class ZFITSHeapReader implements Reader {
         this.numberOfRowsRead = numSkip;
         
         // skip the remaining rows
-        for (int i=0; i<skipMore; i++) {
+        for (int i=0; i<numRowsSkip; i++) {
             getNextRow();
         }
     }

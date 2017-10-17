@@ -4,7 +4,7 @@
 package fact.utils;
 
 import fact.Utils;
-import fact.io.hdureader.BinTableReader;
+import fact.container.PreviousEventInfoContainer;
 import fact.io.hdureader.FITSStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +39,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
     @Parameter(required = true, description = "The file containing the noise database for the noise to be used.")
     private SourceURL noiseDatabase;
 
-    @Parameter(required = true, description = "The folder containing the noise files.")
-    private String noiseFolder;
+    @Parameter(required = true, description = "The folder containing the data files.")
+    private String dataFolder;
 
     @Parameter(required = false, defaultValue = "", description = "The value to prepend all keys from the noise file." +
                     " (Exp: prependKey='Noise_', 'ZdPointing'->'Noise_ZdPointing'")
@@ -61,7 +61,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
     private String itemBinningKey;
 
     // Data for faster binning
-    List<Data> database; // The database containing index,NIGHT,RUN_ID,Zd,NSB
+    List<Data> database; // The database containing index,NIGHT,RUN_ID,${dbBinningKey},currents
     double[] bins;     // The bins containing the max_values of the different bins
     List<List<Integer>> bins_index;// The indexes of the database that are in each bin
     Random randGenerator;
@@ -115,32 +115,101 @@ public class SamplePedestalEvent implements StatefulProcessor {
         this.seed = seed;
     }
 
+    private String createPathFromNightAndRunId(int night, int runID) {
+        String nightStr = String.format("%d", night);
+        String year = nightStr.substring(0,4);
+        String month = nightStr.substring(4,6);
+        String day = nightStr.substring(6,8);
+        return String.format("%4d/%02d/%02d/%d_%03d", year, month, day, night, runID);
+    }
+
+    private String getPathWithExt(String fullpath) {
+        // test .fz
+        File noiseFile = new File(fullpath+".fz");
+        if (noiseFile.exists()) {
+            return fullpath+".fz";
+        }
+        // test .gz
+        noiseFile = new File(fullpath+".gz");
+        if (noiseFile.exists()) {
+            return fullpath+".gz";
+        }
+        throw new RuntimeException("Couldn't find data file: "+fullpath+".*");
+    }
+
+    private String getDrsPath(String startFolder, int night, int drs0, int drs1) {
+        String drspath = String.format("%s/%s.drs.fits.gz", startFolder, createPathFromNightAndRunId(night, drs0));
+        File drsFile = new File(drspath);
+        if (drsFile.exists()) {
+            return drspath;
+        }
+
+        drspath = String.format("%s/%s.drs.fits.gz", startFolder, createPathFromNightAndRunId(night, drs1));
+        drsFile = new File(drspath);
+        if (drsFile.exists()) {
+            return drspath;
+        }
+        throw new RuntimeException("Couldn't find drs file: "+drspath+".*");
+    }
+
     private Data getNoiseEvent(int index) {
         Data dbItem = this.database.get(index);
         int night = (int)dbItem.get("NIGHT");
         int runid = (int)dbItem.get("RUNID");
         int noiseNr = (int)dbItem.get("noiseNr");
+        int drs0 = (int)dbItem.get("drs0");
+        int drs1 = (int)dbItem.get("drs1");
         double currents = (double)dbItem.get("currents");
-        String filename = (String)dbItem.get("filename");
-        String fullpath = this.noiseFolder+"/"+filename;
-        File noiseFile = new File(fullpath);
-        if (!noiseFile.exists()) { //check if file is gzip file
-            throw new RuntimeException("Couldn't find noisefile: "+fullpath);
-        }
+        //String filename = (String)dbItem.get("filename");
+        //String fullpath = this.noiseFolder+"/"+filename;
+        String fullpath = this.dataFolder+"/"+createPathFromNightAndRunId(night, runid);
+        fullpath = getPathWithExt(fullpath);
+
+        String drsPath = getDrsPath(this.dataFolder, night, drs0, drs1);
+
         Data item;
+        PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();
         try {
             FITSStream fits = new FITSStream(new SourceURL("file:"+fullpath));
             fits.init();
-            //skip to the event num
-            BinTableReader bintable = (BinTableReader)fits.getReader();
-            bintable.skipToRow(noiseNr);
-            item = fits.readNextRaw();
+            //calculate how many previous events should be read
+            int prevEventsCount = 20;
+            int startPrevEvents = noiseNr - prevEventsCount;
+            if (startPrevEvents<0) {
+                startPrevEvents = 0;
+                prevEventsCount = noiseNr;
+            }
+            fits.getReader().skipToRow(startPrevEvents);
+            for (int i=0; i<prevEventsCount; i++) {
+                item = fits.readNext();
+
+                Utils.isKeyValid(item, "StartCellData", short[].class);
+                Utils.isKeyValid(item, "NROI", Integer.class);
+                Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+
+                int[] eventTime = (int[]) item.get("UnixTimeUTC");
+                short[] startCellArray = (short[])item.get("StartCellData");
+                int length = (Integer) item.get("NROI");
+
+                short[] stopCellArray = new short[startCellArray.length];
+                //calculate the stopcellArray for the current event
+                for (int j = 0; j < startCellArray.length; ++j) {
+                    //there are 1024 capacitors in the ringbuffer
+                    stopCellArray[j] = (short) ((startCellArray[j] + length) % 1024);
+                }
+
+                previousEventInfo.addNewInfo(startCellArray, stopCellArray, eventTime);
+            }
+            item = fits.readNext();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
+        item.put("source", source);
         item.put("currents", currents);
         item.put("noiseNr", noiseNr);
+        item.put("drspath", drsPath);
+        item.put("prevEvents", previousEventInfo);
         return item;
     }
 
@@ -187,8 +256,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
         throw new RuntimeException("Data has a value outside of the binning");
     }
 
-    public void setNoiseFolder(String noiseFolder) {
-        this.noiseFolder = noiseFolder;
+    public void setNoiseFolder(String dataFolder) {
+        this.dataFolder = dataFolder;
     }
 
     public void setPrependKey(String prependKey) {

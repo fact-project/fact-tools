@@ -28,10 +28,14 @@ public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 
+	@Parameter(required = false, description = "The data key that will hold the resulting data array.")
 	private String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
+
+	@Parameter(required = false, description = "Key to the StartCellData.")
+	private String startCellKey = "StartCellData";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
@@ -157,7 +161,7 @@ public class DrsCalibration implements StatefulProcessor {
 			rawfloatData = (double[]) data.get(key);
 		}
 
-		short[] startCell = (short[]) data.get("StartCellData");
+		short[] startCell = (short[]) data.get(startCellKey);
 		if (startCell == null) {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
@@ -171,16 +175,16 @@ public class DrsCalibration implements StatefulProcessor {
 		}
 
 		double[] calibrated = applyDrsCalibration(rawfloatData, output,
-				startCell);
+				startCell, reverse);
 		if (!reverse)
 			data.put(outputKey, calibrated);
 		else {
-			short[] shortres = new short[calibrated.length];
+			short[] decalibratedShortData = new short[calibrated.length];
 			// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
 			for (int i = 0; i < calibrated.length; i++) {
-				shortres[i] = (short)calibrated[i];
+				decalibratedShortData[i] = (short)calibrated[i];
 			}
-			data.put(outputKey, shortres);
+			data.put(outputKey, decalibratedShortData);
 		}
 
 		//TODO add color value if set
@@ -189,7 +193,7 @@ public class DrsCalibration implements StatefulProcessor {
 	}
 
 	public double[] applyDrsCalibration(double[] data, double[] destination,
-			short[] startCellVector) {
+			short[] startCellVector, boolean reverse_calibration) {
 
 		if (destination == null || destination.length != data.length)
 			destination = new double[data.length];
@@ -279,7 +283,7 @@ public class DrsCalibration implements StatefulProcessor {
 				triggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
 						+ slice;
 
-				if (!reverse) {
+				if (!reverse_calibration) {
 					vraw = data[pos];
 					vraw *= dconv;
 					vraw -= drsBaselineMean[offsetPos];
@@ -359,5 +363,7 @@ public class DrsCalibration implements StatefulProcessor {
 		this.drsKey = drsKey;
 	}
 
-
+	public void setStartCellKey(String startCellKey) {
+		this.startCellKey = startCellKey;
+	}
 }
