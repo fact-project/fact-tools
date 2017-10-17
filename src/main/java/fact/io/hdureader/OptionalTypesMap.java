@@ -2,7 +2,9 @@ package fact.io.hdureader;
 
 import com.google.common.collect.ForwardingMap;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A map which can returns values of the appropriate type or an empty optional.

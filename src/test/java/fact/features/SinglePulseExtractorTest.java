@@ -1,10 +1,10 @@
 package fact.features;
 
+import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
+import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
+import fact.photonstream.timeSeriesExtraction.TemplatePulse;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.photonstream.timeSeriesExtraction.TemplatePulse;
-import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
-import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
 
 public class SinglePulseExtractorTest {
 

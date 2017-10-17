@@ -2,12 +2,15 @@ package fact.io.hdureader;
 
 import com.google.common.base.Splitter;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * FITS files are split into things called HDUs. This is a simple representation of one.

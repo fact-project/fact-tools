@@ -1,8 +1,8 @@
 package fact.cleaning;
 
 import fact.Utils;
-import fact.hexmap.FactPixelMapping;
 import fact.container.PixelSet;
+import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 
