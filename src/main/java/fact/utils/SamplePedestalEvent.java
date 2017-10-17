@@ -160,6 +160,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
         int drs0 = (int)dbItem.get("drs0");
         int drs1 = (int)dbItem.get("drs1");
         double currents = (double)dbItem.get("currents");
+        String source = (String)dbItem.get("source");
         //String filename = (String)dbItem.get("filename");
         //String fullpath = this.noiseFolder+"/"+filename;
         String fullpath = this.dataFolder+"/"+createPathFromNightAndRunId(night, runid);
