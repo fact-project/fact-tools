@@ -33,7 +33,7 @@ public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
 	@Parameter(required = false, description = "The data key that will hold the resulting data array.")
-	private String outputKey = "DataCalibrated";
+	public String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
