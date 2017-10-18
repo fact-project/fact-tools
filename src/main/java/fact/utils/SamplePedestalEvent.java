@@ -127,12 +127,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
         // test .fz
         File noiseFile = new File(fullpath+".fits.fz");
         if (noiseFile.exists()) {
-            return fullpath+".fz";
+            return fullpath+".fits.fz";
         }
         // test .gz
         noiseFile = new File(fullpath+".fits.gz");
         if (noiseFile.exists()) {
-            return fullpath+".gz";
+            return fullpath+".fits.gz";
         }
         throw new RuntimeException("Couldn't find data file: "+fullpath+".fits.*");
     }
