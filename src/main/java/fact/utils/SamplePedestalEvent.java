@@ -222,7 +222,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
             this.bins_index.add(new ArrayList<Integer>(100));
         }
         try {
-	    log.info("Noise db: "+noiseDatabase.toString());
+	        log.info("Noise db: "+noiseDatabase.toString());
             JSONStream databaseStream = new JSONStream(noiseDatabase);
             databaseStream.init();
 
@@ -243,6 +243,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
             }
 
         } catch (Exception e) {
+            log.error("Got exception");
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -271,6 +273,10 @@ public class SamplePedestalEvent implements StatefulProcessor {
 
     public void setItemBinningKey(String itemBinningKey) {
         this.itemBinningKey = itemBinningKey;
+    }
+
+    public void setNoiseDatabase(SourceURL noiseDatabase) {
+        this.noiseDatabase = noiseDatabase;
     }
 
     @Override
