@@ -209,7 +209,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
         item.put("source", source);
         item.put("currents", currents);
         item.put("noiseNr", noiseNr);
-        item.put("drspath", drsPath);
+        item.put("drspath", new File(drsPath));
         item.put("prevEvents", previousEventInfo);
         return item;
     }

@@ -97,10 +97,9 @@ public class DrsCalibration implements StatefulProcessor {
 			this.drsTriggerOffsetRms = row.getFloatArray("TriggerOffsetRms").orElseThrow( ()-> new RuntimeException("File does not contain key TriggerOffsetRms"));
 			this.drsGainMean = row.getFloatArray("GainMean").orElseThrow( ()-> new RuntimeException("File does not contain key GainMean"));
 			this.drsGainRms = row.getFloatArray("GainRms").orElseThrow( ()-> new RuntimeException("File does not contain key GainRms"));
-
 		}catch(IOException e)
 		{
-			new IOException(e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		}
 
 	}
@@ -122,6 +121,7 @@ public class DrsCalibration implements StatefulProcessor {
                         loadDrsData(drsFile.toURI().toURL());
                     } catch (MalformedURLException e) {
                         //pass.
+						throw new RuntimeException("URL malformed");
                     }
                 }
             } else {
