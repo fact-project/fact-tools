@@ -34,7 +34,7 @@ public class DrsCalibration implements StatefulProcessor {
 	public String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
-	private String key = "Data";
+	private String dataKey = "Data";
 
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
@@ -118,12 +118,12 @@ public class DrsCalibration implements StatefulProcessor {
 		}
 
 		log.debug("Processing Data item by applying DRS calibration...");
-		short[] rawData = (short[]) data.get(key);
+		short[] rawData = (short[]) data.get(dataKey);
 		if (rawData == null) {
 			log.error(" data .fits file did not contain the value for the key "
-					+ key + ". cannot apply drscalibration");
+					+ dataKey + ". cannot apply drscalibration");
 			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
+					" data .fits file did not contain the value for the key \"" + dataKey + "\". Cannot apply drs calibration)");
 		}
 
 		double[] rawfloatData = new double[rawData.length];
@@ -141,7 +141,7 @@ public class DrsCalibration implements StatefulProcessor {
 		log.debug("StartCellData has {} elements", startCell.length);
 
 		double[] output = rawfloatData;
-		if (!key.equals(outputKey)) {
+		if (!dataKey.equals(outputKey)) {
 			output = new double[rawData.length];
 		}
 
@@ -295,6 +295,13 @@ public class DrsCalibration implements StatefulProcessor {
     }
 
 
+	public void setDataKey(String dataKey) {
+		this.dataKey = dataKey;
+	}
+
+	public void setOutputKey(String outputKey) {
+		this.outputKey = outputKey;
+	}
 
 
 }
