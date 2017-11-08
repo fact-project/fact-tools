@@ -5,7 +5,6 @@
   <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />
   <property name="fitParameterFile_Temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
-  <property name="fitParameterFile_Time" value="file:src/main/resources/default/drsTimeCalib_FitParameter.fits" />
   <property name="outfile" value="file:test_out.fits" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
@@ -14,7 +13,10 @@
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
-    <fact.io.PrintKeysOnConsole keys="EventNum" />
+    <fact.io.PrintKeysOnConsole
+      keys="EventNum"
+      repRate= "100"
+    />
 
     <fact.utils.PreviousEventInfo
       startCellKey="StartCellData"
@@ -23,10 +25,17 @@
     />
 
     <fact.datacorrection.DrsCalibration
-      datakey="Data"
+      dataKey="Data"
       outputKey="DRSCalibratedData"
       url="${drsfile}"
     />
+
+    <fact.features.TimeSeriesNoise
+      dataKey="DRSCalibratedData"
+      outputKeyMean="DRSCalibratedData_Mean"
+      outputKeyStd="DRSCalibratedData_Std"
+    />
+
     <fact.datacorrection.PatchJumpRemoval
       dataKey="DRSCalibratedData"
       outputKey="DRSCalibratedData_Jremoved"
@@ -45,7 +54,8 @@
     />
     <fact.features.TimeSeriesNoise
       dataKey="DRSCalibratedData_JSremoved"
-      outputKey="DRSCalibratedData_JSremoved_Noise"
+      outputKeyMean="DRSCalibratedData_JSremoved_Mean"
+      outputKeyStd="DRSCalibratedData_JSremoved_Std"
     />
 
     <fact.datacorrection.DrsTemperatureCalibration
@@ -54,6 +64,13 @@
       fitParameterFile="${fitParameterFile_Temp}"
       auxService="auxService"
     />
+
+    <fact.features.TimeSeriesNoise
+      dataKey="DRSCalibratedData_Temp"
+      outputKeyMean="DRSCalibratedData_Temp_Mean"
+      outputKeyStd="DRSCalibratedData_Temp_Std"
+    />
+
     <fact.datacorrection.PatchJumpRemoval
       dataKey="DRSCalibratedData_Temp"
       outputKey="DRSCalibratedData_Temp_Jremoved"
@@ -72,35 +89,26 @@
     />
     <fact.features.TimeSeriesNoise
       dataKey="DRSCalibratedData_Temp_JSremoved"
-      outputKey="DRSCalibratedData_Temp_JSremoved_Noise"
+      outputKeyMean="DRSCalibratedData_Temp_JSremoved_Mean"
+      outputKeyStd="DRSCalibratedData_Temp_JSremoved_Std"
     />
 
-    <fact.utils.BoardTimeToSeconds outputKey="eventTime" />
-    <fact.utils.DrsCellLastReadout outputKey="deltaT" />
-    <fact.datacorrection.DrsTimelapseCalibration
-      dataKey="DRSCalibratedData_Temp"
-      outputKey="DRSCalibratedData_TempTime"
-      fitParameterFile="${fitParameterFile_Time}"
-      deltaTKey="deltaT"
-    />
-
-    <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData_TempTime"
-      outputKey="DRSCalibratedData_TempTime_Noise"
-    />
-
-    <!--
     <fact.io.FITSWriter
       url="${outfile}"
-      keys="DRSCalibratedData_JSremoval_Noise, DRSCalibratedData_Temp_JSremoval_Noise, DRSCalibratedData_TempTime_Noise"
-      extname="StdPerPixel"
+      keys="DRSCalibratedData_Mean,
+            DRSCalibratedData_Std,
+            DRSCalibratedData_JSremoved_Mean,
+            DRSCalibratedData_JSremoved_Std,
+            DRSCalibratedData_Temp_Mean,
+            DRSCalibratedData_Temp_Std,
+            DRSCalibratedData_Temp_JSremoved_Mean,
+            DRSCalibratedData_Temp_JSremoved_Std"
+      extname="StatsPerPixel"
     />
-    -->
 
     <!--
-    <fact.ShowViewer key="DataCalibratedDRS_Temp" />
+    <fact.ShowViewer key="DRSCalibratedData_Temp" />
     -->
-    <!-- keys="DRSCalibratedData_JSremoval, DRSCalibratedData_Temp_JSremoval, DRSCalibratedData_TempTime" -->
 
   </process>
 </container>

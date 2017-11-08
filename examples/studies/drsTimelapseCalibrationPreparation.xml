@@ -2,13 +2,27 @@
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-  <property name="outfile" value="file:timelapse_data.fits" />
+  <property name="auxFolder" value="file:src/test/resources/aux/" />
+  <property name="fitParameterFile_Temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
+  <property name="outfile" value="file:test_out.fits" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
 
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
-    <fact.io.PrintKeysOnConsole keys="EventNum" />
+    <fact.io.PrintKeysOnConsole
+      keys="EventNum"
+      repRate= "100"
+    />
+
+    <fact.datacorrection.DrsTemperatureCalibration
+      dataKey="Data"
+      outputKey="DRSCalibratedData_Temp"
+      fitParameterFile="${fitParameterFile_Temp}"
+      auxService="auxService"
+    />
 
     <fact.utils.BoardTimeToSeconds
       outputKey="eventTime"
@@ -19,11 +33,11 @@
     <fact.utils.CalculateDRSCells
       outputkey="cellIDs"
     />
-    <!--
+
     <fact.io.FITSWriter
       url="${outfile}"
       keys="deltaT, Data, cellIDs"
     />
-    -->
+
   </process>
 </container>
