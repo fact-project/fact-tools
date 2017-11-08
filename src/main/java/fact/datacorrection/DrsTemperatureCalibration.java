@@ -8,7 +8,7 @@ import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
 
-import fact.io.zfits.ZFitsStream;
+import fact.io.hdureader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -18,6 +18,7 @@ import stream.annotations.Parameter;
 import stream.annotations.Service;
 import stream.io.SourceURL;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
@@ -25,40 +26,49 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.Map;
+import java.util.*;
 
 /**
  * Created by florian on 06.12.16.
  *
  * Calibrate the data by removing the temperature dependencey of the drs4 chips.
- * Therefore the data taking temperature is used do calculate for every drs4 cell
- * the temperature based data-offset and -slope. Both data-offset and slope
- * are generally given by following relationship: amplitude = a * T + b
+ * Therefore the temperature of data taking is used do calculate for every drs4 cell
+ * the temperature based data-offset and -gain.
  *
- * For historical reasons this fit-parameters are given in units of mV
- * So before we can start the calibrate we have to converts the data format
- * from adc counts to mV.
+ * For this reason a linear model of all drs-calibration-parameter:
+ * Baseline and Gain given by following relationship: amplitude = a * T + b
+ * was build.
  *
- * On the FAD board, there is a 12bit ADC, with a 2.0V range, so the
- * factor between ADC units and mV is
- * adcCountsToMilliVolt = 2000/4096. = 0.48828125 (numerically exact)
+ * The used ADC is a 12bit ADC, with a 2.0V range, so the
+ * factor between ADC-units and mV is
+ * adcCountsToMilliVolt = 2000/pow(2, 12) = 0.48828125 mV/ADC-units (numerically exact)
  *
- * Now we have to subtract the data-offset from the data and than to divided the data by the data-slope
+ * Calibration:
+ *   We have to subtract the data-offset from the data and
+ *   to normend the difference by divide with the data-gain
  *
- * From the schematic of the FAD we learned, that the voltage at the ADC
- * should be 1907.35 mV(adcMax) when the calibration DAC is set to 50000.
+ *   So the total calibration scheme looks like:
+ *   calibratedData = (rawData - dataOffset)/dataGain;
  *
- * So the total calibration looks like:
- * calibratedData = (rawData * adcCountsToMilliVolt - dataOffset)/dataSlope * adcMax;
+ *  Where the gain is normed by divide with the DAC-ADC-units to a unitless value. .
+ *  Given by the used 16 bit DAC with a 2.5V range and an input of 50 000 Dac-counts
+ *  dacVoltage = 2500/pow(2, 16)*50000 = 1907.34863281 mV (numerically exact)
+ *  DAC-ADC-units = dacVoltage/adcCountsToMilliVolt = 3906.25 ADC-units (numerically exact)
  */
 
+// TODO fill .orElseThrow(IOException::new) with error-infos
 public class DrsTemperatureCalibration implements StatefulProcessor {
 
     private final static Logger log = LoggerFactory.getLogger(DrsTemperatureCalibration.class);
 
+    // TODO get this constants from a unique source
     private double adcCountsToMilliVolt = 2000.0 / 4096.0; //[mV/adc]
-    private double adcMax = 1907.35; //[mV]
+    private int NRCHIDS = 1440;
+    private int NRCELLS = 1024;
+    private int ROI = 300;
 
     @Parameter(description = "Key to the Data array to be calibrated", defaultValue = "Data")
     private String dataKey = "Data";
@@ -67,7 +77,7 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
     private String outputKey = "DataCalibrated";
 
     @Parameter(required = true, description = "Fits file with the calibration constants",
-               defaultValue = "Null. Will try to find path to fitParameterFile from the stream.")
+            defaultValue = "Null. If Null process will fail in the init method")
     private SourceURL fitParameterFile = null;
 
     @Service(required = true, description = "Name of the service that provides aux files")
@@ -75,17 +85,18 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
 
     private final static AuxPointStrategy auxPointStrategy = new Closest();
 
-    // The following keys are required to exist in the fit-parameter data
-    private final static String[] fitParameterKeys = new String[]{"BaselineSlope", "BaselineOffset",
-                                                                  "GainSlope", "GainOffset"};
+    private final static String[] fitParameter = new String[]{"Slope", "Offset"};
 
-    private HashMap<ZonedDateTime, HashMap<String, float[]>> intervalFitParameterMap = new HashMap();
+    private int intervalNr;
+    private ZonedDateTime[] intervalLimits;
+
+    HashMap<String, float[][]> fitParameterBaseline = new HashMap<String, float[][]>();
+    HashMap<String, float[]> fitParameterGain = new HashMap<String, float[]>();
 
     // The following keys are required to exist in the raw data
     private final static String[] dataKeys = new String[]{"UnixTimeUTC", "NPIX", "NCELLS", "NROI", "StartCellData"};
 
     /******************************************************************************************************************/
-    /* // new version -dosent work jet
     @Override
     public void init(ProcessContext processContext) throws Exception {
         log.debug("----- init -----");
@@ -93,77 +104,23 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
         if (fitParameterFile != null) {
             try {
-                FITS f = FITS.fromFile(new File(fitParameterFile.getFile()));
-                HDU primaryHDU = f.primaryHDU;
-                int nrOfIntervals =  (int) primaryHDU.header.getInt("NrOfInt").orElse(0);
-                for (int intervalNr = 1; intervalNr <= nrOfIntervals; intervalNr++) {
+                FITS fits = FITS.fromFile(new File(fitParameterFile.getFile()));
+                HDU primaryHDU = fits.primaryHDU;
 
-                    String extName = "interval" + intervalNr;
-                    HDU hdu = f.getHDU(extName); //.orElseThrow(IOException::new);
-                    BinTable intervalData = hdu.getBinTable(); //.orElseThrow(IOException::new);
-                    String dateString = hdu.header.get("LowLimit").toString();
-                    ZonedDateTime dateTime = ZonedDateTime.parse(dateString, formatter);
-                    updateDrsFitParameterMap(intervalData, dateTime);
-                }
+                intervalNr =  Integer.parseInt(primaryHDU.header.get("INTNR").orElseThrow(IOException::new));
 
-           } catch (Exception e) {
-                log.error("Could not load file '"+fitParameterFile+"' specified in the url_fitValueFile.");
-                throw new RuntimeException(e.getMessage());
-            }
-        } else {
-            log.error("fitParameterFile == null");
-        }
-    }
+                String[] dateString = {primaryHDU.header.get("LOWLIMIT").orElseThrow(IOException::new),
+                        primaryHDU.header.get("UPPLIMIT").orElseThrow(IOException::new)};
 
-    private  void updateDrsFitParameterMap(BinTable intervalData, ZonedDateTime dateTime)
-    {
-        log.debug("----- updateDrsFitParameterMap -----");
-        try {
-            BinTableReader reader = BinTableReader.forBinTable(intervalData);
-            //first row contains null stuff
-            Map<String, Serializable> row = reader.getNextRow();
+                LocalDateTime[] localDateTime = {LocalDateTime.parse(dateString[0], formatter),
+                        LocalDateTime.parse(dateString[1], formatter)};
+                intervalLimits = new ZonedDateTime[]{ZonedDateTime.of(localDateTime[0], ZoneId.of("UTC")),
+                        ZonedDateTime.of(localDateTime[1], ZoneId.of("UTC"))};
 
-            // this for-loop is simply a check that fires an exception if any
-            // of the expected keys is missing in table
-            //Utils.mapContainsKeys(intervalData, fitParameterKeys); //TODO fix
+                String extName = "FitParameter";
+                BinTable intervalData = fits.getHDU(extName).getBinTable();
 
-            HashMap<String, float[]> intervalFitParameter = new HashMap();
-            for (String key: fitParameterKeys) {
-                intervalFitParameter.put(key, (float[]) row.get(key));
-                log.debug("{} data: {}", key, intervalFitParameter.get(key));
-            }
-            intervalFitParameterMap.put(dateTime, intervalFitParameter);
-        } catch (Exception e) {
-
-            log.error("Failed to load DRS data: {}", e.getMessage());
-            if (log.isDebugEnabled())
-                e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    /******************************************************************************************************************/
-    //old stuff TODO remove
-    @Override
-    public void init(ProcessContext processContext) throws Exception {
-        log.debug("----- init -----");
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
-        if (fitParameterFile != null) {
-            try {
-                String[] dateStringCollection = {"2013-06-07 12", "2014-05-20 12", "2015-05-26 12"}; //TODO remove magic numbers
-                final ZFitsStream stream = new ZFitsStream(fitParameterFile); //TODO remove magic numbers
-                int nrOfIntervals =  (int) 3;
-                for (int intervalNr = 1; intervalNr <= nrOfIntervals; intervalNr++) {
-                    String extName = "Interval" + String.valueOf(intervalNr);
-                    stream.tableName = extName;
-                    stream.init();
-                    Data tabledata = stream.readNext();
-                    String dateString = dateStringCollection[intervalNr-1];
-                    LocalDateTime lDateTime = LocalDateTime.parse(dateString, formatter);
-                    ZonedDateTime dateTime = ZonedDateTime.of(lDateTime, ZoneId.of("UTC"));
-                    updateDrsFitParameterMap(tabledata, dateTime);
-                }
+                loadDrsFitParameterMap(intervalData);
 
             } catch (Exception e) {
                 log.error("Could not load file '"+fitParameterFile +"' specified in the url_fitValueFile.");
@@ -174,21 +131,31 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         }
     }
 
-    //old stuff TODO remove
-    private  void updateDrsFitParameterMap(Data tabledata, ZonedDateTime dateTime)
+    /******************************************************************************************************************/
+    private  void loadDrsFitParameterMap(BinTable intervalData)
     {
-        log.debug("----- updateDrsFitParameterMap -----");
+        log.debug("----- loadDrsFitParameterMap -----");
         try {
-            // this for-loop is simply a check that fires an exception if any
-            // of the expected keys is missing in table
-            Utils.mapContainsKeys(tabledata, fitParameterKeys); //TODO fix
+            BinTableReader reader = BinTableReader.forBinTable(intervalData);
 
-            HashMap<String, float[]> intervalFitParameter = new HashMap();
-            for (String key: fitParameterKeys) {
-                intervalFitParameter.put(key, (float[]) tabledata.get(key));
-                log.debug("{} data: {}", key, intervalFitParameter.get(key));
+            int totalNrOfCells = this.NRCHIDS * this.NRCELLS;
+            for (String key: fitParameter) {
+                fitParameterBaseline.put(key, new float[totalNrOfCells][this.ROI]);
+                fitParameterGain.put(key, new float[totalNrOfCells]);
             }
-            intervalFitParameterMap.put(dateTime, intervalFitParameter);
+            OptionalTypesMap<String, Serializable> row;
+            for (int cellIdx = 0; cellIdx < totalNrOfCells; cellIdx++) {
+                row = reader.getNextRow();
+                for (String key: fitParameter) {
+                    fitParameterBaseline.get(key)[cellIdx] = row.getFloatArray("Baseline"+key).orElseThrow(IOException::new);
+                    fitParameterGain.get(key)[cellIdx] = row.getFloat("Gain"+key).orElseThrow(IOException::new);
+                }
+            }
+
+            if (reader.hasNext()){
+                throw new RuntimeException("FitParameter array is larger than expected");
+            }
+
         } catch (Exception e) {
 
             log.error("Failed to load DRS data: {}", e.getMessage());
@@ -197,6 +164,7 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
             throw new RuntimeException(e.getMessage());
         }
     }
+
     /******************************************************************************************************************/
 
     @Override
@@ -210,16 +178,12 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         Instant instant = Instant.ofEpochSecond(unixTimeUTC[0],unixTimeUTC[1] * 1000);
         ZonedDateTime dateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"));
 
-        ZonedDateTime intervalDateTimeKey = null;
-        for ( ZonedDateTime dateTimeKey : intervalFitParameterMap.keySet() ) {
-            if (dateTime.compareTo(dateTimeKey) > 0) {
-                intervalDateTimeKey = dateTimeKey;
-                break;
-            }
-        }
-
-        if(intervalDateTimeKey == null) {
-            throw new IllegalArgumentException("Cant handle File: No drs fit parameters available for the drs-file datetime '"+dateTime.toString()+"'");
+        if ((dateTime.compareTo(intervalLimits[0]) < 0) ||
+                (dateTime.compareTo(intervalLimits[1]) > 0)) {
+            String string = "Cant handle File: No drs fit parameters available for the given drs-file. " +
+                    "The datetime '"+dateTime.toString()+"' of the drs-file is out of range [" +
+                    intervalLimits[0]+","+intervalLimits[1]+"] of interval "+intervalNr;
+            throw new IllegalArgumentException(string);
         }
 
         log.debug("Get patchTemperaure from AuxiliaryService with AuxPointStrategy {}", auxPointStrategy );
@@ -235,31 +199,38 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
         float[] patchTemperatures = (float[]) temperatureData.get("temp");
         if(patchTemperatures.length != 160) { //TODO try to handle 82 Temperatures also
             throw new IllegalArgumentException("Cant handle File: There should be for every patch a Temperature. instant of '"+
-                                                String.valueOf(patchTemperatures.length)+"'");
+                    String.valueOf(patchTemperatures.length)+"'");
         }
 
-        double[] calibrated = applyDrsCalibration(data, patchTemperatures, intervalDateTimeKey);
-        data.put(outputKey, calibrated); //TODO check move into applyDrsCalibration
+        double[] calibrated = applyDrsCalibration(data, patchTemperatures);
+        data.put(outputKey, calibrated);
 
         return data;
     }
 
-    private double[] applyDrsCalibration(Data data,  float[] patchTemperatures, ZonedDateTime intervalDateTimeKey){
+    private double[] applyDrsCalibration(Data data,  float[] patchTemperatures){
         log.debug("----- applyDrsCalibration -----");
 
-        int NRCHIDS = (int) data.get("NPIX");
-        int NRCELLS = (int) data.get("NCELLS");
-        int ROI = (int) data.get("NROI");
+        // TODO check needed (safety stuff)
+        if((this.NRCHIDS != (int) data.get("NPIX")) ||
+           (this.NRCELLS != (int) data.get("NCELLS")) ||
+           (this.ROI != (int) data.get("NROI"))){
+            log.error(" Unexpected data dimensions for NRCHIDS {}, NRCELLS {} or ROI {}. " +
+                      "Expected: NRCHIDS {}, NRCELLS {} or ROI {}",
+                      data.get("NPIX"), data.get("NCELLS"), data.get("NROI"),
+                      this.NRCHIDS, this.NRCELLS, this.ROI);
+            return null;
+        }
 
         short[] startCellVector = (short[]) data.get("StartCellData");
-        // TODO check needed
+        // TODO check needed (safety stuff)
         if (startCellVector == null) {
             log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
             return null;
         }
 
         double[] rawData = Utils.toDoubleArray(data.get(dataKey));
-        // TODO check needed
+        // TODO check needed (safety stuff)
         if (rawData == null) {
             String errString = " data .fits file did not contain the value for the key "
                                + dataKey + ". cannot apply drsCalibration";
@@ -267,30 +238,29 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
             throw new RuntimeException(errString);
         }
 
-        HashMap<String, float[]> intervalFitParameter = intervalFitParameterMap.get(intervalDateTimeKey);
-
-        double vraw, dataOffset, dataSlope = Double.NaN;
+        double vraw, offset, gain = Double.NaN;
         double[] calibrated = new double[rawData.length];
-        int startCell, sample_idx, cell_idx;
+        int startCell_idx, sample_cell, sample_cell_idx, data_idx;
         for (int chid = 0; chid < NRCHIDS; chid++) {
+            startCell_idx = startCellVector[chid]+ chid*NRCELLS;
             for (int sample = 0; sample < ROI; sample++) {
 
-                startCell = Utils.sampleToCell(sample, startCellVector[chid], NRCELLS);
-                sample_idx = chid * ROI + sample;
-                cell_idx = chid * NRCELLS + startCell;
+                sample_cell = Utils.sampleToCell(sample, startCellVector[chid], NRCELLS);
+                sample_cell_idx = chid * NRCELLS + sample_cell;
+                data_idx = chid * ROI + sample;
 
-                dataOffset  = intervalFitParameter.get("BaselineSlope")[cell_idx] * patchTemperatures[chid/9];
-                dataOffset += intervalFitParameter.get("BaselineOffset")[cell_idx];
+                offset  = fitParameterBaseline.get("Slope")[startCell_idx][sample] * patchTemperatures[(int)chid/9];
+                offset += fitParameterBaseline.get("Offset")[startCell_idx][sample];
 
-                dataSlope  = intervalFitParameter.get("GainSlope")[cell_idx] * patchTemperatures[chid/9];
-                dataSlope += intervalFitParameter.get("GainOffset")[cell_idx];
+                gain  = fitParameterGain.get("Slope")[sample_cell_idx] * patchTemperatures[(int)chid/9];
+                gain += fitParameterGain.get("Offset")[sample_cell_idx];
 
-                vraw = rawData[sample_idx] * adcCountsToMilliVolt;
-                vraw -= dataOffset;
-                vraw /= dataSlope;
-                vraw *= adcMax;
+                vraw = rawData[data_idx];
+                vraw -= offset;
+                vraw /= gain;
+                vraw *= adcCountsToMilliVolt;
 
-                calibrated[sample_idx] = vraw;
+                calibrated[data_idx] = vraw;
             }
         }
         return calibrated;
@@ -307,17 +277,15 @@ public class DrsTemperatureCalibration implements StatefulProcessor {
     }
 
 
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
+    public void setDataKey(String dataKey_) {
+        this.dataKey = dataKey_;
     }
 
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
+    public void setOutputKey(String outputKey_) {
+        this.outputKey = outputKey_;
     }
 
-    public void setFitParameterFile(SourceURL fitParameterFile) { this.fitParameterFile = fitParameterFile; }
+    public void setFitParameterFile(SourceURL fitParameterFile_) { this.fitParameterFile = fitParameterFile_; }
 
-    public void setAuxService(AuxiliaryService auxService) {
-        this.auxService = auxService;
-    }
+    public void setAuxService(AuxiliaryService auxService_) { this.auxService = auxService_; }
 }
