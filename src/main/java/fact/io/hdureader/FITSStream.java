@@ -47,9 +47,15 @@ public class FITSStream extends AbstractStream {
         //get calibration constants they are stored in the first (and only) row of this hdu.
         HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
         if (offsetHDU != null){
-            ZFITSHeapReader reader = ZFITSHeapReader.forTable(offsetHDU.getBinTable());
+            Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+            Reader offsetReader;
+            if (ztable) {
+                offsetReader = ZFITSHeapReader.forTable(eventsTable);
+            } else {
+                offsetReader = BinTableReader.forBinTable(eventsTable);
+            }
             boolean ignoreWrongTileHeader;
-            OptionalTypesMap<String, Serializable> row = reader.getNextRow(ignoreWrongTileHeader=true);
+            OptionalTypesMap<String, Serializable> row = reader.getNextRow();
 
             offsetCalibrationsConstants = row
                     .getShortArray("OffsetCalibration")

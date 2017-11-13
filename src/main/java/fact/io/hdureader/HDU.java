@@ -116,8 +116,7 @@ public class HDU {
         if(sizeOfDataArea() == 0){
             return 0;
         }
-        long numberOfBlocks = sizeOfDataArea() / 2880;
-        return 2880 * numberOfBlocks + 2880;
+        return ((sizeOfDataArea()+2879)/2880)*2880;
     }
 
     /**
