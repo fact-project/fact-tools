@@ -186,7 +186,7 @@ public final class ZFITSHeapReader implements Reader {
                 }
             }
         }
-
+        curRowInCache++;
         numberOfRowsRead++;
         return map;
     }
