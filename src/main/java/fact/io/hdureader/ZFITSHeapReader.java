@@ -9,12 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * This reader can interpret the bytes in the heap of a bintable that has been stored in the ZFits format.
@@ -71,6 +68,11 @@ public final class ZFITSHeapReader implements Reader {
     private final Integer numberOfRowsInTable;
     private int numberOfRowsRead = 0;
 
+
+    private Map<String, Buffer> tileCache = null;
+    private Set<String> compressedBlocks = null;
+    private int curRowInCache = 0;
+    private int maxRowsInCache = 0;
 
     /**
      * Check whether there is another row to return from this heap
@@ -130,7 +132,7 @@ public final class ZFITSHeapReader implements Reader {
      *
      * The old ZFits implementation by M.Bulinski ignored the problem by default.
      *
-     * @param ignoreWrongTileHeader if true, ognores wrong tileheader information.
+     * @param ignoreWrongTileHeader if true, ignores wrong tileheader information.
      * @return a map containing the the data from the rows columns.
      * @throws NoSuchElementException iff hasNext() is false
      */
@@ -138,9 +140,64 @@ public final class ZFITSHeapReader implements Reader {
         if(!hasNext()){
            throw new NoSuchElementException();
         }
+        // check if we currently still have rows in the cache if not get the next tile
+        if (maxRowsInCache==curRowInCache) {
+            this.getNextTileIntoCache(ignoreWrongTileHeader);
+        }
         OptionalTypesMap<String, Serializable> map = new OptionalTypesMap<>();
 
-        //Tile header in this row
+        //iterate over columns in the row
+        for (BinTable.TableColumn column : columns) {
+
+            //sometimes there is no data. We do nothing then.
+            if (column.repeatCount == 0){
+                continue;
+            }
+            Buffer curBuffer = tileCache.get(column.name);
+
+            if (compressedBlocks.contains(column.name)) {
+                // Buffer is ShortBuffer
+                ShortBuffer shortBuffer = (ShortBuffer) curBuffer;
+
+                short[] data = new short[column.repeatCount];
+                int offsetAfterReadingBytes = shortBuffer.position() + column.repeatCount * column.type.byteSize;
+
+                shortBuffer.get(data, shortBuffer.position(), column.repeatCount * column.type.byteSize);
+
+                shortBuffer.position(offsetAfterReadingBytes);
+                map.put(column.name, data);
+            } else {
+                //Buffer is ByteBuffer
+                ByteBuffer byteBuffer = (ByteBuffer) curBuffer;
+                if (column.repeatCount == 1) {
+                    map.put(column.name, readSingleValueFromBuffer(column, byteBuffer));
+                } else {
+                    int offsetAfterReadingBytes = byteBuffer.position() + column.repeatCount * column.type.byteSize;
+
+
+                    //This creates a view of the byte buffer. No copying will take place. I think.
+                    ByteBuffer bufferView = ByteBuffer.wrap(byteBuffer.array(),
+                            curBuffer.position(),
+                            offsetAfterReadingBytes)
+                            .order(ByteOrder.LITTLE_ENDIAN);
+
+                    byteBuffer.position(offsetAfterReadingBytes);
+                    map.put(column.name, readArrayFromBuffer(column, bufferView));
+                }
+            }
+        }
+
+        numberOfRowsRead++;
+        return map;
+    }
+
+    /**
+     * Reads the next tile into the cache
+     * @param ignoreWrongTileHeader
+     * @throws IOException
+     */
+    private void getNextTileIntoCache(boolean ignoreWrongTileHeader) throws IOException {
+        //this TileHeader
         //see figure 6 of zfits paper
         TileHeader tile = TileHeader.fromStream(stream, ignoreWrongTileHeader);
 
@@ -151,51 +208,46 @@ public final class ZFITSHeapReader implements Reader {
 
         ByteBuffer tileBuffer = ByteBuffer.wrap(tileData).order(ByteOrder.LITTLE_ENDIAN);
 
-        //iterate over columns in the row
+        tileCache = new HashMap<>();
+        compressedBlocks = new HashSet<>();
+
+        //iterate over columns in the tile
         for (BinTable.TableColumn column : columns) {
 
-            //sometimes there is no data. We do nothing then.
-            if (column.repeatCount == 0){
+            // sometimes there is no data. We do nothing then.
+            if (column.repeatCount == 0) {
                 continue;
             }
 
-
+            // read the current block information
             BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
+            if (block.compression != BlockHeader.Compression.RAW && column.type != BinTable.ColumnType.SHORT) {
+                throw new IOException("Current Reader doesn't support compression other types than short");
+            }
             if (block.compression == BlockHeader.Compression.HUFFMAN) {
-
                 short[] shorts = huffmanDecompression(tileBuffer);
-                map.put(column.name, shorts);
+                compressedBlocks.add(column.name);
+                tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
-            } else if( block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING){
-
+            } else if (block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING) {
                 short[] shorts = huffmanDecompression(tileBuffer);
                 unsmooth(shorts);
-                map.put(column.name, shorts);
+                compressedBlocks.add(column.name);
+                tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
-            }else {
-                if(column.repeatCount == 1){
-                    map.put(column.name, readSingleValueFromBuffer(column, tileBuffer));
-                } else {
-
-                    int offsetAfterReadingBytes = tileBuffer.position() + column.repeatCount * column.type.byteSize;
-
-                    //This creates a view of the byte buffer. No copying will take place. I think.
-                    ByteBuffer bufferView = ByteBuffer.wrap(    tileBuffer.array(),
-                                                                tileBuffer.position(),
-                                                                offsetAfterReadingBytes)
-                                                        .order(ByteOrder.LITTLE_ENDIAN);
-
-                    tileBuffer.position(offsetAfterReadingBytes);
-                    map.put(column.name, readArrayFromBuffer(column, bufferView));
-
+            } else {
+                // convert to int no block is bigger than 4GB
+                int numberBytes = (int) block.getDataSize();
+                byte[] cache = new byte[numberBytes];
+                for (int i = 0; i < numberBytes; i++) {
+                    cache[i] = tileBuffer.get();
                 }
+                tileCache.put(column.name, ByteBuffer.wrap(cache));
             }
-
         }
-
-        numberOfRowsRead++;
-        return map;
+        curRowInCache = 0;
+        maxRowsInCache = tile.numberOfRows;
     }
 
     /**
@@ -402,11 +454,17 @@ public final class ZFITSHeapReader implements Reader {
         private final long size;
         private final String order;
         private final Compression compression;
+        private final long headerSize;
 
-        private BlockHeader(long size, String order, Compression compression) {
+        private BlockHeader(long size, String order, Compression compression, long sizeHeader) {
             this.size = size;
             this.order = order;
             this.compression = compression;
+            this.headerSize = sizeHeader;
+        }
+
+        public long getDataSize() {
+            return this.size-this.headerSize;
         }
 
         /**
@@ -426,6 +484,9 @@ public final class ZFITSHeapReader implements Reader {
 
             byte numberOfProcessings = buffer.get();
 
+            if (numberOfProcessings!=1) {
+                throw new IOException("Current compression doesn't support more than 1 number of processings");
+            }
             byte processingType = 0;
             for (int n = 0; n < numberOfProcessings; n++) {
                 processingType += buffer.get();
@@ -448,7 +509,9 @@ public final class ZFITSHeapReader implements Reader {
                     compression = Compression.RAW;
                     break;
             }
-            return new BlockHeader(size, order, compression);
+            // size(8 Bytes)+order(1 Bytes)+numberOfProcessings(1 Bytes)+Prozessings(2 Bytes*numberOfProcessings)
+            long sizeHeader = 8+1+1+(numberOfProcessings*2);
+            return new BlockHeader(size, order, compression, sizeHeader);
         }
 
     }
