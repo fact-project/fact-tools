@@ -484,13 +484,11 @@ public final class ZFITSHeapReader implements Reader {
 
             byte numberOfProcessings = buffer.get();
 
-            if (numberOfProcessings!=1) {
-                throw new IOException("Current compression doesn't support more than 1 number of processings");
-            }
             byte processingType = 0;
             for (int n = 0; n < numberOfProcessings; n++) {
                 processingType += buffer.get();
-                //skip weird zero byte here. This is not documented correctly in 'the spec'
+                // skip weird zero byte here. This is not documented correctly in 'the spec'
+                // it should be a short but they worte it wrongly in the spec (ignoring here)
                 buffer.get();
             }
 
