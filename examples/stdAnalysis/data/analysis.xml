@@ -26,7 +26,7 @@
 
         <!-- Calibration: -->
         <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
+        DrsTimeCalibration, InterpolateBadPixel -->
         <include url="classpath:/default/data/calibration.xml" />
         <!-- Output: DataCalibrated -->
 
