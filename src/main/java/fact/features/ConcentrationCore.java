@@ -46,50 +46,43 @@ public class ConcentrationCore implements Processor{
 
 		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
 
-		try{
-			Double cogx = (Double) input.get(cogxKey);
-			Double cogy = (Double) input.get(cogyKey);
-			Double delta = (Double) input.get(deltaKey);
-			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
-			PixelSet showerPixelSet = (PixelSet) input.get(pixelSetKey);
-			Double length = (Double) input.get(lengthKey);
-			Double width = (Double) input.get(widthKey);
-			Double size = (Double) input.get(sizeKey);
+		Double cogx = (Double) input.get(cogxKey);
+		Double cogy = (Double) input.get(cogyKey);
+		Double delta = (Double) input.get(deltaKey);
+		double [] photonChargeArray = (double[]) input.get(photonChargeKey);
+		PixelSet showerPixelSet = (PixelSet) input.get(pixelSetKey);
+		Double length = (Double) input.get(lengthKey);
+		Double width = (Double) input.get(widthKey);
+		Double size = (Double) input.get(sizeKey);
 
 
-			double photonsInEllipse = 0;
+		double photonsInEllipse = 0;
 
-			PixelSet corePixels = new PixelSet();
-			for(CameraPixel pix : showerPixelSet.set)
-			{
-                FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
-				double px = p.getXPositionInMM();
-				double py = p.getYPositionInMM();
+		PixelSet corePixels = new PixelSet();
+		for(CameraPixel pix : showerPixelSet.set)
+		{
+			FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
+			double px = p.getXPositionInMM();
+			double py = p.getYPositionInMM();
 
-				double dx = px - cogx;
-				double dy = py - cogy;
+			double dx = px - cogx;
+			double dy = py - cogy;
 
-				double pixelLong = Math.cos(delta) * dx - Math.sin(delta) * dy;
-				double pixelTrans = Math.sin(delta) * dx + Math.cos(delta) * dy;
+			double pixelLong = Math.cos(delta) * dx - Math.sin(delta) * dy;
+			double pixelTrans = Math.sin(delta) * dx + Math.cos(delta) * dy;
 
-				double distance = Math.pow(pixelLong / length, 2.0) + Math.pow(pixelTrans / width, 2.0);
+			double distance = Math.pow(pixelLong / length, 2.0) + Math.pow(pixelTrans / width, 2.0);
 
-				if (distance <= 1) {
-					photonsInEllipse += photonChargeArray[pix.id];
-					corePixels.add(pix);
-				}
+			if (distance <= 1) {
+				photonsInEllipse += photonChargeArray[pix.id];
+				corePixels.add(pix);
 			}
-			double concCore = photonsInEllipse / size;
-
-			input.put(outputKey, concCore);
-			input.put("CorePixels", corePixels);
-			return input;
-
-		} catch (ClassCastException e){
-			log.error("Could not cast the values to the right types");
-			throw e;
 		}
+		double concCore = photonsInEllipse / size;
 
+		input.put(outputKey, concCore);
+		input.put("CorePixels", corePixels);
+		return input;
 	}
 
 	public String getOutputKey() {
