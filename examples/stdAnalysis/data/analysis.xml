@@ -24,6 +24,8 @@
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
         <!-- Output: Data -->
 
+	<fact.features.UnixTimeUTC2DateTime />
+
         <!-- Calibration: -->
         <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
         DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
@@ -59,6 +61,8 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
         <include url="classpath:/default/data/sourceParameter.xml" />
         <!-- Output: source dependent parameters -->
+
+	<fact.io.JSONWriter url="file:test.json" keys="${keysForOutput}" />
 
     </process>
 </container>
