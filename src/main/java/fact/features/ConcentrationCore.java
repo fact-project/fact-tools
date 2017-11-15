@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import streams.tikz.Pixel;
 
 
 public class ConcentrationCore implements Processor{
 	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
-	
+
 	@Parameter(required=true)
 	private String outputKey;
 	@Parameter(required = true, description  = "Key of the Center of Gravity X (by Distribution from shower)")
@@ -35,60 +36,55 @@ public class ConcentrationCore implements Processor{
 	private String widthKey;
 	@Parameter(required = true, description  = "Key of the shower lengthKey")
 	private String lengthKey;
-	
-	final private double pixelRadius = Constants.PIXEL_SIZE;
-	
+
+	/**
+	 * Calculate the percentage of photons inside the Hillas Ellipse
+	 * aka. the pixels with a Mahalanobis Distance <= 1.
+	 */
 	public Data process(Data input)
 	{
 
 		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
-		
+
 		try{
 			Double cogx = (Double) input.get(cogxKey);
 			Double cogy = (Double) input.get(cogyKey);
-			Double d = (Double) input.get(deltaKey);
+			Double delta = (Double) input.get(deltaKey);
 			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
-			PixelSet showerPixelArray = (PixelSet) input.get(pixelSetKey);
-			Double l = (Double) input.get(lengthKey);
-			Double w = (Double) input.get(widthKey);
+			PixelSet showerPixelSet = (PixelSet) input.get(pixelSetKey);
+			Double length = (Double) input.get(lengthKey);
+			Double width = (Double) input.get(widthKey);
 			Double size = (Double) input.get(sizeKey);
-			
-			double c = Math.cos(d);
-			double s = Math.sin(d);
-			
-			double concCore = 0;
-			
-			for(CameraPixel pix : showerPixelArray.set)
+
+
+			double photonsInEllipse = 0;
+
+			PixelSet corePixels = new PixelSet();
+			for(CameraPixel pix : showerPixelSet.set)
 			{
-                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix.id);
+                FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
 				double px = p.getXPositionInMM();
 				double py = p.getYPositionInMM();
-				
-				// short names adapted from mars code (change when understood)
 
 				double dx = px - cogx;
 				double dy = py - cogy;
-				
-				double dist0 = dx*dx + dy*dy;
-				
-				double dzx =  c * dx + s * dy;
-				double dzy = -s * dx + c * dy;
-				
-				double rl = 1/(l * l);
-				double rw = 1/(w * w);
-				double dz = pixelRadius * pixelRadius / 4;
 
-				double tana = dzy * dzy / (dzx * dzx);
-				double distr = (1+tana)/(rl + tana*rw);
-				
-				if (distr>dist0-dz || dzx==0)
-					 concCore += photonChargeArray[pix.id];
-				
+				double pixelLong = Math.cos(delta) * dx - Math.sin(delta) * dy;
+				double pixelTrans = Math.sin(delta) * dx + Math.cos(delta) * dy;
+
+				double distance = Math.pow(pixelLong / length, 2.0) + Math.pow(pixelTrans / width, 2.0);
+
+				if (distance <= 1) {
+					photonsInEllipse += photonChargeArray[pix.id];
+					corePixels.add(pix);
+				}
 			}
-			concCore /= size;
+			double concCore = photonsInEllipse / size;
+
 			input.put(outputKey, concCore);
+			input.put("CorePixels", corePixels);
 			return input;
-			
+
 		} catch (ClassCastException e){
 			log.error("Could not cast the values to the right types");
 			throw e;
@@ -163,7 +159,7 @@ public class ConcentrationCore implements Processor{
 	public void setLengthKey(String lengthKey) {
 		this.lengthKey = lengthKey;
 	}
-	
 
-	
+
+
 }
