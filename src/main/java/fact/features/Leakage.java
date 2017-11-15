@@ -14,16 +14,16 @@ import stream.annotations.Parameter;
 public class Leakage implements Processor {
 	static Logger log = LoggerFactory.getLogger(Leakage.class);
 
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String pixelSetKey;
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String weights;
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String leakage1OutputKey;
-    @Parameter(required = true)
+	@Parameter(required = true)
 	private String leakage2OutputKey;
 
-    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	@Override
 	public Data process(Data input) {
@@ -31,37 +31,36 @@ public class Leakage implements Processor {
 
 		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
 		double[] photonCharge = (double[]) input.get(weights);
-		
-		
+
+
 		double size = 0;
-	
-	    double leakageBorder          = 0;
-	    double leakageSecondBorder    = 0;
 
-	    for (CameraPixel pix: showerPixel.set)
-	    {
-	    	size += photonCharge[pix.id];
-	        if (isBorderPixel(pix.id) )
-	        {
-	            leakageBorder          += photonCharge[pix.id];
-	            leakageSecondBorder    += photonCharge[pix.id];
-	        }
-	        else if (isSecondBorderPixel(pix.id))
-	        {
-	            leakageSecondBorder    += photonCharge[pix.id];
-	        }
-	    }
-	    leakageBorder          = leakageBorder        / size;
-	    leakageSecondBorder    = leakageSecondBorder  / size;
+		double leakageBorder          = 0;
+		double leakageSecondBorder    = 0;
 
-		
+		for (CameraPixel pix: showerPixel.set)
+		{
+			size += photonCharge[pix.id];
+			if (isBorderPixel(pix.id) )
+			{
+				leakageBorder          += photonCharge[pix.id];
+				leakageSecondBorder    += photonCharge[pix.id];
+			}
+			else if (isSecondBorderPixel(pix.id))
+			{
+				leakageSecondBorder    += photonCharge[pix.id];
+			}
+		}
+		leakageBorder          = leakageBorder        / size;
+		leakageSecondBorder    = leakageSecondBorder  / size;
+
+
 		input.put(leakage1OutputKey , leakageBorder);
 		input.put(leakage2OutputKey , leakageSecondBorder);
 		return input;
-		
-		
+
 	}
-	
+
 	//this is of course not the most efficient solution
 	boolean isSecondBorderPixel(int pix){
 		for(FactCameraPixel nPix: pixelMap.getNeighboursFromID(pix))
@@ -73,7 +72,7 @@ public class Leakage implements Processor {
 		return false;
 	}
 	boolean isBorderPixel(int pix){
-        return pixelMap.getNeighboursFromID(pix).length < 6;
+		return pixelMap.getNeighboursFromID(pix).length < 6;
 	}
 
 	public void setPixelSetKey(String pixelSetKey) {
@@ -103,6 +102,6 @@ public class Leakage implements Processor {
 		this.leakage2OutputKey = leakage2OutputKey;
 	}
 
-	
+
 
 }

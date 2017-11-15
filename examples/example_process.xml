@@ -3,12 +3,45 @@
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
-  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
   <!-- Description of the process and the corresponding stream -->
   <process input="fact" copies="1">
-    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
-    <include url="classpath:/default/data/calibration.xml" />
+    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prev_events" limitEvents="10" />
+    <fact.datacorrection.DrsCalibration
+            url="${drsfile}"
+            key="Data"
+            outputKey="data_calibrated"
+    />
+    <fact.datacorrection.PatchJumpRemoval
+            dataKey="data_calibrated"
+            outputKey="data_calibrated"
+            prevEventsKey="prev_events"
+            startCellKey="StartCellData"
+            jumpLimit="${patch_jump_removal_jump_limit}"
+    />
+    <fact.datacorrection.RemoveSpikes
+            dataKey="data_calibrated"
+            outputKey="data_calibrated"
+            startCellKey="StartCellData"
+            leftBorder="${remove_spikes_left_border}"
+            spikeLimit="${remove_spikes_spike_limit}"
+            topSlopeLimit="${remove_spikes_top_slope_limit}"
+            maxSpikeLength="${remove_spikes_max_spike_length}"
+    />
+    <fact.filter.DrsTimeCalibration
+            outputKey="time_calib_const"
+    />
+    <fact.filter.ArrayTimeCorrection
+            dataKey="data_calibrated"
+            timeCalibConstKey="time_calib_const"
+            outputKey="data_calibrated"
+    />
+    <fact.datacorrection.InterpolateTimeSeries
+            calibService="calib_service"
+            dataKey="data_calibrated"
+            dataOutputKey="data_calibrated"
+    />
   </process>
 </container>

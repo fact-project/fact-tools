@@ -1,37 +1,71 @@
 <container>
+    <properties url="classpath:/default/settings.properties"/>
 
-	<properties url="classpath:/default/settings.properties" />
+    <property name="mcflag" value="MCorsikaEvtHeader.fTotalEnergy"/>
 
-    <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
-	<property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
-	<property name="disp_rf_file" value="file:/home/mknoetig/doctorate/programming/ara/DispRegressor_v1.pmml"/>
+    <property name="infile" value="file:src/main/resources/testMcFile.fits.gz"/>
+    <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz"/>
 
-    <property name="integral_gain_file" value="classpath:/default/defaultIntegralGains.csv" />
+    <!--<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />-->
 
-    <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
-    <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
+    <property name="integral_gain_file" value="classpath:/default/gain_sorted_20131127.csv"/>
+    <property name="pixel_delay_file" value="classpath:/default/delays_lightpulser_20150217.csv"/>
 
-    <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
+    <property name="aux_folder" value="file:src/main/resources/aux/"/>
+    <service id="aux_service" class="fact.auxservice.AuxFileService" auxFolder="${aux_folder}"/>
+
+    <service id="calib_service" class="fact.calibrationservice.ConstantCalibService"/>
+    <!--In case you want to analyze .zfits files.-->
+    <!-- <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/> -->
+
+    <stream id="fact" class="fact.io.FITSStream" url="${infile}"/>
 
     <process id="2" input="fact">
 
-		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
+        <If condition="%{data.${mcflag}}==null">
+            <!-- prevEventAndSkip: -->
+            <fact.utils.PreviousEventInfo
+                    startCellKey="StartCellData"
+                    outputKey="prev_events"
+                    limitEvents="${prev_events_limit_events}"
+            />
+            <stream.flow.Skip condition="%{data.TriggerType} != 4"/>
+            <!-- Output: Data -->
+        </If>
+
         <!-- Calibration: -->
-        <!-- PreviousEventInfo, DrsCalibration, PatchJumpRemoval, RemoveSpikes,
+        <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
         DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
-        <fact.utils.Remapping
-                key="Data"
-                outputKey="Data"
-        />
-        <fact.utils.RemappingKeys
-                keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
-        />
+        <!--data=0-->
+        <If condition="%{data.${mcflag}}!=null">
+            <fact.utils.Remapping
+                    key="Data"
+                    outputKey="Data"
+            />
+            <fact.utils.RemappingKeys
+                    keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+            />
+        </If>
+
+
         <fact.datacorrection.DrsCalibration
                 url="${drsfile}"
                 key="Data"
                 outputKey="data_calibrated"
         />
+
+        <If condition="%{data.${mcflag}}==null">
+            <fact.datacorrection.PatchJumpRemoval
+                    dataKey="data_calibrated"
+                    outputKey="data_calibrated"
+                    prevEventsKey="prev_events"
+                    startCellKey="StartCellData"
+                    jumpLimit="${patch_jump_removal_jump_limit}"
+            />
+        </If>
+
         <fact.datacorrection.RemoveSpikes
                 dataKey="data_calibrated"
                 outputKey="data_calibrated"
@@ -41,6 +75,19 @@
                 topSlopeLimit="${remove_spikes_top_slope_limit}"
                 maxSpikeLength="${remove_spikes_max_spike_length}"
         />
+
+        <If condition="%{data.${mcflag}}==null">
+            <fact.filter.DrsTimeCalibration
+                    outputKey="time_calib_const"
+            />
+            <fact.filter.ArrayTimeCorrection
+                    dataKey="data_calibrated"
+                    timeCalibConstKey="time_calib_const"
+                    outputKey="data_calibrated"
+            />
+        </If>
+
+
         <fact.datacorrection.InterpolateTimeSeries
                 calibService="calib_service"
                 dataKey="data_calibrated"
@@ -107,6 +154,15 @@
                 numberOfPoints="11"
                 maxSlopesKey="max_slopes"
         />
+        <If condition="%{data.${mcflag}}==null">
+            <fact.datacorrection.CorrectPixelDelays
+                    arrivalTimeKey="arrival_time"
+                    outputKey="arrival_time"
+                    url="${pixel_delay_file}"
+            />
+        </If>
+
+
         <fact.datacorrection.InterpolatePhotondata
                 calibService="calib_service"
                 photonChargeKey="photoncharge"
@@ -118,30 +174,231 @@
 
         <!-- Cleaning -->
         <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-        <fact.cleaning.TwoLevelTimeNeighbor
-                calibService="calib_service"
-                photonChargeKey="photoncharge"
-                outputKey="shower"
-                arrivalTimeKey="arrival_time"
-                corePixelThreshold="${two_level_time_neighbor_core_threshold}"
-                neighborPixelThreshold="${two_level_time_neighbor_neighbor_threshold}"
-                timeLimit="${two_level_time_neighbor_time_limit}"
-                minNumberOfPixel="${two_level_time_neighbor_min_number_of_pixel}"
-        />
+        <If condition="%{data.${mcflag}}==null">
+            <fact.features.source.SourcePosition
+                    outputKey="cetatauri"
+                    sourceRightAscension="5.627416667"
+                    sourceDeclination="21.1425"
+                    auxService="aux_service"
+            />
+
+            <fact.cleaning.TwoLevelTimeNeighbor
+                    calibService="calib_service"
+                    photonChargeKey="photoncharge"
+                    outputKey="shower"
+                    arrivalTimeKey="arrival_time"
+                    corePixelThreshold="${two_level_time_neighbor_core_threshold}"
+                    neighborPixelThreshold="${two_level_time_neighbor_neighbor_threshold}"
+                    timeLimit="${two_level_time_neighbor_time_limit}"
+                    minNumberOfPixel="${two_level_time_neighbor_min_number_of_pixel}"
+                    starPositionKeys="cetatauri"
+                    starRadiusInCamera="11.0"
+            />
+        </If>
+
+        <If condition="%{data.${mcflag}}!=null">
+            <fact.cleaning.TwoLevelTimeNeighbor
+                    calibService="calib_service"
+                    photonChargeKey="photoncharge"
+                    outputKey="shower"
+                    arrivalTimeKey="arrival_time"
+                    corePixelThreshold="${two_level_time_neighbor_core_threshold}"
+                    neighborPixelThreshold="${two_level_time_neighbor_neighbor_threshold}"
+                    timeLimit="${two_level_time_neighbor_time_limit}"
+                    minNumberOfPixel="${two_level_time_neighbor_min_number_of_pixel}"
+            />
+        </If>
         <!-- Output: shower -->
+
+        <!-- pedestal parameters -->
+        <!-- WaveformFluctuation on non-cleaning pixels-->
+        <fact.pixelsets.Invert
+                insetKey="badPixel"
+                outsetKey="good_pixel"
+        />
+
+        <fact.pixelsets.Difference
+                setUKey="good_pixel"
+                setAKey="shower"
+                outsetKey="pedestal"
+        />
+
+        <fact.extraction.WaveformFluctuation
+                key="data_calibrated"
+                pixelSetKey="good_pixel"
+                outputKey="ped"
+                skipFirst="35"
+                skipLast="50"
+                windowSize="30"
+        />
+
+        <fact.pixelsets.Length
+                pixelSetKey="pedestal"
+                outputKey="num_pixel_in_pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_mean"
+                outputKey="ped_mean"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_std"
+                outputKey="ped_std"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_var"
+                outputKey="ped_var"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_kurtosis"
+                outputKey="ped_kurtosis"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_max"
+                outputKey="ped_max"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_min"
+                outputKey="ped_min"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_skewness"
+                outputKey="ped_skewness"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_median"
+                outputKey="ped_median"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_sum"
+                outputKey="ped_sum"
+                pixelSetKey="pedestal"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="photoncharge"
+                outputKey="ph_charge_pedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="arrival_time"
+                outputKey="arr_time_pedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="max_slopes"
+                outputKey="max_slopes_pedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="arrival_time_pos"
+                outputKey="arr_time_pos_pedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="max_slopes_pos"
+                outputKey="max_slopes_pos_pedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.statistics.ArrayStatistics
+                key="max_pos"
+                outputKey="max_pos_pedestal"
+                pixelSetKey="pedestal"
+        />
+        <fact.features.Size
+                pixelSetKey="pedestal"
+                photonChargeKey="photoncharge"
+                outputKey="pedestal_size"
+        />
+        <fact.features.TimeSpread
+                weightsKey="photoncharge"
+                arrivalTimeKey="arrival_time"
+                pixelSetKey="pedestal"
+                outputKey="pedestal_timespread"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_mean"
+                outputKey="fluct_mean"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_std"
+                outputKey="fluct_std"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_var"
+                outputKey="fluct_var"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_kurtosis"
+                outputKey="fluct_kurtosis"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_max"
+                outputKey="fluct_max"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_min"
+                outputKey="fluct_min"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_skewness"
+                outputKey="fluct_skewness"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_median"
+                outputKey="fluct_median"
+                pixelSetKey="shower"
+        />
+
+        <fact.statistics.ArrayStatistics
+                key="ped_sum"
+                outputKey="fluct_sum"
+                pixelSetKey="shower"
+        />
 
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
         arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        Size, HillasParameter, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
         Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
         ShowerSlope, Disp -->
-        <Skip condition="%{data.shower} == null" />
+        <Skip condition="%{data.shower} == null"/>
         <fact.pixelsets.Length
                 pixelSetKey="shower"
                 outputKey="num_pixel_in_shower"
         />
-        <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
+        <Skip condition="%{data.num_pixel_in_shower} &lt; 5"/>
 
         <fact.statistics.ArrayMean
                 key="photoncharge"
@@ -181,6 +438,7 @@
                 outputKey="max_pos_shower"
                 pixelSetKey="shower"
         />
+
         <fact.features.HillasParameter
                 weightsKey="photoncharge"
                 pixelSetKey="shower"
@@ -260,19 +518,28 @@
         />
         <!-- Output: source independent parameters -->
 
-        <!-- test the pmml file implementation -->
-        <fact.ApplyModel url="${disp_rf_file}" />
-
         <!-- Parameter calculation (only source dependent) -->
         <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <fact.features.source.SourcePosition
-                outputKey="sourcePosition"
-                pointingZdKey="MPointingPos.fZd"
-                pointingAzKey="MPointingPos.fAz"
-                sourceZdKey="MSimSourcePos.fZd"
-                sourceAzKey="MSimSourcePos.fAz"
-        />
+        <!--data=0-->
+        <If condition="%{data.${mcflag}}!=null">
+            <fact.features.source.SourcePosition
+                    outputKey="source_position"
+                    pointingZdKey="MPointingPos.fZd"
+                    pointingAzKey="MPointingPos.fAz"
+                    sourceZdKey="MSimSourcePos.fZd"
+                    sourceAzKey="MSimSourcePos.fAz"
+            />
+        </If>
+
+        <If condition="%{data.${mcflag}}==null">
+            <fact.features.source.SourcePosition
+                    outputKey="source_position"
+                    auxService="aux_service"
+
+            />
+        </If>
+
         <fact.features.source.AntiSourcePosition
                 sourcePositionKey="source_position"
                 numberOfAntiSourcePositions="5"
@@ -471,13 +738,6 @@
                 signM3lConstant="-200"
                 outputKey="theta_off_5"
         />
-        <!-- Output: source dependent parameters -->
-
-         <fact.io.PrintKeysOnConsole keys="${keys_for_output}" />
-
-        <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
 
     </process>
-
-
 </container>

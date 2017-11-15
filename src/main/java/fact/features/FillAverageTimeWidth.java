@@ -7,14 +7,14 @@ import stream.Data;
 import stream.Processor;
 
 public class FillAverageTimeWidth implements Processor {
-	static Logger log = LoggerFactory.getLogger(FillAverageTimeWidth.class);
+    static Logger log = LoggerFactory.getLogger(FillAverageTimeWidth.class);
 
     private int numberTimeMarker = 160;
     private int numberOfSlices = 1024;
 
     private String key = null;
-    private String outputKeyOffset = "timeOffset";
-    private String outputKeyAverageWidth = "timeAverageWidth";
+    private String outputKeyOffset = "time_offset";
+    private String outputKeyAverageWidth = "time_average_width";
     private double[] averageTimeWidth = new double[numberTimeMarker*numberOfSlices];
     private double[] weights = new double[numberTimeMarker*numberOfSlices];
     private int roi;
@@ -44,11 +44,11 @@ public class FillAverageTimeWidth implements Processor {
 
             double last_zero_crossing = -1;
             double last_weight = 0;
-            
+
             for(int sl=0 ; sl < roi - 1 ; sl++){
                 // Search for zero crossing on rising edges:
                 // To do, make sure, that this is really a zero crossing of our signal, not a small fluctuation,
-                // maybe we check the calculated length, or use a filter 
+                // maybe we check the calculated length, or use a filter
                 if (data[pos+sl] < 0 && data[pos+sl+1] > 0){
                     // calculate zero crossing in the interval [pos+sl,pos+sl+1] relativ to pos+sl, by linear interpolation
                     // this is also the weight which we use for the bin in which the zero crossing is happening:
@@ -96,7 +96,7 @@ public class FillAverageTimeWidth implements Processor {
         for(int timemarker=0 ; timemarker < numberTimeMarker ; timemarker++){
             timeOffsets[timemarker*roi] = averageTimeWidth[timemarker*roi] / wholeAverageTimeWidth[timemarker] - 1;
             for (int sl = 1 ; sl < numberOfSlices ; sl++){
-                timeOffsets[timemarker*roi+sl] = timeOffsets[timemarker*roi+sl-1] 
+                timeOffsets[timemarker*roi+sl] = timeOffsets[timemarker*roi+sl-1]
                         + averageTimeWidth[timemarker*roi+sl] / wholeAverageTimeWidth[timemarker] - 1;
             }
         }
@@ -105,10 +105,10 @@ public class FillAverageTimeWidth implements Processor {
 //      }
         input.put(outputKeyOffset, timeOffsets);
         input.put(outputKeyAverageWidth, wholeAverageTimeWidth);
-        
+
         return input;
     }
-    
+
     public int getNumberTimeMarker() {
         return numberTimeMarker;
     }
@@ -140,6 +140,6 @@ public class FillAverageTimeWidth implements Processor {
     public void setOutputKeyAverageWidth(String outputKeyAverageWidth) {
         this.outputKeyAverageWidth = outputKeyAverageWidth;
     }
-    
+
 
 }

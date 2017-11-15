@@ -8,7 +8,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 public class FindTimeMarker implements Processor {
-	static Logger log = LoggerFactory.getLogger(FindTimeMarker.class);
+    static Logger log = LoggerFactory.getLogger(FindTimeMarker.class);
 
     @Parameter(required = true)
     private String key = null;
@@ -44,7 +44,7 @@ public class FindTimeMarker implements Processor {
             throw e;
         }
         int numberTimeMarker = npix/9;
-        
+
         posRisingEdges = new double[numberTimeMarker];
         posFallingEdges = new double[numberTimeMarker];
         durations = new double[numberTimeMarker];
@@ -54,19 +54,19 @@ public class FindTimeMarker implements Processor {
         double[] offsetsRis = new double[numberTimeMarker];
         double[] offsetsFal = new double[numberTimeMarker];
         int roi = data.length / npix;
-        
+
         for(int timemarker = 0 ; timemarker < numberTimeMarker; timemarker++){
             int pos = (9*timemarker + 8) * roi;
-            
+
             int posRisingEdge = 0;
             int posFallingEdge = 0;
             double maxHeight = 0;
             double slope = 0;
             double integral = 0;
             int sl = 1;
-            
+
             sl = roi - 51;
-            
+
             for(; sl < roi && posRisingEdge == 0 ; sl++){
                 slope = data[pos+sl] - data[pos+sl-1];
                 if (slope > 50){
@@ -104,22 +104,22 @@ public class FindTimeMarker implements Processor {
             maxHeights[timemarker] = maxHeight;
             integrals[timemarker] = integral;
             averageHeights[timemarker] = integral / durations[timemarker];
-            
-            
+
+
         }
-        
-        input.put(outputKey + "_risingEdges", posRisingEdges);
-        input.put(outputKey + "_fallingEdges", posFallingEdges);
+
+        input.put(outputKey + "_rising_edges", posRisingEdges);
+        input.put(outputKey + "_falling_edges", posFallingEdges);
         input.put(outputKey + "_durations", durations);
-        input.put(outputKey + "_maxHeights", maxHeights);
+        input.put(outputKey + "_max_heights", maxHeights);
         input.put(outputKey + "_integrals", integrals);
-        input.put(outputKey + "_averageHeights", averageHeights);
-        input.put(outputKey + "_offsetRis", offsetsRis);
-        input.put(outputKey + "_offsetFal", offsetsFal);
-        
+        input.put(outputKey + "_average_heights", averageHeights);
+        input.put(outputKey + "_offset_ris", offsetsRis);
+        input.put(outputKey + "_offset_fal", offsetsFal);
+
         return input;
     }
-    
+
     public String getKey() {
         return key;
     }

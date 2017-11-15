@@ -55,7 +55,7 @@ public class FunctionalTest {
     @Test
     public void analysisXML() {
         try {
-            File arg = new File("examples/stdAnalysis/data/analysis.xml");
+            File arg = new File("examples/stdAnalysis/analysis.xml");
             ProcessContainer container = new ProcessContainer(arg.toURI().toURL());
             container.run();
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class FunctionalTest {
     @Test
     public void analysis_mcXML() {
         try {
-            String[] args = {"examples/stdAnalysis/mc/analysis_mc.xml"};
+            String[] args = {"examples/stdAnalysis/analysis.xml"};
             stream.run.main(args);
         } catch (Exception e) {
             fail("Could not run the analysis_mc.xml");
@@ -77,7 +77,7 @@ public class FunctionalTest {
     @Test
     public void studiesXMLs() throws IOException {
         int counter = 0;
-        List<Path> pathList = Files.walk(Paths.get("examples/studies"))
+        List<Path> pathList = Files.walk(Paths.get("examples/studies/"))
                 .filter(Files::isRegularFile)
                 .collect(Collectors.toList());
 

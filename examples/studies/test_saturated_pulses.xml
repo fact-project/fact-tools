@@ -1,9 +1,9 @@
 <container>
-  <properties url="classpath:/default/settings_mc.properties" />
+  <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+  <property name="integral_gain_file" value="classpath:/default/defaultIntegralGains.csv" />
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
   <!-- Description of the process and the corresponding stream -->
@@ -11,32 +11,32 @@
     <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 0" />-->
     <fact.utils.Remapping key="Data" outputKey="Data" />
     <fact.utils.RemappingKeys keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax" />
-    <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="DataCalibrated" />
-    <fact.datacorrection.RemoveSpikes dataKey="DataCalibrated" outputKey="DataCalibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" />
+    <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="data_calibrated" />
+    <fact.datacorrection.RemoveSpikes dataKey="data_calibrated" outputKey="data_calibrated" startCellKey="StartCellData" leftBorder="6" spikeLimit="20" topSlopeLimit="16" maxSpikeLength="4" />
     <!--<fact.datacorrection.InterpolateTimeSeries-->
-    <!--key="DataCalibrated"-->
-    <!--outputKey="DataCalibrated"-->
+    <!--key="data_calibrated"-->
+    <!--outputKey="data_calibrated"-->
     <!--badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722"-->
     <!--/>-->
     <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-    <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
-    rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
-    <fact.extraction.EstimateBaseline dataKey="DataCalibrated" outputKey="baseline" firstSlice="10" range="40" />
-    <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
-    <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
-    <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxPos" threshold="1800" thresholdOutputKey="thresholdForToT" />
-    <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold1000" firstSliceOverThresholdOutputKey="arrivalTimeTOT1000" positionsKey="maxPos" threshold="1000" thresholdOutputKey="thresholdForToT1000" />
-    <fact.datacorrection.CorrectSaturation dataKey="DataCalibrated" outputKey="DataNoSat" totKey="timeOverThreshold" firstSliceOverThresholdKey="arrivalTimeTOT" threshold="1800" maxPosKey="maxPos" baselineKey="baseline" />
-    <fact.extraction.BasicExtraction dataKey="DataNoSat" outputKeyMaxAmplPos="maxPosNoSat" outputKeyPhotonCharge="phChargeNoSat" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
-    rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
-    <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold" thresholdKey="thresholdForToT" outputKey="photonchargeSaturated" />
-    <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold1000" thresholdKey="thresholdForToT1000" outputKey="photonchargeSaturated1000" />
-    <fact.extraction.IdentifyPixelAboveThreshold key="photoncharge" threshold="200" outputKey="pixelAbove200Pe" />
+    <fact.extraction.BasicExtraction dataKey="data_calibrated" outputKeyMaxAmplPos="max_pos" outputKeyPhotonCharge="photoncharge" url="${integral_gain_file}" startSearchWindow="${basic_extraction_start_search_window}"
+                                     rangeSearchWindow="${basic_extraction_range_search_window}" rangeHalfHeightWindow="25" />
+    <fact.extraction.EstimateBaseline dataKey="data_calibrated" outputKey="baseline" firstSlice="10" range="40" />
+    <fact.extraction.RisingEdgeForPositions dataKey="data_calibrated" amplitudePositionsKey="max_pos" outputKey="arrival_time_pos" maxSlopesKey="max_slopes_pos" />
+    <fact.extraction.RisingEdgePolynomFit dataKey="data_calibrated" risingEdgeKey="arrival_time_pos" outputKey="arrival_time" numberOfPoints="11" maxSlopesKey="max_slopes" />
+    <fact.extraction.TimeOverThreshold dataKey="data_calibrated" outputKey="time_over_threshold" firstSliceOverThresholdOutputKey="arrival_time_tot" positionsKey="max_pos" threshold="1800" thresholdOutputKey="threshold_for_tot" />
+    <fact.extraction.TimeOverThreshold dataKey="data_calibrated" outputKey="time_over_threshold_1000" firstSliceOverThresholdOutputKey="arrival_time_tot_1000" positionsKey="max_pos" threshold="1000" thresholdOutputKey="threshold_for_tot_1000" />
+    <fact.datacorrection.CorrectSaturation dataKey="data_calibrated" outputKey="data_no_sat" totKey="time_over_threshold" firstSliceOverThresholdKey="arrival_time_tot" threshold="1800" maxPosKey="max_pos" baselineKey="baseline" />
+    <fact.extraction.BasicExtraction dataKey="data_no_sat" outputKeyMaxAmplPos="max_pos_no_sat" outputKeyPhotonCharge="ph_charge_no_sat" url="${integral_gain_file}" startSearchWindow="${basic_extraction_start_search_window}"
+                                     rangeSearchWindow="${basic_extraction_range_search_window}" rangeHalfHeightWindow="25" />
+    <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="time_over_threshold" thresholdKey="threshold_for_tot" outputKey="photoncharge_saturated" />
+    <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="time_over_threshold_1000" thresholdKey="threshold_for_tot_1000" outputKey="photoncharge_saturated_1000" />
+    <fact.extraction.IdentifyPixelAboveThreshold key="photoncharge" threshold="200" outputKey="pixel_above_200_pe" />
     <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
     <!-- <stream.flow.Skip condition="%{data.EventNum} &lt; 0" /> -->
     <!-- <stream.flow.Skip condition="%{data.TriggerType} != 1024" /> -->
     <!-- <Skip condition="%{data.shower} == null" /> -->
-    <!--<fact.ShowViewer key="DataCalibrated"/>-->
-    <!--<fact.io.JSONWriter url="file:${outfile}" keys="timeOverThreshold,timeOverThreshold1000,arrivalTimePos,arrivalTime,arrivalTimeTOT,arrivalTimeTOT1000,maxPos,maxSlopesPos,photoncharge,photonchargeSaturated,photonchargeSaturated1000,MCorsikaEvtHeader.fWeightedNumPhotons,McCherPhotWeight,McCherPhotNumber"/>-->
+    <!--<fact.ShowViewer key="data_calibrated"/>-->
+    <!--<fact.io.JSONWriter url="file:${outfile}" keys="time_over_threshold,time_over_threshold_1000,arrival_time_pos,arrival_time,arrival_time_tot,arrival_time_tot_1000,max_pos,max_slopes_pos,photoncharge,photoncharge_saturated,photoncharge_saturated_1000,MCorsikaEvtHeader.fWeightedNumPhotons,McCherPhotWeight,McCherPhotNumber"/>-->
   </process>
 </container>

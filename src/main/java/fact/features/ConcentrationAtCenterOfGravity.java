@@ -11,33 +11,33 @@ import stream.annotations.Parameter;
 
 
 /**
- * 
+ *
  * @author Fabian Temme
  *
  */
 public class ConcentrationAtCenterOfGravity implements Processor
 {
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-	
+
 	static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
-	
-	@Parameter(required = true, defaultValue = "photonCharge", description = "Key of the array of photoncharge.")
+
+	@Parameter(required = true, defaultValue = "photoncharge", description = "Key of the array of photoncharge.")
 	private String photonChargeKey = null;
-	@Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
+	@Parameter(required = true, defaultValue = "cog_x", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
 	private String cogxKey = null;
-	@Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
+	@Parameter(required = true, defaultValue = "cog_y", description = "Key of the Y-center of gravity. (see CogX)")
 	private String cogyKey = null;
-	@Parameter(required = true, defaultValue  = "Size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
+	@Parameter(required = true, defaultValue  = "size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
 	private String sizeKey = null;
-	@Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
+	@Parameter(required = true, defaultValue = "conc_cog", description = "The key of the generated value.")
 	private String outputKey = null;
-	
+
 	private double cogx;
 	private double cogy;
 	private double size;
-	
+
 	private double[] photonCharge = null;
-	
+
 
 	/**
 	 * This function calculates the concentration at the center of gravity including the 2 nearest pixel
@@ -46,11 +46,11 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	public Data process(Data input)
 	{
 		Utils.mapContainsKeys( input, cogxKey, cogyKey, sizeKey, photonChargeKey);
-		
+
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
 		size = (Double) input.get(sizeKey);
-		
+
 		photonCharge = (double[]) input.get(photonChargeKey);
 		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		if (cogPixel == null)
@@ -59,21 +59,21 @@ public class ConcentrationAtCenterOfGravity implements Processor
 			return input;
 		}
 		FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(cogPixel);
-		
+
 		// mindist1 < mindist2
 		double mindist1 = Float.MAX_VALUE;
 		double mindist2 = Float.MAX_VALUE;
-		
+
 		FactCameraPixel minChId1 = cogPixel;
 		FactCameraPixel minChId2 = cogPixel;
-		
+
 		// search for the two nearest neighbors
 		for (FactCameraPixel pix : neighbors)
 		{
 			double x = pix.getXPositionInMM();
 			double y = pix.getYPositionInMM();
 			double dist = (cogx - x) * (cogx - x) + (cogy - y) * (cogy - y);
-			
+
 			if(dist < mindist1)
 			{
 				mindist2 = mindist1;
@@ -86,11 +86,11 @@ public class ConcentrationAtCenterOfGravity implements Processor
 				minChId2 = pix;
 			}
 		}
-		
+
 		double conc = photonCharge[cogPixel.id] + photonCharge[minChId1.id] + photonCharge[minChId2.id];
 		conc /= size;
 		input.put(outputKey, conc);
-		
+
 		return input;
 	}
 
@@ -143,6 +143,6 @@ public class ConcentrationAtCenterOfGravity implements Processor
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
 	}
-	
-	
+
+
 }

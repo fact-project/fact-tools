@@ -119,16 +119,16 @@ public class SourcePosition implements StatefulProcessor {
 
         hasMcWobblePosition = false;
         if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
-        	if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
-        	{
+            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
+            {
                 hasMcWobblePosition = true;
-        		log.warn("Using zd and az values from the data item");
-        	}
-        	else
-        	{
-        		log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
-        		throw new IllegalArgumentException();
-        	}
+                log.warn("Using zd and az values from the data item");
+            }
+            else
+            {
+                log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
+                throw new IllegalArgumentException();
+            }
         } else if (auxService == null ){
 
             log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
@@ -157,39 +157,39 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
 
-            data.put("AzTracking", 0);
-            data.put("ZdTracking", 0);
+            data.put("az_tracking", 0);
+            data.put("zd_tracking", 0);
 
-            data.put("AzPointing", 0);
-            data.put("ZdPointing", 0);
+            data.put("az_pointing", 0);
+            data.put("zd_pointing", 0);
 
-            data.put("AzSourceCalc", 0);
-            data.put("ZdSourceCalc", 0);
+            data.put("az_source_calc", 0);
+            data.put("zd_source_calc", 0);
             return data;
         }
 
         if (hasMcWobblePosition)
         {
-        	double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
-        	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
-        	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
-        	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
-        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to
-        	// rotate the coordinate system by 180 deg such that 0 deg is north
-        	pointingAz = 180 + pointingAz;
-        	sourceAz = 180 + sourceAz;
-        	// Now we can calculate the source position from the zd,az coordinates for pointing and source
-        	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
-        	data.put(outputKey, sourcePosition);
+            double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
+            double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
+            double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
+            double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+            // Due to the fact, that Ceres handle the coordinate in a different way, we have to
+            // rotate the coordinate system by 180 deg such that 0 deg is north
+            pointingAz = 180 + pointingAz;
+            sourceAz = 180 + sourceAz;
+            // Now we can calculate the source position from the zd,az coordinates for pointing and source
+            double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
+            data.put(outputKey, sourcePosition);
 
-            data.put("AzTracking", pointingAz);
-            data.put("ZdTracking", pointingZd);
+            data.put("az_tracking", pointingAz);
+            data.put("zd_tracking", pointingZd);
 
-            data.put("AzPointing", pointingAz);
-            data.put("ZdPointing", pointingZd);
+            data.put("az_pointing", pointingAz);
+            data.put("zd_pointing", pointingZd);
 
-            data.put("AzSourceCalc", sourceAz);
-            data.put("ZdSourceCalc", sourceZd);
+            data.put("az_source_calc", sourceAz);
+            data.put("zd_source_calc", sourceZd);
 
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
             return data;
@@ -232,17 +232,17 @@ public class SourcePosition implements StatefulProcessor {
             double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
 
             String sourceName = sourcePoint.getString("Name");
-            data.put("SourceName", sourceName);
+            data.put("source_Name", sourceName);
             data.put(outputKey, sourcePosition);
 
-            data.put("AzTracking", trackingPoint.getDouble("Az"));
-            data.put("ZdTracking", trackingPoint.getDouble("Zd"));
+            data.put("az_tracking", trackingPoint.getDouble("Az"));
+            data.put("zd_tracking", trackingPoint.getDouble("Zd"));
 
-            data.put("AzPointing", pointingAzZd[0]);
-            data.put("ZdPointing", pointingAzZd[1]);
+            data.put("az_pointing", pointingAzZd[0]);
+            data.put("zd_pointing", pointingAzZd[1]);
 
-            data.put("AzSourceCalc", sourceAzZd[0]);
-            data.put("ZdSourceCalc", sourceAzZd[1]);
+            data.put("az_source_calc", sourceAzZd[0]);
+            data.put("zd_source_calc", sourceAzZd[1]);
 
             data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
 
@@ -263,8 +263,8 @@ public class SourcePosition implements StatefulProcessor {
      */
     public double datetimeToGST(ZonedDateTime datetime){
 
-    	Duration difference = Duration.between(gstReferenceDateTime, datetime);
-    	double gst = 18.697374558 + 24.06570982441908 * (difference.toMillis() / 86400000.0);
+        Duration difference = Duration.between(gstReferenceDateTime, datetime);
+        double gst = 18.697374558 + 24.06570982441908 * (difference.toMillis() / 86400000.0);
 
         // normalize to [0, 24] and convert to radians
         gst = (gst % 24) / 12.0 * Math.PI;
@@ -299,12 +299,12 @@ public class SourcePosition implements StatefulProcessor {
 
         double altitude = Math.asin(
                 Math.sin(telLatRad) * Math.sin(dec) +
-                Math.cos(telLatRad) * Math.cos(dec) * Math.cos(hourAngle)
+                        Math.cos(telLatRad) * Math.cos(dec) * Math.cos(hourAngle)
         );
 
         double azimuth = Math.atan2(
                 Math.sin(hourAngle),
-        		Math.cos(hourAngle) * Math.sin(telLatRad) - Math.tan(dec) * Math.cos(telLatRad)
+                Math.cos(hourAngle) * Math.sin(telLatRad) - Math.tan(dec) * Math.cos(telLatRad)
         );
 
         azimuth -= Math.PI;
@@ -361,32 +361,32 @@ public class SourcePosition implements StatefulProcessor {
     }
 
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
-	public void setSourceZdKey(String sourceZdKey) {
-		this.sourceZdKey = sourceZdKey;
-	}
+    public void setSourceZdKey(String sourceZdKey) {
+        this.sourceZdKey = sourceZdKey;
+    }
 
-	public void setSourceAzKey(String sourceAzKey) {
-		this.sourceAzKey = sourceAzKey;
-	}
+    public void setSourceAzKey(String sourceAzKey) {
+        this.sourceAzKey = sourceAzKey;
+    }
 
-	public void setPointingZdKey(String pointingZdKey) {
-		this.pointingZdKey = pointingZdKey;
-	}
+    public void setPointingZdKey(String pointingZdKey) {
+        this.pointingZdKey = pointingZdKey;
+    }
 
-	public void setPointingAzKey(String pointingAzKey) {
-		this.pointingAzKey = pointingAzKey;
-	}
+    public void setPointingAzKey(String pointingAzKey) {
+        this.pointingAzKey = pointingAzKey;
+    }
 
-	public void setSourceRightAscension(Double sourceRightAscension) {
-		this.sourceRightAscension = sourceRightAscension;
-	}
+    public void setSourceRightAscension(Double sourceRightAscension) {
+        this.sourceRightAscension = sourceRightAscension;
+    }
 
-	public void setSourceDeclination(Double sourceDeclination) {
-		this.sourceDeclination = sourceDeclination;
-	}
+    public void setSourceDeclination(Double sourceDeclination) {
+        this.sourceDeclination = sourceDeclination;
+    }
 
 }

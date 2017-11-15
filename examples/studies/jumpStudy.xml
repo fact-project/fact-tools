@@ -18,26 +18,26 @@
     <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="DataCalibrated" />
     <fact.statistics.PatchAverage key="DataCalibrated" outputKey="DataPatches" />
 		<fact.datacorrection.PatchJumpRemoval
-			dataKey="DataCalibrated"
-			outputKey="DataRemoved"
-			outputJumpsKey="j"
-			addJumpInfos="true"
-			prevEventsKey="prevEvents"
-			startCellKey="StartCellData"
-			jumpLimit="4.0"
-			spikeLimit="7.0"
-			freqAmplLimit="0.4"
-			leftBorder="10"
-			signalFlankLimit="0.63"
-			lengthForFFT="32"
-			lengthAfterPosForFFT="10"
-			ringingPeriode="11"
-			freqCompAmplLimit="2.0"
-			leftRingingFreq="0.18"
-			rightRingingFreq="0.22"
-			timeDependLimit="10"
-			/>
-    <fact.statistics.PatchAverage key="DataRemoved" outputKey="DataPatchesRemoved" />
-    <!--<fact.ShowViewer key="DataCalibrated"/>-->
-  </process>
+				dataKey="data_calibrated"
+				outputKey="data_removed"
+				outputJumpsKey="j"
+				addJumpInfos="true"
+				prevEventsKey="prev_events"
+				startCellKey="StartCellData"
+				jumpLimit="4.0"
+				spikeLimit="7.0"
+				freqAmplLimit="0.4"
+				leftBorder="10"
+				signalFlankLimit="0.63"
+				lengthForFFT="32"
+				lengthAfterPosForFFT="10"
+				ringingPeriode="11"
+				freqCompAmplLimit="2.0"
+				leftRingingFreq="0.18"
+				rightRingingFreq="0.22"
+				timeDependLimit="10"
+		/>
+		<fact.statistics.PatchAverage key="data_removed" outputKey="data_patches_removed" />
+		<!--<fact.ShowViewer key="data_calibrated"/>-->
+	</process>
 </container>
