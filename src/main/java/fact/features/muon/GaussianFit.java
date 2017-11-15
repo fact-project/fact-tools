@@ -13,7 +13,6 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.PowellOptimizer;
-import org.apache.commons.math3.util.DoubleArray;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;

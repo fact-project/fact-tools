@@ -8,7 +8,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * MotionCleaning:

@@ -2,18 +2,16 @@ package fact.parameter;
 
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
+import fact.datacorrection.DrsCalibration;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.HillasParameter;
 import fact.features.source.SourcePosition;
-import fact.datacorrection.DrsCalibration;
-import fact.io.FITSStream;
 import fact.io.FITSStreamTest;
-
+import fact.io.hdureader.FITSStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -64,8 +62,8 @@ public class ParameterTest {
 		URL drsUrl = FITSStreamTest.class
 				.getResource("/testDrsFile.drs.fits.gz");
 		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey(key);
+		pr.url = drsUrl;
+		pr.outputKey = key;
         pr.init(null);
 		pr.process(item);
 

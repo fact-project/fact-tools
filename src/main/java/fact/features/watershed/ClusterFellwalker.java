@@ -28,7 +28,6 @@ package fact.features.watershed;
  */
 
 import fact.Utils;
-import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;

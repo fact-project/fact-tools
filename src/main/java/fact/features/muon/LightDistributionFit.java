@@ -12,9 +12,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.PowellOptimizer;
 import stream.Data;
-import stream.ProcessContext;
 import stream.Processor;
-import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
 /**

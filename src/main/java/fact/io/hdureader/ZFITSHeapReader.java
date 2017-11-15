@@ -115,6 +115,26 @@ public final class ZFITSHeapReader implements Reader {
      * @throws NoSuchElementException iff hasNext() is false
      */
     public OptionalTypesMap<String, Serializable> getNextRow() throws IOException {
+        return getNextRow(false);
+    }
+
+
+    /**
+     * Get the data from the next row. The columns in the row can be accessed by their name in the resulting
+     * map that is returned by this method. The resulting map comes with convenience methods for accessing data of
+     * predefined types.
+     *
+     * Some zfits file apparently contain a wrong tile header in the heap storing the ZDrsCellOffsets.
+     * I haven't figures out to which files this applies. Files from 2013 seem to have that problem.
+     * But also newer ones. Some files from 2016 are fine however.
+     *
+     * The old ZFits implementation by M.Bulinski ignored the problem by default.
+     *
+     * @param ignoreWrongTileHeader if true, ognores wrong tileheader information.
+     * @return a map containing the the data from the rows columns.
+     * @throws NoSuchElementException iff hasNext() is false
+     */
+    public OptionalTypesMap<String, Serializable> getNextRow(boolean ignoreWrongTileHeader) throws IOException {
         if(!hasNext()){
            throw new NoSuchElementException();
         }
@@ -122,7 +142,7 @@ public final class ZFITSHeapReader implements Reader {
 
         //Tile header in this row
         //see figure 6 of zfits paper
-        TileHeader tile = TileHeader.fromStream(stream);
+        TileHeader tile = TileHeader.fromStream(stream, ignoreWrongTileHeader);
 
         //The tile header itself has 16 bytes.
         //Hence we subtract 16 bytes from the total number of bytes in this tile.
@@ -343,19 +363,23 @@ public final class ZFITSHeapReader implements Reader {
          * Creates a TileHeader object. This method reads 16 bytes from the stream as described in
          * figure 6 in 'the spec'.
          * A TileHeader always should start with the letters TILE. If that is not the case the
-         * this method will throw an IOException
+         * this method will throw an IOException except when ignoreWrongHeader is set to true.
+         * The latter is necessary for some broken ZFits files.
          *
          * @param stream the DataInputStream that is reading the  bytes from the heap.
+         * @param ignoreWrongHeader ignore when Tile does not start with 'TILE'.
          * @return a TileHeader object created from bytes in the stream.
-         * @throws IOException when the tileheader cannot be created
+         * @throws IOException when the tile header cannot be created
          */
-        static TileHeader fromStream(DataInputStream stream) throws IOException {
+        static TileHeader fromStream(DataInputStream stream, boolean ignoreWrongHeader) throws IOException {
             byte[] tileHeaderBytes = new byte[16];
             stream.readFully(tileHeaderBytes);
 
             TileHeader tileHeader = new TileHeader(tileHeaderBytes);
             if (!tileHeader.definitionString.equals("TILE")){
-                throw new IOException("Tile header did not begin with word 'TILE'");
+                if (!ignoreWrongHeader)
+                    throw new IOException("Tile header did not begin with word 'TILE'");
+                log.warn("Tile header did not begin with word 'TILE'. Ignoring error.");
             }
 
             return tileHeader;
@@ -364,7 +388,8 @@ public final class ZFITSHeapReader implements Reader {
 
 
     /**
-     * Each tile contains a number of blockheaders. The blockheader describes how the data was compressed and how many bytes it contains.
+     * Each tile contains a number of blockheaders.
+     * The blockheader describes how the data was compressed and how many bytes it contains.
      */
     private static class BlockHeader{
         enum Compression{

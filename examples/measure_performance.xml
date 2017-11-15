@@ -9,7 +9,7 @@
   <service id="aux_service" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
   <service id="calib_service" class="fact.calibrationservice.ConstantCalibService" />
 
-  <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}"/>
+  <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}"/>
 
   <process class="fact.PerformanceMeasuringProcess" url="file:./measured_runtime.json" id="1" input="fact" warmupIterations="1">
 

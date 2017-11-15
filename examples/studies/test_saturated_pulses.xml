@@ -5,7 +5,7 @@
   <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
   <property name="integral_gain_file" value="classpath:/default/defaultIntegralGains.csv" />
   <!-- Name of the stream and url to the input file -->
-  <stream id="fact" class="fact.io.FITSStream" url="${infile}" />
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
     <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 0" />-->

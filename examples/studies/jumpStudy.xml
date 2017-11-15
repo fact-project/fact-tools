@@ -1,22 +1,22 @@
 <container>
-	<properties url="classpath:/default/settings.properties" />
-	<!-- Pathes to the input files -->
-	<property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-	<property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
-	<property name="integral_gain_file" value="classpath:/default/gain_sorted_20131127.csv" />
-	<property name="pixel_delay_file" value="classpath:/default/delays_20141114.csv" />
-	<service id="aux_service" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
-	<!-- Name des Streams und pfad zu dem Daten-File -->
-	<!-- <stream id="fact" class="fact.io.FITSStream"  url="file:${infile}" limit="100"/> -->
-	<stream id="fact" class="fact.io.FITSStream" url="${infile}" />
-	<process id="2" input="fact">
-		<fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prev_events" limitEvents="5" />
-		<!--         <fact.utils.CreateFakeStartCells outputKey="FStartCells" />
-            <fact.utils.PreviousEventInfo startCellKey="FStartCells" outputKey="prev_events" limitEvents="5"/> -->
-		<!--<stream.flow.Skip condition="%{data.EventNum} &lt; 17" />-->
-		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
-		<fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="data_calibrated" />
-		<fact.statistics.PatchAverage key="data_calibrated" outputKey="data_patches" />
+  <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
+  <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
+  <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
+  <!-- Name des Streams und pfad zu dem Daten-File -->
+  <!-- <stream id="fact" class="fact.io.FITSStream"  url="file:${infile}" limit="100"/> -->
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
+  <process id="2" input="fact">
+    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="5" />
+    <!--         <fact.utils.CreateFakeStartCells outputKey="FStartCells" />
+        <fact.utils.PreviousEventInfo startCellKey="FStartCells" outputKey="prevEvents" limitEvents="5"/> -->
+    <!--<stream.flow.Skip condition="%{data.EventNum} &lt; 17" />-->
+    <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+    <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="DataCalibrated" />
+    <fact.statistics.PatchAverage key="DataCalibrated" outputKey="DataPatches" />
 		<fact.datacorrection.PatchJumpRemoval
 				dataKey="data_calibrated"
 				outputKey="data_removed"

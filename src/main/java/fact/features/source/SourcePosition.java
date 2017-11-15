@@ -2,6 +2,8 @@ package fact.features.source;
 
 
 //import com.sun.scenario.effect.Offset;
+
+import fact.Utils;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
@@ -9,21 +11,18 @@ import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
 import fact.auxservice.strategies.Earlier;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
-
-
-import fact.Utils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
-import stream.annotations.Service;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.IOException;
-import java.time.*;
+import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 
 /**

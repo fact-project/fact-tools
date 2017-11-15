@@ -3,6 +3,7 @@
  */
 package fact.io;
 
+import fact.io.hdureader.FITSStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
