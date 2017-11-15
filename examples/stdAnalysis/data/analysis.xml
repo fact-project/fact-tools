@@ -62,7 +62,5 @@
         <include url="classpath:/default/data/sourceParameter.xml" />
         <!-- Output: source dependent parameters -->
 
-	<fact.io.JSONWriter url="file:test.json" keys="${keysForOutput}" />
-
     </process>
 </container>
