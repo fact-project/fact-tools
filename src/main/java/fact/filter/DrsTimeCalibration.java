@@ -13,6 +13,7 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 
@@ -39,11 +40,11 @@ public class DrsTimeCalibration implements StatefulProcessor{
 
 
 	@Override
-	public void init(ProcessContext context) throws Exception {
+	public void init(ProcessContext context) {
 		try {
 			loadDrsTimeCalibConstants(url);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 
 	}
@@ -73,29 +74,16 @@ public class DrsTimeCalibration implements StatefulProcessor{
 		return input;
 	}
 
-	protected void loadDrsTimeCalibConstants(URL  in) {
-		try {
+	protected void loadDrsTimeCalibConstants(URL  in) throws IOException {
+		FITS fits = new FITS(in);
+		BinTable calibrationTable = fits.getBinTableByName("DrsCellTimes").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCellTimes\""));
 
-			FITS fits = new FITS(in);
-			BinTable calibrationTable = fits.getBinTableByName("DrsCellTimes").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCellTimes\""));
-
-			BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
+		BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
 
-			OptionalTypesMap<String, Serializable> row = reader.getNextRow();
+		OptionalTypesMap<String, Serializable> row = reader.getNextRow();
 
-			absoluteTimeOffsets = row.getDoubleArray(drsTimeKey).orElseThrow(()->new RuntimeException(drsTimeKey+"is not in the File"));
-
-
-		} catch (Exception e) {
-
-			log.error("Failed to load DRS data: {}", e.getMessage());
-			if (log.isDebugEnabled())
-				e.printStackTrace();
-			this.absoluteTimeOffsets = null;
-
-			throw new RuntimeException(e.getMessage());
-		}
+		absoluteTimeOffsets = row.getDoubleArray(drsTimeKey).orElseThrow(()->new RuntimeException(drsTimeKey+"is not in the File"));
 	}
 
 
