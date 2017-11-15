@@ -1,7 +1,5 @@
 package fact.features;
 
-
-import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
@@ -12,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import streams.tikz.Pixel;
 
 
 public class ConcentrationCore implements Processor{
