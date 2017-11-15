@@ -58,7 +58,6 @@ public class ConcentrationCore implements Processor{
 
 		double photonsInEllipse = 0;
 
-		PixelSet corePixels = new PixelSet();
 		for(CameraPixel pix : showerPixelSet.set)
 		{
 			FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
@@ -75,84 +74,11 @@ public class ConcentrationCore implements Processor{
 
 			if (distance <= 1) {
 				photonsInEllipse += photonChargeArray[pix.id];
-				corePixels.add(pix);
 			}
 		}
 		double concCore = photonsInEllipse / size;
 
 		input.put(outputKey, concCore);
-		input.put("CorePixels", corePixels);
 		return input;
 	}
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public String getCogxKey() {
-		return cogxKey;
-	}
-
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
-
-	public String getCogyKey() {
-		return cogyKey;
-	}
-
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
-
-	public String getDeltaKey() {
-		return deltaKey;
-	}
-
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
-
-	public String getSizeKey() {
-		return sizeKey;
-	}
-
-	public void setSizeKey(String sizeKey) {
-		this.sizeKey = sizeKey;
-	}
-
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
-
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
-
-	public String getWidthKey() {
-		return widthKey;
-	}
-
-	public void setWidthKey(String widthKey) {
-		this.widthKey = widthKey;
-	}
-
-	public String getLengthKey() {
-		return lengthKey;
-	}
-
-	public void setLengthKey(String lengthKey) {
-		this.lengthKey = lengthKey;
-	}
-
-
-
 }
