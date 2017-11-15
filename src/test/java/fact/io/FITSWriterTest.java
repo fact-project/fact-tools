@@ -3,7 +3,10 @@
  */
 package fact.io;
 
-import junit.framework.Assert;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +16,11 @@ import stream.data.DataFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -20,6 +28,8 @@ import java.net.URL;
  */
 public class FITSWriterTest {
     static Logger log = LoggerFactory.getLogger(FITSWriterTest.class);
+
+
 
 	@Test
 	public void testFitsWriterNoItems() throws Exception {
@@ -52,10 +62,30 @@ public class FITSWriterTest {
         item.put("NPIX", 1440);
         item.put("x", 0.0);
         item.put("y", 5.0);
-        item.put("array", new double[]{1.0, 2.0, 3.0});
+
+        double[] array = new double[]{1.0, 2.0, 3.0};
+        item.put("array", array);
+
+        item.put("timestamp", ZonedDateTime.of(2017, 1, 1, 12, 0, 0, 991300000, ZoneOffset.UTC));
 
         fitsWriter.process(item);
-        Assert.assertEquals(fitsWriter.getNumEventsWritten(), 1);
+        assertEquals(fitsWriter.getNumEventsWritten(), 1);
         fitsWriter.finish();
+
+        FITS fits = FITS.fromFile(f);
+        BinTable table = fits.getBinTableByName("Events").get();
+        BinTableReader tableReader = BinTableReader.forBinTable(table);
+        OptionalTypesMap row = tableReader.getNextRow();
+
+        assertEquals(row.getInt("NROI").get(), 300);
+        assertEquals(row.getInt("NPIX").get(), 1440);
+        assertEquals(row.getDouble("x").get(), 0.0);
+        assertEquals(row.getDouble("y").get(), 5.0);
+
+        double[] arrayRead = (double[]) row.getDoubleArray("array").get();
+        for (int i = 0; i < array.length; i++) {
+            assertEquals(array[i], arrayRead[i], 1e-12);
+        }
+        assertEquals(row.get("timestamp"), "2017-01-01T12:00:00.991300Z");
     }
 }
