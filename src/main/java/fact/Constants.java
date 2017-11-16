@@ -11,5 +11,5 @@ public class Constants {
 	public static final double PIXEL_SIZE = 9.5; //9.5mm
 
 
-	public static final double MILLIVOLTPERDAC = 610.*Math.pow(10,-3);
+	public static final double MILLIVOLT_PER_DAC = 610e-3;
 }

@@ -60,7 +60,7 @@ public class EmulateDiscriminator implements Processor{
         double[][] data = (double[][]) item.get(key);
 
         int n_patches = Constants.NUMBEROFPIXEL/9;
-        double millivoltPerDAC = Constants.MILLIVOLTPERDAC;
+        double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
         boolean[] triggerPrimitives = new boolean[n_patches];
         int[] patchTriggerSlice = new int[n_patches];
