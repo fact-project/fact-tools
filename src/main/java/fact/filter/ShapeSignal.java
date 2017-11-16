@@ -22,7 +22,7 @@ public class ShapeSignal implements Processor {
     private String outputKey;
 
     @Parameter(required = true)
-    int shift = 10;
+    int shift = 20;
 
     @Parameter
     double factor = 0.66;
