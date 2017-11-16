@@ -54,27 +54,21 @@ public class ConcentrationCore implements Processor{
 
 
 		double photonsInEllipse = 0;
-
 		for(CameraPixel pix : showerPixelSet.set)
 		{
 			FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
 			double px = p.getXPositionInMM();
 			double py = p.getYPositionInMM();
 
-			double dx = px - cogx;
-			double dy = py - cogy;
+			double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cogx, cogy, delta);
 
-			double pixelLong = Math.cos(delta) * dx - Math.sin(delta) * dy;
-			double pixelTrans = Math.sin(delta) * dx + Math.cos(delta) * dy;
-
-			double distance = Math.pow(pixelLong / length, 2.0) + Math.pow(pixelTrans / width, 2.0);
+			double distance = Math.pow(ellipseCoords[0] / length, 2.0) + Math.pow(ellipseCoords[1] / width, 2.0);
 
 			if (distance <= 1) {
 				photonsInEllipse += photonChargeArray[pix.id];
 			}
 		}
 		double concCore = photonsInEllipse / size;
-
 		input.put(outputKey, concCore);
 		return input;
 	}
