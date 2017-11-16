@@ -1,16 +1,12 @@
 package fact.TriggerEmulation;
 
-import com.google.common.primitives.Ints;
 import fact.Constants;
 import fact.filter.ShapeSignal;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.util.Arrays;
 
 /**
  * Emulate a discriminator that is working on the summed timeseries of the patches. Signals are digitized according to
