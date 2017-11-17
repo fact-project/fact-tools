@@ -109,16 +109,16 @@ public class SourcePosition implements StatefulProcessor {
 
         hasMcWobblePosition = false;
         if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
-        	if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
-        	{
+            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
+            {
                 hasMcWobblePosition = true;
-        		log.warn("Using zd and az values from the data item");
-        	}
-        	else
-        	{
-        		log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
-        		throw new IllegalArgumentException();
-        	}
+                log.warn("Using zd and az values from the data item");
+            }
+            else
+            {
+                log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
+                throw new IllegalArgumentException();
+            }
         } else if (auxService == null ){
 
             log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
@@ -159,23 +159,23 @@ public class SourcePosition implements StatefulProcessor {
 
         if (hasMcWobblePosition)
         {
-        	double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
-        	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
-        	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
-        	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
-        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to
-        	// rotate the coordinate system by 180 deg such that 0 deg is north
-        	pointingAz = 180 + pointingAz;
-        	sourceAz = 180 + sourceAz;
+            double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
+            double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
+            double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
+            double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+            // Due to the fact, that Ceres handle the coordinate in a different way, we have to
+            // rotate the coordinate system by 180 deg such that 0 deg is north
+            pointingAz = 180 + pointingAz;
+            sourceAz = 180 + sourceAz;
 
-        	pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingAz);
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingAz);
             sourceHorizontal = HorizontalCoordinate.fromDegrees(sourceZd, sourceAz);
 
-        	// Now we can calculate the source position from the zd,az coordinates for pointing and source
-        	sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
-        	data.put(outputKey, sourceCamera);
+            // Now we can calculate the source position from the zd,az coordinates for pointing and source
+            sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
+            data.put(outputKey, sourceCamera);
 
-        	HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(pointingZd, pointingZd);
+            HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(pointingZd, pointingZd);
             data.put("pointingPosition", pointingPosition);
             data.put("auxPointingPosition", pointingPosition);
             data.put("sourcePositionHorizontal", HorizontalCoordinate.fromDegrees(sourceZd, sourceAz));
@@ -256,32 +256,32 @@ public class SourcePosition implements StatefulProcessor {
         this.y = y;
     }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
-	public void setSourceZdKey(String sourceZdKey) {
-		this.sourceZdKey = sourceZdKey;
-	}
+    public void setSourceZdKey(String sourceZdKey) {
+        this.sourceZdKey = sourceZdKey;
+    }
 
-	public void setSourceAzKey(String sourceAzKey) {
-		this.sourceAzKey = sourceAzKey;
-	}
+    public void setSourceAzKey(String sourceAzKey) {
+        this.sourceAzKey = sourceAzKey;
+    }
 
-	public void setPointingZdKey(String pointingZdKey) {
-		this.pointingZdKey = pointingZdKey;
-	}
+    public void setPointingZdKey(String pointingZdKey) {
+        this.pointingZdKey = pointingZdKey;
+    }
 
-	public void setPointingAzKey(String pointingAzKey) {
-		this.pointingAzKey = pointingAzKey;
-	}
+    public void setPointingAzKey(String pointingAzKey) {
+        this.pointingAzKey = pointingAzKey;
+    }
 
-	public void setSourceRightAscension(Double sourceRightAscension) {
-		this.sourceRightAscension = sourceRightAscension;
-	}
+    public void setSourceRightAscension(Double sourceRightAscension) {
+        this.sourceRightAscension = sourceRightAscension;
+    }
 
-	public void setSourceDeclination(Double sourceDeclination) {
-		this.sourceDeclination = sourceDeclination;
-	}
+    public void setSourceDeclination(Double sourceDeclination) {
+        this.sourceDeclination = sourceDeclination;
+    }
 
 }
