@@ -38,8 +38,8 @@ public class AntiSourcePosition implements Processor {
 
 		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antiSource));
 		input.put(outputKey, antiSource);
-		input.put(outputKey + "_x", antiSource.xMM);
-		input.put(outputKey + "_y", antiSource.yMM);
+		input.put(outputKey + "X", antiSource.xMM);
+		input.put(outputKey + "Y", antiSource.yMM);
 		return input;
 	}
 
