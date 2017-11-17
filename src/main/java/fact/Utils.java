@@ -349,22 +349,17 @@ public class Utils {
 	 * @param delta
 	 * @return an array having two elements {l, t}
 	 */
-	public static double[] transformToEllipseCoordinates(double x, double y,
-			double cogX, double cogY, double delta) {
+	public static double[] transformToEllipseCoordinates(double x, double y, double cogX, double cogY, double delta) {
 		double translatedX = x - cogX;
 		double translatedY = y - cogY;
 
-		double dist = Math.sqrt(translatedX * translatedX + translatedY
-				* translatedY);
+		double sinDelta = Math.sin(delta);
+		double cosDelta = Math.cos(delta);
 
-		double beta = Math.atan2(translatedY, translatedX);
-		double alpha = (beta - delta);
+		double l = cosDelta * translatedX + sinDelta * translatedY;
+		double t = -sinDelta * translatedX + cosDelta * translatedY;
 
-		double t = Math.sin(alpha) * dist;
-		double l = Math.cos(alpha) * dist;
-		double[] c = { l, t };
-
-		return c;
+		return new double[]{l, t};
 	}
 
     public static double calculateDistancePointToShowerAxis(double cogx, double cogy, double delta, double x, double y){
