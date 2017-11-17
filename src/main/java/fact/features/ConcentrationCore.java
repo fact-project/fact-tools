@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
@@ -62,7 +63,11 @@ public class ConcentrationCore implements Processor{
 
 			double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cogx, cogy, delta);
 
-			double distance = Math.pow(ellipseCoords[0] / length, 2.0) + Math.pow(ellipseCoords[1] / width, 2.0);
+			// add a tolerance of 10% of the pixel size to not only get pixels with the center in the ellipse
+			double dl = Math.abs(ellipseCoords[0]) - 0.1 * Constants.PIXEL_SIZE;
+			double dt = Math.abs(ellipseCoords[1]) - 0.1 * Constants.PIXEL_SIZE;
+
+			double distance = Math.pow(dl / length, 2.0) + Math.pow(dt / width, 2.0);
 
 			if (distance <= 1) {
 				photonsInEllipse += photonChargeArray[pix.id];
