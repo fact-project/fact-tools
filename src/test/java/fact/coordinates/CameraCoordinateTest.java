@@ -16,6 +16,15 @@ public class CameraCoordinateTest {
         CameraCoordinate c1 = new CameraCoordinate(-1, -1);
         CameraCoordinate c2 = new CameraCoordinate(1, 1);
         assertEquals(Math.sqrt(8), c1.euclideanDistance(c2), 1e-12);
+
+        c1 = new CameraCoordinate(5, 0);
+        c2 = new CameraCoordinate(0, 0);
+        assertEquals(5, c1.euclideanDistance(c2), 1e-12);
+
+        c1 = new CameraCoordinate(0, 5);
+        c2 = new CameraCoordinate(0, 0);
+        assertEquals(5, c1.euclideanDistance(c2), 1e-12);
+
     }
 
     @Test

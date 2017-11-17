@@ -55,8 +55,8 @@ public class CameraCoordinate implements Serializable {
     }
 
     public double euclideanDistance(CameraCoordinate other) {
-        double dx = xMM - other.yMM;
-        double dy = xMM - other.yMM;
+        double dx = xMM - other.xMM;
+        double dy = yMM - other.yMM;
         return Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0));
     }
 
