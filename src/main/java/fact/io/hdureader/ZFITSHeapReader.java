@@ -222,16 +222,17 @@ public final class ZFITSHeapReader implements Reader {
             // read the current block information
             BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
+            int elementByteCount = column.type.byteSize*column.repeatCount;
             if (block.compression != BlockHeader.Compression.RAW && column.type != BinTable.ColumnType.SHORT) {
                 throw new NotImplementedException("Current Reader doesn't support compression other types than short");
             }
             if (block.compression == BlockHeader.Compression.HUFFMAN) {
-                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, column.type.byteSize);
+                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteCount);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
             } else if (block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING) {
-                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, column.type.byteSize);
+                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteCount);
                 unsmooth(shorts);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
@@ -298,7 +299,6 @@ public final class ZFITSHeapReader implements Reader {
      */
     private short[] huffmanDecompression(ByteBuffer buffer, int numRows, int sizeSingleRow) throws IOException {
         //start reading the huffman tree definition
-        long compressedBytes = Math.toIntExact(buffer.getInt()); //size is stored in num of shorts
 
         int[] sizeCompressedRows = new int[numRows];
         for (int i=0; i<numRows; i++){
@@ -306,10 +306,17 @@ public final class ZFITSHeapReader implements Reader {
         }
 
         short[] result = new short[sizeSingleRow*numRows];
+        int currentPositionInBuffer = 0;
         for (int i=0; i<numRows; i++){
+            ByteBuffer rowBuffer = ByteBuffer.wrap(buffer.array(), 0, sizeCompressedRows[i]);
+            currentPositionInBuffer += sizeCompressedRows[i];
+            buffer.position(currentPositionInBuffer);
             //its given as number of int16. nobody knows why. it says nowhere.
             long numberOfShorts = buffer.getLong();
-            short[] symbols = new short[Math.toIntExact(sizeSingleRow)];
+            if (Math.toIntExact(numberOfShorts*2)!=sizeSingleRow) {
+                throw new ArithmeticException("Size of decompressed Data array doesn't is not as expected (second): "+numberOfShorts+"!="+sizeSingleRow);
+            }
+            short[] symbols = new short[Math.toIntExact(numberOfShorts)];
 
             long numberOfSymbols = buffer.getLong();
 
@@ -317,6 +324,7 @@ public final class ZFITSHeapReader implements Reader {
 
             BitQueue q = new BitQueue();
             ByteWiseHuffmanTree currentNode = huffmanTree;
+
 
             int depth = 0;
             int index = 0;
@@ -351,9 +359,9 @@ public final class ZFITSHeapReader implements Reader {
                     }
                 }
             } catch (BufferUnderflowException e){
-                log.error("compressed size was: {}, number of symbols was {}", compressedBytes, numberOfSymbols);
+                log.error("compressed size was: {}, number of symbols was {}", sizeCompressedRows[i], numberOfSymbols);
             }
-            System.arraycopy(symbols, 0, result, i*sizeSingleRow, sizeSingleRow);
+            System.arraycopy(symbols, 0, result, i*(sizeSingleRow/2), (sizeSingleRow/2));
         }
         return result;
     }
