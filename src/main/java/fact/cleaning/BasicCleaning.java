@@ -2,7 +2,7 @@ package fact.cleaning;
 
 import fact.Constants;
 import fact.Utils;
-import fact.calibrationservice.CalibrationService;\
+import fact.calibrationservice.CalibrationService;
 import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
 import fact.hexmap.FactCameraPixel;
