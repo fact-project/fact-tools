@@ -60,8 +60,8 @@ if __name__ == '__main__':
 public class EquatorialCoordinateTest {
 
     static Logger log = LoggerFactory.getLogger(EquatorialCoordinateTest.class);
-    private double precisionAngles = 0.25;
-    private double precisionDistance = 0.005;
+    private double precisionAngles = 0.8;
+    private double precisionDistance = 0.35;
 
     @Test
     public void toHorizontalTest() throws Exception {
