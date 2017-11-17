@@ -223,22 +223,22 @@ public final class ZFITSHeapReader implements Reader {
             BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
             if (block.compression != BlockHeader.Compression.RAW && column.type != BinTable.ColumnType.SHORT) {
-                throw new IOException("Current Reader doesn't support compression other types than short");
+                throw new NotImplementedException("Current Reader doesn't support compression other types than short");
             }
             if (block.compression == BlockHeader.Compression.HUFFMAN) {
-                short[] shorts = huffmanDecompression(tileBuffer);
+                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, column.type.byteSize);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
             } else if (block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING) {
-                short[] shorts = huffmanDecompression(tileBuffer);
+                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, column.type.byteSize);
                 unsmooth(shorts);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
             } else {
-                // convert to int no block is bigger than 4GB
-                int numberBytes = (int) block.getDataSize();
+                // convert to int, no block is bigger than 4GB
+                int numberBytes = Math.toIntExact(block.getDataSize());
                 byte[] cache = new byte[numberBytes];
                 for (int i = 0; i < numberBytes; i++) {
                     cache[i] = tileBuffer.get();
@@ -296,57 +296,66 @@ public final class ZFITSHeapReader implements Reader {
      * @param buffer the coplet tile buffer (with blockheaders, but without the tile headers.)
      * @throws IOException in case the buffer ends before all bytes are read
      */
-    private short[] huffmanDecompression(ByteBuffer buffer) throws IOException {
+    private short[] huffmanDecompression(ByteBuffer buffer, int numRows, int sizeSingleRow) throws IOException {
         //start reading the huffman tree definition
-        long compressedBytes = buffer.getInt(); //size is stored in num of shorts
+        long compressedBytes = Math.toIntExact(buffer.getInt()); //size is stored in num of shorts
 
-        //its given as number of int16. nobody knows why. it says nowhere.
-        long numberOfShorts = buffer.getLong();
-        short[] symbols = new short[Math.toIntExact(numberOfShorts)];
+        int[] sizeCompressedRows = new int[numRows];
+        for (int i=0; i<numRows; i++){
+            sizeCompressedRows[i] = buffer.getInt();
+        }
 
-        long numberOfSymbols = buffer.getLong();
+        short[] result = new short[sizeSingleRow*numRows];
+        for (int i=0; i<numRows; i++){
+            //its given as number of int16. nobody knows why. it says nowhere.
+            long numberOfShorts = buffer.getLong();
+            short[] symbols = new short[Math.toIntExact(sizeSingleRow)];
 
-        ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(buffer, numberOfSymbols);
+            long numberOfSymbols = buffer.getLong();
 
-        BitQueue q = new BitQueue();
-        ByteWiseHuffmanTree currentNode = huffmanTree;
+            ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(buffer, numberOfSymbols);
 
-        int depth = 0;
-        int index = 0;
-        try {
-            while (index < numberOfShorts) {
+            BitQueue q = new BitQueue();
+            ByteWiseHuffmanTree currentNode = huffmanTree;
 
-                if(q.queueLength < 16) {
-                    if (buffer.remaining() >= 2) {
-                        q.addShort(buffer.getShort());
-                    } else if (buffer.remaining() == 1) {
-                        q.addByte(buffer.get());
-                        q.addByte((byte) 0);
-                    }else if (buffer.remaining() == 0) {
-                        q.addShort((short) 0);
+            int depth = 0;
+            int index = 0;
+            try {
+                while (index < numberOfShorts) {
+
+                    if(q.queueLength < 16) {
+                        if (buffer.remaining() >= 2) {
+                            q.addShort(buffer.getShort());
+                        } else if (buffer.remaining() == 1) {
+                            q.addByte(buffer.get());
+                            q.addByte((byte) 0);
+                        }else if (buffer.remaining() == 0) {
+                            q.addShort((short) 0);
+                        }
+                    }
+
+                    ByteWiseHuffmanTree node = currentNode.children[q.peekByte()];
+                    if (node.isLeaf) {
+                        symbols[index] = node.payload.symbol;
+                        index++;
+                        q.remove(node.payload.codeLengthInBits - depth*8);
+
+                        //reset traversal to root node.
+                        depth = 0;
+                        currentNode = huffmanTree;
+
+                    } else {
+                        currentNode = node;
+                        depth++;
+                        q.remove(8);
                     }
                 }
-
-                ByteWiseHuffmanTree node = currentNode.children[q.peekByte()];
-                if (node.isLeaf) {
-                    symbols[index] = node.payload.symbol;
-                    index++;
-                    q.remove(node.payload.codeLengthInBits - depth*8);
-
-                    //reset traversal to root node.
-                    depth = 0;
-                    currentNode = huffmanTree;
-
-                } else {
-                    currentNode = node;
-                    depth++;
-                    q.remove(8);
-                }
+            } catch (BufferUnderflowException e){
+                log.error("compressed size was: {}, number of symbols was {}", compressedBytes, numberOfSymbols);
             }
-        } catch (BufferUnderflowException e){
-            log.error("compressed size was: {}, number of symbols was {}", compressedBytes, numberOfSymbols);
+            System.arraycopy(symbols, 0, result, i*sizeSingleRow, sizeSingleRow);
         }
-        return symbols;
+        return result;
     }
 
     /**
