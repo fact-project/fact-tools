@@ -81,6 +81,11 @@ public class HorizontalCoordinate implements CelestialCoordinate {
             ra -= 2 * Math.PI;
         }
 
+
+        double[] precessionCorrection = EquatorialCoordinate.calculatePrecessionCorrection(ra, declination, observationTime);
+        ra += precessionCorrection[0];
+        declination += precessionCorrection[1];
+
         return EquatorialCoordinate.fromRad(ra, declination);
     }
 

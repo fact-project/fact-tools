@@ -47,7 +47,6 @@ public interface CelestialCoordinate extends Serializable {
     }
 
 
-
     /**
      * Convert a DateTime object to Greenwich Sidereal Time according to
      * https://en.wikipedia.org/wiki/Sidereal_time#Definition

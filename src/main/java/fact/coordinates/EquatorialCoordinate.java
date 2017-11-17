@@ -1,6 +1,9 @@
 package fact.coordinates;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 /**
  * Created by maxnoe on 22.05.17.
@@ -14,6 +17,9 @@ public class EquatorialCoordinate implements CelestialCoordinate {
 
     public final double rightAscensionRad;
     public final double declinationRad;
+    public static final ZonedDateTime j2000Reference = ZonedDateTime.of(2000, 1, 1, 11, 58, 55, 816000000, ZoneOffset.UTC);
+    public static final double precessionFactorM = 3.075 / 3600 / 12 * Math.PI;
+    public static final double precessionFactorN = 1.336 / 3600 / 12 * Math.PI;
 
     private EquatorialCoordinate(double rightAscensionRad, double declinationRad) {
         this.rightAscensionRad = rightAscensionRad;
@@ -38,6 +44,12 @@ public class EquatorialCoordinate implements CelestialCoordinate {
         return new EquatorialCoordinate(rightAscensionRad, Math.toRadians(declinationDeg));
     }
 
+    static double[] calculatePrecessionCorrection(double rightAscensionRad, double declinationRad, ZonedDateTime observationTime) {
+        double deltaT = observationTime.until(j2000Reference, ChronoUnit.DAYS) / 365.0;
+        double deltaRightAscension = (precessionFactorM +  precessionFactorN * Math.sin(rightAscensionRad) * Math.tan(declinationRad)) * deltaT;
+        double deltaDeclination = precessionFactorN * Math.cos(rightAscensionRad) * deltaT;
+        return new double[] {deltaRightAscension, deltaDeclination};
+    }
 
     /**
      * Transform this EquatorialCoordinate into the horizontal coordinate frame
@@ -57,6 +69,9 @@ public class EquatorialCoordinate implements CelestialCoordinate {
         double ra = this.getRightAscensionRad();
         double dec = this.getDeclinationRad();
 
+        double[] precessionCorrection = calculatePrecessionCorrection(ra, dec, observationTime);
+        ra -= precessionCorrection[0];
+        dec -= precessionCorrection[1];
 
         // wikipedia assumes longitude positive in west direction
         double hourAngle = gst + earthLocation.getLongitudeRad() - ra;
