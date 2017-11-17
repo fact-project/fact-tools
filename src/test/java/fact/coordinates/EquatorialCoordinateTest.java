@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
@@ -60,8 +59,8 @@ if __name__ == '__main__':
 public class EquatorialCoordinateTest {
 
     static Logger log = LoggerFactory.getLogger(EquatorialCoordinateTest.class);
-    private double precisionAngles = 0.8;
-    private double precisionDistance = 0.35;
+    private double precisionAngles = 0.02;
+    private double precisionDistance = 0.02;
 
     @Test
     public void toHorizontalTest() throws Exception {
@@ -84,4 +83,5 @@ public class EquatorialCoordinateTest {
             assertEquals("Difference in Zenith to large", astropyReference.getZenithDeg(), sourceHz.getZenithDeg(), precisionAngles);
         }
     }
+
 }

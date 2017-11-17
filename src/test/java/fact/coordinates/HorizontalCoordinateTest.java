@@ -19,8 +19,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class HorizontalCoordinateTest {
     static Logger log = LoggerFactory.getLogger(HorizontalCoordinateTest.class);
-    private double precisionAngles = 0.8;
-    private double precisionDistance = 0.35;
+    private double precisionAngles = 0.02;
+    private double precisionDistance = 0.02;
 
     @Test
     public void toHorizontalTest() throws Exception {
