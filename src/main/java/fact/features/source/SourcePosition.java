@@ -143,22 +143,18 @@ public class SourcePosition implements StatefulProcessor {
 
         EquatorialCoordinate pointingEquatorial;
         HorizontalCoordinate pointingHorizontal;
+        HorizontalCoordinate auxPointingHorizontal;
 
         // In case the source position is fixed. Used for older ceres version <= revision 18159
         if(x != null && y !=  null) {
+
             // add source position to data item
             sourceCamera = new CameraCoordinate(x, y);
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
-            data.put(outputKey, sourceCamera);
+            auxPointingHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
+            pointingHorizontal =  HorizontalCoordinate.fromDegrees(0, 0);
+            sourceHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
 
-            data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(0, 0));
-            data.put("pointingPosition",  HorizontalCoordinate.fromDegrees(0, 0));
-            data.put("sourcePositionHorizontal", HorizontalCoordinate.fromDegrees(0, 0));
-            return data;
-        }
-
-        if (hasMcWobblePosition)
-        {
+        } else if (hasMcWobblePosition) {
             double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
             double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
             double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
@@ -173,20 +169,14 @@ public class SourcePosition implements StatefulProcessor {
 
             // Now we can calculate the source position from the zd,az coordinates for pointing and source
             sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
-            data.put(outputKey, sourceCamera);
 
-            HorizontalCoordinate pointingPosition = HorizontalCoordinate.fromDegrees(pointingZd, pointingZd);
-            data.put("pointingPosition", pointingPosition);
-            data.put("auxPointingPosition", pointingPosition);
-            data.put("sourcePositionHorizontal", HorizontalCoordinate.fromDegrees(sourceZd, sourceAz));
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingZd);
+            auxPointingHorizontal = pointingHorizontal;
 
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
-            return data;
-        }
-
-        try {
+        } else {
+            // Assume observations
             int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
-            if(unixTimeUTC == null){
+            if (unixTimeUTC == null) {
                 log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
                 return null;
             }
@@ -195,10 +185,16 @@ public class SourcePosition implements StatefulProcessor {
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
-            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
+            AuxPoint sourcePoint;
+            AuxPoint trackingPoint;
+            try {
+                sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
-            //We want to get the tracking point which is closest to the current event.
-            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+                //We want to get the tracking point which is closest to the current event.
+                trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
             pointingEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(
                     trackingPoint.getDouble("Ra"), trackingPoint.getDouble("Dec")
@@ -206,8 +202,7 @@ public class SourcePosition implements StatefulProcessor {
 
             pointingHorizontal = pointingEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
 
-            if (sourceDeclination != null && sourceRightAscension != null)
-            {
+            if (sourceDeclination != null && sourceRightAscension != null) {
                 sourceEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(sourceRightAscension, sourceDeclination);
             } else {
                 sourceEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(
@@ -221,30 +216,31 @@ public class SourcePosition implements StatefulProcessor {
 
             String sourceName = sourcePoint.getString("Name");
             data.put("SourceName", sourceName);
-            data.put(outputKey, sourceCamera);
-            data.put(outputKey + "_x", sourceCamera.xMM);
-            data.put(outputKey + "_y", sourceCamera.yMM);
 
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
-            data.put("auxPointingPosition", HorizontalCoordinate.fromDegrees(auxZd, auxAz));
-            data.put("pointingPosition", pointingHorizontal);
-            data.put("sourcePositionHorizontal", sourceHorizontal);
-            data.put("sourcePositionZd", sourceHorizontal.getZenithDeg());
-            data.put("sourcePositionAz", sourceHorizontal.getAzimuthDeg());
 
-            data.put("auxPointingPositionZd", auxZd);
-            data.put("auxPointingPositionAz", auxAz);
-            data.put("pointingPositionZd", pointingHorizontal.getZenithDeg());
-            data.put("pointingPositionAz", pointingHorizontal.getAzimuthDeg());
-
-            data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
-
-        } catch (IOException e) {
-            log.error("SourcePosition could not be calculated. Stopping stream.");
-            e.printStackTrace();
-            return null;
+            auxPointingHorizontal = HorizontalCoordinate.fromDegrees(auxZd, auxAz);
         }
+
+        data.put(outputKey, sourceCamera);
+        data.put(outputKey + "X", sourceCamera.xMM);
+        data.put(outputKey + "Y", sourceCamera.yMM);
+
+        data.put("auxPointingPosition", auxPointingHorizontal);
+        data.put("pointingPosition", pointingHorizontal);
+        data.put("sourcePositionHorizontal", sourceHorizontal);
+
+        data.put("sourcePositionZd", sourceHorizontal.getZenithDeg());
+        data.put("sourcePositionAz", sourceHorizontal.getAzimuthDeg());
+
+        data.put("auxPointingPositionZd", auxPointingHorizontal.getZenithDeg());
+        data.put("auxPointingPositionAz", auxPointingHorizontal.getAzimuthDeg());
+
+        data.put("pointingPositionZd", pointingHorizontal.getZenithDeg());
+        data.put("pointingPositionAz", pointingHorizontal.getAzimuthDeg());
+
+        data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
 
         return data;
     }
