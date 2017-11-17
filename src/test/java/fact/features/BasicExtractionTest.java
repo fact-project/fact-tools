@@ -1,9 +1,9 @@
 package fact.features;
 
-import fact.extraction.BasicExtraction;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FITSStream;
+import fact.extraction.BasicExtraction;
 import fact.io.FITSStreamTest;
+import fact.io.hdureader.FITSStream;
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;
@@ -26,8 +26,8 @@ public class BasicExtractionTest {
 	public void setup() throws Exception {
 		URL drsUrl =  FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         pr = new DrsCalibration();
-        pr.setUrl(new SourceURL(drsUrl));
-        pr.setOutputKey("test");
+        pr.url = drsUrl;
+        pr.outputKey = "test";
 
         extraction = new BasicExtraction();
         extraction.setDataKey("test");

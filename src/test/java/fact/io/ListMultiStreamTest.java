@@ -1,5 +1,6 @@
 package fact.io;
 
+import fact.io.hdureader.FITSStream;
 import org.junit.Test;
 import stream.Data;
 import stream.io.SourceURL;
@@ -8,9 +9,7 @@ import java.io.File;
 import java.net.URL;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Created by kaibrugge on 14.04.15.

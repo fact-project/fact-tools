@@ -2,10 +2,10 @@ package fact.features;
 
 import fact.Utils;
 import fact.container.PixelDistribution2D;
+import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
-import fact.container.PixelSet;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;

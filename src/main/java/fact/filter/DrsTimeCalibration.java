@@ -2,14 +2,20 @@ package fact.filter;
 
 import fact.Utils;
 import fact.datacorrection.DrsCalibration;
-import fact.io.FITSStream;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
 
 
 public class DrsTimeCalibration implements StatefulProcessor{
@@ -22,7 +28,7 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
 	private String drsTimeKey = "CellOffset";
 	@Parameter(required = false, description = "file with the drs time calib constants", defaultValue="classpath:/long_term_constants_median.time.drs.fits")
-	private SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
+	private URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
 	private int numberOfSlices = 1024;
 	private int numberOfTimemarker = 160;
@@ -30,16 +36,15 @@ public class DrsTimeCalibration implements StatefulProcessor{
 	private int npix;
 
 
-	Data drsTimeData = null;
 	private double[] absoluteTimeOffsets = new double[numberOfSlices*numberOfTimemarker];
 
 
 	@Override
-	public void init(ProcessContext context) throws Exception {
+	public void init(ProcessContext context) {
 		try {
 			loadDrsTimeCalibConstants(url);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 
 	}
@@ -69,53 +74,16 @@ public class DrsTimeCalibration implements StatefulProcessor{
 		return input;
 	}
 
-	protected void loadDrsTimeCalibConstants(SourceURL  in) {
-		try {
+	protected void loadDrsTimeCalibConstants(URL  in) throws IOException {
+		FITS fits = new FITS(in);
+		BinTable calibrationTable = fits.getBinTableByName("DrsCellTimes").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCellTimes\""));
 
-			FITSStream stream = new FITSStream(in);
-			stream.init();
-			drsTimeData = stream.readNext();
-			log.debug("Read DRS Time data: {}", drsTimeData);
+		BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
-			if (!drsTimeData.containsKey(drsTimeKey))
-			{
-				throw new RuntimeException("Drs time data is missing key + " + drsTimeKey + "!");
-			}
-			this.absoluteTimeOffsets = (double[]) drsTimeData.get(drsTimeKey);
 
-		} catch (Exception e) {
+		OptionalTypesMap<String, Serializable> row = reader.getNextRow();
 
-			log.error("Failed to load DRS data: {}", e.getMessage());
-			if (log.isDebugEnabled())
-				e.printStackTrace();
-			this.absoluteTimeOffsets = null;
-
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	public void setStartCellKey(String startCellKey) {
-		this.startCellKey = startCellKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setNumberOfSlices(int numberOfSlices) {
-		this.numberOfSlices = numberOfSlices;
-	}
-
-	public void setNumberOfTimemarker(int numberOfTimemarker) {
-		this.numberOfTimemarker = numberOfTimemarker;
-	}
-
-	public void setUrl(SourceURL url) {
-		this.url = url;
-	}
-
-	public void setDrsTimeKey(String drsTimeKey) {
-		this.drsTimeKey = drsTimeKey;
+		absoluteTimeOffsets = row.getDoubleArray(drsTimeKey).orElseThrow(()->new RuntimeException(drsTimeKey+"is not in the File"));
 	}
 
 

@@ -27,9 +27,13 @@ public class FITSStream extends AbstractStream {
     private HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
 
+    public String nameHDU="Events";
+
     public FITSStream(SourceURL url){
         this.url = url;
     }
+
+    public FITSStream() {    }
 
     @Override
     public void init() throws Exception {
@@ -43,30 +47,32 @@ public class FITSStream extends AbstractStream {
         //get calibration constants they are stored in the first (and only) row of this hdu.
         HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
         if (offsetHDU != null){
-            OptionalTypesMap<String, Serializable> row = ZFITSHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
+            ZFITSHeapReader reader = ZFITSHeapReader.forTable(offsetHDU.getBinTable());
+            boolean ignoreWrongTileHeader;
+            OptionalTypesMap<String, Serializable> row = reader.getNextRow(ignoreWrongTileHeader=true);
 
             offsetCalibrationsConstants = row
                     .getShortArray("OffsetCalibration")
                     .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
 
         }
-
-
         //create a refrence to the events hdu
-        eventHDU = fits.getHDU("Events");
-        BinTable eventsTable = eventHDU.getBinTable();
+        eventHDU = fits.getHDU(nameHDU);
+        if (eventHDU!=null) {
+            BinTable eventsTable = eventHDU.getBinTable();
 
-        //read each headerline and try to get the right datatype
-        //from smallest to largest datatype
-        //if no number can be found simply save the string.
-        Header header = eventHDU.header;
-        fitsHeader = header.asMapOfSerializables();
+            //read each headerline and try to get the right datatype
+            //from smallest to largest datatype
+            //if no number can be found simply save the string.
+            Header header = eventHDU.header;
+            fitsHeader = header.asMapOfSerializables();
 
-        Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-        if (ztable) {
-            reader = ZFITSHeapReader.forTable(eventsTable);
-        } else {
-            reader = BinTableReader.forBinTable(eventsTable);
+            Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+            if (ztable) {
+                reader = ZFITSHeapReader.forTable(eventsTable);
+            } else {
+                reader = BinTableReader.forBinTable(eventsTable);
+            }
         }
     }
 
@@ -93,12 +99,14 @@ public class FITSStream extends AbstractStream {
 
         OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
 
-        short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
-        short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
-        Integer roi = eventHDU.header.getInt("NROI").orElse(300);
 
         if (offsetCalibrationsConstants !=  null) {
+            short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
+            short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
+
+            Integer roi = eventHDU.header.getInt("NROI").orElse(300);
+
             applyDrsOffsetCalib(roi, data, startCellData, offsetCalibrationsConstants);
             nextRow.put("Data", data);
         }

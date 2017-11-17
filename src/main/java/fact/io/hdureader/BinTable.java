@@ -182,6 +182,17 @@ public class BinTable {
             Integer naxis1 = header.getInt("NAXIS1").orElse(0);
             Integer naxis2 = header.getInt("NAXIS2").orElse(0);
 
+            // In ZFITS file the heap data starts at the offset stored in the 'ZHEAPPTR' variable in the header.
+            // This is of course documented nowhere. Not even in the 'official spec' https://arxiv.org/pdf/1506.06045v1.pdf
+            // Its also simply wrong according to the FITS standard. It should be the 'THEAP' variable.
+            // However in this case we give more priority to the mysterious ZHEAPPTR variable if its there.
+            // Heres an email I got from Etienne concerning this keyword:
+            //
+            //      I remember that there is a mismatch between the THEAP (or ZHEAPPTR) values that we output to our .fits.fz
+            //      files and the FITS standard. At the time, it was because the FTOOLS had a bug and I had implemented the
+            //      version that worked with the FTOOLS rather than the version compliant with the standard.
+            //
+            //
             int theap = header.getInt("ZHEAPPTR").orElseGet(() -> header.getInt("THEAP").orElse(naxis1*naxis2));
 
             int bytesToSkip = Math.toIntExact((hduOffset + header.headerSizeInBytes + theap));
@@ -238,23 +249,26 @@ public class BinTable {
         if(pcount < 0){
             throw new IllegalArgumentException("Number of bytes in Heap (PCOUNT) is negative.");
         }
-
+        /*
+            See page 25 of the Fits standard:
+                The zero indexed byte offset to the start of
+                the heap, measured from the start of the main data table, may
+                be given by the THEAP keyword in the header
+                ...
+                (i.e., the default value of THEAP is NAXIS1 × NAXIS2)
+                This default value is the minimum allowed
+                value for the THEAP keyword, because any smaller value would
+                imply that the heap and the main data table overlap.
+         */
         if (pcount > 0){
-            int theap = header.getInt("THEAP").orElseThrow(() -> {
-                log.error("The THEAP keyword cannot be found in the BinTable. " +
-                        "Its mandatory when PCOUNT is larger than 0.\nSee section 7.3.2 of the FITS 3.0 standard");
-                return new IllegalArgumentException("Missing THEAP keyword");
-
-            });
+            int theap = header.getInt("THEAP").orElse(naxis1 * naxis2);
 
             if(theap < 0){
                 throw new IllegalArgumentException("Number of bytes to skip to the heap (THEAP) is negative.");
             }
 
-            int desiredTheap = naxis1*naxis2 + (naxis1 * naxis2) % 2880;
-            if(theap == desiredTheap){
-                throw new IllegalArgumentException("The value for THEAP should be equal to (NAXIS1*NAXIS2 + padding to 2880 blocks)." +
-                        "\nSee section 7.3.2 of the FITS 3.0 standard");
+            if(theap < naxis1*naxis2){
+                throw new IllegalArgumentException("The value of THEAP is lower than the allowed minimum of (NAXIS1 * NAXIS2).");
             }
         }
     }
