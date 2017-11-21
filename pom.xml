@@ -293,10 +293,6 @@
                 <main-class>stream.run</main-class>
               </manifestEntries>
             </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-              <resource>.fits</resource>
-              <resource>.gz</resource>
-            </transformer>
           </transformers>
           <filters>
             <filter>
