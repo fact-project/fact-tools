@@ -158,13 +158,8 @@ public final class ZFITSHeapReader implements Reader {
             if (compressedBlocks.contains(column.name)) {
                 // Buffer is ShortBuffer
                 ShortBuffer shortBuffer = (ShortBuffer) curBuffer;
-
                 short[] data = new short[column.repeatCount];
-                int offsetAfterReadingBytes = shortBuffer.position() + column.repeatCount * column.type.byteSize;
-
-                shortBuffer.get(data, shortBuffer.position(), column.repeatCount * column.type.byteSize);
-
-                shortBuffer.position(offsetAfterReadingBytes);
+                shortBuffer.get(data);
                 map.put(column.name, data);
             } else {
                 //Buffer is ByteBuffer
@@ -172,17 +167,7 @@ public final class ZFITSHeapReader implements Reader {
                 if (column.repeatCount == 1) {
                     map.put(column.name, readSingleValueFromBuffer(column, byteBuffer));
                 } else {
-                    int offsetAfterReadingBytes = byteBuffer.position() + column.repeatCount * column.type.byteSize;
-
-
-                    //This creates a view of the byte buffer. No copying will take place. I think.
-                    ByteBuffer bufferView = ByteBuffer.wrap(byteBuffer.array(),
-                            curBuffer.position(),
-                            offsetAfterReadingBytes)
-                            .order(ByteOrder.LITTLE_ENDIAN);
-
-                    byteBuffer.position(offsetAfterReadingBytes);
-                    map.put(column.name, readArrayFromBuffer(column, bufferView));
+                    map.put(column.name, readArrayFromBuffer(column, byteBuffer));
                 }
             }
         }
@@ -192,7 +177,8 @@ public final class ZFITSHeapReader implements Reader {
     }
 
     /**
-     * Reads the next tile into the cache
+     * Reads the next tile into the cache, to later read the data from it.
+     *
      * @param ignoreWrongTileHeader
      * @throws IOException
      */
@@ -222,29 +208,31 @@ public final class ZFITSHeapReader implements Reader {
             // read the current block information
             BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
-            int elementByteCount = column.type.byteSize*column.repeatCount;
+            int elementByteSize = column.type.byteSize*column.repeatCount;
             if (block.compression != BlockHeader.Compression.RAW && column.type != BinTable.ColumnType.SHORT) {
                 throw new NotImplementedException("Current Reader doesn't support compression other types than short");
             }
             if (block.compression == BlockHeader.Compression.HUFFMAN) {
-                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteCount);
+                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteSize);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
             } else if (block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING) {
-                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteCount);
+                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteSize);
                 unsmooth(shorts);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
-            } else {
+            } else if (block.compression == BlockHeader.Compression.RAW){
                 // convert to int, no block is bigger than 4GB
                 int numberBytes = Math.toIntExact(block.getDataSize());
                 byte[] cache = new byte[numberBytes];
                 for (int i = 0; i < numberBytes; i++) {
                     cache[i] = tileBuffer.get();
                 }
-                tileCache.put(column.name, ByteBuffer.wrap(cache));
+                tileCache.put(column.name, ByteBuffer.wrap(cache).order(ByteOrder.LITTLE_ENDIAN));
+            } else {
+                throw new NotImplementedException("Compression: '"+block.compression.name()+"' is not implemented");
             }
         }
         curRowInCache = 0;
@@ -306,21 +294,24 @@ public final class ZFITSHeapReader implements Reader {
         }
 
         short[] result = new short[sizeSingleRow*numRows];
-        int currentPositionInBuffer = 0;
+        //int currentPositionInBuffer = buffer.position();
         for (int i=0; i<numRows; i++){
-            ByteBuffer rowBuffer = ByteBuffer.wrap(buffer.array(), 0, sizeCompressedRows[i]);
-            currentPositionInBuffer += sizeCompressedRows[i];
-            buffer.position(currentPositionInBuffer);
+            byte[] row = new byte[sizeCompressedRows[i]];
+            buffer.get(row);
+            ByteBuffer rowBuffer = ByteBuffer.wrap(row);
+            //currentPositionInBuffer += sizeCompressedRows[i];
+
+
             //its given as number of int16. nobody knows why. it says nowhere.
-            long numberOfShorts = buffer.getLong();
+            long numberOfShorts = rowBuffer.getLong();
             if (Math.toIntExact(numberOfShorts*2)!=sizeSingleRow) {
-                throw new ArithmeticException("Size of decompressed Data array doesn't is not as expected (second): "+numberOfShorts+"!="+sizeSingleRow);
+                throw new ArithmeticException("Size of decompressed Data array is not as expected (is)!=(should): "+numberOfShorts+"!="+sizeSingleRow);
             }
             short[] symbols = new short[Math.toIntExact(numberOfShorts)];
 
-            long numberOfSymbols = buffer.getLong();
+            long numberOfSymbols = rowBuffer.getLong();
 
-            ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(buffer, numberOfSymbols);
+            ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(rowBuffer, numberOfSymbols);
 
             BitQueue q = new BitQueue();
             ByteWiseHuffmanTree currentNode = huffmanTree;
@@ -332,12 +323,12 @@ public final class ZFITSHeapReader implements Reader {
                 while (index < numberOfShorts) {
 
                     if(q.queueLength < 16) {
-                        if (buffer.remaining() >= 2) {
-                            q.addShort(buffer.getShort());
-                        } else if (buffer.remaining() == 1) {
-                            q.addByte(buffer.get());
+                        if (rowBuffer.remaining() >= 2) {
+                            q.addShort(rowBuffer.getShort());
+                        } else if (rowBuffer.remaining() == 1) {
+                            q.addByte(rowBuffer.get());
                             q.addByte((byte) 0);
-                        }else if (buffer.remaining() == 0) {
+                        }else if (rowBuffer.remaining() == 0) {
                             q.addShort((short) 0);
                         }
                     }
@@ -496,7 +487,10 @@ public final class ZFITSHeapReader implements Reader {
             String order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
 
             if(! (order.equals("R") || order.equals("C")) ){
-                throw new IOException("Block header was not ordered by 'R' or 'C' but " + order);
+                throw new IOException("Block header was not ordered by 'R' or 'C' but '" + order + "'");
+            }
+            if(order.equals("C")) {
+                throw new NotImplementedException("Column ordering not implemented yet");
             }
 
             byte numberOfProcessings = buffer.get();
