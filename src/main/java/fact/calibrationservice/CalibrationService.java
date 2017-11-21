@@ -1,5 +1,6 @@
 package fact.calibrationservice;
 
+import fact.container.PixelSet;
 import stream.service.Service;
 
 import java.time.ZonedDateTime;
@@ -25,7 +26,7 @@ public interface CalibrationService extends Service {
 	 * @param eventTimeStamp
 	 * @return array of chids
 	 */
-	public int[] getBadPixel(ZonedDateTime eventTimeStamp);
+	PixelSet getBadPixel(ZonedDateTime eventTimeStamp);
 
 	/**
 	 * Returns an array, listing the chids of the pixels not usable for cleaning for the given event time stamp
@@ -33,6 +34,6 @@ public interface CalibrationService extends Service {
 	 * @param eventTimeStamp
 	 * @return array of chids, or null if doesn't exist
 	 */
-	public int[] getNotUsablePixels(ZonedDateTime eventTimeStamp);
+	PixelSet getNotUsablePixels(ZonedDateTime eventTimeStamp);
 
 }

@@ -4,6 +4,7 @@ import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
@@ -58,48 +59,44 @@ public class InterpolateTimeSeries implements Processor {
     		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     	}
 
-    	int[] badChIds = calibService.getBadPixel(timeStamp);
-		PixelSet badPixelsSet = new PixelSet();
-		for (int px: badChIds){
-			badPixelsSet.addById(px);
-		}
+		PixelSet badPixelSet = calibService.getBadPixel(timeStamp);
 
 		if(!dataKey.equals(dataOutputKey)){
 			double[] newdata = new double[data.length];
 			System.arraycopy(data,0, newdata, 0, data.length);
-			data = interpolateTimeLine(newdata, badChIds);
+			data = interpolateTimeSeries(newdata, badPixelSet);
 		} else {
-			data = interpolateTimeLine(data, badChIds);
+			data = interpolateTimeSeries(data, badPixelSet);
 		}
 
 		item.put(dataOutputKey, data);
-		item.put("badPixel", badPixelsSet);
+		item.put("badPixels", badPixelSet);
         return item;
     }
 
-	public double[] interpolateTimeLine(double[] data, int[] badChIds) {
+	public double[] interpolateTimeSeries(double[] data, PixelSet badPixelSet) {
         int roi = data.length / npix;
 
-        for (int pix: badChIds) {
-            FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
+        for (CameraPixel pixel: badPixelSet) {
+            FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursForPixel(pixel);
 
             //iterate over all slices
             for (int slice = 0; slice < roi; slice++) {
-                int pos = pix * roi + slice;
+                int pos = pixel.id * roi + slice;
                 //temp save the current value
                 double avg = 0.0f;
                 int numNeighbours = 0;
 
-                for(FactCameraPixel nPix: currentNeighbors){
-                		if (ArrayUtils.contains(badChIds, nPix.id)){
-                			continue;
-                		}
-                        avg += data[nPix.id*roi + slice];
-                        numNeighbours++;
+                for(FactCameraPixel neighborPixel: currentNeighbors) {
+					if (badPixelSet.contains(neighborPixel)) {
+                		continue;
+                	}
+                    avg += data[neighborPixel.id * roi + slice];
+                    numNeighbours++;
                 }
-                checkNumNeighbours(numNeighbours, pix);
+                checkNumNeighbours(numNeighbours, pixel.id);
                 //set value of current slice to average of surrounding pixels
-                data[pos] = avg/(double)numNeighbours;
+                data[pos] = avg / (double) numNeighbours;
             }
         }
         return data;

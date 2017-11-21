@@ -1,5 +1,6 @@
 package fact.container;
 
+import com.google.common.collect.ForwardingSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
@@ -13,45 +14,56 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This is overlay can draw borders around the pixels passed to it via constructor or the add methods.
+ * This class implements a set like container for IACT Camera Pixels.
+ * It can also draw itself in the Viewer.
  */
-public class PixelSet implements CameraMapOverlay, Serializable {
+public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOverlay, Serializable, Iterable<CameraPixel> {
     public Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
+
+    public PixelSet() {}
 
     public PixelSet(HashSet<Integer> set) {
         for (Integer pix : set){
             this.addById(pix);
         }
     }
-    public PixelSet(Set<CameraPixel> set){
-        this.set = set;
+    public static PixelSet fromIDs(int[] chidArray) {
+        PixelSet pixelSet = new PixelSet();
+        for (int chid: chidArray){
+            pixelSet.addById(chid);
+        }
+        return pixelSet;
     }
-    public PixelSet(){
+
+    @Override
+    protected Set<CameraPixel> delegate() {
+        return set;
     }
-    public void add(CameraPixel p){
-        set.add(p);
-    }
+
     public void addById(int id){
         set.add(FactPixelMapping.getInstance().getPixelFromId(id));
     }
 
+    public boolean containsID(int id) {
+        return set.contains(FactPixelMapping.getInstance().getPixelFromId(id));
+    }
+
+    public boolean containsAllIDs(int[] ids) {
+        return set.containsAll(PixelSet.fromIDs(ids));
+    }
+
+
     public int[] toIntArray(){
-        int intSet[] = new int[this.set.size()];
-        int i = 0;
-        for (CameraPixel px : this.set){
-            intSet[i] = px.id;
-            i++;
-        }
-        return intSet;
+        return set.stream().mapToInt(p -> p.id).toArray();
     }
 
     public ArrayList<Integer> toArrayList(){
-        ArrayList<Integer> intSet = new ArrayList<Integer>();
+        ArrayList<Integer> chidArrayList = new ArrayList<Integer>();
         for (CameraPixel px : this.set){
-            intSet.add(px.id);
+            chidArrayList.add(px.id);
         }
-        return intSet;
+        return chidArrayList;
     }
 
     @Override
@@ -78,7 +90,8 @@ public class PixelSet implements CameraMapOverlay, Serializable {
     }
 
 	@Override
-	public int getDrawRank() {		
+	public int getDrawRank() {
 		return 1;
 	}
+
 }

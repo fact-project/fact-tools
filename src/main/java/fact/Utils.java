@@ -5,6 +5,7 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
@@ -19,8 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+
 /**
  *
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
@@ -112,35 +112,35 @@ public class Utils {
 	 *            the list to search in
 	 * @return A list of lists.
 	 */
-	public static ArrayList<ArrayList<Integer>> breadthFirstSearch(
-			List<Integer> showerPixel) {
-		ArrayList<ArrayList<Integer>> listOfLists = new ArrayList<>();
-		HashSet<Integer> marked = new HashSet<>();
-		FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+	public static ArrayList<PixelSet> breadthFirstSearch(PixelSet showerPixel) {
+        FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-		for (int pix : showerPixel) {
-			if (!marked.contains(pix)) {
+        PixelSet marked = new PixelSet();
+        ArrayList<PixelSet> clusters = new ArrayList<>();
+
+		for (CameraPixel pixel : showerPixel) {
+			if (!marked.contains(pixel)) {
 				// start BFS
-				marked.add(pix);
-				ArrayList<Integer> q = new ArrayList<Integer>();
-				q.add(pix);
+				marked.add(pixel);
+				ArrayList<CameraPixel> q = new ArrayList<>();
+				q.add(pixel);
+
 				// cannot use the enhanced for loop here.
-				for (int index = 0; index < q.size() && !q.isEmpty(); index++) {
+				for (int index = 0; index < q.size(); index++) {
 					// add neighbours to q
-					FactCameraPixel[] neighbors = pixelMap
-							.getNeighboursFromID(q.get(index));
-					for (FactCameraPixel i : neighbors) {
-						if (showerPixel.contains(i.id)
-								&& !marked.contains(i.id)) {
-							q.add(i.id);
-							marked.add(i.id);
+					FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(q.get(index));
+					for (FactCameraPixel neighbor : neighbors) {
+
+					    if (showerPixel.contains(neighbor) && !marked.contains(neighbor)) {
+							q.add(neighbor);
+							marked.add(neighbor);
 						}
 					}
 				}
-				listOfLists.add(q);
+				clusters.add(PixelSet.fromIDs(q.stream().mapToInt(p -> p.id).toArray()));
 			}
 		}
-		return listOfLists;
+		return clusters;
 	}
 
 	/**
@@ -204,14 +204,6 @@ public class Utils {
 		} else {
 			return null;
 		}
-	}
-
-	// returns true if the specified value is anywhere in the array
-	public static boolean arrayContains(int[] ar, int value) {
-		for (int anAr : ar) {
-			return anAr == value;
-		}
-		return false;
 	}
 
 	/**
