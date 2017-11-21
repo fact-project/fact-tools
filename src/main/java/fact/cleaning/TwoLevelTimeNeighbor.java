@@ -100,7 +100,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 			addLevelToDataItem(showerPixel, outputKey + "_level1", input);
 		}
 
-		showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
+		showerPixel = removeSmallCluster(showerPixel, minNumberOfPixel);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level2", input);

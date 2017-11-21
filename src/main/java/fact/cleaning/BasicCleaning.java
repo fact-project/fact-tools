@@ -94,7 +94,7 @@ public class BasicCleaning {
 				newShowerPixel.addAll(cluster);
 			}
 		}
-		return showerPixel;
+		return newShowerPixel;
 	}
 
 	/**
