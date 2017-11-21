@@ -298,7 +298,7 @@ public final class ZFITSHeapReader implements Reader {
         for (int i=0; i<numRows; i++){
             byte[] row = new byte[sizeCompressedRows[i]];
             buffer.get(row);
-            ByteBuffer rowBuffer = ByteBuffer.wrap(row);
+            ByteBuffer rowBuffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
             //currentPositionInBuffer += sizeCompressedRows[i];
 
 
