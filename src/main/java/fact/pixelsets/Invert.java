@@ -21,17 +21,13 @@ public class Invert implements Processor{
     static Logger log = LoggerFactory.getLogger(Invert.class);
 
     @Parameter(required = true, description = "key to the first set to be united")
-    private String insetKey;
+    String insetKey;
 
     @Parameter(required = true, description = "key to the output set which contains the inversion")
-    private String outsetKey;
+    String outsetKey;
 
     @Override
     public Data process(Data input) {
-
-        if (!input.containsKey(insetKey)) {
-            return input;
-        }
         Utils.isKeyValid(input, insetKey, PixelSet.class);
         PixelSet inset = (PixelSet) input.get(insetKey);
 
@@ -39,16 +35,11 @@ public class Invert implements Processor{
 
         PixelSet wholeCamSet = createFullCameraSet(npix);
 
-        try {
-            Sets.SetView<CameraPixel> inversion = Sets.difference(wholeCamSet.set, inset.set);
-            Set<CameraPixel> cameraPixels = inversion.immutableCopy();
+        Sets.SetView<CameraPixel> inversion = Sets.difference(wholeCamSet.set, inset.set);
 
-            PixelSet outset = new PixelSet(cameraPixels);
-
-            input.put(outsetKey, outset);
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
+        PixelSet outset = new PixelSet();
+        inversion.copyInto(outset.set);
+        input.put(outsetKey, outset);
 
         return input;
     }
@@ -59,13 +50,5 @@ public class Invert implements Processor{
             wholeCamSet.addById(pix);
         }
         return wholeCamSet;
-    }
-
-    public void setInsetKey(String insetKey) {
-        this.insetKey = insetKey;
-    }
-
-    public void setOutsetKey(String outsetKey) {
-        this.outsetKey = outsetKey;
     }
 }
