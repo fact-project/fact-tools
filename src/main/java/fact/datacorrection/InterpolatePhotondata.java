@@ -13,7 +13,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
-import streams.tikz.Pixel;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
