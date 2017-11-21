@@ -208,6 +208,9 @@ public final class ZFITSHeapReader implements Reader {
             // read the current block information
             BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
+            if (block.order.equals("C") && tile.numberOfRows!=1) {
+                throw new NotImplementedException("Column ordering with more than 1 row not supported for now.");
+            }
             int elementByteSize = column.type.byteSize*column.repeatCount;
             if (block.compression != BlockHeader.Compression.RAW && column.type != BinTable.ColumnType.SHORT) {
                 throw new NotImplementedException("Current Reader doesn't support compression other types than short");
@@ -486,11 +489,8 @@ public final class ZFITSHeapReader implements Reader {
             long size = buffer.getLong();
             String order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
 
-            if(! (order.equals("R") || order.equals("C")) ){
+            if(! (order.equals("R") || order.equals("C")) ) {
                 throw new IOException("Block header was not ordered by 'R' or 'C' but '" + order + "'");
-            }
-            if(order.equals("C")) {
-                throw new NotImplementedException("Column ordering not implemented yet");
             }
 
             byte numberOfProcessings = buffer.get();
