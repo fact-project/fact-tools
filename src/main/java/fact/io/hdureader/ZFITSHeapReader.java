@@ -216,12 +216,12 @@ public final class ZFITSHeapReader implements Reader {
                 throw new NotImplementedException("Current Reader doesn't support compression other types than short");
             }
             if (block.compression == BlockHeader.Compression.HUFFMAN) {
-                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteSize);
+                short[] shorts = blockHuffmanDecompression(tileBuffer, tile.numberOfRows, elementByteSize);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
             } else if (block.compression == BlockHeader.Compression.HUFFMAN_AND_SMOOTHING) {
-                short[] shorts = huffmanDecompression(tileBuffer, tile.numberOfRows, elementByteSize);
+                short[] shorts = blockHuffmanDecompression(tileBuffer, tile.numberOfRows, elementByteSize);
                 unsmooth(shorts);
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
@@ -255,6 +255,39 @@ public final class ZFITSHeapReader implements Reader {
     }
 
     /**
+     * Decompress a whole block of compressed huffman data
+     * @param buffer The buffer containing the block data
+     * @param numRows The amount of rows inside the block
+     * @param sizeSingleRow The decompressed size of a single Row
+     * @return The decompressed block data
+     */
+    private short[] blockHuffmanDecompression(ByteBuffer buffer, int numRows, int sizeSingleRow) throws IOException {
+        //read the sizes of the compressed rows
+        int[] sizeCompressedRows = new int[numRows];
+        for (int i=0; i<numRows; i++) {
+            sizeCompressedRows[i] = buffer.getInt();
+        }
+
+        //the finished product
+        short[] result = new short[sizeSingleRow*numRows];
+
+        for (int i=0; i<numRows; i++) {
+            // grab the row
+            byte[] row = new byte[sizeCompressedRows[i]];
+            buffer.get(row);
+            ByteBuffer rowBuffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
+
+            // decompress it
+            short[] decompressedRow = huffmanDecompression(rowBuffer);
+            if (decompressedRow.length!=sizeSingleRow) {
+                throw new IOException("The decompressed row has the wrong size: "+decompressedRow.length+", expected: "+ sizeSingleRow);
+            }
+            System.arraycopy(decompressedRow, 0, result, i*(sizeSingleRow/2), (sizeSingleRow/2));
+        }
+        return result;
+    }
+
+    /**
      * This methods starts by building a huffman tree from the symbol table in the data.
      * Once build it will be used to map code words to the symbols.
      * Here goes the code from huffman.h in FACT++ which describes how the symbol table is written to the data.
@@ -285,79 +318,60 @@ public final class ZFITSHeapReader implements Reader {
      *
      *
      * The raw data is stored as shorts. So one symbol is two bytes long.
-     * @param buffer the coplet tile buffer (with blockheaders, but without the tile headers.)
+     * @param rowBuffer the buffer only containing the huffman compressed row
      * @throws IOException in case the buffer ends before all bytes are read
      */
-    private short[] huffmanDecompression(ByteBuffer buffer, int numRows, int sizeSingleRow) throws IOException {
+    private short[] huffmanDecompression(ByteBuffer rowBuffer) throws IOException {
         //start reading the huffman tree definition
 
-        int[] sizeCompressedRows = new int[numRows];
-        for (int i=0; i<numRows; i++){
-            sizeCompressedRows[i] = buffer.getInt();
-        }
+        //its given as number of int16. nobody knows why. it says nowhere.
+        long numberOfShorts = rowBuffer.getLong();
+        short[] symbols = new short[Math.toIntExact(numberOfShorts)];
 
-        short[] result = new short[sizeSingleRow*numRows];
-        //int currentPositionInBuffer = buffer.position();
-        for (int i=0; i<numRows; i++){
-            byte[] row = new byte[sizeCompressedRows[i]];
-            buffer.get(row);
-            ByteBuffer rowBuffer = ByteBuffer.wrap(row).order(ByteOrder.LITTLE_ENDIAN);
-            //currentPositionInBuffer += sizeCompressedRows[i];
+        long numberOfSymbols = rowBuffer.getLong();
+
+        ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(rowBuffer, numberOfSymbols);
+
+        BitQueue q = new BitQueue();
+        ByteWiseHuffmanTree currentNode = huffmanTree;
 
 
-            //its given as number of int16. nobody knows why. it says nowhere.
-            long numberOfShorts = rowBuffer.getLong();
-            if (Math.toIntExact(numberOfShorts*2)!=sizeSingleRow) {
-                throw new ArithmeticException("Size of decompressed Data array is not as expected (is)!=(should): "+numberOfShorts+"!="+sizeSingleRow);
-            }
-            short[] symbols = new short[Math.toIntExact(numberOfShorts)];
+        int depth = 0;
+        int index = 0;
+        try {
+            while (index < numberOfShorts) {
 
-            long numberOfSymbols = rowBuffer.getLong();
-
-            ByteWiseHuffmanTree huffmanTree = constructHuffmanTreeFromBytes(rowBuffer, numberOfSymbols);
-
-            BitQueue q = new BitQueue();
-            ByteWiseHuffmanTree currentNode = huffmanTree;
-
-
-            int depth = 0;
-            int index = 0;
-            try {
-                while (index < numberOfShorts) {
-
-                    if(q.queueLength < 16) {
-                        if (rowBuffer.remaining() >= 2) {
-                            q.addShort(rowBuffer.getShort());
-                        } else if (rowBuffer.remaining() == 1) {
-                            q.addByte(rowBuffer.get());
-                            q.addByte((byte) 0);
-                        }else if (rowBuffer.remaining() == 0) {
-                            q.addShort((short) 0);
-                        }
-                    }
-
-                    ByteWiseHuffmanTree node = currentNode.children[q.peekByte()];
-                    if (node.isLeaf) {
-                        symbols[index] = node.payload.symbol;
-                        index++;
-                        q.remove(node.payload.codeLengthInBits - depth*8);
-
-                        //reset traversal to root node.
-                        depth = 0;
-                        currentNode = huffmanTree;
-
-                    } else {
-                        currentNode = node;
-                        depth++;
-                        q.remove(8);
+                if(q.queueLength < 16) {
+                    if (rowBuffer.remaining() >= 2) {
+                        q.addShort(rowBuffer.getShort());
+                    } else if (rowBuffer.remaining() == 1) {
+                        q.addByte(rowBuffer.get());
+                        q.addByte((byte) 0);
+                    }else if (rowBuffer.remaining() == 0) {
+                        q.addShort((short) 0);
                     }
                 }
-            } catch (BufferUnderflowException e){
-                log.error("compressed size was: {}, number of symbols was {}", sizeCompressedRows[i], numberOfSymbols);
+
+                ByteWiseHuffmanTree node = currentNode.children[q.peekByte()];
+                if (node.isLeaf) {
+                    symbols[index] = node.payload.symbol;
+                    index++;
+                    q.remove(node.payload.codeLengthInBits - depth*8);
+
+                    //reset traversal to root node.
+                    depth = 0;
+                    currentNode = huffmanTree;
+
+                } else {
+                    currentNode = node;
+                    depth++;
+                    q.remove(8);
+                }
             }
-            System.arraycopy(symbols, 0, result, i*(sizeSingleRow/2), (sizeSingleRow/2));
+        } catch (BufferUnderflowException e){
+            log.error("compressed size was: {}, number of symbols was {}", rowBuffer.array().length, numberOfSymbols);
         }
-        return result;
+        return symbols;
     }
 
     /**
@@ -474,6 +488,10 @@ public final class ZFITSHeapReader implements Reader {
             this.headerSize = sizeHeader;
         }
 
+        /**
+         * Returns the size of the data that are contained in this block
+         * @return the data size of this block
+         */
         public long getDataSize() {
             return this.size-this.headerSize;
         }
