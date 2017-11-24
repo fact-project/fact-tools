@@ -1,6 +1,7 @@
 package fact;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fact.io.hdureader.FITSStream;
 import stream.Data;
 import stream.io.SourceURL;
@@ -88,7 +89,7 @@ public class ZFitsTester {
             fileInfos.add(info);
         }
 
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         String output = gson.toJson(fileInfos);
 
 
