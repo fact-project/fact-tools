@@ -66,6 +66,7 @@ public final class ZFITSHeapReader implements Reader {
     private final DataInputStream stream;
     private final DataInputStream catalogStream;
     private final int zshrink;
+    private final int zTileLen;
     private final List<BinTable.TableColumn> columns;
     private final Integer numberOfRowsInTable;
     private int numberOfRowsRead = 0;
@@ -97,6 +98,7 @@ public final class ZFITSHeapReader implements Reader {
         this.columns = binTable.columns;
         this.catalogStream = binTable.tableDataStream;
         this.zshrink = binTable.getHeader().getInt("ZSHRINK").orElse(1);
+        this.zTileLen = binTable.getHeader().getInt("ZTILELEN").orElse(1);
     }
 
 
@@ -128,11 +130,12 @@ public final class ZFITSHeapReader implements Reader {
     public void skipToRow(int num) throws IOException {
         //calc zshrink problem
         //num = num+1;
-        int numSkip = num-(num%zshrink); // the amount we can skip in the catalog due to zshrink
-        int numRowsSkip = num - numSkip; // num%zshrink works too, the amount we have to skip with getNext
+        int numRowsSkip = num%(zshrink*zTileLen);   // works too, the amount we have to skip with getNext
+        int numSkip = num-numRowsSkip; // the number of rows that can be skipped
+        int numTileSkip = numSkip/zshrink/zTileLen; // the amout of tiles we can skip
 
         int colCount = columns.size();
-        long skipBytes = colCount*numSkip*(16)+8;//skip additinal 8 to get directly to the offset
+        long skipBytes = colCount*numTileSkip*(16)+8;//skip additinal 8 to get directly to the offset
 
         // the catalog points to the first column so substract 16 to get to the tileheader
         long skiped = this.catalogStream.skip(skipBytes);
