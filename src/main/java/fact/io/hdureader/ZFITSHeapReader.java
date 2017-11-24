@@ -536,7 +536,7 @@ public final class ZFITSHeapReader implements Reader {
                     compression = Compression.RAW;
                     break;
             }
-            // size(8 Bytes)+order(1 Bytes)+numberOfProcessings(1 Bytes)+Prozessings(2 Bytes*numberOfProcessings)
+            // size(8 Bytes)+order(1 Bytes)+numberOfProcessings(1 Bytes)+Processings(2 Bytes*numberOfProcessings)
             long sizeHeader = 8+1+1+(numberOfProcessings*2);
             return new BlockHeader(size, order, compression, sizeHeader);
         }
