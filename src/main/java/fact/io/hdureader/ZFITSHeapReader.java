@@ -279,8 +279,8 @@ public final class ZFITSHeapReader implements Reader {
 
             // decompress it
             short[] decompressedRow = huffmanDecompression(rowBuffer);
-            if (decompressedRow.length!=sizeSingleRow) {
-                throw new IOException("The decompressed row has the wrong size: "+decompressedRow.length+", expected: "+ sizeSingleRow);
+            if (decompressedRow.length*2!=sizeSingleRow) {
+                throw new IOException("The decompressed row has the wrong size: "+decompressedRow.length*2+", expected: "+ sizeSingleRow);
             }
             System.arraycopy(decompressedRow, 0, result, i*(sizeSingleRow/2), (sizeSingleRow/2));
         }
