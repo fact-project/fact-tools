@@ -46,8 +46,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
                     " (Exp: prependKey='Noise_', 'ZdPointing'->'Noise_ZdPointing'")
     private String prependKey = "";
 
-    @Parameter(required = true, description = "The condition for the noise which will be used")
-    private String noiseCondition;
+    @Parameter(required = false, description = "The condition for the noise which will be used")
+    private String noiseCondition ="";
     private Condition condition;
 
     @Parameter(required = true, description="The binning of the zenith-angle. If single value: steplenght, bins into the given steplength"+
@@ -203,6 +203,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
             }
             item = fits.readNext();
         } catch (Exception e) {
+            log.error("Couldn't read file: "+fullpath);
             throw new RuntimeException(e);
         }
 
@@ -227,9 +228,11 @@ public class SamplePedestalEvent implements StatefulProcessor {
             databaseStream.init();
 
             for(Data item = databaseStream.readNext(); item!=null; item = databaseStream.readNext()) {
-                Boolean b = (Boolean)this.condition.get(item);
-                if (b == null? false : !b.booleanValue()) // if condition doesn't applies ignore element
-                    continue;
+                if (this.condition!=null) {
+                    Boolean b = (Boolean) this.condition.get(item);
+                    if (b == null ? false : !b.booleanValue()) // if condition doesn't applies ignore element
+                        continue;
+                }
                 // add the entry into the database
                 this.database.add(item);
                 // add index to the correct bin_index
