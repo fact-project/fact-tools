@@ -2,12 +2,13 @@
 
 # executes the ZFitsTester with a random set of files from the rawfolder
 
-if [ "$#" -ne 2 ]; then
-    echo "Illegal number of parameters, expects: rawfolder (eg: /fact/raw) and amount (eg: 100)"
+if [ "$#" -ne 3 ]; then
+    echo "Illegal number of parameters, expects: jar-file (fact-tools) rawfolder (eg: /fact/raw) and amount (eg: 100)"
     exit
 fi
 
-rawFolder=$1
+target=$1
+rawFolder=$2
 
 if [ ! -d "$rawFolder" ]; then
   echo $rawFolder is not a folder
@@ -15,8 +16,10 @@ if [ ! -d "$rawFolder" ]; then
   exit
 fi
 
-amount=$2
+amount=$3
 
+
+echo using fact-tools: $target
 echo Getting Zfits Files out of: $rawFolder
 echo Getting $amount random files
 
@@ -25,5 +28,5 @@ FILES=( $rawFolder/*/*/*/*.fits.fz )
 FILES=$(printf "%s\n" ${FILES[@]} | sort -R | head -n $amount)
 
 # execute the tester
-java -cp target/fact-tools-0.18.1-SNAPSHOT.jar fact.ZFitsTester ${FILES}
+java -cp $target fact.ZFitsTester ${FILES}
 
