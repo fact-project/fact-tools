@@ -1,5 +1,6 @@
 package fact;
 
+import com.google.gson.Gson;
 import fact.io.hdureader.FITSStream;
 import stream.Data;
 import stream.io.SourceURL;
@@ -30,10 +31,6 @@ public class ZFitsTester {
         public void setError(String errorMsg) {
             this.status = "ERROR";
             this.info = errorMsg;
-        }
-
-        public String getJSON() {
-            return "{ \"filename\": \""+filename+"\", \"status\": \""+status+"\", \"info\": \""+info+"\" }";
         }
     }
 
@@ -79,7 +76,7 @@ public class ZFitsTester {
                 }
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
-                errorMsg += "STACK[";
+                errorMsg += ", STACK[";
                 errorMsg += getStackTrace(e);
                 errorMsg += "]STACK";
                 info.setError(errorMsg);
@@ -91,9 +88,8 @@ public class ZFitsTester {
             fileInfos.add(info);
         }
 
-        String output = "[\n";
-        output += String.join(",\n" , fileInfos.stream().map(x -> x.getJSON()).collect(Collectors.toList()));
-        output += "\n]\n";
+        Gson gson = new Gson();
+        String output = gson.toJson(fileInfos);
 
 
         try {
