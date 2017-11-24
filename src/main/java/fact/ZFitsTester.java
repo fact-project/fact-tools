@@ -91,12 +91,12 @@ public class ZFitsTester {
         }
 
         String output = "[\n";
-        output += String.join("," , fileInfos.stream().map(x -> x.getJSON()).collect(Collectors.toList()));
-        output += "]\n";
+        output += String.join(",\n" , fileInfos.stream().map(x -> x.getJSON()).collect(Collectors.toList()));
+        output += "\n]\n";
 
 
         try {
-            Files.write(Paths.get("filetestoutput.json"), output.getBytes(), StandardOpenOption.CREATE);
+            Files.write(Paths.get("filetestoutput.json"), output.getBytes());
         } catch (IOException e) {
             System.out.println("Error writing file");
             e.printStackTrace();
