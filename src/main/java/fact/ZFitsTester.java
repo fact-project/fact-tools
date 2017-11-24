@@ -50,6 +50,7 @@ public class ZFitsTester {
 
         // process each file
         for (String arg: args) {
+            System.out.println("Process: '"+arg+"'");
             File currentTestFile = new File(arg);
             String filename = currentTestFile.getName();
             FileInfo info = new FileInfo(filename, "IN WORK", "");
