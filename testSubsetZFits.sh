@@ -9,7 +9,7 @@ fi
 
 rawFolder=$1
 
-if [ -d "$rawFolder" ]; then
+if [ ! -d "$rawFolder" ]; then
   echo $rawFolder is not a folder
   echo Stopping
   exit
@@ -20,9 +20,10 @@ amount=$2
 echo Getting Zfits Files out of: $rawFolder
 echo Getting $amount random files
 
+FILES=( $rawFolder/*/*/*/*.fits.fz )
 # get the required amount of random files
-FILES=$(ls $rawFolder/*/*/*/*.fits.?z | sort -R | head -n $amount)
+FILES=$(printf "%s\n" ${FILES[@]} | sort -R | head -n $amount)
 
 # execute the tester
-java -cp target/fact-tools-0.18.1-SNAPSHOT.jar fact.ZFitsTester $FILES
+java -cp target/fact-tools-0.18.1-SNAPSHOT.jar fact.ZFitsTester ${FILES}
 
