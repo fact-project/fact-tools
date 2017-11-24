@@ -8,6 +8,7 @@
     
     <property name="noiseDB" value="file:/home/mbulinski/noise.db" />
     <property name="dataFolder" value="/fhgfs/groups/app/fact/raw/" />
+    <property name="drstime" value="file:classpath:/long_term_constants_median.time.drs.fits"/>
     
     <property name="patchJumpRemoval_jumpLimit" value="2.0" />
 
@@ -47,7 +48,7 @@
         
         
 	<!-- Sample Pedestal Event and calibrate it -->	
-		<fact.utils.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}" dbBinningKey="Zd" itemBinningKey="MPointingPos.fZd" binning="4" noiseCondition="%{data.currents} &lt; 30 "/>
+		<fact.utils.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}" dbBinningKey="Zd" itemBinningKey="MPointingPos.fZd" binning="2"/>
     
         <fact.datacorrection.DrsCalibration
                 drsKey="LONS_drspath"
@@ -74,7 +75,7 @@
         />
 	
         <fact.filter.DrsTimeCalibration
-		url="file:/home/mbulinski/fact-tools/src/main/resources/long_term_constants_median.time.drs.fits"
+                url="${drstime}"
                 outputKey="LONS_timeCalibConst"
                 startCellkey="LONS_StartCellData"
                 dataKey="LONS_DataCalibrated"
