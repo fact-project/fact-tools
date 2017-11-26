@@ -15,7 +15,7 @@ import stream.annotations.Parameter;
 /**
  * This processors changes the order of the pixels in the data from SoftId to Chid
  *
- * @author kai
+ * @author kai , Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
  *
  */
 public class Remapping implements Processor{
@@ -23,6 +23,9 @@ public class Remapping implements Processor{
 
     @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
     private String key;
+
+    @Parameter(required = false, description = "Whether to remap back to softid from chid")
+    private boolean reverse;
 
     @Parameter(required = true)
     private String outputKey;
@@ -38,8 +41,10 @@ public class Remapping implements Processor{
         npix = (Integer) input.get("NPIX");
 
         short[] remapped = new short[data.length];
-        remapFromSoftIdToChid(data, remapped);
-
+        if (!reverse)
+            remapFromSoftIdToChid(data, remapped);
+        else
+            remapFromChidToSoftId(data, remapped);
         input.put(outputKey, remapped);
         return input;
     }
@@ -52,10 +57,21 @@ public class Remapping implements Processor{
         }
     }
 
+    public void remapFromChidToSoftId(short[] data, short[] remapped) {
+        int roi = data.length/ npix;
+        for(int softId = 0; softId < npix; softId++){
+            int chid = FactPixelMapping.getInstance().getSoftIDFromChid(softId);
+            System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
+        }
+    }
+
     public void setKey(String key) {
         this.key = key;
     }
 
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
+    }
 
     public void setOutputKey(String outputkey) {
         this.outputKey = outputkey;

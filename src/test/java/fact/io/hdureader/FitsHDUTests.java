@@ -1,6 +1,8 @@
 package fact.io.hdureader;
 
 import org.junit.Test;
+import stream.io.SourceURL;
+import stream.Data;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -31,6 +33,61 @@ public class FitsHDUTests {
 
     }
 
+    @Test
+    public void testBinTableReaderSkip() throws Exception {
+        URL u = FitsHDUTests.class.getResource("/testDataFile.fits.gz");
+        FITSStream fits = new FITSStream(new SourceURL(u));
+        fits.init();
+        FITSStream fits2 = new FITSStream(new SourceURL(u));
+        fits2.init();
+        //read 3
+        fits.readNext();
+        fits.readNext();
+        Data item = fits.readNext();
+
+        Reader reader = fits2.getReader();
+        reader.skipToRow(2);
+        Data item2 = fits2.readNext();
+
+
+        int eNr = (int)item.get("EventNum");
+        int eNr2 = (int)item2.get("EventNum");
+        assertEquals(eNr, eNr2);
+
+        short[] data = (short[])item.get("Data");
+        short[] data2 = (short[])item2.get("Data");
+        assertArrayEquals(data, data2);
+    }
+
+    @Test
+    public void testZFitsReaderSkip() throws Exception {
+        for(int i=0; i<5; i++) {
+            System.out.println("Test skip: "+i);
+            URL u = FitsHDUTests.class.getResource("/testDataFile.fits.fz");
+            FITSStream fits = new FITSStream(new SourceURL(u));
+            fits.init();
+            FITSStream fits2 = new FITSStream(new SourceURL(u));
+            fits2.init();
+            //read 3
+            for (int j=0;j<i;j++) {
+                fits.readNext();
+            }
+            Data item = fits.readNext();
+
+            Reader reader = fits2.getReader();
+            reader.skipToRow(i);
+            Data item2 = fits2.readNext();
+
+
+            int eNr = (int) item.get("EventNum");
+            int eNr2 = (int) item2.get("EventNum");
+            assertEquals(eNr, eNr2);
+
+            short[] data = (short[]) item.get("Data");
+            short[] data2 = (short[]) item2.get("Data");
+            assertArrayEquals(data, data2);
+        }
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test

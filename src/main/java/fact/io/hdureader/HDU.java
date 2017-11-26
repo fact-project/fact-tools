@@ -113,11 +113,7 @@ public class HDU {
      * @return the number of bytes to skip to hte next hdu.
      */
     long offsetToNextHDU(){
-        if(sizeOfDataArea() == 0){
-            return 0;
-        }
-        long numberOfBlocks = sizeOfDataArea() / 2880;
-        return 2880 * numberOfBlocks + 2880;
+        return ((sizeOfDataArea()+2879)/2880)*2880;
     }
 
     /**

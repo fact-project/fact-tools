@@ -157,14 +157,14 @@ public class SourcePosition implements StatefulProcessor {
             data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
             data.put(outputKey, source);
 
-            data.put("AzTracking", 0);
-            data.put("ZdTracking", 0);
+            data.put("AzTracking", (double)0);
+            data.put("ZdTracking", (double)0);
 
-            data.put("AzPointing", 0);
-            data.put("ZdPointing", 0);
+            data.put("AzPointing", (double)0);
+            data.put("ZdPointing", (double)0);
 
-            data.put("AzSourceCalc", 0);
-            data.put("ZdSourceCalc", 0);
+            data.put("AzSourceCalc", (double)0);
+            data.put("ZdSourceCalc", (double)0);
             return data;
         }
 

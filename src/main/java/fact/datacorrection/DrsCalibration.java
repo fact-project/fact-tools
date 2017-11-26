@@ -3,6 +3,7 @@
  */
 package fact.datacorrection;
 
+import fact.Utils;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
@@ -26,19 +27,30 @@ import java.net.URL;
  * either as File or URL and will read the DRS data from that. This data is then
  * applied to all FactEvents processed by this class.
  *
- * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
+ * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt; , Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
  */
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
+	@Parameter(required = false, description = "The data key that will hold the resulting data array.")
 	public String outputKey = "DataCalibrated";
 
     @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
 	private String key = "Data";
 
+	@Parameter(required = false, description = "Key to the StartCellData.")
+	private String startCellKey = "StartCellData";
+
     @Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
 	public URL url = null;
+
+	@Parameter(required = false, description = "The name of the key that holds the drs filename.",
+			defaultValue = "@drsFile")
+	private String drsKey = "@drsFile";
+
+	@Parameter(required =  false, description = "Whether to reverse the process.", defaultValue = "false")
+	private boolean reverse = false;
 
     Data drsData = null;
 
@@ -85,10 +97,9 @@ public class DrsCalibration implements StatefulProcessor {
 			this.drsTriggerOffsetRms = row.getFloatArray("TriggerOffsetRms").orElseThrow( ()-> new RuntimeException("File does not contain key TriggerOffsetRms"));
 			this.drsGainMean = row.getFloatArray("GainMean").orElseThrow( ()-> new RuntimeException("File does not contain key GainMean"));
 			this.drsGainRms = row.getFloatArray("GainRms").orElseThrow( ()-> new RuntimeException("File does not contain key GainRms"));
-
 		}catch(IOException e)
 		{
-			new IOException(e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		}
 
 	}
@@ -101,7 +112,7 @@ public class DrsCalibration implements StatefulProcessor {
 
         if( this.url == null){
 			//file not loaded yet. try to find by magic.
-            File drsFile = (File) data.get("@drsFile");
+            File drsFile = (File) data.get(drsKey);
             if( drsFile != null){
                 if (!drsFile.equals(currentDrsFile)) {
                     currentDrsFile = drsFile;
@@ -110,6 +121,7 @@ public class DrsCalibration implements StatefulProcessor {
                         loadDrsData(drsFile.toURI().toURL());
                     } catch (MalformedURLException e) {
                         //pass.
+						throw new RuntimeException("URL malformed");
                     }
                 }
             } else {
@@ -117,45 +129,60 @@ public class DrsCalibration implements StatefulProcessor {
             }
 		}
 
+		double[] rawfloatData;
 		log.debug("Processing Data item by applying DRS calibration...");
-		short[] rawData = (short[]) data.get(key);
-		if (rawData == null) {
-			log.error(" data .fits file did not contain the value for the key "
-					+ key + ". cannot apply drscalibration");
-			throw new RuntimeException(
-					" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
+        if (!reverse) {
+			short[] rawData = (short[]) data.get(key);
+			if (rawData == null) {
+				log.error(" data .fits file did not contain the value for the key "
+						+ key + ". cannot apply drscalibration");
+				throw new RuntimeException(
+						" data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
+			}
+
+			rawfloatData = new double[rawData.length];
+			// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
+			for (int i = 0; i < rawData.length; i++) {
+				rawfloatData[i] = rawData[i];
+			}
+		} else {
+			Utils.isKeyValid(data, key, double[].class);
+			rawfloatData = (double[]) data.get(key);
 		}
 
-		double[] rawfloatData = new double[rawData.length];
-		// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
-		for (int i = 0; i < rawData.length; i++) {
-			rawfloatData[i] = rawData[i];
-		}
-
-		short[] startCell = (short[]) data.get("StartCellData");
+		short[] startCell = (short[]) data.get(startCellKey);
 		if (startCell == null) {
 			log.error(" data .fits file did not contain startcell data. cannot apply drscalibration");
 			return null;
 		}
-		log.debug("raw data has {} elements", rawData.length);
+		log.debug("raw data has {} elements", rawfloatData.length);
 		log.debug("StartCellData has {} elements", startCell.length);
 
 		double[] output = rawfloatData;
 		if (!key.equals(outputKey)) {
-			output = new double[rawData.length];
+			output = new double[rawfloatData.length];
 		}
 
 		double[] calibrated = applyDrsCalibration(rawfloatData, output,
-				startCell);
-		data.put(outputKey, calibrated);
+				startCell, reverse);
+		if (!reverse)
+			data.put(outputKey, calibrated);
+		else {
+			short[] decalibratedShortData = new short[calibrated.length];
+			// System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
+			for (int i = 0; i < calibrated.length; i++) {
+				decalibratedShortData[i] = (short)calibrated[i];
+			}
+			data.put(outputKey, decalibratedShortData);
+		}
 
-		// add color value if set
+		//TODO add color value if set
 
 		return data;
 	}
 
 	public double[] applyDrsCalibration(double[] data, double[] destination,
-			short[] startCellVector) {
+			short[] startCellVector, boolean reverse_calibration) {
 
 		if (destination == null || destination.length != data.length)
 			destination = new double[data.length];
@@ -245,11 +272,21 @@ public class DrsCalibration implements StatefulProcessor {
 				triggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
 						+ slice;
 
-				vraw = data[pos] * dconv;
-				vraw -= drsBaselineMean[offsetPos];
-				vraw -= drsTriggerOffsetMean[triggerOffsetPos];
-				vraw /= drsGainMean[offsetPos];
-				vraw *= 1907.35;
+				if (!reverse_calibration) {
+					vraw = data[pos];
+					vraw *= dconv;
+					vraw -= drsBaselineMean[offsetPos];
+					vraw -= drsTriggerOffsetMean[triggerOffsetPos];
+					vraw /= drsGainMean[offsetPos];
+					vraw *= 1907.35;
+				} else {
+					vraw = data[pos];
+					vraw /= 1907.35;
+					vraw *= drsGainMean[offsetPos];
+					vraw += drsTriggerOffsetMean[triggerOffsetPos];
+					vraw += drsBaselineMean[offsetPos];
+					vraw /= dconv;
+				}
 
 				// slice_pt = pixel_pt + sl;
 				// drs_cal_offset = ( sl + StartCellVector[ pixel ] ) %
@@ -296,5 +333,15 @@ public class DrsCalibration implements StatefulProcessor {
 
 
 
+	public void setReverse(boolean b) {
+		this.reverse = b;
+	}
 
+	public void setDrsKey(String drsKey) {
+		this.drsKey = drsKey;
+	}
+
+	public void setStartCellKey(String startCellKey) {
+		this.startCellKey = startCellKey;
+	}
 }

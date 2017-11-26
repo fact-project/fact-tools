@@ -1,0 +1,114 @@
+<container>
+    <properties url="classpath:/default/settings_mc.properties" />
+    
+    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    
+    
+    <property name="noiseDB" value="file:/home/mbulinski/noise.db" />
+    <property name="dataFolder" value="/fhgfs/groups/app/fact/raw/" />
+    <property name="drstime" value="file:classpath:/long_term_constants_median.time.drs.fits"/>
+    
+    <property name="patchJumpRemoval_jumpLimit" value="2.0" />
+
+    <!--In case you want to analyze .zfits files.-->
+    <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
+        <stream class="fact.io.hdureader.FITSStream" id="fact" />
+	</stream>
+
+    <process id="1" input="fact">
+		<fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+        />
+        <fact.utils.RemappingKeys
+                keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+        />
+
+        <fact.datacorrection.DrsCalibration
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+        />
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
+        
+        
+	<!-- Sample Pedestal Event and calibrate it -->	
+		<fact.utils.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}" dbBinningKey="Zd" itemBinningKey="MPointingPos.fZd" binning="2"/>
+    
+        <fact.datacorrection.DrsCalibration
+                drsKey="LONS_drspath"
+                key="LONS_Data"
+                outputKey="LONS_DataCalibrated"
+                startCellKey="LONS_StartCellData"
+        />
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="LONS_DataCalibrated"
+                outputKey="LONS_DataCalibrated"
+                prevEventsKey="LONS_prevEvents"
+                startCellKey="LONS_StartCellData"
+		unixTimeKey="LONS_UnixTimeUTC"
+                jumpLimit="${patchJumpRemoval_jumpLimit}"
+        />
+         <fact.datacorrection.RemoveSpikes
+                dataKey="LONS_DataCalibrated"
+                outputKey="LONS_DataCalibrated"
+                startCellKey="LONS_StartCellData"
+                leftBorder="${removeSpikes_leftBorder}"
+                spikeLimit="${removeSpikes_spikeLimit}"
+                topSlopeLimit="${removeSpikes_topSlopeLimit}"
+                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+        />
+	
+        <fact.filter.DrsTimeCalibration
+                url="${drstime}"
+                outputKey="LONS_timeCalibConst"
+                startCellkey="LONS_StartCellData"
+                dataKey="LONS_DataCalibrated"
+                drsTimeKey="CellOffset"
+        />
+
+        <fact.filter.ArrayTimeCorrection
+                dataKey="LONS_DataCalibrated"
+                timeCalibConstKey="LONS_timeCalibConst"
+                outputKey="LONS_DataCalibrated"
+        />
+
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="LONS_DataCalibrated"
+                dataOutputKey="LONS_DataCalibrated"
+                badPixelKey="LONS_badPixel"
+                unixTimeKey="LONS_UnixTimeUTC"
+        />
+    
+		<fact.utils.CombineDataArrays firstArrayKey="DataCalibrated" secondArrayKey="LONS_DataCalibrated" outputKey="DataCalibrated" op="add"/>
+        
+         <fact.datacorrection.DrsCalibration
+                key="DataCalibrated"
+                outputKey="Data"
+                reverse="true"
+        />
+        <fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+                reverse="True"
+        />
+
+		<fact.io.FITSWriter url="${output}" keys="Data,StartCellData,NIGHT,RUNID,UnixTimeUTC, LONS_currents,LONS_NIGHT,LONS_RUNID,LONS_eventNr,LONS_Zd,LONS_UnixTimeUTC,MPointingPos.fZd,MPointingPos.fAd,MSimSourcePos.fZd,MSimSourcePos.fAd"/>
+    </process>
+</container>
