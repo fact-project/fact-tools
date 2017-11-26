@@ -18,6 +18,7 @@ import stream.io.JSONStream;
 import stream.io.SourceURL;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -79,7 +80,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
         }
         int rand = this.randGenerator.nextInt(sampleSize);
         int index = this.bins_index.get(binNum).get(rand);
-        Data item = this.getNoiseEvent(index);
+        Data item = null;
+        try {
+            item = this.getNoiseEvent(index);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // insert the result into the input item
         for (String s : item.keySet()) {
             input.put(this.prependKey+s, item.get(s));
@@ -105,8 +111,11 @@ public class SamplePedestalEvent implements StatefulProcessor {
             for (int i=0; i<numBins; i++) {
                 this.bins[i] = steplength*(i+1);
             }
-        } else {
-            //this.bins = this.binning;
+        } else { // each number describs the right value of the bin 0 not included
+            this.bins = new double[this.binning.length];
+            for (int i=0; i<this.binning.length; i++) {
+                this.bins[i] = Double.parseDouble(this.binning[i]);
+            }
         }
     }
 
@@ -115,6 +124,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
         this.seed = seed;
     }
 
+    /**
+     * Creates the fact path from the night and runID excluding the extension
+     * @param night
+     * @param runID
+     * @return the constructed path
+     */
     private String createPathFromNightAndRunId(int night, int runID) {
         String nightStr = String.format("%d", night);
         String year = nightStr.substring(0,4);
@@ -123,6 +138,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
         return String.format("%s/%s/%s/%d_%03d", year, month, day, night, runID);
     }
 
+    /**
+     * Constructs the full filename of a fact path and test if it exists.
+     * Makes also sure the extension is correct
+     * @param fullpath
+     * @return
+     */
     private String getPathWithExt(String fullpath) {
         // test .fz
         File noiseFile = new File(fullpath+".fits.fz");
@@ -137,6 +158,14 @@ public class SamplePedestalEvent implements StatefulProcessor {
         throw new RuntimeException("Couldn't find data file: "+fullpath+".fits.*");
     }
 
+    /**
+     * Creates the path to the drs file and checks whether it exists
+     * @param startFolder
+     * @param night
+     * @param drs0
+     * @param drs1
+     * @return
+     */
     private String getDrsPath(String startFolder, int night, int drs0, int drs1) {
         String drspath = String.format("%s/%s.drs.fits.gz", startFolder, createPathFromNightAndRunId(night, drs0));
         File drsFile = new File(drspath);
@@ -152,7 +181,14 @@ public class SamplePedestalEvent implements StatefulProcessor {
         throw new RuntimeException("Couldn't find drs file: "+drspath+".*");
     }
 
-    private Data getNoiseEvent(int index) {
+    /**
+     * Given the index within the database read the pedestal with all the necessary information.
+     *
+     * @param index
+     * @return
+     * @throws IOException
+     */
+    private Data getNoiseEvent(int index) throws IOException {
         Data dbItem = this.database.get(index);
         int night = (int)dbItem.get("NIGHT");
         int runid = (int)dbItem.get("RUNID");
@@ -161,11 +197,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
         int drs1 = (int)dbItem.get("drs1");
         double currents = (double)dbItem.get("currents");
         String source = (String)dbItem.get("source");
-        //String filename = (String)dbItem.get("filename");
-        //String fullpath = this.noiseFolder+"/"+filename;
+
+        //get the path to the file containing the event
         String fullpath = this.dataFolder+"/"+createPathFromNightAndRunId(night, runid);
         fullpath = getPathWithExt(fullpath);
 
+        //get the path to the drs file containing the drs information
         String drsPath = getDrsPath(this.dataFolder, night, drs0, drs1);
 
         Data item;
@@ -175,10 +212,11 @@ public class SamplePedestalEvent implements StatefulProcessor {
             fits.init();
             //calculate how many previous events should be read
             int prevEventsCount = 20;
-            int startPrevEvents = noiseNr - prevEventsCount;
+            int noiseNrStartZero = noiseNr - 1; // the noise number starts with 1 but we need start with 0
+            int startPrevEvents = noiseNrStartZero - prevEventsCount;
             if (startPrevEvents<0) {
                 startPrevEvents = 0;
-                prevEventsCount = noiseNr;
+                prevEventsCount = noiseNrStartZero;
             }
             fits.getReader().skipToRow(startPrevEvents);
             for (int i=0; i<prevEventsCount; i++) {
@@ -207,6 +245,10 @@ public class SamplePedestalEvent implements StatefulProcessor {
             throw new RuntimeException(e);
         }
 
+        if (item==null) {
+            log.error("Couldn't read the pedestal item, nr: '"+noiseNr+"' file: "+fullpath);
+            throw new IOException("Couldn't read the pedestal item");
+        }
         item.put("source", source);
         item.put("currents", currents);
         item.put("noiseNr", noiseNr);
