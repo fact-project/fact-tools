@@ -257,7 +257,9 @@ public class SamplePedestalEvent implements StatefulProcessor {
         return item;
     }
 
-    //load the database and apply the condition and binning
+    /**
+     * load the database and apply the condition and binning
+     */
     private void prepareNoiseDatabase() {
         this.database = new ArrayList<Data>(100000);
         this.bins_index = new ArrayList<List<Integer>>(this.bins.length);
@@ -294,6 +296,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
         }
     }
 
+    /**
+     * Given a value data, calculate the bin it would end up in.
+     *
+     * @param data
+     * @return
+     */
     private int getBin(double data) {
         int i=0;
         while(i<this.bins.length) {
