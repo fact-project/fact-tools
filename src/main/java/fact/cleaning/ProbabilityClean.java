@@ -2,6 +2,7 @@ package fact.cleaning;
 
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -16,67 +17,60 @@ import java.util.ArrayList;
 public class ProbabilityClean extends BasicCleaning implements Processor {
 
 	private String photonChargeKey = null;
-	
+
 	private String outputKey = null;
-	
+
 	private String deltaKey = null;
 	private String cogxKey = null;
 	private String cogyKey = null;
-	
+
 	private double probabilityThreshold;
-	
+
 	private double distanceCoeff = 1.0;
 	private double distanceExp = -1.0;
-	
+
 	private double[] photoncharge = null;
 	private double delta;
 	private double cogx;
 	private double cogy;
-	
+
 	private int npix;
-	
+
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-	
+
 	@Override
 	public Data process(Data input) {
 		Utils.isKeyValid(input, "NPIX", Integer.class);
 		npix = (Integer) input.get("NPIX");
 		Utils.mapContainsKeys(input, photonChargeKey, deltaKey);
-		
+
 		photoncharge = (double[]) input.get(photonChargeKey);
-		
+
 		delta = (Double) input.get(deltaKey);
-		
+
 		cogx = (Double) input.get(cogxKey);
 		cogy = (Double) input.get(cogyKey);
-		
-		ArrayList<Integer> showerlist = new ArrayList<Integer>();
-		
-		for (int px = 0 ; px < npix ; px++)
+
+		PixelSet showerSet = new PixelSet();
+
+		for (int chid = 0 ; chid < npix ; chid++)
 		{
-			double xpos = pixelMap.getPixelFromId(px).getXPositionInMM();
-			double ypos = pixelMap.getPixelFromId(px).getYPositionInMM();
+			FactCameraPixel pixel = pixelMap.getPixelFromId(chid);
+			double xpos = pixel.getXPositionInMM();
+			double ypos = pixel.getYPositionInMM();
 			double dist = Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, xpos, ypos);
-			double weight = photoncharge[px] * Math.pow(distanceCoeff*dist, distanceExp); 
-			
+			double weight = photoncharge[chid] * Math.pow(distanceCoeff*dist, distanceExp);
+
 			if (weight > probabilityThreshold)
 			{
-				showerlist.add(px);
+				showerSet.add(pixel);
 			}
-			
+
 		}
-		
-		showerlist = removeSmallCluster(showerlist,2);
-		
-		PixelSet cleanedPixelSet = new PixelSet();
-		if (showerlist.size() > 0)
-		{
-			for (int i = 0; i < showerlist.size(); i++) {
-                cleanedPixelSet.addById(showerlist.get(i));
-            }
-			
-			input.put(outputKey, cleanedPixelSet);
-		}
+
+		showerSet = removeSmallCluster(showerSet,2);
+
+		input.put(outputKey, showerSet);
 
 		return input;
 	}

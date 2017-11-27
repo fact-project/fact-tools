@@ -17,10 +17,10 @@ public class FromChidArray implements Processor{
     static Logger log = LoggerFactory.getLogger(FromChidArray.class);
 
     @Parameter(required = true, description = "key to the input int array of chids")
-    private String inputKey;
+    String inputKey;
 
     @Parameter(required = true, description = "key to the output for the pixelSet")
-    private String outputKey;
+    String outputKey;
 
     @Override
     public Data process(Data input) {
@@ -34,11 +34,4 @@ public class FromChidArray implements Processor{
         return input;
     }
 
-    public void setInputKey(String inputKey) {
-        this.inputKey = inputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
 }

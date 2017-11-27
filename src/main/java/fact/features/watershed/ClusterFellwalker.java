@@ -132,7 +132,7 @@ public class ClusterFellwalker implements Processor {
 
             while (!pathend) {
                 //find neighbours and brightest neighbour
-                FactCameraPixel[] allNeighbours = mapping.getNeighboursFromID(currentPixel);
+                FactCameraPixel[] allNeighbours = mapping.getNeighborsFromID(currentPixel);
 
                 //find usable neighbours (pixel marked with clusterID = 0 after cleaning)
                 ArrayList<FactCameraPixel> usableNeighbours = new ArrayList<>();
@@ -616,7 +616,7 @@ public class ClusterFellwalker implements Processor {
             int clusterID = c.getClusterID();
             ArrayList<Integer> bound = c.findBoundaryNaive();
             for(int id : bound){
-                FactCameraPixel [] boundPixelNeighbors = mapping.getNeighboursFromID(id);
+                FactCameraPixel [] boundPixelNeighbors = mapping.getNeighborsFromID(id);
                 for(FactCameraPixel p : boundPixelNeighbors){
                     if (showerClusterID[p.id] != clusterID && showerClusterID[p.id] != -2 && !c.naiveNeighborClusterID.contains(showerClusterID[p.id])) {
                         c.naiveNeighborClusterID.add(showerClusterID[p.id]);

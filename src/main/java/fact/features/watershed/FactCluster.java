@@ -352,7 +352,7 @@ public class FactCluster {
 
     //Gets a pixel id and returns an array of all pixels that are neighbors of this pixel AND belong to the same cluster.
     private FactCameraPixel [] getNeighborsInClusterFromId(int id){
-        FactCameraPixel[] allNeighbors = mapping.getNeighboursFromID(id);
+        FactCameraPixel[] allNeighbors = mapping.getNeighborsFromID(id);
         ArrayList<FactCameraPixel> neighborsInCluster = new ArrayList<>();
         for(FactCameraPixel p : allNeighbors){
             if(contentPixel.contains(p.id)){
@@ -369,7 +369,7 @@ public class FactCluster {
 
     //Gets a pixel id, returns true if this pixel is a boundary pixel of the cluster ans false if it's not.
     private boolean isBoundPixel(int id){
-        FactCameraPixel [] allCamNeighbors = mapping.getNeighboursFromID(id);
+        FactCameraPixel [] allCamNeighbors = mapping.getNeighborsFromID(id);
         FactCameraPixel [] clusterNeighbors = getNeighborsInClusterFromId(id);
 
         if(allCamNeighbors.length == 6 && clusterNeighbors.length == 6){

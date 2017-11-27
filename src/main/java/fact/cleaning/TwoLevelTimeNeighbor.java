@@ -1,8 +1,10 @@
 package fact.cleaning;
 
+
 import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
@@ -13,7 +15,6 @@ import stream.annotations.Parameter;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 
 /**
  * TwoLevelTimeNeighbor. Identifies showerPixel in the image array.
@@ -33,40 +34,41 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 	static Logger log = LoggerFactory.getLogger(TwoLevelTimeNeighbor.class);
 
     @Parameter(required = true)
-	private String photonChargeKey;
+	String photonChargeKey;
 
     @Parameter(required = true)
-	private String arrivalTimeKey;
+	String arrivalTimeKey;
 
     @Parameter(required = true)
-	private String outputKey;
+	String outputKey;
 
     @Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have to be " +
             "identified as a CorePixel")
-	private  double corePixelThreshold;
+	double corePixelThreshold;
 
     @Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have that is adjacent to a " +
             "previously identified corePixel")
-	private  double neighborPixelThreshold;
+	double neighborPixelThreshold;
 
     @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" +
     		", which a pixel is aloud to have after cleaning")
-	private  double timeLimit;
+	double timeLimit;
 
     @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
             " are even considered for NeighbourCorePixel. " +
             " If Size is smaller than minSize the Pixels will be discarded.")
-	private int minNumberOfPixel;
+	int minNumberOfPixel;
 
 
     @Parameter(required = false)
-    private String[] starPositionKeys = null;
+    String[] starPositionKeys = null;
+
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-	private double starRadiusInCamera = Constants.PIXEL_SIZE;
+	double starRadiusInCamera = Constants.PIXEL_SIZE;
 
-    private boolean showDifferentCleaningSets = false;
+    @Parameter(description = "Add PixelSets for the different cleaning steps")
+    boolean showDifferentCleaningSets = false;
 
-    private PixelSet cleanedPixelSet;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -90,7 +92,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 		double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));
 		double[] arrivalTimes = Utils.toDoubleArray(input.get(arrivalTimeKey));
 
-		ArrayList<Integer> showerPixel= new ArrayList<>();
+		PixelSet showerPixel = new PixelSet();
 
 		showerPixel = addCorePixel(showerPixel, photonCharge, corePixelThreshold, timeStamp);
 		if (showDifferentCleaningSets == true)
@@ -98,7 +100,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 			addLevelToDataItem(showerPixel, outputKey + "_level1", input);
 		}
 
-		showerPixel = removeSmallCluster(showerPixel,minNumberOfPixel);
+		showerPixel = removeSmallCluster(showerPixel, minNumberOfPixel);
 		if (showDifferentCleaningSets == true)
 		{
 			addLevelToDataItem(showerPixel, outputKey + "_level2", input);
@@ -116,7 +118,8 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 
         //in case we have no showerpixels. We wont get any new ones in the steps below. And also it would crash.
         if(showerPixel.size() == 0){
-            return input;
+            input.put(outputKey, new PixelSet());
+		    return input;
         }
 
         showerPixel = applyTimeNeighborCleaning(showerPixel, arrivalTimes, timeLimit, 2);
@@ -154,14 +157,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             }
         }
 
-        if(showerPixel.size() > 0){
-
-            cleanedPixelSet = new PixelSet();
-            for (int i = 0; i < showerPixel.size(); i++) {
-                cleanedPixelSet.addById(showerPixel.get(i));
-            }
-            input.put(outputKey, cleanedPixelSet);
-        }
+        input.put(outputKey, showerPixel);
 
 		return input;
 	}
@@ -175,25 +171,26 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 	 * @param minNumberOfNeighborPixel
 	 * @return
 	 */
-	public ArrayList<Integer> applyTimeNeighborCleaning(ArrayList<Integer> showerPixel,double[] arrivalTime, double timeThreshold, int minNumberOfNeighborPixel) {
+	public PixelSet applyTimeNeighborCleaning(PixelSet showerPixel, double[] arrivalTime, double timeThreshold, int minNumberOfNeighborPixel) {
 
+        PixelSet newShowerPixels = new PixelSet();
 
-		ArrayList<Integer> newList= new ArrayList<Integer>();
-		for(int pixel: showerPixel){
-			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pixel);
+        for(CameraPixel pixel: showerPixel){
+
+        	FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
 			int counter = 0;
-			double time = arrivalTime[pixel];
-			for (FactCameraPixel nPix:currentNeighbors){
-				if( Math.abs(arrivalTime[nPix.id]-time) < timeThreshold && showerPixel.contains(nPix.id)){
+			double time = arrivalTime[pixel.id];
+
+			for (FactCameraPixel nPix:currentNeighbors) {
+				if( Math.abs(arrivalTime[nPix.id]-time) < timeThreshold && showerPixel.contains(nPix)) {
 					counter++;
 				}
 			}
-			if (counter >= minNumberOfNeighborPixel)
-			{
-				newList.add(pixel);
+			if (counter >= minNumberOfNeighborPixel) {
+				newShowerPixels.add(pixel);
 			}
 		}
-		return newList;
+		return newShowerPixels;
 	}
 
 

@@ -22,58 +22,28 @@ public class Difference implements Processor{
     static Logger log = LoggerFactory.getLogger(Difference.class);
 
     @Parameter(required = true, description = "key to the first set to be compared")
-    private String setUKey;
+    String setUKey;
 
     @Parameter(required = true, description = "key to the second set to be united")
-    private String setAKey;
+    String setAKey;
 
     @Parameter(required = true, description = "key to the output set which contains the difference")
-    private String outsetKey;
+    String outsetKey;
 
     @Override
     public Data process(Data input) {
 
-        if (!input.containsKey(setUKey)) {
-            return input;
-        }
-
         Utils.isKeyValid(input, setUKey, PixelSet.class);
+        Utils.isKeyValid(input, setAKey, PixelSet.class);
 
         PixelSet setU = (PixelSet) input.get(setUKey);
-        PixelSet setA;
+        PixelSet setA = (PixelSet) input.get(setAKey);
 
-        //check if inset2 is given, otherwise create an empty set
-        if (input.containsKey(setAKey)) {
-            Utils.isKeyValid(input, setAKey, PixelSet.class);
-            setA = (PixelSet) input.get(setAKey);
-        } else {
-            //create an empty set if no set is handed over
-            setA = new PixelSet();
-        }
-
-        try{
-            Sets.SetView<CameraPixel> difference = Sets.difference(setU.set, setA.set);
-            Set<CameraPixel> cameraPixels = difference.immutableCopy();
-            PixelSet outset = new PixelSet(cameraPixels);
-            input.put(outsetKey, outset);
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
-
-
+        Sets.SetView<CameraPixel> difference = Sets.difference(setU.set, setA.set);
+        PixelSet outset = new PixelSet();
+        difference.copyInto(outset.set);
+        input.put(outsetKey, outset);
 
         return input;
-    }
-
-    public void setSetUKey(String setUKey) {
-        this.setUKey = setUKey;
-    }
-
-    public void setSetAKey(String setAKey) {
-        this.setAKey = setAKey;
-    }
-
-    public void setOutsetKey(String outsetKey) {
-        this.outsetKey = outsetKey;
     }
 }
