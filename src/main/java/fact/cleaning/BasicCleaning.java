@@ -5,16 +5,14 @@ import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import stream.Data;
 import stream.annotations.Parameter;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class BasicCleaning {
@@ -36,24 +34,17 @@ public class BasicCleaning {
 	 * @param corePixelThreshold
 	 * @return
 	 */
-	public ArrayList<Integer> addCorePixel(ArrayList<Integer> showerPixel, double[] photonCharge, double corePixelThreshold, ZonedDateTime eventTimeStamp) {
-		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
-		if (notUsablePixel != null)
+	public PixelSet addCorePixel(PixelSet showerPixel, double[] photonCharge, double corePixelThreshold, ZonedDateTime eventTimeStamp) {
+		PixelSet notUsablePixels = calibService.getNotUsablePixels(eventTimeStamp);
+
+		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++)
 		{
-			notUsablePixelSet = new PixelSet();
-			for (int pix: notUsablePixel){
-				notUsablePixelSet.addById(pix);
+			FactCameraPixel pixel = pixelMap.getPixelFromId(chid);
+			if (notUsablePixels.contains(pixel)){
+				continue;
 			}
-		}
-		for(int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++)
-		{
-			if (notUsablePixel != null){
-				if (ArrayUtils.contains(notUsablePixel,pix) == true){
-					continue;
-				}
-			}
-			if (photonCharge[pix] > corePixelThreshold){
-				showerPixel.add(pix);
+			if (photonCharge[chid] > corePixelThreshold){
+				showerPixel.add(pixel);
 			}
 		}
 		return showerPixel;
@@ -67,44 +58,44 @@ public class BasicCleaning {
 	 * @param photonCharge
 	 * @return
 	 */
-	public ArrayList<Integer> addNeighboringPixels(ArrayList<Integer> showerPixel, double[] photonCharge, double neighborPixelThreshold, ZonedDateTime eventTimeStamp)
+	public PixelSet addNeighboringPixels(PixelSet showerPixel, double[] photonCharge, double neighborPixelThreshold, ZonedDateTime eventTimeStamp)
 	{
-		int[] notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
-		ArrayList<Integer> newList = new ArrayList<>();
-		for (int pix: showerPixel){
-			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
-			for (FactCameraPixel nPix:currentNeighbors){
-				if (notUsablePixel != null){
-					if (ArrayUtils.contains(notUsablePixel,nPix.chid) == true){
-						continue;
-					}
+		PixelSet notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
+        PixelSet newShowerPixel = new PixelSet();
+        newShowerPixel.addAll(showerPixel);
+		for (CameraPixel pixel: showerPixel){
+			FactCameraPixel[] neighborPixels = pixelMap.getNeighborsFromID(pixel.id);
+
+			for (FactCameraPixel neighborPixel: neighborPixels){
+				if (notUsablePixel.contains(neighborPixel)) {
+					continue;
 				}
-				if(photonCharge[nPix.id] > neighborPixelThreshold && !newList.contains(nPix.id) && !showerPixel.contains(nPix.id)){
-					newList.add(nPix.id);
+				if(photonCharge[neighborPixel.id] > neighborPixelThreshold) {
+					newShowerPixel.add(neighborPixel);
 				}
 			}
 		}
-		showerPixel.addAll(newList);
-		return showerPixel;
+		return newShowerPixel;
 	}
 
 
 	/**
 	 * Remove all clusters of pixels with less than minNumberOfPixel pixels in the cluster
-	 * @param list
+	 * @param showerPixel
 	 * @param minNumberOfPixel
 	 * @return
 	 */
-	public ArrayList<Integer> removeSmallCluster(ArrayList<Integer> list, int minNumberOfPixel)
+	public PixelSet removeSmallCluster(PixelSet showerPixel, int minNumberOfPixel)
 	{
-		ArrayList<ArrayList<Integer>> listOfLists = Utils.breadthFirstSearch(list);
-		ArrayList<Integer> newList = new ArrayList<>();
-		for (ArrayList<Integer> l: listOfLists){
-			if(l.size() >= minNumberOfPixel){
-				newList.addAll(l);
+		ArrayList<PixelSet> clusters = Utils.breadthFirstSearch(showerPixel);
+		PixelSet newShowerPixel = new PixelSet();
+
+		for (PixelSet cluster: clusters){
+			if(cluster.size() >= minNumberOfPixel){
+				newShowerPixel.addAll(cluster);
 			}
 		}
-		return newList;
+		return newShowerPixel;
 	}
 
 	/**
@@ -116,52 +107,40 @@ public class BasicCleaning {
 	 * @param log
 	 * @return
 	 */
-	public ArrayList<Integer> removeStarIslands(ArrayList<Integer> showerPixel, CameraCoordinate starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
+	public PixelSet removeStarIslands(PixelSet showerPixel, CameraCoordinate starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
 
-        FactCameraPixel pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
-        if (pixel == null){
+        FactCameraPixel starPixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
+        if (starPixel == null){
 			log.debug("Star not in camera window. No star islands are removed");
-			return showerPixel;
+			PixelSet pixelSet = new PixelSet();
+			pixelSet.addAll(showerPixel);
+			return pixelSet;
         }
-        int chidOfPixelOfStar = pixel.chid;
-		List<Integer> starChidList = new ArrayList<>();
 
-		starChidList.add(chidOfPixelOfStar);
+		starSet.add(starPixel);
 
-		starSet.addById(chidOfPixelOfStar);
-
-		for (FactCameraPixel px: pixelMap.getNeighboursFromID(chidOfPixelOfStar))
-		{
-				if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera)
-				{
-					starSet.add(px);
-					starChidList.add(px.id);
-				}
-		}
-
-		ArrayList<ArrayList<Integer>> listOfLists = Utils.breadthFirstSearch(showerPixel);
-		ArrayList<Integer> newList = new ArrayList<Integer>();
-		for (ArrayList<Integer> l: listOfLists){
-			if ((l.size() <= starChidList.size() && starChidList.containsAll(l)) == false)
-			{
-				newList.addAll(l);
+		for (FactCameraPixel px: pixelMap.getNeighborsForPixel(starPixel)) {
+			if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
+				starSet.add(px);
 			}
 		}
-		return newList;
+
+		ArrayList<PixelSet> clusters = Utils.breadthFirstSearch(showerPixel);
+
+		PixelSet newShowerPixel = new PixelSet();
+		for (PixelSet cluster: clusters){
+			if (!(cluster.size() <= starSet.size() && starSet.set.containsAll(cluster)))
+			{
+				newShowerPixel.addAll(cluster);
+			}
+		}
+		return newShowerPixel;
 	}
 
-	public void addLevelToDataItem(ArrayList<Integer> showerPixel, String name, Data input){
-		Integer[] level = new Integer[showerPixel.size()];
-		showerPixel.toArray(level);
-
-		if (level.length > 0)
-		{
-            PixelSet overlay = new PixelSet();
-    		for(int pix : level){
-    			overlay.addById(pix);
-    		}
-    		input.put(name, overlay);
-		}
+	public void addLevelToDataItem(PixelSet showerPixel, String name, Data input){
+       PixelSet overlay = new PixelSet();
+       overlay.addAll(showerPixel);
+       input.put(name, overlay);
 	}
 
 	/**

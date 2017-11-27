@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.hexmap;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * The coordinates are offset by 22 on the x-axis and by 19 on the y-axis
  *
  * @author Kai
- * 
+ *
  */
 public class FactPixelMapping implements PixelMapping {
 
@@ -148,8 +148,8 @@ public class FactPixelMapping implements PixelMapping {
      * @param id the id of pixel
      * @return neighbouring Pixels
      */
-    public FactCameraPixel[] getNeighboursFromID(int id){
-        return getNeighboursForPixel(getPixelFromId(id));
+    public FactCameraPixel[] getNeighborsFromID(int id){
+        return getNeighborsForPixel(getPixelFromId(id));
     }
 
     /**
@@ -157,7 +157,7 @@ public class FactPixelMapping implements PixelMapping {
      * @param p the pixel to get the neighbours from
      * @return neighbouring Pixels
      */
-    public FactCameraPixel[] getNeighboursForPixel(CameraPixel p) {
+    public FactCameraPixel[] getNeighborsForPixel(CameraPixel p) {
         ArrayList<FactCameraPixel> l = new ArrayList<>();
         //check if x coordinate is even or not
         int parity = (p.geometricX & 1);
