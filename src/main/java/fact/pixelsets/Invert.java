@@ -20,7 +20,7 @@ import java.util.Set;
 public class Invert implements Processor{
     static Logger log = LoggerFactory.getLogger(Invert.class);
 
-    @Parameter(required = true, description = "key to the first set to be united")
+    @Parameter(required = true, description = "key to the set to be inverted")
     String insetKey;
 
     @Parameter(required = true, description = "key to the output set which contains the inversion")
