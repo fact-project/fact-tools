@@ -6,7 +6,6 @@ import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -87,7 +86,7 @@ public class InterpolatePhotondata implements Processor {
 
     private double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
     	for (CameraPixel pixel: badPixels){
-			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursForPixel(pixel);
+			FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
 			double avg = 0.0;
 			int numNeighbours = 0;
 			for (FactCameraPixel nPix: currentNeighbors){

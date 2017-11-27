@@ -185,7 +185,7 @@ public class ClusterArrivalTimes implements Processor {
         while(foundSeed == false && p<shower.length){
             int showerPixelID = shower[p];
             if (clusterID[showerPixelID] == 0) {
-                FactCameraPixel[] neighbors = mapping.getNeighboursFromID(showerPixelID);
+                FactCameraPixel[] neighbors = mapping.getNeighborsFromID(showerPixelID);
                 boolean foundFlaggedNeighbor = false;
                 int n = 0;
                 while(foundFlaggedNeighbor == false && n < neighbors.length){
@@ -229,7 +229,7 @@ public class ClusterArrivalTimes implements Processor {
 
     private ArrayList findNeighborCluster(int id, int[] clusterID) {
         ArrayList<Integer> neighborCluster = new ArrayList<>();
-        FactCameraPixel[] neighbors = mapping.getNeighboursFromID(id);
+        FactCameraPixel[] neighbors = mapping.getNeighborsFromID(id);
 
         for(FactCameraPixel p : neighbors){
             if(!neighborCluster.contains(clusterID[p.id]) && clusterID[p.id] != 0){
@@ -243,7 +243,7 @@ public class ClusterArrivalTimes implements Processor {
 
 
     private int [] findNearestBlankNeighbor(int current, double[] arrivalTime, int[] clusterID, int[] shower, int cluster, int[] showerArray) {
-        FactCameraPixel[] neighbors = mapping.getNeighboursFromID(current);
+        FactCameraPixel[] neighbors = mapping.getNeighborsFromID(current);
         double minDiff = 1000;
         int minID = -1;
 

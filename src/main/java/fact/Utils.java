@@ -128,7 +128,7 @@ public class Utils {
 				// cannot use the enhanced for loop here.
 				for (int index = 0; index < q.size(); index++) {
 					// add neighbours to q
-					FactCameraPixel[] neighbors = pixelMap.getNeighboursForPixel(q.get(index));
+					FactCameraPixel[] neighbors = pixelMap.getNeighborsForPixel(q.get(index));
 					for (FactCameraPixel neighbor : neighbors) {
 
 					    if (showerPixel.contains(neighbor) && !marked.contains(neighbor)) {

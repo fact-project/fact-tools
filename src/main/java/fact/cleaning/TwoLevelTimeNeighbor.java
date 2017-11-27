@@ -177,7 +177,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 
         for(CameraPixel pixel: showerPixel){
 
-        	FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursForPixel(pixel);
+        	FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
 			int counter = 0;
 			double time = arrivalTime[pixel.id];
 

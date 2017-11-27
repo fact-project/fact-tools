@@ -7,7 +7,6 @@ import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -78,7 +77,7 @@ public class InterpolateTimeSeries implements Processor {
         int roi = data.length / npix;
 
         for (CameraPixel pixel: badPixelSet) {
-            FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursForPixel(pixel);
+            FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
 
             //iterate over all slices
             for (int slice = 0; slice < roi; slice++) {
