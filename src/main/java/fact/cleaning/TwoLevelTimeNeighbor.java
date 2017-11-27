@@ -63,9 +63,10 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 
 
     @Parameter(required = false)
-    private String[] starPositionKeys = null;
+    String[] starPositionKeys = null;
+
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-	private double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
+	double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     @Parameter(description = "Add PixelSets for the different cleaning steps")
     boolean showDifferentCleaningSets = false;
