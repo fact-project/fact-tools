@@ -103,7 +103,7 @@ public class NeighborPixelCorrelation implements Processor {
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
-            FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
+            FactCameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
 
             double pixVariance  = pixelStatistics[pix].getVariance();
             double pixMean      = pixelStatistics[pix].getMean();

@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.zone.ZoneRulesException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -165,6 +168,9 @@ public class FITSWriter implements StatefulProcessor {
                 return new long[]{(long) serializable};
             } else if (ClassUtils.isAssignable(type, Boolean.class)) {
                 return new boolean[]{(boolean) serializable};
+            } else if (ClassUtils.isAssignable(type, ZonedDateTime.class)) {
+                ZonedDateTime zonedDateTime = (ZonedDateTime) serializable;
+                return new String[]{zonedDateTime.format(DateTimeFormatter.ISO_INSTANT)};
             } else {
                 throw new RuntimeException("Serializable cannot be saved to FITS");
             }

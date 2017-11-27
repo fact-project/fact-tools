@@ -92,7 +92,7 @@ public class NeighborPixelDCF implements StatefulProcessor {
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
-            FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
+            FactCameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
 
 
             double pixStdDev = pixelStatistics[pix].getStandardDeviation();

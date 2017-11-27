@@ -66,48 +66,48 @@ public class PixelMappingTest {
         int chid = 393;
         int[] ne1 =  {390,391,394,1098,395, 392};
 
-        FactCameraPixel[] n = m.getNeighboursFromID(chid);
+        FactCameraPixel[] n = m.getNeighborsFromID(chid);
         assertTrue("Neighbour list too short for chid " + chid + ". Expect 6 neighbours", n.length == 6);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne1));
 
         chid = 1060;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne2 ={1058,1055,1056};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 3 neighbours", n.length == 3);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne2));
 
         chid = 13;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne3 ={10,12,15,16};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 4 neighbours", n.length == 4);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne3));
 
         chid = 70;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne4 ={7,71,68};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 3 neighbours", n.length == 3);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne4));
 
         chid = 49;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne5 ={51,50,46};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 3 neighbours", n.length == 3);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne5));
 
         chid = 45;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne6 ={46,47,89,87,86};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 5 neighbours", n.length == 5);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne6));
 
         chid = 1160;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne7 ={1159,1157,1051};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 3 neighbours", n.length == 3);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne7));
 
         chid = 859;
-        n = m.getNeighboursFromID(chid);
+        n = m.getNeighborsFromID(chid);
         int[]  ne8 ={856,858,861,862,749,683};
         assertTrue("Neighbour list has wrong size for chid " +chid+ ". Expect 6 neighbours", n.length == 6);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne8));
