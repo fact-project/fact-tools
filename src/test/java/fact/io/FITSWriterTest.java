@@ -31,7 +31,7 @@ public class FITSWriterTest {
 	public void testFitsWriterNoItems() throws Exception {
         FITSWriter fitsWriter = new FITSWriter();
         File f = File.createTempFile("test_fits", ".fits");
-        log.info(f.getAbsolutePath());
+        log.info("testFitsWriterNoItems {}", f.getAbsolutePath());
 
         URL url = new URL("file:" + f.getAbsolutePath());
         fitsWriter.url = url;
@@ -41,14 +41,15 @@ public class FITSWriterTest {
 
     @Test
     public void testFitsWriter() throws Exception {
-        FITSWriter fitsWriter = new FITSWriter();
+
         File f = File.createTempFile("test_fits", ".fits");
-        log.info(f.getAbsolutePath());
+        log.info("testFitsWriter with path {}", f.getAbsolutePath());
 
         URL url = new URL("file:" + f.getAbsolutePath());
+
+        FITSWriter fitsWriter = new FITSWriter();
         fitsWriter.url = url;
         fitsWriter.keys = new Keys("*");
-
         fitsWriter.init(null);
 
         Data item = DataFactory.create();
@@ -87,11 +88,12 @@ public class FITSWriterTest {
 
     @Test
     public void testHeaderKeys() throws Exception {
-        FITSWriter fitsWriter = new FITSWriter();
-        File f = File.createTempFile("test_fits", ".fits");
-        log.info(f.getAbsolutePath());
+        File f = File.createTempFile("test_fitsheader", ".fits");
+        log.info("testHeaderKeys with path {}", f.getAbsolutePath());
 
         URL url = new URL("file:" + f.getAbsolutePath());
+
+        FITSWriter fitsWriter = new FITSWriter();
         fitsWriter.url = url;
         fitsWriter.keys = new Keys("EventNum,TriggerType");
         fitsWriter.headerKeys = new Keys("NROI,NPIX,UTCTIME,muchtoolong");
