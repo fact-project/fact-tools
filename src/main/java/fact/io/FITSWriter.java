@@ -60,8 +60,8 @@ public class FITSWriter implements StatefulProcessor {
 
     long numEventsWritten = 0;
 
-    static ArrayList<String> columnNames = new ArrayList<>(0);
-    static HashMap<String, int[]> columnDimensions = new HashMap<>(0);
+    ArrayList<String> columnNames = new ArrayList<>(0);
+    HashMap<String, int[]> columnDimensions = new HashMap<>(0);
 
 
     @Override
@@ -227,7 +227,6 @@ public class FITSWriter implements StatefulProcessor {
         ArrayList<Object> rowList = new ArrayList<>();
         for (String columnName: item.keySet()) {
             Serializable serializable = item.get(columnName);
-
             try {
                 Object elem = wrapInArray(serializable);
                 rowList.add(elem);
