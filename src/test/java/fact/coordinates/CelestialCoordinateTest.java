@@ -29,11 +29,11 @@ public class CelestialCoordinateTest {
         Resources.GMSTData[] testData = gson.fromJson(jsonReader, Resources.GMSTData[].class);
 
         for (Resources.GMSTData gmstData: testData) {
-            log.info("Testing GMST for {}", gmstData.obstime);
+            log.debug("Testing GMST for {}", gmstData.obstime);
             ZonedDateTime obstime = ZonedDateTime.parse(gmstData.obstime.replace(" ", "T") + "Z[UTC]");
             double gmst = CelestialCoordinate.datetimeToGST(obstime);
             assertEquals(gmstData.gmst_rad, gmst, precision);
-            log.info("Deviation: {}", gmst - gmstData.gmst_rad);
+            log.debug("Deviation: {}", gmst - gmstData.gmst_rad);
         }
 
     }

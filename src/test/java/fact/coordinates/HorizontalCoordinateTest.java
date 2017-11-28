@@ -31,7 +31,7 @@ public class HorizontalCoordinateTest {
         Source[] sources = gson.fromJson(jsonReader, Source[].class);
 
         for(Source source: sources){
-            log.info("Testing transform for source {} at {}", source.name, source.obstime);
+            log.debug("Testing transform for source {} at {}", source.name, source.obstime);
 
             ZonedDateTime obstime = ZonedDateTime.parse(source.obstime.replace(" ", "T") + "Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME);
             HorizontalCoordinate sourceHz = HorizontalCoordinate.fromDegrees(source.zd, source.az);
@@ -39,7 +39,7 @@ public class HorizontalCoordinateTest {
 
             EquatorialCoordinate sourceEq = sourceHz.toEquatorial(obstime, EarthLocation.FACT);
 
-            log.info("date: {}, deviation {}", obstime, astropyReference.greatCircleDistanceDeg(sourceEq));
+            log.debug("date: {}, deviation {}", obstime, astropyReference.greatCircleDistanceDeg(sourceEq));
             assertEquals("greatCircleDistance to reference to large", 0.0, astropyReference.greatCircleDistanceDeg(sourceEq), precisionDistance);
             assertEquals("Difference in RA to large", astropyReference.getRightAscensionDeg(), sourceEq.getRightAscensionDeg(), precisionAngles);
             assertEquals("Difference in Dec to large", astropyReference.getDeclinationDeg(), sourceEq.getDeclinationDeg(), precisionAngles);

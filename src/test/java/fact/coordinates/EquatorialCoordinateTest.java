@@ -71,7 +71,7 @@ public class EquatorialCoordinateTest {
         Source[] sources = gson.fromJson(jsonReader, Source[].class);
 
         for(Source source: sources){
-            log.info("Testing transform for source {} at {}", source.name, source.obstime);
+            log.debug("Testing transform for source {} at {}", source.name, source.obstime);
             ZonedDateTime obstime = ZonedDateTime.parse(source.obstime.replace(" ", "T") + "Z[UTC]");
             EquatorialCoordinate sourceEq = EquatorialCoordinate.fromHourAngleAndDegrees(source.ra, source.dec);
             HorizontalCoordinate astropyReference = HorizontalCoordinate.fromDegrees(source.zd, source.az);
