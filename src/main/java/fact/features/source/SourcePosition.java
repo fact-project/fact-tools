@@ -55,81 +55,41 @@ public class SourcePosition implements StatefulProcessor {
 
 
     @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
-    private String outputKey = null;
-
-    public void setAuxService(AuxiliaryService auxService) {
-        this.auxService = auxService;
-    }
+    public String outputKey = null;
 
     @Service(required = false, description = "Name of the service that provides aux files")
-    private AuxiliaryService auxService;
+    public AuxiliaryService auxService;
+
+    @Parameter(description = "If set, the fixed x position of the source in mm")
+    public Double x = null;
+
+    @Parameter(description = "If set, the fixed y position of the source in mm")
+    public Double y = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the source coordinates")
+    public String sourceZdKey = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the source coordinates")
+    public String sourceAzKey = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the pointing coordinates")
+    public String pointingZdKey = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the pointing coordinates")
+    public String pointingAzKey = null;
+
+    // used in case we need the sourceposition of a star in the camera
+    @Parameter(required = false)
+    public Double sourceRightAscension = null;
 
     @Parameter(required = false)
-    private Double x = null;
-    @Parameter(required = false)
-    private Double y = null;
-
-    //TODO Standards setzen?
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
-    private String sourceZdKey = null;
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
-    private String sourceAzKey = null;
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
-    private String pointingZdKey = null;
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
-    private String pointingAzKey = null;
-
-    //flag which indicates whether were are looking at montecarlo files which have a wobble position
-    public boolean hasMcWobblePosition;
-
-
-    //used in case we need the sourceposition of a star in the camera
-    @Parameter(required = false)
-    private Double sourceRightAscension = null;
-    @Parameter(required = false)
-    private Double sourceDeclination = null;
+    public Double sourceDeclination = null;
 
     private final AuxPointStrategy closest = new Closest();
     private final AuxPointStrategy earlier = new Earlier();
 
-    @Override
-    public void finish() throws Exception {
-    }
-
-    /**
-     * Here we check whether an auxservice has been set or some fixed coordinates have been provided in the .xml.
-     * If any of the parameters sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey are set then all need to be set.
-     */
-    @Override
-    public void init(ProcessContext arg0) throws Exception {
-        if(x !=  null && y != null){
-            log.warn("Setting source position to dummy values X: " + x + "  Y: " + y);
-            return;
-        }
-
-        hasMcWobblePosition = false;
-        if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
-            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
-            {
-                hasMcWobblePosition = true;
-                log.warn("Using zd and az values from the data item");
-            }
-            else
-            {
-                log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
-                throw new IllegalArgumentException();
-            }
-        } else if (auxService == null ){
-
-            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
-            throw new IllegalArgumentException();
-        }
-    }
-
-    @Override
-    public void resetState() throws Exception {
-    }
-
+    //flag which indicates whether were are looking at montecarlo files which have a wobble position
+    public boolean hasMcWobblePosition;
 
     /**
      * The process method adds the azimuth and zenith values for the pointing, tracking and source position.
@@ -245,39 +205,47 @@ public class SourcePosition implements StatefulProcessor {
         return data;
     }
 
-    public void setX(Double x) {
-        this.x = x;
-    }
-    public void setY(Double y) {
-        this.y = y;
+
+    /**
+     * Here we check whether an auxservice has been set or some fixed coordinates have been provided in the .xml.
+     * If any of the parameters sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey are set then all need to be set.
+     */
+    @Override
+    public void init(ProcessContext arg0) throws Exception {
+        if(x !=  null && y != null){
+            log.warn("Setting source position to dummy values X: " + x + "  Y: " + y);
+            return;
+        }
+
+        hasMcWobblePosition = false;
+        if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
+            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
+            {
+                hasMcWobblePosition = true;
+                log.warn("Using zd and az values from the data item");
+            }
+            else
+            {
+                log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
+                throw new IllegalArgumentException();
+            }
+        } else if (auxService == null ){
+
+            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
+            throw new IllegalArgumentException();
+        }
     }
 
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
+    @Override
+    public void resetState() throws Exception {
     }
 
-    public void setSourceZdKey(String sourceZdKey) {
-        this.sourceZdKey = sourceZdKey;
+
+    @Override
+    public void finish() throws Exception {
     }
 
-    public void setSourceAzKey(String sourceAzKey) {
-        this.sourceAzKey = sourceAzKey;
-    }
 
-    public void setPointingZdKey(String pointingZdKey) {
-        this.pointingZdKey = pointingZdKey;
-    }
 
-    public void setPointingAzKey(String pointingAzKey) {
-        this.pointingAzKey = pointingAzKey;
-    }
-
-    public void setSourceRightAscension(Double sourceRightAscension) {
-        this.sourceRightAscension = sourceRightAscension;
-    }
-
-    public void setSourceDeclination(Double sourceDeclination) {
-        this.sourceDeclination = sourceDeclination;
-    }
 
 }
