@@ -6,10 +6,10 @@ package fact.coordinates;
  * Represents a position on Earth using latitude, longitude and height above sea level
  */
 public class EarthLocation {
-    final private double latitudeRad;
-    final private double longitudeRad;
-    final private double altitudeMeter;
-    
+    final public double latitudeRad;
+    final public double longitudeRad;
+    final public double altitudeMeter;
+
     // coordinates from google earth
     final static public EarthLocation FACT = EarthLocation.fromDegrees(28.761647, -17.891116, 2200);
 
@@ -27,18 +27,6 @@ public class EarthLocation {
         double latitudeRad = Math.toRadians(latitudeDeg);
         double longitudeRad = Math.toRadians(longitudeDeg);
         return new EarthLocation(latitudeRad, longitudeRad, altitudeMeter);
-    }
-
-    public double getLatitudeRad() {
-        return latitudeRad;
-    }
-
-    public double getLongitudeRad() {
-        return longitudeRad;
-    }
-
-    public double getAltitudeMeter() {
-        return altitudeMeter;
     }
 
     public double getLatitudeDeg() {

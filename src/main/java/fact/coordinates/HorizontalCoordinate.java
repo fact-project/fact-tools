@@ -63,8 +63,8 @@ public class HorizontalCoordinate implements CelestialCoordinate {
         double azimuthSouth = this.getAzimuthRad() - Math.PI;
         double alt = this.getAltitudeRad();
 
-        double lat = earthLocation.getLatitudeRad();
-        double lon = earthLocation.getLongitudeRad();
+        double lat = earthLocation.latitudeRad;
+        double lon = earthLocation.longitudeRad;
 
         double hourAngle = Math.atan2(
                 Math.sin(azimuthSouth),

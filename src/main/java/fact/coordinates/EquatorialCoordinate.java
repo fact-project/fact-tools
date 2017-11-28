@@ -74,16 +74,16 @@ public class EquatorialCoordinate implements CelestialCoordinate {
         dec -= precessionCorrection[1];
 
         // wikipedia assumes longitude positive in west direction
-        double hourAngle = gst + earthLocation.getLongitudeRad() - ra;
+        double hourAngle = gst + earthLocation.longitudeRad - ra;
 
         double altitude = Math.asin(
-                Math.sin(earthLocation.getLatitudeRad()) * Math.sin(dec) +
-                        Math.cos(earthLocation.getLatitudeRad()) * Math.cos(dec) * Math.cos(hourAngle)
+                Math.sin(earthLocation.latitudeRad) * Math.sin(dec) +
+                        Math.cos(earthLocation.latitudeRad) * Math.cos(dec) * Math.cos(hourAngle)
         );
 
         double azimuth = Math.atan2(
                 Math.sin(hourAngle),
-                Math.cos(hourAngle) * Math.sin(earthLocation.getLatitudeRad()) - Math.tan(dec) * Math.cos(earthLocation.getLatitudeRad())
+                Math.cos(hourAngle) * Math.sin(earthLocation.latitudeRad) - Math.tan(dec) * Math.cos(earthLocation.latitudeRad)
         );
 
         // azimuth starting in the north
