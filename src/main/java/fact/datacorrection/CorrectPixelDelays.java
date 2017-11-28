@@ -11,20 +11,20 @@ import stream.io.CsvStream;
 import stream.io.SourceURL;
 
 /**
- * 
+ *
  *  This Processor corrects the Pixel-Delays read from a .csv file.
   * @author Maximilian Noethe &lt;maximilian.noethe@tu-dortmund.de&gt;
- * 
+ *
  */
 public class CorrectPixelDelays implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(CorrectPixelDelays.class);
-    
+
     @Parameter(required = true, description = "arrivalTime input")
     private String arrivalTimeKey;
-    
+
     @Parameter(required = true, description = "The name of the output")
     private String outputKey;
-    
+
     @Parameter(description = "The url to the inputfiles for pixel Delays")
     private SourceURL url = null;
 
@@ -32,7 +32,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
     private double[] pixelDelay = null;
 
     private int npix = Constants.NUMBEROFPIXEL;
-    
+
     @Override
     public Data process(Data item) {
 
@@ -42,7 +42,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
         {
             corrArrivalTime[pix] = arrivalTime[pix] - pixelDelay[pix];
         }
-        
+
         item.put(outputKey, corrArrivalTime);
         return item;
     }
@@ -74,35 +74,32 @@ public class CorrectPixelDelays implements StatefulProcessor {
     }
 
     private void loadPixelDelayFile(SourceURL inputUrl) {
-        try 
-        {
+        try {
             this.pixelDelay = new double[this.npix];
             CsvStream stream = new CsvStream(inputUrl, " ");
             stream.setHeader(false);
             stream.init();
 
-            for (int i = 0; i < this.npix; i++)
-            {
+            for (int i = 0; i < this.npix; i++) {
                 pixelDelayData = stream.readNext();
                 String key = "column:0";
                 Double Delay = (Double) pixelDelayData.get(key);
                 this.pixelDelay[i] = Delay;
             }
 
-        } 
-        catch (Exception e) 
-        {
+        }
+        catch (Exception e)  {
             log.error("Failed to load pixel delay data: {}", e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
-    
+
 
     /*
      * Getter and Setter
      */
-    
+
     public String getPhotonChargeKey() {
         return arrivalTimeKey;
     }
@@ -110,8 +107,8 @@ public class CorrectPixelDelays implements StatefulProcessor {
     public void setArrivalTimeKey(String arrivalTimeKey) {
         this.arrivalTimeKey = arrivalTimeKey;
     }
-    
-    
+
+
     public String getOutputKey() {
         return outputKey;
     }
@@ -119,7 +116,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }
-    
+
     public SourceURL getUrl() {
         return url;
     }
