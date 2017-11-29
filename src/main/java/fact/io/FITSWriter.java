@@ -78,7 +78,7 @@ public class FITSWriter implements StatefulProcessor {
 
                 Data headerItem = DataFactory.create();
                 for (String key: headerKeys.select(item) ){
-                    log.info("Saving key {} to header");
+                    log.debug("Saving key {} to header", key);
                     headerItem.put(key, item.get(key));
                 }
 
