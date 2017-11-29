@@ -1,13 +1,11 @@
-# FACT-Tools [![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools) [Website](http://sfb876.tu-dortmund.de/FACT/)  
+# FACT-Tools [![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
 
 
 The `FACT-Tools` are a collection of processors and stream implementations
 for the [streams](http://www.jwall.org/streams/) framework to analyse the data of the *First G-APD Cherenkov Telescope*.
 
 This README file provides a quick overview of the `FACT-Tools`.
-Further information, including API docs, can be found on the project web-page at
-
-	http://sfb876.tu-dortmund.de/FACT/
+Further information, including API docs, can be found on the [project web-page](http://sfb876.tu-dortmund.de/FACT)
 
 The project is licensed under the GNU Public License, Version 3 (GPLv3).
 
