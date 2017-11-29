@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -183,6 +184,9 @@ public class FITSWriter implements StatefulProcessor {
                 } else if (ClassUtils.isAssignable(type, ZonedDateTime.class)) {
                     ZonedDateTime zonedDateTime = (ZonedDateTime) serializable;
                     header.addValue(key, zonedDateTime.format(DateTimeFormatter.ISO_INSTANT), "");
+                } else if (ClassUtils.isAssignable(type, LocalDateTime.class)) {
+                    LocalDateTime localDateTime = (LocalDateTime) serializable;
+                    header.addValue(key, localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "");
                 } else {
                     throw new RuntimeException("Key '" + key + "' cannot be saved to FITS Header");
                 }
