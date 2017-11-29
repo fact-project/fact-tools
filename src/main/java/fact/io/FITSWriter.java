@@ -43,7 +43,7 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(required = true, description = "Keys to write to the FITS Binary Table. Using streams.Keys")
     public Keys keys = new Keys("");
 
-    @Parameter(required = true, description = "Keys to write to the FITS Header. Only the first data item will be used. Using streams.Keys")
+    @Parameter(description = "Keys to write to the FITS Header. Only the first data item will be used. Using streams.Keys")
     public Keys headerKeys = new Keys("");
 
     @Parameter(required = true, description = "Url for the output file")
