@@ -56,7 +56,7 @@ public class EquatorialCoordinate implements CelestialCoordinate {
      * @param rightAscensionRad
      * @param declinationRad
      * @param observationTime
-     * @return
+     * @return correction for right ascension, declination in radians
      */
     static double[] calculatePrecessionCorrection(double rightAscensionRad, double declinationRad, ZonedDateTime observationTime) {
         double deltaT = observationTime.until(j2000Reference, ChronoUnit.SECONDS) / 365.0 / 86400.0;
