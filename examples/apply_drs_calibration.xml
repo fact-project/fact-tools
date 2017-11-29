@@ -45,12 +45,8 @@
           topSlopeLimit="${removeSpikes_topSlopeLimit}"
           maxSpikeLength="${removeSpikes_maxSpikeLength}"
       />
-      <fact.filter.DrsTimeCalibration
-          outputKey="timeCalibConst"
-      />
-      <fact.filter.ArrayTimeCorrection
+      <fact.datacorrection.DrsTimeCalibration
           dataKey="Data"
-          timeCalibConstKey="timeCalibConst"
           outputKey="Data"
       />
       <fact.datacorrection.InterpolateTimeSeries 
