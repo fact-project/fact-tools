@@ -44,6 +44,20 @@ public class EquatorialCoordinate implements CelestialCoordinate {
         return new EquatorialCoordinate(rightAscensionRad, Math.toRadians(declinationDeg));
     }
 
+    /**
+     * Calculate the corrections for right ascension in declination
+     * that are needed because of Earth's precession.
+     *
+     * The formulas are approximations found here
+     * http://www.cv.nrao.edu/~rfisher/Ephemerides/earth_rot.html
+     *
+     * TODO Check with the "Explanatory Supplements for the Astronomical Almanac"
+     *
+     * @param rightAscensionRad
+     * @param declinationRad
+     * @param observationTime
+     * @return
+     */
     static double[] calculatePrecessionCorrection(double rightAscensionRad, double declinationRad, ZonedDateTime observationTime) {
         double deltaT = observationTime.until(j2000Reference, ChronoUnit.SECONDS) / 365.0 / 86400.0;
         double deltaRightAscension = (precessionFactorM +  precessionFactorN * Math.sin(rightAscensionRad) * Math.tan(declinationRad)) * deltaT;
