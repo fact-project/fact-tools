@@ -18,7 +18,28 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 
-
+/**
+ * Applies DRS4 time calibration by using long_term_constants_median.time.drs.fits
+ *
+ *  The common reference point is the 976.5625 kHz DRS4 reference clock. This means the time
+ *  of sampling physical cell zero is assumed to be equal for all 160 DRS4 chips in the camera.
+ *
+ *  After finding the corrected sampling time of each sample in 'dataKey', the data is resampled
+ *  using a linearTimeCorrectionKernel, in order to obtain a time series which may be treated
+ *  as if the 2GHz DRS4 sampling process was flawless.
+ *
+ * The resampling time series starts at the maximum corrected start time of all pixels and always
+ * contains 300 samples. In case there are no more supporting points in the original time series,
+ * i.e. in case we would need to extrapolate instead of interpolate, the last sample is repeated.
+ *
+ * This means the end of the time series is likely to contain unphysical data. Most processors disregard the
+ * end of the time series and therefor this might not matter a lot, but features like PedVar, which are
+ * extracted at random positions of the timeline should be restricted to a timeframe between sample 10 and 250 I would
+ * say.
+ *
+ * @author Dominik Neise &lt;neised@phys.ethz.ch&gt;
+ *
+ */
 public class DrsTimeCalibration implements StatefulProcessor{
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
