@@ -3,6 +3,7 @@
  */
 package fact.datacorrection;
 
+import fact.DrsFileService;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
@@ -13,11 +14,11 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -40,6 +41,10 @@ public class DrsCalibration implements StatefulProcessor {
 	@Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
 	public URL url = null;
+
+	@Service(description = "A DrsFileService which helps to find drs files automagically." +
+			" Either this or the url must be set.", required = false)
+	private DrsFileService drsService;
 
 
 	private File currentDrsFile = new File("");
@@ -99,21 +104,17 @@ public class DrsCalibration implements StatefulProcessor {
 	@Override
 	public Data process(Data data) {
 
-		if( this.url == null){
-			//file not loaded yet. try to find by magic.
-			File drsFile = (File) data.get("@drsFile");
-			if( drsFile != null){
-				if (!drsFile.equals(currentDrsFile)) {
-					currentDrsFile = drsFile;
-					try {
-						log.info("Using .drs File " + drsFile.getAbsolutePath());
-						loadDrsData(drsFile.toURI().toURL());
-					} catch (MalformedURLException e) {
-						//pass.
-					}
-				}
-			} else {
-				throw new IllegalArgumentException("No drs file set or no @drsFile key in data stream");
+		if( this.url == null && this.drsService != null){
+			//file not loaded yet. try to find through service
+			try {
+
+				DrsFileService.CalibrationInfo calibrationInfo = drsService.getCalibrationConstantsForDataItem(data);
+				this.drsBaselineMean = calibrationInfo.drsBaselineMean;
+				this.drsGainMean = calibrationInfo.drsGainMean;
+				this.drsTriggerOffsetMean = calibrationInfo.drsTriggerOffsetMean;
+
+			} catch (NullPointerException | IOException e) {
+				throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
 			}
 		}
 
