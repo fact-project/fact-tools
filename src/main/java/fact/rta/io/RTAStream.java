@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  *
  * Created by mackaiver on 21/09/16.
@@ -64,6 +66,11 @@ public class RTAStream extends AbstractMultiStream {
 
         public RegexVisitor(String pattern) {
             matcher = FileSystems.getDefault().getPathMatcher("regex:" + pattern);
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            return super.preVisitDirectory(dir, attrs);
         }
 
         @Override
@@ -134,6 +141,10 @@ public class RTAStream extends AbstractMultiStream {
                         s.messageHandler.sendDataStatus("No new data present.");
                     }
                 }
+                //sort entries by filename to get the lates one first.
+                List<Path> collect = fileQueue.stream().sorted(Comparator.comparing(p -> p.getFileName().toString())).collect(toList());
+                fileQueue.addAll(collect);
+
 
             } catch (IOException e) {
                 throw new RuntimeException();
