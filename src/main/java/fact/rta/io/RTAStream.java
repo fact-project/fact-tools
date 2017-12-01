@@ -181,6 +181,7 @@ public class RTAStream extends AbstractMultiStream {
             log.warn("Not using the hdureader as input stream. This won't skip non-data runs.");
         } catch (Exception e){
             log.warn("File failed to read. Skipping");
+            e.printStackTrace();
             checkNextFile();
         }
     }
