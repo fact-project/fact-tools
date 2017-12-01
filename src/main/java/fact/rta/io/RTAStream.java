@@ -37,7 +37,7 @@ public class RTAStream extends AbstractMultiStream {
 
     public BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
 
-    private Updater updater = new Updater();
+    Updater updater = new Updater();
     private RTADataBase.DBInterface dbInterface;
 
 
@@ -119,7 +119,7 @@ public class RTAStream extends AbstractMultiStream {
         new Timer().scheduleAtFixedRate(updater, 0, 10 * MINUTE);
     }
 
-    private class Updater extends TimerTask{
+    class Updater extends TimerTask{
 
         @Override
         public void run() {
@@ -141,7 +141,7 @@ public class RTAStream extends AbstractMultiStream {
                         s.messageHandler.sendDataStatus("No new data present.");
                     }
                 }
-                //sort entries by filename to get the lates one first.
+                //sort entries by filename to get the latest one first.
                 List<Path> collect = fileQueue.stream().sorted(Comparator.comparing(p -> p.getFileName().toString())).collect(toList());
                 fileQueue.addAll(collect);
 
