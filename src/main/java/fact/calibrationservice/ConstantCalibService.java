@@ -1,13 +1,13 @@
 package fact.calibrationservice;
 
-import java.time.ZonedDateTime;
-import java.time.ZoneOffset;
-import java.util.TreeSet;
-
+import fact.container.PixelSet;
+import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fact.hexmap.FactPixelMapping;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.TreeSet;
 
 /**
  * From the beginning on there were
@@ -62,15 +62,13 @@ public class ConstantCalibService implements CalibrationService {
 		set = new TreeSet<>();
 
 
-		HardwareConfiguration config1 = new HardwareConfiguration(ZonedDateTime.of(1970, 1, 1, 0, 0,0,0, ZoneOffset.UTC));
-		int[] badPixelFromBeginning = {863,868,297,927,80,873,1093,1094,527,528,721,722};
+		HardwareConfiguration config1 = new HardwareConfiguration(ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC));
+		PixelSet badPixelFromBeginning = PixelSet.fromIDs(new int[]{863, 868, 297, 927, 80, 873, 1093, 1094, 527, 528, 721, 722});
 		config1.setBadPixels(badPixelFromBeginning);
-		config1.setNotUsablePixels(null);
-
-
+		config1.setNotUsablePixels(new PixelSet());
 
 		HardwareConfiguration config2 = new HardwareConfiguration(ZonedDateTime.of(2014, 11, 15, 0, 0,0,0, ZoneOffset.UTC));
-		int[] brokenDrsBoard = {
+		PixelSet brokenDrsBoard = PixelSet.fromIDs(new int[]{
 				pixelMap.getChidFromSoftID(1193),
 				pixelMap.getChidFromSoftID(1194),
 				pixelMap.getChidFromSoftID(1195),
@@ -80,26 +78,26 @@ public class ConstantCalibService implements CalibrationService {
 				pixelMap.getChidFromSoftID(1304),
 				pixelMap.getChidFromSoftID(1305),
 				pixelMap.getChidFromSoftID(1306),
-				};
+		});
 		config2.setBadPixels(badPixelFromBeginning);
 		config2.setNotUsablePixels(brokenDrsBoard);
 
-		HardwareConfiguration config3 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 8, 0, 0,0,0, ZoneOffset.of("+00:00")));
+		HardwareConfiguration config3 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 8, 0, 0,0,0, ZoneOffset.UTC));
 		int[] badPixelInJanuary1 = {863,868,297,927,80,873,1093,1094,527,528,721,722,750,729};
-		config3.setBadPixels(badPixelInJanuary1);
+		config3.setBadPixels(PixelSet.fromIDs(badPixelInJanuary1));
 		config3.setNotUsablePixels(brokenDrsBoard);
 
-		HardwareConfiguration config4 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 9, 0, 0,0,0, ZoneOffset.of("+00:00")));
+		HardwareConfiguration config4 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 9, 0, 0,0,0, ZoneOffset.UTC));
 		int[] badPixelInJanuary2 = {863,868,297,927,80,873,1093,1094,527,528,721,722,750};
-		config4.setBadPixels(badPixelInJanuary2);
+		config4.setBadPixels(PixelSet.fromIDs(badPixelInJanuary2));
 		config4.setNotUsablePixels(brokenDrsBoard);
 
-		HardwareConfiguration config5 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 31, 0, 0,0,0, ZoneOffset.of("+00:00")));
+		HardwareConfiguration config5 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 31, 0, 0,0,0, ZoneOffset.UTC));
 		config5.setBadPixels(badPixelFromBeginning);
 		config5.setNotUsablePixels(brokenDrsBoard);
 
-		HardwareConfiguration config6 = new HardwareConfiguration(ZonedDateTime.of(2015, 2, 6, 0, 0,0,0, ZoneOffset.of("+00:00")));
-		int[] badPixelWithDeadBiasBord = {863,868,297,927,80,873,1093,1094,527,528,721,722,171,172,173,174};
+		HardwareConfiguration config6 = new HardwareConfiguration(ZonedDateTime.of(2015, 2, 6, 0, 0,0,0, ZoneOffset.UTC));
+		PixelSet badPixelWithDeadBiasBord = PixelSet.fromIDs(new int[]{863,868,297,927,80,873,1093,1094,527,528,721,722,171,172,173,174});
 		config6.setBadPixels(badPixelWithDeadBiasBord);
 		config6.setNotUsablePixels(brokenDrsBoard);
 
@@ -113,7 +111,7 @@ public class ConstantCalibService implements CalibrationService {
 
 		HardwareConfiguration config9 = new HardwareConfiguration(ZonedDateTime.of(2015, 5, 26, 0, 0,0,0, ZoneOffset.of("+00:00")));
 		config9.setBadPixels(badPixelWithDeadBiasBord);
-		config9.setNotUsablePixels(null);
+		config9.setNotUsablePixels(new PixelSet());
 		set.add(config1);
 		set.add(config2);
 		set.add(config3);
@@ -129,7 +127,7 @@ public class ConstantCalibService implements CalibrationService {
 	 * @see CalibrationService#getBadPixel(ZonedDateTime)
 	 */
 	@Override
-	public int[] getBadPixel(ZonedDateTime eventTimeStamp) {
+	public PixelSet getBadPixel(ZonedDateTime eventTimeStamp) {
 		if (isInit == false){
 			init();
 			isInit = true;
@@ -142,7 +140,7 @@ public class ConstantCalibService implements CalibrationService {
 	 * @see CalibrationService#getNotUsablePixels(ZonedDateTime)
 	 */
 	@Override
-	public int[] getNotUsablePixels(ZonedDateTime eventTimeStamp) {
+	public PixelSet getNotUsablePixels(ZonedDateTime eventTimeStamp) {
 		if (isInit == false){
 			init();
 			isInit = true;

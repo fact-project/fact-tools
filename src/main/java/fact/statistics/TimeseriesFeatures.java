@@ -8,8 +8,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Arrays;
-
 
 /**
  * This processor calculates several features of the timerow in a given timewindow:

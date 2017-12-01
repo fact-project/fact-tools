@@ -3,14 +3,16 @@
  */
 package fact.datacorrection;
 
-import fact.io.hdureader.*;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.net.URL;
 public class DrsCalibration implements StatefulProcessor {
 	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
+	@Parameter
 	public String outputKey = "DataCalibrated";
 
 	@Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
@@ -38,7 +41,6 @@ public class DrsCalibration implements StatefulProcessor {
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
 	public URL url = null;
 
-	Data drsData = null;
 
 	private File currentDrsFile = new File("");
 
@@ -143,8 +145,8 @@ public class DrsCalibration implements StatefulProcessor {
 			output = new double[rawData.length];
 		}
 
-		double[] calibrated = applyDrsCalibration(rawfloatData, output,
-				startCell);
+		double[] calibrated = applyDrsCalibration(rawfloatData, output,	startCell);
+
 		data.put(outputKey, calibrated);
 
 		// add color value if set

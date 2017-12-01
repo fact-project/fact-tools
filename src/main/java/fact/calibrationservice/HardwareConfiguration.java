@@ -1,15 +1,18 @@
 package fact.calibrationservice;
 
 
-import java.time.*;
+import fact.container.PixelSet;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class HardwareConfiguration implements Comparable<HardwareConfiguration> {
 
 	private ZonedDateTime startTime;
 
-	private int[] badPixels;
+	private PixelSet badPixels;
 
-	private int[] notUsablePixels;
+	private PixelSet notUsablePixels;
 
 	public HardwareConfiguration(ZonedDateTime startTime){
 		this.startTime = startTime.withZoneSameInstant(ZoneOffset.UTC);
@@ -42,19 +45,19 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
 		this.startTime = startTime;
 	}
 
-	public int[] getBadPixels() {
+	public PixelSet getBadPixels() {
 		return badPixels;
 	}
 
-	public void setBadPixels(int[] badPixels) {
+	public void setBadPixels(PixelSet badPixels) {
 		this.badPixels = badPixels;
 	}
 
-	public int[] getNotUsablePixels() {
+	public PixelSet getNotUsablePixels() {
 		return notUsablePixels;
 	}
 
-	public void setNotUsablePixels(int[] notUsablePixels) {
+	public void setNotUsablePixels(PixelSet notUsablePixels) {
 		this.notUsablePixels = notUsablePixels;
 	}
 

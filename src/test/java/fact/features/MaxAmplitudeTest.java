@@ -1,9 +1,9 @@
 package fact.features;
 
-import fact.extraction.MaxAmplitude;
 import fact.datacorrection.DrsCalibration;
-import fact.io.hdureader.FITSStream;
+import fact.extraction.MaxAmplitude;
 import fact.io.FITSStreamTest;
+import fact.io.hdureader.FITSStream;
 import org.junit.Before;
 import org.junit.Test;
 import stream.Data;

@@ -1,15 +1,11 @@
 package fact.extraction;
 
 import fact.container.PixelSet;
-import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.hexmap.PixelMapping;
-import stream.data.DataFactory;
-import stream.Data;
 import junit.framework.Assert;
 import org.junit.Test;
-import streams.tikz.Pixel;
+import stream.Data;
+import stream.data.DataFactory;
 
 
 public class AboveThresholdTest {

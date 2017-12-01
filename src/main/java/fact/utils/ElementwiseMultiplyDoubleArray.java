@@ -1,9 +1,9 @@
 package fact.utils;
 
+import fact.photonstream.timeSeriesExtraction.ElementWise;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import fact.photonstream.timeSeriesExtraction.ElementWise;
 
 public class ElementwiseMultiplyDoubleArray implements Processor {
 

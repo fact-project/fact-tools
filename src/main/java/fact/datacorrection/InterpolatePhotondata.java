@@ -3,21 +3,18 @@ package fact.datacorrection;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.Processor;
-import stream.annotations.Service;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
 
-import javax.rmi.CORBA.Util;
-import java.time.*;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 /**
  *
@@ -64,25 +61,21 @@ public class InterpolatePhotondata implements Processor {
     		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
     	}
 
-    	int[] badChIds = calibService.getBadPixel(timeStamp);
-    	PixelSet badPixelsSet = new PixelSet();
-		for (int px: badChIds){
-			badPixelsSet.addById(px);
-		}
+    	PixelSet badPixelsSet = calibService.getBadPixel(timeStamp);
 
 		if(!photonChargeKey.equals(photonChargeOutputKey)){
 			double[] newPhotonCharge = new double[photoncharge.length];
 			System.arraycopy(photoncharge,0, newPhotonCharge, 0, photoncharge.length);
-			photoncharge = interpolatePixelArray(newPhotonCharge, badChIds);
+			photoncharge = interpolatePixelArray(newPhotonCharge, badPixelsSet);
 		} else {
-			photoncharge = interpolatePixelArray(photoncharge, badChIds);
+			photoncharge = interpolatePixelArray(photoncharge, badPixelsSet);
 		}
 		if(!arrivalTimeKey.equals(arrivalTimeOutputKey)){
 			double[] newArrivalTime = new double[arrivalTime.length];
 			System.arraycopy(arrivalTime,0, newArrivalTime, 0, arrivalTime.length);
-			arrivalTime = interpolatePixelArray(newArrivalTime, badChIds);
+			arrivalTime = interpolatePixelArray(newArrivalTime, badPixelsSet);
 		} else {
-			arrivalTime = interpolatePixelArray(arrivalTime, badChIds);
+			arrivalTime = interpolatePixelArray(arrivalTime, badPixelsSet);
 		}
 		item.put(photonChargeOutputKey, photoncharge);
 		item.put(arrivalTimeOutputKey, arrivalTime);
@@ -91,20 +84,20 @@ public class InterpolatePhotondata implements Processor {
         return item;
     }
 
-    private double[] interpolatePixelArray(double[] pixelArray, int[] badChIds) {
-    	for (int pix: badChIds){
-			FactCameraPixel[] currentNeighbors = pixelMap.getNeighboursFromID(pix);
-			double avg = 0.0f;
+    private double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
+    	for (CameraPixel pixel: badPixels){
+			FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
+			double avg = 0.0;
 			int numNeighbours = 0;
 			for (FactCameraPixel nPix: currentNeighbors){
-				if (ArrayUtils.contains(badChIds, nPix.id)){
+				if (badPixels.contains(nPix)) {
 					continue;
 				}
 				avg += pixelArray[nPix.id];
 				numNeighbours++;
 			}
-			checkNumNeighbours(numNeighbours, pix);
-			pixelArray[pix] = avg/numNeighbours;
+			checkNumNeighbours(numNeighbours, pixel.id);
+			pixelArray[pixel.id] = avg / numNeighbours;
 		}
 		return pixelArray;
 	}

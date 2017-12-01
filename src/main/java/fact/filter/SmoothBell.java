@@ -40,7 +40,7 @@ public class SmoothBell implements Processor {
 
 
         for(int i=0; i<1440; i++){
-            FactCameraPixel[] neighbors = mapping.getNeighboursFromID(i);
+            FactCameraPixel[] neighbors = mapping.getNeighborsFromID(i);
                 double sumNeighbors = 0;
             for(FactCameraPixel n : neighbors){
                 sumNeighbors += pixelValues[n.id];

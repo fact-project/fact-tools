@@ -2,11 +2,10 @@ package fact.services;
 
 
 import fact.auxservice.AuxCache;
+import fact.auxservice.AuxFileService;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryServiceName;
-import fact.auxservice.AuxFileService;
 import fact.auxservice.strategies.Closest;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import stream.io.SourceURL;
 
@@ -17,13 +16,10 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.SortedSet;
 
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**

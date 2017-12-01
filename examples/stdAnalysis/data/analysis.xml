@@ -24,9 +24,11 @@
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
         <!-- Output: Data -->
 
+	<fact.features.UnixTimeUTC2DateTime />
+
         <!-- Calibration: -->
         <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
+        DrsTimeCalibration, InterpolateBadPixel -->
         <include url="classpath:/default/data/calibration.xml" />
         <!-- Output: DataCalibrated -->
 

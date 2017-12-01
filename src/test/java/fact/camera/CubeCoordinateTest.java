@@ -1,14 +1,11 @@
 package fact.camera;
 
-        import fact.hexmap.CameraPixel;
-        import fact.hexmap.FactCameraPixel;
-        import fact.hexmap.FactPixelMapping;
-        import org.junit.Test;
+import fact.hexmap.FactPixelMapping;
+import org.junit.Test;
 
-        import java.io.*;
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
-        import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by lena on 03.12.15.

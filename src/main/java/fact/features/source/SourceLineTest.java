@@ -1,8 +1,8 @@
 package fact.features.source;
 
 import fact.Utils;
-import fact.hexmap.FactPixelMapping;
 import fact.container.PixelSet;
+import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

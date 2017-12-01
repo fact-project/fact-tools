@@ -19,7 +19,7 @@
 		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <!-- Calibration: -->
         <!-- PreviousEventInfo, DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
+        DrsTimeCalibration, InterpolateBadPixel -->
         <include url="classpath:/default/mc/calibration_mc.xml" />
         <!-- Output: DataCalibrated -->
 

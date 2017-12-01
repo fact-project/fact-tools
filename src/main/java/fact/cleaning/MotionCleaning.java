@@ -8,7 +8,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * MotionCleaning:
@@ -147,7 +146,7 @@ public class MotionCleaning implements Processor {
         for (int i = 0; i < 1440; i++) {
             if (clusterID[i] == 0) {
                 int numberNeighbours = 0;
-                FactCameraPixel[] neighbours = map.getNeighboursFromID(i);
+                FactCameraPixel[] neighbours = map.getNeighborsFromID(i);
                 for (FactCameraPixel n:neighbours) {
                     if (clusterID[n.id] == 0) {
                         numberNeighbours++;
@@ -165,7 +164,7 @@ public class MotionCleaning implements Processor {
         for (int i = 0; i < 1440; i++) {
             if(clusterID[i] == -2){
                 int numberNeighbours = 0;
-                FactCameraPixel[] neighbours = map.getNeighboursFromID(i);
+                FactCameraPixel[] neighbours = map.getNeighborsFromID(i);
                 for(FactCameraPixel n : neighbours){
                     if(clusterID[n.id] == 0){
                         numberNeighbours++;
