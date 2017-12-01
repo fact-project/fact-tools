@@ -5,12 +5,10 @@ import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.strategies.AuxPointStrategy;
-import fact.rta.db.*;
+import fact.rta.db.Run;
 import fact.rta.db.Signal;
-
 import fact.rta.rest.Event;
 import fact.rta.rest.StatusContainer;
-import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,9 +152,11 @@ public class WebSocketService implements AuxiliaryService {
 
             currentRun = newRun;
         }
-
-        signals.add(new Signal(eventTimeStamp, ZonedDateTime.now(ZoneOffset.UTC), item, currentRun));
-        messageHandler.sendEvent(new Event(eventTimeStamp, item));
+        Signal signal = new Signal(eventTimeStamp, ZonedDateTime.now(ZoneOffset.UTC), item, currentRun);
+        signals.add(signal);
+        if (signal.prediction > 0.7) {
+            messageHandler.sendEvent(new Event(eventTimeStamp, item));
+        }
     }
 
     /**
