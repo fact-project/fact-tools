@@ -128,12 +128,13 @@ public class AuxFileService implements AuxiliaryService {
         Path pathToFile = Paths.get(auxFolder.getPath(), key.path.toString());
 
         if(pathToFile == null){
-            log.error("Could not load aux file {} for night {}", key.service, key.factNight);
+            log.error("Path was null. Could not load aux file {} for night {}", key.service, key.factNight);
             throw new IOException("Could not load aux file for key " +  key);
         }
 
         //test whether file is in current directory. this ensures compatibility to fact-tools version < 18.0
         if (!pathToFile.toFile().canRead()){
+            log.warn("Could not load data from {}. Trying basepath.", pathToFile);
             pathToFile = Paths.get(auxFolder.getPath(), key.filename);
 
             if (!pathToFile.toFile().canRead()){

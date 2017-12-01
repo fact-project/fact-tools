@@ -59,6 +59,7 @@ public class FITS {
         try {
             return new FITS(path.toUri().toURL());
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException();
         }
     }
