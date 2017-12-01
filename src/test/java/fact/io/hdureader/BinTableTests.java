@@ -21,7 +21,7 @@ public class BinTableTests {
 
     @Test
     public void testBinTableIterator() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+        URL u =  BinTableTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
         BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
@@ -35,7 +35,7 @@ public class BinTableTests {
 
     @Test
     public void testBinTableIteratorForMCs() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testMcFile.fits.gz");
+        URL u =  BinTableTests.class.getResource("/testMcFile.fits.gz");
 
         FITS f = new FITS(u);
         BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
@@ -52,7 +52,7 @@ public class BinTableTests {
 
     @Test
     public void testBinTableReader() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+        URL u =  BinTableTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
 
@@ -84,7 +84,7 @@ public class BinTableTests {
 
     @Test
     public void testFitsBinTable() throws Exception {
-        URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.gz");
+        URL u =  BinTableTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
 

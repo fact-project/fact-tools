@@ -3,7 +3,6 @@ package fact.io.hdureader;
 import com.google.common.base.Splitter;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * One line of a FITS header. Including the comment.

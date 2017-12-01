@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  *
  * Created by mackaiver on 21/09/16.
@@ -35,7 +37,7 @@ public class RTAStream extends AbstractMultiStream {
 
     public BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
 
-    private Updater updater = new Updater();
+    Updater updater = new Updater();
     private RTADataBase.DBInterface dbInterface;
 
 
@@ -64,6 +66,11 @@ public class RTAStream extends AbstractMultiStream {
 
         public RegexVisitor(String pattern) {
             matcher = FileSystems.getDefault().getPathMatcher("regex:" + pattern);
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            return super.preVisitDirectory(dir, attrs);
         }
 
         @Override
@@ -112,7 +119,7 @@ public class RTAStream extends AbstractMultiStream {
         new Timer().scheduleAtFixedRate(updater, 0, 10 * MINUTE);
     }
 
-    private class Updater extends TimerTask{
+    class Updater extends TimerTask{
 
         @Override
         public void run() {
@@ -134,6 +141,10 @@ public class RTAStream extends AbstractMultiStream {
                         s.messageHandler.sendDataStatus("No new data present.");
                     }
                 }
+                //sort entries by filename to get the latest one first.
+                List<Path> collect = fileQueue.stream().sorted(Comparator.comparing(p -> p.getFileName().toString())).collect(toList());
+                fileQueue.addAll(collect);
+
 
             } catch (IOException e) {
                 throw new RuntimeException();
@@ -157,7 +168,8 @@ public class RTAStream extends AbstractMultiStream {
         try{
             stream.init();
             FITSStream zstream = (FITSStream) stream;
-            String runtype = zstream.eventHDUHeader.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
+
+            String runtype = zstream.eventHDU.header.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
 
             if(!runtype.equals("data")){
                 //not a data run. skip

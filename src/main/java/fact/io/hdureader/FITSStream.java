@@ -1,6 +1,7 @@
 package fact.io.hdureader;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
@@ -8,6 +9,8 @@ import stream.io.SourceURL;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The ZFitsStream can read FITS files containing raw data as recorded by the FACT telescope DAQ.
@@ -22,19 +25,21 @@ public class FITSStream extends AbstractStream {
     private short[] offsetCalibrationsConstants;
     private Reader reader;
 
-    private HDU eventHDU;
-    public Header eventHDUHeader;
+    public HDU eventHDU;
+    private Map<String, Serializable> fitsHeader = new HashMap<>();
+
+    @Parameter(required = false, description = "The name of the HDU to read the data from.", defaultValue = "Events")
+    public String nameHDU="Events";
 
     public FITSStream(SourceURL url){
         this.url = url;
     }
 
-    public FITSStream() {}
+    public FITSStream() {    }
 
     @Override
     public void init() throws Exception {
         super.init();
-        this.count= 0L;
 
         //create a fits object from the SourceURL this AbstractStream contains.
         //The FITs object does not know SourceURL so this fits reader is decoupled entirely from the streams framework
@@ -53,22 +58,23 @@ public class FITSStream extends AbstractStream {
                     .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
 
         }
-
-
         //create a refrence to the events hdu
-        eventHDU = fits.getHDU("Events");
-        BinTable eventsTable = eventHDU.getBinTable();
+        eventHDU = fits.getHDU(nameHDU);
+        if (eventHDU!=null) {
+            BinTable eventsTable = eventHDU.getBinTable();
 
-        //read each headerline and try to get the right datatype
-        //from smallest to largest datatype
-        //if no number can be found simply save the string.
-        eventHDUHeader = eventHDU.header;
+            //read each headerline and try to get the right datatype
+            //from smallest to largest datatype
+            //if no number can be found simply save the string.
+            Header header = eventHDU.header;
+            fitsHeader = header.asMapOfSerializables();
 
-        Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-        if (ztable) {
-            reader = ZFITSHeapReader.forTable(eventsTable);
-        } else {
-            reader = BinTableReader.forBinTable(eventsTable);
+            Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+            if (ztable) {
+                reader = ZFITSHeapReader.forTable(eventsTable);
+            } else {
+                reader = BinTableReader.forBinTable(eventsTable);
+            }
         }
     }
 
@@ -95,18 +101,20 @@ public class FITSStream extends AbstractStream {
 
         OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
 
-        short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
-        short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
-        Integer roi = eventHDU.header.getInt("NROI").orElse(300);
 
         if (offsetCalibrationsConstants !=  null) {
+            short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
+            short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
+
+            Integer roi = eventHDU.header.getInt("NROI").orElse(300);
+
             applyDrsOffsetCalib(roi, data, startCellData, offsetCalibrationsConstants);
             nextRow.put("Data", data);
         }
 
         Data item = DataFactory.create(nextRow);
-        item.putAll(eventHDUHeader.asMapOfSerializables());
+        item.putAll(fitsHeader);
 
         return item;
     }

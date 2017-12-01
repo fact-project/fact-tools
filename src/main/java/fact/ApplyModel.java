@@ -18,7 +18,6 @@ import stream.io.SourceURL;
 
 import javax.xml.transform.Source;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +33,7 @@ import java.util.HashMap;
  * This processor is able to serialize scalars and 1d-arrays of fixed length containing primitive types.
  * Other data structures will be ignored (complex objects) or lead to errors (variable length arrays).
  *
- * The fits file is initialised using the given keys from first data item.
+ * The fits file is initialised and the header is filled using the given keys from first data item.
  * All following items must have the same structure.
  *
  */
@@ -38,30 +41,33 @@ public class FITSWriter implements StatefulProcessor {
 
     static Logger log = LoggerFactory.getLogger(FITSWriter.class);
 
-    @Parameter(required = true, description = "Keys to write to the FITS file. Using streams.Keys")
-    private Keys keys = new Keys("");
+    @Parameter(required = true, description = "Keys to write to the FITS Binary Table. Using streams.Keys")
+    public Keys keys = new Keys("");
+
+    @Parameter(description = "Keys to write to the FITS Header. Only the first data item will be used. Using streams.Keys")
+    public Keys headerKeys = new Keys("");
 
     @Parameter(required = true, description = "Url for the output file")
-    private URL url;
+    public URL url;
 
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
-    private String extname = "Events";
+    public String extname = "Events";
 
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
     private boolean initialized = false;
     private long rowSize;
-    private long numEventsWritten = 0;
 
-    static ArrayList<String> columnNames = new ArrayList<>(0);
-    static HashMap<String, int[]> columnDimensions = new HashMap<>(0);
+    long numEventsWritten = 0;
+
+    ArrayList<String> columnNames = new ArrayList<>(0);
+    HashMap<String, int[]> columnDimensions = new HashMap<>(0);
 
 
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
-
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
         }
@@ -69,7 +75,14 @@ public class FITSWriter implements StatefulProcessor {
         if (!initialized){
             try {
                 log.info("Initialising output fits file");
-                initFITSFile(outputItem);
+
+                Data headerItem = DataFactory.create();
+                for (String key: headerKeys.select(item) ){
+                    log.debug("Saving key {} to header", key);
+                    headerItem.put(key, item.get(key));
+                }
+
+                initFITSFile(outputItem, headerItem);
                 initialized = true;
             } catch (FitsException e){
                 throw new RuntimeException("Could not initialize fits file", e);
@@ -143,6 +156,47 @@ public class FITSWriter implements StatefulProcessor {
         bf.write(buffer.array());
     }
 
+    private void fillHeader(Header header, Data item) {
+        for (String key: item.keySet()) {
+            Serializable serializable = item.get(key);
+
+            if (key.length() > 8) {
+                log.warn("Key {} too long, truncating to {}", key, key.substring(0, 8));
+                key = key.substring(0, 8);
+            }
+
+            Class<? extends Serializable> type = serializable.getClass();
+            try {
+                if (ClassUtils.isAssignable(type, String.class)) {
+                    header.addValue(key, (String) serializable, "");
+                } else if (ClassUtils.isAssignable(type, Integer.class)) {
+                    header.addValue(key, (int) serializable, "");
+                } else if (ClassUtils.isAssignable(type, Double.class)) {
+                    header.addValue(key, (double) serializable, "");
+                } else if (ClassUtils.isAssignable(type, Float.class)) {
+                    header.addValue(key, (float) serializable, "");
+                } else if (ClassUtils.isAssignable(type, Short.class)) {
+                    header.addValue(key, (short) serializable, "");
+                } else if (ClassUtils.isAssignable(type, Long.class)) {
+                    header.addValue(key, (long) serializable, "");
+                } else if (ClassUtils.isAssignable(type, Boolean.class)) {
+                    header.addValue(key, (boolean) serializable, "");
+                } else if (ClassUtils.isAssignable(type, ZonedDateTime.class)) {
+                    ZonedDateTime zonedDateTime = (ZonedDateTime) serializable;
+                    header.addValue(key, zonedDateTime.format(DateTimeFormatter.ISO_INSTANT), "");
+                } else if (ClassUtils.isAssignable(type, LocalDateTime.class)) {
+                    LocalDateTime localDateTime = (LocalDateTime) serializable;
+                    header.addValue(key, localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "");
+                } else {
+                    throw new RuntimeException("Key '" + key + "' cannot be saved to FITS Header");
+                }
+            } catch (HeaderCardException e) {
+                log.error("Could not write key {} to FITS header", key);
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     private Object wrapInArray(Serializable serializable) throws RuntimeException {
         Class<? extends Serializable> type = serializable.getClass();
 
@@ -165,6 +219,9 @@ public class FITSWriter implements StatefulProcessor {
                 return new long[]{(long) serializable};
             } else if (ClassUtils.isAssignable(type, Boolean.class)) {
                 return new boolean[]{(boolean) serializable};
+            } else if (ClassUtils.isAssignable(type, ZonedDateTime.class)) {
+                ZonedDateTime zonedDateTime = (ZonedDateTime) serializable;
+                return new String[]{zonedDateTime.format(DateTimeFormatter.ISO_INSTANT)};
             } else {
                 throw new RuntimeException("Serializable cannot be saved to FITS");
             }
@@ -172,11 +229,10 @@ public class FITSWriter implements StatefulProcessor {
     }
 
 
-    private void initFITSFile(Data item) throws  FitsException{
+    private void initFITSFile(Data item, Data headerItem) throws  FitsException{
         ArrayList<Object> rowList = new ArrayList<>();
         for (String columnName: item.keySet()) {
             Serializable serializable = item.get(columnName);
-
             try {
                 Object elem = wrapInArray(serializable);
                 rowList.add(elem);
@@ -192,8 +248,11 @@ public class FITSWriter implements StatefulProcessor {
         log.info("Row size is {} bytes", rowSize);
         BinaryTable table = new BinaryTable();
         table.addRow(row);
+
         Header header = new Header();
         table.fillHeader(header);
+        fillHeader(header, headerItem);
+
         bhdu = new BinaryTableHDU(header, table);
 
         log.info("created bhdu with {} columns", bhdu.getData().getNCols());
@@ -235,21 +294,5 @@ public class FITSWriter implements StatefulProcessor {
         } else {
             bf.close();
         }
-    }
-
-    public void setKeys(Keys keys) {
-        this.keys = keys;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
-    public void setExtname(String extname) {
-        this.extname = extname;
-    }
-
-    public long getNumEventsWritten() {
-        return numEventsWritten;
     }
 }

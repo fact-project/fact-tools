@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
@@ -93,7 +92,7 @@ public class NeighborPixelDCF implements StatefulProcessor {
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
-            FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
+            FactCameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
 
 
             double pixStdDev = pixelStatistics[pix].getStandardDeviation();

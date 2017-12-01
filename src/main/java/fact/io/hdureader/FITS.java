@@ -110,7 +110,8 @@ public class FITS {
     }
 
     static DataInputStream getUnGzippedDataStream(URL url) throws IOException {
-        InputStream stream = url.openStream();
+        BufferedInputStream stream = new BufferedInputStream(url.openStream());
+
 
         byte[] header = new byte[2];
         stream.mark(2);

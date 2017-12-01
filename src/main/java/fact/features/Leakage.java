@@ -1,10 +1,10 @@
 package fact.features;
 
 import fact.Utils;
+import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.container.PixelSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -31,10 +31,10 @@ public class Leakage implements Processor {
 
 		PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
 		double[] photonCharge = (double[]) input.get(weights);
-		
-		
+
+
 		double size = 0;
-	
+
 	    double leakageBorder          = 0;
 	    double leakageSecondBorder    = 0;
 
@@ -54,17 +54,17 @@ public class Leakage implements Processor {
 	    leakageBorder          = leakageBorder        / size;
 	    leakageSecondBorder    = leakageSecondBorder  / size;
 
-		
+
 		input.put(leakage1OutputKey , leakageBorder);
 		input.put(leakage2OutputKey , leakageSecondBorder);
 		return input;
-		
-		
+
+
 	}
-	
+
 	//this is of course not the most efficient solution
 	boolean isSecondBorderPixel(int pix){
-		for(FactCameraPixel nPix: pixelMap.getNeighboursFromID(pix))
+		for(FactCameraPixel nPix: pixelMap.getNeighborsFromID(pix))
 		{
 			if(isBorderPixel(nPix.id)){
 				return true;
@@ -73,7 +73,7 @@ public class Leakage implements Processor {
 		return false;
 	}
 	boolean isBorderPixel(int pix){
-        return pixelMap.getNeighboursFromID(pix).length < 6;
+        return pixelMap.getNeighborsFromID(pix).length < 6;
 	}
 
 	public void setPixelSetKey(String pixelSetKey) {
@@ -103,6 +103,6 @@ public class Leakage implements Processor {
 		this.leakage2OutputKey = leakage2OutputKey;
 	}
 
-	
+
 
 }

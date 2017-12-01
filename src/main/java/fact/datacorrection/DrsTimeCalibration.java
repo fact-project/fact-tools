@@ -1,19 +1,25 @@
 package fact.datacorrection;
 
-import fact.hexmap.FactPixelMapping;
-import fact.io.FITSStream;
+import fact.Utils;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
 import fact.utils.LinearTimeCorrectionKernel;
+import fact.utils.TimeCorrectionKernel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.io.SourceURL;
 
-import static com.google.common.primitives.Doubles.max;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
 
 /**
- * Applies DRS4 time calibration by using
- *  long_term_constants_median.time.drs.fits
+ * Applies DRS4 time calibration by using long_term_constants_median.time.drs.fits
  *
  *  The common reference point is the 976.5625 kHz DRS4 reference clock. This means the time
  *  of sampling physical cell zero is assumed to be equal for all 160 DRS4 chips in the camera.
@@ -35,133 +41,110 @@ import static com.google.common.primitives.Doubles.max;
  *
  */
 public class DrsTimeCalibration implements StatefulProcessor{
+	static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
+
+	@Parameter(required=false, description="Key of the StartCellData in the data fits file",defaultValue="StartCellData")
+	private String startCellKey = "StartCellData";
+
+	@Parameter(required=false, description="name of column in FITS file to find DRS4 time calibration constants.")
+	private String drsTimeKey = "CellOffset";
+
+	@Parameter(required = false, description = "file with the drs time calib constants", defaultValue="classpath:/long_term_constants_median.time.drs.fits")
+	private URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
+
+	@Parameter(required = true, description = "key to the drs amplitude calibrated voltage curves")
+	private String dataKey = null;
+
+	@Parameter(required = true, description = "OutputKey for the calibrated voltage curves")
+	private String outputKey = null;
+
+	private int numberOfSlices = 1024;
+	private int numberOfTimeMarker = 160;
+
+	private double[] absoluteTimeOffsets = new double[numberOfSlices * numberOfTimeMarker];
 
 
-    @Parameter(required = false, description = "", defaultValue = "The standard file provided in the jar")
-    SourceURL url = new SourceURL(DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits"));
+	@Override
+	public void init(ProcessContext context) {
+		try {
+			loadDrsTimeCalibConstants(url);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	@Override
+	public Data process(Data input) {
+		Utils.isKeyValid(input, "NPIX", Integer.class);
+
+		int npix = (Integer) input.get("NPIX");
+		int roi = (Integer) input.get("NROI");
+		short[] startCell = (short[]) input.get(startCellKey);
+
+		if (startCell == null) {
+			throw new RuntimeException("Couldn't find StartCellData");
+		}
+
+		double[] relativeTimeOffsets = new double[roi* npix];
+		for (int px = 0; px < npix; px++){
+			int patch = px / 9;
+			double offsetAtStartCell = absoluteTimeOffsets[patch*numberOfSlices + startCell[px]];
+			for (int slice = 0 ; slice < roi ; slice++){
+				int cell = patch*numberOfSlices + (slice + startCell[px])%numberOfSlices;
+				relativeTimeOffsets[px * roi + slice] = absoluteTimeOffsets[cell] - offsetAtStartCell;
+			}
+		}
+
+		npix = (Integer) input.get("NPIX");
+		double[] data = (double[]) input.get(dataKey);
+		roi = data.length / npix;
+		TimeCorrectionKernel tcKernel = new LinearTimeCorrectionKernel();
+
+		double [] calibratedValues = new double[roi * npix];
+		for(int chid = 0; chid < npix; chid++)
+		{
+			double [] realtimes = new double[roi];
+			double [] values = new double[roi];
+
+			for(int slice = 0; slice < roi; slice++)
+			{
+				realtimes[slice] = slice - relativeTimeOffsets[chid * roi + slice];
+				values[slice] = data[chid * roi + slice];
+			}
+			tcKernel.fit(realtimes, values);
+
+			for(int slice = 0; slice < roi; slice++)
+			{
+				calibratedValues[chid * roi + slice] = tcKernel.interpolate((double) slice);
+			}
+
+		}
+
+		input.put(outputKey, calibratedValues);
+		return input;
+	}
+
+	protected void loadDrsTimeCalibConstants(URL  in) throws IOException {
+		FITS fits = new FITS(in);
+		BinTable calibrationTable = fits.getBinTableByName("DrsCellTimes").orElseThrow(() -> new RuntimeException("No Bintable with \"DrsCellTimes\""));
+
+		BinTableReader reader = BinTableReader.forBinTable(calibrationTable);
 
 
-    @Parameter(required = false, description = "")
-    String outputKey = "DataCalibrated";
+		OptionalTypesMap<String, Serializable> row = reader.getNextRow();
+
+		absoluteTimeOffsets = row.getDoubleArray(drsTimeKey).orElseThrow(()->new RuntimeException(drsTimeKey+"is not in the File"));
+	}
 
 
-    @Parameter(required = false, description = "")
-    String dataKey = "DataCalibrated";
+	@Override
+	public void resetState() throws Exception {
 
-    @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
-    private String drsTimeKey = "CellOffset";
+	}
 
-    private Data drsTimeData;
-    public double[][] true_sampling_time;
+	@Override
+	public void finish() throws Exception {
 
-    private FactPixelMapping m;
-    private LinearTimeCorrectionKernel linearTimeCorrectionKernel = new LinearTimeCorrectionKernel();
-
-    /**
-     * We save the sampling constants into a 2D Array once before the process starts.
-     * The dimension is 2*1024 so we dont have to worry about overlaps in the ringbuffer.
-     *
-     * @param processContext
-     * @throws Exception
-     */
-    @Override
-    public void init(ProcessContext processContext) throws Exception {
-        m = FactPixelMapping.getInstance();
-        double[] absoluteTimeOffsets = loadDrsTimeCalibConstants(url);
-
-        true_sampling_time = new double[160][2048];
-        for(int chip = 0; chip < 160; chip++){
-            System.arraycopy(absoluteTimeOffsets, chip*1024, true_sampling_time[chip], 0, 1024);
-            System.arraycopy(absoluteTimeOffsets, chip*1024, true_sampling_time[chip], 1024, 1024);
-        }
-        for(int chip = 0; chip < 160; chip++){
-            for(int i = 0; i < 2048; i++){
-                true_sampling_time[chip][i] = i - true_sampling_time[chip][i];
-            }
-        }
-    }
-
-
-    @Override
-    public Data process(Data data) {
-
-        short[] startCells = (short[]) data.get("StartCellData");
-        double[] dataCalibrated = (double[]) data.get(dataKey);
-        int npix = 1440;
-        int roi = 300;
-
-
-        double [] timeCalibratedValues = new double[roi * npix];
-        double [][] samplingTimes = new double[npix][roi];
-
-        double [] firstSamplingTimes = new double[npix];
-
-        //We want to get the latest sampling point at the start of the timeseries.
-        for (int pix = 0; pix < npix; pix++){
-            int chip = m.getPixelFromId(pix).drs_chip;
-
-            System.arraycopy(true_sampling_time[chip], startCells[pix], samplingTimes[pix], 0, roi);
-
-            firstSamplingTimes[pix]= samplingTimes[pix][0];
-        }
-        double maximumFirstSamplingTime = max(firstSamplingTimes);
-
-        //at this point the samplingTimes array contains the 't' values for each entry in 'DataCalibrated'
-        double[] currentPixelsDataCalibrated = new double[roi];
-        for (int pix = 0; pix < npix; pix++){
-            System.arraycopy(dataCalibrated, pix * roi, currentPixelsDataCalibrated, 0, roi);
-            linearTimeCorrectionKernel.fit(samplingTimes[pix], currentPixelsDataCalibrated);
-            for (int slice = 0; slice < roi; slice++){
-                timeCalibratedValues[pix*roi + slice] = linearTimeCorrectionKernel.interpolate(maximumFirstSamplingTime + slice);
-            }
-        }
-
-        data.put(outputKey, timeCalibratedValues);
-        //data.put("firstSamplingTime", firstSamplingTimes );
-        return data;
-    }
-
-    protected double[] loadDrsTimeCalibConstants(SourceURL  in) {
-        try {
-
-            FITSStream stream = new FITSStream(in);
-            stream.init();
-            drsTimeData = stream.readNext();
-
-            if (!drsTimeData.containsKey(drsTimeKey))
-            {
-                throw new RuntimeException("Drs time data is missing key + " + drsTimeKey + "!");
-            }
-            return (double[]) drsTimeData.get(drsTimeKey);
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void resetState() throws Exception {}
-
-    @Override
-    public void finish() throws Exception {
-
-    }
-
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setDrsTimeKey(String drsTimeKey) {
-        this.drsTimeKey = drsTimeKey;
-    }
-
+	}
 }

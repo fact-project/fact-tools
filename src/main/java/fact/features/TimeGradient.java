@@ -1,9 +1,9 @@
 package fact.features;
 
 import fact.Utils;
+import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.container.PixelSet;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;

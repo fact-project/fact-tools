@@ -8,7 +8,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import streams.tikz.Pixel;
 
 /**
  * Created by max on 13.05.16.

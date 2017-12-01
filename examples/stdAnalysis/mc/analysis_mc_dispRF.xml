@@ -12,14 +12,14 @@
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
-    <stream id="fact" class="fact.io.FITSStream" url="${infile}"/>
+    <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
     <process id="2" input="fact">
 
 		<stream.flow.Skip condition="%{data.TriggerType} != 4" />
         <!-- Calibration: -->
         <!-- PreviousEventInfo, DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, ArrayTimeCorrection, InterpolateBadPixel -->
+        DrsTimeCalibration, InterpolateBadPixel -->
         <include url="classpath:/default/mc/calibration_mc.xml" />
         <!-- Output: DataCalibrated -->
 
