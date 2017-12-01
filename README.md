@@ -48,5 +48,9 @@ Properties in the `XML` file can be overwritten on the commandline by providing 
 $ java -jar fact-tools-VERSION.jar examples/viewer.xml -Dinfile=file:20131101_151.fits.fz
 ```
 
-We also provide a python package to make running the `FACT-Tools` on
+We also provide a python package including commandline-executables to make running the `FACT-Tools` on
 large amounts of FACT files easier, it's called [erna](https://github.com/fact-project/erna)
+
+## Examples
+
+There are a number of example XML files in the `examples/` directory.
