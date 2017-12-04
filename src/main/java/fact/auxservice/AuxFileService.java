@@ -134,11 +134,12 @@ public class AuxFileService implements AuxiliaryService {
 
         //test whether file is in current directory. this ensures compatibility to fact-tools version < 18.0
         if (!pathToFile.toFile().canRead()){
-            log.warn("Could not load data from {}. Trying basepath.", pathToFile);
-            pathToFile = Paths.get(auxFolder.getPath(), key.filename);
+            log.warn("Could not load data from {}. Trying gz extension.", pathToFile);
+            pathToFile = Paths.get(auxFolder.getPath(), key.path.toString() + ".gz");
 
             if (!pathToFile.toFile().canRead()){
-                log.error("Could not load aux file in given directory {}", auxFolder);
+                log.warn("Could not load aux file in directory {}", auxFolder);
+                log.error("Could not read file {}", pathToFile);
             }
         }
 

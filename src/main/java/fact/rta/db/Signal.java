@@ -1,20 +1,13 @@
 package fact.rta.db;
 
 
-import org.skife.jdbi.v2.StatementContext;
-import org.skife.jdbi.v2.sqlobject.Binder;
-import org.skife.jdbi.v2.sqlobject.BinderFactory;
-import org.skife.jdbi.v2.sqlobject.BindingAnnotation;
-import org.skife.jdbi.v2.tweak.ResultSetMapper;
+import org.jdbi.v3.core.mapper.Nested;
+import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Keys;
 
-import java.lang.annotation.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -27,16 +20,19 @@ public class Signal {
 
     final private static Logger log = LoggerFactory.getLogger(Signal.class);
 
+/*
 
-    /**
+    */
+/**
      * The SignalMapper is needed by the JDBI library to be able to save this object into the database.
      * This would work autmatically except for the DateTime objects which we need to parse
      * using the appropriate methods since JDBI doesn't do that by itself.
-     */
-    public static class SignalMapper implements ResultSetMapper<Signal>
+     *//*
+
+    public static class SignalMapper implements RowMapper<Signal>
     {
-        public Signal map(int index, ResultSet r, StatementContext ctx) throws SQLException
-        {
+        @Override
+        public Signal map(ResultSet r, StatementContext ctx) throws SQLException {
             ZonedDateTime eventTimestamp = ZonedDateTime.parse(r.getString("event_timestamp"));
             ZonedDateTime analyisTimestamp = ZonedDateTime.parse(r.getString("analysis_timestamp"));
             double theta_on = r.getDouble("theta_on");
@@ -47,7 +43,7 @@ public class Signal {
             double theta_off_5 = r.getDouble("theta_off_5");
             double prediction = r.getDouble("prediction");
             double estimated_energy = r.getDouble("estimated_energy");
-            Run run = new Run.RunMapper().map(index, r, ctx);
+            Run run = new Run.RunMapper().map(r, ctx);
 
             return new Signal(eventTimestamp,
                     analyisTimestamp,
@@ -61,14 +57,15 @@ public class Signal {
                     estimated_energy,
                     run);
         }
-
     }
 
 
-    /**
-     * The binding annotations maps member names to coliumn names in the database.
+    */
+/**
+     * The binding annotations maps member names to column names in the database.
      * Maybe this can work automatically? I've seen this work in Google GSON.
-     */
+     *//*
+
     @BindingAnnotation(BindSignal.SignalBinderFactory.class)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER})
@@ -96,6 +93,7 @@ public class Signal {
             }
         }
     }
+*/
 
     public final Run run;
     public final double prediction;
@@ -105,16 +103,16 @@ public class Signal {
     public final double theta_off_3;
     public final double theta_off_4;
     public final double theta_off_5;
-    public final double theta;
-    public final ZonedDateTime eventTimestamp;
-    public final ZonedDateTime analysisTimestamp;
+    public final double theta_on;
+    public final ZonedDateTime event_timestamp;
+    public final ZonedDateTime analysis_timestamp;
 
-    public double onTimePerEvent;
+    public double onTimePerEven = 0;
 
-    public Signal(ZonedDateTime eventTimestamp, ZonedDateTime analysisTimestamp, Data item, Run run) {
+    public Signal(ZonedDateTime event_timestamp, ZonedDateTime analysis_timestamp, Data item, Run run) {
 
         this.run = run;
-        this.theta = (double) item.get("Theta");
+        this.theta_on = (double) item.get("Theta");
         Set<String> offKeys = new Keys("Theta_Off_?").select(item);
         double[] thetaOffs = offKeys.stream().mapToDouble(s -> (double) item.get(s)).toArray();
         this.theta_off_1 = thetaOffs[0];
@@ -125,13 +123,14 @@ public class Signal {
         this.prediction = (double) item.get("signal:prediction");
         this.estimated_energy= (double) item.get("energy");
 
-        this.eventTimestamp = eventTimestamp;
-        this.analysisTimestamp = analysisTimestamp;
+        this.event_timestamp = event_timestamp;
+        this.analysis_timestamp = analysis_timestamp;
     }
 
-    public Signal(ZonedDateTime eventTimestamp,
-                  ZonedDateTime analysisTimestamp,
-                  double theta,
+    @JdbiConstructor
+    public Signal(ZonedDateTime event_timestamp,
+                  ZonedDateTime analysis_timestamp,
+                  double theta_on,
                   double theta_off_1,
                   double theta_off_2,
                   double theta_off_3,
@@ -139,11 +138,11 @@ public class Signal {
                   double theta_off_5,
                   double prediction,
                   double estimated_energy,
-                  Run run) {
+                  @Nested Run run) {
 
         this.run = run;
-        this.analysisTimestamp = analysisTimestamp;
-        this.theta = theta;
+        this.analysis_timestamp = analysis_timestamp;
+        this.theta_on = theta_on;
         this.theta_off_1 = theta_off_1;
         this.theta_off_2 = theta_off_2;
         this.theta_off_3 = theta_off_3;
@@ -151,7 +150,7 @@ public class Signal {
         this.theta_off_5 = theta_off_5;
         this.prediction = prediction;
         this.estimated_energy= estimated_energy;
-        this.eventTimestamp = eventTimestamp;
+        this.event_timestamp = event_timestamp;
     }
 
 

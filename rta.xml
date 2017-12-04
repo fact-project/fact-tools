@@ -24,7 +24,7 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
 
-    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" rtaService="rta_service">
+    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" rtaService="rta_service" limit="300">
         <stream id="_" class="fact.io.hdureader.FITSStream" limit="300" />
     </stream>
 
@@ -59,13 +59,9 @@
                 topSlopeLimit="${removeSpikes_topSlopeLimit}"
                 maxSpikeLength="${removeSpikes_maxSpikeLength}"
         />
-        <fact.filter.DrsTimeCalibration
-                outputKey="timeCalibConst"
-        />
-        <fact.filter.ArrayTimeCorrection
+        <fact.datacorrection.DrsTimeCalibration
                 dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
-                outputKey="DataCalibrated"
+                outputKey="timeCalibConst"
         />
         <fact.datacorrection.InterpolateTimeSeries
                 calibService="calibService"

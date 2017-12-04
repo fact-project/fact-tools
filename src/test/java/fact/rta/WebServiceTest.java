@@ -4,6 +4,8 @@ import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.io.hdureader.FITSStream;
 import fact.rta.db.Run;
+import fact.rta.io.RTAStream;
+import fact.rta.io.RTAStreamTest;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.junit.Before;
@@ -35,6 +37,11 @@ public class WebServiceTest {
     private SourceURL url = new SourceURL(dataUrl);
     private FITSStream stream = new FITSStream(url);
 
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+
     @Before
     public void setup() throws Exception {
         stream.init();
@@ -61,78 +68,72 @@ public class WebServiceTest {
         return item;
     }
 
-    @Rule
-    public TemporaryFolder folder= new TemporaryFolder();
 
 
-//    @Test
-//    public void testRunChange() throws Exception {
-//        //initialize db connection
-//        WebSocketService s = new WebSocketService();
-//        File dbFile  = folder.newFile("data.sqlite");
-//        s.jdbcConnection = "jdbc:sqlite:"+dbFile.getCanonicalPath();
-//        s.init();
-//
-//
-//
-//        RTADataBase.DBInterface rtaTables = s.dbInterface;
-//
-//        //create a few dummy items
-//        Data item = prepareNextItem();
-//        int night = (int) item.get("NIGHT");
-//        int runID = (int) item.get("RUNID");
-//
-//
-//
-//        for (int i = 0; i < 5; i++) {
-//            item = prepareNextItem();
-//            ZonedDateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-//
-//            s.updateEvent(ZonedDateTime.parse(utc.toString()), item);
-//        }
-//
-//
-//        Run factRun = rtaTables.getRun(night, runID);
-//        assertThat(factRun.onTime, is(Duration.ZERO));
-//        assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
-//        //create new run artificially to trigger updating of db entry
-//        item = prepareNextItem();
-//        item.put("NIGHT", night);
-//        item.put("RUNID", runID + 1);
-//        ZonedDateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-//        s.updateEvent(utc, item);
-//
-//
-//
-//        factRun = rtaTables.getRun(night, runID);
-//        assertThat(factRun.onTime, is(Duration.standardSeconds(20L)));
-//        assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
-//
-//        for (int i = 0; i < 5; i++) {
-//            item = prepareNextItem();
-//            item.put("NIGHT", night);
-//            item.put("RUNID", runID + 1);
-//
-//            utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-//            Map<String, Serializable> map = new HashMap<>();
-//            map.put("OnTime", 4.0f);
-//
-//            s.updateEvent(utc, item);
-//        }
-//
-//        factRun = rtaTables.getRun(night, runID + 1);
-//        assertThat(factRun.onTime, is(Duration.ZERO));
-//        assertThat(factRun.health, is(RTADataBase.HEALTH.IN_PROGRESS));
-//        //create new run artificially to trigger updating of db entry
-//        item = prepareNextItem();
-//        item.put("NIGHT", night);
-//        item.put("RUNID", runID + 2);
-//        utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
-//        s.updateEvent(utc, item);
-//
-//
-//        factRun = rtaTables.getRun(night, runID + 1);
-//        assertThat(factRun.onTime, is(Duration.standardSeconds(20L)));
-//        assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
-//    }
+    @Test
+    public void testRunChange() throws Exception {
+
+        File dbFile = temporaryFolder.newFile("test.sqlite");
+
+        WebSocketService service = new WebSocketService();
+        service.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
+        service.auxFolder = new SourceURL(RTAStreamTest.class.getResource("/dummy_files/aux/"));
+        service.init();
+
+        //create a few dummy items
+        Data item = prepareNextItem();
+        int night = (int) item.get("NIGHT");
+        int runID = (int) item.get("RUNID");
+
+
+
+        for (int i = 0; i < 5; i++) {
+            item = prepareNextItem();
+            ZonedDateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+
+            service.updateEvent(ZonedDateTime.parse(utc.toString()), item);
+        }
+
+
+        Run factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID));
+        assertThat(factRun.on_time_seconds, is(0L));
+        assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
+
+        //create new run artificially to trigger updating of db entry
+        item = prepareNextItem();
+        item.put("NIGHT", night);
+        item.put("RUNID", runID + 1);
+        ZonedDateTime utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+        service.updateEvent(utc, item);
+
+
+
+        factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID));
+        assertThat(factRun.on_time_seconds, is(291L));
+        assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
+
+        for (int i = 0; i < 5; i++) {
+            item = prepareNextItem();
+            item.put("NIGHT", night);
+            item.put("RUNID", runID + 1);
+
+            utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+            service.updateEvent(utc, item);
+        }
+
+        factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID + 1));
+        assertThat(factRun.on_time_seconds, is(0L));
+        assertThat(factRun.health, is(RTADataBase.HEALTH.IN_PROGRESS));
+        //create new run artificially to trigger updating of db entry
+        item = prepareNextItem();
+        item.put("NIGHT", night);
+        item.put("RUNID", runID + 2);
+        utc = AuxiliaryService.unixTimeUTCToDateTime(item).orElseThrow(Exception::new);
+        service.updateEvent(utc, item);
+
+
+        factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID + 1));
+        assertThat(factRun.on_time_seconds, is(291L));
+        assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
+    }
 }
