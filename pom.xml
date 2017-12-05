@@ -290,7 +290,7 @@
                 <Implementation-Revision>${project.version}</Implementation-Revision>
                 <Specification-Title>fact-tools</Specification-Title>
                 <Specification-Version>1.0</Specification-Version>
-                <main-class>stream.run</main-class>
+                <main-class>fact.run</main-class>
               </manifestEntries>
             </transformer>
           </transformers>
