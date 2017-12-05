@@ -35,6 +35,11 @@ public class HDU {
     private BinTable binTable = null;
 
 
+    /** Size of a single fits block, each HDU consists of multiple fits blocks
+     *  and every HDU starts at the end of a fits block
+     */
+    private final int FITS_BLOCK_SIZE = 2880;
+
     public final Header header;
 
 
@@ -113,7 +118,7 @@ public class HDU {
      * @return the number of bytes to skip to hte next hdu.
      */
     long offsetToNextHDU(){
-        return ((sizeOfDataArea()+2879)/2880)*2880;
+        return ((sizeOfDataArea()+(FITS_BLOCK_SIZE-1))/FITS_BLOCK_SIZE)*FITS_BLOCK_SIZE;
     }
 
     /**
