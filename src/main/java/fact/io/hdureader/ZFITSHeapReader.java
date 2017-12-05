@@ -156,13 +156,11 @@ public final class ZFITSHeapReader implements Reader {
             Buffer curBuffer = tileCache.get(column.name);
 
             if (compressedBlocks.contains(column.name)) {
-                // Buffer is ShortBuffer
                 ShortBuffer shortBuffer = (ShortBuffer) curBuffer;
                 short[] data = new short[column.repeatCount];
                 shortBuffer.get(data);
                 map.put(column.name, data);
             } else {
-                //Buffer is ByteBuffer
                 ByteBuffer byteBuffer = (ByteBuffer) curBuffer;
                 if (column.repeatCount == 1) {
                     map.put(column.name, readSingleValueFromBuffer(column, byteBuffer));
