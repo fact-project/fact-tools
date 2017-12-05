@@ -32,7 +32,7 @@ public class FactStandardAnalysisTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run the ./fact_example.xml");
+            fail("Could not run examples/stdAnalysis/data/analysis.xml");
         }
     }
 
@@ -56,7 +56,7 @@ public class FactStandardAnalysisTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run the ./fact_example.xml");
+            fail("Could not run examples/stdAnalysis/mc/analysis_mc.xml");
         }
     }
 }
