@@ -1,7 +1,6 @@
 package fact.services;
 
 import fact.auxservice.AuxPoint;
-import fact.auxservice.AuxWebService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.SqliteService;
 import fact.auxservice.strategies.Closest;
