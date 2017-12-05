@@ -80,23 +80,17 @@ public class SqliteTest {
     @Test
     public void testTimeFlooring() throws IOException {
         ZonedDateTime time = ZonedDateTime.of(1987, 9, 20, 12, 40, 34,0, ZoneOffset.UTC);
-
-        SqliteService.AuxDataCacheKey key = new SqliteService().new AuxDataCacheKey(AuxiliaryServiceName.BIAS_CONTROL_DAC, time);
-
-        ZonedDateTime roundedTime = key.floorToQuarterHour(time);
-        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 12, 30, 00,0,ZoneOffset.UTC)));
-
+        ZonedDateTime roundedTime = SqliteService.floorToQuarterHour(time);
+        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 12, 30, 00,0, ZoneOffset.UTC)));
 
         time = ZonedDateTime.of(1987, 9, 20, 23, 59, 59,0,ZoneOffset.UTC);
-        roundedTime = AuxWebService.floorToQuarterHour(time);
+        roundedTime = SqliteService.floorToQuarterHour(time);
+        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 23, 45, 00,0, ZoneOffset.UTC)));
 
-        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 23, 45, 00,0,ZoneOffset.UTC)));
 
-
-        time = ZonedDateTime.of(1987, 9, 20, 00, 00, 01,0,ZoneOffset.UTC);
-        roundedTime = AuxWebService.floorToQuarterHour(time);
-
-        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 00, 00, 00,0,ZoneOffset.UTC)));
+        time = ZonedDateTime.of(1987, 9, 20, 00, 00, 01,0, ZoneOffset.UTC);
+        roundedTime = SqliteService.floorToQuarterHour(time);
+        assertThat(roundedTime, is(ZonedDateTime.of(1987, 9, 20, 00, 00, 00,0, ZoneOffset.UTC)));
     }
 
 
