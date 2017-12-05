@@ -143,8 +143,8 @@ public class JSONWriter implements StatefulProcessor {
         	}
             b.append(gson.toJson(item));
             bw.write(b.toString());
-        } catch (IOException ioex) {
-            ioex.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         b.delete(0, b.length());
         return data;

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.tools;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 /**
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
- * 
+ *
  */
 public class CommandLine {
 
@@ -36,15 +36,14 @@ public class CommandLine {
 			System.exit(-1);
 		} else {
 			try {
-				ProcessContainer container = new ProcessContainer(file.toURI()
-						.toURL());
+				ProcessContainer container = new ProcessContainer(file.toURI().toURL());
 				container.run();
 			} catch (IOException e){
 				Log.error("Could not open file");
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace();
 				System.exit(-1);
-				
+
 			} catch (Exception e) {
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace();
