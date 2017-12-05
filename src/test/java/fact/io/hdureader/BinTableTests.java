@@ -1,12 +1,13 @@
 package fact.io.hdureader;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import fact.Utils;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
@@ -74,12 +75,12 @@ public class BinTableTests {
         int[] unixtime = (int[]) row.get("UnixTimeUTC");
         assertThat(unixtime.length , is(2));
 
-        DateTime date = new DateTime((long) (unixtime[0]* 1000.0 + unixtime[1]/ 1000.0),  DateTimeZone.UTC);
+        ZonedDateTime date = Utils.unixTimeUTCToZonedDateTime(unixtime);;
         assertThat(date.getYear(), is(2013));
-        assertThat(date.getMonthOfYear(), is(1));
+        assertThat(date.getMonthValue(), is(1));
         assertThat(date.getDayOfMonth(), is(2));
-        assertThat(date.getHourOfDay(), is(21));
-        assertThat(date.getMinuteOfHour(), is(46));
+        assertThat(date.getHour(), is(21));
+        assertThat(date.getMinute(), is(46));
     }
 
     @Test
