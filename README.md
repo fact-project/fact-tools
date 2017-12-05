@@ -2,7 +2,7 @@
 
 
 The `FACT-Tools` are a collection of processors and stream implementations
-for the [streams](http://www.jwall.org/streams/) framework to analyse the data of the *First G-APD Cherenkov Telescope*.
+for the [streams](http://www.jwall.org/streams/) framework to analyse the data of the [*First G-APD Cherenkov Telescope*](https://fact-project.org).
 
 This README file provides a quick overview of the `FACT-Tools`.
 Further information, including API docs, can be found on the [project web-page](http://sfb876.tu-dortmund.de/FACT)
