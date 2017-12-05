@@ -52,27 +52,6 @@ public class FunctionalTest {
         }
     }
 
-    @Test
-    public void analysisXML() {
-        try {
-            File arg = new File("examples/stdAnalysis/data/analysis.xml");
-            ProcessContainer container = new ProcessContainer(arg.toURI().toURL());
-            container.run();
-        } catch (Exception e) {
-            fail("Could not run the analysis.xml");
-        }
-    }
-
-    @Test
-    public void analysis_mcXML() {
-        try {
-            String[] args = {"examples/stdAnalysis/mc/analysis_mc.xml"};
-            stream.run.main(args);
-        } catch (Exception e) {
-            fail("Could not run the analysis_mc.xml");
-        }
-    }
-
 
     @Test
     public void studiesXMLs() throws IOException {
