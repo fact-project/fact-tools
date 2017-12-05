@@ -10,7 +10,7 @@ public class run {
 
     public static void handleArguments(String[] args) {
         if (args.length == 0) {
-            System.out.println("fact-tools, version " + VersionInformation.getInstance().version);
+            System.out.println("fact-tools, version " + VersionInformation.getInstance().gitDescribe);
             System.out.println();
             System.out.println("No container file specified.");
             System.out.println();
@@ -22,8 +22,9 @@ public class run {
 
         for (String arg : args) {
             if (arg.equals("-v") || "--version".equals(args)) {
-                System.out.println("version: " + VersionInformation.getInstance().version);
-                System.out.println("git commit: " + VersionInformation.getInstance().commit);
+                System.out.println("project version: " + VersionInformation.getInstance().version);
+                System.out.println("git description: " + VersionInformation.getInstance().gitDescribe);
+                System.out.println("git commit hash: " + VersionInformation.getInstance().commitHash);
                 System.exit(0);
             }
         }

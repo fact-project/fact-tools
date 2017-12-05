@@ -222,6 +222,12 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>   
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -345,6 +351,9 @@
           <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
           <generateGitPropertiesFile>true</generateGitPropertiesFile>
           <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+          <gitDescribe>
+            <tags>true</tags>
+          </gitDescribe>
         </configuration>
       </plugin>
     </plugins>
