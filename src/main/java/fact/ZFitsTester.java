@@ -18,6 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class to automaticly test whether a file could be read by the HduReader
+ * Creates a json file (in the execution folder, name: filetestoutput.json)
+ * which contains the result of the test.
+ * If no error was found adds the amount of events read into the info key
+ * Otherwise the info key contains the error message.
+ *
+ * usage:
+ *   java -cp fact-tools.jar fact.ZFitsTester pathToFz1 pathToFz2
+ */
 public class ZFitsTester {
     private static class FileInfo {
         public String filename;
