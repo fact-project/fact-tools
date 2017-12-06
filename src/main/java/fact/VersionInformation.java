@@ -7,14 +7,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+
+/**
+ * Singleton class that provides version information about fact-tools.
+ */
 public class VersionInformation {
 
     private final Logger log = LoggerFactory.getLogger(VersionInformation.class);
 
+    /** Version from maven pom.xml */
     public final String version;
+
+    /** The git commit hash */
     public final String commitHash;
+
+    /** Last tag, including light-weight tags */
     public final String closestTag;
+
+    /** Number of commits since last tag */
     public final int commitsSinceClosestTag;
+
+    /** Output of git describe, $(LAST_TAG)-$(COMMITS_SINCE_LAST_TAG)-$(COMMIT_HASH) */
     public final String gitDescribe;
 
     private static VersionInformation instance;
