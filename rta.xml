@@ -20,26 +20,27 @@
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw" />
+    <!--<service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw/" />-->
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
 
     <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" rtaService="rta_service">
-        <stream id="_" class="fact.io.hdureader.FITSStream" limit="300" />
+        <stream id="_" class="fact.io.hdureader.FITSStream" limit="500" />
     </stream>
 
 
     <!-- Description of the process and the corresponding stream -->
-    <process input="fact" copies="1">
+    <process input="fact" copies="2">
         <!--<Delay time="50ms" />-->
-        <fact.DataRate every="50" logmemory="true"  webService="rta_service"/>
+        <Enqueue queues="performance_queue" keys="UnixTimeUTC"/>
+
         <Skip condition="%{data.TriggerType} != 4" />
 
-        <!--<Enqueue queues="performance_queue" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
+
 
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
         <fact.datacorrection.DrsCalibration
-                drsService="drsService"
+                url="file:/fhgfs/groups/app/fact/raw/2013/11/08/20131108_041.drs.fits.gz"
                 key="Data"
                 outputKey="DataCalibrated"
         />
@@ -59,14 +60,11 @@
                 topSlopeLimit="${removeSpikes_topSlopeLimit}"
                 maxSpikeLength="${removeSpikes_maxSpikeLength}"
         />
-        <fact.filter.DrsTimeCalibration
+        <fact.datacorrection.DrsTimeCalibration
+                dataKey="DataCalibrated"
                 outputKey="timeCalibConst"
         />
-        <fact.filter.ArrayTimeCorrection
-                dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
-                outputKey="DataCalibrated"
-        />
+
         <fact.datacorrection.InterpolateTimeSeries
                 calibService="calibService"
                 dataKey="DataCalibrated"
@@ -84,11 +82,9 @@
             <!--<Enqueue queues="out_queue" />-->
     </process>
 
-    <!--<process input="performance_queue">-->
-        <!--<If condition="%{data.@datarate} != null" >-->
-            <!--<fact.io.JSONWriter url="file:./rta_performance.json" keys="@timestamp,@thread,@datarate,@freememory,@totalmemory,@maxmemory"/>-->
-        <!--</If>-->
-    <!--</process>-->
+    <process input="performance_queue">
+        <fact.DataRate every="150" logmemory="true"  webService="rta_service"/>
+    </process>
 
     <!--<process input="out_queue">-->
         <!--<fact.io.JSONWriter url="file:./rta.json" keys="@timestamp,signal:*,energy,background:*"/>-->

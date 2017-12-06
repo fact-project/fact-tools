@@ -113,10 +113,10 @@ public class RTAStream extends AbstractMultiStream {
         dbInterface = dbi.open(RTADataBase.DBInterface.class);
         dbInterface.createRunTableIfNotExists();
         dbInterface.createSignalTableIfNotExists();
-
+        long SECOND = 1000L;
         long MINUTE = 60 * 1000;
         log.info("Starting file system watcher with interval of 10 Minutes");
-        new Timer().scheduleAtFixedRate(updater, 0, 10 * MINUTE);
+        new Timer().scheduleAtFixedRate(updater, 30 * SECOND, 10 * MINUTE);
     }
 
     class Updater extends TimerTask{
@@ -134,17 +134,18 @@ public class RTAStream extends AbstractMultiStream {
                     s.messageHandler.sendDataStatus("Checking for new data.");
                 }
                 Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|fits.fz|fits\\.gz)$"));
+                //sort entries by filename to get the latest one first.
+                List<Path> collect = fileQueue.stream().sorted(Comparator.comparing(p -> p.getFileName().toString())).collect(toList());
+                fileQueue.addAll(collect);
 
                 if (fileQueue.isEmpty()){
                     log.info("No new data present.");
                     if (s!=null){
                         s.messageHandler.sendDataStatus("No new data present.");
                     }
+                } else {
+                    log.info("Files in Queue: {}", fileQueue.size());
                 }
-                //sort entries by filename to get the latest one first.
-                List<Path> collect = fileQueue.stream().sorted(Comparator.comparing(p -> p.getFileName().toString())).collect(toList());
-                fileQueue.addAll(collect);
-
 
             } catch (IOException e) {
                 throw new RuntimeException();
@@ -158,6 +159,9 @@ public class RTAStream extends AbstractMultiStream {
             log.info("FileQueue is empty. Waiting for new data. ");
             if (s != null){
                     s.messageHandler.sendDataStatus("Waiting for new data.");
+            }
+            else{
+                log.info("No WebService available");
             }
         }
 
@@ -198,7 +202,9 @@ public class RTAStream extends AbstractMultiStream {
         if (this.count % 128 == 0){
             WebSocketService s = WebSocketService.getService();
             if(s != null){
-               s.messageHandler.sendDataStatus("Currently streaming data.");
+                s.messageHandler.sendDataStatus("Currently streaming data.");
+            } else {
+                log.info("no WebService available on readnext");
             }
         }
 

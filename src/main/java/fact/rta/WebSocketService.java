@@ -34,7 +34,6 @@ public class WebSocketService implements AuxiliaryService {
     RTADataBase.DBInterface dbInterface;
     private Run currentRun = null;
     private Deque<Signal> signals = new ArrayDeque<>();
-    private boolean isInit = false;
     private AuxFileService auxService;
     public MessageHandler messageHandler = new MessageHandler();
 
@@ -48,15 +47,38 @@ public class WebSocketService implements AuxiliaryService {
 
 
     //behold the most ugly workaround in history.
-    private static WebSocketService service;
+    static WebSocketService service;
+    boolean is_initialized = false;
     public static WebSocketService getService(){
         if (service == null){
-            return null;
+            log.info("Returning new singleton instance for WebSocketService");
+            service = new WebSocketService();
+        }
+        if (!service.is_initialized && service.auxFolder != null){
+            log.info("Singleton instance exists. Parameters set. But not initialized. Initializing now.");
+            service.init();
         }
         return service;
     }
 
     public WebSocketService(){
+        log.info("Constructing a WebSocketService");
+    }
+
+
+    /**
+     * I need an init method here since streams does not have a proper lifecycle for service objects.
+     * I cannot initialize the DBI interface in the constructor since I don't know the jdbc conncection
+     * at that point. It will be set after the constructor has been called.
+     *
+     */
+    public void init(){
+        //see workaround above.
+        log.info("Initializing WebSocketService {}", this);
+
+        service = this;
+        is_initialized = true;
+
         Spark.webSocket("/rta", WebSocket.class);
 
         Spark.staticFiles.location("/rta/static/");
@@ -73,18 +95,6 @@ public class WebSocketService implements AuxiliaryService {
                 messageHandler.sendStatus(StatusContainer.create());
             }
         }, (long) (0.05 * MINUTE), (long) (0.1 * MINUTE));
-    }
-
-
-    /**
-     * I need an init method here since streams does not have a proper lifecycle for service objects.
-     * I cannot initialize the DBI interface in the constructor since I don't know the jdbc conncection
-     * at that point. It will be set after the constructor has been called.
-     *
-     */
-    public void init(){
-        //see workaround above.
-        service = this;
 
         dbInterface = new DBI(this.jdbcConnection).open(RTADataBase.DBInterface.class);
 
@@ -94,7 +104,6 @@ public class WebSocketService implements AuxiliaryService {
 
         auxService = new AuxFileService();
         auxService.auxFolder = auxFolder;
-        isInit = true;
     }
 
 
@@ -205,7 +214,7 @@ public class WebSocketService implements AuxiliaryService {
      */
     @Override
     public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
-        if (!isInit){
+        if (!is_initialized){
             init();
         }
         return auxService.getAuxiliaryData(serviceName, eventTimeStamp, strategy);
