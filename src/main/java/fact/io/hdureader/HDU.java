@@ -118,7 +118,13 @@ public class HDU {
      * @return the number of bytes to skip to hte next hdu.
      */
     long offsetToNextHDU(){
-        return ((sizeOfDataArea()+(FITS_BLOCK_SIZE-1))/FITS_BLOCK_SIZE)*FITS_BLOCK_SIZE;
+        // numberOfBlocks = ceil(1.0*sizeOfDataArea()/FITS_BLOCK_SIZE)
+        // utulizes the fact that we use int arithmetic which is simply a/b = floor(a/b)
+        // and we want ceil(a/b) which we get if we do: (a+(b-1))/b
+        long numberOfBlocks = (sizeOfDataArea()+(FITS_BLOCK_SIZE-1))/FITS_BLOCK_SIZE;
+        // the offset is now simply the size of all the blocks
+        long sizeOfBlocks = numberOfBlocks*FITS_BLOCK_SIZE;
+        return sizeOfBlocks;
     }
 
     /**
