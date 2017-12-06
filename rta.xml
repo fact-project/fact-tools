@@ -10,9 +10,10 @@
     <property name="infile" value="/fhgfs/groups/app/fact/raw/2013/11/08/"/>
 
 
-    <property name="auxService" value="rta_service" />
+    <property name="auxService" value="auxService" />
 
-    <service id="rta_service" class="fact.rta.WebSocketService" auxFolder="${auxfolder}"  jdbcConnection="${jdbc}"/>
+    <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxfolder}"/>
+
     <service id="rf" class="fact.PredictionService" url="${separator}" />
     <service id="regressor" class="fact.PredictionService" url="${estimator}" />
 
@@ -20,12 +21,12 @@
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <!--<service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw/" />-->
+    <service id="drsService" class="fact.DrsFileService" rawDataFolder="file:/fhgfs/groups/app/fact/raw/" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
 
-    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" rtaService="rta_service">
-        <stream id="_" class="fact.io.hdureader.FITSStream" limit="500" />
+    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" auxFolder="${auxfolder}" limit="500">
+        <stream id="_" class="fact.io.hdureader.FITSStream"  />
     </stream>
 
 
@@ -78,12 +79,12 @@
         <Skip condition="%{data.numPixeInShower} &lt; 9" />
 
             <fact.rta.Energy predictor="regressor" />
-            <fact.rta.Signal predictor="rf" webService="rta_service"/>
+            <fact.rta.Signal predictor="rf"/>
             <!--<Enqueue queues="out_queue" />-->
     </process>
 
     <process input="performance_queue">
-        <fact.DataRate every="150" logmemory="true"  webService="rta_service"/>
+        <fact.DataRate every="150" logmemory="true" rtamode="true"/>
     </process>
 
     <!--<process input="out_queue">-->

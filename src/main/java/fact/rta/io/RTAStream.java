@@ -4,7 +4,6 @@ import fact.io.hdureader.FITSStream;
 import fact.rta.RTADataBase;
 import fact.rta.WebSocketService;
 import fact.rta.db.Run;
-import org.jdbi.v3.core.Jdbi;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -28,6 +27,13 @@ public class RTAStream extends AbstractMultiStream {
 
     @Parameter(required = true, description = "Path to folder that is being watched")
     public String folder;
+
+    @Parameter(required = true, description = "jdcb connection string. e.g. jdbc:sqlite:rta.sqlite")
+    public String jdbcConnection;
+
+    @Parameter(required = true, description = "The url pointing to the path containing a the auxilary " +
+            "data in FACTS canonical folder structure." )
+    public SourceURL auxFolder;
 
     private AbstractStream stream;
 
@@ -60,7 +66,8 @@ public class RTAStream extends AbstractMultiStream {
         long SECOND = 1000L;
         long MINUTE = 60 * 1000;
         log.info("Starting file system watcher with interval of 10 Minutes");
-        new Timer().scheduleAtFixedRate(updater, 30 * SECOND, 10 * MINUTE);
+        WebSocketService s = WebSocketService.getService(jdbcConnection, auxFolder);
+        new Timer().scheduleAtFixedRate(updater, 0, 10 * MINUTE);
     }
 
     class Updater extends TimerTask{
@@ -68,24 +75,29 @@ public class RTAStream extends AbstractMultiStream {
         @Override
         public void run() {
             Path dir = Paths.get(folder);
+
             WebSocketService s = WebSocketService.getService();
             if (s == null){
                 log.info("Could not get an instance of the websocket service");
             } else {
+
+                if (s.dbInterface == null){
+                    return;
+                }
+
                 try {
                     log.info("Checking file system for new data.");
                     s.messageHandler.sendDataStatus("Checking for new data.");
 
                     PathMatcher regex = FileSystems
                             .getDefault()
-                            .getPathMatcher("regex:\\d{8}_\\d{3}.(fits|zfits)(.gz)?");
+                            .getPathMatcher("regex:\\d{8}_\\d{3}.(fits|zfits)(.gz|.fz)?");
 
 
                     List<Path> paths = Files.walk(dir)
-                            .filter(path -> Files.isRegularFile(path))
+                            .filter(Files::isRegularFile)
                             .filter(Files::isReadable)
-                            .map(Path::getFileName)
-                            .filter(regex::matches)
+                            .filter(p ->regex.matches(p.getFileName()))
                             .sorted(Comparator.comparing(p -> p.getFileName().toString()))
                             .collect(toList());
 
@@ -97,6 +109,8 @@ public class RTAStream extends AbstractMultiStream {
                             //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
                             if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN) {
                                 fileQueue.add(p);
+                            } else{
+                                log.info("File {} already marked as analyzed in DB", p);
                             }
                         }
                     });

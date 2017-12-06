@@ -1,13 +1,8 @@
 package fact.rta;
 
-import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.io.hdureader.FITSStream;
 import fact.rta.db.Run;
-import fact.rta.io.RTAStream;
-import fact.rta.io.RTAStreamTest;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,16 +11,12 @@ import stream.Data;
 import stream.io.SourceURL;
 
 import java.io.File;
-import java.io.Serializable;
 import java.net.URL;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Random;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Check some functions of the webserive. E.g. what happens when a new wild run suddenly appears in the tall grass.
@@ -74,11 +65,9 @@ public class WebServiceTest {
     public void testRunChange() throws Exception {
 
         File dbFile = temporaryFolder.newFile("test.sqlite");
-
-        WebSocketService service = new WebSocketService();
-        service.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
-        service.auxFolder = new SourceURL(RTAStreamTest.class.getResource("/dummy_files/aux/"));
-        service.init();
+        String jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
+        SourceURL auxFolder = new SourceURL(WebServiceTest.class.getResource("/dummy_files/aux/"));
+        WebSocketService service = WebSocketService.getService(jdbcConnection, auxFolder);
 
         //create a few dummy items
         Data item = prepareNextItem();

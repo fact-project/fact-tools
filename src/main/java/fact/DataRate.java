@@ -1,20 +1,17 @@
 package fact;
 
 import com.google.common.base.Stopwatch;
-
 import fact.rta.WebSocketService;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.OffsetDateTime;
-import java.util.concurrent.TimeUnit;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-import stream.annotations.Service;
+
+import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * DataRate counts number of items processed per second. Additionally it can log memory (free, total, max).
@@ -22,13 +19,13 @@ import stream.annotations.Service;
  * @author kai
  */
 public class DataRate implements StatefulProcessor {
-    Logger log = LoggerFactory.getLogger(DataRate.class);
+    private Logger log = LoggerFactory.getLogger(DataRate.class);
 
-    long totalItems = 0;
-    long itemCounter = 0;
+    private long totalItems = 0;
+    private long itemCounter = 0;
 
 
-    Runtime runtime;
+    private Runtime runtime;
 
 
     @Parameter(required = false, description = "How many data items are collected for each " +
@@ -46,13 +43,13 @@ public class DataRate implements StatefulProcessor {
             "in the item after calculating it.", defaultValue = "@datarate")
     String output = "@datarate";
 
+    @Parameter(required = true, description = "If true this will update the datarate for the webservice to display")
+    private boolean rtamode = false;
 
-    @Service(required = true, description = "If a RTAwebservice is provided this will update the " +
-            "datarate for the webservice to display")
-    WebSocketService webService;
 
     SummaryStatistics statistics = new SummaryStatistics();
     private Stopwatch stopwatch;
+
 
     @Override
     public void init(ProcessContext context) throws Exception {
@@ -91,22 +88,18 @@ public class DataRate implements StatefulProcessor {
             input.put("@thread", Thread.currentThread().getName());
             input.put(output, dataRatePerSecond);
 
-            if(webService != null){
-                webService.updateDataRate(OffsetDateTime.now(), dataRatePerSecond);
+            if(rtamode){
+                WebSocketService.getService().updateDataRate(OffsetDateTime.now(), dataRatePerSecond);
             }
 
-            stopwatch.reset();
-            stopwatch.start();
+            stopwatch.reset().start();
+
             itemCounter = 0;
         }
 
         itemCounter++;
         totalItems++;
         return input;
-    }
-
-    public void setWebService(WebSocketService webService) {
-        this.webService = webService;
     }
 
 }

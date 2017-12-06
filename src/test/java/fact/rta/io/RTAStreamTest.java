@@ -1,6 +1,5 @@
 package fact.rta.io;
 
-import fact.rta.WebSocketService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -13,11 +12,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by mackaiver on 21/09/16.
@@ -31,18 +27,18 @@ public class RTAStreamTest {
     public void testFileMatching() throws Exception {
         URL resource = RTAStreamTest.class.getResource("/./");
         File dbFile = temporaryFolder.newFile("test.sqlite");
+        String jdbc = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
+        SourceURL auxFolder = new SourceURL(RTAStreamTest.class.getResource("/dummy_files/aux/"));
 
-        WebSocketService service = new WebSocketService();
-        service.jdbcConnection = "jdbc:sqlite:"+ dbFile.getCanonicalPath();
-        service.auxFolder = new SourceURL(RTAStreamTest.class.getResource("/dummy_files/aux/"));
-        service.init();
 
         RTAStream rtaStream = new RTAStream();
         rtaStream.folder = resource.getPath();
+        rtaStream.auxFolder = auxFolder;
+        rtaStream.jdbcConnection = jdbc;
         rtaStream.init();
 
-        for (int i = 0; i < 5; i++) {
-            Path path = rtaStream.fileQueue.poll(5, TimeUnit.SECONDS);
+        for (int i = 0; i < 6; i++) {
+            Path path = rtaStream.fileQueue.poll(10, TimeUnit.SECONDS);
             assertThat(path, is(not(nullValue())));
         }
     }
@@ -51,7 +47,7 @@ public class RTAStreamTest {
     public void testFileWalker() throws Exception {
         URL resource = RTAStreamTest.class.getResource("/./");
         Path rootPath = Paths.get(resource.toURI());
-        PathMatcher regex = FileSystems.getDefault().getPathMatcher("regex:\\d{8}_\\d{3}.(fits|zfits)(.gz)?");
+        PathMatcher regex = FileSystems.getDefault().getPathMatcher("regex:\\d{8}_\\d{3}.(fits|zfits)(.gz|.fz)?");
         assertThat(regex.matches(Paths.get("20130101_012.fits.gz")), is(true));
 
         List<Path> paths = Files.walk(rootPath)
@@ -62,7 +58,7 @@ public class RTAStreamTest {
                 .collect(toList());
 
         //there are 5 valid test files at the moment
-        assertThat(paths.size(), is(5));
+        assertThat(paths.size(), is(6));
     }
 
     @Test

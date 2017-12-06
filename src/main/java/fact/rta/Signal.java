@@ -1,23 +1,16 @@
 package fact.rta;
 
-import fact.auxservice.AuxFileService;
-import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
-
-import fact.auxservice.AuxiliaryServiceName;
-import org.joda.time.DateTime;
-
 import org.jpmml.evaluator.ProbabilityDistribution;
-import stream.*;
+import stream.Data;
+import stream.Keys;
+import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
 
-
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Set;
-import java.util.SortedSet;
 
 
 /**
@@ -26,13 +19,15 @@ import java.util.SortedSet;
 public class Signal implements Processor {
 
     @Service(required = true)
-    private   fact.PredictionService predictor;
+    private  fact.PredictionService predictor;
 
     @Parameter
     private String signalClassName = "1";
 
-    @Service(required = true)
-    private WebSocketService webService;
+    @Parameter
+    private boolean rtamode = false;
+
+
 
     private static double thetaDegreesToThetaSquaredInMM(double theta){
         double pixelsize = 9.5;
@@ -63,8 +58,8 @@ public class Signal implements Processor {
                     orElseThrow(() -> new IllegalArgumentException("No valid eventTimestamp in event."));
 
             try {
-                if(distribution.getProbability(signalClassName) > 0.5) {
-                    webService.updateEvent(ZonedDateTime.parse(eventTimeStamp.toString()), data);
+                if(rtamode && distribution.getProbability(signalClassName) > 0.5) {
+                    WebSocketService.getService().updateEvent(ZonedDateTime.parse(eventTimeStamp.toString()), data);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

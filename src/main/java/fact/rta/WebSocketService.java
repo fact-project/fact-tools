@@ -4,7 +4,6 @@ import fact.auxservice.AuxFileService;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
-import fact.auxservice.strategies.AuxPointStrategy;
 import fact.rta.db.Run;
 import fact.rta.db.Signal;
 import fact.rta.rest.Event;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Spark;
 import stream.Data;
-import stream.annotations.Parameter;
 import stream.io.SourceURL;
 
 import java.io.IOException;
@@ -28,58 +26,32 @@ import java.util.*;
 /**
  *
  */
-public class WebSocketService implements AuxiliaryService {
+public class WebSocketService{
 
     final private static Logger log = LoggerFactory.getLogger(WebSocketService.class);
 
     public Jdbi dbInterface;
     private Run currentRun = null;
     private Deque<Signal> signals = new ArrayDeque<>();
-    private AuxFileService auxService;
     public MessageHandler messageHandler = new MessageHandler();
-
-
-    @Parameter(required = true, description = "Path to the .sqlite file")
-    public String jdbcConnection;
-
-    @Parameter(required = true, description = "The url pointing to the path containing a the auxilary " +
-            "data in FACTs canonical folder structure." )
-    public SourceURL auxFolder;
+    AuxFileService auxFileService;
 
 
     //behold the most ugly workaround in history.
-    static WebSocketService service;
-    boolean is_initialized = false;
-    public static WebSocketService getService(){
+    private static WebSocketService service;
+    public static WebSocketService getService(String jdbcConnection, SourceURL auxFolder){
         if (service == null){
             log.info("Returning new singleton instance for WebSocketService");
-            service = new WebSocketService();
-        }
-        if (!service.is_initialized && service.auxFolder != null){
-            log.info("Singleton instance exists. Parameters set. But not initialized. Initializing now.");
-            service.init();
+            service = new WebSocketService(jdbcConnection, auxFolder);
         }
         return service;
     }
-
-    public WebSocketService(){
-        log.info("Constructing a WebSocketService");
+    public static WebSocketService getService(){
+        return service;
     }
 
-
-    /**
-     * I need an init method here since streams does not have a proper lifecycle for service objects.
-     * I cannot initialize the DBI interface in the constructor since I don't know the jdbc conncection
-     * at that point. It will be set after the constructor has been called.
-     *
-     */
-    public void init(){
-        //see workaround above.
-        log.info("Initializing WebSocketService {}", this);
-
-        service = this;
-        is_initialized = true;
-
+    private WebSocketService(String jdbcConnection, SourceURL auxFolder){
+        log.info("Constructing a WebSocketService");
         Spark.webSocket("/rta", WebSocket.class);
 
         Spark.staticFiles.location("/rta/static/");
@@ -96,17 +68,16 @@ public class WebSocketService implements AuxiliaryService {
             }
         }, (long) (0.05 * MINUTE), (long) (0.1 * MINUTE));
 
-        dbInterface = Jdbi.create(this.jdbcConnection);
+        dbInterface = Jdbi.create(jdbcConnection);
         dbInterface.installPlugin(new SqlObjectPlugin());
 
-        dbInterface.withExtension(RTADataBase.class, dao -> {
+        dbInterface.useExtension(RTADataBase.class, dao -> {
             dao.createRunTableIfNotExists();
             dao.createSignalTableIfNotExists();
-            return null;
         });
 
-        auxService = new AuxFileService();
-        auxService.auxFolder = auxFolder;
+        auxFileService = new AuxFileService();
+        auxFileService.auxFolder = auxFolder;
     }
 
 
@@ -126,7 +97,7 @@ public class WebSocketService implements AuxiliaryService {
                 .unixTimeUTCToDateTime(item)
                 .orElseThrow(() -> new RuntimeException("Could not get time stamp from current event."));
 
-        SortedSet<AuxPoint> ftmPointsForNight = auxService.getAuxiliaryDataForWholeNight(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, dT);
+        SortedSet<AuxPoint> ftmPointsForNight = auxFileService.getAuxiliaryDataForWholeNight(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, dT);
 
         Run newRun = new Run(item);
         if (currentRun == null){
@@ -202,28 +173,4 @@ public class WebSocketService implements AuxiliaryService {
         return Duration.ofMillis((long) (onTimeInMilliSeconds));
     }
 
-
-    @Override
-    public void reset() throws Exception {
-
-    }
-
-    /**
-     * Delegating call to the method in the AuxFileService.
-     *
-     * @see AuxiliaryService#getAuxiliaryData(AuxiliaryServiceName, ZonedDateTime, AuxPointStrategy)
-     *
-     * @param serviceName the name of the aux data to access. This is written in the filename 20130112.<serviceName>.fits
-     * @param eventTimeStamp the DateTime of the event you need the aux data for.
-     * @param strategy one of the strategies implemented for fetching aux points
-     * @return the AuxPoint.
-     * @throws IOException propagates the exception of the underlying AuxFileService
-     */
-    @Override
-    public AuxPoint getAuxiliaryData(AuxiliaryServiceName serviceName, ZonedDateTime eventTimeStamp, AuxPointStrategy strategy) throws IOException {
-        if (!is_initialized){
-            init();
-        }
-        return auxService.getAuxiliaryData(serviceName, eventTimeStamp, strategy);
-    }
 }
