@@ -6,9 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import stream.runtime.ProcessContainer;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +44,7 @@ public class FunctionalTest {
     public void exampleXML() {
         try {
             String[] args = {"examples/example_process.xml"};
-            stream.run.main(args);
+            fact.run.main(args);
         } catch (Exception e) {
             fail("Could not run the example_process.xml");
         }
@@ -67,7 +65,7 @@ public class FunctionalTest {
         for (Path f : pathList){
             String[] args = {f.toAbsolutePath().toString()};
             try{
-                stream.run.main(args);
+                fact.run.main(args);
             } catch (Exception e){
                 log.error("Error executing xml: " + f, e);
                 failedFilesList.add(f.toString());

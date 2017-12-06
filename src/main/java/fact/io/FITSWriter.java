@@ -1,5 +1,6 @@
 package fact.io;
 
+import fact.VersionInformation;
 import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
 import nom.tam.util.BufferedFile;
@@ -250,6 +251,11 @@ public class FITSWriter implements StatefulProcessor {
         table.addRow(row);
 
         Header header = new Header();
+        header.addValue(
+                "VERSION",
+                VersionInformation.getInstance().gitDescribe,
+                "The FACT-Tools Version used to write this file"
+        );
         table.fillHeader(header);
         fillHeader(header, headerItem);
 
@@ -274,7 +280,13 @@ public class FITSWriter implements StatefulProcessor {
         bf.setLength(0); // clear current file content
 
         // We first have to write an empty header because a binary table cannot be the first hdu
-        BasicHDU.getDummyHDU().write(bf);
+        BasicHDU bhdu = BasicHDU.getDummyHDU();
+        bhdu.getHeader().addValue(
+                "VERSION",
+                VersionInformation.getInstance().gitDescribe,
+                "The FACT-Tools Version used to write this file"
+        );
+        bhdu.write(bf);
     }
 
     @Override

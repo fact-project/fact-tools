@@ -22,7 +22,7 @@ public class FactStandardAnalysisTest {
 
             String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
 
-            stream.run.main(args);
+            fact.run.main(args);
 
             FITS fits = FITS.fromFile(outFile);
             BinTable table = fits.getBinTableByName("Events").get();
@@ -32,7 +32,7 @@ public class FactStandardAnalysisTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run the ./fact_example.xml");
+            fail("Could not run examples/stdAnalysis/data/analysis.xml");
         }
     }
 
@@ -46,7 +46,7 @@ public class FactStandardAnalysisTest {
 
             String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
 
-            stream.run.main(args);
+            fact.run.main(args);
 
             FITS fits = FITS.fromFile(outFile);
             BinTable table = fits.getBinTableByName("Events").get();
@@ -56,7 +56,7 @@ public class FactStandardAnalysisTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run the ./fact_example.xml");
+            fail("Could not run examples/stdAnalysis/mc/analysis_mc.xml");
         }
     }
 }
