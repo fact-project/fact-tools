@@ -1,5 +1,10 @@
 package fact;
 
+
+/**
+ * Main executable for the FACT-Tools,
+ * this is a thin wrapper around stream.run and only changes version and help text.
+ */
 public class run {
     public static void main(String[] args) throws Exception {
         handleArguments(args);
