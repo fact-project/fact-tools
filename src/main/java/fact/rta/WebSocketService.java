@@ -141,7 +141,7 @@ public class WebSocketService{
         }
         Signal signal = new Signal(eventTimeStamp, ZonedDateTime.now(ZoneOffset.UTC), item, currentRun);
         signals.add(signal);
-        if (signal.prediction > 0.7) {
+        if (signal.prediction > 0.75) {
             messageHandler.sendEvent(new Event(eventTimeStamp, item));
         }
     }

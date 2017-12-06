@@ -25,7 +25,7 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
 
-    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" auxFolder="${auxfolder}" limit="500">
+    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" auxFolder="${auxfolder}" limit="5000">
         <stream id="_" class="fact.io.hdureader.FITSStream"  />
     </stream>
 
@@ -79,7 +79,7 @@
         <Skip condition="%{data.numPixeInShower} &lt; 9" />
 
             <fact.rta.Energy predictor="regressor" />
-            <fact.rta.Signal predictor="rf"/>
+            <fact.rta.Signal predictor="rf" rtamode="true"/>
             <!--<Enqueue queues="out_queue" />-->
     </process>
 

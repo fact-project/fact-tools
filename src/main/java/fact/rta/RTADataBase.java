@@ -30,8 +30,8 @@ public interface RTADataBase {
 
 
         @SqlUpdate("INSERT OR IGNORE INTO fact_run " +
-                "(night, run_id, start_time, end_time, on_time_seconds, source, health) " +
-                "values (:night, :run_id, :start_time, :end_time, :on_time_seconds, :source, :health)")
+                "(night, run_id, start_time, end_time, ontime_seconds, source, health) " +
+                "values (:night, :run_id, :start_time, :end_time, :ontime_seconds, :source, :health)")
         void insertRun(@BindFields Run run);
 
         @SqlUpdate("INSERT OR IGNORE INTO signal " +
@@ -86,8 +86,8 @@ public interface RTADataBase {
         @SqlUpdate("UPDATE fact_run SET health = :health WHERE   (night = :run.night AND run_id = :run.run_id)")
         void updateRunHealth(HEALTH health, @BindFields("run") Run run);
 
-        @SqlUpdate("UPDATE fact_run SET on_time_seconds = :on_time_seconds WHERE   night = :run.night AND run_id = :run.run_id")
-        void updateRunWithOnTime(@BindFields("run") Run run, double on_time_seconds);
+        @SqlUpdate("UPDATE fact_run SET ontime_seconds = :ontime_seconds WHERE   night = :run.night AND run_id = :run.run_id")
+        void updateRunWithOnTime(@BindFields("run") Run run, double ontime_seconds);
 
 
         @SqlQuery("SELECT * from fact_run WHERE run_id = :run_id AND night = :night")
@@ -103,7 +103,7 @@ public interface RTADataBase {
         @SqlUpdate("CREATE TABLE IF NOT EXISTS fact_run " +
                 "(night INTEGER NOT NULL, " +
                 "run_id INTEGER NOT NULL," +
-                "on_time_seconds REAL," +
+                "ontime_seconds REAL," +
                 "start_time DATETIME," +
                 "end_time DATETIME," +
                 "source varchar(50)," +

@@ -85,7 +85,7 @@ public class WebServiceTest {
 
 
         Run factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID));
-        assertThat(factRun.on_time_seconds, is(0L));
+        assertThat(factRun.ontime_seconds, is(0L));
         assertThat(factRun.health, is(RTADataBase.HEALTH.UNKNOWN));
 
         //create new run artificially to trigger updating of db entry
@@ -98,7 +98,7 @@ public class WebServiceTest {
 
 
         factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID));
-        assertThat(factRun.on_time_seconds, is(291L));
+        assertThat(factRun.ontime_seconds, is(291L));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
 
         for (int i = 0; i < 5; i++) {
@@ -111,7 +111,7 @@ public class WebServiceTest {
         }
 
         factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID + 1));
-        assertThat(factRun.on_time_seconds, is(0L));
+        assertThat(factRun.ontime_seconds, is(0L));
         assertThat(factRun.health, is(RTADataBase.HEALTH.IN_PROGRESS));
         //create new run artificially to trigger updating of db entry
         item = prepareNextItem();
@@ -122,7 +122,7 @@ public class WebServiceTest {
 
 
         factRun = service.dbInterface.withExtension(RTADataBase.class, dao -> dao.getRun(night, runID + 1));
-        assertThat(factRun.on_time_seconds, is(291L));
+        assertThat(factRun.ontime_seconds, is(291L));
         assertThat(factRun.health, is(RTADataBase.HEALTH.OK));
     }
 }

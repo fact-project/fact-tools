@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by mackaiver on 03/05/17.
  */
-@org.eclipse.jetty.websocket.api.annotations.WebSocket
+@org.eclipse.jetty.websocket.api.annotations.WebSocket(maxIdleTime = 10000, maxTextMessageSize = 1000)
 public class WebSocket {
     final private Logger log = LoggerFactory.getLogger(WebSocket.class);
     @OnWebSocketConnect

@@ -2,7 +2,10 @@ package fact.rta;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import fact.rta.db.Run;
 import fact.rta.rest.Event;
 import fact.rta.rest.Serializer;
@@ -34,7 +37,7 @@ public class MessageHandler {
 
     static Set<Session> sessions = Sets.newConcurrentHashSet();
 
-    void sendDataRate(OffsetDateTime timeStamp, double dataRate){
+    synchronized void sendDataRate(OffsetDateTime timeStamp, double dataRate){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("timestamp", timeStamp.toString());
         jsonObject.addProperty("date", timeStamp.toString());
@@ -44,42 +47,41 @@ public class MessageHandler {
         sendToOpenSessions(jsonObject);
     }
 
-    void sendRunInfo(Run run){
+    synchronized void sendRunInfo(Run run){
         JsonElement element = gson.toJsonTree(run);
         element.getAsJsonObject().addProperty("topic", "RUN_INFO");
         sendToOpenSessions(element);
     }
 
-    void sendStatus(StatusContainer status){
+    synchronized void sendStatus(StatusContainer status){
         JsonElement element = gson.toJsonTree(status);
         element.getAsJsonObject().addProperty("topic", "MACHINE_STATUS");
         sendToOpenSessions(element);
     }
-    void sendEvent(Event event){
+    synchronized void sendEvent(Event event){
         JsonElement element = gson.toJsonTree(event);
         element.getAsJsonObject().addProperty("topic", "EVENT");
         sendToOpenSessions(element);
     }
 
-    public void sendDataStatus(String s) {
+    synchronized public void sendDataStatus(String s) {
         JsonElement element = new JsonObject();
         element.getAsJsonObject().addProperty("topic", "DATA_STATUS");
         element.getAsJsonObject().addProperty("status", s);
         sendToOpenSessions(element);
     }
 
-    private void sendToOpenSessions(JsonElement element) {
+    synchronized private void sendToOpenSessions(JsonElement element) {
         sessions.stream().filter(Session::isOpen).forEach(session -> {
             try {
+
                 session.getRemote().sendString(gson.toJson(element));
             } catch (IOException e) {
                 log.error("Error sending event to session " + session);
                 e.printStackTrace();
             } catch (IllegalStateException e){
-                log.error("Error sending event to session. Illegal State in session:" + session);
-                e.printStackTrace();
+                log.error("Error sending event to session. Illegal State in session: {}, {}", session, e.getMessage());
             }
         });
     }
-
 }

@@ -229,14 +229,14 @@ public class JDBITest {
                     return dao.getRun(run.night, run.run_id);
         });
 
-        assertThat(factRun.on_time_seconds, is(0L));
+        assertThat(factRun.ontime_seconds, is(0L));
 
         Run updatedRun = dbi.withExtension(RTADataBase.class, dao -> {
             dao.updateRunWithOnTime(factRun, 290);
             return dao.getRun(factRun.night, factRun.run_id);
         });
 
-        assertThat(updatedRun.on_time_seconds, is(290L));
+        assertThat(updatedRun.ontime_seconds, is(290L));
     }
 
 

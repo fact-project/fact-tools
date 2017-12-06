@@ -2,8 +2,6 @@ package fact.rta.db;
 
 import fact.rta.RTADataBase;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import stream.Data;
 
 import java.time.Duration;
@@ -21,18 +19,18 @@ public class Run {
     public int night;
     public ZonedDateTime start_time;
     public ZonedDateTime end_time;
-    public long on_time_seconds;
+    public long ontime_seconds;
 
     public RTADataBase.HEALTH health;
 
     @JdbiConstructor
-    public Run(int night, int run_id, String source, ZonedDateTime start_time, ZonedDateTime end_time, long on_time_seconds, RTADataBase.HEALTH health) {
+    public Run(int night, int run_id, String source, ZonedDateTime start_time, ZonedDateTime end_time, long ontime_seconds, RTADataBase.HEALTH health) {
         this.source = source;
         this.run_id = run_id;
         this.night = night;
         this.start_time = start_time;
         this.end_time = end_time;
-        this.on_time_seconds = on_time_seconds;
+        this.ontime_seconds = ontime_seconds;
         this.health = health;
     }
 
@@ -41,7 +39,7 @@ public class Run {
         this.source = ((String) item.get("SourceName")).trim();
         this.run_id = (int) item.get("RUNID");
         this.night = (int) item.get("NIGHT");
-        this.on_time_seconds = Duration.ZERO.getSeconds();
+        this.ontime_seconds = Duration.ZERO.getSeconds();
 
         this.start_time = LocalDateTime.parse((String) item.get("DATE-OBS")).atZone(ZoneOffset.UTC);
         this.end_time = LocalDateTime.parse((String) item.get("DATE-END")).atZone(ZoneOffset.UTC);
@@ -57,7 +55,7 @@ public class Run {
                 ", night=" + night +
                 ", startTime=" + start_time +
                 ", endTime=" + end_time +
-                ", onTime=" + on_time_seconds + " seconds" +
+                ", onTime=" + ontime_seconds + " seconds" +
                 ", health=" + health +
                 '}';
     }
