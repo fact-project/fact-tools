@@ -4,7 +4,7 @@ import fact.io.hdureader.FITSStream;
 import fact.rta.RTADataBase;
 import fact.rta.WebSocketService;
 import fact.rta.db.Run;
-import org.skife.jdbi.v2.DBI;
+import org.jdbi.v3.core.Jdbi;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -13,7 +13,6 @@ import stream.io.multi.AbstractMultiStream;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,15 +29,11 @@ public class RTAStream extends AbstractMultiStream {
     @Parameter(required = true, description = "Path to folder that is being watched")
     public String folder;
 
-    @Parameter
-    public String jdbcConnection;
-
     private AbstractStream stream;
 
     public BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
 
     Updater updater = new Updater();
-    private RTADataBase.DBInterface dbInterface;
 
 
     public static Optional<Integer> filenameToRunID(String filename){
@@ -60,59 +55,8 @@ public class RTAStream extends AbstractMultiStream {
     }
 
 
-    public class RegexVisitor extends SimpleFileVisitor<Path> {
-
-        private final PathMatcher matcher;
-
-        public RegexVisitor(String pattern) {
-            matcher = FileSystems.getDefault().getPathMatcher("regex:" + pattern);
-        }
-
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            return super.preVisitDirectory(dir, attrs);
-        }
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
-            Path name = file.getFileName();
-            if (name != null && attr.isRegularFile()) {
-                //check whether we already looked at the file.
-                if (fileQueue.contains(file)) {
-                         return FileVisitResult.CONTINUE;
-                }
-                if (matcher.matches(name)) {
-                    int night = filenameToFACTNight(file.getFileName().toString()).orElse(0);
-                    int runid = filenameToRunID(file.getFileName().toString()).orElse(0);
-                    Run run = dbInterface.getRun(night, runid);
-                    //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
-                    if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN) {
-                        fileQueue.add(file);
-                    }
-                }
-
-            } else {
-                log.info("Not a regular file: {} ", file);
-            }
-            return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-            exc.printStackTrace();
-            log.error("Could not visit file: {}. Continuing.", file);
-            return FileVisitResult.CONTINUE;
-        }
-    }
-
-
     @Override
     public void init() throws Exception {
-
-        DBI dbi = new DBI(jdbcConnection);
-        dbInterface = dbi.open(RTADataBase.DBInterface.class);
-        dbInterface.createRunTableIfNotExists();
-        dbInterface.createSignalTableIfNotExists();
         long SECOND = 1000L;
         long MINUTE = 60 * 1000;
         log.info("Starting file system watcher with interval of 10 Minutes");
@@ -127,28 +71,44 @@ public class RTAStream extends AbstractMultiStream {
             WebSocketService s = WebSocketService.getService();
             if (s == null){
                 log.info("Could not get an instance of the websocket service");
-            }
-            try {
-                log.info("Checking file system for new data.");
-                if(s != null){
+            } else {
+                try {
+                    log.info("Checking file system for new data.");
                     s.messageHandler.sendDataStatus("Checking for new data.");
-                }
-                Files.walkFileTree(dir, new RegexVisitor("\\d{8}_\\d{3}.(fits|fits.fz|fits\\.gz)$"));
-                //sort entries by filename to get the latest one first.
-                List<Path> collect = fileQueue.stream().sorted(Comparator.comparing(p -> p.getFileName().toString())).collect(toList());
-                fileQueue.addAll(collect);
 
-                if (fileQueue.isEmpty()){
-                    log.info("No new data present.");
-                    if (s!=null){
+                    PathMatcher regex = FileSystems
+                            .getDefault()
+                            .getPathMatcher("regex:\\d{8}_\\d{3}.(fits|zfits)(.gz)?");
+
+
+                    List<Path> paths = Files.walk(dir)
+                            .filter(path -> Files.isRegularFile(path))
+                            .filter(Files::isReadable)
+                            .map(Path::getFileName)
+                            .filter(regex::matches)
+                            .sorted(Comparator.comparing(p -> p.getFileName().toString()))
+                            .collect(toList());
+
+                    s.dbInterface.useExtension(RTADataBase.class, dao -> {
+                        for (Path p : paths) {
+                            int night = filenameToFACTNight(p.getFileName().toString()).orElse(0);
+                            int runid = filenameToRunID(p.getFileName().toString()).orElse(0);
+                            Run run = dao.getRun(night, runid);
+                            //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
+                            if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN) {
+                                fileQueue.add(p);
+                            }
+                        }
+                    });
+
+                    if (fileQueue.isEmpty()) {
+                        log.info("No new data present.");
                         s.messageHandler.sendDataStatus("No new data present.");
                     }
-                } else {
-                    log.info("Files in Queue: {}", fileQueue.size());
-                }
 
-            } catch (IOException e) {
-                throw new RuntimeException();
+                } catch (IOException e) {
+                    throw new RuntimeException();
+                }
             }
         }
     }
@@ -165,6 +125,7 @@ public class RTAStream extends AbstractMultiStream {
             }
         }
 
+        //this operation waits for new data to become available
         String path = fileQueue.take().toFile().getAbsolutePath();
 
         log.info("Opening file " + path);
@@ -192,8 +153,7 @@ public class RTAStream extends AbstractMultiStream {
 
     //TODO: Maybe just get the latest non analysed file from the db and start working on that. seems much simpler.
     /**
-     * This will read all FACT raw files it finds within a folder (recursively). It tries to skip non 'data' runs.
-     * This works as long as the inner stream is a ZFitsStream.
+     * This will read all FACT raw files it finds within a folder (recursively).
      * @return a data item from a raw data file.
      * @throws Exception
      */

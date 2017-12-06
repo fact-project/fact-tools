@@ -122,6 +122,22 @@
     </site>
   </distributionManagement>
 
+
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jdbi</groupId>
+        <artifactId>jdbi3-bom</artifactId>
+        <type>pom</type>
+        <version>3.0.0</version>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+
+
   <dependencies>
     <dependency>
       <groupId>us.monoid.web</groupId>
@@ -155,10 +171,16 @@
       <version>1.0.19</version>
       <scope>${streams.scope}</scope>
     </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.25</version>
+          <scope>${streams.scope}</scope>
+      </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>[1.6.4,)</version>
+      <version>1.7.25</version>
       <scope>${streams.scope}</scope>
     </dependency>
     <dependency>
@@ -219,12 +241,20 @@
       <artifactId>nom-tam-fits</artifactId>
       <version>1.15.2</version>
     </dependency>
+
     <dependency>
-      <groupId>org.jdbi</groupId>
-      <artifactId>jdbi</artifactId>
-      <version>2.78</version>
+        <groupId>org.jdbi</groupId>
+        <artifactId>jdbi3-core</artifactId>
     </dependency>
-    <dependency>
+
+
+  <dependency>
+      <groupId>org.jdbi</groupId>
+      <artifactId>jdbi3-sqlobject</artifactId>
+  </dependency>
+
+
+      <dependency>
       <groupId>com.sparkjava</groupId>
       <artifactId>spark-core</artifactId>
       <version>2.5.5</version>
@@ -243,13 +273,18 @@
 
   <build>
     <plugins>
+
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
+        <version>3.7.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <encoding>UTF-8</encoding>
+            <source>1.8</source>
+            <target>1.8</target>
+            <encoding>UTF-8</encoding>
+            <compilerArgs>
+                <arg>-parameters</arg>
+            </compilerArgs>
         </configuration>
       </plugin>
       <plugin>

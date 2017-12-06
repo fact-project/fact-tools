@@ -9,7 +9,8 @@ import fact.rta.db.Run;
 import fact.rta.db.Signal;
 import fact.rta.rest.Event;
 import fact.rta.rest.StatusContainer;
-import org.skife.jdbi.v2.DBI;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Spark;
@@ -31,7 +32,7 @@ public class WebSocketService implements AuxiliaryService {
 
     final private static Logger log = LoggerFactory.getLogger(WebSocketService.class);
 
-    RTADataBase.DBInterface dbInterface;
+    public Jdbi dbInterface;
     private Run currentRun = null;
     private Deque<Signal> signals = new ArrayDeque<>();
     private AuxFileService auxService;
@@ -39,7 +40,7 @@ public class WebSocketService implements AuxiliaryService {
 
 
     @Parameter(required = true, description = "Path to the .sqlite file")
-    String jdbcConnection;
+    public String jdbcConnection;
 
     @Parameter(required = true, description = "The url pointing to the path containing a the auxilary " +
             "data in FACTs canonical folder structure." )
@@ -91,16 +92,18 @@ public class WebSocketService implements AuxiliaryService {
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                log.debug("Sending status");
                 messageHandler.sendStatus(StatusContainer.create());
             }
         }, (long) (0.05 * MINUTE), (long) (0.1 * MINUTE));
 
-        dbInterface = new DBI(this.jdbcConnection).open(RTADataBase.DBInterface.class);
+        dbInterface = Jdbi.create(this.jdbcConnection);
+        dbInterface.installPlugin(new SqlObjectPlugin());
 
-        dbInterface.createRunTableIfNotExists();
-        dbInterface.createSignalTableIfNotExists();
-
+        dbInterface.withExtension(RTADataBase.class, dao -> {
+            dao.createRunTableIfNotExists();
+            dao.createSignalTableIfNotExists();
+            return null;
+        });
 
         auxService = new AuxFileService();
         auxService.auxFolder = auxFolder;
@@ -125,10 +128,12 @@ public class WebSocketService implements AuxiliaryService {
 
         SortedSet<AuxPoint> ftmPointsForNight = auxService.getAuxiliaryDataForWholeNight(AuxiliaryServiceName.FTM_CONTROL_TRIGGER_RATES, dT);
 
-
         Run newRun = new Run(item);
         if (currentRun == null){
-            dbInterface.insertRun(newRun);
+
+            dbInterface.useExtension(RTADataBase.class, dao -> {
+                dao.insertRun(newRun);
+            });
 
             log.info("Sending runinfo to clients");
             messageHandler.sendRunInfo(newRun);
@@ -139,21 +144,23 @@ public class WebSocketService implements AuxiliaryService {
             //found a new run. calculate the ontime for the old one and update it in the data base
             Duration onTime = calculateOnTimeForRun(currentRun, ftmPointsForNight);
 
-            dbInterface.updateRunWithOnTime(currentRun, onTime.getSeconds());
-            log.info("New run found. OnTime of old run was: {} seconds.", onTime.getSeconds());
+            dbInterface.useExtension(RTADataBase.class, dao -> {
+                dao.updateRunWithOnTime(currentRun, onTime.getSeconds());
 
-            //Save signals to database by looping over the collection and poping the elements
-            //to remove them at the same time.
-            //TODO: Can this be a bulk operation?
-            while(signals.size() > 0){
-                dbInterface.insertSignal(signals.pop());
-            }
+                log.info("New run found. OnTime of old run was: {} seconds.", onTime.getSeconds());
 
-            dbInterface.updateRunHealth(RTADataBase.HEALTH.OK, currentRun.runID, currentRun.night);
+                //Save signals to database by looping over the collection and popping the elements
+                //to remove them at the same time.
+                dao.insertSignals(signals.iterator());
+                signals.clear();
 
-            //insert new run to db
-            dbInterface.insertRun(newRun);
-            dbInterface.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, newRun.runID, newRun.night);
+                dao.updateRunHealth(RTADataBase.HEALTH.OK, currentRun);
+
+                //insert new run to db
+                dao.insertRun(newRun);
+                dao.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, newRun);
+            });
+
 
             //send information about the new run around.
             log.info("Sending runinfo to clients");
@@ -185,8 +192,8 @@ public class WebSocketService implements AuxiliaryService {
                 .filter(p -> {
                     ZonedDateTime t = p.getTimeStamp();
 
-                    boolean afterStart = t.isAfter(run.startTime);
-                    boolean beforeEnd = t.isBefore(run.endTime);
+                    boolean afterStart = t.isAfter(run.start_time);
+                    boolean beforeEnd = t.isBefore(run.end_time);
                     return afterStart && beforeEnd;
                 })
                 .mapToDouble(p -> p.getFloat("OnTime"))
