@@ -18,40 +18,40 @@ import java.util.TreeMap;
 
 /**
  * <p>
- * This processor handles the Gps time correction. It requires a gps time 
- * corrected events file either as URL and will read the Unix time 
- * data ( unix time seconds, unix time microseconds ) from that. The corrected time 
+ * This processor handles the Gps time correction. It requires a gps time
+ * corrected events file either as URL and will read the Unix time
+ * data ( unix time seconds, unix time microseconds ) from that. The corrected time
  * datum is then applied to the corresponding FactEvent processed by the
  * process method.
  * </p>
- * 
+ *
  * @author Max Ahnen &lt;mknoetig@phys.ethz.ch&gt;
- * 
+ *
  */
 
 public class GpsTimeCorrection implements Processor {
-	
+
 	static Logger log = LoggerFactory.getLogger(GpsTimeCorrection.class);
 
 	@Parameter(required=true,description="Key of the GpsUnixTimeUTC[2] output")
 	private String outputKey;
-	
-	/** 
-	 * This is the structure to hold the gps times in [int,int]: [seconds microseconds]. 
-	 * It is filled by the constructor and 
+
+	/**
+	 * This is the structure to hold the gps times in [int,int]: [seconds microseconds].
+	 * It is filled by the constructor and
 	 * can be accessed by the key: EventNum
-	 */ 
+	 */
 	public TreeMap<Integer, Integer[]> gpsTimes = new TreeMap<Integer, Integer[]>();
 
 	/**
 	 * This is the method called in the process loop.
-	 * All it does is to call gpsTimes with the EventNum and get back the 
+	 * All it does is to call gpsTimes with the EventNum and get back the
 	 * teo ints corresponding to the GPS corrected unix time
 	 */
 	@Override
-	public Data process(Data input) {		
+	public Data process(Data input) {
 		//Check that the eventnum exists
-		Utils.isKeyValid(input, "EventNum", Integer.class); 
+		Utils.isKeyValid(input, "EventNum", Integer.class);
 
 		Integer triggerType = new Integer( input.get( "TriggerType").toString() );
 
@@ -110,11 +110,8 @@ public class GpsTimeCorrection implements Processor {
 		} catch (Exception e) {
 
 			log.error("Failed to load Gps corrected data: {}", e.getMessage());
-			if (log.isDebugEnabled())
-				e.printStackTrace();
-			
 			this.gpsTimes = null;
-			throw new RuntimeException(e.getMessage());
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -128,7 +125,7 @@ public class GpsTimeCorrection implements Processor {
 	 * [4] correctedUnixTimeMicroseconds
 	 */
 	private ArrayList<int[]> getTimeDataFromFile(String fileName) {
-		
+
 		String lineData;
 		ArrayList<int[]> fileContents = new ArrayList<int[]>();
 		BufferedReader gpsFile=null;
@@ -189,7 +186,7 @@ public class GpsTimeCorrection implements Processor {
 				fileContents.add(intBuf);
 			}
 			gpsFile.close();
-		} 
+		}
 		catch(IOException e) {
 			log.error("Exception caught while reading gps event time correction data file: " + fileName + e.toString());
 		}
@@ -224,12 +221,10 @@ public class GpsTimeCorrection implements Processor {
 	}
 
 	public void setUrl(URL url) {
-		try 
-		{
+		try {
 			loadGpsTimeCorrection(new SourceURL(url));
-		} catch (Exception e)
-		{
-			throw new RuntimeException(e.getMessage());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

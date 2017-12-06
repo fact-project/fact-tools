@@ -17,9 +17,9 @@ import stream.io.SourceURL;
  * 2. Calculates the position of the half height in front of the maxAmplitudePosition
  * 3. Calculates the integral by summing up the following integrationWindow slices beginning with the half heigth position
  * The resulting photoncharge is calculated by dividing the integral by the integralGain of the pixel
- * 
+ *
  * This processor also serves as a basic class for extraction processors
- * 
+ *
  * @author Fabian Temme
  *
  */
@@ -31,7 +31,7 @@ public class BasicExtraction implements Processor {
 	protected String outputKeyMaxAmplPos = null;
 	@Parameter(required = true, description="outputKey for the calculated photoncharge")
 	protected String outputKeyPhotonCharge = null;
-	
+
 	@Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants",defaultValue="file:src/main/resources/defaultIntegralGains.csv")
 	protected SourceURL url = null;
 	@Parameter(required = false, description="start slice of the search window for the max amplitude", defaultValue="35")
@@ -44,33 +44,33 @@ public class BasicExtraction implements Processor {
 	protected int integrationWindow = 30;
 	@Parameter(required = false, description="minimal slice with valid values (we want to ignore slices below this value", defaultValue="10")
 	protected int validMinimalSlice = 10;
-	
+
 	protected double[] integralGains = null;
-	
+
 	private int npix = Constants.NUMBEROFPIXEL;
-	
+
 	@Override
 	public Data process(Data input) {
 		Utils.mapContainsKeys(input, dataKey,"NROI");
-		
+
 		int roi = (Integer) input.get("NROI");
 		npix = (Integer) input.get("NPIX");
-		
+
 		double[] data = (double[]) input.get(dataKey);
-		
+
 		int[] positions =  new int[npix];
         IntervalMarker[] mPositions = new IntervalMarker[npix];
 		double[] photonCharge = new double[npix];
         IntervalMarker[] mPhotonCharge = new IntervalMarker[npix];
-        
+
         Utils.checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow+validMinimalSlice, roi);
-        
+
         for (int pix = 0; pix < npix; pix++) {
 			positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow+rangeSearchWindow, roi, data);
 			mPositions[pix] = new IntervalMarker(positions[pix],positions[pix] + 1);
-			
+
 			int halfHeightPos = calculatePositionHalfHeight(pix, positions[pix],positions[pix]-rangeHalfHeightWindow, roi, data);
-			
+
 			Utils.checkWindow(halfHeightPos, integrationWindow, validMinimalSlice, roi);
 			photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / integralGains[pix];
 			mPhotonCharge[pix] = new IntervalMarker(halfHeightPos,halfHeightPos + integrationWindow);
@@ -80,10 +80,10 @@ public class BasicExtraction implements Processor {
         input.put(outputKeyPhotonCharge, photonCharge);
         input.put("@photoncharge", photonCharge);
         input.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
-        
+
 		return input;
-	}	
-	
+	}
+
 	public int calculateMaxPosition(int px, int start, int rightBorder, int roi, double[] data) {
 		int maxPos = start;
 		double tempMax = -Double.MAX_VALUE;
@@ -100,9 +100,9 @@ public class BasicExtraction implements Processor {
 	}
 
 	/**
-	 * In an area ]amplitudePositon-leftBorder,amplitudePosition] searches for the last position, where data[pos] is < 0.5 * 
+	 * In an area ]amplitudePositon-leftBorder,amplitudePosition] searches for the last position, where data[pos] is < 0.5 *
 	 * maxAmplitude. Returns the following slice.
-	 * 
+	 *
 	 * @param px
 	 * @param maxPos
 	 * @param leftBorder
@@ -123,7 +123,7 @@ public class BasicExtraction implements Processor {
 		}
 		return slice;
 	}
-	
+
 	public double calculateIntegral(int px, int startingPosition, int integralSize, int roi, double[] data) {
 		double integral = 0;
 		for (int sl = startingPosition ; sl < startingPosition + integralSize ; sl++)
@@ -134,7 +134,7 @@ public class BasicExtraction implements Processor {
 		return integral;
 	}
 
-	
+
 	public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
 		double[] integralGains = new double[npix];
 		Data integralGainData = null;
@@ -143,20 +143,19 @@ public class BasicExtraction implements Processor {
 			stream.setHeader(false);
 			stream.init();
 			integralGainData = stream.readNext();
-			
+
 			for (int i = 0 ; i < npix ; i++){
 				String key = "column:" + (i);
 				integralGains[i] = (Double) integralGainData.get(key);
 			}
 			return integralGains;
-			
+
 		} catch (Exception e) {
 			log.error("Failed to load integral Gain data: {}", e.getMessage());
-			e.printStackTrace();
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public String getDataKey() {
 		return dataKey;
 	}
