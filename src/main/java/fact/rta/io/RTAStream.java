@@ -157,13 +157,14 @@ public class RTAStream extends AbstractStream {
 
             RetryPolicy retryPolicy = new RetryPolicy()
                     .retryOn(FileNotFoundException.class)
-                    .withDelay(1, TimeUnit.MINUTES)
+                    .retryOn(NullPointerException.class)
+                    .withDelay(10, TimeUnit.SECONDS)
                     .withMaxRetries(5);
 
             Failsafe
                     .with(retryPolicy)
                     .onFailedAttempt(failure ->{
-                        log.warn("Could not find file at {} retrying in 1 minute", nextFile);
+                        log.warn("Could not open file at {} retrying in 10 seconds", nextFile);
                     })
                     .run(() -> fitsStream.init());
 
