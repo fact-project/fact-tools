@@ -158,13 +158,14 @@ public class RTAStream extends AbstractStream {
             RetryPolicy retryPolicy = new RetryPolicy()
                     .retryOn(FileNotFoundException.class)
                     .retryOn(NullPointerException.class)
-                    .withDelay(10, TimeUnit.SECONDS)
-                    .withMaxRetries(5);
+                    .withDelay(2, TimeUnit.SECONDS)
+                    .withMaxRetries(15);
 
             Failsafe
                     .with(retryPolicy)
                     .onFailedAttempt(failure ->{
-                        log.warn("Could not open file at {} retrying in 10 seconds", nextFile);
+                        log.warn("Could not open file at {} trying next file in 15 seconds", nextFile);
+                        fitsStream.setUrl(new SourceURL("file:" + fileQueue.take().toString()));
                     })
                     .run(() -> fitsStream.init());
 
@@ -177,7 +178,7 @@ public class RTAStream extends AbstractStream {
                 log.info("Skipping run with type: " + runtype);
             }
             if (runtype.equals("broken")) {
-                log.info("Could not get runtype from fitsfile: " + nextFile);
+                log.info("Could not get runtype from fitsfile: " + fitsStream.getUrl().getFile());
             }
         }
     }
