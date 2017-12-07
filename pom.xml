@@ -217,11 +217,26 @@
     <dependency>
       <groupId>gov.nasa.gsfc.heasarc</groupId>
       <artifactId>nom-tam-fits</artifactId>
-      <version>1.15.1</version>
+      <version>1.15.2</version>
     </dependency>
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+          <includes>
+            <include>project.properties</include>
+          </includes>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+          <excludes>
+            <exclude>project.properties</exclude>
+          </excludes>
+      </resource>
+    </resources>   
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -290,7 +305,7 @@
                 <Implementation-Revision>${project.version}</Implementation-Revision>
                 <Specification-Title>fact-tools</Specification-Title>
                 <Specification-Version>1.0</Specification-Version>
-                <main-class>stream.run</main-class>
+                <main-class>fact.run</main-class>
               </manifestEntries>
             </transformer>
           </transformers>
@@ -326,6 +341,28 @@
         <configuration>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.2.4</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+          <gitDescribe>
+            <tags>true</tags>
+          </gitDescribe>
         </configuration>
       </plugin>
     </plugins>

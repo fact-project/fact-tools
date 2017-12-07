@@ -5,12 +5,12 @@
     -->
     <properties url="classpath:/default/settings.properties" />
 
-    <property name="db" value="file:./2015.sqlite" />
+    <property name="aux_source" value="file:./2015.sqlite" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <service id="auxService" class="fact.auxservice.SqliteService" url="${db}" />
+    <service id="auxService" class="fact.auxservice.SqliteService" url="${aux_source}" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
     
     <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
@@ -47,12 +47,8 @@
                 topSlopeLimit="${removeSpikes_topSlopeLimit}"
                 maxSpikeLength="${removeSpikes_maxSpikeLength}"
         />
-        <fact.filter.DrsTimeCalibration
-                outputKey="timeCalibConst"
-        />
-        <fact.filter.ArrayTimeCorrection
+        <fact.datacorrection.DrsTimeCalibration
                 dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
                 outputKey="DataCalibrated"
         />
         <fact.datacorrection.InterpolateTimeSeries

@@ -57,6 +57,16 @@ public class SqliteService implements AuxiliaryService {
                 }
             });
 
+    public static ZonedDateTime floorToQuarterHour(ZonedDateTime time){
+        ZonedDateTime t = time.withZoneSameInstant(ZoneOffset.UTC).withSecond(0);
+
+        int oldMinute = t.getMinute();
+        int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
+
+        return t.withMinute(newMinute);
+    }
+
+
     public class AuxDataCacheKey {
         private final AuxiliaryServiceName service;
         private final ZonedDateTime roundedTimeStamp;
@@ -66,14 +76,7 @@ public class SqliteService implements AuxiliaryService {
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
         }
 
-        public ZonedDateTime floorToQuarterHour(ZonedDateTime time){
-            ZonedDateTime t = time.withZoneSameInstant(ZoneOffset.UTC).withSecond(0);
 
-            int oldMinute = t.getMinute();
-            int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
-
-            return t.withMinute(newMinute);
-        }
 
         @Override
         public boolean equals(Object o) {
