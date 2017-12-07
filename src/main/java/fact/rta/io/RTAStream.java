@@ -4,17 +4,22 @@ import fact.io.hdureader.FITSStream;
 import fact.rta.RTADataBase;
 import fact.rta.WebSocketService;
 import fact.rta.db.Run;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
-import stream.io.multi.AbstractMultiStream;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,8 +27,9 @@ import static java.util.stream.Collectors.toList;
  *
  * Created by mackaiver on 21/09/16.
  */
-public class RTAStream extends AbstractMultiStream {
+public class RTAStream extends AbstractStream {
 
+    final private static Logger log = LoggerFactory.getLogger(RTAStream.class);
 
     @Parameter(required = true, description = "Path to folder that is being watched")
     public String folder;
@@ -35,14 +41,12 @@ public class RTAStream extends AbstractMultiStream {
             "data in FACTS canonical folder structure." )
     public SourceURL auxFolder;
 
-    private AbstractStream stream;
+    private FITSStream fitsStream = new FITSStream();
 
-    public BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
-
-    Updater updater = new Updater();
+    BlockingQueue<Path> fileQueue = new LinkedBlockingQueue<>();
 
 
-    public static Optional<Integer> filenameToRunID(String filename){
+    static Optional<Integer> filenameToRunID(String filename){
         String[] split = filename.split("_|\\.");
         try {
             return Optional.of(Integer.parseInt(split[1]));
@@ -51,7 +55,7 @@ public class RTAStream extends AbstractMultiStream {
         }
     }
 
-    public static Optional<Integer> filenameToFACTNight(String filename){
+    static Optional<Integer> filenameToFACTNight(String filename){
         String[] split = filename.split("_|\\.");
         try {
             return Optional.of(Integer.parseInt(split[0]));
@@ -67,10 +71,28 @@ public class RTAStream extends AbstractMultiStream {
         long MINUTE = 60 * 1000;
         log.info("Starting file system watcher with interval of 10 Minutes");
         WebSocketService s = WebSocketService.getService(jdbcConnection, auxFolder);
-        new Timer().scheduleAtFixedRate(updater, 0, 10 * MINUTE);
+        new Timer().scheduleAtFixedRate(new Updater(), 0, 10 * MINUTE);
+        new Timer().scheduleAtFixedRate(new Reporter(), 10 * SECOND, 2 * MINUTE);
     }
 
-    class Updater extends TimerTask{
+    private class Reporter extends TimerTask{
+        @Override
+        public void run() {
+            WebSocketService s = WebSocketService.getService();
+            if (s == null){
+                log.info("Could not get an instance of the websocket service");
+                return;
+            }
+            if(fileQueue.isEmpty()){
+                s.messageHandler.sendDataStatus("Waiting for new Data.");
+                return;
+            }
+            s.messageHandler.sendDataStatus(String.format("Currently %d files in queue.", fileQueue.size()));
+        }
+    }
+
+
+    private class Updater extends TimerTask{
 
         @Override
         public void run() {
@@ -127,71 +149,59 @@ public class RTAStream extends AbstractMultiStream {
         }
     }
 
-    private void checkNextFile() throws Exception {
-        WebSocketService s = WebSocketService.getService();
-        if(fileQueue.isEmpty()){
-            log.info("FileQueue is empty. Waiting for new data. ");
-            if (s != null){
-                    s.messageHandler.sendDataStatus("Waiting for new data.");
-            }
-            else{
-                log.info("No WebService available");
-            }
-        }
+    private void takeNextFile() throws Exception {
+        String runtype = "";
+        while (!runtype.equals("data")) {
+            Path nextFile = fileQueue.take();
+            fitsStream.setUrl(new SourceURL("file:" + nextFile.toString()));
 
-        //this operation waits for new data to become available
-        String path = fileQueue.take().toFile().getAbsolutePath();
+            RetryPolicy retryPolicy = new RetryPolicy()
+                    .retryOn(FileNotFoundException.class)
+                    .withDelay(1, TimeUnit.MINUTES)
+                    .withMaxRetries(5);
 
-        log.info("Opening file " + path);
-        stream.setUrl(new SourceURL("file:" + path));
-        try{
-            stream.init();
-            FITSStream zstream = (FITSStream) stream;
+            Failsafe
+                    .with(retryPolicy)
+                    .onFailedAttempt(failure ->{
+                        log.warn("Could not find file at {} retrying in 1 minute", nextFile);
+                    })
+                    .run(() -> fitsStream.init());
 
-            String runtype = zstream.eventHDU.header.get("RUNTYPE").orElseThrow(() -> new IOException("No runtype information"));
+            runtype= fitsStream.eventHDU
+                                .header
+                                .get("RUNTYPE")
+                                .orElse("broken");
 
-            if(!runtype.equals("data")){
-                //not a data run. skip
+            if (!runtype.equals("data")) {
                 log.info("Skipping run with type: " + runtype);
-                checkNextFile();
             }
-        } catch (ClassCastException e){
-            //pass
-            log.warn("Not using the hdureader as input stream. This won't skip non-data runs.");
-        } catch (Exception e){
-            log.warn("File failed to read. Skipping");
-            e.printStackTrace();
-            checkNextFile();
+            if (runtype.equals("broken")) {
+                log.info("Could not get runtype from fitsfile: " + nextFile);
+            }
         }
     }
 
-    //TODO: Maybe just get the latest non analysed file from the db and start working on that. seems much simpler.
+
+    private RetryPolicy pollingPolicy = new RetryPolicy()
+            .retryIf(result -> result == null)
+            .withDelay(5, TimeUnit.SECONDS)
+            .withJitter(500, TimeUnit.MILLISECONDS);
+
     /**
      * This will read all FACT raw files it finds within a folder (recursively).
      * @return a data item from a raw data file.
-     * @throws Exception
+     * @throws Exception hopefully not very often.
      */
     @Override
     public synchronized Data readNext() throws Exception {
-        if (this.count % 128 == 0){
-            WebSocketService s = WebSocketService.getService();
-            if(s != null){
-                s.messageHandler.sendDataStatus("Currently streaming data.");
-            } else {
-                log.info("no WebService available on readnext");
-            }
+        if (fitsStream.getUrl() ==  null){
+            takeNextFile();
         }
 
-        if (stream == null) {
-            //get the first stream inside this multistream.
-            stream = (AbstractStream) streams.get(additionOrder.get(0));
-            checkNextFile();
-        }
-        Data data = stream.read();
-        if(data == null){
-            checkNextFile();
-            data = stream.read();
-        }
-        return data;
+        return Failsafe.with(pollingPolicy)
+                .onFailedAttempt((a, failure) -> {
+                    takeNextFile();
+                })
+                .get(() -> fitsStream.readNext());
     }
 }
