@@ -54,3 +54,25 @@ large amounts of FACT files easier, it's called [erna](https://github.com/fact-p
 ## Examples
 
 There are a number of example XML files in the `examples/` directory.
+
+
+To perform the current FACT-Tools standard analysis and write image parameters to FITS files, run 
+
+```
+$ java -jar <jar> examples/stdAnalysis/data/analysis.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile> -DauxFolder=file:<aux_dir>
+```
+
+To convert FACT rawdata zfits files to standard, uncompressed FITS, use:
+```
+$ java -jar <jar> examples/zfits2fits.xml -Dinfile=file:<datafile> -Doutfile=file:<outputfile>
+```
+
+To apply the DRS calibration and save calibrated time series in standard, uncompressed FITS, use:
+```
+$ java -jar <jar> examples/apply_drs_calibration.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile>
+```
+
+To save number of photons and mean arrival times (DL1) to standard, uncompressed FITS, use:
+```
+$ java -jar <jar> examples/save_dl1.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile>
+```
