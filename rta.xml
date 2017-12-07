@@ -25,9 +25,11 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
 
-    <stream class="fact.rta.io.RTAStream" id="fact" folder="${infile}" jdbcConnection="${jdbc}" auxFolder="${auxfolder}" limit="5000">
-        <stream id="_" class="fact.io.hdureader.FITSStream"  />
-    </stream>
+    <stream class="fact.rta.io.RTAStream"
+            id="fact" folder="${infile}"
+            jdbcConnection="${jdbc}"
+            auxFolder="${auxfolder}"
+            limit="500"/>
 
 
     <!-- Description of the process and the corresponding stream -->
