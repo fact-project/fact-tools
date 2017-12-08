@@ -2,6 +2,8 @@ package fact.io.hdureader;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,13 +77,14 @@ public class Header {
      *
      * @return date stored in the HDU header
      */
-    public Optional<LocalDateTime> date(){
+    public Optional<ZonedDateTime> date(){
         if (!headerMap.containsKey("DATE")){
             return Optional.empty();
         }
 
         String dateString = headerMap.get("DATE").value;
-        return Optional.of(LocalDateTime.parse(dateString));
+        ZonedDateTime dateTime = LocalDateTime.parse(dateString).atZone(ZoneOffset.UTC);
+        return Optional.of(dateTime);
     }
 
     /**
