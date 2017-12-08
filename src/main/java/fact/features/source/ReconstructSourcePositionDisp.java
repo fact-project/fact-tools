@@ -9,21 +9,28 @@ import stream.annotations.Parameter;
 
 public class ReconstructSourcePositionDisp implements Processor {
     @Parameter(required=true)
-    private String dispKey = null;
+    String dispKey = null;
+
     @Parameter(required=true)
-    private String cogxKey = null;
+    String cogxKey = null;
+
     @Parameter(required=true)
-    private String cogyKey = null;
+    String cogyKey = null;
+
     @Parameter(required=true)
-    private String deltaKey = null;
+    String deltaKey = null;
+
     @Parameter(required=true)
-    private String m3lKey = null;
+    String m3lKey = null;
+
     @Parameter(required=true)
-    private String cosDeltaAlphaKey = null;
+    String cosDeltaAlphaKey = null;
+
     @Parameter(required=true)
-    private String outputKey = null;
+    String outputKey = null;
+
     @Parameter(required=true)
-    private double signM3lConstant = 0;
+    double signM3lConstant = 0;
 
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dispKey, cogxKey, cogyKey, deltaKey, cosDeltaAlphaKey);
@@ -39,6 +46,8 @@ public class ReconstructSourcePositionDisp implements Processor {
 
         input.put("@reconstructedPosition" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
         input.put(outputKey, recPosition);
+        input.put(outputKey + 'X', recPosition.xMM);
+        input.put(outputKey + 'Y', recPosition.yMM);
 
         return input;
     }
