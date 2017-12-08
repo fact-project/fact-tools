@@ -318,6 +318,9 @@ public class FITSWriter implements StatefulProcessor {
     public static String formatDateTime(ZonedDateTime zonedDateTime) {
         String iso = zonedDateTime.format(DateTimeFormatter.ISO_INSTANT);
         iso = iso.replace("Z", "");
+        if (iso.length() == 19) {
+            iso = iso + ".";
+        }
         iso = StringUtils.rightPad(iso,  26, "0");
         iso = iso.substring(0, 26);
         return iso + "Z";
