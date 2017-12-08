@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Keys;
 import stream.data.DataFactory;
+import stream.learner.evaluation.ZeroOneLoss;
 
 import java.io.File;
 import java.net.URL;
@@ -130,5 +131,20 @@ public class FITSWriterTest {
         assertEquals(1440, npix);
 
         assertEquals(false, header.get("EventNum").isPresent());
+    }
+
+    @Test
+    public void testDateTimeFormatter () {
+	    ZonedDateTime date1 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123000000, ZoneOffset.UTC);
+	    ZonedDateTime date2 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123400000, ZoneOffset.UTC);
+	    ZonedDateTime date3 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456000, ZoneOffset.UTC);
+	    ZonedDateTime date4 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456700, ZoneOffset.UTC);
+	    ZonedDateTime date5 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456789, ZoneOffset.UTC);
+
+	    assertEquals(FITSWriter.formatDateTime(date1).length(), 27);
+	    assertEquals(FITSWriter.formatDateTime(date2).length(), 27);
+	    assertEquals(FITSWriter.formatDateTime(date3).length(), 27);
+	    assertEquals(FITSWriter.formatDateTime(date4).length(), 27);
+	    assertEquals(FITSWriter.formatDateTime(date5).length(), 27);
     }
 }

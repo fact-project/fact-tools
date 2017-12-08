@@ -5,6 +5,7 @@ import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
 import nom.tam.util.BufferedFile;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -184,10 +184,8 @@ public class FITSWriter implements StatefulProcessor {
                     header.addValue(key, (boolean) serializable, "");
                 } else if (ClassUtils.isAssignable(type, ZonedDateTime.class)) {
                     ZonedDateTime zonedDateTime = (ZonedDateTime) serializable;
-                    header.addValue(key, zonedDateTime.format(DateTimeFormatter.ISO_INSTANT), "");
-                } else if (ClassUtils.isAssignable(type, LocalDateTime.class)) {
-                    LocalDateTime localDateTime = (LocalDateTime) serializable;
-                    header.addValue(key, localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "");
+                    String iso = formatDateTime(zonedDateTime);
+                    header.addValue(key, iso, "");
                 } else {
                     throw new RuntimeException("Key '" + key + "' cannot be saved to FITS Header");
                 }
@@ -222,7 +220,8 @@ public class FITSWriter implements StatefulProcessor {
                 return new boolean[]{(boolean) serializable};
             } else if (ClassUtils.isAssignable(type, ZonedDateTime.class)) {
                 ZonedDateTime zonedDateTime = (ZonedDateTime) serializable;
-                return new String[]{zonedDateTime.format(DateTimeFormatter.ISO_INSTANT)};
+                String iso = formatDateTime(zonedDateTime);
+                return new String[]{iso};
             } else {
                 throw new RuntimeException("Serializable cannot be saved to FITS");
             }
@@ -306,5 +305,21 @@ public class FITSWriter implements StatefulProcessor {
         } else {
             bf.close();
         }
+    }
+
+    /**
+     * Java DateTimeFormatter.ISO_INSTANT creates variable length strings, because
+     * only the significant digits are returned.
+     * Thus, we pad the string and return only the microseconds part.
+     *
+     * @param zonedDateTime
+     * @return
+     */
+    public static String formatDateTime(ZonedDateTime zonedDateTime) {
+        String iso = zonedDateTime.format(DateTimeFormatter.ISO_INSTANT);
+        iso = iso.replace("Z", "");
+        iso = StringUtils.rightPad(iso,  26, "0");
+        iso = iso.substring(0, 26);
+        return iso + "Z";
     }
 }
