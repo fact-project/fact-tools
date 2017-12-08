@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Keys;
 import stream.data.DataFactory;
-
 import java.io.File;
 import java.net.URL;
 import java.time.ZoneOffset;
@@ -130,5 +129,29 @@ public class FITSWriterTest {
         assertEquals(1440, npix);
 
         assertEquals(false, header.get("EventNum").isPresent());
+    }
+
+    @Test
+    public void testDateTimeFormatter () {
+        ZonedDateTime date1 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123000000, ZoneOffset.UTC);
+        ZonedDateTime date2 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123400000, ZoneOffset.UTC);
+        ZonedDateTime date3 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456000, ZoneOffset.UTC);
+        ZonedDateTime date4 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456700, ZoneOffset.UTC);
+        ZonedDateTime date5 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456789, ZoneOffset.UTC);
+        ZonedDateTime date6 = ZonedDateTime.of(2013, 11, 01, 0, 0, 0, 0, ZoneOffset.UTC);
+
+        assertEquals(FITSWriter.formatDateTime(date1).length(), 27);
+        assertEquals(FITSWriter.formatDateTime(date2).length(), 27);
+        assertEquals(FITSWriter.formatDateTime(date3).length(), 27);
+        assertEquals(FITSWriter.formatDateTime(date4).length(), 27);
+        assertEquals(FITSWriter.formatDateTime(date5).length(), 27);
+        assertEquals(FITSWriter.formatDateTime(date6).length(), 27);
+
+        assertEquals(FITSWriter.formatDateTime(date1), "2013-11-01T23:44:25.123000Z");
+        assertEquals(FITSWriter.formatDateTime(date2), "2013-11-01T23:44:25.123400Z");
+        assertEquals(FITSWriter.formatDateTime(date3), "2013-11-01T23:44:25.123456Z");
+        assertEquals(FITSWriter.formatDateTime(date4), "2013-11-01T23:44:25.123456Z");
+        assertEquals(FITSWriter.formatDateTime(date5), "2013-11-01T23:44:25.123456Z");
+        assertEquals(FITSWriter.formatDateTime(date6), "2013-11-01T00:00:00.000000Z");
     }
 }
