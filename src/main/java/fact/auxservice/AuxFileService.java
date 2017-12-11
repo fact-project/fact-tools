@@ -140,6 +140,7 @@ public class AuxFileService implements AuxiliaryService {
             if (!pathToFile.toFile().canRead()){
                 log.warn("Could not load aux file in directory {}", auxFolder);
                 log.error("Could not read file {}", pathToFile);
+                pathToFile = Paths.get(auxFolder.getPath(), key.path.getFileName().toString());
             }
         }
 
