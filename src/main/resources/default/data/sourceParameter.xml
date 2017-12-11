@@ -1,7 +1,7 @@
 <module>
 <fact.features.source.SourcePosition
     outputKey="sourcePosition"
-    auxService="${auxService}"
+    auxService="auxService"
 />
 <fact.features.source.AntiSourcePosition
         sourcePositionKey="sourcePosition"
