@@ -130,7 +130,9 @@ public class RTAStream extends AbstractStream {
                             Run run = dao.getRun(night, runid);
                             //analyze run if it doesn't exist or its state is unknown. but avoid duplicates in the queue.
                             if (run == null || run.health == RTADataBase.HEALTH.UNKNOWN) {
-                                fileQueue.add(p);
+                                if (! fileQueue.contains(p)) {
+                                    fileQueue.add(p);
+                                }
                             } else{
                                 log.info("File {} already marked as analyzed in DB", p);
                             }
@@ -181,6 +183,7 @@ public class RTAStream extends AbstractStream {
                 log.info("Could not get runtype from fitsfile: " + fitsStream.getUrl().getFile());
             }
         }
+        log.info("Opening File {}", fitsStream.getUrl().getFile());
     }
 
 
