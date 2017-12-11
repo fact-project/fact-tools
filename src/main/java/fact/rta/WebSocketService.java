@@ -101,10 +101,11 @@ public class WebSocketService{
 
         Run newRun = new Run(item);
         if (currentRun == null){
-
-            dbInterface.useExtension(RTADataBase.class, dao -> {
-                dao.insertRun(newRun);
-            });
+            synchronized (this) {
+                dbInterface.useExtension(RTADataBase.class, dao -> {
+                    dao.insertRun(newRun);
+                });
+            }
 
             log.info("Sending runinfo to clients");
             messageHandler.sendRunInfo(newRun);
@@ -114,23 +115,24 @@ public class WebSocketService{
 
             //found a new run. calculate the ontime for the old one and update it in the data base
             Duration onTime = calculateOnTimeForRun(currentRun, ftmPointsForNight);
+            synchronized (this) {
+                dbInterface.useExtension(RTADataBase.class, dao -> {
+                    dao.updateRunWithOnTime(currentRun, onTime.getSeconds());
 
-            dbInterface.useExtension(RTADataBase.class, dao -> {
-                dao.updateRunWithOnTime(currentRun, onTime.getSeconds());
+                    log.info("New run found. OnTime of old run was: {} seconds.", onTime.getSeconds());
 
-                log.info("New run found. OnTime of old run was: {} seconds.", onTime.getSeconds());
+                    //Save signals to database by looping over the collection and popping the elements
+                    //to remove them at the same time.
+                    dao.insertSignals(signals.iterator());
+                    signals.clear();
 
-                //Save signals to database by looping over the collection and popping the elements
-                //to remove them at the same time.
-                dao.insertSignals(signals.iterator());
-                signals.clear();
+                    dao.updateRunHealth(RTADataBase.HEALTH.OK, currentRun);
 
-                dao.updateRunHealth(RTADataBase.HEALTH.OK, currentRun);
-
-                //insert new run to db
-                dao.insertRun(newRun);
-                dao.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, newRun);
-            });
+                    //insert new run to db
+                    dao.insertRun(newRun);
+                    dao.updateRunHealth(RTADataBase.HEALTH.IN_PROGRESS, newRun);
+                });
+            }
 
 
             //send information about the new run around.
