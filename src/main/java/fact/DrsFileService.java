@@ -3,24 +3,22 @@ package fact;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import fact.auxservice.AuxCache;
 import fact.io.hdureader.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.SourceURL;
 import stream.service.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -68,7 +66,9 @@ public class DrsFileService implements Service {
      * @throws IOException if no file with drs constant can be found or an error occurs while reading it.
      */
     public CalibrationInfo getCalibrationConstantsForDataItem(Data item) throws IOException {
-        LocalDateTime observationDate = LocalDateTime.parse(item.get("DATE-OBS").toString());
+        LocalDateTime dateTime = LocalDateTime.parse(item.get("DATE-OBS").toString());
+
+        ZonedDateTime observationDate = ZonedDateTime.of(dateTime, ZoneOffset.UTC);
         int runId = (int) item.get("RUNID");
         try {
             return cache.get(new DrsCacheKey(observationDate, runId));
@@ -78,10 +78,11 @@ public class DrsFileService implements Service {
     }
 
 
-    private LocalDateTime getObservationDate(Path p) {
+    private ZonedDateTime getObservationDate(Path p) {
         FITS fits = FITS.fromPath(p);
         HDU hdu = fits.getHDU("DrsCalibration");
-        return hdu.header.date().orElse(LocalDateTime.MIN);
+        //return the date found or some date very far in the past.
+        return hdu.header.date().orElse(ZonedDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC));
     }
 
 
@@ -116,7 +117,7 @@ public class DrsFileService implements Service {
         float[] gainMean = row.getFloatArray("GainMean")
                 .orElseThrow(()-> new IOException("GainMean not found in BinTable"));
 
-        LocalDateTime calibrationDateTime = calibrationHDU.header.date()
+        ZonedDateTime calibrationDateTime = calibrationHDU.header.date()
                 .orElseThrow(()-> new IOException("Date of calibration not found in BinTable"));
 
         return new CalibrationInfo(calibrationDateTime, baselineMean, gainMean, triggerOffsetMean);
@@ -128,14 +129,14 @@ public class DrsFileService implements Service {
         final int month;
         final int day;
         final int year;
-        final LocalDateTime observationDate;
+        final ZonedDateTime observationDate;
         final Path partialPathToFolder;
 
-        DrsCacheKey(LocalDateTime observationDateTime, int runId) {
+        DrsCacheKey(ZonedDateTime observationDateTime, int runId) {
             month = observationDateTime.getMonthValue();
             day = observationDateTime.getDayOfMonth();
             year = observationDateTime.getYear();
-            partialPathToFolder = dateTimeStampToFACTPath(observationDateTime);
+            partialPathToFolder = AuxCache.dateTimeStampToFACTPath(observationDateTime);
             observationDate = observationDateTime;
             this.runId = runId;
         }
@@ -159,23 +160,6 @@ public class DrsFileService implements Service {
             result = 31 * result + year;
             return result;
         }
-
-        /**
-         * Takes a dateTime object and returns the canonical path to an aux or data file.
-         * For example 2016-01-03 09:30:12 returns a path to "2016/01/02" while
-         * 2016-01-03 13:30:12 would return "2016/01/03"
-         *
-         * @param timeStamp the timestamp to get the night for
-         * @return a partial path starting with the year.
-         */
-        private Path dateTimeStampToFACTPath(LocalDateTime timeStamp){
-            LocalDateTime offsetDate = timeStamp.minusHours(12);
-            int year = offsetDate.getYear();
-            int month = offsetDate.getMonthValue();
-            int day = offsetDate.getDayOfMonth();
-
-            return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));
-        }
     }
 
     /**
@@ -186,9 +170,9 @@ public class DrsFileService implements Service {
         public final float[] drsBaselineMean;
         public final float[] drsGainMean;
         public final float[] drsTriggerOffsetMean;
-        public final LocalDateTime timeOfCalibration;
+        public final ZonedDateTime timeOfCalibration;
 
-        CalibrationInfo(LocalDateTime timeOfCalibration,
+        CalibrationInfo(ZonedDateTime timeOfCalibration,
                         float[] drsBaselineMean,
                         float[] drsGainMean,
                         float[] drsTriggerOffsetMean)

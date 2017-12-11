@@ -7,9 +7,7 @@ import stream.Data;
 import stream.io.SourceURL;
 
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.time.ZonedDateTime;
 
 import static org.junit.Assert.assertTrue;
 
@@ -36,7 +34,7 @@ public class DrsServiceTest {
         DrsFileService.CalibrationInfo info = s.getCalibrationConstantsForDataItem(item);
 
         assertTrue(info != null);
-        assertTrue(info.timeOfCalibration.isEqual(LocalDateTime.parse("2013-01-02T21:59:00")));
+        assertTrue(info.timeOfCalibration.isEqual(ZonedDateTime.parse("2013-01-02T21:59:00+00:00")));
     }
 
 }
