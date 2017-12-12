@@ -1,11 +1,14 @@
 language: java
-sudo: false
-script: mvn clean verify
+
 jdk:
-- oraclejdk8
+  - oraclejdk8
+
+sudo: false
+
+script: mvn --batch-mode clean verify
 
 after_script:
-- bash ./deploy_site.sh
+  - bash ./deploy_site.sh
 
 env:
   global:
@@ -13,7 +16,7 @@ env:
     - secure: aeSPoJ7VKwYnRpE1mpU02jVNYW3SbRS1UDy2UBt7UZOHOuJ6QzW3ZWaot2M5F4LOHpyvYgpQ//coe4zW/kL6Lf7+M8Xga2cn9Yrqpm03gAZiHLFimPbDuG5WxnRqOPs1kgaWHhlvNXiH5j8bsfWwY52HwyU9aQ7F5tG0xLJnboEwPnb2qy+QkxUqI5u7WFtTd5edAFxtRwFZNLLx1LJ9V+Ej5xl3trVKlvMQ+6QFaUM5lv4TSh/OhEQYJ2IE1tfAadAnqX5CwBDeeVmn7vuYgU7ADXB3MPCYXU2tjsPa4fEi3whCu/62ACb5o8OvCnVRhRB94OvR/v1P8Xh/nTd477eVwV+YV263CEFAHpPjSJsWdYqo+N0UuujebJMpjTP0gdbEoQfGOJH2aek/FEPdOQqqL3c1T6dry12QV6CcTTPLbEMlHBHq/PbeMbcLwBWSbDpYN1ZOhbGW1S7rmjChUGinYC/FOOwrJiwoArLSKkKQiL7HfiufBF4K01s4KtUDoHFprDvWBhc2ZRwZSxZdwFKiGs67i0FEU+g7hjw03WyDftwC9MgkjfDbh7M84DkG6rgcNkqPacIJmKSVJYGYf09BnIRWq8ElaGeAj5gXOfTagAG5BFt8/lSMa7ptete2mC5Oyc4E59sJU4MyOvsumq6Tw1Zjye7gc/bhglrRFJg=
 
 before_deploy:
-  - mvn -DfinalName=fact-tools-$TRAVIS_BRANCH package
+  - mvn --batch-mode -DfinalName=fact-tools-$TRAVIS_BRANCH package
 
 deploy:
   provider: releases
