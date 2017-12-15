@@ -25,6 +25,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,7 +57,7 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
     public String extname = "Events";
 
-    @Parameter(required = false, description = "Set if you want to allow empty keys.")
+    @Parameter(required = false, description = "Set if you want to allow non existing keys.")
     public boolean allowNullKeys = false;
 
     private BufferedFile bf;
@@ -73,8 +75,13 @@ public class FITSWriter implements StatefulProcessor {
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
-        if (!allowNullKeys)
-            Utils.mapContainsKeys(item, keys.getKeyValues());
+        if (!allowNullKeys) {
+            List<String> keysList = Arrays.stream(keys.getKeyValues())
+                    .filter(p -> !p.contains("*"))
+                    .filter(p -> !p.startsWith("!"))
+                    .collect(Collectors.toList());
+            Utils.mapContainsKeys(item, keysList);
+        }
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
         }

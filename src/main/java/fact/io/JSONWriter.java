@@ -19,6 +19,9 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -127,9 +130,13 @@ public class JSONWriter implements StatefulProcessor {
     public Data process(Data data) {
         Data item = DataFactory.create();
 
-        if (!allowNullKeys)
-            Utils.mapContainsKeys(item, keys.getKeyValues());
-
+        if (!allowNullKeys) {
+            List<String> keysList = Arrays.stream(keys.getKeyValues())
+                    .filter(p -> !p.contains("*"))
+                    .filter(p -> !p.startsWith("!"))
+                    .collect(Collectors.toList());
+            Utils.mapContainsKeys(item, keysList);
+        }
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));
         }

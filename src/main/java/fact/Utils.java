@@ -20,6 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -269,6 +270,41 @@ public class Utils {
 	 * @param keys
 	 */
 	public static void mapContainsKeys(Data item, String... keys) {
+		ArrayList<String> e = new ArrayList<>();
+		boolean isValid = true;
+		if (keys == null) {
+			isValid = false;
+		}
+		for (String key : keys) {
+			if (key == null || !item.containsKey(key)) {
+				isValid = false;
+				e.add(key);
+			}
+		}
+		if (!isValid) {
+			StringBuilder b = new StringBuilder();
+			for (String er : e) {
+				b.append(er);
+				b.append("\n");
+			}
+			StackTraceElement traceElement = Thread.currentThread()
+					.getStackTrace()[2];
+			String caller = traceElement.getClassName();
+			throw new RuntimeException("Missing keys for processor " + caller
+					+ ":  " + b.toString());
+		}
+	}
+
+	/**
+	 * This is a helper method which checks if all the keys provided are in the
+	 * data item. If one of the keys is not in the item a RuntimeException will
+	 * be thrown containing a message detailing which processor is causing the
+	 * error
+	 *
+	 * @param item
+	 * @param keys
+	 */
+	public static void mapContainsKeys(Data item, List<String> keys) {
 		ArrayList<String> e = new ArrayList<>();
 		boolean isValid = true;
 		if (keys == null) {
