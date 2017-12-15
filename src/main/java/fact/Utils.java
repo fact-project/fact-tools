@@ -270,7 +270,7 @@ public class Utils {
 	 * @param keys
 	 */
 	public static void mapContainsKeys(Data item, String... keys) {
-		mapContainsKeys(item, keys);
+		mapContainsKeys(item, Arrays.asList(keys));
 	}
 
 	/**

@@ -22,10 +22,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -66,6 +63,7 @@ public class FITSWriter implements StatefulProcessor {
     private boolean initialized = false;
     private long rowSize;
 
+    private Set<String> previousKeySet;
     long numEventsWritten = 0;
 
     ArrayList<String> columnNames = new ArrayList<>(0);
@@ -84,6 +82,19 @@ public class FITSWriter implements StatefulProcessor {
         }
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
+        }
+        if (previousKeySet==null) {
+            previousKeySet = item.keySet();
+        } else {
+            if (!previousKeySet.equals(item.keySet())) {
+                Set<String> diff1 = item.keySet();
+                diff1.removeAll(previousKeySet);
+                Set<String> diff2 = previousKeySet;
+                diff2.removeAll(item.keySet());
+                diff1.addAll(diff2);
+                String missingKeys = StringUtils.join(diff1, ",");
+                throw new RuntimeException("The Keyset changed, missing keys: '"+missingKeys+"'");
+            }
         }
 
         if (!initialized){

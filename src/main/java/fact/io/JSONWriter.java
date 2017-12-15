@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import fact.Utils;
 import fact.container.PixelSet;
+import org.apache.commons.lang3.StringUtils;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
@@ -124,6 +126,7 @@ public class JSONWriter implements StatefulProcessor {
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
 
+    private Set<String> previousKeySet;
     boolean isFirstLine = true;
 
     @Override
@@ -139,6 +142,19 @@ public class JSONWriter implements StatefulProcessor {
         }
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));
+        }
+        if (previousKeySet==null) {
+            previousKeySet = item.keySet();
+        } else {
+            if (!previousKeySet.equals(item.keySet())) {
+                Set<String> diff1 = item.keySet();
+                diff1.removeAll(previousKeySet);
+                Set<String> diff2 = previousKeySet;
+                diff2.removeAll(item.keySet());
+                diff1.addAll(diff2);
+                String missingKeys = StringUtils.join(diff1, ",");
+                throw new RuntimeException("The Keyset changed, missing keys: '"+missingKeys+"'");
+            }
         }
 
         try {
