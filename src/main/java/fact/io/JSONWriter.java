@@ -99,8 +99,7 @@ import java.util.zip.GZIPOutputStream;
  * Created by bruegge on 7/30/14.
  * Refactored by maxnoe on 2/2/2016
  */
-public class JSONWriter implements StatefulProcessor {
-
+public class JSONWriter extends Writer implements StatefulProcessor {
 
     @Parameter(required = true)
     private Keys keys = new Keys("");
@@ -133,29 +132,11 @@ public class JSONWriter implements StatefulProcessor {
     public Data process(Data data) {
         Data item = DataFactory.create();
 
-        if (!allowNullKeys) {
-            List<String> keysList = Arrays.stream(keys.getKeyValues())
-                    .filter(p -> !p.contains("*"))
-                    .filter(p -> !p.startsWith("!"))
-                    .collect(Collectors.toList());
-            Utils.mapContainsKeys(item, keysList);
-        }
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));
         }
-        if (previousKeySet==null) {
-            previousKeySet = item.keySet();
-        } else {
-            if (!previousKeySet.equals(item.keySet())) {
-                Set<String> diff1 = item.keySet();
-                diff1.removeAll(previousKeySet);
-                Set<String> diff2 = previousKeySet;
-                diff2.removeAll(item.keySet());
-                diff1.addAll(diff2);
-                String missingKeys = StringUtils.join(diff1, ",");
-                throw new RuntimeException("The Keyset changed, missing keys: '"+missingKeys+"'");
-            }
-        }
+
+        testKeys(item, keys, allowNullKeys);
 
         try {
         	if (isFirstLine)

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * All following items must have the same structure.
  *
  */
-public class FITSWriter implements StatefulProcessor {
+public class FITSWriter extends Writer implements StatefulProcessor {
 
     static Logger log = LoggerFactory.getLogger(FITSWriter.class);
 
@@ -73,29 +73,11 @@ public class FITSWriter implements StatefulProcessor {
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
-        if (!allowNullKeys) {
-            List<String> keysList = Arrays.stream(keys.getKeyValues())
-                    .filter(p -> !p.contains("*"))
-                    .filter(p -> !p.startsWith("!"))
-                    .collect(Collectors.toList());
-            Utils.mapContainsKeys(item, keysList);
-        }
+
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
         }
-        if (previousKeySet==null) {
-            previousKeySet = item.keySet();
-        } else {
-            if (!previousKeySet.equals(item.keySet())) {
-                Set<String> diff1 = item.keySet();
-                diff1.removeAll(previousKeySet);
-                Set<String> diff2 = previousKeySet;
-                diff2.removeAll(item.keySet());
-                diff1.addAll(diff2);
-                String missingKeys = StringUtils.join(diff1, ",");
-                throw new RuntimeException("The Keyset changed, missing keys: '"+missingKeys+"'");
-            }
-        }
+        testKeys(item, keys, allowNullKeys);
 
         if (!initialized){
             try {
