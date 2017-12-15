@@ -280,9 +280,6 @@ public class FITSWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        System.out.println("Keys: ");
-        for (String key: keys.getKeyValues())
-            System.out.println(key);
         FitsFactory.setUseAsciiTables(false);
         bf = new BufferedFile(url.getFile(), "rw");
         bf.setLength(0); // clear current file content
