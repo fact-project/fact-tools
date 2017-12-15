@@ -130,7 +130,7 @@ public class SourcePosition implements StatefulProcessor {
             // Now we can calculate the source position from the zd,az coordinates for pointing and source
             sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
-            pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingZd);
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingAz);
             auxPointingHorizontal = pointingHorizontal;
 
         } else {
