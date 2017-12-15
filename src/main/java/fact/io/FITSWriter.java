@@ -1,5 +1,6 @@
 package fact.io;
 
+import fact.Utils;
 import fact.VersionInformation;
 import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
@@ -54,6 +55,9 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
     public String extname = "Events";
 
+    @Parameter(required = false, description = "Set if you want to allow empty keys.")
+    public boolean allowNullKeys = false;
+
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
@@ -69,6 +73,8 @@ public class FITSWriter implements StatefulProcessor {
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
+        if (!allowNullKeys)
+            Utils.mapContainsKeys(item, keys.getKeyValues());
         for (String key: keys.select(item) ){
             outputItem.put(key, item.get(key));
         }
@@ -274,6 +280,9 @@ public class FITSWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
+        System.out.println("Keys: ");
+        for (String key: keys.getKeyValues())
+            System.out.println(key);
         FitsFactory.setUseAsciiTables(false);
         bf = new BufferedFile(url.getFile(), "rw");
         bf.setLength(0); // clear current file content

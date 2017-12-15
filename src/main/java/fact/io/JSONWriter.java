@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import fact.Utils;
 import fact.container.PixelSet;
 import stream.Data;
 import stream.Keys;
@@ -110,6 +111,8 @@ public class JSONWriter implements StatefulProcessor {
     private boolean specialDoubleValuesAsString = false;
     @Parameter(required = false, description = "If true, use gzip compression")
     private boolean gzip = false;
+    @Parameter(required = false, description = "Set if you want to allow empty keys.")
+    public boolean allowNullKeys = false;
 
     @Parameter(required = true)
     private URL url;
@@ -123,6 +126,9 @@ public class JSONWriter implements StatefulProcessor {
     @Override
     public Data process(Data data) {
         Data item = DataFactory.create();
+
+        if (!allowNullKeys)
+            Utils.mapContainsKeys(item, keys.getKeyValues());
 
         for (String key: keys.select(data) ){
             item.put(key, data.get(key));
