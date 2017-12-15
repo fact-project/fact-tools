@@ -20,7 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 /**
  *
@@ -270,29 +270,7 @@ public class Utils {
 	 * @param keys
 	 */
 	public static void mapContainsKeys(Data item, String... keys) {
-		ArrayList<String> e = new ArrayList<>();
-		boolean isValid = true;
-		if (keys == null) {
-			isValid = false;
-		}
-		for (String key : keys) {
-			if (key == null || !item.containsKey(key)) {
-				isValid = false;
-				e.add(key);
-			}
-		}
-		if (!isValid) {
-			StringBuilder b = new StringBuilder();
-			for (String er : e) {
-				b.append(er);
-				b.append("\n");
-			}
-			StackTraceElement traceElement = Thread.currentThread()
-					.getStackTrace()[2];
-			String caller = traceElement.getClassName();
-			throw new RuntimeException("Missing keys for processor " + caller
-					+ ":  " + b.toString());
-		}
+		mapContainsKeys(item, keys);
 	}
 
 	/**
@@ -304,7 +282,7 @@ public class Utils {
 	 * @param item
 	 * @param keys
 	 */
-	public static void mapContainsKeys(Data item, List<String> keys) {
+	public static void mapContainsKeys(Data item, Collection<String> keys) {
 		ArrayList<String> e = new ArrayList<>();
 		boolean isValid = true;
 		if (keys == null) {
