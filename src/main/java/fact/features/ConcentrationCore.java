@@ -4,7 +4,6 @@ import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public class ConcentrationCore implements Processor{
 	@Parameter(required = true, description  = "Key of the shower lengthKey")
 	private String lengthKey;
 
-	
+
 
 	/**
 	 * Calculate the percentage of photons inside the Hillas Ellipse
@@ -57,11 +56,9 @@ public class ConcentrationCore implements Processor{
 
 
 		double photonsInEllipse = 0;
-		for(CameraPixel pix : showerPixelSet.set)
-		{
-			FactCameraPixel p = FactPixelMapping.getInstance().getPixelFromId(pix.id);
-			double px = p.getXPositionInMM();
-			double py = p.getYPositionInMM();
+		for(CameraPixel pix: showerPixelSet.set) {
+			double px = pix.getXPositionInMM();
+			double py = pix.getYPositionInMM();
 
 			double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cogx, cogy, delta);
 

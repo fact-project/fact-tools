@@ -201,8 +201,7 @@ public class DistributionFromShower implements Processor {
 		return m / sumWeights;
 	}
 
-	public double[] calculateCog(double[] weights, int[] showerPixel,
-			double size) {
+	public double[] calculateCog(double[] weights, int[] showerPixel, double size) {
 
 		double[] cog = { 0, 0 };
 		// find weighted center of the shower pixels.
@@ -222,8 +221,8 @@ public class DistributionFromShower implements Processor {
 		double[] cog = { 0, 0 };
 		// find center of the shower pixels.
 		for (CameraPixel pix : showerPixel.set) {
-			cog[0] += pixelMap.getPixelFromId(pix.id).getXPositionInMM();
-			cog[1] += pixelMap.getPixelFromId(pix.id).getYPositionInMM();
+			cog[0] += pix.getXPositionInMM();
+			cog[1] += pix.getYPositionInMM();
 		}
 		cog[0] /= showerPixel.set.size();
 		cog[1] /= showerPixel.set.size();
@@ -260,7 +259,7 @@ public class DistributionFromShower implements Processor {
 	public void setPixelSetKey(String pixelSetKey) {
 		this.pixelSetKey = pixelSetKey;
 	}
-	
+
 
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;
@@ -309,7 +308,7 @@ public class DistributionFromShower implements Processor {
 	public void setDeltaKey(String deltaKey) {
 		this.deltaKey = deltaKey;
 	}
-	
-	
+
+
 
 }

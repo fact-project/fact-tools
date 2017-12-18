@@ -7,7 +7,6 @@ import fact.Utils;
 import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,11 +178,11 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
 
         for(CameraPixel pixel: showerPixel){
 
-        	FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
+        	CameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
 			int counter = 0;
 			double time = arrivalTime[pixel.id];
 
-			for (FactCameraPixel nPix:currentNeighbors) {
+			for (CameraPixel nPix:currentNeighbors) {
 				if( Math.abs(arrivalTime[nPix.id]-time) < timeThreshold && showerPixel.contains(nPix)) {
 					counter++;
 				}

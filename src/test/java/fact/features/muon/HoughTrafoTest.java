@@ -1,6 +1,5 @@
-package fact.features;
+package fact.features.muon;
 
-import fact.features.muon.HoughTransform;
 import fact.parameter.ParameterTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,8 +25,8 @@ public class HoughTrafoTest extends ParameterTest {
     @Test
     public void testValidParameter() throws Exception{
         HoughTransform poser = new HoughTransform();
-        poser.setPixelSetKey("shower");
-        poser.setPhotonChargeKey("photoncharge");
+        poser.pixelSetKey = "shower";
+        poser.photonChargeKey = "photoncharge";
         poser.init(null);
         poser.process(item);
     }
@@ -40,7 +39,7 @@ public class HoughTrafoTest extends ParameterTest {
     public void testMemoryConsumption() throws Exception {
         HoughTransform transform = new HoughTransform();
         transform.init(null);
-        
+
         long size = 0;
         for( ArrayList<Integer> entry : transform.circle2chids.values()){
             size += entry.size();

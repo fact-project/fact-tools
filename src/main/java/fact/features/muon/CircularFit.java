@@ -5,7 +5,6 @@ import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 import stream.Data;
@@ -105,7 +104,7 @@ public class CircularFit implements StatefulProcessor {
 
     public void init(ProcessContext processContext) {
         for (int chid = 0; chid < npix; chid++) {
-            FactCameraPixel pixel = mapping.getPixelFromId(chid);
+            CameraPixel pixel = mapping.getPixelFromId(chid);
             pixel_x[chid] = pixel.getXPositionInMM();
             pixel_y[chid] = pixel.getYPositionInMM();
         }

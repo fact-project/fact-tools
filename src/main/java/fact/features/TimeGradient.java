@@ -14,7 +14,7 @@ import stream.annotations.Parameter;
 
 /**
  * This processor calculates the timing gradient along the longitudinal and the transversal axis of the shower.
- * Therefore the ellipse coordinates ({l,t}) are calculated and the function arrTime(l)=s_l*l + i_l 
+ * Therefore the ellipse coordinates ({l,t}) are calculated and the function arrTime(l)=s_l*l + i_l
  * and arrTime(t)=s_t*t + i_t are fitted.
  * The parameters (s_l,i_l,s_t,i_t) of the fits, their standard deviation and the sum squared errors of the fits are pushed in the
  * data item.
@@ -22,9 +22,9 @@ import stream.annotations.Parameter;
  *
  */
 public class TimeGradient implements Processor {
-	
+
 	static Logger log = LoggerFactory.getLogger(TimeGradient.class);
-	
+
 	@Parameter(required=true, description="key to the shower pixels")
 	private String pixelSetKey = null;
 	@Parameter(required=true, description="key to the arrival times of all pixels")
@@ -41,11 +41,11 @@ public class TimeGradient implements Processor {
 	private String outputKeyIntercept = null;
 	@Parameter(required=true, description="outputKey for the sum squared errors of the linear fits")
 	private String outputKeySumSquaredErrors = null;
-	
+
 	FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 	public Data process(Data input) {
-		
+
 		Utils.mapContainsKeys(input, pixelSetKey,arrivalTimeKey,cogxKey,cogyKey,deltaKey);
 
 		PixelSet shower = (PixelSet) input.get(pixelSetKey);
@@ -53,26 +53,26 @@ public class TimeGradient implements Processor {
 		double cogx = (Double) input.get(cogxKey);
 		double cogy = (Double) input.get(cogyKey);
 		double delta = (Double) input.get(deltaKey);
-		
+
 		SimpleRegression regressorLong = new SimpleRegression();
 		SimpleRegression regressorTrans = new SimpleRegression();
-		
+
 		for (CameraPixel px: shower.set)
 		{
-			double x = pixelMap.getPixelFromId(px.id).getXPositionInMM();
-			double y = pixelMap.getPixelFromId(px.id).getYPositionInMM();
+			double x = px.getXPositionInMM();
+			double y = px.getYPositionInMM();
 			double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
 			double time = arrivalTime[px.id];
 			regressorLong.addData(ellipseCoord[0], time);
 			regressorTrans.addData(ellipseCoord[1], time);
 		}
-		
+
 		double[] slope = {0,0};
 		double[] slopeErr = {0,0};
 		double[] intercept = {0,0};
 		double[] interceptErr = {0,0};
 		double[] sumSquaredErrors = {0,0};
-		
+
 		try
 		{
 			regressorLong.regress();
@@ -91,7 +91,7 @@ public class TimeGradient implements Processor {
 			interceptErr[0] = Double.NaN;
 			sumSquaredErrors[0] = Double.NaN;
 		}
-		
+
 		try
 		{
 			regressorTrans.regress();
@@ -110,13 +110,13 @@ public class TimeGradient implements Processor {
 			interceptErr[0] = Double.NaN;
 			sumSquaredErrors[0] = Double.NaN;
 		}
-		
+
 		input.put(outputKeySlope, slope);
 		input.put(outputKeySlope+"_err", slopeErr);
 		input.put(outputKeyIntercept, intercept);
 		input.put(outputKeyIntercept+"_err", interceptErr);
 		input.put(outputKeySumSquaredErrors, sumSquaredErrors);
-		
+
 		return input;
 	}
 

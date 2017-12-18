@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.hexmap.ui.components;
 
@@ -10,7 +10,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.EventObserver;
 import fact.hexmap.ui.PixelSelectionObserver;
@@ -30,7 +29,7 @@ import java.util.Set;
  * information for all the selected pixels. So far the pixel information is a bit crude.
  *
  * @author Kai
- * 
+ *
  */
 public class EventInfoPanel extends JPanel implements EventObserver, PixelSelectionObserver {
     final private String disabledString = "No Data in Event";
@@ -65,14 +64,14 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
     private void updateSelectionInfo(Set<CameraPixel> selectedPixel) {
         model.clear();
         for (CameraPixel sp : selectedPixel){
-            FactCameraPixel p = (FactCameraPixel) sp;
+            CameraPixel p = (CameraPixel) sp;
             String m = "Chid: " + p.id + "  SoftId: " + p.softid;
             if(photonChargeArray !=  null){
                 m += "   photonChqarge: " + photonChargeArray[p.id];
             }
 
-//            m +=  " x in MM " +  ((FactCameraPixel) sp).getXPositionInMM();
-//            m += "  y in MM " + ((FactCameraPixel) sp).getYPositionInMM();
+//            m +=  " x in MM " +  ((CameraPixel) sp).getXPositionInMM();
+//            m += "  y in MM " + ((CameraPixel) sp).getYPositionInMM();
             model.addElement(m);
         }
     }

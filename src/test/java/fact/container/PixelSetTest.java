@@ -1,6 +1,6 @@
 package fact.container;
 
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.junit.Test;
 import static org.junit.Assert.assertFalse;
@@ -17,8 +17,8 @@ public class PixelSetTest {
     public void testContains(){
         PixelSet pixelSet = new PixelSet();
         PixelSet pixelSet2 = new PixelSet();
-        FactCameraPixel pixel1 = pixelMapping.getPixelFromId(1);
-        FactCameraPixel pixel100 = pixelMapping.getPixelFromId(100);
+        CameraPixel pixel1 = pixelMapping.getPixelFromId(1);
+        CameraPixel pixel100 = pixelMapping.getPixelFromId(100);
 
         assertFalse(pixelSet.contains(pixel1));
         assertFalse(pixelSet.contains(pixel100));

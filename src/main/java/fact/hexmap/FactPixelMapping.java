@@ -29,8 +29,8 @@ import java.util.ArrayList;
 public class FactPixelMapping implements PixelMapping {
 
     //store each pixel by its 'geometric' or axial coordinate.
-    private final FactCameraPixel[][] offsetCoordinates = new FactCameraPixel[45][40];
-    public final FactCameraPixel[] pixelArray = new FactCameraPixel[1440];
+    private final CameraPixel[][] offsetCoordinates = new CameraPixel[45][40];
+    public final CameraPixel[] pixelArray = new CameraPixel[1440];
     private final int[] chId2softId = new int[1440];
     private final int[] software2chId = new int[1440];
 
@@ -84,14 +84,14 @@ public class FactPixelMapping implements PixelMapping {
     }
 
     /**
-     * Get the FactCameraPixel sitting below the coordinates passed to the method.
+     * Get the CameraPixel sitting below the coordinates passed to the method.
      * The center of the coordinate system in the camera is the center of the camera.
      *
      * @param xCoordinate
      * @param yCoordinate
      * @return The pixel below the point or NULL if the pixels does not exist.
      */
-    public FactCameraPixel getPixelBelowCoordinatesInMM(double xCoordinate, double yCoordinate){
+    public CameraPixel getPixelBelowCoordinatesInMM(double xCoordinate, double yCoordinate){
         //get some pixel near the point provided
         //in pixel units
         xCoordinate /= 9.5;
@@ -136,7 +136,7 @@ public class FactPixelMapping implements PixelMapping {
         int qd = rx;
         int rd = rz + (rx - (rx&1))/2;
 
-        FactCameraPixel p = getPixelFromOffsetCoordinates(qd, rd);
+        CameraPixel p = getPixelFromOffsetCoordinates(qd, rd);
         return p;
 
 
@@ -144,62 +144,62 @@ public class FactPixelMapping implements PixelMapping {
     }
 
     /**
-     * Return an array of FactCameraPixel which are direct neighbours to the pixel ID passed into this method.
+     * Return an array of CameraPixel which are direct neighbours to the pixel ID passed into this method.
      * @param id the id of pixel
      * @return neighbouring Pixels
      */
-    public FactCameraPixel[] getNeighborsFromID(int id){
+    public CameraPixel[] getNeighborsFromID(int id){
         return getNeighborsForPixel(getPixelFromId(id));
     }
 
     /**
-     * Return an array of FactCameraPixel which direct are neighbours to the pixel passed into this method.
+     * Return an array of CameraPixel which direct are neighbours to the pixel passed into this method.
      * @param p the pixel to get the neighbours from
      * @return neighbouring Pixels
      */
-    public FactCameraPixel[] getNeighborsForPixel(CameraPixel p) {
-        ArrayList<FactCameraPixel> l = new ArrayList<>();
+    public CameraPixel[] getNeighborsForPixel(CameraPixel p) {
+        ArrayList<CameraPixel> l = new ArrayList<>();
         //check if x coordinate is even or not
         int parity = (p.geometricX & 1);
         //get the neighbour in each direction and store them in hte list
         for (int direction = 0; direction <= 5; direction++) {
             int[] d = neighbourOffsets[parity][direction];
-            FactCameraPixel np = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);
+            CameraPixel np = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);
             if (np != null){
                 l.add(np);
             }
         }
-        FactCameraPixel[] t = new FactCameraPixel[l.size()];
+        CameraPixel[] t = new CameraPixel[l.size()];
         return l.toArray(t);
     }
 
     /**
-     * Return an array of FactCameraPixel which are the neighbours of the neighbours without the direct neighbours. These are all pixels with distance 2
+     * Return an array of CameraPixel which are the neighbours of the neighbours without the direct neighbours. These are all pixels with distance 2
      * @param id
-     * @return array of FactCameraPixel; not always the same length
+     * @return array of CameraPixel; not always the same length
      */
-    public FactCameraPixel[] getSecondOrderNeighboursFromID(int id){
+    public CameraPixel[] getSecondOrderNeighboursFromID(int id){
         return getSecondOrderNeighboursForPixel(getPixelFromId(id));
     }
 
     /**
-     * Return an array of FactCameraPixel which are the neighbours of the neighbours without the direct neighbours. These are all pixels with distance 2
+     * Return an array of CameraPixel which are the neighbours of the neighbours without the direct neighbours. These are all pixels with distance 2
      * @param p
-     * @return array of FactCameraPixel; not always the same length
+     * @return array of CameraPixel; not always the same length
      */
-    public FactCameraPixel[] getSecondOrderNeighboursForPixel(CameraPixel p) {
-        ArrayList<FactCameraPixel> l = new ArrayList<>();
+    public CameraPixel[] getSecondOrderNeighboursForPixel(CameraPixel p) {
+        ArrayList<CameraPixel> l = new ArrayList<>();
         //check if x coordinate is even or not
         int parity = (p.geometricX & 1);
         //get the neighbour in each direction and store them in hte list
         for (int direction = 0; direction < 12; direction++) {
             int[] d = neighbourOffsetsLarge[parity][direction];
-            FactCameraPixel np = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);
+            CameraPixel np = getPixelFromOffsetCoordinates(p.geometricX + d[0], p.geometricY + d[1]);
             if (np != null){
                 l.add(np);
             }
         }
-        FactCameraPixel[] t = new FactCameraPixel[l.size()];
+        CameraPixel[] t = new CameraPixel[l.size()];
         return l.toArray(t);
     }
 
@@ -225,7 +225,7 @@ public class FactPixelMapping implements PixelMapping {
         return cube;
     }
 
-    public FactCameraPixel getPixelFromCubeCoordinates(long x,  long z){
+    public CameraPixel getPixelFromCubeCoordinates(long x, long z){
         int col =  (int) x;
         int row = (int) (z + (x-(x&1)) / 2);
 
@@ -255,7 +255,7 @@ public class FactPixelMapping implements PixelMapping {
         for (int i = 0; i <= hexDistance; i++) {
             double[] point = linePoint(cube1, cube2, 1.0 / N * i);
             int[] pixel = cube_round(point);
-            FactCameraPixel linePixel = getPixelFromCubeCoordinates(pixel[0], pixel[2]);
+            CameraPixel linePixel = getPixelFromCubeCoordinates(pixel[0], pixel[2]);
             if(linePixel != null){
                 line.add(linePixel.id);
             }
@@ -306,10 +306,10 @@ public class FactPixelMapping implements PixelMapping {
      *
      * @return a pixel with the info from the item
      */
-    private FactCameraPixel getPixelFromCSVItem(Data item){
-        FactCameraPixel p = new FactCameraPixel();
+    private CameraPixel getPixelFromCSVItem(Data item){
+        CameraPixel p = new CameraPixel();
         p.setSoftID( (Integer)(item.get("softID"))  );
-        p.setHardid( (Integer)(item.get("hardID"))  );
+        p.setHardID( (Integer)(item.get("hardID"))  );
         p.geometricX = (Integer)(item.get("geom_i"));
         p.geometricY = (Integer)(item.get("geom_j"));
         p.posX = Float.parseFloat(item.get("pos_X").toString());
@@ -341,7 +341,7 @@ public class FactPixelMapping implements PixelMapping {
             } catch (Exception e) {
                 log.error(e.toString());
             }
-            FactCameraPixel p = getPixelFromCSVItem(item);
+            CameraPixel p = getPixelFromCSVItem(item);
 
             software2chId[p.softid] = p.chid;
             chId2softId[p.chid] = p.softid;
@@ -353,7 +353,7 @@ public class FactPixelMapping implements PixelMapping {
 	}
 
     @Override
-    public FactCameraPixel getPixelFromOffsetCoordinates(int x, int y){
+    public CameraPixel getPixelFromOffsetCoordinates(int x, int y){
         if (x + xOffset > 44 || y + yOffset >= 40){
             return null;
         }
@@ -370,7 +370,7 @@ public class FactPixelMapping implements PixelMapping {
     }
 
     @Override
-    public FactCameraPixel getPixelFromId(int id) {
+    public CameraPixel getPixelFromId(int id) {
         return pixelArray[id];
     }
 

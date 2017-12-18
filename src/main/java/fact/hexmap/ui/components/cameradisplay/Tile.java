@@ -1,16 +1,15 @@
 /**
- * 
+ *
  */
 package fact.hexmap.ui.components.cameradisplay;
 
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 
 import java.awt.*;
 
 /**
  * @author kai
- * 
+ *
  */
 public abstract class Tile extends Component {
 
@@ -68,7 +67,7 @@ public abstract class Tile extends Component {
         Color c = g.getColor();
 		g.setColor(fillColor);
 
-        FactCameraPixel pixel = (FactCameraPixel) this.getCameraPixel();
+        CameraPixel pixel = (CameraPixel) this.getCameraPixel();
         /*
         if(pixel.softid == 0){
             g.setColor(Color.RED);
