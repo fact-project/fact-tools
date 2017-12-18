@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by bruegge on 7/30/14.
  */
-public class BadPixelInterpolationTest {
+public class TestInterpolateTimeseries {
 
     int roi = 10;
     double[] mock = new double[1440 * roi];

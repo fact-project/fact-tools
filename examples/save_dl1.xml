@@ -117,12 +117,15 @@
           outputKey="arrivalTime"
           url="${pixelDelayFile}"
       />
-      <fact.datacorrection.InterpolatePhotondata
+      <fact.datacorrection.InterpolatePixelArray
           calibService="calibService"
-          photonChargeKey="photoncharge"
-          photonChargeOutputKey="photoncharge"
-          arrivalTimeKey="arrivalTime"
-          arrivalTimeOutputKey="arrivalTime"
+          inputKey="photoncharge"
+          outputKey="photoncharge"
+      />
+      <fact.datacorrection.InterpolatePixelArray
+          calibService="calibService"
+          inputKey="arrivalTime"
+          outputKey="arrivalTime"
       />
     
       <fact.io.FITSWriter
