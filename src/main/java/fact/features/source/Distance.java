@@ -2,6 +2,7 @@ package fact.features.source;
 
 import fact.Utils;
 import fact.container.PixelDistribution2D;
+import fact.coordinates.CameraCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -22,51 +23,33 @@ public class Distance implements Processor {
     @Parameter(required = true)
 	private String outputKey;
 	/**
-	 * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid 
+	 * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid
 	 */
 	@Override
 	public Data process(Data input) {
 		if(!input.containsKey(distribution)){
-			log.info("No shower in evernt. Not calculating distance");
+			log.info("No shower in event. Not calculating distance");
 			return input;
 		}
-		Utils.mapContainsKeys( input, distribution, sourcePosition);
+		Utils.mapContainsKeys(input, distribution, sourcePosition);
 
 		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-		double[] source  = (double[]) input.get(sourcePosition);
+		CameraCoordinate source  = (CameraCoordinate) input.get(sourcePosition);
 
-		double x = source[0];
-		double y = source[1];
+		double dx = dist.getCenterX() - source.xMM;
+		double dy = dist.getCenterY() - source.yMM;
 
-		input.put(outputKey, 
-				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
-						+ (dist.getCenterX() - x) * (dist.getCenterX() - x) )
-				);
+		input.put(outputKey, Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0)));
 		return input;
 	}
 
 
 
-	public String getDistribution() {
-		return distribution;
-	}
 	public void setDistribution(String distribution) {
 		this.distribution = distribution;
 	}
-
-
-
-	public String getSourcePosition() {
-		return sourcePosition;
-	}
 	public void setSourcePosition(String sourcePosition) {
 		this.sourcePosition = sourcePosition;
-	}
-
-
-
-	public String getOutputKey() {
-		return outputKey;
 	}
 	public void setOutputKey(String outputKey) {
 		this.outputKey = outputKey;

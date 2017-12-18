@@ -4,6 +4,7 @@ import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.SqliteService;
 import fact.auxservice.strategies.Closest;
+
 import org.junit.Test;
 import stream.io.SourceURL;
 

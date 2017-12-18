@@ -136,8 +136,7 @@
     deltaKey="Delta"
     outputKey="CosDeltaAlpha_Off_5"
 />
-<fact.features.source.Theta
-    sourcePositionKey="sourcePosition"
+<fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -145,10 +144,9 @@
     m3lKey="m3l"
     cosDeltaAlphaKey="CosDeltaAlpha"
     signM3lConstant="-200"
-    outputKey="Theta"
+    outputKey="reconstructedSourcePosition"
 />
-<fact.features.source.Theta
-    sourcePositionKey="antiSourcePosition_1"
+<fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -156,10 +154,9 @@
     m3lKey="m3l"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
     signM3lConstant="-200"
-    outputKey="Theta_Off_1"
+    outputKey="reconstructedSourcePositionOff1"
 />
-<fact.features.source.Theta
-    sourcePositionKey="antiSourcePosition_2"
+<fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -167,10 +164,9 @@
     m3lKey="m3l"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
     signM3lConstant="-200"
-    outputKey="Theta_Off_2"
+    outputKey="reconstructedSourcePositionOff2"
 />
-<fact.features.source.Theta
-    sourcePositionKey="antiSourcePosition_3"
+<fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -178,10 +174,9 @@
     m3lKey="m3l"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
     signM3lConstant="-200"
-    outputKey="Theta_Off_3"
+    outputKey="reconstructedSourcePositionOff3"
 />
-<fact.features.source.Theta
-    sourcePositionKey="antiSourcePosition_4"
+<fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -189,10 +184,9 @@
     m3lKey="m3l"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
     signM3lConstant="-200"
-    outputKey="Theta_Off_4"
+    outputKey="reconstructedSourcePositionOff4"
 />
-<fact.features.source.Theta
-    sourcePositionKey="antiSourcePosition_5"
+<fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
     cogxKey="COGx"
     cogyKey="COGy"
@@ -200,6 +194,67 @@
     m3lKey="m3l"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
     signM3lConstant="-200"
-    outputKey="Theta_Off_5"
+    outputKey="reconstructedSourcePositionOff5"
+/>
+<fact.features.source.Theta
+	sourcePositionKey="sourcePosition"
+	reconstructedPositionKey="reconstructedSourcePosition"
+	outputKey="Theta"
+/>
+<fact.features.source.Theta
+	sourcePositionKey="antiSourcePosition_1"
+	reconstructedPositionKey="reconstructedSourcePositionOff1"
+	outputKey="Theta_Off_1"
+/>
+<fact.features.source.Theta
+	sourcePositionKey="antiSourcePosition_2"
+	reconstructedPositionKey="reconstructedSourcePositionOff2"
+	outputKey="Theta_Off_2"
+/>
+<fact.features.source.Theta
+	sourcePositionKey="antiSourcePosition_3"
+	reconstructedPositionKey="reconstructedSourcePositionOff3"
+	outputKey="Theta_Off_3"
+/>
+<fact.features.source.Theta
+	sourcePositionKey="antiSourcePosition_4"
+	reconstructedPositionKey="reconstructedSourcePositionOff4"
+	outputKey="Theta_Off_4"
+/>
+<fact.features.source.Theta
+	sourcePositionKey="antiSourcePosition_5"
+	reconstructedPositionKey="reconstructedSourcePositionOff5"
+	outputKey="Theta_Off_5"
+/>
+
+<fact.features.source.CameraToEquatorial
+	cameraCoordinateKey="reconstructedSourcePosition"
+	pointingPositionKey="pointingPosition"
+	outputKey="reconstructedSourcePositionEquatorial"
+/>
+<fact.features.source.CameraToEquatorial
+	cameraCoordinateKey="reconstructedSourcePositionOff1"
+	pointingPositionKey="pointingPosition"
+	outputKey="reconstructedSourcePositionEquatorialOff1"
+/>
+<fact.features.source.CameraToEquatorial
+	cameraCoordinateKey="reconstructedSourcePositionOff2"
+	pointingPositionKey="pointingPosition"
+	outputKey="reconstructedSourcePositionEquatorialOff2"
+/>
+<fact.features.source.CameraToEquatorial
+	cameraCoordinateKey="reconstructedSourcePositionOff3"
+	pointingPositionKey="pointingPosition"
+	outputKey="reconstructedSourcePositionEquatorialOff3"
+/>
+<fact.features.source.CameraToEquatorial
+	cameraCoordinateKey="reconstructedSourcePositionOff4"
+	pointingPositionKey="pointingPosition"
+	outputKey="reconstructedSourcePositionEquatorialOff4"
+/>
+<fact.features.source.CameraToEquatorial
+	cameraCoordinateKey="reconstructedSourcePositionOff5"
+	pointingPositionKey="pointingPosition"
+	outputKey="reconstructedSourcePositionEquatorialOff5"
 />
 </module>

@@ -3,6 +3,8 @@ package fact.cleaning;
 
 import fact.Constants;
 import fact.Utils;
+
+import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
@@ -64,7 +66,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
     String[] starPositionKeys = null;
 
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-	double starRadiusInCamera = Constants.PIXEL_SIZE;
+	double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     @Parameter(description = "Add PixelSets for the different cleaning steps")
     boolean showDifferentCleaningSets = false;
@@ -145,10 +147,10 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor{
             PixelSet starSet = new PixelSet();
             for (String starPositionKey : starPositionKeys)
             {
-                Utils.isKeyValid(input, starPositionKey, double[].class);
-                double[] starPosition = (double[]) input.get(starPositionKey);
+                Utils.isKeyValid(input, starPositionKey, CameraCoordinate.class);
+                CameraCoordinate starPosition = (CameraCoordinate) input.get(starPositionKey);
 
-                showerPixel = removeStarIslands(showerPixel,starPosition,starSet,starRadiusInCamera, log);
+                showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true)
                 {
                     addLevelToDataItem(showerPixel, outputKey + "_level7", input);

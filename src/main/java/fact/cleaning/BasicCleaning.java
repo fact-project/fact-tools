@@ -3,6 +3,7 @@ package fact.cleaning;
 import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
+import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactCameraPixel;
@@ -106,9 +107,9 @@ public class BasicCleaning {
 	 * @param log
 	 * @return
 	 */
-	public PixelSet removeStarIslands(PixelSet showerPixel, double[] starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
+	public PixelSet removeStarIslands(PixelSet showerPixel, CameraCoordinate starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
 
-        FactCameraPixel starPixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
+        FactCameraPixel starPixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
         if (starPixel == null){
 			log.debug("Star not in camera window. No star islands are removed");
 			PixelSet pixelSet = new PixelSet();
@@ -118,10 +119,8 @@ public class BasicCleaning {
 
 		starSet.add(starPixel);
 
-		for (FactCameraPixel px: pixelMap.getNeighborsForPixel(starPixel))
-		{
-			if (calculateDistance(px.id, starPosition[0], starPosition[1]) < starRadiusInCamera)
-			{
+		for (FactCameraPixel px: pixelMap.getNeighborsForPixel(starPixel)) {
+			if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
 				starSet.add(px);
 			}
 		}

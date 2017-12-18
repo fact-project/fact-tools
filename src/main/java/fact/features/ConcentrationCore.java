@@ -35,6 +35,8 @@ public class ConcentrationCore implements Processor{
 	@Parameter(required = true, description  = "Key of the shower lengthKey")
 	private String lengthKey;
 
+	
+
 	/**
 	 * Calculate the percentage of photons inside the Hillas Ellipse
 	 * aka. the pixels with a Mahalanobis Distance <= 1.
@@ -64,8 +66,8 @@ public class ConcentrationCore implements Processor{
 			double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cogx, cogy, delta);
 
 			// add a tolerance of 10% of the pixel size to not only get pixels with the center in the ellipse
-			double dl = Math.abs(ellipseCoords[0]) - 0.1 * Constants.PIXEL_SIZE;
-			double dt = Math.abs(ellipseCoords[1]) - 0.1 * Constants.PIXEL_SIZE;
+			double dl = Math.abs(ellipseCoords[0]) - 0.1 * Constants.PIXEL_SIZE_MM;
+			double dt = Math.abs(ellipseCoords[1]) - 0.1 * Constants.PIXEL_SIZE_MM;
 
 			double distance = Math.pow(dl / length, 2.0) + Math.pow(dt / width, 2.0);
 

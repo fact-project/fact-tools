@@ -50,7 +50,7 @@ public class EllipseOverlay implements CameraMapOverlay {
         Paint oldPaint = g2.getPaint();
         Stroke oldStroke = g2.getStroke();
 
-        double scaling = radius / (Constants.PIXEL_SIZE / Math.sqrt(3));
+        double scaling = radius / (Constants.PIXEL_SIZE_MM / Math.sqrt(3));
 
         Ellipse2D el = new Ellipse2D.Double(
                 - 0.5 * ellipse_height, - 0.5 * ellipse_width,
@@ -80,7 +80,7 @@ public class EllipseOverlay implements CameraMapOverlay {
     }
 
 	@Override
-	public int getDrawRank() {		
+	public int getDrawRank() {
 		return 5;
 	}
 }

@@ -1,5 +1,6 @@
 package fact.hexmap.ui.overlays;
 
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
 
 import java.awt.*;
@@ -16,10 +17,10 @@ public class SourcePositionOverlay implements CameraMapOverlay {
     private int[] pointsx = {-5, 5, 0};
     private int[] pointsy = {0, 0, 10};
 
-    private double[] source = {0, 0};
+    private CameraCoordinate source = new CameraCoordinate(0, 0);
 
 
-    public SourcePositionOverlay(String name, double[] source) {
+    public SourcePositionOverlay(String name, CameraCoordinate source) {
         this.name = name;
         this.source = source;
     }
@@ -41,7 +42,7 @@ public class SourcePositionOverlay implements CameraMapOverlay {
         g2.setColor(color);
 
         //lets draw a star symbol
-        g2.translate(source[0]*scalingX, source[1]*scalingY);
+        g2.translate(source.xMM * scalingX, source.yMM * scalingY);
         Polygon p  = new Polygon(pointsx, pointsy, 3);
         g2.fill(p);
 
@@ -57,7 +58,7 @@ public class SourcePositionOverlay implements CameraMapOverlay {
     }
 
 	@Override
-	public int getDrawRank() {		
+	public int getDrawRank() {
 		return 2;
 	}
 }

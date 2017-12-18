@@ -2,9 +2,11 @@ package fact.cleaning;
 
 import fact.Constants;
 import fact.Utils;
+
+import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactPixelMapping;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -13,7 +15,6 @@ import stream.annotations.Parameter;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -58,8 +59,9 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
 
     @Parameter(required = false)
     private String[] starPositionKeys = null;
-    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-	private double starRadiusInCamera = Constants.PIXEL_SIZE;
+
+    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE_MM")
+	private double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     @Parameter
     private boolean showDifferentCleaningSets = true;
@@ -136,8 +138,8 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor{
             PixelSet starSet = new PixelSet();
             for (String starPositionKey : starPositionKeys)
             {
-                Utils.isKeyValid(input, starPositionKey, double[].class);
-                double[] starPosition = (double[]) input.get(starPositionKey);
+                Utils.isKeyValid(input, starPositionKey, CameraCoordinate.class);
+                CameraCoordinate starPosition = (CameraCoordinate) input.get(starPositionKey);
 
                 showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true) {
