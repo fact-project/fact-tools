@@ -43,62 +43,62 @@ public class InterpolatePixelArray implements Processor {
 
     @Override
     public Data process(Data item) {
-    	Utils.isKeyValid(item, inputKey, double[].class);
+        Utils.isKeyValid(item, inputKey, double[].class);
 
-		double[] input = (double[]) item.get(inputKey);
+        double[] input = (double[]) item.get(inputKey);
 
-		ZonedDateTime timeStamp;
+        ZonedDateTime timeStamp;
 
-    	if (item.containsKey("UnixTimeUTC") == true) {
-    		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-    		int[] eventTime = (int[]) item.get("UnixTimeUTC");
-			timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-    	} else {
-    		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-    		// => The 12 bad pixels we have from the beginning on are used.
-    		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
-    	}
+        if (item.containsKey("UnixTimeUTC") == true) {
+            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+            int[] eventTime = (int[]) item.get("UnixTimeUTC");
+            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
+        } else {
+            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
+            // => The 12 bad pixels we have from the beginning on are used.
+            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
+        }
 
-    	PixelSet badPixelsSet = calibService.getBadPixel(timeStamp);
+        PixelSet badPixelsSet = calibService.getBadPixel(timeStamp);
 
-		if (!inputKey.equals(outputKey)) {
-			double[] output = new double[input.length];
-			System.arraycopy(input,0, output, 0, input.length);
-			input = interpolatePixelArray(output, badPixelsSet);
-		} else {
-			input = interpolatePixelArray(input, badPixelsSet);
-		}
-		item.put(outputKey, input);
-		return item;
+        if (!inputKey.equals(outputKey)) {
+            double[] output = new double[input.length];
+            System.arraycopy(input,0, output, 0, input.length);
+            input = interpolatePixelArray(output, badPixelsSet);
+        } else {
+            input = interpolatePixelArray(input, badPixelsSet);
+        }
+        item.put(outputKey, input);
+        return item;
     }
 
     double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
-    	for (CameraPixel pixel: badPixels){
-			FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
-			double avg = 0.0;
-			int numNeighbours = 0;
-			for (FactCameraPixel nPix: currentNeighbors){
-				if (badPixels.contains(nPix)) {
-					continue;
-				}
-				avg += pixelArray[nPix.id];
-				numNeighbours++;
-			}
-			checkNumNeighbours(numNeighbours, pixel.id);
-			pixelArray[pixel.id] = avg / numNeighbours;
-		}
-		return pixelArray;
-	}
+        for (CameraPixel pixel: badPixels){
+            FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
+            double avg = 0.0;
+            int numNeighbours = 0;
+            for (FactCameraPixel nPix: currentNeighbors){
+                if (badPixels.contains(nPix)) {
+                    continue;
+                }
+                avg += pixelArray[nPix.id];
+                numNeighbours++;
+            }
+            checkNumNeighbours(numNeighbours, pixel.id);
+            pixelArray[pixel.id] = avg / numNeighbours;
+        }
+        return pixelArray;
+    }
 
-	void checkNumNeighbours(int numNeighbours, int pixToInterpolate) {
-		if (numNeighbours == 0) {
-			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there a no valid "
-					+ "neighboring pixel to interpolate.");
-		}
-		if (numNeighbours < minPixelToInterpolate) {
-			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there are only "
-					+ numNeighbours + " valid neighboring pixel to interpolate.\n" +
-					"Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
-		}
-	}
+    void checkNumNeighbours(int numNeighbours, int pixToInterpolate) {
+        if (numNeighbours == 0) {
+            throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there a no valid "
+                    + "neighboring pixel to interpolate.");
+        }
+        if (numNeighbours < minPixelToInterpolate) {
+            throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there are only "
+                    + numNeighbours + " valid neighboring pixel to interpolate.\n" +
+                    "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
+        }
+    }
 }
