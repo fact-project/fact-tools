@@ -49,12 +49,11 @@ public class InterpolatePixelArray implements Processor {
 
 		ZonedDateTime timeStamp;
 
-    	if (item.containsKey("UnixTimeUTC") == true){
+    	if (item.containsKey("UnixTimeUTC") == true) {
     		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
     		int[] eventTime = (int[]) item.get("UnixTimeUTC");
 			timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-    	}
-    	else {
+    	} else {
     		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
     		// => The 12 bad pixels we have from the beginning on are used.
     		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
@@ -62,7 +61,7 @@ public class InterpolatePixelArray implements Processor {
 
     	PixelSet badPixelsSet = calibService.getBadPixel(timeStamp);
 
-		if(!inputKey.equals(outputKey)){
+		if (!inputKey.equals(outputKey)) {
 			double[] output = new double[input.length];
 			System.arraycopy(input,0, output, 0, input.length);
 			input = interpolatePixelArray(output, badPixelsSet);
@@ -92,12 +91,11 @@ public class InterpolatePixelArray implements Processor {
 	}
 
 	void checkNumNeighbours(int numNeighbours, int pixToInterpolate) {
-		if (numNeighbours == 0){
+		if (numNeighbours == 0) {
 			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there a no valid "
 					+ "neighboring pixel to interpolate.");
 		}
-		if (numNeighbours < minPixelToInterpolate)
-		{
+		if (numNeighbours < minPixelToInterpolate) {
 			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there are only "
 					+ numNeighbours + " valid neighboring pixel to interpolate.\n" +
 					"Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
