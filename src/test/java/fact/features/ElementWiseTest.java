@@ -1,6 +1,6 @@
 package fact.features;
 
-import fact.photonstream.timeSeriesExtraction.ElementWise;
+import fact.utils.ElementWise;
 import junit.framework.Assert;
 import org.junit.Test;
 

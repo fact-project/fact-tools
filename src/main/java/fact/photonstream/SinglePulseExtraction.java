@@ -2,7 +2,7 @@ package fact.photonstream;
 
 import fact.Constants;
 import fact.Utils;
-import fact.photonstream.timeSeriesExtraction.ElementWise;
+import fact.utils.ElementWise;
 import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
 import stream.Data;
 import stream.Processor;

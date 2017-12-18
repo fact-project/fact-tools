@@ -1,6 +1,7 @@
 package fact.photonstream.timeSeriesExtraction;
 
 import fact.Utils;
+import fact.utils.ElementWise;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.ArrayList;
