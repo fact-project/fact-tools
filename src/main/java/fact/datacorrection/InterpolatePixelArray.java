@@ -61,14 +61,15 @@ public class InterpolatePixelArray implements Processor {
 
         PixelSet badPixelsSet = calibService.getBadPixel(timeStamp);
 
+        double[] output;
         if (!inputKey.equals(outputKey)) {
-            double[] output = new double[input.length];
+            output = new double[input.length];
             System.arraycopy(input,0, output, 0, input.length);
-            input = interpolatePixelArray(output, badPixelsSet);
         } else {
-            input = interpolatePixelArray(input, badPixelsSet);
+            output = input;
         }
-        item.put(outputKey, input);
+        output = interpolatePixelArray(output, badPixelsSet);
+        item.put(outputKey, output);
         return item;
     }
 
