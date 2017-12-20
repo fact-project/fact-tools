@@ -4,7 +4,6 @@ import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,14 +74,14 @@ public class InterpolatePixelArray implements Processor {
 
     double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
         for (CameraPixel pixel: badPixels){
-            FactCameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
+            CameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
             double avg = 0.0;
             int numNeighbours = 0;
-            for (FactCameraPixel nPix: currentNeighbors){
-                if (badPixels.contains(nPix)) {
+            for (CameraPixel neighbor: currentNeighbors){
+                if (badPixels.contains(neighbor)) {
                     continue;
                 }
-                avg += pixelArray[nPix.id];
+                avg += pixelArray[neighbor.id];
                 numNeighbours++;
             }
             checkNumNeighbours(numNeighbours, pixel.id);
