@@ -5,17 +5,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MuonRingClean implements Processor {
 
+    @Parameter(required = true)
     public String ringPixelKey;
+
+    @Parameter(required = true)
     public String photonChargeKey;
+
+    @Parameter(required = true)
     public String arrivalTimeKey;
+
+    @Parameter(required = true)
     public String outputKey;
+
+    @Parameter(required = true)
     public double photonChargeThreshold;
+
+    @Parameter(required = true)
     public double timeThreshold;
 
     @Override

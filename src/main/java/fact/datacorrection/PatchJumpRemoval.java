@@ -37,32 +37,54 @@ public class PatchJumpRemoval implements Processor {
     @Parameter(required = true)
     public String startCellKey = null;
 
-    public @Parameter(required = true)
+    @Parameter
+    public double jumpLimit = 5.0;
 
-    double jumpLimit = 5.0;
-    int leftBorder = 10;
+    @Parameter
     double spikeLimit = 7.0;
+
+    @Parameter
+    int leftBorder = 10;
+
+    @Parameter
     double signalFlankLimit = 0.63;
 
+    @Parameter
     int lengthForFFT = 32;
+
+    @Parameter
     int lengthAfterPosForFFT = 10;
 
+    @Parameter
     int ringingPeriode = 11;
 
+    @Parameter
     double freqAmplLimit = 0.4;
+
+    @Parameter
     double freqCompAmplLimit = 2.0;
 
+    @Parameter
     double leftRingingFreq = 0.18;
+
+    @Parameter
     double rightRingingFreq = 0.22;
 
+    @Parameter
     double tau = -0.5;
+
+    @Parameter
     double constant = 14.454;
+
+    @Parameter
     double timeDependLimit = 10;
+
+    @Parameter
+    boolean addJumpInfos = false;
 
     int roi = 300;
     private int npix;
 
-    boolean addJumpInfos = false;
 
     JumpInfos jumpInfos;
 
@@ -88,7 +110,6 @@ public class PatchJumpRemoval implements Processor {
         System.arraycopy(data, 0, result, 0, data.length);
 
         int numberPatches = npix / 9;
-
 
         boolean stopLoop = false;
 
