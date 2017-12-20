@@ -6,30 +6,27 @@ import stream.Data;
 import stream.data.DataFactory;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PixelSetProcessorsTests {
 
 
-
     @Test
-    public void createFullCameraSetTest(){
+    public void createFullCameraSetTest() {
         Invert i = new Invert();
         PixelSet fullCameraSet = i.createFullCameraSet(1440);
         assertThat(fullCameraSet.set.size(), is(1440));
     }
 
     @Test
-    public void invertTest(){
+    public void invertTest() {
         Data item = DataFactory.create();
 
         PixelSet testSet = new PixelSet();
         for (int pix = 0; pix < 20; pix++) {
             testSet.addById(pix);
         }
-        item.put("testSet", testSet );
+        item.put("testSet", testSet);
         item.put("NPIX", 1440);
 
         Invert invert = new Invert();
@@ -45,12 +42,12 @@ public class PixelSetProcessorsTests {
     }
 
     @Test
-    public void intersectionTest(){
+    public void intersectionTest() {
         Data item = DataFactory.create();
 
-        PixelSet setA = PixelSet.fromIDs(new int[] {1, 2, 3});
-        PixelSet setB = PixelSet.fromIDs(new int[] {2, 3, 4, 5});
-        PixelSet setIntersection = PixelSet.fromIDs(new int[] {2, 3});
+        PixelSet setA = PixelSet.fromIDs(new int[]{1, 2, 3});
+        PixelSet setB = PixelSet.fromIDs(new int[]{2, 3, 4, 5});
+        PixelSet setIntersection = PixelSet.fromIDs(new int[]{2, 3});
 
         item.put("setA", setA);
         item.put("setB", setB);
@@ -69,7 +66,7 @@ public class PixelSetProcessorsTests {
     }
 
     @Test
-    public void testEmptyIntersection(){
+    public void testEmptyIntersection() {
         Data item = DataFactory.create();
 
         PixelSet setA = new PixelSet();
@@ -93,7 +90,7 @@ public class PixelSetProcessorsTests {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testMissingKeyIntersection(){
+    public void testMissingKeyIntersection() {
         Data item = DataFactory.create();
 
 
@@ -106,12 +103,12 @@ public class PixelSetProcessorsTests {
     }
 
     @Test
-    public void unionTest(){
+    public void unionTest() {
         Data item = DataFactory.create();
 
-        PixelSet setA = PixelSet.fromIDs(new int[] {1, 2, 3});
-        PixelSet setB = PixelSet.fromIDs(new int[] {3, 4, 5});
-        PixelSet setUnion = PixelSet.fromIDs(new int[] {1, 2, 3, 4, 5});
+        PixelSet setA = PixelSet.fromIDs(new int[]{1, 2, 3});
+        PixelSet setB = PixelSet.fromIDs(new int[]{3, 4, 5});
+        PixelSet setUnion = PixelSet.fromIDs(new int[]{1, 2, 3, 4, 5});
 
         item.put("setA", setA);
         item.put("setB", setB);

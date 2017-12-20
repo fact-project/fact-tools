@@ -18,7 +18,7 @@ public class CastToDoubleArray implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext context) throws Exception {
-        if (outputKey == null){
+        if (outputKey == null) {
             outputKey = key;
         }
     }
@@ -42,6 +42,7 @@ public class CastToDoubleArray implements StatefulProcessor {
     public void setKey(String key) {
         this.key = key;
     }
+
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }

@@ -11,89 +11,84 @@ import stream.Data;
 import stream.Processor;
 
 public class SlidingFastFourierTrafo implements Processor {
-	static Logger log = LoggerFactory.getLogger(SlidingFastFourierTrafo.class);
+    static Logger log = LoggerFactory.getLogger(SlidingFastFourierTrafo.class);
 
-	String key = null;
-	String outputKey = null;
-	
-	int lengthForFFT = 128;
-	
-	int stepSize = 32;
-	
-	FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
-	
-	private int npix;
-	
-	@Override
-	public Data process(Data input) {
-		// TODO Auto-generated method stub
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		npix = (Integer) input.get("NPIX");
-		Utils.mapContainsKeys( input, key);
-		
-		double[] data = (double[])input.get(key);
-		int roi = data.length / npix;
-		double[] result = new double[data.length]; 
-		
-		
-		for (int px = 0 ; px < npix ; px++)
-		{
-			for (int slBegin = 0 ; slBegin < roi ; slBegin+=stepSize)
-			{
-				double[] arrayForFFT = new double[lengthForFFT]; 
-				int sl = 0;
-				for (; sl < lengthForFFT && (sl+slBegin) < roi ; sl++)
-				{
-					arrayForFFT[sl] = data[px*roi+slBegin+sl];
-				}
-				for ( ; sl < lengthForFFT ; sl++)
-				{
-					arrayForFFT[sl] = 0;
-				}
-				Complex[] resultWindow = fftObject.transform(arrayForFFT, TransformType.INVERSE);
-				for (sl = 1 ; sl < stepSize && (sl+slBegin) < roi ; sl++)
-				{
-					double real = resultWindow[sl].getReal();
-					double imag = resultWindow[sl].getImaginary();
-					result[px*roi+slBegin+sl] = Math.sqrt(real*real+imag*imag);
-				}
-			}
-		}
-		input.put(outputKey, result);
-		
-		return input;
-	}
+    String key = null;
+    String outputKey = null;
 
-	public String getKey() {
-		return key;
-	}
+    int lengthForFFT = 128;
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    int stepSize = 32;
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    private int npix;
 
-	public int getLengthForFFT() {
-		return lengthForFFT;
-	}
+    @Override
+    public Data process(Data input) {
+        // TODO Auto-generated method stub
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
+        Utils.mapContainsKeys(input, key);
 
-	public void setLengthForFFT(int lengthForFFT) {
-		this.lengthForFFT = lengthForFFT;
-	}
+        double[] data = (double[]) input.get(key);
+        int roi = data.length / npix;
+        double[] result = new double[data.length];
 
-	public int getStepSize() {
-		return stepSize;
-	}
 
-	public void setStepSize(int stepSize) {
-		this.stepSize = stepSize;
-	}
+        for (int px = 0; px < npix; px++) {
+            for (int slBegin = 0; slBegin < roi; slBegin += stepSize) {
+                double[] arrayForFFT = new double[lengthForFFT];
+                int sl = 0;
+                for (; sl < lengthForFFT && (sl + slBegin) < roi; sl++) {
+                    arrayForFFT[sl] = data[px * roi + slBegin + sl];
+                }
+                for (; sl < lengthForFFT; sl++) {
+                    arrayForFFT[sl] = 0;
+                }
+                Complex[] resultWindow = fftObject.transform(arrayForFFT, TransformType.INVERSE);
+                for (sl = 1; sl < stepSize && (sl + slBegin) < roi; sl++) {
+                    double real = resultWindow[sl].getReal();
+                    double imag = resultWindow[sl].getImaginary();
+                    result[px * roi + slBegin + sl] = Math.sqrt(real * real + imag * imag);
+                }
+            }
+        }
+        input.put(outputKey, result);
+
+        return input;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getOutputKey() {
+        return outputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
+
+    public int getLengthForFFT() {
+        return lengthForFFT;
+    }
+
+    public void setLengthForFFT(int lengthForFFT) {
+        this.lengthForFFT = lengthForFFT;
+    }
+
+    public int getStepSize() {
+        return stepSize;
+    }
+
+    public void setStepSize(int stepSize) {
+        this.stepSize = stepSize;
+    }
 
 }

@@ -9,44 +9,48 @@ import stream.Processor;
 /**
  * Return an array with the deviation of neighboring slices in each pixel.
  * Therefore loop over data array and subtract the prior slice from the current.
- *
+ * <p>
  * Created by ftemme, jbuss?
  */
 
 
 public class Derivation implements Processor {
-	static Logger log = LoggerFactory.getLogger(Derivation.class);
-	
-	String key=null;
-	String outputKey=null;
-	@Override
-	public Data process(Data input) {
-		// TODO Auto-generated method stub
-		Utils.mapContainsKeys( input, key);
-		
-		double[] data = (double[])input.get(key);
-		double[] result = new double[data.length];
-		
-		for (int i=1 ; i < data.length ; i++)
-		{
-			result[i] = data[i] - data[i-1];
-		}
-		
-		input.put(outputKey, result);
-		
-		return input;
-	}
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    static Logger log = LoggerFactory.getLogger(Derivation.class);
+
+    String key = null;
+    String outputKey = null;
+
+    @Override
+    public Data process(Data input) {
+        // TODO Auto-generated method stub
+        Utils.mapContainsKeys(input, key);
+
+        double[] data = (double[]) input.get(key);
+        double[] result = new double[data.length];
+
+        for (int i = 1; i < data.length; i++) {
+            result[i] = data[i] - data[i - 1];
+        }
+
+        input.put(outputKey, result);
+
+        return input;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getOutputKey() {
+        return outputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
 }

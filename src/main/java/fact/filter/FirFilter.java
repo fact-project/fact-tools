@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.filter;
 
@@ -16,9 +16,8 @@ import stream.annotations.Parameter;
  * http://en.wikipedia.org/wiki/Fir_filter for Details. The coefficients of the
  * are stored in an array {n, n-1, n-2, ..}. Values outside of the data domain
  * are treated as zeroes.
- * 
+ *
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
  */
 @Description(group = "Fact Tools.Filter", text = "")
 public class FirFilter implements Processor {
@@ -32,17 +31,17 @@ public class FirFilter implements Processor {
 
     @Parameter(required = true)
     private String outputKey;
-    
-	private int npix;
+
+    private int npix;
 
 
     @Override
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
+        Utils.isKeyValid(input, "NPIX", Integer.class);
         double[] data = (double[]) input.get(key);
         double[] result = new double[data.length];
-		npix = (Integer) input.get("NPIX");
+        npix = (Integer) input.get("NPIX");
 
         // foreach pixel
         int roi = data.length / npix;

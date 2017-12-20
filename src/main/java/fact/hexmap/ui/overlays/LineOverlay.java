@@ -39,17 +39,17 @@ public class LineOverlay implements CameraMapOverlay, Serializable {
         g2.setPaint(fillColor);
         g2.setStroke(new BasicStroke(2));
 
-        double scalingX = 0.172*radius;
-        double scalingY = 0.184*radius;
-        Line2D line = new Line2D.Double(fromX*scalingX, -fromY*scalingY, toX*scalingX, -toY*scalingY);
-        Ellipse2D el = new Ellipse2D.Double(fromX*scalingX - 3, -fromY*scalingY - 3, 6, 6);
+        double scalingX = 0.172 * radius;
+        double scalingY = 0.184 * radius;
+        Line2D line = new Line2D.Double(fromX * scalingX, -fromY * scalingY, toX * scalingX, -toY * scalingY);
+        Ellipse2D el = new Ellipse2D.Double(fromX * scalingX - 3, -fromY * scalingY - 3, 6, 6);
         g2.draw(line);
         g2.draw(el);
         g2.setStroke(new BasicStroke(1));
     }
 
-	@Override
-	public int getDrawRank() {		
-		return 3;
-	}
+    @Override
+    public int getDrawRank() {
+        return 3;
+    }
 }

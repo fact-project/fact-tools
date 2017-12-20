@@ -15,51 +15,48 @@ public class FastFourierTrafo implements Processor {
 
     String key = null;
     String outputKey = null;
-    
+
     int lengthForFFT = 512;
-    
-    int excludeFreqBinsMin = (int) (0.15*lengthForFFT*0.5);
-    int excludeFreqBinsMax = (int) (0.25*lengthForFFT*0.5);
-    
+
+    int excludeFreqBinsMin = (int) (0.15 * lengthForFFT * 0.5);
+    int excludeFreqBinsMax = (int) (0.25 * lengthForFFT * 0.5);
+
     int searchWindowLeft = 10;
     int searchWindowRight = 250;
-    
-    
+
+
 //  excludeFreqBins[0] = (int) (0.17*lengthForFFT*0.5);
-    
+
     FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);
-    
+
     private int npix = 1440;
     private int roi = 300;
-    
+
     @Override
     public Data process(Data input) {
-        Utils.mapContainsKeys( input, key);
+        Utils.mapContainsKeys(input, key);
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
         Utils.isKeyValid(input, "NROI", Integer.class);
         roi = (Integer) input.get("NROI");
-        
+
         log.info("exclution range: [" + excludeFreqBinsMin + "," + excludeFreqBinsMax + "]");
-        
+
         double[] freqAverage = new double[npix * roi];
-        double[] data = (double[])input.get(key);
+        double[] data = (double[]) input.get(key);
         int roi = data.length / npix;
         double[] frResult = new double[data.length];
         double[] resultBackTrafo = new double[data.length];
-        
+
         Complex[] frResultPixel = null;
-        
-        for (int px = 0 ; px < npix ; px++)
-        {
+
+        for (int px = 0; px < npix; px++) {
             double[] currPixel = new double[lengthForFFT];
-            int sl = searchWindowLeft ;
-            for ( ; sl < searchWindowRight && sl < lengthForFFT ; sl++)
-            {
-                currPixel[sl] = data[px*roi+sl];
+            int sl = searchWindowLeft;
+            for (; sl < searchWindowRight && sl < lengthForFFT; sl++) {
+                currPixel[sl] = data[px * roi + sl];
             }
-            for ( ; sl < lengthForFFT ; sl++)
-            {
+            for (; sl < lengthForFFT; sl++) {
                 currPixel[sl] = 0;
             }
             frResultPixel = fftObject.transform(currPixel, TransformType.INVERSE);
@@ -68,43 +65,37 @@ public class FastFourierTrafo implements Processor {
 //          {
 //              frResult[px*roi+sl] = 0;
 //          }
-            for ( ; sl < (lengthForFFT/2 + 1) ; sl++)
-            {
+            for (; sl < (lengthForFFT / 2 + 1); sl++) {
                 double real = frResultPixel[sl].getReal();
                 double ima = frResultPixel[sl].getImaginary();
-                frResult[px*roi+sl] = Math.sqrt(real*real + ima*ima);
+                frResult[px * roi + sl] = Math.sqrt(real * real + ima * ima);
             }
-            for ( ; sl < roi ; sl++)
-            {
-                frResult[px*roi+sl] = 0;
+            for (; sl < roi; sl++) {
+                frResult[px * roi + sl] = 0;
             }
-            for (int fr=excludeFreqBinsMin ; fr < excludeFreqBinsMax && fr < lengthForFFT ; fr++)
-            {
+            for (int fr = excludeFreqBinsMin; fr < excludeFreqBinsMax && fr < lengthForFFT; fr++) {
                 frResultPixel[fr].multiply(0.0);
             }
             Complex[] backTrafo = fftObject.transform(frResultPixel, TransformType.FORWARD);
-            sl = 0 ;
-            for ( ; sl < roi && sl < lengthForFFT ; sl++)
-            {
+            sl = 0;
+            for (; sl < roi && sl < lengthForFFT; sl++) {
                 double real = backTrafo[sl].getReal();
                 double ima = backTrafo[sl].getImaginary();
-                resultBackTrafo[px*roi+sl] = Math.sqrt(real*real + ima*ima);
+                resultBackTrafo[px * roi + sl] = Math.sqrt(real * real + ima * ima);
             }
-            for ( ; sl < roi ; sl++)
-            {
-                resultBackTrafo[px*roi+sl] = 0;
+            for (; sl < roi; sl++) {
+                resultBackTrafo[px * roi + sl] = 0;
             }
         }
-        
-        for (int i = 0 ; i < freqAverage.length ; i++)
-        {
+
+        for (int i = 0; i < freqAverage.length; i++) {
             freqAverage[i] += frResult[i];
         }
-        
+
         input.put(outputKey, frResult);
-        input.put(outputKey+"BackTrafo", resultBackTrafo);
-        input.put(outputKey+"Average", freqAverage);
-        
+        input.put(outputKey + "BackTrafo", resultBackTrafo);
+        input.put(outputKey + "Average", freqAverage);
+
         return input;
     }
 

@@ -21,16 +21,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Given a glob like a pattern describing files a folder _relative_ to the provided url, starts a stream working on
  * all files sequentially.
- *
+ * <p>
  * For example:
- *
- *     <stream id="fact" class="fact.io.RecursiveDirectoryStream"   url="file:/some/folder" pattern="**&#47;*_Events.fits.gz*" >
- *            <stream class="fact.io.FITSStream" id="_"/>
- *     </stream>
- *
+ * <p>
+ * <stream id="fact" class="fact.io.RecursiveDirectoryStream"   url="file:/some/folder" pattern="**&#47;*_Events.fits.gz*" >
+ * <stream class="fact.io.FITSStream" id="_"/>
+ * </stream>
+ * <p>
  * finds all files below (recursively) /some/folder with their names matching the pattern. See unix globs for more
  * information on pattern syntax
- *
+ * <p>
  * Created by mackaiver on 12/15/15.
  */
 public class RecursiveDirectoryStream extends AbstractMultiStream {
@@ -40,7 +40,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     public BlockingQueue<Path> files = new LinkedBlockingQueue<>();
 
     @Parameter(required = false, description = "Maximum depth of folders to traverse", defaultValue = "6")
-    private int  maxDepth = 6;
+    private int maxDepth = 6;
 
     @Parameter(required = true, description = "The pattern to filter files by. Understands usual glob syntax")
     private String pattern;
@@ -50,7 +50,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     private int failedFilesCounter = 0;
     private List<String> failedFilesList = new ArrayList<>();
     @Parameter(required = false, description = "If false the reading of a broken file throws"
-    		+ " an exception and the process is aborted, if true the next file will be processed", defaultValue = "true")
+            + " an exception and the process is aborted, if true the next file will be processed", defaultValue = "true")
     private boolean skipErrors = true;
     private AbstractStream stream;
 
@@ -59,7 +59,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     }
 
 
-    private class GlobVisitor extends SimpleFileVisitor<Path>{
+    private class GlobVisitor extends SimpleFileVisitor<Path> {
 
         private final PathMatcher matcher;
 
@@ -71,7 +71,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
             Path name = file.getFileName();
             if (name != null && attr.isRegularFile()) {
-                if (matcher.matches(file)){
+                if (matcher.matches(file)) {
                     files.add(file);
                 }
             } else {
@@ -91,7 +91,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     @Override
     public void init() throws Exception {
 
-        if (streams != null && streams.size() > 1){
+        if (streams != null && streams.size() > 1) {
             log.error("This multistrream only supports 1 substream");
         }
 
@@ -99,7 +99,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         GlobVisitor globVisitor = new GlobVisitor(Paths.get(startingDir.toString(), pattern).toString());
         Files.walkFileTree(startingDir, new HashSet<FileVisitOption>(), maxDepth, globVisitor);
 
-        if(files.isEmpty()){
+        if (files.isEmpty()) {
             log.error("No files could be loaded for pattern {}", pattern);
             throw new RuntimeException("No files could be loaded");
         }
@@ -122,7 +122,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         try {
 
             //create new stream when we don't have one
-            if (stream == null){
+            if (stream == null) {
                 if (files.isEmpty()) {
                     return null;
                 }
@@ -154,7 +154,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
 
             return data;
 
-        } catch(IOException e){
+        } catch (IOException e) {
             log.info("File: " + stream.getUrl().toString() + " throws IOException.");
 
             if (skipErrors) {
@@ -174,17 +174,16 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     }
 
 
-
     @Override
     public void close() throws Exception {
         super.close();
-        log.info("In total " + filesCounter +  " files were processed.");
+        log.info("In total " + filesCounter + " files were processed.");
         log.info("In total " + failedFilesCounter + " were broken (and therefore skipped).");
-        for ( String fileName : failedFilesList)
-        {
-        	log.info(fileName);
+        for (String fileName : failedFilesList) {
+            log.info(fileName);
         }
     }
+
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }
@@ -193,8 +192,8 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
         this.pattern = pattern;
     }
 
-	public void setSkipErrors(boolean skipErrors) {
-		this.skipErrors = skipErrors;
-	}
+    public void setSkipErrors(boolean skipErrors) {
+        this.skipErrors = skipErrors;
+    }
 
 }

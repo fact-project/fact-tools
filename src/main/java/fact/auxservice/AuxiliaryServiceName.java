@@ -3,7 +3,7 @@ package fact.auxservice;
 /**
  * A collection of names for the various data sources that contain auxiliary data.
  * These names are equal to the file names where the data is usually stored.
- *
+ * <p>
  * Created by kai on 31.03.15.
  */
 public enum AuxiliaryServiceName {
@@ -190,7 +190,6 @@ public enum AuxiliaryServiceName {
     SKYBOX_MESSAGE,
     FPS_CONTROL_MESSAGE,
     FPS_CONTROL_CLIENT_LIST,
-
 
 
 }

@@ -21,16 +21,18 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
     public Set<CameraPixel> set = new HashSet<>();
     Color c = Color.WHITE;
 
-    public PixelSet() {}
+    public PixelSet() {
+    }
 
     public PixelSet(HashSet<Integer> set) {
-        for (Integer pix : set){
+        for (Integer pix : set) {
             this.addById(pix);
         }
     }
+
     public static PixelSet fromIDs(int[] chidArray) {
         PixelSet pixelSet = new PixelSet();
-        for (int chid: chidArray){
+        for (int chid : chidArray) {
             pixelSet.addById(chid);
         }
         return pixelSet;
@@ -41,7 +43,7 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
         return set;
     }
 
-    public void addById(int id){
+    public void addById(int id) {
         set.add(FactPixelMapping.getInstance().getPixelFromId(id));
     }
 
@@ -54,13 +56,13 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
     }
 
 
-    public int[] toIntArray(){
+    public int[] toIntArray() {
         return set.stream().mapToInt(p -> p.id).toArray();
     }
 
-    public ArrayList<Integer> toArrayList(){
+    public ArrayList<Integer> toArrayList() {
         ArrayList<Integer> chidArrayList = new ArrayList<Integer>();
-        for (CameraPixel px : this.set){
+        for (CameraPixel px : this.set) {
             chidArrayList.add(px.id);
         }
         return chidArrayList;
@@ -73,9 +75,9 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
 
     @Override
     public void paint(Graphics2D g2, FactHexMapDisplay map) {
-        for (Tile t : map.getTiles()){
-            if(set.contains(t.getCameraPixel())){
-                if (t.getBorderColor() != Color.BLACK){
+        for (Tile t : map.getTiles()) {
+            if (set.contains(t.getCameraPixel())) {
+                if (t.getBorderColor() != Color.BLACK) {
                     t.setBorderColor(Color.YELLOW);
                 } else {
                     t.setBorderColor(this.c);
@@ -89,9 +91,9 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
         set.clear();
     }
 
-	@Override
-	public int getDrawRank() {
-		return 1;
-	}
+    @Override
+    public int getDrawRank() {
+        return 1;
+    }
 
 }

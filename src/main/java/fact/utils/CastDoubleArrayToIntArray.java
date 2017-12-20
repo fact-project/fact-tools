@@ -7,14 +7,14 @@ import stream.annotations.Parameter;
 public class CastDoubleArrayToIntArray implements Processor {
 
     @Parameter(
-        required = true,
-        description = "Key to your double array."
+            required = true,
+            description = "Key to your double array."
     )
     private String inputKey;
 
     @Parameter(
-        required = true,
-        description = "Key to the output integer array."
+            required = true,
+            description = "Key to the output integer array."
     )
     protected String outputKey;
 
@@ -23,7 +23,7 @@ public class CastDoubleArrayToIntArray implements Processor {
         double[] doubleArray = (double[]) input.get(inputKey);
         int[] intArray = new int[doubleArray.length];
 
-        for (int i=0; i<intArray.length; ++i){
+        for (int i = 0; i < intArray.length; ++i) {
             intArray[i] = (int) Math.round(doubleArray[i]);
         }
 
@@ -34,6 +34,7 @@ public class CastDoubleArrayToIntArray implements Processor {
     public void setInputKey(String inputKey) {
         this.inputKey = inputKey;
     }
+
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }

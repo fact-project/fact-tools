@@ -1,5 +1,6 @@
 package fact.features.source;
 
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,68 +11,69 @@ import stream.annotations.Parameter;
 //TODO: Documentation!?
 
 public class AntiSourcePosition implements Processor {
-	static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
-	@Parameter(required=true)
-	private String sourcePositionKey = null;
-	@Parameter(required=true)
-	private int numberOfAntiSourcePositions;
-	@Parameter(required=true)
-	private int antiSourcePositionId;
-	@Parameter(required=true)
-	private String outputKey = null;
+    static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
+    @Parameter(required = true)
+    private String sourcePositionKey = null;
+    @Parameter(required = true)
+    private int numberOfAntiSourcePositions;
+    @Parameter(required = true)
+    private int antiSourcePositionId;
+    @Parameter(required = true)
+    private String outputKey = null;
 
-	@Override
-	public Data process(Data input) {
-		if(sourcePositionKey != null && !input.containsKey(sourcePositionKey)){
-			log.error("No source position in data item. Can not calculate anti source position!");
-			throw new RuntimeException("Missing parameter. Enter valid sourcePositionKey");
-		}
-		double[] source  = (double[]) input.get(sourcePositionKey);
-		
-		double[] antisource = {0,0};
-		
-		double rotAngle = 2 * Math.PI * antiSourcePositionId / (numberOfAntiSourcePositions + 1);
-		antisource[0] = source[0] * Math.cos(rotAngle) - source[1] * Math.sin(rotAngle);
-		antisource[1] = source[0] * Math.sin(rotAngle) + source[1] * Math.cos(rotAngle);
-		
-		//input.put("AntiSourcePosition_"+String.valueOf(antiSourcePositionId), new SourceOverlay((float) antisource[0], (float) antisource[1]) );
+    @Override
+    public Data process(Data input) {
+        if (sourcePositionKey != null && !input.containsKey(sourcePositionKey)) {
+            log.error("No source position in data item. Can not calculate anti source position!");
+            throw new RuntimeException("Missing parameter. Enter valid sourcePositionKey");
+        }
+        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
 
-		input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antisource));
-		input.put(outputKey, antisource);
-		return input;
-	}
+        double rotAngle = 2 * Math.PI * antiSourcePositionId / (numberOfAntiSourcePositions + 1);
 
-	public String getSourcePositionKey() {
-		return sourcePositionKey;
-	}
+        CameraCoordinate antiSource = new CameraCoordinate(
+                source.xMM * Math.cos(rotAngle) - source.yMM * Math.sin(rotAngle),
+                source.xMM * Math.sin(rotAngle) + source.yMM * Math.cos(rotAngle)
+        );
 
-	public void setSourcePositionKey(String sourcePositionKey) {
-		this.sourcePositionKey = sourcePositionKey;
-	}
+        input.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, antiSource));
+        input.put(outputKey, antiSource);
+        input.put(outputKey + "X", antiSource.xMM);
+        input.put(outputKey + "Y", antiSource.yMM);
+        return input;
+    }
 
-	public int getNumberOfAntiSourcePositions() {
-		return numberOfAntiSourcePositions;
-	}
+    public String getSourcePositionKey() {
+        return sourcePositionKey;
+    }
 
-	public void setNumberOfAntiSourcePositions(int numberOfAntiSourcePositions) {
-		this.numberOfAntiSourcePositions = numberOfAntiSourcePositions;
-	}
+    public void setSourcePositionKey(String sourcePositionKey) {
+        this.sourcePositionKey = sourcePositionKey;
+    }
 
-	public int getAntiSourcePositionId() {
-		return antiSourcePositionId;
-	}
+    public int getNumberOfAntiSourcePositions() {
+        return numberOfAntiSourcePositions;
+    }
 
-	public void setAntiSourcePositionId(int antiSourcePositionId) {
-		this.antiSourcePositionId = antiSourcePositionId;
-	}
+    public void setNumberOfAntiSourcePositions(int numberOfAntiSourcePositions) {
+        this.numberOfAntiSourcePositions = numberOfAntiSourcePositions;
+    }
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    public int getAntiSourcePositionId() {
+        return antiSourcePositionId;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setAntiSourcePositionId(int antiSourcePositionId) {
+        this.antiSourcePositionId = antiSourcePositionId;
+    }
 
-	
+    public String getOutputKey() {
+        return outputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
+
+
 }

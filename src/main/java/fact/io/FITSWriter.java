@@ -28,15 +28,14 @@ import java.util.HashMap;
 
 /**
  * Created by maxnoe on 10.08.16.
- *
+ * <p>
  * Write data to a FITS file sequentially.
- *
+ * <p>
  * This processor is able to serialize scalars and 1d-arrays of fixed length containing primitive types.
  * Other data structures will be ignored (complex objects) or lead to errors (variable length arrays).
- *
+ * <p>
  * The fits file is initialised and the header is filled using the given keys from first data item.
  * All following items must have the same structure.
- *
  */
 public class FITSWriter implements StatefulProcessor {
 
@@ -51,7 +50,7 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(required = true, description = "Url for the output file")
     public URL url;
 
-    @Parameter(defaultValue ="Events", description = "EXTNAME for the binary table extension")
+    @Parameter(defaultValue = "Events", description = "EXTNAME for the binary table extension")
     public String extname = "Events";
 
     private BufferedFile bf;
@@ -69,23 +68,23 @@ public class FITSWriter implements StatefulProcessor {
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
-        for (String key: keys.select(item) ){
+        for (String key : keys.select(item)) {
             outputItem.put(key, item.get(key));
         }
 
-        if (!initialized){
+        if (!initialized) {
             try {
                 log.info("Initialising output fits file");
 
                 Data headerItem = DataFactory.create();
-                for (String key: headerKeys.select(item) ){
+                for (String key : headerKeys.select(item)) {
                     log.debug("Saving key {} to header", key);
                     headerItem.put(key, item.get(key));
                 }
 
                 initFITSFile(outputItem, headerItem);
                 initialized = true;
-            } catch (FitsException e){
+            } catch (FitsException e) {
                 throw new RuntimeException("Could not initialize fits file", e);
             }
         }
@@ -102,23 +101,23 @@ public class FITSWriter implements StatefulProcessor {
 
     private void writeRow(Data item) throws IOException {
         buffer.clear();
-        for (String columnName: columnNames){
+        for (String columnName : columnNames) {
             Serializable unwrappedElem = item.get(columnName);
 
             Object elem = wrapInArray(unwrappedElem);
 
-            if(!Arrays.equals(columnDimensions.get(columnName), ArrayFuncs.getDimensions(elem))){
+            if (!Arrays.equals(columnDimensions.get(columnName), ArrayFuncs.getDimensions(elem))) {
                 throw new RuntimeException("Dimensions of key " + columnName + " changed. FITSWriter does not support variable length arrays");
             }
 
             if (elem instanceof int[]) {
                 int[] arr = (int[]) elem;
-                for (int val: arr){
+                for (int val : arr) {
                     buffer.putInt(val);
                 }
             } else if (elem instanceof double[]) {
                 double[] arr = (double[]) elem;
-                for (double val: arr){
+                for (double val : arr) {
                     buffer.putDouble(val);
                 }
             } else if (elem instanceof byte[]) {
@@ -126,25 +125,25 @@ public class FITSWriter implements StatefulProcessor {
                 buffer.put(arr);
             } else if (elem instanceof String[]) {
                 String[] arr = (String[]) elem;
-                for(String val: arr){
+                for (String val : arr) {
                     buffer.put(val.getBytes());
                 }
             } else if (elem instanceof float[]) {
                 float[] arr = (float[]) elem;
-                for (float val: arr){
+                for (float val : arr) {
                     buffer.putFloat(val);
                 }
             } else if (elem instanceof short[]) {
                 short[] arr = (short[]) elem;
-                for (short val: arr){
+                for (short val : arr) {
                     buffer.putShort(val);
                 }
             } else if (elem instanceof long[]) {
-                for (long val: (long[]) elem){
+                for (long val : (long[]) elem) {
                     buffer.putLong(val);
                 }
             } else if (elem instanceof boolean[]) {
-                for(boolean val: (boolean[]) elem){
+                for (boolean val : (boolean[]) elem) {
                     buffer.put((byte) (val ? 1 : 0));
                 }
             } else {
@@ -158,7 +157,7 @@ public class FITSWriter implements StatefulProcessor {
     }
 
     private void fillHeader(Header header, Data item) {
-        for (String key: item.keySet()) {
+        for (String key : item.keySet()) {
             Serializable serializable = item.get(key);
 
             if (key.length() > 8) {
@@ -229,9 +228,9 @@ public class FITSWriter implements StatefulProcessor {
     }
 
 
-    private void initFITSFile(Data item, Data headerItem) throws  FitsException{
+    private void initFITSFile(Data item, Data headerItem) throws FitsException {
         ArrayList<Object> rowList = new ArrayList<>();
-        for (String columnName: item.keySet()) {
+        for (String columnName : item.keySet()) {
             Serializable serializable = item.get(columnName);
             try {
                 Object elem = wrapInArray(serializable);
@@ -263,7 +262,7 @@ public class FITSWriter implements StatefulProcessor {
         log.info("created bhdu with {} columns", bhdu.getData().getNCols());
         buffer = ByteBuffer.allocate((int) rowSize);
 
-        for (int i=0; i < columnNames.size(); i++){
+        for (int i = 0; i < columnNames.size(); i++) {
             bhdu.setColumnName(i, columnNames.get(i), null);
         }
         bhdu.getHeader().addValue("EXTNAME", extname, "name of extension table");
@@ -321,7 +320,7 @@ public class FITSWriter implements StatefulProcessor {
         if (iso.length() == 19) {
             iso = iso + ".";
         }
-        iso = StringUtils.rightPad(iso,  26, "0");
+        iso = StringUtils.rightPad(iso, 26, "0");
         iso = iso.substring(0, 26);
         return iso + "Z";
     }

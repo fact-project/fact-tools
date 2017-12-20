@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
  * This class defines some classes needed for caching many {@link AuxPoint} into ram
  * using an LRU cache. A specific auxfile is uniquely defined by its name and the 'FACT Night' string.
  * You know...the typical 20160320-like string.
- *
+ * <p>
  * Created by kai on 12.06.16.
  */
 
@@ -64,7 +64,7 @@ public class AuxCache {
      * @param timestamp the timestamp to get the night for
      * @return a FACT night number.
      */
-    public static Integer dateTimeStampToFACTNight(ZonedDateTime timestamp){
+    public static Integer dateTimeStampToFACTNight(ZonedDateTime timestamp) {
         ZonedDateTime offsetDate = timestamp.minusHours(12);
         String night = String.format("%1$d%2$02d%3$02d", offsetDate.getYear(), offsetDate.getMonthValue(), offsetDate.getDayOfMonth());
         return Integer.parseInt(night);
@@ -79,13 +79,13 @@ public class AuxCache {
      * @param timeStamp the timestamp to get the night for
      * @return a partial path starting with the year.
      */
-    public static Path dateTimeStampToFACTPath(ZonedDateTime timeStamp){
+    public static Path dateTimeStampToFACTPath(ZonedDateTime timeStamp) {
         ZonedDateTime offsetDate = timeStamp.minusHours(12);
 
         int year = offsetDate.getYear();
         int month = offsetDate.getMonthValue();
         int day = offsetDate.getDayOfMonth();
 
-        return Paths.get(String.format("%04d", year), String.format("%02d",month), String.format("%02d", day));
+        return Paths.get(String.format("%04d", year), String.format("%02d", month), String.format("%02d", day));
     }
 }

@@ -10,18 +10,16 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Set;
-
 
 /**
  * This processor gets two pixel sets (A and B) and returns the symmetric difference of sets A and B,
  * denoted A △ B or A ⊖ B, is the set of all objects that are a member of exactly one of A and B
  * (elements which are in one of the sets, but not in both).
  * For instance, for the sets {1,2,3} and {2,3,4} , the symmetric difference set is {1,4} .
- *
+ * <p>
  * Created by jebuss on 17.12.15.
  */
-public class SymmetricDifference implements Processor{
+public class SymmetricDifference implements Processor {
     static Logger log = LoggerFactory.getLogger(SymmetricDifference.class);
 
     @Parameter(required = true, description = "key to the first set to be compared")
