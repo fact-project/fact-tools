@@ -1,6 +1,6 @@
 package fact.filter;
 
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -40,9 +40,9 @@ public class SmoothBell implements Processor {
 
 
         for(int i=0; i<1440; i++){
-            FactCameraPixel[] neighbors = mapping.getNeighborsFromID(i);
+            CameraPixel[] neighbors = mapping.getNeighborsFromID(i);
                 double sumNeighbors = 0;
-            for(FactCameraPixel n : neighbors){
+            for(CameraPixel n : neighbors){
                 sumNeighbors += pixelValues[n.id];
             }
 

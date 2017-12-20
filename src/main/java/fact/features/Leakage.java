@@ -3,7 +3,6 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public class Leakage implements Processor {
 
 	//this is of course not the most efficient solution
 	boolean isSecondBorderPixel(int pix){
-		for(FactCameraPixel nPix: pixelMap.getNeighborsFromID(pix))
+		for(CameraPixel nPix: pixelMap.getNeighborsFromID(pix))
 		{
 			if(isBorderPixel(nPix.id)){
 				return true;

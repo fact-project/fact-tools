@@ -6,7 +6,6 @@ import fact.calibrationservice.CalibrationService;
 import fact.coordinates.CameraCoordinate;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import stream.Data;
@@ -37,9 +36,8 @@ public class BasicCleaning {
 	public PixelSet addCorePixel(PixelSet showerPixel, double[] photonCharge, double corePixelThreshold, ZonedDateTime eventTimeStamp) {
 		PixelSet notUsablePixels = calibService.getNotUsablePixels(eventTimeStamp);
 
-		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++)
-		{
-			FactCameraPixel pixel = pixelMap.getPixelFromId(chid);
+		for(int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+			CameraPixel pixel = pixelMap.getPixelFromId(chid);
 			if (notUsablePixels.contains(pixel)){
 				continue;
 			}
@@ -63,10 +61,10 @@ public class BasicCleaning {
 		PixelSet notUsablePixel = calibService.getNotUsablePixels(eventTimeStamp);
         PixelSet newShowerPixel = new PixelSet();
         newShowerPixel.addAll(showerPixel);
-		for (CameraPixel pixel: showerPixel){
-			FactCameraPixel[] neighborPixels = pixelMap.getNeighborsFromID(pixel.id);
+		for (CameraPixel pixel: showerPixel) {
+			CameraPixel[] neighborPixels = pixelMap.getNeighborsFromID(pixel.id);
 
-			for (FactCameraPixel neighborPixel: neighborPixels){
+			for (CameraPixel neighborPixel: neighborPixels) {
 				if (notUsablePixel.contains(neighborPixel)) {
 					continue;
 				}
@@ -109,7 +107,7 @@ public class BasicCleaning {
 	 */
 	public PixelSet removeStarIslands(PixelSet showerPixel, CameraCoordinate starPosition, PixelSet starSet, double starRadiusInCamera, Logger log) {
 
-        FactCameraPixel starPixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
+        CameraPixel starPixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
         if (starPixel == null){
 			log.debug("Star not in camera window. No star islands are removed");
 			PixelSet pixelSet = new PixelSet();
@@ -119,7 +117,7 @@ public class BasicCleaning {
 
 		starSet.add(starPixel);
 
-		for (FactCameraPixel px: pixelMap.getNeighborsForPixel(starPixel)) {
+		for (CameraPixel px: pixelMap.getNeighborsForPixel(starPixel)) {
 			if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
 				starSet.add(px);
 			}

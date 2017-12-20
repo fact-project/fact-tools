@@ -28,7 +28,7 @@ package fact.features.watershed;
  */
 
 import fact.Utils;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -132,12 +132,12 @@ public class ClusterFellwalker implements Processor {
 
             while (!pathend) {
                 //find neighbours and brightest neighbour
-                FactCameraPixel[] allNeighbours = mapping.getNeighborsFromID(currentPixel);
+                CameraPixel[] allNeighbours = mapping.getNeighborsFromID(currentPixel);
 
                 //find usable neighbours (pixel marked with clusterID = 0 after cleaning)
-                ArrayList<FactCameraPixel> usableNeighbours = new ArrayList<>();
+                ArrayList<CameraPixel> usableNeighbours = new ArrayList<>();
 
-                for (FactCameraPixel n : allNeighbours) {
+                for (CameraPixel n : allNeighbours) {
                     if (clusterID[n.id] != -2 && areaArray[n.id] == 1) {
                         usableNeighbours.add(n);
                     }
@@ -385,12 +385,12 @@ public class ClusterFellwalker implements Processor {
     }
 
     //find brightest neighbour, return the currentPixel if there is no brighter neighbour!!
-    public int findMaxChargeNeighbour(ArrayList<FactCameraPixel> usableNeighbours, int currentPixel, double[] photoncharge) {
+    public int findMaxChargeNeighbour(ArrayList<CameraPixel> usableNeighbours, int currentPixel, double[] photoncharge) {
 
         double maxBrightness = photoncharge[currentPixel];
         int maxBrightnessID = currentPixel;
 
-        for (FactCameraPixel n : usableNeighbours) {
+        for (CameraPixel n : usableNeighbours) {
             if (photoncharge[n.id] > maxBrightness) {
                 maxBrightness = photoncharge[n.id];
                 maxBrightnessID = n.id;
@@ -401,12 +401,12 @@ public class ClusterFellwalker implements Processor {
 
     //find brightest neighbour in large neighbourhood, return the currentPixel if there is no brighter neighbour!!
     public int findMaxChargeLargeNeighbour(int currentPixel, double[] photoncharge) {
-        FactCameraPixel[] largeNeighbours = mapping.getSecondOrderNeighboursFromID(currentPixel);
+        CameraPixel[] largeNeighbours = mapping.getSecondOrderNeighboursFromID(currentPixel);
 
         double maxBrightness = photoncharge[currentPixel];
         int maxBrightnessID = currentPixel;
 
-        for (FactCameraPixel n : largeNeighbours) {
+        for (CameraPixel n : largeNeighbours) {
             if (photoncharge[n.id] > maxBrightness) {
                 maxBrightness = photoncharge[n.id];
                 maxBrightnessID = n.id;
@@ -616,8 +616,8 @@ public class ClusterFellwalker implements Processor {
             int clusterID = c.getClusterID();
             ArrayList<Integer> bound = c.findBoundaryNaive();
             for(int id : bound){
-                FactCameraPixel [] boundPixelNeighbors = mapping.getNeighborsFromID(id);
-                for(FactCameraPixel p : boundPixelNeighbors){
+                CameraPixel[] boundPixelNeighbors = mapping.getNeighborsFromID(id);
+                for(CameraPixel p : boundPixelNeighbors){
                     if (showerClusterID[p.id] != clusterID && showerClusterID[p.id] != -2 && !c.naiveNeighborClusterID.contains(showerClusterID[p.id])) {
                         c.naiveNeighborClusterID.add(showerClusterID[p.id]);
                     }

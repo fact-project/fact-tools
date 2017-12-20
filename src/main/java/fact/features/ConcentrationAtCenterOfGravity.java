@@ -1,7 +1,7 @@
 package fact.features;
 
 import fact.Utils;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,23 +52,23 @@ public class ConcentrationAtCenterOfGravity implements Processor
 		size = (Double) input.get(sizeKey);
 
 		photonCharge = (double[]) input.get(photonChargeKey);
-		FactCameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
+		CameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
 		if (cogPixel == null)
 		{
 			input.put(outputKey, -Double.MAX_VALUE);
 			return input;
 		}
-		FactCameraPixel[] neighbors = pixelMap.getNeighborsForPixel(cogPixel);
+		CameraPixel[] neighbors = pixelMap.getNeighborsForPixel(cogPixel);
 
 		// mindist1 < mindist2
 		double mindist1 = Float.MAX_VALUE;
 		double mindist2 = Float.MAX_VALUE;
 
-		FactCameraPixel minChId1 = cogPixel;
-		FactCameraPixel minChId2 = cogPixel;
+		CameraPixel minChId1 = cogPixel;
+		CameraPixel minChId2 = cogPixel;
 
 		// search for the two nearest neighbors
-		for (FactCameraPixel pix : neighbors)
+		for (CameraPixel pix : neighbors)
 		{
 			double x = pix.getXPositionInMM();
 			double y = pix.getYPositionInMM();

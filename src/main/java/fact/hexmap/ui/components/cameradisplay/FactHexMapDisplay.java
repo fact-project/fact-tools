@@ -1,12 +1,11 @@
 /**
- * 
+ *
  */
 package fact.hexmap.ui.components.cameradisplay;
 
 import com.google.common.eventbus.Subscribe;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.SliceObserver;
@@ -34,7 +33,7 @@ import static com.google.common.primitives.Doubles.min;
  * This implements a PixelMap to draw a grid of hexagons as seen in the camera
  * of the fact telescope The hexagons are equally spaced and sized. Orientated
  * with one edge on the bottom. Also has a colorbar next to it.
- * 
+ *
  */
 public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 		SliceObserver, MouseListener {
@@ -52,7 +51,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 	int rows = 0, cols = 0;
 
-	Set<FactCameraPixel> selectedPixels = new LinkedHashSet<FactCameraPixel>();
+	Set<CameraPixel> selectedPixels = new LinkedHashSet<CameraPixel>();
 
 	public double[][] sliceValues = new double[1440][1024];
 	int currentSlice = 0;
@@ -91,7 +90,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 	 * A Hexagon in this case is defined by the passed radius. The radius of the
 	 * circle that fits into the hexagon can be calculated by sqrt(3)/2 *
 	 * (outter radius)
-	 * 
+	 *
 	 * @param radius
 	 *            the radius of the circle the hexagon should fit into
 	 */
@@ -188,17 +187,17 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 				overlays.add(overlay);
 			}
 		}
-		
+
 		class CustomComparator implements Comparator<CameraMapOverlay> {
-		    public int compare(CameraMapOverlay object1, CameraMapOverlay object2) {            	
+		    public int compare(CameraMapOverlay object1, CameraMapOverlay object2) {
 		        return object1.getDrawRank() - object2.getDrawRank();
 		    }
 		}
 		// Sortierung in der richtigen Reihenfolge
-		// um ueberdeckungen zu vermeiden 
+		// um ueberdeckungen zu vermeiden
 		// von niedrig nach hoch
 		Collections.sort(overlays, new CustomComparator());
-		
+
 		return overlays;
 	}
 
@@ -347,7 +346,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
 			for (Tile cell : tiles) {
 				if (cell.contains(p)) {
-					FactCameraPixel selectedPixel = (FactCameraPixel) cell
+					CameraPixel selectedPixel = (CameraPixel) cell
 							.getCameraPixel();
 
 					// getting the patch by dividing chid by 9 since there are
@@ -366,10 +365,10 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 						// pixel clicked
 						selectedPatches.remove(patch);
 						if (patchSelectionMode) {
-							Iterator<FactCameraPixel> it = selectedPixels
+							Iterator<CameraPixel> it = selectedPixels
 									.iterator();
 							while (it.hasNext()) {
-								FactCameraPixel pt = it.next();
+								CameraPixel pt = it.next();
 								if (pt.chid / 9 == patch) {
 									it.remove();
 								}
@@ -390,7 +389,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 			// to the selectionset
 			if (patchSelectionMode) {
 				for (Tile cell : tiles) {
-					FactCameraPixel pixel = (FactCameraPixel) cell
+					CameraPixel pixel = (CameraPixel) cell
 							.getCameraPixel();
 					Integer patch = pixel.chid / 9;
 					if (selectedPatches.contains(patch)) {

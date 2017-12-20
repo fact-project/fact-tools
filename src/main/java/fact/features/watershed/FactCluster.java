@@ -1,6 +1,6 @@
 package fact.features.watershed;
 
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 
 import java.util.ArrayList;
@@ -103,7 +103,7 @@ public class FactCluster {
             cogX /= size;
             cogY /= size;
 
-            FactCameraPixel cog = mapping.getPixelBelowCoordinatesInMM(cogX,cogY);
+            CameraPixel cog = mapping.getPixelBelowCoordinatesInMM(cogX,cogY);
             if(cog == null){
                 return maxPhotonchargeId();
             }
@@ -244,7 +244,7 @@ public class FactCluster {
      * as they appear if one would walk over the boundary. So the pixel list can be seen as path around the cluster. This
      * is needed to calculate the change of direction from step to step (pixel to pixel).
      */
-    private ArrayList<FactCameraPixel> findSortedBoundary() {
+    private ArrayList<CameraPixel> findSortedBoundary() {
 
 
         int startId = findStartPixelBoundary();
@@ -252,15 +252,15 @@ public class FactCluster {
         int currentId = startId;
         boolean boundEnd = false;
 
-        ArrayList<FactCameraPixel> boundNeighbors = new ArrayList<>();
-        ArrayList<FactCameraPixel> sortedBound = new ArrayList<>();
+        ArrayList<CameraPixel> boundNeighbors = new ArrayList<>();
+        ArrayList<CameraPixel> sortedBound = new ArrayList<>();
         sortedBound.add(mapping.getPixelFromId(startId));
 
         while (!boundEnd) {
-            FactCameraPixel [] neighbors = getNeighborsInClusterFromId(currentId);
+            CameraPixel[] neighbors = getNeighborsInClusterFromId(currentId);
 
             int i =0;
-            for (FactCameraPixel p : neighbors) {
+            for (CameraPixel p : neighbors) {
                 // short version:  photonchargeNeighbors.add(contentPixelPhotoncharge.get(contentPixel.indexOf(p.id)));
                 if (sortedBound.contains(p) || !isBoundPixel(p.id)) {
                     neighbors[i] = null;
@@ -285,8 +285,8 @@ public class FactCluster {
                 }
                 else {
                     int min = 100;
-                    FactCameraPixel minP = boundNeighbors.get(0);
-                    for(FactCameraPixel p:boundNeighbors){
+                    CameraPixel minP = boundNeighbors.get(0);
+                    for(CameraPixel p:boundNeighbors){
                         int numClusterNeighbors = getNeighborsInClusterFromId(p.id).length;
                         if(numClusterNeighbors < min){
                             min = numClusterNeighbors;
@@ -299,7 +299,7 @@ public class FactCluster {
 
                 }
             }
-            else { FactCameraPixel [] neighborsNew = getNeighborsInClusterFromId(currentId);
+            else { CameraPixel[] neighborsNew = getNeighborsInClusterFromId(currentId);
 
                 if (neighborsNew.length == 1) {
                     sortedBound.add(mapping.getPixelFromId(currentId));
@@ -351,16 +351,16 @@ public class FactCluster {
     }
 
     //Gets a pixel id and returns an array of all pixels that are neighbors of this pixel AND belong to the same cluster.
-    private FactCameraPixel [] getNeighborsInClusterFromId(int id){
-        FactCameraPixel[] allNeighbors = mapping.getNeighborsFromID(id);
-        ArrayList<FactCameraPixel> neighborsInCluster = new ArrayList<>();
-        for(FactCameraPixel p : allNeighbors){
+    private CameraPixel[] getNeighborsInClusterFromId(int id){
+        CameraPixel[] allNeighbors = mapping.getNeighborsFromID(id);
+        ArrayList<CameraPixel> neighborsInCluster = new ArrayList<>();
+        for(CameraPixel p : allNeighbors){
             if(contentPixel.contains(p.id)){
                 neighborsInCluster.add(p);
             }
         }
 
-        FactCameraPixel [] neighborsArray = new FactCameraPixel[neighborsInCluster.size()];
+        CameraPixel[] neighborsArray = new CameraPixel[neighborsInCluster.size()];
         for(int i=0; i<neighborsInCluster.size(); i++){
             neighborsArray[i] = neighborsInCluster.get(i);
         }
@@ -369,8 +369,8 @@ public class FactCluster {
 
     //Gets a pixel id, returns true if this pixel is a boundary pixel of the cluster ans false if it's not.
     private boolean isBoundPixel(int id){
-        FactCameraPixel [] allCamNeighbors = mapping.getNeighborsFromID(id);
-        FactCameraPixel [] clusterNeighbors = getNeighborsInClusterFromId(id);
+        CameraPixel[] allCamNeighbors = mapping.getNeighborsFromID(id);
+        CameraPixel[] clusterNeighbors = getNeighborsInClusterFromId(id);
 
         if(allCamNeighbors.length == 6 && clusterNeighbors.length == 6){
             return false;
@@ -416,7 +416,7 @@ public class FactCluster {
      * Idea behind: If the cluster has a smooth round shape the boundAngleSum should be quite small. In case of zigzag it increases.
      */
     public int boundAngleSum(){
-        ArrayList<FactCameraPixel> sortedBound = findSortedBoundary();
+        ArrayList<CameraPixel> sortedBound = findSortedBoundary();
         if(sortedBound.size() > 1) {
             int cuDir = calcDirection(mapping.getCubeCoordinatesFromId(sortedBound.get(0).id), mapping.getCubeCoordinatesFromId(sortedBound.get(1).id));
             int countChangeDir = 0;

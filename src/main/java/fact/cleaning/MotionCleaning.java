@@ -1,7 +1,7 @@
 package fact.cleaning;
 
 import fact.container.PixelSet;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -59,7 +59,7 @@ public class MotionCleaning implements Processor {
 
         //System.out.println(maxAmplitude);
 
-        for(FactCameraPixel p : map.pixelArray){
+        for(CameraPixel p : map.pixelArray){
             double[] pixelData = p.getPixelData(data_array, roi);
             accumulativeDifferences[p.id] = 0;
 
@@ -146,8 +146,8 @@ public class MotionCleaning implements Processor {
         for (int i = 0; i < 1440; i++) {
             if (clusterID[i] == 0) {
                 int numberNeighbours = 0;
-                FactCameraPixel[] neighbours = map.getNeighborsFromID(i);
-                for (FactCameraPixel n:neighbours) {
+                CameraPixel[] neighbours = map.getNeighborsFromID(i);
+                for (CameraPixel n:neighbours) {
                     if (clusterID[n.id] == 0) {
                         numberNeighbours++;
                     }
@@ -164,8 +164,8 @@ public class MotionCleaning implements Processor {
         for (int i = 0; i < 1440; i++) {
             if(clusterID[i] == -2){
                 int numberNeighbours = 0;
-                FactCameraPixel[] neighbours = map.getNeighborsFromID(i);
-                for(FactCameraPixel n : neighbours){
+                CameraPixel[] neighbours = map.getNeighborsFromID(i);
+                for(CameraPixel n : neighbours){
                     if(clusterID[n.id] == 0){
                         numberNeighbours++;
                     }

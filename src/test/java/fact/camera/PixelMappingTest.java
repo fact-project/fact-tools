@@ -1,7 +1,6 @@
 package fact.camera;
 
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class PixelMappingTest {
         FactPixelMapping m  = FactPixelMapping.getInstance();
 
         //check existing pixel
-        FactCameraPixel p = m.getPixelFromOffsetCoordinates(0, 0);
+        CameraPixel p = m.getPixelFromOffsetCoordinates(0, 0);
         assertTrue("Pixel didnt have the desired coordinates", p.geometricX == 0 && p.geometricY == 0);
 
         p = m.getPixelFromOffsetCoordinates(-8, 19);
@@ -66,7 +65,7 @@ public class PixelMappingTest {
         int chid = 393;
         int[] ne1 =  {390,391,394,1098,395, 392};
 
-        FactCameraPixel[] n = m.getNeighborsFromID(chid);
+        CameraPixel[] n = m.getNeighborsFromID(chid);
         assertTrue("Neighbour list too short for chid " + chid + ". Expect 6 neighbours", n.length == 6);
         assertTrue("Neighbour array does not contain the right pixels", pixelArrayContainsChids(n,ne1));
 
@@ -117,12 +116,12 @@ public class PixelMappingTest {
 
     /**
      * Helper Function to check if the Pixel array contains the right chids
-     * @param ar the array of FactCameraPixel
+     * @param ar the array of CameraPixel
      * @param chids
      * @return if the pixel array contains the correct chids
      */
-    private boolean pixelArrayContainsChids(FactCameraPixel[] ar,  int[] chids){
-        for (FactCameraPixel p : ar ) {
+    private boolean pixelArrayContainsChids(CameraPixel[] ar, int[] chids){
+        for (CameraPixel p : ar ) {
             int id = p.chid;
             return arrayContains(chids, id);
         }
@@ -187,7 +186,7 @@ public class PixelMappingTest {
             //walk through rows
             for(double y = -220; y < 220 ; y += step ){
                 for  (double x = -280; x < 280; x += step){
-                    FactCameraPixel p = m.getPixelBelowCoordinatesInMM(x, y);
+                    CameraPixel p = m.getPixelBelowCoordinatesInMM(x, y);
                     if (p != null){
                         int id = p.id;
                         w.write(String.valueOf(id));
@@ -226,7 +225,7 @@ public class PixelMappingTest {
         x = 0.0f* 9.5f;
         y = 0.5f* 9.5f;
         chid = 393;
-        FactCameraPixel p = (FactCameraPixel) m.getPixelFromId(393);
+        CameraPixel p = (CameraPixel) m.getPixelFromId(393);
         p = m.getPixelBelowCoordinatesInMM(x, y);
         assertTrue("Map didnt return the right pixel " + chid + " for coordinates: " + x + ", " + y,
                 chid == p.chid);
@@ -235,7 +234,7 @@ public class PixelMappingTest {
 		x = -19.05f * 9.5f;
 		y = 5.5f * 9.5f;
 		chid =  722;
-        p = (FactCameraPixel) m.getPixelFromId(722);
+        p = (CameraPixel) m.getPixelFromId(722);
         p = m.getPixelBelowCoordinatesInMM(x, y);
         assertTrue("Map didnt return the right pixel " + chid + " for coordinates: " + x + ", " + y + "\n" +
                             " returnded chid was: " + p.chid + " with coordinates: "
@@ -278,7 +277,7 @@ public class PixelMappingTest {
             double lowestDistance = 100000.0d;
             for (int chid = 0 ; chid < m.getNumberOfPixel() ; chid++ )
             {
-                FactCameraPixel p = (FactCameraPixel) m.getPixelFromId(chid);
+                CameraPixel p = (CameraPixel) m.getPixelFromId(chid);
                 double yChid = p.posY *9.5;
                 double xChid = p.posX *9.5;
                 double distance = Math.sqrt( (xChid-x)*(xChid-x) + (yChid-y)*(yChid-y) );

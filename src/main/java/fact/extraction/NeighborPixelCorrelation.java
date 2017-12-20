@@ -2,7 +2,6 @@ package fact.extraction;
 
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -103,7 +102,7 @@ public class NeighborPixelCorrelation implements Processor {
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
-            FactCameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
+            CameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
 
             double pixVariance  = pixelStatistics[pix].getVariance();
             double pixMean      = pixelStatistics[pix].getMean();

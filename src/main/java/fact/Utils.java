@@ -6,7 +6,6 @@ import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -128,8 +127,8 @@ public class Utils {
 				// cannot use the enhanced for loop here.
 				for (int index = 0; index < q.size(); index++) {
 					// add neighbours to q
-					FactCameraPixel[] neighbors = pixelMap.getNeighborsForPixel(q.get(index));
-					for (FactCameraPixel neighbor : neighbors) {
+					CameraPixel[] neighbors = pixelMap.getNeighborsForPixel(q.get(index));
+					for (CameraPixel neighbor : neighbors) {
 
 					    if (showerPixel.contains(neighbor) && !marked.contains(neighbor)) {
 							q.add(neighbor);

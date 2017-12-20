@@ -1,7 +1,6 @@
 package fact.hexmap.ui.components.cameradisplay;
 
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +21,9 @@ public class FactHexTile extends Tile {
 	private double height;
 	private double width;
     private double radius;
-    private FactCameraPixel pixel;
+    private CameraPixel pixel;
 
-    public FactHexTile(FactCameraPixel p, double radius){
+    public FactHexTile(CameraPixel p, double radius){
         this.pixel = p;
         this.radius = radius;
         this.width =radius * 2;
@@ -93,5 +92,5 @@ public class FactHexTile extends Tile {
 		}
 		return false;
 	}
-	
+
 }

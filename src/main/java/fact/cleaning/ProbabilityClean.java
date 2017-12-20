@@ -2,12 +2,10 @@ package fact.cleaning;
 
 import fact.Utils;
 import fact.container.PixelSet;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
-
-import java.util.ArrayList;
 
 /**
  * Wolfgangs idea after previous cleaning make a new cleaning depending on the distance to showeraxis.
@@ -55,7 +53,7 @@ public class ProbabilityClean extends BasicCleaning implements Processor {
 
 		for (int chid = 0 ; chid < npix ; chid++)
 		{
-			FactCameraPixel pixel = pixelMap.getPixelFromId(chid);
+			CameraPixel pixel = pixelMap.getPixelFromId(chid);
 			double xpos = pixel.getXPositionInMM();
 			double ypos = pixel.getYPositionInMM();
 			double dist = Utils.calculateDistancePointToShowerAxis(cogx, cogy, delta, xpos, ypos);

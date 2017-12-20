@@ -1,7 +1,7 @@
 package fact.features.watershed;
 
 import fact.container.PixelSet;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -185,7 +185,7 @@ public class ClusterArrivalTimes implements Processor {
         while(foundSeed == false && p<shower.length){
             int showerPixelID = shower[p];
             if (clusterID[showerPixelID] == 0) {
-                FactCameraPixel[] neighbors = mapping.getNeighborsFromID(showerPixelID);
+                CameraPixel[] neighbors = mapping.getNeighborsFromID(showerPixelID);
                 boolean foundFlaggedNeighbor = false;
                 int n = 0;
                 while(foundFlaggedNeighbor == false && n < neighbors.length){
@@ -229,9 +229,9 @@ public class ClusterArrivalTimes implements Processor {
 
     private ArrayList findNeighborCluster(int id, int[] clusterID) {
         ArrayList<Integer> neighborCluster = new ArrayList<>();
-        FactCameraPixel[] neighbors = mapping.getNeighborsFromID(id);
+        CameraPixel[] neighbors = mapping.getNeighborsFromID(id);
 
-        for(FactCameraPixel p : neighbors){
+        for(CameraPixel p : neighbors){
             if(!neighborCluster.contains(clusterID[p.id]) && clusterID[p.id] != 0){
                 neighborCluster.add(p.id);
             }
@@ -243,11 +243,11 @@ public class ClusterArrivalTimes implements Processor {
 
 
     private int [] findNearestBlankNeighbor(int current, double[] arrivalTime, int[] clusterID, int[] shower, int cluster, int[] showerArray) {
-        FactCameraPixel[] neighbors = mapping.getNeighborsFromID(current);
+        CameraPixel[] neighbors = mapping.getNeighborsFromID(current);
         double minDiff = 1000;
         int minID = -1;
 
-        for(FactCameraPixel n : neighbors) {
+        for(CameraPixel n : neighbors) {
             if (clusterID[n.id] == 0 && showerArray[n.id] == 1) {
 
                 double diff = Math.abs(arrivalTime[n.id] - arrivalTime[current]);

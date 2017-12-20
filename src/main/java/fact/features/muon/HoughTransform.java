@@ -3,7 +3,7 @@ package fact.features.muon;
 import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,40 +29,51 @@ public class HoughTransform implements StatefulProcessor {
 
     // OutputKeys
     @Parameter(required = false, description = "outputkey for the hough peakness")
-    private String peaknessKey = "hough:peakness";
+    String peaknessKey = "hough:peakness";
+
     @Parameter(required = false, description = "outputkey for the hough distance")
-    private String distanceKey = "hough:distance";
+    String distanceKey = "hough:distance";
+
     @Parameter(required = false, description = "outputkey for the octantsHit parameter")
-    private String octantsHitKey = "hough:octants";
+    String octantsHitKey = "hough:octants";
+
     @Parameter(required = false, description = "outputkey for the cleaningPercentage parameter")
-    private String cleaningPercentageKey = "hough:cleaningPercentage";
+    String cleaningPercentageKey = "hough:cleaningPercentage";
+
     @Parameter(required = false, description = "outputkey for the ringPercentage parameter")
-    private String ringPercentageKey = "hough:ringPercentage";
+    String ringPercentageKey = "hough:ringPercentage";
+
     @Parameter(required = false, description = "outputkey for the hough pixelset of the best Ring")
-    private String bestCircleKey = "hough:Ring";
+    String bestCircleKey = "hough:Ring";
+
     @Parameter(required = false, description = "outputkey for x coordinate of the center point of the best ring")
-    private String bestXKey = "hough:x";
+    String bestXKey = "hough:x";
+
     @Parameter(required=false, description = "outputkey for y coordinate of the center point of the best ring")
-    private String bestYKey = "hough:y";
+    String bestYKey = "hough:y";
+
     @Parameter(required = false, description = "outputkey for the radius of the best ring")
-    private String bestRadiusKey = "hough:r";
+    String bestRadiusKey = "hough:r";
+
     @Parameter(required = false, description = "outputkey for pixel chids on the best ring")
-    private String bestRingPixelKey = "hough:pixel";
+    String bestRingPixelKey = "hough:pixel";
 
 
 
     //InputKeys
     @Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
-    private String pixelSetKey;
+    String pixelSetKey;
 
     @Parameter(required = true, description = "PhotonCharge")
-    private String photonChargeKey;
+    String photonChargeKey;
+
     //If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
     @Parameter(required = false, description = "if this key is true, the three best rings will be shown in the viewer", defaultValue="false")
-    private boolean showRingKey = false;
+    boolean showRingKey = false;
+
     //if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
     @Parameter(required = false, description = "if this key is true, the Hough Accumulator at the bestR will be printetd on the terminal", defaultValue="false")
-    private boolean showMatrixKey = false;
+    boolean showMatrixKey = false;
 
     double min_radius = 40;  // minimal radius in mm
     double max_radius = 120; // maximal  -->radius in mm
@@ -114,7 +125,7 @@ public class HoughTransform implements StatefulProcessor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         int npix = (Integer) input.get("NPIX");
 
-        int[] cleaningPixel = ((PixelSet) input.get(pixelSetKey)).toIntArray();
+        PixelSet cleaningPixel = (PixelSet) input.get(pixelSetKey);
         double[] photonCharge = (double[]) input.get(photonChargeKey);
 
 
@@ -130,8 +141,8 @@ public class HoughTransform implements StatefulProcessor {
 
 
         double houghSum = 0;
-        for (int chid : cleaningPixel) {
-            for (int[] idx : chid2circles[chid]) {
+        for (CameraPixel pixel : cleaningPixel) {
+            for (int[] idx : chid2circles[pixel.id]) {
 
                 int r = idx[0];
                 int x = idx[1];
@@ -141,8 +152,8 @@ public class HoughTransform implements StatefulProcessor {
                     noneZeroElems += 1;
                 }
 
-                HoughMatrix[r][x][y] += photonCharge[chid];
-                houghSum += photonCharge[chid];
+                HoughMatrix[r][x][y] += photonCharge[pixel.id];
+                houghSum += photonCharge[pixel.id];
             }
         }
 
@@ -150,7 +161,6 @@ public class HoughTransform implements StatefulProcessor {
         for (int r = 0; r < circle_r.length; r++) {
             for (int x = 0; x < circle_x.length; x++) {
                 for (int y = 0; y < circle_y.length; y++) {
-
                     if (HoughMatrix[r][x][y] >= houghMaximum){
                         houghMaximum = HoughMatrix[r][x][y];
                         int[] idx = {r, x, y};
@@ -210,15 +220,14 @@ public class HoughTransform implements StatefulProcessor {
         int octantsHit=0;
         boolean[] octants = {false, false, false, false, false, false, false, false};
 
-        for (int chid: cleaningPixel)
+        for (CameraPixel pix: cleaningPixel)
         {
-            FactCameraPixel pix = m.getPixelFromId(chid);
             double pix_x = pix.getXPositionInMM();
             double pix_y = pix.getYPositionInMM();
 
             double distance = euclidean_distance2d(pix_x, pix_y, best_x[0], best_y[0]);
 
-            if(Math.abs(distance - best_r[0]) <= fact.Constants.PIXEL_SIZE_MM)
+            if(Math.abs(distance - best_r[0]) <= Constants.PIXEL_SIZE_MM)
             {
                 onRingPixel += 1;
 
@@ -238,7 +247,7 @@ public class HoughTransform implements StatefulProcessor {
         input.put(octantsHitKey, octantsHit);
 
 
-        double cleaningPercentage = onRingPixel / cleaningPixel.length;
+        double cleaningPercentage = onRingPixel / cleaningPixel.size();
         double ringPercentage = onRingPixel / numPixBestRing;
         input.put(cleaningPercentageKey, cleaningPercentage);
         input.put(ringPercentageKey, ringPercentage);
@@ -262,11 +271,11 @@ public class HoughTransform implements StatefulProcessor {
                 PixelSet CirclePixelSet = new PixelSet();
                 for (int pix = 0; pix < npix; pix++)
                 {
-                    FactCameraPixel p = m.getPixelFromId(pix);
+                    CameraPixel p = m.getPixelFromId(pix);
                     double pix_x = p.getXPositionInMM();
                     double pix_y = p.getYPositionInMM();
                     distance = euclidean_distance2d(pix_x, pix_y, best_x[i], best_y[i]);
-                    if (Math.abs(distance - best_r[i]) <= fact.Constants.PIXEL_SIZE_MM) {
+                    if (Math.abs(distance - best_r[i]) <= Constants.PIXEL_SIZE_MM) {
                         CirclePixelSet.addById(pix);
                     }
                 }
@@ -319,7 +328,7 @@ public class HoughTransform implements StatefulProcessor {
         }
 
         for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++){
-            FactCameraPixel pix = m.getPixelFromId(chid);
+            CameraPixel pix = m.getPixelFromId(chid);
             double pix_x = pix.getXPositionInMM();
             double pix_y = pix.getYPositionInMM();
             for (int r = 0; r < circle_r.length; r++) {
@@ -357,51 +366,4 @@ public class HoughTransform implements StatefulProcessor {
     public void finish() throws Exception {
 
     }
-
-    public void setDistanceKey(String distanceKey) {
-        this.distanceKey = distanceKey;
-    }
-    public void setPeaknessKey(String peaknessKey) {
-        this.peaknessKey = peaknessKey;
-    }
-    public void setBestCircleKey(String bestCircleKey) {
-        this.bestCircleKey = bestCircleKey;
-    }
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-    public void setoctantsHitKey(String octantsHitKey) {
-        this.octantsHitKey = octantsHitKey;
-    }
-    public void setBestRingPixelKey(String bestRingPixelKey) {
-        this.bestRingPixelKey = bestRingPixelKey;
-    }
-    public void setShowRingKey(boolean showRingKey) {
-        this.showRingKey = showRingKey;
-    }
-    public void setBestXKey(String bestXKey) {
-        this.bestXKey = bestXKey;
-    }
-
-    public void setBestYKey(String bestYKey) {
-        this.bestYKey = bestYKey;
-    }
-    public void setBestRadiusKey(String bestRadiusKey) {
-        this.bestRadiusKey = bestRadiusKey;
-    }
-    public void setShowMatrixKey(boolean showMatrixKey) {
-        this.showMatrixKey = showMatrixKey;
-    }
-
-    public void setCleaningPercentageKey(String cleaningPercentageKey) {
-        this.cleaningPercentageKey = cleaningPercentageKey;
-    }
-
-    public void setRingPercentageKey(String ringPercentageKey) {
-        this.ringPercentageKey = ringPercentageKey;
-    }
-
 }
