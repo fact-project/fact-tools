@@ -5,16 +5,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PhotonchargeEvaluate implements Processor {
     static Logger log = LoggerFactory.getLogger(PhotonchargeEvaluate.class);
 
+    @Parameter(required = true)
     public String photonchargeKey = null;
+
+    @Parameter(required = true)
     public String arrivalTimeKey = null;
+
+    @Parameter(required = true)
     public  String mcCherenkovWeightKey = null;
+
+    @Parameter(required = true)
     public String mcCherenkovArrTimeMeanKey = null;
+
+    @Parameter(required = true)
     public String mcNoiseWeightKey = null;
+
+    @Parameter(required = true)
     public String outputKeyPhotonCharge = null;
+
+    @Parameter(required = true)
     public String outputKeyArrivalTime = null;
 //	int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
 //	int integrationWindow = 30;

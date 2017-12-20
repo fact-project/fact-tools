@@ -3,14 +3,22 @@ package fact.features.evaluate;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 
 public class CleaningEvaluate implements Processor {
 
+    @Parameter(required = true)
     String showerKey = null;
+
+    @Parameter(required = true)
     String mcCherenkovWeightKey = null;
+
+    @Parameter(required = true)
     String mcNoiseWeightKey = null;
+
+    @Parameter(required = true)
     String outputKey = null;
     int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
     int integrationWindow = 30;
