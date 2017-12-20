@@ -1,4 +1,4 @@
-package fact.photonstream.timeSeriesExtraction;
+package fact.utils;
 
 /**
  * A collection of element-wise operations on double[] arrays with a scalar.
