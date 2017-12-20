@@ -17,9 +17,6 @@ public class PrintKeys implements Processor {
     @Parameter
     public Keys keys = new Keys("*");
 
-    @Parameter
-    public String classFilter;
-
     @Override
     public Data process(Data input) {
         final Logger log = LoggerFactory.getLogger(PrintKeys.class);
@@ -29,21 +26,6 @@ public class PrintKeys implements Processor {
 
         for (String key : keys.select(input)) {
             Serializable value = input.get(key);
-            if (classFilter != null) {
-                String className;
-                try {
-                    className = value.getClass().getName();
-                    System.out.println("Class name failed");
-                    System.out.println(key);
-                    System.out.println(String.valueOf(value));
-                } catch (Exception e) {
-                    className = "";
-                }
-
-                if (!className.equals(classFilter)) {
-                    continue;
-                }
-            }
             output += "\t" + key + " = " + String.valueOf(value) + "\n";
         }
         log.info(output);
