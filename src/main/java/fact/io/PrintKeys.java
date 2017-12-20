@@ -6,7 +6,6 @@ import stream.Data;
 import stream.Keys;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.annotations.Service;
 
 import java.io.Serializable;
 
@@ -15,20 +14,20 @@ import java.io.Serializable;
  */
 public class PrintKeys implements Processor {
 
-	@Parameter
-	public Keys keys = new Keys("*");
+    @Parameter
+    public Keys keys = new Keys("*");
 
-	@Parameter
+    @Parameter
     public String classFilter;
 
-	@Override
-	public Data process(Data input) {
-		final Logger log = LoggerFactory.getLogger(PrintKeys.class);
+    @Override
+    public Data process(Data input) {
+        final Logger log = LoggerFactory.getLogger(PrintKeys.class);
 
-		String output = "\n";
+        String output = "\n";
 
 
-        for(String key : keys.select(input)) {
+        for (String key : keys.select(input)) {
             Serializable value = input.get(key);
             if (classFilter != null) {
                 String className;
@@ -46,10 +45,10 @@ public class PrintKeys implements Processor {
                 }
             }
             output += "\t" + key + " = " + String.valueOf(value) + "\n";
-		}
-		log.info(output);
+        }
+        log.info(output);
 
-		return input;
-	}
+        return input;
+    }
 
 }
