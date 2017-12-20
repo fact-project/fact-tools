@@ -18,7 +18,7 @@ import java.awt.event.ActionListener;
 
 /**
  * This should be able to plot all data in form of a double array which has the same length as the N*1440.
- *
+ * <p>
  * Created by kaibrugge on 13.05.14.
  */
 public class CameraWindow implements EventObserver {
@@ -29,15 +29,16 @@ public class CameraWindow implements EventObserver {
 
     /**
      * The window takes a key to some entry in the Data item which it will display
+     *
      * @param key
      */
-    public CameraWindow(String key){
+    public CameraWindow(String key) {
         keyComboBox.addItem(key);
         keyComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String key = (String) ((JComboBox)e.getSource()).getSelectedItem();
-                if(key != null) {
+                String key = (String) ((JComboBox) e.getSource()).getSelectedItem();
+                if (key != null) {
                     hexMapDisplay.setItemToDisplay(key, dataItem);
                 }
             }
@@ -53,17 +54,17 @@ public class CameraWindow implements EventObserver {
     /**
      * Define the layout for the window
      */
-    public void showWindow(){
+    public void showWindow() {
         JFrame frame = new JFrame();
 
         // set layout of the main window
         frame.getContentPane().setLayout(
-                new FormLayout( new ColumnSpec[]{
-                                    ColumnSpec.decode("right:max(500;pref):grow"),},
-                                new RowSpec[]{
-                                    RowSpec.decode("pref"),
-                                    RowSpec.decode("default"),
-                                }
+                new FormLayout(new ColumnSpec[]{
+                        ColumnSpec.decode("right:max(500;pref):grow"),},
+                        new RowSpec[]{
+                                RowSpec.decode("pref"),
+                                RowSpec.decode("default"),
+                        }
                 )
         );
         frame.getContentPane().add(keyComboBox, "1,1,left,top");
@@ -77,6 +78,7 @@ public class CameraWindow implements EventObserver {
 
     /**
      * Adds the keys we can display in the camera window to the dropdown list.
+     *
      * @param itemKeyPair the current data item we want to display
      */
     @Override
@@ -85,11 +87,11 @@ public class CameraWindow implements EventObserver {
         this.dataItem = itemKeyPair.getFirst();
         String selectedKey = (String) keyComboBox.getSelectedItem();
         keyComboBox.removeAllItems();
-        for(String key : dataItem.keySet()){
+        for (String key : dataItem.keySet()) {
             double[] data = Utils.toDoubleArray(dataItem.get(key));
-            if(data != null && data.length > 0 && data.length%1440 == 0) {
+            if (data != null && data.length > 0 && data.length % 1440 == 0) {
                 keyComboBox.addItem(key);
-                if(key.equals(selectedKey)){
+                if (key.equals(selectedKey)) {
                     keyComboBox.setSelectedItem(key);
                 }
             }

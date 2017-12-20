@@ -11,10 +11,9 @@ import stream.io.CsvStream;
 import stream.io.SourceURL;
 
 /**
+ * This Processor corrects the Pixel-Delays read from a .csv file.
  *
- *  This Processor corrects the Pixel-Delays read from a .csv file.
-  * @author Maximilian Noethe &lt;maximilian.noethe@tu-dortmund.de&gt;
- *
+ * @author Maximilian Noethe &lt;maximilian.noethe@tu-dortmund.de&gt;
  */
 public class CorrectPixelDelays implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(CorrectPixelDelays.class);
@@ -38,7 +37,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
         double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
         double[] corrArrivalTime = new double[npix];
 
-        for(int pix=0; pix < npix; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
             corrArrivalTime[pix] = arrivalTime[pix] - pixelDelays[pix];
         }
 
@@ -82,8 +81,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
                 this.pixelDelays[i] = Delay;
             }
 
-        }
-        catch (Exception e)  {
+        } catch (Exception e) {
             log.error("Failed to load pixel delay data: {}", e.getMessage());
             throw new RuntimeException(e);
         }

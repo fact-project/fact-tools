@@ -9,27 +9,27 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * <fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
- * @author bruegge
  *
+ * @author bruegge
  */
 public class SizeTest extends ParameterTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-	final String outputKey = "sizeoutput";
+    final String outputKey = "sizeoutput";
 
 
-	@Test
-	public void testValidParameter() throws Exception{
+    @Test
+    public void testValidParameter() throws Exception {
 //		//start processor with the correct parameter
-		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
+        assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
         Size poser = new Size();
         poser.setPhotonChargeKey(photonCharge);
         poser.setPixelSetKey(shower);
         poser.setOutputKey(outputKey);
         poser.process(item);
-		assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
+        assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);
-	}
+    }
 }

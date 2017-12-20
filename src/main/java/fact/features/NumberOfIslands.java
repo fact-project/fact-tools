@@ -8,8 +8,8 @@ import stream.annotations.Parameter;
 
 /**
  * If showerKey refers to an int[] of showerpixel. this will calculate the number of islands
- * @author kaibrugge
  *
+ * @author kaibrugge
  */
 public class NumberOfIslands implements Processor {
 
@@ -21,11 +21,10 @@ public class NumberOfIslands implements Processor {
 
     @Override
     public Data process(Data input) {
-    	if (!input.containsKey(pixelSetKey))
-    	{
-    		input.put(outputKey, 0);
-    		return input;
-    	}
+        if (!input.containsKey(pixelSetKey)) {
+            input.put(outputKey, 0);
+            return input;
+        }
         Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 
         PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);

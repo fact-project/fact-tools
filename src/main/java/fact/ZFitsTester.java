@@ -13,10 +13,8 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Class to automaticly test whether a file could be read by the HduReader
@@ -24,15 +22,16 @@ import java.util.stream.Collectors;
  * which contains the result of the test.
  * If no error was found adds the amount of events read into the info key
  * Otherwise the info key contains the error message.
- *
+ * <p>
  * usage:
- *   java -cp fact-tools.jar fact.ZFitsTester pathToFz1 pathToFz2
+ * java -cp fact-tools.jar fact.ZFitsTester pathToFz1 pathToFz2
  */
 public class ZFitsTester {
     private static class FileInfo {
         public String filename;
         public String status;
         public String info;
+
         public FileInfo(String filename, String status, String info) {
             this.filename = filename;
             this.status = status;
@@ -57,8 +56,8 @@ public class ZFitsTester {
         List<FileInfo> fileInfos = new ArrayList<FileInfo>();
 
         // process each file
-        for (String arg: args) {
-            System.out.println("Process: '"+arg+"'");
+        for (String arg : args) {
+            System.out.println("Process: '" + arg + "'");
             File currentTestFile = new File(arg);
             String filename = currentTestFile.getName();
             FileInfo info = new FileInfo(filename, "IN WORK", "");
@@ -95,7 +94,7 @@ public class ZFitsTester {
                 continue;
             }
             info.status = "PROCESSED";
-            info.info = "eventCount= "+eventCount+"";
+            info.info = "eventCount= " + eventCount + "";
             fileInfos.add(info);
         }
 

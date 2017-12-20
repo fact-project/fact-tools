@@ -18,7 +18,7 @@ public class ListMultiStreamTest {
 
     @Test
     public void readJsonTest() throws Exception {
-        URL u =  ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
+        URL u = ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
         FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
         multiStream.setUrl(new SourceURL(u));
 
@@ -29,7 +29,7 @@ public class ListMultiStreamTest {
 
     @Test
     public void testDrsInjection() throws Exception {
-        URL u =  FITSStreamTest.class.getResource("/dummy_files/file_drs_list.json");
+        URL u = FITSStreamTest.class.getResource("/dummy_files/file_drs_list.json");
         FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
         multiStream.setUrl(new SourceURL(u));
 

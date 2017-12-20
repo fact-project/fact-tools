@@ -10,7 +10,8 @@ import java.util.Set;
  */
 public class OverlaySelectionChangedEvent {
     public final Set<Pair<String, Color>> selectedItems;
-    public OverlaySelectionChangedEvent(Set<Pair<String, Color>> kl){
+
+    public OverlaySelectionChangedEvent(Set<Pair<String, Color>> kl) {
         this.selectedItems = kl;
     }
 

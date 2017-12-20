@@ -11,7 +11,7 @@ import java.util.Set;
 public class TimeSeriesSelectionChangedEvent {
     public final Set<Pair<String, Color>> selectedItems;
 
-    public TimeSeriesSelectionChangedEvent(Set<Pair<String, Color>> kl){
+    public TimeSeriesSelectionChangedEvent(Set<Pair<String, Color>> kl) {
         this.selectedItems = kl;
     }
 }
