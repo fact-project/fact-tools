@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 
 /**
  * Created by maxnoe on 23.05.17.
- *
+ * <p>
  * Interface for celestial coordinates. Provides
  * the greatCircleDistance and the conversion from ZonedDateTime to Greenwich Sidereal Time
  */
@@ -50,10 +50,11 @@ public interface CelestialCoordinate extends Serializable {
     /**
      * Convert a DateTime object to Greenwich Sidereal Time according to
      * https://en.wikipedia.org/wiki/Sidereal_time#Definition
+     *
      * @param datetime
      * @return gst in radians
      */
-    static double datetimeToGST(ZonedDateTime datetime){
+    static double datetimeToGST(ZonedDateTime datetime) {
 
         Duration difference = Duration.between(gstReferenceDateTime, datetime);
         double difference_seconds = difference.getSeconds() + difference.getNano() / 1e9;

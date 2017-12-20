@@ -15,14 +15,14 @@ import java.util.Set;
  * A KeySelector is a JPanel which lays out KeySelectorItems. It keeps track of which KeySelectorItems are selected
  * in the selectedItems HashSet. In case a new Event (DataItem) will be shown in the viewer, this class will call
  * the abstract filterItems(Data item) method.
- *
+ * <p>
  * The filterItems(Data item) should return a Set &lt; KeySelectorItem &gt; which will be shown in the JPanel
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
  * Created by kaibrugge on 15.05.14.
  */
-public abstract class KeySelector extends JPanel implements EventObserver{
+public abstract class KeySelector extends JPanel implements EventObserver {
 
     private final JPanel keySelectionContentPanel = new JPanel();
     private final JScrollPane keyScrollPane = new JScrollPane(keySelectionContentPanel);
@@ -31,7 +31,7 @@ public abstract class KeySelector extends JPanel implements EventObserver{
     protected Set<SeriesKeySelectorItem> selectedItems = new HashSet<>();
 
 
-    public KeySelector(){
+    public KeySelector() {
 
         Bus.eventBus.register(this);
 
@@ -46,15 +46,16 @@ public abstract class KeySelector extends JPanel implements EventObserver{
         //keyScrollPane.setBackground(Color.WHITE);
         add(keyScrollPane, BorderLayout.WEST);
     }
+
     @Override
-    public void setPreferredSize(Dimension preferredSize){
+    public void setPreferredSize(Dimension preferredSize) {
         super.setPreferredSize(preferredSize);
         this.keyScrollPane.setPreferredSize(preferredSize);
     }
 
     @Override
     @Subscribe
-    public void handleEventChange(Pair<Data, String> itemKeyPair){
+    public void handleEventChange(Pair<Data, String> itemKeyPair) {
 
         Set<SeriesKeySelectorItem> newItems = filterItems(itemKeyPair.getFirst());
         //keep old items selected
@@ -64,7 +65,7 @@ public abstract class KeySelector extends JPanel implements EventObserver{
         items.addAll(newItems);
 
         keySelectionContentPanel.removeAll();
-        for(SeriesKeySelectorItem k : items){
+        for (SeriesKeySelectorItem k : items) {
             k.setAlignmentX(Component.LEFT_ALIGNMENT);
             keySelectionContentPanel.add(k);
         }
@@ -72,9 +73,9 @@ public abstract class KeySelector extends JPanel implements EventObserver{
         keySelectionContentPanel.repaint();
     }
 
-    public Set<Pair<String, Color>> getSelectedItemPairs(){
+    public Set<Pair<String, Color>> getSelectedItemPairs() {
         Set<Pair<String, Color>> pairSet = new HashSet<>();
-        for(SeriesKeySelectorItem k : selectedItems) {
+        for (SeriesKeySelectorItem k : selectedItems) {
             pairSet.add(Pair.create(k.key, k.color));
         }
         return pairSet;
@@ -92,6 +93,7 @@ public abstract class KeySelector extends JPanel implements EventObserver{
     }
 
     public abstract void selectionUpdate();
+
     public abstract Set<SeriesKeySelectorItem> filterItems(Data item);
 
 }

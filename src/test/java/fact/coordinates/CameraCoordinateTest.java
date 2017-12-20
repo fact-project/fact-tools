@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 public class CameraCoordinateTest {
 
     @Test
-    public void euclideanDistanceTest(){
+    public void euclideanDistanceTest() {
         CameraCoordinate c1 = new CameraCoordinate(-1, -1);
         CameraCoordinate c2 = new CameraCoordinate(1, 1);
         assertEquals(Math.sqrt(8), c1.euclideanDistance(c2), 1e-12);
@@ -28,7 +28,7 @@ public class CameraCoordinateTest {
     }
 
     @Test
-    public void testToHorizontal(){
+    public void testToHorizontal() {
         CameraCoordinate c;
         HorizontalCoordinate h;
         HorizontalCoordinate pointing = HorizontalCoordinate.fromDegrees(90, 90);

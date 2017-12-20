@@ -15,7 +15,7 @@ import java.util.Optional;
  * The service should provide the ability to get the aux data from some data source.
  * Since sensor data can be written at different time intervals and frequencies we need to specify some strategy
  * for fetching the data. E.g. get the nearest point written before the given timestamp.
- *
+ * <p>
  * Created by kai on 31.03.15.
  */
 public interface AuxiliaryService extends Service {
@@ -24,9 +24,9 @@ public interface AuxiliaryService extends Service {
      * Providing the timestamp of the event, the name of the service
      * and some strategy, this method should return an AuxPoint.
      *
-     * @param serviceName the name of the aux data to access. This is written in the filename 20130112.<serviceName>.fits
+     * @param serviceName    the name of the aux data to access. This is written in the filename 20130112.<serviceName>.fits
      * @param eventTimeStamp the DateTime of the event you need the aux data for.
-     * @param strategy one of the strategies implemented for fetcvhing aux points
+     * @param strategy       one of the strategies implemented for fetcvhing aux points
      * @return the auxpoint according to the strategy
      * @throws IOException in case something goes wrong while trying to access the aux data. Be it a file or a database.
      */
@@ -39,9 +39,9 @@ public interface AuxiliaryService extends Service {
      * @param eventTime the UnixTimeUTC array as found in the FITS file.
      * @return an Optional containing the Datetime instance
      */
-     static Optional<ZonedDateTime> unixTimeUTCToDateTime(int [] eventTime){
-        if(eventTime != null && eventTime.length == 2) {
-            long value = (long)((eventTime[0]+eventTime[1]/1000000.)*1000);
+    static Optional<ZonedDateTime> unixTimeUTCToDateTime(int[] eventTime) {
+        if (eventTime != null && eventTime.length == 2) {
+            long value = (long) ((eventTime[0] + eventTime[1] / 1000000.) * 1000);
             ZonedDateTime timeStamp = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
             return Optional.of(timeStamp);
         }
@@ -55,7 +55,7 @@ public interface AuxiliaryService extends Service {
      * @param item A data item from the stream of raw FACT data
      * @return an Optional containing the Datetime instance
      */
-    static Optional<ZonedDateTime> unixTimeUTCToDateTime(Data item){
+    static Optional<ZonedDateTime> unixTimeUTCToDateTime(Data item) {
         int[] eventTime = (int[]) item.get("UnixTimeUTC");
         return unixTimeUTCToDateTime(eventTime);
     }

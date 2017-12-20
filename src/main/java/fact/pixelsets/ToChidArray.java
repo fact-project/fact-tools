@@ -14,7 +14,7 @@ import stream.annotations.Parameter;
  * from the pixelSet.
  * created by maxnoe
  */
-public class ToChidArray implements Processor{
+public class ToChidArray implements Processor {
     static Logger log = LoggerFactory.getLogger(ToChidArray.class);
 
     @Parameter(required = true, description = "key to the input PixelSet")

@@ -8,9 +8,9 @@ import java.time.ZonedDateTime;
 
 /**
  * Represents a coordinate in the horizontal coordinate.
- *
+ * <p>
  * Provides a method to transform into the equatorial and camera frame.
- *
+ * <p>
  * Created by maxnoe on 22.05.17.
  */
 public class HorizontalCoordinate implements CelestialCoordinate {
@@ -49,7 +49,7 @@ public class HorizontalCoordinate implements CelestialCoordinate {
     /**
      * Transform this HorizontalCoordinate into the equatorial coordinate frame
      * for given observation time and location.
-     *
+     * <p>
      * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
      *
@@ -75,7 +75,7 @@ public class HorizontalCoordinate implements CelestialCoordinate {
 
         double ra = gst + lon - hourAngle;
 
-        if(ra < 0.0) {
+        if (ra < 0.0) {
             ra += 2 * Math.PI;
         } else if (ra > 2 * Math.PI) {
             ra -= 2 * Math.PI;
@@ -91,12 +91,12 @@ public class HorizontalCoordinate implements CelestialCoordinate {
 
     /**
      * Transform this horizontal coordinate to the camera frame for the given pointing position and focal length.
+     *
      * @param pointingPosition Pointing of the telescope
-     * @param focalLength focalLength of the telescope
+     * @param focalLength      focalLength of the telescope
      * @return coordinate transformed into the camera frame
      */
-    public CameraCoordinate toCamera(HorizontalCoordinate pointingPosition, double focalLength)
-    {
+    public CameraCoordinate toCamera(HorizontalCoordinate pointingPosition, double focalLength) {
 
         double paz = pointingPosition.getAzimuthRad();
         double pzd = pointingPosition.getZenithRad();
@@ -119,7 +119,7 @@ public class HorizontalCoordinate implements CelestialCoordinate {
         return cameraCoordinate;
     }
 
-    public String toString(){
+    public String toString() {
         return String.format("HorizontalCoordinate(zd=%.4f°, az=%.4f°)", this.getZenithDeg(), this.getAzimuthDeg());
     }
 

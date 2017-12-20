@@ -7,50 +7,50 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * Calculate the feature called Size. A physicist would call this the number of Photons in a shower. 
+ * Calculate the feature called Size. A physicist would call this the number of Photons in a shower.
  * This basically sums up all weights that belong to a shower.
- * In short size is the sum of the photonCharge of all showerPixel. 
- * @author kaibrugge
+ * In short size is the sum of the photonCharge of all showerPixel.
  *
+ * @author kaibrugge
  */
 public class Size implements Processor {
 
     @Parameter(required = true)
-	private String pixelSetKey;
+    private String pixelSetKey;
     @Parameter(required = true)
-	private String photonChargeKey;
+    private String photonChargeKey;
     @Parameter(required = true)
-	private String outputKey;
+    private String outputKey;
 
-	@Override
-	public Data process(Data input) {
-		
-		
-		Utils.mapContainsKeys( input, photonChargeKey);
-		
-		double size = 0;
-		if (input.containsKey(pixelSetKey))
-		{
-		
-			int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
-			double[] charge 	= (double[])input.get(photonChargeKey);
+    @Override
+    public Data process(Data input) {
 
-        	size = calculateSize(shower, charge);
-		}
+
+        Utils.mapContainsKeys(input, photonChargeKey);
+
+        double size = 0;
+        if (input.containsKey(pixelSetKey)) {
+
+            int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
+            double[] charge = (double[]) input.get(photonChargeKey);
+
+            size = calculateSize(shower, charge);
+        }
         input.put("@size", size);
-		input.put(outputKey, size);
-		return input;
-	}
+        input.put(outputKey, size);
+        return input;
+    }
 
     /**
-     *Get the size of the shower.
+     * Get the size of the shower.
+     *
      * @param shower the array containing the chids of the pixels which are marked as showers
      * @param weight some sort of weight for each pixel. Should have 1440 entries
      * @return the weighted sum of the showerpixels
      */
     public double calculateSize(int[] shower, double[] weight) {
         double size = 0;
-        for (int i = 0; i < shower.length; i++){
+        for (int i = 0; i < shower.length; i++) {
             size += weight[shower[i]];
         }
         return size;
@@ -58,22 +58,24 @@ public class Size implements Processor {
 
 
     public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+        return outputKey;
+    }
+
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
 
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
+    public void setPixelSetKey(String pixelSetKey) {
+        this.pixelSetKey = pixelSetKey;
+    }
 
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
+    public String getPhotonChargeKey() {
+        return photonChargeKey;
+    }
+
+    public void setPhotonChargeKey(String photonChargeKey) {
+        this.photonChargeKey = photonChargeKey;
+    }
 
 }

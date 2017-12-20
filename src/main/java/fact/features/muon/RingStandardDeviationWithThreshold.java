@@ -35,7 +35,7 @@ public class RingStandardDeviationWithThreshold implements Processor {
     @Override
     public Data process(Data item) {
 
-        if (outputKey == null){
+        if (outputKey == null) {
             outputKey = "StdDevTime" + String.valueOf(threshold);
         }
 
@@ -51,8 +51,8 @@ public class RingStandardDeviationWithThreshold implements Processor {
         Sets.SetView<CameraPixel> intersection = Sets.intersection(cleaningPixel.set, ringPixel.set);
 
         DescriptiveStatistics stats = new DescriptiveStatistics();
-        for(CameraPixel pixel: intersection){
-            if(photoncharge[pixel.id] >= threshold){
+        for (CameraPixel pixel : intersection) {
+            if (photoncharge[pixel.id] >= threshold) {
                 stats.addValue(arrivalTime[pixel.id]);
             }
         }

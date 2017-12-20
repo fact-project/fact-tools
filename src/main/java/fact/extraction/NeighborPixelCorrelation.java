@@ -2,7 +2,6 @@ package fact.extraction;
 
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -16,7 +15,7 @@ import stream.annotations.Parameter;
 /**
  * Calculate the average covariance and correlation of neighboring pixels to determine
  * the correlation of theire timeseries
- *
+ * <p>
  * Created by jebuss on 04.04.16.
  */
 public class NeighborPixelCorrelation implements Processor {
@@ -68,14 +67,14 @@ public class NeighborPixelCorrelation implements Processor {
         double[] data = (double[]) input.get(key);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
         int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
-        log.debug("npix: " + pixels.length );
+        log.debug("npix: " + pixels.length);
 
         roi = data.length / npix;
 
         IntervalMarker[] m = new IntervalMarker[npix];
 
         //scale the data in the array to make it comparable
-        double[] scaledData      = scaleData(data, amplitudePositions);
+        double[] scaledData = scaleData(data, amplitudePositions);
 
         //snip pixel Data to arrays without skipped slices
         double[][] snipedPixelData = Utils.snipPixelData(scaledData, skipFirst, skipLast, npix, roi);
@@ -83,33 +82,33 @@ public class NeighborPixelCorrelation implements Processor {
         //get mean and variance of the timeseries for each pixel
         DescriptiveStatistics[] pixelStatistics = Utils.calculateTimeseriesStatistics(snipedPixelData);
 
-        double[] covarianceMean     = new double[npix];
-        double[] correlationMean    = new double[npix];
+        double[] covarianceMean = new double[npix];
+        double[] correlationMean = new double[npix];
 
-        double[] covarianceStd      = new double[npix];
-        double[] correlationStd     = new double[npix];
+        double[] covarianceStd = new double[npix];
+        double[] correlationStd = new double[npix];
 
-        double[] covarianceMax      = new double[npix];
-        double[] correlationMax     = new double[npix];
+        double[] covarianceMax = new double[npix];
+        double[] correlationMax = new double[npix];
 
-        double[] covarianceMin      = new double[npix];
-        double[] correlationMin     = new double[npix];
+        double[] covarianceMin = new double[npix];
+        double[] correlationMin = new double[npix];
 
         double[] covarianceKurtosis = new double[npix];
-        double[] correlationKurtosis= new double[npix];
+        double[] correlationKurtosis = new double[npix];
 
         double[] covarianceSkewness = new double[npix];
-        double[] correlationSkewness= new double[npix];
+        double[] correlationSkewness = new double[npix];
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
-            FactCameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
+            CameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
 
-            double pixVariance  = pixelStatistics[pix].getVariance();
-            double pixMean      = pixelStatistics[pix].getMean();
+            double pixVariance = pixelStatistics[pix].getVariance();
+            double pixMean = pixelStatistics[pix].getMean();
 
-            covarianceMean[pix]     = 0.;
-            correlationMean[pix]    = 0.;
+            covarianceMean[pix] = 0.;
+            correlationMean[pix] = 0.;
 
             DescriptiveStatistics statisticsCovariance = new DescriptiveStatistics();
             DescriptiveStatistics statisticsCorrelation = new DescriptiveStatistics();
@@ -118,15 +117,15 @@ public class NeighborPixelCorrelation implements Processor {
             for (CameraPixel neighbour : neighbours) {
 
                 //exclude pixel that are not contained in the pixel set             }
-                if (!ArrayUtils.contains(pixels, neighbour.id)){
+                if (!ArrayUtils.contains(pixels, neighbour.id)) {
                     continue;
                 }
 
-                double neighbourVariance    = pixelStatistics[neighbour.id].getVariance();
-                double neighbourMean        = pixelStatistics[neighbour.id].getMean();
+                double neighbourVariance = pixelStatistics[neighbour.id].getVariance();
+                double neighbourMean = pixelStatistics[neighbour.id].getMean();
 
                 double covariance = calculateCovariance(snipedPixelData[pix], snipedPixelData[neighbour.id],
-                                                            pixMean, neighbourMean);
+                        pixMean, neighbourMean);
 
                 double correlation = calculateCorrelation(pixVariance, neighbourVariance, covariance);
 
@@ -137,54 +136,53 @@ public class NeighborPixelCorrelation implements Processor {
 
             // weight with number of neighbours, (necessary for pixel at the camera edges and faulty pixels)
 
-            covarianceMean[pix]     = statisticsCovariance.getMean();
-            covarianceMax[pix]      = statisticsCovariance.getMax();
-            covarianceMin[pix]      = statisticsCovariance.getMin();
-            covarianceStd[pix]      = statisticsCovariance.getStandardDeviation();
+            covarianceMean[pix] = statisticsCovariance.getMean();
+            covarianceMax[pix] = statisticsCovariance.getMax();
+            covarianceMin[pix] = statisticsCovariance.getMin();
+            covarianceStd[pix] = statisticsCovariance.getStandardDeviation();
             covarianceKurtosis[pix] = statisticsCovariance.getKurtosis();
             covarianceSkewness[pix] = statisticsCovariance.getSkewness();
 
-            correlationMean[pix]     = statisticsCorrelation.getMean();
-            correlationMax[pix]      = statisticsCorrelation.getMax();
-            correlationMin[pix]      = statisticsCorrelation.getMin();
-            correlationStd[pix]      = statisticsCorrelation.getStandardDeviation();
+            correlationMean[pix] = statisticsCorrelation.getMean();
+            correlationMax[pix] = statisticsCorrelation.getMax();
+            correlationMin[pix] = statisticsCorrelation.getMin();
+            correlationStd[pix] = statisticsCorrelation.getStandardDeviation();
             correlationKurtosis[pix] = statisticsCorrelation.getKurtosis();
             correlationSkewness[pix] = statisticsCorrelation.getSkewness();
 
-            m[pix] = new IntervalMarker(skipFirst,roi - skipLast);
+            m[pix] = new IntervalMarker(skipFirst, roi - skipLast);
 
         }
 
         if (returnScaledCorrelation == true) {
-            input.put(correlationKey+"_mean", scaleCorrelation(correlationMean));
-            input.put(correlationKey+"_max", scaleCorrelation(correlationMax));
-            input.put(correlationKey+"_min", scaleCorrelation(correlationMin));
-            input.put(correlationKey+"_stdDev", scaleCorrelation(correlationStd));
-            input.put(correlationKey+"_Kurtosis", scaleCorrelation(correlationKurtosis));
-            input.put(correlationKey+"_Skewness", scaleCorrelation(correlationSkewness));
-        }
-        else{
-            input.put(correlationKey+"_mean", correlationMean);
-            input.put(correlationKey+"_max", correlationMax);
-            input.put(correlationKey+"_min", correlationMin);
-            input.put(correlationKey+"_stdDev", correlationStd);
-            input.put(correlationKey+"_Kurtosis", correlationKurtosis);
-            input.put(correlationKey+"_Skewness", correlationSkewness);
+            input.put(correlationKey + "_mean", scaleCorrelation(correlationMean));
+            input.put(correlationKey + "_max", scaleCorrelation(correlationMax));
+            input.put(correlationKey + "_min", scaleCorrelation(correlationMin));
+            input.put(correlationKey + "_stdDev", scaleCorrelation(correlationStd));
+            input.put(correlationKey + "_Kurtosis", scaleCorrelation(correlationKurtosis));
+            input.put(correlationKey + "_Skewness", scaleCorrelation(correlationSkewness));
+        } else {
+            input.put(correlationKey + "_mean", correlationMean);
+            input.put(correlationKey + "_max", correlationMax);
+            input.put(correlationKey + "_min", correlationMin);
+            input.put(correlationKey + "_stdDev", correlationStd);
+            input.put(correlationKey + "_Kurtosis", correlationKurtosis);
+            input.put(correlationKey + "_Skewness", correlationSkewness);
         }
 
         input.put(markerKey, m);
-        input.put(covarianceKey+"_mean", covarianceMean);
-        input.put(covarianceKey+"_max", covarianceMax);
-        input.put(covarianceKey+"_min", covarianceMin);
-        input.put(covarianceKey+"_stdDev", covarianceStd);
-        input.put(covarianceKey+"_Kurtosis", covarianceKurtosis);
-        input.put(covarianceKey+"_Skewness", covarianceSkewness);
+        input.put(covarianceKey + "_mean", covarianceMean);
+        input.put(covarianceKey + "_max", covarianceMax);
+        input.put(covarianceKey + "_min", covarianceMin);
+        input.put(covarianceKey + "_stdDev", covarianceStd);
+        input.put(covarianceKey + "_Kurtosis", covarianceKurtosis);
+        input.put(covarianceKey + "_Skewness", covarianceSkewness);
 
         return input;
     }
 
     private double calculateCorrelation(double varianceA, double varianceB, double covariance) {
-        Double correlation = Math.abs(covariance) / Math.sqrt(varianceA*varianceA*varianceB*varianceB );
+        Double correlation = Math.abs(covariance) / Math.sqrt(varianceA * varianceA * varianceB * varianceB);
         return Math.abs(correlation);
     }
 
@@ -192,8 +190,8 @@ public class NeighborPixelCorrelation implements Processor {
         double covariance = 0.;
 
         for (int slice = 0; slice < arrayA.length; slice++) {
-            double distanceA        = arrayA[slice] - meanA;
-            double distanceB        = arrayB[slice] - meanB;
+            double distanceA = arrayA[slice] - meanA;
+            double distanceB = arrayB[slice] - meanB;
 
             covariance += distanceA * distanceB;
         }
@@ -210,12 +208,11 @@ public class NeighborPixelCorrelation implements Processor {
             //check if maxAmpl is 0 to avoid division by zero which leads to NaN values in scaledData.
             // Quick and dirty solution: if maxAmpl is close to 0, add an arbitrary 10 to every slice.
             //Other solution: do something with baseline. could be more elegant...
-            if(Math.abs(maxAmpl) < 0.1){
+            if (Math.abs(maxAmpl) < 0.1) {
                 for (int slice = 0; slice < roi; slice++) {
-                    scaledData[Utils.absPos(pix, slice, roi)] = (scaledData[Utils.absPos(pix, slice, roi)] + 10) / (maxAmpl+10);
+                    scaledData[Utils.absPos(pix, slice, roi)] = (scaledData[Utils.absPos(pix, slice, roi)] + 10) / (maxAmpl + 10);
                 }
-            }
-            else {
+            } else {
                 for (int slice = 0; slice < roi; slice++) {
                     scaledData[Utils.absPos(pix, slice, roi)] = (scaledData[Utils.absPos(pix, slice, roi)] / maxAmpl);
                 }
@@ -225,24 +222,24 @@ public class NeighborPixelCorrelation implements Processor {
     }
 
 
-    private double[] scaleCorrelation(double[] correlation){
+    private double[] scaleCorrelation(double[] correlation) {
 
         double[] scaledCorrelation = new double[1440];
         double max = 0;
         double min = 1000;
-        for(int i=0; i<1440; i++){
-            if(correlation[i] > max){
+        for (int i = 0; i < 1440; i++) {
+            if (correlation[i] > max) {
                 int maxIndex = i;
                 max = correlation[i];
             }
-            if(correlation[i] < min){
+            if (correlation[i] < min) {
                 int minIndex = i;
                 min = correlation[i];
             }
         }
 
 
-        for(int i=0; i<1440; i++){
+        for (int i = 0; i < 1440; i++) {
             scaledCorrelation[i] = (correlation[i] - min) / (max - min);
         }
 
@@ -282,5 +279,7 @@ public class NeighborPixelCorrelation implements Processor {
         this.markerKey = markerKey;
     }
 
-    public void setReturnScaledCorrelation(boolean returnScaledCorrelation) {this.returnScaledCorrelation = returnScaledCorrelation;}
+    public void setReturnScaledCorrelation(boolean returnScaledCorrelation) {
+        this.returnScaledCorrelation = returnScaledCorrelation;
+    }
 }

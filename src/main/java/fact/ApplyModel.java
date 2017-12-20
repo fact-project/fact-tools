@@ -28,11 +28,11 @@ import java.util.Map;
 
 /**
  * Applies a .pmml model to data in the data item. The model can be written with SciKit learn. Using ERnA for example.
- *
- *
+ * <p>
+ * <p>
  * Created by kai on 03.12.15.
  */
-public class ApplyModel implements StatefulProcessor{
+public class ApplyModel implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(ApplyModel.class);
 
     PMML pmml;
@@ -67,7 +67,7 @@ public class ApplyModel implements StatefulProcessor{
         log.info("Loaded model requires the following fields: " + modelEvaluator.getActiveFields().toString());
 
         log.info("Loaded model has targets: " + modelEvaluator.getTargetFields().toString());
-        if(modelEvaluator.getTargetFields().size() > 1){
+        if (modelEvaluator.getTargetFields().size() > 1) {
             log.error("Only models with one target variable are supported for now");
         }
 
@@ -88,14 +88,14 @@ public class ApplyModel implements StatefulProcessor{
     @Override
     public Data process(Data data) {
 
-        for(InputField activeField : activeFields){
+        for (InputField activeField : activeFields) {
 
             Object rawValue = data.get(activeField.toString());
 
             // The raw value is passed through: type conversion or any other transofrmations applied in sklearn
-            FieldValue activeValue =activeField.prepare(rawValue);
+            FieldValue activeValue = activeField.prepare(rawValue);
 
-            FieldName activeFieldName=activeField.getName();
+            FieldName activeFieldName = activeField.getName();
 
             arguments.put(activeFieldName, activeValue);
         }
@@ -105,16 +105,15 @@ public class ApplyModel implements StatefulProcessor{
         Object targetValue = results.get(targetName);
 
         log.info("Prediction: " + targetValue);
-        try{
-            data.put(targetName.getValue(),(Serializable) targetValue);
-        } catch (ClassCastException e){
+        try {
+            data.put(targetName.getValue(), (Serializable) targetValue);
+        } catch (ClassCastException e) {
             log.warn("Cannot cast target type to serializable type");
             data.put(targetName.getValue(), targetValue.toString());
         }
 
         return data;
     }
-
 
 
     public void setUrl(SourceURL url) {

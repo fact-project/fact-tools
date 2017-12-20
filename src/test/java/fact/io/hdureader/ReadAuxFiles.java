@@ -17,13 +17,13 @@ import static org.junit.Assert.*;
 public class ReadAuxFiles {
     @Test
     public void testBinTableIteratorForMCs() throws Exception {
-        URL u =  ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
+        URL u = ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
 
         FITS f = new FITS(u);
 
         BinTable b = f.getBinTableByName("DRIVE_CONTROL_SOURCE_POSITION").orElseThrow(IOException::new);
 
-        for(OptionalTypesMap p : BinTableReader.forBinTable(b)){
+        for (OptionalTypesMap p : BinTableReader.forBinTable(b)) {
             assertTrue(p.containsKey("Ra_src"));
             assertTrue(p.containsKey("Dec_src"));
             assertTrue(p.containsKey("Name"));
@@ -33,7 +33,7 @@ public class ReadAuxFiles {
 
     @Test
     public void testBinTableReader() throws Exception {
-        URL u =  ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
+        URL u = ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
 
         FITS f = new FITS(u);
 
@@ -55,8 +55,8 @@ public class ReadAuxFiles {
         dec = (double) row.get("Dec_src");
         name = (String) row.get("Name");
 
-        assertEquals(5.5,  ra, 0.1);
-        assertEquals(22.0, dec,  0.1);
+        assertEquals(5.5, ra, 0.1);
+        assertEquals(22.0, dec, 0.1);
         assertEquals("Crab", name);
 
     }

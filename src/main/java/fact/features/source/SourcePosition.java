@@ -2,7 +2,6 @@ package fact.features.source;
 
 import fact.Constants;
 import fact.Utils;
-
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
@@ -14,7 +13,6 @@ import fact.coordinates.EarthLocation;
 import fact.coordinates.EquatorialCoordinate;
 import fact.coordinates.HorizontalCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -27,28 +25,28 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 
 /**
- *  This calculates the position of the source in the camera. The Telescope usually does not look
- *  directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
- *  the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
- *  The point (0.0, 0.0) is the center of the camera.
- *  In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
- *  This data is written by the telescope drive system into  auxiliary .fits files called DRIVE_CONTROL_SOURCE_POSITION and
- *  DRIVE_CONTROL_TRACKING_POSITION.
+ * This calculates the position of the source in the camera. The Telescope usually does not look
+ * directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
+ * the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
+ * The point (0.0, 0.0) is the center of the camera.
+ * In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
+ * This data is written by the telescope drive system into  auxiliary .fits files called DRIVE_CONTROL_SOURCE_POSITION and
+ * DRIVE_CONTROL_TRACKING_POSITION.
+ * <p>
+ * This processor handles a handful of different tasks. It can calculate the source position in the camera for
+ * some fixed celestial coordinates (e.g. In case you want to get the coordinates of a star projected onto the camera plane)
+ * <p>
+ * For data processing we need the auxService to read data from both the DRIVE_CONTROL_SOURCE_POSITION and the DRIVE_CONTROL_TRACKING_POSITION
+ * files. The first contains the name and celestial coordinates of the source we're at looking while the second contains
+ * information at where the telescope pointing which is updated in small intervals.
+ * <p>
+ * Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
+ * to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (after revision 18159),
+ * the source and pointing information are simply taken from the data stream.
+ * <p>
+ * For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
  *
- *  This processor handles a handful of different tasks. It can calculate the source position in the camera for
- *  some fixed celestial coordinates (e.g. In case you want to get the coordinates of a star projected onto the camera plane)
- *
- *  For data processing we need the auxService to read data from both the DRIVE_CONTROL_SOURCE_POSITION and the DRIVE_CONTROL_TRACKING_POSITION
- *  files. The first contains the name and celestial coordinates of the source we're at looking while the second contains
- *  information at where the telescope pointing which is updated in small intervals.
- *
- *  Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
- *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (after revision 18159),
- *  the source and pointing information are simply taken from the data stream.
- *
- *  For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
- *
- *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt, Max Nöthe;
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt, Max Nöthe;
  */
 public class SourcePosition implements StatefulProcessor {
     private static final Logger log = LoggerFactory.getLogger(SourcePosition.class);
@@ -106,12 +104,12 @@ public class SourcePosition implements StatefulProcessor {
         HorizontalCoordinate auxPointingHorizontal;
 
         // In case the source position is fixed. Used for older ceres version <= revision 18159
-        if(x != null && y !=  null) {
+        if (x != null && y != null) {
 
             // add source position to data item
             sourceCamera = new CameraCoordinate(x, y);
             auxPointingHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
-            pointingHorizontal =  HorizontalCoordinate.fromDegrees(0, 0);
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
             sourceHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
 
         } else if (hasMcWobblePosition) {
@@ -212,24 +210,21 @@ public class SourcePosition implements StatefulProcessor {
      */
     @Override
     public void init(ProcessContext arg0) throws Exception {
-        if(x !=  null && y != null){
+        if (x != null && y != null) {
             log.warn("Setting source position to dummy values X: " + x + "  Y: " + y);
             return;
         }
 
         hasMcWobblePosition = false;
-        if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
-            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
-            {
+        if (!(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null)) {
+            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null) {
                 hasMcWobblePosition = true;
                 log.warn("Using zd and az values from the data item");
-            }
-            else
-            {
+            } else {
                 log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
                 throw new IllegalArgumentException();
             }
-        } else if (auxService == null ){
+        } else if (auxService == null) {
 
             log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
             throw new IllegalArgumentException();
@@ -244,8 +239,6 @@ public class SourcePosition implements StatefulProcessor {
     @Override
     public void finish() throws Exception {
     }
-
-
 
 
 }

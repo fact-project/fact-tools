@@ -34,7 +34,7 @@ public class CameraToEquatorial implements Processor {
     @Override
     public Data process(Data item) {
         int[] unixTimeUTC = (int[]) item.get("UnixTimeUTC");
-        if(unixTimeUTC == null){
+        if (unixTimeUTC == null) {
             log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
             return null;
         }

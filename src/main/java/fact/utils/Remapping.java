@@ -16,9 +16,8 @@ import stream.annotations.Parameter;
  * This processors changes the order of the pixels in the data from SoftId to Chid
  *
  * @author kai
- *
  */
-public class Remapping implements Processor{
+public class Remapping implements Processor {
     static Logger log = LoggerFactory.getLogger(Remapping.class);
 
     @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
@@ -45,10 +44,10 @@ public class Remapping implements Processor{
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {
-        int roi = data.length/ npix;
-        for(int softId = 0; softId < npix; softId++){
+        int roi = data.length / npix;
+        for (int softId = 0; softId < npix; softId++) {
             int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
-            System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
+            System.arraycopy(data, softId * roi, remapped, chid * roi, roi);
         }
     }
 
