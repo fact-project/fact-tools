@@ -9,7 +9,7 @@ import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import stream.Data;
-import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -19,9 +19,8 @@ public class BasicCleaning {
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-    @Parameter(required = true)
+    @Service(required = true)
     public CalibrationService calibService;
-
 
     protected PixelSet notUsablePixelSet = null;
 
@@ -154,5 +153,9 @@ public class BasicCleaning {
         double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
 
         return Math.sqrt((xdist * xdist) + (ydist * ydist));
+    }
+
+    public void setCalibService(CalibrationService calibService) {
+        this.calibService = calibService;
     }
 }
