@@ -16,9 +16,6 @@ public class PatchAverage implements Processor {
     @Parameter(required = true)
     String outputKey = null;
 
-    @Parameter(required = true)
-    String color = null;
-
     private int npix;
 
     @Override
