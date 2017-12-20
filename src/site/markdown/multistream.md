@@ -40,7 +40,7 @@ by the simulation program Ceres.
             <process id="2" input="fact:${copy.id}" copies="${num_copies}" >
         
                 <stream.flow.Skip condition="%{data.EventNum} &lt; 0" />
-                <fact.io.PrintKeys keys="MCorsikaEvtHeader.fTotalEnergy" />
+                <fact.io.PrintKeysOnConsole keys="MCorsikaEvtHeader.fTotalEnergy" />
         
                 <include url="classpath:/default/mc/calibration_mc.xml" />
         
