@@ -8,80 +8,78 @@ import stream.annotations.Parameter;
 
 /**
  * This processor calculates CosDeltaAlpha from MARS Code:
- *  fCosDeltaAlpha cosine of angle between d and a, where
- *	- d is the vector from the source position to the
- *	center of the ellipse
- *	- a is a vector along the main axis of the ellipse,
- *	defined with positive x-component
+ * fCosDeltaAlpha cosine of angle between d and a, where
+ * - d is the vector from the source position to the
+ * center of the ellipse
+ * - a is a vector along the main axis of the ellipse,
+ * defined with positive x-component
  *
  * @author Jan Freiwald
- *
  */
-public class CosDeltaAlpha implements Processor{
-	@Parameter(required=true)
-	private String sourcePositionKey;
-	@Parameter(required=true)
-	private String cogxKey;
-	@Parameter(required=true)
-	private String cogyKey;
-	@Parameter(required=true)
-	private String deltaKey;
-	@Parameter(required=true)
-	private String outputKey;
+public class CosDeltaAlpha implements Processor {
+    @Parameter(required = true)
+    private String sourcePositionKey;
+    @Parameter(required = true)
+    private String cogxKey;
+    @Parameter(required = true)
+    private String cogyKey;
+    @Parameter(required = true)
+    private String deltaKey;
+    @Parameter(required = true)
+    private String outputKey;
 
-	@Override
-	public Data process(Data input)
-	{
+    @Override
+    public Data process(Data input) {
 
-		Utils.mapContainsKeys( input, sourcePositionKey, cogxKey, cogyKey, deltaKey);
-		CameraCoordinate sourcePosition = (CameraCoordinate) input.get(sourcePositionKey);
+        Utils.mapContainsKeys(input, sourcePositionKey, cogxKey, cogyKey, deltaKey);
+        CameraCoordinate sourcePosition = (CameraCoordinate) input.get(sourcePositionKey);
 
-		double cogx = (double) input.get(cogxKey);
-		double cogy = (double) input.get(cogyKey);
-		double delta = (double) input.get(deltaKey);
+        double cogx = (double) input.get(cogxKey);
+        double cogy = (double) input.get(cogyKey);
+        double delta = (double) input.get(deltaKey);
 
-		double sx = cogx - sourcePosition.xMM;
-		double sy = cogy - sourcePosition.yMM;
-		double dist = Math.sqrt(sx*sx + sy*sy);
+        double sx = cogx - sourcePosition.xMM;
+        double sy = cogy - sourcePosition.yMM;
+        double dist = Math.sqrt(sx * sx + sy * sy);
 
-		if(dist == 0) {
-			return input;
-		}
+        if (dist == 0) {
+            return input;
+        }
 
-		double s = Math.sin(delta);
-		double c = Math.cos(delta);
+        double s = Math.sin(delta);
+        double c = Math.cos(delta);
 
-	    double arg2 = c*sx + s*sy; // mm
+        double arg2 = c * sx + s * sy; // mm
 
-		if (arg2 == 0) {
-			return input;
-		}
-	    //double arg1 = c*sy - s*sx;          // [mm]
+        if (arg2 == 0) {
+            return input;
+        }
+        //double arg1 = c*sy - s*sx;          // [mm]
 
-		double cosDeltaAlpha = arg2 / dist;
+        double cosDeltaAlpha = arg2 / dist;
 
-		input.put(outputKey, cosDeltaAlpha);
-		return input;
-	}
+        input.put(outputKey, cosDeltaAlpha);
+        return input;
+    }
 
-	public void setSourcePositionKey(String sourcePositionKey) {
-		this.sourcePositionKey = sourcePositionKey;
-	}
+    public void setSourcePositionKey(String sourcePositionKey) {
+        this.sourcePositionKey = sourcePositionKey;
+    }
 
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
+    public void setCogxKey(String cogxKey) {
+        this.cogxKey = cogxKey;
+    }
 
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
+    public void setCogyKey(String cogyKey) {
+        this.cogyKey = cogyKey;
+    }
 
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
+    public void setDeltaKey(String deltaKey) {
+        this.deltaKey = deltaKey;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
 }

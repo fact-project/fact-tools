@@ -6,10 +6,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertEquals;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by maxnoe on 29.06.17.
@@ -28,7 +29,7 @@ public class CelestialCoordinateTest {
         JsonReader jsonReader = new JsonReader(new InputStreamReader(testDataStream));
         Resources.GMSTData[] testData = gson.fromJson(jsonReader, Resources.GMSTData[].class);
 
-        for (Resources.GMSTData gmstData: testData) {
+        for (Resources.GMSTData gmstData : testData) {
             log.debug("Testing GMST for {}", gmstData.obstime);
             ZonedDateTime obstime = ZonedDateTime.parse(gmstData.obstime.replace(" ", "T") + "Z[UTC]");
             double gmst = CelestialCoordinate.datetimeToGST(obstime);

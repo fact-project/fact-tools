@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -22,9 +24,9 @@ public class SaveCoordinateComparison {
     /**
      * Reads the output of scrips/create_coordinate_comparison.py and saves the transformation result
      * to json. This can be visiualised using scripts/plot_coordinate_comparison.py
-     *
+     * <p>
      * Call it like this: java -cp JARFILE fact.coordinates.SaveCoordinateComparison INPUT OUTPUT
-
+     *
      * @param args
      * @throws Exception
      */
@@ -44,7 +46,7 @@ public class SaveCoordinateComparison {
         JsonWriter writer = new JsonWriter(new FileWriter(args[1]));
 
         writer.beginArray();
-        for(Source source: sources){
+        for (Source source : sources) {
             ZonedDateTime obstime = ZonedDateTime.parse(source.obstime.replace(" ", "T") + "Z[UTC]");
             EquatorialCoordinate sourceEq = EquatorialCoordinate.fromHourAngleAndDegrees(source.ra, source.dec);
             HorizontalCoordinate astropyReference = HorizontalCoordinate.fromDegrees(source.zd, source.az);

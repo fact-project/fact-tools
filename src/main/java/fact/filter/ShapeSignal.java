@@ -37,13 +37,11 @@ public class ShapeSignal implements Processor {
         double[] result = new double[data.length];
 
 
-        for (int i=0 ; i < data.length ; i++)
-        {
-            shifted_data[ (i+shift) % data.length] = (-1) * factor * data[ i ];
+        for (int i = 0; i < data.length; i++) {
+            shifted_data[(i + shift) % data.length] = (-1) * factor * data[i];
         }
 
-        for (int i=0 ; i < data.length ; i++)
-        {
+        for (int i = 0; i < data.length; i++) {
             result[i] = data[i] + shifted_data[i];
         }
 

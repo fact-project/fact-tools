@@ -45,7 +45,7 @@ import java.util.zip.GZIPOutputStream;
  * The writer also supports the .jsonl format.
  * http://jsonlines.org/
  * To use the .jsonl format provide the key jsonl="true" in the xml.
- *
+ * <p>
  * In this case the format will be:
  * <pre>
  * {"key1": value, ...}
@@ -65,7 +65,7 @@ import java.util.zip.GZIPOutputStream;
  *     data = json.load(f)
  * df = pd.DataFrame(data)
  * </pre>
- *
+ * <p>
  * If you do not want this behaviour, you can use
  * <code>specialDoubleValuesAsString="true"</code>
  * to convert these values to json compatible strings containing "inf", "-inf" or "nan"
@@ -98,12 +98,12 @@ public class JSONWriter implements StatefulProcessor {
 
     @Parameter(required = true)
     private Keys keys = new Keys("");
-    @Parameter(required = false, description = "Defines how many significant digits are used for double values", defaultValue="null")
+    @Parameter(required = false, description = "Defines how many significant digits are used for double values", defaultValue = "null")
     private Integer doubleSignDigits = null;
     @Parameter(required = false, description = "If true, use jsonl format instead of json format", defaultValue = "false")
     private boolean jsonl = false;
     @Parameter(required = false, description = "If true, append to existing file else overwrite", defaultValue = "false")
-    private  boolean append = false;
+    private boolean append = false;
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
     private boolean pixelSetsAsInt = true;
     @Parameter(required = false, description = "If true, Infinity, -Infinity and NaN are converted to strings 'inf', '-inf' and 'nan'", defaultValue = "false")
@@ -124,23 +124,19 @@ public class JSONWriter implements StatefulProcessor {
     public Data process(Data data) {
         Data item = DataFactory.create();
 
-        for (String key: keys.select(data) ){
+        for (String key : keys.select(data)) {
             item.put(key, data.get(key));
         }
 
         try {
-        	if (isFirstLine)
-        	{
-        		isFirstLine = false;
-        	}
-        	else
-        	{
-        		if (!jsonl)
-        		{
-        			bw.write(",");
-        		}
-    			bw.newLine();
-        	}
+            if (isFirstLine) {
+                isFirstLine = false;
+            } else {
+                if (!jsonl) {
+                    bw.write(",");
+                }
+                bw.newLine();
+            }
             b.append(gson.toJson(item));
             bw.write(b.toString());
         } catch (IOException e) {
@@ -153,19 +149,18 @@ public class JSONWriter implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        if (gzip){
+        if (gzip) {
             GZIPOutputStream gzip = new GZIPOutputStream(new FileOutputStream(new File(url.getFile()), append));
             bw = new BufferedWriter(new OutputStreamWriter(gzip, "UTF-8"));
-        }
-        else {
+        } else {
             bw = new BufferedWriter(new FileWriter(new File(url.getFile()), append));
         }
 
-        GsonBuilder gsonBuilder  = new GsonBuilder().serializeSpecialFloatingPointValues();
+        GsonBuilder gsonBuilder = new GsonBuilder().serializeSpecialFloatingPointValues();
         gsonBuilder.enableComplexMapKeySerialization();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeAdapter());
 
-        if (specialDoubleValuesAsString){
+        if (specialDoubleValuesAsString) {
             SpecialDoubleValuesAdapter specialDoubleValuesAdapter = new SpecialDoubleValuesAdapter();
             gsonBuilder.registerTypeAdapter(double.class, specialDoubleValuesAdapter);
             gsonBuilder.registerTypeAdapter(Double.class, specialDoubleValuesAdapter);
@@ -178,35 +173,34 @@ public class JSONWriter implements StatefulProcessor {
             gsonBuilder.registerTypeAdapter(Double.class, signDigitsAdapter);
         }
 
-        if (pixelSetsAsInt){
+        if (pixelSetsAsInt) {
             gsonBuilder.registerTypeAdapter(PixelSet.class, new PixelSetAdapter());
         }
 
         gson = gsonBuilder.create();
 
-        if (!jsonl)
-        {
-        	bw.write("[");
+        if (!jsonl) {
+            bw.write("[");
         }
     }
 
     @Override
-    public void resetState() throws Exception {}
+    public void resetState() throws Exception {
+    }
 
     @Override
     public void finish() throws Exception {
         try {
-            if(bw != null) {
+            if (bw != null) {
                 bw.newLine();
-                if (!jsonl)
-                {
+                if (!jsonl) {
                     bw.write("]");
                 }
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             // ignore stream bw was closed apparently
         } finally {
-            if (bw != null){
+            if (bw != null) {
                 bw.close();
             }
         }
@@ -233,10 +227,10 @@ public class JSONWriter implements StatefulProcessor {
     }
 
     public void setDoubleSignDigits(int doubleSignDigits) {
-		this.doubleSignDigits = doubleSignDigits;
-	}
+        this.doubleSignDigits = doubleSignDigits;
+    }
 
-	public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
+    public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
         this.pixelSetsAsInt = pixelSetsAsInt;
     }
 
@@ -244,14 +238,13 @@ public class JSONWriter implements StatefulProcessor {
         this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
-    public class DateTimeAdapter extends TypeAdapter<ZonedDateTime>{
+    public class DateTimeAdapter extends TypeAdapter<ZonedDateTime> {
 
         @Override
         public void write(JsonWriter jsonWriter, ZonedDateTime dateTime) throws IOException {
-            if (dateTime == null){
+            if (dateTime == null) {
                 jsonWriter.nullValue();
-            }
-            else{
+            } else {
                 jsonWriter.value(dateTime.toString());
             }
         }
@@ -262,14 +255,13 @@ public class JSONWriter implements StatefulProcessor {
         }
     }
 
-    public class PixelSetAdapter extends TypeAdapter<PixelSet>{
+    public class PixelSetAdapter extends TypeAdapter<PixelSet> {
 
         @Override
         public void write(JsonWriter jsonWriter, PixelSet pixelSet) throws IOException {
             if (pixelSet == null) {
                 jsonWriter.nullValue();
-            }
-            else {
+            } else {
                 jsonWriter.beginArray();
                 for (int chid : pixelSet.toIntArray()) {
                     jsonWriter.value(chid);
@@ -293,19 +285,16 @@ public class JSONWriter implements StatefulProcessor {
         }
 
         public void write(JsonWriter writer, Double value) throws IOException {
-            if (value.isNaN() || value.isInfinite())
-            {
+            if (value.isNaN() || value.isInfinite()) {
                 writer.value(value);
-            }
-            else
-            {
+            } else {
                 BigDecimal bValue = new BigDecimal(value);
                 bValue = bValue.round(new MathContext(signDigits));
                 writer.value(bValue.doubleValue());
             }
         }
 
-        public void setSignDigits(int sD){
+        public void setSignDigits(int sD) {
             signDigits = sD;
         }
 
@@ -320,14 +309,11 @@ public class JSONWriter implements StatefulProcessor {
         public void write(JsonWriter writer, Double value) throws IOException {
             if (value == Double.NEGATIVE_INFINITY) {
                 writer.value("-inf");
-            }
-            else if (value == Double.POSITIVE_INFINITY) {
+            } else if (value == Double.POSITIVE_INFINITY) {
                 writer.value("inf");
-            }
-            else if (value.isNaN()) {
+            } else if (value.isNaN()) {
                 writer.value("nan");
-            }
-            else{
+            } else {
                 writer.value(value);
             }
         }

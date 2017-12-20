@@ -48,7 +48,7 @@ public class SinglePulseExtractor {
 
         public double timeSeriesBaseLine() {
             DescriptiveStatistics statistics =
-                new DescriptiveStatistics(timeSeriesAfterExtraction);
+                    new DescriptiveStatistics(timeSeriesAfterExtraction);
             return statistics.getMean();
         }
 
@@ -57,20 +57,18 @@ public class SinglePulseExtractor {
          *
          * @param  startSlice      with respect to extraction window start.
          * @param  lengthInSlices  the length in slices.
-         * @return      an int[] with arrivalSlices within the given range.
+         * @return an int[] with arrivalSlices within the given range.
          */
         /**
          * @param:
          */
         public int[] pulseArrivalSlicesInRange(
-            int startSlice,
-            int lengthInSlices)
-        {
+                int startSlice,
+                int lengthInSlices) {
             ArrayList<Integer> pulses = new ArrayList<>();
-            for (int pulse: pulseArrivalSlices){
+            for (int pulse : pulseArrivalSlices) {
                 if ((pulse >= startSlice) &&
-                    (pulse < startSlice + lengthInSlices))
-                {
+                        (pulse < startSlice + lengthInSlices)) {
                     pulses.add(pulse);
                 }
             }
@@ -97,82 +95,80 @@ public class SinglePulseExtractor {
 
     void initPulseToLookFor() {
         double[] pulse = new double[
-            config.pulseToLookForLength + config.plateauLength];
+                config.pulseToLookForLength + config.plateauLength];
 
         AddFirstArrayToSecondArray.at(
-            TemplatePulse.factSinglePePulse(config.pulseToLookForLength),
-            pulse,
-            config.plateauLength
+                TemplatePulse.factSinglePePulse(config.pulseToLookForLength),
+                pulse,
+                config.plateauLength
         );
         double sum = 0.0;
-        for (double slice: pulse){
+        for (double slice : pulse) {
             sum += slice;
         }
         pulseToLookForIntegral = sum;
-        pulseToLookFor = ElementWise.multiply(pulse, 1.0/pulseToLookForIntegral);
+        pulseToLookFor = ElementWise.multiply(pulse, 1.0 / pulseToLookForIntegral);
     }
 
     void initPlateau() {
         double[] plateau = new double[
-            config.pulseToLookForLength + config.plateauLength];
+                config.pulseToLookForLength + config.plateauLength];
 
         double plateau_sum = 0.0;
-        for (int i=0; i<config.plateauLength; i++) {
-                plateau[i] = 1.0;
-                plateau_sum += plateau[i];
+        for (int i = 0; i < config.plateauLength; i++) {
+            plateau[i] = 1.0;
+            plateau_sum += plateau[i];
         }
         plateauIntegral = plateau_sum;
-        plateauToLookFor = ElementWise.multiply(plateau, 1.0/plateauIntegral);
+        plateauToLookFor = ElementWise.multiply(plateau, 1.0 / plateauIntegral);
     }
 
     void initNegativePulse() {
         double[] pulseToSubtract = TemplatePulse.factSinglePePulse(
-            config.negativePulseLength);
+                config.negativePulseLength);
         negativePulse = ElementWise.multiply(pulseToSubtract, -1.0);
     }
 
     /**
      * Reconstructs the arrival slices of single photons on a time series.
      *
+     * @param timeSeries The time line to look for pulses in. The time line
+     *                   is modified in place. When the extractor was
+     *                   successfull, the time line is flat and all pulses
+     *                   were subtracted.
+     *                   Amplitude of the single puls must be normalized to 1.0.
      * @return result
-     *           A class containing:
-     *           - pulseArrivalSlices
-     *           - timeSeriesAfterExtraction
-     *
-     * @param timeSeries
-     *           The time line to look for pulses in. The time line
-     *           is modified in place. When the extractor was
-     *           successfull, the time line is flat and all pulses
-     *           were subtracted.
-     *           Amplitude of the single puls must be normalized to 1.0.
+     * A class containing:
+     * - pulseArrivalSlices
+     * - timeSeriesAfterExtraction
      */
     public Result extractFromTimeSeries(double[] timeSeries) {
         ArrayList<Integer> arrival_slices = new ArrayList<>();
         int iteration = 0;
 
-        while(iteration < config.maxIterations) {
+        while (iteration < config.maxIterations) {
 
             final double[] pulseResponse = Convolve.firstWithSecond(
-                timeSeries,
-                pulseToLookFor);
+                    timeSeries,
+                    pulseToLookFor);
 
             final double[] baselineResponse = Convolve.firstWithSecond(
-                timeSeries,
-                plateauToLookFor);
+                    timeSeries,
+                    plateauToLookFor);
 
             final double[] response = ElementWise.subtractFirstFromSecond(
-                baselineResponse,
-                pulseResponse);
+                    baselineResponse,
+                    pulseResponse);
 
             final ArgMax am = new ArgMax(response);
             final int maxSlice = am.arg + config.plateauLength;
             final double maxResponse = am.max;
 
-            if(maxResponse > 0.65) {
+            if (maxResponse > 0.65) {
                 AddFirstArrayToSecondArray.at(
-                    negativePulse,
-                    timeSeries,
-                    maxSlice);
+                        negativePulse,
+                        timeSeries,
+                        maxSlice);
 
                 if (maxSlice >= 1)
                     arrival_slices.add(maxSlice);

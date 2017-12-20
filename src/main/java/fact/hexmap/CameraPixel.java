@@ -27,8 +27,8 @@ public class CameraPixel implements Serializable {
     public double length = 1;
 
     @Override
-    public String toString(){
-        return "ID: " + this.id ;
+    public String toString() {
+        return "ID: " + this.id;
     }
 
     public double posX;
@@ -36,9 +36,10 @@ public class CameraPixel implements Serializable {
 
     /**
      * This sets the chid of this pixel.
+     *
      * @param chid
      */
-    public void setId(int chid){
+    public void setId(int chid) {
         this.id = chid;
     }
 
@@ -47,7 +48,7 @@ public class CameraPixel implements Serializable {
         this.crate = hardid / 1000;
         this.board = (hardid / 100) % 10;
         this.patch = (hardid / 10) % 10;
-        this.chid  = (hardid % 10) + 9 * patch + 36 * board + 360 * crate;
+        this.chid = (hardid % 10) + 9 * patch + 36 * board + 360 * crate;
         this.drs_chip = this.chid / 9;
         this.id = this.chid;
     }
@@ -56,28 +57,31 @@ public class CameraPixel implements Serializable {
         this.softid = softID;
     }
 
-    public double getXPositionInMM(){
+    public double getXPositionInMM() {
         return posX * Constants.PIXEL_SIZE_MM;
     }
-    public double getYPositionInMM(){
+
+    public double getYPositionInMM() {
         return posY * Constants.PIXEL_SIZE_MM;
     }
 
-    public double getXPositionInPixelUnits(){
+    public double getXPositionInPixelUnits() {
         return posX;
     }
-    public double getYPositionInPixelUnits(){
+
+    public double getYPositionInPixelUnits() {
         return posY;
     }
 
     /**
      * This function returns the data contained in this pixel from the big data array containing the data for all pixels
+     *
      * @param data the array containing the data for all pixels
-     * @param roi the region of interest in the data. Usually 300 slices or 1024
+     * @param roi  the region of interest in the data. Usually 300 slices or 1024
      * @return the data for this pixel
      */
-    public double[] getPixelData(double[] data, int roi){
-        double[] pixelData = Arrays.copyOfRange(data, id*roi, id*roi + roi);
+    public double[] getPixelData(double[] data, int roi) {
+        double[] pixelData = Arrays.copyOfRange(data, id * roi, id * roi + roi);
         return pixelData;
     }
 

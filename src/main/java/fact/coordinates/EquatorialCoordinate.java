@@ -3,14 +3,13 @@ package fact.coordinates;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 
 /**
  * Created by maxnoe on 22.05.17.
- *
+ * <p>
  * Represents a celestial coordinate in the equatorial coordinate frame
  * using right ascension and declination.
- *
+ * <p>
  * Provides a method to convert to the horizontal coordinate frame
  */
 public class EquatorialCoordinate implements CelestialCoordinate {
@@ -47,10 +46,10 @@ public class EquatorialCoordinate implements CelestialCoordinate {
     /**
      * Calculate the corrections for right ascension in declination
      * that are needed because of Earth's precession.
-     *
+     * <p>
      * The formulas are approximations found here
      * http://www.cv.nrao.edu/~rfisher/Ephemerides/earth_rot.html
-     *
+     * <p>
      * TODO Check with the "Explanatory Supplements for the Astronomical Almanac"
      *
      * @param rightAscensionRad
@@ -60,15 +59,15 @@ public class EquatorialCoordinate implements CelestialCoordinate {
      */
     static double[] calculatePrecessionCorrection(double rightAscensionRad, double declinationRad, ZonedDateTime observationTime) {
         double deltaT = observationTime.until(j2000Reference, ChronoUnit.SECONDS) / 365.0 / 86400.0;
-        double deltaRightAscension = (precessionFactorM +  precessionFactorN * Math.sin(rightAscensionRad) * Math.tan(declinationRad)) * deltaT;
+        double deltaRightAscension = (precessionFactorM + precessionFactorN * Math.sin(rightAscensionRad) * Math.tan(declinationRad)) * deltaT;
         double deltaDeclination = precessionFactorN * Math.cos(rightAscensionRad) * deltaT;
-        return new double[] {deltaRightAscension, deltaDeclination};
+        return new double[]{deltaRightAscension, deltaDeclination};
     }
 
     /**
      * Transform this EquatorialCoordinate into the horizontal coordinate frame
      * for given observation time and location.
-     *
+     * <p>
      * Implementation of the formulas from
      * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
      *
@@ -111,13 +110,14 @@ public class EquatorialCoordinate implements CelestialCoordinate {
         return HorizontalCoordinate.fromRad(Math.PI / 2.0 - altitude, azimuth);
     }
 
-    public String toString(){
+    public String toString() {
         return String.format("HorizontalCoordinate(ra=%.4f ha, dec=%.4f°)", this.getRightAscensionHA(), this.getDeclinationDeg());
     }
 
     /**
      * Return the angular great circle distance in radians
      * between this EquatorialCoordinate and another
+     *
      * @param other
      * @return Angular great circle distance in radians
      */

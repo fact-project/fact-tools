@@ -16,7 +16,7 @@ public class LeakageTest {
                 433,
                 1196};
         Leakage l = new Leakage();
-        for (int pix: pixelIds){
+        for (int pix : pixelIds) {
             assertTrue("Pixel with chid " + pix + " should be recognized as a borderpixel.",
                     l.isBorderPixel(pix));
         }

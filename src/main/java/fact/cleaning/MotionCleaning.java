@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * (accumulativeDifferences) is set +1.
  * After all slices in the window are compared with the left bound, every pixel whose counter
  * is bigger than threshold2 (=2 at the moment) is classified as showerpixel.
- *
+ * <p>
  * Created by lena on 18.08.15.
  */
 public class MotionCleaning implements Processor {
@@ -36,7 +36,7 @@ public class MotionCleaning implements Processor {
     @Parameter(required = true)
     private String numPixelKey;
 
-    @Parameter(required = false, description="minimal difference between the values of two slices to set the accumulative difference to 1", defaultValue="30")
+    @Parameter(required = false, description = "minimal difference between the values of two slices to set the accumulative difference to 1", defaultValue = "30")
     protected double threshold = 30;         //<------------------------------------hardcode: mc-pedestal: 30--------------------------
 
     @Override
@@ -44,7 +44,7 @@ public class MotionCleaning implements Processor {
 
         double[] data_array = (double[]) data.get("DataCalibrated");
         int[] accumulativeDifferences = new int[1440];
-        int [] cleaningID = new int[1440];
+        int[] cleaningID = new int[1440];
 
         int numShowerPixel;
 
@@ -59,7 +59,7 @@ public class MotionCleaning implements Processor {
 
         //System.out.println(maxAmplitude);
 
-        for(CameraPixel p : map.pixelArray){
+        for (CameraPixel p : map.pixelArray) {
             double[] pixelData = p.getPixelData(data_array, roi);
             accumulativeDifferences[p.id] = 0;
 
@@ -67,20 +67,18 @@ public class MotionCleaning implements Processor {
             double ref = pixelData[25];         //  <------------------------------------------hardcode---------------
 
 
-
-            for(int i=25; i<=positionMax; i++){
+            for (int i = 25; i <= positionMax; i++) {
                 double diff = pixelData[i] - ref;
 
-                if(diff > threshold){             //  <----------------------------------- threshold 1 -----------------
+                if (diff > threshold) {             //  <----------------------------------- threshold 1 -----------------
                     accumulativeDifferences[p.id] += 1;
 
                 }
             }
 
-            if(accumulativeDifferences[p.id] > 2){ // <--------------------------threshold2-----hardcode---------------
+            if (accumulativeDifferences[p.id] > 2) { // <--------------------------threshold2-----hardcode---------------
                 cleaningID[p.id] = 0;
-            }
-            else {
+            } else {
                 cleaningID[p.id] = -2;
             }
         }
@@ -95,13 +93,12 @@ public class MotionCleaning implements Processor {
         PixelSet pixelSet = new PixelSet();
 
         //Array -> PixelSet
-        if(showerPixelArray != null){
+        if (showerPixelArray != null) {
             numShowerPixel = showerPixelArray.length;
             for (int id : showerPixelArray) {
                 pixelSet.addById(id);
             }
-        }
-        else{
+        } else {
             numShowerPixel = 0;
             pixelSet.add(null);
 
@@ -124,17 +121,17 @@ public class MotionCleaning implements Processor {
 
 
     //calculates the maximum of the mean over all pixels. Used for the upper(right) bound for the "difference-window"
-    public int positionOfMaxMeanAmplitude(double [] data, int min, int max){
+    public int positionOfMaxMeanAmplitude(double[] data, int min, int max) {
         double tempValue = 0;
         int tempPosition = min;
         double brightnessMean = -1;
 
-        for(int slice = min; slice<max; slice++){
+        for (int slice = min; slice < max; slice++) {
 
-            for(int i=0;i<1440; i++){
-                brightnessMean += data[i*roi + slice]/roi;
+            for (int i = 0; i < 1440; i++) {
+                brightnessMean += data[i * roi + slice] / roi;
             }
-            if(brightnessMean > tempValue){
+            if (brightnessMean > tempValue) {
                 tempValue = brightnessMean;
                 tempPosition = slice;
             }
@@ -147,7 +144,7 @@ public class MotionCleaning implements Processor {
             if (clusterID[i] == 0) {
                 int numberNeighbours = 0;
                 CameraPixel[] neighbours = map.getNeighborsFromID(i);
-                for (CameraPixel n:neighbours) {
+                for (CameraPixel n : neighbours) {
                     if (clusterID[n.id] == 0) {
                         numberNeighbours++;
                     }
@@ -160,17 +157,17 @@ public class MotionCleaning implements Processor {
         return clusterID;
     }
 
-    public int [] fillHoles(int[] clusterID){
+    public int[] fillHoles(int[] clusterID) {
         for (int i = 0; i < 1440; i++) {
-            if(clusterID[i] == -2){
+            if (clusterID[i] == -2) {
                 int numberNeighbours = 0;
                 CameraPixel[] neighbours = map.getNeighborsFromID(i);
-                for(CameraPixel n : neighbours){
-                    if(clusterID[n.id] == 0){
+                for (CameraPixel n : neighbours) {
+                    if (clusterID[n.id] == 0) {
                         numberNeighbours++;
                     }
                 }
-                if(numberNeighbours >= neighbours.length-1){
+                if (numberNeighbours >= neighbours.length - 1) {
                     clusterID[i] = 0;
                 }
             }
@@ -179,33 +176,31 @@ public class MotionCleaning implements Processor {
     }
 
     //returns an array with all showerpixel IDs. If no pixel survived the cleaning, returns null
-    public int [] makeShowerPixelArray(int[] cleaningID){
-        ArrayList<Integer> showerPixel= new ArrayList<>();
-        for( int i=0; i<1440; i++){
-            if(cleaningID[i] == 0){
+    public int[] makeShowerPixelArray(int[] cleaningID) {
+        ArrayList<Integer> showerPixel = new ArrayList<>();
+        for (int i = 0; i < 1440; i++) {
+            if (cleaningID[i] == 0) {
                 showerPixel.add(i);
             }
         }
         int[] showerPixelArray;
-        if(showerPixel.size() > 0){
+        if (showerPixel.size() > 0) {
             showerPixelArray = new int[showerPixel.size()];
-            for(int i = 0; i < showerPixel.size(); i++){
-                showerPixelArray[i] =  showerPixel.get(i);
+            for (int i = 0; i < showerPixel.size(); i++) {
+                showerPixelArray[i] = showerPixel.get(i);
             }
-        }
-        else {
+        } else {
             showerPixelArray = null;
         }
         return showerPixelArray;
     }
 
     // returns an array with all x-position of the showerpixels
-    public double[] getShowerPixel_X(int[] showerPixelArray){
+    public double[] getShowerPixel_X(int[] showerPixelArray) {
         double[] showerPixel_X;
-        if(showerPixelArray == null){
+        if (showerPixelArray == null) {
             showerPixel_X = null;
-        }
-        else {
+        } else {
             showerPixel_X = new double[showerPixelArray.length];
             for (int i = 0; i < showerPixelArray.length; i++) {
                 showerPixel_X[i] = map.getPixelFromId(showerPixelArray[i]).posX;
@@ -213,13 +208,13 @@ public class MotionCleaning implements Processor {
         }
         return showerPixel_X;
     }
+
     // returns an array with all y-position of the showerpixels
     public double[] getShowerPixel_Y(int[] showerPixelArray) {
         double[] showerPixel_Y;
-        if(showerPixelArray == null){
+        if (showerPixelArray == null) {
             showerPixel_Y = null;
-        }
-        else{
+        } else {
             showerPixel_Y = new double[showerPixelArray.length];
             for (int i = 0; i < showerPixelArray.length; i++) {
                 showerPixel_Y[i] = map.getPixelFromId(showerPixelArray[i]).posY;
@@ -229,10 +224,10 @@ public class MotionCleaning implements Processor {
     }
 
 
-
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
+
     public String getOutputKey() {
         return outputKey;
     }
@@ -240,5 +235,8 @@ public class MotionCleaning implements Processor {
     public void setOutputKey(String outputKey) {
         this.outputKey = outputKey;
     }
-    public void setNumPixelKey(String numPixelKey) {this.numPixelKey = numPixelKey; }
+
+    public void setNumPixelKey(String numPixelKey) {
+        this.numPixelKey = numPixelKey;
+    }
 }

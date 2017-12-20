@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Keys;
 import stream.data.DataFactory;
+
 import java.io.File;
 import java.net.URL;
 import java.time.ZoneOffset;
@@ -25,9 +26,8 @@ public class FITSWriterTest {
     static Logger log = LoggerFactory.getLogger(FITSWriterTest.class);
 
 
-
-	@Test
-	public void testFitsWriterNoItems() throws Exception {
+    @Test
+    public void testFitsWriterNoItems() throws Exception {
         FITSWriter fitsWriter = new FITSWriter();
         File f = File.createTempFile("test_fits", ".fits");
         log.info("testFitsWriterNoItems {}", f.getAbsolutePath());
@@ -132,7 +132,7 @@ public class FITSWriterTest {
     }
 
     @Test
-    public void testDateTimeFormatter () {
+    public void testDateTimeFormatter() {
         ZonedDateTime date1 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123000000, ZoneOffset.UTC);
         ZonedDateTime date2 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123400000, ZoneOffset.UTC);
         ZonedDateTime date3 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123456000, ZoneOffset.UTC);

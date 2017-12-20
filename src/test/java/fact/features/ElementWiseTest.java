@@ -7,7 +7,7 @@ import org.junit.Test;
 public class ElementWiseTest {
 
     @Test
-    public void testMultiplyEmpty(){
+    public void testMultiplyEmpty() {
 
         double[] empty = {};
 
@@ -17,34 +17,34 @@ public class ElementWiseTest {
     }
 
     @Test
-    public void testMultiplyOnes(){
+    public void testMultiplyOnes() {
 
         double[] ones = {1.0, 1.0, 1.0, 1.0, 1.0};
 
         double[] result = ElementWise.multiply(ones, 1.0);
         Assert.assertEquals(ones.length, result.length);
 
-        for(int i=0; i<ones.length; i++)
+        for (int i = 0; i < ones.length; i++)
             Assert.assertEquals(1.0, result[i]);
     }
 
     @Test
-    public void testMultiplyArrayOnesSeveralScalars(){
+    public void testMultiplyArrayOnesSeveralScalars() {
 
         double[] ones = {1.0, 1.0, 1.0, 1.0, 1.0};
 
-        for(int i=-13; i<37; i++) {
-            double scalar = (double)(i);
+        for (int i = -13; i < 37; i++) {
+            double scalar = (double) (i);
             double[] result = ElementWise.multiply(ones, scalar);
             Assert.assertEquals(ones.length, result.length);
 
-            for(int j=0; j<ones.length; j++)
+            for (int j = 0; j < ones.length; j++)
                 Assert.assertEquals(scalar, result[j]);
         }
     }
 
     @Test
-    public void testAddEmpty(){
+    public void testAddEmpty() {
 
         double[] empty = {};
 
@@ -54,7 +54,7 @@ public class ElementWiseTest {
     }
 
     @Test
-    public void testAddZeros(){
+    public void testAddZeros() {
 
         double[] zeros = {0.0, 0.0, 0.0, 0.0, 0.0};
 
@@ -62,12 +62,12 @@ public class ElementWiseTest {
         Assert.assertEquals(5, zeros.length);
         Assert.assertEquals(5, result.length);
 
-        for(int i=0; i<zeros.length; i++)
+        for (int i = 0; i < zeros.length; i++)
             Assert.assertEquals(1.0, result[i]);
     }
 
     @Test
-    public void testAddArrays(){
+    public void testAddArrays() {
 
         double[] arr1 = {0.0, 2.0, 0.0, 4.0, 2.5};
         double[] arr2 = {1.0, 0.0, 3.0, 0.0, 2.5};
@@ -76,12 +76,12 @@ public class ElementWiseTest {
         double[] result = ElementWise.addFirstToSecond(arr1, arr2);
         Assert.assertEquals(expected_result.length, result.length);
 
-        for(int i=0; i<result.length; i++)
+        for (int i = 0; i < result.length; i++)
             Assert.assertEquals(expected_result[i], result[i]);
     }
 
     @Test
-    public void testSubtractArrays(){
+    public void testSubtractArrays() {
 
         double[] arr1 = {0.0, 0.5, 1.0, 1.5, 2.0};
         double[] arr2 = {2.0, 2.0, 2.0, 2.0, 2.0};
@@ -90,7 +90,7 @@ public class ElementWiseTest {
         double[] result = ElementWise.subtractFirstFromSecond(arr1, arr2);
         Assert.assertEquals(expected_result.length, result.length);
 
-        for(int i=0; i<result.length; i++)
+        for (int i = 0; i < result.length; i++)
             Assert.assertEquals(expected_result[i], result[i]);
     }
 }

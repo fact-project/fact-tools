@@ -10,16 +10,14 @@ import stream.annotations.Parameter;
 import java.util.ArrayList;
 
 /**
- *
  * Calculates the positions of pulse candidates by finding threshold crossings with boundary restrictions.
  * Outputs an array containing a list of positions for each pixel.
  *
  * @author Katie Gray &lt;kathryn.gray@tu-dortmund.de&gt;
- *
  */
 
 public class FindThresholdCrossings implements Processor {
-	static Logger log = LoggerFactory.getLogger(FindThresholdCrossings.class);
+    static Logger log = LoggerFactory.getLogger(FindThresholdCrossings.class);
 
     @Parameter(required = true)
     private String key;
@@ -51,55 +49,66 @@ public class FindThresholdCrossings implements Processor {
         int roi = data.length / npix;
 
         //the graph of the array positions visually shows the positions of the crossings for an individual pixel
-        double[] positions =  new double[data.length];
+        double[] positions = new double[data.length];
 
         //the array CrossPositions contains lists of positions of crossings for each pixel
         int[][] CrossPositions = new int[npix][];
 
-            for(int pix=0; pix < npix; pix++){
-                //creates a list of positions of threshold crossings for a single pixel
-                ArrayList<Integer> slices = new ArrayList<Integer>();
+        for (int pix = 0; pix < npix; pix++) {
+            //creates a list of positions of threshold crossings for a single pixel
+            ArrayList<Integer> slices = new ArrayList<Integer>();
 
-                for(int slice=0; slice < roi; slice++){
-                    if(candidate(pix, slice, roi, data) == true) {
-                        slices.add(slice);
-                        positions[pix*roi+slice]=5;
-                        slice += minAbove;
-                    }
-                    else {
-                        positions[pix*roi+slice]=0;
-                    }
+            for (int slice = 0; slice < roi; slice++) {
+                if (candidate(pix, slice, roi, data) == true) {
+                    slices.add(slice);
+                    positions[pix * roi + slice] = 5;
+                    slice += minAbove;
+                } else {
+                    positions[pix * roi + slice] = 0;
                 }
-
-                //  if no crossing, list for that pixel is empty
-                CrossPositions[pix] = new int[slices.size()];
-                CrossPositions[pix] = Utils.arrayListToInt(slices);
             }
 
-            input.put(visualizeOutputKey, positions);
-            input.put(outputKey, CrossPositions);
-            return input;
+            //  if no crossing, list for that pixel is empty
+            CrossPositions[pix] = new int[slices.size()];
+            CrossPositions[pix] = Utils.arrayListToInt(slices);
+        }
+
+        input.put(visualizeOutputKey, positions);
+        input.put(outputKey, CrossPositions);
+        return input;
 
     }
 
     //to determine threshold crossings
-    public boolean candidate(int pix, int slice, int roi, double[] data){
+    public boolean candidate(int pix, int slice, int roi, double[] data) {
         boolean answer = true;
 
         int pos = pix * roi + slice;
 
-        if(data[pos] < threshold){return false;}
+        if (data[pos] < threshold) {
+            return false;
+        }
 
-        for(int i=1; i < minBelow; i++){
-            if(slice-i < 0){return false;}
-            if(data[pos-i] >= threshold){return false;}
+        for (int i = 1; i < minBelow; i++) {
+            if (slice - i < 0) {
+                return false;
             }
+            if (data[pos - i] >= threshold) {
+                return false;
+            }
+        }
 
-        for(int k=0; k < minAbove; k++){
-            if(slice+k > roi){return false;}
-            if(pos+k == npix * roi) {return false;}
-            if(data[pos+k] <= threshold){return false;}
+        for (int k = 0; k < minAbove; k++) {
+            if (slice + k > roi) {
+                return false;
             }
+            if (pos + k == npix * roi) {
+                return false;
+            }
+            if (data[pos + k] <= threshold) {
+                return false;
+            }
+        }
 
         return answer;
     }
@@ -153,7 +162,6 @@ public class FindThresholdCrossings implements Processor {
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
-
 
 
 }

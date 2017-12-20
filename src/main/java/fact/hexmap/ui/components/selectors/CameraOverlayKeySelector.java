@@ -22,11 +22,11 @@ public class CameraOverlayKeySelector extends KeySelector {
     @Override
     public Set<SeriesKeySelectorItem> filterItems(Data item) {
         Set<SeriesKeySelectorItem> newItems = new HashSet<>();
-        for  (String key: item.keySet()){
+        for (String key : item.keySet()) {
             try {
                 CameraMapOverlay b = (CameraMapOverlay) item.get(key);
                 newItems.add(new SeriesKeySelectorItem(key, new Color(186, 217, 246), this));
-            } catch (ClassCastException e){
+            } catch (ClassCastException e) {
                 continue;
             }
         }

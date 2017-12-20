@@ -17,14 +17,14 @@ import java.util.Random;
  * desired (arrival time) distribution.
  * Created by jbuss on 28.10.14.
  */
-public class ApplyRandomArrivalTimeShift implements Processor{
+public class ApplyRandomArrivalTimeShift implements Processor {
     static Logger log = LoggerFactory.getLogger(ApplyRandomArrivalTimeShift.class);
 
     @Parameter(required = true, description = "key of the arrival times array")
     private String key = null;
 
     @Parameter(description = "mean standard deviation of the original (arrival time) distribution")
-    private double stdDevGoal   = 1.33;
+    private double stdDevGoal = 1.33;
 
     @Parameter(description = "mean standard deviation of the desired (arrival time) distribution")
     private double stdDevOrigin = 0.52;
@@ -38,32 +38,32 @@ public class ApplyRandomArrivalTimeShift implements Processor{
 
     private double[] arrivalTime = null;
     private double[] newArrivalTime = null;
-    
-	private int npix;
+
+    private int npix;
 
     @Override
     public Data process(Data input) {
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		npix = (Integer) input.get("NPIX");
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, key);
 
         IntervalMarker[] marker = new IntervalMarker[npix];
 
-        arrivalTime     = (double[]) input.get(key);
-        newArrivalTime  = new double[arrivalTime.length];
+        arrivalTime = (double[]) input.get(key);
+        newArrivalTime = new double[arrivalTime.length];
 
         Random rand = new Random(Seed);
 
-        for ( int i = 0; i < arrivalTime.length; i++){
+        for (int i = 0; i < arrivalTime.length; i++) {
             Double effStdDev = Math.sqrt(stdDevGoal * stdDevGoal - stdDevOrigin * stdDevOrigin);
-            Double randomArrTimeOffset = rand.nextGaussian()* effStdDev;
+            Double randomArrTimeOffset = rand.nextGaussian() * effStdDev;
 
             newArrivalTime[i] = arrivalTime[i] + randomArrTimeOffset;
-            marker[i] = new IntervalMarker(newArrivalTime[i], newArrivalTime[i]+10);
+            marker[i] = new IntervalMarker(newArrivalTime[i], newArrivalTime[i] + 10);
         }
 
         input.put(outputKey, newArrivalTime);
-        input.put(outputKey+"marker", marker);
+        input.put(outputKey + "marker", marker);
         return input;
     }
 

@@ -17,10 +17,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
- *
  * This Processor interpolates all values for a broken Pixel by the average values of its neighboring Pixels.
-  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
 public class InterpolateTimeSeries implements Processor {
     static Logger log = LoggerFactory.getLogger(InterpolateTimeSeries.class);
@@ -31,7 +30,7 @@ public class InterpolateTimeSeries implements Processor {
     private String dataKey = null;
     @Parameter(required = true, description = "The name of the interpolated data output")
     private String dataOutputKey = null;
-    @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue="3")
+    @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
     private int minPixelToInterpolate = 3;
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -39,43 +38,42 @@ public class InterpolateTimeSeries implements Processor {
 
     @Override
     public Data process(Data item) {
-    	Utils.isKeyValid(item, "NPIX", Integer.class);
-		Utils.isKeyValid(item, dataKey, double[].class);
-    	npix = (Integer) item.get("NPIX");
-		double[] data = (double[]) item.get(dataKey);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        Utils.isKeyValid(item, dataKey, double[].class);
+        npix = (Integer) item.get("NPIX");
+        double[] data = (double[]) item.get(dataKey);
 
-		ZonedDateTime timeStamp = null;
+        ZonedDateTime timeStamp = null;
 
-    	if (item.containsKey("UnixTimeUTC") == true){
-    		Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-    		int[] eventTime = (int[]) item.get("UnixTimeUTC");
-			timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-    	}
-    	else {
-    		// MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-    		// => The 12 bad pixels we have from the beginning on are used.
-    		timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-    	}
+        if (item.containsKey("UnixTimeUTC") == true) {
+            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+            int[] eventTime = (int[]) item.get("UnixTimeUTC");
+            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
+        } else {
+            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
+            // => The 12 bad pixels we have from the beginning on are used.
+            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        }
 
-		PixelSet badPixelSet = calibService.getBadPixel(timeStamp);
+        PixelSet badPixelSet = calibService.getBadPixel(timeStamp);
 
-		if(!dataKey.equals(dataOutputKey)){
-			double[] newdata = new double[data.length];
-			System.arraycopy(data,0, newdata, 0, data.length);
-			data = interpolateTimeSeries(newdata, badPixelSet);
-		} else {
-			data = interpolateTimeSeries(data, badPixelSet);
-		}
+        if (!dataKey.equals(dataOutputKey)) {
+            double[] newdata = new double[data.length];
+            System.arraycopy(data, 0, newdata, 0, data.length);
+            data = interpolateTimeSeries(newdata, badPixelSet);
+        } else {
+            data = interpolateTimeSeries(data, badPixelSet);
+        }
 
-		item.put(dataOutputKey, data);
-		item.put("badPixels", badPixelSet);
+        item.put(dataOutputKey, data);
+        item.put("badPixels", badPixelSet);
         return item;
     }
 
-	public double[] interpolateTimeSeries(double[] data, PixelSet badPixelSet) {
+    public double[] interpolateTimeSeries(double[] data, PixelSet badPixelSet) {
         int roi = data.length / npix;
 
-        for (CameraPixel pixel: badPixelSet) {
+        for (CameraPixel pixel : badPixelSet) {
             CameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
 
             //iterate over all slices
@@ -85,10 +83,10 @@ public class InterpolateTimeSeries implements Processor {
                 double avg = 0.0f;
                 int numNeighbours = 0;
 
-                for(CameraPixel neighborPixel: currentNeighbors) {
-					if (badPixelSet.contains(neighborPixel)) {
-                		continue;
-                	}
+                for (CameraPixel neighborPixel : currentNeighbors) {
+                    if (badPixelSet.contains(neighborPixel)) {
+                        continue;
+                    }
                     avg += data[neighborPixel.id * roi + slice];
                     numNeighbours++;
                 }
@@ -100,34 +98,33 @@ public class InterpolateTimeSeries implements Processor {
         return data;
     }
 
-	private void checkNumNeighbours(int numNeighbours, int pixToInterpolate) {
-		if (numNeighbours == 0){
-			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there a no valid "
-					+ "neighboring pixel to interpolate.");
-		}
-		if (numNeighbours < minPixelToInterpolate)
-		{
-			throw new RuntimeException("A pixel (chid: "+ pixToInterpolate + ") shall be interpolated, but there are only "
-					+ numNeighbours + " valid neighboring pixel to interpolate.\n" +
-					"Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
-		}
-	}
+    private void checkNumNeighbours(int numNeighbours, int pixToInterpolate) {
+        if (numNeighbours == 0) {
+            throw new RuntimeException("A pixel (chid: " + pixToInterpolate + ") shall be interpolated, but there a no valid "
+                    + "neighboring pixel to interpolate.");
+        }
+        if (numNeighbours < minPixelToInterpolate) {
+            throw new RuntimeException("A pixel (chid: " + pixToInterpolate + ") shall be interpolated, but there are only "
+                    + numNeighbours + " valid neighboring pixel to interpolate.\n" +
+                    "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
+        }
+    }
 
 
-	public void setCalibService(CalibrationService calibService) {
-		this.calibService = calibService;
-	}
+    public void setCalibService(CalibrationService calibService) {
+        this.calibService = calibService;
+    }
 
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
+    public void setDataKey(String dataKey) {
+        this.dataKey = dataKey;
+    }
 
-	public void setDataOutputKey(String dataOutputKey) {
-		this.dataOutputKey = dataOutputKey;
-	}
+    public void setDataOutputKey(String dataOutputKey) {
+        this.dataOutputKey = dataOutputKey;
+    }
 
-	public void setMinPixelToInterpolate(int minPixelToInterpolate) {
-		this.minPixelToInterpolate = minPixelToInterpolate;
-	}
+    public void setMinPixelToInterpolate(int minPixelToInterpolate) {
+        this.minPixelToInterpolate = minPixelToInterpolate;
+    }
 
 }

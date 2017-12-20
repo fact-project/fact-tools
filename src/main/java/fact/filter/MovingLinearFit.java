@@ -10,20 +10,20 @@ import stream.annotations.Parameter;
 
 /**
  * Fit a line to a given window of values in an array
- *
+ * <p>
  * Created by jbuss on 08.10.14.
  */
-public class MovingLinearFit implements Processor{
+public class MovingLinearFit implements Processor {
     static Logger log = LoggerFactory.getLogger(MovingLinearFit.class);
 
     @Parameter(required = true, description = "key of data array")
-    String key=null;
+    String key = null;
 
     @Parameter(required = true, description = "key of slope array")
-    String slopeKey=null;
+    String slopeKey = null;
 
     @Parameter(required = true, description = "key of intercept array")
-    String interceptKey=null;
+    String interceptKey = null;
 
     @Parameter(description = "width of the window to do the linear regression", defaultValue = "10")
     int width = 10;
@@ -37,19 +37,18 @@ public class MovingLinearFit implements Processor{
         // TODO Auto-generated method stub
         Utils.mapContainsKeys(input, key);
 
-        double[] data = (double[])input.get(key);
+        double[] data = (double[]) input.get(key);
         double[] slope = new double[data.length];
         double[] intercept = new double[data.length];
 
-        for (int i=1 ; i < data.length ; i++)
-        {
+        for (int i = 1; i < data.length; i++) {
             SimpleRegression regression = new SimpleRegression();
-            for (int j=0 ; j < width ; j++){
-                regression.addData( j, data[(i+j) % data.length]);
+            for (int j = 0; j < width; j++) {
+                regression.addData(j, data[(i + j) % data.length]);
             }
             regression.regress();
-            slope[ (i+(width/2)) % data.length ]     = scale*regression.getSlope();
-            intercept[ (i+(width/2)) % data.length ] = regression.getIntercept();
+            slope[(i + (width / 2)) % data.length] = scale * regression.getSlope();
+            intercept[(i + (width / 2)) % data.length] = regression.getIntercept();
         }
 
         input.put(slopeKey, slope);

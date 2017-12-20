@@ -7,13 +7,13 @@ import stream.annotations.Parameter;
 
 public class PhotonStream2ArrivalTime implements Processor {
     @Parameter(
-        required = true,
-        description = "The arrival slices of the single pulses.")
+            required = true,
+            description = "The arrival slices of the single pulses.")
     private String singlePulsesKey = null;
 
     @Parameter(
-        required = true,
-        description = "The reconstruted arrival time")
+            required = true,
+            description = "The reconstruted arrival time")
     private String arrivalTimeKey = null;
 
     @Override
@@ -22,11 +22,11 @@ public class PhotonStream2ArrivalTime implements Processor {
         double[] arrivalTimes = new double[singlePulses.length];
 
         for (int pix = 0; pix < singlePulses.length; pix++) {
-            if (singlePulses[pix].length == 0){
+            if (singlePulses[pix].length == 0) {
                 arrivalTimes[pix] = 0.; // use zero instead of NaN - plotter likes no NaN
             } else {
                 DescriptiveStatistics stat = new DescriptiveStatistics();
-                for (int slice: singlePulses[pix]){
+                for (int slice : singlePulses[pix]) {
                     stat.addValue((double) slice);
                 }
                 arrivalTimes[pix] = stat.getPercentile(50);
