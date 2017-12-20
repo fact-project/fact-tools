@@ -14,13 +14,16 @@ public class Leakage implements Processor {
     static Logger log = LoggerFactory.getLogger(Leakage.class);
 
     @Parameter(required = true)
-    private String pixelSetKey;
+    public String pixelSetKey;
+
     @Parameter(required = true)
-    private String weights;
+    public String weights;
+
     @Parameter(required = true)
-    private String leakage1OutputKey;
+    public String leakage1OutputKey;
+
     @Parameter(required = true)
-    private String leakage2OutputKey;
+    public String leakage2OutputKey;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -37,12 +40,12 @@ public class Leakage implements Processor {
         double leakageBorder = 0;
         double leakageSecondBorder = 0;
 
-        for (CameraPixel pix : showerPixel.set) {
+        for (CameraPixel pix : showerPixel) {
             size += photonCharge[pix.id];
-            if (isBorderPixel(pix.id)) {
+            if (isBorderPixel(pix)) {
                 leakageBorder += photonCharge[pix.id];
                 leakageSecondBorder += photonCharge[pix.id];
-            } else if (isSecondBorderPixel(pix.id)) {
+            } else if (isSecondBorderPixel(pix)) {
                 leakageSecondBorder += photonCharge[pix.id];
             }
         }
@@ -57,47 +60,18 @@ public class Leakage implements Processor {
 
     }
 
-    //this is of course not the most efficient solution
-    boolean isSecondBorderPixel(int pix) {
-        for (CameraPixel nPix : pixelMap.getNeighborsFromID(pix)) {
-            if (isBorderPixel(nPix.id)) {
+    // this is of course not the most efficient solution
+    boolean isSecondBorderPixel(CameraPixel pixel) {
+        for (CameraPixel neighbor : pixelMap.getNeighborsForPixel(pixel)) {
+            if (isBorderPixel(neighbor)) {
                 return true;
             }
         }
         return false;
     }
 
-    boolean isBorderPixel(int pix) {
-        return pixelMap.getNeighborsFromID(pix).length < 6;
+    boolean isBorderPixel(CameraPixel pix) {
+        return pixelMap.getNeighborsForPixel(pix).length < 6;
     }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getWeights() {
-        return weights;
-    }
-
-    public void setWeights(String weights) {
-        this.weights = weights;
-    }
-
-    public String getLeakage1OutputKey() {
-        return leakage1OutputKey;
-    }
-
-    public void setLeakage1OutputKey(String leakage1OutputKey) {
-        this.leakage1OutputKey = leakage1OutputKey;
-    }
-
-    public String getLeakage2OutputKey() {
-        return leakage2OutputKey;
-    }
-
-    public void setLeakage2OutputKey(String leakage2OutputKey) {
-        this.leakage2OutputKey = leakage2OutputKey;
-    }
-
 
 }

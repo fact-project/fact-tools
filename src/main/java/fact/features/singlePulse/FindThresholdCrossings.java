@@ -17,14 +17,16 @@ import java.util.ArrayList;
  */
 
 public class FindThresholdCrossings implements Processor {
-    static Logger log = LoggerFactory.getLogger(FindThresholdCrossings.class);
+    private static final Logger log = LoggerFactory.getLogger(FindThresholdCrossings.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = false)
-    private String outputKey;
+    public String outputKey;
+
     @Parameter(required = false)
-    private String visualizeOutputKey;
+    public String visualizeOutputKey;
 
     private int minBelow = 0;
     private int minAbove = 0;
@@ -112,56 +114,4 @@ public class FindThresholdCrossings implements Processor {
 
         return answer;
     }
-
-    //Getters and Setters
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getVisualizeOutputKey() {
-        return visualizeOutputKey;
-    }
-
-    public void setVisualizeOutputKey(String visualizeOutputKey) {
-        this.visualizeOutputKey = visualizeOutputKey;
-    }
-
-    public int getMinBelow() {
-        return minBelow;
-    }
-
-    public void setMinBelow(int minBelow) {
-        this.minBelow = minBelow;
-    }
-
-    public int getMinAbove() {
-        return minAbove;
-    }
-
-    public void setMinAbove(int minAbove) {
-        this.minAbove = minAbove;
-    }
-
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-
 }

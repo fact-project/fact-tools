@@ -9,13 +9,13 @@ import stream.Processor;
 public class PhotonchargeEvaluate implements Processor {
     static Logger log = LoggerFactory.getLogger(PhotonchargeEvaluate.class);
 
-    String photonchargeKey = null;
-    String arrivalTimeKey = null;
-    String mcCherenkovWeightKey = null;
-    String mcCherenkovArrTimeMeanKey = null;
-    String mcNoiseWeightKey = null;
-    String outputKeyPhotonCharge = null;
-    String outputKeyArrivalTime = null;
+    public String photonchargeKey = null;
+    public String arrivalTimeKey = null;
+    public  String mcCherenkovWeightKey = null;
+    public String mcCherenkovArrTimeMeanKey = null;
+    public String mcNoiseWeightKey = null;
+    public String outputKeyPhotonCharge = null;
+    public String outputKeyArrivalTime = null;
 //	int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
 //	int integrationWindow = 30;
 
@@ -53,61 +53,4 @@ public class PhotonchargeEvaluate implements Processor {
         // TODO Auto-generated method stub
         return input;
     }
-
-    public String getPhotonchargeKey() {
-        return photonchargeKey;
-    }
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
-    public String getMcCherenkovWeightKey() {
-        return mcCherenkovWeightKey;
-    }
-
-    public void setMcCherenkovWeightKey(String mcCherenkovWeightKey) {
-        this.mcCherenkovWeightKey = mcCherenkovWeightKey;
-    }
-
-    public String getMcNoiseWeightKey() {
-        return mcNoiseWeightKey;
-    }
-
-    public void setMcNoiseWeightKey(String mcNoiseWeightKey) {
-        this.mcNoiseWeightKey = mcNoiseWeightKey;
-    }
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public String getMcCherenkovArrTimeMeanKey() {
-        return mcCherenkovArrTimeMeanKey;
-    }
-
-    public void setMcCherenkovArrTimeMeanKey(String mcCherenkovArrTimeMeanKey) {
-        this.mcCherenkovArrTimeMeanKey = mcCherenkovArrTimeMeanKey;
-    }
-
-    public String getOutputKeyPhotonCharge() {
-        return outputKeyPhotonCharge;
-    }
-
-    public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-        this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-    }
-
-    public String getOutputKeyArrivalTime() {
-        return outputKeyArrivalTime;
-    }
-
-    public void setOutputKeyArrivalTime(String outputKeyArrivalTime) {
-        this.outputKeyArrivalTime = outputKeyArrivalTime;
-    }
-
 }

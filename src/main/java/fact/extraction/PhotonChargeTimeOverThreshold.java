@@ -22,11 +22,13 @@ public class PhotonChargeTimeOverThreshold implements Processor {
     static Logger log = LoggerFactory.getLogger(PhotonChargeTimeOverThreshold.class);
 
     @Parameter(required = true, description = "")
-    private String timeOverThresholdKey = null;
+    public String timeOverThresholdKey = null;
+
     @Parameter(required = true, description = "")
-    private String thresholdKey = null;
+    public String thresholdKey = null;
+
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
 
     private double threshold = 0;
     private int npix;
@@ -74,30 +76,4 @@ public class PhotonChargeTimeOverThreshold implements Processor {
 
         return input;
     }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getTimeOverThresholdKey() {
-        return timeOverThresholdKey;
-    }
-
-    public void setTimeOverThresholdKey(String timeOverThresholdKey) {
-        this.timeOverThresholdKey = timeOverThresholdKey;
-    }
-
-    public String getThresholdKey() {
-        return thresholdKey;
-    }
-
-    public void setThresholdKey(String thresholdKey) {
-        this.thresholdKey = thresholdKey;
-    }
-
-
 }

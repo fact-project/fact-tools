@@ -42,34 +42,4 @@ public class PolygonLength implements Processor {
 
         return input;
     }
-
-
-    public String getPolygonX() {
-        return polygonX;
-    }
-
-
-    public void setPolygonX(String polygonX) {
-        this.polygonX = polygonX;
-    }
-
-
-    public String getPolygonY() {
-        return polygonY;
-    }
-
-
-    public void setPolygonY(String polygonY) {
-        this.polygonY = polygonY;
-    }
-
-
-    public String getOutkey() {
-        return outkey;
-    }
-
-    public void setOutkey(String outkey) {
-        this.outkey = outkey;
-    }
-
 }

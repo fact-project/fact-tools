@@ -19,25 +19,25 @@ public class FindMaxSlope implements Processor {
     static Logger log = LoggerFactory.getLogger(MovingLinearFit.class);
 
     @Parameter(required = true, description = "key of data array")
-    String key = null;
+    public String key = null;
 
     @Parameter(required = true, description = "key of arrival time array")
-    String arrivalTimeKey = null;
+    public String arrivalTimeKey = null;
 
     @Parameter(required = true, description = "key of arrival time array")
-    String derivationKey = null;
+    public String derivationKey = null;
 
     @Parameter(required = true, description = "key of output array")
-    String outputKeyVisualization = null;
+    public String outputKeyVisualization = null;
 
     @Parameter(required = true, description = "key of output array")
-    String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(description = "size of the window to search for the max amplitude", defaultValue = "20")
-    int maxSearchSlice = 20;
+    public int maxSearchSlice = 20;
 
     @Parameter(description = "number of slices to fit the slope", defaultValue = "1")
-    int numFitSlices = 8;
+    public int numFitSlices = 8;
 
     @Override
     public Data process(Data input) {
@@ -126,61 +126,5 @@ public class FindMaxSlope implements Processor {
 
         return regression.getSlope();
 
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getMaxSearchSlice() {
-        return maxSearchSlice;
-    }
-
-    public void setMaxSearchSlice(int maxSearchSlice) {
-        this.maxSearchSlice = maxSearchSlice;
-    }
-
-    public int getNumFitSlices() {
-        return numFitSlices;
-    }
-
-    public void setNumFitSlices(int numFitSlices) {
-        this.numFitSlices = numFitSlices;
-    }
-
-    public String getDerivationKey() {
-        return derivationKey;
-    }
-
-    public void setDerivationKey(String derivationKey) {
-        this.derivationKey = derivationKey;
-    }
-
-    public String getOutputKeyVisualization() {
-        return outputKeyVisualization;
-    }
-
-    public void setOutputKeyVisualization(String outputKeyVisualization) {
-        this.outputKeyVisualization = outputKeyVisualization;
     }
 }

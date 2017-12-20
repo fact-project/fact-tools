@@ -8,7 +8,10 @@ import stream.annotations.Parameter;
 import java.util.Arrays;
 
 public class SortDoubleArray implements Processor {
+    @Parameter(required = true, description = "Input key to 1 dimensional double array")
     public String key = "";
+
+    @Parameter(required = true, description = "Outputkey")
     public String outputKey = "";
 
     @Override
@@ -24,23 +27,4 @@ public class SortDoubleArray implements Processor {
 
         return input;
     }
-
-    public String getKey() {
-        return key;
-    }
-
-    @Parameter(required = true, description = "Input key to 1 dimensional double array")
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    @Parameter(required = true, description = "Outputkey")
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

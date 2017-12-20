@@ -20,7 +20,7 @@ public class BasicCleaning {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     @Parameter(required = true)
-    CalibrationService calibService;
+    public CalibrationService calibService;
 
 
     protected PixelSet notUsablePixelSet = null;
@@ -155,11 +155,4 @@ public class BasicCleaning {
 
         return Math.sqrt((xdist * xdist) + (ydist * ydist));
     }
-
-
-    public void setCalibService(CalibrationService calibService) {
-        this.calibService = calibService;
-    }
-
-
 }

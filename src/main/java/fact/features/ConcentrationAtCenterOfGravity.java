@@ -19,15 +19,19 @@ public class ConcentrationAtCenterOfGravity implements Processor {
     static Logger log = LoggerFactory.getLogger(ConcentrationAtCenterOfGravity.class);
 
     @Parameter(required = true, defaultValue = "photonCharge", description = "Key of the array of photoncharge.")
-    private String photonChargeKey = null;
+    public String photonChargeKey = null;
+
     @Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
-    private String cogxKey = null;
+    public String cogxKey = null;
+
     @Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
-    private String cogyKey = null;
+    public String cogyKey = null;
+
     @Parameter(required = true, defaultValue = "Size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
-    private String sizeKey = null;
+    public String sizeKey = null;
+
     @Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
-    private String outputKey = null;
+    public String outputKey = null;
 
     private double cogx;
     private double cogy;
@@ -85,56 +89,4 @@ public class ConcentrationAtCenterOfGravity implements Processor {
 
         return input;
     }
-
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-
-    public String getCogxKey() {
-        return cogxKey;
-    }
-
-
-    public void setCogxKey(String cogxKey) {
-        this.cogxKey = cogxKey;
-    }
-
-
-    public String getCogyKey() {
-        return cogyKey;
-    }
-
-
-    public void setCogyKey(String cogyKey) {
-        this.cogyKey = cogyKey;
-    }
-
-
-    public String getSizeKey() {
-        return sizeKey;
-    }
-
-
-    public void setSizeKey(String sizeKey) {
-        this.sizeKey = sizeKey;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

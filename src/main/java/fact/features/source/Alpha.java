@@ -15,13 +15,16 @@ import stream.annotations.Parameter;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
 public class Alpha implements Processor {
-    static Logger log = LoggerFactory.getLogger(Alpha.class);
+    private static final Logger log = LoggerFactory.getLogger(Alpha.class);
+
     @Parameter(required = true)
-    private String distribution = null;
+    public String distribution = null;
+
     @Parameter(required = true)
-    private String sourcePosition = null;
+    public String sourcePosition = null;
+
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Override
     public Data process(Data input) {
@@ -61,33 +64,4 @@ public class Alpha implements Processor {
         input.put(outputKey, alpha);
         return input;
     }
-
-
-    public String getDistribution() {
-        return distribution;
-    }
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
-    }
-
-
-    public String getSourcePosition() {
-        return sourcePosition;
-    }
-
-    public void setSourcePosition(String sourcePosition) {
-        this.sourcePosition = sourcePosition;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

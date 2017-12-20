@@ -97,22 +97,28 @@ public class JSONWriter implements StatefulProcessor {
 
 
     @Parameter(required = true)
-    private Keys keys = new Keys("");
+    public Keys keys = new Keys("");
+
     @Parameter(required = false, description = "Defines how many significant digits are used for double values", defaultValue = "null")
-    private Integer doubleSignDigits = null;
+    public Integer doubleSignDigits = null;
+
     @Parameter(required = false, description = "If true, use jsonl format instead of json format", defaultValue = "false")
-    private boolean jsonl = false;
+    public boolean jsonl = false;
+
     @Parameter(required = false, description = "If true, append to existing file else overwrite", defaultValue = "false")
-    private boolean append = false;
+    public boolean append = false;
+
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
-    private boolean pixelSetsAsInt = true;
+    public boolean pixelSetsAsInt = true;
+
     @Parameter(required = false, description = "If true, Infinity, -Infinity and NaN are converted to strings 'inf', '-inf' and 'nan'", defaultValue = "false")
-    private boolean specialDoubleValuesAsString = false;
+    public boolean specialDoubleValuesAsString = false;
+
     @Parameter(required = false, description = "If true, use gzip compression")
-    private boolean gzip = false;
+    public boolean gzip = false;
 
     @Parameter(required = true)
-    private URL url;
+    public URL url;
 
     private Gson gson;
     private StringBuffer b = new StringBuffer();
@@ -204,38 +210,6 @@ public class JSONWriter implements StatefulProcessor {
                 bw.close();
             }
         }
-    }
-
-    public void setAppend(boolean append) {
-        this.append = append;
-    }
-
-    public void setKeys(Keys keys) {
-        this.keys = keys;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
-    public void setJsonl(boolean jsonl) {
-        this.jsonl = jsonl;
-    }
-
-    public void setGzip(boolean gzip) {
-        this.gzip = gzip;
-    }
-
-    public void setDoubleSignDigits(int doubleSignDigits) {
-        this.doubleSignDigits = doubleSignDigits;
-    }
-
-    public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
-        this.pixelSetsAsInt = pixelSetsAsInt;
-    }
-
-    public void setSpecialDoubleValuesAsString(boolean specialDoubleValuesAsString) {
-        this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
     public class DateTimeAdapter extends TypeAdapter<ZonedDateTime> {

@@ -19,16 +19,16 @@ public class ApplyRandomTimelineShift implements Processor {
     static Logger log = LoggerFactory.getLogger(ApplyRandomTimelineShift.class);
 
     @Parameter(required = true, description = "key of the data array")
-    private String key = null;
+    public String key = null;
 
     @Parameter(description = "standard deviation of the random distribution")
-    private double stdDeviation = 1.22;
+    public double stdDeviation = 1.22;
 
     @Parameter(description = "Seed of the random number generator")
-    private long Seed = 5901;
+    public long Seed = 5901;
 
     @Parameter(required = true, description = "key of the output data array")
-    private String outputKey = null;
+    public String outputKey = null;
 
     private int npix;
 
@@ -70,37 +70,5 @@ public class ApplyRandomTimelineShift implements Processor {
 
         input.put(outputKey, shifted_data);
         return input;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public double getStdDeviation() {
-        return stdDeviation;
-    }
-
-    public void setStdDeviation(double stdDeviation) {
-        this.stdDeviation = stdDeviation;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public long getSeed() {
-        return Seed;
-    }
-
-    public void setSeed(long seed) {
-        Seed = seed;
     }
 }

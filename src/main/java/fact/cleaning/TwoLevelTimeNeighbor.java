@@ -34,40 +34,40 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
     static Logger log = LoggerFactory.getLogger(TwoLevelTimeNeighbor.class);
 
     @Parameter(required = true)
-    String photonChargeKey;
+    public String photonChargeKey;
 
     @Parameter(required = true)
-    String arrivalTimeKey;
+    public String arrivalTimeKey;
 
     @Parameter(required = true)
-    String outputKey;
+    public String outputKey;
 
     @Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have to be " +
             "identified as a CorePixel")
-    double corePixelThreshold;
+    public double corePixelThreshold;
 
     @Parameter(required = true, description = "The smallest PhotonCharge a Pixel must have that is adjacent to a " +
             "previously identified corePixel")
-    double neighborPixelThreshold;
+    public double neighborPixelThreshold;
 
     @Parameter(required = true, description = "Maximal difference in arrival time to the median of the arrival times of the shower" +
             ", which a pixel is aloud to have after cleaning")
-    double timeLimit;
+    public double timeLimit;
 
     @Parameter(required = true, description = "Number of Pixels a patch of CorePixel must have before its Neighbours" +
             " are even considered for NeighbourCorePixel. " +
             " If Size is smaller than minSize the Pixels will be discarded.")
-    int minNumberOfPixel;
+    public int minNumberOfPixel;
 
 
     @Parameter(required = false)
-    String[] starPositionKeys = null;
+    public String[] starPositionKeys = null;
 
     @Parameter(required = false, defaultValue = "Constants.PIXEL_SIZE")
-    double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
+    public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     @Parameter(description = "Add PixelSets for the different cleaning steps")
-    boolean showDifferentCleaningSets = false;
+    public boolean showDifferentCleaningSets = false;
 
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
@@ -183,92 +183,4 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
         }
         return newShowerPixels;
     }
-
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getCorePixelThreshold() {
-        return corePixelThreshold;
-    }
-
-    public void setCorePixelThreshold(double corePixelThreshold) {
-        this.corePixelThreshold = corePixelThreshold;
-    }
-
-    public double getNeighborPixelThreshold() {
-        return neighborPixelThreshold;
-    }
-
-    public void setNeighborPixelThreshold(double neighborPixelThreshold) {
-        this.neighborPixelThreshold = neighborPixelThreshold;
-    }
-
-
-    public double getTimeLimit() {
-        return timeLimit;
-    }
-
-    public void setTimeLimit(double timeLimit) {
-        this.timeLimit = timeLimit;
-    }
-
-    public int getMinNumberOfPixel() {
-        return minNumberOfPixel;
-    }
-
-    public void setMinNumberOfPixel(int minNumberOfPixel) {
-        this.minNumberOfPixel = minNumberOfPixel;
-    }
-
-    public String[] getStarPositionKeys() {
-        return starPositionKeys;
-    }
-
-    public void setStarPositionKeys(String[] starPositionKeys) {
-        this.starPositionKeys = starPositionKeys;
-    }
-
-    public double getStarRadiusInCamera() {
-        return starRadiusInCamera;
-    }
-
-    public void setStarRadiusInCamera(double starRadiusInCamera) {
-        this.starRadiusInCamera = starRadiusInCamera;
-    }
-
-    public boolean isShowDifferentCleaningSets() {
-        return showDifferentCleaningSets;
-    }
-
-    public void setShowDifferentCleaningSets(boolean showDifferentCleaningSets) {
-        this.showDifferentCleaningSets = showDifferentCleaningSets;
-    }
-
-	/*
-     * Getter and Setter
-	 */
-
-
 }

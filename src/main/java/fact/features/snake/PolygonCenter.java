@@ -36,38 +36,4 @@ public class PolygonCenter implements Processor {
 
         return input;
     }
-
-    public String getPolygonX() {
-        return polygonX;
-    }
-
-    public void setPolygonX(String polygonX) {
-        this.polygonX = polygonX;
-    }
-
-    public String getPolygonY() {
-        return polygonY;
-    }
-
-    public void setPolygonY(String polygonY) {
-        this.polygonY = polygonY;
-    }
-
-    public String getOutkeyX() {
-        return outkeyX;
-    }
-
-    public void setOutkeyX(String outkeyX) {
-        this.outkeyX = outkeyX;
-    }
-
-    public String getOutkeyY() {
-        return outkeyY;
-    }
-
-    public void setOutkeyY(String outkeyY) {
-        this.outkeyY = outkeyY;
-    }
-
-
 }

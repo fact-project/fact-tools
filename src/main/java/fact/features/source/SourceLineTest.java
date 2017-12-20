@@ -13,16 +13,20 @@ import stream.annotations.Parameter;
 public class SourceLineTest implements Processor {
 
     @Parameter(required = true, defaultValue = "photonCharge", description = "Key of photoncharge array.")
-    private String photonCharge;
+    public String photonCharge;
     //consider the error of the arrival time later...
+
     @Parameter(required = true, defaultValue = "arrivalTime", description = "Key of arrivaltime array.")
-    private String arrivalTime;
+    public String arrivalTime;
+
     @Parameter(required = true, defaultValue = "showerPixel", description = "Key of showerpixel array.")
-    private String pixelSetKey;
+    public String pixelSetKey;
+
     @Parameter(required = true, defaultValue = "sourceposition", description = "Key of sourceposition vector.")
-    private String sourcePosition;
+    public String sourcePosition;
+
     @Parameter(required = true, defaultValue = "SourceLineTest", description = "Master outputkey, which will be written before every attribute.")
-    private String outputKey;
+    public String outputKey;
 
     private double[] arrivalTimeArray = null;
     private double[] photonChargeArray = null;
@@ -240,42 +244,5 @@ public class SourceLineTest implements Processor {
 
 
         return input;
-    }
-
-
-    public String getPhotonCharge() {
-        return photonCharge;
-    }
-
-    public void setPhotonCharge(String photonCharge) {
-        this.photonCharge = photonCharge;
-    }
-
-    public String getArrivalTime() {
-        return arrivalTime;
-    }
-
-    public void setArrivalTime(String arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getSourcePosition() {
-        return sourcePosition;
-    }
-
-    public void setSourcePosition(String sourcePosition) {
-        this.sourcePosition = sourcePosition;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }

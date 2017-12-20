@@ -21,10 +21,10 @@ public class Remapping implements Processor {
     static Logger log = LoggerFactory.getLogger(Remapping.class);
 
     @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     private int npix = Constants.NUMBEROFPIXEL;
 
@@ -49,14 +49,5 @@ public class Remapping implements Processor {
             int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
             System.arraycopy(data, softId * roi, remapped, chid * roi, roi);
         }
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public void setOutputKey(String outputkey) {
-        this.outputKey = outputkey;
     }
 }

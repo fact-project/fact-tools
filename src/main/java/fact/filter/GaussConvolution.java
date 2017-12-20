@@ -15,13 +15,13 @@ import stream.annotations.Parameter;
 public class GaussConvolution implements StatefulProcessor {
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = false, defaultValue = "1")
-    private double variance = 1;
+    public double variance = 1;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     private int numSamples;
     private double[] coefficents;
@@ -69,20 +69,6 @@ public class GaussConvolution implements StatefulProcessor {
         return input;
 
     }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
-    public void setVariance(double variance) {
-        this.variance = variance;
-    }
-
 
     @Override
     public void resetState() throws Exception {

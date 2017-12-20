@@ -13,24 +13,30 @@ import stream.annotations.Parameter;
  */
 public class HandleSaturation implements Processor {
     @Parameter(required = true, description = "Key to the photonCharge Array, calculated by the normal processor")
-    private String photonChargeKey = null;
+    public String photonChargeKey = null;
+
     @Parameter(required = true, description = "Key to the photonCharge Array, calculated by the time over threshold processor")
-    private String photonChargeSaturatedKey = null;
+    public String photonChargeSaturatedKey = null;
+
     @Parameter(required = true, description = "Key to the arrivalTime Array, calculated by the normal processor")
-    private String arrivalTimeKey = null;
+    public String arrivalTimeKey = null;
+
     @Parameter(required = true, description = "Key to the arrivalTime Array, calculated by the time over threshold processor")
-    private String arrivalTimeSaturatedKey = null;
+    public String arrivalTimeSaturatedKey = null;
+
     @Parameter(required = true, description = "Limit above the time over threshold photoncharge is used [phe]. A good value is around 180")
-    private double limitForSaturatedPixel;
+    public double limitForSaturatedPixel;
+
     @Parameter(required = true)
-    private String outputKeyPhotonCharge = null;
+    public String outputKeyPhotonCharge = null;
+
     @Parameter(required = true)
-    private String outputKeyArrivalTime = null;
+    public String outputKeyArrivalTime = null;
+
     @Parameter(description = "Key for Pixel Set of saturated Pixels")
-    private String saturatedPixelKey = null;
+    public String saturatedPixelKey = null;
 
     private PixelSet saturatedPixelSet = null;
-
     private int npix;
 
     public Data process(Data input) {
@@ -72,83 +78,5 @@ public class HandleSaturation implements Processor {
         input.put(saturatedPixelKey + "Overlay", saturatedPixelSet);
 
         return input;
-    }
-
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-
-    public String getPhotonChargeSaturatedKey() {
-        return photonChargeSaturatedKey;
-    }
-
-
-    public void setPhotonChargeSaturatedKey(String photonChargeSaturatedKey) {
-        this.photonChargeSaturatedKey = photonChargeSaturatedKey;
-    }
-
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-
-    public String getArrivalTimeSaturatedKey() {
-        return arrivalTimeSaturatedKey;
-    }
-
-
-    public void setArrivalTimeSaturatedKey(String arrivalTimeSaturatedKey) {
-        this.arrivalTimeSaturatedKey = arrivalTimeSaturatedKey;
-    }
-
-
-    public double getLimitForSaturatedPixel() {
-        return limitForSaturatedPixel;
-    }
-
-
-    public void setLimitForSaturatedPixel(double limitForSaturatedPixel) {
-        this.limitForSaturatedPixel = limitForSaturatedPixel;
-    }
-
-
-    public String getOutputKeyPhotonCharge() {
-        return outputKeyPhotonCharge;
-    }
-
-
-    public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-        this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-    }
-
-
-    public String getOutputKeyArrivalTime() {
-        return outputKeyArrivalTime;
-    }
-
-
-    public void setOutputKeyArrivalTime(String outputKeyArrivalTime) {
-        this.outputKeyArrivalTime = outputKeyArrivalTime;
-    }
-
-    public String getSaturatedPixelKey() {
-        return saturatedPixelKey;
-    }
-
-    public void setSaturatedPixelKey(String saturatedPixelKey) {
-        this.saturatedPixelKey = saturatedPixelKey;
     }
 }

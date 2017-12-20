@@ -18,31 +18,32 @@ import static org.apache.commons.math3.util.FastMath.pow;
  */
 public class CorrectSaturation implements Processor {
     @Parameter(required = true, description = "Array containing the raw data")
-    private String dataKey = null;
+    public String dataKey = null;
 
     @Parameter(required = true, description = "Target Array for the saturation corrected raw data")
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(required = true, description = "1440pix array containing the time-over-threshold for the pixel")
-    private String totKey = null;
+    public String totKey = null;
 
     @Parameter(required = true, description = "1440pix array containing the first slice time-over-threshold for the pixel")
-    private String firstSliceOverThresholdKey = null;
+    public String firstSliceOverThresholdKey = null;
 
     @Parameter(required = true, description = "threshold at which the time-over-threshold was measured")
-    private double threshold = 1800.0;
+    public double threshold = 1800.0;
 
     @Parameter(required = false, description = "threshold that defines a pixel showing saturation")
-    private double saturationThreshold = 1900.0;
+    public double saturationThreshold = 1900.0;
 
     @Parameter(required = true, description = "1440pix array containing the slice of maximum amplitude")
-    private String maxPosKey = null;
+    public String maxPosKey = null;
+
     @Parameter(required = true, description = "1440pix array containing the estimated baseline amplitude")
-    private String baselineKey = null;
+    public String baselineKey = null;
 
     // Default values
-    private Integer npix = 1440;
-    private Integer roi = 300;
+    private int npix = 1440;
+    private int roi = 300;
 
     @Override
     public Data process(Data input) {
@@ -50,8 +51,8 @@ public class CorrectSaturation implements Processor {
         Utils.isKeyValid(input, "NPIX", Integer.class);
         Utils.mapContainsKeys(input, dataKey, totKey, maxPosKey, baselineKey, firstSliceOverThresholdKey, "NPIX");
 
-        npix = (Integer) input.get("NPIX");
-        roi = (Integer) input.get("NROI");
+        npix = (int) input.get("NPIX");
+        roi = (int) input.get("NROI");
 
         double[] firstSlOverThresh = (double[]) input.get(firstSliceOverThresholdKey);
         int[] timeOverThreshold = (int[]) input.get(totKey);
@@ -128,69 +129,5 @@ public class CorrectSaturation implements Processor {
         input.put(outputKey, corrData);
 
         return input;
-    }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getTotKey() {
-        return totKey;
-    }
-
-    public void setTotKey(String totKey) {
-        this.totKey = totKey;
-    }
-
-    public String getFirstSliceOverThresholdKey() {
-        return firstSliceOverThresholdKey;
-    }
-
-    public void setFirstSliceOverThresholdKey(String firstSliceOverThresholdKey) {
-        this.firstSliceOverThresholdKey = firstSliceOverThresholdKey;
-    }
-
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public String getMaxPosKey() {
-        return maxPosKey;
-    }
-
-    public void setMaxPosKey(String maxPosKey) {
-        this.maxPosKey = maxPosKey;
-    }
-
-    public double getSaturationThreshold() {
-        return saturationThreshold;
-    }
-
-    public void setSaturationThreshold(double saturationThreshold) {
-        this.saturationThreshold = saturationThreshold;
-    }
-
-    public String getBaselineKey() {
-        return baselineKey;
-    }
-
-    public void setBaselineKey(String baselineKey) {
-        this.baselineKey = baselineKey;
     }
 }

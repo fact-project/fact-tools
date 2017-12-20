@@ -5,13 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PatchAverage implements Processor {
     static Logger log = LoggerFactory.getLogger(PatchAverage.class);
 
+    @Parameter(required = true)
     String key = null;
+
+    @Parameter(required = true)
     String outputKey = null;
 
+    @Parameter(required = true)
     String color = null;
 
     private int npix;
@@ -46,29 +51,4 @@ public class PatchAverage implements Processor {
 
         return input;
     }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
 }

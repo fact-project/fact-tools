@@ -17,19 +17,19 @@ public class MovingLinearFit implements Processor {
     static Logger log = LoggerFactory.getLogger(MovingLinearFit.class);
 
     @Parameter(required = true, description = "key of data array")
-    String key = null;
+    public String key = null;
 
     @Parameter(required = true, description = "key of slope array")
-    String slopeKey = null;
+    public String slopeKey = null;
 
     @Parameter(required = true, description = "key of intercept array")
-    String interceptKey = null;
+    public String interceptKey = null;
 
     @Parameter(description = "width of the window to do the linear regression", defaultValue = "10")
-    int width = 10;
+    public int width = 10;
 
     @Parameter(description = "scaling factor for the slope", defaultValue = "1")
-    double scale = 1;
+    public double scale = 1;
 
     @Override
     public Data process(Data input) {
@@ -55,45 +55,5 @@ public class MovingLinearFit implements Processor {
         input.put(interceptKey, intercept);
 
         return input;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public double getScale() {
-        return scale;
-    }
-
-    public void setScale(double scale) {
-        this.scale = scale;
-    }
-
-    public String getSlopeKey() {
-        return slopeKey;
-    }
-
-    public void setSlopeKey(String slopeKey) {
-        this.slopeKey = slopeKey;
-    }
-
-    public String getInterceptKey() {
-        return interceptKey;
-    }
-
-    public void setInterceptKey(String interceptKey) {
-        this.interceptKey = interceptKey;
     }
 }

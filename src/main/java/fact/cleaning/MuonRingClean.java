@@ -11,12 +11,12 @@ import java.util.Arrays;
 
 public class MuonRingClean implements Processor {
 
-    private String ringPixelKey;
-    private String photonChargeKey;
-    private String arrivalTimeKey;
-    private String outputKey;
-    private double photonChargeThreshold;
-    private double timeThreshold;
+    public String ringPixelKey;
+    public String photonChargeKey;
+    public String arrivalTimeKey;
+    public String outputKey;
+    public double photonChargeThreshold;
+    public double timeThreshold;
 
     @Override
     public Data process(Data input) {
@@ -88,64 +88,4 @@ public class MuonRingClean implements Processor {
 
         return input;
     }
-
-    // ********************************
-    // Getters and Setters for the Keys
-    // ********************************
-
-    public String getRingPixelKey() {
-        return ringPixelKey;
-    }
-
-
-    public void setRingPixelKey(String ringPixelKey) {
-        this.ringPixelKey = ringPixelKey;
-    }
-
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getPhotonChargeThreshold() {
-        return photonChargeThreshold;
-    }
-
-    public void setPhotonChargeThreshold(double photonChargeThreshold) {
-        this.photonChargeThreshold = photonChargeThreshold;
-    }
-
-    public double getTimeThreshold() {
-        return timeThreshold;
-    }
-
-    public void setTimeThreshold(double timeThreshold) {
-        this.timeThreshold = timeThreshold;
-    }
-
 }

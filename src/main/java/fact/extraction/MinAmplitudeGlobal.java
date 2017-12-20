@@ -13,7 +13,7 @@ import stream.annotations.Parameter;
 /**
  * This processor simply calculates the minimum value for all time slices in each Pixel.
  * The output is a double array with an entry for each Pixel.
- * TODO: REfactor to only search inside a window
+ * TODO: Refactor to only search inside a window
  *
  * @author Jens Buß &lt;jens.buss@tu-dortmund.de&gt;
  */
@@ -21,15 +21,16 @@ public class MinAmplitudeGlobal implements Processor {
     static Logger log = LoggerFactory.getLogger(MinAmplitudeGlobal.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Parameter(description = "skip the first N slices of the timeline")
-    private int skipFirstSlices = 50;
+    public int skipFirstSlices = 50;
 
     @Parameter(description = "skip the last N slices of the timeline")
-    private int skipLastSlices = 100;
+    public int skipLastSlices = 100;
 
     private int npix;
 
@@ -72,37 +73,5 @@ public class MinAmplitudeGlobal implements Processor {
             }
         }
         return tempMinValue;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getSkipFirstSlices() {
-        return skipFirstSlices;
-    }
-
-    public void setSkipFirstSlices(int skipFirstSlices) {
-        this.skipFirstSlices = skipFirstSlices;
-    }
-
-    public int getSkipLastSlices() {
-        return skipLastSlices;
-    }
-
-    public void setSkipLastSlices(int skipLastSlices) {
-        this.skipLastSlices = skipLastSlices;
     }
 }

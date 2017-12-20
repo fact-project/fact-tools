@@ -108,46 +108,4 @@ public class FillAverageTimeWidth implements Processor {
 
         return input;
     }
-
-    public int getNumberTimeMarker() {
-        return numberTimeMarker;
-    }
-
-    public void setNumberTimeMarker(int numberTimeMarker) {
-        this.numberTimeMarker = numberTimeMarker;
-    }
-
-    public int getNumberOfSlices() {
-        return numberOfSlices;
-    }
-
-    public void setNumberOfSlices(int numberOfSlices) {
-        this.numberOfSlices = numberOfSlices;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKeyOffset() {
-        return outputKeyOffset;
-    }
-
-    public void setOutputKeyOffset(String outputKeyOffset) {
-        this.outputKeyOffset = outputKeyOffset;
-    }
-
-    public String getOutputKeyAverageWidth() {
-        return outputKeyAverageWidth;
-    }
-
-    public void setOutputKeyAverageWidth(String outputKeyAverageWidth) {
-        this.outputKeyAverageWidth = outputKeyAverageWidth;
-    }
-
-
 }

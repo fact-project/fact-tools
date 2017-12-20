@@ -18,25 +18,31 @@ public class RemoveSpikes implements Processor {
     static Logger log = LoggerFactory.getLogger(RemoveSpikes.class);
 
     @Parameter(required = true)
-    String dataKey = null;
+    public String dataKey = null;
+
     @Parameter(required = true)
-    String startCellKey = null;
+    public String startCellKey = null;
+
     @Parameter(required = true)
-    String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(required = true)
-    double spikeLimit;
+    public double spikeLimit;
+
     @Parameter(required = true)
-    double topSlopeLimit;
+    public double topSlopeLimit;
+
     @Parameter(required = false, description = "useful for spike studies")
-    String outputSpikesKey = null;
+    public String outputSpikesKey = null;
+
     @Parameter(required = true, defaultValue = "2")
-    int maxSpikeLength = 2;
+    public int maxSpikeLength = 2;
+
     @Parameter(required = false)
-    boolean addSpikeInfo = false;
+    public boolean addSpikeInfo = false;
 
     int roi;
     int npix;
-
     int leftBorder = 10;
 
 
@@ -123,78 +129,4 @@ public class RemoveSpikes implements Processor {
 
         return spikeHeight;
     }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getStartCellKey() {
-        return startCellKey;
-    }
-
-    public void setStartCellKey(String startCellKey) {
-        this.startCellKey = startCellKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getSpikeLimit() {
-        return spikeLimit;
-    }
-
-    public void setSpikeLimit(double spikeLimit) {
-        this.spikeLimit = spikeLimit;
-    }
-
-    public double getTopSlopeLimit() {
-        return topSlopeLimit;
-    }
-
-    public void setTopSlopeLimit(double topSlopeLimit) {
-        this.topSlopeLimit = topSlopeLimit;
-    }
-
-    public String getOutputSpikesKey() {
-        return outputSpikesKey;
-    }
-
-    public void setOutputSpikesKey(String outputSpikesKey) {
-        this.outputSpikesKey = outputSpikesKey;
-    }
-
-    public int getMaxSpikeLength() {
-        return maxSpikeLength;
-    }
-
-    public void setMaxSpikeLength(int maxSpikeLength) {
-        this.maxSpikeLength = maxSpikeLength;
-    }
-
-    public int getLeftBorder() {
-        return leftBorder;
-    }
-
-    public void setLeftBorder(int leftBorder) {
-        this.leftBorder = leftBorder;
-    }
-
-    public boolean isAddSpikeInfo() {
-        return addSpikeInfo;
-    }
-
-    public void setAddSpikeInfo(boolean addSpikeInfo) {
-        this.addSpikeInfo = addSpikeInfo;
-    }
-
-
 }

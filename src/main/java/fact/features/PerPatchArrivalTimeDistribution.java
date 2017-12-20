@@ -12,26 +12,12 @@ import stream.annotations.Parameter;
  */
 public class PerPatchArrivalTimeDistribution implements Processor {
 
-    String key;
 
-    public String getKey() {
-        return key;
-    }
 
     @Parameter(required = true, description = "Key to an arrivaltime array.", defaultValue = "arrivalTime")
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
+    String key;
 
     @Parameter(required = true, description = "Outputkey", defaultValue = "perPatchArrivalTime")
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
     String outputKey;
 
     private int npix;

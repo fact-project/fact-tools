@@ -26,23 +26,28 @@ public class TimeGradient implements Processor {
     static Logger log = LoggerFactory.getLogger(TimeGradient.class);
 
     @Parameter(required = true, description = "key to the shower pixels")
-    private String pixelSetKey = null;
-    @Parameter(required = true, description = "key to the arrival times of all pixels")
-    private String arrivalTimeKey = null;
-    @Parameter(required = true, description = "key to the xvalue of the cog of the shower")
-    private String cogxKey = null;
-    @Parameter(required = true, description = "key to the yvalue of the cog of the shower")
-    private String cogyKey = null;
-    @Parameter(required = true, description = "key to the delta angle of the shower")
-    private String deltaKey = null;
-    @Parameter(required = true, description = "outputKey for the calculated timegradient slopes")
-    private String outputKeySlope = null;
-    @Parameter(required = true, description = "outputKey for the calculated timegradient intercepts")
-    private String outputKeyIntercept = null;
-    @Parameter(required = true, description = "outputKey for the sum squared errors of the linear fits")
-    private String outputKeySumSquaredErrors = null;
+    public String pixelSetKey = null;
 
-    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+    @Parameter(required = true, description = "key to the arrival times of all pixels")
+    public String arrivalTimeKey = null;
+
+    @Parameter(required = true, description = "key to the xvalue of the cog of the shower")
+    public String cogxKey = null;
+
+    @Parameter(required = true, description = "key to the yvalue of the cog of the shower")
+    public String cogyKey = null;
+
+    @Parameter(required = true, description = "key to the delta angle of the shower")
+    public String deltaKey = null;
+
+    @Parameter(required = true, description = "outputKey for the calculated timegradient slopes")
+    public String outputKeySlope = null;
+
+    @Parameter(required = true, description = "outputKey for the calculated timegradient intercepts")
+    public String outputKeyIntercept = null;
+
+    @Parameter(required = true, description = "outputKey for the sum squared errors of the linear fits")
+    public String outputKeySumSquaredErrors = null;
 
     public Data process(Data input) {
 
@@ -112,65 +117,4 @@ public class TimeGradient implements Processor {
 
         return input;
     }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public String getCogxKey() {
-        return cogxKey;
-    }
-
-    public void setCogxKey(String cogxKey) {
-        this.cogxKey = cogxKey;
-    }
-
-    public String getCogyKey() {
-        return cogyKey;
-    }
-
-    public void setCogyKey(String cogyKey) {
-        this.cogyKey = cogyKey;
-    }
-
-    public String getDeltaKey() {
-        return deltaKey;
-    }
-
-    public void setDeltaKey(String deltaKey) {
-        this.deltaKey = deltaKey;
-    }
-
-    public String getOutputKeySlope() {
-        return outputKeySlope;
-    }
-
-    public void setOutputKeySlope(String outputKeySlope) {
-        this.outputKeySlope = outputKeySlope;
-    }
-
-    public String getOutputKeyIntercept() {
-        return outputKeyIntercept;
-    }
-
-    public void setOutputKeyIntercept(String outputKeyIntercept) {
-        this.outputKeyIntercept = outputKeyIntercept;
-    }
-
-    public String getOutputKeySumSquaredErrors() {
-        return outputKeySumSquaredErrors;
-    }
-
-    public void setOutputKeySumSquaredErrors(String outputKeySumSquaredErrors) {
-        this.outputKeySumSquaredErrors = outputKeySumSquaredErrors;
-    }
-
 }

@@ -40,10 +40,10 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     public BlockingQueue<Path> files = new LinkedBlockingQueue<>();
 
     @Parameter(required = false, description = "Maximum depth of folders to traverse", defaultValue = "6")
-    private int maxDepth = 6;
+    public int maxDepth = 6;
 
     @Parameter(required = true, description = "The pattern to filter files by. Understands usual glob syntax")
-    private String pattern;
+    public String pattern;
 
     //counts how many files have been processed
     private int filesCounter = 0;
@@ -51,7 +51,7 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
     private List<String> failedFilesList = new ArrayList<>();
     @Parameter(required = false, description = "If false the reading of a broken file throws"
             + " an exception and the process is aborted, if true the next file will be processed", defaultValue = "true")
-    private boolean skipErrors = true;
+    public boolean skipErrors = true;
     private AbstractStream stream;
 
     public RecursiveDirectoryStream(SourceURL url) {
@@ -183,17 +183,4 @@ public class RecursiveDirectoryStream extends AbstractMultiStream {
             log.info(fileName);
         }
     }
-
-    public void setMaxDepth(int maxDepth) {
-        this.maxDepth = maxDepth;
-    }
-
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
-    }
-
-    public void setSkipErrors(boolean skipErrors) {
-        this.skipErrors = skipErrors;
-    }
-
 }

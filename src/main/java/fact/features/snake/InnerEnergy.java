@@ -61,30 +61,4 @@ public class InnerEnergy implements Processor {
         input.put(outkey, erg);
         return input;
     }
-
-    public String getSnakeX() {
-        return snakeX;
-    }
-
-    public void setSnakeX(String snakeX) {
-        this.snakeX = snakeX;
-    }
-
-    public String getSnakeY() {
-        return snakeY;
-    }
-
-    public void setSnakeY(String snakeY) {
-        this.snakeY = snakeY;
-    }
-
-    public String getOutkey() {
-        return outkey;
-    }
-
-    public void setOutkey(String outkey) {
-        this.outkey = outkey;
-    }
-
-
 }

@@ -24,10 +24,10 @@ public class PixelNormalization implements Processor {
 
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {
@@ -59,14 +59,5 @@ public class PixelNormalization implements Processor {
         }
         input.put(outputKey, normalizedSlices);
         return input;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 }

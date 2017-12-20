@@ -9,18 +9,18 @@ import stream.annotations.Parameter;
  * Created by lena on 02.11.15.
  * <p>
  * Processor to evaluate a cleaning.
- * 1) Needs a showerpixelarray and the number of Cherenkov photons per pixel
+ * 1) Needs a PixelSet and the number of Cherenkov photons per pixel
  * 2) Returns a "performance matrix" containing 4 doubles for true positives, false negatives and so on. A pixel with more
  * than "mcPhotThreshold" mc-photons is classified as showerpixel. The default value is 3.
- * 3) Calculates an returns some parameter for evaluation like precision, recall, accuracy and true/false positive/negative rate
+ * 3) Calculates and returns some parameters for evaluation like precision, recall, accuracy and true/false positive/negative rate
  */
 public class CleaningPerformance implements Processor {
 
     @Parameter(required = true)
-    private String pixelSetKey;
+    public String pixelSetKey;
 
     @Parameter(required = false, description = "Minimal number of MC Cherenkov photons to classify a pixel as showerpixel", defaultValue = "3")
-    int mcPhotThreshold = 3;
+    public int mcPhotThreshold = 3;
 
     @Override
     public Data process(Data data) {
@@ -135,13 +135,5 @@ public class CleaningPerformance implements Processor {
             }
         }
         return performance;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setMcPhotThreshold(int mcPhotThreshold) {
-        this.mcPhotThreshold = mcPhotThreshold;
     }
 }

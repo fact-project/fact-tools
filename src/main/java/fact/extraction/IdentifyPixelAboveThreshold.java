@@ -10,7 +10,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * Identify pixel with a signal above a given threshold by means of photon chrage, hand them over as list and pixel array
+ * Identify pixel with a signal above a given threshold by means of photon charge, hand them over as list and pixel array
  *
  * @author jbuss
  */
@@ -18,13 +18,13 @@ public class IdentifyPixelAboveThreshold implements Processor {
     static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
 
     @Parameter(required = true, description = "The key to your data array.")
-    private String key;
-    @Parameter(required = true, description = "The threshold you want to check for.")
-    private Integer threshold = 0;
-    @Parameter(required = false)
-    private String outputKey;
+    public String key;
 
-    private PixelSet pixelSet;
+    @Parameter(required = true, description = "The threshold you want to check for.")
+    public Integer threshold = 0;
+
+    @Parameter(required = false)
+    public String outputKey;
 
     private int npix;
 
@@ -35,10 +35,9 @@ public class IdentifyPixelAboveThreshold implements Processor {
         npix = (Integer) input.get("NPIX");
 
         double[] matchArray = new double[npix];
-
         double[] featureArray = (double[]) input.get(key);
 
-        pixelSet = new PixelSet();
+        PixelSet pixelSet = new PixelSet();
         for (int pix = 0; pix < npix; pix++) {
             matchArray[pix] = 0;
             if (featureArray[pix] > threshold) {
@@ -47,53 +46,9 @@ public class IdentifyPixelAboveThreshold implements Processor {
             }
         }
 
-
         input.put(outputKey + "Set", pixelSet);
-
         input.put(outputKey, matchArray);
 
-        // TODO Auto-generated method stub
         return input;
     }
-
-
-    public String getKey() {
-        return key;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public Integer getThreshold() {
-        return threshold;
-    }
-
-
-    public void setThreshold(Integer threshold) {
-        this.threshold = threshold;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
-    public PixelSet getPixelSet() {
-        return pixelSet;
-    }
-
-
-    public void setPixelSet(PixelSet pixelSet) {
-        this.pixelSet = pixelSet;
-    }
-
 }

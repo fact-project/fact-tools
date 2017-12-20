@@ -22,19 +22,22 @@ public class TimeOverThreshold implements Processor {
     static Logger log = LoggerFactory.getLogger(TimeOverThreshold.class);
 
     @Parameter(required = true)
-    private String dataKey = null;
-    @Parameter(required = true)
-    private String positionsKey = null;
-    @Parameter(required = true)
-    private double threshold = 50;
-    @Parameter(required = true)
-    private String thresholdOutputKey = null;
-    @Parameter(required = true)
-    private String firstSliceOverThresholdOutputKey = null;
-    @Parameter(required = true)
-    private String outputKey = null;
+    public String dataKey = null;
 
-    private PixelSet pixelSet;
+    @Parameter(required = true)
+    public String positionsKey = null;
+
+    @Parameter(required = true)
+    public double threshold = 50;
+
+    @Parameter(required = true)
+    public String thresholdOutputKey = null;
+
+    @Parameter(required = true)
+    public String firstSliceOverThresholdOutputKey = null;
+
+    @Parameter(required = true)
+    public String outputKey = null;
 
     private int npix;
 
@@ -55,8 +58,7 @@ public class TimeOverThreshold implements Processor {
         int roi = data.length / npix;
         int numPixelAboveThreshold = 0;
 
-        pixelSet = new PixelSet();
-        int[] totPixelSet = null;
+        PixelSet pixelSet = new PixelSet();
 
         //Loop over pixels
         for (int pix = 0; pix < npix; pix++) {
@@ -117,60 +119,8 @@ public class TimeOverThreshold implements Processor {
         input.put(outputKey + "Marker", m);
         input.put(outputKey + "SetOverlay", pixelSet);
 
-        //Add totPixelSet only to data item if it is not empty
-        totPixelSet = pixelSet.toIntArray();
+
         input.put(outputKey + "Set", pixelSet.toIntArray());
         return input;
     }
-
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getPositionsKey() {
-        return positionsKey;
-    }
-
-    public void setPositionsKey(String positionsKey) {
-        this.positionsKey = positionsKey;
-    }
-
-    public String getThresholdOutputKey() {
-        return thresholdOutputKey;
-    }
-
-    public void setThresholdOutputKey(String thresholdOutputKey) {
-        this.thresholdOutputKey = thresholdOutputKey;
-    }
-
-    public String getFirstSliceOverThresholdOutputKey() {
-        return firstSliceOverThresholdOutputKey;
-    }
-
-    public void setFirstSliceOverThresholdOutputKey(
-            String firstSliceOverThresholdOutputKey) {
-        this.firstSliceOverThresholdOutputKey = firstSliceOverThresholdOutputKey;
-    }
-
-
 }

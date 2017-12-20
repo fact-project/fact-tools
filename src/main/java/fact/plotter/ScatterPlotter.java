@@ -33,11 +33,13 @@ public class ScatterPlotter extends DataVisualizer {
     private String xValue = "";
     private String yValue = "";
 
-    private String title = "Default Title";
+    @Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
+    public String title = "Default Title";
+
+    @Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
+    public boolean keepOpen = true;
+
     private String color = "#2A2EE0";
-
-    private boolean keepOpen = true;
-
     //	private int i;
     private double x;
 
@@ -140,48 +142,5 @@ public class ScatterPlotter extends DataVisualizer {
                 return Color.blue;
             }
         }
-    }
-
-    public boolean isKeepOpen() {
-        return keepOpen;
-    }
-
-    @Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
-    public void setKeepOpen(boolean keepOpen) {
-        this.keepOpen = keepOpen;
-    }
-
-    public String getxValue() {
-        return xValue;
-    }
-
-    public void setxValue(String xValue) {
-        this.xValue = xValue;
-    }
-
-    public String getyValue() {
-        return yValue;
-    }
-
-    public void setyValue(String yValue) {
-        this.yValue = yValue;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    @Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 }

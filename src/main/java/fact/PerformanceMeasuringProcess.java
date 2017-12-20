@@ -37,10 +37,10 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
     static Logger log = LoggerFactory.getLogger(PerformanceMeasuringProcess.class);
 
     @Parameter(required = false, description = "Url to the .json file where the performance numbers are stored")
-    private SourceURL url = null;
+    public SourceURL url = null;
 
     @Parameter(required = false, description = "Number of warmup iterations to be performed before measuring time")
-    private int warmupIterations = 0;
+    public int warmupIterations = 0;
 
     long iterations = 0;
     long dataItems = 0;
@@ -164,13 +164,5 @@ public class PerformanceMeasuringProcess extends DefaultProcess {
         }
 
         super.finish();
-    }
-
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
-    public void setWarmupIterations(int warmupIterations) {
-        this.warmupIterations = warmupIterations;
     }
 }

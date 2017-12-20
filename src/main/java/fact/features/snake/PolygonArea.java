@@ -32,30 +32,4 @@ public class PolygonArea implements Processor {
 
         return input;
     }
-
-    public String getOutkey() {
-        return outkey;
-    }
-
-    public void setOutkey(String outkey) {
-        this.outkey = outkey;
-    }
-
-    public String getPolygonX() {
-        return polygonX;
-    }
-
-    public void setPolygonX(String polygonX) {
-        this.polygonX = polygonX;
-    }
-
-    public String getPolygonY() {
-        return polygonY;
-    }
-
-    public void setPolygonY(String polygonY) {
-        this.polygonY = polygonY;
-    }
-
-
 }
