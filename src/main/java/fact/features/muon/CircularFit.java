@@ -14,12 +14,12 @@ import stream.annotations.Parameter;
 
 /**
  * Created by maxnoe on 12.08.15.
- *
+ * <p>
  * Calculates center and radius of a ring according to
  * "Optimum circular fit to weighted data in multidimensional space", B.B. Chaudhuri and P. Kundu
  * Pattern Recognition Letters 14 (1993)
  * http://www.sciencedirect.com/science/article/pii/016786559390126X
- *
+ * <p>
  * Equations (11) and (12)
  */
 public class CircularFit implements StatefulProcessor {
@@ -46,7 +46,7 @@ public class CircularFit implements StatefulProcessor {
                 mean_y = 0,
                 photoncharge_sum = 0;
 
-        for (CameraPixel pix: pixelSet.set) {
+        for (CameraPixel pix : pixelSet.set) {
             photoncharge_sum += photoncharge[pix.id];
             mean_x += photoncharge[pix.id] * pixel_x[pix.id];
             mean_y += photoncharge[pix.id] * pixel_y[pix.id];
@@ -63,7 +63,7 @@ public class CircularFit implements StatefulProcessor {
                 C1 = 0,
                 C2 = 0;
 
-        for (CameraPixel pix: pixelSet.set) {
+        for (CameraPixel pix : pixelSet.set) {
             double x = pixel_x[pix.id];
             double y = pixel_y[pix.id];
             double m = photoncharge[pix.id];
@@ -75,11 +75,11 @@ public class CircularFit implements StatefulProcessor {
             C2 += 0.5 * m * (y - mean_y) * (Math.pow(x, 2) + Math.pow(y, 2));
         }
 
-        double center_x = (B2 * C1 - B1 * C2)/ (A1 * B2 - A2 * B1);
-        double center_y = (A2 * C1 - A1 * C2)/ (A2 * B1 - A1 * B2);
+        double center_x = (B2 * C1 - B1 * C2) / (A1 * B2 - A2 * B1);
+        double center_y = (A2 * C1 - A1 * C2) / (A2 * B1 - A1 * B2);
 
         double numerator = 0;
-        for (CameraPixel pix: pixelSet.set) {
+        for (CameraPixel pix : pixelSet.set) {
             numerator += photoncharge[pix.id] * (Math.pow(pixel_x[pix.id] - center_x, 2) + Math.pow(pixel_y[pix.id] - center_y, 2));
         }
 
@@ -94,11 +94,11 @@ public class CircularFit implements StatefulProcessor {
     }
 
     @Override
-    public void finish(){
+    public void finish() {
         return;
     }
 
-    public void resetState(){
+    public void resetState() {
         return;
     }
 

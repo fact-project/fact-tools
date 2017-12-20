@@ -10,14 +10,12 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Set;
-
 
 /**
  * This processor gets a pixel set and returns the reverted set for the whole camera.
  * Created by jebuss on 17.12.15.
  */
-public class Invert implements Processor{
+public class Invert implements Processor {
     static Logger log = LoggerFactory.getLogger(Invert.class);
 
     @Parameter(required = true, description = "key to the set to be inverted")

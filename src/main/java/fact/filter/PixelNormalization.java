@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.filter;
 
@@ -20,7 +20,7 @@ import stream.annotations.Parameter;
 @Description(group = "Data Stream.FACT")
 public class PixelNormalization implements Processor {
 
-	static Logger log = LoggerFactory.getLogger(PixelNormalization.class);
+    static Logger log = LoggerFactory.getLogger(PixelNormalization.class);
 
 
     @Parameter(required = true)
@@ -28,14 +28,14 @@ public class PixelNormalization implements Processor {
 
     @Parameter(required = true)
     private String outputKey;
-	
+
     @Override
     public Data process(Data input) {
 
         Utils.isKeyValid(input, key, double[].class);
 
         double[] data = (double[]) input.get(key);
-        double[] normalizedSlices =  new double[data.length];
+        double[] normalizedSlices = new double[data.length];
 
 
         int pixels = 1440;
@@ -54,13 +54,12 @@ public class PixelNormalization implements Processor {
 
             for (int slice = 0; slice < roi; slice++) {
                 int pos = pix * roi + slice;
-                normalizedSlices[pos] = data[pos]/range + Math.abs(min)/range;
+                normalizedSlices[pos] = data[pos] / range + Math.abs(min) / range;
             }
         }
         input.put(outputKey, normalizedSlices);
         return input;
     }
-
 
 
     public void setOutputKey(String outputKey) {

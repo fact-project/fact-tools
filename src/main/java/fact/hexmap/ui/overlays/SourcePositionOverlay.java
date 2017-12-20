@@ -33,8 +33,8 @@ public class SourcePositionOverlay implements CameraMapOverlay {
     @Override
     public void paint(Graphics2D g2, FactHexMapDisplay map) {
         double radius = map.getTileRadiusInPixels();
-        double scalingX = 0.172*radius;
-        double scalingY = -0.184*radius;
+        double scalingX = 0.172 * radius;
+        double scalingY = -0.184 * radius;
 
         Paint oldPaint = g2.getPaint();
         AffineTransform transform = g2.getTransform();
@@ -43,7 +43,7 @@ public class SourcePositionOverlay implements CameraMapOverlay {
 
         //lets draw a star symbol
         g2.translate(source.xMM * scalingX, source.yMM * scalingY);
-        Polygon p  = new Polygon(pointsx, pointsy, 3);
+        Polygon p = new Polygon(pointsx, pointsy, 3);
         g2.fill(p);
 
         g2.rotate(Math.PI / 2);
@@ -57,8 +57,8 @@ public class SourcePositionOverlay implements CameraMapOverlay {
         g2.setTransform(transform);
     }
 
-	@Override
-	public int getDrawRank() {
-		return 2;
-	}
+    @Override
+    public int getDrawRank() {
+        return 2;
+    }
 }

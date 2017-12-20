@@ -2,9 +2,6 @@ package fact.coordinates;
 
 import org.junit.Test;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-
 import static org.junit.Assert.assertEquals;
 
 

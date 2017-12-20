@@ -16,14 +16,12 @@ public class HoughTrafoTest extends ParameterTest {
     static Logger log = LoggerFactory.getLogger(HoughTrafoTest.class);
 
 
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
 
-
     @Test
-    public void testValidParameter() throws Exception{
+    public void testValidParameter() throws Exception {
         HoughTransform poser = new HoughTransform();
         poser.pixelSetKey = "shower";
         poser.photonChargeKey = "photoncharge";
@@ -41,16 +39,16 @@ public class HoughTrafoTest extends ParameterTest {
         transform.init(null);
 
         long size = 0;
-        for( ArrayList<Integer> entry : transform.circle2chids.values()){
+        for (ArrayList<Integer> entry : transform.circle2chids.values()) {
             size += entry.size();
         }
-        log.info("Moun circle to chid contains {} Integer entries. Thats about {} MebiByte", size, (size*192/8)/(1024*1024));
+        log.info("Moun circle to chid contains {} Integer entries. Thats about {} MebiByte", size, (size * 192 / 8) / (1024 * 1024));
 
         long circles = 0;
-        for (ArrayList<int[]> l : transform.chid2circles){
+        for (ArrayList<int[]> l : transform.chid2circles) {
             circles += l.size();
         }
-        log.info("chid2circles contains {} primitive integers. Thats about {} MebiByte", circles*3, (circles*3*64/8)/((1024*1024)) );
+        log.info("chid2circles contains {} primitive integers. Thats about {} MebiByte", circles * 3, (circles * 3 * 64 / 8) / ((1024 * 1024)));
 
     }
 }

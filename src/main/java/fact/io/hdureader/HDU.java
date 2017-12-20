@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * FITS files are split into things called HDUs. This is a simple representation of one.
  * For more details on HDUs see http://fits.gsfc.nasa.gov/fits_primer.html
- *
+ * <p>
  * Created by mackaiver on 03/11/16.
  */
 public class HDU {
@@ -35,8 +35,9 @@ public class HDU {
     private BinTable binTable = null;
 
 
-    /** Size of a single fits block, each HDU consists of multiple fits blocks
-     *  and every HDU starts at the end of a fits block
+    /**
+     * Size of a single fits block, each HDU consists of multiple fits blocks
+     * and every HDU starts at the end of a fits block
      */
     private final int FITS_BLOCK_SIZE = 2880;
 
@@ -45,11 +46,12 @@ public class HDU {
 
     /**
      * Here is how this works:
-     *  1. Read blocks of 2880 bytes and add lines of 80 chars to a list until the END keyword is found.
-     *  2. Iterate over the list of lines and parse the strings into a hashmap.
+     * 1. Read blocks of 2880 bytes and add lines of 80 chars to a list until the END keyword is found.
+     * 2. Iterate over the list of lines and parse the strings into a hashmap.
+     *
      * @param inputStream The stream of the fits file
-     * @param url the url to the fits file to read.
-     * @param hduOffset the offset the HDU has from the beginning of the file. In bytes.
+     * @param url         the url to the fits file to read.
+     * @param hduOffset   the offset the HDU has from the beginning of the file. In bytes.
      * @throws IOException in case an error occurs when reading the bytes
      */
     HDU(DataInputStream inputStream, URL url, long hduOffset) throws IOException {
@@ -80,9 +82,9 @@ public class HDU {
                     .anyMatch(a -> a.matches("END$"));
 
             //store how many blocks are in this hdu
-            headerSizeInBytes = (blockNumber + 1)*2880;
+            headerSizeInBytes = (blockNumber + 1) * 2880;
 
-            if(hasEndKeyWord){
+            if (hasEndKeyWord) {
                 break;
             }
         }
@@ -96,15 +98,14 @@ public class HDU {
         header.get("XTENSION")
                 .ifPresent(xtensionValue -> extension = XTENSION.valueOf(xtensionValue));
 
-        if (extension == XTENSION.BINTABLE){
+        if (extension == XTENSION.BINTABLE) {
             this.binTable = new BinTable(header, hduOffset, url); //tableName, tableDataStream, heapDataStream);
         }
 
     }
 
 
-
-    public BinTable getBinTable(){
+    public BinTable getBinTable() {
         return this.binTable;
     }
 
@@ -117,13 +118,13 @@ public class HDU {
      *
      * @return the number of bytes to skip to hte next hdu.
      */
-    long offsetToNextHDU(){
+    long offsetToNextHDU() {
         // numberOfBlocks = ceil(1.0*sizeOfDataArea()/FITS_BLOCK_SIZE)
         // utulizes the fact that we use int arithmetic which is simply a/b = floor(a/b)
         // and we want ceil(a/b) which we get if we do: (a+(b-1))/b
-        long numberOfBlocks = (sizeOfDataArea()+(FITS_BLOCK_SIZE-1))/FITS_BLOCK_SIZE;
+        long numberOfBlocks = (sizeOfDataArea() + (FITS_BLOCK_SIZE - 1)) / FITS_BLOCK_SIZE;
         // the offset is now simply the size of all the blocks
-        long sizeOfBlocks = numberOfBlocks*FITS_BLOCK_SIZE;
+        long sizeOfBlocks = numberOfBlocks * FITS_BLOCK_SIZE;
         return sizeOfBlocks;
     }
 
@@ -134,7 +135,7 @@ public class HDU {
      *
      * @return size of the data area in  bytes.
      */
-    long sizeOfDataArea(){
+    long sizeOfDataArea() {
         Map<String, HeaderLine> headerMap = header.headerMap;
 
         //get NAXIS1*NAXIS2*NAXIS3....
@@ -148,15 +149,15 @@ public class HDU {
 
 
         //calculate size according to equation 1.
-        if(!isPrimaryHDU){
+        if (!isPrimaryHDU) {
             long gcount = header.getLong("GCOUNT").orElse(0L);
 
             long pcount = header.getLong("PCOUNT").orElse(0L);
 
-            return bitpix * gcount * (pcount + factorNAXIS)/8L;
+            return bitpix * gcount * (pcount + factorNAXIS) / 8L;
         }
 
-        return bitpix*factorNAXIS/8;
+        return bitpix * factorNAXIS / 8;
     }
 
 
@@ -172,7 +173,7 @@ public class HDU {
                 "size=" + sizeOfDataArea() + "\n" +
                 "date=" + header.date().toString() + "\n" +
                 "extension=" + extension + "\n" +
-                "data=" + sizeOfDataArea() +" bytes \n" +
+                "data=" + sizeOfDataArea() + " bytes \n" +
                 '}'
                 ;
     }

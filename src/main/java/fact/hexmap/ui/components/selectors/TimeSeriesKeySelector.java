@@ -30,7 +30,7 @@ public class TimeSeriesKeySelector extends KeySelector {
         for (String key : item.keySet()) {
 
             Serializable value = item.get(key);
-            if (value == null){
+            if (value == null) {
                 continue;
             }
             double[] series = Utils.toDoubleArray(value);

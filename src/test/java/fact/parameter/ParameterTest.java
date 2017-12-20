@@ -24,7 +24,6 @@ import static org.junit.Assert.fail;
  * sourcePosition="sourcePosition" outputKey="alpha" />
  *
  * @author bruegge
- *
  */
 public class ParameterTest {
 
@@ -48,7 +47,6 @@ public class ParameterTest {
         SourceURL url = new SourceURL(dataUrl);
 
 
-
         stream = new FITSStream(url);
 
         try {
@@ -59,39 +57,38 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-		URL drsUrl = FITSStreamTest.class
-				.getResource("/testDrsFile.drs.fits.gz");
-		DrsCalibration pr = new DrsCalibration();
-		pr.url = drsUrl;
-		pr.outputKey = key;
+        URL drsUrl = FITSStreamTest.class
+                .getResource("/testDrsFile.drs.fits.gz");
+        DrsCalibration pr = new DrsCalibration();
+        pr.url = drsUrl;
+        pr.outputKey = key;
         pr.init(null);
-		pr.process(item);
+        pr.process(item);
 
-		BasicExtraction bE = new BasicExtraction();
-		bE.setDataKey(key);
-		bE.setOutputKeyMaxAmplPos(positions);
-		bE.setOutputKeyPhotonCharge(photonCharge);
-		bE.setUrl(new SourceURL(FITSStreamTest.class
-				.getResource("/defaultIntegralGains.csv")));
-		bE.process(item);
+        BasicExtraction bE = new BasicExtraction();
+        bE.setDataKey(key);
+        bE.setOutputKeyMaxAmplPos(positions);
+        bE.setOutputKeyPhotonCharge(photonCharge);
+        bE.setUrl(new SourceURL(FITSStreamTest.class
+                .getResource("/defaultIntegralGains.csv")));
+        bE.process(item);
 
-		RisingEdgeForPositions pR = new RisingEdgeForPositions();
-		pR.setDataKey(key);
-		pR.setAmplitudePositionsKey(positions);
-		pR.setOutputKey(arrivalTime);
-		pR.process(item);
+        RisingEdgeForPositions pR = new RisingEdgeForPositions();
+        pR.setDataKey(key);
+        pR.setAmplitudePositionsKey(positions);
+        pR.setOutputKey(arrivalTime);
+        pR.process(item);
 
-		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
-		poser.setCalibService(calibService);
-		poser.setPhotonChargeKey(photonCharge);
-		poser.setArrivalTimeKey(arrivalTime);
-		poser.setOutputKey(shower);
-		poser.setCorePixelThreshold(1);
-		poser.setNeighborPixelThreshold(0.1);
-		poser.setMinNumberOfPixel(1);
-		poser.setTimeLimit(40);
-		poser.process(item);
-
+        TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
+        poser.setCalibService(calibService);
+        poser.setPhotonChargeKey(photonCharge);
+        poser.setArrivalTimeKey(arrivalTime);
+        poser.setOutputKey(shower);
+        poser.setCorePixelThreshold(1);
+        poser.setNeighborPixelThreshold(0.1);
+        poser.setMinNumberOfPixel(1);
+        poser.setTimeLimit(40);
+        poser.process(item);
 
 
         DistributionFromShower dist = new DistributionFromShower();

@@ -10,15 +10,13 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Set;
-
 
 /**
  * This processor gets two pixel sets (U and A) and returns the difference of these sets,
  * denoted U \ A, is the set of all members of U that are not members of A
  * Created by jebuss on 17.12.15.
  */
-public class Difference implements Processor{
+public class Difference implements Processor {
     static Logger log = LoggerFactory.getLogger(Difference.class);
 
     @Parameter(required = true, description = "key to the first set to be compared")

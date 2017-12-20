@@ -8,7 +8,8 @@ import com.google.common.eventbus.EventBus;
  */
 public class Bus {
     public static EventBus eventBus = new EventBus();
-    private Bus(){
+
+    private Bus() {
 
     }
 }

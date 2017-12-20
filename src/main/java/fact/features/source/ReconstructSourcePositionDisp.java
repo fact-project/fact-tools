@@ -8,28 +8,28 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 public class ReconstructSourcePositionDisp implements Processor {
-    @Parameter(required=true)
+    @Parameter(required = true)
     String dispKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     String cogxKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     String cogyKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     String deltaKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     String m3lKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     String cosDeltaAlphaKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     String outputKey = null;
 
-    @Parameter(required=true)
+    @Parameter(required = true)
     double signM3lConstant = 0;
 
     public Data process(Data input) {
@@ -68,7 +68,7 @@ public class ReconstructSourcePositionDisp implements Processor {
      */
     private CameraCoordinate calculateRecPosition(double cogx, double cogy, double disp, double delta, double cosDeltaAlpha, double m3l) {
 
-        double sign = - Math.signum(cosDeltaAlpha) * Math.signum(m3l * Math.signum(cosDeltaAlpha) - signM3lConstant);
+        double sign = -Math.signum(cosDeltaAlpha) * Math.signum(m3l * Math.signum(cosDeltaAlpha) - signM3lConstant);
 
         double x = cogx + disp * Math.cos(delta) * sign;
         double y = cogy + disp * Math.sin(delta) * sign;

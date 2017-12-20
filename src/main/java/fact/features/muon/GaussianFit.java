@@ -54,27 +54,27 @@ public class GaussianFit implements StatefulProcessor {
                 startY = 0,
                 startSigma = 5;
 
-        if (!startRKey.isEmpty()){
+        if (!startRKey.isEmpty()) {
             startR = (double) data.get(startRKey);
         }
-        if (!startXKey.isEmpty()){
+        if (!startXKey.isEmpty()) {
             startX = (double) data.get(startXKey);
         }
-        if (!startYKey.isEmpty()){
+        if (!startYKey.isEmpty()) {
             startY = (double) data.get(startYKey);
         }
-        if (!startSigmaKey.isEmpty()){
+        if (!startSigmaKey.isEmpty()) {
             startSigma = (double) data.get(startSigmaKey);
         }
 
         MaxEval maxEval = new MaxEval(10000);
-        InitialGuess start_values = new InitialGuess(new double[] {startR, startX, startY, startSigma});
+        InitialGuess start_values = new InitialGuess(new double[]{startR, startX, startY, startSigma});
         PowellOptimizer optimizer = new PowellOptimizer(1e-4, 1e-2);
 
         PointValuePair result;
         try {
             result = optimizer.optimize(ob_negLnL, GoalType.MINIMIZE, start_values, maxEval);
-        } catch (TooManyEvaluationsException e){
+        } catch (TooManyEvaluationsException e) {
             result = new PointValuePair(new double[]{Double.NaN, Double.NaN, Double.NaN, Double.NaN}, Double.NaN);
         }
         double[] result_point = result.getPoint();
@@ -108,9 +108,11 @@ public class GaussianFit implements StatefulProcessor {
         }
     }
 
-    public void finish(){}
+    public void finish() {
+    }
 
-    public void resetState(){}
+    public void resetState() {
+    }
 
     public void setStartRKey(String startRKey) {
         this.startRKey = startRKey;
@@ -148,11 +150,11 @@ public class GaussianFit implements StatefulProcessor {
 
         /**
          * @param photoncharge double array containing the photoncharge for each pixel
-         * @param pixelSet int array containing all pixel chids for the pixel that survived cleaning
-         * @param pixel_x double array containing the x coordinates for all pixel
-         * @param pixel_y double array containing the y coordinates for all pixel
+         * @param pixelSet     int array containing all pixel chids for the pixel that survived cleaning
+         * @param pixel_x      double array containing the x coordinates for all pixel
+         * @param pixel_y      double array containing the y coordinates for all pixel
          */
-        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet, double[] pixel_x, double[] pixel_y){
+        public GaussianNegLogLikelihood(double[] photoncharge, PixelSet pixelSet, double[] pixel_x, double[] pixel_y) {
             this.photoncharge = photoncharge;
             this.pixel_x = pixel_x;
             this.pixel_y = pixel_y;
@@ -160,7 +162,6 @@ public class GaussianFit implements StatefulProcessor {
         }
 
         /**
-         *
          * @param point a double array with length 4 containing r, x, y, sigma in this order
          * @return the negative log likelihood at this point for the given data
          */
@@ -171,7 +172,7 @@ public class GaussianFit implements StatefulProcessor {
             double sigma = point[3];
             double neg_ln_L = 0;
 
-            for (CameraPixel pix: pixelSet.set) {
+            for (CameraPixel pix : pixelSet.set) {
                 double distance = Math.sqrt(Math.pow(pixel_x[pix.id] - x, 2.0) + Math.pow(pixel_y[pix.id] - y, 2.0));
                 neg_ln_L += (Math.log(sigma) + 0.5 * Math.pow((distance - r) / sigma, 2)) * photoncharge[pix.id];
             }

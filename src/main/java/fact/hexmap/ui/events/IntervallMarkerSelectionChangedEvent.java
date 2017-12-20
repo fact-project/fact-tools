@@ -10,7 +10,8 @@ import java.util.Set;
  */
 public class IntervallMarkerSelectionChangedEvent {
     public final Set<Pair<String, Color>> selectedItems;
-    public IntervallMarkerSelectionChangedEvent(Set<Pair<String, Color>> kl){
+
+    public IntervallMarkerSelectionChangedEvent(Set<Pair<String, Color>> kl) {
         this.selectedItems = kl;
     }
 

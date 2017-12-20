@@ -2,7 +2,7 @@ package fact.coordinates;
 
 /**
  * Created by maxnoe on 22.05.17.
- *
+ * <p>
  * Represents a position on Earth using latitude, longitude and height above sea level
  */
 public class EarthLocation {

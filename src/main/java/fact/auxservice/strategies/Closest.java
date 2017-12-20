@@ -13,7 +13,8 @@ import java.util.TreeSet;
 public class Closest implements AuxPointStrategy {
     /**
      * Returns the closest (in time)  AuxPoint found in the TreeSet that is not null.
-     * @param set the set from which to get the points
+     *
+     * @param set            the set from which to get the points
      * @param eventTimeStamp the timestamp for which you want the auxiliary data
      * @return an AuxPoint according to the concrete strategy implementation, or null if it doesn't exist.
      */
@@ -25,21 +26,21 @@ public class Closest implements AuxPointStrategy {
 
         AuxPoint retVal = null;
 
-        if (floorPoint != null && ceilPoint != null ) {
-            Duration durationFloor=Duration.between(floorPoint.getTimeStamp(), eventTimeStamp);
-            Duration durationCeil = Duration.between(eventTimeStamp,  ceilPoint.getTimeStamp());
+        if (floorPoint != null && ceilPoint != null) {
+            Duration durationFloor = Duration.between(floorPoint.getTimeStamp(), eventTimeStamp);
+            Duration durationCeil = Duration.between(eventTimeStamp, ceilPoint.getTimeStamp());
 
             //Duration durationFloor = new Duration(floorPoint.getTimeStamp(), eventTimeStamp);
             //Duration durationCeil = new Duration(eventTimeStamp,  ceilPoint.getTimeStamp());
-            if ((durationCeil.compareTo(durationFloor))<0){
-                retVal=  ceilPoint;
+            if ((durationCeil.compareTo(durationFloor)) < 0) {
+                retVal = ceilPoint;
             } else {
-                retVal=  floorPoint;
+                retVal = floorPoint;
             }
-        } else if (ceilPoint != null){
-            retVal=  ceilPoint;
-        } else if (floorPoint != null){
-            retVal=  floorPoint;
+        } else if (ceilPoint != null) {
+            retVal = ceilPoint;
+        } else if (floorPoint != null) {
+            retVal = floorPoint;
         }
         return retVal;
     }

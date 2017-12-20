@@ -10,7 +10,7 @@ import java.awt.event.ItemListener;
 /**
  * Created by kaibrugge on 14.05.14.
  */
-public class SeriesKeySelectorItem extends JPanel  {
+public class SeriesKeySelectorItem extends JPanel {
     private final JButton colorButton;
     private final JLabel label;
     private JCheckBox checkBox;
@@ -18,7 +18,7 @@ public class SeriesKeySelectorItem extends JPanel  {
     public Color color;
 
     @Override
-    public boolean equals(Object obj){
+    public boolean equals(Object obj) {
         if (obj == null)
             return false;
         if (obj == this)
@@ -26,18 +26,19 @@ public class SeriesKeySelectorItem extends JPanel  {
         if (!(obj instanceof SeriesKeySelectorItem))
             return false;
         SeriesKeySelectorItem i = (SeriesKeySelectorItem) obj;
-        if (this.key.equals(i.key)){
+        if (this.key.equals(i.key)) {
             return true;
         } else {
             return false;
         }
     }
+
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return key.hashCode();
     }
 
-    public SeriesKeySelectorItem(final String key, final Color c, final KeySelector selector){
+    public SeriesKeySelectorItem(final String key, final Color c, final KeySelector selector) {
         this.key = key;
         this.color = c;
         setLayout(new BorderLayout(0, 0));
@@ -52,9 +53,9 @@ public class SeriesKeySelectorItem extends JPanel  {
         checkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange()==ItemEvent.SELECTED){
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     selector.addSelected(SeriesKeySelectorItem.this);
-                } else if (e.getStateChange()==ItemEvent.DESELECTED){
+                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                     selector.removeSelected(SeriesKeySelectorItem.this);
                 }
             }

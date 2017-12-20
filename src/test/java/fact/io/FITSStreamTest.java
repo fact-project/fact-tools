@@ -14,51 +14,51 @@ import static org.junit.Assert.fail;
 
 /**
  * @author kai
- *
  */
 public class FITSStreamTest {
 
 
-	@Test
-	public void testFitsStream() {
+    @Test
+    public void testFitsStream() {
 
-		try {
-			URL u =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
-			SourceURL url = new SourceURL(u);
-			FITSStream stream = new FITSStream(url);
+        try {
+            URL u = FITSStreamTest.class.getResource("/testDataFile.fits.gz");
+            SourceURL url = new SourceURL(u);
+            FITSStream stream = new FITSStream(url);
 
-			stream.init();
-			Data item = stream.read();
-			while (item != null) {
-				item = stream.read();
-			}
+            stream.init();
+            Data item = stream.read();
+            while (item != null) {
+                item = stream.read();
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Could not read FitsFile");
-		}
-	}
-	@Test
-	public void testFitsKeys() {
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Could not read FitsFile");
+        }
+    }
 
-		try {
-			URL u =  FITSStreamTest.class.getResource("/testDataFile.fits.gz");
-			SourceURL url = new SourceURL(u);
-			FITSStream stream = new FITSStream(url);
-			stream.init();
+    @Test
+    public void testFitsKeys() {
 
-			Data item = stream.read();
-			while (item != null) {
-				if (!(item.containsKey("Data") && item.containsKey("EventNum") )){
-					fail("fitsStream is not reading the right keys");
-				}
-				item = stream.read();
-			}
+        try {
+            URL u = FITSStreamTest.class.getResource("/testDataFile.fits.gz");
+            SourceURL url = new SourceURL(u);
+            FITSStream stream = new FITSStream(url);
+            stream.init();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Could not read FitsFile");
-		}
-	}
+            Data item = stream.read();
+            while (item != null) {
+                if (!(item.containsKey("Data") && item.containsKey("EventNum"))) {
+                    fail("fitsStream is not reading the right keys");
+                }
+                item = stream.read();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Could not read FitsFile");
+        }
+    }
 
 }

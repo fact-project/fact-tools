@@ -16,49 +16,50 @@ import java.util.*;
 /**
  * This reader can interpret the bytes in the heap of a bintable that has been stored in the ZFits format.
  * Some specification of that format can be found on arxiv : https://arxiv.org/pdf/1506.06045v1.pdf
- *
+ * <p>
  * This class implements the iterable and iterator interfaces which allow for such nice things as
- *
- *        for(OptionalTypesMap p : heapReader){
- *              assertTrue(p.containsKey("Data"));
- *              assertTrue(p.size() == 9);
- *         }
- *
- *
+ * <p>
+ * for(OptionalTypesMap p : heapReader){
+ * assertTrue(p.containsKey("Data"));
+ * assertTrue(p.size() == 9);
+ * }
+ * <p>
+ * <p>
  * The next() and the getNextRow() methods deliver a map with the data from one row in the heap.
- *
+ * <p>
  * Reading the heap in a ZFits bintable works as follows:
- *
+ * <p>
  * The heap data starts at the offset stored in the 'ZHEAPTR' variable in the header.
  * This is wrong according to the FITS standard. It should be the 'THEAP' variable.
- *
+ * <p>
  * Each heap contains one TileHeader for each row with one BlockHeader for each column in the row.
  * Information about the data in the columns can be read from the 'ZFORMn' keywords in the header.
- *
+ * <p>
  * Data in the tiles is in Little Endian byte order.
- *
+ * <p>
  * The data from one tile is read completely into one bytebuffer.
+ *
  * @see ZFITSHeapReader#getNextRow()
- *
- *
+ * <p>
+ * <p>
  * Then for each column the appropriate compression type is parsed from the block header.
  * @see BlockHeader#fromBuffer
- *
+ * <p>
  * When a column is huffman compressed, the definition of the huffmann tree will be stored in the first couple of bytes
  * in that row. This is documented exactly nowhere!
- *
+ * <p>
  * First we start with
- *
+ * <p>
  * [(int) numberOfCompressedBytes, (long) numberOfShortsAfterDecompression, (long) numberOfSymbolsUsedInCompression]
- *
+ * <p>
  * after that for each symbol (numberOfSymbolsUsedInCompression)
- *
+ * <p>
  * [(short) symbol, (byte) codeLengthInBits, the codeword stored in codeLengthInBits-rounded-up-to-bytes bytes (max 4 bytes)]
- *
+ * <p>
  * From these symbols and codewords the tree can be build see the ByteWiseHuffmanTree for details.
  * @see ByteWiseHuffmanTree
- *
- *
+ * <p>
+ * <p>
  * Created by mackaiver on 14/11/16.
  */
 public final class ZFITSHeapReader implements Reader {
@@ -76,15 +77,13 @@ public final class ZFITSHeapReader implements Reader {
 
     /**
      * Check whether there is another row to return from this heap
+     *
      * @return true iff another row can be read.
      */
     @Override
     public boolean hasNext() {
         return numberOfRowsRead < numberOfRowsInTable;
     }
-
-
-
 
 
     private static Logger log = LoggerFactory.getLogger(ZFITSHeapReader.class);
@@ -103,7 +102,7 @@ public final class ZFITSHeapReader implements Reader {
      * @param binTable the binary table which contains a zfits heap.
      * @return the ZFITSHeapReader for the given table.
      */
-    public static ZFITSHeapReader forTable(BinTable binTable){
+    public static ZFITSHeapReader forTable(BinTable binTable) {
         return new ZFITSHeapReader(binTable);
     }
 
@@ -125,11 +124,11 @@ public final class ZFITSHeapReader implements Reader {
      * Get the data from the next row. The columns in the row can be accessed by their name in the resulting
      * map that is returned by this method. The resulting map comes with convenience methods for accessing data of
      * predefined types.
-     *
+     * <p>
      * Some zfits file apparently contain a wrong tile header in the heap storing the ZDrsCellOffsets.
      * I haven't figures out to which files this applies. Files from 2013 seem to have that problem.
      * But also newer ones. Some files from 2016 are fine however.
-     *
+     * <p>
      * The old ZFits implementation by M.Bulinski ignored the problem by default.
      *
      * @param ignoreWrongTileHeader if true, ignores wrong tileheader information.
@@ -137,11 +136,11 @@ public final class ZFITSHeapReader implements Reader {
      * @throws NoSuchElementException iff hasNext() is false
      */
     public OptionalTypesMap<String, Serializable> getNextRow(boolean ignoreWrongTileHeader) throws IOException {
-        if(!hasNext()){
-           throw new NoSuchElementException();
+        if (!hasNext()) {
+            throw new NoSuchElementException();
         }
         // check if we currently still have rows in the cache if not get the next tile
-        if (maxRowsInCache==curRowInCache) {
+        if (maxRowsInCache == curRowInCache) {
             this.getNextTileIntoCache(ignoreWrongTileHeader);
         }
         OptionalTypesMap<String, Serializable> map = new OptionalTypesMap<>();
@@ -150,7 +149,7 @@ public final class ZFITSHeapReader implements Reader {
         for (BinTable.TableColumn column : columns) {
 
             //sometimes there is no data. We do nothing then.
-            if (column.repeatCount == 0){
+            if (column.repeatCount == 0) {
                 continue;
             }
             Buffer curBuffer = tileCache.get(column.name);
@@ -206,10 +205,10 @@ public final class ZFITSHeapReader implements Reader {
             // read the current block information
             BlockHeader block = BlockHeader.fromBuffer(tileBuffer);
 
-            if (block.order.equals("C") && tile.numberOfRows!=1) {
+            if (block.order.equals("C") && tile.numberOfRows != 1) {
                 throw new NotImplementedException("Column ordering with more than 1 row not supported for now.");
             }
-            int elementByteSize = column.type.byteSize*column.repeatCount;
+            int elementByteSize = column.type.byteSize * column.repeatCount;
             if (block.compression != BlockHeader.Compression.RAW && column.type != BinTable.ColumnType.SHORT) {
                 throw new NotImplementedException("Current Reader doesn't support compression other types than short");
             }
@@ -224,7 +223,7 @@ public final class ZFITSHeapReader implements Reader {
                 compressedBlocks.add(column.name);
                 tileCache.put(column.name, ShortBuffer.wrap(shorts));
 
-            } else if (block.compression == BlockHeader.Compression.RAW){
+            } else if (block.compression == BlockHeader.Compression.RAW) {
                 // convert to int, no block is bigger than 4GB
                 int numberBytes = Math.toIntExact(block.getDataSize());
                 byte[] cache = new byte[numberBytes];
@@ -233,7 +232,7 @@ public final class ZFITSHeapReader implements Reader {
                 }
                 tileCache.put(column.name, ByteBuffer.wrap(cache).order(ByteOrder.LITTLE_ENDIAN));
             } else {
-                throw new NotImplementedException("Compression: '"+block.compression.name()+"' is not implemented");
+                throw new NotImplementedException("Compression: '" + block.compression.name() + "' is not implemented");
             }
         }
         curRowInCache = 0;
@@ -246,30 +245,31 @@ public final class ZFITSHeapReader implements Reader {
      *
      * @param data the data to unsmooth
      */
-    private void unsmooth(short[] data){
+    private void unsmooth(short[] data) {
         for (int i = 2; i < data.length; i++) {
-            data[i] = (short) (data[i] + (data[i-1] +  data[i-2])/2 );
+            data[i] = (short) (data[i] + (data[i - 1] + data[i - 2]) / 2);
         }
     }
 
     /**
      * Decompress a whole block of compressed huffman data
-     * @param buffer The buffer containing the block data
-     * @param numRows The amount of rows inside the block
+     *
+     * @param buffer        The buffer containing the block data
+     * @param numRows       The amount of rows inside the block
      * @param sizeSingleRow The decompressed size of a single Row
      * @return The decompressed block data
      */
     private short[] blockHuffmanDecompression(ByteBuffer buffer, int numRows, int sizeSingleRow) throws IOException {
         //read the sizes of the compressed rows
         int[] sizeCompressedRows = new int[numRows];
-        for (int i=0; i<numRows; i++) {
+        for (int i = 0; i < numRows; i++) {
             sizeCompressedRows[i] = buffer.getInt();
         }
 
         //the finished product
-        short[] result = new short[sizeSingleRow*numRows];
+        short[] result = new short[sizeSingleRow * numRows];
 
-        for (int i=0; i<numRows; i++) {
+        for (int i = 0; i < numRows; i++) {
             // grab the row
             byte[] row = new byte[sizeCompressedRows[i]];
             buffer.get(row);
@@ -277,10 +277,10 @@ public final class ZFITSHeapReader implements Reader {
 
             // decompress it
             short[] decompressedRow = huffmanDecompression(rowBuffer);
-            if (decompressedRow.length*2!=sizeSingleRow) {
-                throw new IOException("The decompressed row has the wrong size: "+decompressedRow.length*2+", expected: "+ sizeSingleRow);
+            if (decompressedRow.length * 2 != sizeSingleRow) {
+                throw new IOException("The decompressed row has the wrong size: " + decompressedRow.length * 2 + ", expected: " + sizeSingleRow);
             }
-            System.arraycopy(decompressedRow, 0, result, i*(sizeSingleRow/2), (sizeSingleRow/2));
+            System.arraycopy(decompressedRow, 0, result, i * (sizeSingleRow / 2), (sizeSingleRow / 2));
         }
         return result;
     }
@@ -290,32 +290,33 @@ public final class ZFITSHeapReader implements Reader {
      * Once build it will be used to map code words to the symbols.
      * Here goes the code from huffman.h in FACT++ which describes how the symbol table is written to the data.
      * apparently this is the only 'documentation' about that.
-     *
-     *     void WriteCodeTable(std::string &out) const {
-     *           out.append((char*)&count, sizeof(size_t));
-     *
-     *           for (uint32_t i=0; i<MAX_SYMBOLS; i++)
-     *           {
-     *              const Code &n = lut[i];
-     *              if (n.numbits==0)
-     *                  continue;
-     *
-     *               // Write the 2 byte symbol.
-     *               out.append((char*)&i, sizeof(uint16_t));
-     *               if (count==1)
-     *                  return;
-     *
-     *               // Write the 1 byte code bit length.
-     *               out.append((char*)&n.numbits, sizeof(uint8_t));
-     *
-     *               // Write the code bytes.
-     *               uint32_t numbytes = numbytes_from_numbits(n.numbits);
-     *               out.append((char*)&n.bits, numbytes);
-     *           }
-     *       }
-     *
-     *
+     * <p>
+     * void WriteCodeTable(std::string &out) const {
+     * out.append((char*)&count, sizeof(size_t));
+     * <p>
+     * for (uint32_t i=0; i<MAX_SYMBOLS; i++)
+     * {
+     * const Code &n = lut[i];
+     * if (n.numbits==0)
+     * continue;
+     * <p>
+     * // Write the 2 byte symbol.
+     * out.append((char*)&i, sizeof(uint16_t));
+     * if (count==1)
+     * return;
+     * <p>
+     * // Write the 1 byte code bit length.
+     * out.append((char*)&n.numbits, sizeof(uint8_t));
+     * <p>
+     * // Write the code bytes.
+     * uint32_t numbytes = numbytes_from_numbits(n.numbits);
+     * out.append((char*)&n.bits, numbytes);
+     * }
+     * }
+     * <p>
+     * <p>
      * The raw data is stored as shorts. So one symbol is two bytes long.
+     *
      * @param rowBuffer the buffer only containing the huffman compressed row
      * @throws IOException in case the buffer ends before all bytes are read
      */
@@ -339,13 +340,13 @@ public final class ZFITSHeapReader implements Reader {
         try {
             while (index < numberOfShorts) {
 
-                if(q.queueLength < 16) {
+                if (q.queueLength < 16) {
                     if (rowBuffer.remaining() >= 2) {
                         q.addShort(rowBuffer.getShort());
                     } else if (rowBuffer.remaining() == 1) {
                         q.addByte(rowBuffer.get());
                         q.addByte((byte) 0);
-                    }else if (rowBuffer.remaining() == 0) {
+                    } else if (rowBuffer.remaining() == 0) {
                         q.addShort((short) 0);
                     }
                 }
@@ -354,7 +355,7 @@ public final class ZFITSHeapReader implements Reader {
                 if (node.isLeaf) {
                     symbols[index] = node.payload.symbol;
                     index++;
-                    q.remove(node.payload.codeLengthInBits - depth*8);
+                    q.remove(node.payload.codeLengthInBits - depth * 8);
 
                     //reset traversal to root node.
                     depth = 0;
@@ -366,7 +367,7 @@ public final class ZFITSHeapReader implements Reader {
                     q.remove(8);
                 }
             }
-        } catch (BufferUnderflowException e){
+        } catch (BufferUnderflowException e) {
             log.error("compressed size was: {}, number of symbols was {}", rowBuffer.array().length, numberOfSymbols);
         }
         return symbols;
@@ -375,11 +376,11 @@ public final class ZFITSHeapReader implements Reader {
     /**
      * Construct a huffmann tree from the symbol table stored for each huffmann compressed column
      *
-     * @param buffer the buffer containing the bytes in the column
+     * @param buffer          the buffer containing the bytes in the column
      * @param numberOfSymbols the number of symbols this table contains
      * @return a ByteWiseHuffmanTree from the symbol table in the buffer
      */
-    private ByteWiseHuffmanTree constructHuffmanTreeFromBytes(ByteBuffer buffer, long numberOfSymbols){
+    private ByteWiseHuffmanTree constructHuffmanTreeFromBytes(ByteBuffer buffer, long numberOfSymbols) {
         ByteWiseHuffmanTree huffmanTree = new ByteWiseHuffmanTree();
         //read all entries and create the decoding tree
         for (long i = 0; i < numberOfSymbols; i++) {
@@ -411,7 +412,7 @@ public final class ZFITSHeapReader implements Reader {
 
 
             // add the symbol to the huffmanntree
-            ByteWiseHuffmanTree.insert(huffmanTree, bits, codeLengthInBits, new ByteWiseHuffmanTree.Symbol(symbol, codeLengthInBits, codeLengthInBytes, bits) );
+            ByteWiseHuffmanTree.insert(huffmanTree, bits, codeLengthInBits, new ByteWiseHuffmanTree.Symbol(symbol, codeLengthInBits, codeLengthInBytes, bits));
         }
         return huffmanTree;
     }
@@ -422,7 +423,7 @@ public final class ZFITSHeapReader implements Reader {
      * One tile can contain many rows according to 'the spec' however we don't support this and
      * I haven't encountered this case yet
      */
-    private static class TileHeader{
+    private static class TileHeader {
         private final long size;
         private final int numberOfRows;
         private final String definitionString;
@@ -441,7 +442,7 @@ public final class ZFITSHeapReader implements Reader {
          * this method will throw an IOException except when ignoreWrongHeader is set to true.
          * The latter is necessary for some broken ZFits files.
          *
-         * @param stream the DataInputStream that is reading the  bytes from the heap.
+         * @param stream            the DataInputStream that is reading the  bytes from the heap.
          * @param ignoreWrongHeader ignore when Tile does not start with 'TILE'.
          * @return a TileHeader object created from bytes in the stream.
          * @throws IOException when the tile header cannot be created
@@ -451,7 +452,7 @@ public final class ZFITSHeapReader implements Reader {
             stream.readFully(tileHeaderBytes);
 
             TileHeader tileHeader = new TileHeader(tileHeaderBytes);
-            if (!tileHeader.definitionString.equals("TILE")){
+            if (!tileHeader.definitionString.equals("TILE")) {
                 if (!ignoreWrongHeader)
                     throw new IOException("Tile header did not begin with word 'TILE'");
                 log.warn("Tile header did not begin with word 'TILE'. Ignoring error.");
@@ -466,8 +467,8 @@ public final class ZFITSHeapReader implements Reader {
      * Each tile contains a number of blockheaders.
      * The blockheader describes how the data was compressed and how many bytes it contains.
      */
-    private static class BlockHeader{
-        enum Compression{
+    private static class BlockHeader {
+        enum Compression {
             RAW,
             SMOOTHING,
             HUFFMAN,
@@ -488,24 +489,26 @@ public final class ZFITSHeapReader implements Reader {
 
         /**
          * Returns the size of the data that are contained in this block
+         *
          * @return the data size of this block
          */
         public long getDataSize() {
-            return this.size-this.headerSize;
+            return this.size - this.headerSize;
         }
 
         /**
          * Create a blockheader from the bytebuffer passed.
+         *
          * @param buffer the buffer to read.
          * @return the blockheader form the bytes in the buffer
          * @throws IOException in case the ordering is wrong
          */
-        static BlockHeader fromBuffer(ByteBuffer buffer) throws IOException{
+        static BlockHeader fromBuffer(ByteBuffer buffer) throws IOException {
 
             long size = buffer.getLong();
             String order = new String(new byte[]{buffer.get()}, StandardCharsets.US_ASCII);
 
-            if(! (order.equals("R") || order.equals("C")) ) {
+            if (!(order.equals("R") || order.equals("C"))) {
                 throw new IOException("Block header was not ordered by 'R' or 'C' but '" + order + "'");
             }
 
@@ -520,7 +523,7 @@ public final class ZFITSHeapReader implements Reader {
             }
 
             Compression compression;
-            switch (processingType){
+            switch (processingType) {
                 case 1:
                     compression = Compression.SMOOTHING;
                     break;
@@ -535,7 +538,7 @@ public final class ZFITSHeapReader implements Reader {
                     break;
             }
             // size(8 Bytes)+order(1 Bytes)+numberOfProcessings(1 Bytes)+Processings(2 Bytes*numberOfProcessings)
-            long sizeHeader = 8+1+1+(numberOfProcessings*2);
+            long sizeHeader = 8 + 1 + 1 + (numberOfProcessings * 2);
             return new BlockHeader(size, order, compression, sizeHeader);
         }
 
@@ -544,12 +547,12 @@ public final class ZFITSHeapReader implements Reader {
     private Serializable readSingleValueFromBuffer(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
 
         Serializable b = null;
-        switch (c.type){
+        switch (c.type) {
             case BOOLEAN:
                 b = buffer.get() > 0;
                 break;
             case CHAR:
-                b =  buffer.asCharBuffer().toString();
+                b = buffer.asCharBuffer().toString();
                 break;
             case BYTE:
                 b = buffer.get();
@@ -575,7 +578,7 @@ public final class ZFITSHeapReader implements Reader {
 
     private Serializable readArrayFromBuffer(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
 
-        if(c.type == BinTable.ColumnType.BOOLEAN){
+        if (c.type == BinTable.ColumnType.BOOLEAN) {
             boolean[] bools = new boolean[c.repeatCount];
             for (int i = 0; i < c.repeatCount; i++) {
                 bools[i] = buffer.get() > 0;
@@ -583,7 +586,7 @@ public final class ZFITSHeapReader implements Reader {
             return bools;
         }
 
-        switch (c.type){
+        switch (c.type) {
             case CHAR:
                 char[] chars = new char[c.repeatCount];
                 buffer.asCharBuffer().get(chars);

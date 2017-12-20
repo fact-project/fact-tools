@@ -33,9 +33,11 @@ import java.net.URISyntaxException;
  */
 public class Viewer extends JFrame {
 
-	/** The unique class ID */
-	private static final long serialVersionUID = -5687227971590846044L;
-	static Logger log = LoggerFactory.getLogger(Viewer.class);
+    /**
+     * The unique class ID
+     */
+    private static final long serialVersionUID = -5687227971590846044L;
+    static Logger log = LoggerFactory.getLogger(Viewer.class);
 
 
     //------some components for the viewer
@@ -52,8 +54,9 @@ public class Viewer extends JFrame {
         defaultKey = key;
         chartPanel.setDefaultEntry(defaultKey, Color.red);
     }
+
     //set plotrange in the plotpanel
-    public void setRange(Integer[] range){
+    public void setRange(Integer[] range) {
         chartPanel.setRange(range[0], range[1]);
     }
 
@@ -62,6 +65,7 @@ public class Viewer extends JFrame {
 
     //there should also be only 1 instance of the viewer.
     private static Viewer viewer = null;
+
     public static Viewer getInstance() {
         if (viewer == null) {
             viewer = new Viewer();
@@ -70,9 +74,9 @@ public class Viewer extends JFrame {
     }
 
     //the constructor. build layout here. bitch
-	private Viewer() {
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setTitle("Fact Tools GUI Development");
+    private Viewer() {
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Fact Tools GUI Development");
 
 
         //------- add a chart window
@@ -83,31 +87,32 @@ public class Viewer extends JFrame {
         this.setJMenuBar(menu);
 
         // set layout of the main window
-        FormLayout layout = new FormLayout(new ColumnSpec[] {
-                                    ColumnSpec.decode("fill:605px"),
-                                    ColumnSpec.decode("fill:605px"), },
-                                new RowSpec[] {
-                                    RowSpec.decode("fill:pref"),
-                                    RowSpec.decode("fill:pref"),
-                                    RowSpec.decode("fill:pref")
-                                });
+        FormLayout layout = new FormLayout(new ColumnSpec[]{
+                ColumnSpec.decode("fill:605px"),
+                ColumnSpec.decode("fill:605px"),},
+                new RowSpec[]{
+                        RowSpec.decode("fill:pref"),
+                        RowSpec.decode("fill:pref"),
+                        RowSpec.decode("fill:pref")
+                });
 
         PanelBuilder builder = new PanelBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.add(chartPanel, cc.xywh(2, 1, 1, 1));
         builder.add(eventInfoPanel, cc.xywh(2, 2, 1, 1));
         builder.add(mapDisplay, cc.xywh(1, 1, 1, 2));
-        builder.add(navigation, cc.xywh(1,3, 2,1));
+        builder.add(navigation, cc.xywh(1, 3, 2, 1));
 
         setContentPane(builder.getPanel());
 
-		//setSize(1200, 850);
-		pack();
-	}
+        //setSize(1200, 850);
+        pack();
+    }
 
 
     /**
      * Creates the menu bar and returns it. All menubar setup shoudl happen in here
+     *
      * @return
      */
     private JMenuBar createMenuBar() {
@@ -181,6 +186,7 @@ public class Viewer extends JFrame {
     /**
      * Open the default web browser of the system with the specified url
      * stolen from http://stackoverflow.com/questions/10967451/open-a-link-in-browser-with-java-button
+     *
      * @param url the url to open
      */
     public void openUrl(String url) {
@@ -193,7 +199,7 @@ public class Viewer extends JFrame {
                     desktop.browse(uri);
                 }
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             log.error("Couldnt connect to desktop environment. Cannot open browser");
         } catch (URISyntaxException e) {
             log.error("Wrong syntax for an url provided by string: " + url);
@@ -202,20 +208,20 @@ public class Viewer extends JFrame {
     }
 
 
-
-	public JButton getNextButton() {
-		return navigation.getNextButton();
-	}
+    public JButton getNextButton() {
+        return navigation.getNextButton();
+    }
 
 
     /**
      * The current data item to be displayed. This will sent an Event to all eventbus subscribers who care about new
      * events from the stream
+     *
      * @param item the new item from the stream
      */
-	public void setDataItem(Data item) {
+    public void setDataItem(Data item) {
         this.item = item;
         Bus.eventBus.post(Pair.create(item, defaultKey));
-	}
+    }
 
 }

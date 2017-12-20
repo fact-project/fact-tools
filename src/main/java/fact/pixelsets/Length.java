@@ -11,28 +11,27 @@ import stream.annotations.Parameter;
 /**
  * This processor calculates the length of a pixelset and put it in the data item.
  *
- * @author ftemme,jbuss
- *
+ * @author ftemme, jbuss
  */
 public class Length implements Processor {
 
-	static Logger log = LoggerFactory.getLogger(Length.class);
+    static Logger log = LoggerFactory.getLogger(Length.class);
 
-	@Parameter(required=true, description="The pixelset of which you want to calculate the length")
-	String pixelSetKey;
-	@Parameter(required=true, description="The outputkey.")
-	String outputKey;
+    @Parameter(required = true, description = "The pixelset of which you want to calculate the length")
+    String pixelSetKey;
+    @Parameter(required = true, description = "The outputkey.")
+    String outputKey;
 
-	@Override
-	public Data process(Data input) {
+    @Override
+    public Data process(Data input) {
 
-		Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
 
-		PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
+        PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
 
-		int length = pixelSet.set.size();
-		input.put(outputKey, length);
+        int length = pixelSet.set.size();
+        input.put(outputKey, length);
 
-		return input;
-	}
+        return input;
+    }
 }

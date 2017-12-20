@@ -10,7 +10,7 @@ public interface EventObserver {
 
 
     /**
-     *Pass the event to this observer. The EventObserver has to decide what he wants to display.
+     * Pass the event to this observer. The EventObserver has to decide what he wants to display.
      *
      * @param itemKeyPair the current data item we want to display
      */

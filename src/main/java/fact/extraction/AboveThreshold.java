@@ -13,24 +13,24 @@ import stream.annotations.Parameter;
  */
 public class AboveThreshold implements Processor {
     @Parameter(
-        required = true,
-        description = "A double array with length NROI times NPIX"
+            required = true,
+            description = "A double array with length NROI times NPIX"
     )
     private String dataKey = null;
 
     @Parameter(
-        required = true,
-        description = "A PixelSet with the pixels above the threshold. " +
-                      "The fraction of pixels above the threshold is put into outputKey + PixelRatio" +
-                      "The number of pixels above the threshold is put into outputKey + PixelCount" +
-                      "The fraction of slices above the threshold is put into outputKey + SliceRatio" +
-                      "The number of slices above the threshold is put into outputKey + SliceCount"
+            required = true,
+            description = "A PixelSet with the pixels above the threshold. " +
+                    "The fraction of pixels above the threshold is put into outputKey + PixelRatio" +
+                    "The number of pixels above the threshold is put into outputKey + PixelCount" +
+                    "The fraction of slices above the threshold is put into outputKey + SliceRatio" +
+                    "The number of slices above the threshold is put into outputKey + SliceCount"
     )
     private String outputKey = null;
 
     @Parameter(
-        required = true,
-        description = "Threshold value to be exceeded"
+            required = true,
+            description = "Threshold value to be exceeded"
     )
     protected double threshold = 0;
 
@@ -44,17 +44,17 @@ public class AboveThreshold implements Processor {
 
         int numSlicesAboveThreshold = 0;
         PixelSet pixelsAboveThreshold = new PixelSet();
-        for (int pix=0; pix<npix; pix++) {
-            for(int slice=0; slice<roi; slice++) {
-                final int pos = pix*roi + slice;
-                if(timeSeries[pos] > thresholdShort) {
+        for (int pix = 0; pix < npix; pix++) {
+            for (int slice = 0; slice < roi; slice++) {
+                final int pos = pix * roi + slice;
+                if (timeSeries[pos] > thresholdShort) {
                     pixelsAboveThreshold.addById(pix);
                     numSlicesAboveThreshold += 1;
                 }
             }
         }
 
-        final double ratioOfPixels = (double) pixelsAboveThreshold.set.size() / (double)npix;
+        final double ratioOfPixels = (double) pixelsAboveThreshold.set.size() / (double) npix;
 
         input.put(outputKey, pixelsAboveThreshold);
         input.put(outputKey + "PixelRatio", ratioOfPixels);

@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
@@ -22,13 +21,13 @@ public class BinTableTests {
 
     @Test
     public void testBinTableIterator() throws Exception {
-        URL u =  BinTableTests.class.getResource("/testDataFile.fits.gz");
+        URL u = BinTableTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
         BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
 
 
-        for(OptionalTypesMap p : BinTableReader.forBinTable(events)){
+        for (OptionalTypesMap p : BinTableReader.forBinTable(events)) {
             assertTrue(p.containsKey("Data"));
         }
 
@@ -36,24 +35,22 @@ public class BinTableTests {
 
     @Test
     public void testBinTableIteratorForMCs() throws Exception {
-        URL u =  BinTableTests.class.getResource("/testMcFile.fits.gz");
+        URL u = BinTableTests.class.getResource("/testMcFile.fits.gz");
 
         FITS f = new FITS(u);
         BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
 
 
-        for(OptionalTypesMap p : BinTableReader.forBinTable(events)){
+        for (OptionalTypesMap p : BinTableReader.forBinTable(events)) {
             assertTrue(p.containsKey("Data"));
         }
 
     }
 
 
-
-
     @Test
     public void testBinTableReader() throws Exception {
-        URL u =  BinTableTests.class.getResource("/testDataFile.fits.gz");
+        URL u = BinTableTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
 
@@ -62,20 +59,21 @@ public class BinTableTests {
 
 
         Map<String, Serializable> row = reader.getNextRow();
-        assertThat(row.size() , is(b.numberOfColumnsInTable));
+        assertThat(row.size(), is(b.numberOfColumnsInTable));
 
         short[] data = (short[]) row.get("Data");
-        assertThat(data.length , is(1440*300));
+        assertThat(data.length, is(1440 * 300));
 
 
         int[] boardTime = (int[]) row.get("BoardTime");
-        assertThat(boardTime.length , is(40));
+        assertThat(boardTime.length, is(40));
 
 
         int[] unixtime = (int[]) row.get("UnixTimeUTC");
-        assertThat(unixtime.length , is(2));
+        assertThat(unixtime.length, is(2));
 
-        ZonedDateTime date = Utils.unixTimeUTCToZonedDateTime(unixtime);;
+        ZonedDateTime date = Utils.unixTimeUTCToZonedDateTime(unixtime);
+        ;
         assertThat(date.getYear(), is(2013));
         assertThat(date.getMonthValue(), is(1));
         assertThat(date.getDayOfMonth(), is(2));
@@ -85,7 +83,7 @@ public class BinTableTests {
 
     @Test
     public void testFitsBinTable() throws Exception {
-        URL u =  BinTableTests.class.getResource("/testDataFile.fits.gz");
+        URL u = BinTableTests.class.getResource("/testDataFile.fits.gz");
 
         FITS f = new FITS(u);
 

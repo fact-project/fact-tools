@@ -13,11 +13,11 @@ import static org.junit.Assert.assertThat;
 public class BitQueueTests {
 
     @Test
-    public void bitQueueTest(){
+    public void bitQueueTest() {
         BitQueue q = new BitQueue();
 
         q.addByte(Byte.parseByte("00110011", 2));
-        assertThat(q.bitString(), is("00000000"+"00110011"));
+        assertThat(q.bitString(), is("00000000" + "00110011"));
         assertThat(q.queueLength, is(8));
 
         q.addByte(Byte.parseByte("00000000", 2));

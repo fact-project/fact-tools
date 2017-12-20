@@ -83,9 +83,9 @@ public class AddFirstArrayToSecondArrayTest {
         Assert.assertEquals(7, first.length);
         Assert.assertEquals(10, second.length);
 
-        for(int i=0; i<first.length; i++)
+        for (int i = 0; i < first.length; i++)
             Assert.assertEquals(0.0, first[i]);
-        for(int i=0; i<second.length; i++)
+        for (int i = 0; i < second.length; i++)
             Assert.assertEquals(0.0, second[i]);
     }
 
@@ -94,8 +94,8 @@ public class AddFirstArrayToSecondArrayTest {
 
         double[] first = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         double[] second = new double[10];
-        for(int i=0; i<second.length; i++)
-            second[i] = (double)(i);
+        for (int i = 0; i < second.length; i++)
+            second[i] = (double) (i);
         int slice = 0;
 
         Assert.assertEquals(7, first.length);
@@ -106,16 +106,16 @@ public class AddFirstArrayToSecondArrayTest {
         Assert.assertEquals(7, first.length);
         Assert.assertEquals(10, second.length);
 
-        for(int i=0; i<first.length; i++)
+        for (int i = 0; i < first.length; i++)
             Assert.assertEquals(0.0, first[i]);
-        for(int i=0; i<second.length; i++)
-            Assert.assertEquals((double)(i), second[i]);
+        for (int i = 0; i < second.length; i++)
+            Assert.assertEquals((double) (i), second[i]);
     }
 
     @Test
     public void testAddArraysFirstSimpleSignalSecondZeros() {
 
-        for(int slice=0; slice<10; slice++) {
+        for (int slice = 0; slice < 10; slice++) {
             double[] first = {1.0};
             double[] second = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
@@ -123,8 +123,8 @@ public class AddFirstArrayToSecondArrayTest {
 
             Assert.assertEquals(1.0, first[0]);
 
-            for(int i=0; i<second.length; i++)
-                if(i == slice)
+            for (int i = 0; i < second.length; i++)
+                if (i == slice)
                     Assert.assertEquals(1.0, second[i]);
                 else
                     Assert.assertEquals(0.0, second[i]);
@@ -137,12 +137,12 @@ public class AddFirstArrayToSecondArrayTest {
         double[] first = {1.0};
         double[] second = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-        for(int slice=0; slice<10; slice++)
+        for (int slice = 0; slice < 10; slice++)
             AddFirstArrayToSecondArray.at(first, second, slice);
 
         Assert.assertEquals(1.0, first[0]);
 
-        for(int i=0; i<second.length; i++)
+        for (int i = 0; i < second.length; i++)
             Assert.assertEquals(1.0, second[i]);
     }
 

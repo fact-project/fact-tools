@@ -9,24 +9,23 @@ import java.awt.*;
 
 /**
  * @author kai
- *
  */
 public abstract class Tile extends Component {
 
-	/** The unique class ID */
-	private static final long serialVersionUID = 8849968124603265083L;
+    /**
+     * The unique class ID
+     */
+    private static final long serialVersionUID = 8849968124603265083L;
 
     /**
      * The polygon which defines the shape of the tile
      */
-	protected Polygon polygon;
+    protected Polygon polygon;
 
     /**
      * Center position of this tile
      */
     protected Point position;
-
-
 
 
     private Color borderColor = Color.WHITE;
@@ -35,37 +34,37 @@ public abstract class Tile extends Component {
 
     public abstract CameraPixel getCameraPixel();
 
-	Double value = 0.0d;
+    Double value = 0.0d;
 
 
     //Calculates the center position from the abstract pixel coordinates according to the geometry of the tile
-	//private abstract Point getPosition();
+    //private abstract Point getPosition();
 
     public abstract Polygon getPolygon();
 
     @Override
-    public boolean contains(Point p){
+    public boolean contains(Point p) {
         return getPolygon().contains(p);
     }
 
 
-	/**
-	 * @see java.awt.Component#paint(java.awt.Graphics)
-	 */
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+    /**
+     * @see java.awt.Component#paint(java.awt.Graphics)
+     */
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
         paintBackground(g);
         paintBorder(g);
-	}
+    }
 
-	/**
-	 * @see java.awt.Component#paint(java.awt.Graphics)
-	 */
-	public void paintBackground(Graphics g) {
-		Polygon p = getPolygon();
+    /**
+     * @see java.awt.Component#paint(java.awt.Graphics)
+     */
+    public void paintBackground(Graphics g) {
+        Polygon p = getPolygon();
         Color c = g.getColor();
-		g.setColor(fillColor);
+        g.setColor(fillColor);
 
         CameraPixel pixel = (CameraPixel) this.getCameraPixel();
         /*
@@ -80,32 +79,31 @@ public abstract class Tile extends Component {
         }
         */
 
-		g.fillPolygon(p);
+        g.fillPolygon(p);
         g.setColor(c);
-	}
+    }
 
-	public void paintBorder(Graphics g) {
-		Polygon p = getPolygon();
+    public void paintBorder(Graphics g) {
+        Polygon p = getPolygon();
         Color c = g.getColor();
         g.setColor(this.borderColor);
-		g.drawPolygon(p);
+        g.drawPolygon(p);
         g.setColor(c);
-	}
+    }
 
-	/**
-	 * @return the value
-	 */
-	public Double getValue() {
-		return value;
-	}
+    /**
+     * @return the value
+     */
+    public Double getValue() {
+        return value;
+    }
 
-	/**
-	 * @param value
-	 *            the value to set
-	 */
-	public void setValue(Double value) {
-		this.value = value;
-	}
+    /**
+     * @param value the value to set
+     */
+    public void setValue(Double value) {
+        this.value = value;
+    }
 
 
     public Color getFillColor() {

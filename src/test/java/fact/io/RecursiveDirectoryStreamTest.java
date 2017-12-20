@@ -20,7 +20,7 @@ public class RecursiveDirectoryStreamTest {
     static org.slf4j.Logger log = LoggerFactory.getLogger(RecursiveDirectoryStreamTest.class);
 
     @Rule
-    public TemporaryFolder folder= new TemporaryFolder();
+    public TemporaryFolder folder = new TemporaryFolder();
 
     private void createTestFiles() throws IOException {
         folder.newFolder("aux", "2013", "08");
@@ -51,7 +51,7 @@ public class RecursiveDirectoryStreamTest {
     public void testGlob() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
 
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
@@ -65,7 +65,7 @@ public class RecursiveDirectoryStreamTest {
     public void testGlobTrackingSourcePos() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
 
@@ -80,7 +80,7 @@ public class RecursiveDirectoryStreamTest {
     public void testGlobSourcePos() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
 
@@ -95,7 +95,7 @@ public class RecursiveDirectoryStreamTest {
     public void testGlobPos() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         //no files in this directory
@@ -110,7 +110,7 @@ public class RecursiveDirectoryStreamTest {
     public void testInvalidGlobPattern() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         //this is not a valid pattern

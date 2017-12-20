@@ -2,6 +2,7 @@ package fact.coordinates;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import fact.coordinates.Resources.Source;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,6 @@ import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import fact.coordinates.Resources.Source;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -30,7 +30,7 @@ public class HorizontalCoordinateTest {
         JsonReader jsonReader = new JsonReader(new InputStreamReader(testData));
         Source[] sources = gson.fromJson(jsonReader, Source[].class);
 
-        for(Source source: sources){
+        for (Source source : sources) {
             log.debug("Testing transform for source {} at {}", source.name, source.obstime);
 
             ZonedDateTime obstime = ZonedDateTime.parse(source.obstime.replace(" ", "T") + "Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME);

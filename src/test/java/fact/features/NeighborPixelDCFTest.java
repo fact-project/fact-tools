@@ -18,23 +18,23 @@ public class NeighborPixelDCFTest {
     DescriptiveStatistics statsA, statsB;
 
     @Before
-    public void setup() throws Exception{
+    public void setup() throws Exception {
         statsA = new DescriptiveStatistics(arrayA);
         statsB = new DescriptiveStatistics(arrayB);
     }
 
     @Test
     public void testUDCF() {
-        double a        = 2.0;
-        double b        = 2.0;
-        double meanA    = 1.0;
-        double meanB    = 1.0;
-        double stdDevA  = 2.0;
-        double stdDevB  = 2.0;
-        double noiseA   = 1.0;
-        double noiseB   = 1.0;
+        double a = 2.0;
+        double b = 2.0;
+        double meanA = 1.0;
+        double meanB = 1.0;
+        double stdDevA = 2.0;
+        double stdDevB = 2.0;
+        double noiseA = 1.0;
+        double noiseB = 1.0;
 
-        double true_udcf = 1/3.0;
+        double true_udcf = 1 / 3.0;
 
         NeighborPixelDCF npDCF = new NeighborPixelDCF();
 
@@ -43,7 +43,7 @@ public class NeighborPixelDCFTest {
         double udcf = npDCF.UDCF(a, b, meanA, meanB, udcfNorm);
 
         assertTrue("UDCF should be " + true_udcf +
-                " but its " + udcf , udcf == true_udcf);
+                " but its " + udcf, udcf == true_udcf);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class NeighborPixelDCFTest {
         double dcf = npDCF.DCF(0, arrayA, arrayB, statsA.getMean(), statsB.getMean(), udcfNorm);
 
         assertTrue("DCF should be " + true_dcf +
-                " but its " + dcf , dcf == true_dcf);
+                " but its " + dcf, dcf == true_dcf);
     }
 
 }
