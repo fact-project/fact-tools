@@ -1,6 +1,7 @@
 package fact.features.source;
 
 import fact.Utils;
+import fact.container.PixelSet;
 import fact.coordinates.CameraCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import stream.Data;
@@ -12,10 +13,8 @@ public class ReconstructSourcePositionDisp implements Processor {
     public String dispKey = null;
 
     @Parameter(required = true)
-    public String cogxKey = null;
+    public String cogKey = null;
 
-    @Parameter(required = true)
-    public String cogyKey = null;
 
     @Parameter(required = true)
     public String deltaKey = null;
@@ -33,16 +32,17 @@ public class ReconstructSourcePositionDisp implements Processor {
     public double signM3lConstant = 0;
 
     public Data process(Data input) {
-        Utils.mapContainsKeys(input, dispKey, cogxKey, cogyKey, deltaKey, cosDeltaAlphaKey);
+        Utils.mapContainsKeys(input, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey);
+        Utils.isKeyValid(input, cogKey, PixelSet.class);
 
         double disp = (double) input.get(dispKey);
-        double cogx = (double) input.get(cogxKey);
-        double cogy = (double) input.get(cogyKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+
         double delta = (double) input.get(deltaKey);
         double m3l = Math.cbrt((double) input.get(m3LongKey));  // MARS calls cbrt(M3) M3
         double cosDeltaAlpha = (double) input.get(cosDeltaAlphaKey);
 
-        CameraCoordinate recPosition = calculateRecPosition(cogx, cogy, disp, delta, cosDeltaAlpha, m3l);
+        CameraCoordinate recPosition = calculateRecPosition(cog.xMM, cog.yMM, disp, delta, cosDeltaAlpha, m3l);
 
         input.put("@reconstructedPosition" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
         input.put(outputKey, recPosition);

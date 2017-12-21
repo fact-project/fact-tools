@@ -2,6 +2,7 @@ package fact.features.source;
 
 import fact.Utils;
 import fact.coordinates.CameraCoordinate;
+import fact.hexmap.CameraPixel;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -21,10 +22,7 @@ public class CosDeltaAlpha implements Processor {
     public String sourcePositionKey;
 
     @Parameter(required = true)
-    public String cogxKey;
-
-    @Parameter(required = true)
-    public String cogyKey;
+    public String cogKey;
 
     @Parameter(required = true)
     public String deltaKey;
@@ -35,32 +33,32 @@ public class CosDeltaAlpha implements Processor {
     @Override
     public Data process(Data input) {
 
-        Utils.mapContainsKeys(input, sourcePositionKey, cogxKey, cogyKey, deltaKey);
-        CameraCoordinate sourcePosition = (CameraCoordinate) input.get(sourcePositionKey);
+        Utils.mapContainsKeys(input, sourcePositionKey, cogKey, deltaKey);
+        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
-        double cogx = (double) input.get(cogxKey);
-        double cogy = (double) input.get(cogyKey);
+        CameraCoordinate sourcePosition = (CameraCoordinate) input.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
         double delta = (double) input.get(deltaKey);
 
-        double sx = cogx - sourcePosition.xMM;
-        double sy = cogy - sourcePosition.yMM;
-        double dist = Math.sqrt(sx * sx + sy * sy);
+        double dist = cog.euclideanDistance(sourcePosition);
 
+        double cosDeltaAlpha;
         if (dist == 0) {
-            return input;
+            cosDeltaAlpha = Double.NaN;
+        } else {
+
+            double s = Math.sin(delta);
+            double c = Math.cos(delta);
+
+            double arg2 = c * (cog.xMM - sourcePosition.xMM) + s * (cog.yMM - sourcePosition.yMM); // mm
+
+            if (arg2 == 0) {
+                cosDeltaAlpha = Double.NaN;
+            } else {
+                cosDeltaAlpha = arg2 / dist;
+            }
         }
-
-        double s = Math.sin(delta);
-        double c = Math.cos(delta);
-
-        double arg2 = c * sx + s * sy; // mm
-
-        if (arg2 == 0) {
-            return input;
-        }
-        //double arg1 = c*sy - s*sx;          // [mm]
-
-        double cosDeltaAlpha = arg2 / dist;
 
         input.put(outputKey, cosDeltaAlpha);
         return input;
