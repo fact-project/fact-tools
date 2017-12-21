@@ -19,7 +19,7 @@
   <property name="twoLevelTimeNeighbor_timeLimit" value="3.0" />
   <property name="twoLevelTimeNeighbor_minNumberOfPixel" value="2" />
 
-  <property name="features" value="timestamp,COGx,COGy,ConcCore,Delta,EventNum,Leakage,Leakage2,Length,M3Long,M3Trans,M4Long,M4Trans,NIGHT,NumPixelAfterCleaning,PCOUNT,RUNID,RUNTYPE,Size,Width,arrivalTimeCleaningStatistics_kurtosis,arrivalTimeCleaningStatistics_max,arrivalTimeCleaningStatistics_mean,arrivalTimeCleaningStatistics_min,arrivalTimeCleaningStatistics_skewness,arrivalTimeCleaningStatistics_variance,arrivalTimeStatistics_kurtosis,arrivalTimeStatistics_max,arrivalTimeStatistics_mean,arrivalTimeStatistics_min,arrivalTimeStatistics_skewness,arrivalTimeStatistics_variance,bestR,bestRingPixel,bestX,bestY,shower,conc1,conc2,concCOG,houghCleaningPercentage,houghDistance,houghOctantsHit,houghPeakness,houghRingPercentage,numIslands,photonchargeCleaningStatistics_kurtosis,photonchargeCleaningStatistics_max,photonchargeCleaningStatistics_mean,photonchargeCleaningStatistics_min,photonchargeCleaningStatistics_skewness,photonchargeCleaningStatistics_variance,photonchargeStatistics_kurtosis,photonchargeStatistics_max,photonchargeStatistics_mean,photonchargeStatistics_min,photonchargeStatistics_skewness,photonchargeStatistics_variance,timeOverThreshold_numPixel,ZdPointing,ZdTracking,ZdSourceCalc,Distance,SourceName,gaussianFitX,gaussianFitY,gaussianFitR,gaussianFitSigma,StdDevTime8.0,numPixelStdDevTime8.0"/>
+  <property name="features" value="timestamp,cogX,cogY,ConcCore,delta,EventNum,Leakage,Leakage2,length,m3Long,m3Trans,m4Long,m4Trans,skewnessLong,skewnessTrans,kurtosisLong,kurtosisTrans,NIGHT,numPixelAfterCleaning,PCOUNT,RUNID,RUNTYPE,size,width,arrivalTimeCleaningStatistics_kurtosis,arrivalTimeCleaningStatistics_max,arrivalTimeCleaningStatistics_mean,arrivalTimeCleaningStatistics_min,arrivalTimeCleaningStatistics_skewness,arrivalTimeCleaningStatistics_variance,arrivalTimeStatistics_kurtosis,arrivalTimeStatistics_max,arrivalTimeStatistics_mean,arrivalTimeStatistics_min,arrivalTimeStatistics_skewness,arrivalTimeStatistics_variance,bestR,bestRingPixel,bestX,bestY,shower,conc1,conc2,concCOG,houghCleaningPercentage,houghDistance,houghOctantsHit,houghPeakness,houghRingPercentage,numIslands,photonchargeCleaningStatistics_kurtosis,photonchargeCleaningStatistics_max,photonchargeCleaningStatistics_mean,photonchargeCleaningStatistics_min,photonchargeCleaningStatistics_skewness,photonchargeCleaningStatistics_variance,photonchargeStatistics_kurtosis,photonchargeStatistics_max,photonchargeStatistics_mean,photonchargeStatistics_min,photonchargeStatistics_skewness,photonchargeStatistics_variance,timeOverThreshold_numPixel,ZdPointing,ZdTracking,ZdSourceCalc,Distance,SourceName,gaussianFitX,gaussianFitY,gaussianFitR,gaussianFitSigma,StdDevTime8.0,numPixelStdDevTime8.0"/>
 
   <property name="outputKeys" value="${features}"/>
 
@@ -36,14 +36,12 @@
 
 
     <Skip condition="%{data.shower} == null" />
-    <fact.pixelsets.Length pixelSetKey="shower" outputKey="NumPixelAfterCleaning" />
-    <Skip condition="%{data.NumPixelAfterCleaning} &lt; 15" />
+    <fact.pixelsets.Length pixelSetKey="shower" outputKey="numPixelAfterCleaning" />
+    <Skip condition="%{data.numPixelAfterCleaning} &lt; 15" />
 
-    <fact.features.DistributionFromShower
+    <fact.features.HillasParameters
       weightsKey="photoncharge"
       pixelSetKey="shower"
-      sizeKey="Size"
-      outputKey="showerDistribution"
     />
 
     <fact.statistics.ArrayStatistics
@@ -74,7 +72,7 @@
     <fact.features.Size
       pixelSetKey="shower"
       photonChargeKey="photoncharge"
-      outputKey="Size"
+      outputKey="size"
     />
 
     <fact.features.Concentration
@@ -85,25 +83,25 @@
     />
 
     <fact.features.ConcentrationCore
-      cogxKey="COGx"
-      cogyKey="COGy"
+      cogxKey="cogX"
+      cogyKey="cogY"
       pixelSetKey="shower"
       photonChargeKey="photoncharge"
-      sizeKey="Size"
-      widthKey="Width"
-      lengthKey="Length"
+      sizeKey="size"
+      widthKey="width"
+      lengthKey="length"
       deltaKey="Delta"
       outputKey="ConcCore"
     />
     <fact.features.ConcentrationAtCenterOfGravity
       photonChargeKey="photoncharge"
-      cogxKey="COGx"
-      cogyKey="COGy"
-      sizeKey="Size"
+      cogxKey="cogX"
+      cogyKey="cogY"
+      sizeKey="size"
       outputKey="concCOG"
     />
     <fact.features.Leakage
-      cogKey="showerDistribution"
+      cogKey="cog"
       pixelSetKey="shower"
       weights="photoncharge"
       leakage1OutputKey="Leakage"
@@ -133,7 +131,7 @@
     />
 
     <fact.features.source.Distance
-      cogKey="showerDistribution"
+      cogKey="cog"
       sourcePositionKey="sourcePositionKey"
       outputKey="Distance"
     />
