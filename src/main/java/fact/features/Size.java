@@ -2,6 +2,7 @@ package fact.features;
 
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -28,16 +29,11 @@ public class Size implements Processor {
     public Data process(Data input) {
 
 
-        Utils.mapContainsKeys(input, photonChargeKey);
+        Utils.mapContainsKeys(input, photonChargeKey, pixelSetKey);
 
-        double size = 0;
-        if (input.containsKey(pixelSetKey)) {
-
-            int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
-            double[] charge = (double[]) input.get(photonChargeKey);
-
-            size = calculateSize(shower, charge);
-        }
+        PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
+        double[] charge = (double[]) input.get(photonChargeKey);
+        double size = calculateSize(pixelSet, charge);
         input.put("@size", size);
         input.put(outputKey, size);
         return input;
@@ -46,14 +42,14 @@ public class Size implements Processor {
     /**
      * Get the size of the shower.
      *
-     * @param shower the array containing the chids of the pixels which are marked as showers
+     * @param pixelSet PixelSet to take into account
      * @param weight some sort of weight for each pixel. Should have 1440 entries
      * @return the weighted sum of the showerpixels
      */
-    public double calculateSize(int[] shower, double[] weight) {
+    public double calculateSize(PixelSet pixelSet, double[] weight) {
         double size = 0;
-        for (int i = 0; i < shower.length; i++) {
-            size += weight[shower[i]];
+        for (CameraPixel pixel: pixelSet) {
+            size += weight[pixel.id];
         }
         return size;
     }
