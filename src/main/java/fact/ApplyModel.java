@@ -114,10 +114,4 @@ public class ApplyModel implements StatefulProcessor {
 
         return data;
     }
-
-
-    public void setUrl(SourceURL url) {
-        this.url = url;
-    }
-
 }

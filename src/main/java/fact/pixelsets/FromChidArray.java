@@ -16,10 +16,10 @@ public class FromChidArray implements Processor {
     static Logger log = LoggerFactory.getLogger(FromChidArray.class);
 
     @Parameter(required = true, description = "key to the input int array of chids")
-    String inputKey;
+    public String inputKey;
 
     @Parameter(required = true, description = "key to the output for the pixelSet")
-    String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {

@@ -7,9 +7,9 @@ import stream.annotations.Parameter;
 
 public class Disp implements Processor {
     @Parameter(required = true)
-    private String widthKey = null;
+    public String widthKey = null;
     @Parameter(required = true)
-    private String lengthKey = null;
+    public String lengthKey = null;
 
     //	private String slopeKey = null;
 //
@@ -17,7 +17,7 @@ public class Disp implements Processor {
 //
 //	private String sizeKey = null;
     @Parameter(required = true, defaultValue = "117.94")
-    private double c0 = 117.94;
+    public double c0 = 117.94;
     //	private double c1 = 117.94;
 //	private double c2 = 117.94;
 //	private double c3 = 117.94;
@@ -62,37 +62,4 @@ public class Disp implements Processor {
 
         return disp;
     }
-
-    public String getWidthKey() {
-        return widthKey;
-    }
-
-    public void setWidthKey(String widthKey) {
-        this.widthKey = widthKey;
-    }
-
-    public String getLengthKey() {
-        return lengthKey;
-    }
-
-    public void setLengthKey(String lengthKey) {
-        this.lengthKey = lengthKey;
-    }
-
-    public double getC0() {
-        return c0;
-    }
-
-    public void setC0(double c0) {
-        this.c0 = c0;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

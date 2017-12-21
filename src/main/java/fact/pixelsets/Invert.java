@@ -19,10 +19,10 @@ public class Invert implements Processor {
     static Logger log = LoggerFactory.getLogger(Invert.class);
 
     @Parameter(required = true, description = "key to the set to be inverted")
-    String insetKey;
+    public String insetKey;
 
     @Parameter(required = true, description = "key to the output set which contains the inversion")
-    String outsetKey;
+    public String outsetKey;
 
     @Override
     public Data process(Data input) {

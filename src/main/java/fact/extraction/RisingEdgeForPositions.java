@@ -18,17 +18,19 @@ public class RisingEdgeForPositions implements Processor {
 
     static Logger log = LoggerFactory.getLogger(RisingEdgeForPositions.class);
 
+    @Parameter(required = true)
+    public String dataKey = null;
+
+    @Parameter(required = true)
+    public String outputKey = null;
+
+    @Parameter(required = true)
+    public String amplitudePositionsKey = null;
+
+    @Parameter(required = true)
+    public String maxSlopesKey = null;
+
     private int searchWindowLeft = 25;
-
-    @Parameter(required = true)
-    private String dataKey = null;
-    @Parameter(required = true)
-    private String outputKey = null;
-    @Parameter(required = true)
-    private String amplitudePositionsKey = null;
-    @Parameter(required = true)
-    private String maxSlopesKey = null;
-
     private int npix;
 
     @Override
@@ -83,45 +85,5 @@ public class RisingEdgeForPositions implements Processor {
 
         return input;
 
-    }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getAmplitudePositionsKey() {
-        return amplitudePositionsKey;
-    }
-
-    public void setAmplitudePositionsKey(String amplitudePositionsKey) {
-        this.amplitudePositionsKey = amplitudePositionsKey;
-    }
-
-    public String getMaxSlopesKey() {
-        return maxSlopesKey;
-    }
-
-    public void setMaxSlopesKey(String maxSlopesKey) {
-        this.maxSlopesKey = maxSlopesKey;
-    }
-
-    public int getSearchWindowLeft() {
-        return searchWindowLeft;
-    }
-
-    public void setSearchWindowLeft(int searchWindowLeft) {
-        this.searchWindowLeft = searchWindowLeft;
     }
 }

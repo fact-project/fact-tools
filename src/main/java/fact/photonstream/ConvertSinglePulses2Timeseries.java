@@ -15,16 +15,16 @@ import stream.annotations.Parameter;
  */
 public class ConvertSinglePulses2Timeseries implements Processor {
     @Parameter(required = true, description = "The arrival slices of the single pulses.")
-    private String singlePulsesKey = null;
+    public String singlePulsesKey = null;
 
     @Parameter(required = true, description = "The reconstruted time series.")
-    private String timeSeriesKey = null;
+    public String timeSeriesKey = null;
 
     @Parameter(required = false, description = "The region of interest to be reconstructed.")
-    private int roi = 300;
+    public int roi = 300;
 
     @Parameter(required = false, description = "The reconstructed baseline of the original time series.")
-    private String baseLineKey = null;
+    public String baseLineKey = null;
 
     @Override
     public Data process(Data input) {
@@ -67,21 +67,5 @@ public class ConvertSinglePulses2Timeseries implements Processor {
         input.put(timeSeriesKey, timeSeries);
 
         return input;
-    }
-
-    public void setSinglePulsesKey(String singlePulsesKey) {
-        this.singlePulsesKey = singlePulsesKey;
-    }
-
-    public void settimeSeriesKey(String timeSeriesKey) {
-        this.timeSeriesKey = timeSeriesKey;
-    }
-
-    public void setBaseLineKey(String baseLineKey) {
-        this.baseLineKey = baseLineKey;
-    }
-
-    public void setRoi(int roi) {
-        this.roi = roi;
     }
 }

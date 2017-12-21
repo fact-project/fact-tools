@@ -23,18 +23,22 @@ public class ArrivalTimeFromSlope implements Processor {
     static Logger log = LoggerFactory.getLogger(ArrivalTimeFromSlope.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = true)
-    private String derivationKey;
+    public String derivationKey;
     //slopes at each time slice; used features.Derivation
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
     //positions of arrival times
+
     @Parameter(required = false)
-    private String visualizeKey;
+    public String visualizeKey;
     //array of size data.length with values of zero except for time slices of arrival times.
+
     @Parameter(required = false)
-    private String baselineKey;
+    public String baselineKey;
     //used in OpenShutterPulseSize to account for negative values
 
     private int skipFirstSlices = 0;
@@ -212,77 +216,4 @@ public class ArrivalTimeFromSlope implements Processor {
         baselineValues[pix] = Utils.arrayListToDouble(baseValues);
         return Utils.arrayListToInt(times);
     }
-
-
-
-    /*
-     * Getters and Setters
-     */
-
-
-    public String getDerivationKey() {
-        return derivationKey;
-    }
-
-    public void setDerivationKey(String derivationKey) {
-        this.derivationKey = derivationKey;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getVisualizeKey() {
-        return visualizeKey;
-    }
-
-    public void setVisualizeKey(String visualizeKey) {
-        this.visualizeKey = visualizeKey;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public String getBaselineKey() {
-        return baselineKey;
-    }
-
-    public void setBaselineKey(String baselineKey) {
-        this.baselineKey = baselineKey;
-    }
-
-    public int getSkipFirstSlices() {
-        return skipFirstSlices;
-    }
-
-    public void setSkipFirstSlices(int skipFirstSlices) {
-        this.skipFirstSlices = skipFirstSlices;
-    }
-
-    public int getSkipLastSlices() {
-        return skipLastSlices;
-    }
-
-    public void setSkipLastSlices(int skipLastSlices) {
-        this.skipLastSlices = skipLastSlices;
-    }
-
-
 }

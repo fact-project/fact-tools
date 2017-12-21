@@ -30,16 +30,25 @@ public class HistogramArrayPlotter extends DataVisualizer {
     static Logger log = LoggerFactory.getLogger(HistogramArrayPlotter.class);
     JFrame frame;
 
+    @Parameter(required = false, description = "Flag indicates whether the window stays open after the process has finished", defaultValue = "true")
     private boolean keepOpen = true;
+
+    @Parameter(required = true, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
     private String key;
 
-    private double binWidth = 0.5f;
+    private double binWidth = 0.5;
 
+    @Parameter(required = false, description = "Flag to indicate wether the y-Axis should be in logarithmic units")
     private boolean logAxis = false;
 
     private SimpleHistogramDataset dataset;
+
+    @Parameter(required = false, description = "The title string of the window")
     private String title = "Histogram";
-    private String color = "#666699";
+
+    @Parameter(required = false, description = "The color of the bars to be drawn #f4f4f4")
+    public String color = "#666699";
+
     private JFreeChart chart;
     private long counter = 0;
 
@@ -137,63 +146,5 @@ public class HistogramArrayPlotter extends DataVisualizer {
     }
 
 
-    public boolean isKeepOpen() {
-        return keepOpen;
-    }
-
-    @Parameter(required = false, description = "Flag indicates whether the window stays open after the process has finished", defaultValue = "true")
-    public void setKeepOpen(boolean keepOpen) {
-        this.keepOpen = keepOpen;
-    }
-
-
-    public String getKey() {
-        return key;
-    }
-
-    @Parameter(required = true, description = "The attributes/features to be plotted (non-numerical features will be ignored)")
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public boolean isLogAxis() {
-        return logAxis;
-    }
-
-    @Parameter(required = false, description = "Flag to indicate wether the y-Axis should be in logarithmic units")
-    public void setLogAxis(boolean logAxis) {
-        this.logAxis = logAxis;
-    }
-
-
-    public String getTitle() {
-        return title;
-    }
-
-    @Parameter(required = false, description = "The title string of the window")
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-
-    public String getColor() {
-        return color;
-    }
-
-    @Parameter(required = false, description = "The color of the bars to be drawn #f4f4f4")
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-
-    public double getBinWidth() {
-        return binWidth;
-    }
-
-
-    public void setBinWidth(double binWidth) {
-        this.binWidth = binWidth;
-    }
 
 }

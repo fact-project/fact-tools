@@ -23,13 +23,13 @@ public class ExponentialSmoothing implements Processor {
     @Parameter(required = true, description = "This value changes the amount of smoothing that will take place. " +
             "If alpha equals 1 the values remain unchanged.  " +
             "See http://en.wikipedia.org/wiki/Exponential_smoothing", min = 0.0, max = 1.0, defaultValue = "0.5")
-    double alpha = 0.5;
+    public double alpha = 0.5;
 
     @Parameter(required = true, description = "The key to the double array to smooth")
-    String key;
+    public String key;
 
     @Parameter(required = true, description = "The outputKey to which the smoothed data will be written to the stream")
-    String outputKey;
+    public String outputKey;
 
     private int npix;
 
@@ -55,35 +55,4 @@ public class ExponentialSmoothing implements Processor {
         item.put(outputKey, smoothedData);
         return item;
     }
-
-
-    /*
-     * Getter and Setter
-     */
-    public double getAlpha() {
-        return alpha;
-    }
-
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
-    }
-
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

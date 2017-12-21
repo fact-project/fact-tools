@@ -28,50 +28,48 @@ public class HoughTransform implements StatefulProcessor {
 
     // OutputKeys
     @Parameter(required = false, description = "outputkey for the hough peakness")
-    String peaknessKey = "hough:peakness";
+    public String peaknessKey = "hough:peakness";
 
     @Parameter(required = false, description = "outputkey for the hough distance")
-    String distanceKey = "hough:distance";
+    public String distanceKey = "hough:distance";
 
     @Parameter(required = false, description = "outputkey for the octantsHit parameter")
-    String octantsHitKey = "hough:octants";
+    public String octantsHitKey = "hough:octants";
 
     @Parameter(required = false, description = "outputkey for the cleaningPercentage parameter")
-    String cleaningPercentageKey = "hough:cleaningPercentage";
+    public String cleaningPercentageKey = "hough:cleaningPercentage";
 
     @Parameter(required = false, description = "outputkey for the ringPercentage parameter")
-    String ringPercentageKey = "hough:ringPercentage";
+    public String ringPercentageKey = "hough:ringPercentage";
 
     @Parameter(required = false, description = "outputkey for the hough pixelset of the best Ring")
-    String bestCircleKey = "hough:Ring";
+    public String bestCircleKey = "hough:Ring";
 
     @Parameter(required = false, description = "outputkey for x coordinate of the center point of the best ring")
-    String bestXKey = "hough:x";
+    public String bestXKey = "hough:x";
 
     @Parameter(required = false, description = "outputkey for y coordinate of the center point of the best ring")
-    String bestYKey = "hough:y";
+    public String bestYKey = "hough:y";
 
     @Parameter(required = false, description = "outputkey for the radius of the best ring")
-    String bestRadiusKey = "hough:r";
+    public String bestRadiusKey = "hough:r";
 
     @Parameter(required = false, description = "outputkey for pixel chids on the best ring")
-    String bestRingPixelKey = "hough:pixel";
+    public String bestRingPixelKey = "hough:pixel";
 
 
     //InputKeys
     @Parameter(required = true, description = "The Pixelset on which the hough transform is performed, usually the cleaning output")
-    String pixelSetKey;
+    public String pixelSetKey;
 
     @Parameter(required = true, description = "PhotonCharge")
-    String photonChargeKey;
+    public String photonChargeKey;
 
-    //If showRingkey == true, the PixelSets for the three best circles are returned for the Viewer
     @Parameter(required = false, description = "if this key is true, the three best rings will be shown in the viewer", defaultValue = "false")
-    boolean showRingKey = false;
+    public boolean showRingKey = false;
 
-    //if true the 2D-HoughMatrix for x and y at best Radius is printed on the terminal
     @Parameter(required = false, description = "if this key is true, the Hough Accumulator at the bestR will be printetd on the terminal", defaultValue = "false")
-    boolean showMatrixKey = false;
+    public boolean showMatrixKey = false;
 
     double min_radius = 40;  // minimal radius in mm
     double max_radius = 120; // maximal  -->radius in mm

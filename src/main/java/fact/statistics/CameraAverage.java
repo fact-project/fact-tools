@@ -5,19 +5,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class CameraAverage implements Processor {
 
     static Logger log = LoggerFactory.getLogger(CameraAverage.class);
 
-    String key = null;
-    String outputKey = null;
+    @Parameter(required = true)
+    public String key;
+    public String outputKey;
 
     private int npix;
 
     @Override
     public Data process(Data input) {
-        // TODO Auto-generated method stub
         Utils.mapContainsKeys(input, key);
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");

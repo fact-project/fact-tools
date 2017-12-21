@@ -3,11 +3,16 @@ package fact.features.snake;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PolygonArea implements Processor {
+    @Parameter(required = true)
     private String outkey = null;
 
+    @Parameter(required = true)
     private String polygonX = null;
+
+    @Parameter(required = true)
     private String polygonY = null;
 
     @Override
@@ -32,30 +37,4 @@ public class PolygonArea implements Processor {
 
         return input;
     }
-
-    public String getOutkey() {
-        return outkey;
-    }
-
-    public void setOutkey(String outkey) {
-        this.outkey = outkey;
-    }
-
-    public String getPolygonX() {
-        return polygonX;
-    }
-
-    public void setPolygonX(String polygonX) {
-        this.polygonX = polygonX;
-    }
-
-    public String getPolygonY() {
-        return polygonY;
-    }
-
-    public void setPolygonY(String polygonY) {
-        this.polygonY = polygonY;
-    }
-
-
 }

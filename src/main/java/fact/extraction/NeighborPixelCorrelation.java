@@ -20,33 +20,33 @@ import stream.annotations.Parameter;
  */
 public class NeighborPixelCorrelation implements Processor {
     @Parameter(required = true, description = "raw data array")
-    private String key = null;
+    public String key = null;
 
     @Parameter(required = true, description = "array containing the positions of maximum amplitudes for each pixel")
-    private String amplitudePositionsKey = null;
+    public String amplitudePositionsKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used, " +
             "if no pixelset is given, the whole camera is used", defaultValue = "")
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "15")
-    private int skipFirst = 15;
+    public int skipFirst = 15;
 
     @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
-    private int skipLast = 50;
+    public int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the correlation of neighbouring pixels")
-    private String correlationKey = "NPCor";
+    public String correlationKey = "NPCor";
 
     @Parameter(required = false, description = "Outputkey for the covariance of neighbouring pixels")
-    private String covarianceKey = "NPCov";
+    public String covarianceKey = "NPCov";
 
     @Parameter(required = false, description = "Outputkey for the covariance window marker")
-    private String markerKey = "covarianceWindow";
+    public String markerKey = "covarianceWindow";
 
     @Parameter(required = false, description = "Return scaled mean correlation (values between 0 and 1) if 'true'." +
             "Return absolute values if 'false'.", defaultValue = "false")
-    private boolean returnScaledCorrelation = false;
+    public boolean returnScaledCorrelation = false;
 
 
     private int npix = 1440;
@@ -244,42 +244,5 @@ public class NeighborPixelCorrelation implements Processor {
         }
 
         return scaledCorrelation;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setAmplitudePositionsKey(String amplitudePositionsKey) {
-        this.amplitudePositionsKey = amplitudePositionsKey;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
-    }
-
-    public void setCorrelationKey(String correlationKey) {
-        this.correlationKey = correlationKey;
-    }
-
-    public void setCovarianceKey(String covarianceKey) {
-        this.covarianceKey = covarianceKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setMarkerKey(String markerKey) {
-        this.markerKey = markerKey;
-    }
-
-    public void setReturnScaledCorrelation(boolean returnScaledCorrelation) {
-        this.returnScaledCorrelation = returnScaledCorrelation;
     }
 }

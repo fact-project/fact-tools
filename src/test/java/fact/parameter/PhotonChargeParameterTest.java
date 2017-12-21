@@ -27,14 +27,12 @@ public class PhotonChargeParameterTest extends ParameterTest {
         assertTrue("Expecteds output already in data item",
                 !item.containsKey(outputKey));
         BasicExtraction extraction = new BasicExtraction();
-        extraction.setDataKey(key);
-        extraction.setOutputKeyMaxAmplPos(positions);
-        extraction.setOutputKeyPhotonCharge(outputKey);
-        extraction.setUrl(new SourceURL(FITSStreamTest.class
-                .getResource("/defaultIntegralGains.csv")));
+        extraction.dataKey = key;
+        extraction.outputKeyMaxAmplPos = positions;
+        extraction.outputKeyPhotonCharge = outputKey;
+        extraction.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
         extraction.process(item);
-        assertTrue("Expecteds output not in data item but it should be there",
-                item.containsKey(outputKey));
+        assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
         // item.remove(outputKey);
     }
 }

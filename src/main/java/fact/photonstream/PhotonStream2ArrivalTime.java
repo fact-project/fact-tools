@@ -9,12 +9,12 @@ public class PhotonStream2ArrivalTime implements Processor {
     @Parameter(
             required = true,
             description = "The arrival slices of the single pulses.")
-    private String singlePulsesKey = null;
+    public String singlePulsesKey = null;
 
     @Parameter(
             required = true,
             description = "The reconstruted arrival time")
-    private String arrivalTimeKey = null;
+    public String arrivalTimeKey = null;
 
     @Override
     public Data process(Data input) {
@@ -35,13 +35,4 @@ public class PhotonStream2ArrivalTime implements Processor {
         input.put(arrivalTimeKey, arrivalTimes);
         return input;
     }
-
-    public void setSinglePulsesKey(String singlePulsesKey) {
-        this.singlePulsesKey = singlePulsesKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
 }

@@ -12,14 +12,18 @@ import stream.annotations.Parameter;
 
 public class AntiSourcePosition implements Processor {
     static Logger log = LoggerFactory.getLogger(AntiSourcePosition.class);
+
     @Parameter(required = true)
-    private String sourcePositionKey = null;
+    public String sourcePositionKey = null;
+
     @Parameter(required = true)
-    private int numberOfAntiSourcePositions;
+    public int numberOfAntiSourcePositions;
+
     @Parameter(required = true)
-    private int antiSourcePositionId;
+    public int antiSourcePositionId;
+
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Override
     public Data process(Data input) {
@@ -42,38 +46,4 @@ public class AntiSourcePosition implements Processor {
         input.put(outputKey + "Y", antiSource.yMM);
         return input;
     }
-
-    public String getSourcePositionKey() {
-        return sourcePositionKey;
-    }
-
-    public void setSourcePositionKey(String sourcePositionKey) {
-        this.sourcePositionKey = sourcePositionKey;
-    }
-
-    public int getNumberOfAntiSourcePositions() {
-        return numberOfAntiSourcePositions;
-    }
-
-    public void setNumberOfAntiSourcePositions(int numberOfAntiSourcePositions) {
-        this.numberOfAntiSourcePositions = numberOfAntiSourcePositions;
-    }
-
-    public int getAntiSourcePositionId() {
-        return antiSourcePositionId;
-    }
-
-    public void setAntiSourcePositionId(int antiSourcePositionId) {
-        this.antiSourcePositionId = antiSourcePositionId;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

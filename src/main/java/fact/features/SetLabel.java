@@ -19,8 +19,4 @@ public class SetLabel implements Processor {
 
         return input;
     }
-
-    public void setLabel(int label) {
-        this.label = label;
-    }
 }

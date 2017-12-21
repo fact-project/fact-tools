@@ -20,16 +20,19 @@ import stream.annotations.Parameter;
 public class TimeseriesFeatures implements Processor {
 
     @Parameter(required = true, description = "key to the data array")
-    private String dataKey = null;
-    @Parameter(required = true, description = "key to a data array, which was previously filtered using a moving average filter")
-    private String movingAverageKey = null;
-    @Parameter(required = false, description = "left side of the search window for which the features are calculated. 0 < searchWindowLeft < roi", defaultValue = "10")
-    private int searchWindowLeft = 10;
-    @Parameter(required = false, description = "right side of the search window for which the features are calculated. 0 < searchWindowLeft < searchWindowRight < roi", defaultValue = "250")
-    private int searchWindowRight = 250;
-    @Parameter(required = true, description = "name of the key of the calculated features")
-    private String outputKey = null;
+    public String dataKey = null;
 
+    @Parameter(required = true, description = "key to a data array, which was previously filtered using a moving average filter")
+    public String movingAverageKey = null;
+
+    @Parameter(required = false, description = "left side of the search window for which the features are calculated. 0 < searchWindowLeft < roi", defaultValue = "10")
+    public int searchWindowLeft = 10;
+
+    @Parameter(required = false, description = "right side of the search window for which the features are calculated. 0 < searchWindowLeft < searchWindowRight < roi", defaultValue = "250")
+    public int searchWindowRight = 250;
+
+    @Parameter(required = true, description = "name of the key of the calculated features")
+    public String outputKey = null;
 
     private int numberOfBins = 200;
     private double histogramMinBin = -10.0;
@@ -125,47 +128,4 @@ public class TimeseriesFeatures implements Processor {
         int binNumber = (int) ((value - histogramMinBin) / binWidth);
         return binNumber;
     }
-
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-
-    public void setMovingAverageKey(String movingAverageKey) {
-        this.movingAverageKey = movingAverageKey;
-    }
-
-    public void setSearchWindowLeft(int searchWindowLeft) {
-        this.searchWindowLeft = searchWindowLeft;
-    }
-
-    public void setSearchWindowRight(int searchWindowRight) {
-        this.searchWindowRight = searchWindowRight;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setNumberOfBins(int numberOfBins) {
-        this.numberOfBins = numberOfBins;
-    }
-
-    public double getHistogramMinBin() {
-        return histogramMinBin;
-    }
-
-    public void setHistogramMinBin(double histogramMinBin) {
-        this.histogramMinBin = histogramMinBin;
-    }
-
-    public double getHistogramMaxBin() {
-        return histogramMaxBin;
-    }
-
-    public void setHistogramMaxBin(double histogramMaxBin) {
-        this.histogramMaxBin = histogramMaxBin;
-    }
-
 }

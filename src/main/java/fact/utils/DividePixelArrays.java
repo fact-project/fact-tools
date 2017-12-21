@@ -19,11 +19,13 @@ public class DividePixelArrays implements Processor {
     static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
 
     @Parameter(required = true, description = "The key to your data array.")
-    private String numeratorKey;
+    public String numeratorKey;
+
     @Parameter(required = true, description = "The key to your subtracted data array.")
-    private String denominatorKey;
+    public String denominatorKey;
+
     @Parameter(required = false)
-    private String outputKey;
+    public String outputKey;
 
     private int npix;
 
@@ -57,21 +59,4 @@ public class DividePixelArrays implements Processor {
 
         return input;
     }
-
-
-    public void setNumeratorKey(String numeratorKey) {
-        this.numeratorKey = numeratorKey;
-    }
-
-
-    public void setDenominatorKey(String denominatorKey) {
-        this.denominatorKey = denominatorKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

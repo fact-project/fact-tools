@@ -23,34 +23,45 @@ import stream.io.SourceURL;
  * @author Fabian Temme
  */
 public class BasicExtraction implements Processor {
-    static Logger log = LoggerFactory.getLogger(BasicExtraction.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicExtraction.class);
+
     @Parameter(required = true, description = "key to the data array")
-    protected String dataKey = null;
+    public String dataKey = null;
+
     @Parameter(required = true, description = "outputKey for the position of the max amplitudes")
-    protected String outputKeyMaxAmplPos = null;
+    public String outputKeyMaxAmplPos = null;
+
     @Parameter(required = true, description = "outputKey for the calculated photoncharge")
-    protected String outputKeyPhotonCharge = null;
+    public String outputKeyPhotonCharge = null;
 
     @Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants", defaultValue = "file:src/main/resources/defaultIntegralGains.csv")
-    protected SourceURL url = null;
+    public SourceURL url = null;
+
     @Parameter(required = false, description = "start slice of the search window for the max amplitude", defaultValue = "35")
-    protected int startSearchWindow = 35;
+    public int startSearchWindow = 35;
+
     @Parameter(required = false, description = "range of the search window for the max amplitude", defaultValue = "90")
-    protected int rangeSearchWindow = 90;
+    public int rangeSearchWindow = 90;
+
     @Parameter(required = false, description = "range of the search window for the half heigt position", defaultValue = "25")
-    protected int rangeHalfHeightWindow = 25;
+    public int rangeHalfHeightWindow = 25;
+
     @Parameter(required = false, description = "range of the integration window", defaultValue = "30")
-    protected int integrationWindow = 30;
+    public int integrationWindow = 30;
+
     @Parameter(required = false, description = "minimal slice with valid values (we want to ignore slices below this value", defaultValue = "10")
-    protected int validMinimalSlice = 10;
+    public int validMinimalSlice = 10;
 
-    protected double[] integralGains = null;
-
+    double[] integralGains = null;
     private int npix = Constants.NUMBEROFPIXEL;
 
     @Override
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dataKey, "NROI");
+
+        if (integralGains == null) {
+            integralGains = loadIntegralGainFile(url);
+        }
 
         int roi = (Integer) input.get("NROI");
         npix = (Integer) input.get("NPIX");
@@ -129,7 +140,7 @@ public class BasicExtraction implements Processor {
     }
 
 
-    public double[] loadIntegralGainFile(SourceURL inputUrl, Logger log) {
+    public double[] loadIntegralGainFile(SourceURL inputUrl) {
         double[] integralGains = new double[npix];
         Data integralGainData = null;
         try {
@@ -149,84 +160,4 @@ public class BasicExtraction implements Processor {
             throw new RuntimeException(e);
         }
     }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKeyMaxAmplPos() {
-        return outputKeyMaxAmplPos;
-    }
-
-    public void setOutputKeyMaxAmplPos(String outputKeyMaxAmplPos) {
-        this.outputKeyMaxAmplPos = outputKeyMaxAmplPos;
-    }
-
-    public String getOutputKeyPhotonCharge() {
-        return outputKeyPhotonCharge;
-    }
-
-    public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-        this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-    }
-
-    public int getStartSearchWindow() {
-        return startSearchWindow;
-    }
-
-    public void setStartSearchWindow(int startSearchWindow) {
-        this.startSearchWindow = startSearchWindow;
-    }
-
-    public int getRangeSearchWindow() {
-        return rangeSearchWindow;
-    }
-
-    public void setRangeSearchWindow(int rangeSearchWindow) {
-        this.rangeSearchWindow = rangeSearchWindow;
-    }
-
-    public int getRangeHalfHeightWindow() {
-        return rangeHalfHeightWindow;
-    }
-
-    public void setRangeHalfHeightWindow(int rangeHalfHeightWindow) {
-        this.rangeHalfHeightWindow = rangeHalfHeightWindow;
-    }
-
-
-    public int getIntegrationWindow() {
-        return integrationWindow;
-    }
-
-    public void setIntegrationWindow(int integrationWindow) {
-        this.integrationWindow = integrationWindow;
-    }
-
-    public int getValidMinimalSlice() {
-        return validMinimalSlice;
-    }
-
-    public void setValidMinimalSlice(int validMinimalSlice) {
-        this.validMinimalSlice = validMinimalSlice;
-    }
-
-    public void setUrl(SourceURL url) {
-        try {
-            integralGains = loadIntegralGainFile(url, log);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        this.url = url;
-    }
-
-    public SourceURL getUrl() {
-        return url;
-    }
-
-
 }

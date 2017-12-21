@@ -25,16 +25,16 @@ public class BarPlotter extends DataVisualizer {
     private BarPlotPanel histPanel;
     JFrame frame;
     @Parameter(required = false, description = "Flag indicates whether the window stays open after the process has finished", defaultValue = "true")
-    private boolean keepOpen = true;
+    public  boolean keepOpen = true;
 
     @Parameter(required = false, description = "Flag to toggle drawing of Errorbars in plot.")
-    private boolean drawErrors = true;
+    public  boolean drawErrors = true;
 
     @Parameter(required = false, description = "The attributes/features to be plotted")
-    private String[] keys;
+    public  String[] keys;
 
     @Parameter(required = false, description = "Title String of the plot", defaultValue = "Default Title")
-    private String title = "Default Title";
+    public  String title = "Default Title";
 
     private HashMap<String, SummaryStatistics> summaryStatisticsHashMap = new HashMap<>();
 
@@ -94,22 +94,5 @@ public class BarPlotter extends DataVisualizer {
         } else {
             log.debug("Keeping plot frame visible...");
         }
-    }
-
-
-    public void setKeepOpen(boolean keepOpen) {
-        this.keepOpen = keepOpen;
-    }
-
-    public void setKeys(String[] keys) {
-        this.keys = keys;
-    }
-
-    public void setDrawErrors(boolean drawErrors) {
-        this.drawErrors = drawErrors;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 }

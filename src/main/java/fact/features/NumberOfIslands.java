@@ -14,10 +14,10 @@ import stream.annotations.Parameter;
 public class NumberOfIslands implements Processor {
 
     @Parameter(required = true, description = "Key refering to an array of integer containing pixel Ids")
-    private String pixelSetKey;
+    public String pixelSetKey;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {
@@ -32,13 +32,4 @@ public class NumberOfIslands implements Processor {
         input.put(outputKey, numIslands);
         return input;
     }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setOutputKey(String outputkey) {
-        this.outputKey = outputkey;
-    }
-
 }

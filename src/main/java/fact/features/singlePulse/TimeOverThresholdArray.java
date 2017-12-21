@@ -24,13 +24,16 @@ public class TimeOverThresholdArray implements Processor {
     static Logger log = LoggerFactory.getLogger(TimeOverThresholdArray.class);
 
     @Parameter(required = true, description = "key of data array")
-    private String dataKey = null;
+    public String dataKey = null;
+
     @Parameter(required = true, description = "key of array containing arrival times")
-    private String positionsKey = null;
+    public String positionsKey = null;
+
     @Parameter(required = true, description = "key of output array")
-    private String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(description = "key of output for visualisation")
-    private String visualizationKey = null;
+    public String visualizationKey = null;
 
     public Data process(Data input) {
 
@@ -81,37 +84,5 @@ public class TimeOverThresholdArray implements Processor {
         input.put(visualizationKey, width);
 
         return input;
-    }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getPositionsKey() {
-        return positionsKey;
-    }
-
-    public void setPositionsKey(String positionsKey) {
-        this.positionsKey = positionsKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getVisualizationKey() {
-        return visualizationKey;
-    }
-
-    public void setVisualizationKey(String visualizationKey) {
-        this.visualizationKey = visualizationKey;
     }
 }

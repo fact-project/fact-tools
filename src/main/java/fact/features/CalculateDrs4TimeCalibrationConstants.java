@@ -13,18 +13,19 @@ import java.util.ArrayList;
 public class CalculateDrs4TimeCalibrationConstants implements Processor {
     static Logger log = LoggerFactory.getLogger(CalculateDrs4TimeCalibrationConstants.class);
 
-    private int number_of_patches = 160;
-    private int number_of_slices = 1024;
+    private int numberOfPatches = 160;
+    private int numberOfSlices = 1024;
 
     @Parameter(required = true, description = "")
-    private String key;
-    @Parameter(required = true, description = "")
-    private String outputKey;
+    public String key;
 
-    double[] wi = new double[1440 * number_of_slices];
-    double[] wli = new double[1440 * number_of_slices];
-    double[] s_n = new double[1440 * number_of_slices];
-    double[] time_offsets = new double[1440 * number_of_slices];
+    @Parameter(required = true, description = "")
+    public String outputKey;
+
+    double[] wi = new double[1440 * numberOfSlices];
+    double[] wli = new double[1440 * numberOfSlices];
+    double[] s_n = new double[1440 * numberOfSlices];
+    double[] time_offsets = new double[1440 * numberOfSlices];
 
     /**
      * Just a way of keeping the process() method small:
@@ -106,8 +107,8 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
             double right_f = right - right_i;
 
 
-            int left_index = patch_id * number_of_slices + (left_i + sc) % 1024;
-            int right_index = patch_id * number_of_slices + (right_i + sc) % 1024;
+            int left_index = patch_id * numberOfSlices + (left_i + sc) % 1024;
+            int right_index = patch_id * numberOfSlices + (right_i + sc) % 1024;
 
             wi[left_index] += (1. - left_f);
             wli[left_index] += (1. - left_f) * l_k;
@@ -117,7 +118,7 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
 
             for (int i = left_i + 1; i < right_i; i++) {
 
-                int cid = patch_id * number_of_slices + (i + sc) % 1024;
+                int cid = patch_id * numberOfSlices + (i + sc) % 1024;
 
                 wi[cid] += 1.;
                 wli[cid] += l_k;
@@ -144,16 +145,16 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     void calculate_s_n_and_time_offsets(int patch_id) {
         double cumsum_wi = 0.;
         double cumsum_wli = 0.;
-        for (int n = 0; n < number_of_slices; n++) {
-            int d = patch_id * number_of_slices + n;
+        for (int n = 0; n < numberOfSlices; n++) {
+            int d = patch_id * numberOfSlices + n;
             cumsum_wi += wi[d];
             cumsum_wli += wli[d];
             s_n[d] = cumsum_wli / cumsum_wi;
         }
 
-        int end = patch_id * number_of_slices + 1023;
-        for (int i = 0; i < number_of_slices; i++) {
-            int d = patch_id * number_of_slices + i;
+        int end = patch_id * numberOfSlices + 1023;
+        for (int i = 0; i < numberOfSlices; i++) {
+            int d = patch_id * numberOfSlices + i;
             time_offsets[d] = (i + 1) * (1. - (s_n[end] / s_n[d]));
         }
 
@@ -175,13 +176,13 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
         double[] data = retrieve_data(input);
         short[] startCell = (short[]) input.get("StartCellData");
 
-        for (int patch_id = 0; patch_id < number_of_patches; patch_id++) {
+        for (int patch_id = 0; patch_id < numberOfPatches; patch_id++) {
             // We only look at the 9th channel of each DRS4 chip
             // because only this channel sees a special periodic calibration signal.
             int chid = 9 * patch_id + 8;
             short sc = startCell[chid];
 
-            ArrayList<Double> lzc = find_zero_crossings(data, chid * number_of_slices, number_of_slices);
+            ArrayList<Double> lzc = find_zero_crossings(data, chid * numberOfSlices, numberOfSlices);
             calculate_wi_wli(lzc, chid, sc);
             calculate_s_n_and_time_offsets(chid);
         }
@@ -189,23 +190,6 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
         input.put(outputKey, time_offsets);
 
         return input;
-    }
-
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }
 

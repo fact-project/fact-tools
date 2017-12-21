@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 /**
  * Return an array with the deviation of neighboring slices in each pixel.
@@ -17,12 +18,14 @@ import stream.Processor;
 public class Derivation implements Processor {
     static Logger log = LoggerFactory.getLogger(Derivation.class);
 
+    @Parameter(required = true)
     String key = null;
+
+    @Parameter(required = true)
     String outputKey = null;
 
     @Override
     public Data process(Data input) {
-        // TODO Auto-generated method stub
         Utils.mapContainsKeys(input, key);
 
         double[] data = (double[]) input.get(key);
@@ -36,21 +39,4 @@ public class Derivation implements Processor {
 
         return input;
     }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

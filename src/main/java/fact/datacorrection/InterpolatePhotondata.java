@@ -24,17 +24,22 @@ public class InterpolatePhotondata implements Processor {
     static Logger log = LoggerFactory.getLogger(InterpolatePhotondata.class);
 
     @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
-    CalibrationService calibService;
+    public CalibrationService calibService;
+
     @Parameter(required = true, description = "The photoncharge key to work on")
-    private String photonChargeKey = null;
+    public String photonChargeKey = null;
+
     @Parameter(required = true, description = "The name of the interpolated photoncharge output")
-    private String photonChargeOutputKey = null;
+    public String photonChargeOutputKey = null;
+
     @Parameter(required = true, description = "The arrivalTime key to work on")
-    private String arrivalTimeKey = null;
+    public String arrivalTimeKey = null;
+
     @Parameter(required = true, description = "The name of the interpolated arrivalTime output")
-    private String arrivalTimeOutputKey = null;
+    public String arrivalTimeOutputKey = null;
+
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
-    private int minPixelToInterpolate = 3;
+    public int minPixelToInterpolate = 3;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -110,30 +115,4 @@ public class InterpolatePhotondata implements Processor {
                     "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
         }
     }
-
-
-    public void setCalibService(CalibrationService calibService) {
-        this.calibService = calibService;
-    }
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-    public void setPhotonChargeOutputKey(String photonChargeOutputKey) {
-        this.photonChargeOutputKey = photonChargeOutputKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public void setArrivalTimeOutputKey(String arrivalTimeOutputKey) {
-        this.arrivalTimeOutputKey = arrivalTimeOutputKey;
-    }
-
-    public void setMinPixelToInterpolate(int minPixelToInterpolate) {
-        this.minPixelToInterpolate = minPixelToInterpolate;
-    }
-
 }

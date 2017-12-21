@@ -13,7 +13,7 @@ import stream.annotations.Parameter;
 /**
  * This processor simply calculates the maximum value for all time slices in each Pixel.
  * The output is a double array with an entry for each Pixel.
- * TODO: REfactor to only search inside a window
+ * TODO: Refactor to only search inside a window
  *
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
@@ -21,9 +21,10 @@ public class MaxAmplitude implements Processor {
     static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     private int npix;
 
@@ -64,14 +65,5 @@ public class MaxAmplitude implements Processor {
             }
         }
         return tempMaxValue;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }

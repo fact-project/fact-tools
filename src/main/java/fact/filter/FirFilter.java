@@ -24,13 +24,13 @@ public class FirFilter implements Processor {
     static Logger log = LoggerFactory.getLogger(FirFilter.class);
 
     @Parameter(required = false, description = "Filter coefficents array. {n, n-1, n-2, ..}.", defaultValue = "{0.5f,0.2f, 0.1f}")
-    Double[] coefficients = {0.5, 0.2, 0.1};
+    public Double[] coefficients = {0.5, 0.2, 0.1};
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     private int npix;
 
@@ -61,17 +61,4 @@ public class FirFilter implements Processor {
         return input;
 
     }
-
-    public void setCoefficients(Double[] coefficients) {
-        this.coefficients = coefficients;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

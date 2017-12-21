@@ -3,14 +3,22 @@ package fact.features.evaluate;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 
 public class CleaningEvaluate implements Processor {
 
+    @Parameter(required = true)
     String showerKey = null;
+
+    @Parameter(required = true)
     String mcCherenkovWeightKey = null;
+
+    @Parameter(required = true)
     String mcNoiseWeightKey = null;
+
+    @Parameter(required = true)
     String outputKey = null;
     int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
     int integrationWindow = 30;
@@ -60,75 +68,4 @@ public class CleaningEvaluate implements Processor {
         // TODO Auto-generated method stub
         return input;
     }
-
-
-    public String getShowerKey() {
-        return showerKey;
-    }
-
-
-    public void setShowerKey(String showerKey) {
-        this.showerKey = showerKey;
-    }
-
-
-    public String getMcCherenkovWeightKey() {
-        return mcCherenkovWeightKey;
-    }
-
-
-    public void setMcCherenkovWeightKey(String mcCherenkovWeightKey) {
-        this.mcCherenkovWeightKey = mcCherenkovWeightKey;
-    }
-
-
-    public String getMcNoiseWeightKey() {
-        return mcNoiseWeightKey;
-    }
-
-
-    public void setMcNoiseWeightKey(String mcNoiseWeightKey) {
-        this.mcNoiseWeightKey = mcNoiseWeightKey;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
-    public int getNumberOfSimulatedSlices() {
-        return NumberOfSimulatedSlices;
-    }
-
-
-    public void setNumberOfSimulatedSlices(int numberOfSimulatedSlices) {
-        NumberOfSimulatedSlices = numberOfSimulatedSlices;
-    }
-
-
-    public int getIntegrationWindow() {
-        return integrationWindow;
-    }
-
-
-    public void setIntegrationWindow(int integrationWindow) {
-        this.integrationWindow = integrationWindow;
-    }
-
-
-    public double getMcShowerThreshold() {
-        return mcShowerThreshold;
-    }
-
-
-    public void setMcShowerThreshold(double mcShowerThreshold) {
-        this.mcShowerThreshold = mcShowerThreshold;
-    }
-
 }

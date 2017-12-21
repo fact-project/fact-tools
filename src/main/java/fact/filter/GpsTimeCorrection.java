@@ -33,7 +33,7 @@ public class GpsTimeCorrection implements Processor {
     static Logger log = LoggerFactory.getLogger(GpsTimeCorrection.class);
 
     @Parameter(required = true, description = "Key of the GpsUnixTimeUTC[2] output")
-    private String outputKey;
+    public String outputKey;
 
     /**
      * This is the structure to hold the gps times in [int,int]: [seconds microseconds].
@@ -206,11 +206,6 @@ public class GpsTimeCorrection implements Processor {
             timeMap.put(key, column);
         }
         return timeMap;
-    }
-
-    // ----------------- getters and setters -------------------
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 
     public void setUrl(URL url) {
