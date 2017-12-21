@@ -138,7 +138,7 @@ public class HillasParameters implements Processor {
         // camrera axis.
         // this will be written in radians.
         double longitudinalComponent = eig.getEigenvector(0).getEntry(0);
-        double transversalComponent = eig.getEigenvector(0).getEntry(1);
-        return Math.atan(transversalComponent / longitudinalComponent);
+        double transverseComponent = eig.getEigenvector(0).getEntry(1);
+        return Math.atan(transverseComponent / longitudinalComponent);
     }
 }
