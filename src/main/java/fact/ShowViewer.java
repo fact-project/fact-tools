@@ -28,19 +28,10 @@ public class ShowViewer implements StatefulProcessor {
      * The key for the data to  be displayed on the screen
      */
     @Parameter(required = true)
-    private String key;
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
+    public String key;
 
     @Parameter(required = false, description = "The default plot range in the main viewer")
-    private Integer[] range;
+    public Integer[] range;
 
     public void setRange(Integer[] range) {
         if (range.length != 2) {

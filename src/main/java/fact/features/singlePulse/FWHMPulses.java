@@ -19,19 +19,19 @@ public class FWHMPulses implements Processor {
     static Logger log = LoggerFactory.getLogger(MovingLinearFit.class);
 
     @Parameter(required = true, description = "key of data array")
-    String key = null;
+    public String key = null;
 
     @Parameter(required = true, description = "key of max position array")
-    String maxPosKey = null;
+    public String maxPosKey = null;
 
     @Parameter(required = true, description = "key of min position array")
-    String minPosKey = null;
+    public String minPosKey = null;
 
     @Parameter(required = true, description = "key of output array")
-    String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(description = "key of output for visualisation")
-    private String visualizationKey = null;
+    public String visualizationKey = null;
 
     @Override
     public Data process(Data input) {
@@ -112,25 +112,5 @@ public class FWHMPulses implements Processor {
 
 
         return input;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setMaxPosKey(String maxPosKey) {
-        this.maxPosKey = maxPosKey;
-    }
-
-    public void setMinPosKey(String minPosKey) {
-        this.minPosKey = minPosKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setVisualizationKey(String visualizationKey) {
-        this.visualizationKey = visualizationKey;
     }
 }

@@ -15,7 +15,8 @@ import stream.annotations.Parameter;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
 public class Alpha implements Processor {
-    static Logger log = LoggerFactory.getLogger(Alpha.class);
+    private static final Logger log = LoggerFactory.getLogger(Alpha.class);
+
     @Parameter(required = true)
     public String deltaKey;
 

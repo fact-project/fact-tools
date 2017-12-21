@@ -23,9 +23,9 @@ public class AboveThresholdTest {
         data.put("NPIX", 1440);
 
         AboveThreshold above = new AboveThreshold();
-        above.setDataKey("data");
-        above.setOutputKey("output");
-        above.setThreshold(1);
+        above.dataKey = "data";
+        above.outputKey = "output";
+        above.threshold = 1;
         above.process(data);
 
         PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
@@ -68,9 +68,9 @@ public class AboveThresholdTest {
         data.put("NPIX", 1440);
 
         AboveThreshold above = new AboveThreshold();
-        above.setDataKey("data");
-        above.setOutputKey("output");
-        above.setThreshold(5);
+        above.dataKey = "data";
+        above.outputKey = "output";
+        above.threshold = 5;
         above.process(data);
 
         PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
@@ -100,9 +100,9 @@ public class AboveThresholdTest {
         data.put("NPIX", 1440);
 
         AboveThreshold above = new AboveThreshold();
-        above.setDataKey("data");
-        above.setOutputKey("output");
-        above.setThreshold(5);
+        above.dataKey = "data";
+        above.outputKey = "output";
+        above.threshold = 5;
         above.process(data);
 
         PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
@@ -125,9 +125,9 @@ public class AboveThresholdTest {
         data.put("NPIX", 1);
 
         AboveThreshold at = new AboveThreshold();
-        at.setDataKey("data");
-        at.setOutputKey("output");
-        at.setThreshold(10);
+        at.dataKey  = "data";
+        at.outputKey = "output";
+        at.threshold = 10;
         at.process(data);
 
         PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
@@ -137,9 +137,9 @@ public class AboveThresholdTest {
         Assert.assertEquals(0, pixelsAboveThreshold.set.size());
 
         AboveThreshold at2 = new AboveThreshold();
-        at2.setDataKey("data");
-        at2.setOutputKey("output");
-        at2.setThreshold(9);
+        at2.dataKey = "data";
+        at2.outputKey = "output";
+        at2.threshold = 9;
         at2.process(data);
 
         pixelsAboveThreshold = (PixelSet) data.get("output");

@@ -25,10 +25,10 @@ public class SmoothBell implements Processor {
 
 
     @Parameter(required = true, description = "Key for output array")
-    protected String outputKey;
+    public String outputKey;
 
     @Parameter(required = true, description = "Array/Values to smooth, e.g. photoncharge")
-    protected String inputKey;
+    public String inputKey;
 
     @Override
     public Data process(Data data) {
@@ -52,14 +52,5 @@ public class SmoothBell implements Processor {
         data.put(outputKey, smoothedImage);
 
         return data;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setInputKey(String inputKey) {
-        this.inputKey = inputKey;
     }
 }

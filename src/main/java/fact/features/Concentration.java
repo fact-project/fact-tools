@@ -12,13 +12,16 @@ public class Concentration implements Processor {
     static Logger log = LoggerFactory.getLogger(Concentration.class);
 
     @Parameter(required = true)
-    private String pixelSetKey;
+    public String pixelSetKey;
+
     @Parameter(required = true)
-    private String weights;
+    public String weights;
+
     @Parameter(required = true)
-    private String concOneOutputKey;
+    public String concOneOutputKey;
+
     @Parameter(required = true)
-    private String concTwoOutputKey;
+    public String concTwoOutputKey;
 
     @Override
     public Data process(Data input) {
@@ -59,34 +62,4 @@ public class Concentration implements Processor {
         input.put(concTwoOutputKey, (max_photon_charge + second_max_photon_charge) / size);
         return input;
     }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getWeights() {
-        return weights;
-    }
-
-    public void setWeights(String weights) {
-        this.weights = weights;
-    }
-
-    public String getConcOneOutputKey() {
-        return concOneOutputKey;
-    }
-
-    public void setConcOneOutputKey(String concOneOutputKey) {
-        this.concOneOutputKey = concOneOutputKey;
-    }
-
-    public String getConcTwoOutputKey() {
-        return concTwoOutputKey;
-    }
-
-    public void setConcTwoOutputKey(String concTwoOutputKey) {
-        this.concTwoOutputKey = concTwoOutputKey;
-    }
-
-
 }

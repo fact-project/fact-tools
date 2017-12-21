@@ -33,6 +33,7 @@ public class AlphaTest extends ParameterTest {
         poser.deltaKey = deltaKey;
         poser.sourcePositionKey = sourcePositionKey;
         poser.outputKey = outputKey;
+
         poser.process(item);
         assertTrue("Expected output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);

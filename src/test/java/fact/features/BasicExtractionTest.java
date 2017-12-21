@@ -30,11 +30,10 @@ public class BasicExtractionTest {
         pr.outputKey = "test";
 
         extraction = new BasicExtraction();
-        extraction.setDataKey("test");
-        extraction.setOutputKeyMaxAmplPos(positionsKey);
-        extraction.setOutputKeyPhotonCharge(photonChargeKey);
-        extraction.setUrl(new SourceURL(FITSStreamTest.class
-                .getResource("/defaultIntegralGains.csv")));
+        extraction.dataKey  = "test";
+        extraction.outputKeyMaxAmplPos  = positionsKey;
+        extraction.outputKeyPhotonCharge = photonChargeKey;
+        extraction.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
     }
 
     @Test
@@ -75,5 +74,4 @@ public class BasicExtractionTest {
         double integral = extraction.calculateIntegral(0, halfHeightPos, 5, data.length, data);
         assertTrue("integral should have value 40 , integral: " + integral, integral == 40.0);
     }
-
 }

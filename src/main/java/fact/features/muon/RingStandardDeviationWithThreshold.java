@@ -15,22 +15,22 @@ import stream.annotations.Parameter;
 public class RingStandardDeviationWithThreshold implements Processor {
 
     @Parameter(description = "Key containing the photoncharge array", defaultValue = "photoncharge")
-    private String photonchargeKey = "photoncharge";
+    public String photonchargeKey = "photoncharge";
 
     @Parameter(description = "Key containing the arrivalTime array", defaultValue = "arrivalTime")
-    private String arrivalTimeKey = "arrivalTime";
+    public String arrivalTimeKey = "arrivalTime";
 
     @Parameter(description = "Key for the ring pixelset", defaultValue = "bestRingPixel")
-    private String ringPixelSetKey = "bestRingPixel";
+    public String ringPixelSetKey = "bestRingPixel";
 
     @Parameter(description = "Key for the cleaning pixelset", defaultValue = "shower")
-    private String cleaningPixelSetKey = "shower";
+    public String cleaningPixelSetKey = "shower";
 
     @Parameter(description = "The threshold, only pixels above the threshold are considered", defaultValue = "8")
-    private double threshold = 8.0;
+    public double threshold = 8.0;
 
     @Parameter(description = "The outputkey", defaultValue = "StdDevTime{threshold}")
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Override
     public Data process(Data item) {
@@ -60,29 +60,5 @@ public class RingStandardDeviationWithThreshold implements Processor {
         item.put(outputKey, stats.getStandardDeviation());
         item.put("numPixel" + outputKey, stats.getN());
         return item;
-    }
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public void setRingPixelSetKey(String ringPixelSetKey) {
-        this.ringPixelSetKey = ringPixelSetKey;
-    }
-
-    public void setCleaningPixelSetKey(String cleaningPixelSetKey) {
-        this.cleaningPixelSetKey = cleaningPixelSetKey;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }

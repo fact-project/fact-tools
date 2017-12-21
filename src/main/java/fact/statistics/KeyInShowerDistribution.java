@@ -6,13 +6,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.io.Serializable;
 
 public class KeyInShowerDistribution implements Processor {
 
+    @Parameter(required = true)
     private String pixelSetKey;
+
+    @Parameter(required = true)
     private String outputKey;
+
+    @Parameter(required = true)
     private String Key;
 
     @Override
@@ -54,29 +60,4 @@ public class KeyInShowerDistribution implements Processor {
 
         return input;
     }
-
-    public String getPixelSetKey() {
-        return pixelSetKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputkey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getKey() {
-        return Key;
-    }
-
-    public void setKey(String Key) {
-        this.Key = Key;
-    }
-
 }

@@ -21,19 +21,19 @@ public class ApplyRandomArrivalTimeShift implements Processor {
     static Logger log = LoggerFactory.getLogger(ApplyRandomArrivalTimeShift.class);
 
     @Parameter(required = true, description = "key of the arrival times array")
-    private String key = null;
+    public String key = null;
 
     @Parameter(description = "mean standard deviation of the original (arrival time) distribution")
-    private double stdDevGoal = 1.33;
+    public double stdDevGoal = 1.33;
 
     @Parameter(description = "mean standard deviation of the desired (arrival time) distribution")
-    private double stdDevOrigin = 0.52;
+    public double stdDevOrigin = 0.52;
 
     @Parameter(description = "Seed of the random number generator")
-    private long Seed = 5901;
+    public long Seed = 5901;
 
     @Parameter(required = true, description = "key of the output array")
-    private String outputKey = null;
+    public String outputKey = null;
 
 
     private double[] arrivalTime = null;
@@ -65,45 +65,5 @@ public class ApplyRandomArrivalTimeShift implements Processor {
         input.put(outputKey, newArrivalTime);
         input.put(outputKey + "marker", marker);
         return input;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getStdDevOrigin() {
-        return stdDevOrigin;
-    }
-
-    public void setStdDevOrigin(double stdDevOrigin) {
-        this.stdDevOrigin = stdDevOrigin;
-    }
-
-    public double getStdDevGoal() {
-        return stdDevGoal;
-    }
-
-    public void setStdDevGoal(double stdDevGoal) {
-        this.stdDevGoal = stdDevGoal;
-    }
-
-    public long getSeed() {
-        return Seed;
-    }
-
-    public void setSeed(long seed) {
-        Seed = seed;
     }
 }

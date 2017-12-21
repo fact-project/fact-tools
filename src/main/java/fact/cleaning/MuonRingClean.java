@@ -5,18 +5,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MuonRingClean implements Processor {
 
-    private String ringPixelKey;
-    private String photonChargeKey;
-    private String arrivalTimeKey;
-    private String outputKey;
-    private double photonChargeThreshold;
-    private double timeThreshold;
+    @Parameter(required = true)
+    public String ringPixelKey;
+
+    @Parameter(required = true)
+    public String photonChargeKey;
+
+    @Parameter(required = true)
+    public String arrivalTimeKey;
+
+    @Parameter(required = true)
+    public String outputKey;
+
+    @Parameter(required = true)
+    public double photonChargeThreshold;
+
+    @Parameter(required = true)
+    public double timeThreshold;
 
     @Override
     public Data process(Data input) {
@@ -88,64 +100,4 @@ public class MuonRingClean implements Processor {
 
         return input;
     }
-
-    // ********************************
-    // Getters and Setters for the Keys
-    // ********************************
-
-    public String getRingPixelKey() {
-        return ringPixelKey;
-    }
-
-
-    public void setRingPixelKey(String ringPixelKey) {
-        this.ringPixelKey = ringPixelKey;
-    }
-
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getPhotonChargeThreshold() {
-        return photonChargeThreshold;
-    }
-
-    public void setPhotonChargeThreshold(double photonChargeThreshold) {
-        this.photonChargeThreshold = photonChargeThreshold;
-    }
-
-    public double getTimeThreshold() {
-        return timeThreshold;
-    }
-
-    public void setTimeThreshold(double timeThreshold) {
-        this.timeThreshold = timeThreshold;
-    }
-
 }

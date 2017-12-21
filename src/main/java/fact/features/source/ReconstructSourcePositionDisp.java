@@ -9,28 +9,28 @@ import stream.annotations.Parameter;
 
 public class ReconstructSourcePositionDisp implements Processor {
     @Parameter(required = true)
-    String dispKey = null;
+    public String dispKey = null;
 
     @Parameter(required = true)
-    String cogxKey = null;
+    public String cogxKey = null;
 
     @Parameter(required = true)
-    String cogyKey = null;
+    public String cogyKey = null;
 
     @Parameter(required = true)
-    String deltaKey = null;
+    public String deltaKey = null;
 
     @Parameter(required = true)
     String m3LongKey = null;
 
     @Parameter(required = true)
-    String cosDeltaAlphaKey = null;
+    public String cosDeltaAlphaKey = null;
 
     @Parameter(required = true)
-    String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(required = true)
-    double signM3lConstant = 0;
+    public double signM3lConstant = 0;
 
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dispKey, cogxKey, cogyKey, deltaKey, cosDeltaAlphaKey);

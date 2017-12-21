@@ -22,23 +22,23 @@ import java.util.Arrays;
  */
 public class NeighborPixelDCF implements StatefulProcessor {
     @Parameter(required = true, description = "raw data array")
-    private String key = null;
+    public String key = null;
 
     @Parameter(required = false, description = "pixel array containing a noise estimation for each pixel")
-    private String noiseKey = null;
+    public String noiseKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used, " +
             "if no pixelset is given, the whole camera is used", defaultValue = "")
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "30")
-    private int skipFirst = 30;
+    public int skipFirst = 30;
 
     @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
-    private int skipLast = 50;
+    public int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
-    private String neighborPixDCFKey = "neighborPixDCF";
+    public String neighborPixDCFKey = "neighborPixDCF";
 
     private int deltaTMax = 5;
 
@@ -236,34 +236,6 @@ public class NeighborPixelDCF implements StatefulProcessor {
      */
     public double UDCFNorm(double stdDevA, double stdDevB, double noiseA, double noiseB) {
         return Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setNoiseKey(String noiseKey) {
-        this.noiseKey = noiseKey;
-    }
-
-    public void setDeltaTMax(int deltaTMax) {
-        this.deltaTMax = deltaTMax;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
-    }
-
-    public void setNeighborPixDCFKey(String neighborPixDCFKey) {
-        this.neighborPixDCFKey = neighborPixDCFKey;
     }
 
     @Override

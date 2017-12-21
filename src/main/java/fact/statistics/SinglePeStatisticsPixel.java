@@ -16,9 +16,10 @@ import stream.annotations.Parameter;
 public class SinglePeStatisticsPixel implements Processor {
 
     @Parameter(required = true, description = "key to the data array")
-    private String dataKey = null;
+    public String dataKey = null;
+
     @Parameter(required = true, description = "name of the key of the calculated features")
-    private String outputKey = null;
+    public String outputKey = null;
 
     private int npix;
 
@@ -80,23 +81,4 @@ public class SinglePeStatisticsPixel implements Processor {
 
         return input;
     }
-
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

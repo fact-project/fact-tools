@@ -25,9 +25,9 @@ public class SizeTest extends ParameterTest {
 //		//start processor with the correct parameter
         assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
         Size poser = new Size();
-        poser.setPhotonChargeKey(photonCharge);
-        poser.setPixelSetKey(shower);
-        poser.setOutputKey(outputKey);
+        poser.photonChargeKey = photonCharge;
+        poser.pixelSetKey = shower;
+        poser.outputKey = outputKey;
         poser.process(item);
         assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);

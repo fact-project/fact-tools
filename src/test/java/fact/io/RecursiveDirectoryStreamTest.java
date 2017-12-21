@@ -41,7 +41,7 @@ public class RecursiveDirectoryStreamTest {
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         String pattern = "test*.fits.*";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
 
         assertTrue(r.files.size() > 0);
@@ -56,7 +56,7 @@ public class RecursiveDirectoryStreamTest {
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         String pattern = "/**/*DRIVE_CONTROL_{TRACKING,POINTING}_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
         assertThat(r.files.size(), is(4));
     }
@@ -70,7 +70,7 @@ public class RecursiveDirectoryStreamTest {
 
 
         String pattern = "/**/*DRIVE_CONTROL_{TRACKING,SOURCE}_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
 
         assertThat(r.files.size(), is(4));
@@ -85,7 +85,7 @@ public class RecursiveDirectoryStreamTest {
 
 
         String pattern = "/**/*DRIVE_CONTROL_SOURCE_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
 
         assertThat(r.files.size(), is(2));
@@ -100,7 +100,7 @@ public class RecursiveDirectoryStreamTest {
 
         //no files in this directory
         String pattern = "/*DRIVE_CONTROL_SOURCE_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         //this should throw a runtime exception
         r.init();
 
@@ -115,7 +115,7 @@ public class RecursiveDirectoryStreamTest {
 
         //this is not a valid pattern
         String pattern = "/**/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         //should throw an exception
         r.init();
     }

@@ -9,12 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class FastFourierTrafo implements Processor {
     static Logger log = LoggerFactory.getLogger(FastFourierTrafo.class);
 
-    String key = null;
-    String outputKey = null;
+    @Parameter(required = true)
+    public String key;
+
+    @Parameter(required = true)
+    public String outputKey = null;
 
     int lengthForFFT = 512;
 
@@ -98,45 +102,4 @@ public class FastFourierTrafo implements Processor {
 
         return input;
     }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getLengthForFFT() {
-        return lengthForFFT;
-    }
-
-    public void setLengthForFFT(int lengthForFFT) {
-        this.lengthForFFT = lengthForFFT;
-    }
-
-    public int getSearchWindowLeft() {
-        return searchWindowLeft;
-    }
-
-    public void setSearchWindowLeft(int searchWindowLeft) {
-        this.searchWindowLeft = searchWindowLeft;
-    }
-
-    public int getSearchWindowRight() {
-        return searchWindowRight;
-    }
-
-    public void setSearchWindowRight(int searchWindowRight) {
-        this.searchWindowRight = searchWindowRight;
-    }
-
 }

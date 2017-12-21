@@ -8,13 +8,13 @@ import stream.annotations.Parameter;
 
 public class Theta implements Processor {
     @Parameter(required = true)
-    private String sourcePositionKey = null;
+    public String sourcePositionKey = null;
 
     @Parameter(required = true)
-    private String reconstructedPositionKey = null;
+    public String reconstructedPositionKey = null;
 
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
 
     public Data process(Data input) {
         Utils.mapContainsKeys(input, sourcePositionKey, reconstructedPositionKey);
@@ -28,16 +28,4 @@ public class Theta implements Processor {
         return input;
     }
 
-
-    public void setSourcePositionKey(String sourcePositionKey) {
-        this.sourcePositionKey = sourcePositionKey;
-    }
-
-    public void setReconstructedPositionKey(String reconstructedPositionKey) {
-        this.reconstructedPositionKey = reconstructedPositionKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
 }

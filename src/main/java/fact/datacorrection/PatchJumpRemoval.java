@@ -23,43 +23,68 @@ public class PatchJumpRemoval implements Processor {
     static Logger log = LoggerFactory.getLogger(PatchJumpRemoval.class);
 
     @Parameter(required = true)
-    String dataKey = null;
+    public String dataKey = null;
+
     @Parameter(required = true)
-    String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(required = false, description = "Useful for jump studies")
-    String outputJumpsKey = null;
-    @Parameter(required = true)
-    String prevEventsKey = null;
-    @Parameter(required = true)
-    String startCellKey = null;
-    @Parameter(required = true)
-    double jumpLimit = 5.0;
+    public String outputJumpsKey = null;
 
-    int leftBorder = 10;
+    @Parameter(required = true)
+    public String prevEventsKey = null;
 
+    @Parameter(required = true)
+    public String startCellKey = null;
+
+    @Parameter
+    public double jumpLimit = 5.0;
+
+    @Parameter
     double spikeLimit = 7.0;
 
+    @Parameter
+    int leftBorder = 10;
+
+    @Parameter
     double signalFlankLimit = 0.63;
 
+    @Parameter
     int lengthForFFT = 32;
+
+    @Parameter
     int lengthAfterPosForFFT = 10;
 
+    @Parameter
     int ringingPeriode = 11;
 
+    @Parameter
     double freqAmplLimit = 0.4;
+
+    @Parameter
     double freqCompAmplLimit = 2.0;
 
+    @Parameter
     double leftRingingFreq = 0.18;
+
+    @Parameter
     double rightRingingFreq = 0.22;
 
+    @Parameter
     double tau = -0.5;
+
+    @Parameter
     double constant = 14.454;
+
+    @Parameter
     double timeDependLimit = 10;
+
+    @Parameter
+    boolean addJumpInfos = false;
 
     int roi = 300;
     private int npix;
 
-    boolean addJumpInfos = false;
 
     JumpInfos jumpInfos;
 
@@ -85,7 +110,6 @@ public class PatchJumpRemoval implements Processor {
         System.arraycopy(data, 0, result, 0, data.length);
 
         int numberPatches = npix / 9;
-
 
         boolean stopLoop = false;
 
@@ -499,86 +523,4 @@ public class PatchJumpRemoval implements Processor {
         }
         return result;
     }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setOutputJumpsKey(String outputJumpsKey) {
-        this.outputJumpsKey = outputJumpsKey;
-    }
-
-    public void setPrevEventsKey(String prevEventsKey) {
-        this.prevEventsKey = prevEventsKey;
-    }
-
-    public void setStartCellKey(String startCellKey) {
-        this.startCellKey = startCellKey;
-    }
-
-    public void setJumpLimit(double jumpLimit) {
-        this.jumpLimit = jumpLimit;
-    }
-
-    public void setLeftBorder(int leftBorder) {
-        this.leftBorder = leftBorder;
-    }
-
-    public void setSpikeLimit(double spikeLimit) {
-        this.spikeLimit = spikeLimit;
-    }
-
-    public void setSignalFlankLimit(double signalFlankLimit) {
-        this.signalFlankLimit = signalFlankLimit;
-    }
-
-    public void setLengthForFFT(int lengthForFFT) {
-        this.lengthForFFT = lengthForFFT;
-    }
-
-    public void setLengthAfterPosForFFT(int lengthAfterPosForFFT) {
-        this.lengthAfterPosForFFT = lengthAfterPosForFFT;
-    }
-
-    public void setRingingPeriode(int ringingPeriode) {
-        this.ringingPeriode = ringingPeriode;
-    }
-
-    public void setFreqAmplLimit(double freqAmplLimit) {
-        this.freqAmplLimit = freqAmplLimit;
-    }
-
-    public void setFreqCompAmplLimit(double freqCompAmplLimit) {
-        this.freqCompAmplLimit = freqCompAmplLimit;
-    }
-
-    public void setLeftRingingFreq(double leftRingingFreq) {
-        this.leftRingingFreq = leftRingingFreq;
-    }
-
-    public void setRightRingingFreq(double rightRingingFreq) {
-        this.rightRingingFreq = rightRingingFreq;
-    }
-
-    public void setTau(double tau) {
-        this.tau = tau;
-    }
-
-    public void setConstant(double constant) {
-        this.constant = constant;
-    }
-
-    public void setTimeDependLimit(double timeDependLimit) {
-        this.timeDependLimit = timeDependLimit;
-    }
-
-    public void setAddJumpInfos(boolean addJumpInfos) {
-        this.addJumpInfos = addJumpInfos;
-    }
-
-
 }

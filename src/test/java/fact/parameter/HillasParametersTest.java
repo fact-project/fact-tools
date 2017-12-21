@@ -23,6 +23,7 @@ public class HillasParametersTest extends ParameterTest {
     public void testValidParameter() throws Exception {
 //		//start processor with the correct parameter
         assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
+
         HillasParameters poser = new HillasParameters();
         poser.pixelSetKey = shower;
         poser.weightsKey = photonCharge;

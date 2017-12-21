@@ -31,13 +31,13 @@ public class MotionCleaning implements Processor {
 
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Parameter(required = true)
-    private String numPixelKey;
+    public String numPixelKey;
 
     @Parameter(required = false, description = "minimal difference between the values of two slices to set the accumulative difference to 1", defaultValue = "30")
-    protected double threshold = 30;         //<------------------------------------hardcode: mc-pedestal: 30--------------------------
+    public double threshold = 30;         //<------------------------------------hardcode: mc-pedestal: 30--------------------------
 
     @Override
     public Data process(Data data) {
@@ -221,22 +221,5 @@ public class MotionCleaning implements Processor {
             }
         }
         return showerPixel_Y;
-    }
-
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setNumPixelKey(String numPixelKey) {
-        this.numPixelKey = numPixelKey;
     }
 }

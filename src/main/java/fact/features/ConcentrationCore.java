@@ -15,23 +15,31 @@ public class ConcentrationCore implements Processor {
     static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
+
     @Parameter(required = true, description = "Key of the Center of Gravity X (by Distribution from shower)")
-    private String cogxKey;
+    public String cogxKey;
+
     @Parameter(required = true, description = "Key of the Center of Gravity Y (by Distribution from shower)")
-    private String cogyKey;
+    public String cogyKey;
+
     @Parameter(required = true, description = "Key of the delta angle")
-    private String deltaKey;
+    public String deltaKey;
+
     @Parameter(required = true, description = "Key of the sizeKey")
-    private String sizeKey;
+    public String sizeKey;
+
     @Parameter(required = true, description = "Key of the photoncharge array")
-    private String photonChargeKey;
+    public String photonChargeKey;
+
     @Parameter(required = true, description = "Key of the shower pixel array")
-    private String pixelSetKey;
+    public String pixelSetKey;
+
     @Parameter(required = true, description = "Key of the shower width")
-    private String widthKey;
+    public String widthKey;
+
     @Parameter(required = true, description = "Key of the shower lengthKey")
-    private String lengthKey;
+    public String lengthKey;
 
 
     /**

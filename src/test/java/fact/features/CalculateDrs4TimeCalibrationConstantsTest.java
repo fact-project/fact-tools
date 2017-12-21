@@ -16,8 +16,8 @@ public class CalculateDrs4TimeCalibrationConstantsTest {
     @Before
     public void setup() {
         test_me = new CalculateDrs4TimeCalibrationConstants();
-        test_me.setKey("test");
-        test_me.setOutputKey("test_output");
+        test_me.key  = "test";
+        test_me.outputKey = "test_output";
     }
 
 
@@ -360,8 +360,5 @@ public class CalculateDrs4TimeCalibrationConstantsTest {
         for (int i = 0; i < 1024; i++) {
             assertTrue("The array sn should be " + on_values[i] + " at i=" + i + ", but is:" + test_me.time_offsets[i], Math.abs(test_me.time_offsets[i] - on_values[i]) < 1e-3);
         }
-
-
     }
-
 }
