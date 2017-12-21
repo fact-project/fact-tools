@@ -62,7 +62,7 @@
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
         arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+        Size, HillasParameters, M3Long, Length, Width, NumberOfIslands, TimeGraident,
         Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
         ShowerSlope, Disp -->
         <include url="classpath:/default/mc/parameterCalc_mc.xml" />
@@ -75,9 +75,9 @@
         <!-- Output: source dependent parameters -->
 
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-	<fact.io.JSONWriter keys="${keysForOutput}" 
-		url="${output}" 
-		writeListOfItems="True" 
+	<fact.io.JSONWriter keys="${keysForOutput}"
+		url="${output}"
+		writeListOfItems="True"
 		pixelSetsAsInt="True"
 		/>
 	<!-- <fact.io.PrintKeysOnConsole keys="${keysForOutput}" /> -->

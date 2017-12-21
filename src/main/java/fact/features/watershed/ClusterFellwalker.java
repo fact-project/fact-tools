@@ -60,8 +60,8 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = false, description = "Value chosen for clustering. Could be photoncharge, arrival times or mean correlation.", defaultValue = "photoncharge")
     protected String morphologyKey = photonchargeKey;
 
-    @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePosition")
-    protected String sourcePositionKey = "sourcePosition";
+    @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePositionKey")
+    protected String sourcePositionKey = "sourcePositionKey";
 
     @Parameter(required = false, description = "Pixel set to cluster. If null, cluster all camera pixel; in that case decide which clusters should be kept via pixelSetKey", defaultValue = "null")
     protected String areaKey = null;
@@ -266,7 +266,7 @@ public class ClusterFellwalker implements Processor {
              */
             double distanceSource = distanceSource(showerCluster, sourcePosition);
             /*
-            cog must be calculated in DistributionFromShower, before distanceCog can be calculated
+            cog must be calculated in HillasParameters, before distanceCog can be calculated
              */
             double distanceCog = distanceCog(showerCluster, cogX, cogY);
 

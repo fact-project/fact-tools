@@ -15,47 +15,29 @@ import stream.annotations.Parameter;
  * @author kaibrugge
  */
 public class Distance implements Processor {
-    static Logger log = LoggerFactory.getLogger(Distance.class);
+    private static final Logger log = LoggerFactory.getLogger(Distance.class);
+
     @Parameter(required = true)
-    private String distribution;
+    public String cogKey;
+
     @Parameter(required = true)
-    private String sourcePosition;
+    public String sourcePositionKey;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     /**
      * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid
      */
     @Override
     public Data process(Data input) {
-        if (!input.containsKey(distribution)) {
-            log.info("No shower in event. Not calculating distance");
-            return input;
-        }
-        Utils.mapContainsKeys(input, distribution, sourcePosition);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
 
-        PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-        CameraCoordinate source = (CameraCoordinate) input.get(sourcePosition);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
 
-        double dx = dist.getCenterX() - source.xMM;
-        double dy = dist.getCenterY() - source.yMM;
-
-        input.put(outputKey, Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0)));
+        input.put(outputKey, cog.euclideanDistance(source));
         return input;
     }
-
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
-    }
-
-    public void setSourcePosition(String sourcePosition) {
-        this.sourcePosition = sourcePosition;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

@@ -81,7 +81,7 @@ Here is an example .xml file.
         <process input="mystream:${copy.id}" copies="${num_copies}" >
 
             <fact.datacorrection.DrsCalibration key="Data" outputKey="DataCalibrated"/>
-            <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxFileService"/>
+            <fact.features.source.SourcePosition outputKey="sourcePositionKey" auxService="auxFileService"/>
 
         </process>
 

@@ -21,7 +21,7 @@ public class ReconstructSourcePositionDisp implements Processor {
     String deltaKey = null;
 
     @Parameter(required = true)
-    String m3lKey = null;
+    String m3LongKey = null;
 
     @Parameter(required = true)
     String cosDeltaAlphaKey = null;
@@ -35,12 +35,12 @@ public class ReconstructSourcePositionDisp implements Processor {
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dispKey, cogxKey, cogyKey, deltaKey, cosDeltaAlphaKey);
 
-        double disp = (Double) input.get(dispKey);
-        double cogx = (Double) input.get(cogxKey);
-        double cogy = (Double) input.get(cogyKey);
-        double delta = (Double) input.get(deltaKey);
-        double m3l = (Double) input.get(m3lKey);
-        double cosDeltaAlpha = (Double) input.get(cosDeltaAlphaKey);
+        double disp = (double) input.get(dispKey);
+        double cogx = (double) input.get(cogxKey);
+        double cogy = (double) input.get(cogyKey);
+        double delta = (double) input.get(deltaKey);
+        double m3l = Math.cbrt((double) input.get(m3LongKey));  // MARS calls cbrt(M3) M3
+        double cosDeltaAlpha = (double) input.get(cosDeltaAlphaKey);
 
         CameraCoordinate recPosition = calculateRecPosition(cogx, cogy, disp, delta, cosDeltaAlpha, m3l);
 

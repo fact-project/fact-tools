@@ -1,6 +1,6 @@
 package fact.features.source;
 
-import fact.container.PixelDistribution2D;
+import fact.Utils;
 import fact.coordinates.CameraCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,40 +17,30 @@ import stream.annotations.Parameter;
 public class Alpha implements Processor {
     static Logger log = LoggerFactory.getLogger(Alpha.class);
     @Parameter(required = true)
-    private String distribution = null;
+    public String deltaKey;
+
     @Parameter(required = true)
-    private String sourcePosition = null;
+    public String cogKey;
+
     @Parameter(required = true)
-    private String outputKey = null;
+    public String sourcePositionKey;
+
+    @Parameter(required = true)
+    public String outputKey;
 
     @Override
     public Data process(Data input) {
-        PixelDistribution2D dist;
-        try {
-            dist = (PixelDistribution2D) input.get(distribution);
-            if (dist == null) {
-                log.info("No showerpixel in this event. Not calculating alpha");
-                return input;
-            }
-        } catch (ClassCastException e) {
-            log.error("distribution is not of type PixelDistribution2D. Aborting");
-            return null;
-        }
 
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
+        Utils.isKeyValid(input, deltaKey, Double.class);
 
-        CameraCoordinate source = null;
-        try {
-            source = (CameraCoordinate) input.get(sourcePosition);
-            if (source == null) {
-                throw new RuntimeException("This event didnt have a sourceposition. Eventnumber: " + input.get("EventNum"));
-            }
-        } catch (ClassCastException e) {
-            log.error("wrong types" + e.toString());
-        }
+        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        double delta = (double) input.get(deltaKey);
 
-        double auxiliary_angle = Math.atan((source.yMM - dist.getCenterY()) / (source.xMM - dist.getCenterX()));
-
-        double alpha = dist.getAngle() - auxiliary_angle;
+        double auxiliary_angle = Math.atan2(source.yMM - cog.yMM, source.xMM - cog.xMM);
+        double alpha = delta - auxiliary_angle;
 
         if (alpha > Math.PI / 2) {
             alpha = alpha - Math.PI;
@@ -61,33 +51,4 @@ public class Alpha implements Processor {
         input.put(outputKey, alpha);
         return input;
     }
-
-
-    public String getDistribution() {
-        return distribution;
-    }
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
-    }
-
-
-    public String getSourcePosition() {
-        return sourcePosition;
-    }
-
-    public void setSourcePosition(String sourcePosition) {
-        this.sourcePosition = sourcePosition;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

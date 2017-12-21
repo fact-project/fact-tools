@@ -1,6 +1,6 @@
 package fact.parameter;
 
-import fact.features.DistributionFromShower;
+import fact.features.HillasParameters;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author bruegge
  */
-public class DistributionFromShowerTest extends ParameterTest {
+public class HillasParametersTest extends ParameterTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -23,12 +23,16 @@ public class DistributionFromShowerTest extends ParameterTest {
     public void testValidParameter() throws Exception {
 //		//start processor with the correct parameter
         assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
-        DistributionFromShower poser = new DistributionFromShower();
-        poser.setPixelSetKey(shower);
-        poser.setWeightsKey(photonCharge);
-        poser.setOutputKey(outputKey);
+        HillasParameters poser = new HillasParameters();
+        poser.pixelSetKey = shower;
+        poser.weightsKey = photonCharge;
         poser.process(item);
-        assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
+
+        String[] keys = {"size", "width", "length", "cog", "cogX", "cogY", "delta", "m3Long", "m3Trans", "m4Long", "m4Trans", "skewnessLong", "skewnessTrans"};
+        for (String key: keys){
+            assertTrue("Expected output not in data item but it should be there", item.containsKey(key));
+        }
+
 //		item.remove(outputKey);
     }
 }
