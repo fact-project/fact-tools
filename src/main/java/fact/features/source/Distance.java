@@ -1,7 +1,6 @@
 package fact.features.source;
 
 import fact.Utils;
-import fact.container.PixelDistribution2D;
 import fact.coordinates.CameraCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
