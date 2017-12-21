@@ -75,7 +75,7 @@
     photonChargeKey="photoncharge"
     sizeKey="size"
     widthKey="width"
-    lengthKey="Length"
+    lengthKey="length"
     deltaKey="delta"
     outputKey="ConcCore"
 />
@@ -113,7 +113,7 @@
 />
 <fact.features.Disp
     widthKey="width"
-    lengthKey="Length"
+    lengthKey="length"
     c0="117.94"
     outputKey="Disp"
 />
