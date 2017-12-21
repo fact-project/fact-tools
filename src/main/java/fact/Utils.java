@@ -295,11 +295,14 @@ public class Utils {
                 b.append(er);
                 b.append("\n");
             }
-            StackTraceElement traceElement = Thread.currentThread()
-                    .getStackTrace()[2];
+            StackTraceElement traceElement = Thread.currentThread().getStackTrace()[2];
             String caller = traceElement.getClassName();
-            throw new RuntimeException("Missing keys for processor " + caller
-                    + ":  " + b.toString());
+            // if wrapped by the mapContainsKeys(Data item, String...)
+            if (caller.equals("fact.Utils")) {
+                traceElement = Thread.currentThread().getStackTrace()[3];
+                caller = traceElement.getClassName();
+            }
+            throw new RuntimeException("Missing keys for processor " + caller + ":  " + b.toString());
         }
     }
 
