@@ -5,7 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import fact.Utils;
 import fact.container.PixelSet;
+import org.apache.commons.lang3.StringUtils;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -18,6 +20,10 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -93,8 +99,7 @@ import java.util.zip.GZIPOutputStream;
  * Created by bruegge on 7/30/14.
  * Refactored by maxnoe on 2/2/2016
  */
-public class JSONWriter implements StatefulProcessor {
-
+public class JSONWriter extends Writer implements StatefulProcessor {
 
     @Parameter(required = true)
     private Keys keys = new Keys("");
@@ -110,6 +115,8 @@ public class JSONWriter implements StatefulProcessor {
     private boolean specialDoubleValuesAsString = false;
     @Parameter(required = false, description = "If true, use gzip compression")
     private boolean gzip = false;
+    @Parameter(required = false, description = "Set if you want to allow empty keys.")
+    public boolean allowNullKeys = false;
 
     @Parameter(required = true)
     private URL url;
@@ -118,6 +125,7 @@ public class JSONWriter implements StatefulProcessor {
     private StringBuffer b = new StringBuffer();
     private BufferedWriter bw;
 
+    private Set<String> previousKeySet;
     boolean isFirstLine = true;
 
     @Override
@@ -127,6 +135,8 @@ public class JSONWriter implements StatefulProcessor {
         for (String key : keys.select(data)) {
             item.put(key, data.get(key));
         }
+
+        testKeys(item, keys, allowNullKeys);
 
         try {
             if (isFirstLine) {

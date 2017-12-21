@@ -19,6 +19,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
@@ -264,6 +265,19 @@ public class Utils {
      * @param keys
      */
     public static void mapContainsKeys(Data item, String... keys) {
+		mapContainsKeys(item, Arrays.asList(keys));
+	}
+
+	/**
+	 * This is a helper method which checks if all the keys provided are in the
+	 * data item. If one of the keys is not in the item a RuntimeException will
+	 * be thrown containing a message detailing which processor is causing the
+	 * error
+	 *
+	 * @param item
+	 * @param keys
+	 */
+	public static void mapContainsKeys(Data item, Collection<String> keys) {
         ArrayList<String> e = new ArrayList<>();
         boolean isValid = true;
         if (keys == null) {
