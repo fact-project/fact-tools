@@ -83,8 +83,7 @@
     />
 
     <fact.features.ConcentrationCore
-      cogxKey="cogX"
-      cogyKey="cogY"
+      cogKey="cog"
       pixelSetKey="shower"
       photonChargeKey="photoncharge"
       sizeKey="size"
@@ -95,8 +94,7 @@
     />
     <fact.features.ConcentrationAtCenterOfGravity
       photonChargeKey="photoncharge"
-      cogxKey="cogX"
-      cogyKey="cogY"
+      cogKey="cog"
       sizeKey="size"
       outputKey="concCOG"
     />
