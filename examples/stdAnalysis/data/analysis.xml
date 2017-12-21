@@ -57,8 +57,6 @@
       Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
       <include url="classpath:/default/data/sourceParameter.xml" />
       <!-- Output: source dependent parameters -->
-      <fact.io.PrintKeysOnConsole keys="size,width,length,delta,Alpha,Distance"/>
-      <fact.ShowViewer key="photoncharge" />
       <fact.io.FITSWriter url="${outfile}" keys="${keysForOutput}"/>
   </process>
 </container>
