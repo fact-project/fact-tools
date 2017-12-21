@@ -14,6 +14,11 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+/**
+ * Calculate the classical hillas parameters on a PixelSet.
+ * Calculated are size, length, width, delta, the cog, and the higher moments m3, m4, skewness, kurtosis
+ * each for longitudinal and transverse shower coordinates.
+ */
 public class HillasParameters implements Processor {
 
     @Parameter(required = true)
