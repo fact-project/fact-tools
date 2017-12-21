@@ -23,7 +23,9 @@ public class Weighted2dStatistics {
     }
 
     public static Weighted2dStatistics ofArrays (double[] x, double[] y, double[] weights) {
-        assert (x.length == y.length) & (x.length == weights.length);
+        if (!((x.length == y.length) & (x.length == weights.length))) {
+            throw new RuntimeException("Length of arrays does not match: x: " + x.length + ", y: " + y.length + ", weights: " + weights.length);
+        }
 
         int N = x.length;
 

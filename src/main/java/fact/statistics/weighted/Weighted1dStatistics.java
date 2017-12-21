@@ -25,7 +25,9 @@ public class Weighted1dStatistics {
     }
 
     public static Weighted1dStatistics ofArrays (double[] x, double[] weights) {
-        assert x.length == weights.length;
+        if (x.length != weights.length) {
+            throw new RuntimeException("Length of arrays does not match: x: " + x.length + ", weights: " + weights.length);
+        }
 
         int N = x.length;
 
