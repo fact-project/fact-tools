@@ -33,7 +33,7 @@ public class ReconstructSourcePositionDisp implements Processor {
 
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey);
-        Utils.isKeyValid(input, cogKey, PixelSet.class);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
         double disp = (double) input.get(dispKey);
         CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);

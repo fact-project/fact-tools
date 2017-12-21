@@ -110,50 +110,43 @@
 />
 <fact.features.source.CosDeltaAlpha
     sourcePositionKey="sourcePosition"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKey="CosDeltaAlpha"
 />
 <fact.features.source.CosDeltaAlpha
     sourcePositionKey="antiSourcePosition_1"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKey="CosDeltaAlpha_Off_1"
 />
 <fact.features.source.CosDeltaAlpha
     sourcePositionKey="antiSourcePosition_2"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKey="CosDeltaAlpha_Off_2"
 />
 <fact.features.source.CosDeltaAlpha
     sourcePositionKey="antiSourcePosition_3"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKey="CosDeltaAlpha_Off_3"
 />
 <fact.features.source.CosDeltaAlpha
     sourcePositionKey="antiSourcePosition_4"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKey="CosDeltaAlpha_Off_4"
 />
 <fact.features.source.CosDeltaAlpha
     sourcePositionKey="antiSourcePosition_5"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKey="CosDeltaAlpha_Off_5"
 />
 <fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     m3LongKey="m3Long"
     cosDeltaAlphaKey="CosDeltaAlpha"
@@ -162,8 +155,7 @@
 />
 <fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     m3LongKey="m3Long"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
@@ -172,8 +164,7 @@
 />
 <fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     m3LongKey="m3Long"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
@@ -182,8 +173,7 @@
 />
 <fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     m3LongKey="m3Long"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
@@ -192,8 +182,7 @@
 />
 <fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     m3LongKey="m3Long"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
@@ -202,8 +191,7 @@
 />
 <fact.features.source.ReconstructSourcePositionDisp
     dispKey="Disp"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     m3LongKey="m3Long"
     cosDeltaAlphaKey="CosDeltaAlpha_Off_5"

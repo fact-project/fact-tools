@@ -2,8 +2,8 @@ package fact.features;
 
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactPixelMapping;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
@@ -32,10 +32,7 @@ public class TimeGradient implements Processor {
     public String arrivalTimeKey = null;
 
     @Parameter(required = true, description = "key to the xvalue of the cog of the shower")
-    public String cogxKey = null;
-
-    @Parameter(required = true, description = "key to the yvalue of the cog of the shower")
-    public String cogyKey = null;
+    public String cogKey = null;
 
     @Parameter(required = true, description = "key to the delta angle of the shower")
     public String deltaKey = null;
@@ -51,13 +48,14 @@ public class TimeGradient implements Processor {
 
     public Data process(Data input) {
 
-        Utils.mapContainsKeys(input, pixelSetKey, arrivalTimeKey, cogxKey, cogyKey, deltaKey);
+        Utils.mapContainsKeys(input, pixelSetKey, arrivalTimeKey, cogKey, deltaKey);
+        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
         PixelSet shower = (PixelSet) input.get(pixelSetKey);
         double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-        double cogx = (Double) input.get(cogxKey);
-        double cogy = (Double) input.get(cogyKey);
         double delta = (Double) input.get(deltaKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
 
         SimpleRegression regressorLong = new SimpleRegression();
         SimpleRegression regressorTrans = new SimpleRegression();
@@ -65,7 +63,7 @@ public class TimeGradient implements Processor {
         for (CameraPixel px : shower.set) {
             double x = px.getXPositionInMM();
             double y = px.getYPositionInMM();
-            double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cogx, cogy, delta);
+            double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cog.xMM, cog.yMM, delta);
             double time = arrivalTime[px.id];
             regressorLong.addData(ellipseCoord[0], time);
             regressorTrans.addData(ellipseCoord[1], time);

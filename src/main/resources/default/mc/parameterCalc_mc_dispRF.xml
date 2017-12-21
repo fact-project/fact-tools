@@ -55,8 +55,7 @@
 <fact.features.TimeGradient
     pixelSetKey="shower"
     arrivalTimeKey="arrivalTime"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     outputKeySlope="timeGradientSlope"
     outputKeyIntercept="timeGradientIntercept"
@@ -69,8 +68,7 @@
     concTwoOutputKey="Concentration_twoPixel"
 />
 <fact.features.ConcentrationCore
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     pixelSetKey="shower"
     photonChargeKey="photoncharge"
     sizeKey="size"
@@ -81,8 +79,7 @@
 />
 <fact.features.ConcentrationAtCenterOfGravity
     photonChargeKey="photoncharge"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     sizeKey="size"
     outputKey="concCOG"
 />
@@ -103,8 +100,7 @@
     photonChargeKey="photoncharge"
     arrivalTimeKey="arrivalTime"
     pixelSetKey="shower"
-    cogxKey="cogX"
-    cogyKey="cogY"
+    cogKey="cog"
     deltaKey="delta"
     slopeLongOutputKey="Slope_long"
     slopeTransOutputKey="Slope_trans"
