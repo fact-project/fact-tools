@@ -15,13 +15,13 @@ public class ShiftDataArray implements Processor {
     static Logger log = LoggerFactory.getLogger(MovingLinearFit.class);
 
     @Parameter(required = true, description = "key of input array")
-    String key = null;
+    public String key = null;
 
     @Parameter(required = true, description = "key of output array")
-    String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(description = "shift of the array", defaultValue = "1")
-    int shift = 1;
+    public int shift = 1;
 
     @Override
     public Data process(Data input) {
@@ -42,29 +42,5 @@ public class ShiftDataArray implements Processor {
         input.put(outputKey, result);
 
         return input;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getShift() {
-        return shift;
-    }
-
-    public void setShift(int shift) {
-        this.shift = shift;
     }
 }

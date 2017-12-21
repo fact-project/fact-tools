@@ -2,11 +2,13 @@ package fact.utils;
 
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.util.Random;
 
 public class CreateFakeTime implements Processor {
 
+    @Parameter(required = true)
     String outputKey = null;
 
     long seed = 0;
@@ -48,24 +50,6 @@ public class CreateFakeTime implements Processor {
 
         input.put(outputKey, fakeEventTime);
 
-        // TODO Auto-generated method stub
         return input;
     }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public long getSeed() {
-        return seed;
-    }
-
-    public void setSeed(long seed) {
-        this.seed = seed;
-    }
-
 }

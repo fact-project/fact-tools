@@ -31,8 +31,8 @@ public class MaxAmplitudeTest {
 
 
         maxAmp = new MaxAmplitude();
-        maxAmp.setKey("test");
-        maxAmp.setOutputKey(outputKey);
+        maxAmp.key = "test";
+        maxAmp.outputKey = outputKey;
 
 
     }

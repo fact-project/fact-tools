@@ -22,15 +22,19 @@ public class TimeGradientExtraction extends BasicExtraction {
     static Logger log = LoggerFactory.getLogger(TimeGradientExtraction.class);
 
     @Parameter(required = true, description = "key to the delta angle of the shower")
-    private String deltaKey = null;
+    public String deltaKey = null;
+
     @Parameter(required = true, description = "key to the xvalue of the cog of the shower")
-    private String cogxKey = null;
+    public String cogxKey = null;
+
     @Parameter(required = true, description = "key to the yvalue of the cog of the shower")
-    private String cogyKey = null;
+    public String cogyKey = null;
+
     @Parameter(required = true, description = "key to the timegradient slopes")
-    private String timeGradientSlopeKey = null;
+    public String timeGradientSlopeKey = null;
+
     @Parameter(required = true, description = "key to the timegradient intercepts")
-    private String timeGradientInterceptKey = null;
+    public String timeGradientInterceptKey = null;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -81,45 +85,4 @@ public class TimeGradientExtraction extends BasicExtraction {
 
         return input;
     }
-
-    public String getDeltaKey() {
-        return deltaKey;
-    }
-
-    public void setDeltaKey(String deltaKey) {
-        this.deltaKey = deltaKey;
-    }
-
-    public String getCogxKey() {
-        return cogxKey;
-    }
-
-    public void setCogxKey(String cogxKey) {
-        this.cogxKey = cogxKey;
-    }
-
-    public String getCogyKey() {
-        return cogyKey;
-    }
-
-    public void setCogyKey(String cogyKey) {
-        this.cogyKey = cogyKey;
-    }
-
-    public String getTimeGradientSlopeKey() {
-        return timeGradientSlopeKey;
-    }
-
-    public void setTimeGradientSlopeKey(String timeGradientSlopeKey) {
-        this.timeGradientSlopeKey = timeGradientSlopeKey;
-    }
-
-    public String getTimeGradientInterceptKey() {
-        return timeGradientInterceptKey;
-    }
-
-    public void setTimeGradientInterceptKey(String timeGradientInterceptKey) {
-        this.timeGradientInterceptKey = timeGradientInterceptKey;
-    }
-
 }

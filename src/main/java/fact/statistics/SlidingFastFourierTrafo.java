@@ -9,11 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class SlidingFastFourierTrafo implements Processor {
     static Logger log = LoggerFactory.getLogger(SlidingFastFourierTrafo.class);
 
+    @Parameter(required = true)
     String key = null;
+
+    @Parameter(required = true)
     String outputKey = null;
 
     int lengthForFFT = 128;
@@ -26,7 +30,6 @@ public class SlidingFastFourierTrafo implements Processor {
 
     @Override
     public Data process(Data input) {
-        // TODO Auto-generated method stub
         Utils.isKeyValid(input, "NPIX", Integer.class);
         npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, key);
@@ -58,37 +61,4 @@ public class SlidingFastFourierTrafo implements Processor {
 
         return input;
     }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getLengthForFFT() {
-        return lengthForFFT;
-    }
-
-    public void setLengthForFFT(int lengthForFFT) {
-        this.lengthForFFT = lengthForFFT;
-    }
-
-    public int getStepSize() {
-        return stepSize;
-    }
-
-    public void setStepSize(int stepSize) {
-        this.stepSize = stepSize;
-    }
-
 }

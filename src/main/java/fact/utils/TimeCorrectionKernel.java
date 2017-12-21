@@ -16,7 +16,7 @@ public interface TimeCorrectionKernel {
      * @param realTime in ns
      * @param value
      */
-    public void fit(double[] realTime, double[] value);
+    void fit(double[] realTime, double[] value);
 
     /**
      * This is f(t) and will be used for rebinning data
@@ -24,5 +24,5 @@ public interface TimeCorrectionKernel {
      * @param realtime in ns
      * @return
      */
-    public double interpolate(double realtime);
+    double interpolate(double realtime);
 }

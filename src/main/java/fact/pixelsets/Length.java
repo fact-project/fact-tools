@@ -18,9 +18,9 @@ public class Length implements Processor {
     static Logger log = LoggerFactory.getLogger(Length.class);
 
     @Parameter(required = true, description = "The pixelset of which you want to calculate the length")
-    String pixelSetKey;
+    public String pixelSetKey;
     @Parameter(required = true, description = "The outputkey.")
-    String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {

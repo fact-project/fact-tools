@@ -21,18 +21,22 @@ import stream.annotations.Parameter;
 public class LightDistributionFit implements Processor {
 
     @Parameter(required = false, description = "key containing the photoncharges", defaultValue = "photoncharge")
-    private String photonchargeKey = "photoncharge";
+    public  String photonchargeKey = "photoncharge";
+
     @Parameter(required = false, description = "key containing the pixel that survided cleaning", defaultValue = "shower")
-    private String cleaningPixelKey = "shower";
+    public  String cleaningPixelKey = "shower";
+
     @Parameter(required = false, description = "key containing the initial guess for the radius, if not given 100mm is used", defaultValue = "null")
-    private String initialRKey = null;
+    public  String initialRKey = null;
+
     @Parameter(required = false, description = "key containing the initial guess for center x, if not given 0 is used", defaultValue = "null")
-    private String initialXKey = null;
+    public  String initialXKey = null;
+
     @Parameter(required = false, description = "key containing the initial guess for center y, if not given 0 is used", defaultValue = "null")
-    private String initialYKey = null;
+    public  String initialYKey = null;
 
     @Parameter(required = false, description = "outputkey basis, r,x,y,rho,phi,eps are appended to it", defaultValue = "muonfit_")
-    private String outputKey = "muonfit_";
+    public  String outputKey = "muonfit_";
 
     private double initialR = 100;
     private double initialX = 0;
@@ -117,30 +121,6 @@ public class LightDistributionFit implements Processor {
         }
 
         return data;
-    }
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
-    public void setInitialRKey(String initialRKey) {
-        this.initialRKey = initialRKey;
-    }
-
-    public void setInitialXKey(String initialXKey) {
-        this.initialXKey = initialXKey;
-    }
-
-    public void setInitialYKey(String initialYKey) {
-        this.initialYKey = initialYKey;
-    }
-
-    public void setCleaningPixelKey(String cleaningPixelKey) {
-        this.cleaningPixelKey = cleaningPixelKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 
     public class LightDistributionNegLogLikelihood implements MultivariateFunction {

@@ -46,22 +46,4 @@ public class ArrayElementsMean implements Processor {
             throw new RuntimeException("Key not found in event. " + key);
         }
     }
-
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
 }

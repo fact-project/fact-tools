@@ -22,13 +22,13 @@ public class Intersection implements Processor {
     static Logger log = LoggerFactory.getLogger(Intersection.class);
 
     @Parameter(required = true, description = "key to the first set to intersect")
-    String setAKey;
+    public  String setAKey;
 
     @Parameter(required = true, description = "key to the second set to intersect")
-    String setBKey;
+    public String setBKey;
 
     @Parameter(required = true, description = "key to the output set which contains the intersection")
-    String outsetKey;
+    public String outsetKey;
 
 
     @Override

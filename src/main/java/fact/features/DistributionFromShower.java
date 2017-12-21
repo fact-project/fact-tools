@@ -18,32 +18,41 @@ import stream.annotations.Parameter;
 public class DistributionFromShower implements Processor {
 
     @Parameter(required = true)
-    private String weightsKey = null;
+    public String weightsKey = null;
     @Parameter(required = true, description = "The key to the showerPixel. "
             + "That is some sort of int[] containing pixel chids.")
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
 
     // the in and outputkeys
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(required = false, defaultValue = "M3Long")
-    private String m3longKey = "M3Long";
+    public String m3longKey = "M3Long";
+
     @Parameter(required = false, defaultValue = "M3Trans")
-    private String m3transKey = "M3Trans";
+    public String m3transKey = "M3Trans";
+
     @Parameter(required = false, defaultValue = "M4Long")
-    private String m4longKey = "M4Long";
+    public String m4longKey = "M4Long";
+
     @Parameter(required = false, defaultValue = "M4Trans")
-    private String m4transKey = "M4Trans";
+    public String m4transKey = "M4Trans";
+
     @Parameter(required = false, defaultValue = "COGx")
-    private String cogxKey = "COGx";
+    public String cogxKey = "COGx";
+
     @Parameter(required = false, defaultValue = "COGy")
-    private String cogyKey = "COGy";
+    public String cogyKey = "COGy";
+
     @Parameter(required = false, defaultValue = "Length")
-    private String lengthKey = "Length";
+    public String lengthKey = "Length";
+
     @Parameter(required = false, defaultValue = "Width")
-    private String widthKey = "Width";
+    public String widthKey = "Width";
+
     @Parameter(required = false, defaultValue = "Delta")
-    private String deltaKey = "Delta";
+    public String deltaKey = "Delta";
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -251,63 +260,4 @@ public class DistributionFromShower implements Processor {
                 {covariance_xy, variance_yy}};
         return MatrixUtils.createRealMatrix(matrixData);
     }
-
-    public void setWeightsKey(String wheights) {
-        this.weightsKey = wheights;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
-    public void setM3longKey(String m3longKey) {
-        this.m3longKey = m3longKey;
-    }
-
-
-    public void setM3transKey(String m3transKey) {
-        this.m3transKey = m3transKey;
-    }
-
-
-    public void setM4longKey(String m4longKey) {
-        this.m4longKey = m4longKey;
-    }
-
-    public void setM4transKey(String m4transKey) {
-        this.m4transKey = m4transKey;
-    }
-
-
-    public void setCogxKey(String cogxKey) {
-        this.cogxKey = cogxKey;
-    }
-
-
-    public void setCogyKey(String cogyKey) {
-        this.cogyKey = cogyKey;
-    }
-
-
-    public void setLengthKey(String lengthKey) {
-        this.lengthKey = lengthKey;
-    }
-
-
-    public void setWidthKey(String widthKey) {
-        this.widthKey = widthKey;
-    }
-
-
-    public void setDeltaKey(String deltaKey) {
-        this.deltaKey = deltaKey;
-    }
-
-
 }

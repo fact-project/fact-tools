@@ -25,16 +25,18 @@ import stream.annotations.Parameter;
 public class CircularFit implements StatefulProcessor {
 
     @Parameter(required = false, description = "Key to the extracted photoncharges", defaultValue = "photoncharge")
-    private String photonchargeKey = "photoncharge";
+    public String photonchargeKey = "photoncharge";
+
     @Parameter(required = false, description = "PixelSet to perform the fit on", defaultValue = "shower")
-    private String pixelSetKey = "shower";
+    public String pixelSetKey = "shower";
+
     @Parameter(required = false, description = "Base for the Outputkeys, outputs are radius, x, y", defaultValue = "circfit_")
-    private String outputKey = "circFit";
+    public String outputKey = "circFit";
 
     private FactPixelMapping mapping = FactPixelMapping.getInstance();
     private int npix = Constants.NUMBEROFPIXEL;
-    private double[] pixel_x = new double[npix];
-    private double[] pixel_y = new double[npix];
+    private double[] pixelX = new double[npix];
+    private double[] pixelY = new double[npix];
 
     public Data process(Data item) {
         Utils.mapContainsKeys(item, photonchargeKey, pixelSetKey);
@@ -48,8 +50,8 @@ public class CircularFit implements StatefulProcessor {
 
         for (CameraPixel pix : pixelSet.set) {
             photoncharge_sum += photoncharge[pix.id];
-            mean_x += photoncharge[pix.id] * pixel_x[pix.id];
-            mean_y += photoncharge[pix.id] * pixel_y[pix.id];
+            mean_x += photoncharge[pix.id] * pixelX[pix.id];
+            mean_y += photoncharge[pix.id] * pixelY[pix.id];
         }
 
         mean_x /= photoncharge_sum;
@@ -64,8 +66,8 @@ public class CircularFit implements StatefulProcessor {
                 C2 = 0;
 
         for (CameraPixel pix : pixelSet.set) {
-            double x = pixel_x[pix.id];
-            double y = pixel_y[pix.id];
+            double x = pixelX[pix.id];
+            double y = pixelY[pix.id];
             double m = photoncharge[pix.id];
             A1 += m * (x - mean_x) * x;
             A2 += m * (y - mean_y) * x;
@@ -80,7 +82,7 @@ public class CircularFit implements StatefulProcessor {
 
         double numerator = 0;
         for (CameraPixel pix : pixelSet.set) {
-            numerator += photoncharge[pix.id] * (Math.pow(pixel_x[pix.id] - center_x, 2) + Math.pow(pixel_y[pix.id] - center_y, 2));
+            numerator += photoncharge[pix.id] * (Math.pow(pixelX[pix.id] - center_x, 2) + Math.pow(pixelY[pix.id] - center_y, 2));
         }
 
         double radius = Math.sqrt(numerator / photoncharge_sum);
@@ -105,21 +107,8 @@ public class CircularFit implements StatefulProcessor {
     public void init(ProcessContext processContext) {
         for (int chid = 0; chid < npix; chid++) {
             CameraPixel pixel = mapping.getPixelFromId(chid);
-            pixel_x[chid] = pixel.getXPositionInMM();
-            pixel_y[chid] = pixel.getYPositionInMM();
+            pixelX[chid] = pixel.getXPositionInMM();
+            pixelY[chid] = pixel.getYPositionInMM();
         }
-    }
-
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
     }
 }

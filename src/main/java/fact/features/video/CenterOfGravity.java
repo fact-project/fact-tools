@@ -1,6 +1,8 @@
 package fact.features.video;
 
 import fact.Utils;
+import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +13,24 @@ import stream.annotations.Parameter;
 
 public class CenterOfGravity implements Processor {
 
-    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-    private int sliceCount;
+    private static final Logger log = LoggerFactory.getLogger(CenterOfGravity.class);
+
+    @Parameter(required = true, defaultValue = "showerPixelKey", description = "Key to the array of showerpixel chids.")
+    private String showerPixelKey;
+
+    @Parameter(required = true, defaultValue = "DataCalibrated", description = "Key to the calibrated data array.")
+    private String dataCalibratedKey;
+
+    @Parameter(required = true, defaultValue = "CenterOfGravity", description = "The output key tag. Will be inserted before all output keys.")
+    public String outputKey;
+
+    @Parameter(required = true, defaultValue = "4", description = "Minimum of shower pixel to start calculation.")
+    public int numberOfShowerPixelThreshold;
+
+
+    private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
 
     /**
      * This function calculates the center of gravity for every slice. It uses only shower pixel.
@@ -27,23 +44,17 @@ public class CenterOfGravity implements Processor {
 //      mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 
         // check keys
-        Utils.mapContainsKeys(input, showerPixel, dataCalibrated);
+        Utils.mapContainsKeys(input, showerPixelKey, dataCalibratedKey);
         Utils.isKeyValid(input, "NROI", Integer.class);
-        sliceCount = (Integer) input.get("NROI");
-        /// get input
-        try {
-            showerPixelArray = (int[]) input.get(showerPixel);
-            dataCalibratedArray = (double[]) input.get(dataCalibrated);
-        } catch (ClassCastException e) {
-            log.error("wrong types" + e.toString());
-        }
+        int sliceCount = (int) input.get("NROI");
 
-        if (dataCalibratedArray == null || showerPixelArray == null) {
-            log.error("Map does not conatin the right values for the keys");
-            return null;
-        }
+        Utils.isKeyValid(input, showerPixelKey, PixelSet.class);
+        PixelSet showerPixelArray = (PixelSet) input.get(showerPixelKey);
 
-        if (showerPixelArray.length < numberOfShowerPixelThreshold) {
+        Utils.isKeyValid(input, dataCalibratedKey, double[].class);
+        double[] dataCalibratedArray = (double[]) input.get(dataCalibratedKey);
+
+        if (showerPixelArray.size() < numberOfShowerPixelThreshold) {
             input.put(outputKey + "_X", null);
             input.put(outputKey + "_Y", null);
 
@@ -75,20 +86,20 @@ public class CenterOfGravity implements Processor {
 
         // COG for every slice
 
-        cogx = new double[sliceCount];
-        cogy = new double[sliceCount];
+        double[] cogx = new double[sliceCount];
+        double[] cogy = new double[sliceCount];
 
-        varcogx = new double[sliceCount];
-        varcogy = new double[sliceCount];
-        covcog = new double[sliceCount];
+        double[] varcogx = new double[sliceCount];
+        double[] varcogy = new double[sliceCount];
+        double[] covcog = new double[sliceCount];
 
-        cogVelocityX = new double[sliceCount - 1];
-        cogVelocityY = new double[sliceCount - 1];
-        cogVelocity = new double[sliceCount - 1];
-        cogVelocityXError = new double[sliceCount - 1];
-        cogVelocityYError = new double[sliceCount - 1];
-        cogVelocityError = new double[sliceCount - 1];
-        size = new double[sliceCount];
+        double[] cogVelocityX = new double[sliceCount - 1];
+        double[] cogVelocityY = new double[sliceCount - 1];
+        double[] cogVelocity = new double[sliceCount - 1];
+        double[] cogVelocityXError = new double[sliceCount - 1];
+        double[] cogVelocityYError = new double[sliceCount - 1];
+        double[] cogVelocityError = new double[sliceCount - 1];
+        double[] size = new double[sliceCount];
 
         double minimalVelocity = Double.MAX_VALUE; // minimal velocity of all slices
         int minimalVelocityId = 0;
@@ -100,11 +111,12 @@ public class CenterOfGravity implements Processor {
 
 
         // Baseline correction
-        eventBaseline = 0.0f;
-        for (int pix : showerPixelArray)
+        double eventBaseline = 0.0;
+        for (CameraPixel pixel : showerPixelArray) {
             for (int slice = 0; slice < sliceCount; slice++) {
-                eventBaseline = eventBaseline > dataCalibratedArray[pix * sliceCount + slice] ? dataCalibratedArray[pix * sliceCount + slice] : eventBaseline;
+                eventBaseline = eventBaseline > dataCalibratedArray[pixel.id * sliceCount + slice] ? dataCalibratedArray[pixel.id * sliceCount + slice] : eventBaseline;
             }
+        }
         eventBaseline = eventBaseline > 0 ? eventBaseline : -eventBaseline;
 
         for (int slice = 0; slice < sliceCount; slice++) {
@@ -116,10 +128,11 @@ public class CenterOfGravity implements Processor {
             covcog[slice] = 0;
 
             // Calculate COGs
-            for (int chid : showerPixelArray) {
+            for (CameraPixel pixel : showerPixelArray) {
+                int chid = pixel.id;
                 //TODO insert rotate by hillas_delta switch
-                double posx = pixelMap.getPixelFromId(chid).getXPositionInMM();
-                double posy = pixelMap.getPixelFromId(chid).getXPositionInMM();
+                double posx = pixel.getXPositionInMM();
+                double posy = pixel.getXPositionInMM();
                 size[slice] += dataCalibratedArray[chid * sliceCount + slice] + eventBaseline;
                 cogx[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * posx;
                 cogy[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * posy;
@@ -129,12 +142,13 @@ public class CenterOfGravity implements Processor {
             cogy[slice] /= size[slice];
 
             // Calculate variance and covariance
-            for (int pix : showerPixelArray) {
-                double posx = pixelMap.getPixelFromId(pix).getXPositionInMM();
-                double posy = pixelMap.getPixelFromId(pix).getXPositionInMM();
-                varcogx[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posx - cogx[slice]);
-                varcogy[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (posy - cogy[slice]) * (posy - cogy[slice]);
-                covcog[slice] += (dataCalibratedArray[pix * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posy - cogy[slice]);
+            for (CameraPixel pixel : showerPixelArray) {
+                int chid = pixel.id;
+                double posx = pixel.getXPositionInMM();
+                double posy = pixel.getXPositionInMM();
+                varcogx[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posx - cogx[slice]);
+                varcogy[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * (posy - cogy[slice]) * (posy - cogy[slice]);
+                covcog[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posy - cogy[slice]);
             }
             varcogx[slice] /= size[slice];
             varcogy[slice] /= size[slice];
@@ -213,74 +227,4 @@ public class CenterOfGravity implements Processor {
 
         return input;
     }
-
-    public String getShowerPixel() {
-        return showerPixel;
-    }
-
-    @Parameter(required = true, defaultValue = "showerPixel", description = "Key to the array of showerpixel chids.")
-    public void setShowerPixel(String showerPixel) {
-        this.showerPixel = showerPixel;
-    }
-
-    public String getDataCalibrated() {
-        return dataCalibrated;
-    }
-
-    @Parameter(required = true, defaultValue = "DataCalibrated", description = "Key to the calibrated data array.")
-    public void setDataCalibrated(String dataCalibrated) {
-        this.dataCalibrated = dataCalibrated;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    @Parameter(required = true, defaultValue = "CenterOfGravity", description = "The output key tag. Will be inserted before all output keys.")
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getNumberOfShowerPixelThreshold() {
-        return numberOfShowerPixelThreshold;
-    }
-
-    @Parameter(required = true, defaultValue = "4", description = "Minimum of shower pixel to start calculation.")
-    public void setNumberOfShowerPixelThreshold(int numberOfShowerPixelThreshold) {
-        this.numberOfShowerPixelThreshold = numberOfShowerPixelThreshold;
-    }
-
-    static Logger log = LoggerFactory.getLogger(CenterOfGravity.class);
-
-    private String showerPixel;
-    private int[] showerPixelArray = null;
-
-    private String dataCalibrated;
-    private double[] dataCalibratedArray = null;
-
-    // Helper and utilities
-    private double[] size;
-    private double eventBaseline;
-
-    private int numberOfShowerPixelThreshold;
-
-    // COG of showerPixelSet for every slice
-    private double[] cogx = null;
-    private double[] cogy = null;
-    private double[] varcogx = null;
-    private double[] varcogy = null;
-    private double[] covcog = null;
-
-    // Velocity of COG of showerPixel
-    private double[] cogVelocityX = null;
-    private double[] cogVelocityY = null;
-    private double[] cogVelocity = null;
-
-    private double[] cogVelocityXError = null;
-    private double[] cogVelocityYError = null;
-    private double[] cogVelocityError = null;
-
-    private String outputKey;
-
-
 }

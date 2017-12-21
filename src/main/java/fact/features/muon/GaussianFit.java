@@ -23,30 +23,35 @@ import stream.annotations.Parameter;
  */
 public class GaussianFit implements StatefulProcessor {
     @Parameter(required = false, description = "Start value for the radius for the likelihood fit", defaultValue = "120")
-    private String startRKey = "";
+    public String startRKey = "";
+
     @Parameter(required = false, description = "Start value for X for the likelihood fit", defaultValue = "0")
-    private String startXKey = "";
+    public String startXKey = "";
+
     @Parameter(required = false, description = "Start value for Y for the likelihood fit", defaultValue = "0")
-    private String startYKey = "";
+    public String startYKey = "";
+
     @Parameter(required = false, description = "Start value for Y for the likelihood fit", defaultValue = "5")
-    private String startSigmaKey = "";
+    public String startSigmaKey = "";
+
     @Parameter(required = false, description = "Key containing the photoncharges", defaultValue = "photoncharge")
-    private String photonchargeKey = "photoncharge";
+    public String photonchargeKey = "photoncharge";
+
     @Parameter(required = false, description = "The pixelSet on which the fit is performed", defaultValue = "shower")
-    private String pixelSetKey = "shower";
+    public String pixelSetKey = "shower";
 
     @Parameter(required = false, description = "Base name for the output keys", defaultValue = "gaussian_fit_")
-    private String outputKey = "gaussianFit";
+    public String outputKey = "gaussianFit";
 
-    private double[] pixel_x;
-    private double[] pixel_y;
+    private double[] pixelX;
+    private double[] pixelY;
 
 
     @Override
     public Data process(Data data) {
         double[] photoncharge = (double[]) data.get(photonchargeKey);
         PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
-        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet, pixel_x, pixel_y);
+        GaussianNegLogLikelihood negLnL = new GaussianNegLogLikelihood(photoncharge, pixelSet, pixelX, pixelY);
         ObjectiveFunction ob_negLnL = new ObjectiveFunction(negLnL);
 
         double startR = 120,
@@ -97,14 +102,14 @@ public class GaussianFit implements StatefulProcessor {
 
     public void init(ProcessContext context) {
         int npix = Constants.NUMBEROFPIXEL;
-        pixel_x = new double[npix];
-        pixel_y = new double[npix];
+        pixelX = new double[npix];
+        pixelY = new double[npix];
 
         FactPixelMapping mapping = FactPixelMapping.getInstance();
 
         for (int pix = 0; pix < npix; pix++) {
-            pixel_x[pix] = mapping.getPixelFromId(pix).getXPositionInMM();
-            pixel_y[pix] = mapping.getPixelFromId(pix).getYPositionInMM();
+            pixelX[pix] = mapping.getPixelFromId(pix).getXPositionInMM();
+            pixelY[pix] = mapping.getPixelFromId(pix).getYPositionInMM();
         }
     }
 
@@ -112,34 +117,6 @@ public class GaussianFit implements StatefulProcessor {
     }
 
     public void resetState() {
-    }
-
-    public void setStartRKey(String startRKey) {
-        this.startRKey = startRKey;
-    }
-
-    public void setStartXKey(String startXKey) {
-        this.startXKey = startXKey;
-    }
-
-    public void setStartYKey(String startYKey) {
-        this.startYKey = startYKey;
-    }
-
-    public void setStartSigmaKey(String startSigmaKey) {
-        this.startSigmaKey = startSigmaKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 
     public class GaussianNegLogLikelihood implements MultivariateFunction {

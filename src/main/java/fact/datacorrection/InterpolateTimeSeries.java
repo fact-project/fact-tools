@@ -25,15 +25,18 @@ public class InterpolateTimeSeries implements Processor {
     static Logger log = LoggerFactory.getLogger(InterpolateTimeSeries.class);
 
     @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
-    CalibrationService calibService;
-    @Parameter(required = true, description = "The data key to work on")
-    private String dataKey = null;
-    @Parameter(required = true, description = "The name of the interpolated data output")
-    private String dataOutputKey = null;
-    @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
-    private int minPixelToInterpolate = 3;
-    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+    public CalibrationService calibService;
 
+    @Parameter(required = true, description = "The data key to work on")
+    public String dataKey = null;
+
+    @Parameter(required = true, description = "The name of the interpolated data output")
+    public String dataOutputKey = null;
+
+    @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
+    public int minPixelToInterpolate = 3;
+
+    private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
     private int npix = Constants.NUMBEROFPIXEL;
 
     @Override
@@ -109,22 +112,4 @@ public class InterpolateTimeSeries implements Processor {
                     "Minimum number of pixel to interpolate is set to " + minPixelToInterpolate);
         }
     }
-
-
-    public void setCalibService(CalibrationService calibService) {
-        this.calibService = calibService;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setDataOutputKey(String dataOutputKey) {
-        this.dataOutputKey = dataOutputKey;
-    }
-
-    public void setMinPixelToInterpolate(int minPixelToInterpolate) {
-        this.minPixelToInterpolate = minPixelToInterpolate;
-    }
-
 }

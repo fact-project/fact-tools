@@ -14,22 +14,24 @@ import stream.annotations.Parameter;
 public class M3Long implements Processor {
 
     @Parameter(required = true)
-    private String weightsKey = null;
+    public String weightsKey = null;
+
     @Parameter(required = true, description = "The key to the showerPixel. " +
             "That is some sort of int[] containing pixel chids.")
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
 
     @Parameter(required = true)
-    private String m3lOutputKey = "m3l";
-    @Parameter(required = true)
-    private String m3tOutputKey = "m3t";
+    public String m3lOutputKey = "m3l";
 
     @Parameter(required = true)
-    private String distributionKey = null;
+    public String m3tOutputKey = "m3t";
+
+    @Parameter(required = true)
+    public String distributionKey = null;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-    // A logger
+
     static Logger log = LoggerFactory.getLogger(M3Long.class);
 
     @Override
@@ -121,38 +123,4 @@ public class M3Long implements Processor {
         cog[1] /= size;
         return cog;
     }
-
-    public void setWeightsKey(String weights) {
-        this.weightsKey = weights;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getDistributionKey() {
-        return distributionKey;
-    }
-
-    public void setDistributionKey(String distributionKey) {
-        this.distributionKey = distributionKey;
-    }
-
-    public String getM3lOutputKey() {
-        return m3lOutputKey;
-    }
-
-    public void setM3lOutputKey(String m3lOutputKey) {
-        this.m3lOutputKey = m3lOutputKey;
-    }
-
-    public String getM3tOutputKey() {
-        return m3tOutputKey;
-    }
-
-    public void setM3tOutputKey(String m3tOutputKey) {
-        this.m3tOutputKey = m3tOutputKey;
-    }
-
-
 }

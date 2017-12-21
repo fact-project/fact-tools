@@ -10,21 +10,25 @@ import stream.annotations.Parameter;
 public class RisingEdgePolynomFit implements Processor {
 
     @Parameter(required = true, description = "Key to the position of the rising edges")
-    private String risingEdgeKey = null;
+    public String risingEdgeKey = null;
+
     @Parameter(required = true, description = "Key to the data array")
-    private String dataKey = null;
+    public String dataKey = null;
+
     @Parameter(required = true, description = "outputKey for the calculated arrival time")
-    private String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(required = true, description = "outputKey for the calculated slope at the arrival time")
-    private String maxSlopesKey = null;
+    public String maxSlopesKey = null;
 
     @Parameter(required = false, description = "number of points used for the fit", defaultValue = "11")
-    private int numberOfPoints = 11;
+    public int numberOfPoints = 11;
+
     @Parameter(required = false, description = "push fit results into data item", defaultValue = "false")
-    private boolean showFitResult = false;
+    public boolean showFitResult = false;
 
 
-    private int fit_degree = 3;
+    private int fitDegree = 3;
     private double[] fitResult = null;
     private int npix;
 
@@ -55,13 +59,13 @@ public class RisingEdgePolynomFit implements Processor {
             // Aij = fi(xj)
             // => a = (A^T * A)^(-1) * A^T * y
             int n_points = window[1] - window[0];
-            double[][] arrA = new double[n_points][fit_degree + 1];
+            double[][] arrA = new double[n_points][fitDegree + 1];
             double[] arrY = new double[n_points];
 
             for (int i = 0; i < n_points; i++) {
                 int x = i + window[0];
                 int slice = pix * roi + x;
-                for (int j = 0; j <= fit_degree; j++) {
+                for (int j = 0; j <= fitDegree; j++) {
                     arrA[i][j] = Math.pow(x, j);
                     arrY[i] = data[slice];
                 }
@@ -141,32 +145,5 @@ public class RisingEdgePolynomFit implements Processor {
     private double calcDerivationAtPoint(double x, double[] c) {
         return 3 * c[3] * x * x + 2 * c[2] * x + c[1];
     }
-
-
-    public void setRisingEdgeKey(String risingEdgeKey) {
-        this.risingEdgeKey = risingEdgeKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setNumberOfPoints(int numberOfPoints) {
-        this.numberOfPoints = numberOfPoints;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setMaxSlopesKey(String maxSlopesKey) {
-        this.maxSlopesKey = maxSlopesKey;
-    }
-
-
-    public void setShowFitResult(boolean showFitResult) {
-        this.showFitResult = showFitResult;
-    }
-
 
 }

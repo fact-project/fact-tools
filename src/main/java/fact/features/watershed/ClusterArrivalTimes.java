@@ -34,16 +34,16 @@ public class ClusterArrivalTimes implements Processor {
     FactPixelMapping mapping = FactPixelMapping.getInstance();
 
     @Parameter(required = false, description = "Threshold to decide whether a pixel belongs to a cluster or not", defaultValue = "3")
-    protected double threshold = 3;
+    public double threshold = 3;
 
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel)")
-    protected String showerKey = null;
+    public String showerKey = null;
 
     @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
-    protected String arrivaltimePosKey = "arrivalTimePos";
+    public String arrivaltimePosKey = "arrivalTimePos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
-    protected String photonchargeKey = "photoncharge";
+    public String photonchargeKey = "photoncharge";
 
 
     @Override
@@ -262,22 +262,4 @@ public class ClusterArrivalTimes implements Processor {
 
         return new int[]{minID, cluster};
     }
-
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public void setShowerKey(String showerKey) {
-        this.showerKey = showerKey;
-    }
-
-    public void setArrivaltimePosKey(String arrivaltimePosKey) {
-        this.arrivaltimePosKey = arrivaltimePosKey;
-    }
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
 }

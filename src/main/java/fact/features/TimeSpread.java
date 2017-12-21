@@ -9,13 +9,16 @@ import stream.annotations.Parameter;
 public class TimeSpread implements Processor {
 
     @Parameter(required = true)
-    private String arrivalTimeKey = null;
+    public String arrivalTimeKey = null;
+
     @Parameter(required = true)
-    private String weightsKey = null;
+    public String weightsKey = null;
+
     @Parameter(required = true)
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
+
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Override
     public Data process(Data input) {
@@ -59,33 +62,4 @@ public class TimeSpread implements Processor {
 
         return input;
     }
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public String getWeightsKey() {
-        return weightsKey;
-    }
-
-    public void setWeightsKey(String weightsKey) {
-        this.weightsKey = weightsKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

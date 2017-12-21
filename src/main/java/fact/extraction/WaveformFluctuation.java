@@ -19,28 +19,27 @@ import java.util.Random;
  */
 public class WaveformFluctuation implements Processor {
     @Parameter(required = true)
-    private String key = null;
+    public String key = null;
 
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used", defaultValue = "")
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "50")
-    private int skipFirst = 35;
+    public int skipFirst = 35;
 
     @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
-    private int skipLast = 100;
+    public int skipLast = 100;
 
     @Parameter(description = "Size of the integration window", defaultValue = "30")
-    private int windowSize = 30;
+    public int windowSize = 30;
 
     @Parameter(description = "Seed of the random number generator")
-    private long Seed = 5901;
+    public long Seed = 5901;
 
-    // A logger
-    static Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
+    private static final Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
 
     private int npix;
 
@@ -132,57 +131,5 @@ public class WaveformFluctuation implements Processor {
         input.put(outputKey + "_sum", chargeSum);
 
         return input;
-    }
-
-    public void setPixelSetKey(String pixelSampleKey) {
-        this.pixelSetKey = pixelSampleKey;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getSkipFirst() {
-        return skipFirst;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public int getSkipLast() {
-        return skipLast;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
-    }
-
-    public int getWindowSize() {
-        return windowSize;
-    }
-
-    public void setWindowSize(int windowSize) {
-        this.windowSize = windowSize;
-    }
-
-    public long getSeed() {
-        return Seed;
-    }
-
-    public void setSeed(long seed) {
-        Seed = seed;
     }
 }

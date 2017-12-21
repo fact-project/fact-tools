@@ -8,16 +8,30 @@ import org.apache.commons.math3.linear.QRDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 
 public class FitEllipse implements Processor {
-    private String outkeyAlpha = null;
-    private String outkeyCenterX = null;
-    private String outkeyCenterY = null;
-    private String outkeyMinor = null;
-    private String outkeyMajor = null;
 
+    @Parameter(required = true)
+    public String outkeyAlpha = null;
+
+    @Parameter(required = true)
+    public String outkeyCenterX = null;
+
+    @Parameter(required = true)
+    public String outkeyCenterY = null;
+
+    @Parameter(required = true)
+    public String outkeyMinor = null;
+
+    @Parameter(required = true)
+    public String outkeyMajor = null;
+
+    @Parameter(required = true)
     private String snakeX = null;
+
+    @Parameter(required = true)
     private String snakeY = null;
 
 
@@ -82,11 +96,6 @@ public class FitEllipse implements Processor {
     @Override
     public Data process(Data input)    //http://autotrace.sourceforge.net/WSCG98.pdf
     {
-        if (outkeyAlpha == null) throw new RuntimeException("Missing parameter: outkeyAlpha");
-        if (outkeyCenterX == null) throw new RuntimeException("Missing parameter: outkeyCenterX");
-        if (outkeyCenterY == null) throw new RuntimeException("Missing parameter: outkeyCenterY");
-        if (outkeyMinor == null) throw new RuntimeException("Missing parameter: outkeyMinor");
-        if (outkeyMajor == null) throw new RuntimeException("Missing parameter: outkeyMajor");
 
         Utils.mapContainsKeys(input, snakeX, snakeY);
         double[] x = (double[]) input.get(snakeX);
@@ -186,75 +195,4 @@ public class FitEllipse implements Processor {
 
         return input;
     }
-
-
-    public String getOutkeyAlpha() {
-        return outkeyAlpha;
-    }
-
-
-    public void setOutkeyAlpha(String outkeyAlpha) {
-        this.outkeyAlpha = outkeyAlpha;
-    }
-
-
-    public String getOutkeyCenterX() {
-        return outkeyCenterX;
-    }
-
-
-    public void setOutkeyCenterX(String outkeyCenterX) {
-        this.outkeyCenterX = outkeyCenterX;
-    }
-
-
-    public String getOutkeyCenterY() {
-        return outkeyCenterY;
-    }
-
-
-    public void setOutkeyCenterY(String outkeyCenterY) {
-        this.outkeyCenterY = outkeyCenterY;
-    }
-
-
-    public String getOutkeyMinor() {
-        return outkeyMinor;
-    }
-
-
-    public void setOutkeyMinor(String outkeyMinor) {
-        this.outkeyMinor = outkeyMinor;
-    }
-
-
-    public String getOutkeyMajor() {
-        return outkeyMajor;
-    }
-
-
-    public void setOutkeyMajor(String outkeyMajor) {
-        this.outkeyMajor = outkeyMajor;
-    }
-
-
-    public String getSnakeX() {
-        return snakeX;
-    }
-
-
-    public void setSnakeX(String snakeX) {
-        this.snakeX = snakeX;
-    }
-
-
-    public String getSnakeY() {
-        return snakeY;
-    }
-
-
-    public void setSnakeY(String snakeY) {
-        this.snakeY = snakeY;
-    }
-
 }

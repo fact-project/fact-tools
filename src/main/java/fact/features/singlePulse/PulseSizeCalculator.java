@@ -21,15 +21,18 @@ public class PulseSizeCalculator implements Processor {
     static Logger log = LoggerFactory.getLogger(PulseSizeCalculator.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
     //size of pulse
+
     @Parameter(required = true)
-    private String arrivalTimeKey;
+    public String arrivalTimeKey;
     //positions of arrival times
+
     @Parameter(required = true)
-    private int width;
+    public int width;
     //number of slices over which we integrate
 
     private int npix;
@@ -51,10 +54,6 @@ public class PulseSizeCalculator implements Processor {
             pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
         }
         input.put(outputKey, pulseSizes);
-
-
-//       System.out.println(Arrays.toString(pulseSizes));
-//       System.out.println(singlePixelPulses);
 
         return input;
     }
@@ -84,43 +83,4 @@ public class PulseSizeCalculator implements Processor {
         }
         return Utils.arrayListToDouble(sizes);
     }
-
-
-    /*
-     * Getters and Setters
-     */
-
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getarrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setarrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
 }

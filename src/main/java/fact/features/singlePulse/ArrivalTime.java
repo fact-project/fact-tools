@@ -19,18 +19,19 @@ import java.util.ArrayList;
  * @author Katie Gray &lt;kathryn.gray@tu-dortmund.de&gt;
  */
 public class ArrivalTime implements Processor {
-    static Logger log = LoggerFactory.getLogger(ArrivalTime.class);
+    private static final Logger log = LoggerFactory.getLogger(ArrivalTime.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = true)
-    private String outputKey;
-    //positions of arrival times
-    @Parameter(required = true)
-    private String maxAmpPositionKey;
-    //positions of max pulse amplitude
+    public String outputKey;
+
+    @Parameter(required = true, description = "Key to the positions of max pulse amplitude")
+    public String maxAmpPositionKey;
+
     @Parameter(required = false)
-    private String visualizeKey;
+    public String visualizeKey;
 
     private int npix;
 
@@ -101,43 +102,4 @@ public class ArrivalTime implements Processor {
 
         return Utils.arrayListToInt(positions);
     }
-
-
-    /*
-     * Getters and Setters
-     */
-
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getmaxAmpPositionKey() {
-        return maxAmpPositionKey;
-    }
-
-    public void setmaxAmpPositionKey(String maxAmpPositionKey) {
-        this.maxAmpPositionKey = maxAmpPositionKey;
-    }
-
-    public String getVisualizeKey() {
-        return visualizeKey;
-    }
-
-    public void setVisualizeKey(String visualizeKey) {
-        this.visualizeKey = visualizeKey;
-    }
-
 }

@@ -29,13 +29,13 @@ public class MovingAverage implements StatefulProcessor {
 
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Parameter(required = true)
-    private int length = 5;
+    public int length = 5;
 
     private int npix;
 
@@ -95,17 +95,5 @@ public class MovingAverage implements StatefulProcessor {
     @Override
     public void finish() throws Exception {
 
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }

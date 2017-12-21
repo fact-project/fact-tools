@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -17,6 +18,7 @@ import java.lang.reflect.Array;
 public class RemappingKeys implements Processor {
     static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
 
+    @Parameter(required = true)
     String keys[] = null;
 
     private int npix;
@@ -85,16 +87,4 @@ public class RemappingKeys implements Processor {
         }
         return input;
     }
-
-
-    public String[] getKeys() {
-        return keys;
-    }
-
-
-    public void setKeys(String keys[]) {
-        this.keys = keys;
-    }
-
-
 }

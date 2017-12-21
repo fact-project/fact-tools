@@ -28,13 +28,15 @@ import stream.annotations.Parameter;
 public class ArrayStatistics implements Processor {
 
     static Logger log = LoggerFactory.getLogger(ArrayStatistics.class);
-    @Parameter(required = true, description = "Key to the array you want the information about")
-    private String key = null;
-    @Parameter(required = true, description = "The name of the data written to the stream")
-    private String outputKey = null;
-    @Parameter(description = "key of a pixelSet (PixelSetOverlay) containing the IDs of a desired Subset")
-    private String pixelSetKey = null;
 
+    @Parameter(required = true, description = "Key to the array you want the information about")
+    public String key = null;
+
+    @Parameter(required = true, description = "The name of the data written to the stream")
+    public String outputKey = null;
+
+    @Parameter(description = "key of a pixelSet (PixelSetOverlay) containing the IDs of a desired Subset")
+    public String pixelSetKey = null;
 
     @Override
     public Data process(Data input) {
@@ -63,7 +65,6 @@ public class ArrayStatistics implements Processor {
         input.put(outputKey + "_" + "mean", s.getMean());
         input.put(outputKey + "_" + "max", s.getMax());
         input.put(outputKey + "_" + "min", s.getMin());
-//        input.put(outputKey+"_" +"geometricMean",s.getGeometricMean());
         input.put(outputKey + "_" + "kurtosis", s.getKurtosis());
         input.put(outputKey + "_" + "variance", s.getVariance());
         input.put(outputKey + "_" + "skewness", s.getSkewness());
@@ -71,17 +72,4 @@ public class ArrayStatistics implements Processor {
         return input;
 
     }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
 }

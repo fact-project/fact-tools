@@ -26,9 +26,9 @@ public class AlphaTest extends ParameterTest {
 //		//start processor with the correct parameter
         assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
         Alpha poser = new Alpha();
-        poser.setDistribution(distribution);
-        poser.setSourcePosition(sourcePosition);
-        poser.setOutputKey(outputKey);
+        poser.distribution = distribution;
+        poser.sourcePosition = sourcePosition;
+        poser.outputKey = outputKey;
         poser.process(item);
         assertTrue("Expected output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);

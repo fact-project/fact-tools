@@ -16,11 +16,13 @@ import stream.annotations.Parameter;
 public class Size implements Processor {
 
     @Parameter(required = true)
-    private String pixelSetKey;
+    public String pixelSetKey;
+
     @Parameter(required = true)
-    private String photonChargeKey;
+    public String photonChargeKey;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {
@@ -55,27 +57,4 @@ public class Size implements Processor {
         }
         return size;
     }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
 }

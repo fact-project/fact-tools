@@ -18,15 +18,19 @@ import stream.annotations.Parameter;
  */
 public class CosDeltaAlpha implements Processor {
     @Parameter(required = true)
-    private String sourcePositionKey;
+    public String sourcePositionKey;
+
     @Parameter(required = true)
-    private String cogxKey;
+    public String cogxKey;
+
     @Parameter(required = true)
-    private String cogyKey;
+    public String cogyKey;
+
     @Parameter(required = true)
-    private String deltaKey;
+    public String deltaKey;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {
@@ -61,25 +65,4 @@ public class CosDeltaAlpha implements Processor {
         input.put(outputKey, cosDeltaAlpha);
         return input;
     }
-
-    public void setSourcePositionKey(String sourcePositionKey) {
-        this.sourcePositionKey = sourcePositionKey;
-    }
-
-    public void setCogxKey(String cogxKey) {
-        this.cogxKey = cogxKey;
-    }
-
-    public void setCogyKey(String cogyKey) {
-        this.cogyKey = cogyKey;
-    }
-
-    public void setDeltaKey(String deltaKey) {
-        this.deltaKey = deltaKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Generalized Class for the writers with some common
+ * Generalized Class for the writers with some common methods
  */
 public abstract class Writer {
     private Set<String> previousKeySet;
