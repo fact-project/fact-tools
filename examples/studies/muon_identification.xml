@@ -90,7 +90,7 @@
       sizeKey="size"
       widthKey="width"
       lengthKey="length"
-      deltaKey="Delta"
+      deltaKey="delta"
       outputKey="ConcCore"
     />
     <fact.features.ConcentrationAtCenterOfGravity
