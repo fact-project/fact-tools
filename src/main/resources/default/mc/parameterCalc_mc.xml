@@ -55,21 +55,6 @@
     sizeKey="Size"
     outputKey="showerDistribution"
 />
-<fact.features.M3Long 
-    weightsKey="photoncharge" 
-    pixelSetKey="shower"
-    distributionKey="showerDistribution" 
-    m3lOutputKey="m3l"
-    m3tOutputKey="m3t"
-/>
-<fact.features.Length
-    distribution="showerDistribution"
-    outputKey="Length"
-/>
-<fact.features.Width
-    distribution="showerDistribution"
-    outputKey="Width"
-/>
 <fact.features.NumberOfIslands
     pixelSetKey="shower"
     outputKey="numIslands"
