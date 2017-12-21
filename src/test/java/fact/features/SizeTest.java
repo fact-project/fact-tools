@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.container.PixelSet;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class SizeTest {
     public void simpleCharge() {
         int[] showerIds = {12, 34, 35, 56, 57, 58, 59, 123, 1322, 1321, 1320};
         Size size = new Size();
-        double s = size.calculateSize(showerIds, charges);
+        double s = size.calculateSize(PixelSet.fromIDs(showerIds), charges);
         assertTrue("Size should be " + showerIds.length + " but its " + s, s == showerIds.length);
     }
 
@@ -33,7 +34,7 @@ public class SizeTest {
     public void zeroCharge() {
         int[] showerIds = {12, 34, 35, 56, 57, 58, 59, 123, 1322, 1321, 1320};
         Size size = new Size();
-        double s = size.calculateSize(showerIds, zeroCharges);
+        double s = size.calculateSize(PixelSet.fromIDs(showerIds), zeroCharges);
         assertTrue("Size should be 0 but its " + s, s == 0);
     }
 }
