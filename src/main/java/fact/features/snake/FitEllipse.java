@@ -8,16 +8,30 @@ import org.apache.commons.math3.linear.QRDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 
 public class FitEllipse implements Processor {
-    private String outkeyAlpha = null;
-    private String outkeyCenterX = null;
-    private String outkeyCenterY = null;
-    private String outkeyMinor = null;
-    private String outkeyMajor = null;
 
+    @Parameter(required = true)
+    public String outkeyAlpha = null;
+
+    @Parameter(required = true)
+    public String outkeyCenterX = null;
+
+    @Parameter(required = true)
+    public String outkeyCenterY = null;
+
+    @Parameter(required = true)
+    public String outkeyMinor = null;
+
+    @Parameter(required = true)
+    public String outkeyMajor = null;
+
+    @Parameter(required = true)
     private String snakeX = null;
+
+    @Parameter(required = true)
     private String snakeY = null;
 
 
@@ -82,11 +96,6 @@ public class FitEllipse implements Processor {
     @Override
     public Data process(Data input)    //http://autotrace.sourceforge.net/WSCG98.pdf
     {
-        if (outkeyAlpha == null) throw new RuntimeException("Missing parameter: outkeyAlpha");
-        if (outkeyCenterX == null) throw new RuntimeException("Missing parameter: outkeyCenterX");
-        if (outkeyCenterY == null) throw new RuntimeException("Missing parameter: outkeyCenterY");
-        if (outkeyMinor == null) throw new RuntimeException("Missing parameter: outkeyMinor");
-        if (outkeyMajor == null) throw new RuntimeException("Missing parameter: outkeyMajor");
 
         Utils.mapContainsKeys(input, snakeX, snakeY);
         double[] x = (double[]) input.get(snakeX);

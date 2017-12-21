@@ -3,11 +3,16 @@ package fact.features.snake;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PolygonLength implements Processor {
+    @Parameter(required = true)
     String outkey;
 
+    @Parameter(required = true)
     String polygonX = null;
+
+    @Parameter(required = true)
     String polygonY = null;
 
     @Override

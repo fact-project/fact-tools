@@ -3,11 +3,16 @@ package fact.features.snake;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PolygonArea implements Processor {
+    @Parameter(required = true)
     private String outkey = null;
 
+    @Parameter(required = true)
     private String polygonX = null;
+
+    @Parameter(required = true)
     private String polygonY = null;
 
     @Override
