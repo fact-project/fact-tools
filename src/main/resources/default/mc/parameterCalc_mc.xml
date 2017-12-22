@@ -94,7 +94,7 @@
     weightsKey="photoncharge"
     arrivalTimeKey="arrivalTime"
     pixelSetKey="shower"
-    outputKey="Timespread"
+    outputKey="timespread"
 />
 <fact.features.ShowerSlope
     photonChargeKey="photoncharge"

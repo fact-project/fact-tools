@@ -37,14 +37,14 @@ public class TimeGradient implements Processor {
     @Parameter(required = true, description = "key to the delta angle of the shower")
     public String deltaKey = null;
 
-    @Parameter(required = true, description = "outputKey for the calculated timegradient slopes")
-    public String outputKeySlope = null;
+    @Parameter(description = "outputKey for the calculated timegradient slopes")
+    public String outputKeySlope = "timeGradientSlope";
 
-    @Parameter(required = true, description = "outputKey for the calculated timegradient intercepts")
-    public String outputKeyIntercept = null;
+    @Parameter(description = "outputKey for the calculated timegradient intercepts")
+    public String outputKeyIntercept = "timeGradientIntercept";
 
-    @Parameter(required = true, description = "outputKey for the sum squared errors of the linear fits")
-    public String outputKeySumSquaredErrors = null;
+    @Parameter(description = "outputKey for the sum squared errors of the linear fits")
+    public String outputKeySumSquaredErrors = "timeGradientSSE";
 
     public Data process(Data input) {
 
@@ -57,61 +57,64 @@ public class TimeGradient implements Processor {
         double delta = (Double) input.get(deltaKey);
         CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
 
-        SimpleRegression regressorLong = new SimpleRegression();
-        SimpleRegression regressorTrans = new SimpleRegression();
+        SimpleRegression regressionLong = new SimpleRegression();
+        SimpleRegression regressionTrans = new SimpleRegression();
 
-        for (CameraPixel px : shower.set) {
+        for (CameraPixel px : shower) {
             double x = px.getXPositionInMM();
             double y = px.getYPositionInMM();
             double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cog.xMM, cog.yMM, delta);
             double time = arrivalTime[px.id];
-            regressorLong.addData(ellipseCoord[0], time);
-            regressorTrans.addData(ellipseCoord[1], time);
+            regressionLong.addData(ellipseCoord[0], time);
+            regressionTrans.addData(ellipseCoord[1], time);
         }
 
-        double[] slope = {0, 0};
-        double[] slopeErr = {0, 0};
-        double[] intercept = {0, 0};
-        double[] interceptErr = {0, 0};
-        double[] sumSquaredErrors = {0, 0};
-
+        double slopeLong = Double.NaN;
+        double slopeLongErr = Double.NaN;
+        double interceptLong = Double.NaN;
+        double interceptLongErr = Double.NaN;
+        double sumSquaredErrorsLong = Double.NaN;
         try {
-            regressorLong.regress();
-            slope[0] = regressorLong.getSlope();
-            slopeErr[0] = regressorLong.getSlopeStdErr();
-            intercept[0] = regressorLong.getIntercept();
-            interceptErr[0] = regressorLong.getInterceptStdErr();
-            sumSquaredErrors[0] = regressorLong.getSumSquaredErrors();
+            regressionLong.regress();
+            slopeLong = regressionLong.getSlope();
+            slopeLongErr = regressionLong.getSlopeStdErr();
+            interceptLong = regressionLong.getIntercept();
+            interceptLongErr = regressionLong.getInterceptStdErr();
+            sumSquaredErrorsLong = regressionLong.getSumSquaredErrors();
         } catch (NoDataException exc) {
             log.warn("Not enough data points to regress the longitudinal timegradient. Putting Double.NaN in data item");
-            slope[0] = Double.NaN;
-            slopeErr[0] = Double.NaN;
-            intercept[0] = Double.NaN;
-            interceptErr[0] = Double.NaN;
-            sumSquaredErrors[0] = Double.NaN;
         }
 
+        regressionLong.regress();
+        regressionLong.getSlope();
+
+        double slopeTrans = Double.NaN;
+        double slopeTransErr = Double.NaN;
+        double interceptTrans = Double.NaN;
+        double interceptTransErr = Double.NaN;
+        double sumSquaredErrorsTrans = Double.NaN;
         try {
-            regressorTrans.regress();
-            slope[1] = regressorTrans.getSlope();
-            slopeErr[1] = regressorTrans.getSlopeStdErr();
-            intercept[1] = regressorTrans.getIntercept();
-            interceptErr[1] = regressorTrans.getInterceptStdErr();
-            sumSquaredErrors[1] = regressorTrans.getSumSquaredErrors();
+            regressionTrans.regress();
+            slopeTrans = regressionTrans.getSlope();
+            slopeTransErr = regressionTrans.getSlopeStdErr();
+            interceptTrans = regressionTrans.getIntercept();
+            interceptTransErr = regressionTrans.getInterceptStdErr();
+            sumSquaredErrorsTrans = regressionTrans.getSumSquaredErrors();
         } catch (NoDataException exc) {
-            log.warn("Not enough data points to regress the transversal timegradient. Putting Double.NaN in data item");
-            slope[0] = Double.NaN;
-            slopeErr[0] = Double.NaN;
-            intercept[0] = Double.NaN;
-            interceptErr[0] = Double.NaN;
-            sumSquaredErrors[0] = Double.NaN;
+            log.warn("Not enough data points to regress the transverse timegradient. Putting Double.NaN in data item");
         }
 
-        input.put(outputKeySlope, slope);
-        input.put(outputKeySlope + "_err", slopeErr);
-        input.put(outputKeyIntercept, intercept);
-        input.put(outputKeyIntercept + "_err", interceptErr);
-        input.put(outputKeySumSquaredErrors, sumSquaredErrors);
+        input.put(outputKeySlope + "Long", slopeLong);
+        input.put(outputKeySlope + "LongErr", slopeLongErr);
+        input.put(outputKeyIntercept + "Long", interceptLong);
+        input.put(outputKeyIntercept + "LongErr", interceptLongErr);
+        input.put(outputKeySumSquaredErrors + "Long", sumSquaredErrorsLong);
+
+        input.put(outputKeySlope + "Trans", slopeTrans);
+        input.put(outputKeySlope + "TransErr", slopeTransErr);
+        input.put(outputKeyIntercept + "Trans", interceptTrans);
+        input.put(outputKeyIntercept + "TransErr", interceptTransErr);
+        input.put(outputKeySumSquaredErrors + "Trans", sumSquaredErrorsTrans);
 
         return input;
     }
