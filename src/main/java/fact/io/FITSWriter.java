@@ -1,5 +1,6 @@
 package fact.io;
 
+import fact.Utils;
 import fact.VersionInformation;
 import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
@@ -21,9 +22,8 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -37,7 +37,7 @@ import java.util.HashMap;
  * The fits file is initialised and the header is filled using the given keys from first data item.
  * All following items must have the same structure.
  */
-public class FITSWriter implements StatefulProcessor {
+public class FITSWriter extends Writer implements StatefulProcessor {
 
     static Logger log = LoggerFactory.getLogger(FITSWriter.class);
 
@@ -53,12 +53,16 @@ public class FITSWriter implements StatefulProcessor {
     @Parameter(defaultValue = "Events", description = "EXTNAME for the binary table extension")
     public String extname = "Events";
 
+    @Parameter(required = false, description = "Set if you want to allow non existing keys.")
+    public boolean allowNullKeys = false;
+
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
     private boolean initialized = false;
     private long rowSize;
 
+    private Set<String> previousKeySet;
     long numEventsWritten = 0;
 
     ArrayList<String> columnNames = new ArrayList<>(0);
@@ -68,9 +72,11 @@ public class FITSWriter implements StatefulProcessor {
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
+        
         for (String key : keys.select(item)) {
             outputItem.put(key, item.get(key));
         }
+        testKeys(item, keys, allowNullKeys);
 
         if (!initialized) {
             try {

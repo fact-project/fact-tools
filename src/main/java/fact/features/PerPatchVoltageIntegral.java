@@ -10,27 +10,11 @@ import stream.annotations.Parameter;
  */
 
 public class PerPatchVoltageIntegral implements Processor {
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
     @Parameter(required = true, defaultValue = "dataCalibrated", description = "The input key")
-    private String key = "";
+    public String key = "";
 
     @Parameter(required = true, defaultValue = "perPatchVoltageIntegral", description = "The output key")
-    private String outputKey;
+    public String outputKey;
 
     private int npix;
 

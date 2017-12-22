@@ -23,13 +23,13 @@ public class CameraToEquatorial implements Processor {
     private static final Logger log = LoggerFactory.getLogger(CameraToEquatorial.class);
 
     @Parameter
-    private String cameraCoordinateKey = null;
+    public String cameraCoordinateKey = null;
 
     @Parameter
-    private String pointingPositionKey = null;
+    public String pointingPositionKey = null;
 
     @Parameter
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Override
     public Data process(Data item) {

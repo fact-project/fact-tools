@@ -6,17 +6,21 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class InnerEnergy implements Processor {
+
+    @Parameter(required = true)
     private String snakeX = null;
+
+    @Parameter(required = true)
     private String snakeY = null;
 
+    @Parameter(required = true)
     private String outkey = null;
 
     @Override
     public Data process(Data input) {
-        if (outkey == null) throw new RuntimeException("Key \"outkey\" not set");
-
         Utils.mapContainsKeys(input, snakeX, snakeY);
 
         double[] x = (double[]) input.get(snakeX);
@@ -56,35 +60,7 @@ public class InnerEnergy implements Processor {
 
         erg /= 2.0 * dim;
 
-//		System.out.println(erg);
-
         input.put(outkey, erg);
         return input;
     }
-
-    public String getSnakeX() {
-        return snakeX;
-    }
-
-    public void setSnakeX(String snakeX) {
-        this.snakeX = snakeX;
-    }
-
-    public String getSnakeY() {
-        return snakeY;
-    }
-
-    public void setSnakeY(String snakeY) {
-        this.snakeY = snakeY;
-    }
-
-    public String getOutkey() {
-        return outkey;
-    }
-
-    public void setOutkey(String outkey) {
-        this.outkey = outkey;
-    }
-
-
 }

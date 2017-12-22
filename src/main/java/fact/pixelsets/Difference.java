@@ -20,13 +20,13 @@ public class Difference implements Processor {
     static Logger log = LoggerFactory.getLogger(Difference.class);
 
     @Parameter(required = true, description = "key to the first set to be compared")
-    String setUKey;
+    public String setUKey;
 
     @Parameter(required = true, description = "key to the second set to be united")
-    String setAKey;
+    public String setAKey;
 
     @Parameter(required = true, description = "key to the output set which contains the difference")
-    String outsetKey;
+    public String outsetKey;
 
     @Override
     public Data process(Data input) {

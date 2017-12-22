@@ -13,9 +13,10 @@ public class PreviousEventInfo implements Processor {
     static Logger log = LoggerFactory.getLogger(PreviousEventInfo.class);
 
     @Parameter(required = true)
-    String startCellKey = null;
+    public String startCellKey = null;
+
     @Parameter(required = true)
-    String outputKey = null;
+    public String outputKey = null;
 
     int limitEvents = 20;
 
@@ -49,29 +50,4 @@ public class PreviousEventInfo implements Processor {
         input.put(outputKey, previousEventInfo);
         return input;
     }
-
-    public String getStartCellKey() {
-        return startCellKey;
-    }
-
-    public void setStartCellKey(String startCellKey) {
-        this.startCellKey = startCellKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getLimitEvents() {
-        return limitEvents;
-    }
-
-    public void setLimitEvents(int limitEvents) {
-        this.limitEvents = limitEvents;
-    }
-
 }

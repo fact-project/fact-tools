@@ -3,18 +3,23 @@ package fact.features.snake;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PolygonCenter implements Processor {
+    @Parameter(required = true)
     private String polygonX = null;
+
+    @Parameter(required = true)
     private String polygonY = null;
+
+    @Parameter(required = true)
     private String outkeyX = null;
+
+    @Parameter(required = true)
     private String outkeyY = null;
 
     @Override
     public Data process(Data input) {
-        if (outkeyX == null) throw new RuntimeException("Key \"outkeyX\" not set");
-        if (outkeyY == null) throw new RuntimeException("Key \"outkeyY\" not set");
-
         Utils.mapContainsKeys(input, polygonX, polygonY);
 
 
@@ -36,38 +41,4 @@ public class PolygonCenter implements Processor {
 
         return input;
     }
-
-    public String getPolygonX() {
-        return polygonX;
-    }
-
-    public void setPolygonX(String polygonX) {
-        this.polygonX = polygonX;
-    }
-
-    public String getPolygonY() {
-        return polygonY;
-    }
-
-    public void setPolygonY(String polygonY) {
-        this.polygonY = polygonY;
-    }
-
-    public String getOutkeyX() {
-        return outkeyX;
-    }
-
-    public void setOutkeyX(String outkeyX) {
-        this.outkeyX = outkeyX;
-    }
-
-    public String getOutkeyY() {
-        return outkeyY;
-    }
-
-    public void setOutkeyY(String outkeyY) {
-        this.outkeyY = outkeyY;
-    }
-
-
 }

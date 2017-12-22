@@ -36,14 +36,14 @@ import java.util.Arrays;
  */
 public class SinglePulseExtraction implements Processor {
     @Parameter(required = true, description = "")
-    private String dataKey = null;
+    public String dataKey = null;
 
     @Parameter(
             required = true,
             description = "output key: The value is a 2dim int array [1440][variable length]" +
                     "of arrival slices of photons found in each pixel"
     )
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(
             required = false,
@@ -51,35 +51,35 @@ public class SinglePulseExtraction implements Processor {
                     "time line before abort",
             defaultValue = "4000"
     )
-    protected int maxIterations = 4000;
+    public int maxIterations = 4000;
 
     @Parameter(
             required = false,
             description = "start slice of extraction window",
             defaultValue = "20"
     )
-    protected int startSliceExtractionWindow = 20;
+    public int startSliceExtractionWindow = 20;
 
     @Parameter(
             required = false,
             description = "start slice of output window",
             defaultValue = "30"
     )
-    protected int startSliceOutputWindow = 30;
+    public int startSliceOutputWindow = 30;
 
     @Parameter(
             required = false,
             description = "output window length in slices",
             defaultValue = "100"
     )
-    protected int outputWindowLengthInSlices = 100;
+    public int outputWindowLengthInSlices = 100;
 
     @Parameter(
             required = false,
             description = "extraction window length in slices",
             defaultValue = "225"
     )
-    protected int extractionWindowLengthInSlices = 225;
+    public int extractionWindowLengthInSlices = 225;
 
     private int npix = Constants.NUMBEROFPIXEL;
     private int roi = 300;
@@ -148,34 +148,4 @@ public class SinglePulseExtraction implements Processor {
             }
         }
     }
-
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setStartSliceExtractionWindow(int startSliceExtractionWindow) {
-        this.startSliceExtractionWindow = startSliceExtractionWindow;
-    }
-
-    public void setStartSliceOutputWindow(int startSliceOutputWindow) {
-        this.startSliceOutputWindow = startSliceOutputWindow;
-    }
-
-    public void setOutputWindowLengthInSlices(int outputWindowLengthInSlices) {
-        this.outputWindowLengthInSlices = outputWindowLengthInSlices;
-    }
-
-    public void setExtractionWindowLengthInSlices(int extractionWindowLengthInSlices) {
-        this.extractionWindowLengthInSlices = extractionWindowLengthInSlices;
-    }
-
-    public void setMaxIterations(int maxIterations) {
-        this.maxIterations = maxIterations;
-    }
-
 }

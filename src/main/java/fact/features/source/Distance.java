@@ -15,13 +15,16 @@ import stream.annotations.Parameter;
  * @author kaibrugge
  */
 public class Distance implements Processor {
-    static Logger log = LoggerFactory.getLogger(Distance.class);
+    private static final Logger log = LoggerFactory.getLogger(Distance.class);
+
     @Parameter(required = true)
-    private String distribution;
+    public String distribution;
+
     @Parameter(required = true)
-    private String sourcePosition;
+    public String sourcePosition;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     /**
      * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid
@@ -43,19 +46,4 @@ public class Distance implements Processor {
         input.put(outputKey, Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0)));
         return input;
     }
-
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
-    }
-
-    public void setSourcePosition(String sourcePosition) {
-        this.sourcePosition = sourcePosition;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

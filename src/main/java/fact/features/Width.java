@@ -10,10 +10,12 @@ import stream.annotations.Parameter;
 
 public class Width implements Processor {
     static Logger log = LoggerFactory.getLogger(Width.class);
+
     @Parameter(required = true)
-    private String distribution;
+    public String distribution;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {
@@ -29,23 +31,4 @@ public class Width implements Processor {
 
         return input;
     }
-
-
-    public String getDistribution() {
-        return distribution;
-    }
-
-    public void setDistribution(String distribution) {
-        this.distribution = distribution;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

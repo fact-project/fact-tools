@@ -10,25 +10,34 @@ import stream.annotations.Parameter;
 public class ShowerSlope implements Processor {
 
     @Parameter(required = true)
-    private String photonChargeKey = null;
+    public String photonChargeKey = null;
+
     @Parameter(required = true)
-    private String arrivalTimeKey = null;
+    public String arrivalTimeKey = null;
+
     @Parameter(required = true)
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
+
     @Parameter(required = true)
-    private String cogxKey = null;
+    public String cogxKey = null;
+
     @Parameter(required = true)
-    private String cogyKey = null;
+    public String cogyKey = null;
+
     @Parameter(required = true)
-    private String deltaKey = null;
+    public String deltaKey = null;
+
     @Parameter(required = true)
-    private String slopeLongOutputKey = null;
+    public String slopeLongOutputKey = null;
+
     @Parameter(required = true)
-    private String slopeTransOutputKey = null;
+    public String slopeTransOutputKey = null;
+
     @Parameter(required = true)
-    private String slopeSpreadOutputKey = null;
+    public String slopeSpreadOutputKey = null;
+
     @Parameter(required = true)
-    private String slopeSpreadWeightedOutputKey = null;
+    public String slopeSpreadWeightedOutputKey = null;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -106,82 +115,4 @@ public class ShowerSlope implements Processor {
         input.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
         return input;
     }
-
-    public String getPhotonChargeKey() {
-        return photonChargeKey;
-    }
-
-    public void setPhotonChargeKey(String photonChargeKey) {
-        this.photonChargeKey = photonChargeKey;
-    }
-
-    public String getArrivalTimeKey() {
-        return arrivalTimeKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public String getCogxKey() {
-        return cogxKey;
-    }
-
-    public void setCogxKey(String cogxKey) {
-        this.cogxKey = cogxKey;
-    }
-
-    public String getCogyKey() {
-        return cogyKey;
-    }
-
-    public void setCogyKey(String cogyKey) {
-        this.cogyKey = cogyKey;
-    }
-
-    public String getDeltaKey() {
-        return deltaKey;
-    }
-
-    public void setDeltaKey(String deltaKey) {
-        this.deltaKey = deltaKey;
-    }
-
-    public String getSlopeLongOutputKey() {
-        return slopeLongOutputKey;
-    }
-
-    public void setSlopeLongOutputKey(String slopeLongOutputKey) {
-        this.slopeLongOutputKey = slopeLongOutputKey;
-    }
-
-    public String getSlopeTransOutputKey() {
-        return slopeTransOutputKey;
-    }
-
-    public void setSlopeTransOutputKey(String slopeTransOutputKey) {
-        this.slopeTransOutputKey = slopeTransOutputKey;
-    }
-
-    public String getSlopeSpreadOutputKey() {
-        return slopeSpreadOutputKey;
-    }
-
-    public void setSlopeSpreadOutputKey(String slopeSpreadOutputKey) {
-        this.slopeSpreadOutputKey = slopeSpreadOutputKey;
-    }
-
-    public String getSlopeSpreadWeightedOutputKey() {
-        return slopeSpreadWeightedOutputKey;
-    }
-
-    public void setSlopeSpreadWeightedOutputKey(String slopeSpreadWeightedOutputKey) {
-        this.slopeSpreadWeightedOutputKey = slopeSpreadWeightedOutputKey;
-    }
-
-
 }

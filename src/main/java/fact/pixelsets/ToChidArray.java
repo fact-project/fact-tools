@@ -18,10 +18,10 @@ public class ToChidArray implements Processor {
     static Logger log = LoggerFactory.getLogger(ToChidArray.class);
 
     @Parameter(required = true, description = "key to the input PixelSet")
-    String pixelSetKey;
+    public String pixelSetKey;
 
     @Parameter(required = true, description = "key to the output the chid array")
-    String outputKey;
+    public String outputKey;
 
     @Override
     public Data process(Data input) {

@@ -43,19 +43,19 @@ public class DrsTimeCalibration implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(DrsCalibration.class);
 
     @Parameter(required = false, description = "Key of the StartCellData in the data fits file", defaultValue = "StartCellData")
-    private String startCellKey = "StartCellData";
+    public String startCellKey = "StartCellData";
 
     @Parameter(required = false, description = "name of column in FITS file to find DRS4 time calibration constants.")
-    private String drsTimeKey = "CellOffset";
+    public String drsTimeKey = "CellOffset";
 
     @Parameter(required = false, description = "file with the drs time calib constants", defaultValue = "classpath:/long_term_constants_median.time.drs.fits")
-    private URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
+    public URL url = DrsTimeCalibration.class.getResource("/long_term_constants_median.time.drs.fits");
 
     @Parameter(required = true, description = "key to the drs amplitude calibrated voltage curves")
-    private String dataKey = null;
+    public String dataKey = null;
 
     @Parameter(required = true, description = "OutputKey for the calibrated voltage curves")
-    private String outputKey = null;
+    public String outputKey = null;
 
     private int numberOfSlices = 1024;
     private int numberOfTimeMarker = 160;

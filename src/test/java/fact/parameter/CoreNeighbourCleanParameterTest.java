@@ -23,14 +23,14 @@ public class CoreNeighbourCleanParameterTest extends ParameterTest {
 //		//start processor with the correct parameter
         assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
         TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
-        poser.setCalibService(calibService);
-        poser.setPhotonChargeKey(photonCharge);
-        poser.setArrivalTimeKey(arrivalTime);
-        poser.setCorePixelThreshold(0);
-        poser.setNeighborPixelThreshold(0);
-        poser.setMinNumberOfPixel(0);
-        poser.setTimeLimit(300);
-        poser.setOutputKey(outputKey);
+        poser.calibService = calibService;
+        poser.photonChargeKey = photonCharge;
+        poser.arrivalTimeKey = arrivalTime;
+        poser.corePixelThreshold = 0;
+        poser.neighborPixelThreshold = 0;
+        poser.minNumberOfPixel = 0;
+        poser.timeLimit = 300;
+        poser.outputKey = outputKey;
         poser.process(item);
         assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);

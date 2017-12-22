@@ -11,11 +11,13 @@ public class FindTimeMarker implements Processor {
     static Logger log = LoggerFactory.getLogger(FindTimeMarker.class);
 
     @Parameter(required = true)
-    private String key = null;
+    public String key = null;
+
     @Parameter(required = true)
-    private String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(required = true)
-    private String timeOffsetKey = null;
+    public String timeOffsetKey = null;
 
     double[] posRisingEdges = null;
     double[] posFallingEdges = null;
@@ -117,77 +119,4 @@ public class FindTimeMarker implements Processor {
 
         return input;
     }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double[] getPosRisingEdges() {
-        return posRisingEdges;
-    }
-
-    public void setPosRisingEdges(double[] posRisingEdges) {
-        this.posRisingEdges = posRisingEdges;
-    }
-
-    public double[] getPosFallingEdges() {
-        return posFallingEdges;
-    }
-
-    public void setPosFallingEdges(double[] posFallingEdges) {
-        this.posFallingEdges = posFallingEdges;
-    }
-
-    public double[] getDurations() {
-        return durations;
-    }
-
-    public void setDurations(double[] durations) {
-        this.durations = durations;
-    }
-
-    public double[] getMaxHeights() {
-        return maxHeights;
-    }
-
-    public void setMaxHeights(double[] maxHeights) {
-        this.maxHeights = maxHeights;
-    }
-
-    public double[] getIntegrals() {
-        return integrals;
-    }
-
-    public void setIntegrals(double[] integrals) {
-        this.integrals = integrals;
-    }
-
-    public double[] getAverageHeights() {
-        return averageHeights;
-    }
-
-    public void setAverageHeights(double[] averageHeights) {
-        this.averageHeights = averageHeights;
-    }
-
-    public String getTimeOffsetKey() {
-        return timeOffsetKey;
-    }
-
-    public void setTimeOffsetKey(String timeOffsetKey) {
-        this.timeOffsetKey = timeOffsetKey;
-    }
-
 }

@@ -30,13 +30,4 @@ public class CastDoubleArrayToIntArray implements Processor {
         input.put(outputKey, intArray);
         return input;
     }
-
-    public void setInputKey(String inputKey) {
-        this.inputKey = inputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

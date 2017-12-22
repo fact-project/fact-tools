@@ -13,15 +13,16 @@ import stream.annotations.Parameter;
  */
 public class EstimateBaseline implements Processor {
     @Parameter(required = true, description = "")
-    private String dataKey = null;
+    public String dataKey = null;
 
     @Parameter(required = true, description = "key for the baseline output, 1440 pixel array containing a baseline amplitude for each pixel")
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(required = false, description = "start slice of the calculation window", defaultValue = "10")
-    protected int firstSlice = 10;
+    public int firstSlice = 10;
+
     @Parameter(required = false, description = "range of the calculation window ", defaultValue = "40")
-    protected int range = 40;
+    public int range = 40;
 
     private int npix = Constants.NUMBEROFPIXEL;
     private int roi = 300;
@@ -65,37 +66,5 @@ public class EstimateBaseline implements Processor {
         input.put(outputKey + "_range", mBslRange);
         input.put(outputKey + "_level", mBslLevel);
         return input;
-    }
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getFirstSlice() {
-        return firstSlice;
-    }
-
-    public void setFirstSlice(int firstSlice) {
-        this.firstSlice = firstSlice;
-    }
-
-    public int getRange() {
-        return range;
-    }
-
-    public void setRange(int range) {
-        this.range = range;
     }
 }

@@ -46,25 +46,25 @@ public class ClusterFellwalker implements Processor {
 
 
     @Parameter(required = false, description = "Minimal number of pixels a cluster must contain to be labeled as 'showerCluster'", defaultValue = "2")
-    protected int minShowerpixel = 2;
+    public int minShowerpixel = 2;
 
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel). Used to keep/remove cluster if areaKey=null.")
-    protected String showerKey = null;
+    public String showerKey = null;
 
     @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
-    protected String arrivaltimePosKey = "arrivalTimePos";
+    public String arrivaltimePosKey = "arrivalTimePos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
-    protected String photonchargeKey = "photoncharge";
+    public String photonchargeKey = "photoncharge";
 
     @Parameter(required = false, description = "Value chosen for clustering. Could be photoncharge, arrival times or mean correlation.", defaultValue = "photoncharge")
-    protected String morphologyKey = photonchargeKey;
+    public String morphologyKey = photonchargeKey;
 
     @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePosition")
-    protected String sourcePositionKey = "sourcePosition";
+    public String sourcePositionKey = "sourcePosition";
 
     @Parameter(required = false, description = "Pixel set to cluster. If null, cluster all camera pixel; in that case decide which clusters should be kept via pixelSetKey", defaultValue = "null")
-    protected String areaKey = null;
+    public String areaKey = null;
 
 
     @Override
@@ -726,34 +726,4 @@ public class ClusterFellwalker implements Processor {
 
         return Math.sqrt(std);
     }
-
-
-    public void setMinShowerpixel(int minShowerpixel) {
-        this.minShowerpixel = minShowerpixel;
-    }
-
-    public void setShowerKey(String showerKey) {
-        this.showerKey = showerKey;
-    }
-
-    public void setArrivaltimePosKey(String arrivaltimePosKey) {
-        this.arrivaltimePosKey = arrivaltimePosKey;
-    }
-
-    public void setPhotonchargeKey(String photonchargeKey) {
-        this.photonchargeKey = photonchargeKey;
-    }
-
-    public void setSourcePositionKey(String sourcePositionKey) {
-        this.sourcePositionKey = sourcePositionKey;
-    }
-
-    public void setAreaKey(String areaKey) {
-        this.areaKey = areaKey;
-    }
-
-    public void setMorphologyKey(String morphologyKey) {
-        this.morphologyKey = morphologyKey;
-    }
-
 }

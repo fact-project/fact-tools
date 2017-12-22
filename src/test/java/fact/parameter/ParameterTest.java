@@ -66,35 +66,34 @@ public class ParameterTest {
         pr.process(item);
 
         BasicExtraction bE = new BasicExtraction();
-        bE.setDataKey(key);
-        bE.setOutputKeyMaxAmplPos(positions);
-        bE.setOutputKeyPhotonCharge(photonCharge);
-        bE.setUrl(new SourceURL(FITSStreamTest.class
-                .getResource("/defaultIntegralGains.csv")));
+        bE.dataKey = key;
+        bE.outputKeyMaxAmplPos = positions;
+        bE.outputKeyPhotonCharge = photonCharge;
+        bE.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
         bE.process(item);
 
         RisingEdgeForPositions pR = new RisingEdgeForPositions();
-        pR.setDataKey(key);
-        pR.setAmplitudePositionsKey(positions);
-        pR.setOutputKey(arrivalTime);
+        pR.dataKey = key;
+        pR.amplitudePositionsKey = positions;
+        pR.outputKey = arrivalTime;
         pR.process(item);
 
         TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
-        poser.setCalibService(calibService);
-        poser.setPhotonChargeKey(photonCharge);
-        poser.setArrivalTimeKey(arrivalTime);
-        poser.setOutputKey(shower);
-        poser.setCorePixelThreshold(1);
-        poser.setNeighborPixelThreshold(0.1);
-        poser.setMinNumberOfPixel(1);
-        poser.setTimeLimit(40);
+        poser.calibService = calibService;
+        poser.photonChargeKey = photonCharge;
+        poser.arrivalTimeKey = arrivalTime;
+        poser.outputKey = shower;
+        poser.corePixelThreshold = 1;
+        poser.neighborPixelThreshold = 0.1;
+        poser.minNumberOfPixel = 1;
+        poser.timeLimit = 40;
         poser.process(item);
 
 
         DistributionFromShower dist = new DistributionFromShower();
-        dist.setPixelSetKey(shower);
-        dist.setWeightsKey(photonCharge);
-        dist.setOutputKey(distribution);
+        dist.pixelSetKey = shower;
+        dist.weightsKey = photonCharge;
+        dist.outputKey = distribution;
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();

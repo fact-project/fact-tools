@@ -21,20 +21,19 @@ public class TimeOverThresholdTL implements Processor {
     static Logger log = LoggerFactory.getLogger(TimeOverThresholdTL.class);
 
     @Parameter(required = true)
-    private String dataKey = null;
+    public String dataKey = null;
 
     @Parameter(required = false)
-    private double threshold = 50;
+    public double threshold = 50;
 
-    private int firstSlice = 0;
+    @Parameter
+    public int range = -1;
 
-    private int range = -1;
+    @Parameter
+    public int firstSlice = 0;
 
     @Parameter(required = true)
-    private String outputKey = null;
-
-    private PixelSet pixelSet;
-
+    public String outputKey = null;
 
     public Data process(Data input) {
         Utils.isKeyValid(input, dataKey, double[].class);
@@ -45,7 +44,7 @@ public class TimeOverThresholdTL implements Processor {
 
         double[] data = (double[]) input.get(dataKey);
 
-        pixelSet = new PixelSet();
+        PixelSet pixelSet = new PixelSet();
 
         int roi = data.length / npix;
 

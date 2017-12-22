@@ -22,12 +22,14 @@ public class PulseMaxAmplitude implements Processor {
     static Logger log = LoggerFactory.getLogger(PulseMaxAmplitude.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
+
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
     //positions of max amplitudes of pulses
+
     @Parameter(required = true)
-    private String pulsePositionKey;
+    public String pulsePositionKey;
     //positions of threshold crossings
 
     private int npix;
@@ -94,35 +96,4 @@ public class PulseMaxAmplitude implements Processor {
 
         return Utils.arrayListToInt(maxima);
     }
-
-
-    /*
-     * Getters and Setters
-     */
-
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getPulsePositionKey() {
-        return pulsePositionKey;
-    }
-
-    public void setPulsePositionKey(String pulsePositionKey) {
-        this.pulsePositionKey = pulsePositionKey;
-    }
-
 }

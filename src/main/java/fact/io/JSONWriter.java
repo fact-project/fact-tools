@@ -5,7 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import fact.Utils;
 import fact.container.PixelSet;
+import org.apache.commons.lang3.StringUtils;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -18,6 +20,10 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -93,26 +99,34 @@ import java.util.zip.GZIPOutputStream;
  * Created by bruegge on 7/30/14.
  * Refactored by maxnoe on 2/2/2016
  */
-public class JSONWriter implements StatefulProcessor {
-
+public class JSONWriter extends Writer implements StatefulProcessor {
 
     @Parameter(required = true)
-    private Keys keys = new Keys("");
+    public Keys keys = new Keys("");
+
     @Parameter(required = false, description = "Defines how many significant digits are used for double values", defaultValue = "null")
-    private Integer doubleSignDigits = null;
+    public Integer doubleSignDigits = null;
+
     @Parameter(required = false, description = "If true, use jsonl format instead of json format", defaultValue = "false")
-    private boolean jsonl = false;
+    public boolean jsonl = false;
+
     @Parameter(required = false, description = "If true, append to existing file else overwrite", defaultValue = "false")
-    private boolean append = false;
+    public boolean append = false;
+
     @Parameter(required = false, description = "If true, PixelSets are written out as int arrays of chids", defaultValue = "true")
-    private boolean pixelSetsAsInt = true;
+    public boolean pixelSetsAsInt = true;
+
     @Parameter(required = false, description = "If true, Infinity, -Infinity and NaN are converted to strings 'inf', '-inf' and 'nan'", defaultValue = "false")
-    private boolean specialDoubleValuesAsString = false;
+    public boolean specialDoubleValuesAsString = false;
+
     @Parameter(required = false, description = "If true, use gzip compression")
-    private boolean gzip = false;
+    public boolean gzip = false;
+
+    @Parameter(required = false, description = "Set if you want to allow empty keys.")
+    public boolean allowNullKeys = false;
 
     @Parameter(required = true)
-    private URL url;
+    public URL url;
 
     private Gson gson;
     private StringBuffer b = new StringBuffer();
@@ -127,6 +141,8 @@ public class JSONWriter implements StatefulProcessor {
         for (String key : keys.select(data)) {
             item.put(key, data.get(key));
         }
+
+        testKeys(item, keys, allowNullKeys);
 
         try {
             if (isFirstLine) {
@@ -204,38 +220,6 @@ public class JSONWriter implements StatefulProcessor {
                 bw.close();
             }
         }
-    }
-
-    public void setAppend(boolean append) {
-        this.append = append;
-    }
-
-    public void setKeys(Keys keys) {
-        this.keys = keys;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
-    public void setJsonl(boolean jsonl) {
-        this.jsonl = jsonl;
-    }
-
-    public void setGzip(boolean gzip) {
-        this.gzip = gzip;
-    }
-
-    public void setDoubleSignDigits(int doubleSignDigits) {
-        this.doubleSignDigits = doubleSignDigits;
-    }
-
-    public void setPixelSetsAsInt(boolean pixelSetsAsInt) {
-        this.pixelSetsAsInt = pixelSetsAsInt;
-    }
-
-    public void setSpecialDoubleValuesAsString(boolean specialDoubleValuesAsString) {
-        this.specialDoubleValuesAsString = specialDoubleValuesAsString;
     }
 
     public class DateTimeAdapter extends TypeAdapter<ZonedDateTime> {

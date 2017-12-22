@@ -19,11 +19,13 @@ public class SubtractDataArrays implements Processor {
     static Logger log = LoggerFactory.getLogger(RemappingKeys.class);
 
     @Parameter(required = true, description = "The key to your data array.")
-    private String key;
+    public String key;
+
     @Parameter(required = true, description = "The key to your subtracted data array.")
-    private String subtractedKey;
+    public String subtractedKey;
+
     @Parameter(required = false)
-    private String outputKey;
+    public String outputKey;
 
     private int npix;
 
@@ -53,46 +55,4 @@ public class SubtractDataArrays implements Processor {
 
         return input;
     }
-
-
-    public static Logger getLog() {
-        return log;
-    }
-
-
-    public static void setLog(Logger log) {
-        SubtractDataArrays.log = log;
-    }
-
-
-    public String getKey() {
-        return key;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public String getSubtractedKey() {
-        return subtractedKey;
-    }
-
-
-    public void setSubtractedKey(String subtractedKey) {
-        this.subtractedKey = subtractedKey;
-    }
-
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }

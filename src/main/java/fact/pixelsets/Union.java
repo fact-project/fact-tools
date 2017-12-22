@@ -16,13 +16,13 @@ import stream.annotations.Parameter;
 public class Union implements Processor {
 
     @Parameter(required = true, description = "key to the first set to be united")
-    String setAKey;
+    public String setAKey;
 
     @Parameter(required = true, description = "key to the second set to be united")
-    String setBKey;
+    public String setBKey;
 
     @Parameter(required = true, description = "key to the output set which contains the union")
-    String outsetKey;
+    public String outsetKey;
 
     @Override
     public Data process(Data input) {
