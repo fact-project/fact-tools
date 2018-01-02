@@ -34,7 +34,6 @@ public class Size implements Processor {
         PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
         double[] charge = (double[]) input.get(photonChargeKey);
         double size = calculateSize(pixelSet, charge);
-        input.put("@size", size);
         input.put(outputKey, size);
         return input;
     }

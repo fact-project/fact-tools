@@ -44,7 +44,7 @@ public class ReconstructSourcePositionDisp implements Processor {
 
         CameraCoordinate recPosition = calculateRecPosition(cog.xMM, cog.yMM, disp, delta, cosDeltaAlpha, m3l);
 
-        input.put("@reconstructedPosition" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
+        input.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, recPosition));
         input.put(outputKey, recPosition);
         input.put(outputKey + 'X', recPosition.xMM);
         input.put(outputKey + 'Y', recPosition.yMM);
