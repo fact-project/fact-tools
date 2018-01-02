@@ -198,7 +198,7 @@ public class SourcePosition implements StatefulProcessor {
         data.put("pointingPositionZd", pointingHorizontal.getZenithDeg());
         data.put("pointingPositionAz", pointingHorizontal.getAzimuthDeg());
 
-        data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourceCamera));
+        data.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
 
         return data;
     }
