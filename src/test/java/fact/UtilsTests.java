@@ -1,8 +1,12 @@
 package fact;
 
 import org.junit.Test;
+import stream.Data;
+import stream.data.DataFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by jebuss on 14.11.16.
@@ -51,4 +55,17 @@ public class UtilsTests {
         assertEquals(coords[1], 10, 1e-12);
     }
 
+    @Test
+    public void testMapContainsKeys() {
+        Data item = DataFactory.create();
+        item.put("stuff", 4);
+        item.put("other", 2);
+        try {
+            Utils.mapContainsKeys(item, "stuff", "other", "bla");
+            fail("mapContainsKeys should have thrown because of missing key bla");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("bla"));
+            assertTrue(e.getMessage().contains("fact.UtilsTests"));
+        }
+    }
 }
