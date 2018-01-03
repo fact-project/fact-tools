@@ -85,7 +85,7 @@ public class DrsCalibration implements StatefulProcessor {
             this.drsGainRms = row.getFloatArray("GainRms").orElseThrow(() -> new RuntimeException("File does not contain key GainRms"));
 
         } catch (IOException e) {
-            new IOException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
     }
