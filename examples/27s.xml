@@ -5,9 +5,6 @@
   <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
-  <property name="auxFolder" value="file:src/main/resources/aux/" />
-
-  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
@@ -16,24 +13,15 @@
   <process id="2" input="fact">
     <fact.extraction.SaturatedSlicesPercentage />
 
+    <fact.io.PrintKeys keys="EventNum,saturatedSlicesPercentage" />
+    <Skip condition="%{data.saturatedSlicesPercentage} &lt;= 0.0" />
+
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
+
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
-    <include url="classpath:/default/data/cleaning.xml" />
-    <include url="classpath:/default/data/pedestalParameters.xml" />
 
-
-    <fact.photonstream.SinglePulseExtraction
-        dataKey="DataCalibrated"
-        outputKey="PhotonArrivals"
-    />
-
-    <fact.photonstream.ConvertSinglePulses2Timeseries
-      singlePulsesKey="PhotonArrivals"
-      baseLineKey="PhotonArrivalsBaseLine"
-      timeSeriesKey="ReconstructedDataCalibrated"
-    />
-
-    <fact.ShowViewer key="DataCalibrated" />
+    <!-- <fact.io.FITSWriter url="file:27s.fits" keys="EventNum,saturatedSlicesPercentage,photoncharge"/> -->
+    <fact.ShowViewer key="Data" />
   </process>
 </container>

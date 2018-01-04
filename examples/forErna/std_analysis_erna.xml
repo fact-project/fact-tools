@@ -19,6 +19,8 @@
     </stream>
 
     <process id="1" input="fact">
+        <fact.extraction.SaturatedSlicesPercentage />
+        <Skip condition="%{data.saturatedSlicesPercentage} &gt; 0.2" />
         <!-- prevEventAndSkip: -->
         <!-- PreviousEventInfo, Skip(no Data Trigger) -->
         <include url="classpath:/default/data/prevEventAndSkip.xml" />

@@ -28,7 +28,7 @@ public class FactStandardAnalysisTest {
             BinTable table = fits.getBinTableByName("Events").get();
 
             assertEquals(3, (long) table.numberOfRowsInTable);
-
+        
 
         } catch (Exception e) {
             e.printStackTrace();
