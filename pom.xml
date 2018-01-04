@@ -321,12 +321,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.7</version>
         <dependencies>
           <dependency>
-            <groupId>org.jwall</groupId>
+            <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-markdown</artifactId>
-            <version>1.1.4</version>
+            <version>1.8</version>
           </dependency>
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
@@ -367,6 +367,13 @@
 
   <reporting>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -478,18 +485,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-site-plugin</artifactId>
-            <version>3.3</version>
-            <configuration>
-              <reportPlugins>
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-javadoc-plugin</artifactId>
-                  <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                  </configuration>
-                </plugin>
-              </reportPlugins>
-            </configuration>
+            <version>3.7</version>
           </plugin>
         </plugins>
       </build>
