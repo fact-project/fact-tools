@@ -9,7 +9,10 @@ import stream.Data;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * A KeySelector is a JPanel which lays out KeySelectorItems. It keeps track of which KeySelectorItems are selected
@@ -65,7 +68,12 @@ public abstract class KeySelector extends JPanel implements EventObserver {
         items.addAll(newItems);
 
         keySelectionContentPanel.removeAll();
-        for (SeriesKeySelectorItem k : items) {
+
+        List<SeriesKeySelectorItem> sortedItems = items.stream()
+                .sorted((lhs, rhs) -> lhs.key.compareToIgnoreCase(rhs.key))
+                .collect(toList());
+
+        for (SeriesKeySelectorItem k : sortedItems) {
             k.setAlignmentX(Component.LEFT_ALIGNMENT);
             keySelectionContentPanel.add(k);
         }

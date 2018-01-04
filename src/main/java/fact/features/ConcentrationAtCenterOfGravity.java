@@ -1,6 +1,7 @@
 package fact.features;
 
 import fact.Utils;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
@@ -21,21 +22,15 @@ public class ConcentrationAtCenterOfGravity implements Processor {
     @Parameter(required = true, defaultValue = "photonCharge", description = "Key of the array of photoncharge.")
     public String photonChargeKey = null;
 
-    @Parameter(required = true, defaultValue = "COGx", description = "Key of the X-center of gravity of shower. (generate by e.g. Distribution from shower)")
-    public String cogxKey = null;
+    @Parameter(required = true, description = "Key of the center of gravity of shower. (generate by HillasParameters)")
+    public String cogKey = null;
 
-    @Parameter(required = true, defaultValue = "COGy", description = "Key of the Y-center of gravity. (see CogX)")
-    public String cogyKey = null;
 
     @Parameter(required = true, defaultValue = "Size", description = "Key of the size of the event. (Generated e.g. by Size processor.)")
     public String sizeKey = null;
 
     @Parameter(required = true, defaultValue = "concCOG", description = "The key of the generated value.")
     public String outputKey = null;
-
-    private double cogx;
-    private double cogy;
-    private double size;
 
     private double[] photonCharge = null;
 
@@ -45,14 +40,14 @@ public class ConcentrationAtCenterOfGravity implements Processor {
      */
     @Override
     public Data process(Data input) {
-        Utils.mapContainsKeys(input, cogxKey, cogyKey, sizeKey, photonChargeKey);
+        Utils.mapContainsKeys(input, cogKey, sizeKey, photonChargeKey);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
-        cogx = (Double) input.get(cogxKey);
-        cogy = (Double) input.get(cogyKey);
-        size = (Double) input.get(sizeKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        double size = (double) input.get(sizeKey);
 
         photonCharge = (double[]) input.get(photonChargeKey);
-        CameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cogx, cogy);
+        CameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cog.xMM, cog.yMM);
         if (cogPixel == null) {
             input.put(outputKey, -Double.MAX_VALUE);
             return input;
@@ -70,7 +65,7 @@ public class ConcentrationAtCenterOfGravity implements Processor {
         for (CameraPixel pix : neighbors) {
             double x = pix.getXPositionInMM();
             double y = pix.getYPositionInMM();
-            double dist = (cogx - x) * (cogx - x) + (cogy - y) * (cogy - y);
+            double dist = (cog.xMM - x) * (cog.xMM - x) + (cog.yMM - y) * (cog.yMM - y);
 
             if (dist < mindist1) {
                 mindist2 = mindist1;

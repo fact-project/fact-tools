@@ -2,7 +2,8 @@ package fact.features;
 
 import fact.Utils;
 import fact.container.PixelSet;
-import fact.hexmap.FactPixelMapping;
+import fact.coordinates.CameraCoordinate;
+import fact.hexmap.CameraPixel;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -19,10 +20,7 @@ public class ShowerSlope implements Processor {
     public String pixelSetKey = null;
 
     @Parameter(required = true)
-    public String cogxKey = null;
-
-    @Parameter(required = true)
-    public String cogyKey = null;
+    public String cogKey = null;
 
     @Parameter(required = true)
     public String deltaKey = null;
@@ -39,21 +37,20 @@ public class ShowerSlope implements Processor {
     @Parameter(required = true)
     public String slopeSpreadWeightedOutputKey = null;
 
-    FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-
     @Override
     public Data process(Data input) {
-        Utils.mapContainsKeys(input, photonChargeKey, arrivalTimeKey, pixelSetKey, cogxKey, cogyKey, deltaKey);
+        Utils.mapContainsKeys(input, photonChargeKey, arrivalTimeKey, pixelSetKey, cogKey, deltaKey);
+        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
         double[] photonCharge = (double[]) input.get(photonChargeKey);
         double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-        int[] shower = ((PixelSet) input.get(pixelSetKey)).toIntArray();
-        double cogx = (Double) input.get(cogxKey);
-        double cogy = (Double) input.get(cogyKey);
+        PixelSet shower = (PixelSet) input.get(pixelSetKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
         double delta = (Double) input.get(deltaKey);
 
         // NumberShowerPixel
-        int n = shower.length;
+        int n = shower.size();
         // in shower coordinates rotated x coord of the shower pixel
         double x[] = new double[n];
         // in shower coordinates rotated x coord of the shower pixel
@@ -63,15 +60,17 @@ public class ShowerSlope implements Processor {
         // Weights of shower pixel
         double w[] = new double[n];
 
-        for (int i = 0; i < n; i++) {
-            int chid = shower[i];
-            double xcoord = pixelMap.getPixelFromId(chid).getXPositionInMM();
-            double ycoord = pixelMap.getPixelFromId(chid).getYPositionInMM();
-            double[] rotPixels = Utils.transformToEllipseCoordinates(xcoord, ycoord, cogx, cogy, delta);
-            x[i] = rotPixels[0];
-            y[i] = rotPixels[1];
-            t[i] = arrivalTime[chid];
-            w[i] = photonCharge[chid];
+        int counter = 0;
+        for (CameraPixel pixel: shower) {
+            int chid = pixel.id;
+            double xcoord = pixel.getXPositionInMM();
+            double ycoord = pixel.getYPositionInMM();
+            double[] rotPixels = Utils.transformToEllipseCoordinates(xcoord, ycoord, cog.xMM, cog.yMM, delta);
+            x[counter] = rotPixels[0];
+            y[counter] = rotPixels[1];
+            t[counter] = arrivalTime[chid];
+            w[counter] = photonCharge[chid];
+            counter++;
         }
 
         // Calculate several element wise multiplication

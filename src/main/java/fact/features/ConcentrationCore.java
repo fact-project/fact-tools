@@ -3,6 +3,7 @@ package fact.features;
 import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +18,8 @@ public class ConcentrationCore implements Processor {
     @Parameter(required = true)
     public String outputKey;
 
-    @Parameter(required = true, description = "Key of the Center of Gravity X (by Distribution from shower)")
-    public String cogxKey;
-
-    @Parameter(required = true, description = "Key of the Center of Gravity Y (by Distribution from shower)")
-    public String cogyKey;
+    @Parameter(required = true, description = "Key of the Center of Gravity")
+    public String cogKey;
 
     @Parameter(required = true, description = "Key of the delta angle")
     public String deltaKey;
@@ -48,10 +46,11 @@ public class ConcentrationCore implements Processor {
      */
     public Data process(Data input) {
 
-        Utils.mapContainsKeys(input, cogxKey, cogyKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
+        Utils.mapContainsKeys(input, cogKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
+        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
-        Double cogx = (Double) input.get(cogxKey);
-        Double cogy = (Double) input.get(cogyKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
         Double delta = (Double) input.get(deltaKey);
         double[] photonChargeArray = (double[]) input.get(photonChargeKey);
         PixelSet showerPixelSet = (PixelSet) input.get(pixelSetKey);
@@ -65,7 +64,7 @@ public class ConcentrationCore implements Processor {
             double px = pix.getXPositionInMM();
             double py = pix.getYPositionInMM();
 
-            double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cogx, cogy, delta);
+            double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cog.xMM, cog.yMM, delta);
 
             // add a tolerance of 10% of the pixel size to not only get pixels with the center in the ellipse
             double dl = Math.abs(ellipseCoords[0]) - 0.1 * Constants.PIXEL_SIZE_MM;

@@ -64,15 +64,14 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
 
     private void updateSelectionInfo(Set<CameraPixel> selectedPixel) {
         model.clear();
-        for (CameraPixel sp : selectedPixel) {
-            CameraPixel p = (CameraPixel) sp;
-            String m = "Chid: " + p.id + "  SoftId: " + p.softid;
+        for (CameraPixel p : selectedPixel) {
+            String m = "Chid: " + p.id + ", SoftId: " + p.softid;
             if (photonChargeArray != null) {
-                m += "   photonChqarge: " + photonChargeArray[p.id];
+                m += ", photoncharge: " + String.format("%.2f", photonChargeArray[p.id]);
             }
 
-//            m +=  " x in MM " +  ((CameraPixel) sp).getXPositionInMM();
-//            m += "  y in MM " + ((CameraPixel) sp).getYPositionInMM();
+            m += ", x in mm " +  String.format("%.1f", p.getXPositionInMM());
+            m += ", y in mm " + String.format("%.1f", p.getYPositionInMM());
             model.addElement(m);
         }
     }
@@ -106,7 +105,7 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
             runIDField.setEnabled(true);
         }
         //get photoncharge if its in the map
-        Serializable chargeArray = item.get("@photoncharge");
+        Serializable chargeArray = item.get("photoncharge");
         if (chargeArray != null) {
             try {
                 photonChargeArray = ((double[]) chargeArray);
@@ -114,10 +113,10 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
                 for (double v : photonChargeArray) {
                     eventStatistics.addValue(v);
                 }
-                chargeField.setText("" + eventStatistics.getMean());
+                chargeField.setText(String.format("%.2f", eventStatistics.getMean()));
                 chargeField.setEnabled(true);
 
-                chargeFieldStd.setText("" + eventStatistics.getStandardDeviation());
+                chargeFieldStd.setText(String.format("%.2f", eventStatistics.getStandardDeviation()));
                 chargeFieldStd.setEnabled(true);
             } catch (ClassCastException e) {
                 //pass
@@ -125,10 +124,10 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         }
 
         //get size if its in the map
-        if (item.get("@size") != null) {
+        if (item.get("size") != null) {
             try {
-                Double size = (Double) item.get("@size");
-                sizeField.setText("" + size);
+                Double size = (Double) item.get("size");
+                sizeField.setText(String.format("%.2f", size));
                 sizeField.setEnabled(true);
             } catch (ClassCastException e) {
                 //pass
@@ -139,14 +138,14 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
         }
 
         //get width and length if they are in the map
-        if (item.get("@width") != null && item.get("@length") != null) {
+        if (item.get("width") != null && item.get("length") != null) {
             try {
-                Double width = (Double) item.get("@width");
-                Double length = (Double) item.get("@length");
-                widthField.setText("" + width);
+                Double width = (Double) item.get("width");
+                Double length = (Double) item.get("length");
+                widthField.setText(String.format("%.2f", width));
                 widthField.setEnabled(true);
 
-                lengthField.setText("" + length);
+                lengthField.setText(String.format("%.2f", length));
                 lengthField.setEnabled(true);
             } catch (ClassCastException e) {
                 //pass

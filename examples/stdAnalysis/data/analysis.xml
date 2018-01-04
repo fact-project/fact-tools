@@ -49,7 +49,7 @@
       <!-- Parameter calculation (only source independent) -->
       <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
       arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-      Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+      HillasParameters, NumberOfIslands, TimeGraident,
       Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
       ShowerSlope, Disp -->
       <include url="classpath:/default/data/parameterCalc.xml" />
@@ -60,7 +60,6 @@
       Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
       <include url="classpath:/default/data/sourceParameter.xml" />
       <!-- Output: source dependent parameters -->
-
       <fact.io.FITSWriter url="${outfile}" keys="${keysForOutput}"/>
   </process>
 </container>

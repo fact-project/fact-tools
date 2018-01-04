@@ -75,4 +75,5 @@ public class SeriesKeySelectorItem extends JPanel {
         add(colorButton, BorderLayout.EAST);
         add(label, BorderLayout.CENTER);
     }
+
 }
