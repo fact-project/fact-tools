@@ -1,6 +1,7 @@
 package fact.features.source;
 
 import fact.Utils;
+import fact.container.PixelSet;
 import fact.coordinates.CameraCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
 import stream.Data;
@@ -12,16 +13,14 @@ public class ReconstructSourcePositionDisp implements Processor {
     public String dispKey = null;
 
     @Parameter(required = true)
-    public String cogxKey = null;
+    public String cogKey = null;
 
-    @Parameter(required = true)
-    public String cogyKey = null;
 
     @Parameter(required = true)
     public String deltaKey = null;
 
     @Parameter(required = true)
-    public String m3lKey = null;
+    String m3LongKey = null;
 
     @Parameter(required = true)
     public String cosDeltaAlphaKey = null;
@@ -33,18 +32,19 @@ public class ReconstructSourcePositionDisp implements Processor {
     public double signM3lConstant = 0;
 
     public Data process(Data input) {
-        Utils.mapContainsKeys(input, dispKey, cogxKey, cogyKey, deltaKey, cosDeltaAlphaKey);
+        Utils.mapContainsKeys(input, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
-        double disp = (Double) input.get(dispKey);
-        double cogx = (Double) input.get(cogxKey);
-        double cogy = (Double) input.get(cogyKey);
-        double delta = (Double) input.get(deltaKey);
-        double m3l = (Double) input.get(m3lKey);
-        double cosDeltaAlpha = (Double) input.get(cosDeltaAlphaKey);
+        double disp = (double) input.get(dispKey);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
 
-        CameraCoordinate recPosition = calculateRecPosition(cogx, cogy, disp, delta, cosDeltaAlpha, m3l);
+        double delta = (double) input.get(deltaKey);
+        double m3l = Math.cbrt((double) input.get(m3LongKey));  // MARS calls cbrt(M3) M3
+        double cosDeltaAlpha = (double) input.get(cosDeltaAlphaKey);
 
-        input.put("@reconstructedPosition" + outputKey, new SourcePositionOverlay(outputKey, recPosition));
+        CameraCoordinate recPosition = calculateRecPosition(cog.xMM, cog.yMM, disp, delta, cosDeltaAlpha, m3l);
+
+        input.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, recPosition));
         input.put(outputKey, recPosition);
         input.put(outputKey + 'X', recPosition.xMM);
         input.put(outputKey + 'Y', recPosition.yMM);

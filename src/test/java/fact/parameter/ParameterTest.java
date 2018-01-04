@@ -5,7 +5,7 @@ import fact.cleaning.TwoLevelTimeMedian;
 import fact.datacorrection.DrsCalibration;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
-import fact.features.DistributionFromShower;
+import fact.features.HillasParameters;
 import fact.features.source.SourcePosition;
 import fact.io.FITSStreamTest;
 import fact.io.hdureader.FITSStream;
@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 
 /**
  * <fact.features.HillasAlpha distribution="dist"
- * sourcePosition="sourcePosition" outputKey="alpha" />
+ * sourcePositionKey="sourcePositionKey" outputKey="alpha" />
  *
  * @author bruegge
  */
@@ -90,10 +90,10 @@ public class ParameterTest {
         poser.process(item);
 
 
-        DistributionFromShower dist = new DistributionFromShower();
+
+        HillasParameters dist = new HillasParameters();
         dist.pixelSetKey = shower;
         dist.weightsKey = photonCharge;
-        dist.outputKey = distribution;
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();

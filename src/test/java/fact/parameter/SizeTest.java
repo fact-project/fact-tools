@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertTrue;
 
 /**
- * <fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
+ * <fact.features.HillasAlpha distribution="dist" sourcePositionKey="sourcePositionKey" outputKey="alpha" />
  *
  * @author bruegge
  */

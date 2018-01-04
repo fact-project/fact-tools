@@ -1,7 +1,6 @@
 package fact.features.source;
 
 import fact.Utils;
-import fact.container.PixelDistribution2D;
 import fact.coordinates.CameraCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +17,10 @@ public class Distance implements Processor {
     private static final Logger log = LoggerFactory.getLogger(Distance.class);
 
     @Parameter(required = true)
-    public String distribution;
+    public String cogKey;
 
     @Parameter(required = true)
-    public String sourcePosition;
+    public String sourcePositionKey;
 
     @Parameter(required = true)
     public String outputKey;
@@ -31,19 +30,13 @@ public class Distance implements Processor {
      */
     @Override
     public Data process(Data input) {
-        if (!input.containsKey(distribution)) {
-            log.info("No shower in event. Not calculating distance");
-            return input;
-        }
-        Utils.mapContainsKeys(input, distribution, sourcePosition);
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
 
-        PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-        CameraCoordinate source = (CameraCoordinate) input.get(sourcePosition);
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
 
-        double dx = dist.getCenterX() - source.xMM;
-        double dy = dist.getCenterY() - source.yMM;
-
-        input.put(outputKey, Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0)));
+        input.put(outputKey, cog.euclideanDistance(source));
         return input;
     }
 }
