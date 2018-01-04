@@ -76,7 +76,4 @@ public class SeriesKeySelectorItem extends JPanel {
         add(label, BorderLayout.CENTER);
     }
 
-    public String getKey() {
-        return key;
-    }
 }
