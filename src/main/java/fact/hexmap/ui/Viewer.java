@@ -1,6 +1,5 @@
 package fact.hexmap.ui;
 
-import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -96,14 +95,14 @@ public class Viewer extends JFrame {
                         RowSpec.decode("fill:pref")
                 });
 
-        PanelBuilder builder = new PanelBuilder(layout);
+        JPanel panel = new JPanel(layout);
         CellConstraints cc = new CellConstraints();
-        builder.add(chartPanel, cc.xywh(2, 1, 1, 1));
-        builder.add(eventInfoPanel, cc.xywh(2, 2, 1, 1));
-        builder.add(mapDisplay, cc.xywh(1, 1, 1, 2));
-        builder.add(navigation, cc.xywh(1, 3, 2, 1));
+        panel.add(chartPanel, cc.xywh(2, 1, 1, 1));
+        panel.add(eventInfoPanel, cc.xywh(2, 2, 1, 1));
+        panel.add(mapDisplay, cc.xywh(1, 1, 1, 2));
+        panel.add(navigation, cc.xywh(1, 3, 2, 1));
 
-        setContentPane(builder.getPanel());
+        setContentPane(panel);
 
         //setSize(1200, 850);
         pack();

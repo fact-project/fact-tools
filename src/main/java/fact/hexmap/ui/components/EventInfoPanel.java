@@ -4,7 +4,6 @@
 package fact.hexmap.ui.components;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -215,34 +214,34 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
                         RowSpec.decode("fill:pref")
                 });
 
-        PanelBuilder builder = new PanelBuilder(layout);
+        JPanel panel = new JPanel(layout);
         CellConstraints cc = new CellConstraints();
-        builder.addSeparator("Event Information", cc.xywh(1, 1, 6, 1));
-        builder.add(new JLabel("ROI "), cc.xy(1, 2));
-        builder.add(roiField, cc.xy(2, 2));
+        panel.add(new JLabel("Event Information"), cc.xywh(1, 1, 6, 1));
+        panel.add(new JLabel("ROI "), cc.xy(1, 2));
+        panel.add(roiField, cc.xy(2, 2));
 
-        builder.add(new JLabel("Time "), cc.xy(3, 2));
-        builder.add(timeField, cc.xy(4, 2));
+        panel.add(new JLabel("Time "), cc.xy(3, 2));
+        panel.add(timeField, cc.xy(4, 2));
 
-        builder.add(new JLabel("Run ID "), cc.xy(5, 2));
-        builder.add(runIDField, cc.xy(6, 2));
-        builder.addSeparator("Selection Information", cc.xywh(1, 3, 6, 1));
-        builder.add(new JLabel(("Pixel IDs")), cc.xy(1, 4));
-        builder.add(new JScrollPane(pixIDList), cc.xywh(2, 4, 5, 1));
+        panel.add(new JLabel("Run ID "), cc.xy(5, 2));
+        panel.add(runIDField, cc.xy(6, 2));
+        panel.add(new JLabel("Selection Information"), cc.xywh(1, 3, 6, 1));
+        panel.add(new JLabel(("Pixel IDs")), cc.xy(1, 4));
+        panel.add(new JScrollPane(pixIDList), cc.xywh(2, 4, 5, 1));
 
-        builder.addSeparator("Addition Physics Information", cc.xywh(1, 5, 6, 1));
-        builder.add(new JLabel("Charge Mean/Deviation"), cc.xywh(1, 6, 2, 1));
-        builder.add(chargeField, cc.xywh(3, 6, 1, 1));
-        builder.add(chargeFieldStd, cc.xywh(4, 6, 1, 1));
-        builder.add(new JLabel("Width, Length"), cc.xywh(1, 7, 2, 1));
-        builder.add(widthField, cc.xywh(3, 7, 1, 1));
-        builder.add(lengthField, cc.xywh(4, 7, 1, 1));
+        panel.add(new JLabel("Addition Physics Information"), cc.xywh(1, 5, 6, 1));
+        panel.add(new JLabel("Charge Mean/Deviation"), cc.xywh(1, 6, 2, 1));
+        panel.add(chargeField, cc.xywh(3, 6, 1, 1));
+        panel.add(chargeFieldStd, cc.xywh(4, 6, 1, 1));
+        panel.add(new JLabel("Width, Length"), cc.xywh(1, 7, 2, 1));
+        panel.add(widthField, cc.xywh(3, 7, 1, 1));
+        panel.add(lengthField, cc.xywh(4, 7, 1, 1));
 
-        builder.add(new JLabel("Size (of Shower)"), cc.xywh(1, 8, 2, 1));
-        builder.add(sizeField, cc.xywh(3, 8, 2, 1));
+        panel.add(new JLabel("Size (of Shower)"), cc.xywh(1, 8, 2, 1));
+        panel.add(sizeField, cc.xywh(3, 8, 2, 1));
 
 
-        contentPanel.add(builder.getPanel());
+        contentPanel.add(panel);
         add(contentPanel);
     }
 

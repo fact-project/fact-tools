@@ -1,7 +1,6 @@
 package fact.hexmap.ui.windows;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -47,15 +46,18 @@ public class PlotDisplayWindow implements EventObserver {
                 }
         );
 
-        PanelBuilder builder = new PanelBuilder(layout);
-        CellConstraints cc = new CellConstraints();
-        builder.add(plotPanel, cc.xywh(1, 1, 1, 4));
-        builder.addSeparator("Series Selection", cc.xy(2, 1));
-        builder.add(keySelector, cc.xy(2, 2));
-        builder.addSeparator("Marker Selection", cc.xy(2, 3));
-        builder.add(intervalKeySelector, cc.xy(2, 4));
 
-        frame.setContentPane(builder.getPanel());
+        JPanel panel = new JPanel(layout);
+        CellConstraints cc = new CellConstraints();
+        panel.add(plotPanel, cc.xywh(1, 1, 1, 4));
+
+        panel.add(new JLabel("Series Selection"), cc.xy(2, 1));
+        panel.add(keySelector, cc.xy(2, 2));
+
+        panel.add(new JLabel("Marker Selection"), cc.xy(2, 3));
+        panel.add(intervalKeySelector, cc.xy(2, 4));
+
+        frame.setContentPane(panel);
         frame.pack();
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
