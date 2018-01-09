@@ -1,8 +1,8 @@
 <container>
     <properties url="classpath:/default/settings_mc.properties" />
 
-    <property name="infile" value="classpath:/ceres_output/18000/00018000.000_D_MonteCarlo018_Events.fits.gz" />
-    <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
+    <property name="infile" value="file:src/test/resources/ceres_output/18000/00018000.000_D_MonteCarlo018_Events.fits.gz" />
+    <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
 
     <property name="out_path_basename" value="test_ceres" />
@@ -16,9 +16,9 @@
         <include url="classpath:/default/mc/calibration_mc.xml" />
         <include url="classpath:/default/mc/extraction_mc.xml" />
 
-        <fact.extraction.AboveThreshold 
-            dataKey="Data" 
-            threshold="2040" 
+        <fact.extraction.AboveThreshold
+            dataKey="Data"
+            threshold="2040"
             outputKey="Saturation"
         />
 
@@ -56,7 +56,7 @@
         <stream.data.RenameKey from="MCorsikaRunHeader.fRunNumber" to="Run"/>
         <stream.data.RenameKey from="MCorsikaEvtHeader.fEvtNumber" to="Event"/>
         <stream.data.RenameKey from="MMcEvt.fEventReuse" to="Reuse"/>
- 
+
         <fact.io.JSONWriter
                 keys="
                     Run,
@@ -74,8 +74,8 @@
                 jsonl="true"
         />
 
-        <fact.io.JSONWriter 
-            keys="Night,Run,Event,CentiBaseLines"
+        <fact.io.JSONWriter
+            keys="Run,Event,Reuse,CentiBaseLines"
             url="file:${out_path_basename}.bsl.jsonl.gz"
             writeListOfItems="true"
             pixelSetsAsInt="true"
