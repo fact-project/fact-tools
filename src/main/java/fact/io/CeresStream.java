@@ -47,7 +47,13 @@ public class CeresStream extends AbstractStream {
         fitsStream.init();
 
         Path path = Paths.get(expandedURL.getPath());
-        String runHeaderFileName = path.getFileName().toString().replace("_Events", "_RunHeaders");
+        String filename = path.getFileName().toString();
+
+        if (!filename.contains("_Events")) {
+            throw new IOException("Inputfile does not contain '_Events', cannot look for RunHeader file");
+        }
+
+        String runHeaderFileName = filename.replace("_Events", "_RunHeaders");
         Path runHeaderPath = Paths.get(path.getParent().toString(), runHeaderFileName);
 
         if (Files.notExists(runHeaderPath)) {
@@ -55,6 +61,9 @@ public class CeresStream extends AbstractStream {
         }
 
         HDU runHeaderHDU = FITS.fromPath(runHeaderPath).getHDU("RunHeaders");
+        if (runHeaderHDU == null) {
+            throw new IOException("RunHeader file '" + runHeaderPath.toString() + "' did not contain 'RunHeaders' HDU");
+        }
         BinTableReader tableReader = BinTableReader.forBinTable(runHeaderHDU.getBinTable());
         ceresRunHeader = tableReader.getNextRow();
     }
