@@ -3,8 +3,10 @@ package fact.features;
 import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
 import fact.photonstream.timeSeriesExtraction.SinglePulseExtractor;
 import fact.photonstream.timeSeriesExtraction.TemplatePulse;
-import junit.framework.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SinglePulseExtractorTest {
 
@@ -17,8 +19,8 @@ public class SinglePulseExtractorTest {
         SinglePulseExtractor spe = new SinglePulseExtractor(config);
 
         SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
-        Assert.assertEquals(0, result.pulseArrivalSlices.length);
-        Assert.assertEquals(0, result.numberOfPulses());
+        assertEquals(0, result.pulseArrivalSlices.length);
+        assertEquals(0, result.numberOfPulses());
     }
 
 
@@ -36,8 +38,8 @@ public class SinglePulseExtractorTest {
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
-            Assert.assertEquals(0, result.numberOfPulses());
-            Assert.assertTrue(
+            assertEquals(0, result.numberOfPulses());
+            assertTrue(
                     result.timeSeriesBaseLine() <= baseLine + 1.0 &&
                             result.timeSeriesBaseLine() >= baseLine - 1.0
             );
@@ -63,8 +65,8 @@ public class SinglePulseExtractorTest {
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
-            Assert.assertEquals(1, result.numberOfPulses());
-            Assert.assertTrue(
+            assertEquals(1, result.numberOfPulses());
+            assertTrue(
                     result.timeSeriesBaseLine() <= baseLine + 1.0 &&
                             result.timeSeriesBaseLine() >= baseLine - 1.0
             );
@@ -88,10 +90,10 @@ public class SinglePulseExtractorTest {
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
-            Assert.assertEquals(1, result.pulseArrivalSlices.length);
-            Assert.assertEquals(1, result.numberOfPulses());
+            assertEquals(1, result.pulseArrivalSlices.length);
+            assertEquals(1, result.numberOfPulses());
 
-            Assert.assertTrue(
+            assertTrue(
                     result.pulseArrivalSlices[0] <= injectionSlice + 2 &&
                             result.pulseArrivalSlices[0] >= injectionSlice - 2
             );
@@ -119,7 +121,7 @@ public class SinglePulseExtractorTest {
 
             SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
-            Assert.assertTrue(
+            assertTrue(
                     (double) result.numberOfPulses() <= amplitude + amplitude * 0.25 &&
                             (double) result.numberOfPulses() >= amplitude - amplitude * 0.25
             );
@@ -153,16 +155,16 @@ public class SinglePulseExtractorTest {
         SinglePulseExtractor.Result result = spe.extractFromTimeSeries(timeSeries);
 
 
-        Assert.assertEquals(3, result.pulseArrivalSlices.length);
+        assertEquals(3, result.pulseArrivalSlices.length);
 
-        Assert.assertTrue((double) result.pulseArrivalSlices[0] >= 50 - 2);
-        Assert.assertTrue((double) result.pulseArrivalSlices[0] <= 50 + 2);
+        assertTrue((double) result.pulseArrivalSlices[0] >= 50 - 2);
+        assertTrue((double) result.pulseArrivalSlices[0] <= 50 + 2);
 
-        Assert.assertTrue((double) result.pulseArrivalSlices[1] >= 125 - 2);
-        Assert.assertTrue((double) result.pulseArrivalSlices[1] <= 125 + 2);
+        assertTrue((double) result.pulseArrivalSlices[1] >= 125 - 2);
+        assertTrue((double) result.pulseArrivalSlices[1] <= 125 + 2);
 
-        Assert.assertTrue((double) result.pulseArrivalSlices[2] >= 200 - 2);
-        Assert.assertTrue((double) result.pulseArrivalSlices[2] <= 200 + 2);
+        assertTrue((double) result.pulseArrivalSlices[2] >= 200 - 2);
+        assertTrue((double) result.pulseArrivalSlices[2] <= 200 + 2);
     }
 
     @Test
@@ -171,7 +173,7 @@ public class SinglePulseExtractorTest {
         result.pulseArrivalSlices = new int[0];
 
         int[] myPulses = result.pulseArrivalSlicesInRange(0, 1000);
-        Assert.assertEquals(0, myPulses.length);
+        assertEquals(0, myPulses.length);
     }
 
     @Test
@@ -180,8 +182,8 @@ public class SinglePulseExtractorTest {
         result.pulseArrivalSlices = new int[]{10, 50, 100, 550, 1000};
 
         int[] myPulses = result.pulseArrivalSlicesInRange(50, 500);
-        Assert.assertEquals(2, myPulses.length);
-        Assert.assertEquals(50, myPulses[0]);
-        Assert.assertEquals(100, myPulses[1]);
+        assertEquals(2, myPulses.length);
+        assertEquals(50, myPulses[0]);
+        assertEquals(100, myPulses[1]);
     }
 }

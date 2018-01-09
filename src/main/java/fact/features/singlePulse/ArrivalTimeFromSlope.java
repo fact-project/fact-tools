@@ -63,7 +63,7 @@ public class ArrivalTimeFromSlope implements Processor {
         double[] slopes = (double[]) input.get(derivationKey);
         int roi = data.length / npix;
 
-        ArrayList[] pulsePeaks = new ArrayList[npix];
+        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>();
         //the position where pulse leading edges end
         int[][] arrivalTimes = new int[npix][];
         //arrival times for all pulses in each pixel
@@ -78,10 +78,13 @@ public class ArrivalTimeFromSlope implements Processor {
 
         //for each pixel
         for (int pix = 0; pix < npix; pix++) {
-            pulsePeaks[pix] = findPulsePeaks(pix, roi, slopes);
+            ArrayList<Integer> currentPulsePeaks = findPulsePeaks(pix, roi, slopes);
+            pulsePeaks.add(currentPulsePeaks);
 
-            arrivalTimes[pix] = new int[pulsePeaks[pix].size()];
-            baselineValues[pix] = new double[pulsePeaks[pix].size()];
+            arrivalTimes[pix] = new int[pulsePeaks.size()];
+            baselineValues[pix] = new double[pulsePeaks.size()];
+
+
             arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
         }
 
@@ -100,13 +103,13 @@ public class ArrivalTimeFromSlope implements Processor {
      */
 
     //the function that finds the pulses. returns positions of the peaks
-    public ArrayList findPulsePeaks(int pix, int roi, double[] slopes) {
+    public ArrayList<Integer> findPulsePeaks(int pix, int roi, double[] slopes) {
 
-        ArrayList<Integer> peaks = new ArrayList<Integer>();
+        ArrayList<Integer> peaks = new ArrayList<>();
         int risingEdgeLength = 10;
 
 
-        for (int slice = 0 + skipFirstSlices; slice < roi - skipLastSlices; slice++) {
+        for (int slice = skipFirstSlices; slice < roi - skipLastSlices; slice++) {
             int pos = pix * roi + slice;
             boolean peak = true;
             boolean check = false;
@@ -114,19 +117,17 @@ public class ArrivalTimeFromSlope implements Processor {
 
 
             if (slopes[pos] <= 0) {
-                peak = false;
                 continue;
             } else {
                 for (int i = 0; i < risingEdgeLength; i++) {
                     if (slice - i >= 0 && slice + i < roi) {
                         if (slopes[pos - i] < 0) {
-                            if (check == true) {
+                            if (check) {
                                 peak = false;
                                 break;
-                            } else check = true;
-
-                        } else {
-                            continue;
+                            } else {
+                                check = true;
+                            }
                         }
                     } else {
                         peak = false;
@@ -135,7 +136,7 @@ public class ArrivalTimeFromSlope implements Processor {
                 }
             }
 
-            if (peak == false) {
+            if (!peak) {
                 continue;
             }
 
@@ -143,13 +144,13 @@ public class ArrivalTimeFromSlope implements Processor {
             while (slice + k < roi) {
                 if (slopes[pos + k] > 0) {
                     k++;
-                } else break;
+                } else {
+                    break;
+                }
             }
             slice += k - 1;
 
-            if (peak == true) {
-                peaks.add(slice);
-            }
+            peaks.add(slice);
         }
 
         return peaks;
@@ -158,15 +159,15 @@ public class ArrivalTimeFromSlope implements Processor {
 
     //the function that finds the starting point of the pulse, defined by the first position with a positive slope, and
 //the position of maximum slope. both values can be used for arrival time or baseline values
-    public int[] findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList[] pulsePeaks, double[] visualizePositions, double[][] baselineValues) {
-        ArrayList<Integer> times = new ArrayList<Integer>();
-        ArrayList<Double> baseValues = new ArrayList<Double>();
-        ArrayList<Integer> peaks = pulsePeaks[pix];
-        int number = peaks.size();
+    public int[] findArrivalTimes(int pix, int roi, int width, double[] data, double[] slopes, ArrayList<ArrayList<Integer>> pulsePeaks, double[] visualizePositions, double[][] baselineValues) {
+        ArrayList<Integer> times = new ArrayList<>();
+        ArrayList<Double> baseValues = new ArrayList<>();
+        ArrayList<Integer> peaks = pulsePeaks.get(pix);
+
         int pivot = (int) (width / 2.0);
 
-        for (int pulse = 0; pulse < number; pulse++) {
-            int end = (Integer) peaks.get(pulse);
+        for (Integer peak : peaks) {
+            int end = peak;
 
             //find the starting point of the leading edge
             int current = end;
@@ -206,7 +207,7 @@ public class ArrivalTimeFromSlope implements Processor {
                 }
             }
 
-            if (start > 0 + skipFirstSlices && end < roi - skipLastSlices && end - maxpos < 14) {
+            if (start > skipFirstSlices && end < roi - skipLastSlices && end - maxpos < 14) {
                 visualizePositions[pix * roi + start] = 15;
                 times.add(start);
                 baseValues.add(data[pix * roi + start]);

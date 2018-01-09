@@ -92,7 +92,7 @@ public class ClusterArrivalTimes implements Processor {
 
         //Region Growing Algorithm
 
-        while (finishCluster == false) {
+        while (!finishCluster) {
 
             //get ids from neighbor pixel which have already a cluster id
 
@@ -222,7 +222,7 @@ public class ClusterArrivalTimes implements Processor {
 
     }
 
-    private ArrayList findNeighborCluster(int id, int[] clusterID) {
+    private ArrayList<Integer> findNeighborCluster(int id, int[] clusterID) {
         ArrayList<Integer> neighborCluster = new ArrayList<>();
         CameraPixel[] neighbors = mapping.getNeighborsFromID(id);
 

@@ -25,7 +25,7 @@ import java.util.Collection;
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
 public class Utils {
-    static Logger log = LoggerFactory.getLogger(Utils.class);
+    private final static Logger log = LoggerFactory.getLogger(Utils.class);
 
     public static ZonedDateTime unixTimeUTCToZonedDateTime(int[] unixTimeUTC) {
         return Instant.ofEpochSecond(unixTimeUTC[0], unixTimeUTC[1] * 1000).atZone(ZoneOffset.UTC);
@@ -55,7 +55,7 @@ public class Utils {
      * return all camera pixel Ids if the set is not existing
      */
     public static int[] getValidPixelSetAsIntArr(Data input, int npix, String pixelSetKey) {
-        int[] pixels = null;
+        int[] pixels;
 
         //Load a given pixelset, otherwise use the the whole camera
 
@@ -144,7 +144,7 @@ public class Utils {
      * Arrays.aslist cannot be used for this conversion
      */
     public static ArrayList<Integer> arrayToList(int[] a) {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
+        ArrayList<Integer> ret = new ArrayList<>();
         for (int i = 0; i < a.length; i++) {
             ret.add(a[i]);
         }

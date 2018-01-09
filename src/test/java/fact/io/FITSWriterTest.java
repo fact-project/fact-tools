@@ -118,14 +118,14 @@ public class FITSWriterTest {
         Header header = hdu.header;
 
         // test truncation of too long key
-        assertEquals(true, header.getBoolean("muchtool").get());
+        assertEquals(true, header.getBoolean("muchtool").orElseThrow(() -> new RuntimeException("Missing key 'muchtool'")));
 
-        int nroi = header.getInt("NROI").get();
+        int nroi = header.getInt("NROI").orElseThrow(() -> new RuntimeException("Missing key 'NROI"));
         assertEquals(300, nroi);
 
-        assertEquals("2017-01-01T12:00:00.991300Z", header.get("UTCTIME").get());
+        assertEquals("2017-01-01T12:00:00.991300Z", header.get("UTCTIME").orElseThrow(() -> new RuntimeException("Missing key 'UTCTIME'")));
 
-        int npix = header.getInt("NPIX").get();
+        int npix = header.getInt("NPIX").orElseThrow(() -> new RuntimeException("Missing key 'NPIX'"));
         assertEquals(1440, npix);
 
         assertEquals(false, header.get("EventNum").isPresent());
