@@ -57,6 +57,7 @@
         <stream.data.RenameKey from="MCorsikaEvtHeader.fEvtNumber" to="Event"/>
         <stream.data.RenameKey from="MMcEvt.fEventReuse" to="Reuse"/>
 
+	<!--
         <fact.io.JSONWriter
                 keys="
                     Run,
@@ -82,5 +83,6 @@
             gzip="true"
             jsonl="true"
         />
+	-->
     </process>
 </container>
