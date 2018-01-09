@@ -5,9 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import fact.Utils;
 import fact.container.PixelSet;
-import org.apache.commons.lang3.StringUtils;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -20,10 +18,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 

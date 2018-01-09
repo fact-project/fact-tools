@@ -4,8 +4,6 @@ import fact.features.source.Alpha;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runners.Parameterized;
-import stream.annotations.Parameter;
 
 import static org.junit.Assert.assertTrue;
 

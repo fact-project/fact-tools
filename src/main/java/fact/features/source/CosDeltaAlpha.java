@@ -2,7 +2,6 @@ package fact.features.source;
 
 import fact.Utils;
 import fact.coordinates.CameraCoordinate;
-import fact.hexmap.CameraPixel;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;

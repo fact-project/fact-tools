@@ -3,7 +3,6 @@
  */
 package fact.io;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import fact.io.hdureader.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,9 +18,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**

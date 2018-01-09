@@ -1,13 +1,10 @@
 package fact.statistics;
 
-import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-
-import java.io.Serializable;
 
 /**
  * This operator returns the length of the array specified by the key

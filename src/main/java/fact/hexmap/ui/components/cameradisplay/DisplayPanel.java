@@ -29,8 +29,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
