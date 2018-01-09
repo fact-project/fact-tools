@@ -183,7 +183,7 @@ public class MainPlotPanel extends JPanel implements EventObserver, SliceObserve
                 //we also create a new dataset for each key
                 XYSeriesCollection dataset = new XYSeriesCollection();
                 if (showAverage) {
-                    double[] average = Utils.averageSlicesForEachPixel(data, roi);
+                    double[] average = Utils.averageSlicesForEachPixel(data);
                     dataset.addSeries(createSeries(key, average));
                 } else {
                     //for each pixel add a new series to the dataset

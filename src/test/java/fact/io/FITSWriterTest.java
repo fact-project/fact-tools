@@ -3,6 +3,7 @@
  */
 package fact.io;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import fact.io.hdureader.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -12,11 +13,15 @@ import stream.Keys;
 import stream.data.DataFactory;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -71,14 +76,14 @@ public class FITSWriterTest {
         FITS fits = FITS.fromFile(f);
         BinTable table = fits.getBinTableByName("Events").get();
         BinTableReader tableReader = BinTableReader.forBinTable(table);
-        OptionalTypesMap row = tableReader.getNextRow();
+        OptionalTypesMap<String, Serializable> row = tableReader.getNextRow();
 
-        assertEquals(row.getInt("NROI").get(), 300);
-        assertEquals(row.getInt("NPIX").get(), 1440);
-        assertEquals(row.getDouble("x").get(), 0.0);
-        assertEquals(row.getDouble("y").get(), 5.0);
+        assertEquals(300, (int) row.getInt("NROI").orElse(-1));
+        assertEquals(1440, (int) row.getInt("NPIX").orElse(-1));
+        assertEquals(0.0, row.getDouble("x").get(), 1e-12);
+        assertEquals(5.0, row.getDouble("y").get(), 1e-12);
 
-        double[] arrayRead = (double[]) row.getDoubleArray("array").get();
+        double[] arrayRead = row.getDoubleArray("array").orElse(new double[]{});
         for (int i = 0; i < array.length; i++) {
             assertEquals(array[i], arrayRead[i], 1e-12);
         }
@@ -118,17 +123,17 @@ public class FITSWriterTest {
         Header header = hdu.header;
 
         // test truncation of too long key
-        assertEquals(true, header.getBoolean("muchtool").orElseThrow(() -> new RuntimeException("Missing key 'muchtool'")));
+        Optional<Boolean> muchtool = header.getBoolean("muchtool");
+        assertTrue(muchtool.isPresent());
+        assertEquals(true, muchtool.get());
 
-        int nroi = header.getInt("NROI").orElseThrow(() -> new RuntimeException("Missing key 'NROI"));
-        assertEquals(300, nroi);
+        assertEquals(300, (int) header.getInt("NROI").orElse(-1));
 
-        assertEquals("2017-01-01T12:00:00.991300Z", header.get("UTCTIME").orElseThrow(() -> new RuntimeException("Missing key 'UTCTIME'")));
+        assertEquals("2017-01-01T12:00:00.991300Z", header.get("UTCTIME").orElse(""));
 
-        int npix = header.getInt("NPIX").orElseThrow(() -> new RuntimeException("Missing key 'NPIX'"));
-        assertEquals(1440, npix);
+        assertEquals(1440, (int) header.getInt("NPIX").orElse(-1));
 
-        assertEquals(false, header.get("EventNum").isPresent());
+        assertFalse(header.get("EventNum").isPresent());
     }
 
     @Test

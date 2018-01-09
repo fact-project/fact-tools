@@ -77,11 +77,10 @@ public class Utils {
      * values of the other pixels in that slice.
      *
      * @param data array of length pixels*region of interest
-     * @param roi  region of interrest. usualy 300 or 1024 for fact data
      * @return an array of length roi containing the slice averages
      */
-    public static double[] averageSlicesForEachPixel(double[] data, int roi) {
-        roi = data.length / Constants.NUMBEROFPIXEL;
+    public static double[] averageSlicesForEachPixel(double[] data) {
+        int roi = data.length / Constants.NUMBEROFPIXEL;
         double[] average = new double[roi];
         double[][] values = Utils.sortPixels(data, 1440);
         int slice = 0;
@@ -243,13 +242,13 @@ public class Utils {
         return 0;
     }
 
-    public static double[] arrayListToDouble(ArrayList list) {
+    public static double[] arrayListToDouble(ArrayList<Double> list) {
         Double[] tempArray = new Double[list.size()];
         list.toArray(tempArray);
         return ArrayUtils.toPrimitive(tempArray);
     }
 
-    public static int[] arrayListToInt(ArrayList list) {
+    public static int[] arrayListToInt(ArrayList<Integer> list) {
         Integer[] tempArray = new Integer[list.size()];
         list.toArray(tempArray);
         return ArrayUtils.toPrimitive(tempArray);
@@ -282,11 +281,12 @@ public class Utils {
         boolean isValid = true;
         if (keys == null) {
             isValid = false;
-        }
-        for (String key : keys) {
-            if (key == null || !item.containsKey(key)) {
-                isValid = false;
-                e.add(key);
+        } else {
+            for (String key : keys) {
+                if (key == null || !item.containsKey(key)) {
+                    isValid = false;
+                    e.add(key);
+                }
             }
         }
         if (!isValid) {
@@ -391,8 +391,8 @@ public class Utils {
 
         double ret = 0.0;
 
-        for (int i = 0; i < a.length; i++) {
-            ret += a[i];
+        for (double element : a) {
+            ret += element;
         }
 
         return ret;

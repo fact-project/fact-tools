@@ -324,7 +324,7 @@ public class HoughTransform implements StatefulProcessor {
                             circles.add(idx);
 
                             if (circle2chids.get(ring) == null) {
-                                circle2chids.put(ring, new ArrayList<Integer>());
+                                circle2chids.put(ring, new ArrayList<>());
                             }
                             circle2chids.get(ring).add(chid);
                         }
