@@ -12,12 +12,15 @@ import stream.annotations.Parameter;
  */
 public class SelectValueByChid implements Processor {
     static Logger log = LoggerFactory.getLogger(SelectValueByChid.class);
+
     @Parameter(required = true, description = "Key to the array you want the information about")
-    private String key = null;
+    public String key = null;
+
     @Parameter(required = true, description = "The name of the data written to the stream")
-    private String outputKey = null;
+    public String outputKey = null;
+
     @Parameter(description = "key of an array containing the IDs of a desired Subset")
-    private int chid = 0;
+    public int chid = 0;
 
     @Override
     public Data process(Data input) {
@@ -27,34 +30,10 @@ public class SelectValueByChid implements Processor {
         double[] data = Utils.toDoubleArray(input.get(key));
 
         //add processors threshold to the DataItem
-        if (data !=  null){
+        if (data != null) {
             input.put(outputKey, data[chid]);
         }
 
         return input;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public int getChid() {
-        return chid;
-    }
-
-    public void setChid(int chid) {
-        this.chid = chid;
     }
 }

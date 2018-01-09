@@ -2,6 +2,8 @@ package fact.io.hdureader;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents a header in the HDU of fits file. The values in the header can be accessed via
  * convenience 'get' methods for the main data types. HISTORY and COMMENT strings are also saved.
- *
+ * <p>
  * Created by mackaiver on 18/11/16.
  */
 public class Header {
@@ -21,10 +23,10 @@ public class Header {
 
     final int headerSizeInBytes;
 
-    public  final String comment;
+    public final String comment;
     public final String history;
 
-    Header(List<String> headerLines, int headerSizeInBytes){
+    Header(List<String> headerLines, int headerSizeInBytes) {
         this.headerSizeInBytes = headerSizeInBytes;
         //iterate over each header string and parse all interesting information.
         headerMap = headerLines.stream()
@@ -53,16 +55,16 @@ public class Header {
      *
      * @return a HashMap containing the key value pairs.
      */
-    Map<String, Serializable> asMapOfSerializables(){
+    public Map<String, Serializable> asMapOfSerializables() {
         Map<String, Serializable> m = new HashMap<>();
-        date().ifPresent(d -> m.put("DATE" , d));
+        date().ifPresent(d -> m.put("DATE", d));
 
-        headerMap.forEach((k, v ) -> {
+        headerMap.forEach((k, v) -> {
             getDouble(k).ifPresent(d -> m.put(k, d));
             getLong(k).ifPresent(d -> m.put(k, d));
             getInt(k).ifPresent(d -> m.put(k, d));
 
-            if(!m.containsKey(k)){
+            if (!m.containsKey(k)) {
                 m.put(k, v.value);
             }
         });
@@ -75,13 +77,14 @@ public class Header {
      *
      * @return date stored in the HDU header
      */
-    public Optional<LocalDateTime> date(){
-        if (!headerMap.containsKey("DATE")){
+    public Optional<ZonedDateTime> date() {
+        if (!headerMap.containsKey("DATE")) {
             return Optional.empty();
         }
 
         String dateString = headerMap.get("DATE").value;
-        return Optional.of(LocalDateTime.parse(dateString));
+        ZonedDateTime dateTime = LocalDateTime.parse(dateString).atZone(ZoneOffset.UTC);
+        return Optional.of(dateTime);
     }
 
     /**
@@ -89,11 +92,11 @@ public class Header {
      *
      * @return integer value for the key
      */
-    public Optional<Integer> getInt(String key){
+    public Optional<Integer> getInt(String key) {
         try {
             HeaderLine line = headerMap.get(key);
             return Optional.of(Integer.parseInt(line.value));
-        } catch (NumberFormatException| NullPointerException e){
+        } catch (NumberFormatException | NullPointerException e) {
             return Optional.empty();
         }
     }
@@ -104,11 +107,11 @@ public class Header {
      *
      * @return long value for the key
      */
-    public Optional<Long> getLong(String key){
+    public Optional<Long> getLong(String key) {
         try {
             HeaderLine line = headerMap.get(key);
             return Optional.of(Long.parseLong(line.value));
-        } catch (NumberFormatException| NullPointerException e){
+        } catch (NumberFormatException | NullPointerException e) {
             return Optional.empty();
         }
     }
@@ -119,11 +122,11 @@ public class Header {
      *
      * @return float value for the key
      */
-    public Optional<Float> getFloat(String key){
+    public Optional<Float> getFloat(String key) {
         try {
             HeaderLine line = headerMap.get(key);
             return Optional.of(Float.parseFloat(line.value));
-        } catch (NumberFormatException| NullPointerException e){
+        } catch (NumberFormatException | NullPointerException e) {
             return Optional.empty();
         }
     }
@@ -134,12 +137,12 @@ public class Header {
      *
      * @return float value for the key
      */
-    public Optional<Boolean> getBoolean(String key){
+    public Optional<Boolean> getBoolean(String key) {
         try {
             HeaderLine line = headerMap.get(key);
             Boolean b = line.value.equals("T");
             return Optional.of(b);
-        } catch (NumberFormatException| NullPointerException e){
+        } catch (NumberFormatException | NullPointerException e) {
             return Optional.empty();
         }
     }
@@ -150,11 +153,11 @@ public class Header {
      *
      * @return Double value for the key
      */
-    public Optional<Double> getDouble(String key){
+    public Optional<Double> getDouble(String key) {
         try {
             HeaderLine line = headerMap.get(key);
             return Optional.of(Double.parseDouble(line.value));
-        } catch (NumberFormatException| NullPointerException e){
+        } catch (NumberFormatException | NullPointerException e) {
             return Optional.empty();
         }
     }
@@ -164,11 +167,11 @@ public class Header {
      *
      * @return Double value for the key
      */
-    public Optional<String> get(String key){
+    public Optional<String> get(String key) {
         try {
             HeaderLine line = headerMap.get(key);
             return Optional.ofNullable(line.value);
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return Optional.empty();
         }
     }

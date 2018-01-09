@@ -14,6 +14,7 @@
 
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
+    <fact.extraction.SaturatedSlicesPercentage />
 
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
     <include url="classpath:/default/data/calibration.xml" />

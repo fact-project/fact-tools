@@ -12,25 +12,25 @@ import java.util.Random;
 /**
  * shift each pixel's timeline by a random offsets. The offset is sampled from a gaussian distribution around zero
  * with a given standard deviation.
- *
+ * <p>
  * Created by jbuss on 30.10.14.
  */
-public class ApplyRandomTimelineShift implements Processor{
+public class ApplyRandomTimelineShift implements Processor {
     static Logger log = LoggerFactory.getLogger(ApplyRandomTimelineShift.class);
 
     @Parameter(required = true, description = "key of the data array")
-    private String key = null;
+    public String key = null;
 
     @Parameter(description = "standard deviation of the random distribution")
-    private double stdDeviation = 1.22;
+    public double stdDeviation = 1.22;
 
     @Parameter(description = "Seed of the random number generator")
-    private long Seed = 5901;
+    public long Seed = 5901;
 
     @Parameter(required = true, description = "key of the output data array")
-    private String outputKey = null;
+    public String outputKey = null;
 
-	private int npix;
+    private int npix;
 
     @Override
     public Data process(Data input) {
@@ -39,31 +39,30 @@ public class ApplyRandomTimelineShift implements Processor{
 
         Utils.mapContainsKeys(input, key);
         Utils.isKeyValid(input, key, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		npix = (Integer) input.get("NPIX");
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        npix = (Integer) input.get("NPIX");
 
-        double[] data 	 = (double[]) input.get(key);
+        double[] data = (double[]) input.get(key);
         double[] shifted_data = new double[data.length];
 
         int roi = data.length / npix;
 
-        for(int pix = 0 ; pix < npix; pix++) {
+        for (int pix = 0; pix < npix; pix++) {
             int first = pix * roi;
 
-            Double randomOffset =  (rand.nextGaussian()* stdDeviation);
+            Double randomOffset = (rand.nextGaussian() * stdDeviation);
 
             //Loop over slices and shift according to random offset
             for (int slice = 0; slice < roi; slice++) {
 
-                int shiftedSlice  = slice + (int)Math.round(randomOffset) ;
-                if (shiftedSlice < 0 ){
+                int shiftedSlice = slice + (int) Math.round(randomOffset);
+                if (shiftedSlice < 0) {
                     shiftedSlice = shiftedSlice + roi;
-                }
-                else if (shiftedSlice >= roi ){
+                } else if (shiftedSlice >= roi) {
                     shiftedSlice = shiftedSlice - roi;
                 }
 
-                shifted_data[first+slice] = data[first+shiftedSlice];
+                shifted_data[first + slice] = data[first + shiftedSlice];
 
             }
 
@@ -71,37 +70,5 @@ public class ApplyRandomTimelineShift implements Processor{
 
         input.put(outputKey, shifted_data);
         return input;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public double getStdDeviation() {
-        return stdDeviation;
-    }
-
-    public void setStdDeviation(double stdDeviation) {
-        this.stdDeviation = stdDeviation;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public long getSeed() {
-        return Seed;
-    }
-
-    public void setSeed(long seed) {
-        Seed = seed;
     }
 }

@@ -3,62 +3,38 @@ package fact.features.snake;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
-public class PolygonArea  implements Processor
-{
-	private String outkey = null;	
-	
-	private String polygonX = null;
-	private String polygonY = null;
+public class PolygonArea implements Processor {
+    @Parameter(required = true)
+    private String outkey = null;
 
-	@Override
-	public Data process(Data input) 
-	{
-		if(outkey == null) throw new RuntimeException("Key \"outkey\" not set");		
-		
-		Utils.mapContainsKeys( input, polygonX, polygonY);
-		
-		
-		double[] x = (double[]) input.get(polygonX);
-		double[] y = (double[]) input.get(polygonY);
-		
-		final int N = x.length;
-		
-		float erg = 0;
-		
-		for(int i=0; i < N; i++)
-		{			
-			erg += (y[i] + y[(i+1) % N]) * (x[i] - x[(i+1) % N]);
-		}				
+    @Parameter(required = true)
+    private String polygonX = null;
 
-		input.put(outkey, Math.abs(0.5 * erg));
-		
-		return input;
-	}
+    @Parameter(required = true)
+    private String polygonY = null;
 
-	public String getOutkey() {
-		return outkey;
-	}
+    @Override
+    public Data process(Data input) {
+        if (outkey == null) throw new RuntimeException("Key \"outkey\" not set");
 
-	public void setOutkey(String outkey) {
-		this.outkey = outkey;
-	}
+        Utils.mapContainsKeys(input, polygonX, polygonY);
 
-	public String getPolygonX() {
-		return polygonX;
-	}
 
-	public void setPolygonX(String polygonX) {
-		this.polygonX = polygonX;
-	}
+        double[] x = (double[]) input.get(polygonX);
+        double[] y = (double[]) input.get(polygonY);
 
-	public String getPolygonY() {
-		return polygonY;
-	}
+        final int N = x.length;
 
-	public void setPolygonY(String polygonY) {
-		this.polygonY = polygonY;
-	}
-	
-	
+        float erg = 0;
+
+        for (int i = 0; i < N; i++) {
+            erg += (y[i] + y[(i + 1) % N]) * (x[i] - x[(i + 1) % N]);
+        }
+
+        input.put(outkey, Math.abs(0.5 * erg));
+
+        return input;
+    }
 }

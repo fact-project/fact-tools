@@ -1,0 +1,29 @@
+- name: Crab
+  obstime: 2013-10-01T04:00:00Z
+
+- name: "Mrk 501"
+  obstime: 2014-06-23T22:00:00Z
+
+- name: "Mrk 421"
+  obstime: 2015-12-16T01:00:00Z
+
+- name: "1ES1959+650"
+  obstime: 2017-06-28T23:00:30Z
+
+- name: "1ES2344+51.4"
+  obstime: 2000-01-01T00:00:01Z
+
+- name: "IC 310"
+  obstime: 2010-06-01T18:00:01Z
+
+- name: "IC 310"
+  obstime: 2011-06-01T18:00:01Z
+
+- name: "IC 310"
+  obstime: 2012-06-01T18:00:01Z
+
+- name: "IC 310"
+  obstime: 2013-06-01T18:00:01Z
+
+- name: "IC 310"
+  obstime: 2020-06-01T18:00:01Z

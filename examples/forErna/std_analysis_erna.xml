@@ -5,24 +5,28 @@
     -->
     <properties url="classpath:/default/settings.properties" />
 
-    <property name="db" value="file:./2015.sqlite" />
+    <property name="aux_source" value="file:./2015.sqlite" />
 
     <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <service id="auxService" class="fact.auxservice.SqliteService" url="${db}" />
+    <service id="auxService" class="fact.auxservice.SqliteService" url="${aux_source}" />
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
-    
+
     <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
     <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-        <stream class="fact.io.zfits.ZFitsStream" id="_" />
+        <stream class="fact.io.hdureader.FITSStream" id="_" />
     </stream>
 
     <process id="1" input="fact">
+        <fact.extraction.SaturatedSlicesPercentage />
+        <Skip condition="%{data.saturatedSlicesPercentage} &gt; 0.2" />
         <!-- prevEventAndSkip: -->
         <!-- PreviousEventInfo, Skip(no Data Trigger) -->
         <include url="classpath:/default/data/prevEventAndSkip.xml" />
         <!-- Output: Data -->
+
+	<fact.features.UnixTimeUTC2DateTime />
 
         <!-- Calibration: -->
         <fact.datacorrection.DrsCalibration
@@ -45,12 +49,8 @@
                 topSlopeLimit="${removeSpikes_topSlopeLimit}"
                 maxSpikeLength="${removeSpikes_maxSpikeLength}"
         />
-        <fact.filter.DrsTimeCalibration
-                outputKey="timeCalibConst"
-        />
-        <fact.filter.ArrayTimeCorrection
+        <fact.datacorrection.DrsTimeCalibration
                 dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
                 outputKey="DataCalibrated"
         />
         <fact.datacorrection.InterpolateTimeSeries
@@ -77,7 +77,7 @@
         <!-- Parameter calculation (only source independent) -->
         <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
         arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        Size, DistributionFromShower, M3Long, Length, Width, NumberOfIslands, TimeGraident,
+        HillasParameters, NumberOfIslands, TimeGraident,
         Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
         ShowerSlope, Disp -->
         <include url="classpath:/default/data/parameterCalc.xml" />
@@ -90,9 +90,9 @@
         <!-- Output: source dependent parameters -->
 
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-	<fact.io.JSONWriter keys="${keysForOutput}" 
-		url="${output}" 
-		writeListOfItems="True" 
+	<fact.io.JSONWriter keys="${keysForOutput}"
+		url="${output}"
+		writeListOfItems="True"
 		specialDoubleValuesAsString="True"
 		pixelSetsAsInt="True"
 		/>

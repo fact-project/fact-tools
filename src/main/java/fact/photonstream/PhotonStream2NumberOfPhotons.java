@@ -6,19 +6,19 @@ import stream.annotations.Parameter;
 
 public class PhotonStream2NumberOfPhotons implements Processor {
     @Parameter(
-        required = true,
-        description = "The arrival slices of the single pulses.")
-    private String singlePulsesKey = null;
+            required = true,
+            description = "The arrival slices of the single pulses.")
+    public String singlePulsesKey = null;
 
     @Parameter(
-        required = true,
-        description = "The reconstruted arrival time")
-    private String arrivalTimeKey = null;
+            required = true,
+            description = "The reconstruted arrival time")
+    public String arrivalTimeKey = null;
 
     @Parameter(
-        required = true,
-        description = "The reconstruted number of photons")
-    private String numberOfPhotonsKey = null;
+            required = true,
+            description = "The reconstruted number of photons")
+    public String numberOfPhotonsKey = null;
 
     @Override
     public Data process(Data input) {
@@ -28,9 +28,9 @@ public class PhotonStream2NumberOfPhotons implements Processor {
 
         for (int pix = 0; pix < singlePulses.length; pix++) {
             int[] pulses = singlePulses[pix];
-            for (int time_of_pulse: pulses){
+            for (int time_of_pulse : pulses) {
                 if ((time_of_pulse >= arrivalTimes[pix] - 5) &&
-                    (time_of_pulse < arrivalTimes[pix] + 25)){
+                        (time_of_pulse < arrivalTimes[pix] + 25)) {
                     numberOfPhotons[pix] += 1;
                 }
             }
@@ -38,17 +38,4 @@ public class PhotonStream2NumberOfPhotons implements Processor {
         input.put(numberOfPhotonsKey, numberOfPhotons);
         return input;
     }
-
-    public void setSinglePulsesKey(String singlePulsesKey) {
-        this.singlePulsesKey = singlePulsesKey;
-    }
-
-    public void setArrivalTimeKey(String arrivalTimeKey) {
-        this.arrivalTimeKey = arrivalTimeKey;
-    }
-
-    public void setNumberOfPhotonsKey(String numberOfPhotonsKey) {
-        this.numberOfPhotonsKey = numberOfPhotonsKey;
-    }
-
 }

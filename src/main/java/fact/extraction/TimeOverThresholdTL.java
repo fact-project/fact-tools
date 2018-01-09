@@ -1,11 +1,10 @@
 /**
- * 
+ *
  */
 package fact.extraction;
 
 import fact.Utils;
 import fact.container.PixelSet;
-import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -13,60 +12,57 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * This feature is supposed to give the number of slices above a given Threshold, 
+ * This feature is supposed to give the number of slices above a given Threshold,
  * caclulated for a defined extraction window
  *
- * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a> 
- *
+ * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a>
  */
 public class TimeOverThresholdTL implements Processor {
-	static Logger log = LoggerFactory.getLogger(TimeOverThresholdTL.class);
-	
-	@Parameter(required = true)
-	private String dataKey = null;
+    static Logger log = LoggerFactory.getLogger(TimeOverThresholdTL.class);
 
-	@Parameter(required = false)
-	private double threshold = 50;
+    @Parameter(required = true)
+    public String dataKey = null;
 
-	private int firstSlice = 0;
+    @Parameter(required = false)
+    public double threshold = 50;
 
-	private int range = -1;
+    @Parameter
+    public int range = -1;
 
-	@Parameter(required = true)
-	private String outputKey = null;
+    @Parameter
+    public int firstSlice = 0;
 
-	private PixelSet pixelSet;
+    @Parameter(required = true)
+    public String outputKey = null;
 
-
-	public Data process(Data input) {
+    public Data process(Data input) {
         Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		int npix = (Integer) input.get("NPIX");
-				
-		int[] timeOverThresholdArray =  new int[npix];
+        Utils.isKeyValid(input, "NPIX", Integer.class);
+        int npix = (Integer) input.get("NPIX");
 
-		double[] data 	 = (double[]) input.get(dataKey);
+        int[] timeOverThresholdArray = new int[npix];
 
-		pixelSet = new PixelSet();
-			
-		int roi = data.length / npix;
+        double[] data = (double[]) input.get(dataKey);
 
-		if ( range < 0){
-			range = roi - firstSlice;
-		}
+        PixelSet pixelSet = new PixelSet();
 
-		//Loop over pixels
-		for(int pix = 0 ; pix < npix; pix++){
+        int roi = data.length / npix;
 
-			int pos = pix*roi;
+        if (range < 0) {
+            range = roi - firstSlice;
+        }
 
-			int timeOverThreshold = 0;
+        //Loop over pixels
+        for (int pix = 0; pix < npix; pix++) {
 
-			//Loop over slices
-			for (int sl = firstSlice ; sl < range ; sl++)
-			{					
-				if (data[pos + sl] > threshold){
-					timeOverThreshold++;
+            int pos = pix * roi;
+
+            int timeOverThreshold = 0;
+
+            //Loop over slices
+            for (int sl = firstSlice; sl < range; sl++) {
+                if (data[pos + sl] > threshold) {
+                    timeOverThreshold++;
                 }
             }
 
@@ -75,32 +71,31 @@ public class TimeOverThresholdTL implements Processor {
             }
 
             timeOverThresholdArray[pix] = timeOverThreshold;
-		}
-		
-	
-		
-		//add times over threshold to the DataItem
-		input.put(outputKey, timeOverThresholdArray);
-		input.put(outputKey+"SetOverlay", pixelSet);
+        }
+
+
+        //add times over threshold to the DataItem
+        input.put(outputKey, timeOverThresholdArray);
+        input.put(outputKey + "SetOverlay", pixelSet);
 
         //Add totPixelSet only to data item if it is not empty
-        if (pixelSet.toIntArray().length != 0){
-            input.put(outputKey+"Set", pixelSet.toIntArray());
+        if (pixelSet.toIntArray().length != 0) {
+            input.put(outputKey + "Set", pixelSet.toIntArray());
         }
         return input;
-	}
+    }
 
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
 
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
+    public void setDataKey(String dataKey) {
+        this.dataKey = dataKey;
+    }
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    public void setOutputKey(String outputKey) {
+        this.outputKey = outputKey;
+    }
 
 
 }

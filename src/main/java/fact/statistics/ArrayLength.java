@@ -5,44 +5,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.io.Serializable;
 
 /**
  * This operator returns the length of the array specified by the key
- * 
- *  @author  Maximilian Noethe maximilian.noethe@tu-dortmund.de
+ *
+ * @author Maximilian Noethe maximilian.noethe@tu-dortmund.de
  */
 public class ArrayLength implements Processor {
-	static Logger log = LoggerFactory.getLogger(ArrayLength.class);
-	private String key;
-	private String outputKey = "length";
-	
-	@Override
-	public Data process(Data input)
-  {
-		Serializable data = input.get(key);
-    double[] dataArray = Utils.toDoubleArray(data);
-		int length = dataArray.length;
+    static Logger log = LoggerFactory.getLogger(ArrayLength.class);
 
-		//get the sqrt of the sum of squares. Lets call it RMS. Cause we can.
-		input.put(outputKey, length);
-		return input;
-	}
+    @Parameter(required = true)
+    public String key;
 
-	
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
+    @Parameter(required = true)
+    public String outputKey = "length";
 
-	
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    @Override
+    public Data process(Data input) {
+        Object[] data = (Object[]) input.get(key);
+        int length = data.length;
+
+        //get the sqrt of the sum of squares. Lets call it RMS. Cause we can.
+        input.put(outputKey, length);
+        return input;
+    }
 }

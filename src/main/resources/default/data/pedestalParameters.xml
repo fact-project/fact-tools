@@ -1,18 +1,18 @@
 <module>
     <fact.pixelsets.Invert 
-        insetKey="badPixel" 
-        outsetKey="goodPixel" 
+        insetKey="badPixels" 
+        outsetKey="goodPixels" 
     />
         
     <fact.pixelsets.Difference 
-        setUKey="goodPixel"
+        setUKey="goodPixels"
         setAKey="shower"
         outsetKey="pedestal" 
     />
         
     <fact.extraction.WaveformFluctuation 
         key="DataCalibrated"
-        pixelSetKey="goodPixel"
+        pixelSetKey="goodPixels"
         outputKey="ped"
         skipFirst="35" 
         skipLast="50"

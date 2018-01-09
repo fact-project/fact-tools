@@ -4,10 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-
-  <version>0.18.1</version>
-
-
+  <version>1.0.0-SNAPSHOT</version>
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -19,9 +16,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
     <streams.version>1.0.0</streams.version>
-    <binary.name>fact-tools-${project.version}</binary.name>
+    <binary.name>fact-tools-${git.commit.id.describe}</binary.name>
     <skipTests>false</skipTests>
-    <finalName>fact-tools-${project.version}</finalName>
+    <finalName>fact-tools-${git.commit.id.describe}</finalName>
   </properties>
 
   <licenses>
@@ -87,7 +84,6 @@
     <url>https://github.com/fact-tools</url>
     <developerConnection>scm:git:ssh://git@github.com/fact-project/fact-tools</developerConnection>
     <connection>scm:git:ssh://git@github.com/fact-project/fact-tools</connection>
-    <!--<tag>fact-tools-0.11.0</tag>-->
   </scm>
 
   <mailingLists>
@@ -220,11 +216,27 @@
     <dependency>
       <groupId>gov.nasa.gsfc.heasarc</groupId>
       <artifactId>nom-tam-fits</artifactId>
-      <version>1.15.1</version>
+      <version>1.15.2</version>
     </dependency>
   </dependencies>
 
   <build>
+    <finalName>${finalName}</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+          <includes>
+            <include>project.properties</include>
+          </includes>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+          <excludes>
+            <exclude>project.properties</exclude>
+          </excludes>
+      </resource>
+    </resources>   
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -250,9 +262,6 @@
         <version>2.1.2</version>
         <configuration>
           <finalName>${finalName}</finalName>
-          <!--
-                                        <attach>false</attach>
-                                         -->
         </configuration>
         <executions>
           <execution>
@@ -282,7 +291,6 @@
           </execution>
         </executions>
         <configuration>
-          <!--<minimizeJar>true</minimizeJar>-->
           <finalName>${finalName}</finalName>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -293,12 +301,8 @@
                 <Implementation-Revision>${project.version}</Implementation-Revision>
                 <Specification-Title>fact-tools</Specification-Title>
                 <Specification-Version>1.0</Specification-Version>
-                <main-class>stream.run</main-class>
+                <main-class>fact.run</main-class>
               </manifestEntries>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-              <resource>.fits</resource>
-              <resource>.gz</resource>
             </transformer>
           </transformers>
           <filters>
@@ -317,12 +321,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.7</version>
         <dependencies>
           <dependency>
-            <groupId>org.jwall</groupId>
+            <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-markdown</artifactId>
-            <version>1.1.4</version>
+            <version>1.8</version>
           </dependency>
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
@@ -335,11 +339,41 @@
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.2.4</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+          <gitDescribe>
+            <tags>true</tags>
+          </gitDescribe>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
   <reporting>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -451,18 +485,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-site-plugin</artifactId>
-            <version>3.3</version>
-            <configuration>
-              <reportPlugins>
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-javadoc-plugin</artifactId>
-                  <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                  </configuration>
-                </plugin>
-              </reportPlugins>
-            </configuration>
+            <version>3.7</version>
           </plugin>
         </plugins>
       </build>

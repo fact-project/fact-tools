@@ -1,0 +1,133 @@
+<container>
+
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="" />
+  <property name="drsfile" value="" />
+  <property name="outfile" value="" />
+
+  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+    <stream id="fact" class="fact.io.hdureader.FITSStream" url="file:${infile}"/>
+
+    <process id="2" input="fact">
+      <fact.utils.PreviousEventInfo
+          startCellKey="StartCellData"
+          outputKey="prevEvents"
+          limitEvents="${prevEvents_limitEvents}"
+      />
+
+      <fact.features.UnixTimeUTC2DateTime />
+
+      <fact.datacorrection.DrsCalibration
+          url="file:${drsfile}"
+          key="Data"
+          outputKey="DataCalibrated"
+      />  
+      <fact.datacorrection.PatchJumpRemoval
+          dataKey="DataCalibrated"
+          outputKey="DataCalibrated"
+          prevEventsKey="prevEvents"
+          startCellKey="StartCellData"
+          jumpLimit="${patchJumpRemoval_jumpLimit}"
+      />
+      <fact.datacorrection.RemoveSpikes
+          dataKey="DataCalibrated"
+          outputKey="DataCalibrated"
+          startCellKey="StartCellData"
+          leftBorder="${removeSpikes_leftBorder}"
+          spikeLimit="${removeSpikes_spikeLimit}"
+          topSlopeLimit="${removeSpikes_topSlopeLimit}"
+          maxSpikeLength="${removeSpikes_maxSpikeLength}"
+      />
+      <fact.datacorrection.DrsTimeCalibration
+          dataKey="DataCalibrated"
+          outputKey="DataCalibrated"
+      />
+      <fact.datacorrection.InterpolateTimeSeries 
+          calibService="calibService"
+          dataKey="DataCalibrated"
+          dataOutputKey="DataCalibrated"
+      />
+
+      <fact.extraction.BasicExtraction
+          dataKey="DataCalibrated" 
+          outputKeyMaxAmplPos="maxPos"
+          outputKeyPhotonCharge="photoncharge" 
+          url="${integralGainFile}"
+          startSearchWindow="${basicExtraction_startSearchWindow}"
+          rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+          rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+      />
+      <fact.extraction.EstimateBaseline
+          dataKey="DataCalibrated"
+          outputKey="baseline"
+          firstSlice="10"
+          range="30"
+      />
+      <fact.extraction.TimeOverThreshold
+          dataKey="DataCalibrated"
+          outputKey="timeOverThreshold"
+          firstSliceOverThresholdOutputKey="arrivalTimeTOT"
+          positionsKey="maxPos"
+          threshold="1800"
+          thresholdOutputKey="thresholdForToT"
+      />
+      <fact.datacorrection.CorrectSaturation
+          dataKey="DataCalibrated"
+          outputKey="DataCalibrated"
+          totKey="timeOverThreshold"
+          firstSliceOverThresholdKey="arrivalTimeTOT"
+          threshold="1800"
+          maxPosKey="maxPos"
+          baselineKey="baseline"
+      />
+      <fact.extraction.BasicExtraction
+          dataKey="DataCalibrated" 
+          outputKeyMaxAmplPos="maxPos"
+          outputKeyPhotonCharge="photoncharge" 
+          url="${integralGainFile}"
+          startSearchWindow="${basicExtraction_startSearchWindow}"
+          rangeSearchWindow="${basicExtraction_rangeSearchWindow}"
+          rangeHalfHeightWindow="${basicExtraction_rangeHalfHeigthWindow}"
+      />
+      <fact.extraction.RisingEdgeForPositions
+          dataKey="DataCalibrated"
+          amplitudePositionsKey="maxPos"
+          outputKey="arrivalTimePos"
+          maxSlopesKey="maxSlopesPos"
+      />
+      <fact.extraction.RisingEdgePolynomFit
+          dataKey="DataCalibrated"
+          risingEdgeKey="arrivalTimePos"
+          outputKey="arrivalTime"
+          numberOfPoints="11"
+          maxSlopesKey="maxSlopes"
+      />
+      <fact.datacorrection.CorrectPixelDelays
+          arrivalTimeKey="arrivalTime"
+          outputKey="arrivalTime"
+          url="${pixelDelayFile}"
+      />
+      <fact.datacorrection.InterpolatePixelArray
+          calibService="calibService"
+          inputKey="photoncharge"
+          outputKey="photoncharge"
+      />
+      <fact.datacorrection.InterpolatePixelArray
+          calibService="calibService"
+          inputKey="arrivalTime"
+          outputKey="arrivalTime"
+      />
+    
+      <fact.io.FITSWriter
+        url="file:${outfile}"
+        keys="EventNum,TriggerNum,TriggerType,UnixTimeUTC,timestamp,photonCharge,arrivalTime"
+        headerKeys="TELESCOP,CREATOR,COMPILED,ORIGIN,TIMESYS,TIMEUNIT,MJDREF,PACKAGE,VERSION,REVISION,DATE,NIGHT,RUNID,NBOARD,NPIX,NTMARK,NCELLS,NROI,NROITM,TMSHHIFT,CAMERA,DAQ,ADCRANGE,ADC,RUNTYPE,PRESC,PHASE,DRSCALIB,TSTARTI,TSTARTF,TSTOPI,TSTOPF,DATE-OBS,DATE-END,NTRG,NTRGPED,NTRGPED,NTRGTIM,NTRGLPI,NTRGEXT1,NTRGEXT2,NTRGMISC"
+      />
+
+    </process>
+</container>

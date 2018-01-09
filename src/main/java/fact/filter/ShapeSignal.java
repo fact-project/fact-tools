@@ -16,16 +16,16 @@ public class ShapeSignal implements Processor {
 
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Parameter(required = true)
-    int shift = 10;
+    public int shift = 10;
 
     @Parameter
-    double factor = 0.66;
+    public double factor = 0.66;
 
 
     @Override
@@ -37,50 +37,16 @@ public class ShapeSignal implements Processor {
         double[] result = new double[data.length];
 
 
-        for (int i=0 ; i < data.length ; i++)
-        {
-            shifted_data[ (i+shift) % data.length] = (-1) * factor * data[ i ];
+        for (int i = 0; i < data.length; i++) {
+            shifted_data[(i + shift) % data.length] = (-1) * factor * data[i];
         }
 
-        for (int i=0 ; i < data.length ; i++)
-        {
+        for (int i = 0; i < data.length; i++) {
             result[i] = data[i] + shifted_data[i];
         }
 
         input.put(outputKey, result);
 
         return input;
-    }
-
-    public void setShift(int shift) {
-        this.shift = shift;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getShift() {
-        return shift;
-    }
-
-    public double getFactor() {
-        return factor;
-    }
-
-    public void setFactor(double factor) {
-        this.factor = factor;
     }
 }

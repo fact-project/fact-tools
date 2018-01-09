@@ -12,13 +12,14 @@ import stream.annotations.Parameter;
 public class CastToDoubleArray implements StatefulProcessor {
 
     @Parameter(required = true, description = "The key to your data array.")
-    private String key;
+    public String key;
+
     @Parameter(required = false)
-    private String outputKey;
+    public String outputKey;
 
     @Override
     public void init(ProcessContext context) throws Exception {
-        if (outputKey == null){
+        if (outputKey == null) {
             outputKey = key;
         }
     }
@@ -37,13 +38,4 @@ public class CastToDoubleArray implements StatefulProcessor {
         input.put(outputKey, b);
         return input;
     }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

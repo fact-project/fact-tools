@@ -2,11 +2,10 @@ package fact.services;
 
 
 import fact.auxservice.AuxCache;
+import fact.auxservice.AuxFileService;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryServiceName;
-import fact.auxservice.AuxFileService;
 import fact.auxservice.strategies.Closest;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import stream.io.SourceURL;
 
@@ -17,13 +16,10 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.SortedSet;
 
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -34,7 +30,7 @@ public class AuxServiceTest {
 
 
     @Test
-    public void testDateTimeToFACTNight(){
+    public void testDateTimeToFACTNight() {
         Integer factNight = AuxCache.dateTimeStampToFACTNight(ZonedDateTime.parse("2014-01-02T23:55:02Z"));
         assertThat(factNight, is(20140102));
 
@@ -57,7 +53,7 @@ public class AuxServiceTest {
 
 
     @Test
-    public void testDateTimeToFACTPath(){
+    public void testDateTimeToFACTPath() {
         Path factNight = AuxCache.dateTimeStampToFACTPath(ZonedDateTime.parse("2014-01-02T23:55:02Z"));
 
         assertThat(factNight, is(Paths.get("2014", "01", "02")));
@@ -94,7 +90,6 @@ public class AuxServiceTest {
         assertFalse(path.toFile().exists());
 
 
-
         night = ZonedDateTime.parse("2014-09-20T20:55:02Z");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.FTM_CONTROL_STATE, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
@@ -109,13 +104,11 @@ public class AuxServiceTest {
         assertTrue(path.toFile().exists());
 
 
-
         night = ZonedDateTime.parse("2013-01-02T20:55:02Z");
         key = new AuxCache().new CacheKey(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, night);
         path = Paths.get(auxFileService.auxFolder.getPath(), key.path.toString());
 
         assertTrue(path.toFile().exists());
-
 
 
         night = ZonedDateTime.parse("2014-09-20T20:55:02Z");
@@ -134,7 +127,6 @@ public class AuxServiceTest {
         assertThat(auxiliaryData, is(not(nullValue())));
         assertThat(auxiliaryData.getDouble("Ra"), is(not(nullValue())));
     }
-
 
 
     @Test

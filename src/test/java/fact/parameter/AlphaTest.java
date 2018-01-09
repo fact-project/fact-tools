@@ -4,32 +4,38 @@ import fact.features.source.Alpha;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
+import stream.annotations.Parameter;
 
 import static org.junit.Assert.assertTrue;
+
 /**
- * <fact.features.HillasAlpha distribution="dist" sourcePosition="sourcePosition" outputKey="alpha" />
- * @author bruegge
+ * <fact.features.HillasAlpha distribution="dist" sourcePositionKey="sourcePositionKey" outputKey="alpha" />
  *
+ * @author bruegge
  */
 public class AlphaTest extends ParameterTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-	final String distribution = "dist";
-	final String sourcePosition="pos";
-	final String outputKey = "alpha";
+    final String cogKey = "cog";
+    final String deltaKey = "delta";
+    final String sourcePositionKey = "pos";
+    final String outputKey = "alpha";
 
-	@Test
-	public void testValidParameter() throws Exception{
+    @Test
+    public void testValidParameter() throws Exception {
 //		//start processor with the correct parameter
-		assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
-		Alpha poser = new Alpha();
-		poser.setDistribution(distribution);
-		poser.setSourcePosition(sourcePosition);
-		poser.setOutputKey(outputKey);
-		poser.process(item);
-		assertTrue("Expected output not in data item but it should be there", item.containsKey(outputKey));
+        assertTrue("Expecteds output already in data item", !item.containsKey(outputKey));
+        Alpha poser = new Alpha();
+        poser.cogKey = cogKey;
+        poser.deltaKey = deltaKey;
+        poser.sourcePositionKey = sourcePositionKey;
+        poser.outputKey = outputKey;
+
+        poser.process(item);
+        assertTrue("Expected output not in data item but it should be there", item.containsKey(outputKey));
 //		item.remove(outputKey);
-	}
+    }
 }

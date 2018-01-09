@@ -1,5 +1,6 @@
 package fact.io;
 
+import fact.io.hdureader.FITSStream;
 import org.junit.Test;
 import stream.Data;
 import stream.io.SourceURL;
@@ -8,9 +9,7 @@ import java.io.File;
 import java.net.URL;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Created by kaibrugge on 14.04.15.
@@ -19,7 +18,7 @@ public class ListMultiStreamTest {
 
     @Test
     public void readJsonTest() throws Exception {
-        URL u =  ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
+        URL u = ListMultiStreamTest.class.getResource("/dummy_files/file_drs_list.json");
         FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
         multiStream.setUrl(new SourceURL(u));
 
@@ -30,7 +29,7 @@ public class ListMultiStreamTest {
 
     @Test
     public void testDrsInjection() throws Exception {
-        URL u =  FITSStreamTest.class.getResource("/dummy_files/file_drs_list.json");
+        URL u = FITSStreamTest.class.getResource("/dummy_files/file_drs_list.json");
         FactFileListMultiStream multiStream = new FactFileListMultiStream(new SourceURL(u));
         multiStream.setUrl(new SourceURL(u));
 

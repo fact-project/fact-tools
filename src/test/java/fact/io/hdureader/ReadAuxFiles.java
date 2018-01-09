@@ -8,9 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test reading some reading of aux files
@@ -19,13 +17,13 @@ import static org.junit.Assert.assertTrue;
 public class ReadAuxFiles {
     @Test
     public void testBinTableIteratorForMCs() throws Exception {
-        URL u =  ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
+        URL u = ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
 
         FITS f = new FITS(u);
 
         BinTable b = f.getBinTableByName("DRIVE_CONTROL_SOURCE_POSITION").orElseThrow(IOException::new);
 
-        for(OptionalTypesMap p : BinTableReader.forBinTable(b)){
+        for (OptionalTypesMap p : BinTableReader.forBinTable(b)) {
             assertTrue(p.containsKey("Ra_src"));
             assertTrue(p.containsKey("Dec_src"));
             assertTrue(p.containsKey("Name"));
@@ -35,7 +33,7 @@ public class ReadAuxFiles {
 
     @Test
     public void testBinTableReader() throws Exception {
-        URL u =  ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
+        URL u = ReadAuxFiles.class.getResource("/20130102.DRIVE_CONTROL_SOURCE_POSITION.fits");
 
         FITS f = new FITS(u);
 
@@ -57,8 +55,8 @@ public class ReadAuxFiles {
         dec = (double) row.get("Dec_src");
         name = (String) row.get("Name");
 
-        assertEquals(5.5,  ra, 0.1);
-        assertEquals(22.0, dec,  0.1);
+        assertEquals(5.5, ra, 0.1);
+        assertEquals(22.0, dec, 0.1);
         assertEquals("Crab", name);
 
     }

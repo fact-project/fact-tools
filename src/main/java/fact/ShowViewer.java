@@ -17,37 +17,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author chris
- *
  */
 public class ShowViewer implements StatefulProcessor {
 
-	static Logger log = LoggerFactory.getLogger(ShowViewer.class);
-	Viewer viewer = null;
-	AtomicBoolean lock = new AtomicBoolean(true);
+    static Logger log = LoggerFactory.getLogger(ShowViewer.class);
+    Viewer viewer = null;
+    AtomicBoolean lock = new AtomicBoolean(true);
 
     /**
      * The key for the data to  be displayed on the screen
      */
     @Parameter(required = true)
-    private String key;
-    public String getKey() {
-        return key;
-    }
-    public void setKey(String key) {
-        this.key = key;
-    }
-
+    public String key;
 
     @Parameter(required = false, description = "The default plot range in the main viewer")
-    private Integer[] range;
+    public Integer[] range;
+
     public void setRange(Integer[] range) {
-        if(range.length != 2){
+        if (range.length != 2) {
             throw new RuntimeException("The plotrange has to consist of two numbers");
         }
         this.range = range;
     }
-
-
 
 
     @Override
@@ -57,59 +48,58 @@ public class ShowViewer implements StatefulProcessor {
     }
 
 
-	/**
-	 * @see stream.Processor#process(stream.Data)
-	 */
-	@Override
-	public Data process(final Data input) {
+    /**
+     * @see stream.Processor#process(stream.Data)
+     */
+    @Override
+    public Data process(final Data input) {
 
-        if(!input.containsKey(key)){
+        if (!input.containsKey(key)) {
             throw new RuntimeException("Key " + key + " not found in event. Cannot show viewer");
         }
 
         lock.set(true);
 
-		Thread t = new Thread() {
-			public void run() {
-				if (viewer == null) {
-					viewer = Viewer.getInstance();
+        Thread t = new Thread() {
+            public void run() {
+                if (viewer == null) {
+                    viewer = Viewer.getInstance();
                     viewer.setDefaultKey(key);
-                    if (range != null){
+                    if (range != null) {
                         viewer.setRange(range);
                     }
-					viewer.getNextButton().setEnabled(true);
-					viewer.getNextButton().addActionListener(
-							new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									synchronized (lock) {
-										lock.set(!lock.get());
-										log.debug("Notifying all listeners on lock...");
-										lock.notifyAll();
-									}
-								}
-							});
-				}
-				viewer.setVisible(true);
-				viewer.setDataItem(input);
-			}
-		};
-		t.start();
+                    viewer.getNextButton().setEnabled(true);
+                    viewer.getNextButton().addActionListener(
+                            new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    synchronized (lock) {
+                                        lock.set(!lock.get());
+                                        log.debug("Notifying all listeners on lock...");
+                                        lock.notifyAll();
+                                    }
+                                }
+                            });
+                }
+                viewer.setVisible(true);
+                viewer.setDataItem(input);
+            }
+        };
+        t.start();
 
-		synchronized (lock) {
-			while (lock.get()) {
-				try {
-					log.debug("Waiting on lock...");
-					lock.wait();
-					log.debug("Notification occured on lock!");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return input;
-	}
-
+        synchronized (lock) {
+            while (lock.get()) {
+                try {
+                    log.debug("Waiting on lock...");
+                    lock.wait();
+                    log.debug("Notification occured on lock!");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return input;
+    }
 
 
     @Override

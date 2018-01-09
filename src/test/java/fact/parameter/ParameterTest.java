@@ -2,18 +2,16 @@ package fact.parameter;
 
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
+import fact.datacorrection.DrsCalibration;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
-import fact.features.DistributionFromShower;
+import fact.features.HillasParameters;
 import fact.features.source.SourcePosition;
-import fact.datacorrection.DrsCalibration;
-import fact.io.FITSStream;
 import fact.io.FITSStreamTest;
-
+import fact.io.hdureader.FITSStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-
 import stream.Data;
 import stream.io.SourceURL;
 
@@ -23,10 +21,9 @@ import static org.junit.Assert.fail;
 
 /**
  * <fact.features.HillasAlpha distribution="dist"
- * sourcePosition="sourcePosition" outputKey="alpha" />
+ * sourcePositionKey="sourcePositionKey" outputKey="alpha" />
  *
  * @author bruegge
- *
  */
 public class ParameterTest {
 
@@ -50,7 +47,6 @@ public class ParameterTest {
         SourceURL url = new SourceURL(dataUrl);
 
 
-
         stream = new FITSStream(url);
 
         try {
@@ -61,51 +57,49 @@ public class ParameterTest {
             e.printStackTrace();
         }
 
-		URL drsUrl = FITSStreamTest.class
-				.getResource("/testDrsFile.drs.fits.gz");
-		DrsCalibration pr = new DrsCalibration();
-		pr.setUrl(new SourceURL(drsUrl));
-		pr.setOutputKey(key);
+        URL drsUrl = FITSStreamTest.class
+                .getResource("/testDrsFile.drs.fits.gz");
+        DrsCalibration pr = new DrsCalibration();
+        pr.url = drsUrl;
+        pr.outputKey = key;
         pr.init(null);
-		pr.process(item);
+        pr.process(item);
 
-		BasicExtraction bE = new BasicExtraction();
-		bE.setDataKey(key);
-		bE.setOutputKeyMaxAmplPos(positions);
-		bE.setOutputKeyPhotonCharge(photonCharge);
-		bE.setUrl(new SourceURL(FITSStreamTest.class
-				.getResource("/defaultIntegralGains.csv")));
-		bE.process(item);
+        BasicExtraction bE = new BasicExtraction();
+        bE.dataKey = key;
+        bE.outputKeyMaxAmplPos = positions;
+        bE.outputKeyPhotonCharge = photonCharge;
+        bE.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
+        bE.process(item);
 
-		RisingEdgeForPositions pR = new RisingEdgeForPositions();
-		pR.setDataKey(key);
-		pR.setAmplitudePositionsKey(positions);
-		pR.setOutputKey(arrivalTime);
-		pR.process(item);
+        RisingEdgeForPositions pR = new RisingEdgeForPositions();
+        pR.dataKey = key;
+        pR.amplitudePositionsKey = positions;
+        pR.outputKey = arrivalTime;
+        pR.process(item);
 
-		TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
-		poser.setCalibService(calibService);
-		poser.setPhotonChargeKey(photonCharge);
-		poser.setArrivalTimeKey(arrivalTime);
-		poser.setOutputKey(shower);
-		poser.setCorePixelThreshold(1);
-		poser.setNeighborPixelThreshold(0.1);
-		poser.setMinNumberOfPixel(1);
-		poser.setTimeLimit(40);
-		poser.process(item);
-
+        TwoLevelTimeMedian poser = new TwoLevelTimeMedian();
+        poser.calibService = calibService;
+        poser.photonChargeKey = photonCharge;
+        poser.arrivalTimeKey = arrivalTime;
+        poser.outputKey = shower;
+        poser.corePixelThreshold = 1;
+        poser.neighborPixelThreshold = 0.1;
+        poser.minNumberOfPixel = 1;
+        poser.timeLimit = 40;
+        poser.process(item);
 
 
-        DistributionFromShower dist = new DistributionFromShower();
-        dist.setPixelSetKey(shower);
-        dist.setWeightsKey(photonCharge);
-        dist.setOutputKey(distribution);
+
+        HillasParameters dist = new HillasParameters();
+        dist.pixelSetKey = shower;
+        dist.weightsKey = photonCharge;
         dist.process(item);
 
         SourcePosition pos = new SourcePosition();
-        pos.setX(0.0);
-        pos.setY(0.0);
-        pos.setOutputKey(sourcePosition);
+        pos.x = 0.0;
+        pos.y = 0.0;
+        pos.outputKey = sourcePosition;
         pos.init(null);
         pos.process(item);
     }

@@ -2,7 +2,6 @@ package fact.extraction;
 
 import fact.Utils;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.ProcessContext;
-import stream.Processor;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
@@ -19,28 +17,28 @@ import java.util.Arrays;
 /**
  * Calculate the Descrete Correlation Function for the Time Series of neigbouring pixels as a measure for their
  * correllation
- *
+ * <p>
  * Created by jebuss on 10.08.16.
  */
 public class NeighborPixelDCF implements StatefulProcessor {
     @Parameter(required = true, description = "raw data array")
-    private String key = null;
+    public String key = null;
 
     @Parameter(required = false, description = "pixel array containing a noise estimation for each pixel")
-    private String noiseKey = null;
+    public String noiseKey = null;
 
     @Parameter(description = "Key of the pixel sample that should be used, " +
             "if no pixelset is given, the whole camera is used", defaultValue = "")
-    private String pixelSetKey = null;
+    public String pixelSetKey = null;
 
     @Parameter(description = "Number of slices to be skipped at the time lines beginning", defaultValue = "30")
-    private int skipFirst = 30;
+    public int skipFirst = 30;
 
     @Parameter(description = "Number of slices to be skipped at the time lines end", defaultValue = "50")
-    private int skipLast = 50;
+    public int skipLast = 50;
 
     @Parameter(required = false, description = "Outputkey for the mean correlation of neighbouring pixels")
-    private String neighborPixDCFKey = "neighborPixDCF";
+    public String neighborPixDCFKey = "neighborPixDCF";
 
     private int deltaTMax = 5;
 
@@ -62,7 +60,7 @@ public class NeighborPixelDCF implements StatefulProcessor {
 
         double[] data = (double[]) input.get(key);
         double[] noise = default_noise;
-        if ( noiseKey != null ){
+        if (noiseKey != null) {
             noise = (double[]) input.get(noiseKey);
         }
 
@@ -77,23 +75,23 @@ public class NeighborPixelDCF implements StatefulProcessor {
         //get mean and variance of the timeseries for each pixel
         DescriptiveStatistics[] pixelStatistics = Utils.calculateTimeseriesStatistics(snipedPixelData);
 
-        double[] meanPixDCF        = new double[npix];
-        double[] meanPixDCFDeltaT  = new double[npix];
+        double[] meanPixDCF = new double[npix];
+        double[] meanPixDCFDeltaT = new double[npix];
 
-        double[] stdDevPixDCF        = new double[npix];
-        double[] stdDevPixDCFDeltaT  = new double[npix];
+        double[] stdDevPixDCF = new double[npix];
+        double[] stdDevPixDCFDeltaT = new double[npix];
 
-        double[] maxPixDCF        = new double[npix];
-        double[] maxPixDCFDeltaT  = new double[npix];
+        double[] maxPixDCF = new double[npix];
+        double[] maxPixDCFDeltaT = new double[npix];
 
-        double[] minPixDCF        = new double[npix];
-        double[] minPixDCFDeltaT  = new double[npix];
+        double[] minPixDCF = new double[npix];
+        double[] minPixDCFDeltaT = new double[npix];
 
         // TODO: 11.08.16 Make sure that each pair of pixels is only touched once
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
-            FactCameraPixel[] neighbours = pixelMap.getNeighboursFromID(pix);
+            CameraPixel[] neighbours = pixelMap.getNeighborsFromID(pix);
 
 
             double pixStdDev = pixelStatistics[pix].getStandardDeviation();
@@ -136,8 +134,8 @@ public class NeighborPixelDCF implements StatefulProcessor {
                 for (int t : deltaT) {
                     dcf[deltaTMax + t] = DCF(t, snipedPixelData[pix], snipedPixelData[neighbour.id],
                             pixMean, neighbourMean, udcfNorm);
-                    if (dcf[deltaTMax + t] > maxDcf){
-                        maxDcf       = dcf[deltaTMax + t];
+                    if (dcf[deltaTMax + t] > maxDcf) {
+                        maxDcf = dcf[deltaTMax + t];
                         maxDcfDeltaT = deltaT[deltaTMax + t];
                     }
                 }
@@ -148,7 +146,7 @@ public class NeighborPixelDCF implements StatefulProcessor {
             }
 
             DescriptiveStatistics statisticsDCF = new DescriptiveStatistics(maxNeighborDcf);
-            DescriptiveStatistics statisticsDCFDeltaT = new DescriptiveStatistics( maxNeighborDcfDeltaT);
+            DescriptiveStatistics statisticsDCFDeltaT = new DescriptiveStatistics(maxNeighborDcfDeltaT);
 
             meanPixDCF[pix] = statisticsDCF.getMean();
             meanPixDCFDeltaT[pix] = statisticsDCFDeltaT.getMean();
@@ -165,14 +163,14 @@ public class NeighborPixelDCF implements StatefulProcessor {
         }
 
 
-        input.put(neighborPixDCFKey +"_mean",meanPixDCF);
-        input.put(neighborPixDCFKey +"_stdDev", stdDevPixDCF);
-        input.put(neighborPixDCFKey +"_max", maxPixDCF);
-        input.put(neighborPixDCFKey +"_min", minPixDCF);
-        input.put(neighborPixDCFKey +"_meanDeltaT", meanPixDCFDeltaT);
-        input.put(neighborPixDCFKey +"_stdDevDeltaT", stdDevPixDCFDeltaT);
-        input.put(neighborPixDCFKey +"_maxDeltaT", maxPixDCFDeltaT);
-        input.put(neighborPixDCFKey +"_minDeltaT", minPixDCFDeltaT);
+        input.put(neighborPixDCFKey + "_mean", meanPixDCF);
+        input.put(neighborPixDCFKey + "_stdDev", stdDevPixDCF);
+        input.put(neighborPixDCFKey + "_max", maxPixDCF);
+        input.put(neighborPixDCFKey + "_min", minPixDCF);
+        input.put(neighborPixDCFKey + "_meanDeltaT", meanPixDCFDeltaT);
+        input.put(neighborPixDCFKey + "_stdDevDeltaT", stdDevPixDCFDeltaT);
+        input.put(neighborPixDCFKey + "_maxDeltaT", maxPixDCFDeltaT);
+        input.put(neighborPixDCFKey + "_minDeltaT", minPixDCFDeltaT);
 
         return input;
     }
@@ -181,11 +179,11 @@ public class NeighborPixelDCF implements StatefulProcessor {
     /**
      * Calculate the descrete correlation function for a pair of values
      *
-     * @param t     shift of the arrays
-     * @param a     first array
-     * @param b     second array
-     * @param meanA     mean of a
-     * @param meanB     mean of b
+     * @param t        shift of the arrays
+     * @param a        first array
+     * @param b        second array
+     * @param meanA    mean of a
+     * @param meanB    mean of b
      * @param UDCFNorm
      * @return descrete correlation
      */
@@ -214,10 +212,10 @@ public class NeighborPixelDCF implements StatefulProcessor {
     /**
      * Calculate the unbinned descrete correlation function for a pair of values
      *
-     * @param a     first value
-     * @param b     second value
-     * @param meanA     mean of the a's origin
-     * @param meanB     mean of the b's origin
+     * @param a        first value
+     * @param b        second value
+     * @param meanA    mean of the a's origin
+     * @param meanB    mean of the b's origin
      * @param UDCFNorm
      * @return unbinned descrete correlation
      */
@@ -230,42 +228,14 @@ public class NeighborPixelDCF implements StatefulProcessor {
     /**
      * Calculate the norm for the unbinned descrete correlation function
      *
-     * @param stdDevA   standard deviation of a
-     * @param stdDevB   standard deviation of b
-     * @param noiseA    noise of a
-     * @param noiseB    noise of b
+     * @param stdDevA standard deviation of a
+     * @param stdDevB standard deviation of b
+     * @param noiseA  noise of a
+     * @param noiseB  noise of b
      * @return unbinned descrete correlation
      */
-    public double UDCFNorm(double stdDevA, double stdDevB, double noiseA, double noiseB){
+    public double UDCFNorm(double stdDevA, double stdDevB, double noiseA, double noiseB) {
         return Math.sqrt((stdDevA * stdDevA - noiseA * noiseA) * (stdDevB * stdDevB - noiseB * noiseB));
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setNoiseKey(String noiseKey) {
-        this.noiseKey = noiseKey;
-    }
-
-    public void setDeltaTMax(int deltaTMax) {
-        this.deltaTMax = deltaTMax;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
-    }
-
-    public void setNeighborPixDCFKey(String neighborPixDCFKey) {
-        this.neighborPixDCFKey = neighborPixDCFKey;
     }
 
     @Override

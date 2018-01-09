@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This implements an AuxiliaryService {@link AuxiliaryService}  providing data from a sqlite file.
  * Can handle TRACKING and SOURCE information.
- *
+ * <p>
  * Created by kai on 01.03.15.
  */
 public class SqliteService implements AuxiliaryService {
@@ -46,7 +46,7 @@ public class SqliteService implements AuxiliaryService {
             .removalListener(new RemovalListener<Object, Object>() {
                 @Override
                 public void onRemoval(RemovalNotification<Object, Object> notification) {
-                    log.info("Removing Data {} from cache for cause {}", notification.toString() ,notification.getCause());
+                    log.info("Removing Data {} from cache for cause {}", notification.toString(), notification.getCause());
                 }
             })
             .build(new CacheLoader<AuxDataCacheKey, TreeSet<AuxPoint>>() {
@@ -57,6 +57,16 @@ public class SqliteService implements AuxiliaryService {
                 }
             });
 
+    public static ZonedDateTime floorToQuarterHour(ZonedDateTime time) {
+        ZonedDateTime t = time.withZoneSameInstant(ZoneOffset.UTC).withSecond(0);
+
+        int oldMinute = t.getMinute();
+        int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
+
+        return t.withMinute(newMinute);
+    }
+
+
     public class AuxDataCacheKey {
         private final AuxiliaryServiceName service;
         private final ZonedDateTime roundedTimeStamp;
@@ -66,14 +76,6 @@ public class SqliteService implements AuxiliaryService {
             this.roundedTimeStamp = floorToQuarterHour(timeStamp);
         }
 
-        public ZonedDateTime floorToQuarterHour(ZonedDateTime time){
-            ZonedDateTime t = time.withZoneSameInstant(ZoneOffset.UTC).withSecond(0);
-
-            int oldMinute = t.getMinute();
-            int newMinute = 15 * (int) Math.floor(oldMinute / 15.0);
-
-            return t.withMinute(newMinute);
-        }
 
         @Override
         public boolean equals(Object o) {
@@ -99,11 +101,12 @@ public class SqliteService implements AuxiliaryService {
 
     /**
      * public for unit testing purposes
+     *
      * @param service the name of the aux data to fetch
-     * @param time the time stamp of the data event
+     * @param time    the time stamp of the data event
      * @return the TreeSet containing the AuxPoints
      */
-    public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, ZonedDateTime time){
+    public TreeSet<AuxPoint> loadDataFromDataBase(AuxiliaryServiceName service, ZonedDateTime time) {
         TreeSet<AuxPoint> result = new TreeSet<>();
 
         try {
@@ -116,32 +119,32 @@ public class SqliteService implements AuxiliaryService {
 
                 db.beginTransaction(SqlJetTransactionMode.READ_ONLY);
                 try {
-                    if(service == AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION){
+                    if (service == AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION) {
 
 
-                        String earlierTime=time.minusHours(4).toString();
-                        String [] dateAndTime=earlierTime.split("T");
-                        String [] timeSplitZone=dateAndTime[1].split("Z");
-                        String earlier=dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
+                        String earlierTime = time.minusHours(4).toString();
+                        String[] dateAndTime = earlierTime.split("T");
+                        String[] timeSplitZone = dateAndTime[1].split("Z");
+                        String earlier = dateAndTime[0] + " " + timeSplitZone[0].substring(0, 8);
 
-                        String laterTime=time.plusMinutes(window).toString();
-                        dateAndTime=laterTime.split("T");
-                        timeSplitZone=dateAndTime[1].split("Z");
-                        String later = dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
+                        String laterTime = time.plusMinutes(window).toString();
+                        dateAndTime = laterTime.split("T");
+                        timeSplitZone = dateAndTime[1].split("Z");
+                        String later = dateAndTime[0] + " " + timeSplitZone[0].substring(0, 8);
 
                         cursor = table.scope("ix_DRIVE_CONTROL_TRACKING_POSITION_Time", new Object[]{earlier}, new Object[]{later});
                         result = getTrackingDataFromCursor(cursor);
-                    } else if(service == AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION){
+                    } else if (service == AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION) {
                         //source position is slower. get data from several hours ago.
-                        String earlierTime=time.minusHours(4).toString();
-                        String [] dateAndTime=earlierTime.split("T");
-                        String [] timeSplitZone=dateAndTime[1].split("Z");
-                        String earlier=dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
+                        String earlierTime = time.minusHours(4).toString();
+                        String[] dateAndTime = earlierTime.split("T");
+                        String[] timeSplitZone = dateAndTime[1].split("Z");
+                        String earlier = dateAndTime[0] + " " + timeSplitZone[0].substring(0, 8);
 
-                        String laterTime=time.plusMinutes(window).toString();
-                        dateAndTime=laterTime.split("T");
-                        timeSplitZone=dateAndTime[1].split("Z");
-                        String later = dateAndTime[0]+" "+timeSplitZone[0].substring(0,8);
+                        String laterTime = time.plusMinutes(window).toString();
+                        dateAndTime = laterTime.split("T");
+                        timeSplitZone = dateAndTime[1].split("Z");
+                        String later = dateAndTime[0] + " " + timeSplitZone[0].substring(0, 8);
 
                         cursor = table.scope("ix_DRIVE_CONTROL_SOURCE_POSITION_Time", new Object[]{earlier}, new Object[]{later});
                         result = getSourceDataFromCursor(cursor);
@@ -182,7 +185,7 @@ public class SqliteService implements AuxiliaryService {
 
                 String tempTime = cursor.getString("Time");
                 tempTime = tempTime.concat("+00:00");
-                tempTime = tempTime.replace(" ","T");
+                tempTime = tempTime.replace(" ", "T");
                 ZonedDateTime t = ZonedDateTime.parse(tempTime);
                 result.add(new AuxPoint(t, m));
             } while (cursor.next());
@@ -206,9 +209,9 @@ public class SqliteService implements AuxiliaryService {
                 m.put("dev", cursor.getFloat("dev"));
 
 
-                String tempTime=cursor.getString("Time");
-                tempTime=tempTime.concat("+00:00");
-                tempTime=tempTime.replace(" ","T");
+                String tempTime = cursor.getString("Time");
+                tempTime = tempTime.concat("+00:00");
+                tempTime = tempTime.replace(" ", "T");
 
 
                 ZonedDateTime t = ZonedDateTime.parse(tempTime);
@@ -222,7 +225,8 @@ public class SqliteService implements AuxiliaryService {
 
     /**
      * Get auxiliary data from the cache connected to the sqlite database holding drive information.
-     * @param service The service to query.
+     *
+     * @param service        The service to query.
      * @param eventTimeStamp The timestamp of your current event.
      * @return the data closest to the eventtimestamp which is found in the database according to the strategy.
      */
@@ -233,13 +237,13 @@ public class SqliteService implements AuxiliaryService {
             //this set might not contain the data we need
             TreeSet<AuxPoint> set = cache.get(key);
             AuxPoint a = strategy.getPointFromTreeSet(set, eventTimeStamp);
-            if (a == null){
+            if (a == null) {
                 throw new IOException("No auxpoint found for the given timestamp " + eventTimeStamp);
             }
-            TimeUnit tu=TimeUnit.SECONDS;
-            long difference=eventTimeStamp.toEpochSecond()-a.getTimeStamp().toEpochSecond();
+            TimeUnit tu = TimeUnit.SECONDS;
+            long difference = eventTimeStamp.toEpochSecond() - a.getTimeStamp().toEpochSecond();
             long seconds = tu.toSeconds(difference);
-            log.debug("Seconds between event and {} auxpoint : {}", service,  seconds);
+            log.debug("Seconds between event and {} auxpoint : {}", service, seconds);
             return strategy.getPointFromTreeSet(set, eventTimeStamp);
 
         } catch (ExecutionException e) {

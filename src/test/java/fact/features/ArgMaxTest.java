@@ -1,9 +1,8 @@
 package fact.features;
 
-import fact.Utils;
+import fact.photonstream.timeSeriesExtraction.ArgMax;
 import junit.framework.Assert;
 import org.junit.Test;
-import fact.photonstream.timeSeriesExtraction.ArgMax;
 
 public class ArgMaxTest {
 
@@ -14,18 +13,18 @@ public class ArgMaxTest {
         try {
             double[] emptyTimeSeries = {};
             ArgMax am = new ArgMax(emptyTimeSeries);
-        }catch(Throwable ex) {
+        } catch (Throwable ex) {
             e = ex;
         }
         Assert.assertTrue(e instanceof IndexOutOfBoundsException);
     }
 
     @Test
-    public void testArgMaxZeroTimeSeries(){
+    public void testArgMaxZeroTimeSeries() {
 
         double[] zeroTimeSeries = {
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
         ArgMax am = new ArgMax(zeroTimeSeries);
         Assert.assertEquals(0, am.arg);
@@ -33,10 +32,10 @@ public class ArgMaxTest {
     }
 
     @Test
-    public void testArgMaxSingleMaxTimeSeries(){
+    public void testArgMaxSingleMaxTimeSeries() {
 
         double[] trianglePulse = {
-            0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
+                0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
 
         ArgMax am = new ArgMax(trianglePulse);
         Assert.assertEquals(5, am.arg);
@@ -44,10 +43,10 @@ public class ArgMaxTest {
     }
 
     @Test
-    public void testArgMaxTwoSameMaxima(){
+    public void testArgMaxTwoSameMaxima() {
 
         double[] samePulses = {
-            0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0};
+                0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0};
 
         // find the first of the two same maxima
         ArgMax am = new ArgMax(samePulses);
@@ -56,10 +55,10 @@ public class ArgMaxTest {
     }
 
     @Test
-    public void testArgMaxTwoFistLowSecondHigh(){
+    public void testArgMaxTwoFistLowSecondHigh() {
 
         double[] pulses = {
-            0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 4.0, 2.0, 1.0, 0.0};
+                0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 4.0, 2.0, 1.0, 0.0};
         //                 1st                           2nd
         ArgMax am = new ArgMax(pulses);
         Assert.assertEquals(9, am.arg);
@@ -67,10 +66,10 @@ public class ArgMaxTest {
     }
 
     @Test
-    public void testArgMaxTwoFistHighSecondLow(){
+    public void testArgMaxTwoFistHighSecondLow() {
 
         double[] pulses = {
-            0.0, 1.0, 2.0, 4.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0};
+                0.0, 1.0, 2.0, 4.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0};
         //                 1st                           2nd
         ArgMax am = new ArgMax(pulses);
         Assert.assertEquals(3, am.arg);

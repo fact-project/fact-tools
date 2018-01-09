@@ -16,7 +16,7 @@ import java.util.Map;
  * It also reads FITS files written by the Monte Carlo simulation program CERES.
  * It can decompress binary tables which have been compressed according to
  * the ZFITS standard. See http://arxiv.org/abs/1506.06045.
- *
+ * <p>
  * Created by mackaiver on 12/12/16.
  */
 public class FITSStream extends AbstractStream {
@@ -27,8 +27,13 @@ public class FITSStream extends AbstractStream {
     private HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
 
-    public FITSStream(SourceURL url){
+    public String nameHDU = "Events";
+
+    public FITSStream(SourceURL url) {
         this.url = url;
+    }
+
+    public FITSStream() {
     }
 
     @Override
@@ -42,44 +47,56 @@ public class FITSStream extends AbstractStream {
 
         //get calibration constants they are stored in the first (and only) row of this hdu.
         HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
-        if (offsetHDU != null){
-            OptionalTypesMap<String, Serializable> row = ZFITSHeapReader.forTable(offsetHDU.getBinTable()).getNextRow();
+        if (offsetHDU != null) {
+            Boolean ztable = offsetHDU.header.getBoolean("ZTABLE").orElse(false);
+            Reader offsetReader;
+            if (ztable) {
+                offsetReader = ZFITSHeapReader.forTable(offsetHDU.getBinTable());
+            } else {
+                offsetReader = BinTableReader.forBinTable(offsetHDU.getBinTable());
+            }
 
+            OptionalTypesMap<String, Serializable> row;
+            if (ztable) {
+                //some of the ZDrsOffsetTables that were compressed have wrong tileheader ignore here
+                row = ((ZFITSHeapReader) offsetReader).getNextRow(true);
+            } else {
+                row = offsetReader.getNextRow();
+            }
             offsetCalibrationsConstants = row
                     .getShortArray("OffsetCalibration")
                     .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
 
         }
-
-
         //create a refrence to the events hdu
-        eventHDU = fits.getHDU("Events");
-        BinTable eventsTable = eventHDU.getBinTable();
+        eventHDU = fits.getHDU(nameHDU);
+        if (eventHDU != null) {
+            BinTable eventsTable = eventHDU.getBinTable();
 
-        //read each headerline and try to get the right datatype
-        //from smallest to largest datatype
-        //if no number can be found simply save the string.
-        Header header = eventHDU.header;
-        fitsHeader = header.asMapOfSerializables();
+            //read each headerline and try to get the right datatype
+            //from smallest to largest datatype
+            //if no number can be found simply save the string.
+            Header header = eventHDU.header;
+            fitsHeader = header.asMapOfSerializables();
 
-        Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-        if (ztable) {
-            reader = ZFITSHeapReader.forTable(eventsTable);
-        } else {
-            reader = BinTableReader.forBinTable(eventsTable);
+            Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+            if (ztable) {
+                reader = ZFITSHeapReader.forTable(eventsTable);
+            } else {
+                reader = BinTableReader.forBinTable(eventsTable);
+            }
         }
     }
 
 
-
-    private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants){
+    private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants) {
         int numChannel = 1440;
 
-        for (int ch=0; ch<numChannel; ch++) {
+        for (int ch = 0; ch < numChannel; ch++) {
             int startCell = startCellData[ch];
-            for (int sliceNum=0; sliceNum<numSlices; sliceNum++) {
-                int curCell = (startCell+sliceNum)%1024;
-                data[ch*numSlices+sliceNum] += calibrationConstants[ ch*1024 + curCell ];
+            for (int sliceNum = 0; sliceNum < numSlices; sliceNum++) {
+                int curCell = (startCell + sliceNum) % 1024;
+                data[ch * numSlices + sliceNum] += calibrationConstants[ch * 1024 + curCell];
             }
         }
     }
@@ -87,18 +104,19 @@ public class FITSStream extends AbstractStream {
     @Override
     public Data readNext() throws Exception {
 
-        if(!reader.hasNext()){
+        if (!reader.hasNext()) {
             return null;
         }
 
         OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
 
-        short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
-        short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
-        Integer roi = eventHDU.header.getInt("NROI").orElse(300);
+        if (offsetCalibrationsConstants != null) {
+            short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
+            short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
-        if (offsetCalibrationsConstants !=  null) {
+            Integer roi = eventHDU.header.getInt("NROI").orElse(300);
+
             applyDrsOffsetCalib(roi, data, startCellData, offsetCalibrationsConstants);
             nextRow.put("Data", data);
         }

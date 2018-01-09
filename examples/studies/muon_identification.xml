@@ -8,7 +8,7 @@
   <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <property name="auxpath" value="file:src/main/resources/aux/" />
-    
+
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxpath}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -19,11 +19,11 @@
   <property name="twoLevelTimeNeighbor_timeLimit" value="3.0" />
   <property name="twoLevelTimeNeighbor_minNumberOfPixel" value="2" />
 
-  <property name="features" value="timestamp,COGx,COGy,ConcCore,Delta,EventNum,Leakage,Leakage2,Length,M3Long,M3Trans,M4Long,M4Trans,NIGHT,NumPixelAfterCleaning,PCOUNT,RUNID,RUNTYPE,Size,Width,arrivalTimeCleaningStatistics_kurtosis,arrivalTimeCleaningStatistics_max,arrivalTimeCleaningStatistics_mean,arrivalTimeCleaningStatistics_min,arrivalTimeCleaningStatistics_skewness,arrivalTimeCleaningStatistics_variance,arrivalTimeStatistics_kurtosis,arrivalTimeStatistics_max,arrivalTimeStatistics_mean,arrivalTimeStatistics_min,arrivalTimeStatistics_skewness,arrivalTimeStatistics_variance,bestR,bestRingPixel,bestX,bestY,shower,conc1,conc2,concCOG,houghCleaningPercentage,houghDistance,houghOctantsHit,houghPeakness,houghRingPercentage,numIslands,photonchargeCleaningStatistics_kurtosis,photonchargeCleaningStatistics_max,photonchargeCleaningStatistics_mean,photonchargeCleaningStatistics_min,photonchargeCleaningStatistics_skewness,photonchargeCleaningStatistics_variance,photonchargeStatistics_kurtosis,photonchargeStatistics_max,photonchargeStatistics_mean,photonchargeStatistics_min,photonchargeStatistics_skewness,photonchargeStatistics_variance,timeOverThreshold_numPixel,ZdPointing,ZdTracking,ZdSourceCalc,Distance,SourceName,gaussianFitX,gaussianFitY,gaussianFitR,gaussianFitSigma,StdDevTime8.0,numPixelStdDevTime8.0"/>
+  <property name="features" value="timestamp,cogX,cogY,ConcCore,delta,EventNum,Leakage,Leakage2,length,m3Long,m3Trans,m4Long,m4Trans,skewnessLong,skewnessTrans,kurtosisLong,kurtosisTrans,NIGHT,numPixelAfterCleaning,PCOUNT,RUNID,RUNTYPE,size,width,arrivalTimeCleaningStatistics_kurtosis,arrivalTimeCleaningStatistics_max,arrivalTimeCleaningStatistics_mean,arrivalTimeCleaningStatistics_min,arrivalTimeCleaningStatistics_skewness,arrivalTimeCleaningStatistics_variance,arrivalTimeStatistics_kurtosis,arrivalTimeStatistics_max,arrivalTimeStatistics_mean,arrivalTimeStatistics_min,arrivalTimeStatistics_skewness,arrivalTimeStatistics_variance,bestR,bestRingPixel,bestX,bestY,shower,conc1,conc2,concCOG,houghCleaningPercentage,houghDistance,houghOctantsHit,houghPeakness,houghRingPercentage,numIslands,photonchargeCleaningStatistics_kurtosis,photonchargeCleaningStatistics_max,photonchargeCleaningStatistics_mean,photonchargeCleaningStatistics_min,photonchargeCleaningStatistics_skewness,photonchargeCleaningStatistics_variance,photonchargeStatistics_kurtosis,photonchargeStatistics_max,photonchargeStatistics_mean,photonchargeStatistics_min,photonchargeStatistics_skewness,photonchargeStatistics_variance,timeOverThreshold_numPixel,ZdPointing,ZdTracking,ZdSourceCalc,Distance,SourceName,gaussianFitX,gaussianFitY,gaussianFitR,gaussianFitSigma,StdDevTime8.0,numPixelStdDevTime8.0"/>
 
   <property name="outputKeys" value="${features}"/>
 
-  <stream id="fact" class="fact.io.zfits.ZFitsStream"  url="${infile}" />
+  <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}" />
 
   <process id="2" input="fact">
 
@@ -32,18 +32,16 @@
     <include url="classpath:/default/data/prevEventAndSkip.xml" />
     <include url="classpath:/default/data/calibration.xml" />
     <include url="classpath:/default/data/extraction.xml" />
-    <include url="classpath:/default/data/cleaning.xml" />     
+    <include url="classpath:/default/data/cleaning.xml" />
 
 
     <Skip condition="%{data.shower} == null" />
-    <fact.pixelsets.Length pixelSetKey="shower" outputKey="NumPixelAfterCleaning" />
-    <Skip condition="%{data.NumPixelAfterCleaning} &lt; 15" />
+    <fact.pixelsets.Length pixelSetKey="shower" outputKey="numPixelAfterCleaning" />
+    <Skip condition="%{data.numPixelAfterCleaning} &lt; 15" />
 
-    <fact.features.DistributionFromShower
+    <fact.features.HillasParameters
       weightsKey="photoncharge"
       pixelSetKey="shower"
-      sizeKey="Size"
-      outputKey="showerDistribution"
     />
 
     <fact.statistics.ArrayStatistics
@@ -74,10 +72,10 @@
     <fact.features.Size
       pixelSetKey="shower"
       photonChargeKey="photoncharge"
-      outputKey="Size"
-    />   
+      outputKey="size"
+    />
 
-    <fact.features.Concentration 
+    <fact.features.Concentration
       weights="photoncharge"
       pixelSetKey="shower"
       concOneOutputKey="conc1"
@@ -85,61 +83,59 @@
     />
 
     <fact.features.ConcentrationCore
-      cogxKey="COGx"
-      cogyKey="COGy"
+      cogKey="cog"
       pixelSetKey="shower"
       photonChargeKey="photoncharge"
-      sizeKey="Size"
-      widthKey="Width"
-      lengthKey="Length"
-      deltaKey="Delta"
+      sizeKey="size"
+      widthKey="width"
+      lengthKey="length"
+      deltaKey="delta"
       outputKey="ConcCore"
     />
     <fact.features.ConcentrationAtCenterOfGravity
       photonChargeKey="photoncharge"
-      cogxKey="COGx"
-      cogyKey="COGy"
-      sizeKey="Size"
+      cogKey="cog"
+      sizeKey="size"
       outputKey="concCOG"
     />
     <fact.features.Leakage
-      distribution="showerDistribution"
+      cogKey="cog"
       pixelSetKey="shower"
       weights="photoncharge"
       leakage1OutputKey="Leakage"
       leakage2OutputKey="Leakage2"
     />
-                    
+
     <fact.features.muon.HoughTransform
-      showRingKey="false"  
+      showRingKey="false"
       showMatrixKey="false"
       photonChargeKey="photoncharge"
       bestCircleKey="bestRing"
-      pixelSetKey="shower" 
+      pixelSetKey="shower"
       peaknessKey="houghPeakness"
       cleaningPercentageKey="houghCleaningPercentage"
       ringPercentageKey="houghRingPercentage"
       distanceKey="houghDistance"
       octantsHitKey="houghOctantsHit"
       bestRingPixelKey="bestRingPixel"
-      bestRadiusKey="bestR" 
+      bestRadiusKey="bestR"
       bestXKey="bestX"
       bestYKey="bestY"
     />
 
     <fact.features.source.SourcePosition
-      outputKey="sourcePosition"
+      outputKey="sourcePositionKey"
       auxService="auxService"
     />
 
     <fact.features.source.Distance
-      distribution="showerDistribution"
-      sourcePosition="sourcePosition"
+      cogKey="cog"
+      sourcePositionKey="sourcePositionKey"
       outputKey="Distance"
     />
 
     <fact.features.muon.CircularFit />
-    <fact.features.muon.GaussianFit 
+    <fact.features.muon.GaussianFit
       startXKey="circFitX"
       startYKey="circFitY"
       startRKey="circFitR"

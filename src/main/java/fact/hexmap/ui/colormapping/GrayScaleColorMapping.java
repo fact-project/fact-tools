@@ -8,14 +8,14 @@ import java.awt.*;
 
 /**
  * Map values to grayscale by linear interpolation from minimal Value in camera to maximum value in camera.
+ *
  * @author kai
  */
 public class GrayScaleColorMapping
-        implements ColorMapping
-{
-    static Logger log = LoggerFactory.getLogger( GrayScaleColorMapping.class );
+        implements ColorMapping {
+    static Logger log = LoggerFactory.getLogger(GrayScaleColorMapping.class);
     double neutralValue = 0.0f;
-//    Color maxColor = Color.white;
+    //    Color maxColor = Color.white;
 //    Color minColor = Color.black;
     double minValue, maxValue;
 
@@ -32,8 +32,8 @@ public class GrayScaleColorMapping
 //            }
 //        }
 //        double value = v - minValue;
-        double value = (v - minValue)/(maxValue-minValue);
-        return Color.getHSBColor(0.0f, 0.0f, (float)value);
+        double value = (v - minValue) / (maxValue - minValue);
+        return Color.getHSBColor(0.0f, 0.0f, (float) value);
 
     }
 }

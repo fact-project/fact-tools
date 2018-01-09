@@ -1,7 +1,7 @@
 package fact.features.source;
 
 import fact.Utils;
-import fact.container.PixelDistribution2D;
+import fact.coordinates.CameraCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -10,67 +10,33 @@ import stream.annotations.Parameter;
 
 /**
  * Quite simply the distance between the CoG of the shower and the calculated source position.
- * @author kaibrugge
  *
+ * @author kaibrugge
  */
 public class Distance implements Processor {
-	static Logger log = LoggerFactory.getLogger(Distance.class);
+    private static final Logger log = LoggerFactory.getLogger(Distance.class);
+
     @Parameter(required = true)
-	private String distribution;
+    public String cogKey;
+
     @Parameter(required = true)
-	private String sourcePosition;
+    public String sourcePositionKey;
+
     @Parameter(required = true)
-	private String outputKey;
-	/**
-	 * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid 
-	 */
-	@Override
-	public Data process(Data input) {
-		if(!input.containsKey(distribution)){
-			log.info("No shower in evernt. Not calculating distance");
-			return input;
-		}
-		Utils.mapContainsKeys( input, distribution, sourcePosition);
+    public String outputKey;
 
-		PixelDistribution2D dist = (PixelDistribution2D) input.get(distribution);
-		double[] source  = (double[]) input.get(sourcePosition);
+    /**
+     * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid
+     */
+    @Override
+    public Data process(Data input) {
+        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
 
-		double x = source[0];
-		double y = source[1];
+        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
 
-		input.put(outputKey, 
-				Math.sqrt( (dist.getCenterY() - y) * (dist.getCenterY() - y)
-						+ (dist.getCenterX() - x) * (dist.getCenterX() - x) )
-				);
-		return input;
-	}
-
-
-
-	public String getDistribution() {
-		return distribution;
-	}
-	public void setDistribution(String distribution) {
-		this.distribution = distribution;
-	}
-
-
-
-	public String getSourcePosition() {
-		return sourcePosition;
-	}
-	public void setSourcePosition(String sourcePosition) {
-		this.sourcePosition = sourcePosition;
-	}
-
-
-
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-
+        input.put(outputKey, cog.euclideanDistance(source));
+        return input;
+    }
 }

@@ -1,148 +1,93 @@
 package fact.features.source;
 
-
-//import com.sun.scenario.effect.Offset;
+import fact.Constants;
+import fact.Utils;
 import fact.auxservice.AuxPoint;
 import fact.auxservice.AuxiliaryService;
 import fact.auxservice.AuxiliaryServiceName;
 import fact.auxservice.strategies.AuxPointStrategy;
 import fact.auxservice.strategies.Closest;
 import fact.auxservice.strategies.Earlier;
+import fact.coordinates.CameraCoordinate;
+import fact.coordinates.EarthLocation;
+import fact.coordinates.EquatorialCoordinate;
+import fact.coordinates.HorizontalCoordinate;
 import fact.hexmap.ui.overlays.SourcePositionOverlay;
-
-
-import fact.Utils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
-import stream.annotations.Service;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.IOException;
-import java.time.*;
-
+import java.time.ZonedDateTime;
 
 /**
- *  This calculates the position of the source in the camera. The Telescope usually does not look
- *  directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
- *  the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
- *  The point (0.0, 0.0) is the center of the camera.
- *  In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
- *  This data is written by the telescope drive system into  auxilary .fits files called DRIVE_CONTROL_SOURCE_POSITION and
- *  DRIVE_CONTROL_TRACKING_POSITION.
+ * This calculates the position of the source in the camera. The Telescope usually does not look
+ * directly at the source but somewhere close by. That means the image of the source projected by the mirrors onto
+ * the camera is not exactly in the center but at some point (X,Y). This point will be called source position from now on.
+ * The point (0.0, 0.0) is the center of the camera.
+ * In  order to calculate the source position we need to know where the telescope is looking. And at what time exactly.
+ * This data is written by the telescope drive system into  auxiliary .fits files called DRIVE_CONTROL_SOURCE_POSITION and
+ * DRIVE_CONTROL_TRACKING_POSITION.
+ * <p>
+ * This processor handles a handful of different tasks. It can calculate the source position in the camera for
+ * some fixed celestial coordinates (e.g. In case you want to get the coordinates of a star projected onto the camera plane)
+ * <p>
+ * For data processing we need the auxService to read data from both the DRIVE_CONTROL_SOURCE_POSITION and the DRIVE_CONTROL_TRACKING_POSITION
+ * files. The first contains the name and celestial coordinates of the source we're at looking while the second contains
+ * information at where the telescope pointing which is updated in small intervals.
+ * <p>
+ * Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
+ * to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (after revision 18159),
+ * the source and pointing information are simply taken from the data stream.
+ * <p>
+ * For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
  *
- *  This processor handles a handful of different tasks. It can calculate the sourceposition in the camera for
- *  some fixed celestial coordinates (e.g. In case you want to get the coordinates of a star projected onto the camera plane)
- *
- *  For data processing we need the auxService to read data from both the DRIVE_CONTROL_SOURCE_POSITION and the DRIVE_CONTROL_TRACKING_POSITION
- *  files. The first contains the name and celestial coordinates of the source we're at looking while the second contains
- *  information at where the telescope pointing which is updated in small intervals.
- *
- *  Unfortunately MC processed files have to be treated differently than data files since there are no pointing positions written
- *  to auxiliary files. For newer ceres versions which allow the simulation of wobble positions (after revision 18159),
- *  the source and pointing information are simply taken from the datastream.
- *
- *  For older ceres versions you can simply specify fixed X and Y coordinates in the camera plane.
- *
- *  @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt, Max Nöthe;
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt; , Fabian Temme &lt;fabian.temme@tu-dortmund.de&gt, Max Nöthe;
  */
 public class SourcePosition implements StatefulProcessor {
-    static Logger log = LoggerFactory.getLogger(SourcePosition.class);
+    private static final Logger log = LoggerFactory.getLogger(SourcePosition.class);
 
 
     @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
-    private String outputKey = null;
-
-    public void setAuxService(AuxiliaryService auxService) {
-        this.auxService = auxService;
-    }
+    public String outputKey = null;
 
     @Service(required = false, description = "Name of the service that provides aux files")
-    private AuxiliaryService auxService;
+    public AuxiliaryService auxService;
+
+    @Parameter(description = "If set, the fixed x position of the source in mm")
+    public Double x = null;
+
+    @Parameter(description = "If set, the fixed y position of the source in mm")
+    public Double y = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the source coordinates")
+    public String sourceZdKey = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the source coordinates")
+    public String sourceAzKey = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the pointing coordinates")
+    public String pointingZdKey = null;
+
+    @Parameter(description = "In case of MC-Input you specify the key to the pointing coordinates")
+    public String pointingAzKey = null;
+
+    // used in case we need the sourceposition of a star in the camera
+    @Parameter(required = false)
+    public Double sourceRightAscension = null;
 
     @Parameter(required = false)
-    private Double x = null;
-    @Parameter(required = false)
-    private Double y = null;
+    public Double sourceDeclination = null;
 
-    //TODO Standards setzen?
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
-    private String sourceZdKey = null;
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the source coordinates")
-    private String sourceAzKey = null;
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
-    private String pointingZdKey = null;
-    @Parameter(required = false, description = "In case of MC-Input you specify the key to the pointing coordinates")
-    private String pointingAzKey = null;
+    private final AuxPointStrategy closest = new Closest();
+    private final AuxPointStrategy earlier = new Earlier();
 
     //flag which indicates whether were are looking at montecarlo files which have a wobble position
     public boolean hasMcWobblePosition;
-
-
-    //used in case we need the sourceposition of a star in the camera
-    @Parameter(required = false)
-    private Double sourceRightAscension = null;
-    @Parameter(required = false)
-    private Double sourceDeclination = null;
-
-
-    AuxPointStrategy closest = new Closest();
-    AuxPointStrategy earlier = new Earlier();
-
-    //position of the Telescope
-    private final double telescopeLongitudeDeg = -17.890701389;
-    private final double telescopeLatitudeDeg = 28.761795;
-    //Distance from earth center
-    private final double focalLength = 4889.0;
-
-    // reference datetime
-    ZonedDateTime gstReferenceDateTime = ZonedDateTime.of(2000, 1, 1, 12, 0, 0, 0, ZoneOffset.UTC);
-
-
-    @Override
-    public void finish() throws Exception {
-    }
-
-    /**
-     * Here we check whether an auxservice has been set or some fixed coordinates have been provided in the .xml.
-     * If any of the parameters sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey are set then all need to be set.
-     */
-    @Override
-    public void init(ProcessContext arg0) throws Exception {
-        if(x !=  null && y != null){
-            log.warn("Setting source position to dummy values X: " + x + "  Y: " + y);
-            return;
-        }
-
-        hasMcWobblePosition = false;
-        if ( !(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null) ){
-        	if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null)
-        	{
-                hasMcWobblePosition = true;
-        		log.warn("Using zd and az values from the data item");
-        	}
-        	else
-        	{
-        		log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
-        		throw new IllegalArgumentException();
-        	}
-        } else if (auxService == null ){
-
-            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
-            throw new IllegalArgumentException();
-        }
-    }
-
-
-
-    @Override
-    public void resetState() throws Exception {
-    }
-
 
     /**
      * The process method adds the azimuth and zenith values for the pointing, tracking and source position.
@@ -150,244 +95,150 @@ public class SourcePosition implements StatefulProcessor {
      */
     @Override
     public Data process(Data data) {
+        EquatorialCoordinate sourceEquatorial;
+        HorizontalCoordinate sourceHorizontal;
+        CameraCoordinate sourceCamera;
+
+        EquatorialCoordinate pointingEquatorial;
+        HorizontalCoordinate pointingHorizontal;
+        HorizontalCoordinate auxPointingHorizontal;
 
         // In case the source position is fixed. Used for older ceres version <= revision 18159
-        if(x != null && y !=  null) {
+        if (x != null && y != null) {
+
             // add source position to data item
-            double[] source = {x, y};
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, source));
-            data.put(outputKey, source);
+            sourceCamera = new CameraCoordinate(x, y);
+            auxPointingHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
+            sourceHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
 
-            data.put("AzTracking", 0);
-            data.put("ZdTracking", 0);
+        } else if (hasMcWobblePosition) {
+            double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
+            double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
+            double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
+            double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+            // Due to the fact, that Ceres handle the coordinate in a different way, we have to
+            // rotate the coordinate system by 180 deg such that 0 deg is north
+            pointingAz = 180 + pointingAz;
+            sourceAz = 180 + sourceAz;
 
-            data.put("AzPointing", 0);
-            data.put("ZdPointing", 0);
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingAz);
+            sourceHorizontal = HorizontalCoordinate.fromDegrees(sourceZd, sourceAz);
 
-            data.put("AzSourceCalc", 0);
-            data.put("ZdSourceCalc", 0);
-            return data;
-        }
+            // Now we can calculate the source position from the zd,az coordinates for pointing and source
+            sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
-        if (hasMcWobblePosition)
-        {
-        	double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
-        	double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
-        	double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
-        	double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
-        	// Due to the fact, that Ceres handle the coordinate in a different way, we have to
-        	// rotate the coordinate system by 180 deg such that 0 deg is north
-        	pointingAz = 180 + pointingAz;
-        	sourceAz = 180 + sourceAz;
-        	// Now we can calculate the source position from the zd,az coordinates for pointing and source
-        	double[] sourcePosition = getSourcePosition(pointingAz, pointingZd, sourceAz, sourceZd);
-        	data.put(outputKey, sourcePosition);
+            pointingHorizontal = HorizontalCoordinate.fromDegrees(pointingZd, pointingAz);
+            auxPointingHorizontal = pointingHorizontal;
 
-            data.put("AzTracking", pointingAz);
-            data.put("ZdTracking", pointingZd);
-
-            data.put("AzPointing", pointingAz);
-            data.put("ZdPointing", pointingZd);
-
-            data.put("AzSourceCalc", sourceAz);
-            data.put("ZdSourceCalc", sourceZd);
-
-            data.put("@sourceOverlay" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
-            return data;
-        }
-
-        try {
-            int[] eventTime = (int[]) data.get("UnixTimeUTC");
-            if(eventTime == null){
+        } else {
+            // Assume observations
+            int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
+            if (unixTimeUTC == null) {
                 log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
                 return null;
             }
 
-            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
+            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
-            AuxPoint sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
+            AuxPoint sourcePoint;
+            AuxPoint trackingPoint;
+            try {
+                sourcePoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_SOURCE_POSITION, timeStamp, earlier);
 
-            //We want to get the tracking point which is closest to the current event.
-            AuxPoint trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+                //We want to get the tracking point which is closest to the current event.
+                trackingPoint = auxService.getAuxiliaryData(AuxiliaryServiceName.DRIVE_CONTROL_TRACKING_POSITION, timeStamp, closest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-            double ra = trackingPoint.getDouble("Ra");
-            double dec = trackingPoint.getDouble("Dec");
+            pointingEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(
+                    trackingPoint.getDouble("Ra"), trackingPoint.getDouble("Dec")
+            );
 
-            //convert celestial coordinates to local coordinate system.
-            double[] pointingAzZd = equatorialToHorizontal(ra, dec, timeStamp);
+            pointingHorizontal = pointingEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
 
-            double[] sourceAzZd;
-            if (sourceDeclination != null && sourceRightAscension != null)
-            {
-                sourceAzZd = equatorialToHorizontal(sourceRightAscension, sourceDeclination, timeStamp);
+            if (sourceDeclination != null && sourceRightAscension != null) {
+                sourceEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(sourceRightAscension, sourceDeclination);
             } else {
-                sourceAzZd = equatorialToHorizontal(
+                sourceEquatorial = EquatorialCoordinate.fromHourAngleAndDegrees(
                         sourcePoint.getDouble("Ra_src"),
-                        sourcePoint.getDouble("Dec_src"),
-                        timeStamp
+                        sourcePoint.getDouble("Dec_src")
                 );
             }
 
-            double[] sourcePosition = getSourcePosition(pointingAzZd[0], pointingAzZd[1], sourceAzZd[0], sourceAzZd[1]);
+            sourceHorizontal = sourceEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
+            sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
             String sourceName = sourcePoint.getString("Name");
             data.put("SourceName", sourceName);
-            data.put(outputKey, sourcePosition);
 
-            data.put("AzTracking", trackingPoint.getDouble("Az"));
-            data.put("ZdTracking", trackingPoint.getDouble("Zd"));
+            Double auxZd = trackingPoint.getDouble("Zd");
+            Double auxAz = trackingPoint.getDouble("Az");
 
-            data.put("AzPointing", pointingAzZd[0]);
-            data.put("ZdPointing", pointingAzZd[1]);
-
-            data.put("AzSourceCalc", sourceAzZd[0]);
-            data.put("ZdSourceCalc", sourceAzZd[1]);
-
-            data.put("@Source" + outputKey, new SourcePositionOverlay(outputKey, sourcePosition));
-
-        } catch (IOException e) {
-            log.error("SourcePosition could not be calculated. Stopping stream.");
-            e.printStackTrace();
-            return null;
+            auxPointingHorizontal = HorizontalCoordinate.fromDegrees(auxZd, auxAz);
         }
+
+        data.put(outputKey, sourceCamera);
+        data.put(outputKey + "X", sourceCamera.xMM);
+        data.put(outputKey + "Y", sourceCamera.yMM);
+
+        data.put("auxPointingPosition", auxPointingHorizontal);
+        data.put("pointingPosition", pointingHorizontal);
+        data.put("sourcePositionHorizontal", sourceHorizontal);
+
+        data.put("sourcePositionZd", sourceHorizontal.getZenithDeg());
+        data.put("sourcePositionAz", sourceHorizontal.getAzimuthDeg());
+
+        data.put("auxPointingPositionZd", auxPointingHorizontal.getZenithDeg());
+        data.put("auxPointingPositionAz", auxPointingHorizontal.getAzimuthDeg());
+
+        data.put("pointingPositionZd", pointingHorizontal.getZenithDeg());
+        data.put("pointingPositionAz", pointingHorizontal.getAzimuthDeg());
+
+        data.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
 
         return data;
     }
 
-    /**
-     * Convert a DateTime object to greenwhich sidereal time according to
-     * https://en.wikipedia.org/wiki/Sidereal_time#Definition
-     * @param datetime
-     * @return gst in radians
-     */
-    public double datetimeToGST(ZonedDateTime datetime){
-
-    	Duration difference = Duration.between(gstReferenceDateTime, datetime);
-    	double gst = 18.697374558 + 24.06570982441908 * (difference.toMillis() / 86400000.0);
-
-        // normalize to [0, 24] and convert to radians
-        gst = (gst % 24) / 12.0 * Math.PI;
-        return gst;
-    }
 
     /**
-     * Implementation of the formulas from
-     * https://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
-     *
-     * @param ra in decimal arc hours (e.g. 5h and 30 minutes : ra = 5.5)
-     * @param dec in decimal degrees (e.g. 21 degrees and 30 arc minutes : zd = 21.5)
-     * @param datetime DateTime of the event
-     * @return an array of length 2 containing {azimuth, zenith} in degree, not null;
+     * Here we check whether an auxservice has been set or some fixed coordinates have been provided in the .xml.
+     * If any of the parameters sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey are set then all need to be set.
      */
-
-    public double[] equatorialToHorizontal(double ra, double dec, ZonedDateTime datetime){
-        if (ra >= 24.0 || ra < 0.0 || dec >= 90.0 || dec <= -90 ){
-            throw new RuntimeException("Ra or Dec values are invalid. They should be given in decimal arc hours and decimal degree");
+    @Override
+    public void init(ProcessContext arg0) throws Exception {
+        if (x != null && y != null) {
+            log.warn("Setting source position to dummy values X: " + x + "  Y: " + y);
+            return;
         }
 
-        double gst = datetimeToGST(datetime);
+        hasMcWobblePosition = false;
+        if (!(sourceZdKey == null && sourceAzKey == null && pointingZdKey == null && pointingAzKey == null)) {
+            if (sourceZdKey != null && sourceAzKey != null && pointingZdKey != null && pointingAzKey != null) {
+                hasMcWobblePosition = true;
+                log.warn("Using zd and az values from the data item");
+            } else {
+                log.error("You need to specify all position keys (sourceZdKey,sourceAzKey,pointingZdKey,pointingAzKey");
+                throw new IllegalArgumentException();
+            }
+        } else if (auxService == null) {
 
-        ra = ra / 12. * Math.PI;
-        dec = Math.toRadians(dec);
-
-        double telLatRad = Math.toRadians(telescopeLatitudeDeg);
-        double telLonRad = Math.toRadians(telescopeLongitudeDeg);
-
-        // wikipedia assumes longitude positive in west direction
-        double hourAngle = gst + telLonRad - ra;
-
-        double altitude = Math.asin(
-                Math.sin(telLatRad) * Math.sin(dec) +
-                Math.cos(telLatRad) * Math.cos(dec) * Math.cos(hourAngle)
-        );
-
-        double azimuth = Math.atan2(
-                Math.sin(hourAngle),
-        		Math.cos(hourAngle) * Math.sin(telLatRad) - Math.tan(dec) * Math.cos(telLatRad)
-        );
-
-        azimuth -= Math.PI;
-
-        if (azimuth <= - Math.PI){
-            azimuth += 2 * Math.PI;
+            log.error("You have to provide fixed sourceposition coordinates X and Y, or specify position keys, or specify the auxService.");
+            throw new IllegalArgumentException();
         }
+    }
 
-        return new double[]{Math.toDegrees(azimuth), 90 - Math.toDegrees(altitude)};
+    @Override
+    public void resetState() throws Exception {
     }
 
 
-
-    /**
-     * Returns position of the source in the camera in [mm] from the given pointing Azimuth and Zenith
-     * Code by F. Temme
-     * @param pointingAz
-     * @param pointingZd
-     * @param sourceAz
-     * @param sourceZd
-     * @return
-     */
-    public double[] getSourcePosition(double pointingAz, double pointingZd, double sourceAz, double sourceZd)
-    {
-
-        double paz = Math.toRadians(pointingAz);
-        double pzd = Math.toRadians(pointingZd);
-        double saz = Math.toRadians(sourceAz);
-        double szd = Math.toRadians(sourceZd);
-
-
-        double x = Math.sin(szd) * Math.cos(saz);
-        double y = Math.sin(szd) * Math.sin(saz);
-        double z = Math.cos(szd);
-
-
-        double x_rot = -Math.sin(-pzd) * z - Math.cos(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
-        double y_rot =  Math.sin(-paz) * x + Math.cos(-paz) * y;
-        double z_rot =  Math.cos(-pzd) * z - Math.sin(-pzd) * (Math.cos(-paz) * x - Math.sin(-paz) * y);
-
-        double[] r = new double[2];
-        r[0] = x_rot * (-focalLength) / z_rot;
-        r[1] = - y_rot * (-focalLength) / z_rot;
-
-        return r;
+    @Override
+    public void finish() throws Exception {
     }
 
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-    public void setY(Double y) {
-        this.y = y;
-    }
-
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-	public void setSourceZdKey(String sourceZdKey) {
-		this.sourceZdKey = sourceZdKey;
-	}
-
-	public void setSourceAzKey(String sourceAzKey) {
-		this.sourceAzKey = sourceAzKey;
-	}
-
-	public void setPointingZdKey(String pointingZdKey) {
-		this.pointingZdKey = pointingZdKey;
-	}
-
-	public void setPointingAzKey(String pointingAzKey) {
-		this.pointingAzKey = pointingAzKey;
-	}
-
-	public void setSourceRightAscension(Double sourceRightAscension) {
-		this.sourceRightAscension = sourceRightAscension;
-	}
-
-	public void setSourceDeclination(Double sourceDeclination) {
-		this.sourceDeclination = sourceDeclination;
-	}
 
 }

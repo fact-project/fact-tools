@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package fact.extraction;
 
@@ -11,21 +11,22 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * This processor simply calculates the maximum value for all time slices in each Pixel. 
+ * This processor simply calculates the maximum value for all time slices in each Pixel.
  * The output is a double array with an entry for each Pixel.
- * TODO: REfactor to only search inside a window
- *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
+ * TODO: Refactor to only search inside a window
+ *
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
-public class MaxAmplitude implements Processor{
-	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
+public class MaxAmplitude implements Processor {
+    static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 
     @Parameter(required = true)
-    private String key;
-    @Parameter(required = true)
-    private String outputKey;
+    public String key;
 
-	private int npix;
+    @Parameter(required = true)
+    public String outputKey;
+
+    private int npix;
 
     @Override
     public Data process(Data input) {
@@ -48,12 +49,13 @@ public class MaxAmplitude implements Processor{
 
     /**
      * Find the maximum value in the array. searchs in the window from pix * roi + slice to pix * roi + (slice + roi -1)
+     *
      * @param roi
-     * @param pix pixel to be checked
+     * @param pix  pixel to be checked
      * @param data the array to be checked
      * @return
      */
-    public double maximum(int roi, int pix, double[] data){
+    public double maximum(int roi, int pix, double[] data) {
         double tempMaxValue = 0;
         for (int slice = 0; slice < roi; slice++) {
             int pos = pix * roi + slice;
@@ -63,14 +65,5 @@ public class MaxAmplitude implements Processor{
             }
         }
         return tempMaxValue;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }

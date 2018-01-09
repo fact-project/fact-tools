@@ -33,13 +33,15 @@ public abstract class ArrayColorMapping implements ColorMapping {
         return getColorFromIndex(index);
     }
 
-    protected Color getNaNColor(){
+    protected Color getNaNColor() {
         return Color.GRAY;
     }
-    protected Color getOverflowColor(){
+
+    protected Color getOverflowColor() {
         return Color.GRAY;
     }
-    protected Color getUnderflowColor(){
+
+    protected Color getUnderflowColor() {
         return Color.GRAY;
     }
 

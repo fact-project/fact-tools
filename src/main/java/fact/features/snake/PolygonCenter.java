@@ -3,77 +3,42 @@ package fact.features.snake;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
-public class PolygonCenter implements Processor
-{
-	private String polygonX = null;
-	private String polygonY = null;
-	private String outkeyX = null;
-	private String outkeyY = null;
-	
-	@Override
-	public Data process(Data input) 
-	{
-		if(outkeyX == null) throw new RuntimeException("Key \"outkeyX\" not set");	
-		if(outkeyY == null) throw new RuntimeException("Key \"outkeyY\" not set");	
-		
-		Utils.mapContainsKeys( input, polygonX, polygonY);
-		
-		
-		double[] x = (double[]) input.get(polygonX);
-		double[] y = (double[]) input.get(polygonY);
-		
-		double centerX = 0;
-		double centerY = 0;
-		
-		for(int i = 0; i<x.length; i++)
-		{
-			centerX += x[i];
-			centerY += y[i];
-		}
-		centerX /= x.length;
-		centerY /= y.length;
-		
-		input.put(outkeyX, centerX);
-		input.put(outkeyY, centerY);
-		
-		return input;
-	}
+public class PolygonCenter implements Processor {
+    @Parameter(required = true)
+    private String polygonX = null;
 
-	public String getPolygonX() {
-		return polygonX;
-	}
+    @Parameter(required = true)
+    private String polygonY = null;
 
-	public void setPolygonX(String polygonX) {
-		this.polygonX = polygonX;
-	}
+    @Parameter(required = true)
+    private String outkeyX = null;
 
-	public String getPolygonY() {
-		return polygonY;
-	}
+    @Parameter(required = true)
+    private String outkeyY = null;
 
-	public void setPolygonY(String polygonY) {
-		this.polygonY = polygonY;
-	}
+    @Override
+    public Data process(Data input) {
+        Utils.mapContainsKeys(input, polygonX, polygonY);
 
-	public String getOutkeyX() {
-		return outkeyX;
-	}
 
-	public void setOutkeyX(String outkeyX) {
-		this.outkeyX = outkeyX;
-	}
+        double[] x = (double[]) input.get(polygonX);
+        double[] y = (double[]) input.get(polygonY);
 
-	public String getOutkeyY() {
-		return outkeyY;
-	}
+        double centerX = 0;
+        double centerY = 0;
 
-	public void setOutkeyY(String outkeyY) {
-		this.outkeyY = outkeyY;
-	}
+        for (int i = 0; i < x.length; i++) {
+            centerX += x[i];
+            centerY += y[i];
+        }
+        centerX /= x.length;
+        centerY /= y.length;
 
-	
+        input.put(outkeyX, centerX);
+        input.put(outkeyY, centerY);
 
-	
-	
+        return input;
+    }
 }

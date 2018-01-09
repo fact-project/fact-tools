@@ -19,100 +19,70 @@ import java.util.ArrayList;
  * array of arrival times.
  *
  * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a>
- *
  */
 public class TimeOverThresholdArray implements Processor {
-	static Logger log = LoggerFactory.getLogger(TimeOverThresholdArray.class);
+    static Logger log = LoggerFactory.getLogger(TimeOverThresholdArray.class);
 
-	@Parameter(required = true, description = "key of data array")
-	private String dataKey = null;
-	@Parameter(required = true, description = "key of array containing arrival times")
-	private String positionsKey = null;
-	@Parameter(required = true, description = "key of output array")
-	private String outputKey = null;
+    @Parameter(required = true, description = "key of data array")
+    public String dataKey = null;
+
+    @Parameter(required = true, description = "key of array containing arrival times")
+    public String positionsKey = null;
+
+    @Parameter(required = true, description = "key of output array")
+    public String outputKey = null;
+
     @Parameter(description = "key of output for visualisation")
-    private String visualizationKey = null;
+    public String visualizationKey = null;
 
-	public Data process(Data input) {
+    public Data process(Data input) {
 
-		Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, positionsKey, int[][].class);
+        Utils.isKeyValid(input, dataKey, double[].class);
+        Utils.isKeyValid(input, positionsKey, int[][].class);
 
         int[][] timeOverThresholdArrayList = new int[Constants.NUMBEROFPIXEL][];
 
-		double[] data 	 = (double[]) input.get(dataKey);
-        int[][] posArray = (  int[][] ) input.get(positionsKey);
+        double[] data = (double[]) input.get(dataKey);
+        int[][] posArray = (int[][]) input.get(positionsKey);
 
-        double[] width 	 =  new double[data.length];
+        double[] width = new double[data.length];
 
-		int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
-		//Loop over pixels
-		for(int pix = 0 ; pix < Constants.NUMBEROFPIXEL; pix++){
+        //Loop over pixels
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 
-            ArrayList<Integer>  timeOverThresholdArray =  new ArrayList<Integer>();
+            ArrayList<Integer> timeOverThresholdArray = new ArrayList<Integer>();
 
             //Loop over positions in positions Array
-            for (int i = 0 ; i < posArray[pix].length ; i++ ){
-                int     position    = posArray[pix][i];
-                int     slice       = (pix * roi) + position;
-                double  threshold   = data[slice];
+            for (int i = 0; i < posArray[pix].length; i++) {
+                int position = posArray[pix][i];
+                int slice = (pix * roi) + position;
+                double threshold = data[slice];
 
                 int timeOverThreshold = 0;
 
                 //Loop over slices after arrival time and sum up those above threshold
-                while (slice < data.length && threshold <= data[slice] && slice < (pix+1)*roi ){
+                while (slice < data.length && threshold <= data[slice] && slice < (pix + 1) * roi) {
                     width[slice] = 10;
                     timeOverThreshold++;
                     slice++;
-                    if (slice < 0 || slice > data.length){
+                    if (slice < 0 || slice > data.length) {
                         log.error(String.format("calling data array out of bounds slice = %s", slice));
                         break;
                     }
                 }
                 timeOverThresholdArray.add(timeOverThreshold);
-			}
+            }
 
-            timeOverThresholdArrayList[pix] =  Utils.arrayListToInt(timeOverThresholdArray);
-		}
+            timeOverThresholdArrayList[pix] = Utils.arrayListToInt(timeOverThresholdArray);
+        }
 
-		//add times over threshold array to the DataItem
-		input.put(outputKey, timeOverThresholdArrayList);
+        //add times over threshold array to the DataItem
+        input.put(outputKey, timeOverThresholdArrayList);
 
         input.put(visualizationKey, width);
 
-		return input;
-	}
-
-    public String getDataKey() {
-        return dataKey;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public String getPositionsKey() {
-        return positionsKey;
-    }
-
-    public void setPositionsKey(String positionsKey) {
-        this.positionsKey = positionsKey;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public String getVisualizationKey() {
-        return visualizationKey;
-    }
-
-    public void setVisualizationKey(String visualizationKey) {
-        this.visualizationKey = visualizationKey;
+        return input;
     }
 }
