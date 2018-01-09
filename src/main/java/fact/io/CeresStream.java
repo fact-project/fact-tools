@@ -6,8 +6,10 @@ import stream.Data;
 import stream.io.AbstractStream;
 import stream.io.SourceURL;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -24,7 +26,7 @@ import java.nio.file.Paths;
  */
 public class CeresStream extends AbstractStream {
 
-    fact.io.hdureader.FITSStream fitsstream;
+    private fact.io.hdureader.FITSStream fitsStream;
     private OptionalTypesMap<String, Serializable> ceresRunHeader;
 
     public CeresStream(SourceURL url){
@@ -41,13 +43,16 @@ public class CeresStream extends AbstractStream {
             expandedURL = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
         }
 
-        fitsstream = new FITSStream(new SourceURL(expandedURL));
-        fitsstream.init();
+        fitsStream = new FITSStream(new SourceURL(expandedURL));
+        fitsStream.init();
 
         Path path = Paths.get(expandedURL.getPath());
         String runHeaderFileName = path.getFileName().toString().replace("_Events", "_RunHeaders");
-
         Path runHeaderPath = Paths.get(path.getParent().toString(), runHeaderFileName);
+
+        if (Files.notExists(runHeaderPath)) {
+            throw new IOException("Run Header fits file not found for input file '" + path.toString() + "'");
+        }
 
         HDU runHeaderHDU = FITS.fromPath(runHeaderPath).getHDU("RunHeaders");
         BinTableReader tableReader = BinTableReader.forBinTable(runHeaderHDU.getBinTable());
@@ -56,7 +61,7 @@ public class CeresStream extends AbstractStream {
 
     @Override
     public Data readNext() throws Exception {
-        Data data = fitsstream.readNext();
+        Data data = fitsStream.readNext();
         if (data == null){
             return null;
         }
