@@ -91,7 +91,7 @@ public class HoughTransform implements StatefulProcessor {
     private double[] circle_x;
     private double[] circle_r;
 
-    public ArrayList<ArrayList<int[]>> chid2circles = new ArrayList<>();
+    public ArrayList<ArrayList<int[]>> chid2circles = new ArrayList<>(Constants.NUMBEROFPIXEL);
     public HashMap<RingId, ArrayList<Integer>> circle2chids = new HashMap<>();
 
     public final class RingId {

@@ -4,6 +4,7 @@
 package fact.features.singlePulse;
 
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class ArrivalTimeFromSlope implements Processor {
         double[] slopes = (double[]) input.get(derivationKey);
         int roi = data.length / npix;
 
-        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.NUMBEROFPIXEL);
         //the position where pulse leading edges end
         int[][] arrivalTimes = new int[npix][];
         //arrival times for all pulses in each pixel
