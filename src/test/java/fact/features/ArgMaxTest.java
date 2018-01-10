@@ -1,8 +1,10 @@
 package fact.features;
 
 import fact.photonstream.timeSeriesExtraction.ArgMax;
-import junit.framework.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ArgMaxTest {
 
@@ -16,7 +18,7 @@ public class ArgMaxTest {
         } catch (Throwable ex) {
             e = ex;
         }
-        Assert.assertTrue(e instanceof IndexOutOfBoundsException);
+        assertTrue(e instanceof IndexOutOfBoundsException);
     }
 
     @Test
@@ -27,8 +29,8 @@ public class ArgMaxTest {
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
         ArgMax am = new ArgMax(zeroTimeSeries);
-        Assert.assertEquals(0, am.arg);
-        Assert.assertEquals(0.0, am.max);
+        assertEquals(0, am.arg);
+        assertEquals(0.0, am.max, 1e-12);
     }
 
     @Test
@@ -38,8 +40,8 @@ public class ArgMaxTest {
                 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
 
         ArgMax am = new ArgMax(trianglePulse);
-        Assert.assertEquals(5, am.arg);
-        Assert.assertEquals(5.0, am.max);
+        assertEquals(5, am.arg);
+        assertEquals(5.0, am.max, 1e-12);
     }
 
     @Test
@@ -50,8 +52,8 @@ public class ArgMaxTest {
 
         // find the first of the two same maxima
         ArgMax am = new ArgMax(samePulses);
-        Assert.assertEquals(3, am.arg);
-        Assert.assertEquals(3.0, am.max);
+        assertEquals(3, am.arg);
+        assertEquals(3.0, am.max, 1e-12);
     }
 
     @Test
@@ -61,8 +63,8 @@ public class ArgMaxTest {
                 0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 4.0, 2.0, 1.0, 0.0};
         //                 1st                           2nd
         ArgMax am = new ArgMax(pulses);
-        Assert.assertEquals(9, am.arg);
-        Assert.assertEquals(4.0, am.max);
+        assertEquals(9, am.arg);
+        assertEquals(4.0, am.max, 1e-12);
     }
 
     @Test
@@ -72,7 +74,7 @@ public class ArgMaxTest {
                 0.0, 1.0, 2.0, 4.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0};
         //                 1st                           2nd
         ArgMax am = new ArgMax(pulses);
-        Assert.assertEquals(3, am.arg);
-        Assert.assertEquals(4.0, am.max);
+        assertEquals(3, am.arg);
+        assertEquals(4.0, am.max, 1e-12);
     }
 }

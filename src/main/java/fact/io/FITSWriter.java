@@ -1,6 +1,5 @@
 package fact.io;
 
-import fact.Utils;
 import fact.VersionInformation;
 import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
@@ -22,8 +21,10 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
 
 
 /**
@@ -72,7 +73,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
     @Override
     public Data process(Data item) {
         Data outputItem = DataFactory.create();
-        
+
         for (String key : keys.select(item)) {
             outputItem.put(key, item.get(key));
         }

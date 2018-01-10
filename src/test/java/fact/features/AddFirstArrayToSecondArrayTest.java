@@ -1,10 +1,13 @@
 package fact.features;
 
 import fact.photonstream.timeSeriesExtraction.AddFirstArrayToSecondArray;
-import junit.framework.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class AddFirstArrayToSecondArrayTest {
+
+    private double eps = 1e-12;
 
     @Test
     public void testAddArraysAddBothEmpty() {
@@ -13,13 +16,13 @@ public class AddFirstArrayToSecondArrayTest {
         double[] empty2 = {};
         int slice = 0;
 
-        Assert.assertEquals(0, empty1.length);
-        Assert.assertEquals(0, empty2.length);
+        assertEquals(0, empty1.length);
+        assertEquals(0, empty2.length);
 
         AddFirstArrayToSecondArray.at(empty1, empty2, slice);
 
-        Assert.assertEquals(0, empty1.length);
-        Assert.assertEquals(0, empty2.length);
+        assertEquals(0, empty1.length);
+        assertEquals(0, empty2.length);
     }
 
     @Test
@@ -29,20 +32,20 @@ public class AddFirstArrayToSecondArrayTest {
         double[] second = {};
         int slice = 0;
 
-        Assert.assertEquals(6, first.length);
-        Assert.assertEquals(0, second.length);
+        assertEquals(6, first.length);
+        assertEquals(0, second.length);
 
         AddFirstArrayToSecondArray.at(first, second, slice);
 
-        Assert.assertEquals(6, first.length);
-        Assert.assertEquals(0, second.length);
+        assertEquals(6, first.length);
+        assertEquals(0, second.length);
 
-        Assert.assertEquals(0.0, first[0]);
-        Assert.assertEquals(1.0, first[1]);
-        Assert.assertEquals(2.0, first[2]);
-        Assert.assertEquals(3.0, first[3]);
-        Assert.assertEquals(4.0, first[4]);
-        Assert.assertEquals(5.0, first[5]);
+        assertEquals(0.0, first[0], eps);
+        assertEquals(1.0, first[1], eps);
+        assertEquals(2.0, first[2], eps);
+        assertEquals(3.0, first[3], eps);
+        assertEquals(4.0, first[4], eps);
+        assertEquals(5.0, first[5], eps);
     }
 
     @Test
@@ -52,20 +55,20 @@ public class AddFirstArrayToSecondArrayTest {
         double[] second = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
         int slice = 0;
 
-        Assert.assertEquals(0, first.length);
-        Assert.assertEquals(6, second.length);
+        assertEquals(0, first.length);
+        assertEquals(6, second.length);
 
         AddFirstArrayToSecondArray.at(first, second, slice);
 
-        Assert.assertEquals(0, first.length);
-        Assert.assertEquals(6, second.length);
+        assertEquals(0, first.length);
+        assertEquals(6, second.length);
 
-        Assert.assertEquals(0.0, second[0]);
-        Assert.assertEquals(1.0, second[1]);
-        Assert.assertEquals(2.0, second[2]);
-        Assert.assertEquals(3.0, second[3]);
-        Assert.assertEquals(4.0, second[4]);
-        Assert.assertEquals(5.0, second[5]);
+        assertEquals(0.0, second[0], eps);
+        assertEquals(1.0, second[1], eps);
+        assertEquals(2.0, second[2], eps);
+        assertEquals(3.0, second[3], eps);
+        assertEquals(4.0, second[4], eps);
+        assertEquals(5.0, second[5], eps);
     }
 
     @Test
@@ -75,18 +78,18 @@ public class AddFirstArrayToSecondArrayTest {
         double[] second = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         int slice = 0;
 
-        Assert.assertEquals(7, first.length);
-        Assert.assertEquals(10, second.length);
+        assertEquals(7, first.length);
+        assertEquals(10, second.length);
 
         AddFirstArrayToSecondArray.at(first, second, slice);
 
-        Assert.assertEquals(7, first.length);
-        Assert.assertEquals(10, second.length);
+        assertEquals(7, first.length);
+        assertEquals(10, second.length);
 
         for (int i = 0; i < first.length; i++)
-            Assert.assertEquals(0.0, first[i]);
+            assertEquals(0.0, first[i], eps);
         for (int i = 0; i < second.length; i++)
-            Assert.assertEquals(0.0, second[i]);
+            assertEquals(0.0, second[i], eps);
     }
 
     @Test
@@ -98,18 +101,18 @@ public class AddFirstArrayToSecondArrayTest {
             second[i] = (double) (i);
         int slice = 0;
 
-        Assert.assertEquals(7, first.length);
-        Assert.assertEquals(10, second.length);
+        assertEquals(7, first.length);
+        assertEquals(10, second.length);
 
         AddFirstArrayToSecondArray.at(first, second, slice);
 
-        Assert.assertEquals(7, first.length);
-        Assert.assertEquals(10, second.length);
+        assertEquals(7, first.length);
+        assertEquals(10, second.length);
 
         for (int i = 0; i < first.length; i++)
-            Assert.assertEquals(0.0, first[i]);
+            assertEquals(0.0, first[i], eps);
         for (int i = 0; i < second.length; i++)
-            Assert.assertEquals((double) (i), second[i]);
+            assertEquals((double) (i), second[i], eps);
     }
 
     @Test
@@ -121,13 +124,13 @@ public class AddFirstArrayToSecondArrayTest {
 
             AddFirstArrayToSecondArray.at(first, second, slice);
 
-            Assert.assertEquals(1.0, first[0]);
+            assertEquals(1.0, first[0], eps);
 
             for (int i = 0; i < second.length; i++)
                 if (i == slice)
-                    Assert.assertEquals(1.0, second[i]);
+                    assertEquals(1.0, second[i], eps);
                 else
-                    Assert.assertEquals(0.0, second[i]);
+                    assertEquals(0.0, second[i], eps);
         }
     }
 
@@ -140,10 +143,10 @@ public class AddFirstArrayToSecondArrayTest {
         for (int slice = 0; slice < 10; slice++)
             AddFirstArrayToSecondArray.at(first, second, slice);
 
-        Assert.assertEquals(1.0, first[0]);
+        assertEquals(1.0, first[0], eps);
 
         for (int i = 0; i < second.length; i++)
-            Assert.assertEquals(1.0, second[i]);
+            assertEquals(1.0, second[i], eps);
     }
 
     @Test
@@ -156,13 +159,13 @@ public class AddFirstArrayToSecondArrayTest {
 
         AddFirstArrayToSecondArray.at(first, second, atSlice);
 
-        Assert.assertEquals(1.0, second[0]);
-        Assert.assertEquals(0.0, second[1]);
-        Assert.assertEquals(0.0, second[2]);
-        Assert.assertEquals(0.0, second[3]);
-        Assert.assertEquals(0.0, second[4]);
-        Assert.assertEquals(0.0, second[5]);
-        Assert.assertEquals(0.0, second[6]);
+        assertEquals(1.0, second[0], eps);
+        assertEquals(0.0, second[1], eps);
+        assertEquals(0.0, second[2], eps);
+        assertEquals(0.0, second[3], eps);
+        assertEquals(0.0, second[4], eps);
+        assertEquals(0.0, second[5], eps);
+        assertEquals(0.0, second[6], eps);
     }
 
     @Test
@@ -175,12 +178,12 @@ public class AddFirstArrayToSecondArrayTest {
 
         AddFirstArrayToSecondArray.at(first, second, atSlice);
 
-        Assert.assertEquals(2.0, second[0]);
-        Assert.assertEquals(3.0, second[1]);
-        Assert.assertEquals(4.0, second[2]);
-        Assert.assertEquals(5.0, second[3]);
-        Assert.assertEquals(6.0, second[4]);
-        Assert.assertEquals(7.0, second[5]);
-        Assert.assertEquals(8.0, second[6]);
+        assertEquals(2.0, second[0], eps);
+        assertEquals(3.0, second[1], eps);
+        assertEquals(4.0, second[2], eps);
+        assertEquals(5.0, second[3], eps);
+        assertEquals(6.0, second[4], eps);
+        assertEquals(7.0, second[5], eps);
+        assertEquals(8.0, second[6], eps);
     }
 }

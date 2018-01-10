@@ -91,7 +91,7 @@ public class HoughTransform implements StatefulProcessor {
     private double[] circle_x;
     private double[] circle_r;
 
-    public ArrayList<int[]>[] chid2circles = new ArrayList[Constants.NUMBEROFPIXEL];
+    public ArrayList<ArrayList<int[]>> chid2circles = new ArrayList<>(Constants.NUMBEROFPIXEL);
     public HashMap<RingId, ArrayList<Integer>> circle2chids = new HashMap<>();
 
     public final class RingId {
@@ -138,7 +138,7 @@ public class HoughTransform implements StatefulProcessor {
 
         double houghSum = 0;
         for (CameraPixel pixel : cleaningPixel) {
-            for (int[] idx : chid2circles[pixel.id]) {
+            for (int[] idx : chid2circles.get(pixel.id)) {
 
                 int r = idx[0];
                 int x = idx[1];
@@ -308,11 +308,9 @@ public class HoughTransform implements StatefulProcessor {
             circle_y[i] = (max_y - min_y) * i / res_y + min_y;
         }
 
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
-            chid2circles[chid] = new ArrayList<>();
-        }
 
         for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+            ArrayList<int[]> circles = new ArrayList<>();
             CameraPixel pix = m.getPixelFromId(chid);
             double pix_x = pix.getXPositionInMM();
             double pix_y = pix.getYPositionInMM();
@@ -323,16 +321,17 @@ public class HoughTransform implements StatefulProcessor {
                         if (Math.abs(distance - circle_r[r]) <= fact.Constants.PIXEL_SIZE_MM) {
                             int[] idx = {r, x, y};
                             RingId ring = new RingId(r, x, y);
-                            chid2circles[chid].add(idx);
+                            circles.add(idx);
 
                             if (circle2chids.get(ring) == null) {
-                                circle2chids.put(ring, new ArrayList<Integer>());
+                                circle2chids.put(ring, new ArrayList<>());
                             }
                             circle2chids.get(ring).add(chid);
                         }
                     }
                 }
             }
+            chid2circles.add(circles);
         }
 
 

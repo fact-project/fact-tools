@@ -3,7 +3,6 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.coordinates.CameraCoordinate;
-import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.overlays.EllipseOverlay;
 import fact.statistics.weighted.Weighted1dStatistics;
 import fact.statistics.weighted.Weighted2dStatistics;

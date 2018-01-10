@@ -23,7 +23,7 @@ import java.awt.event.ActionListener;
  */
 public class CameraWindow implements EventObserver {
     private final DisplayPanel hexMapDisplay;
-    private final JComboBox keyComboBox = new JComboBox();
+    private final JComboBox<String> keyComboBox = new JComboBox<>();
     private Data dataItem;
 
 

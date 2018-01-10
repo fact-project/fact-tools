@@ -1,7 +1,6 @@
 package fact.hexmap.ui.components.cameradisplay;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -153,21 +152,20 @@ public class DisplayPanel extends JPanel implements EventObserver {
 
         // set layout of the main window
         FormLayout layout = new FormLayout(
-                new ColumnSpec[]{ColumnSpec.decode("left:pref:grow"),},
-                new RowSpec[]{RowSpec.decode("fill:530"),
+                new ColumnSpec[]{ColumnSpec.decode("left:pref:grow")},
+                new RowSpec[] {
+                        RowSpec.decode("fill:530"),
                         RowSpec.decode("center:10dlu:grow"),
-                        RowSpec.decode("fill:125"),});
+                        RowSpec.decode("fill:125")
+                }
+        );
 
-        PanelBuilder builder = new PanelBuilder(layout);
+        JPanel panel = new JPanel(layout);
         CellConstraints cc = new CellConstraints();
-        // first row
-        builder.add(hexmap, cc.xy(1, 1));
-        builder.addSeparator("Overlays", cc.xy(1, 2));
-
-        builder.add(selector, cc.xy(1, 3));
-        // builder.add(overlaySelector, cc.xywh(1,4,6,1));
-        add(builder.getPanel());
-
+        panel.add(hexmap, cc.xy(1, 1));
+        panel.add(new JLabel("Overlays"), cc.xy(1, 2));
+        panel.add(selector, cc.xy(1, 3));
+        add(panel);
     }
 
     /**
