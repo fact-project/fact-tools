@@ -21,7 +21,7 @@ public class ZFitsReaderTests {
         URL u = ZFitsReaderTests.class.getResource("/testDataFile.fits.fz");
 
         FITS f = new FITS(u);
-        HDU events = f.getHDU("Events");
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
         BinTable binTable = events.getBinTable();
         ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
 
@@ -37,7 +37,7 @@ public class ZFitsReaderTests {
         URL u = ZFitsReaderTests.class.getResource("/testDataFileZSHRINK.fits.fz");
 
         FITS f = new FITS(u);
-        HDU events = f.getHDU("Events");
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
         BinTable binTable = events.getBinTable();
         ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
 
@@ -56,7 +56,7 @@ public class ZFitsReaderTests {
         URL u = ZFitsReaderTests.class.getResource("/testDataFileZTILELEN.fits.fz");
 
         FITS f = new FITS(u);
-        HDU events = f.getHDU("Events");
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
         BinTable binTable = events.getBinTable();
         ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
 
@@ -74,7 +74,7 @@ public class ZFitsReaderTests {
         URL u = ZFitsReaderTests.class.getResource("/testDataFile.fits.fz");
 
         FITS f = new FITS(u);
-        HDU events = f.getHDU("Events");
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
         BinTable binTable = events.getBinTable();
         ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
         for (int i = 1; i < 5; i++) {

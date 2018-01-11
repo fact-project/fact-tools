@@ -150,8 +150,13 @@ public class FITS {
      * @param extname the HDU to get.
      * @return the HDU with the passed EXTNAME value
      */
-    public HDU getHDU(String extname) {
-        return hduNames.get(extname);
+    public Optional<HDU> getHDU(String extname) {
+        HDU hdu = hduNames.get(extname);
+        if (hdu == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(hdu);
+        }
     }
 
 

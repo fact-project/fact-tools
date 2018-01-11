@@ -21,11 +21,11 @@ public class FitsHDUTests {
 
         FITS f = new FITS(u);
 
-        HDU events = f.getHDU("Events");
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
 
         assertThat(events.header.get("EXTNAME").orElse("WRONG"), is("Events"));
 
-        HDU zDrsCellOffsets = f.getHDU("ZDrsCellOffsets");
+        HDU zDrsCellOffsets = f.getHDU("ZDrsCellOffsets").orElseThrow(() -> new RuntimeException("File did not contain HDU 'ZDrsCellOffsets'"));
 
         f.getInputStreamForHDUData(zDrsCellOffsets);
 
@@ -57,7 +57,7 @@ public class FitsHDUTests {
 
         FITS f = new FITS(u);
 
-        HDU events = f.getHDU("Events");
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
 
         DataInputStream inputStreamForHDUData = f.getInputStreamForHDUData(events);
 
