@@ -76,7 +76,7 @@ public class FITS {
         try {
             return new FITS(file.toURI().toURL());
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
