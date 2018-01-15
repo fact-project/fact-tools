@@ -115,7 +115,7 @@ public class FITSWriterTest {
 
         FITS fits = FITS.fromFile(f);
 
-        HDU hdu = fits.getHDU("Events");
+        HDU hdu = fits.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
 
         Header header = hdu.header;
 

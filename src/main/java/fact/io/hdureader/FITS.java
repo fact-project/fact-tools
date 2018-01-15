@@ -15,7 +15,7 @@ import java.util.zip.GZIPInputStream;
  * HDUs can be accessed by their name.
  * <p>
  * FITS f = FITS.fromPath(p)
- * HDU offsets = f.getHDU("ZDrsCellOffsets");
+ * HDU offsets = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
  * BinTable binTable = offsets.getBinTable();
  * <p>
  * BinTables can also directly be accessed by name if they exist.
@@ -76,7 +76,7 @@ public class FITS {
         try {
             return new FITS(file.toURI().toURL());
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -150,8 +150,8 @@ public class FITS {
      * @param extname the HDU to get.
      * @return the HDU with the passed EXTNAME value
      */
-    public HDU getHDU(String extname) {
-        return hduNames.get(extname);
+    public Optional<HDU> getHDU(String extname) {
+        return Optional.ofNullable(hduNames.get(extname));
     }
 
 

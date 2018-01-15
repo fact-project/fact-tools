@@ -60,10 +60,10 @@ public class CeresStream extends AbstractStream {
             throw new IOException("Run Header fits file not found for input file '" + path.toString() + "'");
         }
 
-        HDU runHeaderHDU = FITS.fromPath(runHeaderPath).getHDU("RunHeaders");
-        if (runHeaderHDU == null) {
-            throw new IOException("RunHeader file '" + runHeaderPath.toString() + "' did not contain 'RunHeaders' HDU");
-        }
+        HDU runHeaderHDU = FITS.fromPath(runHeaderPath)
+                               .getHDU("RunHeaders")
+                               .orElseThrow(() -> new IOException("RunHeader file '" + runHeaderPath.toString() + "' did not contain 'RunHeaders' HDU"));
+
         BinTableReader tableReader = BinTableReader.forBinTable(runHeaderHDU.getBinTable());
         ceresRunHeader = tableReader.getNextRow();
     }
