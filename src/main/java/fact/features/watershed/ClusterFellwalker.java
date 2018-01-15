@@ -266,7 +266,12 @@ public class ClusterFellwalker implements Processor {
             Source dependent parameter! Not needed for fellwalker_example. If this parameter shall be calculated,
             "sourceParameter_mc.xml" has to be included in the xml-file, cause source position has to be known
              */
-            double distanceSource = distanceSource(showerCluster, sourcePosition);
+            double distanceSource;
+            if (sourcePosition == null) {
+                distanceSource = Double.NaN;
+            } else {
+                distanceSource = distanceSource(showerCluster, sourcePosition);
+            }
             /*
             cog must be calculated in HillasParameters, before distanceCog can be calculated
              */
