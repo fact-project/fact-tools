@@ -55,11 +55,8 @@
       <include url="classpath:/default/data/parameterCalc.xml" />
       <!-- Output: source independent parameters -->
 
-      <!-- Parameter calculation (only source dependent) -->
-      <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
-      Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-      <include url="classpath:/default/data/sourceParameter.xml" />
-      <!-- Output: source dependent parameters -->
+      <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxService" />
+
       <fact.io.FITSWriter url="${outfile}" keys="${keysForOutput}"/>
   </process>
 </container>
