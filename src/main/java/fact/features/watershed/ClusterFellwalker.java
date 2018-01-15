@@ -97,7 +97,6 @@ public class ClusterFellwalker implements Processor {
 
         int[] areaArray = new int[1440];
         if (areaKey != null) {
-
             for (int i = 0; i < area.length; i++) {
                 areaArray[area[i]] = 1;
             }

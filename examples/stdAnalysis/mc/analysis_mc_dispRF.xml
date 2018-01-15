@@ -52,9 +52,7 @@
         <include url="classpath:/default/mc/sourceParameter_mc.xml" />
         <!-- Output: source dependent parameters -->
 
-         <fact.io.PrintKeysOnConsole keys="${keysForOutput}" />
-
-        <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
+        <fact.io.PrintKeys keys="${keysForOutput}" />
 
     </process>
 

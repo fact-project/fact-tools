@@ -46,6 +46,5 @@
 			outputKeyArrivalTime="qualityFactorArrTi"
 			/>
 
-    <!-- <fact.io.RootASCIIWriter url="file:${outfile}" keys="qualityFactorPhCh,qualityFactorArrTi"/> -->
   </process>
 </container>

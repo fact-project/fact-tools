@@ -39,7 +39,7 @@
         <Skip condition="%{data.numCluster} == 0" />
 
 
-        <fact.io.PrintKeysOnConsole keys="numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />
+        <fact.io.PrintKeys keys="numCluster,boundRatio,idealBoundDiff,boundAngle,distanceCenter,neighborCluster,chargeMax,maxClusterNumPixel,numClusterPixel,stdNumPixel,convexity" />
 
 
     </process>
