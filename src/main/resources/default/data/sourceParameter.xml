@@ -1,4 +1,10 @@
 <module>
+<fact.features.source.Disp
+		widthKey="width"
+		lengthKey="length"
+		c0="117.94"
+		outputKey="Disp"
+/>
 <fact.features.source.SourcePosition
     outputKey="sourcePosition"
     auxService="auxService"

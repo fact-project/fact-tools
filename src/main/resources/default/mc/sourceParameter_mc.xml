@@ -1,231 +1,237 @@
 <module>
-<fact.features.source.SourcePosition 
-    outputKey="sourcePosition" 
-    pointingZdKey="MPointingPos.fZd"
-    pointingAzKey="MPointingPos.fAz"
-    sourceZdKey="MSimSourcePos.fZd"
-    sourceAzKey="MSimSourcePos.fAz"
-/>
-<fact.features.source.OffPosition
-    sourcePositionKey="sourcePosition"
-    numberOfOffPositions="5"
-    offPositionId="1"
-    outputKey="offPosition1"
-/>
-<fact.features.source.OffPosition
-    sourcePositionKey="sourcePosition"
-    numberOfOffPositions="5"
-    offPositionId="2"
-    outputKey="offPosition2"
-/>
-<fact.features.source.OffPosition
-    sourcePositionKey="sourcePosition"
-    numberOfOffPositions="5"
-    offPositionId="3"
-    outputKey="offPosition3"
-/>
-<fact.features.source.OffPosition
-    sourcePositionKey="sourcePosition"
-    numberOfOffPositions="5"
-    offPositionId="4"
-    outputKey="offPosition4"
-/>
-<fact.features.source.OffPosition
-    sourcePositionKey="sourcePosition"
-    numberOfOffPositions="5"
-    offPositionId="5"
-    outputKey="offPosition5"
-/>
-<fact.features.source.Alpha
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="sourcePosition"
-    outputKey="Alpha"
-/>
-<fact.features.source.Distance
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="sourcePosition"
-    outputKey="Distance"
-/>
-<fact.features.source.Alpha
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition1"
-    outputKey="Alpha_Off_1"
-/>
-<fact.features.source.Distance
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition1"
-    outputKey="Distance_Off_1"
-/>
-<fact.features.source.Alpha
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition2"
-    outputKey="Alpha_Off_2"
-/>
-<fact.features.source.Distance
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition2"
-    outputKey="Distance_Off_2"
-/>
-<fact.features.source.Alpha
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition3"
-    outputKey="Alpha_Off_3"
-/>
-<fact.features.source.Distance
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition3"
-    outputKey="Distance_Off_3"
-/>
-<fact.features.source.Alpha
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition4"
-    outputKey="Alpha_Off_4"
-/>
-<fact.features.source.Distance
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition4"
-    outputKey="Distance_Off_4"
-/>
-<fact.features.source.Alpha
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition5"
-    outputKey="Alpha_Off_5"
-/>
-<fact.features.source.Distance
-    deltaKey="delta"
-    cogKey="cog"
-    sourcePositionKey="offPosition5"
-    outputKey="Distance_Off_5"
-/>
-<fact.features.source.CosDeltaAlpha
-    sourcePositionKey="sourcePosition"
-    cogKey="cog"
-    deltaKey="delta"
-    outputKey="CosDeltaAlpha"
-/>
-<fact.features.source.CosDeltaAlpha
-    sourcePositionKey="offPosition1"
-    cogKey="cog"
-    deltaKey="delta"
-    outputKey="CosDeltaAlpha_Off_1"
-/>
-<fact.features.source.CosDeltaAlpha
-    sourcePositionKey="offPosition2"
-    cogKey="cog"
-    deltaKey="delta"
-    outputKey="CosDeltaAlpha_Off_2"
-/>
-<fact.features.source.CosDeltaAlpha
-    sourcePositionKey="offPosition3"
-    cogKey="cog"
-    deltaKey="delta"
-    outputKey="CosDeltaAlpha_Off_3"
-/>
-<fact.features.source.CosDeltaAlpha
-    sourcePositionKey="offPosition4"
-    cogKey="cog"
-    deltaKey="delta"
-    outputKey="CosDeltaAlpha_Off_4"
-/>
-<fact.features.source.CosDeltaAlpha
-    sourcePositionKey="offPosition5"
-    cogKey="cog"
-    deltaKey="delta"
-    outputKey="CosDeltaAlpha_Off_5"
-/>
-<fact.features.source.ReconstructSourcePositionDisp
-    dispKey="Disp"
-    cogKey="cog"
-    deltaKey="delta"
-    m3LongKey="m3Long"
-    cosDeltaAlphaKey="CosDeltaAlpha"
-    signM3lConstant="-200"
-    outputKey="reconstructedSourcePosition"
-/>
-<fact.features.source.ReconstructSourcePositionDisp
-    dispKey="Disp"
-    cogKey="cog"
-    deltaKey="delta"
-    m3LongKey="m3Long"
-    cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
-    signM3lConstant="-200"
-    outputKey="reconstructedSourcePositionOff1"
-/>
-<fact.features.source.ReconstructSourcePositionDisp
-    dispKey="Disp"
-    cogKey="cog"
-    deltaKey="delta"
-    m3LongKey="m3Long"
-    cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
-    signM3lConstant="-200"
-    outputKey="reconstructedSourcePositionOff2"
-/>
-<fact.features.source.ReconstructSourcePositionDisp
-    dispKey="Disp"
-    cogKey="cog"
-    deltaKey="delta"
-    m3LongKey="m3Long"
-    cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
-    signM3lConstant="-200"
-    outputKey="reconstructedSourcePositionOff3"
-/>
-<fact.features.source.ReconstructSourcePositionDisp
-    dispKey="Disp"
-    cogKey="cog"
-    deltaKey="delta"
-    m3LongKey="m3Long"
-    cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
-    signM3lConstant="-200"
-    outputKey="reconstructedSourcePositionOff4"
-/>
-<fact.features.source.ReconstructSourcePositionDisp
-    dispKey="Disp"
-    cogKey="cog"
-    deltaKey="delta"
-    m3LongKey="m3Long"
-    cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
-    signM3lConstant="-200"
-    outputKey="reconstructedSourcePositionOff5"
-/>
-<fact.features.source.Theta
-	sourcePositionKey="sourcePosition"
-	reconstructedPositionKey="reconstructedSourcePosition"
-	outputKey="Theta"
-/>
-<fact.features.source.Theta
-	sourcePositionKey="offPosition1"
-	reconstructedPositionKey="reconstructedSourcePositionOff1"
-	outputKey="Theta_Off_1"
-/>
-<fact.features.source.Theta
-	sourcePositionKey="offPosition2"
-	reconstructedPositionKey="reconstructedSourcePositionOff2"
-	outputKey="Theta_Off_2"
-/>
-<fact.features.source.Theta
-	sourcePositionKey="offPosition3"
-	reconstructedPositionKey="reconstructedSourcePositionOff3"
-	outputKey="Theta_Off_3"
-/>
-<fact.features.source.Theta
-	sourcePositionKey="offPosition4"
-	reconstructedPositionKey="reconstructedSourcePositionOff4"
-	outputKey="Theta_Off_4"
-/>
-<fact.features.source.Theta
-	sourcePositionKey="offPosition5"
-	reconstructedPositionKey="reconstructedSourcePositionOff5"
-	outputKey="Theta_Off_5"
-/>
+	<fact.features.source.Disp
+			widthKey="width"
+			lengthKey="length"
+			c0="117.94"
+			outputKey="Disp"
+	/>
+	<fact.features.source.SourcePosition
+		outputKey="sourcePosition"
+		pointingZdKey="MPointingPos.fZd"
+		pointingAzKey="MPointingPos.fAz"
+		sourceZdKey="MSimSourcePos.fZd"
+		sourceAzKey="MSimSourcePos.fAz"
+	/>
+	<fact.features.source.OffPosition
+		sourcePositionKey="sourcePosition"
+		numberOfOffPositions="5"
+		offPositionId="1"
+		outputKey="offPosition1"
+	/>
+	<fact.features.source.OffPosition
+		sourcePositionKey="sourcePosition"
+		numberOfOffPositions="5"
+		offPositionId="2"
+		outputKey="offPosition2"
+	/>
+	<fact.features.source.OffPosition
+		sourcePositionKey="sourcePosition"
+		numberOfOffPositions="5"
+		offPositionId="3"
+		outputKey="offPosition3"
+	/>
+	<fact.features.source.OffPosition
+		sourcePositionKey="sourcePosition"
+		numberOfOffPositions="5"
+		offPositionId="4"
+		outputKey="offPosition4"
+	/>
+	<fact.features.source.OffPosition
+		sourcePositionKey="sourcePosition"
+		numberOfOffPositions="5"
+		offPositionId="5"
+		outputKey="offPosition5"
+	/>
+	<fact.features.source.Alpha
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="sourcePosition"
+		outputKey="Alpha"
+	/>
+	<fact.features.source.Distance
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="sourcePosition"
+		outputKey="Distance"
+	/>
+	<fact.features.source.Alpha
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition1"
+		outputKey="Alpha_Off_1"
+	/>
+	<fact.features.source.Distance
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition1"
+		outputKey="Distance_Off_1"
+	/>
+	<fact.features.source.Alpha
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition2"
+		outputKey="Alpha_Off_2"
+	/>
+	<fact.features.source.Distance
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition2"
+		outputKey="Distance_Off_2"
+	/>
+	<fact.features.source.Alpha
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition3"
+		outputKey="Alpha_Off_3"
+	/>
+	<fact.features.source.Distance
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition3"
+		outputKey="Distance_Off_3"
+	/>
+	<fact.features.source.Alpha
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition4"
+		outputKey="Alpha_Off_4"
+	/>
+	<fact.features.source.Distance
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition4"
+		outputKey="Distance_Off_4"
+	/>
+	<fact.features.source.Alpha
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition5"
+		outputKey="Alpha_Off_5"
+	/>
+	<fact.features.source.Distance
+		deltaKey="delta"
+		cogKey="cog"
+		sourcePositionKey="offPosition5"
+		outputKey="Distance_Off_5"
+	/>
+	<fact.features.source.CosDeltaAlpha
+		sourcePositionKey="sourcePosition"
+		cogKey="cog"
+		deltaKey="delta"
+		outputKey="CosDeltaAlpha"
+	/>
+	<fact.features.source.CosDeltaAlpha
+		sourcePositionKey="offPosition1"
+		cogKey="cog"
+		deltaKey="delta"
+		outputKey="CosDeltaAlpha_Off_1"
+	/>
+	<fact.features.source.CosDeltaAlpha
+		sourcePositionKey="offPosition2"
+		cogKey="cog"
+		deltaKey="delta"
+		outputKey="CosDeltaAlpha_Off_2"
+	/>
+	<fact.features.source.CosDeltaAlpha
+		sourcePositionKey="offPosition3"
+		cogKey="cog"
+		deltaKey="delta"
+		outputKey="CosDeltaAlpha_Off_3"
+	/>
+	<fact.features.source.CosDeltaAlpha
+		sourcePositionKey="offPosition4"
+		cogKey="cog"
+		deltaKey="delta"
+		outputKey="CosDeltaAlpha_Off_4"
+	/>
+	<fact.features.source.CosDeltaAlpha
+		sourcePositionKey="offPosition5"
+		cogKey="cog"
+		deltaKey="delta"
+		outputKey="CosDeltaAlpha_Off_5"
+	/>
+	<fact.features.source.ReconstructSourcePositionDisp
+		dispKey="Disp"
+		cogKey="cog"
+		deltaKey="delta"
+		m3LongKey="m3Long"
+		cosDeltaAlphaKey="CosDeltaAlpha"
+		signM3lConstant="-200"
+		outputKey="reconstructedSourcePosition"
+	/>
+	<fact.features.source.ReconstructSourcePositionDisp
+		dispKey="Disp"
+		cogKey="cog"
+		deltaKey="delta"
+		m3LongKey="m3Long"
+		cosDeltaAlphaKey="CosDeltaAlpha_Off_1"
+		signM3lConstant="-200"
+		outputKey="reconstructedSourcePositionOff1"
+	/>
+	<fact.features.source.ReconstructSourcePositionDisp
+		dispKey="Disp"
+		cogKey="cog"
+		deltaKey="delta"
+		m3LongKey="m3Long"
+		cosDeltaAlphaKey="CosDeltaAlpha_Off_2"
+		signM3lConstant="-200"
+		outputKey="reconstructedSourcePositionOff2"
+	/>
+	<fact.features.source.ReconstructSourcePositionDisp
+		dispKey="Disp"
+		cogKey="cog"
+		deltaKey="delta"
+		m3LongKey="m3Long"
+		cosDeltaAlphaKey="CosDeltaAlpha_Off_3"
+		signM3lConstant="-200"
+		outputKey="reconstructedSourcePositionOff3"
+	/>
+	<fact.features.source.ReconstructSourcePositionDisp
+		dispKey="Disp"
+		cogKey="cog"
+		deltaKey="delta"
+		m3LongKey="m3Long"
+		cosDeltaAlphaKey="CosDeltaAlpha_Off_4"
+		signM3lConstant="-200"
+		outputKey="reconstructedSourcePositionOff4"
+	/>
+	<fact.features.source.ReconstructSourcePositionDisp
+		dispKey="Disp"
+		cogKey="cog"
+		deltaKey="delta"
+		m3LongKey="m3Long"
+		cosDeltaAlphaKey="CosDeltaAlpha_Off_5"
+		signM3lConstant="-200"
+		outputKey="reconstructedSourcePositionOff5"
+	/>
+	<fact.features.source.Theta
+		sourcePositionKey="sourcePosition"
+		reconstructedPositionKey="reconstructedSourcePosition"
+		outputKey="Theta"
+	/>
+	<fact.features.source.Theta
+		sourcePositionKey="offPosition1"
+		reconstructedPositionKey="reconstructedSourcePositionOff1"
+		outputKey="Theta_Off_1"
+	/>
+	<fact.features.source.Theta
+		sourcePositionKey="offPosition2"
+		reconstructedPositionKey="reconstructedSourcePositionOff2"
+		outputKey="Theta_Off_2"
+	/>
+	<fact.features.source.Theta
+		sourcePositionKey="offPosition3"
+		reconstructedPositionKey="reconstructedSourcePositionOff3"
+		outputKey="Theta_Off_3"
+	/>
+	<fact.features.source.Theta
+		sourcePositionKey="offPosition4"
+		reconstructedPositionKey="reconstructedSourcePositionOff4"
+		outputKey="Theta_Off_4"
+	/>
+	<fact.features.source.Theta
+		sourcePositionKey="offPosition5"
+		reconstructedPositionKey="reconstructedSourcePositionOff5"
+		outputKey="Theta_Off_5"
+	/>
 </module>

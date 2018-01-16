@@ -68,18 +68,20 @@
         <include url="classpath:/default/mc/parameterCalc_mc.xml" />
         <!-- Output: source independent parameters -->
 
-        <!-- Parameter calculation (only source dependent) -->
-        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
-        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <include url="classpath:/default/mc/sourceParameter_mc.xml" />
-        <!-- Output: source dependent parameters -->
+        <fact.features.source.SourcePosition
+                outputKey="sourcePosition"
+                pointingZdKey="MPointingPos.fZd"
+                pointingAzKey="MPointingPos.fAz"
+                sourceZdKey="MSimSourcePos.fZd"
+                sourceAzKey="MSimSourcePos.fAz"
+        />
 
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-	<fact.io.JSONWriter keys="${keysForOutput}"
-		url="${output}"
-		writeListOfItems="True"
-		pixelSetsAsInt="True"
-		/>
-	<!-- <fact.io.PrintKeys keys="${keysForOutput}" /> -->
+        <fact.io.JSONWriter keys="${keysForOutput}"
+            url="${output}"
+            writeListOfItems="True"
+            pixelSetsAsInt="True"
+            />
+        <!-- <fact.io.PrintKeys keys="${keysForOutput}" /> -->
     </process>
 </container>
