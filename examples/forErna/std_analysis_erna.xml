@@ -83,21 +83,17 @@
         <include url="classpath:/default/data/parameterCalc.xml" />
         <!-- Output: source independent parameters -->
 
-        <!-- Parameter calculation (only source dependent) -->
-        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
-        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <include url="classpath:/default/data/sourceParameter.xml" />
-        <!-- Output: source dependent parameters -->
+        <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxService" />
 
         <fact.utils.SanitizeKeys />
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
         <fact.io.JSONWriter keys="${keysForOutput}"
-		    url="${output}"
-		    writeListOfItems="True"
-		    specialDoubleValuesAsString="True"
-		    pixelSetsAsInt="True"
-		/>
-	<!-- <PrintData/> -->
-	<!-- <fact.io.PrintKeysOnConsole keys="${keysForOutput}" /> -->
+            url="${output}"
+            writeListOfItems="True"
+            specialDoubleValuesAsString="True"
+            pixelSetsAsInt="True"
+            />
+        <!-- <PrintData/> -->
+        <!-- <fact.io.PrintKeys keys="${keysForOutput}" /> -->
     </process>
 </container>

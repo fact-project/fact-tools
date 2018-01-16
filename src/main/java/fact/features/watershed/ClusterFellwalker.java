@@ -27,6 +27,7 @@ package fact.features.watershed;
  */
 
 import fact.Utils;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
@@ -63,6 +64,9 @@ public class ClusterFellwalker implements Processor {
     @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePositionKey")
     public String sourcePositionKey = "sourcePositionKey";
 
+    @Parameter(description = "Key to CameraCoordinate of the cog as calculated bei HillasParameters", defaultValue = "cog")
+    public String cogKey = "cog";
+
     @Parameter(required = false, description = "Pixel set to cluster. If null, cluster all camera pixel; in that case decide which clusters should be kept via pixelSetKey", defaultValue = "null")
     public String areaKey = null;
 
@@ -82,10 +86,8 @@ public class ClusterFellwalker implements Processor {
         //source position not needed for example-xml, need to be calculated in "sourceParameter_mc.xml" for the feature "distanceSource"
         //same for COGxy, needed for distanceCog, but not in the example xml
 
-        double[] sourcePosition = (double[]) data.get(sourcePositionKey);
-        double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");
-
+        CameraCoordinate sourcePosition = (CameraCoordinate) data.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) data.get(cogKey);
 
         //get 'shower' as int array with pixel id's3System.out.println();
 
@@ -95,7 +97,6 @@ public class ClusterFellwalker implements Processor {
 
         int[] areaArray = new int[1440];
         if (areaKey != null) {
-
             for (int i = 0; i < area.length; i++) {
                 areaArray[area[i]] = 1;
             }
@@ -264,11 +265,16 @@ public class ClusterFellwalker implements Processor {
             Source dependent parameter! Not needed for fellwalker_example. If this parameter shall be calculated,
             "sourceParameter_mc.xml" has to be included in the xml-file, cause source position has to be known
              */
-            double distanceSource = distanceSource(showerCluster, sourcePosition);
+            double distanceSource;
+            if (sourcePosition == null) {
+                distanceSource = Double.NaN;
+            } else {
+                distanceSource = distanceSource(showerCluster, sourcePosition);
+            }
             /*
             cog must be calculated in HillasParameters, before distanceCog can be calculated
              */
-            double distanceCog = distanceCog(showerCluster, cogX, cogY);
+            double distanceCog = distanceCog(showerCluster, cog.xMM, cog.yMM);
 
 
             int convexity = searchForCompactGroups(showerCluster, showerClusterID);
@@ -528,10 +534,10 @@ public class ClusterFellwalker implements Processor {
         return sum / showerCluster.length;
     }
 
-    public double distanceSource(FactCluster[] showerCluster, double[] sourcePosition) {
+    public double distanceSource(FactCluster[] showerCluster, CameraCoordinate sourcePosition) {
         double sum = 0;
         for (FactCluster c : showerCluster) {
-            sum += c.distanceSource(sourcePosition[0], sourcePosition[1]);
+            sum += c.distanceSource(sourcePosition.xMM, sourcePosition.yMM);
         }
         return sum / showerCluster.length;
     }

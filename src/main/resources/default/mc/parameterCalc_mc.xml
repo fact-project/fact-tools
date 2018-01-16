@@ -92,10 +92,4 @@
     slopeSpreadOutputKey="slope_spread"
     slopeSpreadWeightedOutputKey="slope_spread_weighted"
 />
-<fact.features.Disp
-    widthKey="width"
-    lengthKey="length"
-    c0="117.94"
-    outputKey="disp"
-/>
 </module>

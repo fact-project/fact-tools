@@ -173,7 +173,7 @@ public class SourcePosition implements StatefulProcessor {
             sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
             String sourceName = sourcePoint.getString("Name");
-            data.put("SourceName", sourceName);
+            data.put("sourceName", sourceName);
 
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
