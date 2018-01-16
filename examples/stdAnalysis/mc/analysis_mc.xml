@@ -45,7 +45,7 @@
       <!-- Output: source independent parameters -->
 
       <fact.features.source.SourcePosition
-              outputKey="sourcePosition"
+              outputKey="source_position"
               pointingZdKey="MPointingPos.fZd"
               pointingAzKey="MPointingPos.fAz"
               sourceZdKey="MSimSourcePos.fZd"

@@ -55,7 +55,7 @@
       <include url="classpath:/default/data/parameterCalc.xml" />
       <!-- Output: source independent parameters -->
 
-      <fact.features.source.SourcePosition outputKey="sourcePosition" auxService="auxService" />
+      <fact.features.source.SourcePosition outputKey="source_position" auxService="auxService" />
 
       <fact.utils.SanitizeKeys />
       <fact.io.FITSWriter url="${outfile}" keys="${keysForOutput}"/>
