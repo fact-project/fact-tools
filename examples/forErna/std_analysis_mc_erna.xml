@@ -75,6 +75,7 @@
         <!-- Output: source dependent parameters -->
 
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
+	<fact.utils.SanitizeKeys />
 	<fact.io.JSONWriter keys="${keysForOutput}"
 		url="${output}"
 		writeListOfItems="True"
