@@ -58,14 +58,11 @@
         <include url="classpath:/default/data/sourceParameter.xml" />
         <!-- Output: source dependent parameters -->
 
-        <!--<fact.io.PrintKeysOnConsole keys="${keysForOutput}" />-->
+        <!--<fact.io.PrintKeys keys="${keysForOutput}" />-->
 
         <fact.ApplyModel url="file:/home/kai/Development/erna/test.pmml" />
 
         <!--<fact.ShowViewer key="DataCalibrated"/>-->
-
-        <!-- <fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" /> -->
-
     </process>
 
 

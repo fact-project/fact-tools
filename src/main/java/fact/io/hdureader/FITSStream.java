@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The ZFitsStream can read FITS files containing raw data as recorded by the FACT telescope DAQ.
@@ -46,8 +47,9 @@ public class FITSStream extends AbstractStream {
         FITS fits = new FITS(url);
 
         //get calibration constants they are stored in the first (and only) row of this hdu.
-        HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
-        if (offsetHDU != null) {
+        Optional<HDU> offsetOptional = fits.getHDU("ZDrsCellOffsets");
+        if (offsetOptional.isPresent()) {
+            HDU offsetHDU = offsetOptional.get();
             Boolean ztable = offsetHDU.header.getBoolean("ZTABLE").orElse(false);
             Reader offsetReader;
             if (ztable) {
@@ -68,24 +70,24 @@ public class FITSStream extends AbstractStream {
                     .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
 
         }
-        //create a refrence to the events hdu
-        eventHDU = fits.getHDU(nameHDU);
-        if (eventHDU != null) {
-            BinTable eventsTable = eventHDU.getBinTable();
+        // create a refrence to the events hdu
+        eventHDU = fits.getHDU(nameHDU).orElseThrow(() -> new IOException("Inputfile did not contain HDU '" + nameHDU + "'"));
 
-            //read each headerline and try to get the right datatype
-            //from smallest to largest datatype
-            //if no number can be found simply save the string.
-            Header header = eventHDU.header;
-            fitsHeader = header.asMapOfSerializables();
+        BinTable eventsTable = eventHDU.getBinTable();
 
-            Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-            if (ztable) {
-                reader = ZFITSHeapReader.forTable(eventsTable);
-            } else {
-                reader = BinTableReader.forBinTable(eventsTable);
-            }
+        // read each headerline and try to get the right datatype
+        // from smallest to largest datatype
+        // if no number can be found simply save the string.
+        Header header = eventHDU.header;
+        fitsHeader = header.asMapOfSerializables();
+
+        Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+        if (ztable) {
+            reader = ZFITSHeapReader.forTable(eventsTable);
+        } else {
+            reader = BinTableReader.forBinTable(eventsTable);
         }
+
     }
 
 

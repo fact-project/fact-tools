@@ -44,7 +44,6 @@
         Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
     <!--<include url="classpath:/default/data/sourceParameter.xml" />-->
     <!-- Output: source dependent parameters -->
-    <!--<fact.io.PrintKeysOnConsole keys="${keysForOutput}" />-->
-    <!--<fact.io.RootASCIIWriter url="${outfile}" keys="${keysForOutput}" />-->
+    <!--<fact.io.PrintKeys keys="${keysForOutput}" />-->
   </process>
 </container>

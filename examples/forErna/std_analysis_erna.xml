@@ -93,6 +93,6 @@
             pixelSetsAsInt="True"
             />
         <!-- <PrintData/> -->
-        <!-- <fact.io.PrintKeysOnConsole keys="${keysForOutput}" /> -->
+        <!-- <fact.io.PrintKeys keys="${keysForOutput}" /> -->
     </process>
 </container>
