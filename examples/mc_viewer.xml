@@ -15,7 +15,12 @@
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
 
-  <fact.utils.SanitizeKeys />
-  <fact.io.PrintKeys keys="${mc_truth}" />
+    <!-- Use standard calibration, extraction and cleaning -->
+    <include url="classpath:/default/mc/calibration_mc.xml" />
+    <include url="classpath:/default/mc/extraction_mc.xml" />
+    <include url="classpath:/default/mc/cleaning_mc.xml" />
+    <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
+
+    <fact.ShowViewer key="DataCalibrated" />
   </process>
 </container>
