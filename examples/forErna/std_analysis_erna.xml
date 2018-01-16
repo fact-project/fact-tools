@@ -89,12 +89,13 @@
         <include url="classpath:/default/data/sourceParameter.xml" />
         <!-- Output: source dependent parameters -->
 
+        <fact.utils.SanitizeKeys />
         <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-	<fact.io.JSONWriter keys="${keysForOutput}"
-		url="${output}"
-		writeListOfItems="True"
-		specialDoubleValuesAsString="True"
-		pixelSetsAsInt="True"
+        <fact.io.JSONWriter keys="${keysForOutput}"
+		    url="${output}"
+		    writeListOfItems="True"
+		    specialDoubleValuesAsString="True"
+		    pixelSetsAsInt="True"
 		/>
 	<!-- <PrintData/> -->
 	<!-- <fact.io.PrintKeysOnConsole keys="${keysForOutput}" /> -->

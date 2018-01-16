@@ -104,17 +104,17 @@ public class TimeGradient implements Processor {
             log.warn("Not enough data points to regress the transverse timegradient. Putting Double.NaN in data item");
         }
 
-        input.put(outputKeySlope + "Long", slopeLong);
-        input.put(outputKeySlope + "LongErr", slopeLongErr);
-        input.put(outputKeyIntercept + "Long", interceptLong);
-        input.put(outputKeyIntercept + "LongErr", interceptLongErr);
-        input.put(outputKeySumSquaredErrors + "Long", sumSquaredErrorsLong);
+        input.put(outputKeySlope + "_long", slopeLong);
+        input.put(outputKeySlope + "_long_err", slopeLongErr);
+        input.put(outputKeyIntercept + "_long", interceptLong);
+        input.put(outputKeyIntercept + "_long_err", interceptLongErr);
+        input.put(outputKeySumSquaredErrors + "_long", sumSquaredErrorsLong);
 
-        input.put(outputKeySlope + "Trans", slopeTrans);
-        input.put(outputKeySlope + "TransErr", slopeTransErr);
-        input.put(outputKeyIntercept + "Trans", interceptTrans);
-        input.put(outputKeyIntercept + "TransErr", interceptTransErr);
-        input.put(outputKeySumSquaredErrors + "Trans", sumSquaredErrorsTrans);
+        input.put(outputKeySlope + "_trans", slopeTrans);
+        input.put(outputKeySlope + "_trans_err", slopeTransErr);
+        input.put(outputKeyIntercept + "_trans", interceptTrans);
+        input.put(outputKeyIntercept + "_trans_err", interceptTransErr);
+        input.put(outputKeySumSquaredErrors + "_trans", sumSquaredErrorsTrans);
 
         return input;
     }

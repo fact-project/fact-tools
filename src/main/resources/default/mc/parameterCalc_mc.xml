@@ -2,46 +2,31 @@
 <Skip condition="%{data.shower} == null" />
 <fact.pixelsets.Length
     pixelSetKey="shower"
-    outputKey="numPixelInShower"
+    outputKey="num_pixel_in_shower"
 />
-<Skip condition="%{data.numPixelInShower} &lt; 5" />
+<Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
 
 <fact.statistics.ArrayMean
     key="photoncharge"
-    outputKey="photonchargeMean"
+    outputKey="photoncharge_mean"
 />
 <fact.statistics.ArrayMean
     key="arrivalTime"
-    outputKey="arrivalTimeMean"
+    outputKey="arrival_time_mean"
 />
 <fact.statistics.ArrayStatistics
     key="photoncharge"
-    outputKey="phChargeShower"
+    outputKey="photoncharge_shower"
     pixelSetKey="shower"
     />
 <fact.statistics.ArrayStatistics
     key="arrivalTime"
-    outputKey="arrTimeShower"
+    outputKey="arrival_time_shower"
     pixelSetKey="shower"
 />
 <fact.statistics.ArrayStatistics
     key="maxSlopes"
-    outputKey="maxSlopesShower"
-    pixelSetKey="shower"
-/>
-<fact.statistics.ArrayStatistics
-    key="arrivalTimePos"
-    outputKey="arrTimePosShower"
-    pixelSetKey="shower"
-/>
-<fact.statistics.ArrayStatistics
-    key="maxSlopesPos"
-    outputKey="maxSlopesPosShower"
-    pixelSetKey="shower"
-/>
-<fact.statistics.ArrayStatistics
-    key="maxPos"
-    outputKey="maxPosShower"
+    outputKey="max_slopes_shower"
     pixelSetKey="shower"
 />
 <fact.features.HillasParameters
@@ -57,9 +42,9 @@
     arrivalTimeKey="arrivalTime"
     cogKey="cog"
     deltaKey="delta"
-    outputKeySlope="timeGradientSlope"
-    outputKeyIntercept="timeGradientIntercept"
-    outputKeySumSquaredErrors="timeGradientSSE"
+    outputKeySlope="time_gradient_slope"
+    outputKeyIntercept="time_gradient_intercept"
+    outputKeySumSquaredErrors="time_gradient_sse"
 />
 <fact.features.Concentration
     weights="photoncharge"
@@ -75,20 +60,20 @@
     widthKey="width"
     lengthKey="length"
     deltaKey="delta"
-    outputKey="ConcCore"
+    outputKey="concentration_core"
 />
 <fact.features.ConcentrationAtCenterOfGravity
     photonChargeKey="photoncharge"
     cogKey="cog"
     sizeKey="size"
-    outputKey="concCOG"
+    outputKey="concentration_cog"
 />
 <fact.features.Leakage
     cogKey="showerDistribution"
     pixelSetKey="shower"
     weights="photoncharge"
-    leakage1OutputKey="Leakage"
-    leakage2OutputKey="Leakage2"
+    leakage1OutputKey="leakage1"
+    leakage2OutputKey="leakage2"
 />
 <fact.features.TimeSpread
     weightsKey="photoncharge"
@@ -102,15 +87,15 @@
     pixelSetKey="shower"
     cogKey="cog"
     deltaKey="delta"
-    slopeLongOutputKey="Slope_long"
-    slopeTransOutputKey="Slope_trans"
-    slopeSpreadOutputKey="Slope_spread"
-    slopeSpreadWeightedOutputKey="Slope_spread_weighted"
+    slopeLongOutputKey="slope_long"
+    slopeTransOutputKey="slope_trans"
+    slopeSpreadOutputKey="slope_spread"
+    slopeSpreadWeightedOutputKey="slope_spread_weighted"
 />
 <fact.features.Disp
     widthKey="width"
     lengthKey="length"
     c0="117.94"
-    outputKey="Disp"
+    outputKey="disp"
 />
 </module>

@@ -41,29 +41,29 @@ public class HillasParameters implements Processor {
     @Parameter(required = false, defaultValue = "delta")
     public String deltaKey = "delta";
 
-    @Parameter(required = false, defaultValue = "skewnessLong")
-    public String skewnessLongKey = "skewnessLong";
+    @Parameter(required = false, defaultValue = "skewness_long")
+    public String skewnessLongKey = "skewness_long";
 
-    @Parameter(required = false, defaultValue = "skewnessTrans")
-    public String skewnessTransKey = "skewnessTrans";
+    @Parameter(required = false, defaultValue = "skewness_trans")
+    public String skewnessTransKey = "skewness_trans";
 
-    @Parameter(required = false, defaultValue = "kurtosisLong")
-    public String kurtosisLongKey = "kurtosisLong";
+    @Parameter(required = false, defaultValue = "kurtosis_long")
+    public String kurtosisLongKey = "kurtosis_long";
 
-    @Parameter(required = false, defaultValue = "kurtosisTrans")
-    public String kurtosisTransKey = "kurtosisTrans";
+    @Parameter(required = false, defaultValue = "kurtosis_trans")
+    public String kurtosisTransKey = "kurtosis_trans";
 
-    @Parameter(required = false, defaultValue = "m3Long")
-    public String m3LongKey = "m3Long";
+    @Parameter(required = false, defaultValue = "m3_long")
+    public String m3LongKey = "m3_long";
 
-    @Parameter(required = false, defaultValue = "m3Trans")
-    public String m3TransKey = "m3Trans";
+    @Parameter(required = false, defaultValue = "m3_trans")
+    public String m3TransKey = "m3_trans";
 
-    @Parameter(required = false, defaultValue = "m4Long")
-    public String m4LongKey = "m4Long";
+    @Parameter(required = false, defaultValue = "m4_long")
+    public String m4LongKey = "m4_long";
 
-    @Parameter(required = false, defaultValue = "m4Trans")
-    public String m4TransKey = "m4Trans";
+    @Parameter(required = false, defaultValue = "m4_trans")
+    public String m4TransKey = "m4_trans";
 
     private static final Logger log = LoggerFactory.getLogger(HillasParameters.class);
 
@@ -112,8 +112,8 @@ public class HillasParameters implements Processor {
         input.put(deltaKey, delta);
 
         input.put(cogKey, cog);
-        input.put(cogKey + "X", cog.xMM);
-        input.put(cogKey + "Y", cog.yMM);
+        input.put(cogKey + "_x", cog.xMM);
+        input.put(cogKey + "_y", cog.yMM);
 
         input.put(m3LongKey, statsLong.m3);
         input.put(m3TransKey, statsTrans.m3);

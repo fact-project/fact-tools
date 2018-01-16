@@ -12,6 +12,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import javax.rmi.CORBA.Util;
 import java.time.ZonedDateTime;
 
 /**
@@ -39,6 +40,8 @@ public class CameraToEquatorial implements Processor {
             return null;
         }
         ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
+        Utils.isKeyValid(item, cameraCoordinateKey, CameraCoordinate.class);
+        Utils.isKeyValid(item, pointingPositionKey, HorizontalCoordinate.class);
 
         CameraCoordinate cameraCoordinate = (CameraCoordinate) item.get(cameraCoordinateKey);
         HorizontalCoordinate pointingPosition = (HorizontalCoordinate) item.get(pointingPositionKey);

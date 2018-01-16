@@ -38,6 +38,16 @@ public class SanitizeKeys implements Processor {
     }
 
     static String renameKey(String key) {
+        if (key.equals("NPIX")) {
+            return "num_pixel";
+        }
+        if (key.equals("RUNID")) {
+            return "run_id";
+        }
+        if (key.equals("NROI")) {
+            return "roi";
+        }
+
         key = key.replaceFirst(".fVal$", "");
         key = key.replace(".f", "");
         key = camelToSnakeCase(key);

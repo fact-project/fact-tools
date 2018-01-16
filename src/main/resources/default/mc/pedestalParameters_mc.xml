@@ -1,22 +1,22 @@
 <module>
-    <fact.pixelsets.Invert 
-        insetKey="badPixels" 
-        outsetKey="goodPixels" 
+    <fact.pixelsets.Invert
+        insetKey="badPixels"
+        outsetKey="goodPixels"
     />
-        
-    <fact.pixelsets.Difference 
+
+    <fact.pixelsets.Difference
         setUKey="goodPixels"
         setAKey="shower"
-        outsetKey="pedestal" 
+        outsetKey="pedestal"
     />
-        
-    <fact.extraction.WaveformFluctuation 
+
+    <fact.extraction.WaveformFluctuation
         key="DataCalibrated"
         pixelSetKey="goodPixels"
         outputKey="ped"
-        skipFirst="35" 
+        skipFirst="35"
         skipLast="50"
-        windowSize="30" 
+        windowSize="30"
     />
 
     <fact.pixelsets.Length
@@ -80,44 +80,29 @@
 
     <fact.statistics.ArrayStatistics
             key="photoncharge"
-            outputKey="phChargePedestal"
+            outputKey="photoncharge_pedestal"
             pixelSetKey="pedestal"
     />
     <fact.statistics.ArrayStatistics
             key="arrivalTime"
-            outputKey="arrTimePedestal"
+            outputKey="arrival_time_pedestal"
             pixelSetKey="pedestal"
     />
     <fact.statistics.ArrayStatistics
             key="maxSlopes"
-            outputKey="maxSlopesPedestal"
-            pixelSetKey="pedestal"
-    />
-    <fact.statistics.ArrayStatistics
-            key="arrivalTimePos"
-            outputKey="arrTimePosPedestal"
-            pixelSetKey="pedestal"
-    />
-    <fact.statistics.ArrayStatistics
-            key="maxSlopesPos"
-            outputKey="maxSlopesPosPedestal"
-            pixelSetKey="pedestal"
-    />
-    <fact.statistics.ArrayStatistics
-            key="maxPos"
-            outputKey="maxPosPedestal"
+            outputKey="max_slopes_pedestal"
             pixelSetKey="pedestal"
     />
     <fact.features.Size
             pixelSetKey="pedestal"
             photonChargeKey="photoncharge"
-            outputKey="pedestalSize"
+            outputKey="pedestal_size"
     />
     <fact.features.TimeSpread
             weightsKey="photoncharge"
             arrivalTimeKey="arrivalTime"
             pixelSetKey="pedestal"
-            outputKey="pedestalTimespread"
+            outputKey="pedestal_timespread"
     />
 
     <fact.statistics.ArrayStatistics
