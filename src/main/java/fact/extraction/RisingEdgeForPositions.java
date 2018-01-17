@@ -34,14 +34,14 @@ public class RisingEdgeForPositions implements Processor {
     private int searchWindowLeft = 25;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, dataKey, amplitudePositionsKey);
 
         double[] positions = new double[Constants.N_PIXELS];
         double[] maxSlopes = new double[Constants.N_PIXELS];
 
-        double[] data = (double[]) input.get(dataKey);
-        int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
+        double[] data = (double[]) item.get(dataKey);
+        int[] amplitudePositions = (int[]) item.get(amplitudePositionsKey);
 
         IntervalMarker[] m = new IntervalMarker[Constants.N_PIXELS];
 
@@ -77,11 +77,11 @@ public class RisingEdgeForPositions implements Processor {
             m[pix] = new IntervalMarker(positions[pix], positions[pix] + 1);
             maxSlopes[pix] = (double) max_slope;
         }
-        input.put(outputKey, positions);
-        input.put(maxSlopesKey, maxSlopes);
-        input.put(outputKey + "Marker", m);
+        item.put(outputKey, positions);
+        item.put(maxSlopesKey, maxSlopes);
+        item.put(outputKey + "Marker", m);
 
-        return input;
+        return item;
 
     }
 }

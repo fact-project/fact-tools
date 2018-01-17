@@ -43,20 +43,20 @@ public class CorrectSaturation implements Processor {
     public String baselineKey = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, dataKey, totKey, maxPosKey, baselineKey, firstSliceOverThresholdKey, "NPIX");
+        Utils.mapContainsKeys(item, dataKey, totKey, maxPosKey, baselineKey, firstSliceOverThresholdKey, "NPIX");
 
-        int roi = (int) input.get("NROI");
+        int roi = (int) item.get("NROI");
 
-        double[] firstSlOverThresh = (double[]) input.get(firstSliceOverThresholdKey);
-        int[] timeOverThreshold = (int[]) input.get(totKey);
+        double[] firstSlOverThresh = (double[]) item.get(firstSliceOverThresholdKey);
+        int[] timeOverThreshold = (int[]) item.get(totKey);
 
-        int[] maxPos = (int[]) input.get(maxPosKey);
-        double[] baselines = (double[]) input.get(baselineKey);
+        int[] maxPos = (int[]) item.get(maxPosKey);
+        double[] baselines = (double[]) item.get(baselineKey);
 
         //get array with time series
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
         double[] corrData = data.clone();
 
         //Marker
@@ -117,12 +117,12 @@ public class CorrectSaturation implements Processor {
 
         }
 
-        input.put(outputKey + "_WidthMarker", markWidth);
-        input.put(outputKey + "_MaxPosMarker", markMaxPos);
-        input.put(outputKey + "_DeltaTMarker", markDeltaT);
-        input.put(outputKey + "_estAtMarker", markEstArrivalTime);
-        input.put(outputKey, corrData);
+        item.put(outputKey + "_WidthMarker", markWidth);
+        item.put(outputKey + "_MaxPosMarker", markMaxPos);
+        item.put(outputKey + "_DeltaTMarker", markDeltaT);
+        item.put(outputKey + "_estAtMarker", markEstArrivalTime);
+        item.put(outputKey, corrData);
 
-        return input;
+        return item;
     }
 }

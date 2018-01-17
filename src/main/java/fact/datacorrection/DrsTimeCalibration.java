@@ -74,9 +74,9 @@ public class DrsTimeCalibration implements StatefulProcessor {
     }
 
     @Override
-    public Data process(Data input) {
-        int roi = (Integer) input.get("NROI");
-        short[] startCell = (short[]) input.get(startCellKey);
+    public Data process(Data item) {
+        int roi = (Integer) item.get("NROI");
+        short[] startCell = (short[]) item.get(startCellKey);
 
         if (startCell == null) {
             throw new RuntimeException("Couldn't find StartCellData");
@@ -92,7 +92,7 @@ public class DrsTimeCalibration implements StatefulProcessor {
             }
         }
 
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
         roi = data.length / Constants.N_PIXELS;
         TimeCorrectionKernel tcKernel = new LinearTimeCorrectionKernel();
 
@@ -113,8 +113,8 @@ public class DrsTimeCalibration implements StatefulProcessor {
 
         }
 
-        input.put(outputKey, calibratedValues);
-        return input;
+        item.put(outputKey, calibratedValues);
+        return item;
     }
 
     protected void loadDrsTimeCalibConstants(URL in) throws IOException {

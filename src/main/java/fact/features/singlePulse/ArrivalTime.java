@@ -35,9 +35,9 @@ public class ArrivalTime implements Processor {
     public String visualizeKey;
 
     @Override
-    public Data process(Data input) {
-        double[] data = (double[]) input.get(key);
-        int[][] maxAmpPositions = (int[][]) input.get(maxAmpPositionKey);
+    public Data process(Data item) {
+        double[] data = (double[]) item.get(key);
+        int[][] maxAmpPositions = (int[][]) item.get(maxAmpPositionKey);
         int roi = data.length / Constants.N_PIXELS;
         int[][] arrivalTimes = new int[Constants.N_PIXELS][];
         double[] visualizePositions = new double[data.length];
@@ -52,12 +52,12 @@ public class ArrivalTime implements Processor {
             arrivalTimes[pix] = new int[maxAmpPositions.length];
             arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
         }
-        input.put(outputKey, arrivalTimes);
-        input.put(visualizeKey, visualizePositions);
+        item.put(outputKey, arrivalTimes);
+        item.put(visualizeKey, visualizePositions);
         //     System.out.println(Arrays.toString(arrivalTimes));
 
 
-        return input;
+        return item;
     }
 
     /**

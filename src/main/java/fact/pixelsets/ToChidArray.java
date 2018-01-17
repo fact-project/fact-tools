@@ -24,10 +24,10 @@ public class ToChidArray implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-        PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-        input.put(outputKey, pixelSet.toIntArray());
-        return input;
+    public Data process(Data item) {
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
+        item.put(outputKey, pixelSet.toIntArray());
+        return item;
     }
 }

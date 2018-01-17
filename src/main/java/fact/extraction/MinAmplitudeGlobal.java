@@ -34,10 +34,10 @@ public class MinAmplitudeGlobal implements Processor {
     public int skipLastSlices = 100;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         int roi = data.length / Constants.N_PIXELS;
 
         //for all pixel find the maximum value
@@ -47,8 +47,8 @@ public class MinAmplitudeGlobal implements Processor {
             min[pix] = globalMinimum(roi, pix, data);
         }
 
-        input.put(outputKey, min);
-        return input;
+        item.put(outputKey, min);
+        return item;
     }
 
     /**

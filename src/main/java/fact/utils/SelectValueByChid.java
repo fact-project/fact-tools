@@ -23,17 +23,17 @@ public class SelectValueByChid implements Processor {
     public int chid = 0;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, key);
+        Utils.mapContainsKeys(item, key);
 
-        double[] data = Utils.toDoubleArray(input.get(key));
+        double[] data = Utils.toDoubleArray(item.get(key));
 
         //add processors threshold to the DataItem
         if (data != null) {
-            input.put(outputKey, data[chid]);
+            item.put(outputKey, data[chid]);
         }
 
-        return input;
+        return item;
     }
 }

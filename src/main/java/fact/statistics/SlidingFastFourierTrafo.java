@@ -29,12 +29,12 @@ public class SlidingFastFourierTrafo implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-        Utils.mapContainsKeys(input, key);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
+        Utils.mapContainsKeys(item, key);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         int roi = data.length / npix;
         double[] result = new double[data.length];
 
@@ -57,8 +57,8 @@ public class SlidingFastFourierTrafo implements Processor {
                 }
             }
         }
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
     }
 }

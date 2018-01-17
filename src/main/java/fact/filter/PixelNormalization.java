@@ -30,11 +30,11 @@ public class PixelNormalization implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, key, double[].class);
+        Utils.isKeyValid(item, key, double[].class);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] normalizedSlices = new double[data.length];
 
 
@@ -57,7 +57,7 @@ public class PixelNormalization implements Processor {
                 normalizedSlices[pos] = data[pos] / range + Math.abs(min) / range;
             }
         }
-        input.put(outputKey, normalizedSlices);
-        return input;
+        item.put(outputKey, normalizedSlices);
+        return item;
     }
 }

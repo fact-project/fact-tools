@@ -30,15 +30,15 @@ public class Alpha implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
-        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
-        Utils.isKeyValid(input, deltaKey, Double.class);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
+        Utils.isKeyValid(item, sourcePositionKey, CameraCoordinate.class);
+        Utils.isKeyValid(item, deltaKey, Double.class);
 
-        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
-        double delta = (double) input.get(deltaKey);
+        CameraCoordinate source = (CameraCoordinate) item.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        double delta = (double) item.get(deltaKey);
 
         double auxiliary_angle = Math.atan2(source.yMM - cog.yMM, source.xMM - cog.xMM);
         double alpha = delta - auxiliary_angle;
@@ -49,7 +49,7 @@ public class Alpha implements Processor {
         if (alpha < -Math.PI / 2) {
             alpha = Math.PI + alpha;
         }
-        input.put(outputKey, alpha);
-        return input;
+        item.put(outputKey, alpha);
+        return item;
     }
 }

@@ -48,20 +48,20 @@ public class GpsTimeCorrection implements Processor {
      * teo ints corresponding to the GPS corrected unix time
      */
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         //Check that the eventnum exists
-        Utils.isKeyValid(input, "EventNum", Integer.class);
+        Utils.isKeyValid(item, "EventNum", Integer.class);
 
-        Integer triggerType = new Integer(input.get("TriggerType").toString());
+        Integer triggerType = new Integer(item.get("TriggerType").toString());
 
         //Check that the trigger type is 4, equivalent to the physics trigger
         if (!triggerType.equals(4)) {
-            log.error("Non-pysics trigger type detected: " + input.get("TriggerType") + " Please cut on physics triggers for gps time correction.");
+            log.error("Non-pysics trigger type detected: " + item.get("TriggerType") + " Please cut on physics triggers for gps time correction.");
             throw new RuntimeException(
-                    "Non-pysics trigger type detected: " + input.get("TriggerType") + " Please cut on physics triggers for gps time correction.");
+                    "Non-pysics trigger type detected: " + item.get("TriggerType") + " Please cut on physics triggers for gps time correction.");
         }
 
-        Integer[] bufGpsTimes = gpsTimes.get(input.get("EventNum"));
+        Integer[] bufGpsTimes = gpsTimes.get(item.get("EventNum"));
         //check that the correct files were chosen
         if (bufGpsTimes == null) {
             log.error("Couldn't find corresponding EventNum. Be sure to have equal gpsEventTiming file and run file.");
@@ -74,7 +74,7 @@ public class GpsTimeCorrection implements Processor {
         Integer unixTimeMuSec = bufGpsTimes[1];
         Integer gpsUnixTimeSec = bufGpsTimes[2];
         Integer gpsUnixTimeMuSec = bufGpsTimes[3];
-        int[] utc = (int[]) input.get("UnixTimeUTC");
+        int[] utc = (int[]) item.get("UnixTimeUTC");
 
         if (!unixTimeSec.equals(utc[0])) {
             log.error("UnixTimeSec in GpsTimeCorrection file not equal to UnixTimeSec in stream");
@@ -91,8 +91,8 @@ public class GpsTimeCorrection implements Processor {
         bufCorrectedTimes[0] = gpsUnixTimeSec;
         bufCorrectedTimes[1] = gpsUnixTimeMuSec;
 
-        input.put(outputKey, bufCorrectedTimes);
-        return input;
+        item.put(outputKey, bufCorrectedTimes);
+        return item;
     }
 
     // This method is called from the setter that is called in the beginning.

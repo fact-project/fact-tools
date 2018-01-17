@@ -23,15 +23,15 @@ public class Length implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
 
-        PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
+        PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
 
         int length = pixelSet.set.size();
-        input.put(outputKey, length);
+        item.put(outputKey, length);
 
-        return input;
+        return item;
     }
 }

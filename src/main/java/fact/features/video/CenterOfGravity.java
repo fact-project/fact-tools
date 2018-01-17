@@ -38,48 +38,48 @@ public class CenterOfGravity implements Processor {
      */
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         /// init helper and utils
 //      mpGeomXCoord =  DefaultPixelMapping.getGeomXArray();
 //      mpGeomYCoord =  DefaultPixelMapping.getGeomYArray();
 
         // check keys
-        Utils.mapContainsKeys(input, showerPixelKey, dataCalibratedKey);
-        Utils.isKeyValid(input, "NROI", Integer.class);
-        int sliceCount = (int) input.get("NROI");
+        Utils.mapContainsKeys(item, showerPixelKey, dataCalibratedKey);
+        Utils.isKeyValid(item, "NROI", Integer.class);
+        int sliceCount = (int) item.get("NROI");
 
-        Utils.isKeyValid(input, showerPixelKey, PixelSet.class);
-        PixelSet showerPixelArray = (PixelSet) input.get(showerPixelKey);
+        Utils.isKeyValid(item, showerPixelKey, PixelSet.class);
+        PixelSet showerPixelArray = (PixelSet) item.get(showerPixelKey);
 
-        Utils.isKeyValid(input, dataCalibratedKey, double[].class);
-        double[] dataCalibratedArray = (double[]) input.get(dataCalibratedKey);
+        Utils.isKeyValid(item, dataCalibratedKey, double[].class);
+        double[] dataCalibratedArray = (double[]) item.get(dataCalibratedKey);
 
         if (showerPixelArray.size() < numberOfShowerPixelThreshold) {
-            input.put(outputKey + "_X", null);
-            input.put(outputKey + "_Y", null);
+            item.put(outputKey + "_X", null);
+            item.put(outputKey + "_Y", null);
 
-            input.put(outputKey + "_VarX", null);
-            input.put(outputKey + "_VarY", null);
-            input.put(outputKey + "_CovXY", null);
+            item.put(outputKey + "_VarX", null);
+            item.put(outputKey + "_VarY", null);
+            item.put(outputKey + "_CovXY", null);
 
-            input.put(outputKey + "_VelX", null);
-            input.put(outputKey + "_VelY", null);
+            item.put(outputKey + "_VelX", null);
+            item.put(outputKey + "_VelY", null);
 
-            input.put(outputKey + "_Vel", null);
-            input.put(outputKey + "_VelErr", null);
+            item.put(outputKey + "_Vel", null);
+            item.put(outputKey + "_VelErr", null);
 
-            input.put(outputKey + "_MinVel", Double.NaN);
-            input.put(outputKey + "_MinVelId", Double.NaN);
-            input.put(outputKey + "_MinVelError", Double.NaN);
+            item.put(outputKey + "_MinVel", Double.NaN);
+            item.put(outputKey + "_MinVelId", Double.NaN);
+            item.put(outputKey + "_MinVelError", Double.NaN);
 
-            input.put(outputKey + "_MaxVel", Double.NaN);
-            input.put(outputKey + "_MaxVelId", Double.NaN);
-            input.put(outputKey + "_MaxVelError", Double.NaN);
+            item.put(outputKey + "_MaxVel", Double.NaN);
+            item.put(outputKey + "_MaxVelId", Double.NaN);
+            item.put(outputKey + "_MaxVelError", Double.NaN);
 
-            input.put(outputKey + "_BestVel", Double.NaN);
-            input.put(outputKey + "_BestVelError", Double.NaN);
-            input.put(outputKey + "_BestVelId", Double.NaN);
-            return input;
+            item.put(outputKey + "_BestVel", Double.NaN);
+            item.put(outputKey + "_BestVelError", Double.NaN);
+            item.put(outputKey + "_BestVelId", Double.NaN);
+            return item;
         }
 
         /// init internal parameter
@@ -200,31 +200,31 @@ public class CenterOfGravity implements Processor {
         }
 
 
-        input.put(outputKey + "_X", cogx);
-        input.put(outputKey + "_Y", cogy);
+        item.put(outputKey + "_X", cogx);
+        item.put(outputKey + "_Y", cogy);
 
-        input.put(outputKey + "_VarX", varcogx);
-        input.put(outputKey + "_VarY", varcogy);
-        input.put(outputKey + "_CovXY", covcog);
+        item.put(outputKey + "_VarX", varcogx);
+        item.put(outputKey + "_VarY", varcogy);
+        item.put(outputKey + "_CovXY", covcog);
 
-        input.put(outputKey + "_VelX", cogVelocityX);
-        input.put(outputKey + "_VelY", cogVelocityY);
+        item.put(outputKey + "_VelX", cogVelocityX);
+        item.put(outputKey + "_VelY", cogVelocityY);
 
-        input.put(outputKey + "_Vel", cogVelocity);
-        input.put(outputKey + "_VelErr", cogVelocityError);
+        item.put(outputKey + "_Vel", cogVelocity);
+        item.put(outputKey + "_VelErr", cogVelocityError);
 
-        input.put(outputKey + "_MinVel", minimalVelocity);
-        input.put(outputKey + "_MinVelId", minimalVelocityId);
-        input.put(outputKey + "_MinVelError", cogVelocityError[minimalVelocityId]);
+        item.put(outputKey + "_MinVel", minimalVelocity);
+        item.put(outputKey + "_MinVelId", minimalVelocityId);
+        item.put(outputKey + "_MinVelError", cogVelocityError[minimalVelocityId]);
 
-        input.put(outputKey + "_MaxVel", maximalVelocity);
-        input.put(outputKey + "_MaxVelId", maximalVelocityId);
-        input.put(outputKey + "_MaxVelError", cogVelocityError[maximalVelocityId]);
+        item.put(outputKey + "_MaxVel", maximalVelocity);
+        item.put(outputKey + "_MaxVelId", maximalVelocityId);
+        item.put(outputKey + "_MaxVelError", cogVelocityError[maximalVelocityId]);
 
-        input.put(outputKey + "_BestVel", bestVelocity);
-        input.put(outputKey + "_BestVelError", bestVelocityError);
-        input.put(outputKey + "_BestVelId", bestVelocityId);
+        item.put(outputKey + "_BestVel", bestVelocity);
+        item.put(outputKey + "_BestVelError", bestVelocityError);
+        item.put(outputKey + "_BestVelId", bestVelocityId);
 
-        return input;
+        return item;
     }
 }

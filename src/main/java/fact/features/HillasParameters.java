@@ -68,12 +68,12 @@ public class HillasParameters implements Processor {
     private static final Logger log = LoggerFactory.getLogger(HillasParameters.class);
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-        Utils.isKeyValid(input, weightsKey, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, weightsKey, double[].class);
 
-        PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
-        double[] weights = (double[])  input.get(weightsKey);
+        PixelSet showerPixel = (PixelSet) item.get(pixelSetKey);
+        double[] weights = (double[])  item.get(weightsKey);
 
         double[] showerWeights = showerPixel.stream().mapToDouble((p) -> weights[p.id]).toArray();
         double[] pixelX = showerPixel.stream().mapToDouble((p) -> p.getXPositionInMM()).toArray();
@@ -106,29 +106,29 @@ public class HillasParameters implements Processor {
         Weighted1dStatistics statsLong = Weighted1dStatistics.ofArrays(longitudinalCoordinates, showerWeights);
         Weighted1dStatistics statsTrans = Weighted1dStatistics.ofArrays(transverseCoordinates, showerWeights);
 
-        input.put(sizeKey, size);
-        input.put(lengthKey, length);
-        input.put(widthKey, width);
-        input.put(deltaKey, delta);
+        item.put(sizeKey, size);
+        item.put(lengthKey, length);
+        item.put(widthKey, width);
+        item.put(deltaKey, delta);
 
-        input.put(cogKey, cog);
-        input.put(cogKey + "_x", cog.xMM);
-        input.put(cogKey + "_y", cog.yMM);
+        item.put(cogKey, cog);
+        item.put(cogKey + "_x", cog.xMM);
+        item.put(cogKey + "_y", cog.yMM);
 
-        input.put(m3LongKey, statsLong.m3);
-        input.put(m3TransKey, statsTrans.m3);
-        input.put(m4LongKey, statsLong.m4);
-        input.put(m4TransKey, statsTrans.m4);
+        item.put(m3LongKey, statsLong.m3);
+        item.put(m3TransKey, statsTrans.m3);
+        item.put(m4LongKey, statsLong.m4);
+        item.put(m4TransKey, statsTrans.m4);
 
-        input.put(skewnessLongKey, statsLong.skewness);
-        input.put(skewnessTransKey, statsTrans.skewness);
-        input.put(kurtosisLongKey, statsLong.kurtosis);
-        input.put(kurtosisTransKey, statsTrans.kurtosis);
+        item.put(skewnessLongKey, statsLong.skewness);
+        item.put(skewnessTransKey, statsTrans.skewness);
+        item.put(kurtosisLongKey, statsLong.kurtosis);
+        item.put(kurtosisTransKey, statsTrans.kurtosis);
 
-        input.put("2-sigma-ellipse", new EllipseOverlay(cog, 2 * width,2 * length, delta));
-        input.put("1-sigma-ellipse", new EllipseOverlay(cog, width, length, delta));
+        item.put("2-sigma-ellipse", new EllipseOverlay(cog, 2 * width,2 * length, delta));
+        item.put("1-sigma-ellipse", new EllipseOverlay(cog, width, length, delta));
 
-        return input;
+        return item;
     }
 
     public double calculateDelta(EigenDecomposition eig) {

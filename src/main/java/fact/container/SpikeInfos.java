@@ -35,7 +35,7 @@ public class SpikeInfos implements Serializable {
         spikeMarker[px] = new IntervalMarker(sl, sl + 1);
     }
 
-    public void addInfosToDataItem(Data input, int spikeLength, String name) {
+    public void addInfosToDataItem(Data item, int spikeLength, String name) {
         int[] spPixelArr = new int[spPixel.size()];
         int[] spLogSliceArr = new int[spLogSlice.size()];
         int[] spPhysSliceArr = new int[spPhysSpike.size()];
@@ -50,14 +50,14 @@ public class SpikeInfos implements Serializable {
         }
 
 
-        input.put(name + "N" + spikeLength, spPixelArr.length);
-        input.put(name + "Pixel" + spikeLength, spPixelArr);
-        input.put(name + "LogSlices" + spikeLength, spLogSliceArr);
-        input.put(name + "PhysSlices" + spikeLength, spPhysSliceArr);
-        input.put(name + "Heights" + spikeLength, spHeightArr);
-        input.put(name + "TopSlope" + spikeLength, spTopSlopeArr);
-        input.put(name + "Set" + spikeLength, spikesSet);
-        input.put(name + "Marker" + spikeLength, spikeMarker);
+        item.put(name + "N" + spikeLength, spPixelArr.length);
+        item.put(name + "Pixel" + spikeLength, spPixelArr);
+        item.put(name + "LogSlices" + spikeLength, spLogSliceArr);
+        item.put(name + "PhysSlices" + spikeLength, spPhysSliceArr);
+        item.put(name + "Heights" + spikeLength, spHeightArr);
+        item.put(name + "TopSlope" + spikeLength, spTopSlopeArr);
+        item.put(name + "Set" + spikeLength, spikesSet);
+        item.put(name + "Marker" + spikeLength, spikeMarker);
     }
 
 }

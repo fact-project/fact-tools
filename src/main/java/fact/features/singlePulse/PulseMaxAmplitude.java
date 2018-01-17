@@ -34,9 +34,9 @@ public class PulseMaxAmplitude implements Processor {
     //positions of threshold crossings
 
     @Override
-    public Data process(Data input) {
-        double[] data = (double[]) input.get(key);
-        int[][] pulsePositions = (int[][]) input.get(pulsePositionKey);
+    public Data process(Data item) {
+        double[] data = (double[]) item.get(key);
+        int[][] pulsePositions = (int[][]) item.get(pulsePositionKey);
         int roi = data.length / Constants.N_PIXELS;
         int[][] positions = new int[Constants.N_PIXELS][];
 
@@ -45,10 +45,10 @@ public class PulseMaxAmplitude implements Processor {
             positions[pix] = new int[pulsePositions[pix].length];
             positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
         }
-        input.put(outputKey, positions);
+        item.put(outputKey, positions);
 //      System.out.println(Arrays.toString(positions));
 
-        return input;
+        return item;
     }
 
     /**

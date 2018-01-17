@@ -63,17 +63,17 @@ public class JumpInfos implements Serializable {
         }
     }
 
-    public void addInfosToDataItem(Data input, int prevEvent, String name, double deltaT) {
-        input.put(name + prevEvent + "Jumps", averJumpHeights);
-        input.put(name + prevEvent + "Time", deltaT);
-        input.put(name + prevEvent + "Spikes", pixelWithSpikes);
-        input.put(name + prevEvent + "SignalFlanks", pixelWithSignalFlanks);
-        input.put(name + prevEvent + "Ringing", pixelWithRinging);
-        input.put(name + prevEvent + "JumpsSet", pixelWithCorrectedJumps);
-        input.put(name + prevEvent + "TimeSet", pixelWithWrongTimeDepend);
-        input.put(name + prevEvent + "MarkerUp", posMarkerUp);
-        input.put(name + prevEvent + "MarkerDown", posMarkerDown);
-        input.put(name + prevEvent + "fftResults", fftResults);
+    public void addInfosToDataItem(Data item, int prevEvent, String name, double deltaT) {
+        item.put(name + prevEvent + "Jumps", averJumpHeights);
+        item.put(name + prevEvent + "Time", deltaT);
+        item.put(name + prevEvent + "Spikes", pixelWithSpikes);
+        item.put(name + prevEvent + "SignalFlanks", pixelWithSignalFlanks);
+        item.put(name + prevEvent + "Ringing", pixelWithRinging);
+        item.put(name + prevEvent + "JumpsSet", pixelWithCorrectedJumps);
+        item.put(name + prevEvent + "TimeSet", pixelWithWrongTimeDepend);
+        item.put(name + prevEvent + "MarkerUp", posMarkerUp);
+        item.put(name + prevEvent + "MarkerDown", posMarkerDown);
+        item.put(name + prevEvent + "fftResults", fftResults);
     }
 
     public void addPosMarkerForPatch(int patch, short pos, boolean isStartCell) {

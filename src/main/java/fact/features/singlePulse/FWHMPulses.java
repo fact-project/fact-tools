@@ -34,7 +34,7 @@ public class FWHMPulses implements Processor {
     public String visualizationKey = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         /**
          * Takes the data array,
          * Takes the position of the maximum
@@ -44,11 +44,11 @@ public class FWHMPulses implements Processor {
          * calculate FWHM for pulse
          */
 
-        Utils.mapContainsKeys(input, key, maxPosKey, minPosKey);
+        Utils.mapContainsKeys(item, key, maxPosKey, minPosKey);
 
-        double[] data = (double[]) input.get(key);
-        double[] minAmplitudes = (double[]) input.get(minPosKey);
-        int[][] maxPosArrayList = (int[][]) input.get(maxPosKey);
+        double[] data = (double[]) item.get(key);
+        double[] minAmplitudes = (double[]) item.get(minPosKey);
+        int[][] maxPosArrayList = (int[][]) item.get(maxPosKey);
 
         double[][] widthArrayList = new double[Constants.N_PIXELS][];
         double[] visualisation = new double[data.length];
@@ -107,10 +107,10 @@ public class FWHMPulses implements Processor {
             widthArrayList[pix] = new double[widthList.size()];
             widthArrayList[pix] = Utils.arrayListToDouble(widthList);
         }
-        input.put(outputKey, widthArrayList);
-        input.put(visualizationKey, visualisation);
+        item.put(outputKey, widthArrayList);
+        item.put(visualizationKey, visualisation);
 
 
-        return input;
+        return item;
     }
 }

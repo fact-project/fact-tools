@@ -29,19 +29,19 @@ public class SubtractDataArrays implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, subtractedKey, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        Utils.isKeyValid(item, subtractedKey, double[].class);
         double[] subtractedArray = new double[Constants.N_PIXELS];
 
-        double[] array1 = (double[]) input.get(key);
-        double[] array2 = (double[]) input.get(subtractedKey);
+        double[] array1 = (double[]) item.get(key);
+        double[] array2 = (double[]) item.get(subtractedKey);
 
         for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             subtractedArray[pix] = array1[pix] - array2[pix];
         }
 
-        input.put(outputKey, subtractedArray);
-        return input;
+        item.put(outputKey, subtractedArray);
+        return item;
     }
 }

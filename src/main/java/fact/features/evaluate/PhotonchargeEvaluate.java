@@ -34,25 +34,25 @@ public class PhotonchargeEvaluate implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
 
         double[] qualityFactorPhotoncharge = new double[Constants.N_PIXELS];
         double[] qualityFactorArrivalTime = new double[Constants.N_PIXELS];
 
-        double[] photoncharge = Utils.toDoubleArray(input.get(photonchargeKey));
-        double[] arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));
-        double[] cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));
-        double[] cherenkovArrTimeMean = Utils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
+        double[] photoncharge = Utils.toDoubleArray(item.get(photonchargeKey));
+        double[] arrivalTime = Utils.toDoubleArray(item.get(arrivalTimeKey));
+        double[] cherenkovWeight = Utils.toDoubleArray(item.get(mcCherenkovWeightKey));
+        double[] cherenkovArrTimeMean = Utils.toDoubleArray(item.get(mcCherenkovArrTimeMeanKey));
 
         for (int px = 0; px < Constants.N_PIXELS; px++) {
             qualityFactorPhotoncharge[px] = photoncharge[px] / cherenkovWeight[px];
             qualityFactorArrivalTime[px] = arrivalTime[px] / cherenkovArrTimeMean[px];
         }
 
-        input.put(outputKeyPhotonCharge, qualityFactorPhotoncharge);
-        input.put(outputKeyArrivalTime, qualityFactorArrivalTime);
+        item.put(outputKeyPhotonCharge, qualityFactorPhotoncharge);
+        item.put(outputKeyArrivalTime, qualityFactorArrivalTime);
 
-        return input;
+        return item;
     }
 }

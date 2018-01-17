@@ -88,20 +88,20 @@ public class PatchJumpRemoval implements Processor {
     int roi;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, dataKey, double[].class);
-        Utils.isKeyValid(input, prevEventsKey, PreviousEventInfoContainer.class);
-        Utils.isKeyValid(input, startCellKey, short[].class);
-        Utils.isKeyValid(input, "NROI", Integer.class);
-        Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
+        Utils.isKeyValid(item, dataKey, double[].class);
+        Utils.isKeyValid(item, prevEventsKey, PreviousEventInfoContainer.class);
+        Utils.isKeyValid(item, startCellKey, short[].class);
+        Utils.isKeyValid(item, "NROI", Integer.class);
+        Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
 
         // Get variables out of data item
-        int[] currentTime = (int[]) input.get("UnixTimeUTC");
-        roi = (Integer) input.get("NROI");
-        short[] currentStartCells = (short[]) input.get(startCellKey);
-        double[] data = (double[]) input.get(dataKey);
-        PreviousEventInfoContainer prevEventInfo = (PreviousEventInfoContainer) input.get(prevEventsKey);
+        int[] currentTime = (int[]) item.get("UnixTimeUTC");
+        roi = (Integer) item.get("NROI");
+        short[] currentStartCells = (short[]) item.get(startCellKey);
+        double[] data = (double[]) item.get(dataKey);
+        PreviousEventInfoContainer prevEventInfo = (PreviousEventInfoContainer) item.get(prevEventsKey);
 
         double[] result = new double[data.length];
         System.arraycopy(data, 0, result, 0, data.length);
@@ -171,12 +171,12 @@ public class PatchJumpRemoval implements Processor {
                 }
             }
             if (addJumpInfos == true) {
-                jumpInfos.addInfosToDataItem(input, prevEvent, outputJumpsKey, deltaT);
+                jumpInfos.addInfosToDataItem(item, prevEvent, outputJumpsKey, deltaT);
             }
         }
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
 
     }
 

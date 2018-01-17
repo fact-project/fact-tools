@@ -40,12 +40,12 @@ public class FindMaxSlope implements Processor {
     public int numFitSlices = 8;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key, arrivalTimeKey, derivationKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key, arrivalTimeKey, derivationKey);
 
-        double[] data = (double[]) input.get(key);
-        double[] slopesArray = (double[]) input.get(derivationKey);
-        int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
+        double[] data = (double[]) item.get(key);
+        double[] slopesArray = (double[]) item.get(derivationKey);
+        int[][] arrivalTimes = (int[][]) item.get(arrivalTimeKey);
 
         double[] result = new double[data.length];
 
@@ -89,10 +89,10 @@ public class FindMaxSlope implements Processor {
 
         }
 
-        input.put(outputKeyVisualization, result);
-        input.put(outputKey, pulseSlopes);
+        item.put(outputKeyVisualization, result);
+        item.put(outputKey, pulseSlopes);
 
-        return input;
+        return item;
     }
 
     public int findMaxSlopePos(int arrTime, int maxSearchSlice, double[] slopesArray) {

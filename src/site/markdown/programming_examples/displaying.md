@@ -26,7 +26,7 @@ array of the right length to the data item in your processor.
 
         public class MyAwesomeProcessor implements Processor {
                   @Override
-                  public Data process(Data input) {
+                  public Data process(Data item) {
                     ...
                     double[] myAwesomeData = new double[1440*300]
                     ... do something with data

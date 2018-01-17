@@ -22,15 +22,15 @@ public class FromChidArray implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         FactPixelMapping m = FactPixelMapping.getInstance();
         PixelSet pixelSet = new PixelSet();
-        int[] chids = (int[]) input.get(inputKey);
+        int[] chids = (int[]) item.get(inputKey);
         for (int chid : chids) {
             pixelSet.add(m.getPixelFromId(chid));
         }
-        input.put(outputKey, pixelSet);
-        return input;
+        item.put(outputKey, pixelSet);
+        return item;
     }
 
 }

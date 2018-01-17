@@ -18,19 +18,19 @@ public class PrintKeys implements Processor {
     public Keys keys = new Keys("*");
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         final Logger log = LoggerFactory.getLogger(PrintKeys.class);
 
         String output = "\n";
 
 
-        for (String key : keys.select(input)) {
-            Serializable value = input.get(key);
+        for (String key : keys.select(item)) {
+            Serializable value = item.get(key);
             output += "\t" + key + " = " + String.valueOf(value) + "\n";
         }
         log.info(output);
 
-        return input;
+        return item;
     }
 
 }

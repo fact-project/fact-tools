@@ -33,9 +33,9 @@ public class CastToDoubleArray implements StatefulProcessor {
     }
 
     @Override
-    public Data process(Data input) {
-        double[] b = Utils.toDoubleArray(input.get(key));
-        input.put(outputKey, b);
-        return input;
+    public Data process(Data item) {
+        double[] b = Utils.toDoubleArray(item.get(key));
+        item.put(outputKey, b);
+        return item;
     }
 }

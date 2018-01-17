@@ -16,16 +16,16 @@ public class PolygonLength implements Processor {
     String polygonY = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         if (outkey == null) throw new RuntimeException("Key \"outkey\" not set");
 
-        Utils.mapContainsKeys(input, polygonX, polygonY);
+        Utils.mapContainsKeys(item, polygonX, polygonY);
 
 
-        double[] x = (double[]) input.get(polygonX);
-        double[] y = (double[]) input.get(polygonY);
+        double[] x = (double[]) item.get(polygonX);
+        double[] y = (double[]) item.get(polygonY);
 
-        if (x.length < 3) input.put(outkey, 0);
+        if (x.length < 3) item.put(outkey, 0);
 
         double erg = 0;
         for (int i = 1; i < x.length; i++) {
@@ -43,8 +43,8 @@ public class PolygonLength implements Processor {
         b *= b;
         erg += Math.sqrt(a + b);
 
-        input.put(outkey, Math.abs(erg));
+        item.put(outkey, Math.abs(erg));
 
-        return input;
+        return item;
     }
 }

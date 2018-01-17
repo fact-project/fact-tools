@@ -22,7 +22,7 @@ public class RemappingKeys implements Processor {
     String keys[] = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         if (keys == null) {
             log.error("No key specified");
             throw new RuntimeException("You have to specify the key to remap");
@@ -30,8 +30,8 @@ public class RemappingKeys implements Processor {
         for (int i = 0; i < keys.length; i++) {
             String key = keys[i];
             Serializable value = null;
-            if (input.containsKey(key)) {
-                value = input.get(key);
+            if (item.containsKey(key)) {
+                value = item.get(key);
             } else {
                 throw new RuntimeException("Could not get key: " + key + " from data item");
             }
@@ -78,8 +78,8 @@ public class RemappingKeys implements Processor {
                 int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
                 System.arraycopy(arrayInSoftID, softId, arrayInCHID, chid, 1);
             }
-            input.put(key, (Serializable) arrayInCHID);
+            item.put(key, (Serializable) arrayInCHID);
         }
-        return input;
+        return item;
     }
 }

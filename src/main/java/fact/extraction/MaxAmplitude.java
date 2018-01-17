@@ -29,9 +29,9 @@ public class MaxAmplitude implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        double[] data = (double[]) input.get(key);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
         int roi = data.length / Constants.N_PIXELS;
 
         //for all pixel find the maximum value
@@ -41,8 +41,8 @@ public class MaxAmplitude implements Processor {
             max[pix] = maximum(roi, pix, data);
         }
 
-        input.put(outputKey, max);
-        return input;
+        item.put(outputKey, max);
+        return item;
     }
 
     /**

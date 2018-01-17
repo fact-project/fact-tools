@@ -35,9 +35,9 @@ public class FirFilter implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        double[] data = (double[]) input.get(key);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
 
         // foreach pixel
@@ -54,8 +54,8 @@ public class FirFilter implements Processor {
                 }
             }
         }
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
 
     }
 }

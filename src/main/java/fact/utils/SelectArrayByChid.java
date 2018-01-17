@@ -23,15 +23,15 @@ public class SelectArrayByChid implements Processor {
     public int chid = 0;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, key);
+        Utils.mapContainsKeys(item, key);
 
-        double[][] data = (double[][]) input.get(key);
+        double[][] data = (double[][]) item.get(key);
 
         //add processors threshold to the DataItem
-        input.put(outputKey, data[chid]);
+        item.put(outputKey, data[chid]);
 
-        return input;
+        return item;
     }
 }

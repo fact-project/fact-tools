@@ -37,12 +37,12 @@ public class PulseSizeCalculator implements Processor {
     //number of slices over which we integrate
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key, arrivalTimeKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key, arrivalTimeKey);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         int roi = data.length / Constants.N_PIXELS;
-        int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
+        int[][] arrivalTimes = (int[][]) item.get(arrivalTimeKey);
         double[][] pulseSizes = new double[Constants.N_PIXELS][];
 
         //for each pixel
@@ -50,9 +50,9 @@ public class PulseSizeCalculator implements Processor {
             pulseSizes[pix] = new double[arrivalTimes[pix].length];
             pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
         }
-        input.put(outputKey, pulseSizes);
+        item.put(outputKey, pulseSizes);
 
-        return input;
+        return item;
     }
 
     /**

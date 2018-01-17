@@ -19,12 +19,12 @@ public class PolygonCenter implements Processor {
     private String outkeyY = null;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, polygonX, polygonY);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, polygonX, polygonY);
 
 
-        double[] x = (double[]) input.get(polygonX);
-        double[] y = (double[]) input.get(polygonY);
+        double[] x = (double[]) item.get(polygonX);
+        double[] y = (double[]) item.get(polygonY);
 
         double centerX = 0;
         double centerY = 0;
@@ -36,9 +36,9 @@ public class PolygonCenter implements Processor {
         centerX /= x.length;
         centerY /= y.length;
 
-        input.put(outkeyX, centerX);
-        input.put(outkeyY, centerY);
+        item.put(outkeyX, centerX);
+        item.put(outkeyY, centerY);
 
-        return input;
+        return item;
     }
 }

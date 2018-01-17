@@ -32,14 +32,14 @@ public class ApplyRandomTimelineShift implements Processor {
     public String outputKey = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
         Random rand = new Random(Seed);
 
-        Utils.mapContainsKeys(input, key);
-        Utils.isKeyValid(input, key, double[].class);
+        Utils.mapContainsKeys(item, key);
+        Utils.isKeyValid(item, key, double[].class);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] shifted_data = new double[data.length];
 
         int roi = data.length / Constants.N_PIXELS;
@@ -65,7 +65,7 @@ public class ApplyRandomTimelineShift implements Processor {
 
         }
 
-        input.put(outputKey, shifted_data);
-        return input;
+        item.put(outputKey, shifted_data);
+        return item;
     }
 }

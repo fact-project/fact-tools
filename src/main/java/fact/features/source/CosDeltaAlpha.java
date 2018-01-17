@@ -30,15 +30,15 @@ public class CosDeltaAlpha implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, sourcePositionKey, cogKey, deltaKey);
-        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.mapContainsKeys(item, sourcePositionKey, cogKey, deltaKey);
+        Utils.isKeyValid(item, sourcePositionKey, CameraCoordinate.class);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-        CameraCoordinate sourcePosition = (CameraCoordinate) input.get(sourcePositionKey);
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
-        double delta = (double) input.get(deltaKey);
+        CameraCoordinate sourcePosition = (CameraCoordinate) item.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        double delta = (double) item.get(deltaKey);
 
         double dist = cog.euclideanDistance(sourcePosition);
 
@@ -59,7 +59,7 @@ public class CosDeltaAlpha implements Processor {
             }
         }
 
-        input.put(outputKey, cosDeltaAlpha);
-        return input;
+        item.put(outputKey, cosDeltaAlpha);
+        return item;
     }
 }

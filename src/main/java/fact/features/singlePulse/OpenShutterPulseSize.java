@@ -42,11 +42,11 @@ public class OpenShutterPulseSize implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        double[] data = (double[]) input.get(key);
+    public Data process(Data item) {
+        double[] data = (double[]) item.get(key);
         int roi = data.length / Constants.N_PIXELS;
-        int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
-        double[][] baselineValues = (double[][]) input.get(baselineKey);
+        int[][] arrivalTimes = (int[][]) item.get(arrivalTimeKey);
+        double[][] baselineValues = (double[][]) item.get(baselineKey);
         double[][] pulseSizes = new double[Constants.N_PIXELS][];
 
         //for each pixel
@@ -55,9 +55,9 @@ public class OpenShutterPulseSize implements Processor {
             pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues);
         }
 
-        input.put(outputKey, pulseSizes);
+        item.put(outputKey, pulseSizes);
 
-        return input;
+        return item;
     }
 
     /**

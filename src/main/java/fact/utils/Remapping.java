@@ -27,16 +27,16 @@ public class Remapping implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, short[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, short[].class);
 
-        short[] data = (short[]) input.get(key);
+        short[] data = (short[]) item.get(key);
 
         short[] remapped = new short[data.length];
         remapFromSoftIdToChid(data, remapped);
 
-        input.put(outputKey, remapped);
-        return input;
+        item.put(outputKey, remapped);
+        return item;
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {

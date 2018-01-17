@@ -24,20 +24,20 @@ public class Concentration implements Processor {
     public String concTwoOutputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
         PixelSet showerPixel;
         double[] photonCharge;
         try {
-            showerPixel = (PixelSet) input.get(pixelSetKey);
-            photonCharge = (double[]) input.get(weights);
+            showerPixel = (PixelSet) item.get(pixelSetKey);
+            photonCharge = (double[]) item.get(weights);
         } catch (ClassCastException e) {
             log.error("Could  not cast the keys to the right types");
             throw e;
         }
         if (showerPixel == null || showerPixel.set.size() == 0) {
             log.warn("No shower in event. not calculating conenctration");
-            return input;
+            return item;
         }
 
 
@@ -58,8 +58,8 @@ public class Concentration implements Processor {
 
         }
 
-        input.put(concOneOutputKey, max_photon_charge / size);
-        input.put(concTwoOutputKey, (max_photon_charge + second_max_photon_charge) / size);
-        return input;
+        item.put(concOneOutputKey, max_photon_charge / size);
+        item.put(concTwoOutputKey, (max_photon_charge + second_max_photon_charge) / size);
+        return item;
     }
 }

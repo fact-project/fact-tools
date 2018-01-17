@@ -26,11 +26,11 @@ public class EstimateBaseline implements Processor {
     private int roi = 300;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        roi = (Integer) input.get("NROI");
+        roi = (Integer) item.get("NROI");
 
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
         double[] baseline = new double[Constants.N_PIXELS];
 
         double[] mBslLevel = new double[data.length];
@@ -56,9 +56,9 @@ public class EstimateBaseline implements Processor {
             }
 
         }
-        input.put(outputKey, baseline);
-        input.put(outputKey + "_range", mBslRange);
-        input.put(outputKey + "_level", mBslLevel);
-        return input;
+        item.put(outputKey, baseline);
+        item.put(outputKey + "_range", mBslRange);
+        item.put(outputKey + "_level", mBslLevel);
+        return item;
     }
 }

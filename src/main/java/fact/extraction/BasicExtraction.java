@@ -56,16 +56,16 @@ public class BasicExtraction implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, dataKey, "NROI");
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, dataKey, "NROI");
 
         if (integralGains == null) {
             integralGains = loadIntegralGainFile(url);
         }
 
-        int roi = (Integer) input.get("NROI");
+        int roi = (Integer) item.get("NROI");
 
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
 
         int[] positions = new int[Constants.N_PIXELS];
         IntervalMarker[] mPositions = new IntervalMarker[Constants.N_PIXELS];
@@ -84,13 +84,13 @@ public class BasicExtraction implements Processor {
             photonCharge[pix] = calculateIntegral(pix, halfHeightPos, integrationWindow, roi, data) / integralGains[pix];
             mPhotonCharge[pix] = new IntervalMarker(halfHeightPos, halfHeightPos + integrationWindow);
         }
-        input.put(outputKeyMaxAmplPos, positions);
-        input.put(outputKeyMaxAmplPos + "Marker", mPositions);
-        input.put(outputKeyPhotonCharge, photonCharge);
-        input.put("@photoncharge", photonCharge);
-        input.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
+        item.put(outputKeyMaxAmplPos, positions);
+        item.put(outputKeyMaxAmplPos + "Marker", mPositions);
+        item.put(outputKeyPhotonCharge, photonCharge);
+        item.put("@photoncharge", photonCharge);
+        item.put(outputKeyPhotonCharge + "Marker", mPhotonCharge);
 
-        return input;
+        return item;
     }
 
     public int calculateMaxPosition(int px, int start, int rightBorder, int roi, double[] data) {

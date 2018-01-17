@@ -52,12 +52,12 @@ public class GaussConvolution implements StatefulProcessor {
     }
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
 //        Stopwatch stopwatch = Stopwatch.createUnstarted();
 
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
 
         double[] result = new double[data.length];
         for (int i = numSamples; i < result.length - numSamples - 1; i++) {
@@ -65,8 +65,8 @@ public class GaussConvolution implements StatefulProcessor {
                 result[i] += data[i + m] * coefficents[m + numSamples];
             }
         }
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
 
     }
 

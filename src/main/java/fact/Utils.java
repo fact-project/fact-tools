@@ -54,7 +54,7 @@ public class Utils {
      * Return an int array with the ids of the pixelSet belonging to the given Key,
      * return all camera pixel Ids if the set is not existing
      */
-    public static int[] getValidPixelSetAsIntArr(Data input, int npix, String pixelSetKey) {
+    public static int[] getValidPixelSetAsIntArr(Data item, int npix, String pixelSetKey) {
         int[] pixels;
 
         //Load a given pixelset, otherwise use the the whole camera
@@ -63,8 +63,8 @@ public class Utils {
             ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix - 1), DiscreteDomain.integers());
             pixels = Ints.toArray(numbers);
         } else {
-            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
+            Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+            PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
             pixels = pixelSet.toIntArray();
         }
 

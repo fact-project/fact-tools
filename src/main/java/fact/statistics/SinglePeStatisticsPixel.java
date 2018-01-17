@@ -24,13 +24,13 @@ public class SinglePeStatisticsPixel implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
 
-        Utils.mapContainsKeys(input, dataKey);
+        Utils.mapContainsKeys(item, dataKey);
 
-        int[][] data = (int[][]) input.get(dataKey);
+        int[][] data = (int[][]) item.get(dataKey);
 
         double[] mean = new double[npix];
         double[] median = new double[npix];
@@ -67,18 +67,18 @@ public class SinglePeStatisticsPixel implements Processor {
             mode[pix] = modeArray[0];
         }
 
-        input.put(outputKey + "_mean", mean);
-        input.put(outputKey + "_median", median);
-        input.put(outputKey + "_mode", mode);
-        input.put(outputKey + "_std", std);
-        input.put(outputKey + "_kurtosis", kurtosis);
-        input.put(outputKey + "_skewness", skewness);
-        input.put(outputKey + "_min", min);
-        input.put(outputKey + "_max", max);
-        input.put(outputKey + "_quantil25", quantil25);
-        input.put(outputKey + "_quantil75", quantil75);
+        item.put(outputKey + "_mean", mean);
+        item.put(outputKey + "_median", median);
+        item.put(outputKey + "_mode", mode);
+        item.put(outputKey + "_std", std);
+        item.put(outputKey + "_kurtosis", kurtosis);
+        item.put(outputKey + "_skewness", skewness);
+        item.put(outputKey + "_min", min);
+        item.put(outputKey + "_max", max);
+        item.put(outputKey + "_quantil25", quantil25);
+        item.put(outputKey + "_quantil75", quantil75);
 
 
-        return input;
+        return item;
     }
 }

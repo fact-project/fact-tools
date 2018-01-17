@@ -29,14 +29,14 @@ public class Distance implements Processor {
      * @return input. The original DataItem with a double named {@code outputKey}. Will return null one inputKey was invalid
      */
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
-        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
+        Utils.isKeyValid(item, sourcePositionKey, CameraCoordinate.class);
 
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
-        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        CameraCoordinate source = (CameraCoordinate) item.get(sourcePositionKey);
 
-        input.put(outputKey, cog.euclideanDistance(source));
-        return input;
+        item.put(outputKey, cog.euclideanDistance(source));
+        return item;
     }
 }

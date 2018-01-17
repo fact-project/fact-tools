@@ -36,12 +36,12 @@ public class TimeOverThresholdTL implements Processor {
     @Parameter(required = true)
     public String outputKey = null;
 
-    public Data process(Data input) {
-        Utils.isKeyValid(input, dataKey, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, dataKey, double[].class);
 
         int[] timeOverThresholdArray = new int[Constants.N_PIXELS];
 
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
 
         PixelSet pixelSet = new PixelSet();
 
@@ -74,13 +74,13 @@ public class TimeOverThresholdTL implements Processor {
 
 
         //add times over threshold to the DataItem
-        input.put(outputKey, timeOverThresholdArray);
-        input.put(outputKey + "SetOverlay", pixelSet);
+        item.put(outputKey, timeOverThresholdArray);
+        item.put(outputKey + "SetOverlay", pixelSet);
 
         //Add totPixelSet only to data item if it is not empty
         if (pixelSet.toIntArray().length != 0) {
-            input.put(outputKey + "Set", pixelSet.toIntArray());
+            item.put(outputKey + "Set", pixelSet.toIntArray());
         }
-        return input;
+        return item;
     }
 }

@@ -16,14 +16,14 @@ public class PolygonArea implements Processor {
     private String polygonY = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         if (outkey == null) throw new RuntimeException("Key \"outkey\" not set");
 
-        Utils.mapContainsKeys(input, polygonX, polygonY);
+        Utils.mapContainsKeys(item, polygonX, polygonY);
 
 
-        double[] x = (double[]) input.get(polygonX);
-        double[] y = (double[]) input.get(polygonY);
+        double[] x = (double[]) item.get(polygonX);
+        double[] y = (double[]) item.get(polygonY);
 
         final int N = x.length;
 
@@ -33,8 +33,8 @@ public class PolygonArea implements Processor {
             erg += (y[i] + y[(i + 1) % N]) * (x[i] - x[(i + 1) % N]);
         }
 
-        input.put(outkey, Math.abs(0.5 * erg));
+        item.put(outkey, Math.abs(0.5 * erg));
 
-        return input;
+        return item;
     }
 }

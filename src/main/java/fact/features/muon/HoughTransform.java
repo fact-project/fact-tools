@@ -117,9 +117,9 @@ public class HoughTransform implements StatefulProcessor {
     }
 
     @Override
-    public Data process(Data input) {
-        PixelSet cleaningPixel = (PixelSet) input.get(pixelSetKey);
-        double[] photonCharge = (double[]) input.get(photonChargeKey);
+    public Data process(Data item) {
+        PixelSet cleaningPixel = (PixelSet) item.get(pixelSetKey);
+        double[] photonCharge = (double[]) item.get(photonChargeKey);
 
 
         // generate Hough-Voting-Matrix n:
@@ -182,16 +182,16 @@ public class HoughTransform implements StatefulProcessor {
             best_y[i] = circle_y[max_positions[i][2]];
         }
 
-        input.put(bestRadiusKey, best_r[0]);
-        input.put(bestXKey, best_x[0]);
-        input.put(bestYKey, best_y[0]);
+        item.put(bestRadiusKey, best_r[0]);
+        item.put(bestXKey, best_x[0]);
+        item.put(bestYKey, best_y[0]);
 
         double paramDistanceSum = calc_hough_distance(best_r, best_x, best_y);
-        input.put(distanceKey, paramDistanceSum);
+        item.put(distanceKey, paramDistanceSum);
 
 
         double peakness = houghMaximum / (houghSum / noneZeroElems);
-        input.put(peaknessKey, peakness);
+        item.put(peaknessKey, peakness);
 
         // Pixels belonging to the best ring:
         RingId bestRing = new RingId(max_positions[0][0], max_positions[0][1], max_positions[0][2]);
@@ -201,7 +201,7 @@ public class HoughTransform implements StatefulProcessor {
         for (int chid : circle2chids.get(bestRing)) {
             bestRingPixel.addById(chid);
         }
-        input.put(bestRingPixelKey, bestRingPixel);
+        item.put(bestRingPixelKey, bestRingPixel);
 
 
         // percentage and octantshit
@@ -231,13 +231,13 @@ public class HoughTransform implements StatefulProcessor {
             }
         }
 
-        input.put(octantsHitKey, octantsHit);
+        item.put(octantsHitKey, octantsHit);
 
 
         double cleaningPercentage = onRingPixel / cleaningPixel.size();
         double ringPercentage = onRingPixel / numPixBestRing;
-        input.put(cleaningPercentageKey, cleaningPercentage);
-        input.put(ringPercentageKey, ringPercentage);
+        item.put(cleaningPercentageKey, cleaningPercentage);
+        item.put(ringPercentageKey, ringPercentage);
 
 
         if (showMatrixKey) {
@@ -263,11 +263,11 @@ public class HoughTransform implements StatefulProcessor {
                         CirclePixelSet.addById(pix);
                     }
                 }
-                input.put(bestCircleKey + String.valueOf(i + 1), CirclePixelSet);
+                item.put(bestCircleKey + String.valueOf(i + 1), CirclePixelSet);
             }
         }
 
-        return input;
+        return item;
     }
 
     private double calc_hough_distance(

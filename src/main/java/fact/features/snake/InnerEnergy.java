@@ -20,11 +20,11 @@ public class InnerEnergy implements Processor {
     private String outkey = null;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, snakeX, snakeY);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, snakeX, snakeY);
 
-        double[] x = (double[]) input.get(snakeX);
-        double[] y = (double[]) input.get(snakeY);
+        double[] x = (double[]) item.get(snakeX);
+        double[] y = (double[]) item.get(snakeY);
 
 
         final double b = 1;
@@ -60,7 +60,7 @@ public class InnerEnergy implements Processor {
 
         erg /= 2.0 * dim;
 
-        input.put(outkey, erg);
-        return input;
+        item.put(outkey, erg);
+        return item;
     }
 }

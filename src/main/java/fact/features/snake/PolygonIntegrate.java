@@ -32,13 +32,13 @@ public class PolygonIntegrate implements Processor {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key, polygonX, polygonY);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key, polygonX, polygonY);
 
 
-        double[] data = (double[]) input.get(key);
-        double[] polyX = (double[]) input.get(polygonX);
-        double[] polyY = (double[]) input.get(polygonY);
+        double[] data = (double[]) item.get(key);
+        double[] polyX = (double[]) item.get(polygonX);
+        double[] polyY = (double[]) item.get(polygonY);
 
         Polygon poly = new Polygon();    // Wandel die Snake in ein Polygon um
 
@@ -65,10 +65,10 @@ public class PolygonIntegrate implements Processor {
             if (chidInPoly[i]) chids[tmpCount++] = i;
         }
 
-        input.put(outkey, erg);
-        input.put(outkeyNumberOfPixel, numberOfPixel);
-        input.put(outkeyPixelList, chids);
+        item.put(outkey, erg);
+        item.put(outkeyNumberOfPixel, numberOfPixel);
+        item.put(outkeyPixelList, chids);
 
-        return input;
+        return item;
     }
 }

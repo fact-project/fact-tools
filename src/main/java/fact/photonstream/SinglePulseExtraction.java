@@ -85,14 +85,14 @@ public class SinglePulseExtraction implements Processor {
     private int roi = 300;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        Utils.mapContainsKeys(input, dataKey, "NPIX");
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        Utils.mapContainsKeys(item, dataKey, "NPIX");
 
-        npix = (Integer) input.get("NPIX");
-        roi = (Integer) input.get("NROI");
-        double[] timeSerieses = (double[]) input.get(dataKey);
+        npix = (Integer) item.get("NPIX");
+        roi = (Integer) item.get("NROI");
+        double[] timeSerieses = (double[]) item.get(dataKey);
 
         double[] numberOfPulses = new double[npix];
         int[][] pixelArrivalSlices = new int[npix][];
@@ -132,12 +132,12 @@ public class SinglePulseExtraction implements Processor {
 
         addStartSliceOffset(pixelArrivalSlices);
 
-        input.put(outputKey, pixelArrivalSlices);
-        input.put(outputKey + "TimeSeriesAfterExtraction", Utils.flatten2dArray(timeSeriesAfterExtraction));
-        input.put(outputKey + "NumberOfPulses", numberOfPulses);
-        input.put(outputKey + "BaseLine", baseLine);
-        input.put(outputKey + "MaxIterations", maxIterations);
-        return input;
+        item.put(outputKey, pixelArrivalSlices);
+        item.put(outputKey + "TimeSeriesAfterExtraction", Utils.flatten2dArray(timeSeriesAfterExtraction));
+        item.put(outputKey + "NumberOfPulses", numberOfPulses);
+        item.put(outputKey + "BaseLine", baseLine);
+        item.put(outputKey + "MaxIterations", maxIterations);
+        return item;
     }
 
     private void addStartSliceOffset(int[][] arr) {

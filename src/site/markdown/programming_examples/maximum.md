@@ -20,7 +20,7 @@ object.
           private String outputKey = "maximum_amplitude;
 
           @Override
-          public Data process(Data input) {
+          public Data process(Data item) {
             // get the data from the input
             double[] data = (double[]) input.get(key);
             // here we save the amplitude

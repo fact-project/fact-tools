@@ -31,10 +31,10 @@ public class AboveThreshold implements Processor {
     public double threshold = 0;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        final int roi = (Integer) input.get("NROI");
-        final double[] timeSeries = Utils.toDoubleArray(input.get(dataKey));
+        final int roi = (Integer) item.get("NROI");
+        final double[] timeSeries = Utils.toDoubleArray(item.get(dataKey));
         final short thresholdShort = (short) threshold;
 
         int numSlicesAboveThreshold = 0;
@@ -51,12 +51,12 @@ public class AboveThreshold implements Processor {
 
         final double ratioOfPixels = (double) pixelsAboveThreshold.set.size() / (double) Constants.N_PIXELS;
 
-        input.put(outputKey, pixelsAboveThreshold);
-        input.put(outputKey + "PixelRatio", ratioOfPixels);
-        input.put(outputKey + "SliceRatio", numSlicesAboveThreshold / ((double) roi * Constants.N_PIXELS));
-        input.put(outputKey + "PixelCount", pixelsAboveThreshold.set.size());
-        input.put(outputKey + "SliceCount", numSlicesAboveThreshold);
+        item.put(outputKey, pixelsAboveThreshold);
+        item.put(outputKey + "PixelRatio", ratioOfPixels);
+        item.put(outputKey + "SliceRatio", numSlicesAboveThreshold / ((double) roi * Constants.N_PIXELS));
+        item.put(outputKey + "PixelCount", pixelsAboveThreshold.set.size());
+        item.put(outputKey + "SliceCount", numSlicesAboveThreshold);
 
-        return input;
+        return item;
     }
 }

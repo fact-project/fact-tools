@@ -15,16 +15,16 @@ public class SortDoubleArray implements Processor {
     public String outputKey = "";
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         try {
-            Utils.mapContainsKeys(input, key);
-            double[] array = (double[]) input.get(key);
+            Utils.mapContainsKeys(item, key);
+            double[] array = (double[]) item.get(key);
             Arrays.sort(array);
-            input.put(outputKey, array);
+            item.put(outputKey, array);
         } catch (Exception e) {
-            input.put(null, outputKey);
+            item.put(null, outputKey);
         }
 
-        return input;
+        return item;
     }
 }

@@ -29,14 +29,14 @@ public class DividePixelArrays implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, numeratorKey, double[].class);
-        Utils.isKeyValid(input, denominatorKey, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, numeratorKey, double[].class);
+        Utils.isKeyValid(item, denominatorKey, double[].class);
 
         double[] dividedArray = new double[Constants.N_PIXELS];
 
-        double[] numerator = (double[]) input.get(numeratorKey);
-        double[] denominator = (double[]) input.get(denominatorKey);
+        double[] numerator = (double[]) item.get(numeratorKey);
+        double[] denominator = (double[]) item.get(denominatorKey);
 
         for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             if (denominator[pix] != 0) {
@@ -46,7 +46,7 @@ public class DividePixelArrays implements Processor {
             }
         }
 
-        input.put(outputKey, dividedArray);
-        return input;
+        item.put(outputKey, dividedArray);
+        return item;
     }
 }

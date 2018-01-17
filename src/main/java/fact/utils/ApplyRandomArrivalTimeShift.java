@@ -38,12 +38,12 @@ public class ApplyRandomArrivalTimeShift implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
         IntervalMarker[] marker = new IntervalMarker[Constants.N_PIXELS];
 
-        double[] arrivalTime = (double[]) input.get(key);
+        double[] arrivalTime = (double[]) item.get(key);
         double[] newArrivalTime = new double[arrivalTime.length];
 
         Random rand = new Random(Seed);
@@ -56,8 +56,8 @@ public class ApplyRandomArrivalTimeShift implements Processor {
             marker[i] = new IntervalMarker(newArrivalTime[i], newArrivalTime[i] + 10);
         }
 
-        input.put(outputKey, newArrivalTime);
-        input.put(outputKey + "marker", marker);
-        return input;
+        item.put(outputKey, newArrivalTime);
+        item.put(outputKey + "marker", marker);
+        return item;
     }
 }

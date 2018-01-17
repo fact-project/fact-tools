@@ -26,12 +26,12 @@ public class CleaningEvaluate implements Processor {
     double mcShowerThreshold = 2.0;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, showerKey, mcCherenkovWeightKey, mcNoiseWeightKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, showerKey, mcCherenkovWeightKey, mcNoiseWeightKey);
 
-        int[] shower = (int[]) input.get(showerKey);
-        double[] cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));
-        double[] noiseWeight = Utils.toDoubleArray(input.get(mcNoiseWeightKey));
+        int[] shower = (int[]) item.get(showerKey);
+        double[] cherenkovWeight = Utils.toDoubleArray(item.get(mcCherenkovWeightKey));
+        double[] noiseWeight = Utils.toDoubleArray(item.get(mcNoiseWeightKey));
 
         ArrayList<Integer> correctIdentifiedShowerPixel = new ArrayList<Integer>();
         ArrayList<Integer> wrongIdentifiedShowerPixel = new ArrayList<Integer>();
@@ -55,14 +55,14 @@ public class CleaningEvaluate implements Processor {
             }
         }
 
-        input.put(outputKey + "_correct", correctIdentifiedShowerPixel);
-        input.put(outputKey + "_Numbercorrect", correctIdentifiedShowerPixel.size());
-        input.put(outputKey + "_wrong", wrongIdentifiedShowerPixel);
-        input.put(outputKey + "_Numberwrong", wrongIdentifiedShowerPixel.size());
-        input.put(outputKey + "_not", notIdentifiedShowerPixel);
-        input.put(outputKey + "_Numbernot", notIdentifiedShowerPixel.size());
+        item.put(outputKey + "_correct", correctIdentifiedShowerPixel);
+        item.put(outputKey + "_Numbercorrect", correctIdentifiedShowerPixel.size());
+        item.put(outputKey + "_wrong", wrongIdentifiedShowerPixel);
+        item.put(outputKey + "_Numberwrong", wrongIdentifiedShowerPixel.size());
+        item.put(outputKey + "_not", notIdentifiedShowerPixel);
+        item.put(outputKey + "_Numbernot", notIdentifiedShowerPixel.size());
 
         // TODO Auto-generated method stub
-        return input;
+        return item;
     }
 }

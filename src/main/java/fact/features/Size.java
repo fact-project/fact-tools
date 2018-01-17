@@ -26,16 +26,16 @@ public class Size implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
 
-        Utils.mapContainsKeys(input, photonChargeKey, pixelSetKey);
+        Utils.mapContainsKeys(item, photonChargeKey, pixelSetKey);
 
-        PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-        double[] charge = (double[]) input.get(photonChargeKey);
+        PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
+        double[] charge = (double[]) item.get(photonChargeKey);
         double size = calculateSize(pixelSet, charge);
-        input.put(outputKey, size);
-        return input;
+        item.put(outputKey, size);
+        return item;
     }
 
     /**

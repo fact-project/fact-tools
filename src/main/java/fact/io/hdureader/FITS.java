@@ -134,7 +134,7 @@ public class FITS {
     }
 
     /**
-     * Given the first 2 bytes of an input stream, this returns whether the stream is
+     * Given the first 2 bytes of an item stream, this returns whether the stream is
      * gzipped or not
      *
      * @param header byte[] containing the first two bytes of any file/stream

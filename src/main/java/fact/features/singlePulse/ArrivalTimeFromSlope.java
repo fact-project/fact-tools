@@ -50,14 +50,14 @@ public class ArrivalTimeFromSlope implements Processor {
     //should be an odd number.
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         if (width % 2 == 0) {
             width++;
             log.info("ArrivalTimeFromSlope only supports odd window lengths. New length is: " + width);
         }
 
-        double[] data = (double[]) input.get(key);
-        double[] slopes = (double[]) input.get(derivationKey);
+        double[] data = (double[]) item.get(key);
+        double[] slopes = (double[]) item.get(derivationKey);
         int roi = data.length / Constants.N_PIXELS;
 
         ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.N_PIXELS);
@@ -85,13 +85,13 @@ public class ArrivalTimeFromSlope implements Processor {
             arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
         }
 
-        input.put(outputKey, arrivalTimes);
-        input.put(visualizeKey, visualizePositions);
-        input.put(baselineKey, baselineValues);
+        item.put(outputKey, arrivalTimes);
+        item.put(visualizeKey, visualizePositions);
+        item.put(baselineKey, baselineValues);
 //        System.out.println(Arrays.toString(baselineValues));
 
 
-        return input;
+        return item;
     }
 
     /**

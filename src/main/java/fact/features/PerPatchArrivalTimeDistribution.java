@@ -23,10 +23,10 @@ public class PerPatchArrivalTimeDistribution implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
-        double[] arrivalTimeArray = Utils.toDoubleArray(input.get(key));
+        double[] arrivalTimeArray = Utils.toDoubleArray(item.get(key));
         double[] perPatchMean = new double[Constants.N_PIXELS / 9];
         double[] perPatchVariance = new double[Constants.N_PIXELS / 9];
 
@@ -39,9 +39,9 @@ public class PerPatchArrivalTimeDistribution implements Processor {
             perPatchVariance[patch] += (arrivalTimeArray[chid] - perPatchMean[patch]) * (arrivalTimeArray[chid] - perPatchMean[patch]) / 8.0;
         }
 
-        input.put(outputKey + "_mean", perPatchMean);
-        input.put(outputKey + "_var", perPatchVariance);
-        return input;
+        item.put(outputKey + "_mean", perPatchMean);
+        item.put(outputKey + "_var", perPatchVariance);
+        return item;
     }
 
 }

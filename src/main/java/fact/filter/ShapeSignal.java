@@ -29,10 +29,10 @@ public class ShapeSignal implements Processor {
 
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, key, double[].class);
-        double[] data = (double[]) input.get(key);
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
         double[] shifted_data = new double[data.length];
         double[] result = new double[data.length];
 
@@ -45,8 +45,8 @@ public class ShapeSignal implements Processor {
             result[i] = data[i] + shifted_data[i];
         }
 
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
     }
 }

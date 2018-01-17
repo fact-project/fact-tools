@@ -40,15 +40,15 @@ public class TimeOverThreshold implements Processor {
     @Parameter(required = true)
     public String outputKey = null;
 
-    public Data process(Data input) {
-        Utils.isKeyValid(input, dataKey, double[].class);
-        Utils.isKeyValid(input, positionsKey, int[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, dataKey, double[].class);
+        Utils.isKeyValid(item, positionsKey, int[].class);
 
         int[] timeOverThresholdArray = new int[Constants.N_PIXELS];
         double[] firstSliceOverThresholdArray = new double[Constants.N_PIXELS];
 
-        double[] data = (double[]) input.get(dataKey);
-        int[] posArray = (int[]) input.get(positionsKey);
+        double[] data = (double[]) item.get(dataKey);
+        int[] posArray = (int[]) item.get(positionsKey);
 
         IntervalMarker[] m = new IntervalMarker[Constants.N_PIXELS];
 
@@ -105,19 +105,19 @@ public class TimeOverThreshold implements Processor {
 
 
         //add processors threshold to the DataItem
-        input.put(thresholdOutputKey, threshold);
+        item.put(thresholdOutputKey, threshold);
 
         //add number of pixel above this threshold to the DataItem
-        input.put(outputKey + "_numPixel", numPixelAboveThreshold);
+        item.put(outputKey + "_numPixel", numPixelAboveThreshold);
 
         //add times over threshold to the DataItem
-        input.put(outputKey, timeOverThresholdArray);
-        input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
-        input.put(outputKey + "Marker", m);
-        input.put(outputKey + "SetOverlay", pixelSet);
+        item.put(outputKey, timeOverThresholdArray);
+        item.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
+        item.put(outputKey + "Marker", m);
+        item.put(outputKey + "SetOverlay", pixelSet);
 
 
-        input.put(outputKey + "Set", pixelSet.toIntArray());
-        return input;
+        item.put(outputKey + "Set", pixelSet.toIntArray());
+        return item;
     }
 }

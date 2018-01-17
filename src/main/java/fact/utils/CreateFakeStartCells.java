@@ -17,15 +17,15 @@ public class CreateFakeStartCells implements Processor {
     Random random = new Random(seed);
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         short[] fakeStartCells = new short[Constants.N_PIXELS];
 
         for (int px = 0; px < Constants.N_PIXELS; px++) {
             fakeStartCells[px] = (short) random.nextInt(1023);
         }
 
-        input.put(outputKey, fakeStartCells);
+        item.put(outputKey, fakeStartCells);
 
-        return input;
+        return item;
     }
 }

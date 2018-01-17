@@ -16,16 +16,16 @@ public class Theta implements Processor {
     @Parameter(required = true)
     public String outputKey = null;
 
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, sourcePositionKey, reconstructedPositionKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, sourcePositionKey, reconstructedPositionKey);
 
-        CameraCoordinate sourcePosition = (CameraCoordinate) input.get(sourcePositionKey);
-        CameraCoordinate reconstructedPosition = (CameraCoordinate) input.get(reconstructedPositionKey);
+        CameraCoordinate sourcePosition = (CameraCoordinate) item.get(sourcePositionKey);
+        CameraCoordinate reconstructedPosition = (CameraCoordinate) item.get(reconstructedPositionKey);
 
         double theta = sourcePosition.euclideanDistance(reconstructedPosition);
-        input.put(outputKey, theta);
+        item.put(outputKey, theta);
 
-        return input;
+        return item;
     }
 
 }

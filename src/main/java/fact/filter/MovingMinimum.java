@@ -43,10 +43,10 @@ public class MovingMinimum implements StatefulProcessor {
     public int length = 5;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
 
         int roi = data.length / Constants.N_PIXELS;
@@ -74,8 +74,8 @@ public class MovingMinimum implements StatefulProcessor {
                 result[pivotPosition] = min;
             }
         }
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
     }
 
     @Override

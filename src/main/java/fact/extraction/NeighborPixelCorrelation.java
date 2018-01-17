@@ -58,12 +58,12 @@ public class NeighborPixelCorrelation implements Processor {
     static Logger log = LoggerFactory.getLogger(NeighborPixelCorrelation.class);
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, key, amplitudePositionsKey);
-        double[] data = (double[]) input.get(key);
-        int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
-        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.N_PIXELS, pixelSetKey);
+        Utils.mapContainsKeys(item, key, amplitudePositionsKey);
+        double[] data = (double[]) item.get(key);
+        int[] amplitudePositions = (int[]) item.get(amplitudePositionsKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(item, Constants.N_PIXELS, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
         roi = data.length / Constants.N_PIXELS;
@@ -152,30 +152,30 @@ public class NeighborPixelCorrelation implements Processor {
         }
 
         if (returnScaledCorrelation == true) {
-            input.put(correlationKey + "_mean", scaleCorrelation(correlationMean));
-            input.put(correlationKey + "_max", scaleCorrelation(correlationMax));
-            input.put(correlationKey + "_min", scaleCorrelation(correlationMin));
-            input.put(correlationKey + "_stdDev", scaleCorrelation(correlationStd));
-            input.put(correlationKey + "_Kurtosis", scaleCorrelation(correlationKurtosis));
-            input.put(correlationKey + "_Skewness", scaleCorrelation(correlationSkewness));
+            item.put(correlationKey + "_mean", scaleCorrelation(correlationMean));
+            item.put(correlationKey + "_max", scaleCorrelation(correlationMax));
+            item.put(correlationKey + "_min", scaleCorrelation(correlationMin));
+            item.put(correlationKey + "_stdDev", scaleCorrelation(correlationStd));
+            item.put(correlationKey + "_Kurtosis", scaleCorrelation(correlationKurtosis));
+            item.put(correlationKey + "_Skewness", scaleCorrelation(correlationSkewness));
         } else {
-            input.put(correlationKey + "_mean", correlationMean);
-            input.put(correlationKey + "_max", correlationMax);
-            input.put(correlationKey + "_min", correlationMin);
-            input.put(correlationKey + "_stdDev", correlationStd);
-            input.put(correlationKey + "_Kurtosis", correlationKurtosis);
-            input.put(correlationKey + "_Skewness", correlationSkewness);
+            item.put(correlationKey + "_mean", correlationMean);
+            item.put(correlationKey + "_max", correlationMax);
+            item.put(correlationKey + "_min", correlationMin);
+            item.put(correlationKey + "_stdDev", correlationStd);
+            item.put(correlationKey + "_Kurtosis", correlationKurtosis);
+            item.put(correlationKey + "_Skewness", correlationSkewness);
         }
 
-        input.put(markerKey, m);
-        input.put(covarianceKey + "_mean", covarianceMean);
-        input.put(covarianceKey + "_max", covarianceMax);
-        input.put(covarianceKey + "_min", covarianceMin);
-        input.put(covarianceKey + "_stdDev", covarianceStd);
-        input.put(covarianceKey + "_Kurtosis", covarianceKurtosis);
-        input.put(covarianceKey + "_Skewness", covarianceSkewness);
+        item.put(markerKey, m);
+        item.put(covarianceKey + "_mean", covarianceMean);
+        item.put(covarianceKey + "_max", covarianceMax);
+        item.put(covarianceKey + "_min", covarianceMin);
+        item.put(covarianceKey + "_stdDev", covarianceStd);
+        item.put(covarianceKey + "_Kurtosis", covarianceKurtosis);
+        item.put(covarianceKey + "_Skewness", covarianceSkewness);
 
-        return input;
+        return item;
     }
 
     private double calculateCorrelation(double varianceA, double varianceB, double covariance) {

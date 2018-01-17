@@ -39,18 +39,18 @@ public class ConcentrationAtCenterOfGravity implements Processor {
      * This function calculates the concentration at the center of gravity including the 2 nearest pixel
      */
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, cogKey, sizeKey, photonChargeKey);
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, cogKey, sizeKey, photonChargeKey);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
-        double size = (double) input.get(sizeKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        double size = (double) item.get(sizeKey);
 
-        photonCharge = (double[]) input.get(photonChargeKey);
+        photonCharge = (double[]) item.get(photonChargeKey);
         CameraPixel cogPixel = pixelMap.getPixelBelowCoordinatesInMM(cog.xMM, cog.yMM);
         if (cogPixel == null) {
-            input.put(outputKey, -Double.MAX_VALUE);
-            return input;
+            item.put(outputKey, -Double.MAX_VALUE);
+            return item;
         }
         CameraPixel[] neighbors = pixelMap.getNeighborsForPixel(cogPixel);
 
@@ -80,8 +80,8 @@ public class ConcentrationAtCenterOfGravity implements Processor {
 
         double conc = photonCharge[cogPixel.id] + photonCharge[minChId1.id] + photonCharge[minChId2.id];
         conc /= size;
-        input.put(outputKey, conc);
+        item.put(outputKey, conc);
 
-        return input;
+        return item;
     }
 }

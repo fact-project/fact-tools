@@ -39,10 +39,10 @@ public class ArrayStatistics implements Processor {
     public String pixelSetKey = null;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
-        double[] data = Utils.toDoubleArray(input.get(key));
+        double[] data = Utils.toDoubleArray(item.get(key));
 
 
         DescriptiveStatistics s = new DescriptiveStatistics();
@@ -52,24 +52,24 @@ public class ArrayStatistics implements Processor {
             for (double value : data) {
                 s.addValue(value);
             }
-        } else if (input.containsKey(pixelSetKey)) {
+        } else if (item.containsKey(pixelSetKey)) {
             /* if a set is specified, use only the pixel ids from the set */
-            PixelSet pixelArray = (PixelSet) input.get(pixelSetKey);
+            PixelSet pixelArray = (PixelSet) item.get(pixelSetKey);
             for (CameraPixel pix : pixelArray.set) {
                 s.addValue(data[pix.id]);
             }
         }
-        input.put(outputKey + "_" + "median", s.getPercentile(50));
-        input.put(outputKey + "_" + "p25", s.getPercentile(25));
-        input.put(outputKey + "_" + "p75", s.getPercentile(75));
-        input.put(outputKey + "_" + "mean", s.getMean());
-        input.put(outputKey + "_" + "max", s.getMax());
-        input.put(outputKey + "_" + "min", s.getMin());
-        input.put(outputKey + "_" + "kurtosis", s.getKurtosis());
-        input.put(outputKey + "_" + "variance", s.getVariance());
-        input.put(outputKey + "_" + "skewness", s.getSkewness());
+        item.put(outputKey + "_" + "median", s.getPercentile(50));
+        item.put(outputKey + "_" + "p25", s.getPercentile(25));
+        item.put(outputKey + "_" + "p75", s.getPercentile(75));
+        item.put(outputKey + "_" + "mean", s.getMean());
+        item.put(outputKey + "_" + "max", s.getMax());
+        item.put(outputKey + "_" + "min", s.getMin());
+        item.put(outputKey + "_" + "kurtosis", s.getKurtosis());
+        item.put(outputKey + "_" + "variance", s.getVariance());
+        item.put(outputKey + "_" + "skewness", s.getSkewness());
 
-        return input;
+        return item;
 
     }
 }

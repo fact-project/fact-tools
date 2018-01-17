@@ -28,11 +28,11 @@ public class IdentifyPixelAboveThreshold implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
 
         double[] matchArray = new double[Constants.N_PIXELS];
-        double[] featureArray = (double[]) input.get(key);
+        double[] featureArray = (double[]) item.get(key);
 
         PixelSet pixelSet = new PixelSet();
         for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
@@ -43,9 +43,9 @@ public class IdentifyPixelAboveThreshold implements Processor {
             }
         }
 
-        input.put(outputKey + "Set", pixelSet);
-        input.put(outputKey, matchArray);
+        item.put(outputKey + "Set", pixelSet);
+        item.put(outputKey, matchArray);
 
-        return input;
+        return item;
     }
 }

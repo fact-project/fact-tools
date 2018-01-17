@@ -30,14 +30,14 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     /**
      * Just a way of keeping the process() method small:
      *
-     * @param input : Data hash-map we look for
+     * @param item : Data hash-map we look for
      * @return
      */
-    private double[] retrieve_data(Data input) {
-        Utils.mapContainsKeys(input, key, "StartCellData");
+    private double[] retrieve_data(Data item) {
+        Utils.mapContainsKeys(item, key, "StartCellData");
         double[] data = null;
         try {
-            data = (double[]) input.get(key);
+            data = (double[]) item.get(key);
         } catch (ClassCastException e) {
             log.error("Could not cast types.");
             throw e;
@@ -171,10 +171,10 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
      *
      *
      */
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        double[] data = retrieve_data(input);
-        short[] startCell = (short[]) input.get("StartCellData");
+        double[] data = retrieve_data(item);
+        short[] startCell = (short[]) item.get("StartCellData");
 
         for (int patch_id = 0; patch_id < numberOfPatches; patch_id++) {
             // We only look at the 9th channel of each DRS4 chip
@@ -187,9 +187,9 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
             calculate_s_n_and_time_offsets(chid);
         }
 
-        input.put(outputKey, time_offsets);
+        item.put(outputKey, time_offsets);
 
-        return input;
+        return item;
     }
 }
 

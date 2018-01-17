@@ -44,19 +44,19 @@ public class ConcentrationCore implements Processor {
      * Calculate the percentage of photons inside the Hillas Ellipse
      * aka. the pixels with a Mahalanobis Distance <= 1.
      */
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, cogKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.mapContainsKeys(item, cogKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
-        Double delta = (Double) input.get(deltaKey);
-        double[] photonChargeArray = (double[]) input.get(photonChargeKey);
-        PixelSet showerPixelSet = (PixelSet) input.get(pixelSetKey);
-        Double length = (Double) input.get(lengthKey);
-        Double width = (Double) input.get(widthKey);
-        Double size = (Double) input.get(sizeKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        Double delta = (Double) item.get(deltaKey);
+        double[] photonChargeArray = (double[]) item.get(photonChargeKey);
+        PixelSet showerPixelSet = (PixelSet) item.get(pixelSetKey);
+        Double length = (Double) item.get(lengthKey);
+        Double width = (Double) item.get(widthKey);
+        Double size = (Double) item.get(sizeKey);
 
 
         double photonsInEllipse = 0;
@@ -77,7 +77,7 @@ public class ConcentrationCore implements Processor {
             }
         }
         double concCore = photonsInEllipse / size;
-        input.put(outputKey, concCore);
-        return input;
+        item.put(outputKey, concCore);
+        return item;
     }
 }

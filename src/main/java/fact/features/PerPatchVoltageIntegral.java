@@ -18,9 +18,9 @@ public class PerPatchVoltageIntegral implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
-        double[] dataCalibratedArray = (double[]) input.get(key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
+        double[] dataCalibratedArray = (double[]) item.get(key);
         int roi = dataCalibratedArray.length / Constants.N_PIXELS;
         double[] perPatchVoltageIntegral = new double[160];
 
@@ -33,9 +33,9 @@ public class PerPatchVoltageIntegral implements Processor {
             }
         }
 
-        input.put(outputKey, perPatchVoltageIntegral);
+        item.put(outputKey, perPatchVoltageIntegral);
 
-        return input;
+        return item;
     }
 
 }

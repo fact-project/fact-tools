@@ -30,25 +30,25 @@ public class ReconstructSourcePositionDisp implements Processor {
     @Parameter(required = true)
     public double signM3lConstant = 0;
 
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey, m3LongKey);
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey, m3LongKey);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-        double disp = (double) input.get(dispKey);
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        double disp = (double) item.get(dispKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
 
-        double delta = (double) input.get(deltaKey);
-        double m3l = Math.cbrt((double) input.get(m3LongKey));  // MARS calls cbrt(M3) M3
-        double cosDeltaAlpha = (double) input.get(cosDeltaAlphaKey);
+        double delta = (double) item.get(deltaKey);
+        double m3l = Math.cbrt((double) item.get(m3LongKey));  // MARS calls cbrt(M3) M3
+        double cosDeltaAlpha = (double) item.get(cosDeltaAlphaKey);
 
         CameraCoordinate recPosition = calculateRecPosition(cog.xMM, cog.yMM, disp, delta, cosDeltaAlpha, m3l);
 
-        input.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, recPosition));
-        input.put(outputKey, recPosition);
-        input.put(outputKey + 'X', recPosition.xMM);
-        input.put(outputKey + 'Y', recPosition.yMM);
+        item.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, recPosition));
+        item.put(outputKey, recPosition);
+        item.put(outputKey + 'X', recPosition.xMM);
+        item.put(outputKey + 'Y', recPosition.yMM);
 
-        return input;
+        return item;
     }
 
     /**

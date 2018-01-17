@@ -24,10 +24,10 @@ public class ShiftDataArray implements Processor {
     public int shift = 1;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
 
 
@@ -39,8 +39,8 @@ public class ShiftDataArray implements Processor {
             }
         }
 
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
     }
 }
