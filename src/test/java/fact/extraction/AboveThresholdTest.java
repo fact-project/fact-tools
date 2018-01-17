@@ -107,7 +107,7 @@ public class AboveThresholdTest {
 
         PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
         assertEquals(Constants.N_PIXELS, (int) data.get("outputPixelCount"));
-        assertEquals(Constants.N_PIXELS / Constants.N_PIXELS, data.get("outputPixelRatio"));
+        assertEquals(1.0, data.get("outputPixelRatio"));
         assertEquals(Constants.N_PIXELS, pixelsAboveThreshold.set.size());
 
     }
