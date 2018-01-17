@@ -37,13 +37,11 @@ public class InterpolateTimeSeries implements Processor {
     public int minPixelToInterpolate = 3;
 
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-    private int npix = Constants.NUMBEROFPIXEL;
+
 
     @Override
     public Data process(Data item) {
-        Utils.isKeyValid(item, "NPIX", Integer.class);
         Utils.isKeyValid(item, dataKey, double[].class);
-        npix = (Integer) item.get("NPIX");
         double[] data = (double[]) item.get(dataKey);
 
         ZonedDateTime timeStamp = null;
@@ -74,7 +72,7 @@ public class InterpolateTimeSeries implements Processor {
     }
 
     public double[] interpolateTimeSeries(double[] data, PixelSet badPixelSet) {
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
         for (CameraPixel pixel : badPixelSet) {
             CameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);

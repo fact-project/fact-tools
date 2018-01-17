@@ -3,6 +3,7 @@
  */
 package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +33,15 @@ public class PulseMaxAmplitude implements Processor {
     public String pulsePositionKey;
     //positions of threshold crossings
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
         int[][] pulsePositions = (int[][]) input.get(pulsePositionKey);
-        int roi = data.length / npix;
-        int[][] positions = new int[npix][];
+        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int[][] positions = new int[Constants.NUMBEROFPIXEL][];
 
         //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             positions[pix] = new int[pulsePositions[pix].length];
             positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
         }

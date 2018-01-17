@@ -49,12 +49,8 @@ public class ArrivalTimeFromSlope implements Processor {
     private int width = 1;
     //should be an odd number.
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         if (width % 2 == 0) {
             width++;
             log.info("ArrivalTimeFromSlope only supports odd window lengths. New length is: " + width);
@@ -62,13 +58,13 @@ public class ArrivalTimeFromSlope implements Processor {
 
         double[] data = (double[]) input.get(key);
         double[] slopes = (double[]) input.get(derivationKey);
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
         ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.NUMBEROFPIXEL);
         //the position where pulse leading edges end
-        int[][] arrivalTimes = new int[npix][];
+        int[][] arrivalTimes = new int[Constants.NUMBEROFPIXEL][];
         //arrival times for all pulses in each pixel
-        double[][] baselineValues = new double[npix][];
+        double[][] baselineValues = new double[Constants.NUMBEROFPIXEL][];
         //value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
@@ -78,7 +74,7 @@ public class ArrivalTimeFromSlope implements Processor {
         }
 
         //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             ArrayList<Integer> currentPulsePeaks = findPulsePeaks(pix, roi, slopes);
             pulsePeaks.add(currentPulsePeaks);
 

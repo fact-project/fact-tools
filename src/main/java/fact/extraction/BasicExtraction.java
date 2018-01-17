@@ -53,7 +53,7 @@ public class BasicExtraction implements Processor {
     public int validMinimalSlice = 10;
 
     double[] integralGains = null;
-    private int npix = Constants.NUMBEROFPIXEL;
+
 
     @Override
     public Data process(Data input) {
@@ -64,18 +64,17 @@ public class BasicExtraction implements Processor {
         }
 
         int roi = (Integer) input.get("NROI");
-        npix = (Integer) input.get("NPIX");
 
         double[] data = (double[]) input.get(dataKey);
 
-        int[] positions = new int[npix];
-        IntervalMarker[] mPositions = new IntervalMarker[npix];
-        double[] photonCharge = new double[npix];
-        IntervalMarker[] mPhotonCharge = new IntervalMarker[npix];
+        int[] positions = new int[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] mPositions = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] mPhotonCharge = new IntervalMarker[Constants.NUMBEROFPIXEL];
 
         Utils.checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow + validMinimalSlice, roi);
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow + rangeSearchWindow, roi, data);
             mPositions[pix] = new IntervalMarker(positions[pix], positions[pix] + 1);
 
@@ -141,7 +140,7 @@ public class BasicExtraction implements Processor {
 
 
     public double[] loadIntegralGainFile(SourceURL inputUrl) {
-        double[] integralGains = new double[npix];
+        double[] integralGains = new double[Constants.NUMBEROFPIXEL];
         Data integralGainData = null;
         try {
             CsvStream stream = new CsvStream(inputUrl, " ");
@@ -149,7 +148,7 @@ public class BasicExtraction implements Processor {
             stream.init();
             integralGainData = stream.readNext();
 
-            for (int i = 0; i < npix; i++) {
+            for (int i = 0; i < Constants.NUMBEROFPIXEL; i++) {
                 String key = "column:" + (i);
                 integralGains[i] = (Double) integralGainData.get(key);
             }

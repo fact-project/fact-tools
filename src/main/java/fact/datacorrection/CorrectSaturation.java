@@ -1,5 +1,6 @@
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
@@ -41,18 +42,12 @@ public class CorrectSaturation implements Processor {
     @Parameter(required = true, description = "1440pix array containing the estimated baseline amplitude")
     public String baselineKey = null;
 
-    // Default values
-    private int npix = 1440;
-    private int roi = 300;
-
     @Override
     public Data process(Data input) {
 
-        Utils.isKeyValid(input, "NPIX", Integer.class);
         Utils.mapContainsKeys(input, dataKey, totKey, maxPosKey, baselineKey, firstSliceOverThresholdKey, "NPIX");
 
-        npix = (int) input.get("NPIX");
-        roi = (int) input.get("NROI");
+        int roi = (int) input.get("NROI");
 
         double[] firstSlOverThresh = (double[]) input.get(firstSliceOverThresholdKey);
         int[] timeOverThreshold = (int[]) input.get(totKey);
@@ -65,14 +60,14 @@ public class CorrectSaturation implements Processor {
         double[] corrData = data.clone();
 
         //Marker
-        IntervalMarker[] markWidth = new IntervalMarker[npix];
-        IntervalMarker[] markMaxPos = new IntervalMarker[npix];
-        IntervalMarker[] markDeltaT = new IntervalMarker[npix];
-        IntervalMarker[] markEstArrivalTime = new IntervalMarker[npix];
+        IntervalMarker[] markWidth = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] markMaxPos = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] markDeltaT = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] markEstArrivalTime = new IntervalMarker[Constants.NUMBEROFPIXEL];
 
         // ------------------------------------------------------------------------------------------------------------
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             int firstSlice = roi * pix;
             int firstSliceAboveThresh = (int) firstSlOverThresh[pix];
             int maxPosInPix = pix * roi + maxPos[pix];

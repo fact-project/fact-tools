@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
@@ -49,7 +50,6 @@ public class NeighborPixelCorrelation implements Processor {
     public boolean returnScaledCorrelation = false;
 
 
-    private int npix = 1440;
     private int roi = 300;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
@@ -60,45 +60,42 @@ public class NeighborPixelCorrelation implements Processor {
     @Override
     public Data process(Data input) {
 
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-
         Utils.mapContainsKeys(input, key, amplitudePositionsKey);
         double[] data = (double[]) input.get(key);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
-        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.NUMBEROFPIXEL, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
-        roi = data.length / npix;
+        roi = data.length / Constants.NUMBEROFPIXEL;
 
-        IntervalMarker[] m = new IntervalMarker[npix];
+        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 
         //scale the data in the array to make it comparable
         double[] scaledData = scaleData(data, amplitudePositions);
 
         //snip pixel Data to arrays without skipped slices
-        double[][] snipedPixelData = Utils.snipPixelData(scaledData, skipFirst, skipLast, npix, roi);
+        double[][] snipedPixelData = Utils.snipPixelData(scaledData, skipFirst, skipLast, Constants.NUMBEROFPIXEL, roi);
 
         //get mean and variance of the timeseries for each pixel
         DescriptiveStatistics[] pixelStatistics = Utils.calculateTimeseriesStatistics(snipedPixelData);
 
-        double[] covarianceMean = new double[npix];
-        double[] correlationMean = new double[npix];
+        double[] covarianceMean = new double[Constants.NUMBEROFPIXEL];
+        double[] correlationMean = new double[Constants.NUMBEROFPIXEL];
 
-        double[] covarianceStd = new double[npix];
-        double[] correlationStd = new double[npix];
+        double[] covarianceStd = new double[Constants.NUMBEROFPIXEL];
+        double[] correlationStd = new double[Constants.NUMBEROFPIXEL];
 
-        double[] covarianceMax = new double[npix];
-        double[] correlationMax = new double[npix];
+        double[] covarianceMax = new double[Constants.NUMBEROFPIXEL];
+        double[] correlationMax = new double[Constants.NUMBEROFPIXEL];
 
-        double[] covarianceMin = new double[npix];
-        double[] correlationMin = new double[npix];
+        double[] covarianceMin = new double[Constants.NUMBEROFPIXEL];
+        double[] correlationMin = new double[Constants.NUMBEROFPIXEL];
 
-        double[] covarianceKurtosis = new double[npix];
-        double[] correlationKurtosis = new double[npix];
+        double[] covarianceKurtosis = new double[Constants.NUMBEROFPIXEL];
+        double[] correlationKurtosis = new double[Constants.NUMBEROFPIXEL];
 
-        double[] covarianceSkewness = new double[npix];
-        double[] correlationSkewness = new double[npix];
+        double[] covarianceSkewness = new double[Constants.NUMBEROFPIXEL];
+        double[] correlationSkewness = new double[Constants.NUMBEROFPIXEL];
 
         //Loop over all pixels to calculate the mean correlation with their neighbours
         for (int pix : pixels) {
@@ -201,7 +198,7 @@ public class NeighborPixelCorrelation implements Processor {
 
     private double[] scaleData(double[] data, int[] amplitudePositions) {
         double[] scaledData = data.clone();
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             int maxAmplPos = Utils.absPos(pix, amplitudePositions[pix], roi);
             double maxAmpl = data[maxAmplPos];
 

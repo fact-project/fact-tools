@@ -1,5 +1,6 @@
 package fact.utils;
 
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
@@ -21,12 +22,8 @@ public class RemappingKeys implements Processor {
     @Parameter(required = true)
     String keys[] = null;
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         if (keys == null) {
             log.error("No key specified");
             throw new RuntimeException("You have to specify the key to remap");
@@ -72,17 +69,16 @@ public class RemappingKeys implements Processor {
                 } else {
                     throw new RuntimeException("The key: " + key + " is of type: " + type + ". Only float,double,int,String supported at the moment!");
                 }
-                if (length != npix) {
-                    throw new RuntimeException("The length of key: " + key + " is not equal to the Number of Pixels: " + npix);
+                if (length != Constants.NUMBEROFPIXEL) {
+                    throw new RuntimeException("The length of key: " + key + " is not equal to the Number of Pixels: " + Constants.NUMBEROFPIXEL);
                 }
             } else {
                 throw new RuntimeException("The key: " + key + " is not an array");
             }
-            for (int softId = 0; softId < npix; softId++) {
+            for (int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++) {
                 int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
                 System.arraycopy(arrayInSoftID, softId, arrayInCHID, chid, 1);
             }
-            // TODO Auto-generated method stub
             input.put(key, (Serializable) arrayInCHID);
         }
         return input;

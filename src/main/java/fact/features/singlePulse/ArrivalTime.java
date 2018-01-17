@@ -3,6 +3,7 @@
  */
 package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +34,12 @@ public class ArrivalTime implements Processor {
     @Parameter(required = false)
     public String visualizeKey;
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         double[] data = (double[]) input.get(key);
         int[][] maxAmpPositions = (int[][]) input.get(maxAmpPositionKey);
-        int roi = data.length / npix;
-        int[][] arrivalTimes = new int[npix][];
+        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int[][] arrivalTimes = new int[Constants.NUMBEROFPIXEL][];
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
 
@@ -51,7 +48,7 @@ public class ArrivalTime implements Processor {
         }
 
         //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             arrivalTimes[pix] = new int[maxAmpPositions.length];
             arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
         }

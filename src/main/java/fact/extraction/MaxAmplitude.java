@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,20 +27,17 @@ public class MaxAmplitude implements Processor {
     @Parameter(required = true)
     public String outputKey;
 
-    private int npix;
 
     @Override
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
         double[] data = (double[]) input.get(key);
-        npix = (Integer) input.get("NPIX");
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
         //for all pixel find the maximum value
-        double[] max = new double[npix];
+        double[] max = new double[Constants.NUMBEROFPIXEL];
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             max[pix] = maximum(roi, pix, data);
         }
 

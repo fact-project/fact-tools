@@ -1,5 +1,6 @@
 package fact.utils;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +31,6 @@ public class ApplyRandomTimelineShift implements Processor {
     @Parameter(required = true, description = "key of the output data array")
     public String outputKey = null;
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
 
@@ -39,15 +38,13 @@ public class ApplyRandomTimelineShift implements Processor {
 
         Utils.mapContainsKeys(input, key);
         Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
 
         double[] data = (double[]) input.get(key);
         double[] shifted_data = new double[data.length];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             int first = pix * roi;
 
             Double randomOffset = (rand.nextGaussian() * stdDeviation);

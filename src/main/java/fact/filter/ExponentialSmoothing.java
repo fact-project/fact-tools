@@ -1,5 +1,6 @@
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,19 +32,15 @@ public class ExponentialSmoothing implements Processor {
     @Parameter(required = true, description = "The outputKey to which the smoothed data will be written to the stream")
     public String outputKey;
 
-    private int npix;
-
     @Override
     public Data process(Data item) {
         Utils.isKeyValid(item, key, double[].class);
-        Utils.isKeyValid(item, "NPIX", Integer.class);
         double[] data = (double[]) item.get(key);
-        npix = (Integer) item.get("NPIX");
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
         double[] smoothedData = new double[data.length];
         //foreach pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             //beginn with startvalue
             smoothedData[pix * roi] = data[pix * roi];
             for (int slice = 1; slice < roi; slice++) {

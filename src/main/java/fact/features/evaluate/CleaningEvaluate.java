@@ -1,5 +1,6 @@
 package fact.features.evaluate;
 
+import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -23,13 +24,9 @@ public class CleaningEvaluate implements Processor {
     int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
     int integrationWindow = 30;
     double mcShowerThreshold = 2.0;
-    private int npix;
-
 
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, showerKey, mcCherenkovWeightKey, mcNoiseWeightKey);
 
         int[] shower = (int[]) input.get(showerKey);
@@ -40,7 +37,7 @@ public class CleaningEvaluate implements Processor {
         ArrayList<Integer> wrongIdentifiedShowerPixel = new ArrayList<Integer>();
         ArrayList<Integer> notIdentifiedShowerPixel = new ArrayList<Integer>();
 
-        for (int px = 0; px < npix; px++) {
+        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
             double cherSignalOverNoise = cherenkovWeight[px] / (noiseWeight[px] * integrationWindow / NumberOfSimulatedSlices);
             if (cherSignalOverNoise > mcShowerThreshold) {
                 notIdentifiedShowerPixel.add(px);

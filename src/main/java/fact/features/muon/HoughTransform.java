@@ -119,9 +119,6 @@ public class HoughTransform implements StatefulProcessor {
 
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        int npix = (Integer) input.get("NPIX");
-
         PixelSet cleaningPixel = (PixelSet) input.get(pixelSetKey);
         double[] photonCharge = (double[]) input.get(photonChargeKey);
 
@@ -258,7 +255,7 @@ public class HoughTransform implements StatefulProcessor {
             double distance;
             for (int i = 0; i < 3; i++) {
                 PixelSet CirclePixelSet = new PixelSet();
-                for (int pix = 0; pix < npix; pix++) {
+                for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
                     CameraPixel p = m.getPixelFromId(pix);
                     double pix_x = p.getXPositionInMM();
                     double pix_y = p.getYPositionInMM();

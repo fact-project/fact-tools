@@ -22,7 +22,6 @@ public class AboveThresholdTest {
 
         data.put("data", raw_fact_data);
         data.put("NROI", 300);
-        data.put("NPIX", 1440);
 
         AboveThreshold above = new AboveThreshold();
         above.dataKey = "data";
@@ -67,7 +66,6 @@ public class AboveThresholdTest {
 
         data.put("data", raw_fact_data);
         data.put("NROI", 300);
-        data.put("NPIX", 1440);
 
         AboveThreshold above = new AboveThreshold();
         above.dataKey = "data";
@@ -99,7 +97,6 @@ public class AboveThresholdTest {
 
         data.put("data", raw_fact_data);
         data.put("NROI", 300);
-        data.put("NPIX", 1440);
 
         AboveThreshold above = new AboveThreshold();
         above.dataKey = "data";
@@ -124,7 +121,6 @@ public class AboveThresholdTest {
 
         data.put("data", raw_fact_data);
         data.put("NROI", 1);
-        data.put("NPIX", 1);
 
         AboveThreshold at = new AboveThreshold();
         at.dataKey  = "data";

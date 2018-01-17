@@ -1,5 +1,6 @@
 package fact.utils;
 
+import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -16,16 +17,11 @@ public class CreateFakeStartCells implements Processor {
 
     Random random = new Random(seed);
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+        short[] fakeStartCells = new short[Constants.NUMBEROFPIXEL];
 
-        short[] fakeStartCells = new short[npix];
-
-        for (int px = 0; px < npix; px++) {
+        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
             fakeStartCells[px] = (short) random.nextInt(1023);
         }
 

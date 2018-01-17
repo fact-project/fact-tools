@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import org.jfree.chart.plot.IntervalMarker;
@@ -39,29 +40,25 @@ public class TimeOverThreshold implements Processor {
     @Parameter(required = true)
     public String outputKey = null;
 
-    private int npix;
-
     public Data process(Data input) {
         Utils.isKeyValid(input, dataKey, double[].class);
         Utils.isKeyValid(input, positionsKey, int[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
 
-        int[] timeOverThresholdArray = new int[npix];
-        double[] firstSliceOverThresholdArray = new double[npix];
+        int[] timeOverThresholdArray = new int[Constants.NUMBEROFPIXEL];
+        double[] firstSliceOverThresholdArray = new double[Constants.NUMBEROFPIXEL];
 
         double[] data = (double[]) input.get(dataKey);
         int[] posArray = (int[]) input.get(positionsKey);
 
-        IntervalMarker[] m = new IntervalMarker[npix];
+        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
         int numPixelAboveThreshold = 0;
 
         PixelSet pixelSet = new PixelSet();
 
         //Loop over pixels
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             firstSliceOverThresholdArray[pix] = 0;
 
             int pos = pix * roi;

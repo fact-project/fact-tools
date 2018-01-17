@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
@@ -41,31 +42,26 @@ public class WaveformFluctuation implements Processor {
 
     private static final Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
 
         Utils.mapContainsKeys(input, key);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-
-        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.NUMBEROFPIXEL, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
         double[] data = (double[]) input.get(key);
 
-        double[] chargeMean = new double[npix];
-        double[] chargeStd = new double[npix];
-        double[] chargeVariance = new double[npix];
-        double[] chargeKurtosis = new double[npix];
-        double[] chargeMax = new double[npix];
-        double[] chargeMin = new double[npix];
-        double[] chargeSkewness = new double[npix];
-        double[] chargeMedian = new double[npix];
-        double[] chargeSum = new double[npix];
+        double[] chargeMean = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeStd = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeVariance = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeKurtosis = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeMax = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeMin = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeSkewness = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeMedian = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeSum = new double[Constants.NUMBEROFPIXEL];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
         Random rand = new Random(Seed);
 
@@ -73,7 +69,7 @@ public class WaveformFluctuation implements Processor {
         int iterations = bound / windowSize;
         log.debug("Iterations: " + iterations);
 
-        double[][] charge = new double[npix][iterations];
+        double[][] charge = new double[Constants.NUMBEROFPIXEL][iterations];
 
 
         //Loop over all pixel and calculate integrals on timeline

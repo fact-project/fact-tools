@@ -1,5 +1,6 @@
 package fact.features.snake;
 
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
@@ -30,13 +31,8 @@ public class PolygonIntegrate implements Processor {
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-    private int npix;
-
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, key, polygonX, polygonY);
 
 
@@ -54,7 +50,7 @@ public class PolygonIntegrate implements Processor {
         boolean[] chidInPoly = new boolean[1440];
 
         double erg = 0;
-        for (int i = 0; i < npix; i++) {
+        for (int i = 0; i < Constants.NUMBEROFPIXEL; i++) {
             if (poly.contains(pixelMap.getPixelFromId(i).getXPositionInMM(), pixelMap.getPixelFromId(i).getYPositionInMM()))    // Prüfe ob Pixel im Poly/Snake liegt
             {
                 erg += data[i];
@@ -65,7 +61,7 @@ public class PolygonIntegrate implements Processor {
         }
 
         int[] chids = new int[numberOfPixel];
-        for (int i = 0, tmpCount = 0; i < npix; i++) {
+        for (int i = 0, tmpCount = 0; i < Constants.NUMBEROFPIXEL; i++) {
             if (chidInPoly[i]) chids[tmpCount++] = i;
         }
 

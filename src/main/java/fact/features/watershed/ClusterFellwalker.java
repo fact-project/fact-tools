@@ -26,6 +26,7 @@ package fact.features.watershed;
  * Created by lena on 16.11.15.
  */
 
+import fact.Constants;
 import fact.Utils;
 import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
@@ -73,9 +74,8 @@ public class ClusterFellwalker implements Processor {
 
     @Override
     public Data process(Data data) {
-        int npix = (Integer) data.get("NPIX");
-        int[] shower = Utils.getValidPixelSetAsIntArr(data, npix, showerKey);
-        int[] area = Utils.getValidPixelSetAsIntArr(data, npix, areaKey);
+        int[] shower = Utils.getValidPixelSetAsIntArr(data, Constants.NUMBEROFPIXEL, showerKey);
+        int[] area = Utils.getValidPixelSetAsIntArr(data, Constants.NUMBEROFPIXEL, areaKey);
 
 
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));

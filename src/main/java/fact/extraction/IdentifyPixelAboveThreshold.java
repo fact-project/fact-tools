@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.utils.RemappingKeys;
@@ -26,19 +27,15 @@ public class IdentifyPixelAboveThreshold implements Processor {
     @Parameter(required = false)
     public String outputKey;
 
-    private int npix;
-
     @Override
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
 
-        double[] matchArray = new double[npix];
+        double[] matchArray = new double[Constants.NUMBEROFPIXEL];
         double[] featureArray = (double[]) input.get(key);
 
         PixelSet pixelSet = new PixelSet();
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             matchArray[pix] = 0;
             if (featureArray[pix] > threshold) {
                 matchArray[pix] = 1;

@@ -1,5 +1,6 @@
 package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,30 +34,24 @@ public class FindThresholdCrossings implements Processor {
 
     private double threshold = 5;
 
-    /*
+    /**
      * minBelow is minimum number of slices required to be below the threshold before the threshold crossing
      * minAbove is minimum number of slices required to be above the threshold after the threshold crossing
      * threshold is the cutoff value
      *
      */
-    private int npix;
-
-
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-
         double[] data = (double[]) input.get(key);
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
         //the graph of the array positions visually shows the positions of the crossings for an individual pixel
         double[] positions = new double[data.length];
 
         //the array CrossPositions contains lists of positions of crossings for each pixel
-        int[][] CrossPositions = new int[npix][];
+        int[][] CrossPositions = new int[Constants.NUMBEROFPIXEL][];
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             //creates a list of positions of threshold crossings for a single pixel
             ArrayList<Integer> slices = new ArrayList<Integer>();
 
@@ -104,7 +99,7 @@ public class FindThresholdCrossings implements Processor {
             if (slice + k > roi) {
                 return false;
             }
-            if (pos + k == npix * roi) {
+            if (pos + k == Constants.NUMBEROFPIXEL * roi) {
                 return false;
             }
             if (data[pos + k] <= threshold) {

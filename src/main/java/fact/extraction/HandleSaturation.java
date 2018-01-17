@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import stream.Data;
@@ -37,7 +38,6 @@ public class HandleSaturation implements Processor {
     public String saturatedPixelKey = null;
 
     private PixelSet saturatedPixelSet = null;
-    private int npix;
 
     public Data process(Data input) {
 
@@ -45,14 +45,11 @@ public class HandleSaturation implements Processor {
         Utils.isKeyValid(input, photonChargeSaturatedKey, double[].class);
         Utils.isKeyValid(input, arrivalTimeKey, double[].class);
         Utils.isKeyValid(input, arrivalTimeSaturatedKey, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
 
         double[] photonCharge = (double[]) input.get(photonChargeKey);
         double[] photonChargeSaturated = (double[]) input.get(photonChargeSaturatedKey);
         double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
         double[] arrivalTimeSaturated = (double[]) input.get(arrivalTimeSaturatedKey);
-        npix = (Integer) input.get("NPIX");
-
 
         double[] resultPhotonCharge = new double[photonCharge.length];
         System.arraycopy(photonCharge, 0, resultPhotonCharge, 0, photonCharge.length);
@@ -61,7 +58,7 @@ public class HandleSaturation implements Processor {
 
         saturatedPixelSet = new PixelSet();
 
-        for (int px = 0; px < npix; px++) {
+        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
             if (photonCharge[px] > limitForSaturatedPixel) {
                 resultArrivalTimes[px] = arrivalTimeSaturated[px];
                 resultPhotonCharge[px] = photonChargeSaturated[px];

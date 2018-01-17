@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
@@ -31,25 +32,22 @@ public class RisingEdgeForPositions implements Processor {
     public String maxSlopesKey = null;
 
     private int searchWindowLeft = 25;
-    private int npix;
 
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
-        double[] positions = new double[npix];
-        double[] maxSlopes = new double[npix];
+        double[] positions = new double[Constants.NUMBEROFPIXEL];
+        double[] maxSlopes = new double[Constants.NUMBEROFPIXEL];
 
         double[] data = (double[]) input.get(dataKey);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 
-        IntervalMarker[] m = new IntervalMarker[npix];
+        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
             int posMaxAmp = amplitudePositions[pix];
 
             // temp. Variables

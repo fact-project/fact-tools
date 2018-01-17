@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import org.slf4j.Logger;
@@ -37,23 +38,21 @@ public class TimeOverThresholdTL implements Processor {
 
     public Data process(Data input) {
         Utils.isKeyValid(input, dataKey, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        int npix = (Integer) input.get("NPIX");
 
-        int[] timeOverThresholdArray = new int[npix];
+        int[] timeOverThresholdArray = new int[Constants.NUMBEROFPIXEL];
 
         double[] data = (double[]) input.get(dataKey);
 
         PixelSet pixelSet = new PixelSet();
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.NUMBEROFPIXEL;
 
         if (range < 0) {
             range = roi - firstSlice;
         }
 
         //Loop over pixels
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
 
             int pos = pix * roi;
 
@@ -84,18 +83,4 @@ public class TimeOverThresholdTL implements Processor {
         }
         return input;
     }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public void setDataKey(String dataKey) {
-        this.dataKey = dataKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-
 }
