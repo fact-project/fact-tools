@@ -3,6 +3,7 @@
  */
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
@@ -156,7 +157,7 @@ public class DrsCalibration implements StatefulProcessor {
 
         if (destination == null || destination.length != data.length)
             destination = new double[data.length];
-        int roi = data.length / 1440;
+        int roi = data.length / Constants.N_PIXELS;
 
         // We do not entirely know how the calibration constants, which are
         // saved in a filename.drs.fits file
@@ -228,7 +229,7 @@ public class DrsCalibration implements StatefulProcessor {
         double vraw;
 
         int pos, offsetPos, triggerOffsetPos;
-        for (int pixel = 0; pixel < 1440; pixel++) {
+        for (int pixel = 0; pixel < Constants.N_PIXELS; pixel++) {
             for (int slice = 0; slice < roi; slice++) {
 
                 pos = pixel * roi + slice;
@@ -236,11 +237,10 @@ public class DrsCalibration implements StatefulProcessor {
                 int start = startCellVector[pixel] != -1 ? startCellVector[pixel]
                         : 0;
 
-                offsetPos = pixel * drsBaselineMean.length / 1440
-                        + ((slice + start) % (drsBaselineMean.length / 1440));
+                offsetPos = pixel * drsBaselineMean.length / Constants.N_PIXELS
+                        + ((slice + start) % (drsBaselineMean.length / Constants.N_PIXELS));
 
-                triggerOffsetPos = pixel * drsTriggerOffsetMean.length / 1440
-                        + slice;
+                triggerOffsetPos = pixel * drsTriggerOffsetMean.length / Constants.N_PIXELS + slice;
 
                 vraw = data[pos] * dconv;
                 vraw -= drsBaselineMean[offsetPos];

@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.EventObserver;
@@ -89,7 +90,7 @@ public class CameraWindow implements EventObserver {
         keyComboBox.removeAllItems();
         for (String key : dataItem.keySet()) {
             double[] data = Utils.toDoubleArray(dataItem.get(key));
-            if (data != null && data.length > 0 && data.length % 1440 == 0) {
+            if (data != null && data.length > 0 && data.length % Constants.N_PIXELS == 0) {
                 keyComboBox.addItem(key);
                 if (key.equals(selectedKey)) {
                     keyComboBox.setSelectedItem(key);

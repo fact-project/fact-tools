@@ -92,22 +92,22 @@ public class ClusterFellwalker implements Processor {
         //get 'shower' as int array with pixel id's3System.out.println();
 
 
-        int[] clusterID = new int[1440];
-        int[] showerClusterID = new int[1440];
+        int[] clusterID = new int[Constants.N_PIXELS];
+        int[] showerClusterID = new int[Constants.N_PIXELS];
 
-        int[] areaArray = new int[1440];
+        int[] areaArray = new int[Constants.N_PIXELS];
         if (areaKey != null) {
             for (int i = 0; i < area.length; i++) {
                 areaArray[area[i]] = 1;
             }
         } else {
 
-            for (int i = 0; i < 1440; i++) {
+            for (int i = 0; i < Constants.N_PIXELS; i++) {
                 areaArray[i] = 1;
             }
         }
 
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             clusterID[i] = 0;
             showerClusterID[i] = -2;
         }
@@ -189,7 +189,7 @@ public class ClusterFellwalker implements Processor {
             clusterSet[i].setClusterID(i);
         }
 
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             clusterSet[clusterID[i]].addContentPixel(i);
             clusterSet[clusterID[i]].addContentPixelPhotoncharge(photoncharge[i]);
             clusterSet[clusterID[i]].addContentPixelArrivaltime(arrivalTime[i]);
@@ -198,7 +198,7 @@ public class ClusterFellwalker implements Processor {
 
         // fill another list with morphology values if morphology is not photoncharge
         if (morphologyKey != photonchargeKey) {
-            for (int i = 0; i < 1440; i++) {
+            for (int i = 0; i < Constants.N_PIXELS; i++) {
                 clusterSet[clusterID[i]].addContentMorphology(morphology[i]);
             }
         }
@@ -345,7 +345,7 @@ public class ClusterFellwalker implements Processor {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        for(int i=0;i<1440;i++){
+        for(int i=0;i<Constants.N_PIXELS;i++){
             writer.println(i + "\t" + showerClusterID[i] + "\t" + photoncharge[i] + "\t" + cleaning[i]);
         }
 

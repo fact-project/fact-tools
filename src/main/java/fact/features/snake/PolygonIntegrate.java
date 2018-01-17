@@ -47,7 +47,7 @@ public class PolygonIntegrate implements Processor {
         }
 
         int numberOfPixel = 0;
-        boolean[] chidInPoly = new boolean[1440];
+        boolean[] chidInPoly = new boolean[Constants.N_PIXELS];
 
         double erg = 0;
         for (int i = 0; i < Constants.N_PIXELS; i++) {

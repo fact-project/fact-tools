@@ -3,7 +3,7 @@
 		widthKey="width"
 		lengthKey="length"
 		c0="117.94"
-		outputKey="Disp"
+		outputKey="disp"
 />
 <fact.features.source.SourcePosition
     outputKey="source_position"

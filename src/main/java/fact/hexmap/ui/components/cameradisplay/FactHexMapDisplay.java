@@ -4,6 +4,7 @@
 package fact.hexmap.ui.components.cameradisplay;
 
 import com.google.common.eventbus.Subscribe;
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
@@ -54,7 +55,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
     Set<CameraPixel> selectedPixels = new LinkedHashSet<CameraPixel>();
 
-    public double[][] sliceValues = new double[1440][1024];
+    public double[][] sliceValues = new double[Constants.N_PIXELS][1024];
     int currentSlice = 0;
 
     // the dataItem to display
@@ -209,7 +210,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
         if (dataToPlot != null) {
             minValueInData = min(dataToPlot);
             maxValueInData = max(dataToPlot);
-            this.sliceValues = Utils.sortPixels(dataToPlot, 1440);
+            this.sliceValues = Utils.sortPixels(dataToPlot, Constants.N_PIXELS);
             this.repaint();
         } else {
             log.error("Tried to plot data that was null");

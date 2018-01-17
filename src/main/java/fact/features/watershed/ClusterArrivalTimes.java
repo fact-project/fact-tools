@@ -1,5 +1,6 @@
 package fact.features.watershed;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
@@ -55,14 +56,14 @@ public class ClusterArrivalTimes implements Processor {
 
         //get 'shower' as int array with pixel id's from 'pixelSet' (HashSet)
         int[] shower = pixelSet.toIntArray();
-        int[] showerArray = new int[1440];
+        int[] showerArray = new int[Constants.N_PIXELS];
 
         for (int p : shower) {
             showerArray[p] = 1;
         }
 
-        int[] clusterID = new int[1440];
-        for (int i = 0; i < 1440; i++) {
+        int[] clusterID = new int[Constants.N_PIXELS];
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             clusterID[i] = 0;
         }
 

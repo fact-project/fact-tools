@@ -221,10 +221,10 @@ public class NeighborPixelCorrelation implements Processor {
 
     private double[] scaleCorrelation(double[] correlation) {
 
-        double[] scaledCorrelation = new double[1440];
+        double[] scaledCorrelation = new double[Constants.N_PIXELS];
         double max = 0;
         double min = 1000;
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             if (correlation[i] > max) {
                 int maxIndex = i;
                 max = correlation[i];
@@ -236,7 +236,7 @@ public class NeighborPixelCorrelation implements Processor {
         }
 
 
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             scaledCorrelation[i] = (correlation[i] - min) / (max - min);
         }
 

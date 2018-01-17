@@ -1,5 +1,6 @@
 package fact.io.hdureader;
 
+import fact.Constants;
 import stream.Data;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
@@ -92,9 +93,7 @@ public class FITSStream extends AbstractStream {
 
 
     private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants) {
-        int numChannel = 1440;
-
-        for (int ch = 0; ch < numChannel; ch++) {
+        for (int ch = 0; ch < Constants.N_PIXELS; ch++) {
             int startCell = startCellData[ch];
             for (int sliceNum = 0; sliceNum < numSlices; sliceNum++) {
                 int curCell = (startCell + sliceNum) % 1024;

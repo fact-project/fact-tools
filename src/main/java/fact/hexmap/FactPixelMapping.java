@@ -3,6 +3,7 @@
  */
 package fact.hexmap;
 
+import fact.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -29,9 +30,9 @@ public class FactPixelMapping implements PixelMapping {
 
     //store each pixel by its 'geometric' or axial coordinate.
     private final CameraPixel[][] offsetCoordinates = new CameraPixel[45][40];
-    public final CameraPixel[] pixelArray = new CameraPixel[1440];
-    private final int[] chId2softId = new int[1440];
-    private final int[] software2chId = new int[1440];
+    public final CameraPixel[] pixelArray = new CameraPixel[Constants.N_PIXELS];
+    private final int[] chId2softId = new int[Constants.N_PIXELS];
+    private final int[] software2chId = new int[Constants.N_PIXELS];
 
     private final int[][][] neighbourOffsets = {
             {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}}, //even
@@ -337,7 +338,7 @@ public class FactPixelMapping implements PixelMapping {
         }
 
         //we should sort this by chid
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             Data item = null;
             try {
                 item = stream.readNext();
@@ -369,7 +370,7 @@ public class FactPixelMapping implements PixelMapping {
 
     @Override
     public int getNumberOfPixel() {
-        return 1440;
+        return Constants.N_PIXELS;
     }
 
     @Override

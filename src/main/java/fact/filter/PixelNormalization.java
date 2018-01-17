@@ -3,6 +3,7 @@
  */
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +38,9 @@ public class PixelNormalization implements Processor {
         double[] data = (double[]) item.get(key);
         double[] normalizedSlices = new double[data.length];
 
+        int roi = data.length / Constants.N_PIXELS;
 
-        int pixels = 1440;
-        int roi = data.length / pixels;
-
-        for (int pix = 0; pix < pixels; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             double min = Double.MAX_VALUE;
             double max = Double.MIN_VALUE;
             for (int slice = 0; slice < roi; slice++) {

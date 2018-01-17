@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,10 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     @Parameter(required = true, description = "")
     public String outputKey;
 
-    double[] wi = new double[1440 * numberOfSlices];
-    double[] wli = new double[1440 * numberOfSlices];
-    double[] s_n = new double[1440 * numberOfSlices];
-    double[] time_offsets = new double[1440 * numberOfSlices];
+    double[] wi = new double[Constants.N_PIXELS * numberOfSlices];
+    double[] wli = new double[Constants.N_PIXELS * numberOfSlices];
+    double[] s_n = new double[Constants.N_PIXELS * numberOfSlices];
+    double[] time_offsets = new double[Constants.N_PIXELS * numberOfSlices];
 
     /**
      * Just a way of keeping the process() method small:

@@ -4,6 +4,7 @@
 package fact.hexmap.ui.components;
 
 import com.google.common.eventbus.Subscribe;
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.ui.Bus;
@@ -233,7 +234,7 @@ public class MainPlotPanel extends JPanel implements EventObserver, SliceObserve
 
     private XYSeries createSeriesForPixel(String name, double[] data, int roi, CameraPixel p) {
         XYSeries series = new XYSeries(name);
-        if (data.length == 1440) {
+        if (data.length == Constants.N_PIXELS) {
             series.add(0, data[p.id]);
             return series;
         }

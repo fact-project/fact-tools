@@ -82,7 +82,7 @@ public class Utils {
     public static double[] averageSlicesForEachPixel(double[] data) {
         int roi = data.length / Constants.N_PIXELS;
         double[] average = new double[roi];
-        double[][] values = Utils.sortPixels(data, 1440);
+        double[][] values = Utils.sortPixels(data, Constants.N_PIXELS);
         int slice = 0;
         for (double[] slices : values) {
             for (double s : slices) {
@@ -92,7 +92,7 @@ public class Utils {
             slice = 0;
         }
         for (int i = 0; i < average.length; i++) {
-            average[i] /= 1440.0;
+            average[i] /= (double) Constants.N_PIXELS;
         }
         return average;
     }
