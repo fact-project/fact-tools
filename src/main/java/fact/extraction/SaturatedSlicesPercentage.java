@@ -16,7 +16,7 @@ public class SaturatedSlicesPercentage implements Processor {
     public String inputKey = "Data";
 
     @Parameter
-    public String outputKey = "saturatedSlicesPercentage";
+    public String outputKey = "saturated_slices_percentage";
 
     @Parameter
     public double threshold = 2048;

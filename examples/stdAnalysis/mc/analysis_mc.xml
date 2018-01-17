@@ -45,13 +45,14 @@
       <!-- Output: source independent parameters -->
 
       <fact.features.source.SourcePosition
-              outputKey="sourcePosition"
+              outputKey="source_position"
               pointingZdKey="MPointingPos.fZd"
               pointingAzKey="MPointingPos.fAz"
               sourceZdKey="MSimSourcePos.fZd"
               sourceAzKey="MSimSourcePos.fAz"
       />
 
+      <fact.utils.SanitizeKeys />
       <fact.io.FITSWriter url="${outfile}" keys="${keysForOutput}"/>
   </process>
 </container>

@@ -69,14 +69,15 @@
         <!-- Output: source independent parameters -->
 
         <fact.features.source.SourcePosition
-                outputKey="sourcePosition"
+                outputKey="source_position"
                 pointingZdKey="MPointingPos.fZd"
                 pointingAzKey="MPointingPos.fAz"
                 sourceZdKey="MSimSourcePos.fZd"
                 sourceAzKey="MSimSourcePos.fAz"
         />
 
-        <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
+        <fact.utils.SanitizeKeys />
+	<!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
         <fact.io.JSONWriter keys="${keysForOutput}"
             url="${output}"
             writeListOfItems="True"

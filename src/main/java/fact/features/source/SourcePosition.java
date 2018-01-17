@@ -182,21 +182,21 @@ public class SourcePosition implements StatefulProcessor {
         }
 
         data.put(outputKey, sourceCamera);
-        data.put(outputKey + "X", sourceCamera.xMM);
-        data.put(outputKey + "Y", sourceCamera.yMM);
+        data.put(outputKey + "_x", sourceCamera.xMM);
+        data.put(outputKey + "_y", sourceCamera.yMM);
 
-        data.put("auxPointingPosition", auxPointingHorizontal);
-        data.put("pointingPosition", pointingHorizontal);
-        data.put("sourcePositionHorizontal", sourceHorizontal);
+        data.put("aux_pointing_position", auxPointingHorizontal);
+        data.put("pointing_position", pointingHorizontal);
+        data.put("source_position_horizontal", sourceHorizontal);
 
-        data.put("sourcePositionZd", sourceHorizontal.getZenithDeg());
-        data.put("sourcePositionAz", sourceHorizontal.getAzimuthDeg());
+        data.put("source_position_zd", sourceHorizontal.getZenithDeg());
+        data.put("source_position_az", sourceHorizontal.getAzimuthDeg());
 
-        data.put("auxPointingPositionZd", auxPointingHorizontal.getZenithDeg());
-        data.put("auxPointingPositionAz", auxPointingHorizontal.getAzimuthDeg());
+        data.put("aux_pointing_position_zd", auxPointingHorizontal.getZenithDeg());
+        data.put("aux_pointing_position_az", auxPointingHorizontal.getAzimuthDeg());
 
-        data.put("pointingPositionZd", pointingHorizontal.getZenithDeg());
-        data.put("pointingPositionAz", pointingHorizontal.getAzimuthDeg());
+        data.put("pointing_position_zd", pointingHorizontal.getZenithDeg());
+        data.put("pointing_position_az", pointingHorizontal.getAzimuthDeg());
 
         data.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
 

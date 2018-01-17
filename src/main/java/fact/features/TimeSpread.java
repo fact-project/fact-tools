@@ -18,7 +18,7 @@ public class TimeSpread implements Processor {
     public String pixelSetKey = null;
 
     @Parameter(required = false)
-    public String outputKey = "timeSpread";
+    public String outputKey = "timepread";
 
     @Override
     public Data process(Data input) {
@@ -58,7 +58,7 @@ public class TimeSpread implements Processor {
         double weightedTimespread = Math.sqrt(sumwtt / sumw - Math.pow(sumwt / sumw, 2));
 
         input.put(outputKey, timespread);
-        input.put(outputKey + "Weighted", weightedTimespread);
+        input.put(outputKey + "_weighted", weightedTimespread);
 
         return input;
     }

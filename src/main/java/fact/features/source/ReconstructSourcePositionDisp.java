@@ -31,7 +31,7 @@ public class ReconstructSourcePositionDisp implements Processor {
     public double signM3lConstant = 0;
 
     public Data process(Data input) {
-        Utils.mapContainsKeys(input, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey);
+        Utils.mapContainsKeys(input, dispKey, cogKey,  deltaKey, cosDeltaAlphaKey, m3LongKey);
         Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
 
         double disp = (double) input.get(dispKey);
