@@ -28,11 +28,34 @@ public class FactStandardAnalysisTest {
             BinTable table = fits.getBinTableByName("Events").get();
 
             assertEquals(3, (long) table.numberOfRowsInTable);
-        
+
 
         } catch (Exception e) {
             e.printStackTrace();
             fail("Could not run examples/stdAnalysis/data/analysis.xml");
+        }
+    }
+
+    @Test
+    public void dataTestSource() {
+
+        try {
+            File xml = new File("examples/stdAnalysis/data/analysis_with_source_dependent.xml");
+            File outFile = File.createTempFile("facttools_test", ".fits");
+
+            String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
+
+            fact.run.main(args);
+
+            FITS fits = FITS.fromFile(outFile);
+            BinTable table = fits.getBinTableByName("Events").get();
+
+            assertEquals(3, (long) table.numberOfRowsInTable);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Could not run examples/stdAnalysis/data/analysis_with_source_dependent.xml");
         }
     }
 
