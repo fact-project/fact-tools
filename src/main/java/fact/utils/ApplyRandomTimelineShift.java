@@ -42,9 +42,9 @@ public class ApplyRandomTimelineShift implements Processor {
         double[] data = (double[]) input.get(key);
         double[] shifted_data = new double[data.length];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int first = pix * roi;
 
             Double randomOffset = (rand.nextGaussian() * stdDeviation);

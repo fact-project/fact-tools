@@ -1,7 +1,6 @@
 package fact.features.muon;
 
 import fact.Constants;
-import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
@@ -91,7 +90,7 @@ public class HoughTransform implements StatefulProcessor {
     private double[] circle_x;
     private double[] circle_r;
 
-    public ArrayList<ArrayList<int[]>> chid2circles = new ArrayList<>(Constants.NUMBEROFPIXEL);
+    public ArrayList<ArrayList<int[]>> chid2circles = new ArrayList<>(Constants.N_PIXELS);
     public HashMap<RingId, ArrayList<Integer>> circle2chids = new HashMap<>();
 
     public final class RingId {
@@ -255,7 +254,7 @@ public class HoughTransform implements StatefulProcessor {
             double distance;
             for (int i = 0; i < 3; i++) {
                 PixelSet CirclePixelSet = new PixelSet();
-                for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+                for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
                     CameraPixel p = m.getPixelFromId(pix);
                     double pix_x = p.getXPositionInMM();
                     double pix_y = p.getYPositionInMM();
@@ -306,7 +305,7 @@ public class HoughTransform implements StatefulProcessor {
         }
 
 
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             ArrayList<int[]> circles = new ArrayList<>();
             CameraPixel pix = m.getPixelFromId(chid);
             double pix_x = pix.getXPositionInMM();

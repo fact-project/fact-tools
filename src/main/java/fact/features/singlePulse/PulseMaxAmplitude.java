@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  * This processor calculates the position of the maximum value for each pulse in each pixel.
- * Input and output are both arrays of size NUMBEROFPIXEL with lists of positions for each pixel.
+ * Input and output are both arrays of size N_PIXELS with lists of positions for each pixel.
  * <p>
  * modified by Katie Gray (kathryn.gray@tu-dortmund.de) from MaxAmplitudePosition
  */
@@ -37,11 +37,11 @@ public class PulseMaxAmplitude implements Processor {
     public Data process(Data input) {
         double[] data = (double[]) input.get(key);
         int[][] pulsePositions = (int[][]) input.get(pulsePositionKey);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
-        int[][] positions = new int[Constants.NUMBEROFPIXEL][];
+        int roi = data.length / Constants.N_PIXELS;
+        int[][] positions = new int[Constants.N_PIXELS][];
 
         //for each pixel
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             positions[pix] = new int[pulsePositions[pix].length];
             positions[pix] = findMaximumPositions(pix, roi, data, pulsePositions);
         }

@@ -40,17 +40,17 @@ public class TimeOverThresholdArray implements Processor {
         Utils.isKeyValid(input, dataKey, double[].class);
         Utils.isKeyValid(input, positionsKey, int[][].class);
 
-        int[][] timeOverThresholdArrayList = new int[Constants.NUMBEROFPIXEL][];
+        int[][] timeOverThresholdArrayList = new int[Constants.N_PIXELS][];
 
         double[] data = (double[]) input.get(dataKey);
         int[][] posArray = (int[][]) input.get(positionsKey);
 
         double[] width = new double[data.length];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         //Loop over pixels
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
 
             ArrayList<Integer> timeOverThresholdArray = new ArrayList<Integer>();
 

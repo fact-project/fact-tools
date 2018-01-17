@@ -46,22 +46,22 @@ public class WaveformFluctuation implements Processor {
     public Data process(Data input) {
 
         Utils.mapContainsKeys(input, key);
-        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.NUMBEROFPIXEL, pixelSetKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.N_PIXELS, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
         double[] data = (double[]) input.get(key);
 
-        double[] chargeMean = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeStd = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeVariance = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeKurtosis = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeMax = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeMin = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeSkewness = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeMedian = new double[Constants.NUMBEROFPIXEL];
-        double[] chargeSum = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeMean = new double[Constants.N_PIXELS];
+        double[] chargeStd = new double[Constants.N_PIXELS];
+        double[] chargeVariance = new double[Constants.N_PIXELS];
+        double[] chargeKurtosis = new double[Constants.N_PIXELS];
+        double[] chargeMax = new double[Constants.N_PIXELS];
+        double[] chargeMin = new double[Constants.N_PIXELS];
+        double[] chargeSkewness = new double[Constants.N_PIXELS];
+        double[] chargeMedian = new double[Constants.N_PIXELS];
+        double[] chargeSum = new double[Constants.N_PIXELS];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         Random rand = new Random(Seed);
 
@@ -69,7 +69,7 @@ public class WaveformFluctuation implements Processor {
         int iterations = bound / windowSize;
         log.debug("Iterations: " + iterations);
 
-        double[][] charge = new double[Constants.NUMBEROFPIXEL][iterations];
+        double[][] charge = new double[Constants.N_PIXELS][iterations];
 
 
         //Loop over all pixel and calculate integrals on timeline

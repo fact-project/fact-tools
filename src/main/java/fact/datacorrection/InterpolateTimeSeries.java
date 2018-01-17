@@ -72,7 +72,7 @@ public class InterpolateTimeSeries implements Processor {
     }
 
     public double[] interpolateTimeSeries(double[] data, PixelSet badPixelSet) {
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         for (CameraPixel pixel : badPixelSet) {
             CameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);

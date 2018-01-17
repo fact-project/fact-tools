@@ -60,14 +60,14 @@ public class CorrectSaturation implements Processor {
         double[] corrData = data.clone();
 
         //Marker
-        IntervalMarker[] markWidth = new IntervalMarker[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] markMaxPos = new IntervalMarker[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] markDeltaT = new IntervalMarker[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] markEstArrivalTime = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] markWidth = new IntervalMarker[Constants.N_PIXELS];
+        IntervalMarker[] markMaxPos = new IntervalMarker[Constants.N_PIXELS];
+        IntervalMarker[] markDeltaT = new IntervalMarker[Constants.N_PIXELS];
+        IntervalMarker[] markEstArrivalTime = new IntervalMarker[Constants.N_PIXELS];
 
         // ------------------------------------------------------------------------------------------------------------
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int firstSlice = roi * pix;
             int firstSliceAboveThresh = (int) firstSlOverThresh[pix];
             int maxPosInPix = pix * roi + maxPos[pix];

@@ -101,7 +101,7 @@ public class GaussianFit implements StatefulProcessor {
     }
 
     public void init(ProcessContext context) {
-        int npix = Constants.NUMBEROFPIXEL;
+        int npix = Constants.N_PIXELS;
         pixelX = new double[npix];
         pixelY = new double[npix];
 

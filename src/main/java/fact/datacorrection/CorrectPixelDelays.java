@@ -29,7 +29,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
 
     private double[] pixelDelays = null;
 
-    private int npix = Constants.NUMBEROFPIXEL;
+    private int npix = Constants.N_PIXELS;
 
     @Override
     public Data process(Data item) {

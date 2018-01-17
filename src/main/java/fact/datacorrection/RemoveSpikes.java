@@ -64,7 +64,7 @@ public class RemoveSpikes implements Processor {
                 spikeInfos = new SpikeInfos();
             }
 
-            for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
+            for (int px = 0; px < Constants.N_PIXELS; px++) {
                 int rightBorder = roi - spikeLength;
                 // we want to skip the timemarker signal (which only occur in files with roi == 300) in the spike removal
                 if (px % 9 == 8 && roi == 300) {

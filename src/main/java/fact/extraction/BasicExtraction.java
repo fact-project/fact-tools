@@ -67,14 +67,14 @@ public class BasicExtraction implements Processor {
 
         double[] data = (double[]) input.get(dataKey);
 
-        int[] positions = new int[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] mPositions = new IntervalMarker[Constants.NUMBEROFPIXEL];
-        double[] photonCharge = new double[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] mPhotonCharge = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        int[] positions = new int[Constants.N_PIXELS];
+        IntervalMarker[] mPositions = new IntervalMarker[Constants.N_PIXELS];
+        double[] photonCharge = new double[Constants.N_PIXELS];
+        IntervalMarker[] mPhotonCharge = new IntervalMarker[Constants.N_PIXELS];
 
         Utils.checkWindow(startSearchWindow, rangeSearchWindow, rangeHalfHeightWindow + validMinimalSlice, roi);
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             positions[pix] = calculateMaxPosition(pix, startSearchWindow, startSearchWindow + rangeSearchWindow, roi, data);
             mPositions[pix] = new IntervalMarker(positions[pix], positions[pix] + 1);
 
@@ -140,7 +140,7 @@ public class BasicExtraction implements Processor {
 
 
     public double[] loadIntegralGainFile(SourceURL inputUrl) {
-        double[] integralGains = new double[Constants.NUMBEROFPIXEL];
+        double[] integralGains = new double[Constants.N_PIXELS];
         Data integralGainData = null;
         try {
             CsvStream stream = new CsvStream(inputUrl, " ");
@@ -148,7 +148,7 @@ public class BasicExtraction implements Processor {
             stream.init();
             integralGainData = stream.readNext();
 
-            for (int i = 0; i < Constants.NUMBEROFPIXEL; i++) {
+            for (int i = 0; i < Constants.N_PIXELS; i++) {
                 String key = "column:" + (i);
                 integralGains[i] = (Double) integralGainData.get(key);
             }

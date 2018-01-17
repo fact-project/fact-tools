@@ -1,7 +1,6 @@
 package fact.datacorrection;
 
 import fact.Constants;
-import fact.Utils;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
@@ -83,8 +82,8 @@ public class DrsTimeCalibration implements StatefulProcessor {
             throw new RuntimeException("Couldn't find StartCellData");
         }
 
-        double[] relativeTimeOffsets = new double[roi * Constants.NUMBEROFPIXEL];
-        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
+        double[] relativeTimeOffsets = new double[roi * Constants.N_PIXELS];
+        for (int px = 0; px < Constants.N_PIXELS; px++) {
             int patch = px / 9;
             double offsetAtStartCell = absoluteTimeOffsets[patch * numberOfSlices + startCell[px]];
             for (int slice = 0; slice < roi; slice++) {
@@ -94,11 +93,11 @@ public class DrsTimeCalibration implements StatefulProcessor {
         }
 
         double[] data = (double[]) input.get(dataKey);
-        roi = data.length / Constants.NUMBEROFPIXEL;
+        roi = data.length / Constants.N_PIXELS;
         TimeCorrectionKernel tcKernel = new LinearTimeCorrectionKernel();
 
-        double[] calibratedValues = new double[roi * Constants.NUMBEROFPIXEL];
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+        double[] calibratedValues = new double[roi * Constants.N_PIXELS];
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             double[] realtimes = new double[roi];
             double[] values = new double[roi];
 

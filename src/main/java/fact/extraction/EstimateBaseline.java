@@ -1,7 +1,6 @@
 package fact.extraction;
 
 import fact.Constants;
-import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 import stream.Processor;
@@ -32,13 +31,13 @@ public class EstimateBaseline implements Processor {
         roi = (Integer) input.get("NROI");
 
         double[] data = (double[]) input.get(dataKey);
-        double[] baseline = new double[Constants.NUMBEROFPIXEL];
+        double[] baseline = new double[Constants.N_PIXELS];
 
         double[] mBslLevel = new double[data.length];
 
-        IntervalMarker[] mBslRange = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] mBslRange = new IntervalMarker[Constants.N_PIXELS];
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int firstSl = pix * roi + firstSlice;
             int lastSl = firstSl + range;
 

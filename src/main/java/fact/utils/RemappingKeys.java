@@ -1,7 +1,6 @@
 package fact.utils;
 
 import fact.Constants;
-import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +68,13 @@ public class RemappingKeys implements Processor {
                 } else {
                     throw new RuntimeException("The key: " + key + " is of type: " + type + ". Only float,double,int,String supported at the moment!");
                 }
-                if (length != Constants.NUMBEROFPIXEL) {
-                    throw new RuntimeException("The length of key: " + key + " is not equal to the Number of Pixels: " + Constants.NUMBEROFPIXEL);
+                if (length != Constants.N_PIXELS) {
+                    throw new RuntimeException("The length of key: " + key + " is not equal to the Number of Pixels: " + Constants.N_PIXELS);
                 }
             } else {
                 throw new RuntimeException("The key: " + key + " is not an array");
             }
-            for (int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++) {
+            for (int softId = 0; softId < Constants.N_PIXELS; softId++) {
                 int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
                 System.arraycopy(arrayInSoftID, softId, arrayInCHID, chid, 1);
             }

@@ -74,8 +74,8 @@ public class ClusterFellwalker implements Processor {
 
     @Override
     public Data process(Data data) {
-        int[] shower = Utils.getValidPixelSetAsIntArr(data, Constants.NUMBEROFPIXEL, showerKey);
-        int[] area = Utils.getValidPixelSetAsIntArr(data, Constants.NUMBEROFPIXEL, areaKey);
+        int[] shower = Utils.getValidPixelSetAsIntArr(data, Constants.N_PIXELS, showerKey);
+        int[] area = Utils.getValidPixelSetAsIntArr(data, Constants.N_PIXELS, areaKey);
 
 
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));

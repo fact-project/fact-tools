@@ -39,20 +39,20 @@ public class TimeOverThresholdTL implements Processor {
     public Data process(Data input) {
         Utils.isKeyValid(input, dataKey, double[].class);
 
-        int[] timeOverThresholdArray = new int[Constants.NUMBEROFPIXEL];
+        int[] timeOverThresholdArray = new int[Constants.N_PIXELS];
 
         double[] data = (double[]) input.get(dataKey);
 
         PixelSet pixelSet = new PixelSet();
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         if (range < 0) {
             range = roi - firstSlice;
         }
 
         //Loop over pixels
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
 
             int pos = pix * roi;
 

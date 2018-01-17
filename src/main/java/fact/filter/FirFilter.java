@@ -41,8 +41,8 @@ public class FirFilter implements Processor {
         double[] result = new double[data.length];
 
         // foreach pixel
-        int roi = data.length / Constants.NUMBEROFPIXEL;
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        int roi = data.length / Constants.N_PIXELS;
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             // result[pix*roi] =
             // iterate over all slices
             for (int slice = 0; slice < roi; slice++) {

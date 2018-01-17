@@ -50,10 +50,10 @@ public class FWHMPulses implements Processor {
         double[] minAmplitudes = (double[]) input.get(minPosKey);
         int[][] maxPosArrayList = (int[][]) input.get(maxPosKey);
 
-        double[][] widthArrayList = new double[Constants.NUMBEROFPIXEL][];
+        double[][] widthArrayList = new double[Constants.N_PIXELS][];
         double[] visualisation = new double[data.length];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         for (int pix = 0; pix < maxPosArrayList.length; pix++) {
             double offset = minAmplitudes[pix];

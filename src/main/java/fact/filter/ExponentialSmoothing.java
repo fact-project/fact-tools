@@ -37,10 +37,10 @@ public class ExponentialSmoothing implements Processor {
         Utils.isKeyValid(item, key, double[].class);
         double[] data = (double[]) item.get(key);
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
         double[] smoothedData = new double[data.length];
         //foreach pixel
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             //beginn with startvalue
             smoothedData[pix * roi] = data[pix * roi];
             for (int slice = 1; slice < roi; slice++) {

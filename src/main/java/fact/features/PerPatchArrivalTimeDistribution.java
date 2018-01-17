@@ -27,14 +27,14 @@ public class PerPatchArrivalTimeDistribution implements Processor {
         Utils.mapContainsKeys(input, key);
 
         double[] arrivalTimeArray = Utils.toDoubleArray(input.get(key));
-        double[] perPatchMean = new double[Constants.NUMBEROFPIXEL / 9];
-        double[] perPatchVariance = new double[Constants.NUMBEROFPIXEL / 9];
+        double[] perPatchMean = new double[Constants.N_PIXELS / 9];
+        double[] perPatchVariance = new double[Constants.N_PIXELS / 9];
 
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             int patch = chid / 9;
             perPatchMean[patch] += arrivalTimeArray[chid] / 9.0;
         }
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             int patch = chid / 9;
             perPatchVariance[patch] += (arrivalTimeArray[chid] - perPatchMean[patch]) * (arrivalTimeArray[chid] - perPatchMean[patch]) / 8.0;
         }

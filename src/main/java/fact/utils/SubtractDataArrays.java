@@ -32,12 +32,12 @@ public class SubtractDataArrays implements Processor {
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
         Utils.isKeyValid(input, subtractedKey, double[].class);
-        double[] subtractedArray = new double[Constants.NUMBEROFPIXEL];
+        double[] subtractedArray = new double[Constants.N_PIXELS];
 
         double[] array1 = (double[]) input.get(key);
         double[] array2 = (double[]) input.get(subtractedKey);
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             subtractedArray[pix] = array1[pix] - array2[pix];
         }
 

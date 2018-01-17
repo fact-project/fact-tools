@@ -37,7 +37,7 @@ public class CleaningEvaluate implements Processor {
         ArrayList<Integer> wrongIdentifiedShowerPixel = new ArrayList<Integer>();
         ArrayList<Integer> notIdentifiedShowerPixel = new ArrayList<Integer>();
 
-        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
+        for (int px = 0; px < Constants.N_PIXELS; px++) {
             double cherSignalOverNoise = cherenkovWeight[px] / (noiseWeight[px] * integrationWindow / NumberOfSimulatedSlices);
             if (cherSignalOverNoise > mcShowerThreshold) {
                 notIdentifiedShowerPixel.add(px);

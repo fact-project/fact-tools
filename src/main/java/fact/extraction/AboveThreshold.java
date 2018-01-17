@@ -39,7 +39,7 @@ public class AboveThreshold implements Processor {
 
         int numSlicesAboveThreshold = 0;
         PixelSet pixelsAboveThreshold = new PixelSet();
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             for (int slice = 0; slice < roi; slice++) {
                 final int pos = pix * roi + slice;
                 if (timeSeries[pos] > thresholdShort) {
@@ -49,11 +49,11 @@ public class AboveThreshold implements Processor {
             }
         }
 
-        final double ratioOfPixels = (double) pixelsAboveThreshold.set.size() / (double) Constants.NUMBEROFPIXEL;
+        final double ratioOfPixels = (double) pixelsAboveThreshold.set.size() / (double) Constants.N_PIXELS;
 
         input.put(outputKey, pixelsAboveThreshold);
         input.put(outputKey + "PixelRatio", ratioOfPixels);
-        input.put(outputKey + "SliceRatio", numSlicesAboveThreshold / ((double) roi * Constants.NUMBEROFPIXEL));
+        input.put(outputKey + "SliceRatio", numSlicesAboveThreshold / ((double) roi * Constants.N_PIXELS));
         input.put(outputKey + "PixelCount", pixelsAboveThreshold.set.size());
         input.put(outputKey + "SliceCount", numSlicesAboveThreshold);
 

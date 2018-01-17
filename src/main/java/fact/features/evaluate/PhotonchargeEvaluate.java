@@ -37,15 +37,15 @@ public class PhotonchargeEvaluate implements Processor {
     public Data process(Data input) {
         Utils.mapContainsKeys(input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
 
-        double[] qualityFactorPhotoncharge = new double[Constants.NUMBEROFPIXEL];
-        double[] qualityFactorArrivalTime = new double[Constants.NUMBEROFPIXEL];
+        double[] qualityFactorPhotoncharge = new double[Constants.N_PIXELS];
+        double[] qualityFactorArrivalTime = new double[Constants.N_PIXELS];
 
         double[] photoncharge = Utils.toDoubleArray(input.get(photonchargeKey));
         double[] arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));
         double[] cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));
         double[] cherenkovArrTimeMean = Utils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
-        
-        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
+
+        for (int px = 0; px < Constants.N_PIXELS; px++) {
             qualityFactorPhotoncharge[px] = photoncharge[px] / cherenkovWeight[px];
             qualityFactorArrivalTime[px] = arrivalTime[px] / cherenkovArrTimeMean[px];
         }

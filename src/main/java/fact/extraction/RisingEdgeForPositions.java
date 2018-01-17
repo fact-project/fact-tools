@@ -37,17 +37,17 @@ public class RisingEdgeForPositions implements Processor {
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
 
-        double[] positions = new double[Constants.NUMBEROFPIXEL];
-        double[] maxSlopes = new double[Constants.NUMBEROFPIXEL];
+        double[] positions = new double[Constants.N_PIXELS];
+        double[] maxSlopes = new double[Constants.N_PIXELS];
 
         double[] data = (double[]) input.get(dataKey);
         int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
 
-        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] m = new IntervalMarker[Constants.N_PIXELS];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int posMaxAmp = amplitudePositions[pix];
 
             // temp. Variables

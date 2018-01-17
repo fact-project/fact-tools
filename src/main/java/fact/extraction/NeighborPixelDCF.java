@@ -61,28 +61,28 @@ public class NeighborPixelDCF implements StatefulProcessor {
             noise = (double[]) input.get(noiseKey);
         }
 
-        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.NUMBEROFPIXEL, pixelSetKey);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(input, Constants.N_PIXELS, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
-        roi = data.length / Constants.NUMBEROFPIXEL;
+        roi = data.length / Constants.N_PIXELS;
 
         //snip pixel Data to arrays without skipped slices
-        double[][] snipedPixelData = Utils.snipPixelData(data, skipFirst, skipLast, Constants.NUMBEROFPIXEL, roi);
+        double[][] snipedPixelData = Utils.snipPixelData(data, skipFirst, skipLast, Constants.N_PIXELS, roi);
 
         //get mean and variance of the timeseries for each pixel
         DescriptiveStatistics[] pixelStatistics = Utils.calculateTimeseriesStatistics(snipedPixelData);
 
-        double[] meanPixDCF = new double[Constants.NUMBEROFPIXEL];
-        double[] meanPixDCFDeltaT = new double[Constants.NUMBEROFPIXEL];
+        double[] meanPixDCF = new double[Constants.N_PIXELS];
+        double[] meanPixDCFDeltaT = new double[Constants.N_PIXELS];
 
-        double[] stdDevPixDCF = new double[Constants.NUMBEROFPIXEL];
-        double[] stdDevPixDCFDeltaT = new double[Constants.NUMBEROFPIXEL];
+        double[] stdDevPixDCF = new double[Constants.N_PIXELS];
+        double[] stdDevPixDCFDeltaT = new double[Constants.N_PIXELS];
 
-        double[] maxPixDCF = new double[Constants.NUMBEROFPIXEL];
-        double[] maxPixDCFDeltaT = new double[Constants.NUMBEROFPIXEL];
+        double[] maxPixDCF = new double[Constants.N_PIXELS];
+        double[] maxPixDCFDeltaT = new double[Constants.N_PIXELS];
 
-        double[] minPixDCF = new double[Constants.NUMBEROFPIXEL];
-        double[] minPixDCFDeltaT = new double[Constants.NUMBEROFPIXEL];
+        double[] minPixDCF = new double[Constants.N_PIXELS];
+        double[] minPixDCFDeltaT = new double[Constants.N_PIXELS];
 
         // TODO: 11.08.16 Make sure that each pair of pixels is only touched once
 
@@ -237,7 +237,7 @@ public class NeighborPixelDCF implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext context) throws Exception {
-        default_noise = new double[Constants.NUMBEROFPIXEL];
+        default_noise = new double[Constants.N_PIXELS];
         Arrays.fill(default_noise, 0.0);
     }
 

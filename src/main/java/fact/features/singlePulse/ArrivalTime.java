@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  * Finds pulse arrival time by searching the 25 slices prior to the maximum and taking the time slice where the amplitude is equal to or just larger than 1/2 the max.
- * * Input and output are both arrays of size NUMBEROFPIXEL with lists of positions for each pixel.
+ * * Input and output are both arrays of size N_PIXELS with lists of positions for each pixel.
  *
  * @author Katie Gray &lt;kathryn.gray@tu-dortmund.de&gt;
  */
@@ -38,8 +38,8 @@ public class ArrivalTime implements Processor {
     public Data process(Data input) {
         double[] data = (double[]) input.get(key);
         int[][] maxAmpPositions = (int[][]) input.get(maxAmpPositionKey);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
-        int[][] arrivalTimes = new int[Constants.NUMBEROFPIXEL][];
+        int roi = data.length / Constants.N_PIXELS;
+        int[][] arrivalTimes = new int[Constants.N_PIXELS][];
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
 
@@ -48,7 +48,7 @@ public class ArrivalTime implements Processor {
         }
 
         //for each pixel
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             arrivalTimes[pix] = new int[maxAmpPositions.length];
             arrivalTimes[pix] = findArrivalTimes(pix, roi, data, maxAmpPositions, visualizePositions);
         }

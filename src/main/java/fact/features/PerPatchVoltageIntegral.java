@@ -21,12 +21,12 @@ public class PerPatchVoltageIntegral implements Processor {
     public Data process(Data input) {
         Utils.mapContainsKeys(input, key);
         double[] dataCalibratedArray = (double[]) input.get(key);
-        int roi = dataCalibratedArray.length / Constants.NUMBEROFPIXEL;
+        int roi = dataCalibratedArray.length / Constants.N_PIXELS;
         double[] perPatchVoltageIntegral = new double[160];
 
         int patch = 0;
 
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             for (int slice = 0; slice < roi; slice++) {
                 patch = chid / 9;
                 perPatchVoltageIntegral[patch] += 0.5 * dataCalibratedArray[chid * roi + slice]; // 0.5 ns per slice

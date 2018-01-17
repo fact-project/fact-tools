@@ -58,13 +58,13 @@ public class ArrivalTimeFromSlope implements Processor {
 
         double[] data = (double[]) input.get(key);
         double[] slopes = (double[]) input.get(derivationKey);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
-        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.NUMBEROFPIXEL);
+        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.N_PIXELS);
         //the position where pulse leading edges end
-        int[][] arrivalTimes = new int[Constants.NUMBEROFPIXEL][];
+        int[][] arrivalTimes = new int[Constants.N_PIXELS][];
         //arrival times for all pulses in each pixel
-        double[][] baselineValues = new double[Constants.NUMBEROFPIXEL][];
+        double[][] baselineValues = new double[Constants.N_PIXELS][];
         //value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
@@ -74,7 +74,7 @@ public class ArrivalTimeFromSlope implements Processor {
         }
 
         //for each pixel
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             ArrayList<Integer> currentPulsePeaks = findPulsePeaks(pix, roi, slopes);
             pulsePeaks.add(currentPulsePeaks);
 

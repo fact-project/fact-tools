@@ -36,9 +36,9 @@ public class RisingEdgePolynomFit implements Processor {
     public Data process(Data input) {
         Utils.mapContainsKeys(input, dataKey, risingEdgeKey, "NROI");
 
-        double[] arrivalTimes = new double[Constants.NUMBEROFPIXEL];
-        double[] maxSlopes = new double[Constants.NUMBEROFPIXEL];
-        IntervalMarker[] marker = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        double[] arrivalTimes = new double[Constants.N_PIXELS];
+        double[] maxSlopes = new double[Constants.N_PIXELS];
+        IntervalMarker[] marker = new IntervalMarker[Constants.N_PIXELS];
 
         double[] data = (double[]) input.get(dataKey);
         int roi = (Integer) input.get("NROI");
@@ -46,10 +46,10 @@ public class RisingEdgePolynomFit implements Processor {
         double[] risingEdges = (double[]) input.get(risingEdgeKey);
 
         if (showFitResult) {
-            fitResult = new double[roi * Constants.NUMBEROFPIXEL];
+            fitResult = new double[roi * Constants.N_PIXELS];
         }
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int pos = (int) risingEdges[pix];
             int[] window = Utils.getValidWindow(pos - numberOfPoints / 2, numberOfPoints, 0, roi);
 

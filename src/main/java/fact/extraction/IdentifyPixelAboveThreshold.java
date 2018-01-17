@@ -31,11 +31,11 @@ public class IdentifyPixelAboveThreshold implements Processor {
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
 
-        double[] matchArray = new double[Constants.NUMBEROFPIXEL];
+        double[] matchArray = new double[Constants.N_PIXELS];
         double[] featureArray = (double[]) input.get(key);
 
         PixelSet pixelSet = new PixelSet();
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             matchArray[pix] = 0;
             if (featureArray[pix] > threshold) {
                 matchArray[pix] = 1;

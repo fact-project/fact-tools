@@ -41,7 +41,7 @@ public class ApplyRandomArrivalTimeShift implements Processor {
     public Data process(Data input) {
         Utils.mapContainsKeys(input, key);
 
-        IntervalMarker[] marker = new IntervalMarker[Constants.NUMBEROFPIXEL];
+        IntervalMarker[] marker = new IntervalMarker[Constants.N_PIXELS];
 
         double[] arrivalTime = (double[]) input.get(key);
         double[] newArrivalTime = new double[arrivalTime.length];

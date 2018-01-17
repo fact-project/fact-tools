@@ -33,12 +33,12 @@ public class DividePixelArrays implements Processor {
         Utils.isKeyValid(input, numeratorKey, double[].class);
         Utils.isKeyValid(input, denominatorKey, double[].class);
 
-        double[] dividedArray = new double[Constants.NUMBEROFPIXEL];
+        double[] dividedArray = new double[Constants.N_PIXELS];
 
         double[] numerator = (double[]) input.get(numeratorKey);
         double[] denominator = (double[]) input.get(denominatorKey);
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             if (denominator[pix] != 0) {
                 dividedArray[pix] = numerator[pix] / denominator[pix];
             } else {

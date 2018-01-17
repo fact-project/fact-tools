@@ -38,12 +38,12 @@ public class MinAmplitudeGlobal implements Processor {
         Utils.isKeyValid(input, key, double[].class);
 
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         //for all pixel find the maximum value
-        double[] min = new double[Constants.NUMBEROFPIXEL];
+        double[] min = new double[Constants.N_PIXELS];
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             min[pix] = globalMinimum(roi, pix, data);
         }
 

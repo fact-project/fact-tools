@@ -58,7 +58,7 @@ public class HandleSaturation implements Processor {
 
         saturatedPixelSet = new PixelSet();
 
-        for (int px = 0; px < Constants.NUMBEROFPIXEL; px++) {
+        for (int px = 0; px < Constants.N_PIXELS; px++) {
             if (photonCharge[px] > limitForSaturatedPixel) {
                 resultArrivalTimes[px] = arrivalTimeSaturated[px];
                 resultPhotonCharge[px] = photonChargeSaturated[px];

@@ -49,9 +49,9 @@ public class MovingMinimum implements StatefulProcessor {
         double[] data = (double[]) input.get(key);
         double[] result = new double[data.length];
 
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             for (int pivot = 0; pivot < roi; pivot++) {
                 int pivotPosition = pix * roi + pivot;
                 int seriesEnd = pix * roi + roi;

@@ -34,7 +34,7 @@ public class CircularFit implements StatefulProcessor {
     public String outputKey = "circFit";
 
     private FactPixelMapping mapping = FactPixelMapping.getInstance();
-    private int npix = Constants.NUMBEROFPIXEL;
+    private int npix = Constants.N_PIXELS;
     private double[] pixelX = new double[npix];
     private double[] pixelY = new double[npix];
 

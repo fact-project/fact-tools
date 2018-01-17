@@ -41,12 +41,12 @@ public class PulseSizeCalculator implements Processor {
         Utils.mapContainsKeys(input, key, arrivalTimeKey);
 
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
         int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
-        double[][] pulseSizes = new double[Constants.NUMBEROFPIXEL][];
+        double[][] pulseSizes = new double[Constants.N_PIXELS][];
 
         //for each pixel
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             pulseSizes[pix] = new double[arrivalTimes[pix].length];
             pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
         }

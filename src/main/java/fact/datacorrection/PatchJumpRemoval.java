@@ -1,6 +1,5 @@
 package fact.datacorrection;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import fact.Constants;
 import fact.Utils;
 import fact.container.JumpInfos;
@@ -107,7 +106,7 @@ public class PatchJumpRemoval implements Processor {
         double[] result = new double[data.length];
         System.arraycopy(data, 0, result, 0, data.length);
 
-        int numberPatches = Constants.NUMBEROFPIXEL / 9;
+        int numberPatches = Constants.N_PIXELS / 9;
 
         boolean stopLoop = false;
 
@@ -119,7 +118,7 @@ public class PatchJumpRemoval implements Processor {
             int[] currPrevTime = prevEventInfo.getPrevUnixTimeCells(prevEvent);
 
             double deltaT = (double) (currentTime[0] - currPrevTime[0]) * 1000.0 + (double) (currentTime[1] - currPrevTime[1]) / 1000.0;
-            jumpInfos = new JumpInfos(Constants.NUMBEROFPIXEL, numberPatches, roi);
+            jumpInfos = new JumpInfos(Constants.N_PIXELS, numberPatches, roi);
 
             // we only want to go on when at least one pixel was corrected (so the jumpheight is larger than the jumpLimit) or
             // previous start and stop cells aren't in the ROI

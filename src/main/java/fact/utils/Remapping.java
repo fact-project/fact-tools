@@ -40,8 +40,8 @@ public class Remapping implements Processor {
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {
-        int roi = data.length / Constants.NUMBEROFPIXEL;
-        for (int softId = 0; softId < Constants.NUMBEROFPIXEL; softId++) {
+        int roi = data.length / Constants.N_PIXELS;
+        for (int softId = 0; softId < Constants.N_PIXELS; softId++) {
             int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
             System.arraycopy(data, softId * roi, remapped, chid * roi, roi);
         }

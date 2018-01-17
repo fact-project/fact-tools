@@ -80,7 +80,7 @@ public class Utils {
      * @return an array of length roi containing the slice averages
      */
     public static double[] averageSlicesForEachPixel(double[] data) {
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
         double[] average = new double[roi];
         double[][] values = Utils.sortPixels(data, 1440);
         int slice = 0;

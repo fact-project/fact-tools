@@ -20,7 +20,7 @@ public class SpikeInfos implements Serializable {
 
     PixelSet spikesSet = new PixelSet();
 
-    IntervalMarker[] spikeMarker = new IntervalMarker[Constants.NUMBEROFPIXEL];
+    IntervalMarker[] spikeMarker = new IntervalMarker[Constants.N_PIXELS];
 
     public void addSpike(int px, int sl, short startCell, double spikeHeight, double averTopSlope) {
 

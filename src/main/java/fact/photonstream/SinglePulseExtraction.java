@@ -81,7 +81,7 @@ public class SinglePulseExtraction implements Processor {
     )
     public int extractionWindowLengthInSlices = 225;
 
-    private int npix = Constants.NUMBEROFPIXEL;
+    private int npix = Constants.N_PIXELS;
     private int roi = 300;
 
     @Override

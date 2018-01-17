@@ -43,15 +43,15 @@ public class FindThresholdCrossings implements Processor {
     @Override
     public Data process(Data input) {
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         //the graph of the array positions visually shows the positions of the crossings for an individual pixel
         double[] positions = new double[data.length];
 
         //the array CrossPositions contains lists of positions of crossings for each pixel
-        int[][] CrossPositions = new int[Constants.NUMBEROFPIXEL][];
+        int[][] CrossPositions = new int[Constants.N_PIXELS][];
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             //creates a list of positions of threshold crossings for a single pixel
             ArrayList<Integer> slices = new ArrayList<Integer>();
 
@@ -99,7 +99,7 @@ public class FindThresholdCrossings implements Processor {
             if (slice + k > roi) {
                 return false;
             }
-            if (pos + k == Constants.NUMBEROFPIXEL * roi) {
+            if (pos + k == Constants.N_PIXELS * roi) {
                 return false;
             }
             if (data[pos + k] <= threshold) {

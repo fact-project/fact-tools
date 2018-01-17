@@ -32,12 +32,12 @@ public class MaxAmplitude implements Processor {
     public Data process(Data input) {
         Utils.isKeyValid(input, key, double[].class);
         double[] data = (double[]) input.get(key);
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
 
         //for all pixel find the maximum value
-        double[] max = new double[Constants.NUMBEROFPIXEL];
+        double[] max = new double[Constants.N_PIXELS];
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             max[pix] = maximum(roi, pix, data);
         }
 

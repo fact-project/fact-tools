@@ -37,12 +37,12 @@ public class PhotonChargeTimeOverThreshold implements Processor {
         Utils.isKeyValid(input, timeOverThresholdKey, int[].class);
         Utils.isKeyValid(input, thresholdKey, Double.class);
 
-        double[] chargeFromThresholdArray = new double[Constants.NUMBEROFPIXEL];
+        double[] chargeFromThresholdArray = new double[Constants.N_PIXELS];
 
         int[] timeOverThresholdArray = (int[]) input.get(timeOverThresholdKey);
         threshold = (Double) input.get(thresholdKey);
 
-        for (int pix = 0; pix < Constants.NUMBEROFPIXEL; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
 
             chargeFromThresholdArray[pix] = 0.;
 
