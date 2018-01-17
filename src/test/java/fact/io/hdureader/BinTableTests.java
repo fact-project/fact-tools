@@ -1,5 +1,6 @@
 package fact.io.hdureader;
 
+import fact.Constants;
 import fact.Utils;
 import org.junit.Test;
 
@@ -62,7 +63,7 @@ public class BinTableTests {
         assertThat(row.size(), is(b.numberOfColumnsInTable));
 
         short[] data = (short[]) row.get("Data");
-        assertThat(data.length, is(1440 * 300));
+        assertThat(data.length, is(Constants.N_PIXELS * 300));
 
 
         int[] boardTime = (int[]) row.get("BoardTime");

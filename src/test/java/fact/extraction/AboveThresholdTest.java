@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import org.junit.Test;
 import stream.Data;
@@ -18,7 +19,7 @@ public class AboveThresholdTest {
     public void testAboveThresholdAllZero() {
 
         Data data = DataFactory.create();
-        short[] raw_fact_data = new short[1440 * 300];
+        short[] raw_fact_data = new short[Constants.N_PIXELS * 300];
 
         data.put("data", raw_fact_data);
         data.put("NROI", 300);
@@ -46,14 +47,14 @@ public class AboveThresholdTest {
     public void testAboveThresholdCertainPixelsAbove() {
 
         Data data = DataFactory.create();
-        short[] raw_fact_data = new short[1440 * 300];
+        short[] raw_fact_data = new short[Constants.N_PIXELS * 300];
 
         PixelSet testPixels = new PixelSet();
         testPixels.addById(42);
         testPixels.addById(314);
         testPixels.addById(1337);
 
-        for (int pix = 0; pix < 1440; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             for (int slice = 0; slice < 300; slice++) {
                 final int pos = pix * 300 + slice;
                 if ((pix == 42 || pix == 314 || pix == 1337) && (slice == 271 || slice == 256)) {
@@ -77,8 +78,8 @@ public class AboveThresholdTest {
 
         assertEquals(3, (int) data.get("outputPixelCount"));
         assertEquals(6, (int) data.get("outputSliceCount"));
-        assertEquals(3.0 / 1440.0, data.get("outputPixelRatio"));
-        assertEquals(6.0 / (1440.0 * 300.0), data.get("outputSliceRatio"));
+        assertEquals(3.0 / Constants.N_PIXELS, data.get("outputPixelRatio"));
+        assertEquals(6.0 / (Constants.N_PIXELS * 300.0), data.get("outputSliceRatio"));
 
         assertEquals(3, pixelsAboveThreshold.set.size());
         assertTrue(pixelsAboveThreshold.set.equals(testPixels.set));
@@ -89,9 +90,9 @@ public class AboveThresholdTest {
     public void testAboveThresholdAllPixelsAbove() {
 
         Data data = DataFactory.create();
-        short[] raw_fact_data = new short[1440 * 300];
+        short[] raw_fact_data = new short[Constants.N_PIXELS * 300];
 
-        for (int i = 0; i < 1440 * 300; i++) {
+        for (int i = 0; i < Constants.N_PIXELS * 300; i++) {
             raw_fact_data[i] = 2000;
         }
 
@@ -105,9 +106,9 @@ public class AboveThresholdTest {
         above.process(data);
 
         PixelSet pixelsAboveThreshold = (PixelSet) data.get("output");
-        assertEquals(1440, (int) data.get("outputPixelCount"));
-        assertEquals(1440.0 / 1440.0, data.get("outputPixelRatio"));
-        assertEquals(1440, pixelsAboveThreshold.set.size());
+        assertEquals(Constants.N_PIXELS, (int) data.get("outputPixelCount"));
+        assertEquals(Constants.N_PIXELS / Constants.N_PIXELS, data.get("outputPixelRatio"));
+        assertEquals(Constants.N_PIXELS, pixelsAboveThreshold.set.size());
 
     }
 
@@ -115,9 +116,11 @@ public class AboveThresholdTest {
     public void testAboveThresholdJustBelow() {
 
         Data data = DataFactory.create();
-        short[] raw_fact_data = new short[1];
+        short[] raw_fact_data = new short[Constants.N_PIXELS];
 
-        raw_fact_data[0] = 10;
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
+            raw_fact_data[chid] = 10;
+        }
 
         data.put("data", raw_fact_data);
         data.put("NROI", 1);
@@ -141,8 +144,8 @@ public class AboveThresholdTest {
         at2.process(data);
 
         pixelsAboveThreshold = (PixelSet) data.get("output");
-        assertEquals(1, (int) data.get("outputPixelCount"));
+        assertEquals(Constants.N_PIXELS, (int) data.get("outputPixelCount"));
         assertEquals(1.0, data.get("outputPixelRatio"));
-        assertEquals(1, pixelsAboveThreshold.set.size());
+        assertEquals(Constants.N_PIXELS, pixelsAboveThreshold.size());
     }
 }

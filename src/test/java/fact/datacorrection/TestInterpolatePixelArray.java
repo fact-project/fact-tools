@@ -1,5 +1,6 @@
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import static org.junit.Assert.fail;
  */
 public class TestInterpolatePixelArray {
 
-    double[] mock = new double[1440];
+    double[] mock = new double[Constants.N_PIXELS];
 
 
     @Test
