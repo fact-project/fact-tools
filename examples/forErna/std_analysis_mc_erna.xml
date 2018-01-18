@@ -1,88 +1,49 @@
 <container>
-    <!--
-    This Process contains the standard analysis for FACT, with modifications to be used with the SGE/TORQUE cluster
-    execution tool ERNA (Easy RuN Access) https://github.com/fact-project/erna
-    -->
-    <properties url="classpath:/default/settings_mc.properties" />
+  <!--
+  This Process contains the standard analysis for FACT, with modifications to be used with the SGE/TORQUE cluster
+  execution tool ERNA (Easy RuN Access) https://github.com/fact-project/erna
+  -->
+  <properties url="classpath:/default/settings_mc.properties" />
 
-    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
 
-    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-    <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
-    <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-        <stream class="fact.io.hdureader.FITSStream" id="_" />
-    </stream>
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
 
-    <process id="1" input="fact">
+  <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
+  <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
+    <stream class="fact.io.hdureader.FITSStream" id="_" />
+  </stream>
 
-        <fact.utils.Remapping
-                key="Data"
-                outputKey="Data"
+  <process id="1" input="fact">
+    <If condition="%{data.CREATOR}!='Ceres'">
+      <fact.utils.PreviousEventInfo
+        startCellKey="StartCellData"
+        outputKey="prevEvents"
+        limitEvents="${PreviousEventInfo.limitEvents}"
+      />
+      <fact.features.UnixTimeUTC2DateTime />
+    </If>
+    <fact.extraction.SaturatedSlicesPercentage />
+    <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
+    <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
+    <include url="classpath:/analysis/pedestalParameters.xml" />
+    <include url="classpath:/analysis/imageParameters.xml" />
+    <include url="classpath:/analysis/sourcePosition.xml" />
+
+    <fact.utils.SanitizeKeys />
+    <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
+    <fact.io.JSONWriter keys="${keysForOutputSimulations}"
+        url="${output}"
+        writeListOfItems="True"
+        pixelSetsAsInt="True"
         />
-        <fact.utils.RemappingKeys
-                keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
-        />
-
-        <fact.datacorrection.DrsCalibration
-                key="Data"
-                outputKey="DataCalibrated"
-        />
-
-        <fact.datacorrection.RemoveSpikes
-                dataKey="DataCalibrated"
-                outputKey="DataCalibrated"
-                startCellKey="StartCellData"
-                leftBorder="${removeSpikes_leftBorder}"
-                spikeLimit="${removeSpikes_spikeLimit}"
-                topSlopeLimit="${removeSpikes_topSlopeLimit}"
-                maxSpikeLength="${removeSpikes_maxSpikeLength}"
-        />
-        <fact.datacorrection.InterpolateTimeSeries
-                calibService="calibService"
-                dataKey="DataCalibrated"
-                dataOutputKey="DataCalibrated"
-        />
-
-        <!-- Extraction -->
-        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
-        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
-        <include url="classpath:/default/mc/extraction_mc.xml" />
-        <!-- Output: photoncharge, arrivalTime -->
-
-        <!-- Cleaning -->
-        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-        <include url="classpath:/default/mc/cleaning_mc.xml" />
-        <!-- Output: shower -->
-
-        <!-- pedestal parameters -->
-        <!-- WaveformFluctuation on non-cleaning pixels-->
-        <include url="classpath:/default/mc/pedestalParameters_mc.xml" />
-
-        <!-- Parameter calculation (only source independent) -->
-        <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
-        arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        HillasParameters,NumberOfIslands, TimeGraident,
-        Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
-        ShowerSlope, Disp -->
-        <include url="classpath:/default/mc/parameterCalc_mc.xml" />
-        <!-- Output: source independent parameters -->
-
-        <fact.features.source.SourcePosition
-                outputKey="source_position"
-                pointingZdKey="MPointingPos.fZd"
-                pointingAzKey="MPointingPos.fAz"
-                sourceZdKey="MSimSourcePos.fZd"
-                sourceAzKey="MSimSourcePos.fAz"
-        />
-
-        <fact.utils.SanitizeKeys />
-	<!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-        <fact.io.JSONWriter keys="${keysForOutput}"
-            url="${output}"
-            writeListOfItems="True"
-            pixelSetsAsInt="True"
-            />
-        <!-- <fact.io.PrintKeys keys="${keysForOutput}" /> -->
-    </process>
+  </process>
 </container>
