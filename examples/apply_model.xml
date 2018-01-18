@@ -21,49 +21,25 @@
     <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
     <process id="2" input="fact">
-        <!-- prevEventAndSkip: -->
-        <!-- PreviousEventInfo, Skip(no Data Trigger) -->
-        <include url="classpath:/default/data/prevEventAndSkip.xml" />
-        <!-- Output: Data -->
+        <If condition="%{data.CREATOR}!='Ceres'">
+            <fact.utils.PreviousEventInfo
+                startCellKey="StartCellData"
+                outputKey="prevEvents"
+                limitEvents="${PreviousEventInfo.limitEvents}"
+            />
+            <fact.features.UnixTimeUTC2DateTime />
+        </If>
+        <fact.extraction.SaturatedSlicesPercentage />
+        <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
+        <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 
-        <!-- Calibration: -->
-        <!-- DrsCalibration, PatchJumpRemoval, RemoveSpikes,
-        DrsTimeCalibration, InterpolateBadPixel -->
-        <include url="classpath:/default/data/calibration.xml" />
-        <!-- Output: DataCalibrated -->
-
-        <!-- Extraction -->
-        <!-- BasicExtraction, RisingEdgeForPositions, RisingEdgePolynomFit, TimeOverThreshold,
-        PhotonChargeTimeOverThreshold, HandleSaturation, CorrectPixelDelays-->
-        <include url="classpath:/default/data/extraction.xml" />
-        <!-- Output: photoncharge, arrivalTime -->
-
-        <!-- Cleaning -->
-        <!-- SourcePosition(Cetatauri), CoreNeighborCleanTimeNeighbor-->
-        <include url="classpath:/default/data/cleaning.xml" />
-        <!-- Output: shower -->
-
-        <!-- Parameter calculation (only source independent) -->
-        <!-- ArrayMean(photoncharge,arrivalTime), ArrayStatistics(photoncharge,arrivalTime,maxSlopes,
-        arrivalTimePos,maxSlopesPos,maxAmplitudePosition,photonchargeSaturated,arrivalTimeTOT),
-        HillasParameters, NumberOfIslands, TimeGraident,
-        Concentration, ConcentrationCore, ConcentrationAtCenterOfGravity, Leakage, TimeSpread,
-        ShowerSlope, Disp -->
-        <include url="classpath:/default/data/parameterCalc.xml" />
-        <!-- Output: source independent parameters -->
-
-        <!-- Parameter calculation (only source dependent) -->
-        <!-- SourcePosition(${sourcename}), AntiSourcePosition(5), Alpha(for 6 Sources),
-        Distance(for 6 Sources), CosDeltaAlpha(for 6 Sources), Theta(for 6 Sources) -->
-        <include url="classpath:/default/data/sourceParameter.xml" />
-        <!-- Output: source dependent parameters -->
-
-        <!--<fact.io.PrintKeys keys="${keysForOutput}" />-->
+        <include url="classpath:/analysis/calibration.xml" />
+        <include url="classpath:/analysis/extraction.xml" />
+        <include url="classpath:/analysis/cleaning.xml" />
+        <include url="classpath:/analysis/pedestalParameters.xml" />
+        <include url="classpath:/analysis/imageParameters.xml" />
+        <include url="classpath:/analysis/sourcePosition.xml" />
 
         <fact.ApplyModel url="file:/home/kai/Development/erna/test.pmml" />
-
-        <!--<fact.ShowViewer key="DataCalibrated"/>-->
     </process>
-
-
 </container>

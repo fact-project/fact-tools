@@ -17,22 +17,10 @@
     <fact.extraction.SaturatedSlicesPercentage />
 
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
-    <include url="classpath:/default/data/calibration.xml" />
-    <include url="classpath:/default/data/extraction.xml" />
-    <include url="classpath:/default/data/cleaning.xml" />
-    <include url="classpath:/default/data/pedestalParameters.xml" />
 
-
-    <fact.photonstream.SinglePulseExtraction
-        dataKey="DataCalibrated"
-        outputKey="PhotonArrivals"
-    />
-
-    <fact.photonstream.ConvertSinglePulses2Timeseries
-      singlePulsesKey="PhotonArrivals"
-      baseLineKey="PhotonArrivalsBaseLine"
-      timeSeriesKey="ReconstructedDataCalibrated"
-    />
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
 
     <fact.ShowViewer key="DataCalibrated" />
   </process>
