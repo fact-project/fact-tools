@@ -14,10 +14,10 @@
 
   <property name="outfile" value="facttools.json" />
 
-  <property name="twoLevelTimeNeighbor_coreThreshold" value="4.0" />
-  <property name="twoLevelTimeNeighbor_neighborThreshold" value="2.0" />
-  <property name="twoLevelTimeNeighbor_timeLimit" value="3.0" />
-  <property name="twoLevelTimeNeighbor_minNumberOfPixel" value="2" />
+  <property name="TwoLevelTimeNeighbor.coreThreshold" value="4.0" />
+  <property name="TwoLevelTimeNeighbor.neighborThreshold" value="2.0" />
+  <property name="TwoLevelTimeNeighbor.timeLimit" value="3.0" />
+  <property name="TwoLevelTimeNeighbor.minNumberOfPixel" value="2" />
 
   <property name="features" value="timestamp,cogX,cogY,ConcCore,delta,EventNum,Leakage,Leakage2,length,m3Long,m3Trans,m4Long,m4Trans,skewnessLong,skewnessTrans,kurtosisLong,kurtosisTrans,NIGHT,numPixelAfterCleaning,PCOUNT,RUNID,RUNTYPE,size,width,arrivalTimeCleaningStatistics_kurtosis,arrivalTimeCleaningStatistics_max,arrivalTimeCleaningStatistics_mean,arrivalTimeCleaningStatistics_min,arrivalTimeCleaningStatistics_skewness,arrivalTimeCleaningStatistics_variance,arrivalTimeStatistics_kurtosis,arrivalTimeStatistics_max,arrivalTimeStatistics_mean,arrivalTimeStatistics_min,arrivalTimeStatistics_skewness,arrivalTimeStatistics_variance,bestR,bestRingPixel,bestX,bestY,shower,conc1,conc2,concCOG,houghCleaningPercentage,houghDistance,houghOctantsHit,houghPeakness,houghRingPercentage,numIslands,photonchargeCleaningStatistics_kurtosis,photonchargeCleaningStatistics_max,photonchargeCleaningStatistics_mean,photonchargeCleaningStatistics_min,photonchargeCleaningStatistics_skewness,photonchargeCleaningStatistics_variance,photonchargeStatistics_kurtosis,photonchargeStatistics_max,photonchargeStatistics_mean,photonchargeStatistics_min,photonchargeStatistics_skewness,photonchargeStatistics_variance,timeOverThreshold_numPixel,ZdPointing,ZdTracking,ZdSourceCalc,Distance,sourceName,gaussianFitX,gaussianFitY,gaussianFitR,gaussianFitSigma,StdDevTime8.0,numPixelStdDevTime8.0"/>
 
@@ -26,13 +26,21 @@
   <stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}" />
 
   <process id="2" input="fact">
+    <If condition="%{data.CREATOR}!='Ceres'">
+      <fact.utils.PreviousEventInfo
+        startCellKey="StartCellData"
+        outputKey="prevEvents"
+        limitEvents="${PreviousEventInfo.limitEvents}"
+      />
+      <fact.features.UnixTimeUTC2DateTime />
+    </If>
+    <fact.extraction.SaturatedSlicesPercentage />
+    <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
+    <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 
-    <fact.features.UnixTimeUTC2DateTime />
-
-    <include url="classpath:/default/data/prevEventAndSkip.xml" />
-    <include url="classpath:/default/data/calibration.xml" />
-    <include url="classpath:/default/data/extraction.xml" />
-    <include url="classpath:/default/data/cleaning.xml" />
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
 
 
     <Skip condition="%{data.shower} == null" />

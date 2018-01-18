@@ -1,5 +1,5 @@
 <container>
-  <properties url="classpath:/default/settings_mc.properties" />
+  <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
@@ -19,16 +19,16 @@
     <!--badChidIds="863,868,297,927,80,873,1093,1094,527,528,721,722"-->
     <!--/>-->
     <stream.flow.Skip condition="%{data.TriggerType} != 4" />
-    <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
-    rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
+    <fact.extraction.BasicExtraction dataKey="DataCalibrated" outputKeyMaxAmplPos="maxPos" outputKeyPhotonCharge="photoncharge" url="${integralGainFile}" startSearchWindow="${BasicExtraction.startSearchWindow}"
+    rangeSearchWindow="${BasicExtraction.rangeSearchWindow}" rangeHalfHeightWindow="25" />
     <fact.extraction.EstimateBaseline dataKey="DataCalibrated" outputKey="baseline" firstSlice="10" range="40" />
     <fact.extraction.RisingEdgeForPositions dataKey="DataCalibrated" amplitudePositionsKey="maxPos" outputKey="arrivalTimePos" maxSlopesKey="maxSlopesPos" />
     <fact.extraction.RisingEdgePolynomFit dataKey="DataCalibrated" risingEdgeKey="arrivalTimePos" outputKey="arrivalTime" numberOfPoints="11" maxSlopesKey="maxSlopes" />
     <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold" firstSliceOverThresholdOutputKey="arrivalTimeTOT" positionsKey="maxPos" threshold="1800" thresholdOutputKey="thresholdForToT" />
     <fact.extraction.TimeOverThreshold dataKey="DataCalibrated" outputKey="timeOverThreshold1000" firstSliceOverThresholdOutputKey="arrivalTimeTOT1000" positionsKey="maxPos" threshold="1000" thresholdOutputKey="thresholdForToT1000" />
     <fact.datacorrection.CorrectSaturation dataKey="DataCalibrated" outputKey="DataNoSat" totKey="timeOverThreshold" firstSliceOverThresholdKey="arrivalTimeTOT" threshold="1800" maxPosKey="maxPos" baselineKey="baseline" />
-    <fact.extraction.BasicExtraction dataKey="DataNoSat" outputKeyMaxAmplPos="maxPosNoSat" outputKeyPhotonCharge="phChargeNoSat" url="${integralGainFile}" startSearchWindow="${basicExtraction_startSearchWindow}"
-    rangeSearchWindow="${basicExtraction_rangeSearchWindow}" rangeHalfHeightWindow="25" />
+    <fact.extraction.BasicExtraction dataKey="DataNoSat" outputKeyMaxAmplPos="maxPosNoSat" outputKeyPhotonCharge="phChargeNoSat" url="${integralGainFile}" startSearchWindow="${BasicExtraction.startSearchWindow}"
+    rangeSearchWindow="${BasicExtraction.rangeSearchWindow}" rangeHalfHeightWindow="25" />
     <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold" thresholdKey="thresholdForToT" outputKey="photonchargeSaturated" />
     <fact.extraction.PhotonChargeTimeOverThreshold timeOverThresholdKey="timeOverThreshold1000" thresholdKey="thresholdForToT1000" outputKey="photonchargeSaturated1000" />
     <fact.extraction.IdentifyPixelAboveThreshold key="photoncharge" threshold="200" outputKey="pixelAbove200Pe" />

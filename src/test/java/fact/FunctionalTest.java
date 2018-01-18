@@ -42,17 +42,6 @@ public class FunctionalTest {
     }
 
     @Test
-    public void exampleXML() {
-        try {
-            String[] args = {"examples/example_process.xml"};
-            fact.run.main(args);
-        } catch (Exception e) {
-            fail("Could not run the example_process.xml");
-        }
-    }
-
-
-    @Test
     public void studiesXMLs() throws IOException {
         int counter = 0;
         List<Path> pathList = Files.walk(Paths.get("examples/studies"))
