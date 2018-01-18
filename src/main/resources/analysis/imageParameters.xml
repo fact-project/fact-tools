@@ -1,42 +1,42 @@
 <module>
-<Skip condition="%{data.shower} == null" />
-<fact.pixelsets.Length
+  <Skip condition="%{data.shower} == null" />
+  <fact.pixelsets.Length
     pixelSetKey="shower"
     outputKey="num_pixel_in_shower"
-/>
-<Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
-<fact.statistics.ArrayMean
+  />
+  <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
+  <fact.statistics.ArrayMean
     key="photoncharge"
     outputKey="photoncharge_mean"
-/>
-<fact.statistics.ArrayMean
+  />
+  <fact.statistics.ArrayMean
     key="arrivalTime"
     outputKey="arrival_time_mean"
-/>
-<fact.statistics.ArrayStatistics
+  />
+  <fact.statistics.ArrayStatistics
     key="photoncharge"
     outputKey="photoncharge_shower"
     pixelSetKey="shower"
-    />
-<fact.statistics.ArrayStatistics
+  />
+  <fact.statistics.ArrayStatistics
     key="arrivalTime"
     outputKey="arrival_time_shower"
     pixelSetKey="shower"
-/>
-<fact.statistics.ArrayStatistics
+  />
+  <fact.statistics.ArrayStatistics
     key="maxSlopes"
     outputKey="max_slopes_shower"
     pixelSetKey="shower"
-/>
-<fact.features.HillasParameters
+  />
+  <fact.features.HillasParameters
     weightsKey="photoncharge"
     pixelSetKey="shower"
-/>
-<fact.features.NumberOfIslands
+  />
+  <fact.features.NumberOfIslands
     pixelSetKey="shower"
     outputKey="num_islands"
-/>
-<fact.features.TimeGradient
+  />
+  <fact.features.TimeGradient
     pixelSetKey="shower"
     arrivalTimeKey="arrivalTime"
     cogKey="cog"
@@ -44,14 +44,14 @@
     outputKeySlope="time_gradient_slope"
     outputKeyIntercept="time_gradient_intercept"
     outputKeySumSquaredErrors="time_gradient_sse"
-/>
-<fact.features.Concentration
+  />
+  <fact.features.Concentration
     weights="photoncharge"
     pixelSetKey="shower"
     concOneOutputKey="concentration_one_pixel"
     concTwoOutputKey="concentration_two_pixel"
-/>
-<fact.features.ConcentrationCore
+  />
+  <fact.features.ConcentrationCore
     cogKey="cog"
     pixelSetKey="shower"
     photonChargeKey="photoncharge"
@@ -60,27 +60,27 @@
     lengthKey="length"
     deltaKey="delta"
     outputKey="concentration_core"
-/>
-<fact.features.ConcentrationAtCenterOfGravity
+  />
+  <fact.features.ConcentrationAtCenterOfGravity
     photonChargeKey="photoncharge"
     cogKey="cog"
     sizeKey="size"
     outputKey="concentration_cog"
-/>
-<fact.features.Leakage
+  />
+  <fact.features.Leakage
     cogKey="showerDistribution"
     pixelSetKey="shower"
     weights="photoncharge"
     leakage1OutputKey="leakage1"
     leakage2OutputKey="leakage2"
-/>
-<fact.features.TimeSpread
+  />
+  <fact.features.TimeSpread
     weightsKey="photoncharge"
     arrivalTimeKey="arrivalTime"
     pixelSetKey="shower"
     outputKey="timespread"
-/>
-<fact.features.ShowerSlope
+  />
+  <fact.features.ShowerSlope
     photonChargeKey="photoncharge"
     arrivalTimeKey="arrivalTime"
     pixelSetKey="shower"
@@ -90,5 +90,5 @@
     slopeTransOutputKey="slope_trans"
     slopeSpreadOutputKey="slope_spread"
     slopeSpreadWeightedOutputKey="slope_spread_weighted"
-/>
+  />
 </module>
