@@ -3,6 +3,7 @@
  */
 package fact.utils;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,36 +28,25 @@ public class DividePixelArrays implements Processor {
     @Parameter(required = false)
     public String outputKey;
 
-    private int npix;
-
-
-    /* (non-Javadoc)
-     * @see stream.Processor#process(stream.Data)
-     */
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, numeratorKey, double[].class);
-        Utils.isKeyValid(input, denominatorKey, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.isKeyValid(item, numeratorKey, double[].class);
+        Utils.isKeyValid(item, denominatorKey, double[].class);
 
-        double[] dividedArray = new double[npix];
+        double[] dividedArray = new double[Constants.N_PIXELS];
 
-        double[] numerator = (double[]) input.get(numeratorKey);
-        double[] denominator = (double[]) input.get(denominatorKey);
+        double[] numerator = (double[]) item.get(numeratorKey);
+        double[] denominator = (double[]) item.get(denominatorKey);
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             if (denominator[pix] != 0) {
                 dividedArray[pix] = numerator[pix] / denominator[pix];
             } else {
-                dividedArray[pix] = Double.NaN; //TODO this the viewer cannot handle, we should change it!
+                dividedArray[pix] = Double.NaN;
             }
         }
 
-        //add times over threshold
-        input.put(outputKey, dividedArray);
-
-
-        return input;
+        item.put(outputKey, dividedArray);
+        return item;
     }
 }

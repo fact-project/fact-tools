@@ -26,9 +26,9 @@ public class ElementwiseMultiplyDoubleArray implements Processor {
 
 
     @Override
-    public Data process(Data input) {
-        double[] doubleArray = (double[]) input.get(inputKey);
-        input.put(outputKey, ElementWise.multiply(doubleArray, factor));
-        return input;
+    public Data process(Data item) {
+        double[] doubleArray = (double[]) item.get(inputKey);
+        item.put(outputKey, ElementWise.multiply(doubleArray, factor));
+        return item;
     }
 }

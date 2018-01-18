@@ -1,6 +1,6 @@
 package fact.datacorrection;
 
-import fact.Utils;
+import fact.Constants;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
@@ -74,19 +74,16 @@ public class DrsTimeCalibration implements StatefulProcessor {
     }
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-
-        int npix = (Integer) input.get("NPIX");
-        int roi = (Integer) input.get("NROI");
-        short[] startCell = (short[]) input.get(startCellKey);
+    public Data process(Data item) {
+        int roi = (Integer) item.get("NROI");
+        short[] startCell = (short[]) item.get(startCellKey);
 
         if (startCell == null) {
             throw new RuntimeException("Couldn't find StartCellData");
         }
 
-        double[] relativeTimeOffsets = new double[roi * npix];
-        for (int px = 0; px < npix; px++) {
+        double[] relativeTimeOffsets = new double[roi * Constants.N_PIXELS];
+        for (int px = 0; px < Constants.N_PIXELS; px++) {
             int patch = px / 9;
             double offsetAtStartCell = absoluteTimeOffsets[patch * numberOfSlices + startCell[px]];
             for (int slice = 0; slice < roi; slice++) {
@@ -95,13 +92,12 @@ public class DrsTimeCalibration implements StatefulProcessor {
             }
         }
 
-        npix = (Integer) input.get("NPIX");
-        double[] data = (double[]) input.get(dataKey);
-        roi = data.length / npix;
+        double[] data = (double[]) item.get(dataKey);
+        roi = data.length / Constants.N_PIXELS;
         TimeCorrectionKernel tcKernel = new LinearTimeCorrectionKernel();
 
-        double[] calibratedValues = new double[roi * npix];
-        for (int chid = 0; chid < npix; chid++) {
+        double[] calibratedValues = new double[roi * Constants.N_PIXELS];
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             double[] realtimes = new double[roi];
             double[] values = new double[roi];
 
@@ -117,8 +113,8 @@ public class DrsTimeCalibration implements StatefulProcessor {
 
         }
 
-        input.put(outputKey, calibratedValues);
-        return input;
+        item.put(outputKey, calibratedValues);
+        return item;
     }
 
     protected void loadDrsTimeCalibConstants(URL in) throws IOException {

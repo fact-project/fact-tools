@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.linear.*;
 import org.jfree.chart.plot.IntervalMarker;
@@ -30,17 +31,14 @@ public class RisingEdgePolynomFit implements Processor {
 
     private int fitDegree = 3;
     private double[] fitResult = null;
-    private int npix;
 
     @Override
     public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
         Utils.mapContainsKeys(input, dataKey, risingEdgeKey, "NROI");
 
-        double[] arrivalTimes = new double[npix];
-        double[] maxSlopes = new double[npix];
-        IntervalMarker[] marker = new IntervalMarker[npix];
+        double[] arrivalTimes = new double[Constants.N_PIXELS];
+        double[] maxSlopes = new double[Constants.N_PIXELS];
+        IntervalMarker[] marker = new IntervalMarker[Constants.N_PIXELS];
 
         double[] data = (double[]) input.get(dataKey);
         int roi = (Integer) input.get("NROI");
@@ -48,10 +46,10 @@ public class RisingEdgePolynomFit implements Processor {
         double[] risingEdges = (double[]) input.get(risingEdgeKey);
 
         if (showFitResult) {
-            fitResult = new double[roi * npix];
+            fitResult = new double[roi * Constants.N_PIXELS];
         }
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int pos = (int) risingEdges[pix];
             int[] window = Utils.getValidWindow(pos - numberOfPoints / 2, numberOfPoints, 0, roi);
 

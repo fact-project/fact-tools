@@ -29,19 +29,19 @@ public class Difference implements Processor {
     public String outsetKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, setUKey, PixelSet.class);
-        Utils.isKeyValid(input, setAKey, PixelSet.class);
+        Utils.isKeyValid(item, setUKey, PixelSet.class);
+        Utils.isKeyValid(item, setAKey, PixelSet.class);
 
-        PixelSet setU = (PixelSet) input.get(setUKey);
-        PixelSet setA = (PixelSet) input.get(setAKey);
+        PixelSet setU = (PixelSet) item.get(setUKey);
+        PixelSet setA = (PixelSet) item.get(setAKey);
 
         Sets.SetView<CameraPixel> difference = Sets.difference(setU.set, setA.set);
         PixelSet outset = new PixelSet();
         difference.copyInto(outset.set);
-        input.put(outsetKey, outset);
+        item.put(outsetKey, outset);
 
-        return input;
+        return item;
     }
 }

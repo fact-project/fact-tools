@@ -3,6 +3,7 @@
  */
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,18 +31,16 @@ public class PixelNormalization implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, key, double[].class);
+        Utils.isKeyValid(item, key, double[].class);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] normalizedSlices = new double[data.length];
 
+        int roi = data.length / Constants.N_PIXELS;
 
-        int pixels = 1440;
-        int roi = data.length / pixels;
-
-        for (int pix = 0; pix < pixels; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             double min = Double.MAX_VALUE;
             double max = Double.MIN_VALUE;
             for (int slice = 0; slice < roi; slice++) {
@@ -57,7 +56,7 @@ public class PixelNormalization implements Processor {
                 normalizedSlices[pos] = data[pos] / range + Math.abs(min) / range;
             }
         }
-        input.put(outputKey, normalizedSlices);
-        return input;
+        item.put(outputKey, normalizedSlices);
+        return item;
     }
 }

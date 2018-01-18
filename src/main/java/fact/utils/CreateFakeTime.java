@@ -23,7 +23,7 @@ public class CreateFakeTime implements Processor {
     double probTau = -0.03582;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
         int[] fakeEventTime = new int[2];
 
@@ -48,8 +48,8 @@ public class CreateFakeTime implements Processor {
         fakeEventTime[0] = currentUnixSec;
         fakeEventTime[1] = currentUnixMuSec;
 
-        input.put(outputKey, fakeEventTime);
+        item.put(outputKey, fakeEventTime);
 
-        return input;
+        return item;
     }
 }

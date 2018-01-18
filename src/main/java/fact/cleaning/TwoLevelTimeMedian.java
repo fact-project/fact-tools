@@ -63,17 +63,13 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
     @Parameter
     public boolean showDifferentCleaningSets = true;
 
-    private int npix;
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
 
         ZonedDateTime timeStamp;
-        if (input.containsKey("UnixTimeUTC") == true) {
-            Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
-            int[] eventTime = (int[]) input.get("UnixTimeUTC");
+        if (item.containsKey("UnixTimeUTC") == true) {
+            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+            int[] eventTime = (int[]) item.get("UnixTimeUTC");
             timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
         } else {
             // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
@@ -81,33 +77,33 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
             timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         }
 
-        double[] photonCharge = Utils.toDoubleArray(input.get(photonChargeKey));
-        double[] arrivalTimes = Utils.toDoubleArray(input.get(arrivalTimeKey));
+        double[] photonCharge = Utils.toDoubleArray(item.get(photonChargeKey));
+        double[] arrivalTimes = Utils.toDoubleArray(item.get(arrivalTimeKey));
 
         PixelSet showerPixel = new PixelSet();
 
         showerPixel = addCorePixel(showerPixel, photonCharge, corePixelThreshold, timeStamp);
         if (showDifferentCleaningSets == true) {
-            addLevelToDataItem(showerPixel, outputKey + "_level1", input);
+            addLevelToDataItem(showerPixel, outputKey + "_level1", item);
         }
 
         showerPixel = removeSmallCluster(showerPixel, minNumberOfPixel);
         if (showDifferentCleaningSets == true) {
-            addLevelToDataItem(showerPixel, outputKey + "_level2", input);
+            addLevelToDataItem(showerPixel, outputKey + "_level2", item);
         }
 
         showerPixel = addNeighboringPixels(showerPixel, photonCharge, neighborPixelThreshold, timeStamp);
         if (showDifferentCleaningSets == true) {
-            addLevelToDataItem(showerPixel, outputKey + "_level3", input);
+            addLevelToDataItem(showerPixel, outputKey + "_level3", item);
         }
 
         if (notUsablePixelSet != null) {
-            input.put("notUsablePixelSet", notUsablePixelSet);
+            item.put("notUsablePixelSet", notUsablePixelSet);
         }
 
         //in case we have no showerpixels. We wont get any new ones in the steps below. And also it would crash.
         if (showerPixel.size() == 0) {
-            return input;
+            return item;
         }
 
         // Hacky method to increase the timeLimit for larger showers (which could have a larger spread in the arrival times):
@@ -118,31 +114,31 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
 
         showerPixel = applyTimeMedianCleaning(showerPixel, arrivalTimes, currentTimeThreshold);
         if (showDifferentCleaningSets == true) {
-            addLevelToDataItem(showerPixel, outputKey + "_level4", input);
+            addLevelToDataItem(showerPixel, outputKey + "_level4", item);
         }
 
         showerPixel = removeSmallCluster(showerPixel, minNumberOfPixel);
         if (showDifferentCleaningSets == true) {
-            addLevelToDataItem(showerPixel, outputKey + "_level5", input);
+            addLevelToDataItem(showerPixel, outputKey + "_level5", item);
         }
 
         if (starPositionKeys != null) {
             PixelSet starSet = new PixelSet();
             for (String starPositionKey : starPositionKeys) {
-                Utils.isKeyValid(input, starPositionKey, CameraCoordinate.class);
-                CameraCoordinate starPosition = (CameraCoordinate) input.get(starPositionKey);
+                Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
+                CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
 
                 showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true) {
-                    addLevelToDataItem(showerPixel, outputKey + "_level6", input);
-                    input.put("Starset", starSet);
+                    addLevelToDataItem(showerPixel, outputKey + "_level6", item);
+                    item.put("Starset", starSet);
                 }
             }
         }
 
-        input.put(outputKey, showerPixel);
+        item.put(outputKey, showerPixel);
 
-        return input;
+        return item;
     }
 
     /**

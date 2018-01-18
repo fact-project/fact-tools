@@ -21,9 +21,9 @@ public class PhotonStream2NumberOfPhotons implements Processor {
     public String numberOfPhotonsKey = null;
 
     @Override
-    public Data process(Data input) {
-        int[][] singlePulses = (int[][]) input.get(singlePulsesKey);
-        double[] arrivalTimes = (double[]) input.get(arrivalTimeKey);
+    public Data process(Data item) {
+        int[][] singlePulses = (int[][]) item.get(singlePulsesKey);
+        double[] arrivalTimes = (double[]) item.get(arrivalTimeKey);
         int[] numberOfPhotons = new int[singlePulses.length];
 
         for (int pix = 0; pix < singlePulses.length; pix++) {
@@ -35,7 +35,7 @@ public class PhotonStream2NumberOfPhotons implements Processor {
                 }
             }
         }
-        input.put(numberOfPhotonsKey, numberOfPhotons);
-        return input;
+        item.put(numberOfPhotonsKey, numberOfPhotons);
+        return item;
     }
 }

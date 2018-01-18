@@ -19,13 +19,12 @@ public class PatchAverage implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        // TODO Auto-generated method stub
-        Utils.mapContainsKeys(input, key);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
 
         int numberOfPatches = npix / 9;
@@ -44,8 +43,8 @@ public class PatchAverage implements Processor {
                 }
             }
         }
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
     }
 }

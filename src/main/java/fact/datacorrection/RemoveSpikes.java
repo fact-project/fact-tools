@@ -1,5 +1,6 @@
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.SpikeInfos;
 import org.slf4j.Logger;
@@ -42,23 +43,20 @@ public class RemoveSpikes implements Processor {
     public boolean addSpikeInfo = false;
 
     int roi;
-    int npix;
     int leftBorder = 10;
 
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, dataKey, double[].class);
-        Utils.isKeyValid(input, startCellKey, short[].class);
-        Utils.isKeyValid(input, "NROI", Integer.class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, dataKey, double[].class);
+        Utils.isKeyValid(item, startCellKey, short[].class);
+        Utils.isKeyValid(item, "NROI", Integer.class);
 
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
         double[] result = new double[data.length];
         System.arraycopy(data, 0, result, 0, data.length);
-        roi = (Integer) input.get("NROI");
-        npix = (Integer) input.get("NPIX");
-        short[] startCells = (short[]) input.get(startCellKey);
+        roi = (Integer) item.get("NROI");
+        short[] startCells = (short[]) item.get(startCellKey);
 
         for (int spikeLength = 1; spikeLength <= maxSpikeLength; spikeLength++) {
             SpikeInfos spikeInfos = null;
@@ -66,7 +64,7 @@ public class RemoveSpikes implements Processor {
                 spikeInfos = new SpikeInfos();
             }
 
-            for (int px = 0; px < npix; px++) {
+            for (int px = 0; px < Constants.N_PIXELS; px++) {
                 int rightBorder = roi - spikeLength;
                 // we want to skip the timemarker signal (which only occur in files with roi == 300) in the spike removal
                 if (px % 9 == 8 && roi == 300) {
@@ -106,14 +104,14 @@ public class RemoveSpikes implements Processor {
             }
 
             if (addSpikeInfo == true) {
-                spikeInfos.addInfosToDataItem(input, spikeLength, outputSpikesKey);
+                spikeInfos.addInfosToDataItem(item, spikeLength, outputSpikesKey);
             }
 
         }
 
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
+        return item;
     }
 
     private double CorrectSpike(int pos, int spikeLength, double averTopValues, double[] result) {

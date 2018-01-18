@@ -38,16 +38,16 @@ public class ShowerSlope implements Processor {
     public String slopeSpreadWeightedOutputKey = null;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, photonChargeKey, arrivalTimeKey, pixelSetKey, cogKey, deltaKey);
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, photonChargeKey, arrivalTimeKey, pixelSetKey, cogKey, deltaKey);
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-        double[] photonCharge = (double[]) input.get(photonChargeKey);
-        double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-        PixelSet shower = (PixelSet) input.get(pixelSetKey);
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
-        double delta = (Double) input.get(deltaKey);
+        double[] photonCharge = (double[]) item.get(photonChargeKey);
+        double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
+        PixelSet shower = (PixelSet) item.get(pixelSetKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        double delta = (Double) item.get(deltaKey);
 
         // NumberShowerPixel
         int n = shower.size();
@@ -108,10 +108,10 @@ public class ShowerSlope implements Processor {
         double slopeSpread = Math.sqrt(sumbb / n - Math.pow(sumb / n, 2));
         double slopeSpreadWeighted = Math.sqrt(sumwbb / sumw - Math.pow(sumwb / sumw, 2));
 
-        input.put(slopeLongOutputKey, slopeLong);
-        input.put(slopeTransOutputKey, slopeTrans);
-        input.put(slopeSpreadOutputKey, slopeSpread);
-        input.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
-        return input;
+        item.put(slopeLongOutputKey, slopeLong);
+        item.put(slopeTransOutputKey, slopeTrans);
+        item.put(slopeSpreadOutputKey, slopeSpread);
+        item.put(slopeSpreadWeightedOutputKey, slopeSpreadWeighted);
+        return item;
     }
 }

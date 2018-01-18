@@ -1,5 +1,6 @@
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,20 +42,16 @@ public class MovingMinimum implements StatefulProcessor {
     @Parameter(required = true)
     public int length = 5;
 
-    public int npix;
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
 
-        npix = (Integer) input.get("NPIX");
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.N_PIXELS;
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             for (int pivot = 0; pivot < roi; pivot++) {
                 int pivotPosition = pix * roi + pivot;
                 int seriesEnd = pix * roi + roi;
@@ -77,8 +74,8 @@ public class MovingMinimum implements StatefulProcessor {
                 result[pivotPosition] = min;
             }
         }
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
     }
 
     @Override

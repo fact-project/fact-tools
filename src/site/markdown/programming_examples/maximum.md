@@ -20,7 +20,7 @@ object.
           private String outputKey = "maximum_amplitude;
 
           @Override
-          public Data process(Data input) {
+          public Data process(Data item) {
             // get the data from the input
             double[] data = (double[]) input.get(key);
             // here we save the amplitude
@@ -29,11 +29,9 @@ object.
             //get the roi. The Region of interest. Thats the length of an event in slices
             int roi = (Integer) input.get("NROI");
             
-            //get npix. number of pixels
-            int npix = (Integer) input.get("NPIX");
             
             // for each pixel
-            for(int pix = 0 ; pix < npix; pix++){
+            for(int pix = 0 ; pix < Constants.NUMBEROFPIXELS; pix++){
               //get the position of the first slice of pixel pix in the 1D array.
               int position = pix*roi;
               //iterate over all slices

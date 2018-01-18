@@ -13,10 +13,10 @@ public class SetLabel implements Processor {
     public int label;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        input.put("label", label);
+        item.put("label", label);
 
-        return input;
+        return item;
     }
 }

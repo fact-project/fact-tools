@@ -1,5 +1,6 @@
 package fact.pixelsets;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import org.junit.Test;
 import stream.Data;
@@ -14,8 +15,8 @@ public class PixelSetProcessorsTests {
     @Test
     public void createFullCameraSetTest() {
         Invert i = new Invert();
-        PixelSet fullCameraSet = i.createFullCameraSet(1440);
-        assertThat(fullCameraSet.set.size(), is(1440));
+        PixelSet fullCameraSet = i.createFullCameraSet(Constants.N_PIXELS);
+        assertThat(fullCameraSet.set.size(), is(Constants.N_PIXELS));
     }
 
     @Test
@@ -27,7 +28,7 @@ public class PixelSetProcessorsTests {
             testSet.addById(pix);
         }
         item.put("testSet", testSet);
-        item.put("NPIX", 1440);
+        item.put("NPIX", Constants.N_PIXELS);
 
         Invert invert = new Invert();
 
@@ -38,7 +39,7 @@ public class PixelSetProcessorsTests {
 
 
         PixelSet inversion = (PixelSet) item.get("testInversion");
-        assertEquals(1440 - 20, inversion.size());
+        assertEquals(Constants.N_PIXELS - 20, inversion.size());
     }
 
     @Test

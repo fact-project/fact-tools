@@ -1,5 +1,6 @@
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
@@ -41,38 +42,32 @@ public class CorrectSaturation implements Processor {
     @Parameter(required = true, description = "1440pix array containing the estimated baseline amplitude")
     public String baselineKey = null;
 
-    // Default values
-    private int npix = 1440;
-    private int roi = 300;
-
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        Utils.mapContainsKeys(input, dataKey, totKey, maxPosKey, baselineKey, firstSliceOverThresholdKey, "NPIX");
+        Utils.mapContainsKeys(item, dataKey, totKey, maxPosKey, baselineKey, firstSliceOverThresholdKey, "NPIX");
 
-        npix = (int) input.get("NPIX");
-        roi = (int) input.get("NROI");
+        int roi = (int) item.get("NROI");
 
-        double[] firstSlOverThresh = (double[]) input.get(firstSliceOverThresholdKey);
-        int[] timeOverThreshold = (int[]) input.get(totKey);
+        double[] firstSlOverThresh = (double[]) item.get(firstSliceOverThresholdKey);
+        int[] timeOverThreshold = (int[]) item.get(totKey);
 
-        int[] maxPos = (int[]) input.get(maxPosKey);
-        double[] baselines = (double[]) input.get(baselineKey);
+        int[] maxPos = (int[]) item.get(maxPosKey);
+        double[] baselines = (double[]) item.get(baselineKey);
 
         //get array with time series
-        double[] data = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
         double[] corrData = data.clone();
 
         //Marker
-        IntervalMarker[] markWidth = new IntervalMarker[npix];
-        IntervalMarker[] markMaxPos = new IntervalMarker[npix];
-        IntervalMarker[] markDeltaT = new IntervalMarker[npix];
-        IntervalMarker[] markEstArrivalTime = new IntervalMarker[npix];
+        IntervalMarker[] markWidth = new IntervalMarker[Constants.N_PIXELS];
+        IntervalMarker[] markMaxPos = new IntervalMarker[Constants.N_PIXELS];
+        IntervalMarker[] markDeltaT = new IntervalMarker[Constants.N_PIXELS];
+        IntervalMarker[] markEstArrivalTime = new IntervalMarker[Constants.N_PIXELS];
 
         // ------------------------------------------------------------------------------------------------------------
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int firstSlice = roi * pix;
             int firstSliceAboveThresh = (int) firstSlOverThresh[pix];
             int maxPosInPix = pix * roi + maxPos[pix];
@@ -122,12 +117,12 @@ public class CorrectSaturation implements Processor {
 
         }
 
-        input.put(outputKey + "_WidthMarker", markWidth);
-        input.put(outputKey + "_MaxPosMarker", markMaxPos);
-        input.put(outputKey + "_DeltaTMarker", markDeltaT);
-        input.put(outputKey + "_estAtMarker", markEstArrivalTime);
-        input.put(outputKey, corrData);
+        item.put(outputKey + "_WidthMarker", markWidth);
+        item.put(outputKey + "_MaxPosMarker", markMaxPos);
+        item.put(outputKey + "_DeltaTMarker", markDeltaT);
+        item.put(outputKey + "_estAtMarker", markEstArrivalTime);
+        item.put(outputKey, corrData);
 
-        return input;
+        return item;
     }
 }

@@ -18,12 +18,12 @@ public class CameraAverage implements Processor {
     private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
+        Utils.isKeyValid(item, "NPIX", Integer.class);
+        npix = (Integer) item.get("NPIX");
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         int currentRoi = data.length / npix;
 
         double[] result = new double[currentRoi];
@@ -34,8 +34,8 @@ public class CameraAverage implements Processor {
             result[sl] /= npix;
         }
 
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
     }
 
 }

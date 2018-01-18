@@ -97,8 +97,8 @@ public class LightDistributionFit implements Processor {
         double rho = result_point[4];
         double phi = result_point[5];
         double eps = result_point[6];
-        double[] test = new double[1440];
-        for (int pix = 0; pix < 1440; pix++) {
+        double[] test = new double[Constants.N_PIXELS];
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             test[pix] = negLnL.photon_expectance_pixel(pix, r, x, y, sigma, rho, phi, eps);
         }
         data.put("photon_expectance_fit", test);

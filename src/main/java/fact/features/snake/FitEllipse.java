@@ -94,12 +94,12 @@ public class FitEllipse implements Processor {
 
 
     @Override
-    public Data process(Data input)    //http://autotrace.sourceforge.net/WSCG98.pdf
+    public Data process(Data item)    //http://autotrace.sourceforge.net/WSCG98.pdf
     {
 
-        Utils.mapContainsKeys(input, snakeX, snakeY);
-        double[] x = (double[]) input.get(snakeX);
-        double[] y = (double[]) input.get(snakeY);
+        Utils.mapContainsKeys(item, snakeX, snakeY);
+        double[] x = (double[]) item.get(snakeX);
+        double[] y = (double[]) item.get(snakeY);
 
         int size = x.length;
 
@@ -186,13 +186,13 @@ public class FitEllipse implements Processor {
         calcParams(parameter);
 
 
-        input.put(outkeyAlpha, angle);
-        input.put(outkeyCenterX, centerX);
-        input.put(outkeyCenterY, centerY);
-        input.put(outkeyMajor, major);
-        input.put(outkeyMinor, minor);
+        item.put(outkeyAlpha, angle);
+        item.put(outkeyCenterX, centerX);
+        item.put(outkeyCenterY, centerY);
+        item.put(outkeyMajor, major);
+        item.put(outkeyMinor, minor);
 
 
-        return input;
+        return item;
     }
 }

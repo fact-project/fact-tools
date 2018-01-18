@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import org.jfree.chart.plot.IntervalMarker;
@@ -39,29 +40,25 @@ public class TimeOverThreshold implements Processor {
     @Parameter(required = true)
     public String outputKey = null;
 
-    private int npix;
+    public Data process(Data item) {
+        Utils.isKeyValid(item, dataKey, double[].class);
+        Utils.isKeyValid(item, positionsKey, int[].class);
 
-    public Data process(Data input) {
-        Utils.isKeyValid(input, dataKey, double[].class);
-        Utils.isKeyValid(input, positionsKey, int[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+        int[] timeOverThresholdArray = new int[Constants.N_PIXELS];
+        double[] firstSliceOverThresholdArray = new double[Constants.N_PIXELS];
 
-        int[] timeOverThresholdArray = new int[npix];
-        double[] firstSliceOverThresholdArray = new double[npix];
+        double[] data = (double[]) item.get(dataKey);
+        int[] posArray = (int[]) item.get(positionsKey);
 
-        double[] data = (double[]) input.get(dataKey);
-        int[] posArray = (int[]) input.get(positionsKey);
+        IntervalMarker[] m = new IntervalMarker[Constants.N_PIXELS];
 
-        IntervalMarker[] m = new IntervalMarker[npix];
-
-        int roi = data.length / npix;
+        int roi = data.length / Constants.N_PIXELS;
         int numPixelAboveThreshold = 0;
 
         PixelSet pixelSet = new PixelSet();
 
         //Loop over pixels
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             firstSliceOverThresholdArray[pix] = 0;
 
             int pos = pix * roi;
@@ -108,19 +105,19 @@ public class TimeOverThreshold implements Processor {
 
 
         //add processors threshold to the DataItem
-        input.put(thresholdOutputKey, threshold);
+        item.put(thresholdOutputKey, threshold);
 
         //add number of pixel above this threshold to the DataItem
-        input.put(outputKey + "_numPixel", numPixelAboveThreshold);
+        item.put(outputKey + "_numPixel", numPixelAboveThreshold);
 
         //add times over threshold to the DataItem
-        input.put(outputKey, timeOverThresholdArray);
-        input.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
-        input.put(outputKey + "Marker", m);
-        input.put(outputKey + "SetOverlay", pixelSet);
+        item.put(outputKey, timeOverThresholdArray);
+        item.put(firstSliceOverThresholdOutputKey, firstSliceOverThresholdArray);
+        item.put(outputKey + "Marker", m);
+        item.put(outputKey + "SetOverlay", pixelSet);
 
 
-        input.put(outputKey + "Set", pixelSet.toIntArray());
-        return input;
+        item.put(outputKey + "Set", pixelSet.toIntArray());
+        return item;
     }
 }

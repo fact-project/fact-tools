@@ -1,5 +1,6 @@
 package fact.features.snake;
 
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
@@ -30,19 +31,14 @@ public class PolygonIntegrate implements Processor {
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
-    private int npix;
-
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-        Utils.mapContainsKeys(input, key, polygonX, polygonY);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key, polygonX, polygonY);
 
 
-        double[] data = (double[]) input.get(key);
-        double[] polyX = (double[]) input.get(polygonX);
-        double[] polyY = (double[]) input.get(polygonY);
+        double[] data = (double[]) item.get(key);
+        double[] polyX = (double[]) item.get(polygonX);
+        double[] polyY = (double[]) item.get(polygonY);
 
         Polygon poly = new Polygon();    // Wandel die Snake in ein Polygon um
 
@@ -51,10 +47,10 @@ public class PolygonIntegrate implements Processor {
         }
 
         int numberOfPixel = 0;
-        boolean[] chidInPoly = new boolean[1440];
+        boolean[] chidInPoly = new boolean[Constants.N_PIXELS];
 
         double erg = 0;
-        for (int i = 0; i < npix; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             if (poly.contains(pixelMap.getPixelFromId(i).getXPositionInMM(), pixelMap.getPixelFromId(i).getYPositionInMM()))    // Prüfe ob Pixel im Poly/Snake liegt
             {
                 erg += data[i];
@@ -65,14 +61,14 @@ public class PolygonIntegrate implements Processor {
         }
 
         int[] chids = new int[numberOfPixel];
-        for (int i = 0, tmpCount = 0; i < npix; i++) {
+        for (int i = 0, tmpCount = 0; i < Constants.N_PIXELS; i++) {
             if (chidInPoly[i]) chids[tmpCount++] = i;
         }
 
-        input.put(outkey, erg);
-        input.put(outkeyNumberOfPixel, numberOfPixel);
-        input.put(outkeyPixelList, chids);
+        item.put(outkey, erg);
+        item.put(outkeyNumberOfPixel, numberOfPixel);
+        item.put(outkeyPixelList, chids);
 
-        return input;
+        return item;
     }
 }

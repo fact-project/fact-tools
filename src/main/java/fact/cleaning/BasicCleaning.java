@@ -36,7 +36,7 @@ public class BasicCleaning {
     public PixelSet addCorePixel(PixelSet showerPixel, double[] photonCharge, double corePixelThreshold, ZonedDateTime eventTimeStamp) {
         PixelSet notUsablePixels = calibService.getNotUsablePixels(eventTimeStamp);
 
-        for (int chid = 0; chid < Constants.NUMBEROFPIXEL; chid++) {
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             CameraPixel pixel = pixelMap.getPixelFromId(chid);
             if (notUsablePixels.contains(pixel)) {
                 continue;
@@ -134,10 +134,10 @@ public class BasicCleaning {
         return newShowerPixel;
     }
 
-    public void addLevelToDataItem(PixelSet showerPixel, String name, Data input) {
+    public void addLevelToDataItem(PixelSet showerPixel, String name, Data item) {
         PixelSet overlay = new PixelSet();
         overlay.addAll(showerPixel);
-        input.put(name, overlay);
+        item.put(name, overlay);
     }
 
     /**

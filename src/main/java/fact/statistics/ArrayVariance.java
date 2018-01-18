@@ -25,11 +25,11 @@ public class ArrayVariance implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, Double[].class);
-        Serializable data = input.get(key);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, Double[].class);
+        Serializable data = item.get(key);
         DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.toDoubleArray(data));
-        input.put(outputKey, descriptiveStatistics.getVariance());
-        return input;
+        item.put(outputKey, descriptiveStatistics.getVariance());
+        return item;
     }
 }

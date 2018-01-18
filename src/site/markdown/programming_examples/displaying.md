@@ -26,7 +26,7 @@ array of the right length to the data item in your processor.
 
         public class MyAwesomeProcessor implements Processor {
                   @Override
-                  public Data process(Data input) {
+                  public Data process(Data item) {
                     ...
                     double[] myAwesomeData = new double[1440*300]
                     ... do something with data
@@ -52,8 +52,7 @@ Some processors try to find some point in time or a certain time interval in the
 Since it can be useful to actually see what your algorithm is doing you can set the background color for a time interval
 in the series. This works by adding an `IntervalMarker` for each pixel in the event.
 
-        int npix = (Integer) input.get("NPIX");
-        IntervalMarker[] m = new IntervalMarker[npix];
+        IntervalMarker[] m = new IntervalMarker[Constants.NUMBEROFPIXELS];
 
         for(int pixel : allPixel){
             m[pixel] =  new IntervalMarker(startposition , endposition, new Color(r,g,b, alpha));

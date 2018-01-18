@@ -1,5 +1,6 @@
 package fact.utils;
 
+import fact.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,15 +11,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class RemappingTest {
 
-    short[] data = new short[1440 * 300];
-    short[] remappedData = new short[1440 * 300];
+    short[] data = new short[Constants.N_PIXELS * 300];
+    short[] remappedData = new short[Constants.N_PIXELS * 300];
 
     @Before
     public void createMockList() {
         //should be 300
-        int roi = data.length / 1440;
+        int roi = data.length / Constants.N_PIXELS;
         //write the pixelnumber into the array
-        for (short pix = 0; pix < 1440; pix++) {
+        for (short pix = 0; pix < Constants.N_PIXELS; pix++) {
             for (int slice = 0; slice < 300; slice++) {
                 int pos = roi * pix + slice;
                 data[pos] = pix;
@@ -30,7 +31,7 @@ public class RemappingTest {
     public void testRemapping() {
         //pretending the data array is given by softid lets remap it to chid
         Remapping re = new Remapping();
-        int roi = data.length / 1440;
+        int roi = data.length / Constants.N_PIXELS;
         assertTrue("First array element should contain 0", data[0] == 0);
         re.remapFromSoftIdToChid(data, remappedData);
         //chid 0 is softid 1348

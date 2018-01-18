@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,22 +23,22 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
     @Parameter(required = true, description = "")
     public String outputKey;
 
-    double[] wi = new double[1440 * numberOfSlices];
-    double[] wli = new double[1440 * numberOfSlices];
-    double[] s_n = new double[1440 * numberOfSlices];
-    double[] time_offsets = new double[1440 * numberOfSlices];
+    double[] wi = new double[Constants.N_PIXELS * numberOfSlices];
+    double[] wli = new double[Constants.N_PIXELS * numberOfSlices];
+    double[] s_n = new double[Constants.N_PIXELS * numberOfSlices];
+    double[] time_offsets = new double[Constants.N_PIXELS * numberOfSlices];
 
     /**
      * Just a way of keeping the process() method small:
      *
-     * @param input : Data hash-map we look for
+     * @param item : Data hash-map we look for
      * @return
      */
-    private double[] retrieve_data(Data input) {
-        Utils.mapContainsKeys(input, key, "StartCellData");
+    private double[] retrieve_data(Data item) {
+        Utils.mapContainsKeys(item, key, "StartCellData");
         double[] data = null;
         try {
-            data = (double[]) input.get(key);
+            data = (double[]) item.get(key);
         } catch (ClassCastException e) {
             log.error("Could not cast types.");
             throw e;
@@ -171,10 +172,10 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
      *
      *
      */
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        double[] data = retrieve_data(input);
-        short[] startCell = (short[]) input.get("StartCellData");
+        double[] data = retrieve_data(item);
+        short[] startCell = (short[]) item.get("StartCellData");
 
         for (int patch_id = 0; patch_id < numberOfPatches; patch_id++) {
             // We only look at the 9th channel of each DRS4 chip
@@ -187,9 +188,9 @@ public class CalculateDrs4TimeCalibrationConstants implements Processor {
             calculate_s_n_and_time_offsets(chid);
         }
 
-        input.put(outputKey, time_offsets);
+        item.put(outputKey, time_offsets);
 
-        return input;
+        return item;
     }
 }
 

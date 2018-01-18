@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,8 @@ public class SizeTest {
 
     @Before
     public void setup() throws Exception {
-        zeroCharges = new double[1440];
-        charges = new double[1440];
+        zeroCharges = new double[Constants.N_PIXELS];
+        charges = new double[Constants.N_PIXELS];
         //set all charges to 1.0
         for (int i = 0; i < charges.length; i++) {
             charges[i] = 1.0;

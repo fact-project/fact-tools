@@ -32,19 +32,19 @@ public class SymmetricDifference implements Processor {
     public String outsetKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, setAKey, PixelSet.class);
-        Utils.isKeyValid(input, setBKey, PixelSet.class);
+        Utils.isKeyValid(item, setAKey, PixelSet.class);
+        Utils.isKeyValid(item, setBKey, PixelSet.class);
 
-        PixelSet setA = (PixelSet) input.get(setAKey);
-        PixelSet setB = (PixelSet) input.get(setBKey);
+        PixelSet setA = (PixelSet) item.get(setAKey);
+        PixelSet setB = (PixelSet) item.get(setBKey);
 
         Sets.SetView<CameraPixel> symDiff = Sets.symmetricDifference(setA.set, setB.set);
         PixelSet outset = new PixelSet();
         symDiff.copyInto(outset.set);
-        input.put(outsetKey, outset);
+        item.put(outsetKey, outset);
 
-        return input;
+        return item;
     }
 }

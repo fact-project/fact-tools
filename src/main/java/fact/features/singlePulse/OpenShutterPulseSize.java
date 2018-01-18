@@ -3,6 +3,7 @@
  */
 package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,27 +40,24 @@ public class OpenShutterPulseSize implements Processor {
     public int width;
     //number of slices over which we integrate
 
-    private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-        double[] data = (double[]) input.get(key);
-        int roi = data.length / npix;
-        int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
-        double[][] baselineValues = (double[][]) input.get(baselineKey);
-        double[][] pulseSizes = new double[npix][];
+    public Data process(Data item) {
+        double[] data = (double[]) item.get(key);
+        int roi = data.length / Constants.N_PIXELS;
+        int[][] arrivalTimes = (int[][]) item.get(arrivalTimeKey);
+        double[][] baselineValues = (double[][]) item.get(baselineKey);
+        double[][] pulseSizes = new double[Constants.N_PIXELS][];
 
         //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             pulseSizes[pix] = new double[arrivalTimes[pix].length];
             pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes, baselineValues);
         }
 
-        input.put(outputKey, pulseSizes);
+        item.put(outputKey, pulseSizes);
 
-        return input;
+        return item;
     }
 
     /**

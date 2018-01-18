@@ -32,12 +32,12 @@ public class MovingLinearFit implements Processor {
     public double scale = 1;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
         // TODO Auto-generated method stub
-        Utils.mapContainsKeys(input, key);
+        Utils.mapContainsKeys(item, key);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
         double[] slope = new double[data.length];
         double[] intercept = new double[data.length];
 
@@ -51,9 +51,9 @@ public class MovingLinearFit implements Processor {
             intercept[(i + (width / 2)) % data.length] = regression.getIntercept();
         }
 
-        input.put(slopeKey, slope);
-        input.put(interceptKey, intercept);
+        item.put(slopeKey, slope);
+        item.put(interceptKey, intercept);
 
-        return input;
+        return item;
     }
 }

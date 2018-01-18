@@ -3,6 +3,7 @@
  */
 package fact.io;
 
+import fact.Constants;
 import fact.io.hdureader.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class FITSWriterTest {
         item.put("EventNum", 1);
         item.put("TriggerType", 4);
         item.put("NROI", 300);
-        item.put("NPIX", 1440);
+        item.put("NPIX", Constants.N_PIXELS);
         item.put("x", 0.0);
         item.put("y", 5.0);
 
@@ -76,7 +77,7 @@ public class FITSWriterTest {
         OptionalTypesMap<String, Serializable> row = tableReader.getNextRow();
 
         assertEquals(300, (int) row.getInt("NROI").orElse(-1));
-        assertEquals(1440, (int) row.getInt("NPIX").orElse(-1));
+        assertEquals(Constants.N_PIXELS, (int) row.getInt("NPIX").orElse(-1));
         assertEquals(0.0, row.getDouble("x").get(), 1e-12);
         assertEquals(5.0, row.getDouble("y").get(), 1e-12);
 
@@ -105,7 +106,7 @@ public class FITSWriterTest {
         item.put("EventNum", 1);
         item.put("TriggerType", 4);
         item.put("NROI", 300);
-        item.put("NPIX", 1440);
+        item.put("NPIX", Constants.N_PIXELS);
         item.put("UTCTIME", ZonedDateTime.of(2017, 1, 1, 12, 0, 0, 991300000, ZoneOffset.UTC));
 
 
@@ -128,7 +129,7 @@ public class FITSWriterTest {
 
         assertEquals("2017-01-01T12:00:00.991300Z", header.get("UTCTIME").orElse(""));
 
-        assertEquals(1440, (int) header.getInt("NPIX").orElse(-1));
+        assertEquals(Constants.N_PIXELS, (int) header.getInt("NPIX").orElse(-1));
 
         assertFalse(header.get("EventNum").isPresent());
     }

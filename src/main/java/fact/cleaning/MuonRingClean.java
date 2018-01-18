@@ -31,13 +31,10 @@ public class MuonRingClean implements Processor {
     public double timeThreshold;
 
     @Override
-    public Data process(Data input) {
-
-        final Logger log = LoggerFactory.getLogger(MuonRingClean.class);
-
-        int[] ringPixel = (int[]) input.get(ringPixelKey);
-        double[] photonCharge = (double[]) input.get(photonChargeKey);
-        double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
+    public Data process(Data item) {
+        int[] ringPixel = (int[]) item.get(ringPixelKey);
+        double[] photonCharge = (double[]) item.get(photonChargeKey);
+        double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
 
         ArrayList<Integer> cleanRingList = new ArrayList<Integer>();
         PixelSet cleanPixelSet = new PixelSet();
@@ -82,9 +79,9 @@ public class MuonRingClean implements Processor {
                 timeCleanRing[i] = timeCleanRingList.get(i);
             }
 
-            input.put(outputKey, timeCleanRing);
-            input.put(outputKey + "_pixelset", cleanPixelSet);
-            return input;
+            item.put(outputKey, timeCleanRing);
+            item.put(outputKey + "_pixelset", cleanPixelSet);
+            return item;
         }
 
 
@@ -94,10 +91,10 @@ public class MuonRingClean implements Processor {
         }
 
 
-        input.put(outputKey, cleanRing);
-        input.put(outputKey + "_pixelset", cleanPixelSet);
+        item.put(outputKey, cleanRing);
+        item.put(outputKey + "_pixelset", cleanPixelSet);
 
 
-        return input;
+        return item;
     }
 }

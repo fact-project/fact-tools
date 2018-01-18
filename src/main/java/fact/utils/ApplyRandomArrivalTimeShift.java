@@ -1,5 +1,6 @@
 package fact.utils;
 
+import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
@@ -36,21 +37,14 @@ public class ApplyRandomArrivalTimeShift implements Processor {
     public String outputKey = null;
 
 
-    private double[] arrivalTime = null;
-    private double[] newArrivalTime = null;
-
-    private int npix;
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-        Utils.mapContainsKeys(input, key);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
-        IntervalMarker[] marker = new IntervalMarker[npix];
+        IntervalMarker[] marker = new IntervalMarker[Constants.N_PIXELS];
 
-        arrivalTime = (double[]) input.get(key);
-        newArrivalTime = new double[arrivalTime.length];
+        double[] arrivalTime = (double[]) item.get(key);
+        double[] newArrivalTime = new double[arrivalTime.length];
 
         Random rand = new Random(Seed);
 
@@ -62,8 +56,8 @@ public class ApplyRandomArrivalTimeShift implements Processor {
             marker[i] = new IntervalMarker(newArrivalTime[i], newArrivalTime[i] + 10);
         }
 
-        input.put(outputKey, newArrivalTime);
-        input.put(outputKey + "marker", marker);
-        return input;
+        item.put(outputKey, newArrivalTime);
+        item.put(outputKey + "marker", marker);
+        return item;
     }
 }

@@ -3,6 +3,7 @@
  */
 package fact.utils;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,32 +28,20 @@ public class SubtractDataArrays implements Processor {
     @Parameter(required = false)
     public String outputKey;
 
-    private int npix;
-
-
-    /* (non-Javadoc)
-     * @see stream.Processor#process(stream.Data)
-     */
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, subtractedKey, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        Utils.isKeyValid(item, subtractedKey, double[].class);
+        double[] subtractedArray = new double[Constants.N_PIXELS];
 
-        double[] subtractedArray = new double[npix];
+        double[] array1 = (double[]) item.get(key);
+        double[] array2 = (double[]) item.get(subtractedKey);
 
-        double[] array1 = (double[]) input.get(key);
-        double[] array2 = (double[]) input.get(subtractedKey);
-
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             subtractedArray[pix] = array1[pix] - array2[pix];
         }
 
-        //add times over threshold
-        input.put(outputKey, subtractedArray);
-
-
-        return input;
+        item.put(outputKey, subtractedArray);
+        return item;
     }
 }

@@ -1,5 +1,6 @@
 package fact.features.evaluate;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
@@ -81,8 +82,8 @@ public class CleaningPerformance implements Processor {
     public double[] getPerformanceMatrixShower(float[] McPhotoncharge, int[] shower, int numShowerpixel) {
         double[] performance = new double[4];
 
-        boolean[] cleaningPixel = new boolean[1440];
-        for (int i = 0; i < 1440; i++) {
+        boolean[] cleaningPixel = new boolean[Constants.N_PIXELS];
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             cleaningPixel[i] = false;
         }
         for (int i = 0; i < numShowerpixel; i++) {
@@ -90,7 +91,7 @@ public class CleaningPerformance implements Processor {
         }
 
 
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
 
             //true positive
             if (McPhotoncharge[i] > mcPhotThreshold && cleaningPixel[i] == true) {
@@ -123,7 +124,7 @@ public class CleaningPerformance implements Processor {
         //false positive
         performance[3] = 0;
 
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             //false negative
             if (McPhotoncharge[i] > mcPhotThreshold) {
                 performance[1]++;

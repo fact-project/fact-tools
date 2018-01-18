@@ -54,7 +54,7 @@ public class Utils {
      * Return an int array with the ids of the pixelSet belonging to the given Key,
      * return all camera pixel Ids if the set is not existing
      */
-    public static int[] getValidPixelSetAsIntArr(Data input, int npix, String pixelSetKey) {
+    public static int[] getValidPixelSetAsIntArr(Data item, int npix, String pixelSetKey) {
         int[] pixels;
 
         //Load a given pixelset, otherwise use the the whole camera
@@ -63,8 +63,8 @@ public class Utils {
             ContiguousSet<Integer> numbers = ContiguousSet.create(Range.closed(0, npix - 1), DiscreteDomain.integers());
             pixels = Ints.toArray(numbers);
         } else {
-            Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-            PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
+            Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+            PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
             pixels = pixelSet.toIntArray();
         }
 
@@ -80,9 +80,9 @@ public class Utils {
      * @return an array of length roi containing the slice averages
      */
     public static double[] averageSlicesForEachPixel(double[] data) {
-        int roi = data.length / Constants.NUMBEROFPIXEL;
+        int roi = data.length / Constants.N_PIXELS;
         double[] average = new double[roi];
-        double[][] values = Utils.sortPixels(data, 1440);
+        double[][] values = Utils.sortPixels(data, Constants.N_PIXELS);
         int slice = 0;
         for (double[] slices : values) {
             for (double s : slices) {
@@ -92,7 +92,7 @@ public class Utils {
             slice = 0;
         }
         for (int i = 0; i < average.length; i++) {
-            average[i] /= 1440.0;
+            average[i] /= (double) Constants.N_PIXELS;
         }
         return average;
     }

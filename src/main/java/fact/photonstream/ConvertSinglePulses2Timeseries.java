@@ -27,13 +27,13 @@ public class ConvertSinglePulses2Timeseries implements Processor {
     public String baseLineKey = null;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        int[][] singlePulses = (int[][]) input.get(singlePulsesKey);
+        int[][] singlePulses = (int[][]) item.get(singlePulsesKey);
 
         double[] baseLine = new double[singlePulses.length];
         if (baseLineKey != null) {
-            baseLine = (double[]) input.get(baseLineKey);
+            baseLine = (double[]) item.get(baseLineKey);
         }
 
         double[] pulseTemplate = TemplatePulse.factSinglePePulse(roi);
@@ -64,8 +64,8 @@ public class ConvertSinglePulses2Timeseries implements Processor {
                 timeSeries,
                 config.factSinglePeAmplitudeInMv);
 
-        input.put(timeSeriesKey, timeSeries);
+        item.put(timeSeriesKey, timeSeries);
 
-        return input;
+        return item;
     }
 }

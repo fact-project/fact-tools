@@ -3,6 +3,7 @@
  */
 package fact.features.singlePulse;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,27 +36,23 @@ public class PulseSizeCalculator implements Processor {
     public int width;
     //number of slices over which we integrate
 
-    private int npix;
-
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, key, arrivalTimeKey);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key, arrivalTimeKey);
 
-        double[] data = (double[]) input.get(key);
-        int roi = data.length / npix;
-        int[][] arrivalTimes = (int[][]) input.get(arrivalTimeKey);
-        double[][] pulseSizes = new double[npix][];
+        double[] data = (double[]) item.get(key);
+        int roi = data.length / Constants.N_PIXELS;
+        int[][] arrivalTimes = (int[][]) item.get(arrivalTimeKey);
+        double[][] pulseSizes = new double[Constants.N_PIXELS][];
 
         //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             pulseSizes[pix] = new double[arrivalTimes[pix].length];
             pulseSizes[pix] = calculateSizes(pix, roi, data, arrivalTimes);
         }
-        input.put(outputKey, pulseSizes);
+        item.put(outputKey, pulseSizes);
 
-        return input;
+        return item;
     }
 
     /**

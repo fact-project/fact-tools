@@ -25,11 +25,11 @@ public class Invert implements Processor {
     public String outsetKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, insetKey, PixelSet.class);
-        PixelSet inset = (PixelSet) input.get(insetKey);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, insetKey, PixelSet.class);
+        PixelSet inset = (PixelSet) item.get(insetKey);
 
-        int npix = (Integer) input.get("NPIX");
+        int npix = (Integer) item.get("NPIX");
 
         PixelSet wholeCamSet = createFullCameraSet(npix);
 
@@ -37,9 +37,9 @@ public class Invert implements Processor {
 
         PixelSet outset = new PixelSet();
         inversion.copyInto(outset.set);
-        input.put(outsetKey, outset);
+        item.put(outsetKey, outset);
 
-        return input;
+        return item;
     }
 
     public PixelSet createFullCameraSet(int npix) {

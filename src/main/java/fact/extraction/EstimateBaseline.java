@@ -1,7 +1,6 @@
 package fact.extraction;
 
 import fact.Constants;
-import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import stream.Data;
 import stream.Processor;
@@ -24,26 +23,21 @@ public class EstimateBaseline implements Processor {
     @Parameter(required = false, description = "range of the calculation window ", defaultValue = "40")
     public int range = 40;
 
-    private int npix = Constants.NUMBEROFPIXEL;
     private int roi = 300;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        Utils.mapContainsKeys(input, dataKey, "NPIX");
+        roi = (Integer) item.get("NROI");
 
-        npix = (Integer) input.get("NPIX");
-        roi = (Integer) input.get("NROI");
-
-        double[] data = (double[]) input.get(dataKey);
-        double[] baseline = new double[npix];
+        double[] data = (double[]) item.get(dataKey);
+        double[] baseline = new double[Constants.N_PIXELS];
 
         double[] mBslLevel = new double[data.length];
 
-        IntervalMarker[] mBslRange = new IntervalMarker[npix];
+        IntervalMarker[] mBslRange = new IntervalMarker[Constants.N_PIXELS];
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int firstSl = pix * roi + firstSlice;
             int lastSl = firstSl + range;
 
@@ -62,9 +56,9 @@ public class EstimateBaseline implements Processor {
             }
 
         }
-        input.put(outputKey, baseline);
-        input.put(outputKey + "_range", mBslRange);
-        input.put(outputKey + "_level", mBslLevel);
-        return input;
+        item.put(outputKey, baseline);
+        item.put(outputKey + "_range", mBslRange);
+        item.put(outputKey + "_level", mBslLevel);
+        return item;
     }
 }

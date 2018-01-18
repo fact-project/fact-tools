@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,27 +33,22 @@ public class MinAmplitudeGlobal implements Processor {
     @Parameter(description = "skip the last N slices of the timeline")
     public int skipLastSlices = 100;
 
-    private int npix;
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
 
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-
-        double[] data = (double[]) input.get(key);
-        int roi = data.length / npix;
+        double[] data = (double[]) item.get(key);
+        int roi = data.length / Constants.N_PIXELS;
 
         //for all pixel find the maximum value
-        double[] min = new double[npix];
+        double[] min = new double[Constants.N_PIXELS];
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             min[pix] = globalMinimum(roi, pix, data);
         }
 
-        input.put(outputKey, min);
-        return input;
+        item.put(outputKey, min);
+        return item;
     }
 
     /**

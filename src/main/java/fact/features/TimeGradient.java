@@ -46,16 +46,16 @@ public class TimeGradient implements Processor {
     @Parameter(description = "outputKey for the sum squared errors of the linear fits")
     public String outputKeySumSquaredErrors = "timeGradientSSE";
 
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, pixelSetKey, arrivalTimeKey, cogKey, deltaKey);
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-        Utils.isKeyValid(input, cogKey, CameraCoordinate.class);
+        Utils.mapContainsKeys(item, pixelSetKey, arrivalTimeKey, cogKey, deltaKey);
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-        PixelSet shower = (PixelSet) input.get(pixelSetKey);
-        double[] arrivalTime = (double[]) input.get(arrivalTimeKey);
-        double delta = (Double) input.get(deltaKey);
-        CameraCoordinate cog = (CameraCoordinate) input.get(cogKey);
+        PixelSet shower = (PixelSet) item.get(pixelSetKey);
+        double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
+        double delta = (Double) item.get(deltaKey);
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
 
         SimpleRegression regressionLong = new SimpleRegression();
         SimpleRegression regressionTrans = new SimpleRegression();
@@ -104,18 +104,18 @@ public class TimeGradient implements Processor {
             log.warn("Not enough data points to regress the transverse timegradient. Putting Double.NaN in data item");
         }
 
-        input.put(outputKeySlope + "_long", slopeLong);
-        input.put(outputKeySlope + "_long_err", slopeLongErr);
-        input.put(outputKeyIntercept + "_long", interceptLong);
-        input.put(outputKeyIntercept + "_long_err", interceptLongErr);
-        input.put(outputKeySumSquaredErrors + "_long", sumSquaredErrorsLong);
+        item.put(outputKeySlope + "_long", slopeLong);
+        item.put(outputKeySlope + "_long_err", slopeLongErr);
+        item.put(outputKeyIntercept + "_long", interceptLong);
+        item.put(outputKeyIntercept + "_long_err", interceptLongErr);
+        item.put(outputKeySumSquaredErrors + "_long", sumSquaredErrorsLong);
 
-        input.put(outputKeySlope + "_trans", slopeTrans);
-        input.put(outputKeySlope + "_trans_err", slopeTransErr);
-        input.put(outputKeyIntercept + "_trans", interceptTrans);
-        input.put(outputKeyIntercept + "_trans_err", interceptTransErr);
-        input.put(outputKeySumSquaredErrors + "_trans", sumSquaredErrorsTrans);
+        item.put(outputKeySlope + "_trans", slopeTrans);
+        item.put(outputKeySlope + "_trans_err", slopeTransErr);
+        item.put(outputKeyIntercept + "_trans", interceptTrans);
+        item.put(outputKeyIntercept + "_trans_err", interceptTransErr);
+        item.put(outputKeySumSquaredErrors + "_trans", sumSquaredErrorsTrans);
 
-        return input;
+        return item;
     }
 }

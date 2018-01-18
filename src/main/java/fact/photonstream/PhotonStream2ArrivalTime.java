@@ -17,8 +17,8 @@ public class PhotonStream2ArrivalTime implements Processor {
     public String arrivalTimeKey = null;
 
     @Override
-    public Data process(Data input) {
-        int[][] singlePulses = (int[][]) input.get(singlePulsesKey);
+    public Data process(Data item) {
+        int[][] singlePulses = (int[][]) item.get(singlePulsesKey);
         double[] arrivalTimes = new double[singlePulses.length];
 
         for (int pix = 0; pix < singlePulses.length; pix++) {
@@ -32,7 +32,7 @@ public class PhotonStream2ArrivalTime implements Processor {
                 arrivalTimes[pix] = stat.getPercentile(50);
             }
         }
-        input.put(arrivalTimeKey, arrivalTimes);
-        return input;
+        item.put(arrivalTimeKey, arrivalTimes);
+        return item;
     }
 }

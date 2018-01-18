@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
@@ -31,25 +32,22 @@ public class RisingEdgeForPositions implements Processor {
     public String maxSlopesKey = null;
 
     private int searchWindowLeft = 25;
-    private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-        Utils.mapContainsKeys(input, dataKey, amplitudePositionsKey);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, dataKey, amplitudePositionsKey);
 
-        double[] positions = new double[npix];
-        double[] maxSlopes = new double[npix];
+        double[] positions = new double[Constants.N_PIXELS];
+        double[] maxSlopes = new double[Constants.N_PIXELS];
 
-        double[] data = (double[]) input.get(dataKey);
-        int[] amplitudePositions = (int[]) input.get(amplitudePositionsKey);
+        double[] data = (double[]) item.get(dataKey);
+        int[] amplitudePositions = (int[]) item.get(amplitudePositionsKey);
 
-        IntervalMarker[] m = new IntervalMarker[npix];
+        IntervalMarker[] m = new IntervalMarker[Constants.N_PIXELS];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.N_PIXELS;
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             int posMaxAmp = amplitudePositions[pix];
 
             // temp. Variables
@@ -79,11 +77,11 @@ public class RisingEdgeForPositions implements Processor {
             m[pix] = new IntervalMarker(positions[pix], positions[pix] + 1);
             maxSlopes[pix] = (double) max_slope;
         }
-        input.put(outputKey, positions);
-        input.put(maxSlopesKey, maxSlopes);
-        input.put(outputKey + "Marker", m);
+        item.put(outputKey, positions);
+        item.put(maxSlopesKey, maxSlopes);
+        item.put(outputKey + "Marker", m);
 
-        return input;
+        return item;
 
     }
 }

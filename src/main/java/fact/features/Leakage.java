@@ -28,11 +28,11 @@ public class Leakage implements Processor {
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     @Override
-    public Data process(Data input) {
-        Utils.mapContainsKeys(input, pixelSetKey, weights);
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, pixelSetKey, weights);
 
-        PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
-        double[] photonCharge = (double[]) input.get(weights);
+        PixelSet showerPixel = (PixelSet) item.get(pixelSetKey);
+        double[] photonCharge = (double[]) item.get(weights);
 
 
         double size = 0;
@@ -53,9 +53,9 @@ public class Leakage implements Processor {
         leakageSecondBorder = leakageSecondBorder / size;
 
 
-        input.put(leakage1OutputKey, leakageBorder);
-        input.put(leakage2OutputKey, leakageSecondBorder);
-        return input;
+        item.put(leakage1OutputKey, leakageBorder);
+        item.put(leakage2OutputKey, leakageSecondBorder);
+        return item;
 
 
     }

@@ -27,10 +27,10 @@ public class OffPosition implements Processor {
     public String outputKey = null;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, sourcePositionKey, CameraCoordinate.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, sourcePositionKey, CameraCoordinate.class);
 
-        CameraCoordinate source = (CameraCoordinate) input.get(sourcePositionKey);
+        CameraCoordinate source = (CameraCoordinate) item.get(sourcePositionKey);
 
         double rotAngle = 2 * Math.PI * offPositionId / (numberOfOffPositions + 1);
 
@@ -39,10 +39,10 @@ public class OffPosition implements Processor {
                 source.xMM * Math.sin(rotAngle) + source.yMM * Math.cos(rotAngle)
         );
 
-        input.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, offPosition));
-        input.put(outputKey, offPosition);
-        input.put(outputKey + "X", offPosition.xMM);
-        input.put(outputKey + "Y", offPosition.yMM);
-        return input;
+        item.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, offPosition));
+        item.put(outputKey, offPosition);
+        item.put(outputKey + "X", offPosition.xMM);
+        item.put(outputKey + "Y", offPosition.yMM);
+        return item;
     }
 }

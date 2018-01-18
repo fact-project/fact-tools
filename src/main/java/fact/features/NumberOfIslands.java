@@ -20,16 +20,16 @@ public class NumberOfIslands implements Processor {
     public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        if (!input.containsKey(pixelSetKey)) {
-            input.put(outputKey, 0);
-            return input;
+    public Data process(Data item) {
+        if (!item.containsKey(pixelSetKey)) {
+            item.put(outputKey, 0);
+            return item;
         }
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
 
-        PixelSet showerPixel = (PixelSet) input.get(pixelSetKey);
+        PixelSet showerPixel = (PixelSet) item.get(pixelSetKey);
         int numIslands = Utils.breadthFirstSearch(showerPixel).size();
-        input.put(outputKey, numIslands);
-        return input;
+        item.put(outputKey, numIslands);
+        return item;
     }
 }

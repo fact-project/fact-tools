@@ -1,5 +1,6 @@
 package fact.features;
 
+import fact.Constants;
 import fact.Utils;
 import stream.Data;
 import stream.Processor;
@@ -20,40 +21,27 @@ public class PerPatchArrivalTimeDistribution implements Processor {
     @Parameter(required = true, description = "Outputkey", defaultValue = "perPatchArrivalTime")
     String outputKey;
 
-    private int npix;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        Utils.mapContainsKeys(input, key);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, key);
 
-        double[] arrivalTimeArray = Utils.toDoubleArray(input.get(key));
-        //try{
-        double[] perPatchMean = new double[npix / 9];
-        double[] perPatchVariance = new double[npix / 9];
+        double[] arrivalTimeArray = Utils.toDoubleArray(item.get(key));
+        double[] perPatchMean = new double[Constants.N_PIXELS / 9];
+        double[] perPatchVariance = new double[Constants.N_PIXELS / 9];
 
-        int patch = 0;
-        for (int chid = 0; chid < npix; chid++) {
-
-            patch = (int) chid / 9;
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
+            int patch = chid / 9;
             perPatchMean[patch] += arrivalTimeArray[chid] / 9.0;
         }
-        for (int chid = 0; chid < npix; chid++) {
-            patch = chid / 9;
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
+            int patch = chid / 9;
             perPatchVariance[patch] += (arrivalTimeArray[chid] - perPatchMean[patch]) * (arrivalTimeArray[chid] - perPatchMean[patch]) / 8.0;
         }
 
-        input.put(outputKey + "_mean", perPatchMean);
-        input.put(outputKey + "_var", perPatchVariance);
-        /*}catch(Exception e)
-		{
-			input.put(outputKey + "_mean", null);
-			input.put(outputKey + "_var", null);
-			return input;
-		}*/
-
-        return input;
+        item.put(outputKey + "_mean", perPatchMean);
+        item.put(outputKey + "_var", perPatchVariance);
+        return item;
     }
 
 }

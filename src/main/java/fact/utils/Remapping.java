@@ -26,26 +26,22 @@ public class Remapping implements Processor {
     @Parameter(required = true)
     public String outputKey;
 
-    private int npix = Constants.NUMBEROFPIXEL;
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, short[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, short[].class);
 
-        short[] data = (short[]) input.get(key);
-        npix = (Integer) input.get("NPIX");
+        short[] data = (short[]) item.get(key);
 
         short[] remapped = new short[data.length];
         remapFromSoftIdToChid(data, remapped);
 
-        input.put(outputKey, remapped);
-        return input;
+        item.put(outputKey, remapped);
+        return item;
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {
-        int roi = data.length / npix;
-        for (int softId = 0; softId < npix; softId++) {
+        int roi = data.length / Constants.N_PIXELS;
+        for (int softId = 0; softId < Constants.N_PIXELS; softId++) {
             int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
             System.arraycopy(data, softId * roi, remapped, chid * roi, roi);
         }

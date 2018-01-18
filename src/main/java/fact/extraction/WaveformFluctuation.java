@@ -1,5 +1,6 @@
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
@@ -41,31 +42,26 @@ public class WaveformFluctuation implements Processor {
 
     private static final Logger log = LoggerFactory.getLogger(WaveformFluctuation.class);
 
-    private int npix;
-
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.mapContainsKeys(input, key);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
-
-        int[] pixels = Utils.getValidPixelSetAsIntArr(input, npix, pixelSetKey);
+        Utils.mapContainsKeys(item, key);
+        int[] pixels = Utils.getValidPixelSetAsIntArr(item, Constants.N_PIXELS, pixelSetKey);
         log.debug("npix: " + pixels.length);
 
-        double[] data = (double[]) input.get(key);
+        double[] data = (double[]) item.get(key);
 
-        double[] chargeMean = new double[npix];
-        double[] chargeStd = new double[npix];
-        double[] chargeVariance = new double[npix];
-        double[] chargeKurtosis = new double[npix];
-        double[] chargeMax = new double[npix];
-        double[] chargeMin = new double[npix];
-        double[] chargeSkewness = new double[npix];
-        double[] chargeMedian = new double[npix];
-        double[] chargeSum = new double[npix];
+        double[] chargeMean = new double[Constants.N_PIXELS];
+        double[] chargeStd = new double[Constants.N_PIXELS];
+        double[] chargeVariance = new double[Constants.N_PIXELS];
+        double[] chargeKurtosis = new double[Constants.N_PIXELS];
+        double[] chargeMax = new double[Constants.N_PIXELS];
+        double[] chargeMin = new double[Constants.N_PIXELS];
+        double[] chargeSkewness = new double[Constants.N_PIXELS];
+        double[] chargeMedian = new double[Constants.N_PIXELS];
+        double[] chargeSum = new double[Constants.N_PIXELS];
 
-        int roi = data.length / npix;
+        int roi = data.length / Constants.N_PIXELS;
 
         Random rand = new Random(Seed);
 
@@ -73,7 +69,7 @@ public class WaveformFluctuation implements Processor {
         int iterations = bound / windowSize;
         log.debug("Iterations: " + iterations);
 
-        double[][] charge = new double[npix][iterations];
+        double[][] charge = new double[Constants.N_PIXELS][iterations];
 
 
         //Loop over all pixel and calculate integrals on timeline
@@ -119,17 +115,17 @@ public class WaveformFluctuation implements Processor {
 
         }
 
-        input.put(outputKey, charge);
-        input.put(outputKey + "_mean", chargeMean);
-        input.put(outputKey + "_std", chargeStd);
-        input.put(outputKey + "_var", chargeVariance);
-        input.put(outputKey + "_kurtosis", chargeKurtosis);
-        input.put(outputKey + "_max", chargeMax);
-        input.put(outputKey + "_min", chargeMin);
-        input.put(outputKey + "_skewness", chargeSkewness);
-        input.put(outputKey + "_median", chargeMedian);
-        input.put(outputKey + "_sum", chargeSum);
+        item.put(outputKey, charge);
+        item.put(outputKey + "_mean", chargeMean);
+        item.put(outputKey + "_std", chargeStd);
+        item.put(outputKey + "_var", chargeVariance);
+        item.put(outputKey + "_kurtosis", chargeKurtosis);
+        item.put(outputKey + "_max", chargeMax);
+        item.put(outputKey + "_min", chargeMin);
+        item.put(outputKey + "_skewness", chargeSkewness);
+        item.put(outputKey + "_median", chargeMedian);
+        item.put(outputKey + "_sum", chargeSum);
 
-        return input;
+        return item;
     }
 }

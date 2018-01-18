@@ -49,26 +49,22 @@ public class ArrivalTimeFromSlope implements Processor {
     private int width = 1;
     //should be an odd number.
 
-    private int npix;
-
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
         if (width % 2 == 0) {
             width++;
             log.info("ArrivalTimeFromSlope only supports odd window lengths. New length is: " + width);
         }
 
-        double[] data = (double[]) input.get(key);
-        double[] slopes = (double[]) input.get(derivationKey);
-        int roi = data.length / npix;
+        double[] data = (double[]) item.get(key);
+        double[] slopes = (double[]) item.get(derivationKey);
+        int roi = data.length / Constants.N_PIXELS;
 
-        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.NUMBEROFPIXEL);
+        ArrayList<ArrayList<Integer>> pulsePeaks = new ArrayList<>(Constants.N_PIXELS);
         //the position where pulse leading edges end
-        int[][] arrivalTimes = new int[npix][];
+        int[][] arrivalTimes = new int[Constants.N_PIXELS][];
         //arrival times for all pulses in each pixel
-        double[][] baselineValues = new double[npix][];
+        double[][] baselineValues = new double[Constants.N_PIXELS][];
         //value at the slice where you want to set your baseline
         double[] visualizePositions = new double[data.length];
         //zero for all positions except where an arrival time is found
@@ -78,7 +74,7 @@ public class ArrivalTimeFromSlope implements Processor {
         }
 
         //for each pixel
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             ArrayList<Integer> currentPulsePeaks = findPulsePeaks(pix, roi, slopes);
             pulsePeaks.add(currentPulsePeaks);
 
@@ -89,13 +85,13 @@ public class ArrivalTimeFromSlope implements Processor {
             arrivalTimes[pix] = findArrivalTimes(pix, roi, width, data, slopes, pulsePeaks, visualizePositions, baselineValues);
         }
 
-        input.put(outputKey, arrivalTimes);
-        input.put(visualizeKey, visualizePositions);
-        input.put(baselineKey, baselineValues);
+        item.put(outputKey, arrivalTimes);
+        item.put(visualizeKey, visualizePositions);
+        item.put(baselineKey, baselineValues);
 //        System.out.println(Arrays.toString(baselineValues));
 
 
-        return input;
+        return item;
     }
 
     /**

@@ -52,9 +52,9 @@ public class ShowViewer implements StatefulProcessor {
      * @see stream.Processor#process(stream.Data)
      */
     @Override
-    public Data process(final Data input) {
+    public Data process(final Data item) {
 
-        if (!input.containsKey(key)) {
+        if (!item.containsKey(key)) {
             throw new RuntimeException("Key " + key + " not found in event. Cannot show viewer");
         }
 
@@ -82,7 +82,7 @@ public class ShowViewer implements StatefulProcessor {
                             });
                 }
                 viewer.setVisible(true);
-                viewer.setDataItem(input);
+                viewer.setDataItem(item);
             }
         };
         t.start();
@@ -98,7 +98,7 @@ public class ShowViewer implements StatefulProcessor {
                 }
             }
         }
-        return input;
+        return item;
     }
 
 

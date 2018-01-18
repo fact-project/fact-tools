@@ -3,6 +3,7 @@
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,21 +32,17 @@ public class PhotonChargeTimeOverThreshold implements Processor {
     public String outputKey = null;
 
     private double threshold = 0;
-    private int npix;
 
-    public Data process(Data input) {
-        Utils.isKeyValid(input, timeOverThresholdKey, int[].class);
-        Utils.isKeyValid(input, thresholdKey, Double.class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        npix = (Integer) input.get("NPIX");
+    public Data process(Data item) {
+        Utils.isKeyValid(item, timeOverThresholdKey, int[].class);
+        Utils.isKeyValid(item, thresholdKey, Double.class);
 
+        double[] chargeFromThresholdArray = new double[Constants.N_PIXELS];
 
-        double[] chargeFromThresholdArray = new double[npix];
+        int[] timeOverThresholdArray = (int[]) item.get(timeOverThresholdKey);
+        threshold = (Double) item.get(thresholdKey);
 
-        int[] timeOverThresholdArray = (int[]) input.get(timeOverThresholdKey);
-        threshold = (Double) input.get(thresholdKey);
-
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
 
             chargeFromThresholdArray[pix] = 0.;
 
@@ -72,8 +69,8 @@ public class PhotonChargeTimeOverThreshold implements Processor {
         }
 
         //add times over threshold
-        input.put(outputKey, chargeFromThresholdArray);
+        item.put(outputKey, chargeFromThresholdArray);
 
-        return input;
+        return item;
     }
 }

@@ -3,6 +3,7 @@
  */
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,20 +33,16 @@ public class FirFilter implements Processor {
     @Parameter(required = true)
     public String outputKey;
 
-    private int npix;
-
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        double[] data = (double[]) input.get(key);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
-        npix = (Integer) input.get("NPIX");
 
         // foreach pixel
-        int roi = data.length / npix;
-        for (int pix = 0; pix < npix; pix++) {
+        int roi = data.length / Constants.N_PIXELS;
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             // result[pix*roi] =
             // iterate over all slices
             for (int slice = 0; slice < roi; slice++) {
@@ -57,8 +54,8 @@ public class FirFilter implements Processor {
                 }
             }
         }
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
 
     }
 }
