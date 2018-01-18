@@ -17,7 +17,7 @@ public class FactStandardAnalysisTest {
     public void dataTest() {
 
         try {
-            File xml = new File("examples/stdAnalysis/data/analysis.xml");
+            File xml = new File("examples/stdAnalysis/observations.xml");
             File outFile = File.createTempFile("facttools_test", ".fits");
 
             String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
@@ -41,7 +41,7 @@ public class FactStandardAnalysisTest {
     public void mcTest() {
 
         try {
-            File xml = new File("examples/stdAnalysis/mc/analysis_mc.xml");
+            File xml = new File("examples/stdAnalysis/simulations.xml");
             File outFile = File.createTempFile("facttools_test", ".fits");
 
             String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
