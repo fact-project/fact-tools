@@ -6,7 +6,7 @@
   <property name="auxFolder" value="file:src/main/resources/aux/" />
 
   <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
   <property name="outfile" value="file:test.fits" />
 

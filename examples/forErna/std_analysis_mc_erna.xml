@@ -3,12 +3,12 @@
   This Process contains the standard analysis for FACT, with modifications to be used with the SGE/TORQUE cluster
   execution tool ERNA (Easy RuN Access) https://github.com/fact-project/erna
   -->
-  <properties url="classpath:/default/settings_mc.properties" />
+  <properties url="classpath:/default/settings.properties" />
 
   <property name="auxFolder" value="file:src/main/resources/aux/" />
 
   <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />

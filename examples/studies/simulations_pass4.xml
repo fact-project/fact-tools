@@ -5,7 +5,7 @@
     <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
 
     <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
-    <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+    <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
     <property name="out_path_basename" value="test_ceres" />
 

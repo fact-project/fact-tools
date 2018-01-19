@@ -28,11 +28,11 @@ public class FactStandardAnalysisTest {
             BinTable table = fits.getBinTableByName("Events").get();
 
             assertEquals(3, (long) table.numberOfRowsInTable);
-        
+
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run examples/stdAnalysis/data/analysis.xml");
+            fail("Could not run examples/stdAnalysis/observations.xml");
         }
     }
 
@@ -56,7 +56,7 @@ public class FactStandardAnalysisTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run examples/stdAnalysis/mc/analysis_mc.xml");
+            fail("Could not run examples/stdAnalysis/simulations.xml");
         }
     }
 }

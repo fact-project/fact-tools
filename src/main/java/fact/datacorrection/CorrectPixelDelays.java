@@ -24,7 +24,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
     @Parameter(required = true, description = "The name of the output")
     public String outputKey;
 
-    @Parameter(description = "The url to the inputfiles for pixel Delays")
+    @Parameter(required=true, description = "The url to the inputfiles for pixel Delays")
     public SourceURL url = null;
 
     private double[] pixelDelays = null;
@@ -47,14 +47,7 @@ public class CorrectPixelDelays implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        if (url != null) {
-            try {
-                loadPixelDelayFile(url);
-            } catch (Exception e) {
-                log.error("Could not load .drs file specified in the url.");
-                throw new RuntimeException(e.getMessage());
-            }
-        }
+            loadPixelDelayFile(url);
     }
 
     @Override

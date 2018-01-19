@@ -53,13 +53,11 @@
       numberOfPoints="${RisingEdgePolynomFit.numberOfPoints}"
       maxSlopesKey="maxSlopes"
   />
-  <If condition="%{data.CREATOR} != 'Ceres'">
-    <fact.datacorrection.CorrectPixelDelays
-        arrivalTimeKey="arrivalTime"
-        outputKey="arrivalTime"
-        url="${pixelDelayFile}"
-    />
-  </If>
+  <fact.datacorrection.CorrectPixelDelays
+      arrivalTimeKey="arrivalTime"
+      outputKey="arrivalTime"
+      url="${pixelDelayFile}"
+  />
   <fact.datacorrection.InterpolatePixelArray
       calibService="calibService"
       inputKey="photoncharge"
