@@ -18,17 +18,11 @@
     <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
     <process id="2" input="fact">
-      <If condition="%{data.CREATOR}!='Ceres'">
-        <fact.utils.PreviousEventInfo
-          startCellKey="StartCellData"
-          outputKey="prevEvents"
-          limitEvents="${PreviousEventInfo.limitEvents}"
-        />
-        <fact.features.UnixTimeUTC2DateTime />
-      </If>
-      <fact.extraction.SaturatedSlicesPercentage />
+      <include url="classpath:/analysis/init.xml" />
+      <!-- This skips events created by our malfunctioning LED light pulser (27s Events) --> 
       <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
-      <stream.flow.Skip condition="%{data.TriggerType} != 4" />
+      <!-- Only analyze physics trigger events -->
+      <Skip condition="%{data.TriggerType} != 4" />
 
       <include url="classpath:/analysis/calibration.xml" />
       <fact.photonstream.SinglePulseExtraction

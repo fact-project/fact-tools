@@ -14,7 +14,7 @@
     <stream id="fact" class="fact.io.CeresStream" url="${infile}"/>
 
     <process id="2" input="fact">
-
+        <include url="classpath:/analysis/init.xml" />
         <include url="classpath:/analysis/calibration.xml" />
         <include url="classpath:/analysis/extraction.xml" />
 
