@@ -31,4 +31,8 @@
         outputKey="shower"
     />
   </If>
+  <fact.pixelsets.Length
+    pixelSetKey="shower"
+    outputKey="num_pixel_in_shower"
+  />
 </module>

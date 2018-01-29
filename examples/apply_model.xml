@@ -30,6 +30,10 @@
         <include url="classpath:/analysis/calibration.xml" />
         <include url="classpath:/analysis/extraction.xml" />
         <include url="classpath:/analysis/cleaning.xml" />
+
+        <!-- Only analyze events with at least 5 pixels after cleaning -->
+        <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
+
         <include url="classpath:/analysis/pedestalParameters.xml" />
         <include url="classpath:/analysis/imageParameters.xml" />
         <include url="classpath:/analysis/sourcePosition.xml" />

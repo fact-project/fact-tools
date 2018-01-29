@@ -1,10 +1,4 @@
 <module>
-  <Skip condition="%{data.shower} == null" />
-  <fact.pixelsets.Length
-    pixelSetKey="shower"
-    outputKey="num_pixel_in_shower"
-  />
-  <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
   <fact.statistics.ArrayMean
     key="photoncharge"
     outputKey="photoncharge_mean"
