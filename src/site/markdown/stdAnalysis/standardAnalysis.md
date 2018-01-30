@@ -1,6 +1,6 @@
 # Performing a Standard Analysis
 
-The standard analysis is meant to analyse raw data files (either from the telescope or from MC Simulations) to identify 
+The standard analysis is meant to analyse raw data files (either from the telescope, called "observations", or from MC Simulations, called "simulations") to identify 
 and parametrize images of air showers. The calculated parameters can be used used afterwards to perform the gamma-hadron 
 classification, energy reconstruction, and the directional reconstruction.
 
@@ -9,20 +9,32 @@ here are still some differences that need special treatment.
 To do this, the `CREATOR` FITS Header tag is checked and if it contains `Ceres`,
 simulations are assumed, else observations.
 
-## Standard Analysis xml Files
+## Standard Analysis xml File
 
-The standard analysis xml files are:
+The standard analysis xml files is:
 
-* `examples/stdAnalysis/observations.xml`
-* `examples/stdAnalysis/simulations.xml`
-
-for the analysis of observed and simulated data respectively.
-
-The two .xml files follow the same structure, the differences are explained in the next subsection.
+* `examples/stdAnalysis.xml`
 
 The upper part defines the pathes to the different input files (raw data file, drs file, aux directory, gains, pixel delays) and
 the url to the [default settings](./standardSettings.html) files (settings.properties).
 Than the stream and the process are defined.
+
+These files need to be set differently for observations and simulations.
+
+For simulations, use the provided drs, gain and delay files:
+```
+<property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz"/>
+<property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv"/>
+<property name="pixelDelayFile" value="classpath:/default/delays_zero.csv"/>
+```
+
+For observations use the appropriate drs file, usually the one taken direcly before
+the observation you want to analyse, and the provided gain and delay files:
+```
+<property name="drsfile" value="file:/path/to/drs/file"/>
+<property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+<property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+```
 
 The process contains 6 different steps, each contained in a module xml file,
 which can be found in the classpath and is thus included in the jar.
@@ -32,6 +44,10 @@ and you can use `classpath:/...` to access it in the xml.
 The analysis modules are the same for simulations and observations and contain 
 control flow based on the `CREATOR` FITS header tag to perform the necessary 
 steps, which are different for simulations and observations.
+
+The analysis results are stored to FITS with the outputkeys determined from
+the settings.properties file and whether the analyzed file containes observations
+or simulations.
 
 ####  `analysis/init.xml`
 

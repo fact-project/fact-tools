@@ -17,10 +17,13 @@ public class FactStandardAnalysisTest {
     public void dataTest() {
 
         try {
-            File xml = new File("examples/stdAnalysis/observations.xml");
+            File xml = new File("examples/stdAnalysis.xml");
             File outFile = File.createTempFile("facttools_test", ".fits");
 
-            String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
+            String[] args = {
+                    xml.toURI().toString(),
+                    "-Doutfile=" + outFile.toURI().toString(),
+            };
 
             fact.run.main(args);
 
@@ -41,10 +44,17 @@ public class FactStandardAnalysisTest {
     public void mcTest() {
 
         try {
-            File xml = new File("examples/stdAnalysis/simulations.xml");
+            File xml = new File("examples/stdAnalysis.xml");
             File outFile = File.createTempFile("facttools_test", ".fits");
 
-            String[] args = {xml.toURI().toString(), "-Doutfile=" + outFile.toURI().toString()};
+            String[] args = {
+                    xml.toURI().toString(),
+                    "-Doutfile=" + outFile.toURI().toString(),
+                    "-Dinfile=file:src/main/resources/testMcFile.fits.gz",
+                    "-Ddrsfile=file:src/main/resources/testMcDrsFile.drs.fits.gz",
+                    "-DintegralGainFile=classpath:/default/defaultIntegralGains.csv",
+                    "-DpixelDelayFile=classpath:/default/delays_zero.csv",
+            };
 
             fact.run.main(args);
 
