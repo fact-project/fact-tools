@@ -42,8 +42,8 @@ public class FITSWriter extends Writer implements StatefulProcessor {
 
     static Logger log = LoggerFactory.getLogger(FITSWriter.class);
 
-    @Parameter(required = true, description = "Keys to write to the FITS Binary Table. Using streams.Keys")
-    public Keys keys = new Keys("");
+    @Parameter(description = "Keys to save to the outputfile, if not given, the default keys for observations and simulations are stored, taken from the default/settings.properties file")
+    public Keys keys = null;
 
     @Parameter(description = "Keys to write to the FITS Header. Only the first data item will be used. Using streams.Keys")
     public Keys headerKeys = new Keys("");
@@ -72,6 +72,11 @@ public class FITSWriter extends Writer implements StatefulProcessor {
 
     @Override
     public Data process(Data item) {
+        if (keys == null) {
+            log.info("Getting default outputkeys");
+            keys = getDefaultKeys(isSimulated(item));
+        }
+
         Data outputItem = DataFactory.create();
 
         for (String key : keys.select(item)) {
