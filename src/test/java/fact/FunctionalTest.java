@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static fact.RunFACTTools.runFACTTools;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -53,9 +54,10 @@ public class FunctionalTest {
         ArrayList<String> failedFilesList = new ArrayList<>();
 
         for (Path f : pathList) {
+            log.info("Executing xml {}", f.toString());
             String[] args = {f.toAbsolutePath().toString()};
             try {
-                fact.run.main(args);
+                runFACTTools(args);
             } catch (Exception e) {
                 log.error("Error executing xml: " + f, e);
                 failedFilesList.add(f.toString());

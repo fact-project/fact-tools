@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static fact.RunFACTTools.runFACTTools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -22,10 +23,13 @@ public class FactStandardAnalysisTest {
 
             String[] args = {
                     xml.toURI().toString(),
+                    "-Dinfile=file:src/main/resources/testDataFile.fits.gz",
+                    "-Ddrsfile=file:src/main/resources/testDrsFile.drs.fits.gz",
+                    "-DauxFolder=file:src/main/resources/aux/",
                     "-Doutfile=" + outFile.toURI().toString(),
             };
 
-            fact.run.main(args);
+            runFACTTools(args);
 
             FITS fits = FITS.fromFile(outFile);
             BinTable table = fits.getBinTableByName("Events").get();
@@ -35,7 +39,7 @@ public class FactStandardAnalysisTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run examples/stdAnalysis/observations.xml");
+            fail("Could not run examples/stdAnalysis.xml for observations");
         }
     }
 
@@ -56,7 +60,7 @@ public class FactStandardAnalysisTest {
                     "-DpixelDelayFile=classpath:/default/delays_zero.csv",
             };
 
-            fact.run.main(args);
+            runFACTTools(args);
 
             FITS fits = FITS.fromFile(outFile);
             BinTable table = fits.getBinTableByName("Events").get();
