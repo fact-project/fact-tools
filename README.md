@@ -59,7 +59,7 @@ There are a number of example XML files in the `examples/` directory.
 To perform the current FACT-Tools standard analysis and write image parameters to FITS files, run 
 
 ```
-$ java -jar <jar> examples/stdAnalysis/data/analysis.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile> -DauxFolder=file:<aux_dir>
+$ java -jar <jar> examples/stdAnalysis.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile> -DauxFolder=file:<aux_dir>
 ```
 
 To convert FACT rawdata zfits files to standard, uncompressed FITS, use:
