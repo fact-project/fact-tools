@@ -69,7 +69,6 @@ public class ConstantCalibService implements CalibrationService {
     public static final PixelSet biasPatch272 = PixelSet.fromIDs(new int[] {1296, 1297, 1298, 1299});
 
     public void init() {
-        FactPixelMapping pixelMap = FactPixelMapping.getInstance();
         set = new TreeSet<>();
 
         PixelSet badPixelsFromBeginning = new PixelSet();
@@ -89,14 +88,14 @@ public class ConstantCalibService implements CalibrationService {
         //  in the night of 2015-01-08, two pixels were broken additionally (729 & 750)
         HardwareConfiguration config20150108 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 8, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150108.badPixels.addAll(badPixelsFromBeginning);
-        config20150108.badPixels.add(pixelMap.getPixelFromId(729));
-        config20150108.badPixels.add(pixelMap.getPixelFromId(750));
+        config20150108.badPixels.addById(729);
+        config20150108.badPixels.addById(750);
         config20150108.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         // On 2015-01-09, pixel 729 recovered
         HardwareConfiguration config20150109 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 9, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150109.badPixels.addAll(badPixelsFromBeginning);
-        config20150109.badPixels.add(pixelMap.getPixelFromId(750));
+        config20150109.badPixels.addById(750);
         config20150109.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         // On 2015-01-31, pixel 750 recovered
