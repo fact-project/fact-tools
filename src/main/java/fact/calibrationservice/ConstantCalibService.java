@@ -60,13 +60,13 @@ public class ConstantCalibService implements CalibrationService {
 
     boolean isInit = false;
 
-    public PixelSet deadPixels = PixelSet.fromIDs(new int[]{80, 873, 927});
-    public PixelSet crazyPixels = PixelSet.fromIDs(new int[]{297, 863, 868});
-    public PixelSet twinPixels = PixelSet.fromIDs(new int[]{527, 528, 721, 722, 1093, 1094});
-    public PixelSet brokenDrsBoard20142015 = PixelSet.fromIDs(new int[]{720, 721, 722, 723, 724, 725, 726, 727, 728});
+    public static final PixelSet deadPixels = PixelSet.fromIDs(new int[]{80, 873, 927});
+    public static final PixelSet crazyPixels = PixelSet.fromIDs(new int[]{297, 863, 868});
+    public static final PixelSet twinPixels = PixelSet.fromIDs(new int[]{527, 528, 721, 722, 1093, 1094});
 
-    public PixelSet biasPatch38 = PixelSet.fromIDs(new int[] {171, 172, 173, 174});
-    public PixelSet biasPatch272 = PixelSet.fromIDs(new int[] {1296, 1297, 1298, 1299});
+    public static final PixelSet brokenDrsBoard20142015 = PixelSet.fromIDs(new int[]{720, 721, 722, 723, 724, 725, 726, 727, 728});
+    public static final PixelSet biasPatch38 = PixelSet.fromIDs(new int[] {171, 172, 173, 174});
+    public static final PixelSet biasPatch272 = PixelSet.fromIDs(new int[] {1296, 1297, 1298, 1299});
 
     public void init() {
         FactPixelMapping pixelMap = FactPixelMapping.getInstance();
