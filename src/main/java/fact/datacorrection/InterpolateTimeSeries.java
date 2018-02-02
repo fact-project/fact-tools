@@ -56,7 +56,7 @@ public class InterpolateTimeSeries implements Processor {
             timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         }
 
-        PixelSet badPixelSet = calibService.getBadPixel(timeStamp);
+        PixelSet badPixelSet = calibService.getBadPixels(timeStamp);
 
         if (!dataKey.equals(dataOutputKey)) {
             double[] newdata = new double[data.length];

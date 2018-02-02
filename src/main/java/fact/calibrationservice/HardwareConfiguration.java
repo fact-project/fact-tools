@@ -8,11 +8,10 @@ import java.time.ZonedDateTime;
 
 public class HardwareConfiguration implements Comparable<HardwareConfiguration> {
 
-    private ZonedDateTime startTime;
+    public final ZonedDateTime startTime;
 
-    private PixelSet badPixels;
-
-    private PixelSet notUsablePixels;
+    public PixelSet badPixels = new PixelSet();
+    public PixelSet notUsablePixels = new PixelSet();
 
     public HardwareConfiguration(ZonedDateTime startTime) {
         this.startTime = startTime.withZoneSameInstant(ZoneOffset.UTC);
@@ -20,7 +19,7 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
 
     @Override
     public int compareTo(HardwareConfiguration o) {
-        return this.startTime.compareTo(o.getStartTime());
+        return this.startTime.compareTo(o.startTime);
     }
 
     @Override
@@ -37,30 +36,4 @@ public class HardwareConfiguration implements Comparable<HardwareConfiguration> 
 
         return true;
     }
-
-    public ZonedDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(ZonedDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public PixelSet getBadPixels() {
-        return badPixels;
-    }
-
-    public void setBadPixels(PixelSet badPixels) {
-        this.badPixels = badPixels;
-    }
-
-    public PixelSet getNotUsablePixels() {
-        return notUsablePixels;
-    }
-
-    public void setNotUsablePixels(PixelSet notUsablePixels) {
-        this.notUsablePixels = notUsablePixels;
-    }
-
-
 }
