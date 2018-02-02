@@ -1,0 +1,45 @@
+<module>
+  <If condition="%{data.CREATOR}=='Ceres'">
+    <fact.utils.Remapping
+        key="Data" 
+        outputKey="Data"
+    />
+    <fact.utils.RemappingKeys 
+        keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+    />
+  </If>
+  <fact.datacorrection.DrsCalibration
+      url="${drsfile}"
+      key="Data"
+      outputKey="DataCalibrated"
+  />  
+  <If condition="%{data.CREATOR}!='Ceres'">
+    <fact.datacorrection.PatchJumpRemoval
+        dataKey="DataCalibrated"
+        outputKey="DataCalibrated"
+        prevEventsKey="prevEvents"
+        startCellKey="StartCellData"
+        jumpLimit="${PatchJumpRemoval.jumpLimit}"
+    />
+  </If>
+  <fact.datacorrection.RemoveSpikes
+      dataKey="DataCalibrated"
+      outputKey="DataCalibrated"
+      startCellKey="StartCellData"
+      leftBorder="${RemoveSpikes.leftBorder}"
+      spikeLimit="${RemoveSpikes.spikeLimit}"
+      topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+      maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+  />
+  <If condition="%{data.CREATOR}!='Ceres'">
+    <fact.datacorrection.DrsTimeCalibration
+        dataKey="DataCalibrated"
+        outputKey="DataCalibrated"
+    />
+  </If>
+  <fact.datacorrection.InterpolateTimeSeries 
+      calibService="calibService"
+      dataKey="DataCalibrated"
+      dataOutputKey="DataCalibrated"
+  />
+</module>

@@ -8,8 +8,7 @@ package fact;
 public class run {
     public static void main(String[] args) throws Exception {
         handleArguments(args);
-        stream.run run = new stream.run();
-        run.main(args);
+        stream.run.main(args);
 
     }
 

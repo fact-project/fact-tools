@@ -1,9 +1,10 @@
 <container>
-  <properties url="classpath:/default/settings_mc.properties" />
+  <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
   <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
   <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+  <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
 
@@ -11,40 +12,40 @@
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
 
   <process id="2" input="fact">
-    <include url="classpath:/default/mc/calibration_mc.xml" />
-    <include url="classpath:/default/mc/extraction_mc.xml" />
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
 
-		<fact.cleaning.TwoLevelTimeMedian
-			calibService="calibService"
-			photonChargeKey="photoncharge"
-			outputKey="shower"
-			arrivalTimeKey="arrivalTime"
-			corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
-    	neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
-			timeLimit="${twoLevelTimeNeighbor_timeLimit}"
-			minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
-			/>
+    <fact.cleaning.TwoLevelTimeMedian
+      calibService="calibService"
+      photonChargeKey="photoncharge"
+      outputKey="shower"
+      arrivalTimeKey="arrivalTime"
+      corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
+      neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
+      timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
+      minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
+      />
 
-		<fact.cleaning.TwoLevelTimeMedian
-			calibService="calibService"
-			photonChargeKey="McCherPhotWeight"
-			outputKey="truth"
-			arrivalTimeKey="McCherArrTimeMean"
-			corePixelThreshold="${twoLevelTimeNeighbor_coreThreshold}"
-    	neighborPixelThreshold="${twoLevelTimeNeighbor_neighborThreshold}"
-			timeLimit="${twoLevelTimeNeighbor_timeLimit}"
-			minNumberOfPixel="${twoLevelTimeNeighbor_minNumberOfPixel}"
-			/>
+    <fact.cleaning.TwoLevelTimeMedian
+      calibService="calibService"
+      photonChargeKey="McCherPhotWeight"
+      outputKey="truth"
+      arrivalTimeKey="McCherArrTimeMean"
+      corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
+      neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
+      timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
+      minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
+      />
 
-		<fact.features.evaluate.PhotonchargeEvaluate
-			photonchargeKey="photoncharge"
-			arrivalTimeKey="arrivalTime"
-			mcCherenkovWeightKey="McCherPhotWeight"
-			mcCherenkovArrTimeMeanKey="McCherArrTimeMean"
-			mcNoiseWeightKey="McNoisePhotWeight"
-    	outputKeyPhotonCharge="qualityFactorPhCh"
-			outputKeyArrivalTime="qualityFactorArrTi"
-			/>
+    <fact.features.evaluate.PhotonchargeEvaluate
+      photonchargeKey="photoncharge"
+      arrivalTimeKey="arrivalTime"
+      mcCherenkovWeightKey="McCherPhotWeight"
+      mcCherenkovArrTimeMeanKey="McCherArrTimeMean"
+      mcNoiseWeightKey="McNoisePhotWeight"
+      outputKeyPhotonCharge="qualityFactorPhCh"
+      outputKeyArrivalTime="qualityFactorArrTi"
+      />
 
   </process>
 </container>

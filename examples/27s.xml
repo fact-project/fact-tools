@@ -18,8 +18,8 @@
 
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
 
-    <include url="classpath:/default/data/calibration.xml" />
-    <include url="classpath:/default/data/extraction.xml" />
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
 
     <!-- <fact.io.FITSWriter url="file:27s.fits" keys="EventNum,saturatedSlicesPercentage,photoncharge"/> -->
     <fact.ShowViewer key="Data" />

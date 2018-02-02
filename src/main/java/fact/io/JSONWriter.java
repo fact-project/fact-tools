@@ -6,6 +6,8 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import fact.container.PixelSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Keys;
 import stream.ProcessContext;
@@ -94,9 +96,11 @@ import java.util.zip.GZIPOutputStream;
  * Refactored by maxnoe on 2/2/2016
  */
 public class JSONWriter extends Writer implements StatefulProcessor {
+    static Logger log = LoggerFactory.getLogger(JSONWriter.class);
 
-    @Parameter(required = true)
-    public Keys keys = new Keys("");
+
+    @Parameter(description = "Keys to save to the outputfile, if not given, the default keys for observations and simulations are stored, taken from the default/settings.properties file")
+    public Keys keys = null;
 
     @Parameter(required = false, description = "Defines how many significant digits are used for double values", defaultValue = "null")
     public Integer doubleSignDigits = null;
@@ -131,6 +135,11 @@ public class JSONWriter extends Writer implements StatefulProcessor {
     @Override
     public Data process(Data data) {
         Data item = DataFactory.create();
+
+        if (keys == null) {
+            log.info("Getting default outputkeys");
+            keys = getDefaultKeys(isSimulated(item));
+        }
 
         for (String key : keys.select(data)) {
             item.put(key, data.get(key));

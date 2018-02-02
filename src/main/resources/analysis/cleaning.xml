@@ -1,0 +1,38 @@
+<module>
+  <If condition="%{data.CREATOR} != 'Ceres'">
+    <fact.features.source.SourcePosition
+        outputKey="Cetatauri"
+        sourceRightAscension="5.627416667"
+        sourceDeclination="21.1425"
+        auxService="auxService"
+    />
+    <fact.cleaning.TwoLevelTimeNeighbor
+        calibService="calibService"
+        photonChargeKey="photoncharge"
+        arrivalTimeKey="arrivalTime"
+        corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
+        neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
+        timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
+        minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
+        starPositionKeys="Cetatauri"
+        starRadiusInCamera="11.0"
+        outputKey="shower"
+    />
+  </If>
+  <If condition="%{data.CREATOR} == 'Ceres'">
+    <fact.cleaning.TwoLevelTimeNeighbor
+        calibService="calibService"
+        photonChargeKey="photoncharge"
+        arrivalTimeKey="arrivalTime"
+        corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
+        neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
+        timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
+        minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
+        outputKey="shower"
+    />
+  </If>
+  <fact.pixelsets.Length
+    pixelSetKey="shower"
+    outputKey="num_pixel_in_shower"
+  />
+</module>
