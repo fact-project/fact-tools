@@ -25,7 +25,31 @@
     <!-- Only analyze physics trigger events -->
     <Skip condition="%{data.TriggerType} != 4" />
 
-    <include url="classpath:/analysis/calibration.xml" />
+    <fact.utils.Remapping
+        key="Data" 
+        outputKey="Data"
+    />
+    <fact.utils.RemappingKeys 
+        keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
+    />
+    <fact.datacorrection.DrsCalibration
+        key="Data"
+        outputKey="DataCalibrated"
+    />  
+    <fact.datacorrection.RemoveSpikes
+        dataKey="DataCalibrated"
+        outputKey="DataCalibrated"
+        startCellKey="StartCellData"
+        leftBorder="${RemoveSpikes.leftBorder}"
+        spikeLimit="${RemoveSpikes.spikeLimit}"
+        topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+        maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+    />
+    <fact.datacorrection.InterpolateTimeSeries 
+        calibService="calibService"
+        dataKey="DataCalibrated"
+        dataOutputKey="DataCalibrated"
+    />
     <include url="classpath:/analysis/extraction.xml" />
     <include url="classpath:/analysis/cleaning.xml" />
 
@@ -38,7 +62,7 @@
 
     <fact.utils.SanitizeKeys />
     <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-    <fact.io.JSONWriter keys="${keysForOutputSimulations}"
+    <fact.io.JSONWriter keys="${outputKeysSimulations}"
         url="${output}"
         writeListOfItems="True"
         pixelSetsAsInt="True"
