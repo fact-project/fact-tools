@@ -2,7 +2,6 @@
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
   <property name="infile" value="file:src/test/resources/testDataFile2.fits.fz" />
-  <property name="drsfile" value="file:src/test/resources/testDrsFile2.drs.fits.gz" />
   <property name="auxFolder" value="file:src/test/resources/aux/" />
   <property name="fitParameterFile_Temp" value="file:src/main/resources/default/drsTempCalib_FitParameter.fits" />
   <property name="outfile" value="file:test_out.fits" />
@@ -22,40 +21,6 @@
       startCellKey="StartCellData"
       outputKey="prevEvents"
       limitEvents="10"
-    />
-
-    <fact.datacorrection.DrsCalibration
-      dataKey="Data"
-      outputKey="DRSCalibratedData"
-      url="${drsfile}"
-    />
-
-    <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData"
-      outputKeyMean="DRSCalibratedData_Mean"
-      outputKeyStd="DRSCalibratedData_Std"
-    />
-
-    <fact.datacorrection.PatchJumpRemoval
-      dataKey="DRSCalibratedData"
-      outputKey="DRSCalibratedData_Jremoved"
-      prevEventsKey="prevEvents"
-      startCellKey="StartCellData"
-      jumpLimit="${patchJumpRemoval_jumpLimit}"
-    />
-    <fact.datacorrection.RemoveSpikes
-      dataKey="DRSCalibratedData_Jremoved"
-      outputKey="DRSCalibratedData_JSremoved"
-      startCellKey="StartCellData"
-      leftBorder="${removeSpikes_leftBorder}"
-      spikeLimit="${removeSpikes_spikeLimit}"
-      topSlopeLimit="${removeSpikes_topSlopeLimit}"
-      maxSpikeLength="${removeSpikes_maxSpikeLength}"
-    />
-    <fact.features.TimeSeriesNoise
-      dataKey="DRSCalibratedData_JSremoved"
-      outputKeyMean="DRSCalibratedData_JSremoved_Mean"
-      outputKeyStd="DRSCalibratedData_JSremoved_Std"
     />
 
     <fact.datacorrection.DrsTemperatureCalibration
@@ -95,12 +60,7 @@
 
     <fact.io.FITSWriter
       url="${outfile}"
-      keys="DRSCalibratedData_Mean,
-            DRSCalibratedData_Std,
-            DRSCalibratedData_JSremoved,
-            DRSCalibratedData_JSremoved_Mean,
-            DRSCalibratedData_JSremoved_Std,
-            DRSCalibratedData_Temp_Mean,
+      keys="DRSCalibratedData_Temp_Mean,
             DRSCalibratedData_Temp_Std,
             DRSCalibratedData_Temp_JSremoved,
             DRSCalibratedData_Temp_JSremoved_Mean,

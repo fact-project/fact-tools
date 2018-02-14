@@ -32,8 +32,6 @@ public class DrsTimelapseCalibration implements StatefulProcessor {
 
     private Logger log = LoggerFactory.getLogger(DrsTimelapseCalibration.class);
 
-    private double adcCountsToMilliVolt = 2000.0 / 4096.0;
-
     @Parameter(description = "Data to calibrate", defaultValue = "Data")
     private String dataKey = "Data";
 
@@ -84,7 +82,7 @@ public class DrsTimelapseCalibration implements StatefulProcessor {
                 double cellOffset = calculateOffset(deltaT[sample_idx], calibrationConstants[cell_idx]);
 
 
-                dataCalibrated[sample_idx] = (rawData[sample_idx] - cellOffset) * adcCountsToMilliVolt;
+                dataCalibrated[sample_idx] = (rawData[sample_idx] - cellOffset);
             }
         }
         data.put(outputKey, dataCalibrated);
