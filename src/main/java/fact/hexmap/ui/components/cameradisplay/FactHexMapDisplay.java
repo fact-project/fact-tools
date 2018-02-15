@@ -325,7 +325,6 @@ public class FactHexMapDisplay extends JPanel implements SliceObserver, MouseLis
             // above we now have to transform
             // the coordinates of the mouse pointer.
             Point p = arg0.getPoint();
-            System.out.println(p);
             p.translate(-getWidth() / 2, -getHeight() / 2);
 
             // In case we want to select wholes patches at a time we save the id
