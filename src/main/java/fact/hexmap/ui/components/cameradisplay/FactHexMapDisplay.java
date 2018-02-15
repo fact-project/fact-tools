@@ -35,15 +35,16 @@ import static com.google.common.primitives.Doubles.min;
  * of the fact telescope The hexagons are equally spaced and sized. Orientated
  * with one edge on the bottom. Also has a colorbar next to it.
  */
-public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
-        SliceObserver, MouseListener {
+public class FactHexMapDisplay extends JPanel implements SliceObserver, MouseListener {
     /**
      * The unique class ID
      */
     private static final long serialVersionUID = -4015808725138908874L;
 
     static Logger log = LoggerFactory.getLogger(FactHexMapDisplay.class);
-    private final double radius;
+    public final double radius;
+    public final double scalingX;
+    public final double scalingY;
 
     FactHexTile tiles[];
 
@@ -88,6 +89,10 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
     private int offsetX = 0;
     private int offsetY = 0;
 
+    public Point cameraCoordinateToPixels(double x, double y){
+        return new Point((int) (scalingX * x), (int) (scalingY * y));
+    }
+
     /**
      * A Hexagon in this case is defined by the passed radius. The radius of the
      * circle that fits into the hexagon can be calculated by sqrt(3)/2 *
@@ -101,6 +106,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
         Bus.eventBus.register(this);
 
         this.radius = radius;
+        scalingX = 0.184 * radius;
+        scalingY = -0.172 * radius;
         this.pixelMapping = FactPixelMapping.getInstance();
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
@@ -109,13 +116,14 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
 
         tiles = new FactHexTile[pixelMapping.getNumberOfPixel()];
         for (int i = 0; i < tiles.length; i++) {
-            FactHexTile t = new FactHexTile(pixelMapping.getPixelFromId(i),
-                    radius);
+            CameraPixel pixel = pixelMapping.getPixelFromId(i);
+            Point center = cameraCoordinateToPixels(pixel.getXPositionInMM(), pixel.getYPositionInMM());
+            FactHexTile t = new FactHexTile(center, pixel, radius);
             tiles[i] = t;
         }
 
         if (mouseAction) {
-            // add the mosuelistener so we can react to mouse clicks on the
+            // add the mouse listener so we can react to mouse clicks on the
             // hexmap
             this.addMouseListener(this);
         }
@@ -125,8 +133,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
         this(radius, canvasWidth, canvasHeight, true);
     }
 
-    @Override
-    public Tile[] getTiles() {
+    public FactHexTile[] getTiles() {
         return tiles;
     }
 
@@ -194,9 +201,8 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
                 return object1.getDrawRank() - object2.getDrawRank();
             }
         }
-        // Sortierung in der richtigen Reihenfolge
-        // um ueberdeckungen zu vermeiden
-        // von niedrig nach hoch
+
+        // sort by z-order to avoid shadowing
         Collections.sort(overlays, new CustomComparator());
 
         return overlays;
@@ -218,7 +224,6 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
     }
 
 
-    @Override
     public void setColorMap(ColorMapping m) {
         this.colormap = m;
         this.repaint();
@@ -242,36 +247,33 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
         int xOffset = getWidth() / 2 + offsetX;
         int yOffset = getHeight() / 2 + offsetY;
+
         if (g instanceof Graphics2D) {
             Graphics2D g2 = (Graphics2D) g;
-            // g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            // RenderingHints.VALUE_ANTIALIAS_ON);
-
-            // draw a grid with lines every 25 pixel in a dark grey color
-            g2.setStroke(new BasicStroke(1.0f));
-            g2.setColor(Color.DARK_GRAY);
-            // drawGrid(g2, 25);
 
             // now draw the actual camera pixel
             // translate to center of canvas
             g2.translate(xOffset, yOffset);
-            // rotate 90 degrees counter clockwise
-            g2.rotate(-Math.PI / 2);
-            // and draw tiles
-            for (Tile tile : tiles) {
-                CameraPixel p = tile.getCameraPixel();
+
+            for (FactHexTile tile : tiles) {
+                CameraPixel p = tile.pixel;
+
                 int slice = currentSlice;
-                if (currentSlice >= sliceValues[tile.getCameraPixel().id].length) {
-                    slice = sliceValues[tile.getCameraPixel().id].length - 1;
+                if (currentSlice >= sliceValues[p.id].length) {
+                    slice = sliceValues[p.id].length - 1;
                 }
-                double value = sliceValues[tile.getCameraPixel().id][slice];
-                tile.setFillColor(this.colormap.getColorFromValue(value,
-                        minValueInData, maxValueInData));
+
+                // set fill color according to colormap and data value
+                double value = sliceValues[p.id][slice];
+                tile.fillColor = this.colormap.getColorFromValue(value,  minValueInData, maxValueInData);
+
+                // mark selected pixels
                 if (selectedPixels.contains(p)) {
-                    tile.setBorderColor(Color.RED);
+                    tile.borderColor = Color.RED;
                 } else {
-                    tile.setBorderColor(Color.BLACK);
+                    tile.borderColor = Color.BLACK;
                 }
+
                 tile.paint(g);
             }
 
@@ -279,20 +281,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
             for (CameraMapOverlay o : overlays) {
                 o.paint(g2, this);
             }
-            // g2.setStroke(new BasicStroke(1.0f));
-            // g2.setColor(Color.WHITE);
-            // // undo the rotation
-            g2.rotate(Math.PI / 2);
-            // to draw the grid translate back
             g2.translate(-xOffset, -yOffset);
-
-            // draw cross across screen to indicate center of component
-
-            // Line2D line = new Line2D.Double(0,0, getWidth(),getHeight());
-            // g2.draw(line);
-            //
-            // line = new Line2D.Double(getWidth(),0,0,getHeight());
-            // g2.draw(line);
 
             if (includeScale) {
                 g2.translate(this.canvasWidth - 40, 0);
@@ -336,19 +325,16 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
             // above we now have to transform
             // the coordinates of the mouse pointer.
             Point p = arg0.getPoint();
+            System.out.println(p);
             p.translate(-getWidth() / 2, -getHeight() / 2);
-            AffineTransform rotateInstance = AffineTransform
-                    .getRotateInstance(Math.PI / 2);
-            rotateInstance.transform(p, p);
 
             // In case we want to select wholes patches at a time we save the id
             // of all selected patches in here
             Set<Integer> selectedPatches = new HashSet<>();
 
-            for (Tile cell : tiles) {
+            for (FactHexTile cell : tiles) {
                 if (cell.contains(p)) {
-                    CameraPixel selectedPixel = (CameraPixel) cell
-                            .getCameraPixel();
+                    CameraPixel selectedPixel = cell.pixel;
 
                     // getting the patch by dividing chid by 9 since there are
                     // 1440/9 = 160 patches
@@ -389,19 +375,16 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
             // in patch selectionmode add all the pixels with the right patchid
             // to the selectionset
             if (patchSelectionMode) {
-                for (Tile cell : tiles) {
-                    CameraPixel pixel = (CameraPixel) cell
-                            .getCameraPixel();
-                    Integer patch = pixel.chid / 9;
+                for (FactHexTile cell : tiles) {
+                    Integer patch = cell.pixel.chid / 9;
                     if (selectedPatches.contains(patch)) {
-                        selectedPixels.add(pixel);
+                        selectedPixels.add(cell.pixel);
                     }
                 }
             }
         }
         this.repaint();
         Bus.eventBus.post(selectedPixels);
-
     }
 
     @Override
@@ -472,13 +455,7 @@ public class FactHexMapDisplay extends JPanel implements PixelMapDisplay,
         return getMinimumSize();
     }
 
-    // ------Getter and Setter----------------
-    @Override
-    public int getNumberOfTiles() {
-        return tiles.length;
-    }
-
-    public double getTileRadiusInPixels() {
+     public double getTileRadiusInPixels() {
         return radius;
     }
 
