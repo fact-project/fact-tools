@@ -10,9 +10,8 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -23,6 +22,7 @@ public class ShowViewer implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(ShowViewer.class);
     Viewer viewer = null;
     AtomicBoolean lock = new AtomicBoolean(true);
+    boolean exit = false;
 
     /**
      * The key for the data to  be displayed on the screen
@@ -45,59 +45,58 @@ public class ShowViewer implements StatefulProcessor {
     public void init(ProcessContext context) throws Exception {
         String os = System.getProperty("os.name");
         log.info("Opening viewer on OS: " + os);
-    }
 
+        viewer = Viewer.getInstance();
+        viewer.setDefaultKey(key);
+        if (range != null) {
+            viewer.setRange(range);
+        }
+        viewer.getNextButton().setEnabled(true);
+        viewer.getNextButton().addActionListener((event) -> {
+            synchronized (lock) {
+                lock.set(!lock.get());
+                lock.notifyAll();
+            }
+        });
+        viewer.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                synchronized (lock) {
+                    lock.set(!lock.get());
+                    lock.notifyAll();
+                    exit = true;
+                    viewer.dispose();
+                }
+            }
+        });
+    }
 
     /**
      * @see stream.Processor#process(stream.Data)
      */
     @Override
-    public Data process(final Data item) {
-
+    public Data process(Data item) {
         if (!item.containsKey(key)) {
             throw new RuntimeException("Key " + key + " not found in event. Cannot show viewer");
         }
 
+        viewer.setDataItem(item);
         lock.set(true);
-
-        Thread t = new Thread() {
-            public void run() {
-                if (viewer == null) {
-                    viewer = Viewer.getInstance();
-                    viewer.setDefaultKey(key);
-                    if (range != null) {
-                        viewer.setRange(range);
-                    }
-                    viewer.getNextButton().setEnabled(true);
-                    viewer.getNextButton().addActionListener(
-                            new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent arg0) {
-                                    synchronized (lock) {
-                                        lock.set(!lock.get());
-                                        log.debug("Notifying all listeners on lock...");
-                                        lock.notifyAll();
-                                    }
-                                }
-                            });
-                }
-                viewer.setVisible(true);
-                viewer.setDataItem(item);
-            }
-        };
-        t.start();
+        viewer.setVisible(true);
 
         synchronized (lock) {
             while (lock.get()) {
                 try {
-                    log.debug("Waiting on lock...");
                     lock.wait();
-                    log.debug("Notification occured on lock!");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }
+        if (exit) {
+            throw new RuntimeException("ViewerExit");
+        }
+
         return item;
     }
 
