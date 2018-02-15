@@ -282,8 +282,6 @@ public class PixelMappingTest {
                 }
             }
             CameraPixel pixel = m.getPixelBelowCoordinatesInMM(x, y);
-            System.out.println(pixel.chid);
-            System.out.println(nearestChid);
             if (pixel != null) {
                 assertEquals("Map did not return the right pixel for coordinates: " + x + ", " + y + " (" + i + ")",
                          nearestChid, pixel.chid);

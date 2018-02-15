@@ -104,9 +104,6 @@ public class FactPixelMapping implements PixelMapping {
         double axial_q = 2.0 / 3.0 * x / size;
         double axial_r = (Math.sqrt(3.0) / 3.0 * y - x / 3.0) / size;
 
-        System.out.println(axial_q);
-        System.out.println(axial_r);
-
         int[] roundedPoint = cube_round(new double[]{axial_q, -axial_q - axial_r, axial_r});
         int rx = roundedPoint[0];
         int rz = roundedPoint[2];
