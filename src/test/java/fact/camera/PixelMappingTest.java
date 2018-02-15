@@ -213,26 +213,17 @@ public class PixelMappingTest {
     @Test
     public void testCoordinatesInMMToPixel() {
         FactPixelMapping m = FactPixelMapping.getInstance();
-        //check inside camera bounds
-        float x = -6.93f * 9.5f;
-        float y = 3.5f * 9.5f;
-        int chid = 911;
 
-
-        //assertTrue("Map didnt return the right pixel " + chid + " for coordinates: " + x + ", " + y,
-        //      chid == m.getPixelBelowCoordinatesInMM(x, y).chid);
-
-        x = 0.0f * 9.5f;
-        y = 0.5f * 9.5f;
-        chid = 393;
-        CameraPixel p = (CameraPixel) m.getPixelFromId(393);
-        p = m.getPixelBelowCoordinatesInMM(x, y);
+        double x = -0.5 * 9.5;
+        double y = 0.0 * 9.5;
+        int chid = 393;
+        CameraPixel p = m.getPixelBelowCoordinatesInMM(x, y);
         assertTrue("Map didnt return the right pixel " + chid + " for coordinates: " + x + ", " + y,
                 chid == p.chid);
 
         //pixel in lower left corner
-        x = -19.05f * 9.5f;
-        y = 5.5f * 9.5f;
+        x = -5.5f * 9.5f;
+        y = -19.05f * 9.5f;
         chid = 722;
         p = (CameraPixel) m.getPixelFromId(722);
         p = m.getPixelBelowCoordinatesInMM(x, y);
@@ -242,8 +233,8 @@ public class PixelMappingTest {
 
 
         //still the same pixel
-        x = -19.06f * 9.5f;
-        y = 5.6f * 9.5f;
+        x = -5.6f * 9.5f;
+        y = -19.06f * 9.5f;
         chid = 722;
         assertTrue("Map didnt return the right pixel " + chid + " for coordinates: " + x + ", " + y,
                 chid == m.getPixelBelowCoordinatesInMM(x, y).chid);
