@@ -10,7 +10,6 @@ import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -87,54 +86,32 @@ public class FactPixelMapping implements PixelMapping {
      * @return The pixel below the point or NULL if the pixels does not exist.
      */
     public CameraPixel getPixelBelowCoordinatesInMM(double xCoordinate, double yCoordinate) {
+
+
+        // undo coordinate system rotation
+        double x = yCoordinate;
+        double y = -xCoordinate;
+
         //get some pixel near the point provided
         //in pixel units
-        xCoordinate /= 9.5;
-        yCoordinate /= -9.5;
-        yCoordinate += 0.5;
+        x /= 9.5;
+        y /= -9.5;
+        y += 0.5;
 
-        //if (xCoordinate*xCoordinate + yCoordinate*yCoordinate >= 440){
-        //    return null;
-        //}
         //distance from center to corner
         double size = 1.0 / Math.sqrt(3);
 
-        double axial_q = 2.0 / 3.0 * xCoordinate / size;
-        double axial_r = (0.5773502693 * yCoordinate - 1.0 / 3.0 * xCoordinate) / size;
+        double axial_q = 2.0 / 3.0 * x / size;
+        double axial_r = (Math.sqrt(3.0) / 3.0 * y - x / 3.0) / size;
 
+        System.out.println(axial_q);
+        System.out.println(axial_r);
 
-        double cube_x = axial_q;
-        double cube_z = axial_r;
-        double cube_y = -cube_x - cube_z;
+        int[] roundedPoint = cube_round(new double[]{axial_q, -axial_q - axial_r, axial_r});
+        int rx = roundedPoint[0];
+        int rz = roundedPoint[2];
 
-
-        //now round maybe violating the constraint
-        int rx = (int) Math.round(cube_x);
-        int rz = (int) Math.round(cube_z);
-        int ry = (int) Math.round(cube_y);
-
-        //artificially fix the constraint.
-        double x_diff = Math.abs(rx - cube_x);
-        double z_diff = Math.abs(rz - cube_z);
-        double y_diff = Math.abs(ry - cube_y);
-
-        if (x_diff > y_diff && x_diff > z_diff) {
-            rx = -ry - rz;
-        } else if (y_diff > z_diff) {
-            ry = -rx - rz;
-        } else {
-            rz = -rx - ry;
-        }
-
-
-        //now convert cube coordinates back to even-q
-        int qd = rx;
-        int rd = rz + (rx - (rx & 1)) / 2;
-
-        CameraPixel p = getPixelFromOffsetCoordinates(qd, rd);
-        return p;
-
-
+        return getPixelFromCubeCoordinates(rx, rz);
     }
 
     /**

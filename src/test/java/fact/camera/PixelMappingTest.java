@@ -263,31 +263,39 @@ public class PixelMappingTest {
      * iterating over all pixels and calculating the distance
      */
     @Test
-    public void testKoordinateToChid() {
+    public void testCoordinateToChid() {
         FactPixelMapping m = FactPixelMapping.getInstance();
 
         // -180,999 .... 180,999
-        double[] xs = {120.513, 12.22, -80.324, -120.6, -6.93 * 9.5, 100.0, 10.50 * 9.5, -11.26 * 9.5};
-        double[] ys = {80.113, 102.22, -5.324, 20.5, 3.49 * 9.5, 100.4, 11 * 9.5, 6.0 * 9.5};
+        double[] xs = {-80.113, -102.22, 5.324, -20.5, -3.49 * 9.5, -100.4, -11 * 9.5, -6.0 * 9.5};
+        double[] ys = {120.513, 12.22, -80.324, -120.6, -6.93 * 9.5, 100.0, 10.70 * 9.5, -11.26 * 9.5};
 
         for (int i = 0; i < xs.length; i++) {
             double x = xs[i];
             double y = ys[i];
+
             int nearestChid = -1;
             double lowestDistance = 100000.0d;
+
             for (int chid = 0; chid < m.getNumberOfPixel(); chid++) {
-                CameraPixel p = (CameraPixel) m.getPixelFromId(chid);
-                double yChid = p.posY * 9.5;
-                double xChid = p.posX * 9.5;
-                double distance = Math.sqrt((xChid - x) * (xChid - x) + (yChid - y) * (yChid - y));
+                CameraPixel p = m.getPixelFromId(chid);
+
+                double xChid = p.getXPositionInMM();
+                double yChid = p.getYPositionInMM();
+
+                double distance = Math.sqrt(Math.pow(xChid - x, 2) + Math.pow(yChid - y, 2));
+
                 if (distance <= lowestDistance) {
                     nearestChid = chid;
                     lowestDistance = distance;
                 }
             }
-            if (m.getPixelBelowCoordinatesInMM(x, y) != null) {
-                assertEquals("Map did not return the right pixel for coordinates: " + x + ", " + y,
-                        nearestChid, m.getPixelBelowCoordinatesInMM(x, y).chid);
+            CameraPixel pixel = m.getPixelBelowCoordinatesInMM(x, y);
+            System.out.println(pixel.chid);
+            System.out.println(nearestChid);
+            if (pixel != null) {
+                assertEquals("Map did not return the right pixel for coordinates: " + x + ", " + y + " (" + i + ")",
+                         nearestChid, pixel.chid);
             } else {
                 fail("No pixel returned for coordinates: " + x + ", " + y);
             }
