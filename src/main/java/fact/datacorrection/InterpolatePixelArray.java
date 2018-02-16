@@ -58,7 +58,7 @@ public class InterpolatePixelArray implements Processor {
             timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
         }
 
-        PixelSet badPixelsSet = calibService.getBadPixel(timeStamp);
+        PixelSet badPixelsSet = calibService.getBadPixels(timeStamp);
 
         double[] output;
         if (!inputKey.equals(outputKey)) {
