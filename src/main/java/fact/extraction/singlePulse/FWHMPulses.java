@@ -1,4 +1,4 @@
-package fact.fephotonstreamatures.singlePulse;
+package fact.extraction.singlePulse;
 
 import fact.Constants;
 import fact.Utils;
