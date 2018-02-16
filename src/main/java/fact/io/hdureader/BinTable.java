@@ -109,9 +109,13 @@ public class BinTable {
         }
 
         private void setTypeAndCount(HeaderLine form) {
-            Matcher matcher = Pattern.compile("(\\d+)([LABIJKED])").matcher(form.value);
+            Matcher matcher = Pattern.compile("(\\d*)([LABIJKED])").matcher(form.value);
             if (matcher.matches()) {
-                this.repeatCount = Integer.parseInt(matcher.group(1));
+                if (matcher.group(1).equals("")) {
+                    this.repeatCount = 1;
+                } else {
+                    this.repeatCount = Integer.parseInt(matcher.group(1));
+                }
                 this.type = ColumnType.typeForChar(matcher.group(2));
             }
         }
