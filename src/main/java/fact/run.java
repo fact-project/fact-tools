@@ -1,6 +1,8 @@
 package fact;
 
 
+import java.net.URL;
+
 /**
  * Main executable for the FACT-Tools,
  * this is a thin wrapper around stream.run and only changes version and help text.
@@ -8,8 +10,12 @@ package fact;
 public class run {
     public static void main(String[] args) throws Exception {
         handleArguments(args);
-        stream.run.main(args);
 
+        // Support "classpath:/path/to/resource" URLs
+        URL.setURLStreamHandlerFactory(new ClasspathURLStreamHandlerFactory());
+
+        // start streams
+        stream.run.main(args);
     }
 
     public static void handleArguments(String[] args) {
