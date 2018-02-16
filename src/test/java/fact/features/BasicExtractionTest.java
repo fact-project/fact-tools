@@ -2,6 +2,7 @@ package fact.features;
 
 import fact.datacorrection.DrsCalibration;
 import fact.extraction.BasicExtraction;
+import fact.gainservice.GainService;
 import fact.io.FITSStreamTest;
 import fact.io.hdureader.FITSStream;
 import org.junit.Before;
@@ -33,7 +34,7 @@ public class BasicExtractionTest {
         extraction.dataKey  = "test";
         extraction.outputKeyMaxAmplPos  = positionsKey;
         extraction.outputKeyPhotonCharge = photonChargeKey;
-        extraction.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
+        extraction.gainService = new GainService();
     }
 
     @Test

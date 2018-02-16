@@ -5,13 +5,13 @@
     <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
     <property name="auxFolder" value="file:src/main/resources/aux/" />
 
-    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
     <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
     <property name="outfile" value="file:/home/fabian/testoutfile_mc.txt" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
     <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+    <service id="gainService" class="fact.gainservice.GainService" />
 
     <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 

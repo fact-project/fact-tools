@@ -3,10 +3,12 @@ package fact.parameter;
 import fact.calibrationservice.ConstantCalibService;
 import fact.cleaning.TwoLevelTimeMedian;
 import fact.datacorrection.DrsCalibration;
+import fact.datacorrection.InterpolatePixelArray;
 import fact.extraction.BasicExtraction;
 import fact.extraction.RisingEdgeForPositions;
 import fact.features.HillasParameters;
 import fact.features.source.SourcePosition;
+import fact.gainservice.GainService;
 import fact.io.FITSStreamTest;
 import fact.io.hdureader.FITSStream;
 import org.junit.Before;
@@ -53,12 +55,11 @@ public class ParameterTest {
             stream.init();
             item = stream.read();
         } catch (Exception e) {
-            fail("could not start stream with test file");
             e.printStackTrace();
+            fail("could not start stream with test file");
         }
 
-        URL drsUrl = FITSStreamTest.class
-                .getResource("/testDrsFile.drs.fits.gz");
+        URL drsUrl = FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         DrsCalibration pr = new DrsCalibration();
         pr.url = drsUrl;
         pr.outputKey = key;
@@ -69,8 +70,14 @@ public class ParameterTest {
         bE.dataKey = key;
         bE.outputKeyMaxAmplPos = positions;
         bE.outputKeyPhotonCharge = photonCharge;
-        bE.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
+        bE.gainService = new GainService();
         bE.process(item);
+
+        InterpolatePixelArray interpolatePhotoncharge = new InterpolatePixelArray();
+        interpolatePhotoncharge.calibService = new ConstantCalibService();
+        interpolatePhotoncharge.inputKey = "photoncharge";
+        interpolatePhotoncharge.outputKey = "photoncharge";
+        interpolatePhotoncharge.process(item);
 
         RisingEdgeForPositions pR = new RisingEdgeForPositions();
         pR.dataKey = key;
@@ -88,7 +95,6 @@ public class ParameterTest {
         poser.minNumberOfPixel = 1;
         poser.timeLimit = 40;
         poser.process(item);
-
 
 
         HillasParameters dist = new HillasParameters();

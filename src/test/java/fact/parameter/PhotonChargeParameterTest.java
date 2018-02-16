@@ -1,6 +1,7 @@
 package fact.parameter;
 
 import fact.extraction.BasicExtraction;
+import fact.gainservice.GainService;
 import fact.io.FITSStreamTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class PhotonChargeParameterTest extends ParameterTest {
         extraction.dataKey = key;
         extraction.outputKeyMaxAmplPos = positions;
         extraction.outputKeyPhotonCharge = outputKey;
-        extraction.url = new SourceURL(FITSStreamTest.class.getResource("/defaultIntegralGains.csv"));
+        extraction.gainService = new GainService();
         extraction.process(item);
         assertTrue("Expecteds output not in data item but it should be there", item.containsKey(outputKey));
         // item.remove(outputKey);
