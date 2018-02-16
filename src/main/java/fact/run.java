@@ -11,9 +11,12 @@ public class run {
     public static void main(String[] args) throws Exception {
         handleArguments(args);
 
-        // Support "classpath:/path/to/resource" URLs
-        URL.setURLStreamHandlerFactory(new ClasspathURLStreamHandlerFactory());
-
+        // Support "classpath:/path/to/resource" URLs,
+        try {
+            URL.setURLStreamHandlerFactory(new ClasspathURLStreamHandlerFactory());
+        } catch (Error e) {
+            // ignore error that happens in multithreaded if handler already set
+        }
         // start streams
         stream.run.main(args);
     }
