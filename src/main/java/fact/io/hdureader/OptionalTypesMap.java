@@ -18,6 +18,13 @@ import java.util.Optional;
 public class OptionalTypesMap<K, V> extends ForwardingMap<K, V> {
     private final Map<K, V> delegateMap = new HashMap<>();
 
+    public Optional<String> getString (K key) {
+        try {
+            return Optional.ofNullable((String) delegate().get(key));
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+    }
 
     /**
      * Get the value for the given key if it exists and the value can be cast to Short.
