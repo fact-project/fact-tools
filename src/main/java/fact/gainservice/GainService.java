@@ -1,12 +1,15 @@
 package fact.gainservice;
 
+import fact.Constants;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
 import fact.io.hdureader.OptionalTypesMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import stream.Data;
 import stream.annotations.Parameter;
+import stream.io.CsvStream;
 import stream.io.SourceURL;
 import stream.service.Service;
 
@@ -34,6 +37,7 @@ public class GainService implements Service{
     public URL gainFile = GainService.class.getResource("/gains_20130825-20170917.fits.gz");
 
     TreeMap<ZonedDateTime, double[]> gains;
+    private double[] gainsSimulations = null;
 
     private static final Logger log = LoggerFactory.getLogger(GainService.class);
 
@@ -83,7 +87,36 @@ public class GainService implements Service{
         return gain;
     }
 
-    private void loadGains() throws Exception {
+
+    public double[] getSimulationGains() {
+        if (gainsSimulations == null) {
+            loadGainsSimulations();
+        }
+        return gainsSimulations;
+    }
+
+    private void loadGainsSimulations() {
+        double[] integralGains = new double[Constants.N_PIXELS];
+
+        SourceURL url = new SourceURL(GainService.class.getResource("/defaultIntegralGains.csv"));
+        try {
+            CsvStream stream = new CsvStream(url, " ");
+            stream.setHeader(false);
+            stream.init();
+            Data integralGainData = stream.readNext();
+            for (int i = 0; i < Constants.N_PIXELS; i++) {
+                String key = "column:" + (i);
+                integralGains[i] = (double) integralGainData.get(key);
+            }
+            gainsSimulations =  integralGains;
+        } catch (Exception e) {
+            log.error("Failed to load integral Gain data: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    void loadGains() throws Exception {
         FITS fits = new FITS(gainFile);
 
         BinTable table = fits.getBinTableByName("Gain").orElseThrow(
