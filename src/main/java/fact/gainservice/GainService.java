@@ -13,13 +13,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.TreeMap;
 
 public class GainService implements Service{
 
-    @Parameter(defaultValue = "classpath:/gains_20130825-20170917.fits.gz")
-    public String gainFile = "classpath:/gains_20130825-20170917.fits.gz";
+    @Parameter(defaultValue = "")
+    public URL gainFile = GainService.class.getResource("/gains_20130825-20170917.fits.gz");
 
     private TreeMap<ZonedDateTime, double[]> gains;
 
@@ -35,16 +37,8 @@ public class GainService implements Service{
     }
 
     private void loadGains() throws Exception {
-
-        URL url;
-        if (gainFile.startsWith("classpath:")) {
-            url = GainService.class.getResource(gainFile.substring(10));
-            System.out.println(url);
-        } else {
-            url = new URL(gainFile);
-        }
-
-        FITS fits = new FITS(url);
+        gainFile = new URL("file:test.fits.gz");
+        FITS fits = new FITS(gainFile);
 
         BinTable table = fits.getBinTableByName("Gain").orElseThrow(
                 () -> new IOException("Gain file has no BinTable 'Gain'")
@@ -53,13 +47,16 @@ public class GainService implements Service{
 
         gains = new TreeMap<>();
         OptionalTypesMap<String, Serializable> row;
+        int i = 0;
         while (reader.hasNext()) {
             row = reader.getNextRow();
-
-            ZonedDateTime timestamp = ZonedDateTime.parse(row.getString("timestamp").orElseThrow(
-                    () -> new RuntimeException("Column 'timetstamp' not in row"))
+            System.out.println(i++);
+            String timestampString = row.getString("timestamp").orElseThrow(
+                    () -> new RuntimeException("Column 'timetstamp' not in row")
             );
-            double[] gain = row.getDoubleArray("Gain").orElseThrow(
+
+            ZonedDateTime timestamp = ZonedDateTime.parse(timestampString + "Z");
+            double[] gain = row.getDoubleArray("gain").orElseThrow(
                     () -> new RuntimeException("Column 'Gain' not in row")
             );
             gains.put(timestamp, gain);
