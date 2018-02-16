@@ -86,20 +86,20 @@ public class ConstantCalibService implements CalibrationService {
         config20141115.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         //  in the night of 2015-01-08, two pixels were broken additionally (729 & 750)
-        HardwareConfiguration config20150108 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 8, 12, 0, 0, 0, ZoneOffset.UTC));
+        HardwareConfiguration config20150108 = new HardwareConfiguration(ZonedDateTime.of(2015, 1, 8, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150108.badPixels.addAll(badPixelsFromBeginning);
         config20150108.badPixels.addById(729);
         config20150108.badPixels.addById(750);
         config20150108.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         // On 2015-01-09, pixel 729 recovered
-        HardwareConfiguration config20150109 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 9, 12, 0, 0, 0, ZoneOffset.UTC));
+        HardwareConfiguration config20150109 = new HardwareConfiguration(ZonedDateTime.of(2015, 1, 9, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150109.badPixels.addAll(badPixelsFromBeginning);
         config20150109.badPixels.addById(750);
         config20150109.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         // On 2015-01-31, pixel 750 recovered
-        HardwareConfiguration config20150131 = new HardwareConfiguration(ZonedDateTime.of(2015, 01, 31, 12, 0, 0, 0, ZoneOffset.UTC));
+        HardwareConfiguration config20150131 = new HardwareConfiguration(ZonedDateTime.of(2015, 1, 31, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150131.badPixels.addAll(badPixelsFromBeginning);
         config20150131.notUsablePixels.addAll(brokenDrsBoard20142015);
 
