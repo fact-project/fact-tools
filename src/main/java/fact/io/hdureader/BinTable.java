@@ -99,7 +99,7 @@ public class BinTable {
          * @param tform the headerline specifying the type of the data.
          * @param ttype the headerline specifying the name of the column.
          */
-        TableColumn(HeaderLine zform, HeaderLine tform, HeaderLine ttype) {
+        TableColumn(HeaderLine zform, HeaderLine tform, HeaderLine ttype) throws IOException{
             if (zform != null) {
                 setTypeAndCount(zform);
             } else {
@@ -108,11 +108,17 @@ public class BinTable {
             this.name = ttype.value;
         }
 
-        private void setTypeAndCount(HeaderLine form) {
-            Matcher matcher = Pattern.compile("(\\d+)([LABIJKED])").matcher(form.value);
+        private void setTypeAndCount(HeaderLine form) throws IOException{
+            Matcher matcher = Pattern.compile("(\\d*)([LABIJKED])").matcher(form.value);
             if (matcher.matches()) {
-                this.repeatCount = Integer.parseInt(matcher.group(1));
+                if (matcher.group(1).equals("")) {
+                    this.repeatCount = 1;
+                } else {
+                    this.repeatCount = Integer.parseInt(matcher.group(1));
+                }
                 this.type = ColumnType.typeForChar(matcher.group(2));
+            } else {
+                throw new IOException("Could not parse column type '" + form.toString() + "'");
             }
         }
 
@@ -124,7 +130,6 @@ public class BinTable {
     public Integer numberOfRowsInTable = 0;
     public Integer numberOfColumnsInTable = 0;
     public final String name;
-
 
     BinTable(Header header, long hduOffset, URL url) throws IllegalArgumentException, IOException {
 
@@ -140,8 +145,8 @@ public class BinTable {
                 .collect(Collectors.toList());
 
 
-        ttypes.forEach(entry -> {
-            final int n = Integer.parseInt(entry.getKey().substring(5));
+        for (Map.Entry<String, HeaderLine> ttype: ttypes) {
+            final int n = Integer.parseInt(ttype.getKey().substring(5));
             HeaderLine zform = entries.stream()
                     .filter(e -> e.getKey().matches("ZFORM" + n))
                     .findFirst()
@@ -155,9 +160,8 @@ public class BinTable {
                     .orElse(null);
 
 
-            columns.add(new TableColumn(zform, tform, entry.getValue()));
-        });
-
+            columns.add(new TableColumn(zform, tform, ttype.getValue()));
+        }
 
         numberOfRowsInTable = header.getInt("ZNAXIS2").orElse(header.getInt("NAXIS2").orElse(0));
         numberOfColumnsInTable = columns.size();
