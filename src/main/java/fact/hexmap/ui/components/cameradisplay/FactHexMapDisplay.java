@@ -90,7 +90,7 @@ public class FactHexMapDisplay extends JPanel implements SliceObserver, MouseLis
     private int offsetY = 0;
 
     public Point cameraCoordinateToPixels(double x, double y){
-        return new Point((int) (scalingX * x), (int) (scalingY * y));
+        return new Point((int) Math.round(scalingX * x), (int) Math.round(scalingY * y));
     }
 
     /**
