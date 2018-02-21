@@ -3,8 +3,8 @@
   <properties url="classpath:/default/settings.properties" />
 
   <!-- Pathes to the input files -->
-  <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
-  <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
+  <property name="infile" value="classpath:/testMcFile.fits.gz" />
+  <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
   <property name="auxFolder" value="file:src/main/resources/aux/" />
 
   <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />

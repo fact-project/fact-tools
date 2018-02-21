@@ -1,8 +1,8 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
-  <property name="infile" value="file:src/main/resources/testMcFile.fits.gz" />
-  <property name="drsfile" value="file:src/main/resources/testMcDrsFile.drs.fits.gz" />
+  <property name="infile" value="classpath:/testMcFile.fits.gz" />
+  <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
   <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
