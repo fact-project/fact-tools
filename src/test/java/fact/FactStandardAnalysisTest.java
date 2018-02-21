@@ -25,7 +25,7 @@ public class FactStandardAnalysisTest {
                     xml.toURI().toString(),
                     "-Dinfile=classpath:/testDataFile.fits.gz",
                     "-Ddrsfile=classpath:/testDrsFile.drs.fits.gz",
-                    "-DauxFolder=classpath:/aux/",
+                    "-DauxFolder=file:src/main/resources/aux/",
                     "-Doutfile=" + outFile.toURI().toString(),
             };
 
