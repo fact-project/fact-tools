@@ -49,11 +49,12 @@ public abstract class Writer {
         String keys;
         if (simulations) {
             keys = variables.expand(variables.get("outputKeysSimulations"));
-            log.info("Using default keys for simulations: {}", keys);
+            log.info("Using default keys for simulations");
         } else {
             keys = variables.expand(variables.get("outputKeysObservations"));
-            log.info("Using default keys for observations: {}", keys);
+            log.info("Using default keys for observations");
         }
+        log.debug("{}", keys);
         return new Keys(keys);
     }
 
