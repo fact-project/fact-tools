@@ -27,6 +27,7 @@ import java.util.ArrayList;
  * @author Kai
  */
 public class FactPixelMapping implements PixelMapping {
+    static Logger log = LoggerFactory.getLogger(FactPixelMapping.class);
 
     //store each pixel by its 'geometric' or axial coordinate.
     private final CameraPixel[][] offsetCoordinates = new CameraPixel[45][40];
@@ -39,19 +40,12 @@ public class FactPixelMapping implements PixelMapping {
             {{1, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}}  //pixel with a uneven x coordinate
     };
 
-    //lena----------------------------------
     private final int[][][] neighbourOffsetsLarge = {
             {{-2, -1}, {-2, 0}, {-2, 1}, {-1, -2}, {-1, 1}, {0, -2}, {0, 2}, {1, -2}, {1, 1}, {2, -1}, {2, 0}, {2, 1}},
             {{-2, -1}, {-2, 0}, {-2, 1}, {-1, -1}, {-1, 2}, {0, -2}, {0, 2}, {1, -1}, {1, 2}, {2, -1}, {2, 0}, {2, 1}}
-
     };
-    //--------------------------------------
     private int xOffset = 22;
     private int yOffset = 19;
-
-
-    static Logger log = LoggerFactory.getLogger(FactPixelMapping.class);
-
 
     private static FactPixelMapping mapping;
 
@@ -92,54 +86,29 @@ public class FactPixelMapping implements PixelMapping {
      * @return The pixel below the point or NULL if the pixels does not exist.
      */
     public CameraPixel getPixelBelowCoordinatesInMM(double xCoordinate, double yCoordinate) {
+
+
+        // undo coordinate system rotation
+        double x = yCoordinate;
+        double y = -xCoordinate;
+
         //get some pixel near the point provided
         //in pixel units
-        xCoordinate /= 9.5;
-        yCoordinate /= -9.5;
-        yCoordinate += 0.5;
+        x /= 9.5;
+        y /= -9.5;
+        y += 0.5;
 
-        //if (xCoordinate*xCoordinate + yCoordinate*yCoordinate >= 440){
-        //    return null;
-        //}
         //distance from center to corner
         double size = 1.0 / Math.sqrt(3);
 
-        double axial_q = 2.0 / 3.0 * xCoordinate / size;
-        double axial_r = (0.5773502693 * yCoordinate - 1.0 / 3.0 * xCoordinate) / size;
+        double axial_q = 2.0 / 3.0 * x / size;
+        double axial_r = (Math.sqrt(3.0) / 3.0 * y - x / 3.0) / size;
 
+        int[] roundedPoint = cube_round(new double[]{axial_q, -axial_q - axial_r, axial_r});
+        int rx = roundedPoint[0];
+        int rz = roundedPoint[2];
 
-        double cube_x = axial_q;
-        double cube_z = axial_r;
-        double cube_y = -cube_x - cube_z;
-
-
-        //now round maybe violating the constraint
-        int rx = (int) Math.round(cube_x);
-        int rz = (int) Math.round(cube_z);
-        int ry = (int) Math.round(cube_y);
-
-        //artificially fix the constraint.
-        double x_diff = Math.abs(rx - cube_x);
-        double z_diff = Math.abs(rz - cube_z);
-        double y_diff = Math.abs(ry - cube_y);
-
-        if (x_diff > y_diff && x_diff > z_diff) {
-            rx = -ry - rz;
-        } else if (y_diff > z_diff) {
-            ry = -rx - rz;
-        } else {
-            rz = -rx - ry;
-        }
-
-
-        //now convert cube coordinates back to even-q
-        int qd = rx;
-        int rd = rz + (rx - (rx & 1)) / 2;
-
-        CameraPixel p = getPixelFromOffsetCoordinates(qd, rd);
-        return p;
-
-
+        return getPixelFromCubeCoordinates(rx, rz);
     }
 
     /**
@@ -315,8 +284,14 @@ public class FactPixelMapping implements PixelMapping {
         p.setHardID((Integer) (item.get("hardID")));
         p.geometricX = (Integer) (item.get("geom_i"));
         p.geometricY = (Integer) (item.get("geom_j"));
-        p.posX = Float.parseFloat(item.get("pos_X").toString());
-        p.posY = Float.parseFloat(item.get("pos_Y").toString());
+
+        double x = Float.parseFloat(item.get("pos_X").toString());
+        double y = Float.parseFloat(item.get("pos_Y").toString());
+
+        // rotate camera by 90 degrees to have the following coordinate definition:
+        // When looking from the telescope dish onto the camera, x points right, y points up
+        p.posX = -y;
+        p.posY = x;
 
         return p;
     }
@@ -328,16 +303,16 @@ public class FactPixelMapping implements PixelMapping {
      */
     private void load(URL mapping) {
 
-        //use the csv stream to read stuff from the csv file
+        // use the csv stream to read stuff from the csv file
         CsvStream stream = null;
         try {
             stream = new CsvStream(new SourceURL(mapping), ",");
             stream.init();
         } catch (Exception e) {
-            log.error(e.toString());
+            throw new RuntimeException(e);
         }
 
-        //we should sort this by chid
+        // we should sort this by chid
         for (int i = 0; i < Constants.N_PIXELS; i++) {
             Data item = null;
             try {

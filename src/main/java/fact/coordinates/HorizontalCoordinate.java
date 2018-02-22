@@ -114,7 +114,9 @@ public class HorizontalCoordinate implements CelestialCoordinate {
         double y = rotVec.getY();
         double z = rotVec.getZ();
 
-        CameraCoordinate cameraCoordinate = new CameraCoordinate(x * (focalLength) / z, y * (focalLength) / z);
+        // rotate camera by 90 degrees to have the following coordinate definition:
+        // When looking from the telescope dish onto the camera, x points right, y points up
+        CameraCoordinate cameraCoordinate = new CameraCoordinate(-y * (focalLength) / z, x * (focalLength) / z);
 
         return cameraCoordinate;
     }
