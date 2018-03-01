@@ -3,10 +3,11 @@
   <!-- Pathes to the input files -->
   <property name="infile" value="classpath:/testMcFile.fits.gz" />
   <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+ 
   <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.gainservice.GainService" />
 
   <!-- Name of the stream and url to the input file -->
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />

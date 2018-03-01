@@ -6,7 +6,7 @@
     <property name="infile" value="classpath:/testDataFile.fits.gz" />
     <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
 
-    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <service id="gainService" class="fact.gainservice.GainService" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
     <!-- Name of the stream and url to the input file -->

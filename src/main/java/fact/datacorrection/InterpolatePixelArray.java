@@ -26,16 +26,16 @@ public class InterpolatePixelArray implements Processor {
     static Logger log = LoggerFactory.getLogger(InterpolatePixelArray.class);
 
     @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
-    CalibrationService calibService;
+    public CalibrationService calibService;
 
     @Parameter(required = true, description = "The photoncharge key to work on")
-    private String inputKey = null;
+    public String inputKey = null;
 
     @Parameter(required = true, description = "The name of the interpolated photoncharge output")
-    private String outputKey = null;
+    public String outputKey = null;
 
     @Parameter(description = "The minimum number of neighboring pixels required for interpolation", defaultValue="3")
-    private int minPixelToInterpolate = 3;
+    public int minPixelToInterpolate = 3;
 
     FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 

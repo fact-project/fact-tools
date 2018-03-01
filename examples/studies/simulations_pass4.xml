@@ -4,7 +4,7 @@
     <property name="infile" value="classpath:/ceres_output/18000/00018000.000_D_MonteCarlo018_Events.fits.gz" />
     <property name="drsfile" value="classpath:/testMcDrsFile.drs.fits.gz" />
 
-    <property name="integralGainFile" value="classpath:/default/defaultIntegralGains.csv" />
+    <service id="gainService" class="fact.gainservice.GainService" />
     <property name="pixelDelayFile" value="classpath:/default/delays_zero.csv" />
 
     <property name="out_path_basename" value="test_ceres" />

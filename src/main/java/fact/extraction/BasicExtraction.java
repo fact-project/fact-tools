@@ -2,14 +2,18 @@ package fact.extraction;
 
 import fact.Constants;
 import fact.Utils;
+import fact.gainservice.GainService;
 import org.jfree.chart.plot.IntervalMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
+
+import java.time.ZonedDateTime;
 
 /**
  * This processor performs a basic extraction on the data array. It contains three steps:
@@ -34,8 +38,8 @@ public class BasicExtraction implements Processor {
     @Parameter(required = true, description = "outputKey for the calculated photoncharge")
     public String outputKeyPhotonCharge = null;
 
-    @Parameter(required = false, description = "The url to the inputfiles for the gain calibration constants", defaultValue = "file:src/main/resources/defaultIntegralGains.csv")
-    public SourceURL url = null;
+    @Service(description = "Gain Service that delivers the integral gains")
+    public GainService gainService = null;
 
     @Parameter(required = false, description = "start slice of the search window for the max amplitude", defaultValue = "35")
     public int startSearchWindow = 35;
@@ -52,15 +56,19 @@ public class BasicExtraction implements Processor {
     @Parameter(required = false, description = "minimal slice with valid values (we want to ignore slices below this value", defaultValue = "10")
     public int validMinimalSlice = 10;
 
-    double[] integralGains = null;
-
 
     @Override
     public Data process(Data item) {
         Utils.mapContainsKeys(item, dataKey, "NROI");
 
-        if (integralGains == null) {
-            integralGains = loadIntegralGainFile(url);
+
+        double[] integralGains;
+        int[] unixTimeUTC = (int[]) item.get("UnixTimeUTC");
+        if (unixTimeUTC == null) {
+            integralGains = gainService.getSimulationGains();
+        } else {
+            ZonedDateTime timestamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
+            integralGains = gainService.getGains(timestamp);
         }
 
         int roi = (Integer) item.get("NROI");
@@ -136,27 +144,5 @@ public class BasicExtraction implements Processor {
             integral += data[pos];
         }
         return integral;
-    }
-
-
-    public double[] loadIntegralGainFile(SourceURL inputUrl) {
-        double[] integralGains = new double[Constants.N_PIXELS];
-        Data integralGainData = null;
-        try {
-            CsvStream stream = new CsvStream(inputUrl, " ");
-            stream.setHeader(false);
-            stream.init();
-            integralGainData = stream.readNext();
-
-            for (int i = 0; i < Constants.N_PIXELS; i++) {
-                String key = "column:" + (i);
-                integralGains[i] = (Double) integralGainData.get(key);
-            }
-            return integralGains;
-
-        } catch (Exception e) {
-            log.error("Failed to load integral Gain data: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
     }
 }
