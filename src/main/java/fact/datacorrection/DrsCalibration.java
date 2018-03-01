@@ -267,10 +267,6 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-//        if(url == null && drsService == null){
-//            log.error("Url and Service are not set. You need to set one of those");
-//            throw new IllegalArgumentException("Wrong parameter");
-//        }
         if (url != null) {
             try {
                 loadDrsData(url);

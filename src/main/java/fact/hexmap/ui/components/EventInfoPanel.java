@@ -69,8 +69,8 @@ public class EventInfoPanel extends JPanel implements EventObserver, PixelSelect
                 m += ", photoncharge: " + String.format("%.2f", photonChargeArray[p.id]);
             }
 
-            m += ", x in mm " +  String.format("%.1f", p.getXPositionInMM());
-            m += ", y in mm " + String.format("%.1f", p.getYPositionInMM());
+            m += ", x in mm " +  String.format("%.2f", p.getXPositionInMM());
+            m += ", y in mm " + String.format("%.2f", p.getYPositionInMM());
             model.addElement(m);
         }
     }

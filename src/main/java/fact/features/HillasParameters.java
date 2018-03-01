@@ -125,9 +125,8 @@ public class HillasParameters implements Processor {
         item.put(kurtosisLongKey, statsLong.kurtosis);
         item.put(kurtosisTransKey, statsTrans.kurtosis);
 
-        item.put("2-sigma-ellipse", new EllipseOverlay(cog, 2 * width,2 * length, delta));
-        item.put("1-sigma-ellipse", new EllipseOverlay(cog, width, length, delta));
-
+        item.put("1-sigma-ellipse", new EllipseOverlay(cog, length, width, delta));
+        item.put("2-sigma-ellipse", new EllipseOverlay(cog, 2 * length,2 * width, delta));
         return item;
     }
 

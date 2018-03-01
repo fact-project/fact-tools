@@ -38,8 +38,10 @@ public class CameraCoordinate implements Serializable {
         double pzd = pointingPosition.getZenithRad();
 
         double z = 1 / Math.sqrt(1 + Math.pow(xMM / focalLength, 2.0) + Math.pow(yMM / focalLength, 2.0));
-        double x = xMM * z / focalLength;
-        double y = yMM * z / focalLength;
+
+        // rotate camera by -90 degrees to invert the rotation
+        double x = yMM * z / focalLength;
+        double y = -xMM * z / focalLength;
 
         Vector3D vec = new Vector3D(x, y, z);
 

@@ -4,7 +4,7 @@ import com.google.common.collect.ForwardingSet;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
-import fact.hexmap.ui.components.cameradisplay.Tile;
+import fact.hexmap.ui.components.cameradisplay.FactHexTile;
 import fact.hexmap.ui.overlays.CameraMapOverlay;
 
 import java.awt.*;
@@ -75,12 +75,12 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
 
     @Override
     public void paint(Graphics2D g2, FactHexMapDisplay map) {
-        for (Tile t : map.getTiles()) {
-            if (set.contains(t.getCameraPixel())) {
-                if (t.getBorderColor() != Color.BLACK) {
-                    t.setBorderColor(Color.YELLOW);
+        for (FactHexTile t : map.getTiles()) {
+            if (set.contains(t.pixel)) {
+                if (t.borderColor != Color.BLACK) {
+                    t.borderColor = Color.YELLOW;
                 } else {
-                    t.setBorderColor(this.c);
+                    t.borderColor = this.c;
                 }
                 t.paint(g2);
             }

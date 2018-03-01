@@ -36,33 +36,18 @@ public class CeresStream extends AbstractStream {
     @Override
     public void init() throws Exception {
         super.init();
-        URL expandedURL;
-        if (this.url.getProtocol().equals("classpath")){
-            expandedURL = FITSStream.class.getResource(this.url.getPath());
-        } else {
-            expandedURL = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), this.url.getFile());
-        }
-
-        fitsStream = new FITSStream(new SourceURL(expandedURL));
+        fitsStream = new FITSStream(this.url);
         fitsStream.init();
-
-        Path path = Paths.get(expandedURL.getPath());
-        String filename = path.getFileName().toString();
-
-        if (!filename.contains("_Events")) {
+        String path = url.getPath();
+        if (!path.contains("_Events")) {
             throw new IOException("Inputfile does not contain '_Events', cannot look for RunHeader file");
         }
+        String runHeaderPath = path.replace("_Events", "_RunHeaders");
+        URL runHeaderURL = new URL(this.url.getProtocol(), this.url.getHost(), this.url.getPort(), runHeaderPath);
 
-        String runHeaderFileName = filename.replace("_Events", "_RunHeaders");
-        Path runHeaderPath = Paths.get(path.getParent().toString(), runHeaderFileName);
-
-        if (Files.notExists(runHeaderPath)) {
-            throw new IOException("Run Header fits file not found for input file '" + path.toString() + "'");
-        }
-
-        HDU runHeaderHDU = FITS.fromPath(runHeaderPath)
-                               .getHDU("RunHeaders")
-                               .orElseThrow(() -> new IOException("RunHeader file '" + runHeaderPath.toString() + "' did not contain 'RunHeaders' HDU"));
+        FITS fits = new FITS(runHeaderURL);
+        HDU runHeaderHDU = fits.getHDU("RunHeaders")
+                .orElseThrow(() -> new IOException("RunHeader file '" + runHeaderPath.toString() + "' did not contain 'RunHeaders' HDU"));
 
         BinTableReader tableReader = BinTableReader.forBinTable(runHeaderHDU.getBinTable());
         ceresRunHeader = tableReader.getNextRow();
