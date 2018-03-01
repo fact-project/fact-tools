@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,11 +29,13 @@ import java.util.TreeMap;
  * It needs a fits file with a BinTable "Gain" which contains the columns "timestamp" and "gain"
  * timestamp needs to be an ISO-8601 datetime string and "gain" needs to be a length 1440 double array
  * with the gain values for each pixel.
+ *
+ * You can create this file using https://github.com/fact-project/spe_analysis
  */
 public class GainService implements Service{
 
-    @Parameter(defaultValue = "classpath:/gains_20130825-20170917.fits.gz")
-    public URL gainFile = GainService.class.getResource("/gains_20130825-20170917.fits.gz");
+    @Parameter(defaultValue = "classpath:/gains_20120503-20171103.fits.gz")
+    public URL gainFile = GainService.class.getResource("/gains_20120503-20171103.fits.gz");
 
     TreeMap<ZonedDateTime, double[]> gains;
     private double[] gainsSimulations = null;
@@ -130,7 +134,7 @@ public class GainService implements Service{
                     () -> new RuntimeException("Column 'timestamp' not in row")
             );
 
-            ZonedDateTime timestamp = ZonedDateTime.parse(timestampString + "Z");
+            ZonedDateTime timestamp = LocalDateTime.parse(timestampString).atZone(ZoneOffset.UTC);
             double[] gain = row.getDoubleArray("gain").orElseThrow(
                     () -> new RuntimeException("Column 'Gain' not in row")
             );
