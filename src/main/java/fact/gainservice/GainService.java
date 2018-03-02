@@ -32,13 +32,14 @@ import java.util.TreeMap;
  *
  * You can create this file using https://github.com/fact-project/spe_analysis
  */
-public class GainService implements Service{
+public class GainService implements Service {
 
     @Parameter(defaultValue = "classpath:/gains_20120503-20171103.fits.gz")
     public URL gainFile = GainService.class.getResource("/gains_20120503-20171103.fits.gz");
 
     TreeMap<ZonedDateTime, double[]> gains;
-    private double[] gainsSimulations = null;
+    private double[] simulationGains = null;
+    private double[] defaultGains = null;
 
     private static final Logger log = LoggerFactory.getLogger(GainService.class);
 
@@ -90,18 +91,34 @@ public class GainService implements Service{
 
 
     public double[] getSimulationGains() {
-        if (gainsSimulations == null) {
-            loadGainsSimulations();
+        if (simulationGains == null) {
+            loadSimulationGains();
         }
-        return gainsSimulations;
+        return simulationGains;
     }
 
-    private void loadGainsSimulations() {
-        double[] integralGains = new double[Constants.N_PIXELS];
+    private void loadSimulationGains() {
+        URL url = GainService.class.getResource("/defaultIntegralGains.csv");
+        simulationGains = loadGainsCSV(url);
+    }
 
-        SourceURL url = new SourceURL(GainService.class.getResource("/defaultIntegralGains.csv"));
+
+    private void loadDefaultGains() {
+        URL url = GainService.class.getResource("/gain_sorted_20131127.csv");
+        defaultGains = loadGainsCSV(url);
+    }
+
+    public double[] getDefaultGains() {
+        if (defaultGains == null) {
+            loadDefaultGains();
+        }
+        return defaultGains;
+    }
+
+    private double[] loadGainsCSV(URL csv) {
+        double[] integralGains = new double[Constants.N_PIXELS];
         try {
-            CsvStream stream = new CsvStream(url, " ");
+            CsvStream stream = new CsvStream(new SourceURL(csv), " ");
             stream.setHeader(false);
             stream.init();
             Data integralGainData = stream.readNext();
@@ -109,7 +126,7 @@ public class GainService implements Service{
                 String key = "column:" + (i);
                 integralGains[i] = (double) integralGainData.get(key);
             }
-            gainsSimulations =  integralGains;
+            return integralGains;
         } catch (Exception e) {
             log.error("Failed to load integral Gain data: {}", e.getMessage());
             throw new RuntimeException(e);
