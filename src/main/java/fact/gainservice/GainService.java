@@ -99,7 +99,7 @@ public class GainService implements Service{
     private void loadGainsSimulations() {
         double[] integralGains = new double[Constants.N_PIXELS];
 
-        SourceURL url = new SourceURL(GainService.class.getResource("/defaultIntegralGains.csv"));
+        SourceURL url = new SourceURL(GainService.class.getResource("/mc_gain_ceres_12.csv"));
         try {
             CsvStream stream = new CsvStream(url, " ");
             stream.setHeader(false);
