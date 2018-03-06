@@ -10,8 +10,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
-import stream.io.CsvStream;
-import stream.io.SourceURL;
 
 import java.time.ZonedDateTime;
 
