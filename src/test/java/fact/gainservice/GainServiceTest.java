@@ -34,4 +34,12 @@ public class GainServiceTest {
         assertEquals(2, gains[0], 1e-12);
 
     }
+
+    @Test
+    public void testLoadSimulationGain() {
+        GainService gainService = new GainService();
+        double[] gains = gainService.getSimulationGains();
+
+        assertEquals(266.0, gains[0], 1e-10);
+    }
 }

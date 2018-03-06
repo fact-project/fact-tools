@@ -37,6 +37,9 @@ public class GainService implements Service{
     @Parameter(defaultValue = "classpath:/gains_20120503-20171103.fits.gz")
     public URL gainFile = GainService.class.getResource("/gains_20120503-20171103.fits.gz");
 
+    @Parameter(defaultValue = "classpath:/mc_gain_ceres_12.csv")
+    public URL simulationGainFile = GainService.class.getResource("/mc_gain_ceres_12.csv");
+
     TreeMap<ZonedDateTime, double[]> gains;
     private double[] gainsSimulations = null;
 
@@ -99,7 +102,7 @@ public class GainService implements Service{
     private void loadGainsSimulations() {
         double[] integralGains = new double[Constants.N_PIXELS];
 
-        SourceURL url = new SourceURL(GainService.class.getResource("/defaultIntegralGains.csv"));
+        SourceURL url = new SourceURL(simulationGainFile);
         try {
             CsvStream stream = new CsvStream(url, " ");
             stream.setHeader(false);
