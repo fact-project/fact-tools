@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class GainServiceTest {
 
     @Test
-    public void testLoadGains () throws Exception {
+    public void testLoadGains() throws Exception {
 
         GainService gainService = new GainService();
 
@@ -20,7 +20,7 @@ public class GainServiceTest {
     }
 
     @Test
-    public void testGetNearest () {
+    public void testGetNearest() {
         GainService gainService = new GainService();
 
         gainService.gains = new TreeMap<>();
@@ -32,6 +32,27 @@ public class GainServiceTest {
 
         gains = gainService.getGains(ZonedDateTime.of(2017, 1, 1, 22, 20, 0, 0, ZoneOffset.UTC));
         assertEquals(2, gains[0], 1e-12);
+
+    }
+
+
+    @Test
+    public void testDefaultGains() {
+
+        GainService gainService = new GainService();
+
+        double gains[] = gainService.getDefaultGains();
+        assertEquals(247.111, gains[0], 1e-3);
+
+    }
+
+    @Test
+    public void testSimulationGains() {
+
+        GainService gainService = new GainService();
+
+        double gains[] = gainService.getSimulationGains();
+        assertEquals(242, gains[0], 1e-3);
 
     }
 }

@@ -10,8 +10,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
-import stream.io.CsvStream;
-import stream.io.SourceURL;
 
 import java.time.ZonedDateTime;
 
@@ -56,6 +54,9 @@ public class BasicExtraction implements Processor {
     @Parameter(required = false, description = "minimal slice with valid values (we want to ignore slices below this value", defaultValue = "10")
     public int validMinimalSlice = 10;
 
+    @Parameter(required = false, description = "If true, use default gains else use time dependent gains from the gain service", defaultValue = "true")
+    public boolean useDefaultGains = true;
+
 
     @Override
     public Data process(Data item) {
@@ -67,8 +68,12 @@ public class BasicExtraction implements Processor {
         if (unixTimeUTC == null) {
             integralGains = gainService.getSimulationGains();
         } else {
-            ZonedDateTime timestamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
-            integralGains = gainService.getGains(timestamp);
+            if (useDefaultGains) {
+                integralGains = gainService.getDefaultGains();
+            } else {
+                ZonedDateTime timestamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
+                integralGains = gainService.getGains(timestamp);
+            }
         }
 
         int roi = (Integer) item.get("NROI");
