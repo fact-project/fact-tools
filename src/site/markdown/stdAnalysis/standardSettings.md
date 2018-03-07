@@ -9,7 +9,7 @@ Each property can be overwritten by specifing the defintion of the property late
 
     [...]
     <properties url="classpath:/default/settings_mc.properties" />
-    <property name="twoLevelTimeNeighbor_coreThreshold" value="5.5" />
+    <property name="TwoLevelTimeNeighbor.coreThreshold" value="5.0" />
     [...]
 
 Now follows the specification of the settings:

@@ -137,8 +137,8 @@ For example changing the cleaning level:
     [...]
     <properties url="classpath:/default/settings_mc.properties" />
 
-    <property name="TwoLevelTimeNeighbor.coreThreshold" value="5.5" />
-    <property name="TwoLevelTimeNeighbor.neighborThreshold" value="3" />
+    <property name="TwoLevelTimeNeighbor.coreThreshold" value="5.0" />
+    <property name="TwoLevelTimeNeighbor.neighborThreshold" value="2.5" />
     <property name="TwoLevelTimeNeighbor.timeLimit" value="10" />
     <property name="TwoLevelTimeNeighbor.minNumberOfPixel" value="2" />
     [...]
