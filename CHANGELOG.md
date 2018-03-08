@@ -1,33 +1,115 @@
 # Changelog for the fact-tools
 
-# Version 0.18.1 -- 26.05.2017
+# Version 1.0.0 -- 08.03.2018
 
-* The HDU reader (new fits stream implementation) now ignores 
-erroneous tile headers that appear in some files.
+This is the first release since 0.17.2, with lots of additions, fixes, 
+new features and breaking changes.
 
+* Complete set of coordinate transformations
+* Removal of source dependent features from the standard analysis
+* Rotate camera coordinate system by 90° to have the following definition
+  * When looking on the camera from the dish, x points right and y points up
+* All outputkeys are snake_case
+* New hdureader is hopefully able to read every fits and zfits file
+* New CeresStream reads in Ceres RunHeader files to provide run level information for simulations
+* 27s events are skipped in the standard analysis by default
+* Correctly report fact-tools version on the command line, including git commit
+* Writers check keys for nulls
+* Writers write default keys if `keys` is not set, which are different for observations
+and simulations
+* The xml files for observations and simulations got merged
+* The AuxService can take the base directory of the usual FACT aux structure now, e.g. `/fact/aux`  
+* The hillas parameters got reimplemented, there is only one version of each parameter now.
+* A new `GainService` provides the gains on base of the runs timestamp
+* New gain file for the current simulations (ceres 12)
 
-# Version 0.18.0 -- 19.01.2017
+* Lots of other small fixes and improvements
 
-* A new reader for FITS and ZFITS files was added.
-* fact.io.zfits.ZFitsStream and fact.io.FITSStream are deprecated now in
-favour of the new fact.io.hdureader.FITSStream
-* add fact.utils.PhotonStream2ArrivalTime
-* add fact.utils.PhotonStream2NumberOfPhotons
+Full list of merged PRs:
 
-# Version 0.17.5 -- 18.01.2017
-
-* Always export the list of saturated pixel IDs to the data item instead of exporting it only if the list is not empty. 
-
-# Version 0.17.4 -- 18.01.2017
-
-* No more default keys for the output writers (FITS and JSON). The former default keys are now among others set in 'src/main/resources/default/settings.properties'. 
-
-# Version 0.17.3 -- 17.01.2017
-
-* output window: Cut out artifacts of SinglePulseExtractor.
-* add fact.utils.CastDoubleArrayToIntArray
-* add fact.utils.ElementwiseMultiplyDoubleArray
-
+* 0fd6a6b9c Merge pull request #336 from fact-project/mc_gain_ceres_12
+* 502807e8b Merge pull request #333 from fact-project/gain_service
+* af23c2339 Merge pull request #327 from fact-project/change_coordinate_system
+* 6ca1e4c37 Merge pull request #328 from fact-project/classpath
+* d87fd5bf0 Merge pull request #334 from fact-project/remove_key_output
+* 1a0e51348 Merge pull request #329 from fact-project/move_single_pulse
+* de9ab4f37 Merge pull request #330 from fact-project/remove_fft
+* ec792dd0e Merge pull request #332 from fact-project/fix_repeat_count
+* 853146adf Merge pull request #321 from fact-project/bias_patch_272
+* b0f218016 Merge pull request #324 from fact-project/fix_erna_xml
+* 936862e8e Merge pull request #325 from fact-project/fix_viewer
+* 0c1095329 Merge pull request #326 from fact-project/silence_streams
+* 6b320c0a2 Merge pull request #318 from fact-project/single_analysis
+* 9cefb8684 Merge pull request #316 from fact-project/consistency
+* c38345402 Merge pull request #317 from fact-project/fix_merge_artifacts
+* 6274d372e Merge pull request #315 from fact-project/rename_snake_case
+* 8ba45a02c Merge pull request #314 from fact-project/remove_source_features
+* 7b79f3faf Merge pull request #312 from fact-project/fix_fellwaker
+* 56a6aae4f Merge pull request #311 from fact-project/optional_hdu
+* aec556486 Merge pull request #308 from fact-project/remove_deprecated
+* 7aa15e570 Merge pull request #310 from fact-project/runheader
+* 46ca322b9 Merge pull request #237 from fact-project/ceresstream
+* f9c0687dd Merge pull request #305 from fact-project/flag_27s
+* 0573494ed Merge pull request #307 from fact-project/fix_pom_warning
+* 91d9f61f4 Merge pull request #306 from fact-project/update_pom
+* fbb661dca Merge pull request #300 from fact-project/refactor_hillas_parameters
+* 32becfcee Merge pull request #292 from fact-project/cleanup_pixelsets
+* 8d00d0b80 Merge pull request #303 from fact-project/sort_viewer_items
+* 145f73022 Merge pull request #304 from fact-project/fix_exception_handling
+* 075e84ad6 Merge pull request #302 from fact-project/fix_contains
+* 811abc5f7 Merge pull request #296 from fact-project/remove_unused
+* f82b07225 Merge pull request #299 from fact-project/remove_getters_setter
+* b791b4207 Merge pull request #290 from fact-project/check_output_keys
+* cb1b32da6 Merge pull request #297 from fact-project/fix_indentation
+* 25d7bb033 Merge pull request #293 from fact-project/move_elementwise
+* 368ca73d4 Merge pull request #295 from fact-project/refactor_pixelset
+* 35b39bac7 Merge pull request #231 from fact-project/coordinate_trafos
+* 8f1ece777 Merge pull request #288 from fact-project/fix_properties
+* c13098c91 Merge pull request #285 from fact-project/fix_date_fitswriter
+* c9c4e029a Merge pull request #264 from fact-project/fixhdureader
+* 568daf212 Merge pull request #273 from fact-project/new_xmls
+* 10bd9cdfd Merge pull request #278 from fact-project/throw_exceptions
+* eb61e4d20 Merge pull request #282 from fact-project/remove_joda
+* 5e07a5ebe Merge pull request #281 from fact-project/print_ft_version
+* 07d0063e3 Merge pull request #275 from fact-project/update_readme
+* e62d780bd Merge pull request #276 from fact-project/write_fits_in_xmls
+* 73969134d Merge pull request #257 from fact-project/refactor_drs_time_calib
+* 4682781b3 Merge pull request #271 from fact-project/fits_writer_header
+* 6f0d4a2f5 Merge pull request #268 from fact-project/fix_delay_files
+* 4744c848f Merge pull request #270 from fact-project/drs_output_key
+* 4a1e4a815 Merge pull request #247 from fact-project/jebuss-adapt-auxservice-key-for-erna
+* 8bbbf2124 Merge pull request #265 from fact-project/empty_cleaning
+* 33a632b80 Merge pull request #258 from fact-project/write_timestamp
+* bfdaa5803 Merge pull request #261 from fact-project/conc_core
+* d79ce8125 Merge pull request #260 from fact-project/pixel_map_cr
+* 73dfcf309 Merge pull request #259 from fact-project/drs_classpath
+* 57219e491 Merge pull request #262 from fact-project/delay_files
+* b04728691 Merge pull request #256 from fact-project/fix_244_hdureader
+* 4fe25d1d7 Merge pull request #243 from fact-project/remove_tutorial_processors
+* a50f361f0 Merge pull request #245 from fact-project/remove_unused_import
+* 9413d0381 Merge pull request #241 from fact-project/refactorIO
+* 8a96abd8d Merge pull request #234 from fact-project/hdu-reader
+* 42ee44105 Merge pull request #235 from fact-project/hdu_reader_theap_fix
+* c49314cc6 Merge pull request #218 from fact-project/aux_fixes
+* bd787131a Merge pull request #228 from fact-project/table_names
+* 46c819a70 Merge pull request #233 from fact-project/library_updates
+* 2184ddec7 Merge pull request #226 from fact-project/fix_coordinate_check
+* 94eafd1f3 Merge pull request #223 from fact-project/znaxis2_fix_219
+* 63319e39a Merge pull request #201 from fact-project/AboveThresholdProcessor
+* b744714e5 Merge pull request #211 from fact-project/fix_viewer_hdureader
+* 984930a50 Merge pull request #180 from fact-project/fact-tools-streams-0.9.26
+* 2b796474f Merge pull request #205 from fact-project/FixPackageLinePhotonStream
+* f6e2b5a15 Merge pull request #202 from fact-project/create_photonstream_package_198
+* 52033f5fd Merge pull request #177 from fact-project/hdu-reader
+* 8a55db4fc Merge pull request #188 from fact-project/photonstream_to_num_photons_and_arrival_time
+* 459bd6a44 Merge pull request #175 from fact-project/remove_test_output
+* 1b2f47b94 Merge pull request #181 from fact-project/new_fits_reader_for_auxservice
+* 44459d4bb Merge pull request #196 from fact-project/AlwaysExportTotPixelSet
+* 5e1ca693e Merge pull request #194 from fact-project/FixJSONWriterNoControlOverDefaultKeys
+* 6532357e8 Merge pull request #185 from fact-project/single_pulse_extractor_issue_183
+* 1f1f91f21 Merge pull request #189 from fact-project/fix-download-link
+* 2ec5214fe Merge pull request #186 from fact-project/add_some_numpy_to_xml
+* 273de4098 Merge pull request #178 from fact-project/update_erna_xml
 
 # Version 0.17.2 -- 05.12.2016
 
