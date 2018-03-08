@@ -32,6 +32,8 @@ public class CeresStream extends AbstractStream {
     public CeresStream(SourceURL url){
         this.url = url;
     }
+    
+    public CeresStream() {}
 
     @Override
     public void init() throws Exception {

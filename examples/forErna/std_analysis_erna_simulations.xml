@@ -15,7 +15,7 @@
 
   <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
   <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-    <stream class="fact.io.hdureader.FITSStream" id="_" />
+    <stream class="fact.io.CeresStream" id="_" />
   </stream>
 
   <process id="1" input="fact">
@@ -62,7 +62,7 @@
 
     <fact.utils.SanitizeKeys />
     <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
-    <fact.io.JSONWriter keys="${outputKeysSimulations}"
+    <fact.io.JSONWriter keys="${outputKeysSimulations},${mc_truths_run}"
         url="${output}"
         writeListOfItems="True"
         pixelSetsAsInt="True"
