@@ -69,8 +69,8 @@ public class FactFileListMultiStream extends AbstractMultiStream {
     @Parameter(required = true, description = "A file containing a json array of dicts with the paths to the files.")
     private SourceURL url = null;
 
-    @Parameter(required = false, description = "Flag indicating whether next file should be tried in case of errors in underlying stream.", defaultValue = "true")
-    private boolean skipErrors = true;
+    @Parameter(required = false, description = "Flag indicating whether next file should be tried in case of errors in underlying stream.", defaultValue = "false")
+    private boolean skipErrors = false;
 
     @Parameter(required = false, defaultValue = "drs_path")
     private String drsPathKey = "drs_path";
@@ -160,13 +160,13 @@ public class FactFileListMultiStream extends AbstractMultiStream {
 
             if (skipErrors) {
                 log.info("Skipping broken files. Continuing with next file.");
+                e.printStackTrace();
                 stream = null;
                 return this.readNext();
             } else {
                 log.error("Stopping stream because of IOException");
-                e.printStackTrace();
                 stream.close();
-                return null;
+                throw new RuntimeException(e);
             }
         }
     }
