@@ -14,7 +14,7 @@
   <service id="gainService" class="fact.gainservice.GainService" />
 
   <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
-  <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
+  <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}" skipErrors="false">
     <stream class="fact.io.CeresStream" id="_" />
   </stream>
 
