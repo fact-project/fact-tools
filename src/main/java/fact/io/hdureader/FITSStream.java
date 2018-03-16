@@ -128,7 +128,7 @@ public class FITSStream extends AbstractStream {
         return item;
     }
 
-    public Reader getReader() {
-        return reader;
+    public void skipToRow(int num) throws IOException{
+        reader.skipToRow(num);
     }
 }

@@ -46,8 +46,7 @@ public class FitsHDUTests {
         fits.readNext();
         fits.readNext();
         Data item = fits.readNext();
-        Reader reader = fits2.getReader();
-        reader.skipToRow(2);
+        fits2.skipToRow(2);
         Data item2 = fits2.readNext();
 
 
@@ -69,14 +68,71 @@ public class FitsHDUTests {
             fits.init();
             FITSStream fits2 = new FITSStream(new SourceURL(u));
             fits2.init();
-            //read 3
+
             for (int j = 0; j < i; j++) {
                 fits.readNext();
             }
             Data item = fits.readNext();
 
-            Reader reader = fits2.getReader();
-            reader.skipToRow(i);
+            fits2.skipToRow(i);
+            Data item2 = fits2.readNext();
+
+
+            int eNr = (int) item.get("EventNum");
+            int eNr2 = (int) item2.get("EventNum");
+            assertEquals(eNr, eNr2);
+
+            short[] data = (short[]) item.get("Data");
+            short[] data2 = (short[]) item2.get("Data");
+            assertArrayEquals(data, data2);
+        }
+    }
+
+    @Test
+    public void testZFitsReaderSkipWithZShrink() throws Exception {
+        for (int i = 0; i < 5; i++) {
+            System.out.println("Test skip: " + i);
+            URL u = FitsHDUTests.class.getResource("/testDataFileZSHRINK.fits.fz");
+            FITSStream fits = new FITSStream(new SourceURL(u));
+            fits.init();
+            FITSStream fits2 = new FITSStream(new SourceURL(u));
+            fits2.init();
+
+            for (int j = 0; j < i; j++) {
+                fits.readNext();
+            }
+            Data item = fits.readNext();
+
+            fits2.skipToRow(i);
+            Data item2 = fits2.readNext();
+
+
+            int eNr = (int) item.get("EventNum");
+            int eNr2 = (int) item2.get("EventNum");
+            assertEquals(eNr, eNr2);
+
+            short[] data = (short[]) item.get("Data");
+            short[] data2 = (short[]) item2.get("Data");
+            assertArrayEquals(data, data2);
+        }
+    }
+
+    @Test
+    public void testZFitsReaderSkipWithZTileLen() throws Exception {
+        for (int i = 98; i < 102; i++) {
+            System.out.println("Test skip: " + i);
+            URL u = FitsHDUTests.class.getResource("/testDataFileZTILELEN.fits.fz");
+            FITSStream fits = new FITSStream(new SourceURL(u));
+            fits.init();
+            FITSStream fits2 = new FITSStream(new SourceURL(u));
+            fits2.init();
+
+            for (int j = 0; j < i; j++) {
+                fits.readNext();
+            }
+            Data item = fits.readNext();
+
+            fits2.skipToRow(i);
             Data item2 = fits2.readNext();
 
 

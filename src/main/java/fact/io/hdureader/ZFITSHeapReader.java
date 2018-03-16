@@ -96,8 +96,8 @@ public final class ZFITSHeapReader implements Reader {
         this.stream = binTable.heapDataStream;
         this.columns = binTable.columns;
         this.catalogStream = binTable.tableDataStream;
-        this.zshrink = binTable.getHeader().getInt("ZSHRINK").orElse(1);
-        this.zTileLen = binTable.getHeader().getInt("ZTILELEN").orElse(1);
+        this.zshrink = binTable.header.getInt("ZSHRINK").orElse(1);
+        this.zTileLen = binTable.header.getInt("ZTILELEN").orElse(1);
     }
 
 
@@ -114,17 +114,16 @@ public final class ZFITSHeapReader implements Reader {
 
     @Override
     public void skipToRow(int num) throws IOException {
-        //calc zshrink problem
-        //num = num+1;
-        int numRowsSkip = num % (zshrink * zTileLen);   // works too, the amount we have to skip with getNext
+        int numRowsSkip = num % (zTileLen);   // works too, the amount we have to skip with getNext
         int numSkip = num - numRowsSkip; // the number of rows that can be skipped
-        int numTileSkip = numSkip / zshrink / zTileLen; // the amout of tiles we can skip
+        int numTileSkip = numSkip / zTileLen; // the amout of tiles we can skip
 
         int colCount = columns.size();
         long skipBytes = colCount * numTileSkip * (16) + 8;//skip additinal 8 to get directly to the offset
-
         // the catalog points to the first column so substract 16 to get to the tileheader
         long skiped = this.catalogStream.skip(skipBytes);
+        if (skiped != skipBytes)
+            throw new IOException("Couldn't skip to the desired position. The file is broken.");
         long tileOffset = this.catalogStream.readLong() - 16;
 
         this.stream.skip(tileOffset);

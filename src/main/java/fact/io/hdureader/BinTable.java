@@ -35,12 +35,7 @@ public class BinTable {
     final DataInputStream tableDataStream;
     DataInputStream heapDataStream = null;
 
-    private final Header header;
-
-    public Header getHeader() {
-        return header;
-    }
-
+    public final Header header;
 
     /**
      * This enum maps the type characters in the header to the fits types.
