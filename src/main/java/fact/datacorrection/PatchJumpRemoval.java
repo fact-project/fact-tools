@@ -38,6 +38,9 @@ public class PatchJumpRemoval implements Processor {
     @Parameter(required = true)
     public String startCellKey = null;
 
+    @Parameter(required = false, description = "The key containing the UnixTimeUTC")
+    public String unixTimeKey = "UnixTimeUTC";
+
     @Parameter
     public double jumpLimit = 5.0;
 
@@ -94,10 +97,10 @@ public class PatchJumpRemoval implements Processor {
         Utils.isKeyValid(item, prevEventsKey, PreviousEventInfoContainer.class);
         Utils.isKeyValid(item, startCellKey, short[].class);
         Utils.isKeyValid(item, "NROI", Integer.class);
-        Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+        Utils.isKeyValid(item, unixTimeKey, int[].class);
 
         // Get variables out of data item
-        int[] currentTime = (int[]) item.get("UnixTimeUTC");
+        int[] currentTime = (int[]) item.get(unixTimeKey);
         roi = (Integer) item.get("NROI");
         short[] currentStartCells = (short[]) item.get(startCellKey);
         double[] data = (double[]) item.get(dataKey);

@@ -36,6 +36,12 @@ public class InterpolateTimeSeries implements Processor {
     @Parameter(required = false, description = "The minimum number of neighboring pixels required for interpolation", defaultValue = "3")
     public int minPixelToInterpolate = 3;
 
+    @Parameter(required = false, description = "The key for the resulting badPixelSet.")
+    public String badPixelKey = "badPixels";
+
+    @Parameter(required = false, description = "The key to the unixTimeUTC of the Event.")
+    public String unixTimeKey = "UnixTimeUTC";
+
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
 
@@ -46,9 +52,9 @@ public class InterpolateTimeSeries implements Processor {
 
         ZonedDateTime timeStamp = null;
 
-        if (item.containsKey("UnixTimeUTC") == true) {
-            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-            int[] eventTime = (int[]) item.get("UnixTimeUTC");
+        if (item.containsKey(unixTimeKey) == true) {
+            Utils.isKeyValid(item, unixTimeKey, int[].class);
+            int[] eventTime = (int[]) item.get(unixTimeKey);
             timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
         } else {
             // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
@@ -67,7 +73,7 @@ public class InterpolateTimeSeries implements Processor {
         }
 
         item.put(dataOutputKey, data);
-        item.put("badPixels", badPixelSet);
+        item.put(badPixelKey, badPixelSet);
         return item;
     }
 

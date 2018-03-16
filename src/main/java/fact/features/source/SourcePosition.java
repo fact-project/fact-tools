@@ -58,6 +58,9 @@ public class SourcePosition implements StatefulProcessor {
     @Service(required = false, description = "Name of the service that provides aux files")
     public AuxiliaryService auxService;
 
+    @Parameter(required = false, description = "The key containing the UnixTimeUTC")
+    public String unixTimeKey = "UnixTimeUTC";
+
     @Parameter(description = "If set, the fixed x position of the source in mm")
     public Double x = null;
 
@@ -133,9 +136,9 @@ public class SourcePosition implements StatefulProcessor {
 
         } else {
             // Assume observations
-            int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
+            int[] unixTimeUTC = (int[]) data.get(unixTimeKey);
             if (unixTimeUTC == null) {
-                log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
+                log.error("The key \""+unixTimeKey+"\" was not found in the event. Ignoring event");
                 return null;
             }
 
