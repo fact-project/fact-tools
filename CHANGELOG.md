@@ -1,5 +1,10 @@
 # Changelog for the fact-tools
 
+# Version 1.0.1 -- 16.03.2018
+
+* Add doi via zenodo
+* Improve error handling of `FileListMultiStream` and `RecursiveDirectoryStream`
+
 # Version 1.0.0 -- 08.03.2018
 
 This is the first release since 0.17.2, with lots of additions, fixes, 
