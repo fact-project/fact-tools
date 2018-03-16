@@ -1,4 +1,4 @@
-# FACT-Tools [![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
+# FACT-Tools [![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools) [![DOI](https://zenodo.org/badge/50855465.svg)](https://zenodo.org/badge/latestdoi/50855465)
 
 
 The `FACT-Tools` are a collection of processors and stream implementations
