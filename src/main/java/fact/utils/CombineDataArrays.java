@@ -70,16 +70,4 @@ public class CombineDataArrays implements Processor {
 
         return input;
     }
-
-
-    public static Logger getLog() {
-        return log;
-    }
-
-
-    public static void setLog(Logger log) {
-        CombineDataArrays.log = log;
-    }
-
-
 }
