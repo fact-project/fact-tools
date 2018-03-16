@@ -127,4 +127,8 @@ public class FITSStream extends AbstractStream {
 
         return item;
     }
+
+    public Reader getReader() {
+        return reader;
+    }
 }

@@ -35,6 +35,12 @@ public class BinTable {
     final DataInputStream tableDataStream;
     DataInputStream heapDataStream = null;
 
+    private final Header header;
+
+    public Header getHeader() {
+        return header;
+    }
+
 
     /**
      * This enum maps the type characters in the header to the fits types.
@@ -130,8 +136,10 @@ public class BinTable {
     public Integer numberOfRowsInTable = 0;
     public Integer numberOfColumnsInTable = 0;
     public final String name;
+    public Integer numberOfBytesPerRow = 0; // in header value: naxis1
 
     BinTable(Header header, long hduOffset, URL url) throws IllegalArgumentException, IOException {
+        this.header = header;
 
         binTableSanityCheck(header);
 
@@ -163,6 +171,7 @@ public class BinTable {
             columns.add(new TableColumn(zform, tform, ttype.getValue()));
         }
 
+        numberOfBytesPerRow = header.getInt("ZNAXIS1").orElse(header.getInt("NAXIS1").orElse(0));
         numberOfRowsInTable = header.getInt("ZNAXIS2").orElse(header.getInt("NAXIS2").orElse(0));
         numberOfColumnsInTable = columns.size();
 
