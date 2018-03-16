@@ -85,7 +85,7 @@ public class TimeseriesFeatures implements Processor {
             for (int sl = searchWindowLeft; sl < searchWindowRight; sl++) {
                 int slice = pix * roi + sl;
                 values[sl - searchWindowLeft] = data[slice];
-                
+
                 if (substractSmoothData) {
                     values[sl - searchWindowLeft] = data[slice] - movingAverage[slice];
                 } else {
