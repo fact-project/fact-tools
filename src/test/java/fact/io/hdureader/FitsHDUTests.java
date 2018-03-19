@@ -61,7 +61,7 @@ public class FitsHDUTests {
 
     @Test
     public void testZFitsReaderSkip() throws Exception {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 2; i < 5; i++) {
             System.out.println("Test skip: " + i);
             URL u = FitsHDUTests.class.getResource("/testDataFile.fits.fz");
             FITSStream fits = new FITSStream(new SourceURL(u));
@@ -76,8 +76,7 @@ public class FitsHDUTests {
 
             fits2.skipRows(i);
             Data item2 = fits2.readNext();
-
-
+            
             int eNr = (int) item.get("EventNum");
             int eNr2 = (int) item2.get("EventNum");
             assertEquals(eNr, eNr2);

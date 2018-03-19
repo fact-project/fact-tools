@@ -113,6 +113,12 @@ public final class ZFITSHeapReader implements Reader {
         return new ZFITSHeapReader(binTable);
     }
 
+    /**
+     * Skips the given number of rows.
+     *
+     * @param num The amount of rows to skip.
+     * @throws IOException
+     */
     @Override
     public void skipRows(int amount) throws IOException {
         int resultingRow = amount+numberOfRowsRead;
@@ -120,6 +126,7 @@ public final class ZFITSHeapReader implements Reader {
             throw new IOException("Not enough rows in table, need "+(amount+numberOfRowsRead)+" have "+numberOfRowsInTable);
         }
 
+        // check if resulting row is in the current catalog remainer
         int remainer = zTileLen - numberOfRowsRead%zTileLen;
         if (amount<remainer) { // no need to deal with the catalog as we just work within one
             for (int i = 0; i < amount; i++) {
@@ -127,11 +134,13 @@ public final class ZFITSHeapReader implements Reader {
             }
             return;
         }
-        // go the the start of the next catalog and adjust the amount to skip left
-        for (int i = 0; i < remainer; i++) {
-            getNextRow();
+        if (remainer!=zTileLen) {
+            // go the the start of the next catalog and adjust the amount to skip left
+            for (int i = 0; i < remainer; i++) {
+                getNextRow();
+            }
+            amount -= remainer;
         }
-        amount -= remainer;
 
 
         int rowCatalogPosition = numberOfRowsRead / zTileLen;
@@ -168,7 +177,7 @@ public final class ZFITSHeapReader implements Reader {
         // get current row position
         this.catalogStream.skip(8); // go directly to the offset
         long rowOffset = this.catalogStream.readLong() - 16; // read the offset - 16 for the header
-        this.catalogStream.skip(columns.size() * (16) - 8); // go to the next catalog start
+        this.catalogStream.skip(columns.size() * (16) - 8 - 8); // go to the next catalog start
         this.catalogPosition += 1;
 
         // go to the finishing position catalog
@@ -177,7 +186,12 @@ public final class ZFITSHeapReader implements Reader {
         this.catalogStream.skip(skipBytes);
         long finalRowOffset = this.catalogStream.readLong() - 16; // read the offset - 16 for the header
 
-        skipBytes = rowOffset - finalRowOffset;
+        // readjust the catalogStream
+        this.catalogStream.skip(columns.size() * (16) - 8 - 8); // go to the next catalog start
+        this.catalogPosition += diffCatalogs+1;
+
+        // skip the bytes in the data stream
+        skipBytes = finalRowOffset - rowOffset;
         this.stream.skip(skipBytes);
         this.numberOfRowsRead += diffCatalogs * this.zTileLen;
 
@@ -185,30 +199,6 @@ public final class ZFITSHeapReader implements Reader {
         for (int i=0; i<remainingRows; i++) {
             getNextRow();
         }
-
-
-        /*int numRowsSkip = amount % (zTileLen);   // works too, the amount we have to skip with getNext
-        int numSkip = amount - numRowsSkip; // the number of rows that can be skipped
-        int numTileSkip = numSkip / zTileLen; // the amout of tiles we can skip
-
-        skipBytes = columns.size() * numTileSkip * (16) + 8;//skip additinal 8 to get directly to the offset
-        long skipBytesNextCatalog = columns.size() * (16) - 8;
-        // the catalog points to the first column so substract 16 to get to the tileheader
-        skiped = this.catalogStream.skip(skipBytes);
-        if (skiped != skipBytes)
-            throw new IOException("Couldn't skip to the desired position. The file is broken.");
-        long tileOffset = this.catalogStream.readLong() - 16;
-        // push the catalogstream to the next catalog position and save the position
-        this.catalogStream.skip(skipBytesNextCatalog);
-        this.catalogPosition = numTileSkip+1;
-
-        this.stream.skip(tileOffset);
-        this.numberOfRowsRead = numSkip;
-
-        // skip the remaining rows
-        for (int i = 0; i < numRowsSkip; i++) {
-            getNextRow();
-        }*/
     }
 
     /**

@@ -144,6 +144,12 @@ public class BinTableReader implements Reader {
         return null;
     }
 
+    /**
+     * Skips the given number of rows.
+     *
+     * @param num The amount of rows to skip.
+     * @throws IOException
+     */
     @Override
     public void skipRows(int amount) throws IOException {
         if (amount+numberOfRowsRead <= numberOfRowsInTable) {
