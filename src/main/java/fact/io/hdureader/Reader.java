@@ -78,6 +78,6 @@ public interface Reader extends
      * @param num The amount of rows to skip.
      * @throws IOException
      */
-    void skipToRow(int num) throws IOException;
+    void skipRows(int amount) throws IOException;
 
 }

@@ -145,11 +145,11 @@ public class BinTableReader implements Reader {
     }
 
     @Override
-    public void skipToRow(int num) throws IOException {
-        if (num <= numberOfRowsInTable) {
-            new IndexOutOfBoundsException("Table has not enough rows to access row num: " + num);
+    public void skipRows(int amount) throws IOException {
+        if (amount+numberOfRowsRead <= numberOfRowsInTable) {
+            new IndexOutOfBoundsException("Table has not enough rows to access row num: " + (amount+numberOfRowsRead));
         }
-        stream.skipBytes(num * this.numberOfBytesPerRow);
-        numberOfRowsRead = num;
+        stream.skipBytes(amount * this.numberOfBytesPerRow);
+        numberOfRowsRead += amount;
     }
 }

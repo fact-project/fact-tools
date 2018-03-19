@@ -46,7 +46,7 @@ public class FitsHDUTests {
         fits.readNext();
         fits.readNext();
         Data item = fits.readNext();
-        fits2.skipToRow(2);
+        fits2.skipRows(2);
         Data item2 = fits2.readNext();
 
 
@@ -74,7 +74,7 @@ public class FitsHDUTests {
             }
             Data item = fits.readNext();
 
-            fits2.skipToRow(i);
+            fits2.skipRows(i);
             Data item2 = fits2.readNext();
 
 
@@ -103,7 +103,7 @@ public class FitsHDUTests {
             }
             Data item = fits.readNext();
 
-            fits2.skipToRow(i);
+            fits2.skipRows(i);
             Data item2 = fits2.readNext();
 
 
@@ -132,7 +132,7 @@ public class FitsHDUTests {
             }
             Data item = fits.readNext();
 
-            fits2.skipToRow(i);
+            fits2.skipRows(i);
             Data item2 = fits2.readNext();
 
 
