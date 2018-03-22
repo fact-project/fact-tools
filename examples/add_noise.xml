@@ -1,0 +1,112 @@
+<container>
+    <properties url="classpath:/default/settings.properties" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+
+    <property name="noiseDB" value="file:${SET_noiseDB}" />
+    <property name="dataFolder" value="${SET_dataFolder}" />
+    <proptery name="noiseBinning" value="2" />
+
+    <property name="LONS_KEYS" value="LONS_currents,LONS_NIGHT,LONS_RUNID,LONS_EventNum,LONS_UnixTimeUTC"/>
+    <property name="MC_KEYS" value="IncidentAngle.fVal,MCorsikaEvtHeader.fEvtNumber,MCorsikaEvtHeader.fNumReuse,MCorsikaEvtHeader.fTotalEnergy,MCorsikaEvtHeader.fStartAltitude,MCorsikaEvtHeader.fFirstTargetNum,CorsikaEvtHeader.fFirstInteractionHeight,MCorsikaEvtHeader.fMomentumX,MCorsikaEvtHeader.fMomentumY,MCorsikaEvtHeader.fMomentumZ,MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,MCorsikaEvtHeader.fX,MCorsikaEvtHeader.fY,MCorsikaEvtHeader.fWeightedNumPhotons,MMcEvt.fEvtNumber,MMcEvt.fThick0,MMcEvt.fFirstTarget,MMcEvt.fZFirstInteraction,MMcEvt.fCoreD,MMcEvt.fCoreX,MMcEvt.fCoreY,MMcEvt.fTimeFirst,MMcEvt.fTimeLast,MMcEvt.fLongiNmax,MMcEvt.fLongit0,MMcEvt.fLongitmax,MMcEvt.fLongia,MMcEvt.fLongib,MMcEvt.fLongic,MMcEvt.fLongichi2,MMcEvt.fPhotIni,MMcEvt.fPassPhotAtm,MMcEvt.fPassPhotRef,MMcEvt.fPassPhotCone,MMcEvt.fPhotElfromShower,MMcEvt.fPhotElinCamera,MMcEvt.fElecCphFraction,MMcEvt.fMuonCphFraction,MMcEvt.fOtherCphFraction,MMcEvt.fFadcTimeJitter,MMcEvt.fEventReuse,MMcEvtBasic.fEnergy,MMcEvtBasic.fImpact,MMcEvtBasic.fTelescopePhi,MMcEvtBasic.fTelescopeTheta,MMcEvtBasic.fTheta,MMcEvtBasic.fPhi,MPointingPos.fZd,MPointingPos.fAz,MPointingPos.fRa,MPointingPos.fHa,MPointingPos.fDec,MRawEvtData.fHiGainPixId,Data,StartCellData,TriggerType,MRawEvtData.fNumBytesPerSample,MRawEvtData.fIsSigned,EventNum,MRawEvtHeader.fNumTrigLvl1,MRawEvtHeader.fTrigPattern,MSimSourcePos.fZd,MSimSourcePos.fAz,MSimSourcePos.fRa,MSimSourcePos.fHa,MSimSourcePos.fDec,McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McMuonCherPhotNumber,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"/>
+    <property name="OUTPUT_KEYS" value="${MC_KEYS},${LONS_KEYS}"/>
+
+    <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
+        <stream class="fact.io.hdureader.FITSStream" id="fact" />
+    </stream>
+
+    <process id="1" input="fact">
+        <fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+        />
+
+        <fact.datacorrection.DrsCalibration
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+
+        <fact.datacorrection.RemoveSpikes
+                dataKey="DataCalibrated"
+                outputKey="DataCalibrated"
+                startCellKey="StartCellData"
+                leftBorder="${RemoveSpikes.leftBorder}"
+                spikeLimit="${RemoveSpikes.spikeLimit}"
+                topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+                maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+        />
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
+
+
+        <!-- Sample Pedestal Event and calibrate it -->
+        <fact.utils.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}"
+                                        dbBinningKey="Zd" itemBinningKey="MPointingPos.fZd" binning="${noiseBinning}"
+        />
+
+        <fact.datacorrection.DrsCalibration
+                drsKey="LONS_drspath"
+                key="LONS_Data"
+                outputKey="LONS_DataCalibrated"
+                startCellKey="LONS_StartCellData"
+        />
+
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="LONS_DataCalibrated"
+                outputKey="LONS_DataCalibrated"
+                prevEventsKey="LONS_prevEvents"
+                startCellKey="LONS_StartCellData"
+                unixTimeKey="LONS_UnixTimeUTC"
+                jumpLimit="${PatchJumpRemoval.jumpLimit}"
+        />
+
+        <fact.datacorrection.RemoveSpikes
+                dataKey="LONS_DataCalibrated"
+                outputKey="LONS_DataCalibrated"
+                startCellKey="LONS_StartCellData"
+                leftBorder="${RemoveSpikes.leftBorder}"
+                spikeLimit="${RemoveSpikes.spikeLimit}"
+                topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+                maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+        />
+
+        <!--url="${drstime}"-->
+        <fact.datacorrection.DrsTimeCalibration
+                startCellKey = "LONS_StartCellData"
+                dataKey      = "LONS_DataCalibrated"
+                outputKey    = "LONS_DataCalibrated"
+        />
+
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="LONS_DataCalibrated"
+                dataOutputKey="LONS_DataCalibrated"
+                badPixelKey="LONS_badPixel"
+                unixTimeKey="LONS_UnixTimeUTC"
+        />
+
+        <fact.utils.CombineDataArrays firstArrayKey="DataCalibrated" secondArrayKey="LONS_DataCalibrated"
+                                      outputKey="DataCalibrated" op="add"/>
+
+        <fact.datacorrection.DrsCalibration
+                key="DataCalibrated"
+                outputKey="Data"
+                reverse="true"
+        />
+        <fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+                reverse="True"
+        />
+        <!--<fact.ShowViewer key="DataCalibrated" />-->
+
+        <fact.io.FITSWriter url="${output}"
+                            keys="${OUTPUT_KEYS}"
+                            headerKeys="CREATOR,NROI,NPIX,TELESCOP,RUNTYPE,CAMERA"
+        />
+    </process>
+</container>
