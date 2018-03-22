@@ -116,7 +116,7 @@ public final class ZFITSHeapReader implements Reader {
     /**
      * Skips the given number of rows.
      *
-     * @param num The amount of rows to skip.
+     * @param amount The amount of rows to skip.
      * @throws IOException
      */
     @Override
@@ -126,6 +126,10 @@ public final class ZFITSHeapReader implements Reader {
             throw new IOException("Not enough rows in table, need "+(amount+numberOfRowsRead)+" have "+numberOfRowsInTable);
         }
 
+        /*for (int i=0; i<amount; i++) {
+            getNextRow();
+        }
+        return;*/
         // check if resulting row is in the current catalog remainer
         int remainer = zTileLen - numberOfRowsRead%zTileLen;
         if (amount<remainer) { // no need to deal with the catalog as we just work within one
@@ -170,32 +174,36 @@ public final class ZFITSHeapReader implements Reader {
         }
 
         // move the current catalog position to the rowCatalogPosition
-        long skipBytes = (rowCatalogPosition - catalogPosition) * columns.size() * (16);
-        long skiped = this.catalogStream.skip(skipBytes);
+        int skipBytes = (rowCatalogPosition - catalogPosition) * columns.size() * (16);
+        this.catalogStream.skipBytes(skipBytes);
         this.catalogPosition = rowCatalogPosition;
 
         // get current row position
-        this.catalogStream.skip(8); // go directly to the offset
+        this.catalogStream.skipBytes(8); // go directly to the offset
         long rowOffset = this.catalogStream.readLong() - 16; // read the offset - 16 for the header
-        this.catalogStream.skip(columns.size() * (16) - 8 - 8); // go to the next catalog start
+        this.catalogStream.skipBytes(columns.size() * (16) - 8 - 8); // go to the next catalog start
         this.catalogPosition += 1;
 
         // go to the finishing position catalog
         int diffCatalogs = rowCatalogPositionFinished-catalogPosition;
         skipBytes = diffCatalogs * columns.size() * (16) + 8; // go directly to the offset
-        this.catalogStream.skip(skipBytes);
+        this.catalogStream.skipBytes(skipBytes);
         long finalRowOffset = this.catalogStream.readLong() - 16; // read the offset - 16 for the header
 
         // readjust the catalogStream
-        this.catalogStream.skip(columns.size() * (16) - 8 - 8); // go to the next catalog start
+        this.catalogStream.skipBytes(columns.size() * (16) - 8 - 8); // go to the next catalog start
         this.catalogPosition += diffCatalogs+1;
 
         // skip the bytes in the data stream
-        skipBytes = finalRowOffset - rowOffset;
-        this.stream.skip(skipBytes);
+        long skipManyBytes = finalRowOffset - rowOffset;
+        while(skipManyBytes!=0) {
+            long skipped = this.stream.skip(skipManyBytes);
+            skipManyBytes -= skipped;
+        }
         this.numberOfRowsRead += diffCatalogs * this.zTileLen;
 
         int remainingRows = resultingRow % zTileLen;
+        //System.out.println("Rem: "+remainingRows);
         for (int i=0; i<remainingRows; i++) {
             getNextRow();
         }
