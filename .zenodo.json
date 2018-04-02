@@ -1,6 +1,14 @@
 {
     "description": "The FACT-Tools are an extension of the streams framework to analyse the data of the First G-APD Cherenkov Telescope", 
     "license": "GPLv3", 
+    "keywords": [
+        "gamma-ray astronomy",
+        "streams",
+        "FACT",
+        "Imaging Atmospheric Cherenkov Telescope",
+        "IACT"
+    ],
+    "upload_type": "software",
     "creators": [
         {
             "affiliation": "TU Dortmund", 
