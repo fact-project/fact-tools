@@ -24,7 +24,8 @@
       <!-- Only analyze physics trigger events -->
       <Skip condition="%{data.TriggerType} != 4" />
 
-      <include url="classpath:/analysis/calibration.xml" />
+      <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
+        <include url="classpath:/analysis/calibration.xml" />
       <fact.photonstream.SinglePulseExtraction
         dataKey="DataCalibrated"
         outputKey="PhotonArrivals"

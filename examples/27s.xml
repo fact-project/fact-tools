@@ -20,6 +20,7 @@
 
     <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
 
+    <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
 

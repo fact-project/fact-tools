@@ -13,6 +13,7 @@
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}" />
 
   <process id="2" input="fact">
+    <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
 

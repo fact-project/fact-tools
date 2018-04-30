@@ -20,6 +20,7 @@
   <process id="2" input="fact">
 
     <!-- Use standard calibration, extraction and cleaning -->
+    <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
     <include url="classpath:/analysis/cleaning.xml" />

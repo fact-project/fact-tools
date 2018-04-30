@@ -19,6 +19,7 @@
 
         <stream.flow.Skip condition="%{data.TriggerType} != 4" />
 
+        <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
         <include url="classpath:/analysis/calibration.xml" />
         <include url="classpath:/analysis/extraction.xml" />
         <include url="classpath:/analysis/cleaning.xml" />
