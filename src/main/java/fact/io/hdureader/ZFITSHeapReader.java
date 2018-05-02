@@ -125,11 +125,7 @@ public final class ZFITSHeapReader implements Reader {
         if (resultingRow >= this.numberOfRowsInTable) {
             throw new IOException("Not enough rows in table, need "+(amount+numberOfRowsRead)+" have "+numberOfRowsInTable);
         }
-
-        /*for (int i=0; i<amount; i++) {
-            getNextRow();
-        }
-        return;*/
+        
         // check if resulting row is in the current catalog remainer
         int remainer = zTileLen - numberOfRowsRead%zTileLen;
         if (amount<remainer) { // no need to deal with the catalog as we just work within one
@@ -203,7 +199,6 @@ public final class ZFITSHeapReader implements Reader {
         this.numberOfRowsRead += diffCatalogs * this.zTileLen;
 
         int remainingRows = resultingRow % zTileLen;
-        //System.out.println("Rem: "+remainingRows);
         for (int i=0; i<remainingRows; i++) {
             getNextRow();
         }
