@@ -4,7 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -15,7 +15,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
-    <streams.version>1.0.0</streams.version>
+    <streams.version>1.0.5</streams.version>
     <binary.name>fact-tools-${git.commit.id.describe}</binary.name>
     <skipTests>false</skipTests>
     <finalName>fact-tools-${git.commit.id.describe}</finalName>
