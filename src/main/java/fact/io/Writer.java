@@ -71,7 +71,8 @@ public abstract class Writer {
             previousKeySet = item.keySet();
         } else {
             if (!previousKeySet.equals(item.keySet())) {
-                Set<String> diff1 = item.keySet();
+                Set<String> diff1 = new HashSet<String>();
+                diff1.addAll(item.keySet());
                 diff1.removeAll(previousKeySet);
                 Set<String> diff2 = previousKeySet;
                 diff2.removeAll(item.keySet());
