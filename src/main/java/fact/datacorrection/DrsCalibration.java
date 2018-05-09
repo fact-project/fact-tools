@@ -39,7 +39,9 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Parameter(required = false, description = "A URL to the DRS calibration data (in FITS formats)",
             defaultValue = "Null. Will try to find path to drsFile from the stream.")
-    public URL url = null;
+    public String url = "";
+
+    public URL drsFileURL = null;
 
 
     private File currentDrsFile = new File("");
@@ -97,7 +99,7 @@ public class DrsCalibration implements StatefulProcessor {
     @Override
     public Data process(Data data) {
 
-        if (this.url == null) {
+        if (this.drsFileURL == null) {
             //file not loaded yet. try to find by magic.
             File drsFile = (File) data.get("@drsFile");
             if (drsFile != null) {
@@ -267,11 +269,20 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
-        if (url != null) {
+
+        if (!url.isEmpty()) {
             try {
-                loadDrsData(url);
+                drsFileURL = new URL(url);
+            } catch (MalformedURLException e) {
+                drsFileURL = new URL("file:" + url);
+            }
+        }
+
+        if (drsFileURL != null) {
+            try {
+                loadDrsData(drsFileURL);
             } catch (Exception e) {
-                log.error("Could not load .drs file specified in the url.");
+                log.error("Could not load .drs file specified in the drsFileURL. {}", drsFileURL);
                 throw new RuntimeException(e.getMessage());
             }
         }
