@@ -82,7 +82,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
         for (String key : keys.select(item)) {
             outputItem.put(key, item.get(key));
         }
-        testKeys(item, keys, allowNullKeys);
+        testKeys(outputItem, keys, allowNullKeys);
 
         if (!initialized) {
             try {

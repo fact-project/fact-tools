@@ -127,4 +127,14 @@ public class FITSStream extends AbstractStream {
 
         return item;
     }
+
+    /**
+     * Skips the given amount of rows in the data table.
+     *
+     * @param amount The amount of Rows to skip.
+     * @throws IOException
+     */
+    public void skipRows(int amount) throws IOException{
+        reader.skipRows(amount);
+    }
 }
