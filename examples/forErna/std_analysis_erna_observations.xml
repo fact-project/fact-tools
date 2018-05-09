@@ -5,7 +5,7 @@
   -->
   <properties url="classpath:/default/settings.properties" />
 
-  <property name="aux_source" value="file:./2015.sqlite" />
+  <property name="aux_source" value="file:src/main/resources/aux/" />
 
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
