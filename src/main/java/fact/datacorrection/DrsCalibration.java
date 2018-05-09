@@ -4,6 +4,7 @@
 package fact.datacorrection;
 
 import fact.Constants;
+import fact.DrsFileService;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
@@ -14,6 +15,7 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,15 +36,20 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter
     public String outputKey = "DataCalibrated";
 
-    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
-    public String key = "Data";
+	@Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
+	private String key = "Data";
 
-    @Parameter(required = false, description = "A URL to the DRS calibration data (in FITS formats)",
-            defaultValue = "Null. Will try to find path to drsFile from the stream.")
-    public URL url = null;
+	@Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
+			defaultValue = "Null. Will try to find path to drsFile from the stream.")
+	public URL url = null;
+
+	@Service(description = "A DrsFileService which helps to find drs files automagically." +
+			" Either this or the url must be set.", required = false)
+	private DrsFileService drsService;
 
 
-    private File currentDrsFile = new File("");
+	private File currentDrsFile = new File("");
+
 
     float[] drsBaselineMean;
     float[] drsBaselineRms;
@@ -96,8 +103,21 @@ public class DrsCalibration implements StatefulProcessor {
      */
     @Override
     public Data process(Data data) {
+		if( this.url == null && this.drsService != null){
+			//file not loaded yet. try to find through service
+			try {
 
-        if (this.url == null) {
+				DrsFileService.CalibrationInfo calibrationInfo = drsService.getCalibrationConstantsForDataItem(data);
+				this.drsBaselineMean = calibrationInfo.drsBaselineMean;
+				this.drsGainMean = calibrationInfo.drsGainMean;
+				this.drsTriggerOffsetMean = calibrationInfo.drsTriggerOffsetMean;
+
+			} catch (NullPointerException | IOException e) {
+				throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
+			}
+		}
+
+        if (this.url == null && this.drsService == null) {
             //file not loaded yet. try to find by magic.
             File drsFile = (File) data.get("@drsFile");
             if (drsFile != null) {
@@ -277,15 +297,16 @@ public class DrsCalibration implements StatefulProcessor {
         }
     }
 
-    @Override
-    public void resetState() throws Exception {
+	@Override
+	public void resetState() throws Exception {
 
-    }
+	}
 
-    @Override
-    public void finish() throws Exception {
+	@Override
+	public void finish() throws Exception {
 
-    }
+	}
 
 
 }
+
