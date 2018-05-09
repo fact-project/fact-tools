@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static fact.RunFACTTools.runFACTTools;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -58,6 +59,12 @@ public class FunctionalTest {
             String[] args = {f.toAbsolutePath().toString()};
             try {
                 runFACTTools(args);
+            } catch (RunFACTTools.SystemExitException e) {
+                if (e.status != 0) {
+                    log.error("Error executing xml: " + f, e);
+                    failedFilesList.add(f.toString());
+                    counter++;
+                }
             } catch (Exception e) {
                 log.error("Error executing xml: " + f, e);
                 failedFilesList.add(f.toString());
@@ -65,9 +72,9 @@ public class FunctionalTest {
             }
         }
 
-        log.debug("\n\n" + counter + " of " + size + " files in  'examples/studies' failed to execute");
-        log.debug(Arrays.toString(failedFilesList.toArray()));
+        String msg =  counter + " of " + size + " files in  'examples/studies' failed to execute: ";
+        msg += Arrays.toString(failedFilesList.toArray());
 
-        assertThat(failedFilesList.size(), is(0));
+        assertEquals(msg, 0, failedFilesList.size());
     }
 }
