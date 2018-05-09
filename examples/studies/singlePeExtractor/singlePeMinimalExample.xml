@@ -22,8 +22,7 @@
       <!-- This skips events created by our malfunctioning LED light pulser (27s Events) --> 
       <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
 
-      <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
-        <include url="classpath:/analysis/calibration.xml" />
+      <include url="classpath:/analysis/calibration.xml" />
       <!-- Output: DataCalibrated -->
 
       <!-- Single Pe Extraction -->

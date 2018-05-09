@@ -16,7 +16,6 @@
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
     <include url="classpath:/analysis/init.xml" />
-    <streams.data.SetValue key="drsKey" value="${@drsfile}"/>
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
     <include url="classpath:/analysis/cleaning.xml" />
