@@ -37,7 +37,7 @@ public class FactErnaAnalysisTest {
 
             String[] args = {
                     xml.toURI().toString(),
-                    "-Dinput=file:src/main/resources/testErnaDataInput.json",
+                    "-Dinput=file:src/test/resources/testErnaDataInput.json",
                     "-DauxFolder=file:src/main/resources/aux/",
                     "-Doutput=" + outFile.toURI().toString(),
             };
@@ -65,7 +65,7 @@ public class FactErnaAnalysisTest {
             String[] args = {
                     xml.toURI().toString(),
                     "-Doutput=" + outFile.toURI().toString(),
-                    "-Dinput=file:src/main/resources/testErnaMCInput.json",
+                    "-Dinput=file:src/test/resources/testErnaMCInput.json",
             };
 
             runFACTTools(args);
