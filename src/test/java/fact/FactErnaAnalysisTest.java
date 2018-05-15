@@ -1,45 +1,56 @@
 package fact;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.FITS;
 import org.junit.Test;
+import stream.Data;
+import stream.data.DataFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static fact.RunFACTTools.runFACTTools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
-public class FactStandardAnalysisTest {
+public class FactErnaAnalysisTest {
 
 
     @Test
     public void dataTest() {
 
         try {
-            File xml = new File("examples/stdAnalysis.xml");
-            File outFile = File.createTempFile("facttools_test", ".fits");
+            File xml = new File("examples/forErna/std_analysis_erna_observations.xml");
+            File outFile = File.createTempFile("facttools_test", ".json");
 
             String[] args = {
                     xml.toURI().toString(),
-                    "-Dinfile=classpath:/testDataFile.fits.gz",
-                    "-Ddrsfile=classpath:/testDrsFile.drs.fits.gz",
+                    "-Dinput=file:src/main/resources/testErnaDataInput.json",
                     "-DauxFolder=file:src/main/resources/aux/",
-                    "-Doutfile=" + outFile.toURI().toString(),
+                    "-Doutput=" + outFile.toURI().toString(),
             };
 
             runFACTTools(args);
 
-            FITS fits = FITS.fromFile(outFile);
-            BinTable table = fits.getBinTableByName("Events").get();
-
-            assertEquals(3, (long) table.numberOfRowsInTable);
+            JsonElement root = new JsonParser().parse(new InputStreamReader(outFile.toURI().toURL().openStream()));
+            assertEquals(3, (long) root.getAsJsonArray().size());
 
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run examples/stdAnalysis.xml for observations");
+            fail("Could not run examples/forErna/std_analysis_erna_observations.xml for observations");
         }
     }
 
@@ -48,29 +59,23 @@ public class FactStandardAnalysisTest {
     public void mcTest() {
 
         try {
-            File xml = new File("examples/stdAnalysis.xml");
-            File outFile = File.createTempFile("facttools_test", ".fits");
+            File xml = new File("examples/forErna/std_analysis_erna_simulations.xml");
+            File outFile = File.createTempFile("facttools_test", ".json");
 
             String[] args = {
                     xml.toURI().toString(),
-                    "-Doutfile=" + outFile.toURI().toString(),
-                    "-Dinfile=file:src/main/resources/testMcFile.fits.gz",
-                    "-Ddrsfile=file:src/main/resources/testMcDrsFile.drs.fits.gz",
-                    "-DintegralGainFile=classpath:/default/defaultIntegralGains.csv",
-                    "-DpixelDelayFile=classpath:/default/delays_zero.csv",
+                    "-Doutput=" + outFile.toURI().toString(),
+                    "-Dinput=file:src/main/resources/testErnaMCInput.json",
             };
 
             runFACTTools(args);
 
-            FITS fits = FITS.fromFile(outFile);
-            BinTable table = fits.getBinTableByName("Events").get();
-
-            assertEquals(13, (long) table.numberOfRowsInTable);
-
+            JsonElement root = new JsonParser().parse(new InputStreamReader(outFile.toURI().toURL().openStream()));
+            assertEquals(12, (long) root.getAsJsonArray().size());
 
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Could not run examples/stdAnalysis/simulations.xml");
+            fail("Could not run forErna/std_analysis_erna_simulations.xml");
         }
     }
 }
