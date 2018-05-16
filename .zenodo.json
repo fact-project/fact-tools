@@ -1,0 +1,67 @@
+{
+    "description": "The FACT-Tools are an extension of the streams framework to analyse the data of the First G-APD Cherenkov Telescope", 
+    "license": "lgpl-3.0", 
+    "keywords": [
+        "gamma-ray astronomy",
+        "streams",
+        "FACT",
+        "Imaging Atmospheric Cherenkov Telescope",
+        "IACT"
+    ],
+    "upload_type": "software",
+    "creators": [
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Maximilian N\u00f6the"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Jens Buss"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Kai Br\u00fcgge"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "T. Fabian Temme"
+        }, 
+        {
+            "affiliation": "ETH Zurich", 
+            "name": "Sebastian A. Mueller"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Christian Bockermann"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Lena Linhoff"
+        }, 
+        {
+            "affiliation": "ETH Zurich", 
+            "name": "Dominik Neise"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Dominik Baack"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Hendrik Hildebrandt"
+        }, 
+        {
+            "affiliation": "ETH Zurich", 
+            "name": "Max Ahnen"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Niklas Wulf"
+        }, 
+        {
+            "affiliation": "TU Dortmund", 
+            "name": "Alexey Egorov"
+        }
+    ], 
+    "access_right": "open"
+}
