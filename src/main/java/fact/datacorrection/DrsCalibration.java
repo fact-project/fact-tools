@@ -52,6 +52,8 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter(required = false, description = "Whether to reverse the process.", defaultValue = "false")
     public boolean reverse = false;
 
+    private double dconv = 2000.0f / 4096.0f;
+
     Data drsData = null;
 
     private File currentDrsFile = new File("");
@@ -135,11 +137,11 @@ public class DrsCalibration implements StatefulProcessor {
                 log.error(" data .fits file did not contain the value for the key "
                         + key + ". cannot apply drscalibration");
                 throw new RuntimeException(
-                        " data .fits file did not contain the value for the key \"" + key + "\". Cannot apply drs calibration)");
+                        " data .fits file did not contain the value for the key \""
+                        + key + "\". Cannot apply drs calibration)");
             }
 
             rawfloatData = new double[rawData.length];
-            // System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
             for (int i = 0; i < rawData.length; i++) {
                 rawfloatData[i] = rawData[i];
             }
@@ -161,25 +163,23 @@ public class DrsCalibration implements StatefulProcessor {
             output = new double[rawfloatData.length];
         }
 
-        double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell, reverse);
-        if (!reverse)
+        if (!reverse) {
+            double[] calibrated = applyDrsCalibration(rawfloatData, output, startCell);
             data.put(outputKey, calibrated);
-        else {
+        } else {
+            double[] calibrated = reverseDrsCalibration(rawfloatData, output, startCell);
             short[] decalibratedShortData = new short[calibrated.length];
-            // System.arraycopy(rawData, 0, rawfloatData, 0, rawfloatData.length);
             for (int i = 0; i < calibrated.length; i++) {
                 decalibratedShortData[i] = (short) calibrated[i];
             }
             data.put(outputKey, decalibratedShortData);
         }
 
-        //TODO add color value if set
-
         return data;
     }
 
     public double[] applyDrsCalibration(double[] data, double[] destination,
-                                        short[] startCellVector, boolean reverse_calibration) {
+                                        short[] startCellVector) {
 
         if (destination == null || destination.length != data.length)
             destination = new double[data.length];
@@ -251,7 +251,6 @@ public class DrsCalibration implements StatefulProcessor {
         // TrueValue[c][s] = ( RawValue[c][s] - Offset[c][ (c+t)%1024 ] ) /
         // Gain[c][ (c+t)%1024 ] * 1907.35 - TriggerOffset[c][s]
 
-        double dconv = 2000.0f / 4096.0f;
         double vraw;
 
         int pos, offsetPos, triggerOffsetPos;
@@ -260,30 +259,19 @@ public class DrsCalibration implements StatefulProcessor {
 
                 pos = pixel * roi + slice;
                 // Offset and Gain vector *should look the same
-                int start = startCellVector[pixel] != -1 ? startCellVector[pixel]
-                        : 0;
+                int start = startCellVector[pixel] != -1 ? startCellVector[pixel] : 0;
 
                 offsetPos = pixel * drsBaselineMean.length / Constants.N_PIXELS
                         + ((slice + start) % (drsBaselineMean.length / Constants.N_PIXELS));
 
-                triggerOffsetPos = pixel * drsTriggerOffsetMean.length / Constants.N_PIXELS
-                        + slice;
+                triggerOffsetPos = pixel * drsTriggerOffsetMean.length / Constants.N_PIXELS + slice;
 
-                if (!reverse_calibration) {
-                    vraw = data[pos];
-                    vraw *= dconv;
-                    vraw -= drsBaselineMean[offsetPos];
-                    vraw -= drsTriggerOffsetMean[triggerOffsetPos];
-                    vraw /= drsGainMean[offsetPos];
-                    vraw *= 1907.35;
-                } else {
-                    vraw = data[pos];
-                    vraw /= 1907.35;
-                    vraw *= drsGainMean[offsetPos];
-                    vraw += drsTriggerOffsetMean[triggerOffsetPos];
-                    vraw += drsBaselineMean[offsetPos];
-                    vraw /= dconv;
-                }
+                vraw = data[pos];
+                vraw *= dconv;
+                vraw -= drsBaselineMean[offsetPos];
+                vraw -= drsTriggerOffsetMean[triggerOffsetPos];
+                vraw /= drsGainMean[offsetPos];
+                vraw *= 1907.35;
 
                 // slice_pt = pixel_pt + sl;
                 // drs_cal_offset = ( sl + StartCellVector[ pixel ] ) %
@@ -301,6 +289,47 @@ public class DrsCalibration implements StatefulProcessor {
         return destination;
     }
 
+    /**
+     * Reverses the drsCalibration performed in applyDrsCalibration.
+     *
+     * @param data The calibrated data the decalibrate.
+     * @param destination If given use this as the destination array otherwise a new one is created.
+     * @param startCellVector The array containing the start cells used to know which calibration constants to use.
+     * @return The decalibrated data array
+     */
+    public double[] reverseDrsCalibration(double[] data, double[] destination, short[] startCellVector) {
+        if (destination == null || destination.length != data.length)
+            destination = new double[data.length];
+        int roi = data.length / Constants.N_PIXELS;
+
+        double vraw;
+
+        int pos, offsetPos, triggerOffsetPos;
+        for (int pixel = 0; pixel < Constants.N_PIXELS; pixel++) {
+            for (int slice = 0; slice < roi; slice++) {
+
+                pos = pixel * roi + slice;
+                // Offset and Gain vector *should look the same
+                int start = startCellVector[pixel] != -1 ? startCellVector[pixel] : 0;
+
+                offsetPos = pixel * drsBaselineMean.length / Constants.N_PIXELS
+                        + ((slice + start) % (drsBaselineMean.length / Constants.N_PIXELS));
+
+                triggerOffsetPos = pixel * drsTriggerOffsetMean.length / Constants.N_PIXELS + slice;
+
+                vraw = data[pos];
+                vraw /= 1907.35;
+                vraw *= drsGainMean[offsetPos];
+                vraw += drsTriggerOffsetMean[triggerOffsetPos];
+                vraw += drsBaselineMean[offsetPos];
+                vraw /= dconv;
+
+                destination[pos] = vraw;
+            }
+        }
+
+        return destination;
+    }
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
