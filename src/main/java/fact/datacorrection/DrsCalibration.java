@@ -39,7 +39,7 @@ public class DrsCalibration implements StatefulProcessor {
 
     @Parameter(required = false, description = "A URL to the DRS calibration data (in FITS formats)",
             defaultValue = "Null. Will try to find path to drsFile from the stream.")
-    public String url = "";
+    public String url = "@drsFile";
 
     public URL drsFileURL = null;
 
@@ -270,7 +270,7 @@ public class DrsCalibration implements StatefulProcessor {
     @Override
     public void init(ProcessContext processContext) throws Exception {
 
-        if (!url.isEmpty()) {
+        if (!url.equals("@drsFile")) {
             try {
                 drsFileURL = new URL(url);
             } catch (MalformedURLException e) {
