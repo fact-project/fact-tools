@@ -39,8 +39,8 @@ public class InterpolateTimeSeries implements Processor {
     @Parameter(required = false, description = "The key for the resulting badPixelSet.")
     public String badPixelKey = "badPixels";
 
-    @Parameter(required = false, description = "The key to the unixTimeUTC of the Event.")
-    public String unixTimeKey = "UnixTimeUTC";
+    @Parameter(required = false, description = "The key to the timestamp of the Event.")
+    public String timeStampKey = "timestamp";
 
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -50,17 +50,7 @@ public class InterpolateTimeSeries implements Processor {
         Utils.isKeyValid(item, dataKey, double[].class);
         double[] data = (double[]) item.get(dataKey);
 
-        ZonedDateTime timeStamp = null;
-
-        if (item.containsKey(unixTimeKey) == true) {
-            Utils.isKeyValid(item, unixTimeKey, int[].class);
-            int[] eventTime = (int[]) item.get(unixTimeKey);
-            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-        } else {
-            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-            // => The 12 bad pixels we have from the beginning on are used.
-            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        }
+        ZonedDateTime timeStamp = Utils.getTimeStamp(item, timeStampKey);
 
         PixelSet badPixelSet = calibService.getBadPixels(timeStamp);
 

@@ -46,17 +46,7 @@ public class InterpolatePixelArray implements Processor {
 
         double[] input = (double[]) item.get(inputKey);
 
-        ZonedDateTime timeStamp;
-
-        if (item.containsKey("UnixTimeUTC") == true) {
-            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-            int[] eventTime = (int[]) item.get("UnixTimeUTC");
-            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-        } else {
-            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-            // => The 12 bad pixels we have from the beginning on are used.
-            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
-        }
+        ZonedDateTime timeStamp = Utils.getTimeStamp(item);
 
         PixelSet badPixelsSet = calibService.getBadPixels(timeStamp);
 

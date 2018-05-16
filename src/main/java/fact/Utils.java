@@ -534,4 +534,34 @@ public class Utils {
                 .toArray();
     }
 
+
+    /**
+     * Check if the dataitem has the timestamp key, if not return the MC data default timestamp
+     *
+     * @param item The event to process
+     * @return The timestamp of the event
+     */
+    public static ZonedDateTime getTimeStamp(Data item) {
+        return getTimeStamp(item, "timestamp");
+    }
+
+    /**
+     * Check if the dataitem has the timestamp key, if not return the MC data default timestamp
+     *
+     * @param item The event to process
+     * @return The timestamp of the event
+     */
+    public static ZonedDateTime getTimeStamp(Data item, String timeStampKey) {
+        ZonedDateTime timeStamp = null;
+        if (item.containsKey(timeStampKey)) {
+            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
+            timeStamp = (ZonedDateTime) item.get(timeStampKey);
+        } else {
+            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
+            // => The 12 bad pixels we have from the beginning on are used.
+            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        }
+
+        return timeStamp;
+    }
 }

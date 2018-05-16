@@ -66,16 +66,7 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
     @Override
     public Data process(Data item) {
 
-        ZonedDateTime timeStamp;
-        if (item.containsKey("UnixTimeUTC") == true) {
-            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-            int[] eventTime = (int[]) item.get("UnixTimeUTC");
-            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-        } else {
-            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-            // => The 12 bad pixels we have from the beginning on are used.
-            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        }
+        ZonedDateTime timeStamp = Utils.getTimeStamp(item);
 
         double[] photonCharge = Utils.toDoubleArray(item.get(photonChargeKey));
         double[] arrivalTimes = Utils.toDoubleArray(item.get(arrivalTimeKey));
