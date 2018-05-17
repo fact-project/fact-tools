@@ -48,7 +48,7 @@ public class run {
         }
     }
 
-    private static class ClasspathURLStreamHandlerFactory implements URLStreamHandlerFactory {
+    public static class ClasspathURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
         @Override
         public URLStreamHandler createURLStreamHandler(String protocol) {
