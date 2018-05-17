@@ -1,5 +1,13 @@
 # Changelog for the fact-tools
 
+# Version 1.0.2 -- 03.05.2018
+
+* Fix exit code being 0 even if an error occured by updating to streams 1.0.5
+* `InterpolatePixelArray` now also interpolates pixels containing `NaN` / `Infinity` values
+* Bug fix for `Writer.testKeys`, that resultet in a wrong error message
+* Implement skipping rows in the `HDUReader`
+* Update all author metadata
+
 # Version 1.0.1 -- 16.03.2018
 
 * Add doi via zenodo

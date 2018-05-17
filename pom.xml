@@ -4,7 +4,7 @@
   <groupId>de.sfb876</groupId>
   <artifactId>fact-tools</artifactId>
   <name>fact-tools</name>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.3-SNAPSHOT</version>
   <url>http://sfb876.de/fact-tools/</url>
 
   <description>
@@ -15,7 +15,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
-    <streams.version>1.0.0</streams.version>
+    <streams.version>1.0.5</streams.version>
     <binary.name>fact-tools-${git.commit.id.describe}</binary.name>
     <skipTests>false</skipTests>
     <finalName>fact-tools-${git.commit.id.describe}</finalName>
@@ -30,13 +30,6 @@
 
   <developers>
     <developer>
-      <name>Christian Bockermann</name>
-      <email>christian.bockermann@cs.uni-dortmund.de</email>
-      <organization>Informatik LS8, TU-Dortmund</organization>
-      <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
       <name>Kai Brügge</name>
       <email>kai.bruegge@tu-dortmund.de</email>
       <organization>Physik E5b, TU-Dortmund</organization>
@@ -44,9 +37,58 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <name>Jens Buss</name>
+      <name>Maximilian Nöthe</name>
+      <email>maximilian.noethe@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Jens Buß</name>
       <email>jens.buss@tu-dortmund.de</email>
       <organization>Physik E5b, TU-Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Fabian Temme</name>
+      <email>fabian.temme@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Michael Bulinski</name>
+      <email>michael.bulinski@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Sebastian A. Mueller</name>
+      <email>sebmuell@phys.ethz.ch</email>
+      <organization>Departement of physics, ETH Zurich</organization>
+      <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Christian Bockermann</name>
+      <email>christian.bockermann@cs.uni-dortmund.de</email>
+      <organization>Informatik LS8, TU-Dortmund</organization>
+      <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Lena Linhoff</name>
+      <email>lena.linhoff@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Jan Freiwald</name>
+      <email>jan.freiwald@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
       <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
       <timezone>+1</timezone>
     </developer>
@@ -58,24 +100,52 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <name>Sebastian Müller</name>
-      <email>sebmuell@phys.ethz.ch</email>
+      <name>Dominik Baack</name>
+      <email>dominik.baack@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Hendrik Hildebrandt</name>
+      <email>hendrik.hildebrandt@tu-dortmund.de</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Katie Gray</name>
+      <email>grayka@whitman.edu</email>
+      <organization>Physik E5b, TU Dortmund</organization>
+      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Max L. Ahnen</name>
+      <email>m.knoetig@gmail.com</email>
+      <timezone>+1</timezone>
       <organization>Departement of physics, ETH Zurich</organization>
       <organizationUrl>http://www.ipp.phys.ethz.ch/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Alexey Egorov</name>
+      <email>alexey.egorov@tu-dortmund.de</email>
+      <organization>Informatik LS8, TU-Dortmund</organization>
+      <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <name>Fabian Temme</name>
-      <email>fabian.temme@tu-dortmund.de</email>
+      <name>Kai Schenetten</name>
+      <email>kai.schenetten@tu-dortmund.de</email>
       <organization>Physik E5b, TU Dortmund</organization>
       <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <name>Maximilian Nöthe</name>
-      <email>maximilian.noethe@tu-dortmund.de</email>
-      <organization>Physik E5b, TU Dortmund</organization>
-      <organizationUrl>http://app.tu-dortmund.de</organizationUrl>
+      <name>Niklas Wulf</name>
+      <email>niklas.wulf@tu-dortmund.de</email>
+      <organization>Informatik LS8, TU-Dortmund</organization>
+      <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
       <timezone>+1</timezone>
     </developer>
   </developers>

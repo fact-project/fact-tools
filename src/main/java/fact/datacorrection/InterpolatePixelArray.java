@@ -1,5 +1,6 @@
 package fact.datacorrection;
 
+import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
@@ -18,7 +19,10 @@ import java.time.ZonedDateTime;
 /**
  *
  * This Processor interpolates all values for a broken Pixel by the average values of its neighboring Pixels.
-  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
+ * It will interpolate the pixels from the GainService.badPixels pixelset as well as all pixels having not-finite
+ * values in the input array.
+ *
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  *
  */
 public class InterpolatePixelArray implements Processor {
@@ -47,7 +51,6 @@ public class InterpolatePixelArray implements Processor {
         double[] input = (double[]) item.get(inputKey);
 
         ZonedDateTime timeStamp = Utils.getTimeStamp(item);
-
         PixelSet badPixelsSet = calibService.getBadPixels(timeStamp);
 
         double[] output;
@@ -63,19 +66,22 @@ public class InterpolatePixelArray implements Processor {
     }
 
     double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
-        for (CameraPixel pixel: badPixels){
-            CameraPixel[] currentNeighbors = pixelMap.getNeighborsForPixel(pixel);
-            double avg = 0.0;
-            int numNeighbours = 0;
-            for (CameraPixel neighbor: currentNeighbors){
-                if (badPixels.contains(neighbor)) {
-                    continue;
+        for (int chid = 0; chid < Constants.N_PIXELS; chid++){
+            if (badPixels.containsID(chid) || (!Double.isFinite(pixelArray[chid]))) {
+                CameraPixel[] currentNeighbors = pixelMap.getNeighborsFromID(chid);
+
+                double avg = 0.0;
+                int numNeighbours = 0;
+                for (CameraPixel neighbor: currentNeighbors){
+                    if (badPixels.contains(neighbor) || (!Double.isFinite(pixelArray[neighbor.id]))) {
+                        continue;
+                    }
+                    avg += pixelArray[neighbor.id];
+                    numNeighbours++;
                 }
-                avg += pixelArray[neighbor.id];
-                numNeighbours++;
+                checkNumNeighbours(numNeighbours, chid);
+                pixelArray[chid] = avg / numNeighbours;
             }
-            checkNumNeighbours(numNeighbours, pixel.id);
-            pixelArray[pixel.id] = avg / numNeighbours;
         }
         return pixelArray;
     }
