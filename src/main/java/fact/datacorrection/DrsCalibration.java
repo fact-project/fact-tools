@@ -181,8 +181,10 @@ public class DrsCalibration implements StatefulProcessor {
     public double[] applyDrsCalibration(double[] data, double[] destination,
                                         short[] startCellVector) {
 
-        if (destination == null || destination.length != data.length)
+        if (destination == null)
             destination = new double[data.length];
+        else if (destination.length != data.length)
+            throw new RuntimeException("The data array and the destination array have different lengths, "+data.length+" vs "+destination.length);
         int roi = data.length / Constants.N_PIXELS;
 
         // We do not entirely know how the calibration constants, which are
@@ -298,8 +300,11 @@ public class DrsCalibration implements StatefulProcessor {
      * @return The decalibrated data array
      */
     public double[] reverseDrsCalibration(double[] data, double[] destination, short[] startCellVector) {
-        if (destination == null || destination.length != data.length)
+        if (destination == null)
             destination = new double[data.length];
+        else if (destination.length != data.length)
+            throw new RuntimeException("The data array and the destination array have different lengths, "+data.length+" vs "+destination.length);
+
         int roi = data.length / Constants.N_PIXELS;
 
         double vraw;
