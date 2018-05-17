@@ -38,11 +38,13 @@ public class BinTableReader implements Reader {
     private final List<BinTable.TableColumn> columns;
     private int numberOfRowsRead = 0;
     private final int numberOfRowsInTable;
+    private final int numberOfBytesPerRow;
 
 
     private BinTableReader(BinTable binTable) {
         this.stream = binTable.tableDataStream;
         this.columns = binTable.columns;
+        this.numberOfBytesPerRow = binTable.numberOfBytesPerRow;
         this.numberOfRowsInTable = binTable.numberOfRowsInTable;
     }
 
@@ -140,5 +142,20 @@ public class BinTableReader implements Reader {
                 return doubles;
         }
         return null;
+    }
+
+    /**
+     * Skips the given number of rows.
+     *
+     * @param num The amount of rows to skip.
+     * @throws IOException
+     */
+    @Override
+    public void skipRows(int amount) throws IOException {
+        if (amount+numberOfRowsRead <= numberOfRowsInTable) {
+            new IndexOutOfBoundsException("Table has not enough rows to access row num: " + (amount+numberOfRowsRead));
+        }
+        stream.skipBytes(amount * this.numberOfBytesPerRow);
+        numberOfRowsRead += amount;
     }
 }
