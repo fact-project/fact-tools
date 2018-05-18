@@ -58,6 +58,9 @@ public class SourcePosition implements StatefulProcessor {
     @Service(required = false, description = "Name of the service that provides aux files")
     public AuxiliaryService auxService;
 
+    @Parameter(required = false, description = "The key containing the event timestamp")
+    public String timeStampKey = "timestamp";
+
     @Parameter(description = "If set, the fixed x position of the source in mm")
     public Double x = null;
 
@@ -133,13 +136,11 @@ public class SourcePosition implements StatefulProcessor {
 
         } else {
             // Assume observations
-            int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
-            if (unixTimeUTC == null) {
-                log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
+            ZonedDateTime timeStamp = (ZonedDateTime) data.get(timeStampKey);
+            if (timeStamp == null) {
+                log.error("The key \""+timeStampKey+"\" was not found in the event. Ignoring event");
                 return null;
             }
-
-            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event

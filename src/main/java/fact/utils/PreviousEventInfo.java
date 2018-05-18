@@ -18,7 +18,11 @@ public class PreviousEventInfo implements Processor {
     @Parameter(required = true)
     public String outputKey = null;
 
-    int limitEvents = 20;
+    @Parameter(required = false, description = "The key containing the UnixTimeUTC")
+    public String unixTimeKey = "UnixTimeUTC";
+
+    @Parameter(required = false, description = "Set the amount of events to buffer for the jumpremoval.")
+    public int limitEvents = 20;
 
     PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();
 
@@ -28,9 +32,9 @@ public class PreviousEventInfo implements Processor {
 
         Utils.isKeyValid(item, startCellKey, short[].class);
         Utils.isKeyValid(item, "NROI", Integer.class);
-        Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
+        Utils.isKeyValid(item, unixTimeKey, int[].class);
 
-        int[] eventTime = (int[]) item.get("UnixTimeUTC");
+        int[] eventTime = (int[]) item.get(unixTimeKey);
         short[] startCellArray = (short[]) item.get(startCellKey);
         int length = (Integer) item.get("NROI");
 
