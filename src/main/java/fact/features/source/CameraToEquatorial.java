@@ -33,11 +33,8 @@ public class CameraToEquatorial implements Processor {
 
     @Override
     public Data process(Data item) {
+        Utils.isKeyValid(item,"timestamp", ZonedDateTime.class);
         ZonedDateTime timeStamp = (ZonedDateTime) item.get("timestamp");
-        if (timeStamp == null) {
-            log.error("The key \"timeStamp\" was not found in the event. Ignoring event");
-            return null;
-        }
         Utils.isKeyValid(item, cameraCoordinateKey, CameraCoordinate.class);
         Utils.isKeyValid(item, pointingPositionKey, HorizontalCoordinate.class);
 

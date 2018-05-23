@@ -97,7 +97,7 @@ public class SourcePosition implements StatefulProcessor {
      * It also adds an overlay to the item so the position can be displayed in the viewer.
      */
     @Override
-    public Data process(Data data) {
+    public Data process(Data item) {
         EquatorialCoordinate sourceEquatorial;
         HorizontalCoordinate sourceHorizontal;
         CameraCoordinate sourceCamera;
@@ -116,10 +116,10 @@ public class SourcePosition implements StatefulProcessor {
             sourceHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
 
         } else if (hasMcWobblePosition) {
-            double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
-            double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
-            double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
-            double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+            double pointingZd = Utils.valueToDouble(item.get(pointingZdKey));
+            double pointingAz = Utils.valueToDouble(item.get(pointingAzKey));
+            double sourceZd = Utils.valueToDouble(item.get(sourceZdKey));
+            double sourceAz = Utils.valueToDouble(item.get(sourceAzKey));
             // Due to the fact, that Ceres handle the coordinate in a different way, we have to
             // rotate the coordinate system by 180 deg such that 0 deg is north
             pointingAz = 180 + pointingAz;
@@ -136,11 +136,9 @@ public class SourcePosition implements StatefulProcessor {
 
         } else {
             // Assume observations
-            ZonedDateTime timeStamp = (ZonedDateTime) data.get(timeStampKey);
-            if (timeStamp == null) {
-                log.error("The key \""+timeStampKey+"\" was not found in the event. Ignoring event");
-                return null;
-            }
+            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
+            ZonedDateTime timeStamp = (ZonedDateTime) item.get(timeStampKey);
+
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
@@ -174,7 +172,7 @@ public class SourcePosition implements StatefulProcessor {
             sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
             String sourceName = sourcePoint.getString("Name");
-            data.put("sourceName", sourceName);
+            item.put("sourceName", sourceName);
 
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
@@ -182,26 +180,26 @@ public class SourcePosition implements StatefulProcessor {
             auxPointingHorizontal = HorizontalCoordinate.fromDegrees(auxZd, auxAz);
         }
 
-        data.put(outputKey, sourceCamera);
-        data.put(outputKey + "_x", sourceCamera.xMM);
-        data.put(outputKey + "_y", sourceCamera.yMM);
+        item.put(outputKey, sourceCamera);
+        item.put(outputKey + "_x", sourceCamera.xMM);
+        item.put(outputKey + "_y", sourceCamera.yMM);
 
-        data.put("aux_pointing_position", auxPointingHorizontal);
-        data.put("pointing_position", pointingHorizontal);
-        data.put("source_position_horizontal", sourceHorizontal);
+        item.put("aux_pointing_position", auxPointingHorizontal);
+        item.put("pointing_position", pointingHorizontal);
+        item.put("source_position_horizontal", sourceHorizontal);
 
-        data.put("source_position_zd", sourceHorizontal.getZenithDeg());
-        data.put("source_position_az", sourceHorizontal.getAzimuthDeg());
+        item.put("source_position_zd", sourceHorizontal.getZenithDeg());
+        item.put("source_position_az", sourceHorizontal.getAzimuthDeg());
 
-        data.put("aux_pointing_position_zd", auxPointingHorizontal.getZenithDeg());
-        data.put("aux_pointing_position_az", auxPointingHorizontal.getAzimuthDeg());
+        item.put("aux_pointing_position_zd", auxPointingHorizontal.getZenithDeg());
+        item.put("aux_pointing_position_az", auxPointingHorizontal.getAzimuthDeg());
 
-        data.put("pointing_position_zd", pointingHorizontal.getZenithDeg());
-        data.put("pointing_position_az", pointingHorizontal.getAzimuthDeg());
+        item.put("pointing_position_zd", pointingHorizontal.getZenithDeg());
+        item.put("pointing_position_az", pointingHorizontal.getAzimuthDeg());
 
-        data.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
+        item.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
 
-        return data;
+        return item;
     }
 
 
