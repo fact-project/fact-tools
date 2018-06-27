@@ -1,4 +1,11 @@
 <container>
+    <!-- This xml takes a given mc set and adds the choosen data noise onto the event.
+         The Creator will be changed from Ceres -> Ceres_Pedestal
+        @parameters SET_noiseDB    The noise database jsonl file created from the fact-eventlist.
+        @parameters SET_dataFolder The folder containing the fact files, structured in the fact data folder convention.
+        @parameters input          The multidata json file (see processor). Containing the MC data which should be added.
+        @output     output         The name of the finished fits file.
+    -->
     <properties url="classpath:/default/settings.properties" />
 
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
@@ -104,6 +111,14 @@
                 outputKey="Data"
                 reverse="True"
         />
+        
+        <stream.script.JavaScript>
+            function process(item){
+                item.put( "CREATOR", "Ceres_Pedestal" );
+                return item;
+            }
+        </stream.script.JavaScript>
+        
         <!--<fact.ShowViewer key="DataCalibrated" />-->
 
         <fact.io.FITSWriter url="${output}"
