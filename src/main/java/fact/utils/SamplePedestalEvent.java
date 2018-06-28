@@ -315,7 +315,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
      * @param data
      * @return
      */
-    private int getBin(double data) {
+    protected int getBin(double data) {
         int i=0;
         while(i<this.bins.length) {
             if (data<this.bins[i])
