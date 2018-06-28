@@ -82,17 +82,13 @@ public class SamplePedestalEvent implements StatefulProcessor {
             log.error("Samplesize of bin: "+binNum+" is too small");
             return null;
         }
-        Data item = samplePedestalEventByBin(binNum, sampleSize);
+        Data item = samplePedestalEventByBin(binNum, sampleSize, 0);
         // insert the result into the input item
         for (String s : item.keySet()) {
             input.put(this.prependKey+s, item.get(s));
         }
 
         return input;
-    }
-
-    private Data samplePedestalEventByBin(int binNum, int sampleSize) {
-        return samplePedestalEventByBin(binNum, sampleSize, 0);
     }
 
     private Data samplePedestalEventByBin(int binNum, int sampleSize, int iteration) {
@@ -103,9 +99,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
             item = this.getNoiseEvent(index);
         } catch (IOException e) {
             if (iteration < this.maxIterations) {
-                iteration += 1;
                 log.info("Iteration "+iteration+": Sampling new pedestal item");
-                return samplePedestalEventByBin(binNum, sampleSize, iteration);
+                return samplePedestalEventByBin(binNum, sampleSize, iteration+1);
             } else {
                 throw new RuntimeException(e);
             }
