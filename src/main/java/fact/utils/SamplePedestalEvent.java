@@ -26,7 +26,8 @@ import java.util.Random;
 import static java.lang.Math.ceil;
 
 /**
- * This processors changes the order of the pixels in the data from SoftId to Chid
+ * This processors loads the given noise database and randomly chooses for each event processed a noise event,
+ * which is then loaded into the item, with the keys prepended with the string prependKey.
  *
  * @author mbulinski
  *
@@ -35,12 +36,12 @@ public class SamplePedestalEvent implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(SamplePedestalEvent.class);
 
     @Parameter(required = false, defaultValue="0", description = "The seed to make the results reproductable if desired.")
-    private long seed;
+    private long seed = 0;
 
     @Parameter(required = true, description = "The file containing the noise database for the noise to be used.")
     private SourceURL noiseDatabase;
 
-    @Parameter(required = true, description = "The folder containing the data files.")
+    @Parameter(required = true, description = "The folder containing the data files in FACTS canonical folder structure.")
     private String dataFolder;
 
     @Parameter(required = false, defaultValue = "", description = "The value to prepend all keys from the noise file." +
@@ -120,21 +121,27 @@ public class SamplePedestalEvent implements StatefulProcessor {
     }
 
 
-    public void setBinning(String[] binning) {
-        this.binning = binning;
+    public static double[] createBinning(String[] binning) {
+        double[] bins = null;
         if (binning.length==1) { // single value
-            double steplength = Double.parseDouble(this.binning[0]);
+            double steplength = Double.parseDouble(binning[0]);
             int numBins = (int)ceil(90.0/steplength);
-            this.bins = new double[numBins];
+            bins = new double[numBins];
             for (int i=0; i<numBins; i++) {
-                this.bins[i] = steplength*(i+1)-0.5;
+                bins[i] = steplength*(i+1)-0.5;
             }
         } else { // each number describs the right value of the bin, 0 not included
-            this.bins = new double[this.binning.length];
-            for (int i=0; i<this.binning.length; i++) {
-                this.bins[i] = Double.parseDouble(this.binning[i]);
+            bins = new double[binning.length];
+            for (int i=0; i<binning.length; i++) {
+                bins[i] = Double.parseDouble(binning[i]);
             }
         }
+        return bins;
+    }
+
+    public void setBinning(String[] binning) {
+        this.binning = binning;
+        this.bins = createBinning(binning);
     }
 
 
@@ -180,8 +187,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
      * Creates the path to the drs file and checks whether it exists
      * @param startFolder
      * @param night
-     * @param drs0
-     * @param drs1
+     * @param drs0 The first drs file to check.
+     * @param drs1 The second drs file to check if the first fails.
      * @return
      */
     private String getDrsPath(String startFolder, int night, int drs0, int drs1) {
@@ -264,7 +271,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
             log.error("Couldn't read the pedestal item, nr: '"+noiseNr+"' file: "+fullpath);
             throw new IOException("Couldn't read the pedestal item");
         }
-        item.put("noiseNr", noiseNr);
+        item.put("noise_db_event_id", noiseNr);
         item.put("drspath", new File(drsPath));
         item.put("prevEvents", previousEventInfo);
         return item;
@@ -274,6 +281,7 @@ public class SamplePedestalEvent implements StatefulProcessor {
      * load the database and apply the condition and binning
      */
     private void prepareNoiseDatabase() {
+        // create an initial database, the initial capacity is set to a high value to reduce the amount of inital copying due to more elemets being added
         this.database = new ArrayList<Data>(100000);
         this.bins_index = new ArrayList<List<Integer>>(this.bins.length);
         for(int i=0; i<this.bins.length; i++) {
@@ -284,7 +292,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
             JSONStream databaseStream = new JSONStream(noiseDatabase);
             databaseStream.init();
 
-            for(Data item = databaseStream.readNext(); item!=null; item = databaseStream.readNext()) {
+            Data item = null;
+            while ((item = databaseStream.readNext()) != null) {
                 if (this.condition!=null) {
                     Boolean b = (Boolean) this.condition.get(item);
                     if (b == null ? false : !b.booleanValue()) // if condition doesn't applies ignore element
@@ -315,12 +324,11 @@ public class SamplePedestalEvent implements StatefulProcessor {
      * @param data
      * @return
      */
+
     protected int getBin(double data) {
-        int i=0;
-        while(i<this.bins.length) {
+        for(int i=0; i<this.bins.length; i++) {
             if (data<this.bins[i])
                 return i;
-            i++;
         }
         throw new RuntimeException("Data has a value outside of the binning");
     }
