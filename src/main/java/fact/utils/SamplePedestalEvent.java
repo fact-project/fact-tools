@@ -61,6 +61,9 @@ public class SamplePedestalEvent implements StatefulProcessor {
     @Parameter(required = true, description = "The binning key of the double value from the item.")
     private String itemBinningKey;
 
+    @Parameter(required = false, defaultValue="10", description = "number of max sampling iteration if a pedestal event is not readable")
+    private int maxIterations = 10;
+
     // Data for faster binning
     List<Data> database; // The database containing index,NIGHT,RUN_ID,${dbBinningKey},currents
     double[] bins;     // The bins containing the max_values of the different bins
@@ -78,20 +81,35 @@ public class SamplePedestalEvent implements StatefulProcessor {
             log.error("Samplesize of bin: "+binNum+" is too small");
             return null;
         }
-        int rand = this.randGenerator.nextInt(sampleSize);
-        int index = this.bins_index.get(binNum).get(rand);
-        Data item = null;
-        try {
-            item = this.getNoiseEvent(index);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Data item = samplePedestalEventByBin(binNum, sampleSize);
         // insert the result into the input item
         for (String s : item.keySet()) {
             input.put(this.prependKey+s, item.get(s));
         }
 
         return input;
+    }
+
+    private Data samplePedestalEventByBin(int binNum, int sampleSize) {
+        return samplePedestalEventByBin(binNum, sampleSize, 0);
+    }
+
+    private Data samplePedestalEventByBin(int binNum, int sampleSize, int iteration) {
+        int rand = this.randGenerator.nextInt(sampleSize);
+        int index = this.bins_index.get(binNum).get(rand);
+        Data item = null;
+        try {
+            item = this.getNoiseEvent(index);
+        } catch (IOException e) {
+            if (iteration < this.maxIterations) {
+                iteration += 1;
+                log.info("Iteration "+iteration+": Sampling new pedestal item");
+                return samplePedestalEventByBin(binNum, sampleSize, iteration);
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+        return item;
     }
 
 
@@ -325,6 +343,10 @@ public class SamplePedestalEvent implements StatefulProcessor {
 
     public void setNoiseDatabase(SourceURL noiseDatabase) {
         this.noiseDatabase = noiseDatabase;
+    }
+
+    public void setMaxIterations(int maxIterations) {
+        this.maxIterations = maxIterations;
     }
 
     @Override
