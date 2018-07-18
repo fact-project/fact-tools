@@ -187,9 +187,11 @@ public class SamplePedestalEvent implements StatefulProcessor {
     }
 
     /**
-     * Creates the path to the drs file and checks whether it exists
-     * @param startFolder
-     * @param night
+     * Creates the path to the drs file and checks whether it exists. The checked drs Files are
+     * given with each event in the noise db. There are always two drs files given in case one
+     * is missing.
+     * @param startFolder The folder containing the fact drs file in the fact folder structure.
+     * @param night The night the event was taken.
      * @param drs0 The first drs file to check.
      * @param drs1 The second drs file to check if the first fails.
      * @return

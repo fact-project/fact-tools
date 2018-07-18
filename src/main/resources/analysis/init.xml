@@ -7,7 +7,7 @@
     />
     <fact.features.UnixTimeUTC2DateTime />
   </If>
-  <If condition="%{data.CREATOR}=='Ceres_Pedestal">
+  <If condition="%{data.CREATOR}=='Ceres_Pedestal'">
     <fact.features.UnixTimeUTC2DateTime inputKey="LONS_UnixTimeUTC" outputKey="LONS_timestamp" />
   </If>
   <fact.extraction.SaturatedSlicesPercentage />
