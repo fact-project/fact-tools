@@ -1,4 +1,5 @@
 <container>
+  <!-- Analysis of the created pedestal MC files -->
   <properties url="classpath:/default/settings.properties" />
 
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
