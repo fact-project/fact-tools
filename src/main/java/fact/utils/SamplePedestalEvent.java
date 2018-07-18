@@ -62,6 +62,9 @@ public class SamplePedestalEvent implements StatefulProcessor {
     @Parameter(required = true, description = "The binning key of the double value from the item.")
     private String itemBinningKey;
 
+    @Parameter(required = true, description = "The key which will hold the amount of sampling tries.")
+    private String samplingTryKey = "Tries";
+
     @Parameter(required = false, defaultValue="10", description = "number of max sampling iteration if a pedestal event is not readable")
     private int maxIterations = 10;
 
@@ -96,11 +99,14 @@ public class SamplePedestalEvent implements StatefulProcessor {
         int index = this.bins_index.get(binNum).get(rand);
         Data item = null;
         try {
+            log.debug("Trying to get sample with iteration: "+iteration);
             item = this.getNoiseEvent(index);
+            item.put(samplingTryKey,iteration);
         } catch (IOException e) {
+            log.error("Iteration "+iteration+" failed. Tried getting sample: "+rand+" from bin: "+binNum);
             if (iteration < this.maxIterations) {
-                log.info("Iteration "+iteration+": Sampling new pedestal item");
-                return samplePedestalEventByBin(binNum, sampleSize, iteration+1);
+                log.info("Still more tries left, trying next Iteration.");
+                item = samplePedestalEventByBin(binNum, sampleSize, iteration+1);
             } else {
                 throw new RuntimeException(e);
             }
@@ -116,6 +122,13 @@ public class SamplePedestalEvent implements StatefulProcessor {
     }
 
 
+    /**
+     * Given a string array create the binning. If the array is a single
+     * element use it as the binwidth. I more than one element is given each Element
+     * represents the right edge of a bin.
+     * @param binning The binning given as a string array.
+     * @return
+     */
     public static double[] createBinning(String[] binning) {
         double[] bins = null;
         if (binning.length==1) { // single value
@@ -137,11 +150,6 @@ public class SamplePedestalEvent implements StatefulProcessor {
     public void setBinning(String[] binning) {
         this.binning = binning;
         this.bins = createBinning(binning);
-    }
-
-
-    public void setSeed(long seed) {
-        this.seed = seed;
     }
 
     /**
