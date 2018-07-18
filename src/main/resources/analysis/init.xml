@@ -1,11 +1,14 @@
 <module>
-  <If condition="%{data.CREATOR}!='Ceres'">
+  <If condition="%{data.CREATOR}!='Ceres' and %{data.CREATOR}!='Ceres_Pedestal'">
     <fact.utils.PreviousEventInfo
         startCellKey="StartCellData"
         outputKey="prevEvents"
         limitEvents="${PreviousEventInfo.limitEvents}"
     />
     <fact.features.UnixTimeUTC2DateTime />
+  </If>
+  <If condition="%{data.CREATOR}=='Ceres_Pedestal">
+    <fact.features.UnixTimeUTC2DateTime inputKey="LONS_UnixTimeUTC" outputKey="LONS_timestamp" />
   </If>
   <fact.extraction.SaturatedSlicesPercentage />
 </module>
