@@ -338,30 +338,6 @@ public class SamplePedestalEvent implements StatefulProcessor {
         throw new RuntimeException("Data has a value outside of the binning");
     }
 
-    public void setNoiseFolder(String dataFolder) {
-        this.dataFolder = dataFolder;
-    }
-
-    public void setPrependKey(String prependKey) {
-        this.prependKey = prependKey;
-    }
-
-    public void setDbBinningKey(String dbBinningKey) {
-        this.dbBinningKey = dbBinningKey;
-    }
-
-    public void setItemBinningKey(String itemBinningKey) {
-        this.itemBinningKey = itemBinningKey;
-    }
-
-    public void setNoiseDatabase(SourceURL noiseDatabase) {
-        this.noiseDatabase = noiseDatabase;
-    }
-
-    public void setMaxIterations(int maxIterations) {
-        this.maxIterations = maxIterations;
-    }
-
     @Override
     public void init(ProcessContext processContext) throws Exception {
         log.info(this.noiseDatabase.toString());
