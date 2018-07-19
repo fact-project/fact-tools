@@ -36,37 +36,37 @@ public class SamplePedestalEvent implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(SamplePedestalEvent.class);
 
     @Parameter(required = false, defaultValue="0", description = "The seed to make the results reproductable if desired.")
-    private long seed = 0;
+    public long seed = 0;
 
     @Parameter(required = true, description = "The file containing the noise database for the noise to be used.")
-    private SourceURL noiseDatabase;
+    public SourceURL noiseDatabase;
 
     @Parameter(required = true, description = "The folder containing the data files in FACTS canonical folder structure.")
-    private String dataFolder;
+    public String dataFolder;
 
     @Parameter(required = false, defaultValue = "", description = "The value to prepend all keys from the noise file." +
                     " (Exp: prependKey='Noise_', 'ZdPointing'->'Noise_ZdPointing'")
-    private String prependKey = "";
+    public String prependKey = "";
 
     @Parameter(required = false, description = "The condition for the noise which will be used")
-    private String noiseCondition ="";
+    public String noiseCondition ="";
     private Condition condition;
 
     @Parameter(required = true, description="The binning of the zenith-angle. If single value: steplenght, bins into the given steplength"+
                                             "If multivalue: Each value is the length of a single step starting with zenith=0.")
-    private String[] binning;
+    public String[] binning;
 
     @Parameter(required = true, description = "The binning key of the double value from the noise database.")
-    private String dbBinningKey;
+    public String dbBinningKey;
 
     @Parameter(required = true, description = "The binning key of the double value from the item.")
-    private String itemBinningKey;
+    public String itemBinningKey;
 
     @Parameter(required = true, description = "The key which will hold the amount of sampling tries.")
-    private String samplingTryKey = "Tries";
+    public String samplingTryKey = "Tries";
 
     @Parameter(required = false, defaultValue="10", description = "number of max sampling iteration if a pedestal event is not readable")
-    private int maxIterations = 10;
+    public int maxIterations = 10;
 
     // Data for faster binning
     List<Data> database; // The database containing index,NIGHT,RUN_ID,${dbBinningKey},currents
