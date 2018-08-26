@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class Ratescan implements StatefulProcessor {
 
-    static Logger log = LoggerFactory.getLogger(ShapeSignal.class);
+    static Logger log = LoggerFactory.getLogger(Ratescan.class);
 
     @Parameter(required = true)
     private String key;

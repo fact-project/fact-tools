@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
  */
 public class SumUpPatches implements Processor {
 
-    static Logger log = LoggerFactory.getLogger(ShapeSignal.class);
+    static Logger log = LoggerFactory.getLogger(SumUpPatches.class);
 
     @Parameter(required = true)
     private String key;
