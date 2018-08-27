@@ -17,7 +17,7 @@ Below is a short example/template for a simple processor.
         public class MaxAmp implements Processor {
 
           @Override
-          public Data process(Data input) {
+          public Data process(Data item) {
             // get the data from the input
             double[] data = (double[]) input.get("DataCalibrated");
             //do something with the data

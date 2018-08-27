@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import org.slf4j.Logger;
@@ -12,60 +13,55 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * This feature is supposed to give the number of slices above a given Threshold, 
+ * This feature is supposed to give the number of slices above a given Threshold,
  * caclulated for a defined extraction window
  *
- * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a> 
- *
+ * @author <a href="mailto:jens.buss@tu-dortmund.de">Jens Buss</a>
  */
 public class TimeOverThresholdTL implements Processor {
-	static Logger log = LoggerFactory.getLogger(TimeOverThresholdTL.class);
-	
-	@Parameter(required = true)
-	private String dataKey = null;
+    static Logger log = LoggerFactory.getLogger(TimeOverThresholdTL.class);
 
-	@Parameter(required = false)
-	private double threshold = 50;
+    @Parameter(required = true)
+    public String dataKey = null;
 
-	private int firstSlice = 0;
+    @Parameter(required = false)
+    public double threshold = 50;
 
-	private int range = -1;
+    @Parameter
+    public int range = -1;
 
-	@Parameter(required = true)
-	private String outputKey = null;
+    @Parameter
+    public int firstSlice = 0;
 
-	private PixelSet pixelSet;
+    @Parameter(required = true)
+    public String outputKey = null;
 
+    public Data process(Data item) {
+        Utils.isKeyValid(item, dataKey, double[].class);
 
-	public Data process(Data input) {
-        Utils.isKeyValid(input, dataKey, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		int npix = (Integer) input.get("NPIX");
-				
-		int[] timeOverThresholdArray =  new int[npix];
+        int[] timeOverThresholdArray = new int[Constants.N_PIXELS];
 
-		double[] data 	 = (double[]) input.get(dataKey);
+        double[] data = (double[]) item.get(dataKey);
 
-		pixelSet = new PixelSet();
-			
-		int roi = data.length / npix;
+        PixelSet pixelSet = new PixelSet();
 
-		if ( range < 0){
-			range = roi - firstSlice;
-		}
+        int roi = data.length / Constants.N_PIXELS;
 
-		//Loop over pixels
-		for(int pix = 0 ; pix < npix; pix++){
+        if (range < 0) {
+            range = roi - firstSlice;
+        }
 
-			int pos = pix*roi;
+        //Loop over pixels
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
 
-			int timeOverThreshold = 0;
+            int pos = pix * roi;
 
-			//Loop over slices
-			for (int sl = firstSlice ; sl < range ; sl++)
-			{					
-				if (data[pos + sl] > threshold){
-					timeOverThreshold++;
+            int timeOverThreshold = 0;
+
+            //Loop over slices
+            for (int sl = firstSlice; sl < range; sl++) {
+                if (data[pos + sl] > threshold) {
+                    timeOverThreshold++;
                 }
             }
 
@@ -74,32 +70,17 @@ public class TimeOverThresholdTL implements Processor {
             }
 
             timeOverThresholdArray[pix] = timeOverThreshold;
-		}
-		
-	
-		
-		//add times over threshold to the DataItem
-		input.put(outputKey, timeOverThresholdArray);
-		input.put(outputKey+"SetOverlay", pixelSet);
+        }
+
+
+        //add times over threshold to the DataItem
+        item.put(outputKey, timeOverThresholdArray);
+        item.put(outputKey + "SetOverlay", pixelSet);
 
         //Add totPixelSet only to data item if it is not empty
-        if (pixelSet.toIntArray().length != 0){
-            input.put(outputKey+"Set", pixelSet.toIntArray());
+        if (pixelSet.toIntArray().length != 0) {
+            item.put(outputKey + "Set", pixelSet.toIntArray());
         }
-        return input;
-	}
-
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
-
-	public void setDataKey(String dataKey) {
-		this.dataKey = dataKey;
-	}
-
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
-
-
+        return item;
+    }
 }

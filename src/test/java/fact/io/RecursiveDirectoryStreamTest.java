@@ -20,7 +20,7 @@ public class RecursiveDirectoryStreamTest {
     static org.slf4j.Logger log = LoggerFactory.getLogger(RecursiveDirectoryStreamTest.class);
 
     @Rule
-    public TemporaryFolder folder= new TemporaryFolder();
+    public TemporaryFolder folder = new TemporaryFolder();
 
     private void createTestFiles() throws IOException {
         folder.newFolder("aux", "2013", "08");
@@ -41,7 +41,7 @@ public class RecursiveDirectoryStreamTest {
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         String pattern = "test*.fits.*";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
 
         assertTrue(r.files.size() > 0);
@@ -51,12 +51,12 @@ public class RecursiveDirectoryStreamTest {
     public void testGlob() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
 
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         String pattern = "/**/*DRIVE_CONTROL_{TRACKING,POINTING}_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
         assertThat(r.files.size(), is(4));
     }
@@ -65,12 +65,12 @@ public class RecursiveDirectoryStreamTest {
     public void testGlobTrackingSourcePos() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
 
         String pattern = "/**/*DRIVE_CONTROL_{TRACKING,SOURCE}_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
 
         assertThat(r.files.size(), is(4));
@@ -80,12 +80,12 @@ public class RecursiveDirectoryStreamTest {
     public void testGlobSourcePos() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
 
         String pattern = "/**/*DRIVE_CONTROL_SOURCE_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         r.init();
 
         assertThat(r.files.size(), is(2));
@@ -95,12 +95,12 @@ public class RecursiveDirectoryStreamTest {
     public void testGlobPos() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         //no files in this directory
         String pattern = "/*DRIVE_CONTROL_SOURCE_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         //this should throw a runtime exception
         r.init();
 
@@ -110,12 +110,12 @@ public class RecursiveDirectoryStreamTest {
     public void testInvalidGlobPattern() throws Exception {
 
         createTestFiles();
-        SourceURL sourceUrl = new SourceURL("file://"+ folder.getRoot());
+        SourceURL sourceUrl = new SourceURL("file://" + folder.getRoot());
         RecursiveDirectoryStream r = new RecursiveDirectoryStream(sourceUrl);
 
         //this is not a valid pattern
         String pattern = "/**/*DRIVE<>?!§$%&/%_SOURCE_POSITION.fits";
-        r.setPattern(pattern);
+        r.pattern = pattern;
         //should throw an exception
         r.init();
     }

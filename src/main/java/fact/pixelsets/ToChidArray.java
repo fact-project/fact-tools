@@ -10,32 +10,24 @@ import stream.annotations.Parameter;
 
 
 /**
- * This processor creates an int array with the chids 
+ * This processor creates an int array with the chids
  * from the pixelSet.
  * created by maxnoe
  */
-public class ToChidArray implements Processor{
+public class ToChidArray implements Processor {
     static Logger log = LoggerFactory.getLogger(ToChidArray.class);
 
     @Parameter(required = true, description = "key to the input PixelSet")
-    private String pixelSetKey;
+    public String pixelSetKey;
 
     @Parameter(required = true, description = "key to the output the chid array")
-    private String outputKey;
+    public String outputKey;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, pixelSetKey, PixelSet.class);
-        PixelSet pixelSet = (PixelSet) input.get(pixelSetKey);
-        input.put(outputKey, pixelSet.toIntArray());
-        return input;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
+    public Data process(Data item) {
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
+        item.put(outputKey, pixelSet.toIntArray());
+        return item;
     }
 }

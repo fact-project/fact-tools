@@ -1,88 +1,77 @@
-fact-tools, [Website](http://sfb876.tu-dortmund.de/FACT/)  
-=============
-[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
+# FACT-Tools [![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1200066.svg)](https://doi.org/10.5281/zenodo.1200066)
 
-The *fact-tools* are a collection of processors and stream implementations
-for the [streams](http://www.jwall.org/streams/) framework. The tools are
-designed to allow for the definition of streaming processes to process data
-produced by the [FACT telescope](http://www.isdc.unige.ch/fact/).
+The `FACT-Tools` are a collection of processors and stream implementations
+for the [streams](http://www.jwall.org/streams/) framework to analyse the data of the [*First G-APD Cherenkov Telescope*](https://fact-project.org).
 
-This README file provides a quick overview of the *fact-tools*. Further
-information can be found on the project web-page at
+This README file provides a quick overview of the `FACT-Tools`.
+Further information, including API docs, can be found on the [project web-page](http://sfb876.tu-dortmund.de/FACT)
 
-	http://sfb876.tu-dortmund.de/FACT/
+The project is licensed under the GNU Public License, Version 3 (GPLv3).
 
 
-The project is licensed under the Gnu Public License, Version 3 (GPLv3).
-The license text is provided along with the sources.
+## Download the latest release
+
+You can download the `jar`-file of the latest release version on our 
+[GitHub Release Page](https://github.com/fact-project/fact-tools/releases)
 
 
-
-Building the *fact-tools*
--------------------------
-
-The *fact-tools* are provided as a standard Maven project. They can be
-built by calling maven as follows:
-
-     # mvn package
-
-This will automatically download the required libraries defined as dependencies
-in the project definition and will create a final bundled Jar file that
-includes all required classes.
-
-Continous Integration
--------------------------
-
-A Travis instance is running. 
-
-[![Build Status](https://travis-ci.org/fact-project/fact-tools.svg?branch=master)](https://travis-ci.org/fact-project/fact-tools)
+## Building the `FACT-Tools`
 
 
+The `FACT-Tools` are provided as a standard Maven project.
+They can be built by calling maven as follows:
 
-Running the *fact-tools*
-------------------------
+```
+$ mvn package
+```
 
-The final Jar file is called `fact-tools-VERSION.jar`, where `VERSION` is the
-current version of the project. Running the *fact-tools* requires a simple
-process graph definition as an XML file.
+This will automatically download the required libraries defined as dependencies in the project definition, run the unit test suite and will create a final bundled Jar file that includes all required classes in the `target` directory.
+
+
+## Running the `FACT-Tools`
+
+The final Jar file is called `fact-tools-VERSION.jar`,
+ where `VERSION` is the current version of the project.
+
+Running the `FACT-Tools` requires a simple process graph definition as an XML file.
 
 With an XML file at hand the process graph can be started by issuing
 
-     # java -jar fact-tools-VERSION.jar /path/to/process.xml
-     
-     
-Versioning Scheme
----------------
-Starting with version 0.6.5 we all solemly swear to abide to the following versioning scheme. All who fail to follow these rules will be forced
-to buy a round of alcoholic beverages for everyone else.
+```
+$ java -jar fact-tools-VERSION.jar /path/to/process.xml
+```
 
-* The master branch only contains stable versions and no SNAPSHOTS (stable in this case mean we are comfortable with publishing results and sharing the program with other people)
-* Version numbers have to look like this:  0.X.YZ(-SNAPSHOT). Where X,Y,Z are natural numbers.
-* An xml file written for version 0.X has to work for all versions 0.X.YZ
-* Major version changes i.e from 0.X to 0.Z will be tagged for release
-* For new experimental features use a feature branch. See [this tutorial](http://git-scm.com/book/en/Git-Branching-Basic-Branching-and-Merging) for more information.
+Properties in the `XML` file can be overwritten on the commandline by providing them with `-Dproperty=value`:
 
-You will receive weekly hugs and much respect from your fellow peers for writing unit tests and documentation. 
-Especially for adding content to our ever growing [project website](http://sfb876.tu-dortmund.de/FACT/) by editing
-the content under the src/site directory.
-  
+```
+$ java -jar fact-tools-VERSION.jar examples/viewer.xml -Dinfile=file:20131101_151.fits.fz
+```
 
-Orientation for Naming of Processors and Keynames
----------------
-Starting with version 0.7.0 we try to introduce a naming convention (or only a orientation, no punishment for not following). Due to the fact that therefore the interface of processors will change, the adapting of older processors to this naming convention will be done over a longer time period. New processors should follow this naming convention:
+We also provide a python package including commandline-executables to make running the `FACT-Tools` on
+large amounts of FACT files easier, it's called [erna](https://github.com/fact-project/erna)
 
-* Processors should be structured in packages
-* Processor names should very shortly describe their functionality
-* inputKeys shall contain the targeted type of item, for example:
-      - dataKey, for processors who works on the data array
-      - showerKey, for processors who works on the cleaned shower pixels
-      - cogxKey, for processors who needs the x coordinate of the cog (center of gravity)
-      - ..., look at the interface of other processors for impression, try to use the same keyname, as other processors
-* outputKeys:
-     - in case there is only one output value, use outputKey:
-     - in case there are more than one output value, create one outputKey for each value, for example:
-     - m3lOutputKey, m3tOutputKey (processor M3Long)
+## Examples
+
+There are a number of example XML files in the `examples/` directory.
 
 
-The details of this naming convention are of course discussable, but we should stick to one convention.
+To perform the current FACT-Tools standard analysis and write image parameters to FITS files, run 
 
+```
+$ java -jar <jar> examples/stdAnalysis.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile> -DauxFolder=file:<aux_dir>
+```
+
+To convert FACT rawdata zfits files to standard, uncompressed FITS, use:
+```
+$ java -jar <jar> examples/zfits2fits.xml -Dinfile=file:<datafile> -Doutfile=file:<outputfile>
+```
+
+To apply the DRS calibration and save calibrated time series in standard, uncompressed FITS, use:
+```
+$ java -jar <jar> examples/apply_drs_calibration.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile>
+```
+
+To save number of photons and mean arrival times (DL1) to standard, uncompressed FITS, use:
+```
+$ java -jar <jar> examples/save_dl1.xml -Dinfile=file:<datafile> -Ddrsfile=file:<drsfile> -Doutfile=file:<outputfile>
+```

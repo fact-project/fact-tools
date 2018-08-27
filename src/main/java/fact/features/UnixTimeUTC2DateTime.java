@@ -13,10 +13,10 @@ import stream.annotations.Parameter;
 public class UnixTimeUTC2DateTime implements Processor {
 
     @Parameter(description = "Input key containing an int[2] array with  {seconds, microseconds}", defaultValue = "UnixTimeUTC", required = false)
-    private String inputKey = "UnixTimeUTC";
+    public String inputKey = "UnixTimeUTC";
 
     @Parameter(description = "Output key for the DateTime instance", defaultValue = "timestamp", required = false)
-    private String outputKey = "timestamp";
+    public String outputKey = "timestamp";
 
     @Override
     public Data process(Data data) {

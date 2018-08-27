@@ -17,104 +17,82 @@ import java.util.HashMap;
 /**
  * This class can plot a bar graph with errorBars by calculating the mean and
  * standarddeviation for a each key and event. The key has to refer to something which can be represented by a Double.
- * 
+ *
  * @author bruegge
- * 
  */
 public class BarPlotter extends DataVisualizer {
-	static Logger log = LoggerFactory.getLogger(BarPlotter.class);
-	private BarPlotPanel histPanel;
-	JFrame frame;
+    static Logger log = LoggerFactory.getLogger(BarPlotter.class);
+    private BarPlotPanel histPanel;
+    JFrame frame;
     @Parameter(required = false, description = "Flag indicates whether the window stays open after the process has finished", defaultValue = "true")
-	private boolean keepOpen = true;
+    public  boolean keepOpen = true;
 
     @Parameter(required = false, description = "Flag to toggle drawing of Errorbars in plot.")
-    private boolean drawErrors = true;
+    public  boolean drawErrors = true;
 
     @Parameter(required = false, description = "The attributes/features to be plotted")
-    private String[] keys;
+    public  String[] keys;
 
     @Parameter(required = false, description = "Title String of the plot", defaultValue = "Default Title")
-	private String title = "Default Title";
+    public  String title = "Default Title";
 
     private HashMap<String, SummaryStatistics> summaryStatisticsHashMap = new HashMap<>();
-	
-	
-	
-
-	public BarPlotter() {
-		width = 690;
-		height = 460;
-	}
 
 
-	@Override
-	public void init(ProcessContext ctx) throws Exception {
-		super.init(ctx);
-		histPanel = new BarPlotPanel(drawErrors, title);
-		frame = new JFrame();
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().add(histPanel, BorderLayout.CENTER);
-		frame.setSize(width, height);
-		frame.setVisible(true);
-        for(String key: keys){
+    public BarPlotter() {
+        width = 690;
+        height = 460;
+    }
+
+
+    @Override
+    public void init(ProcessContext ctx) throws Exception {
+        super.init(ctx);
+        histPanel = new BarPlotPanel(drawErrors, title);
+        frame = new JFrame();
+        frame.getContentPane().setLayout(new BorderLayout());
+        frame.getContentPane().add(histPanel, BorderLayout.CENTER);
+        frame.setSize(width, height);
+        frame.setVisible(true);
+        for (String key : keys) {
             summaryStatisticsHashMap.put(key, new SummaryStatistics());
         }
 //		frame.setTitle(title);
-		if(keys==null){
-			log.error("The keys paramter was null. Did you set it in the .xml file?");
-		}
-	}
+        if (keys == null) {
+            log.error("The keys paramter was null. Did you set it in the .xml file?");
+        }
+    }
 
-	@Override
-	public Data processMatchingData(Data data) {
-		DefaultStatisticalCategoryDataset dataset = new DefaultStatisticalCategoryDataset();
-		
-		for (String key : keys) {
+    @Override
+    public Data processMatchingData(Data data) {
+        DefaultStatisticalCategoryDataset dataset = new DefaultStatisticalCategoryDataset();
 
-			if (data.containsKey(key)) {
-				String val = data.get(key).toString();
+        for (String key : keys) {
+
+            if (data.containsKey(key)) {
+                String val = data.get(key).toString();
                 double d = Double.parseDouble(val);
                 SummaryStatistics ss = summaryStatisticsHashMap.get(key);
                 ss.addValue(d);
-				dataset.add(ss.getMean(), ss.getStandardDeviation(), " ", key);
-			} else {
-				log.warn("The key " + key + " does not exist in the Event");
-			}
-		}
-		histPanel.setDataset(dataset);
-		histPanel.getPreferredSize();
-		return data;
-	}
+                dataset.add(ss.getMean(), ss.getStandardDeviation(), " ", key);
+            } else {
+                log.warn("The key " + key + " does not exist in the Event");
+            }
+        }
+        histPanel.setDataset(dataset);
+        histPanel.getPreferredSize();
+        return data;
+    }
 
-	@Override
-	public void finish() throws Exception {
-		if (!keepOpen) {
-			log.debug("Closing plot frame");
-			frame.setVisible(false);
-			frame.dispose();
-			frame = null;
-		} else {
-			log.debug("Keeping plot frame visible...");
-		}
-	}
-	
-	
-
-
-	public void setKeepOpen(boolean keepOpen) {
-		this.keepOpen = keepOpen;
-	}
-
-	public void setKeys(String[] keys) {
-		this.keys = keys;
-	}
-
-	public void setDrawErrors(boolean drawErrors) {
-		this.drawErrors = drawErrors;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    @Override
+    public void finish() throws Exception {
+        if (!keepOpen) {
+            log.debug("Closing plot frame");
+            frame.setVisible(false);
+            frame.dispose();
+            frame = null;
+        } else {
+            log.debug("Keeping plot frame visible...");
+        }
+    }
 }

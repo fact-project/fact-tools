@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,37 +17,32 @@ import stream.annotations.Parameter;
  * http://en.wikipedia.org/wiki/Fir_filter for Details. The coefficients of the
  * are stored in an array {n, n-1, n-2, ..}. Values outside of the data domain
  * are treated as zeroes.
- * 
+ *
  * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
  */
 @Description(group = "Fact Tools.Filter", text = "")
 public class FirFilter implements Processor {
     static Logger log = LoggerFactory.getLogger(FirFilter.class);
 
     @Parameter(required = false, description = "Filter coefficents array. {n, n-1, n-2, ..}.", defaultValue = "{0.5f,0.2f, 0.1f}")
-    Double[] coefficients = {0.5, 0.2, 0.1};
+    public Double[] coefficients = {0.5, 0.2, 0.1};
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
-    
-	private int npix;
+    public String outputKey;
 
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-        double[] data = (double[]) input.get(key);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
-		npix = (Integer) input.get("NPIX");
 
         // foreach pixel
-        int roi = data.length / npix;
-        for (int pix = 0; pix < npix; pix++) {
+        int roi = data.length / Constants.N_PIXELS;
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             // result[pix*roi] =
             // iterate over all slices
             for (int slice = 0; slice < roi; slice++) {
@@ -58,21 +54,8 @@ public class FirFilter implements Processor {
                 }
             }
         }
-        input.put(outputKey, result);
-        return input;
+        item.put(outputKey, result);
+        return item;
 
     }
-
-    public void setCoefficients(Double[] coefficients) {
-        this.coefficients = coefficients;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

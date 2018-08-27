@@ -1,114 +1,58 @@
 package fact.features.evaluate;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 public class PhotonchargeEvaluate implements Processor {
-	static Logger log = LoggerFactory.getLogger(PhotonchargeEvaluate.class);
-	
-	String photonchargeKey= null;
-	String arrivalTimeKey = null;
-	String mcCherenkovWeightKey = null;
-	String mcCherenkovArrTimeMeanKey = null;
-	String mcNoiseWeightKey = null;
-	String outputKeyPhotonCharge = null;
-	String outputKeyArrivalTime = null;
-//	int NumberOfSimulatedSlices = 2430; // Be aware that this is not the region of interest which was digitized, but the simulated region in ceres
-//	int integrationWindow = 30;
-	
-	double[] photoncharge = null;
-	double[] arrivalTime = null;
-	double[] cherenkovWeight = null;
-	double[] cherenkovArrTimeMean = null;
-	double[] noiseWeight = null;
-	
-	private int npix;
+    static Logger log = LoggerFactory.getLogger(PhotonchargeEvaluate.class);
 
-	@Override
-	public Data process(Data input) {
-		Utils.isKeyValid(input, "NPIX", Integer.class);
-		npix = (Integer) input.get("NPIX");
-		Utils.mapContainsKeys(input, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
-		
-		double[] qualityFactorPhotoncharge = new double[npix];
-		double[] qualityFactorArrivalTime = new double[npix];
-		
-		photoncharge = Utils.toDoubleArray(input.get(photonchargeKey));
-		arrivalTime = Utils.toDoubleArray(input.get(arrivalTimeKey));
-		cherenkovWeight = Utils.toDoubleArray(input.get(mcCherenkovWeightKey));
-		cherenkovArrTimeMean = Utils.toDoubleArray(input.get(mcCherenkovArrTimeMeanKey));
-		noiseWeight = Utils.toDoubleArray(input.get(mcNoiseWeightKey));
-		
-		for (int px = 0 ; px < npix ; px++)
-		{
-			qualityFactorPhotoncharge[px] = photoncharge[px] / cherenkovWeight[px];
-			qualityFactorArrivalTime[px] = arrivalTime[px] / cherenkovArrTimeMean[px];
-		}
-		
-		input.put(outputKeyPhotonCharge, qualityFactorPhotoncharge);
-		input.put(outputKeyArrivalTime, qualityFactorArrivalTime);
+    @Parameter(required = true)
+    public String photonchargeKey = null;
 
-		// TODO Auto-generated method stub
-		return input;
-	}
+    @Parameter(required = true)
+    public String arrivalTimeKey = null;
 
-	public String getPhotonchargeKey() {
-		return photonchargeKey;
-	}
+    @Parameter(required = true)
+    public  String mcCherenkovWeightKey = null;
 
-	public void setPhotonchargeKey(String photonchargeKey) {
-		this.photonchargeKey = photonchargeKey;
-	}
+    @Parameter(required = true)
+    public String mcCherenkovArrTimeMeanKey = null;
 
-	public String getMcCherenkovWeightKey() {
-		return mcCherenkovWeightKey;
-	}
+    @Parameter(required = true)
+    public String mcNoiseWeightKey = null;
 
-	public void setMcCherenkovWeightKey(String mcCherenkovWeightKey) {
-		this.mcCherenkovWeightKey = mcCherenkovWeightKey;
-	}
+    @Parameter(required = true)
+    public String outputKeyPhotonCharge = null;
 
-	public String getMcNoiseWeightKey() {
-		return mcNoiseWeightKey;
-	}
+    @Parameter(required = true)
+    public String outputKeyArrivalTime = null;
 
-	public void setMcNoiseWeightKey(String mcNoiseWeightKey) {
-		this.mcNoiseWeightKey = mcNoiseWeightKey;
-	}
 
-	public String getArrivalTimeKey() {
-		return arrivalTimeKey;
-	}
+    @Override
+    public Data process(Data item) {
+        Utils.mapContainsKeys(item, photonchargeKey, mcCherenkovWeightKey, mcNoiseWeightKey, mcCherenkovArrTimeMeanKey, arrivalTimeKey);
 
-	public void setArrivalTimeKey(String arrivalTimeKey) {
-		this.arrivalTimeKey = arrivalTimeKey;
-	}
+        double[] qualityFactorPhotoncharge = new double[Constants.N_PIXELS];
+        double[] qualityFactorArrivalTime = new double[Constants.N_PIXELS];
 
-	public String getMcCherenkovArrTimeMeanKey() {
-		return mcCherenkovArrTimeMeanKey;
-	}
+        double[] photoncharge = Utils.toDoubleArray(item.get(photonchargeKey));
+        double[] arrivalTime = Utils.toDoubleArray(item.get(arrivalTimeKey));
+        double[] cherenkovWeight = Utils.toDoubleArray(item.get(mcCherenkovWeightKey));
+        double[] cherenkovArrTimeMean = Utils.toDoubleArray(item.get(mcCherenkovArrTimeMeanKey));
 
-	public void setMcCherenkovArrTimeMeanKey(String mcCherenkovArrTimeMeanKey) {
-		this.mcCherenkovArrTimeMeanKey = mcCherenkovArrTimeMeanKey;
-	}
+        for (int px = 0; px < Constants.N_PIXELS; px++) {
+            qualityFactorPhotoncharge[px] = photoncharge[px] / cherenkovWeight[px];
+            qualityFactorArrivalTime[px] = arrivalTime[px] / cherenkovArrTimeMean[px];
+        }
 
-	public String getOutputKeyPhotonCharge() {
-		return outputKeyPhotonCharge;
-	}
+        item.put(outputKeyPhotonCharge, qualityFactorPhotoncharge);
+        item.put(outputKeyArrivalTime, qualityFactorArrivalTime);
 
-	public void setOutputKeyPhotonCharge(String outputKeyPhotonCharge) {
-		this.outputKeyPhotonCharge = outputKeyPhotonCharge;
-	}
-
-	public String getOutputKeyArrivalTime() {
-		return outputKeyArrivalTime;
-	}
-
-	public void setOutputKeyArrivalTime(String outputKeyArrivalTime) {
-		this.outputKeyArrivalTime = outputKeyArrivalTime;
-	}
-
+        return item;
+    }
 }

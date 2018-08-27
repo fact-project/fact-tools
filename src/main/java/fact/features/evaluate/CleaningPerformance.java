@@ -1,5 +1,6 @@
 package fact.features.evaluate;
 
+import fact.Constants;
 import fact.container.PixelSet;
 import stream.Data;
 import stream.Processor;
@@ -7,21 +8,20 @@ import stream.annotations.Parameter;
 
 /**
  * Created by lena on 02.11.15.
- *
+ * <p>
  * Processor to evaluate a cleaning.
- * 1) Needs a showerpixelarray and the number of Cherenkov photons per pixel
+ * 1) Needs a PixelSet and the number of Cherenkov photons per pixel
  * 2) Returns a "performance matrix" containing 4 doubles for true positives, false negatives and so on. A pixel with more
- *    than "mcPhotThreshold" mc-photons is classified as showerpixel. The default value is 3.
- * 3) Calculates an returns some parameter for evaluation like precision, recall, accuracy and true/false positive/negative rate
- *
+ * than "mcPhotThreshold" mc-photons is classified as showerpixel. The default value is 3.
+ * 3) Calculates and returns some parameters for evaluation like precision, recall, accuracy and true/false positive/negative rate
  */
 public class CleaningPerformance implements Processor {
 
     @Parameter(required = true)
-    private String pixelSetKey;
+    public String pixelSetKey;
 
     @Parameter(required = false, description = "Minimal number of MC Cherenkov photons to classify a pixel as showerpixel", defaultValue = "3")
-    int mcPhotThreshold = 3;
+    public int mcPhotThreshold = 3;
 
     @Override
     public Data process(Data data) {
@@ -30,16 +30,14 @@ public class CleaningPerformance implements Processor {
         float[] McPhotoncharge = (float[]) data.get("McCherPhotNumber");
         double[] performance;
 
-        if(data.containsKey(pixelSetKey) && data.get(pixelSetKey) != null) {
+        if (data.containsKey(pixelSetKey) && data.get(pixelSetKey) != null) {
             PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
             int[] shower = pixelSet.toIntArray();
             int numShowerpixel = shower.length;
 
             performance = getPerformanceMatrixShower(McPhotoncharge, shower, numShowerpixel);
 
-        }
-
-        else{
+        } else {
             performance = getPerformanceMatrixNoShower(McPhotoncharge);
             System.out.println(performance[0]);
         }
@@ -57,13 +55,12 @@ public class CleaningPerformance implements Processor {
         double fnr = fn / (fn + tp);                      // false negative rate
         double precision;
 
-        if(data.get(pixelSetKey) != null ) {
-            precision  = tp / (tp + fp);                //aka positive predictive value
+        if (data.get(pixelSetKey) != null) {
+            precision = tp / (tp + fp);                //aka positive predictive value
             //aka true positive rate or sensitivity
             // System.out.println(recall);
 
-        }
-        else{
+        } else {
             precision = 0;
             recall = 0;
         }
@@ -82,19 +79,19 @@ public class CleaningPerformance implements Processor {
     }
 
 
-    public double[] getPerformanceMatrixShower(float[] McPhotoncharge, int[] shower, int numShowerpixel){
+    public double[] getPerformanceMatrixShower(float[] McPhotoncharge, int[] shower, int numShowerpixel) {
         double[] performance = new double[4];
 
-        boolean[] cleaningPixel = new boolean[1440];
-        for(int i=0; i<1440; i++){
+        boolean[] cleaningPixel = new boolean[Constants.N_PIXELS];
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             cleaningPixel[i] = false;
         }
-        for(int i=0; i<numShowerpixel; i++){
+        for (int i = 0; i < numShowerpixel; i++) {
             cleaningPixel[shower[i]] = true;
         }
 
 
-        for(int i=0; i<1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
 
             //true positive
             if (McPhotoncharge[i] > mcPhotThreshold && cleaningPixel[i] == true) {
@@ -119,7 +116,7 @@ public class CleaningPerformance implements Processor {
         return performance;
     }
 
-    public double[] getPerformanceMatrixNoShower(float[] McPhotoncharge){
+    public double[] getPerformanceMatrixNoShower(float[] McPhotoncharge) {
         double[] performance = new double[4];
 
         //true positive
@@ -127,7 +124,7 @@ public class CleaningPerformance implements Processor {
         //false positive
         performance[3] = 0;
 
-        for(int i=0; i<1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             //false negative
             if (McPhotoncharge[i] > mcPhotThreshold) {
                 performance[1]++;
@@ -140,10 +137,4 @@ public class CleaningPerformance implements Processor {
         }
         return performance;
     }
-
-    public void setPixelSetKey(String pixelSetKey) {
-        this.pixelSetKey = pixelSetKey;
-    }
-
-    public void setMcPhotThreshold(int mcPhotThreshold) {this.mcPhotThreshold = mcPhotThreshold;}
 }

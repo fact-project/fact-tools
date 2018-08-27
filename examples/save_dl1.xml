@@ -1,0 +1,33 @@
+<container>
+
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="" />
+  <property name="drsfile" value="" />
+  <property name="outfile" value="" />
+
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.gainservice.GainService" />
+
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
+
+  <process id="2" input="fact">
+      <include url="classpath:/analysis/init.xml" />
+      <!-- This skips events created by our malfunctioning LED light pulser (27s Events) --> 
+      <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
+      <!-- Only analyze physics trigger events -->
+      <Skip condition="%{data.TriggerType} != 4" />
+
+      <include url="classpath:/analysis/calibration.xml" />
+      <include url="classpath:/analysis/extraction.xml" />
+    
+      <fact.io.FITSWriter
+        url="${outfile}"
+        keys="EventNum,TriggerNum,TriggerType,UnixTimeUTC,timestamp,photonCharge,arrivalTime"
+        headerKeys="TELESCOP,CREATOR,COMPILED,ORIGIN,TIMESYS,TIMEUNIT,MJDREF,PACKAGE,VERSION,REVISION,DATE,NIGHT,RUNID,NBOARD,NPIX,NTMARK,NCELLS,NROI,NROITM,TMSHHIFT,CAMERA,DAQ,ADCRANGE,ADC,RUNTYPE,PRESC,PHASE,DRSCALIB,TSTARTI,TSTARTF,TSTOPI,TSTOPF,DATE-OBS,DATE-END,NTRG,NTRGPED,NTRGPED,NTRGTIM,NTRGLPI,NTRGEXT1,NTRGEXT2,NTRGMISC"
+      />
+
+    </process>
+</container>

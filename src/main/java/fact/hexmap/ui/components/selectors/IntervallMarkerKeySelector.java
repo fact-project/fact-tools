@@ -1,5 +1,6 @@
 package fact.hexmap.ui.components.selectors;
 
+import fact.Constants;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.events.IntervallMarkerSelectionChangedEvent;
 import org.jfree.chart.plot.IntervalMarker;
@@ -24,10 +25,10 @@ public class IntervallMarkerKeySelector extends KeySelector {
         for (String key : item.keySet()) {
             try {
                 IntervalMarker[] i = (IntervalMarker[]) item.get(key);
-                if(i != null && i.length == 1440) {
+                if (i != null && i.length == Constants.N_PIXELS) {
                     newItems.add(new SeriesKeySelectorItem(key, Color.LIGHT_GRAY, this));
                 }
-            } catch (ClassCastException e){
+            } catch (ClassCastException e) {
                 continue;
             }
         }

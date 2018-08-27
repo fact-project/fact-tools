@@ -15,49 +15,49 @@ import stream.annotations.Parameter;
 /**
  * This processors changes the order of the pixels in the data from SoftId to Chid
  *
- * @author kai
- *
+ * @author kai, Michael Bulinski &lt;michael.bulinski@udo.edu&gt;
  */
-public class Remapping implements Processor{
+public class Remapping implements Processor {
     static Logger log = LoggerFactory.getLogger(Remapping.class);
 
     @Parameter(required = true, description = "Key refering to an array of short containing pixel data sorted by SoftId")
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
-    private int npix = Constants.NUMBEROFPIXEL;
+    @Parameter(required = false, description = "Whether to remap back to softid from chid")
+    public boolean reverse;
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, short[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, short[].class);
 
-        short[] data = (short[]) input.get(key);
-        npix = (Integer) input.get("NPIX");
+        short[] data = (short[]) item.get(key);
 
         short[] remapped = new short[data.length];
-        remapFromSoftIdToChid(data, remapped);
+        if (!reverse)
+            remapFromSoftIdToChid(data, remapped);
+        else
+            remapFromChidToSoftId(data, remapped);
 
-        input.put(outputKey, remapped);
-        return input;
+        item.put(outputKey, remapped);
+        return item;
     }
 
     public void remapFromSoftIdToChid(short[] data, short[] remapped) {
-        int roi = data.length/ npix;
-        for(int softId = 0; softId < npix; softId++){
+        int roi = data.length / Constants.N_PIXELS;
+        for (int softId = 0; softId < Constants.N_PIXELS; softId++) {
             int chid = FactPixelMapping.getInstance().getChidFromSoftID(softId);
-            System.arraycopy(data, softId*roi, remapped, chid*roi, roi );
+            System.arraycopy(data, softId * roi, remapped, chid * roi, roi);
         }
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-
-    public void setOutputKey(String outputkey) {
-        this.outputKey = outputkey;
+    public void remapFromChidToSoftId(short[] data, short[] remapped) {
+        int roi = data.length / Constants.N_PIXELS;
+        for (int softId = 0; softId < Constants.N_PIXELS; softId++) {
+            int chid = FactPixelMapping.getInstance().getSoftIDFromChid(softId);
+            System.arraycopy(data, softId * roi, remapped, chid * roi, roi);
+        }
     }
 }

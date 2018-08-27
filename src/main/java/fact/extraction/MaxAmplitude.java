@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package fact.extraction;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,49 +12,48 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 /**
- * This processor simply calculates the maximum value for all time slices in each Pixel. 
+ * This processor simply calculates the maximum value for all time slices in each Pixel.
  * The output is a double array with an entry for each Pixel.
- * TODO: REfactor to only search inside a window
- *@author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
- * 
+ * TODO: Refactor to only search inside a window
+ *
+ * @author Kai Bruegge &lt;kai.bruegge@tu-dortmund.de&gt;
  */
-public class MaxAmplitude implements Processor{
-	static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
+public class MaxAmplitude implements Processor {
+    static Logger log = LoggerFactory.getLogger(MaxAmplitude.class);
 
     @Parameter(required = true)
-    private String key;
-    @Parameter(required = true)
-    private String outputKey;
+    public String key;
 
-	private int npix;
+    @Parameter(required = true)
+    public String outputKey;
+
 
     @Override
-    public Data process(Data input) {
-        Utils.isKeyValid(input, key, double[].class);
-        Utils.isKeyValid(input, "NPIX", Integer.class);
-        double[] data = (double[]) input.get(key);
-        npix = (Integer) input.get("NPIX");
-        int roi = data.length / npix;
+    public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
+        int roi = data.length / Constants.N_PIXELS;
 
         //for all pixel find the maximum value
-        double[] max = new double[npix];
+        double[] max = new double[Constants.N_PIXELS];
 
-        for (int pix = 0; pix < npix; pix++) {
+        for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             max[pix] = maximum(roi, pix, data);
         }
 
-        input.put(outputKey, max);
-        return input;
+        item.put(outputKey, max);
+        return item;
     }
 
     /**
      * Find the maximum value in the array. searchs in the window from pix * roi + slice to pix * roi + (slice + roi -1)
+     *
      * @param roi
-     * @param pix pixel to be checked
+     * @param pix  pixel to be checked
      * @param data the array to be checked
      * @return
      */
-    public double maximum(int roi, int pix, double[] data){
+    public double maximum(int roi, int pix, double[] data) {
         double tempMaxValue = 0;
         for (int slice = 0; slice < roi; slice++) {
             int pos = pix * roi + slice;
@@ -63,14 +63,5 @@ public class MaxAmplitude implements Processor{
             }
         }
         return tempMaxValue;
-    }
-
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
     }
 }

@@ -15,7 +15,7 @@ or installed on Ubuntu systems using apt-get:
 Continous Integration services are provided by Drone.IO. You can check the status of the builds on the [travis-ci project site](https://travis-ci.org/fact-project/fact-tools)
 
 
-<a href="https://travis-ci.org/fact-project/fact-tools"><img alt="Build Status" src="https://travis-ci.org/fact-project/fact-tools.svg?branch=master"></a>
+<a href="https://travis-ci.org/fact-project/fact-tools"><img alt="Build Status" src="https://travis-ci.org/fact-project/fact-tools.svg?branch=master"/></a>
 
 
 

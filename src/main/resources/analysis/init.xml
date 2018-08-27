@@ -1,0 +1,11 @@
+<module>
+  <If condition="%{data.CREATOR}!='Ceres'">
+    <fact.utils.PreviousEventInfo
+        startCellKey="StartCellData"
+        outputKey="prevEvents"
+        limitEvents="${PreviousEventInfo.limitEvents}"
+    />
+    <fact.features.UnixTimeUTC2DateTime />
+  </If>
+  <fact.extraction.SaturatedSlicesPercentage />
+</module>
