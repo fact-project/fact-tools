@@ -20,40 +20,40 @@ public class Ratescan implements StatefulProcessor {
     static Logger log = LoggerFactory.getLogger(Ratescan.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = false,
             description = "Int array [number of patches][number of threshold] flaggin if patch was triggered at given theshold")
-    private String triggerRatesKey = "TriggerRates";
+    public String triggerRatesKey = "TriggerRates";
 
     @Parameter(required = false,
             description = "int array [number of patches][number of threshold] containing each the first slice above threshold ")
-    private String triggerSlicesKey = "TriggerSlices";
+    public String triggerSlicesKey = "TriggerSlices";
 
     @Parameter(required = false,
             description = "int array [number of threshold] containing steps threshold ")
-    private String thresholdsKey = "TriggerThresholds";
+    public String thresholdsKey = "TriggerThresholds";
 
     @Parameter(required = false)
-    private Integer minThreshold=0;
+    public Integer minThreshold=0;
 
     @Parameter(required = false)
-    private Integer nThresholds=40;
+    public Integer nThresholds=40;
 
     @Parameter(required = false)
-    private Integer stepSize=20;
+    public Integer stepSize=20;
 
     @Parameter(required = false,
             description = "minimum time the signal has to stay above the threshold")
-    private int minTimeOverThreshold = 8;
+    public int minTimeOverThreshold = 8;
 
     @Parameter(required = false,
             description = "number of slices to ignore at the beginning of the time series")
-    private int skipFirst = 10;
+    public int skipFirst = 10;
 
     @Parameter(required = false,
             description = "number of slices to ignore at the end of the time series")
-    private int skipLast = 40;
+    public int skipLast = 40;
 
     private int[] thresholds;
 

@@ -27,26 +27,26 @@ public class EmulateLogic implements Processor {
     static Logger log = LoggerFactory.getLogger(EmulateDiscriminator.class);
 
     @Parameter(required = true, description = "boolean array [number of patches] flagging if patch triggered ")
-    private String key;
+    public String key;
 
     @Parameter(required = false, description = "decision of the logic [bool]")
-    private String outKey;
+    public String outKey;
 
     @Parameter(required = false,
             description = "int array [number of patches] containing each the first slice above threshold ")
-    private String triggerSliceKey = "TriggerSlice";
+    public String triggerSliceKey = "TriggerSlice";
 
     @Parameter(required = false,
             description = "minimum number of trigger patches per trigger unit to have a signal above threshold")
-    private int nOutOf4 = 1;
+    public int nOutOf4 = 1;
 
     @Parameter(required = false,
             description = "minimum number of trigger units to have a signal above threshold")
-    private int nOutOf40 = 1;
+    public int nOutOf40 = 1;
 
     @Parameter(required = false,
             description = "size of the time window within which the rising edges of the triggerprimitives should be")
-    private int timeWindowSize = 12;
+    public int timeWindowSize = 12;
 
     @Override
     public Data process(Data item) {
@@ -128,30 +128,6 @@ public class EmulateLogic implements Processor {
             }
         }
         return false;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutKey(String outKey) {
-        this.outKey = outKey;
-    }
-
-    public void setTriggerSliceKey(String triggerSliceKey) {
-        this.triggerSliceKey = triggerSliceKey;
-    }
-
-    public void setnOutOf4(int nOutOf4) {
-        this.nOutOf4 = nOutOf4;
-    }
-
-    public void setnOutOf40(int nOutOf40) {
-        this.nOutOf40 = nOutOf40;
-    }
-
-    public void setTimeWindowSize(int timeWindowSize) {
-        this.timeWindowSize = timeWindowSize;
     }
 }
 

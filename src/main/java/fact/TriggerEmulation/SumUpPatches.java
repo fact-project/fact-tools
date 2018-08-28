@@ -35,10 +35,10 @@ public class SumUpPatches implements Processor {
     static Logger log = LoggerFactory.getLogger(SumUpPatches.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = false)
-    private String outKey;
+    public String outKey;
 
     @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
     CalibrationService calibService;
@@ -47,18 +47,18 @@ public class SumUpPatches implements Processor {
     public String timeStampKey = "timestamp";
 
     @Parameter(required = false, description = "Converts the patch array into a 1440*ROI array inorder to visualize the patche time series in the viewer")
-    private Boolean visualize = false;
+    public Boolean visualize = false;
 
     @Parameter(required = false, description = "Ignore the broken pixels in the patch sum")
-    private Boolean ignoreBrokenPixels = false;
+    public Boolean ignoreBrokenPixels = false;
 
     @Parameter(required = false, description = "Ignore the pixels containing light from a start in the patch sum")
-    private Boolean ignoreStarpixels = false;
+    public Boolean ignoreStarpixels = false;
 
     @Parameter(required = false)
-    private String[] starPositionKeys = null;
+    public String[] starPositionKeys = null;
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-    private double starRadiusInCamera = Constants.PIXEL_SIZE;
+    public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
@@ -231,15 +231,4 @@ public class SumUpPatches implements Processor {
         return patch_sum;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setOutKey(String outKey) {
-        this.outKey = outKey;
-    }
-
-    public void setVisualize(Boolean visualize) {
-        this.visualize = visualize;
-    }
 }

@@ -22,44 +22,44 @@ public class EmulateDiscriminator implements Processor{
     static Logger log = LoggerFactory.getLogger(EmulateDiscriminator.class);
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = false,
             description = "boolean array [number of patches] flagging if patch triggered ")
-    private String primitivesKey = "TriggerPrimitives";
+    public String primitivesKey = "TriggerPrimitives";
 
     @Parameter(required = false,
             description = "int array [number of patches] containing each the first slice above threshold ")
-    private String triggerSliceKey = "TriggerSlice";
+    public String triggerSliceKey = "TriggerSlice";
 
     @Parameter(required = false,
             description = "Converts the patch array into a 1440*ROI array inorder to visualize the patche time series in the viewer")
-    private Boolean visualize = false;
+    public Boolean visualize = false;
 
     @Parameter(required = false,
             description = "threshold of the discriminator in DAC units")
-    private int threshold = 330;
+    public int threshold = 330;
 
     @Parameter(required = false,
             description = "minimum time the signal has to stay above the threhold")
-    private int minTimeOverThreshold = 8;
+    public int minTimeOverThreshold = 8;
 
     @Parameter(required = false,
             description = "number of slices to ignore at the beginning of the time series")
-    private int skipFirst = 10;
+    public int skipFirst = 10;
 
     @Parameter(required = false,
             description = "number of slices to ignore at the end of the time series")
-    private int skipLast = 40;
+    public int skipLast = 40;
 
 
-    private int default_slice = Integer.MAX_VALUE;
+    public int default_slice = Integer.MAX_VALUE;
 
     @Override
     public Data process(Data item) {
         double[][] data = (double[][]) item.get(key);
 
-        int n_patches = Constants.NUMBEROFPIXEL/9;
+        int n_patches = Constants.N_PIXELS/9;
         double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
 
@@ -107,38 +107,5 @@ public class EmulateDiscriminator implements Processor{
         }
         item.put(primitivesKey+"_vis", primitives);
         item.put(triggerSliceKey+"_vis", triggerSlices);
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setPrimitivesKey(String primitivesKey) {
-        this.primitivesKey = primitivesKey;
-    }
-
-    public void setTriggerSliceKey(String triggerSliceKey) {
-        this.triggerSliceKey = triggerSliceKey;
-    }
-
-    public void setVisualize(Boolean visualize) {
-        this.visualize = visualize;
-    }
-
-    public void setThreshold(int threshold) {
-        this.threshold = threshold;
-    }
-
-
-    public void setMinTimeOverThreshold(int minTimeOverThreshold) {
-        this.minTimeOverThreshold = minTimeOverThreshold;
-    }
-
-    public void setSkipFirst(int skipFirst) {
-        this.skipFirst = skipFirst;
-    }
-
-    public void setSkipLast(int skipLast) {
-        this.skipLast = skipLast;
     }
 }
