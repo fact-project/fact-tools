@@ -25,11 +25,12 @@ public class EmulateLogic implements Processor {
 
     static Logger log = LoggerFactory.getLogger(EmulateDiscriminator.class);
 
-    @Parameter(required = true, description = "boolean array [number of patches] flagging if patch triggered ")
-    public String key;
-
     @Parameter(required = false, description = "decision of the logic [bool]")
     public String outKey;
+
+    @Parameter(required = false,
+            description = "boolean array [number of patches] flagging if patch triggered ")
+    public String primitivesKey = "TriggerPrimitives";
 
     @Parameter(required = false,
             description = "int array [number of patches] containing each the first slice above threshold ")
@@ -50,7 +51,7 @@ public class EmulateLogic implements Processor {
     @Override
     public Data process(Data item) {
 
-        boolean[] triggerPrimitives = (boolean[]) item.get(key);
+        boolean[] triggerPrimitives = (boolean[]) item.get(primitivesKey);
         int[] patchTriggerSlice = (int[]) item.get(triggerSliceKey);
 
         boolean triggerDecision = isTriggerDecision(
