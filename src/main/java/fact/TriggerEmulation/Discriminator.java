@@ -1,7 +1,5 @@
 package fact.TriggerEmulation;
 
-import stream.Data;
-
 public class Discriminator {
 
     public static int default_slice = Integer.MAX_VALUE;

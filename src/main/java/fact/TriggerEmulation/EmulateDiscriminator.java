@@ -1,7 +1,6 @@
 package fact.TriggerEmulation;
 
 import fact.Constants;
-import fact.filter.ShapeSignal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -9,7 +8,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import static fact.TriggerEmulation.Discriminator.booleanToInt;
-import static fact.TriggerEmulation.Discriminator.discriminatePatch;
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
 
 /**

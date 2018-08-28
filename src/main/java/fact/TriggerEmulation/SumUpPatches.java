@@ -4,11 +4,9 @@ import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
-import fact.cleaning.BasicCleaning;
-import fact.filter.ShapeSignal;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
-import fact.photonstream.timeSeriesExtraction.ElementWise;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 
 /**
  * Sum up the signals of each patch and return an array of patchwise timeseries. This is e.g. useful for an emulation of
