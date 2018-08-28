@@ -2,7 +2,12 @@ package fact.TriggerEmulation;
 
 import fact.Constants;
 import fact.Utils;
+import fact.calibrationservice.CalibrationService;
+import fact.container.PixelSet;
+import fact.cleaning.BasicCleaning;
 import fact.filter.ShapeSignal;
+import fact.hexmap.FactCameraPixel;
+import fact.hexmap.FactPixelMapping;
 import fact.photonstream.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -10,8 +15,13 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
@@ -30,9 +40,21 @@ public class SumUpPatches implements Processor {
     @Parameter(required = false)
     private String outKey;
 
+    @Parameter(required = false, description = "The key containing the event timestamp")
+    public String timeStampKey = "timestamp";
     @Parameter(required = false, description = "Converts the patch array into a 1440*ROI array inorder to visualize the patche time series in the viewer")
     private Boolean visualize = false;
 
+    @Parameter(required = false, description = "Ignore the pixels containing light from a start in the patch sum")
+    private Boolean ignoreStarpixels = false;
+    @Parameter(required = false)
+    private String[] starPositionKeys = null;
+    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
+    private double starRadiusInCamera = Constants.PIXEL_SIZE;
+
+    private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
+
+    private PixelSet star_set = null;
     @Override
     public Data process(Data item) {
         Utils.isKeyValid(item, key, double[].class);
@@ -42,6 +64,7 @@ public class SumUpPatches implements Processor {
 
         int n_patches = Constants.NUMBEROFPIXEL/9;
 
+        star_set = calculateStarPixelSet(item);
 
         double[][] pixel_data = Utils.snipPixelData(data, 0, 0, Constants.NUMBEROFPIXEL, roi);
         double[][] patch_sums = new double[n_patches][];
@@ -57,6 +80,60 @@ public class SumUpPatches implements Processor {
         return item;
 
     }
+
+    /**
+     * generates the pixel set with star pixels to be excluded from the trigger
+     * @param item
+     * @return pixelset
+     */
+    public PixelSet calculateStarPixelSet(Data item) {
+        PixelSet starSet = new PixelSet();
+
+        if (starPositionKeys == null) {
+            return starSet;
+        }
+
+        for (String starPositionKey : starPositionKeys)
+        {
+            Utils.isKeyValid(item, starPositionKey, double[].class);
+            double[] starPosition = (double[]) item.get(starPositionKey);
+
+            FactCameraPixel star_pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
+            int chidOfPixelOfStar = star_pixel.chid;
+
+            List<Integer> starChidList = new ArrayList<>();
+
+            starChidList.add(chidOfPixelOfStar);
+
+            starSet.addById(chidOfPixelOfStar);
+
+            for (FactCameraPixel px: pixelMap.getNeighboursFromID(chidOfPixelOfStar))
+            {
+                if (calculateDistance(px.id, starPosition[0], starPosition[1]) < starRadiusInCamera)
+                {
+                    starSet.add(px);
+                    starChidList.add(px.id);
+                }
+            }
+        }
+        return starSet;
+    }
+
+    /**
+     * Calculates the Distance between a pixel and a given position
+     * @param chid
+     * @param x
+     * @param y
+     * @return
+     */
+    private double calculateDistance(int chid, double x, double y)
+    {
+        double xdist = pixelMap.getPixelFromId(chid).getXPositionInMM() - x;
+        double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
+
+        return Math.sqrt((xdist*xdist)+(ydist*ydist));
+    }
+
 
     /**
      * Convert to a full ROI double array with length npixels*ROI
@@ -85,8 +162,13 @@ public class SumUpPatches implements Processor {
         int nPixPerPatch = 9;
         double[] patch_sum = new double[pixel_data[nPixPerPatch*patch].length];
         Arrays.fill(patch_sum, 0.);
+        int pixel_counter = 0;
         for (int pix = 0; pix < 9; pix++) {
             int current_pix = patch * 9 + pix;
+
+            if (ignoreStarpixels && star_set.toArrayList().contains(current_pix)){
+                continue;
+            }
 
             assert (patch_sum.length == pixel_data[current_pix].length);
 
@@ -95,6 +177,14 @@ public class SumUpPatches implements Processor {
                 assert (i < patch_sum.length);
                 assert (i < pixel_data[current_pix].length);
                 patch_sum[i] += pixel_data[current_pix][i];
+            }
+            pixel_counter++;
+        }
+        // if not all 9 pixels were used scale the patch sum to the same value as is if 9 pixels were used
+        if (pixel_counter < 8){
+            for (int i = 0; i < patch_sum.length; i++) {
+                patch_sum[i] /= pixel_counter;
+                patch_sum[i] *= 9;
             }
         }
         return patch_sum;
