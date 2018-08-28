@@ -13,8 +13,8 @@ public class DiscriminatorTest {
     @Test
     public void testBooleanToInt(){
         EmulateDiscriminator emulateDiscriminator = new EmulateDiscriminator();
-        Assert.assertEquals(emulateDiscriminator.booleanToInt(true), 1);
-        Assert.assertEquals(emulateDiscriminator.booleanToInt(false), 0);
+        Assert.assertEquals(Discriminator.booleanToInt(true), 1);
+        Assert.assertEquals(Discriminator.booleanToInt(false), 0);
     }
 
     @Test
@@ -25,7 +25,7 @@ public class DiscriminatorTest {
         for (int i = 20; i < 30; i++) {
             data[i] = 300.;
         }
-        int estimated_slice = emulateDiscriminator.discriminatePatch(
+        int estimated_slice = Discriminator.discriminatePatch(
                 data,
                 220,
                 8,
