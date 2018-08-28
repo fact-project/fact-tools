@@ -40,13 +40,21 @@ public class SumUpPatches implements Processor {
     @Parameter(required = false)
     private String outKey;
 
+    @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
+    CalibrationService calibService;
+
     @Parameter(required = false, description = "The key containing the event timestamp")
     public String timeStampKey = "timestamp";
+
     @Parameter(required = false, description = "Converts the patch array into a 1440*ROI array inorder to visualize the patche time series in the viewer")
     private Boolean visualize = false;
 
+    @Parameter(required = false, description = "Ignore the broken pixels in the patch sum")
+    private Boolean ignoreBrokenPixels = false;
+
     @Parameter(required = false, description = "Ignore the pixels containing light from a start in the patch sum")
     private Boolean ignoreStarpixels = false;
+
     @Parameter(required = false)
     private String[] starPositionKeys = null;
     @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
@@ -55,6 +63,8 @@ public class SumUpPatches implements Processor {
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
 
     private PixelSet star_set = null;
+    private PixelSet bad_pixel_set = null;
+
     @Override
     public Data process(Data item) {
         Utils.isKeyValid(item, key, double[].class);
@@ -65,6 +75,7 @@ public class SumUpPatches implements Processor {
         int n_patches = Constants.NUMBEROFPIXEL/9;
 
         star_set = calculateStarPixelSet(item);
+        bad_pixel_set = calculateBadPixelSet(item);
 
         double[][] pixel_data = Utils.snipPixelData(data, 0, 0, Constants.NUMBEROFPIXEL, roi);
         double[][] patch_sums = new double[n_patches][];
@@ -79,6 +90,33 @@ public class SumUpPatches implements Processor {
         }
         return item;
 
+    }
+
+    /**
+     * generates the pixel set with bad pixels to be excluded from the trigger
+     * @param item
+     * @return pixelset
+     */
+    public PixelSet calculateBadPixelSet(Data item) {
+        ZonedDateTime timeStamp = null;
+
+        if (item.containsKey(timeStampKey) == true){
+            Utils.isKeyValid(item, timeStampKey, int[].class);
+            int[] eventTime = (int[]) item.get(timeStampKey);
+            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
+        }
+        else {
+            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
+            // => The 12 bad pixels we have from the beginning on are used.
+            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        }
+
+        int[] badChIds = calibService.getBadPixel(timeStamp);
+        PixelSet badPixelsSet = new PixelSet();
+        for (int px: badChIds){
+            badPixelsSet.addById(px);
+        }
+        return badPixelsSet;
     }
 
     /**
@@ -166,6 +204,9 @@ public class SumUpPatches implements Processor {
         for (int pix = 0; pix < 9; pix++) {
             int current_pix = patch * 9 + pix;
 
+            if (ignoreBrokenPixels && bad_pixel_set.toArrayList().contains(current_pix)){
+                continue;
+            }
             if (ignoreStarpixels && star_set.toArrayList().contains(current_pix)){
                 continue;
             }
