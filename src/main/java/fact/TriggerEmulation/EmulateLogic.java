@@ -77,7 +77,7 @@ public class EmulateLogic implements Processor {
         int n_units = 0;
         for (int ftu = 0; ftu < 40; ftu++) {
             int n_trigger_patches = 0;
-            for (int patch = ftu*4; (patch < 4+(ftu*4) || patch < Constants.NUMBEROFPIXEL); patch++) {
+            for (int patch = ftu*4; (patch < 4+(ftu*4) || patch < Constants.N_PIXELS); patch++) {
                 if (triggerPrimitives[patch]){
                     insertToArrayListSorted(patchTriggerSlice[patch], triggerTimes);
                     n_trigger_patches++;

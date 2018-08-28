@@ -63,7 +63,7 @@ public class Ratescan implements StatefulProcessor {
 
         double[][] data = (double[][]) item.get(key);
 
-        int n_patches = Constants.NUMBEROFPIXEL/9;
+        int n_patches = Constants.N_PIXELS/9;
 
         int[][] patchTriggerSlice = new int[n_patches+1][nThresholds];
         int[][] patchTriggerRate = new int[n_patches+1][nThresholds];

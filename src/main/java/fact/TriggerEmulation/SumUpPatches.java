@@ -72,12 +72,12 @@ public class SumUpPatches implements Processor {
 
         int roi = (int) item.get("NROI");
 
-        int n_patches = Constants.NUMBEROFPIXEL/9;
+        int n_patches = Constants.N_PIXELS/9;
 
         star_set = calculateStarPixelSet(item);
         bad_pixel_set = calculateBadPixelSet(item);
 
-        double[][] pixel_data = Utils.snipPixelData(data, 0, 0, Constants.NUMBEROFPIXEL, roi);
+        double[][] pixel_data = Utils.snipPixelData(data, 0, 0, Constants.N_PIXELS, roi);
         double[][] patch_sums = new double[n_patches][];
 
         for (int patch = 0; patch < n_patches; patch++) {

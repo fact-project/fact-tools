@@ -68,7 +68,7 @@ public class findMaximumTriggerThreshold implements Processor {
     public Data process(Data item) {
         double[][] data = (double[][]) item.get(key);
 
-        int n_patches = Constants.NUMBEROFPIXEL/9;
+        int n_patches = Constants.N_PIXELS/9;
         double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
 
