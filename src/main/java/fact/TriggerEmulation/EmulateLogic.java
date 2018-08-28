@@ -50,15 +50,30 @@ public class EmulateLogic implements Processor {
 
     @Override
     public Data process(Data item) {
-        int n_patches = Constants.NUMBEROFPIXEL/9;
 
         boolean[] triggerPrimitives = (boolean[]) item.get(key);
-
         int[] patchTriggerSlice = (int[]) item.get(triggerSliceKey);
 
+        boolean triggerDecision = isTriggerDecision(
+                triggerPrimitives,
+                patchTriggerSlice,
+                nOutOf4,
+                nOutOf40,
+                timeWindowSize);
+        item.put(outKey, triggerDecision);
+
+        return item;
+    }
+
+    public static boolean isTriggerDecision(
+            boolean[] triggerPrimitives,
+            int[] patchTriggerSlice,
+            int nOutOf4,
+            int nOutOf40,
+            int timeWindowSize
+    ) {
         ArrayList<Integer> triggerTimes = new ArrayList<>();
 
-        boolean triggerDecision = false;
         int n_units = 0;
         for (int ftu = 0; ftu < 40; ftu++) {
             int n_trigger_patches = 0;
@@ -73,28 +88,42 @@ public class EmulateLogic implements Processor {
                 }
             }
             if (n_units >= nOutOf40){
-                if (areEnoughTriggersInOneTimeWindow(triggerTimes)){
-                    triggerDecision = true;
-                    break;
+                if (areEnoughTriggersInOneTimeWindow(triggerTimes, nOutOf40, timeWindowSize)){
+                    return true;
                 }
             }
         }
-        item.put(outKey, triggerDecision);
-
-        return item;
+        return false;
     }
 
-    public void insertToArrayListSorted(int x, ArrayList list) {
+    /**
+     * sorted insert of int value into an int array
+     * @param x
+     * @param list
+     */
+    public static void insertToArrayListSorted(int x, ArrayList<Integer> list) {
         int pos = Collections.binarySearch(list, x);
         if (pos < 0) {
             list.add(-pos-1, x);
         }
     }
 
-    public boolean areEnoughTriggersInOneTimeWindow(ArrayList<Integer> list){
-        for (int i = 0; i < list.size() - 40; i++) {
-            int currTimeSpann = list.get(i+39) - list.get(i);
-            if (currTimeSpann < this.timeWindowSize){
+    /**
+     * Check if nOutOf40 triggerPrimitives where in the given time window
+     * @param list
+     * @return
+     */
+    public static boolean areEnoughTriggersInOneTimeWindow(ArrayList<Integer> list,
+                                                           int nOutOf40, int timeWindowSize){
+        for (int i = 0; i <= list.size() - nOutOf40; i++) {
+            /**TODO: This does not distinguish between patches from the same FTU, so it may happen that nOutOf40 or more
+             * FTUs reply a positive trigger and less than nOutOf40 are in the same time window, but in case enough FTUs
+             * have patches within right time window this would still lead to a positive overall trigger. I don'' know
+             *  how the real trigger is handling it. However, since is currently only operating with a 1-OutOf-4 FTU
+             *  and a 1-OutOf40 FTM logic this case is never met.
+            **/
+            int currTimeSpann = list.get(i+nOutOf40-1) - list.get(i);
+            if (currTimeSpann < timeWindowSize){
                 return true;
             }
         }
