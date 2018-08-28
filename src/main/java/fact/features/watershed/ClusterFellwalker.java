@@ -1,8 +1,7 @@
 package fact.features.watershed;
 
 /**
- *
- *  Watershed algorithm to cluster the camera image.
+ * Watershed algorithm to cluster the camera image.
  * The image is interpreted as "landscape" with hills and valleys, where the photoncharge is used as height of a pixel.
  * FellWalker algorithm clusters the pixels by grouping all pixels which belongs to a hill. The algorithm starts at a pixel
  * and searches in the neighborhood for the highest pixel. From this neighbor it searches for the next higher pixel in the
@@ -12,7 +11,7 @@ package fact.features.watershed;
  * the path up to this pixel is marked with the same cluster ID, because it would lead to the top of the same hill.
  * After all pixels are used for a path, the whole image is clustered. In the last step all clusters are removed that contains
  * less than 'minShowerpixel' cleaning pixels.
- *
+ * <p>
  * edit:
  * morphologyKey:
  * FellWalker works on the morphology you choose. Photoncharge would be the most intuitive one, but other pixel values like
@@ -23,12 +22,14 @@ package fact.features.watershed;
  * showerKey:
  * For areaKey = null (whole image clustered) only clusters are kept, if they contain 'minShowerpixel' cleaning pixel, which
  * are collected in a pixelSet named showerKey (e.g. output "shower" from TwoLevelTimeNeighbor or other pixel sets created by other cleaning algorithms).
- *
+ * <p>
  * Created by lena on 16.11.15.
  */
 
+import fact.Constants;
 import fact.Utils;
-import fact.hexmap.FactCameraPixel;
+import fact.coordinates.CameraCoordinate;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import stream.Data;
 import stream.Processor;
@@ -46,35 +47,35 @@ public class ClusterFellwalker implements Processor {
     ArrayList<Integer> aktuellerPfad = new ArrayList<>();
 
 
-    @Parameter(required = false, description="Minimal number of pixels a cluster must contain to be labeled as 'showerCluster'", defaultValue="2")
-    protected int minShowerpixel = 2;
+    @Parameter(required = false, description = "Minimal number of pixels a cluster must contain to be labeled as 'showerCluster'", defaultValue = "2")
+    public int minShowerpixel = 2;
 
     @Parameter(required = true, description = "Input key for pixel set (aka shower pixel). Used to keep/remove cluster if areaKey=null.")
-    protected String showerKey = null;
+    public String showerKey = null;
 
     @Parameter(required = false, description = "Input key for arrivaltime positions", defaultValue = "arrivalTimePos")
-    protected String arrivaltimePosKey = "arrivalTimePos";
+    public String arrivaltimePosKey = "arrivalTimePos";
 
     @Parameter(required = false, description = "Input key for calculated photon charge", defaultValue = "photoncharge")
-    protected String photonchargeKey = "photoncharge";
+    public String photonchargeKey = "photoncharge";
 
     @Parameter(required = false, description = "Value chosen for clustering. Could be photoncharge, arrival times or mean correlation.", defaultValue = "photoncharge")
-    protected String morphologyKey = photonchargeKey;
+    public String morphologyKey = photonchargeKey;
 
-    @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePosition")
-    protected String sourcePositionKey = "sourcePosition" ;
+    @Parameter(required = false, description = "Input key for soure position", defaultValue = "sourcePositionKey")
+    public String sourcePositionKey = "sourcePositionKey";
+
+    @Parameter(description = "Key to CameraCoordinate of the cog as calculated bei HillasParameters", defaultValue = "cog")
+    public String cogKey = "cog";
 
     @Parameter(required = false, description = "Pixel set to cluster. If null, cluster all camera pixel; in that case decide which clusters should be kept via pixelSetKey", defaultValue = "null")
-    protected String areaKey = null;
-
+    public String areaKey = null;
 
 
     @Override
     public Data process(Data data) {
-        int npix = (Integer) data.get("NPIX");
-        int [] shower = Utils.getValidPixelSetAsIntArr(data, npix, showerKey);
-        int [] area = Utils.getValidPixelSetAsIntArr(data, npix, areaKey);
-
+        int[] shower = Utils.getValidPixelSetAsIntArr(data, Constants.N_PIXELS, showerKey);
+        int[] area = Utils.getValidPixelSetAsIntArr(data, Constants.N_PIXELS, areaKey);
 
 
         double[] arrivalTime = ((double[]) data.get(arrivaltimePosKey));
@@ -85,32 +86,28 @@ public class ClusterFellwalker implements Processor {
         //source position not needed for example-xml, need to be calculated in "sourceParameter_mc.xml" for the feature "distanceSource"
         //same for COGxy, needed for distanceCog, but not in the example xml
 
-        double [] sourcePosition = (double[]) data.get(sourcePositionKey);
-        double cogX = (double) data.get("COGx");
-        double cogY = (double) data.get("COGy");
-
+        CameraCoordinate sourcePosition = (CameraCoordinate) data.get(sourcePositionKey);
+        CameraCoordinate cog = (CameraCoordinate) data.get(cogKey);
 
         //get 'shower' as int array with pixel id's3System.out.println();
 
 
-        int[] clusterID = new int[1440];
-        int[] showerClusterID = new int[1440];
+        int[] clusterID = new int[Constants.N_PIXELS];
+        int[] showerClusterID = new int[Constants.N_PIXELS];
 
-        int [] areaArray =new int[1440];
-        if(areaKey != null) {
-
+        int[] areaArray = new int[Constants.N_PIXELS];
+        if (areaKey != null) {
             for (int i = 0; i < area.length; i++) {
                 areaArray[area[i]] = 1;
             }
-        }
-        else{
+        } else {
 
-            for (int i = 0; i < 1440; i++) {
+            for (int i = 0; i < Constants.N_PIXELS; i++) {
                 areaArray[i] = 1;
             }
         }
 
-        for (int i = 0; i < 1440; i++) {
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             clusterID[i] = 0;
             showerClusterID[i] = -2;
         }
@@ -132,12 +129,12 @@ public class ClusterFellwalker implements Processor {
 
             while (!pathend) {
                 //find neighbours and brightest neighbour
-                FactCameraPixel[] allNeighbours = mapping.getNeighboursFromID(currentPixel);
+                CameraPixel[] allNeighbours = mapping.getNeighborsFromID(currentPixel);
 
                 //find usable neighbours (pixel marked with clusterID = 0 after cleaning)
-                ArrayList<FactCameraPixel> usableNeighbours = new ArrayList<>();
+                ArrayList<CameraPixel> usableNeighbours = new ArrayList<>();
 
-                for (FactCameraPixel n : allNeighbours) {
+                for (CameraPixel n : allNeighbours) {
                     if (clusterID[n.id] != -2 && areaArray[n.id] == 1) {
                         usableNeighbours.add(n);
                     }
@@ -160,10 +157,10 @@ public class ClusterFellwalker implements Processor {
 //                            currentPixel = brightestNeighbourIDLarge;
 //                        }
 //                    } else {
-                        pathToNewCluster(clusterID, aktuellerPfad, cluster);
-                        cluster++;
-                        pathend = true;
-                //    }
+                    pathToNewCluster(clusterID, aktuellerPfad, cluster);
+                    cluster++;
+                    pathend = true;
+                    //    }
 
                 } else {
                     if (clusterID[highestNeighbourID] != 0) {
@@ -186,13 +183,13 @@ public class ClusterFellwalker implements Processor {
           */
 
 
-        FactCluster[]  clusterSet = new FactCluster[cluster];
-        for (int i=0; i<cluster; i++){
+        FactCluster[] clusterSet = new FactCluster[cluster];
+        for (int i = 0; i < cluster; i++) {
             clusterSet[i] = new FactCluster();
             clusterSet[i].setClusterID(i);
         }
 
-        for(int i=0;i<1440;i++){
+        for (int i = 0; i < Constants.N_PIXELS; i++) {
             clusterSet[clusterID[i]].addContentPixel(i);
             clusterSet[clusterID[i]].addContentPixelPhotoncharge(photoncharge[i]);
             clusterSet[clusterID[i]].addContentPixelArrivaltime(arrivalTime[i]);
@@ -200,8 +197,8 @@ public class ClusterFellwalker implements Processor {
 
 
         // fill another list with morphology values if morphology is not photoncharge
-        if(morphologyKey!= photonchargeKey){
-            for(int i=0;i<1440; i++){
+        if (morphologyKey != photonchargeKey) {
+            for (int i = 0; i < Constants.N_PIXELS; i++) {
                 clusterSet[clusterID[i]].addContentMorphology(morphology[i]);
             }
         }
@@ -210,12 +207,11 @@ public class ClusterFellwalker implements Processor {
         //if the whole camera pixels are clustered, (areaKey = null) use shower[] as 'cleaningPixel'.
         //If another pixel set (area) should be clustered, use area[] as 'cleaningPixel'. In this case all clustershould be kept, exept clusters with less than 'minShowerpixel' content.
         //Naming is quite confusing.
-        if(areaKey == null) {
+        if (areaKey == null) {
             for (int i = 0; i < shower.length; i++) {
                 clusterSet[clusterID[shower[i]]].addCleaningPixel(shower[i]);
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < area.length; i++) {
                 clusterSet[clusterID[area[i]]].addCleaningPixel(area[i]);
             }
@@ -228,10 +224,7 @@ public class ClusterFellwalker implements Processor {
         */
 
 
-
-
         FactCluster[] showerCluster = removeCluster(clusterSet, minShowerpixel);
-
 
 
         int numCluster = showerCluster.length;
@@ -241,9 +234,9 @@ public class ClusterFellwalker implements Processor {
         /* build 1440-int array that contains the id's of the cluster that survive 'removeCluster' for every pixel.
          * (Just to have a quick look at it in the event viewer, not relevant for the algorithm itself or the resulting event parameters.)
         */
-        for(FactCluster c : clusterSet){
-            if(c.getShowerLabel()){
-                for(int i : c.contentPixel){
+        for (FactCluster c : clusterSet) {
+            if (c.getShowerLabel()) {
+                for (int i : c.contentPixel) {
                     showerClusterID[i] = c.getClusterID();
                 }
             }
@@ -261,7 +254,7 @@ public class ClusterFellwalker implements Processor {
         markBoundaryPixel(clusterSet, showerClusterID);*/
 
         //build features (if there is any cluster left after removeCluster) and put them to data set
-        if(numCluster != 0) {
+        if (numCluster != 0) {
             double ratio = boundContentRatio(showerCluster);
             double idealBoundDiff = idealBoundDiff(showerCluster);
             double boundAngleSum = boundAngleSum(showerCluster);
@@ -272,26 +265,28 @@ public class ClusterFellwalker implements Processor {
             Source dependent parameter! Not needed for fellwalker_example. If this parameter shall be calculated,
             "sourceParameter_mc.xml" has to be included in the xml-file, cause source position has to be known
              */
-            double distanceSource = distanceSource(showerCluster, sourcePosition);
+            double distanceSource;
+            if (sourcePosition == null) {
+                distanceSource = Double.NaN;
+            } else {
+                distanceSource = distanceSource(showerCluster, sourcePosition);
+            }
             /*
-            cog must be calculated in DistributionFromShower, before distanceCog can be calculated
+            cog must be calculated in HillasParameters, before distanceCog can be calculated
              */
-            double distanceCog = distanceCog(showerCluster, cogX, cogY);
-
+            double distanceCog = distanceCog(showerCluster, cog.xMM, cog.yMM);
 
 
             int convexity = searchForCompactGroups(showerCluster, showerClusterID);
-
 
 
             findNeighbors(showerCluster, showerClusterID);
 
             double numNeighborCluster = neighborClusterMean(showerCluster);
             double chargeMaxClusterRatio;
-            if(morphologyKey == photonchargeKey) {
+            if (morphologyKey == photonchargeKey) {
                 chargeMaxClusterRatio = getChargeMaxCluster(showerCluster);
-            }
-            else{
+            } else {
                 chargeMaxClusterRatio = getMorphMaxCluster(showerCluster);
             }
 
@@ -319,8 +314,7 @@ public class ClusterFellwalker implements Processor {
             data.put("convexity", convexity);
 
 
-        }
-        else{
+        } else {
             data.put("boundRatio", null);
             data.put("idealBoundDiff", null);
             data.put("boundAngle", null);
@@ -351,7 +345,7 @@ public class ClusterFellwalker implements Processor {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        for(int i=0;i<1440;i++){
+        for(int i=0;i<Constants.N_PIXELS;i++){
             writer.println(i + "\t" + showerClusterID[i] + "\t" + photoncharge[i] + "\t" + cleaning[i]);
         }
 
@@ -376,21 +370,20 @@ public class ClusterFellwalker implements Processor {
                 break;
             }
         }
-        if(i == -1){
+        if (i == -1) {
             return -1;
-        }
-        else{
+        } else {
             return shower[i];
         }
     }
 
     //find brightest neighbour, return the currentPixel if there is no brighter neighbour!!
-    public int findMaxChargeNeighbour(ArrayList<FactCameraPixel> usableNeighbours, int currentPixel, double[] photoncharge) {
+    public int findMaxChargeNeighbour(ArrayList<CameraPixel> usableNeighbours, int currentPixel, double[] photoncharge) {
 
         double maxBrightness = photoncharge[currentPixel];
         int maxBrightnessID = currentPixel;
 
-        for (FactCameraPixel n : usableNeighbours) {
+        for (CameraPixel n : usableNeighbours) {
             if (photoncharge[n.id] > maxBrightness) {
                 maxBrightness = photoncharge[n.id];
                 maxBrightnessID = n.id;
@@ -401,12 +394,12 @@ public class ClusterFellwalker implements Processor {
 
     //find brightest neighbour in large neighbourhood, return the currentPixel if there is no brighter neighbour!!
     public int findMaxChargeLargeNeighbour(int currentPixel, double[] photoncharge) {
-        FactCameraPixel[] largeNeighbours = mapping.getSecondOrderNeighboursFromID(currentPixel);
+        CameraPixel[] largeNeighbours = mapping.getSecondOrderNeighboursFromID(currentPixel);
 
         double maxBrightness = photoncharge[currentPixel];
         int maxBrightnessID = currentPixel;
 
-        for (FactCameraPixel n : largeNeighbours) {
+        for (CameraPixel n : largeNeighbours) {
             if (photoncharge[n.id] > maxBrightness) {
                 maxBrightness = photoncharge[n.id];
                 maxBrightnessID = n.id;
@@ -434,25 +427,24 @@ public class ClusterFellwalker implements Processor {
     }
 
 
-    public FactCluster [] removeCluster(FactCluster clusterSet[], int minShowerpixel){
+    public FactCluster[] removeCluster(FactCluster clusterSet[], int minShowerpixel) {
         ArrayList<FactCluster> showerCluster = new ArrayList<>();
         int numShowerCluster = 0;
         int newID = 1;
-        for(int c=1; c<clusterSet.length;c++){
-            if(clusterSet[c].cleaningPixel.size()>=minShowerpixel){
+        for (int c = 1; c < clusterSet.length; c++) {
+            if (clusterSet[c].cleaningPixel.size() >= minShowerpixel) {
                 clusterSet[c].setShowerLabel(true);
                 clusterSet[c].setClusterID(newID);
                 newID++;
                 numShowerCluster++;
                 showerCluster.add(clusterSet[c]);
-            }
-            else{
+            } else {
                 clusterSet[c].setShowerLabel(false);
             }
         }
 
-        FactCluster [] showerClusterArray = new FactCluster[numShowerCluster];
-        for(int i=0; i<numShowerCluster; i++){
+        FactCluster[] showerClusterArray = new FactCluster[numShowerCluster];
+        for (int i = 0; i < numShowerCluster; i++) {
             showerClusterArray[i] = showerCluster.get(i);
         }
         return showerClusterArray;
@@ -460,12 +452,12 @@ public class ClusterFellwalker implements Processor {
     }
 
     // not needed for parameter calculation, just to have a quick look in the viewer
-    public static void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID){
-        for(FactCluster c : clusterSet){
-            if(c.getShowerLabel()){
-            ArrayList<Integer> boundPixel = c.findBoundaryNaive();
+    public static void markBoundaryPixel(FactCluster[] clusterSet, int[] showerClusterID) {
+        for (FactCluster c : clusterSet) {
+            if (c.getShowerLabel()) {
+                ArrayList<Integer> boundPixel = c.findBoundaryNaive();
                 showerClusterID[boundPixel.get(0)] = -1;
-                for (int i=1; i<boundPixel.size(); i++){
+                for (int i = 1; i < boundPixel.size(); i++) {
 
                     showerClusterID[boundPixel.get(i)] = 0;
 
@@ -480,14 +472,14 @@ public class ClusterFellwalker implements Processor {
      * 'ratio' by 'showerCluster.length' to have a normed value.
      * Idea behind is to have a value for the shape of a cluster.
      */
-    public static double  boundContentRatio(FactCluster[] showerCluster){
+    public static double boundContentRatio(FactCluster[] showerCluster) {
         double ratio = 0;
 
-        for(FactCluster c : showerCluster){
-            ratio += (double) c.getBoundaryLength()/c.getNumPixel();
+        for (FactCluster c : showerCluster) {
+            ratio += (double) c.getBoundaryLength() / c.getNumPixel();
         }
 
-        return ratio/showerCluster.length;
+        return ratio / showerCluster.length;
     }
 
 
@@ -497,12 +489,12 @@ public class ClusterFellwalker implements Processor {
      * of boundary pixels and the ideal(minimal) number of boundary pixels a cluster with a certain number of pixel could have.
      * Keep in mind that this feature is again correlated to 'NumCluster', as long as the returned 'sum' is not divided by 'showerCluster.length'.
      */
-    public static double idealBoundDiff(FactCluster[] showerCluster){
+    public static double idealBoundDiff(FactCluster[] showerCluster) {
         double sum = 0;
-        for (FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             sum += c.idealBoundDiff();
         }
-        return sum/showerCluster.length;
+        return sum / showerCluster.length;
     }
 
     /*
@@ -513,12 +505,12 @@ public class ClusterFellwalker implements Processor {
      * splashy shape...(Again: correlation to 'NumCluster' if not dividing by 'showerCluster.length'.)
 
      */
-    public static double boundAngleSum(FactCluster[] showerCluster){
+    public static double boundAngleSum(FactCluster[] showerCluster) {
         double sum = 0;
-        for (FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             sum += c.boundAngleSum();
         }
-        return sum/showerCluster.length;
+        return sum / showerCluster.length;
     }
 
 
@@ -526,36 +518,35 @@ public class ClusterFellwalker implements Processor {
      * Returns the mean over all distances from all cluster center of gravity to the camera center (the center position
      * in mm not the 'center pixel'). Gives an information about the geometrical distribution of the clusters in the camera image.
      */
-    public static double distanceCenter(FactCluster[] showerCluster){
+    public static double distanceCenter(FactCluster[] showerCluster) {
         double sum = 0;
-        for (FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             sum += c.distanceCamCenter();
         }
-        return sum/showerCluster.length;
+        return sum / showerCluster.length;
     }
 
-    public double distanceCog(FactCluster [] showerCluster, double cogX, double cogY){
+    public double distanceCog(FactCluster[] showerCluster, double cogX, double cogY) {
         double sum = 0;
-        for (FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             sum += c.distanceCog(cogX, cogY);
         }
-        return sum/showerCluster.length;
+        return sum / showerCluster.length;
     }
 
-    public double distanceSource(FactCluster[] showerCluster, double [] sourcePosition){
+    public double distanceSource(FactCluster[] showerCluster, CameraCoordinate sourcePosition) {
         double sum = 0;
-        for (FactCluster c : showerCluster){
-            sum += c.distanceSource(sourcePosition[0], sourcePosition[1]);
+        for (FactCluster c : showerCluster) {
+            sum += c.distanceSource(sourcePosition.xMM, sourcePosition.yMM);
         }
-        return sum/showerCluster.length;
+        return sum / showerCluster.length;
     }
-
 
 
     /** Method to search for all neighbor clusters of all clusters in the camera image. Two clusters are neighbors if there are no air pixels on the line between their cog's.
-    * "Air pixels" are the pixel on this line that don't belong to any shower-cluster. From the number of air-pixel one can conclude
-    * whether the clusters are neighbors, and, if not, how large the distance is between them.
-    * At the moment two clusters are marked as neighbors if there are no air-pixels between them.
+     * "Air pixels" are the pixel on this line that don't belong to any shower-cluster. From the number of air-pixel one can conclude
+     * whether the clusters are neighbors, and, if not, how large the distance is between them.
+     * At the moment two clusters are marked as neighbors if there are no air-pixels between them.
      * Keep in mind that currently clusters are marked as neighbors even if they are "indirect neighbors" (means they have a third cluster between them). In this case there are also no air pixel on the line
      * between their cog's, because all pixel on this line belongs to a cluster.
      * But maybe this is an opportunity to define another parameter for the whole image, something like "convexity". If there are no air pixel in the image at all, the group of clusters could be defined as convex.
@@ -564,33 +555,33 @@ public class ClusterFellwalker implements Processor {
      *
      * Maybe it's not necessary to fill the distances between the clusters in lists... the resulting 'number of neighbors' from this method isn't really a number of neighbors (as found in findNeighbors);
      * it's more like an estimation for the compactness of the clusters (how many clusters build a compact/connected group in the image). Therefore 'neighborDistance' and 'neighborClusters' could be misleading...
-    */
-    public int searchForCompactGroups(FactCluster [] showerCluster, int [] showerClusterID){
+     */
+    public int searchForCompactGroups(FactCluster[] showerCluster, int[] showerClusterID) {
         //int[][] map = new int [showerCluster.length][showerCluster.length];
-            //int [] viewer = showerClusterID.clone();
+        //int [] viewer = showerClusterID.clone();
         int sumAirpixel = 0;
-            for(int i=0; i<showerCluster.length; i++){
-                for(int j=i+1; j<showerCluster.length; j++){
-                    int airPixel = countAirPixel(mapping.line(showerCluster[i].cogId(), showerCluster[j].cogId()), showerClusterID);
-                    showerCluster[i].addAirDistance(airPixel);
-                    showerCluster[j].addAirDistance(airPixel);
-                    if(airPixel == 0){
-                        showerCluster[i].addCompactCluster(showerCluster[j].getClusterID());
-                        showerCluster[j].addCompactCluster(showerCluster[i].getClusterID());
-                    }
-                    else{sumAirpixel += airPixel;
-                        //System.out.println(sumAirpixel);
-                        }
-
+        for (int i = 0; i < showerCluster.length; i++) {
+            for (int j = i + 1; j < showerCluster.length; j++) {
+                int airPixel = countAirPixel(mapping.line(showerCluster[i].cogId(), showerCluster[j].cogId()), showerClusterID);
+                showerCluster[i].addAirDistance(airPixel);
+                showerCluster[j].addAirDistance(airPixel);
+                if (airPixel == 0) {
+                    showerCluster[i].addCompactCluster(showerCluster[j].getClusterID());
+                    showerCluster[j].addCompactCluster(showerCluster[i].getClusterID());
+                } else {
+                    sumAirpixel += airPixel;
+                    //System.out.println(sumAirpixel);
                 }
+
             }
+        }
 
         return sumAirpixel;
     }
 
-    public int countAirPixel(ArrayList<Integer> gapPixel, int[] showerClusterID){
+    public int countAirPixel(ArrayList<Integer> gapPixel, int[] showerClusterID) {
         int countAirPixel = 0;
-        for(int id : gapPixel){
+        for (int id : gapPixel) {
             if (showerClusterID[id] == -2) {
                 countAirPixel++;
             }
@@ -602,22 +593,22 @@ public class ClusterFellwalker implements Processor {
     /*
      * Mean over the number of (naive) neighbors for all clusters in an event.
      */
-    public double neighborClusterMean(FactCluster [] showerCluster){
+    public double neighborClusterMean(FactCluster[] showerCluster) {
         double sum = 0;
-        for (FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             sum += c.getNumNeighbors();
         }
-        return sum/showerCluster.length;
+        return sum / showerCluster.length;
     }
 
-    public void findNeighbors(FactCluster [] showerSet, int[] showerClusterID){                  //------------------------------- Neighbors testen waere sinnvoll
+    public void findNeighbors(FactCluster[] showerSet, int[] showerClusterID) {                  //------------------------------- Neighbors testen waere sinnvoll
         //int[] numNeighbors = new int [showerSet.length];
-        for(FactCluster c : showerSet){
+        for (FactCluster c : showerSet) {
             int clusterID = c.getClusterID();
             ArrayList<Integer> bound = c.findBoundaryNaive();
-            for(int id : bound){
-                FactCameraPixel [] boundPixelNeighbors = mapping.getNeighboursFromID(id);
-                for(FactCameraPixel p : boundPixelNeighbors){
+            for (int id : bound) {
+                CameraPixel[] boundPixelNeighbors = mapping.getNeighborsFromID(id);
+                for (CameraPixel p : boundPixelNeighbors) {
                     if (showerClusterID[p.id] != clusterID && showerClusterID[p.id] != -2 && !c.naiveNeighborClusterID.contains(showerClusterID[p.id])) {
                         c.naiveNeighborClusterID.add(showerClusterID[p.id]);
                     }
@@ -640,7 +631,7 @@ public class ClusterFellwalker implements Processor {
     }*/
 
 
-    public FactCluster maxCluster(FactCluster [] showerCluster){
+    public FactCluster maxCluster(FactCluster[] showerCluster) {
         int maxClusterIndex = 0;
         int size = 0;
         int i = 0;
@@ -656,11 +647,10 @@ public class ClusterFellwalker implements Processor {
     }
 
 
-    public static double getMorphMaxCluster(FactCluster[] showerCluster){
-        if(showerCluster.length == 1){
+    public static double getMorphMaxCluster(FactCluster[] showerCluster) {
+        if (showerCluster.length == 1) {
             return 1;
-        }
-        else {
+        } else {
             int maxClusterIndex = 0;
             int size = 0;
             double chargeSum = 0;
@@ -679,12 +669,10 @@ public class ClusterFellwalker implements Processor {
     }
 
 
-
-    public static double getChargeMaxCluster(FactCluster[] showerCluster){
-        if(showerCluster.length == 1){
+    public static double getChargeMaxCluster(FactCluster[] showerCluster) {
+        if (showerCluster.length == 1) {
             return 1;
-        }
-        else {
+        } else {
             int maxClusterIndex = 0;
             int size = 0;
             double chargeSum = 0;
@@ -702,27 +690,27 @@ public class ClusterFellwalker implements Processor {
 
     }
 
-    int numClusterPixel(FactCluster [] showerCluster){
+    int numClusterPixel(FactCluster[] showerCluster) {
         int sum = 0;
-        for(FactCluster c : showerCluster){
-            sum+= c.getNumPixel();
+        for (FactCluster c : showerCluster) {
+            sum += c.getNumPixel();
         }
         return sum;
     }
 
 
     //Possible, but not a good feature. Arrival times are therefore not use for feature creation so far.
-    public double stdArrTime(FactCluster [] showerCluster, double [] arrivaltime){
+    public double stdArrTime(FactCluster[] showerCluster, double[] arrivaltime) {
         double arrTimeMean = 0;
         double arrTimeStd = 0;
-        for(FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             int maxId = c.maxPhotonchargeId();
-            arrTimeMean += arrivaltime[maxId]/showerCluster.length;
+            arrTimeMean += arrivaltime[maxId] / showerCluster.length;
         }
 
-        for(FactCluster c : showerCluster){
+        for (FactCluster c : showerCluster) {
             int maxId = c.maxPhotonchargeId();
-            arrTimeStd += Math.pow((arrTimeMean - arrivaltime[maxId]), 2)/showerCluster.length;
+            arrTimeStd += Math.pow((arrTimeMean - arrivaltime[maxId]), 2) / showerCluster.length;
         }
 
         return Math.sqrt(arrTimeStd);
@@ -730,32 +718,18 @@ public class ClusterFellwalker implements Processor {
     }
 
     // Standard deviation of the mean over the number of pixels in every cluster in the event.
-    public static double stdNumPixel(FactCluster[] showerCluster){
+    public static double stdNumPixel(FactCluster[] showerCluster) {
         int numCluster = showerCluster.length;
         double mean = 0;
         double std = 0;
-        for(FactCluster c : showerCluster){
-            mean += c.getNumPixel()/numCluster;
+        for (FactCluster c : showerCluster) {
+            mean += c.getNumPixel() / numCluster;
         }
 
-        for(FactCluster c : showerCluster){
-            std += Math.pow((mean - c.getNumPixel()), 2)/numCluster;
+        for (FactCluster c : showerCluster) {
+            std += Math.pow((mean - c.getNumPixel()), 2) / numCluster;
         }
 
         return Math.sqrt(std);
     }
-
-
-    public void setMinShowerpixel(int minShowerpixel) {
-        this.minShowerpixel = minShowerpixel;
-    }
-    public void setShowerKey(String showerKey) {
-        this.showerKey = showerKey;
-    }
-    public void setArrivaltimePosKey(String arrivaltimePosKey){this.arrivaltimePosKey = arrivaltimePosKey;}
-    public void setPhotonchargeKey(String photonchargeKey){this.photonchargeKey = photonchargeKey;}
-    public void setSourcePositionKey(String sourcePositionKey){this.sourcePositionKey = sourcePositionKey;}
-    public void setAreaKey(String areaKey){this.areaKey = areaKey;}
-    public void setMorphologyKey(String morphologyKey){this.morphologyKey= morphologyKey;}
-
 }

@@ -1,0 +1,60 @@
+<container>
+
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="" />
+  <property name="drsfile" value="" />
+  <property name="outfile" value="" />
+
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
+
+  <process id="2" input="fact">
+    <fact.utils.PreviousEventInfo
+        startCellKey="StartCellData"
+        outputKey="prevEvents"
+        limitEvents="${PreviousEventInfo.limitEvents}"
+    />
+
+    <fact.features.UnixTimeUTC2DateTime />
+
+    <fact.datacorrection.DrsCalibration
+        url="${drsfile}"
+        key="Data"
+        outputKey="Data"
+    />  
+    <fact.datacorrection.PatchJumpRemoval
+        dataKey="Data"
+        outputKey="Data"
+        prevEventsKey="prevEvents"
+        startCellKey="StartCellData"
+        jumpLimit="${PatchJumpRemoval.jumpLimit}"
+    />
+    <fact.datacorrection.RemoveSpikes
+        dataKey="Data"
+        outputKey="Data"
+        startCellKey="StartCellData"
+        leftBorder="${RemoveSpikes.leftBorder}"
+        spikeLimit="${RemoveSpikes.spikeLimit}"
+        topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+        maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+    />
+    <fact.datacorrection.DrsTimeCalibration
+        dataKey="Data"
+        outputKey="Data"
+    />
+    <fact.datacorrection.InterpolateTimeSeries 
+        calibService="calibService"
+        dataKey="Data"
+        dataOutputKey="Data"
+    />
+  
+    <fact.io.FITSWriter
+      url="${outfile}"
+      keys="EventNum,TriggerNum,TriggerType,NumBoards,UnixTimeUTC,BoardTime,StartCellData,StartCellTimeMarker,Data,timestamp"
+      headerKeys="TELESCOP,CREATOR,COMPILED,ORIGIN,TIMESYS,TIMEUNIT,MJDREF,PACKAGE,VERSION,REVISION,DATE,NIGHT,RUNID,NBOARD,NPIX,NTMARK,NCELLS,NROI,NROITM,TMSHHIFT,CAMERA,DAQ,ADCRANGE,ADC,RUNTYPE,PRESC,PHASE,DRSCALIB,TSTARTI,TSTARTF,TSTOPI,TSTOPF,DATE-OBS,DATE-END,NTRG,NTRGPED,NTRGPED,NTRGTIM,NTRGLPI,NTRGEXT1,NTRGEXT2,NTRGMISC"
+    />
+
+  </process>
+</container>

@@ -10,47 +10,36 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.util.Set;
-
 
 /**
  * This processor gets a pixel set and returns the reverted set for the whole camera.
  * Created by jebuss on 17.12.15.
  */
-public class Invert implements Processor{
+public class Invert implements Processor {
     static Logger log = LoggerFactory.getLogger(Invert.class);
 
-    @Parameter(required = true, description = "key to the first set to be united")
-    private String insetKey;
+    @Parameter(required = true, description = "key to the set to be inverted")
+    public String insetKey;
 
     @Parameter(required = true, description = "key to the output set which contains the inversion")
-    private String outsetKey;
+    public String outsetKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
+        Utils.isKeyValid(item, insetKey, PixelSet.class);
+        PixelSet inset = (PixelSet) item.get(insetKey);
 
-        if (!input.containsKey(insetKey)) {
-            return input;
-        }
-        Utils.isKeyValid(input, insetKey, PixelSet.class);
-        PixelSet inset = (PixelSet) input.get(insetKey);
-
-        int npix = (Integer) input.get("NPIX");
+        int npix = (Integer) item.get("NPIX");
 
         PixelSet wholeCamSet = createFullCameraSet(npix);
 
-        try {
-            Sets.SetView<CameraPixel> inversion = Sets.difference(wholeCamSet.set, inset.set);
-            Set<CameraPixel> cameraPixels = inversion.immutableCopy();
+        Sets.SetView<CameraPixel> inversion = Sets.difference(wholeCamSet.set, inset.set);
 
-            PixelSet outset = new PixelSet(cameraPixels);
+        PixelSet outset = new PixelSet();
+        inversion.copyInto(outset.set);
+        item.put(outsetKey, outset);
 
-            input.put(outsetKey, outset);
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
-
-        return input;
+        return item;
     }
 
     public PixelSet createFullCameraSet(int npix) {
@@ -59,13 +48,5 @@ public class Invert implements Processor{
             wholeCamSet.addById(pix);
         }
         return wholeCamSet;
-    }
-
-    public void setInsetKey(String insetKey) {
-        this.insetKey = insetKey;
-    }
-
-    public void setOutsetKey(String outsetKey) {
-        this.outsetKey = outsetKey;
     }
 }

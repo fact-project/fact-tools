@@ -3,14 +3,11 @@
     <properties url="classpath:/default/settings.properties" />
 
     <!-- Pathes to the input files -->
-    <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-    <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
+    <property name="infile" value="classpath:/testDataFile.fits.gz" />
+    <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
 
-    <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
+    <service id="gainService" class="fact.gainservice.GainService" />
     <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
-
-    <!--In case you want to analyze .zfits files.-->
-    <!--<stream id="fact" class="fact.io.hdureader.FITSStream"  url="${infile}"/>-->
 
     <!-- Name of the stream and url to the input file -->
     <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
@@ -34,23 +31,19 @@
                 outputKey="DataCalibrated"
                 prevEventsKey="prevEvents"
                 startCellKey="StartCellData"
-                jumpLimit="${patchJumpRemoval_jumpLimit}"
+                jumpLimit="${PatchJumpRemoval.jumpLimit}"
                 />
         <fact.datacorrection.RemoveSpikes
                 dataKey="DataCalibrated"
                 outputKey="DataCalibrated"
                 startCellKey="StartCellData"
-                leftBorder="${removeSpikes_leftBorder}"
-                spikeLimit="${removeSpikes_spikeLimit}"
-                topSlopeLimit="${removeSpikes_topSlopeLimit}"
-                maxSpikeLength="${removeSpikes_maxSpikeLength}"
+                leftBorder="${RemoveSpikes.leftBorder}"
+                spikeLimit="${RemoveSpikes.spikeLimit}"
+                topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+                maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
                 />
-        <fact.filter.DrsTimeCalibration
-                outputKey="timeCalibConst"
-                />
-        <fact.filter.ArrayTimeCorrection
+        <fact.datacorrection.DrsTimeCalibration
                 dataKey="DataCalibrated"
-                timeCalibConstKey="timeCalibConst"
                 outputKey="DataCalibrated"
                 />
 

@@ -1,7 +1,6 @@
 package fact.hexmap.ui.windows;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -21,7 +20,7 @@ import javax.swing.*;
 
 public class PlotDisplayWindow implements EventObserver {
 
-	private final MainPlotPanel plotPanel = new MainPlotPanel(750, 480, false);
+    private final MainPlotPanel plotPanel = new MainPlotPanel(750, 480, false);
     private final KeySelector keySelector = new TimeSeriesKeySelector();
     private final KeySelector intervalKeySelector = new IntervallMarkerKeySelector();
 
@@ -31,9 +30,9 @@ public class PlotDisplayWindow implements EventObserver {
     public PlotDisplayWindow() {
         //keySelector.addItem(new SeriesKeySelectorItem(key, Color.DARK_GRAY, keySelector));
         Bus.eventBus.register(this);
-	}
+    }
 
-    public void showWindow(){
+    public void showWindow() {
         JFrame frame = new JFrame();
         FormLayout layout = new FormLayout(new ColumnSpec[]{
                 ColumnSpec.decode("pref"),
@@ -47,15 +46,18 @@ public class PlotDisplayWindow implements EventObserver {
                 }
         );
 
-        PanelBuilder builder = new PanelBuilder(layout);
-        CellConstraints cc = new CellConstraints();
-        builder.add(plotPanel, cc.xywh(1,1,1,4));
-        builder.addSeparator("Series Selection", cc.xy(2, 1));
-        builder.add(keySelector, cc.xy(2, 2));
-        builder.addSeparator("Marker Selection", cc.xy(2, 3));
-        builder.add(intervalKeySelector, cc.xy(2, 4));
 
-        frame.setContentPane(builder.getPanel());
+        JPanel panel = new JPanel(layout);
+        CellConstraints cc = new CellConstraints();
+        panel.add(plotPanel, cc.xywh(1, 1, 1, 4));
+
+        panel.add(new JLabel("Series Selection"), cc.xy(2, 1));
+        panel.add(keySelector, cc.xy(2, 2));
+
+        panel.add(new JLabel("Marker Selection"), cc.xy(2, 3));
+        panel.add(intervalKeySelector, cc.xy(2, 4));
+
+        frame.setContentPane(panel);
         frame.pack();
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
@@ -63,13 +65,14 @@ public class PlotDisplayWindow implements EventObserver {
 
 
     @Subscribe
-    public void handleKeySelectionChange(TimeSeriesSelectionChangedEvent e){
+    public void handleKeySelectionChange(TimeSeriesSelectionChangedEvent e) {
         plotPanel.setItemsToPlot(keySelector.getSelectedItemPairs());
         //plotPanel.setMarkerToPlot(selectedMarker);
         plotPanel.drawPlot();
     }
+
     @Subscribe
-    public void handleKeySelectionChange(IntervallMarkerSelectionChangedEvent e){
+    public void handleKeySelectionChange(IntervallMarkerSelectionChangedEvent e) {
         //plotPanel.setItemsToPlot(selectedItems);
         plotPanel.setMarkerToPlot(intervalKeySelector.getSelectedItemPairs());
         plotPanel.drawPlot();
@@ -77,6 +80,7 @@ public class PlotDisplayWindow implements EventObserver {
 
     /**
      * Adds the keys we can display in the plot window to the list on right side of the screen.
+     *
      * @param itemKeyPair the current data item we want to display
      */
     @Override
@@ -90,8 +94,7 @@ public class PlotDisplayWindow implements EventObserver {
     }
 
 
-
-    public static void main(String[]args){
+    public static void main(String[] args) {
         PlotDisplayWindow p = new PlotDisplayWindow();
         p.showWindow();
     }

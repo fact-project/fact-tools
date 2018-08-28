@@ -1,0 +1,83 @@
+{
+    "description": "The FACT-Tools are an extension of the streams framework to analyse the data of the First G-APD Cherenkov Telescope",
+    "license": "lgpl-3.0",
+    "keywords": [
+        "gamma-ray astronomy",
+        "streams",
+        "FACT",
+        "Imaging Atmospheric Cherenkov Telescope",
+        "IACT"
+    ],
+    "upload_type": "software",
+    "creators": [
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Kai Br\u00fcgge"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Maximilian N\u00f6the"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Jens Bu\u00df"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "T. Fabian Temme"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Michael Bulinski"
+        },
+        {
+            "affiliation": "ETH Zurich",
+            "name": "Sebastian A. Mueller"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Christian Bockermann"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Lena Linhoff"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Jan Freiwald"
+        },
+        {
+            "affiliation": "ETH Zurich",
+            "name": "Dominik Neise"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Dominik Baack"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Hendrik Hildebrandt"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Katie Gray"
+        },
+        {
+            "affiliation": "ETH Zurich",
+            "name": "Max L. Ahnen"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Alexey Egorov"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Kai Schenetten"
+        },
+        {
+            "affiliation": "TU Dortmund",
+            "name": "Niklas Wulf"
+        }
+    ],
+    "access_right": "open"
+}

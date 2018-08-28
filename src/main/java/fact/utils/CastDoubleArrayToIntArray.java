@@ -7,35 +7,27 @@ import stream.annotations.Parameter;
 public class CastDoubleArrayToIntArray implements Processor {
 
     @Parameter(
-        required = true,
-        description = "Key to your double array."
+            required = true,
+            description = "Key to your double array."
     )
     private String inputKey;
 
     @Parameter(
-        required = true,
-        description = "Key to the output integer array."
+            required = true,
+            description = "Key to the output integer array."
     )
     protected String outputKey;
 
     @Override
-    public Data process(Data input) {
-        double[] doubleArray = (double[]) input.get(inputKey);
+    public Data process(Data item) {
+        double[] doubleArray = (double[]) item.get(inputKey);
         int[] intArray = new int[doubleArray.length];
 
-        for (int i=0; i<intArray.length; ++i){
+        for (int i = 0; i < intArray.length; ++i) {
             intArray[i] = (int) Math.round(doubleArray[i]);
         }
 
-        input.put(outputKey, intArray);
-        return input;
+        item.put(outputKey, intArray);
+        return item;
     }
-
-    public void setInputKey(String inputKey) {
-        this.inputKey = inputKey;
-    }
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
 }

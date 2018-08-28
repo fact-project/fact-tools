@@ -11,34 +11,26 @@ import stream.annotations.Parameter;
 
 /**
  * Convert an int array of chids into a PixelSet
- *
  */
-public class FromChidArray implements Processor{
+public class FromChidArray implements Processor {
     static Logger log = LoggerFactory.getLogger(FromChidArray.class);
 
     @Parameter(required = true, description = "key to the input int array of chids")
-    private String inputKey;
+    public String inputKey;
 
     @Parameter(required = true, description = "key to the output for the pixelSet")
-    private String outputKey;
+    public String outputKey;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
         FactPixelMapping m = FactPixelMapping.getInstance();
         PixelSet pixelSet = new PixelSet();
-        int[] chids = (int[]) input.get(inputKey);
-        for(int chid : chids){
+        int[] chids = (int[]) item.get(inputKey);
+        for (int chid : chids) {
             pixelSet.add(m.getPixelFromId(chid));
         }
-        input.put(outputKey, pixelSet);
-        return input;
+        item.put(outputKey, pixelSet);
+        return item;
     }
 
-    public void setInputKey(String inputKey) {
-        this.inputKey = inputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
 }

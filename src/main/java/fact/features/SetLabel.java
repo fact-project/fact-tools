@@ -7,18 +7,16 @@ import stream.annotations.Parameter;
 /**
  * Created by lena on 09.02.16.
  */
-public class SetLabel implements Processor{
+public class SetLabel implements Processor {
 
     @Parameter(required = true, description = "Label: Proton = 0, Gamma = 1")
     public int label;
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        input.put("label", label);
+        item.put("label", label);
 
-        return input;
+        return item;
     }
-
-    public void setLabel(int label){this.label = label;}
 }

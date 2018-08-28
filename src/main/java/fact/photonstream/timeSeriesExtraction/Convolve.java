@@ -11,14 +11,10 @@ public class Convolve {
      * This corresponds to numpy.convolve(mode='valid').
      * (No cyclic edge assumptions, No zero filling)
      *
-     * @param first
-     *           The first array [N].
-     *
-     * @param second
-     *           The second array [M].
-     *
+     * @param first  The first array [N].
+     * @param second The second array [M].
      * @return conv
-     *           An array [ max(M,N) - min(M,N) + 1].
+     * An array [ max(M,N) - min(M,N) + 1].
      */
     public static double[] firstWithSecond(double[] first, double[] second) {
 
@@ -29,7 +25,7 @@ public class Convolve {
         for (int i = 0; i < conv.length; i++) {
             double sum = 0.0;
             for (int j = 0; j < second.length; j++)
-                sum += first[i+j]*second[j];
+                sum += first[i + j] * second[j];
             conv[i] = sum;
         }
         return conv;

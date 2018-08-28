@@ -1,0 +1,21 @@
+<container>
+
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="" />
+  <property name="drsfile" value="" />
+  <property name="outfile" value="" />
+
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+
+    <stream id="fact" class="fact.io.hdureader.FITSStream" url="file:${infile}"/>
+
+    <process id="1" input="fact">
+      <fact.io.FITSWriter
+        url="file:${outfile}"
+        keys="EventNum,TriggerNum,TriggerType,NumBoards,UnixTimeUTC,BoardTime,StartCellData,StartCellTimeMarker,Data"
+        headerKeys="TELESCOP,CREATOR,COMPILED,ORIGIN,TIMESYS,TIMEUNIT,MJDREF,PACKAGE,VERSION,REVISION,DATE,NIGHT,RUNID,NBOARD,NPIX,NTMARK,NCELLS,NROI,NROITM,TMSHHIFT,CAMERA,DAQ,ADCRANGE,ADC,RUNTYPE,PRESC,PHASE,DRSCALIB,TSTARTI,TSTARTF,TSTOPI,TSTOPF,DATE-OBS,DATE-END,NTRG,NTRGPED,NTRGPED,NTRGTIM,NTRGLPI,NTRGEXT1,NTRGEXT2,NTRGMISC"
+      />
+
+  </process>
+</container>

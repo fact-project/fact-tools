@@ -1,0 +1,17 @@
+<module>
+  <If condition="%{data.CREATOR}=='Ceres'">
+    <fact.features.source.SourcePosition
+      outputKey="source_position"
+      pointingZdKey="MPointingPos.fZd"
+      pointingAzKey="MPointingPos.fAz"
+      sourceZdKey="MSimSourcePos.fZd"
+      sourceAzKey="MSimSourcePos.fAz"
+    />
+  </If>
+  <If condition="%{data.CREATOR}!='Ceres'">
+    <fact.features.source.SourcePosition
+        outputKey="source_position"
+        auxService="auxService"
+    />
+  </If>
+</module>

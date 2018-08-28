@@ -11,31 +11,30 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 /**
- *
  * A FITS object containing all HDUs in a given file.
  * HDUs can be accessed by their name.
- *
- *    FITS f = FITS.fromPath(p)
- *    HDU offsets = f.getHDU("ZDrsCellOffsets");
- *    BinTable binTable = offsets.getBinTable();
- *
+ * <p>
+ * FITS f = FITS.fromPath(p)
+ * HDU offsets = f.getHDU("ZDrsCellOffsets").orElseThrow(IOException::new);
+ * BinTable binTable = offsets.getBinTable();
+ * <p>
  * BinTables can also directly be accessed by name if they exist.
- *
- *    FITS.fromPath(p).getBinTableByName("Events")
- *                    .ifPresent(binTable -> {
- *                        //do something with bintable
- *                    })
- *
+ * <p>
+ * FITS.fromPath(p).getBinTableByName("Events")
+ * .ifPresent(binTable -> {
+ * //do something with bintable
+ * })
+ * <p>
  * Data from the BinTable can be read using the BinTableReader and ZFITSHeapReader classes.
- *
- *    FITS f = new FITS(u);
- *    BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
- *
- *    for(OptionalTypesMap<String, Serializable> p : BinTableReader.forBinTable(events)){
- *      assertTrue(p.containsKey("Data"));
- *    }
- *
- *
+ * <p>
+ * FITS f = new FITS(u);
+ * BinTable events = f.getBinTableByName("Events").orElseThrow(IOException::new);
+ * <p>
+ * for(OptionalTypesMap<String, Serializable> p : BinTableReader.forBinTable(events)){
+ * assertTrue(p.containsKey("Data"));
+ * }
+ * <p>
+ * <p>
  * Created by mackaiver on 03/11/16.
  */
 public class FITS {
@@ -43,7 +42,7 @@ public class FITS {
 
 
     private final URL url;
-    private final List<HDU>  hdus = new ArrayList<>();
+    private final List<HDU> hdus = new ArrayList<>();
 
     private Map<String, HDU> hduNames = new HashMap<>();
 
@@ -52,10 +51,11 @@ public class FITS {
 
     /**
      * Creates a fits instance from a path object without throwing checked exceptions immediately.
+     *
      * @param path The path to the fits file
      * @return a FITS object
      */
-    public static FITS fromPath(Path path)  {
+    public static FITS fromPath(Path path) {
         try {
             return new FITS(path.toUri().toURL());
         } catch (IOException e) {
@@ -65,21 +65,22 @@ public class FITS {
 
     /**
      * Creates a fits instance from a File object without throwing checked exceptions immediately.
+     *
      * @param file the fits file
      * @return a FITS object
      */
-    public static FITS fromFile(File file)  {
-        if (!file.canRead()){
-            throw new RuntimeException("File " + file.toString() +  " is not readable");
+    public static FITS fromFile(File file) {
+        if (!file.canRead()) {
+            throw new RuntimeException("File " + file.toString() + " is not readable");
         }
         try {
             return new FITS(file.toURI().toURL());
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
-    public FITS(URL  url) throws IOException {
+    public FITS(URL url) throws IOException {
         this.url = url;
         DataInputStream stream = getUnGzippedDataStream(url);
         long absoluteHduOffsetInFile = 0;
@@ -100,7 +101,7 @@ public class FITS {
                 ByteStreams.skipFully(stream, h.offsetToNextHDU());
             }
 
-        } catch (EOFException e){
+        } catch (EOFException e) {
             primaryHDU = hdus.get(0);
             stream.close();
 
@@ -109,13 +110,14 @@ public class FITS {
     }
 
     static DataInputStream getUnGzippedDataStream(URL url) throws IOException {
-        InputStream stream = url.openStream();
+        BufferedInputStream stream = new BufferedInputStream(url.openStream());
+
 
         byte[] header = new byte[2];
         stream.mark(2);
 
         int read = stream.read(header);
-        if(read != 2){
+        if (read != 2) {
             throw new IOException("Could not read the first 2 bytes from stream.");
         }
 
@@ -123,22 +125,23 @@ public class FITS {
         stream.reset();
 
         //check if matches standard gzip magic number
-        if(isGzippedCompressed(header)) {
+        if (isGzippedCompressed(header)) {
             log.debug("Getting gzipped stream");
             return new DataInputStream(new BufferedInputStream(new GZIPInputStream(stream)));
-        }else {
+        } else {
             return new DataInputStream(new BufferedInputStream(stream));
         }
     }
 
     /**
-     * Given the first 2 bytes of an input stream, this returns whether the stream is
+     * Given the first 2 bytes of an item stream, this returns whether the stream is
      * gzipped or not
+     *
      * @param header byte[] containing the first two bytes of any file/stream
      * @return true iff stream is gzipped.
      */
-    static boolean isGzippedCompressed(byte[] header){
-        return header[0] == (byte) GZIPInputStream.GZIP_MAGIC  && header[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
+    static boolean isGzippedCompressed(byte[] header) {
+        return header[0] == (byte) GZIPInputStream.GZIP_MAGIC && header[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
     }
 
     /**
@@ -147,8 +150,8 @@ public class FITS {
      * @param extname the HDU to get.
      * @return the HDU with the passed EXTNAME value
      */
-    public HDU getHDU(String extname){
-        return hduNames.get(extname);
+    public Optional<HDU> getHDU(String extname) {
+        return Optional.ofNullable(hduNames.get(extname));
     }
 
 
@@ -169,7 +172,7 @@ public class FITS {
      * @return the bintable for the specified hdu
      */
     public Optional<BinTable> getBinTableByName(String hduExtName) {
-        if(!hduNames.containsKey(hduExtName)){
+        if (!hduNames.containsKey(hduExtName)) {
             return Optional.empty();
         }
         HDU hdu = hduNames.get(hduExtName);
@@ -190,8 +193,8 @@ public class FITS {
 
 
         long bytesToSkip = 0;
-        for(HDU h : hdus){
-            if(h.equals(hdu)){
+        for (HDU h : hdus) {
+            if (h.equals(hdu)) {
                 bytesToSkip += h.header.headerSizeInBytes;
                 break;
             }
@@ -200,7 +203,7 @@ public class FITS {
 
 
         long skipped = stream.skip(bytesToSkip);
-        if(bytesToSkip!= skipped ){
+        if (bytesToSkip != skipped) {
             log.error("Could not skip to data area. Skipped only {} instead of requested {} bytes.", skipped, bytesToSkip);
             throw new IOException("Could not skip to data area.");
         }

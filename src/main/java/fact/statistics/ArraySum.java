@@ -6,47 +6,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
+import stream.annotations.Parameter;
 
 import java.io.Serializable;
 
 /**
  * This operator calculates the sum of the values in of the array specified by the key.
- *
+ * <p>
  * This operator was created by refactoring ArrayMean
- * 
- *  @author Maximilian Noethe &lt;maximilian.noethe@tu-dortmund.de&gt;
+ *
+ * @author Maximilian Noethe &lt;maximilian.noethe@tu-dortmund.de&gt;
  */
 public class ArraySum implements Processor {
-	static Logger log = LoggerFactory.getLogger(ArraySum.class);
-	private String key;
-	private String outputKey = "sum";
-	
-	@Override
-	public Data process(Data input) {
-		if(input.containsKey(key)){
-			Serializable data = input.get(key);
-			DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.toDoubleArray(data));
-			
-			input.put(outputKey , descriptiveStatistics.getSum());
-			return input;
-		} else {
-			throw new RuntimeException("Key not found in event. "  + key  );
-		}
-	}
+    static Logger log = LoggerFactory.getLogger(ArraySum.class);
 
-	
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
+    @Parameter(required = true)
+    private String key;
 
-	
-	public String getOutputKey() {
-		return outputKey;
-	}
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    @Parameter(required = true)
+    private String outputKey = "sum";
+
+    @Override
+    public Data process(Data input) {
+        Utils.mapContainsKeys(input, key);
+
+        Serializable data = input.get(key);
+        DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics(Utils.toDoubleArray(data));
+
+        input.put(outputKey, descriptiveStatistics.getSum());
+        return input;
+    }
 }

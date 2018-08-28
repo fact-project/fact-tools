@@ -1,32 +1,52 @@
 package fact;
 
-import java.net.URL;
+import fact.coordinates.CameraCoordinate;
+import fact.hexmap.ui.Viewer;
+import fact.hexmap.ui.overlays.EllipseOverlay;
+import fact.hexmap.ui.overlays.SourcePositionOverlay;
+import fact.io.hdureader.BinTable;
+import fact.io.hdureader.BinTableReader;
+import fact.io.hdureader.FITS;
+import fact.io.hdureader.OptionalTypesMap;
+import stream.Data;
+import stream.data.DataFactory;
 
-import static org.junit.Assert.fail;
+import java.io.File;
+import java.io.Serializable;
 
-/**
- * Created by kaibrugge on 20.03.14.
- */
 public class ViewerManualTest {
 
-    public static void main(String[] args){
-        viewerXML();
-    }
+    public static void main(String[] args) throws Exception {
 
-    //this cant be called during an automated unitest cause it needs some user input to exit
-    public static void viewerXML() {
+        Data item = DataFactory.create();
 
-        try {
-            URL url = ViewerManualTest.class.getResource("/viewertest.xml");
-            URL drsUrl =  ViewerManualTest.class.getResource("/testDrsFile.drs.fits.gz");
-            URL dataUrl =  ViewerManualTest.class.getResource("/testDataFile.fits.gz");
-            URL driveUrl =  ViewerManualTest.class.getResource("/testDriveFile.fits");
-            String[] args = {url.toString(), "-Dinput="+dataUrl.toString(), "-DdrsInput="+drsUrl.toString(), "-DdriveFile="+driveUrl.toString()};
-            stream.run.main(args);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            fail("Could not run the ./viewertest.xml");
+        FITS fits = FITS.fromFile(new File("src/main/resources/testDataFile.fits.gz"));
+        BinTable table = fits.getBinTableByName("Events").orElseThrow(RuntimeException::new);
+        BinTableReader reader = BinTableReader.forBinTable(table);
+
+        OptionalTypesMap<String, Serializable> event = null;
+        for (int i = 0; i < 11 ; i++) {
+            event = reader.getNextRow();
+
         }
+        short[] data = event.getShortArray("Data").orElseThrow(RuntimeException::new);
+
+
+        item.put("Data", data);
+
+        item.put("sourceMarker", new SourcePositionOverlay("test", new CameraCoordinate(0, 50)));
+
+        item.put("e1", new EllipseOverlay(0, 0, 50, 25, Math.toRadians(0)));
+        item.put("e2", new EllipseOverlay(0, 0, 50, 25, Math.toRadians(22.5)));
+        item.put("e3", new EllipseOverlay(0, 0, 50, 25, Math.toRadians(45)));
+        item.put("e4", new EllipseOverlay(0, 0, 50, 25, Math.toRadians(90)));
+        item.put("e5", new EllipseOverlay(0, 0, 50, 25, Math.toRadians(135)));
+        item.put("e6", new EllipseOverlay(0, 0, 50, 25, Math.toRadians(225)));
+
+        Viewer viewer = Viewer.getInstance();
+        viewer.setVisible(true);
+        viewer.setDefaultKey("Data");
+        viewer.setDataItem(item);
+
     }
 }

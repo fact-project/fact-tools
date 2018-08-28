@@ -10,69 +10,48 @@ import stream.annotations.Parameter;
 
 
 public class PreviousEventInfo implements Processor {
-	static Logger log = LoggerFactory.getLogger(PreviousEventInfo.class);
-	
-	@Parameter(required=true)
-	String startCellKey = null;
-	@Parameter(required=true)
-	String outputKey=null;
-	
-	int limitEvents=20;
-	
-	PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();
-	
+    static Logger log = LoggerFactory.getLogger(PreviousEventInfo.class);
 
-	@Override
-	public Data process(Data input) {
-		
-		Utils.isKeyValid(input, startCellKey, short[].class);
-		Utils.isKeyValid(input, "NROI", Integer.class);
-		Utils.isKeyValid(input, "UnixTimeUTC", int[].class);
-				
-		int[] eventTime = (int[]) input.get("UnixTimeUTC");
-		short[] startCellArray = (short[])input.get(startCellKey);
-		int length = (Integer) input.get("NROI");
-		
-		short[] stopCellArray = new short[startCellArray.length];
-		//calculate the stopcellArray for the current event
-		for (int i = 0; i < startCellArray.length; ++i){
-			//there are 1024 capacitors in the ringbuffer
-			stopCellArray[i] = (short) ((startCellArray[i] + length)% 1024);
-		}
-		
-		previousEventInfo.addNewInfo(startCellArray, stopCellArray, eventTime);
-		
-		if (previousEventInfo.getListSize() > limitEvents)
-		{
-			previousEventInfo.removeLastInfo();
-		}
-		
-		input.put(outputKey, previousEventInfo);
-		return input;
-	}
+    @Parameter(required = true)
+    public String startCellKey = null;
 
-	public String getStartCellKey() {
-		return startCellKey;
-	}
+    @Parameter(required = true)
+    public String outputKey = null;
 
-	public void setStartCellKey(String startCellKey) {
-		this.startCellKey = startCellKey;
-	}
+    @Parameter(required = false, description = "The key containing the UnixTimeUTC")
+    public String unixTimeKey = "UnixTimeUTC";
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    @Parameter(required = false, description = "Set the amount of events to buffer for the jumpremoval.")
+    public int limitEvents = 20;
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    PreviousEventInfoContainer previousEventInfo = new PreviousEventInfoContainer();
 
-	public int getLimitEvents() {
-		return limitEvents;
-	}
 
-	public void setLimitEvents(int limitEvents) {
-		this.limitEvents = limitEvents;
-	}
+    @Override
+    public Data process(Data item) {
 
+        Utils.isKeyValid(item, startCellKey, short[].class);
+        Utils.isKeyValid(item, "NROI", Integer.class);
+        Utils.isKeyValid(item, unixTimeKey, int[].class);
+
+        int[] eventTime = (int[]) item.get(unixTimeKey);
+        short[] startCellArray = (short[]) item.get(startCellKey);
+        int length = (Integer) item.get("NROI");
+
+        short[] stopCellArray = new short[startCellArray.length];
+        //calculate the stopcellArray for the current event
+        for (int i = 0; i < startCellArray.length; ++i) {
+            //there are 1024 capacitors in the ringbuffer
+            stopCellArray[i] = (short) ((startCellArray[i] + length) % 1024);
+        }
+
+        previousEventInfo.addNewInfo(startCellArray, stopCellArray, eventTime);
+
+        if (previousEventInfo.getListSize() > limitEvents) {
+            previousEventInfo.removeLastInfo();
+        }
+
+        item.put(outputKey, previousEventInfo);
+        return item;
+    }
 }

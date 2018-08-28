@@ -1,0 +1,50 @@
+<container>
+  <!--
+  This Process contains the standard analysis for FACT, with modifications to be used with the SGE/TORQUE cluster
+  execution tool ERNA (Easy RuN Access) https://github.com/fact-project/erna
+  -->
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="aux_source" value="file:src/main/resources/aux/" />
+
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+  <property name="drsfile" value="@drsFile" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${aux_source}" />
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.gainservice.GainService" />
+
+  <!-- Has to be a  FactFileListMultiStream in order to work on tasks from gridmap and the executor script.-->
+  <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
+      <stream class="fact.io.hdureader.FITSStream" id="_" />
+  </stream>
+
+  <process id="1" input="fact">
+    <include url="classpath:/analysis/init.xml" />
+    <!-- This skips events created by our malfunctioning LED light pulser (27s Events) --> 
+    <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
+    <!-- Only analyze physics trigger events -->
+    <Skip condition="%{data.TriggerType} != 4" />
+
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
+
+    <!-- Only analyze events with at least 5 pixels after cleaning -->
+    <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
+
+    <include url="classpath:/analysis/pedestalParameters.xml" />
+    <include url="classpath:/analysis/imageParameters.xml" />
+    <include url="classpath:/analysis/sourcePosition.xml" />
+
+    <fact.utils.SanitizeKeys />
+    <!-- its important that you output a valid json file for this to work in conjuction with gridmap -->
+    <fact.io.JSONWriter keys="${outputKeysObservations}"
+        url="${output}"
+        writeListOfItems="True"
+        specialDoubleValuesAsString="True"
+        pixelSetsAsInt="True"
+        />
+  </process>
+</container>

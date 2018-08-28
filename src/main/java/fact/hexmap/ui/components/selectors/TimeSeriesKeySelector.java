@@ -1,5 +1,6 @@
 package fact.hexmap.ui.components.selectors;
 
+import fact.Constants;
 import fact.Utils;
 import fact.hexmap.ui.Bus;
 import fact.hexmap.ui.events.TimeSeriesSelectionChangedEvent;
@@ -30,11 +31,11 @@ public class TimeSeriesKeySelector extends KeySelector {
         for (String key : item.keySet()) {
 
             Serializable value = item.get(key);
-            if (value == null){
+            if (value == null) {
                 continue;
             }
             double[] series = Utils.toDoubleArray(value);
-            if (series != null && (series.length > 1440) && (series.length % 1440 == 0)) {
+            if (series != null && (series.length > Constants.N_PIXELS) && (series.length % Constants.N_PIXELS == 0)) {
                 SeriesKeySelectorItem newSelectorItem = new SeriesKeySelectorItem(key, Color.GRAY, this);
                 newItems.add(newSelectorItem);
             }

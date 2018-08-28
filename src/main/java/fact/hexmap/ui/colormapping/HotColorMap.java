@@ -13,14 +13,12 @@ public class HotColorMap implements ColorMapping {
     public Color getColorFromValue(double value, double minValue, double maxValue) {
 
 
-        if(Double.isNaN(value)){
+        if (Double.isNaN(value)) {
 
             return Color.GREEN;
-        }
-        else if(minValue == 0 && maxValue == 0){
+        } else if (minValue == 0 && maxValue == 0) {
             return Color.BLUE;
-        }
-        else {
+        } else {
 
             double l1 = (maxValue - minValue) / 3.;
             int n1 = (int) ((value - minValue) / l1);

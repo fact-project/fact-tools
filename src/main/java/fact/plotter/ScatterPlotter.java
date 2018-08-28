@@ -21,164 +21,126 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
- * 
  * @author bruegge
- * 
  */
 public class ScatterPlotter extends DataVisualizer {
-	static Logger log = LoggerFactory.getLogger(ScatterPlotter.class);
-	//	JFrame frame;
+    static Logger log = LoggerFactory.getLogger(ScatterPlotter.class);
+    //	JFrame frame;
 
-	private XYSeriesCollection dataset;
-	private XYSeries series;
+    private XYSeriesCollection dataset;
+    private XYSeries series;
 
-	private String xValue = "";
-	private String yValue = "";
-	
-	private String title = "Default Title";
-	private String color = "#2A2EE0";
+    private String xValue = "";
+    private String yValue = "";
 
-	private boolean keepOpen = true;
+    @Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
+    public String title = "Default Title";
 
-//	private int i;
-	private double x;
+    @Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
+    public boolean keepOpen = true;
 
-	private double y;
+    private String color = "#2A2EE0";
+    //	private int i;
+    private double x;
 
-	private void showGraph() {
-		final JFreeChart chart = ChartFactory.createScatterPlot(
-				title,                  // chart title
-				xValue,                      // x axis label
-				yValue,                      // y axis label
-				dataset,                  // data
-				PlotOrientation.VERTICAL,
-				true,                     // include legend
-				true,                     // tooltips
-				false                     // urls
-				);
-		XYPlot plot = (XYPlot) chart.getPlot();
-		DemoRenderer renderer = new DemoRenderer();
+    private double y;
+
+    private void showGraph() {
+        final JFreeChart chart = ChartFactory.createScatterPlot(
+                title,                  // chart title
+                xValue,                      // x axis label
+                yValue,                      // y axis label
+                dataset,                  // data
+                PlotOrientation.VERTICAL,
+                true,                     // include legend
+                true,                     // tooltips
+                false                     // urls
+        );
+        XYPlot plot = (XYPlot) chart.getPlot();
+        DemoRenderer renderer = new DemoRenderer();
 //		renderer.setBasePaint(Color.blue);
 //		renderer.setSeriesLinesVisible(0, true);
-		plot.setRenderer(renderer);
-		final ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(640, 480));
-		final ApplicationFrame frame = new ApplicationFrame(title);
-		frame.setContentPane(chartPanel);
-		frame.pack();
-		frame.setVisible(true);
-	}
+        plot.setRenderer(renderer);
+        final ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new java.awt.Dimension(640, 480));
+        final ApplicationFrame frame = new ApplicationFrame(title);
+        frame.setContentPane(chartPanel);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
 
-	@Override
-	public void init(ProcessContext ctx) throws Exception {
-		dataset = new XYSeriesCollection();
-		series = new XYSeries("data", false);
+    @Override
+    public void init(ProcessContext ctx) throws Exception {
+        dataset = new XYSeriesCollection();
+        series = new XYSeries("data", false);
 //		series.add(2, 2); //Point 4
-		dataset.addSeries(series);
-		showGraph();
-		super.init(ctx);
-	}
+        dataset.addSeries(series);
+        showGraph();
+        super.init(ctx);
+    }
 
-	@Override
-	public Data processMatchingData(Data data) {
-		if (data.containsKey(xValue) && data.containsKey(yValue)) {
-			if(data.containsKey(xValue)){
-				x = Utils.valueToDouble(data.get(xValue));
-			} else {
-				throw new RuntimeException("Key for xValue not found in event. "  + xValue);
-			}
-			if(Double.isNaN(x)){
-				log.warn("This doesnt handle NaNs very well.");
-			}
-			
-			if(data.containsKey(yValue)){
-				y = Utils.valueToDouble(data.get(yValue));
-			} else {
-				throw new RuntimeException("Key for yValue not found in event. "  + yValue);
-			}
-			if(Double.isNaN(y)){
-				log.warn("This doesnt handle NaNs very well.");
-			}
-			
-		} else {
-			log.info("The key " + xValue +  "  or " + yValue + " does not exist in the Event");
-		}
+    @Override
+    public Data processMatchingData(Data data) {
+        if (data.containsKey(xValue) && data.containsKey(yValue)) {
+            if (data.containsKey(xValue)) {
+                x = Utils.valueToDouble(data.get(xValue));
+            } else {
+                throw new RuntimeException("Key for xValue not found in event. " + xValue);
+            }
+            if (Double.isNaN(x)) {
+                log.warn("This doesnt handle NaNs very well.");
+            }
 
-		series.add(x,y);
-		//		
+            if (data.containsKey(yValue)) {
+                y = Utils.valueToDouble(data.get(yValue));
+            } else {
+                throw new RuntimeException("Key for yValue not found in event. " + yValue);
+            }
+            if (Double.isNaN(y)) {
+                log.warn("This doesnt handle NaNs very well.");
+            }
 
-		return data;
-	}
+        } else {
+            log.info("The key " + xValue + "  or " + yValue + " does not exist in the Event");
+        }
 
-	@Override
-	public void finish() throws Exception {
-		if (!keepOpen) {
-			log.debug("Closing plot frame");
-			//			frame.setVisible(false);
-			//			frame.dispose();
-			//			frame = null;
-		} else {
-			log.debug("Keeping plot frame visible...");
-		}
-	}
+        series.add(x, y);
+        //
 
-	class DemoRenderer extends XYShapeRenderer {
-		private static final long serialVersionUID = 4804521867675934134L;
+        return data;
+    }
 
-		@Override
-		public java.awt.Shape getSeriesShape(int series){
-			return new Rectangle2D.Double(-1, -1, 2, 2);
-			
-		}
-		
-		@Override
-		public java.awt.Paint getSeriesPaint(int series){
-			try{
-				Color c = Color.decode(color);
-				return c;
-			} catch (NumberFormatException e) {
-				log.warn("Could not decode Colorstring. String should look like this: #FAFAFA");
-				return Color.blue;
-			}
-		}
-	}
+    @Override
+    public void finish() throws Exception {
+        if (!keepOpen) {
+            log.debug("Closing plot frame");
+            //			frame.setVisible(false);
+            //			frame.dispose();
+            //			frame = null;
+        } else {
+            log.debug("Keeping plot frame visible...");
+        }
+    }
 
-	public boolean isKeepOpen() {
-		return keepOpen;
-	}
-	@Parameter(required = true, description = "Flag indicates wther the window stays open after the process has finished", defaultValue = "true")
-	public void setKeepOpen(boolean keepOpen) {
-		this.keepOpen = keepOpen;
-	}
+    class DemoRenderer extends XYShapeRenderer {
+        private static final long serialVersionUID = 4804521867675934134L;
 
-	public String getxValue() {
-		return xValue;
-	}
-	public void setxValue(String xValue) {
-		this.xValue = xValue;
-	}
-	
-	public String getyValue() {
-		return yValue;
-	}
-	public void setyValue(String yValue) {
-		this.yValue = yValue;
-	}
+        @Override
+        public java.awt.Shape getSeriesShape(int series) {
+            return new Rectangle2D.Double(-1, -1, 2, 2);
 
-	public String getTitle() {
-		return title;
-	}
-	@Parameter(required = true, description = "Title String of the plot", defaultValue = "Default Title")
-	public void setTitle(String title) {
-		this.title = title;
-	}
+        }
 
-	
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
-	}
+        @Override
+        public java.awt.Paint getSeriesPaint(int series) {
+            try {
+                Color c = Color.decode(color);
+                return c;
+            } catch (NumberFormatException e) {
+                log.warn("Could not decode Colorstring. String should look like this: #FAFAFA");
+                return Color.blue;
+            }
+        }
+    }
 }

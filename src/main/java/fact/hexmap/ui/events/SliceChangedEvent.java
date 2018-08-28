@@ -5,7 +5,8 @@ package fact.hexmap.ui.events;
  */
 public class SliceChangedEvent {
     public int currentSlice = 0;
-    public SliceChangedEvent(int currentSlice){
+
+    public SliceChangedEvent(int currentSlice) {
         this.currentSlice = currentSlice;
     }
 }

@@ -1,12 +1,10 @@
 package fact.features;
 
-
 import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
-import fact.hexmap.FactCameraPixel;
-import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -14,156 +12,72 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 
-public class ConcentrationCore implements Processor{
-	static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
-	
-	@Parameter(required=true)
-	private String outputKey;
-	@Parameter(required = true, description  = "Key of the Center of Gravity X (by Distribution from shower)")
-	private String cogxKey;
-	@Parameter(required = true, description  = "Key of the Center of Gravity Y (by Distribution from shower)")
-	private String cogyKey;
-	@Parameter(required = true, description  = "Key of the delta angle")
-	private String deltaKey;
-	@Parameter(required = true, description  = "Key of the sizeKey")
-	private String sizeKey;
-	@Parameter(required = true, description  = "Key of the photoncharge array")
-	private String photonChargeKey;
-	@Parameter(required = true, description  = "Key of the shower pixel array")
-	private String pixelSetKey;
-	@Parameter(required = true, description  = "Key of the shower width")
-	private String widthKey;
-	@Parameter(required = true, description  = "Key of the shower lengthKey")
-	private String lengthKey;
-	
-	final private double pixelRadius = Constants.PIXEL_SIZE;
-	
-	public Data process(Data input)
-	{
+public class ConcentrationCore implements Processor {
+    static Logger log = LoggerFactory.getLogger(ConcentrationCore.class);
 
-		Utils.mapContainsKeys( input, cogxKey, cogyKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
-		
-		try{
-			Double cogx = (Double) input.get(cogxKey);
-			Double cogy = (Double) input.get(cogyKey);
-			Double d = (Double) input.get(deltaKey);
-			double [] photonChargeArray = (double[]) input.get(photonChargeKey);
-			PixelSet showerPixelArray = (PixelSet) input.get(pixelSetKey);
-			Double l = (Double) input.get(lengthKey);
-			Double w = (Double) input.get(widthKey);
-			Double size = (Double) input.get(sizeKey);
-			
-			double c = Math.cos(d);
-			double s = Math.sin(d);
-			
-			double concCore = 0;
-			
-			for(CameraPixel pix : showerPixelArray.set)
-			{
-                FactCameraPixel p = (FactCameraPixel) FactPixelMapping.getInstance().getPixelFromId(pix.id);
-				double px = p.getXPositionInMM();
-				double py = p.getYPositionInMM();
-				
-				// short names adapted from mars code (change when understood)
+    @Parameter(required = true)
+    public String outputKey;
 
-				double dx = px - cogx;
-				double dy = py - cogy;
-				
-				double dist0 = dx*dx + dy*dy;
-				
-				double dzx =  c * dx + s * dy;
-				double dzy = -s * dx + c * dy;
-				
-				double rl = 1/(l * l);
-				double rw = 1/(w * w);
-				double dz = pixelRadius * pixelRadius / 4;
+    @Parameter(required = true, description = "Key of the Center of Gravity")
+    public String cogKey;
 
-				double tana = dzy * dzy / (dzx * dzx);
-				double distr = (1+tana)/(rl + tana*rw);
-				
-				if (distr>dist0-dz || dzx==0)
-					 concCore += photonChargeArray[pix.id];
-				
-			}
-			concCore /= size;
-			input.put(outputKey, concCore);
-			return input;
-			
-		} catch (ClassCastException e){
-			log.error("Could not cast the values to the right types");
-			throw e;
-		}
+    @Parameter(required = true, description = "Key of the delta angle")
+    public String deltaKey;
 
-	}
+    @Parameter(required = true, description = "Key of the sizeKey")
+    public String sizeKey;
 
-	public String getOutputKey() {
-		return outputKey;
-	}
+    @Parameter(required = true, description = "Key of the photoncharge array")
+    public String photonChargeKey;
 
-	public void setOutputKey(String outputKey) {
-		this.outputKey = outputKey;
-	}
+    @Parameter(required = true, description = "Key of the shower pixel array")
+    public String pixelSetKey;
 
-	public String getCogxKey() {
-		return cogxKey;
-	}
+    @Parameter(required = true, description = "Key of the shower width")
+    public String widthKey;
 
-	public void setCogxKey(String cogxKey) {
-		this.cogxKey = cogxKey;
-	}
+    @Parameter(required = true, description = "Key of the shower lengthKey")
+    public String lengthKey;
 
-	public String getCogyKey() {
-		return cogyKey;
-	}
 
-	public void setCogyKey(String cogyKey) {
-		this.cogyKey = cogyKey;
-	}
+    /**
+     * Calculate the percentage of photons inside the Hillas Ellipse
+     * aka. the pixels with a Mahalanobis Distance <= 1.
+     */
+    public Data process(Data item) {
 
-	public String getDeltaKey() {
-		return deltaKey;
-	}
+        Utils.mapContainsKeys(item, cogKey, deltaKey, photonChargeKey, pixelSetKey, lengthKey, widthKey, sizeKey);
+        Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
+        Utils.isKeyValid(item, cogKey, CameraCoordinate.class);
 
-	public void setDeltaKey(String deltaKey) {
-		this.deltaKey = deltaKey;
-	}
+        CameraCoordinate cog = (CameraCoordinate) item.get(cogKey);
+        Double delta = (Double) item.get(deltaKey);
+        double[] photonChargeArray = (double[]) item.get(photonChargeKey);
+        PixelSet showerPixelSet = (PixelSet) item.get(pixelSetKey);
+        Double length = (Double) item.get(lengthKey);
+        Double width = (Double) item.get(widthKey);
+        Double size = (Double) item.get(sizeKey);
 
-	public String getSizeKey() {
-		return sizeKey;
-	}
 
-	public void setSizeKey(String sizeKey) {
-		this.sizeKey = sizeKey;
-	}
+        double photonsInEllipse = 0;
+        for (CameraPixel pix : showerPixelSet.set) {
+            double px = pix.getXPositionInMM();
+            double py = pix.getYPositionInMM();
 
-	public String getPhotonChargeKey() {
-		return photonChargeKey;
-	}
+            double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cog.xMM, cog.yMM, delta);
 
-	public void setPhotonChargeKey(String photonChargeKey) {
-		this.photonChargeKey = photonChargeKey;
-	}
+            // add a tolerance of 10% of the pixel size to not only get pixels with the center in the ellipse
+            double dl = Math.abs(ellipseCoords[0]) - 0.1 * Constants.PIXEL_SIZE_MM;
+            double dt = Math.abs(ellipseCoords[1]) - 0.1 * Constants.PIXEL_SIZE_MM;
 
-	public void setPixelSetKey(String pixelSetKey) {
-		this.pixelSetKey = pixelSetKey;
-	}
+            double distance = Math.pow(dl / length, 2.0) + Math.pow(dt / width, 2.0);
 
-	public String getWidthKey() {
-		return widthKey;
-	}
-
-	public void setWidthKey(String widthKey) {
-		this.widthKey = widthKey;
-	}
-
-	public String getLengthKey() {
-		return lengthKey;
-	}
-
-	public void setLengthKey(String lengthKey) {
-		this.lengthKey = lengthKey;
-	}
-	
-
-	
+            if (distance <= 1) {
+                photonsInEllipse += photonChargeArray[pix.id];
+            }
+        }
+        double concCore = photonsInEllipse / size;
+        item.put(outputKey, concCore);
+        return item;
+    }
 }

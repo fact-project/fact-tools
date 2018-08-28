@@ -1,5 +1,6 @@
 package fact.io.hdureader;
 
+import fact.Constants;
 import stream.Data;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
@@ -10,13 +11,14 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The ZFitsStream can read FITS files containing raw data as recorded by the FACT telescope DAQ.
  * It also reads FITS files written by the Monte Carlo simulation program CERES.
  * It can decompress binary tables which have been compressed according to
  * the ZFITS standard. See http://arxiv.org/abs/1506.06045.
- *
+ * <p>
  * Created by mackaiver on 12/12/16.
  */
 public class FITSStream extends AbstractStream {
@@ -27,13 +29,14 @@ public class FITSStream extends AbstractStream {
     private HDU eventHDU;
     private Map<String, Serializable> fitsHeader = new HashMap<>();
 
-    public String nameHDU="Events";
+    public String nameHDU = "Events";
 
-    public FITSStream(SourceURL url){
+    public FITSStream(SourceURL url) {
         this.url = url;
     }
 
-    public FITSStream() {    }
+    public FITSStream() {
+    }
 
     @Override
     public void init() throws Exception {
@@ -45,47 +48,56 @@ public class FITSStream extends AbstractStream {
         FITS fits = new FITS(url);
 
         //get calibration constants they are stored in the first (and only) row of this hdu.
-        HDU offsetHDU = fits.getHDU("ZDrsCellOffsets");
-        if (offsetHDU != null){
-            ZFITSHeapReader reader = ZFITSHeapReader.forTable(offsetHDU.getBinTable());
-            boolean ignoreWrongTileHeader;
-            OptionalTypesMap<String, Serializable> row = reader.getNextRow(ignoreWrongTileHeader=true);
+        Optional<HDU> offsetOptional = fits.getHDU("ZDrsCellOffsets");
+        if (offsetOptional.isPresent()) {
+            HDU offsetHDU = offsetOptional.get();
+            Boolean ztable = offsetHDU.header.getBoolean("ZTABLE").orElse(false);
+            Reader offsetReader;
+            if (ztable) {
+                offsetReader = ZFITSHeapReader.forTable(offsetHDU.getBinTable());
+            } else {
+                offsetReader = BinTableReader.forBinTable(offsetHDU.getBinTable());
+            }
 
+            OptionalTypesMap<String, Serializable> row;
+            if (ztable) {
+                //some of the ZDrsOffsetTables that were compressed have wrong tileheader ignore here
+                row = ((ZFITSHeapReader) offsetReader).getNextRow(true);
+            } else {
+                row = offsetReader.getNextRow();
+            }
             offsetCalibrationsConstants = row
                     .getShortArray("OffsetCalibration")
                     .orElseThrow(() -> new IOException("OffsetCalibration not found in file."));
 
         }
-        //create a refrence to the events hdu
-        eventHDU = fits.getHDU(nameHDU);
-        if (eventHDU!=null) {
-            BinTable eventsTable = eventHDU.getBinTable();
+        // create a refrence to the events hdu
+        eventHDU = fits.getHDU(nameHDU).orElseThrow(() -> new IOException("Inputfile did not contain HDU '" + nameHDU + "'"));
 
-            //read each headerline and try to get the right datatype
-            //from smallest to largest datatype
-            //if no number can be found simply save the string.
-            Header header = eventHDU.header;
-            fitsHeader = header.asMapOfSerializables();
+        BinTable eventsTable = eventHDU.getBinTable();
 
-            Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
-            if (ztable) {
-                reader = ZFITSHeapReader.forTable(eventsTable);
-            } else {
-                reader = BinTableReader.forBinTable(eventsTable);
-            }
+        // read each headerline and try to get the right datatype
+        // from smallest to largest datatype
+        // if no number can be found simply save the string.
+        Header header = eventHDU.header;
+        fitsHeader = header.asMapOfSerializables();
+
+        Boolean ztable = eventHDU.header.getBoolean("ZTABLE").orElse(false);
+        if (ztable) {
+            reader = ZFITSHeapReader.forTable(eventsTable);
+        } else {
+            reader = BinTableReader.forBinTable(eventsTable);
         }
+
     }
 
 
-
-    private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants){
-        int numChannel = 1440;
-
-        for (int ch=0; ch<numChannel; ch++) {
+    private void applyDrsOffsetCalib(int numSlices, short[] data, short[] startCellData, short[] calibrationConstants) {
+        for (int ch = 0; ch < Constants.N_PIXELS; ch++) {
             int startCell = startCellData[ch];
-            for (int sliceNum=0; sliceNum<numSlices; sliceNum++) {
-                int curCell = (startCell+sliceNum)%1024;
-                data[ch*numSlices+sliceNum] += calibrationConstants[ ch*1024 + curCell ];
+            for (int sliceNum = 0; sliceNum < numSlices; sliceNum++) {
+                int curCell = (startCell + sliceNum) % 1024;
+                data[ch * numSlices + sliceNum] += calibrationConstants[ch * 1024 + curCell];
             }
         }
     }
@@ -93,15 +105,14 @@ public class FITSStream extends AbstractStream {
     @Override
     public Data readNext() throws Exception {
 
-        if(!reader.hasNext()){
+        if (!reader.hasNext()) {
             return null;
         }
 
         OptionalTypesMap<String, Serializable> nextRow = reader.getNextRow();
 
 
-
-        if (offsetCalibrationsConstants !=  null) {
+        if (offsetCalibrationsConstants != null) {
             short[] data = nextRow.getShortArray("Data").orElseThrow(() -> new IOException("Data not found in file."));
             short[] startCellData = nextRow.getShortArray("StartCellData").orElseThrow(() -> new IOException("StartCellData not found in file."));
 
@@ -115,5 +126,15 @@ public class FITSStream extends AbstractStream {
         item.putAll(fitsHeader);
 
         return item;
+    }
+
+    /**
+     * Skips the given amount of rows in the data table.
+     *
+     * @param amount The amount of Rows to skip.
+     * @throws IOException
+     */
+    public void skipRows(int amount) throws IOException{
+        reader.skipRows(amount);
     }
 }

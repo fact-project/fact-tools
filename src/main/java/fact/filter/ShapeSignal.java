@@ -20,13 +20,13 @@ public class ShapeSignal implements Processor {
 
 
     @Parameter(required = true)
-    private String key;
+    public String key;
 
     @Parameter(required = true)
-    private String outputKey;
+    public String outputKey;
 
     @Parameter(required = true)
-    int shift = 20;
+    public int shift = 10;
 
     @Parameter(required = false)
     int skipLeft = 0;
@@ -35,18 +35,17 @@ public class ShapeSignal implements Processor {
     int skipRight = 0;
 
     @Parameter
-    double factor = 0.66;
+    public double factor = 0.66;
 
 
     @Override
-    public Data process(Data input) {
+    public Data process(Data item) {
 
-        Utils.isKeyValid(input, key, double[].class);
-        double[] data = (double[]) input.get(key);
-//        double[] shifted_data = new double[data.length];
+        Utils.isKeyValid(item, key, double[].class);
+        double[] data = (double[]) item.get(key);
         double[] result = new double[data.length];
 
-        int n_pixels = Constants.NUMBEROFPIXEL;
+        int n_pixels = Constants.N_PIXELS;
         int roi = data.length/1440;
 
         for (int pix = 0; pix < n_pixels; pix++) {
@@ -65,40 +64,8 @@ public class ShapeSignal implements Processor {
             }
         }
 
-        input.put(outputKey, result);
+        item.put(outputKey, result);
 
-        return input;
-    }
-
-    public void setShift(int shift) {
-        this.shift = shift;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getOutputKey() {
-        return outputKey;
-    }
-
-    public void setOutputKey(String outputKey) {
-        this.outputKey = outputKey;
-    }
-
-    public double getShift() {
-        return shift;
-    }
-
-    public double getFactor() {
-        return factor;
-    }
-
-    public void setFactor(double factor) {
-        this.factor = factor;
+        return item;
     }
 }

@@ -10,106 +10,95 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author chris
- *
  */
 public class ShowViewer implements StatefulProcessor {
 
-	static Logger log = LoggerFactory.getLogger(ShowViewer.class);
-	Viewer viewer = null;
-	AtomicBoolean lock = new AtomicBoolean(true);
+    static Logger log = LoggerFactory.getLogger(ShowViewer.class);
+    Viewer viewer = null;
+    AtomicBoolean lock = new AtomicBoolean(true);
+    boolean exit = false;
 
     /**
      * The key for the data to  be displayed on the screen
      */
     @Parameter(required = true)
-    private String key;
-    public String getKey() {
-        return key;
-    }
-    public void setKey(String key) {
-        this.key = key;
-    }
-
+    public String key;
 
     @Parameter(required = false, description = "The default plot range in the main viewer")
-    private Integer[] range;
+    public Integer[] range;
+
     public void setRange(Integer[] range) {
-        if(range.length != 2){
+        if (range.length != 2) {
             throw new RuntimeException("The plotrange has to consist of two numbers");
         }
         this.range = range;
     }
 
 
-
-
     @Override
     public void init(ProcessContext context) throws Exception {
         String os = System.getProperty("os.name");
         log.info("Opening viewer on OS: " + os);
+
+        viewer = Viewer.getInstance();
+        viewer.setDefaultKey(key);
+        if (range != null) {
+            viewer.setRange(range);
+        }
+        viewer.getNextButton().setEnabled(true);
+        viewer.getNextButton().addActionListener((event) -> {
+            synchronized (lock) {
+                lock.set(!lock.get());
+                lock.notifyAll();
+            }
+        });
+        viewer.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                synchronized (lock) {
+                    lock.set(!lock.get());
+                    lock.notifyAll();
+                    exit = true;
+                    viewer.dispose();
+                }
+            }
+        });
     }
 
-
-	/**
-	 * @see stream.Processor#process(stream.Data)
-	 */
-	@Override
-	public Data process(final Data input) {
-
-        if(!input.containsKey(key)){
+    /**
+     * @see stream.Processor#process(stream.Data)
+     */
+    @Override
+    public Data process(Data item) {
+        if (!item.containsKey(key)) {
             throw new RuntimeException("Key " + key + " not found in event. Cannot show viewer");
         }
 
+        viewer.setDataItem(item);
         lock.set(true);
+        viewer.setVisible(true);
 
-		Thread t = new Thread() {
-			public void run() {
-				if (viewer == null) {
-					viewer = Viewer.getInstance();
-                    viewer.setDefaultKey(key);
-                    if (range != null){
-                        viewer.setRange(range);
-                    }
-					viewer.getNextButton().setEnabled(true);
-					viewer.getNextButton().addActionListener(
-							new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									synchronized (lock) {
-										lock.set(!lock.get());
-										log.debug("Notifying all listeners on lock...");
-										lock.notifyAll();
-									}
-								}
-							});
-				}
-				viewer.setVisible(true);
-				viewer.setDataItem(input);
-			}
-		};
-		t.start();
+        synchronized (lock) {
+            while (lock.get()) {
+                try {
+                    lock.wait();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        if (exit) {
+            throw new RuntimeException("ViewerExit");
+        }
 
-		synchronized (lock) {
-			while (lock.get()) {
-				try {
-					log.debug("Waiting on lock...");
-					lock.wait();
-					log.debug("Notification occured on lock!");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return input;
-	}
-
+        return item;
+    }
 
 
     @Override

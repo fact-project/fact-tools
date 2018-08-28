@@ -1,10 +1,10 @@
 <container>
   <properties url="classpath:/default/settings.properties" />
   <!-- Pathes to the input files -->
-  <property name="infile" value="file:src/main/resources/testDataFile.fits.gz" />
-  <property name="drsfile" value="file:src/main/resources/testDrsFile.drs.fits.gz" />
-  <property name="integralGainFile" value="classpath:/default/gain_sorted_20131127.csv" />
-  <property name="pixelDelayFile" value="classpath:/default/delays_20141114.csv" />
+  <property name="infile" value="classpath:/testDataFile.fits.gz" />
+  <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
+ 
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:src/main/resources/aux/" />
   <!-- Name des Streams und pfad zu dem Daten-File -->
   <!-- <stream id="fact" class="fact.io.FITSStream"  url="file:${infile}" limit="100"/> -->
@@ -17,26 +17,26 @@
     <stream.flow.Skip condition="%{data.TriggerType} != 4" />
     <fact.datacorrection.DrsCalibration url="${drsfile}" key="Data" outputKey="DataCalibrated" />
     <fact.statistics.PatchAverage key="DataCalibrated" outputKey="DataPatches" />
-		<fact.datacorrection.PatchJumpRemoval
-			dataKey="DataCalibrated"
-			outputKey="DataRemoved"
-			outputJumpsKey="j"
-			addJumpInfos="true"
-			prevEventsKey="prevEvents"
-			startCellKey="StartCellData"
-			jumpLimit="4.0"
-			spikeLimit="7.0"
-			freqAmplLimit="0.4"
-			leftBorder="10"
-			signalFlankLimit="0.63"
-			lengthForFFT="32"
-			lengthAfterPosForFFT="10"
-			ringingPeriode="11"
-			freqCompAmplLimit="2.0"
-			leftRingingFreq="0.18"
-			rightRingingFreq="0.22"
-			timeDependLimit="10"
-			/>
+    <fact.datacorrection.PatchJumpRemoval
+      dataKey="DataCalibrated"
+      outputKey="DataRemoved"
+      outputJumpsKey="j"
+      addJumpInfos="true"
+      prevEventsKey="prevEvents"
+      startCellKey="StartCellData"
+      jumpLimit="4.0"
+      spikeLimit="7.0"
+      freqAmplLimit="0.4"
+      leftBorder="10"
+      signalFlankLimit="0.63"
+      lengthForFFT="32"
+      lengthAfterPosForFFT="10"
+      ringingPeriode="11"
+      freqCompAmplLimit="2.0"
+      leftRingingFreq="0.18"
+      rightRingingFreq="0.22"
+      timeDependLimit="10"
+      />
     <fact.statistics.PatchAverage key="DataRemoved" outputKey="DataPatchesRemoved" />
     <!--<fact.ShowViewer key="DataCalibrated"/>-->
   </process>

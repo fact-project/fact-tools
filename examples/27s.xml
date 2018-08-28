@@ -1,0 +1,29 @@
+<container>
+  <properties url="classpath:/default/settings.properties" />
+  <!-- Pathes to the input files -->
+  <property name="infile" value="classpath:/testDataFile.fits.gz" />
+  <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
+  
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.gainservice.GainService" />
+
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
+
+  <!-- Description of the process and the corresponding stream -->
+  <process id="2" input="fact">
+    <fact.extraction.SaturatedSlicesPercentage />
+
+    <fact.io.PrintKeys keys="EventNum,saturatedSlicesPercentage" />
+    <Skip condition="%{data.saturatedSlicesPercentage} &lt;= 0.0" />
+
+    <fact.utils.PreviousEventInfo startCellKey="StartCellData" outputKey="prevEvents" limitEvents="10" />
+
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+
+    <!-- <fact.io.FITSWriter url="file:27s.fits" keys="EventNum,saturatedSlicesPercentage,photoncharge"/> -->
+    <fact.ShowViewer key="Data" />
+  </process>
+</container>
