@@ -32,6 +32,7 @@
     />
 
     <fact.TriggerEmulation.SumUpPatches
+            calibService="calibService"
             key="DataShaped"
             outKey="SummedPatches"
     />
