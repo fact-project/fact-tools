@@ -1,11 +1,15 @@
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /**
  * Created by jbuss on 07.10.14.
@@ -24,6 +28,12 @@ public class ShapeSignal implements Processor {
     @Parameter(required = true)
     int shift = 20;
 
+    @Parameter(required = false)
+    int skipLeft = 0;
+
+    @Parameter(required = false)
+    int skipRight = 0;
+
     @Parameter
     double factor = 0.66;
 
@@ -33,18 +43,26 @@ public class ShapeSignal implements Processor {
 
         Utils.isKeyValid(input, key, double[].class);
         double[] data = (double[]) input.get(key);
-        double[] shifted_data = new double[data.length];
+//        double[] shifted_data = new double[data.length];
         double[] result = new double[data.length];
 
+        int n_pixels = Constants.NUMBEROFPIXEL;
+        int roi = data.length/1440;
 
-        for (int i=0 ; i < data.length ; i++)
-        {
-            shifted_data[ (i+shift) % data.length] = (-1) * factor * data[ i ];
-        }
+        for (int pix = 0; pix < n_pixels; pix++) {
+            double[] pixel_data = Arrays.copyOfRange(data, pix*roi+skipLeft, roi*(pix+1)-skipRight);
+            double[] shifted_data = new double[pixel_data.length];
 
-        for (int i=0 ; i < data.length ; i++)
-        {
-            result[i] = data[i] + shifted_data[i];
+            for (int i=0 ; i < pixel_data.length ; i++)
+            {
+                shifted_data[(i+shift) % roi] = (-1) * factor * pixel_data[ i ];
+            }
+
+            for (int i=0 ; i < pixel_data.length ; i++)
+            {
+                int sl = Utils.absPos(pix,i+skipLeft,roi);
+                result[sl] = data[sl] + shifted_data[i];
+            }
         }
 
         input.put(outputKey, result);
