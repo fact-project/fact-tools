@@ -97,9 +97,8 @@ public class SumUpPatches implements Processor {
         ZonedDateTime timeStamp = null;
 
         if (item.containsKey(timeStampKey) == true){
-            Utils.isKeyValid(item, timeStampKey, int[].class);
-            int[] eventTime = (int[]) item.get(timeStampKey);
-            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
+            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
+            timeStamp = (ZonedDateTime) item.get(timeStampKey);
         }
         else {
             // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
