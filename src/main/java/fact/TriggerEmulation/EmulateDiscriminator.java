@@ -94,7 +94,7 @@ public class EmulateDiscriminator implements Processor{
      * @param triggerPrimitives
      * @param patchTriggerSlice
      */
-    private void putAsDataArray(Data item, int n_patches, boolean[] triggerPrimitives, int[] patchTriggerSlice) {
+    public void putAsDataArray(Data item, int n_patches, boolean[] triggerPrimitives, int[] patchTriggerSlice) {
         int[] primitives = new int[1440];
         double[] triggerSlices = new double[1440];
 
