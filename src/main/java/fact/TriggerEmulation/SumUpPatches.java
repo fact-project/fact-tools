@@ -37,7 +37,7 @@ public class SumUpPatches implements Processor {
     public String outKey;
 
     @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
-    CalibrationService calibService;
+    public CalibrationService calibService;
 
     @Parameter(required = false, description = "The key containing the event timestamp")
     public String timeStampKey = "timestamp";
