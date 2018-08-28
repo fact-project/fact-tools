@@ -8,6 +8,10 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
+import static fact.TriggerEmulation.Discriminator.booleanToInt;
+import static fact.TriggerEmulation.Discriminator.discriminatePatch;
+import static fact.TriggerEmulation.Discriminator.discriminatePatches;
+
 /**
  * Emulate a discriminator that is working on the summed timeseries of the patches. Signals are digitized according to
  * the provided threshold and the minimum time a signal has to stay above it.
@@ -58,25 +62,19 @@ public class EmulateDiscriminator implements Processor{
         int n_patches = Constants.NUMBEROFPIXEL/9;
         double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
-        boolean[] triggerPrimitives = new boolean[n_patches];
+
         int[] patchTriggerSlice = new int[n_patches];
 
-        for (int patch = 0; patch < n_patches; patch++) {
-            triggerPrimitives[patch] = false;
-
-            patchTriggerSlice[patch] =
-                    discriminatePatch(
-                            data[patch],
-                            thresholdDACToMillivolt(threshold, millivoltPerDAC),
-                            minTimeOverThreshold,
-                            skipFirst,
-                            skipLast
-                            );
-
-            if (patchTriggerSlice[patch] < default_slice){
-                triggerPrimitives[patch] = true;
-            }
-        }
+        boolean[] triggerPrimitives = discriminatePatches(
+                data,
+                n_patches,
+                millivoltPerDAC,
+                patchTriggerSlice,
+                threshold,
+                minTimeOverThreshold,
+                skipFirst,
+                skipLast
+        );
 
         if (visualize){
             putAsDataArray(item, n_patches, triggerPrimitives, patchTriggerSlice);
@@ -86,16 +84,6 @@ public class EmulateDiscriminator implements Processor{
         item.put(triggerSliceKey, patchTriggerSlice);
 
         return item;
-    }
-
-    /**
-     * Convert threshold in DAC units to millivolt units
-     * @param threshold
-     * @param millivoltPerDAC
-     * @return
-     */
-    public static double thresholdDACToMillivolt(int threshold, double millivoltPerDAC) {
-        return millivoltPerDAC*threshold;
     }
 
     /**
@@ -119,52 +107,6 @@ public class EmulateDiscriminator implements Processor{
         }
         item.put(primitivesKey+"_vis", primitives);
         item.put(triggerSliceKey+"_vis", triggerSlices);
-    }
-
-    /**
-     *Discriminate the signal of a given patch
-     * @param data timeseries
-     * @param thresholdInMillivolt threshold of the discriminator in millivolt units
-     * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
-     * @param skipFirst number of slices to ignore at the beginning of the time series
-     * @param skipLast number of slices to ignore at the end of the time series
-     */
-    public static int discriminatePatch(
-            double[] data,
-            double thresholdInMillivolt,
-            int minTimeOverThreshold,
-            int skipFirst,
-            int skipLast
-    ) {
-        int default_slice = Integer.MAX_VALUE;
-        int counter = 0;
-        int patchTriggerSlice = default_slice;
-
-        for (int slice = skipFirst; slice < data.length-skipLast; slice++) {
-            double slice_amplitude = data[slice];
-
-            if (slice_amplitude >= thresholdInMillivolt){
-                if (counter == 0){
-                    patchTriggerSlice = slice;
-                }
-                counter++;
-            }
-            else if (slice_amplitude < thresholdInMillivolt){
-                counter = 0;
-            }
-            if (counter >= minTimeOverThreshold){
-                return patchTriggerSlice;
-            }
-        }
-        return default_slice;
-    }
-
-    public static int booleanToInt(boolean value) {
-        // Convert true to 1 and false to 0.
-        if (value){
-            return 1;
-        }
-        return 0;
     }
 
     public void setKey(String key) {

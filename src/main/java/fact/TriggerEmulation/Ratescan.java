@@ -105,9 +105,9 @@ public class Ratescan implements StatefulProcessor {
             int dac = minThreshold+i*stepSize;
 
             triggerSlice[i] =
-                    EmulateDiscriminator.discriminatePatch(
+                    Discriminator.discriminatePatch(
                             data,
-                            EmulateDiscriminator.thresholdDACToMillivolt(dac, Constants.MILLIVOLT_PER_DAC),
+                            Discriminator.thresholdDACToMillivolt(dac, Constants.MILLIVOLT_PER_DAC),
                             minTimeOverThreshold,
                             skipFirst,
                             skipLast
