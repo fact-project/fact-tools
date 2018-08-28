@@ -6,7 +6,7 @@ import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
 import fact.cleaning.BasicCleaning;
 import fact.filter.ShapeSignal;
-import fact.hexmap.FactCameraPixel;
+import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.photonstream.timeSeriesExtraction.ElementWise;
 import org.apache.commons.lang3.ArrayUtils;
@@ -111,11 +111,8 @@ public class SumUpPatches implements Processor {
             timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         }
 
-        int[] badChIds = calibService.getBadPixel(timeStamp);
-        PixelSet badPixelsSet = new PixelSet();
-        for (int px: badChIds){
-            badPixelsSet.addById(px);
-        }
+        PixelSet badPixelsSet = calibService.getNotUsablePixels(timeStamp);
+
         return badPixelsSet;
     }
 
@@ -136,7 +133,7 @@ public class SumUpPatches implements Processor {
             Utils.isKeyValid(item, starPositionKey, double[].class);
             double[] starPosition = (double[]) item.get(starPositionKey);
 
-            FactCameraPixel star_pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
+            CameraPixel star_pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
             int chidOfPixelOfStar = star_pixel.chid;
 
             List<Integer> starChidList = new ArrayList<>();
@@ -145,7 +142,7 @@ public class SumUpPatches implements Processor {
 
             starSet.addById(chidOfPixelOfStar);
 
-            for (FactCameraPixel px: pixelMap.getNeighboursFromID(chidOfPixelOfStar))
+            for (CameraPixel px: pixelMap.getNeighborsFromID(chidOfPixelOfStar))
             {
                 if (calculateDistance(px.id, starPosition[0], starPosition[1]) < starRadiusInCamera)
                 {
