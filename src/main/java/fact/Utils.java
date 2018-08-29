@@ -554,8 +554,14 @@ public class Utils {
     public static ZonedDateTime getTimeStamp(Data item, String timeStampKey) {
         ZonedDateTime timeStamp = null;
         if (item.containsKey(timeStampKey)) {
-            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
-            timeStamp = (ZonedDateTime) item.get(timeStampKey);
+            try {
+                Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
+                timeStamp = (ZonedDateTime) item.get(timeStampKey);
+            } catch (ClassCastException e) {
+                Utils.isKeyValid(item, timeStampKey, int[].class);
+                int[] intTimeStamp = (int[]) item.get(timeStampKey);
+                timeStamp = Utils.unixTimeUTCToZonedDateTime(intTimeStamp);
+            }
         } else {
             // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
             // => The 12 bad pixels we have from the beginning on are used.
