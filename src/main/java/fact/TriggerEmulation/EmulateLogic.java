@@ -65,6 +65,16 @@ public class EmulateLogic implements Processor {
         return item;
     }
 
+    public static ArrayList<Integer> getPatchesOfFTU(int ftu_id)
+    {
+        ArrayList<Integer> ftus = new ArrayList<>();
+        int first_patch_of_ftu = ftu_id*4;
+        for (int patch = first_patch_of_ftu; patch < first_patch_of_ftu+4; patch++) {
+            ftus.add(patch);
+        }
+        return ftus;
+    }
+
     public static boolean isTriggerDecision(
             boolean[] triggerPrimitives,
             int[] patchTriggerSlice,
@@ -77,7 +87,10 @@ public class EmulateLogic implements Processor {
         int n_units = 0;
         for (int ftu = 0; ftu < 40; ftu++) {
             int n_trigger_patches = 0;
-            for (int patch = ftu*4; (patch < 4+(ftu*4) && patch < patchTriggerSlice.length); patch++) {
+
+            for (Integer patch :
+                    getPatchesOfFTU(ftu)) {
+
                 if (triggerPrimitives[patch]){
                     insertToArrayListSorted(patchTriggerSlice[patch], triggerTimes);
                     n_trigger_patches++;
