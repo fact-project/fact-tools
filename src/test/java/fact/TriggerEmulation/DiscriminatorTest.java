@@ -12,7 +12,6 @@ public class DiscriminatorTest {
 
     @Test
     public void testBooleanToInt(){
-        EmulateDiscriminator emulateDiscriminator = new EmulateDiscriminator();
         Assert.assertEquals(Discriminator.booleanToInt(true), 1);
         Assert.assertEquals(Discriminator.booleanToInt(false), 0);
     }
