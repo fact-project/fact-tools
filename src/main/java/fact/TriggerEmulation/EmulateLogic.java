@@ -68,8 +68,8 @@ public class EmulateLogic implements Processor {
     public static ArrayList<Integer> getPatchesOfFTU(int ftu_id)
     {
         ArrayList<Integer> ftus = new ArrayList<>();
-        int first_patch_of_ftu = ftu_id*4;
-        for (int patch = first_patch_of_ftu; patch < first_patch_of_ftu+4; patch++) {
+        int first_patch_of_ftu = ftu_id*Constants.N_PATCHES_FTU;
+        for (int patch = first_patch_of_ftu; patch < first_patch_of_ftu+Constants.N_PATCHES_FTU; patch++) {
             ftus.add(patch);
         }
         return ftus;
@@ -85,7 +85,7 @@ public class EmulateLogic implements Processor {
         ArrayList<Integer> triggerTimes = new ArrayList<>();
 
         int n_units = 0;
-        for (int ftu = 0; ftu < 40; ftu++) {
+        for (int ftu = 0; ftu < Constants.N_FTUS; ftu++) {
             int n_trigger_patches = 0;
 
             for (Integer patch :

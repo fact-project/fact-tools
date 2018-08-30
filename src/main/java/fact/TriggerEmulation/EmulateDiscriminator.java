@@ -57,7 +57,7 @@ public class EmulateDiscriminator implements Processor{
     public Data process(Data item) {
         double[][] data = (double[][]) item.get(key);
 
-        int n_patches = Constants.N_PIXELS/9;
+        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
         double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
 
@@ -98,9 +98,11 @@ public class EmulateDiscriminator implements Processor{
 
         for (int patch = 0; patch < n_patches; patch++) {
             int primitive = booleanToInt(triggerPrimitives[patch]);
-            for (int pix = 0; pix < 9 & primitive == 1; pix++) {
-                primitives[patch*9+pix] = primitive;
-                triggerSlices[patch*9+pix] = patchTriggerSlice[patch];
+            for (int pix = 0; pix < Constants.N_PIXELS_PER_PATCH & primitive == 1; pix++) {
+                int pixel_id = patch*Constants.N_PIXELS_PER_PATCH+pix;
+
+                primitives[pixel_id] = primitive;
+                triggerSlices[pixel_id] = patchTriggerSlice[patch];
             }
         }
         item.put(primitivesKey+"_vis", primitives);

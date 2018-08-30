@@ -172,7 +172,7 @@ public class SumUpPatches implements Processor {
 
 
         for (int patch = 0; patch < patch_sums.length; patch++) {
-            for (int pix = 0; pix < 9; pix++) {
+            for (int pix = 0; pix < Constants.N_PIXELS_PER_PATCH; pix++) {
                 new_data = ArrayUtils.addAll(new_data, patch_sums[patch]);
             }
         }
@@ -211,10 +211,10 @@ public class SumUpPatches implements Processor {
             pixel_counter++;
         }
         // if not all 9 pixels were used scale the patch sum to the same value as is if 9 pixels were used
-        if (pixel_counter < 8){
+        if (pixel_counter < Constants.N_PIXELS_PER_PATCH){
             for (int i = 0; i < patch_sum.length; i++) {
                 patch_sum[i] /= pixel_counter;
-                patch_sum[i] *= 9;
+                patch_sum[i] *= Constants.N_PIXELS_PER_PATCH;
             }
         }
         return patch_sum;
