@@ -9,7 +9,7 @@ import stream.Data;
 /**
  * Created by jbuss on 15.11.17.
  */
-public class SummationTest {
+public class SumUpPatchesTest {
 
     int npix = 9;
     int roi = 300;
