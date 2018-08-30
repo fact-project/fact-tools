@@ -1,9 +1,11 @@
 package fact.TriggerEmulation;
 
+import com.google.common.collect.Sets;
 import fact.Constants;
 import fact.Utils;
 import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 
@@ -57,9 +59,7 @@ public class SumUpPatches implements Processor {
     public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
 
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-
-    private PixelSet star_set = null;
-    private PixelSet bad_pixel_set = null;
+    private PixelSet invalidePixels = new PixelSet();
 
     @Override
     public Data process(Data item) {
@@ -68,16 +68,20 @@ public class SumUpPatches implements Processor {
 
         int roi = (int) item.get("NROI");
 
-        int n_patches = Constants.N_PIXELS/9;
+        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
 
-        star_set = calculateStarPixelSet(item);
-        bad_pixel_set = calculateBadPixelSet(item);
+        if (ignoreStarpixels ) {
+            addToInvalidPixels(invalidePixels, calculateStarPixelSet(item));
+        }
+        if (ignoreBrokenPixels) {
+            addToInvalidPixels(invalidePixels, calculateBadPixelSet(item));
+        }
 
         double[][] pixel_data = Utils.snipPixelData(data, 0, 0, Constants.N_PIXELS, roi);
         double[][] patch_sums = new double[n_patches][];
 
         for (int patch = 0; patch < n_patches; patch++) {
-            patch_sums[patch] = sumPixelsOfPatch(pixel_data, patch);
+            patch_sums[patch] = sumPixelsOfPatch(pixel_data, patch, invalidePixels);
         }
         item.put(outKey, patch_sums);
 
@@ -86,6 +90,11 @@ public class SumUpPatches implements Processor {
         }
         return item;
 
+    }
+
+    public static void addToInvalidPixels(PixelSet invalidePixels, PixelSet setA){
+        Sets.SetView<CameraPixel> union = Sets.union(invalidePixels.set, setA.set);
+        union.copyInto(invalidePixels.set);
     }
 
     /**
@@ -125,24 +134,24 @@ public class SumUpPatches implements Processor {
 
         for (String starPositionKey : starPositionKeys)
         {
-            Utils.isKeyValid(item, starPositionKey, double[].class);
-            double[] starPosition = (double[]) item.get(starPositionKey);
+            if (!item.containsKey(starPositionKey)){
+                continue;
+            }
 
-            CameraPixel star_pixel =  pixelMap.getPixelBelowCoordinatesInMM(starPosition[0], starPosition[1]);
-            int chidOfPixelOfStar = star_pixel.chid;
+            Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
+            CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
 
-            List<Integer> starChidList = new ArrayList<>();
+            CameraPixel starPixel = pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
 
-            starChidList.add(chidOfPixelOfStar);
+            if (starPixel == null) {
+                log.debug("Star not in camera window");
+                continue;
+            }
+            starSet.add(starPixel);
 
-            starSet.addById(chidOfPixelOfStar);
-
-            for (CameraPixel px: pixelMap.getNeighborsFromID(chidOfPixelOfStar))
-            {
-                if (calculateDistance(px.id, starPosition[0], starPosition[1]) < starRadiusInCamera)
-                {
+            for (CameraPixel px : pixelMap.getNeighborsForPixel(starPixel)) {
+                if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
                     starSet.add(px);
-                    starChidList.add(px.id);
                 }
             }
         }
@@ -188,18 +197,18 @@ public class SumUpPatches implements Processor {
      * @param patch
      * @return sum of timeserieses of pixels of given patch
      */
-    public double[] sumPixelsOfPatch(double[][] pixel_data, int patch) {
-        int nPixPerPatch = 9;
-        double[] patch_sum = new double[pixel_data[nPixPerPatch*patch].length];
-        Arrays.fill(patch_sum, 0.);
-        int pixel_counter = 0;
-        for (int pix = 0; pix < 9; pix++) {
-            int current_pix = patch * 9 + pix;
+    public double[] sumPixelsOfPatch(double[][] pixel_data, int patch, PixelSet invalid_pixels) {
+        int first_pix_id = Constants.N_PIXELS_PER_PATCH*patch;
 
-            if (ignoreBrokenPixels && bad_pixel_set.toArrayList().contains(current_pix)){
-                continue;
-            }
-            if (ignoreStarpixels && star_set.toArrayList().contains(current_pix)){
+        double[] patch_sum = new double[pixel_data[first_pix_id].length];
+        Arrays.fill(patch_sum, 0.);
+
+        int pixel_counter = 0;
+
+        for (int pix = 0; pix < Constants.N_PIXELS_PER_PATCH; pix++) {
+            int current_pix = first_pix_id + pix;
+
+            if (invalid_pixels.containsID(current_pix)) {
                 continue;
             }
 
