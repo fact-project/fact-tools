@@ -558,6 +558,8 @@ public class Utils {
                 Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
                 timeStamp = (ZonedDateTime) item.get(timeStampKey);
             } catch (ClassCastException e) {
+                log.info(timeStampKey + "seems not to contain a ZonedDateTime object." +
+                        "Trying to cast to int[]");
                 Utils.isKeyValid(item, timeStampKey, int[].class);
                 int[] intTimeStamp = (int[]) item.get(timeStampKey);
                 timeStamp = Utils.unixTimeUTCToZonedDateTime(intTimeStamp);
