@@ -1,8 +1,10 @@
 package fact.TriggerEmulation;
 
+import fact.container.PixelSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import stream.Data;
 
 /**
  * Created by jbuss on 15.11.17.
@@ -16,7 +18,21 @@ public class SummationTest {
     public void testPixelSummation(){
         double[][] pixelData = generateTestData();
         SumUpPatches sumUpPatches = new SumUpPatches();
-        double[] sum = sumUpPatches.sumPixelsOfPatch(pixelData, 0);
+        PixelSet invalid_pixels = new PixelSet();
+        double[] sum = sumUpPatches.sumPixelsOfPatch(pixelData, 0, invalid_pixels);
+        double[] result = generateExpectedResult(0,0);
+        Assert.assertArrayEquals(result, sum, Double.MIN_NORMAL);
+    }
+
+
+    @Test
+    public void testPixelSummationWithInvalidePixels(){
+        double[][] pixelData = generateTestData();
+        SumUpPatches sumUpPatches = new SumUpPatches();
+        PixelSet invalid_pixels = new PixelSet();
+        invalid_pixels.addById(1093);
+        invalid_pixels.addById(80);
+        double[] sum = sumUpPatches.sumPixelsOfPatch(pixelData, 0, invalid_pixels);
         double[] result = generateExpectedResult(0,0);
         Assert.assertArrayEquals(result, sum, Double.MIN_NORMAL);
     }
