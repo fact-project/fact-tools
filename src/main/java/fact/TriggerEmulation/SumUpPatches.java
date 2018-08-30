@@ -103,21 +103,9 @@ public class SumUpPatches implements Processor {
      * @return pixelset
      */
     public PixelSet calculateBadPixelSet(Data item) {
-        ZonedDateTime timeStamp = null;
-
-        if (item.containsKey(timeStampKey) == true){
-            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
-            timeStamp = (ZonedDateTime) item.get(timeStampKey);
-        }
-        else {
-            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-            // => The 12 bad pixels we have from the beginning on are used.
-            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        }
-
-        PixelSet badPixelsSet = calibService.getNotUsablePixels(timeStamp);
-
-        return badPixelsSet;
+        ZonedDateTime timeStamp = Utils.getTimeStamp(item, timeStampKey);
+        PixelSet badPixelSet = calibService.getBadPixels(timeStamp);
+        return badPixelSet;
     }
 
     /**
