@@ -24,6 +24,13 @@
 
     <include url="classpath:/analysis/calibration.xml" />
 
+    <fact.features.source.SourcePosition
+            outputKey="Cetatauri"
+            sourceRightAscension="5.627416667"
+            sourceDeclination="21.1425"
+            auxService="auxService"
+    />
+
     <fact.filter.ShapeSignal
             key="DataCalibrated"
             outputKey="DataShaped"
