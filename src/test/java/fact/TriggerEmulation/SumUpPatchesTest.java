@@ -72,17 +72,6 @@ public class SumUpPatchesTest {
         Assert.assertArrayEquals(result, sum, Double.MIN_NORMAL);
     }
 
-    @Test
-    public void testAddToInvalidPixels(){
-        PixelSet setA = new PixelSet();
-        for (int pix = 0; pix < 3; pix++) {
-            setA.addById(pix);
-        }
-        PixelSet emptySet = new PixelSet();
-
-        SumUpPatches.addToInvalidPixels(emptySet, setA);
-        Assert.assertArrayEquals(setA.toIntArray(), emptySet.toIntArray());
-    }
 
 
 }
