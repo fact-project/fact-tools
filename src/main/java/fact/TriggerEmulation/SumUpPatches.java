@@ -95,6 +95,7 @@ public class SumUpPatches implements Processor {
     public double[] sumPixelsOfPatch(double[][] pixel_data, int patch, PixelSet invalid_pixels) {
         int first_pix_id = Constants.N_PIXELS_PER_PATCH*patch;
 
+        //array of length NROI to contain the summed slices
         double[] patch_sum = new double[pixel_data[first_pix_id].length];
         Arrays.fill(patch_sum, 0.);
 
@@ -117,8 +118,8 @@ public class SumUpPatches implements Processor {
             }
             pixel_counter++;
         }
-        // if not all 9 pixels were used scale the patch sum to the same value as is if 9 pixels were used
-        if (pixel_counter < Constants.N_PIXELS_PER_PATCH){
+        // if not all 9 pixels were used, scale the patch sum to the same value as is if 9 pixels were used.
+        if (pixel_counter > 0 && pixel_counter < Constants.N_PIXELS_PER_PATCH){
             for (int i = 0; i < patch_sum.length; i++) {
                 patch_sum[i] /= pixel_counter;
                 patch_sum[i] *= Constants.N_PIXELS_PER_PATCH;
