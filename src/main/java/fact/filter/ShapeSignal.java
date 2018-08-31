@@ -52,9 +52,11 @@ public class ShapeSignal implements Processor {
             double[] pixel_data = Arrays.copyOfRange(data, pix*roi+skipLeft, roi*(pix+1)-skipRight);
             double[] shifted_data = new double[pixel_data.length];
 
+            int validRoi = roi - skipLeft - skipRight;
+
             for (int i=0 ; i < pixel_data.length ; i++)
             {
-                shifted_data[(i+shift) % roi] = (-1) * factor * pixel_data[ i ];
+                shifted_data[(i+shift) % validRoi] = (-1) * factor * pixel_data[ i ];
             }
 
             for (int i=0 ; i < pixel_data.length ; i++)
