@@ -109,7 +109,7 @@ public class findMaximumTriggerThreshold implements Processor {
                 break;
             }
         }
-
+        log.debug("MaxPossibleThreshold "+lastThreshold+" DAC / "+thresholdDACToMillivolt(lastThreshold, millivoltPerDAC)+" mV"  );
         item.put(outKey, lastThreshold);
         item.put(outKey+"_primitives", lastprimitives);
         item.put(outKey+"_slices", lastSlices);
