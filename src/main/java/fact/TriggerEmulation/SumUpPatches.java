@@ -1,12 +1,8 @@
 package fact.TriggerEmulation;
 
-import com.google.common.collect.Sets;
 import fact.Constants;
 import fact.Utils;
-import fact.calibrationservice.CalibrationService;
 import fact.container.PixelSet;
-import fact.coordinates.CameraCoordinate;
-import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -15,13 +11,8 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
-import stream.annotations.Service;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Sum up the signals of each patch and return an array of patchwise timeseries. This is e.g. useful for an emulation of
