@@ -1,6 +1,7 @@
 package fact.TriggerEmulation;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -8,6 +9,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
+import static fact.TriggerEmulation.Discriminator.thresholdDACToMillivolt;
 import static fact.TriggerEmulation.EmulateLogic.isTriggerDecision;
 
 /**
@@ -66,6 +68,7 @@ public class findMaximumTriggerThreshold implements Processor {
 
     @Override
     public Data process(Data item) {
+        Utils.isKeyValid(item, key, double[][].class);
         double[][] data = (double[][]) item.get(key);
 
         int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
