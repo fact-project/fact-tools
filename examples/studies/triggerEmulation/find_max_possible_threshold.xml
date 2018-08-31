@@ -23,13 +23,8 @@
     <Skip condition="%{data.TriggerType} != 4" />
 
     <include url="classpath:/analysis/calibration.xml" />
-
-    <fact.features.source.SourcePosition
-            outputKey="Cetatauri"
-            sourceRightAscension="5.627416667"
-            sourceDeclination="21.1425"
-            auxService="auxService"
-    />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
 
     <fact.filter.ShapeSignal
             key="DataCalibrated"
@@ -38,10 +33,28 @@
             factor="0.96"
     />
 
+    <fact.features.source.PixelSetForSourcePosition
+            starPositionKeys="Cetatauri"
+            starRadiusInCamera="11.0"
+            outsetKey="starset"
+    />
+
+    <fact.pixelsets.Invert
+            insetKey="badPixels"
+            outsetKey="goodPixels"
+    />
+
+    <fact.pixelsets.Union
+            setAKey="badPixels"
+            setBKey="starset"
+            outsetKey="triggerPixels"
+    />
+
     <fact.TriggerEmulation.SumUpPatches
-            calibService="calibService"
             key="DataShaped"
             outKey="SummedPatches"
+            pixelSetExcludeKey="triggerPixels"
+            visualize="true"
     />
 
     
