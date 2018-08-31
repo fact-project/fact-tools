@@ -79,7 +79,7 @@ public class findMaximumTriggerThreshold implements Processor {
         boolean[] lastprimitives = null;
         int[] lastSlices = null;
 
-        for (int threshold = minThreshold; threshold < maxThreshold; threshold+=thresholdIncrement) {
+        for (int threshold = minThreshold; threshold <= maxThreshold; threshold+=thresholdIncrement) {
 
             int[] patchTriggerSlice = new int[n_patches];
             boolean[] triggerPrimitives = discriminatePatches(
