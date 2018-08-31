@@ -29,28 +29,14 @@ public class SumUpPatches implements Processor {
     @Parameter(required = false)
     public String outKey;
 
-    @Service(required = true, description = "The calibration service which provides the information about the bad pixels")
-    public CalibrationService calibService;
-
-    @Parameter(required = false, description = "The key containing the event timestamp")
-    public String timeStampKey = "timestamp";
+    @Parameter(description = "Key of the pixel sample that should be excluded", defaultValue = "")
+    public String pixelSetExcludeKey = null;
 
     @Parameter(required = false, description = "Converts the patch array into a 1440*ROI array inorder to visualize the patche time series in the viewer")
     public Boolean visualize = false;
 
-    @Parameter(required = false, description = "Ignore the broken pixels in the patch sum")
-    public Boolean ignoreBrokenPixels = false;
-
-    @Parameter(required = false, description = "Ignore the pixels containing light from a start in the patch sum")
-    public Boolean ignoreStarpixels = false;
-
-    @Parameter(required = false)
-    public String[] starPositionKeys = null;
-    @Parameter(required = false, defaultValue="Constants.PIXEL_SIZE")
-    public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
-
     private FactPixelMapping pixelMap = FactPixelMapping.getInstance();
-    private PixelSet invalidePixels = new PixelSet();
+    private PixelSet invalidPixels = new PixelSet();
 
     @Override
     public Data process(Data item) {
@@ -61,18 +47,18 @@ public class SumUpPatches implements Processor {
 
         int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
 
-        if (ignoreStarpixels ) {
-            addToInvalidPixels(invalidePixels, calculateStarPixelSet(item));
-        }
-        if (ignoreBrokenPixels) {
-            addToInvalidPixels(invalidePixels, calculateBadPixelSet(item));
+        //Load a given pixelset, otherwise use the the whole camera
+
+        if (pixelSetExcludeKey != null) {
+            Utils.isKeyValid(item, pixelSetExcludeKey, PixelSet.class);
+            invalidPixels = (PixelSet) item.get(pixelSetExcludeKey);
         }
 
         double[][] pixel_data = Utils.snipPixelData(data, 0, 0, Constants.N_PIXELS, roi);
         double[][] patch_sums = new double[n_patches][];
 
         for (int patch = 0; patch < n_patches; patch++) {
-            patch_sums[patch] = sumPixelsOfPatch(pixel_data, patch, invalidePixels);
+            patch_sums[patch] = sumPixelsOfPatch(pixel_data, patch, invalidPixels);
         }
         item.put(outKey, patch_sums);
 
@@ -82,76 +68,6 @@ public class SumUpPatches implements Processor {
         return item;
 
     }
-
-    public static void addToInvalidPixels(PixelSet invalidePixels, PixelSet setA){
-        Sets.SetView<CameraPixel> union = Sets.union(invalidePixels.set, setA.set);
-        union.copyInto(invalidePixels.set);
-    }
-
-    /**
-     * generates the pixel set with bad pixels to be excluded from the trigger
-     * @param item
-     * @return pixelset
-     */
-    public PixelSet calculateBadPixelSet(Data item) {
-        ZonedDateTime timeStamp = Utils.getTimeStamp(item, timeStampKey);
-        PixelSet badPixelSet = calibService.getBadPixels(timeStamp);
-        return badPixelSet;
-    }
-
-    /**
-     * generates the pixel set with star pixels to be excluded from the trigger
-     * @param item
-     * @return pixelset
-     */
-    public PixelSet calculateStarPixelSet(Data item) {
-        PixelSet starSet = new PixelSet();
-
-        if (starPositionKeys == null) {
-            return starSet;
-        }
-
-        for (String starPositionKey : starPositionKeys)
-        {
-            if (!item.containsKey(starPositionKey)){
-                continue;
-            }
-
-            Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
-            CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
-
-            CameraPixel starPixel = pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
-
-            if (starPixel == null) {
-                log.debug("Star not in camera window");
-                continue;
-            }
-            starSet.add(starPixel);
-
-            for (CameraPixel px : pixelMap.getNeighborsForPixel(starPixel)) {
-                if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
-                    starSet.add(px);
-                }
-            }
-        }
-        return starSet;
-    }
-
-    /**
-     * Calculates the Distance between a pixel and a given position
-     * @param chid
-     * @param x
-     * @param y
-     * @return
-     */
-    private double calculateDistance(int chid, double x, double y)
-    {
-        double xdist = pixelMap.getPixelFromId(chid).getXPositionInMM() - x;
-        double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
-
-        return Math.sqrt((xdist*xdist)+(ydist*ydist));
-    }
-
 
     /**
      * Convert to a full ROI double array with length npixels*ROI
