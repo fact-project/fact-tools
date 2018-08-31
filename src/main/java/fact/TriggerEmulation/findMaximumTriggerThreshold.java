@@ -32,7 +32,7 @@ public class findMaximumTriggerThreshold implements Processor {
 
     @Parameter(required = false,
             description = "threshold of the discriminator in DAC units")
-    public int minThreshold = 200;
+    public int minThreshold = 0;
 
     @Parameter(required = false,
             description = "threshold of the discriminator in DAC units")
@@ -40,7 +40,7 @@ public class findMaximumTriggerThreshold implements Processor {
 
     @Parameter(required = false,
             description = "threshold of the discriminator in DAC units")
-    public int thresholdIncrement = 4;
+    public int thresholdIncrement = 8;
 
     @Parameter(required = false,
             description = "minimum time the signal has to stay above the threhold")
