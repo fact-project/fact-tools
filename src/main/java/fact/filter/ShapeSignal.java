@@ -29,10 +29,10 @@ public class ShapeSignal implements Processor {
     public int shift = 10;
 
     @Parameter(required = false)
-    int skipLeft = 0;
+    int skipLeft = 30;
 
     @Parameter(required = false)
-    int skipRight = 0;
+    int skipRight = 40;
 
     @Parameter
     public double factor = 0.66;
