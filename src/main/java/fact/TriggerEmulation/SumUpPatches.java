@@ -112,8 +112,6 @@ public class SumUpPatches implements Processor {
 
 
             for (int i = 0; i < patch_sum.length; i++) {
-                assert (i < patch_sum.length);
-                assert (i < pixel_data[current_pix].length);
                 patch_sum[i] += pixel_data[current_pix][i];
             }
             pixel_counter++;
