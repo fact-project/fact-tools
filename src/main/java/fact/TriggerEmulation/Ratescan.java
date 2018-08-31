@@ -1,6 +1,7 @@
 package fact.TriggerEmulation;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -8,7 +9,12 @@ import stream.ProcessContext;
 import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
+
+import static fact.TriggerEmulation.Discriminator.booleanToInt;
+import static fact.TriggerEmulation.Discriminator.discriminatePatches;
 
 /**
  * Emulates a ratescan on summed patch time series
@@ -23,24 +29,28 @@ public class Ratescan implements StatefulProcessor {
 
     @Parameter(required = false,
             description = "Int array [number of patches][number of threshold] flaggin if patch was triggered at given theshold")
-    public String triggerRatesKey = "TriggerRates";
+    public String triggerCountsKey = "RatescanTriggerCounts";
 
     @Parameter(required = false,
             description = "int array [number of patches][number of threshold] containing each the first slice above threshold ")
-    public String triggerSlicesKey = "TriggerSlices";
+    public String triggerSlicesKey = "RatescanTriggerSlices";
+
+    @Parameter(required = false,
+            description = "int array [number of patches][number of threshold] containing each the first slice above threshold ")
+    public String triggerPrimitivesKey = "RatescanTriggerPrimitivesSlices";
 
     @Parameter(required = false,
             description = "int array [number of threshold] containing steps threshold ")
-    public String thresholdsKey = "TriggerThresholds";
+    public String thresholdsKey = "RatescanTriggerThresholds";
 
     @Parameter(required = false)
     public Integer minThreshold=0;
 
     @Parameter(required = false)
-    public Integer nThresholds=40;
+    public Integer nThresholds=null;
 
     @Parameter(required = false)
-    public Integer stepSize=20;
+    public Integer stepSize=10;
 
     @Parameter(required = false,
             description = "minimum time the signal has to stay above the threshold")
@@ -48,85 +58,166 @@ public class Ratescan implements StatefulProcessor {
 
     @Parameter(required = false,
             description = "number of slices to ignore at the beginning of the time series")
-    public int skipFirst = 10;
+    public int skipFirst = 30;
 
     @Parameter(required = false,
             description = "number of slices to ignore at the end of the time series")
     public int skipLast = 40;
 
-    private int[] thresholds;
 
 
     @Override
     public Data process(Data item) {
 
+        Utils.isKeyValid(item, key, double[][].class);
         double[][] data = (double[][]) item.get(key);
 
-        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
+        RatescanResult ratescanResult = null;
 
-        int[][] patchTriggerSlice = new int[n_patches+1][nThresholds];
-        int[][] patchTriggerRate = new int[n_patches+1][nThresholds];
-
-        for (int patch = 0; patch < n_patches; patch++) {
-            ratescan(data[patch], minThreshold, nThresholds, stepSize,
-                    patchTriggerSlice[patch], patchTriggerRate[patch]);
-            for (int i = 0; i < nThresholds; i++) {
-                patchTriggerRate[n_patches][i] += patchTriggerRate[patch][i];
-            }
+        if (nThresholds == null){
+            ratescanResult = ratescan( data, minThreshold, stepSize);
+        } else {
+            ratescanResult = ratescan( data, minThreshold, stepSize, nThresholds);
         }
 
-        item.put(triggerRatesKey, patchTriggerRate);
-        item.put(triggerSlicesKey, patchTriggerSlice);
+        int[][] triggerSlices = ratescanResult.getTriggerSlices();
+        int[] triggerCounts = ratescanResult.getNumberOfPrimitives();
+        boolean[][] primitives = ratescanResult.getPrimitives();
+        int[] thresholds = ratescanResult.getThresholds();
+
+        item.put(triggerCountsKey, triggerCounts);
+        item.put(triggerSlicesKey, triggerSlices);
+        item.put(triggerPrimitivesKey, primitives);
         item.put(thresholdsKey, thresholds);
 
         return item;
+    }
+
+    public RatescanResult ratescan(
+            double[][] data,
+            int minThreshold,
+            int stepSize
+    ) {
+        return ratescan( data, minThreshold, stepSize, Integer.MAX_VALUE);
     }
 
     /**
      * Performs a pseudo ratescan on the given data
      * @param data
      * @param minThreshold
-     * @param nThresholds
      * @param stepSize
-     * @param triggerSlice
-     * @param triggerRate
+     * @param nThresholds
      */
-    public void ratescan(
-            double[] data,
+    public RatescanResult ratescan(
+            double[][] data,
             int minThreshold,
-            int nThresholds,
             int stepSize,
-            int[] triggerSlice,
-            int[] triggerRate
+            int nThresholds
     ) {
-        for (int i = 0; i < nThresholds; i++) {
+        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
 
-            int dac = minThreshold+i*stepSize;
+        int n_tiggered_patches = n_patches;
 
-            triggerSlice[i] =
-                    Discriminator.discriminatePatch(
-                            data,
-                            Discriminator.thresholdDACToMillivolt(dac, Constants.MILLIVOLT_PER_DAC),
-                            minTimeOverThreshold,
-                            skipFirst,
-                            skipLast
-                    );
+        RatescanResult ratescanResult = new RatescanResult();
+//        int m = 1;
+//        int beyond_counter = 1;
+//        boolean first_time = true;
+//        double half_life = 0;
+        for (int i = 0; n_tiggered_patches > 0 && i < nThresholds; i++) {
+//            if (n_tiggered_patches <= 1 ){
+//                i += beyond_counter;
+//                beyond_counter+=(1 - n_tiggered_patches/16);
+//            }
+            int threshold = minThreshold+i*stepSize;
 
-            if (triggerSlice[i] < Integer.MAX_VALUE) {
-                triggerRate[i] = 1;
+//            if ( n_tiggered_patches <= 80 ){
+//                if (first_time) {
+//                    first_time = false;
+//                    half_life =  (-1) * Math.log(n_tiggered_patches / 2*160) / i;
+//                }
+//                log.info("expected="+(Math.pow(Math.exp(10),i+1)));
+//            }
+
+
+
+
+            ratescanResult.thresholds_arr.add(threshold);
+
+            int[] patchTriggerSlice = new int[n_patches];
+
+            boolean[] currentTriggerPrimitives = discriminatePatches(
+                    data,
+                    n_patches,
+                    patchTriggerSlice,
+                    threshold,
+                    minTimeOverThreshold,
+                    skipFirst,
+                    skipLast
+            );
+
+            n_tiggered_patches = countPrimitives(currentTriggerPrimitives);
+
+            log.info("Threshold: "+threshold+" nPrimitives: "+n_tiggered_patches);
+
+            ratescanResult.n_primitives_arr.add(n_tiggered_patches);
+            ratescanResult.triggerPrimitives_arr.add(currentTriggerPrimitives);
+            ratescanResult.patchTriggerSlices_arr.add(patchTriggerSlice);
+
+        }
+        return ratescanResult;
+    }
+
+    public static long lin2log(int z) {
+        int x = 1;
+        int y = 256;
+        double b = Math.log(y/x)/(y-x);
+        double a = 10 / Math.exp(b*10);
+        double tempAnswer = a * Math.exp(b*z);
+        long finalAnswer = Math.max(Math.round(tempAnswer) - 1, 0);
+
+        return finalAnswer;
+
+    }
+
+    public class RatescanResult {
+        ArrayList<Integer> thresholds_arr = new ArrayList<>();
+        ArrayList<Integer> n_primitives_arr = new ArrayList<>();
+        ArrayList<boolean[]> triggerPrimitives_arr = new ArrayList<>();
+        ArrayList<int[]> patchTriggerSlices_arr = new ArrayList<>();
+
+        public int[] getThresholds(){
+            return thresholds_arr.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
+        }
+
+        public int[] getNumberOfPrimitives(){
+            return n_primitives_arr.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
+        }
+
+        public boolean[][] getPrimitives(){
+            boolean[][] primitives = new boolean[1][1];
+            return triggerPrimitives_arr.toArray(primitives);
+        }
+
+        public int[][] getTriggerSlices(){
+            int[][] triggerSlices = new int[1][1];
+            return patchTriggerSlices_arr.toArray(triggerSlices);
+        }
+    }
+
+    public int countPrimitives(boolean[] primitives){
+        int counts = 0;
+        for (boolean primitive:
+             primitives) {
+            if (primitive){
+                counts++;
             }
         }
+        return counts;
     }
 
     @Override
     public void init(ProcessContext context) throws Exception {
-        int[] thresholds = new int[nThresholds];
 
-        for (int i = 0; i < nThresholds; i++) {
-            thresholds[i] = minThreshold+stepSize*i;
-        }
-
-        log.info("Performing ratesscan with thresholds: \n"+Arrays.toString(thresholds));
     }
 
     @Override
