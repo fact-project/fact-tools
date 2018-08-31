@@ -76,6 +76,8 @@ public class findMaximumTriggerThreshold implements Processor {
 
 
         Integer lastThreshold = null;
+        boolean[] lastprimitives = null;
+        int[] lastSlices = null;
 
         for (int threshold = minThreshold; threshold < maxThreshold; threshold+=thresholdIncrement) {
 
@@ -100,6 +102,8 @@ public class findMaximumTriggerThreshold implements Processor {
 
             if (triggerDecision){
                 lastThreshold = threshold;
+                lastprimitives = triggerPrimitives;
+                lastSlices = patchTriggerSlice;
             }
             else {
                 break;
@@ -107,6 +111,8 @@ public class findMaximumTriggerThreshold implements Processor {
         }
 
         item.put(outKey, lastThreshold);
+        item.put(outKey+"_primitives", lastprimitives);
+        item.put(outKey+"_slices", lastSlices);
 
         return item;
     }
