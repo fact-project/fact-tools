@@ -1,6 +1,7 @@
 package fact.TriggerEmulation;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -59,6 +60,11 @@ public class EmulateDiscriminator implements Processor{
 
         int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
         double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
+
+        if (thresholdKey != null){
+            Utils.isKeyValid(item, thresholdKey, Integer.class);
+            threshold = (Integer) item.get(thresholdKey);
+        }
 
 
         int[] patchTriggerSlice = new int[n_patches];

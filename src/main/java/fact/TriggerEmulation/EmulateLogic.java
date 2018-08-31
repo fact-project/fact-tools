@@ -1,6 +1,7 @@
 package fact.TriggerEmulation;
 
 import fact.Constants;
+import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -50,6 +51,9 @@ public class EmulateLogic implements Processor {
 
     @Override
     public Data process(Data item) {
+
+        Utils.isKeyValid(item, primitivesKey, boolean[].class);
+        Utils.isKeyValid(item, triggerSliceKey, int[].class);
 
         boolean[] triggerPrimitives = (boolean[]) item.get(primitivesKey);
         int[] patchTriggerSlice = (int[]) item.get(triggerSliceKey);
