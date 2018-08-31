@@ -40,6 +40,10 @@ public class EmulateDiscriminator implements Processor{
     public int threshold = 330;
 
     @Parameter(required = false,
+            description = "key in dataitem with threshold of the discriminator in DAC units. !!!!Overwrites threshold")
+    public String thresholdKey = null;
+
+    @Parameter(required = false,
             description = "minimum time the signal has to stay above the threhold")
     public int minTimeOverThreshold = 8;
 
