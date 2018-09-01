@@ -1,5 +1,7 @@
 package fact.TriggerEmulation;
 
+import fact.Constants;
+
 public class Discriminator {
 
     public static int default_slice = Integer.MAX_VALUE;
@@ -7,20 +9,21 @@ public class Discriminator {
     /**
      *Discriminate the signal of a given patch
      * @param data timeseries
-     * @param thresholdInMillivolt threshold of the discriminator in millivolt units
+     * @param threshold threshold of the discriminator in DAC
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
      */
     public static int discriminatePatch(
             double[] data,
-            double thresholdInMillivolt,
+            int threshold,
             int minTimeOverThreshold,
             int skipFirst,
             int skipLast
     ) {
         int counter = 0;
         int patchTriggerSlice = default_slice;
+        double thresholdInMillivolt = thresholdDACToMillivolt(threshold, Constants.MILLIVOLT_PER_DAC);
 
         for (int slice = skipFirst; slice < data.length-skipLast; slice++) {
             double slice_amplitude = data[slice];
@@ -44,7 +47,6 @@ public class Discriminator {
     public static boolean[] discriminatePatches(
             double[][] data,
             int n_patches,
-            double millivoltPerDAC,
             int[] patchTriggerSlice,
             int threshold,
             int minTimeOverThreshold,
@@ -59,7 +61,7 @@ public class Discriminator {
             patchTriggerSlice[patch] =
                     discriminatePatch(
                             data[patch],
-                            thresholdDACToMillivolt(threshold, millivoltPerDAC),
+                            threshold,
                             minTimeOverThreshold,
                             skipFirst,
                             skipLast

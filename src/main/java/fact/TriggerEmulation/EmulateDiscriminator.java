@@ -76,7 +76,6 @@ public class EmulateDiscriminator implements Processor{
         boolean[] triggerPrimitives = discriminatePatches(
                 data,
                 n_patches,
-                millivoltPerDAC,
                 patchTriggerSlice,
                 threshold,
                 minTimeOverThreshold,
