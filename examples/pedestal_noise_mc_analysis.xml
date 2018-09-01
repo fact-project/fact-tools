@@ -1,22 +1,23 @@
 <container>
-  <!-- Analysis of the created pedestal MC files -->
   <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="classpath:/testDataFile.fits.gz" />
+  <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
 
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="file:/fact/aux" />
+  <property name="outfile" value="file:test.fits" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
   <service id="gainService" class="fact.gainservice.GainService" />
-  
-  <property name="drsfile" value="" />
 
-  <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-    <stream class="fact.io.hdureader.FITSStream" id="fact" />
-  </stream>
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
   <process id="2" input="fact">
     <include url="classpath:/analysis/init.xml" />
-    <!-- This skips events created by our malfunctioning LED light pulser (27s Events) --> 
+    <!-- This skips events created by our malfunctioning LED light pulser (27s Events) -->
     <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
     <!-- Only analyze physics trigger events -->
     <Skip condition="%{data.TriggerType} != 4" />
@@ -24,15 +25,17 @@
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
 
-    <fact.features.UnixTimeUTC2DateTime inputKey="LONS_UnixTimeUTC" outputKey="LONS_timestamp" />
+    <fact.features.UnixTimeUTC2DateTime inputKey="UnixTimeUTC" outputKey="LONS_timestamp" />
 
+
+    \
     <!--Cleaning-->
     <fact.features.source.SourcePosition
             outputKey="Cetatauri"
             sourceRightAscension="5.627416667"
             sourceDeclination="21.1425"
             auxService="auxService"
-            timeStampKey="LONS_timestamp"
+            timeStampKey="UnixTimeUTC"
     />
     <fact.cleaning.TwoLevelTimeNeighbor
             calibService="calibService"
@@ -64,12 +67,12 @@
 
     <fact.utils.SanitizeKeys />
 
-      <fact.io.JSONWriter keys="${outputKeysSimulations}"
-            url="${output}"
-            writeListOfItems="True"
-            specialDoubleValuesAsString="True"
-            pixelSetsAsInt="True"
-      />
+      <!--<fact.io.JSONWriter keys="${outputKeysSimulations}"-->
+            <!--url="${output}"-->
+            <!--writeListOfItems="True"-->
+            <!--specialDoubleValuesAsString="True"-->
+            <!--pixelSetsAsInt="True"-->
+      <!--/>-->
     <!--<fact.io.FITSWriter url="${outfile}"/>-->
     
   </process>
