@@ -35,7 +35,7 @@
             sourceRightAscension="5.627416667"
             sourceDeclination="21.1425"
             auxService="auxService"
-            timeStampKey="UnixTimeUTC"
+            timeStampKey="LONS_timestamp"
     />
     <fact.cleaning.TwoLevelTimeNeighbor
             calibService="calibService"
