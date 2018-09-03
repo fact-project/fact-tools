@@ -266,8 +266,11 @@ public class FITSWriter extends Writer implements StatefulProcessor {
                 VersionInformation.getInstance().gitDescribe,
                 "The FACT-Tools Version used to write this file"
         );
-        table.fillHeader(header);
+        header.addValue("TELESCOP", "FACT", "");
+        header.addValue("ORIGIN", "FACT", "");
+        header.addValue("CREATOR", "FACT-Tools " + VersionInformation.getInstance().gitDescribe, "");
         fillHeader(header, headerItem);
+        table.fillHeader(header);
 
         bhdu = new BinaryTableHDU(header, table);
 
