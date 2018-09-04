@@ -25,6 +25,9 @@
     <Skip condition="%{data.TriggerType} != 4" />
 
     <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
+    <include url="classpath:/analysis/pedestalParameters.xml" />
 
     <fact.filter.ShapeSignal
             key="DataCalibrated"
@@ -34,19 +37,15 @@
     />
 
     <fact.TriggerEmulation.SumUpPatches
-            calibService="calibService"
             key="DataShaped"
             outKey="SummedPatches"
     />
-
-    <fact.TriggerEmulation.EmulateDiscriminator
-            key="SummedPatches"
-      />
 
     <fact.TriggerEmulation.Ratescan
             key="SummedPatches"
     />
 
+    <fact.utils.SanitizeKeys />
 
     <!--<PrintData/>-->
 
