@@ -36,9 +36,27 @@
             factor="0.96"
     />
 
+    <fact.features.source.PixelSetForSourcePosition
+            starPositionKeys="Cetatauri"
+            starRadiusInCamera="11.0"
+            outsetKey="starset"
+    />
+
+    <fact.pixelsets.Invert
+            insetKey="badPixels"
+            outsetKey="goodPixels"
+    />
+
+    <fact.pixelsets.Union
+            setAKey="badPixels"
+            setBKey="starset"
+            outsetKey="triggerPixelsExcluded"
+    />
+
     <fact.TriggerEmulation.SumUpPatches
             key="DataShaped"
             outKey="SummedPatches"
+            pixelSetExcludeKey="triggerPixelsExcluded"
     />
 
     <fact.TriggerEmulation.Ratescan
