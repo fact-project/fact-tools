@@ -95,7 +95,7 @@ public class EmulateLogic implements Processor {
             for (Integer patch :
                     getPatchesOfFTU(ftu)) {
 
-                if (triggerPrimitives[patch]){
+                if (triggerPrimitives[patch] && patchTriggerSlice[patch] > 0){
                     insertToArrayListSorted(patchTriggerSlice[patch], triggerTimes);
                     n_trigger_patches++;
                 }
