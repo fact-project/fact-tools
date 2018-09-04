@@ -4,7 +4,7 @@ import fact.Constants;
 
 public class Discriminator {
 
-    public static int default_slice = Integer.MAX_VALUE;
+    public static int default_slice = 0;
 
     /**
      *Discriminate the signal of a given patch
@@ -23,6 +23,7 @@ public class Discriminator {
     ) {
         int counter = 0;
         int patchTriggerSlice = default_slice;
+
         double thresholdInMillivolt = thresholdDACToMillivolt(threshold, Constants.MILLIVOLT_PER_DAC);
 
         for (int slice = skipFirst; slice < data.length-skipLast; slice++) {
@@ -67,7 +68,7 @@ public class Discriminator {
                             skipLast
                     );
 
-            if (patchTriggerSlice[patch] < default_slice){
+            if (patchTriggerSlice[patch] > default_slice){
                 triggerPrimitives[patch] = true;
             }
         }
