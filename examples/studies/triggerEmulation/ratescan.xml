@@ -7,7 +7,7 @@
 
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-  <property name="outfile" value="file:testTrigger.json" />
+  <property name="output" value="file:testTrigger.json.gz" />
 
   <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
@@ -46,12 +46,15 @@
     />
 
 
-    <!--<fact.io.JSONWriter keys="TriggerRates,TriggerSlices,TriggerThresholds,TriggerPrimitives"-->
-                        <!--url="${output}"-->
-                        <!--writeListOfItems="True"-->
-                        <!--specialDoubleValuesAsString="True"-->
-                        <!--pixelSetsAsInt="True"-->
-    <!--/>-->
+    <!--<PrintData/>-->
+
+    <fact.io.JSONWriter keys="${event_metadata_common},${event_metadata_observations},${RatescanFeatures},${pointing},${pointing},${pedestals}"
+                        url="${output}"
+                        writeListOfItems="True"
+                        pixelSetsAsInt="True"
+                        jsonl="True"
+                        gzip="True"
+    />
 
   </process>
 </container>
