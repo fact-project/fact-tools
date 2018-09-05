@@ -9,7 +9,7 @@ import stream.Processor;
 import stream.annotations.Parameter;
 
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
-import static fact.TriggerEmulation.Discriminator.thresholdDACToMillivolt;
+import static fact.TriggerEmulation.Discriminator.dacToMillivolt;
 import static fact.TriggerEmulation.EmulateLogic.isTriggerDecision;
 
 /**
@@ -108,7 +108,7 @@ public class findMaximumTriggerThreshold implements Processor {
                 break;
             }
         }
-        log.debug("MaxPossibleThreshold "+lastThreshold+" DAC / "+thresholdDACToMillivolt(lastThreshold, millivoltPerDAC)+" mV"  );
+        log.debug("MaxPossibleThreshold "+lastThreshold+" DAC / "+ dacToMillivolt(lastThreshold)+" mV"  );
         item.put(outKey, lastThreshold);
         item.put(outKey+"_primitives", lastprimitives);
         item.put(outKey+"_slices", lastSlices);

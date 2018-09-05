@@ -24,7 +24,7 @@ public class Discriminator {
         int counter = 0;
         int patchTriggerSlice = default_slice;
 
-        double thresholdInMillivolt = thresholdDACToMillivolt(threshold, Constants.MILLIVOLT_PER_DAC);
+        double thresholdInMillivolt = dacToMillivolt(threshold);
 
         for (int slice = skipFirst; slice < data.length-skipLast; slice++) {
             double slice_amplitude = data[slice];
@@ -88,12 +88,21 @@ public class Discriminator {
 
     /**
      * Convert threshold in DAC units to millivolt units
-     * @param threshold
-     * @param millivoltPerDAC
+     * @param amplitude
      * @return
      */
-    public static double thresholdDACToMillivolt(int threshold, double millivoltPerDAC) {
-        return millivoltPerDAC*threshold;
+    public static double dacToMillivolt(int amplitude) {
+        return Constants.MILLIVOLT_PER_DAC*amplitude;
+    }
+
+    /**
+     * Convert amplitude in DAC units to millivolt units
+     * @param amplitude
+     * @return
+     */
+    public static int millivoltToDAC(double amplitude) {
+        long res = Math.round(amplitude/Constants.MILLIVOLT_PER_DAC);
+        return (int) res;
     }
 
 
