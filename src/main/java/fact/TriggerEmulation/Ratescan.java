@@ -119,27 +119,9 @@ public class Ratescan implements StatefulProcessor {
         int n_tiggered_patches = n_patches;
 
         RatescanResult ratescanResult = new RatescanResult();
-//        int m = 1;
-//        int beyond_counter = 1;
-//        boolean first_time = true;
-//        double half_life = 0;
+
         for (int i = 0; n_tiggered_patches > 0 && i < nThresholds; i++) {
-//            if (n_tiggered_patches <= 1 ){
-//                i += beyond_counter;
-//                beyond_counter+=(1 - n_tiggered_patches/16);
-//            }
             int threshold = minThreshold+i*stepSize;
-
-//            if ( n_tiggered_patches <= 80 ){
-//                if (first_time) {
-//                    first_time = false;
-//                    half_life =  (-1) * Math.log(n_tiggered_patches / 2*160) / i;
-//                }
-//                log.info("expected="+(Math.pow(Math.exp(10),i+1)));
-//            }
-
-
-
 
             ratescanResult.thresholds_arr.add(threshold);
 
