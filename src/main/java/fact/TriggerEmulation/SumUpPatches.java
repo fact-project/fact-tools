@@ -29,7 +29,7 @@ public class SumUpPatches implements Processor {
     @Parameter(required = false)
     public String outKey;
 
-    @Parameter(description = "Key of the pixel sample that should be excluded", defaultValue = "")
+    @Parameter(description = "Key of the pixel sample that should be excluded")
     public String pixelSetExcludeKey = null;
 
     @Parameter(required = false, description = "Converts the patch array into a 1440*ROI array inorder to visualize the patche time series in the viewer")

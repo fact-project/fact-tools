@@ -8,7 +8,7 @@ public class Discriminator {
 
     /**
      *Discriminate the signal of a given patch
-     * @param data timeseries
+     * @param data timeseries, array[n_pixels_pe_patch]
      * @param threshold threshold of the discriminator in DAC
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
@@ -45,6 +45,17 @@ public class Discriminator {
         return default_slice;
     }
 
+    /**
+     * loop over pixels patch by patch and discriminate each patch
+     * @param data array[n_patches][n_pixels_pe_patch]
+     * @param n_patches number of patches to loop over
+     * @param patchTriggerSlice output array[n_patches][n_pixels_pe_patch] for triggered slices
+     * @param threshold threshold of the discriminator in DAC
+     * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
+     * @param skipFirst number of slices to ignore at the beginning of the time series
+     * @param skipLast number of slices to ignore at the end of the time series
+     * @return
+     */
     public static boolean[] discriminatePatches(
             double[][] data,
             int n_patches,
