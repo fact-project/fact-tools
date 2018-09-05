@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static fact.TriggerEmulation.Discriminator.millivoltToDAC;
+
 /**
  * Created by jbuss on 16.11.17.
  */
@@ -26,7 +28,7 @@ public class DiscriminatorTest {
         }
         int estimated_slice = Discriminator.discriminatePatch(
                 data,
-                220,
+                millivoltToDAC(220),
                 8,
                 10,
                 50
