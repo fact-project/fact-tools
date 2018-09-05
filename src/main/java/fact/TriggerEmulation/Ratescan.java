@@ -139,7 +139,7 @@ public class Ratescan implements StatefulProcessor {
 
             n_tiggered_patches = countPrimitives(currentTriggerPrimitives);
 
-            log.info("Threshold: "+threshold+" nPrimitives: "+n_tiggered_patches);
+            log.debug("Threshold: "+threshold+" nPrimitives: "+n_tiggered_patches);
 
             ratescanResult.n_primitives_arr.add(n_tiggered_patches);
             ratescanResult.triggerPrimitives_arr.add(currentTriggerPrimitives);
