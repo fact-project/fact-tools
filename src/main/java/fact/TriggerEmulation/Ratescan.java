@@ -28,19 +28,22 @@ public class Ratescan implements StatefulProcessor {
     public String key;
 
     @Parameter(required = false,
-            description = "Int array [number of patches][number of threshold] flaggin if patch was triggered at given theshold")
+            description = "Int array [number of threshold] how many patches were triggered " +
+                    "at given theshold")
     public String triggerCountsKey = "RatescanTriggerCounts";
 
     @Parameter(required = false,
-            description = "int array [number of patches][number of threshold] containing each the first slice above threshold ")
+            description = "int array [number of patches][number of threshold] " +
+                    "containing each the first slice above threshold ")
     public String triggerSlicesKey = "RatescanTriggerSlices";
 
     @Parameter(required = false,
-            description = "int array [number of patches][number of threshold] containing each the first slice above threshold ")
+            description = "boolean array [number of patches][number of threshold] " +
+                    "containing each if patch was triggered for given threshold ")
     public String triggerPrimitivesKey = "RatescanTriggerPrimitives";
 
     @Parameter(required = false,
-            description = "int array [number of threshold] containing steps threshold ")
+            description = "int array [number of threshold] containing steps of thresholds ")
     public String thresholdsKey = "RatescanTriggerThresholds";
 
     @Parameter(required = false)
