@@ -4,6 +4,7 @@
 package fact.io;
 
 import fact.Constants;
+import fact.container.PixelSet;
 import fact.io.hdureader.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -134,6 +135,40 @@ public class FITSWriterTest {
         assertFalse(header.get("EventNum").isPresent());
     }
 
+
+    @Test
+    public void testFitsWriterPixelSet() throws Exception {
+        FITSWriter fitsWriter = new FITSWriter();
+        File f = File.createTempFile("test_fits", ".fits");
+        log.info("testFitsWriterPixelSet {}", f.getAbsolutePath());
+
+        PixelSet pixelSet = new PixelSet();
+        pixelSet.addById(1);
+        pixelSet.addById(5);
+        pixelSet.addById(15);
+        Data item = DataFactory.create();
+        item.put("shower", pixelSet);
+
+        URL url = new URL("file:" + f.getAbsolutePath());
+        fitsWriter.url = url;
+        fitsWriter.keys = new Keys("shower");
+        fitsWriter.init(null);
+        fitsWriter.process(item);
+        assertEquals(fitsWriter.numEventsWritten, 1);
+        fitsWriter.finish();
+
+        FITS fits = FITS.fromFile(f);
+        BinTable table = fits.getBinTableByName("Events").get();
+        BinTableReader tableReader = BinTableReader.forBinTable(table);
+        OptionalTypesMap<String, Serializable> row = tableReader.getNextRow();
+
+        boolean[] read = row.getBooleanArray("shower").orElseThrow(() -> new RuntimeException("Shower not found"));
+        PixelSet pixelsRead = PixelSet.fromBooleanArray(read);
+        assertTrue(pixelsRead.containsID(5));
+        assertTrue(pixelsRead.containsID(5));
+        assertTrue(pixelsRead.containsID(15));
+    }
+
     @Test
     public void testDateTimeFormatter() {
         ZonedDateTime date1 = ZonedDateTime.of(2013, 11, 01, 23, 44, 25, 123000000, ZoneOffset.UTC);
@@ -157,4 +192,6 @@ public class FITSWriterTest {
         assertEquals(FITSWriter.formatDateTime(date5), "2013-11-01T23:44:25.123456Z");
         assertEquals(FITSWriter.formatDateTime(date6), "2013-11-01T00:00:00.000000Z");
     }
+
+
 }

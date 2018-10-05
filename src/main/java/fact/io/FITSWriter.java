@@ -156,12 +156,12 @@ public class FITSWriter extends Writer implements StatefulProcessor {
                 }
             } else if (elem instanceof boolean[]) {
                 for (boolean val : (boolean[]) elem) {
-                    buffer.put((byte) (val ? 1 : 0));
+                    byte b = (byte) (val ? 'T' : 'F');
+                    buffer.put(b);
                 }
             } else {
                 throw new RuntimeException("Serializable cannot be saved to FITS");
             }
-
         }
 
         buffer.flip();
