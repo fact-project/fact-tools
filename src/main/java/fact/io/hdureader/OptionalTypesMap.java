@@ -157,6 +157,32 @@ public class OptionalTypesMap<K, V> extends ForwardingMap<K, V> {
         }
     }
 
+    /**
+     * Get the value for the keyword in the header as boolean  if it exists and the value can be cast to boolean.
+     *
+     * @return an optional holding the value for the key
+     */
+    public Optional<Boolean> getBoolean(K key) {
+        try {
+            return Optional.ofNullable((Boolean) delegate().get(key));
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Get the value for the keyword in the header as boolean array if it exists and the value can be cast to boolean[].
+     *
+     * @return an optional holding the value for the key
+     */
+    public Optional<boolean[]> getBooleanArray(K key) {
+        try {
+            return Optional.ofNullable((boolean[]) delegate().get(key));
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+    }
+
 
     @Override
     protected Map<K, V> delegate() {
