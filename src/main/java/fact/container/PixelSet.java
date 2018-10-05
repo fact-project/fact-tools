@@ -1,6 +1,7 @@
 package fact.container;
 
 import com.google.common.collect.ForwardingSet;
+import fact.Constants;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import fact.hexmap.ui.components.cameradisplay.FactHexMapDisplay;
@@ -58,6 +59,25 @@ public class PixelSet extends ForwardingSet<CameraPixel> implements CameraMapOve
 
     public int[] toIntArray() {
         return set.stream().mapToInt(p -> p.id).toArray();
+    }
+
+    public boolean[] toBooleanArray() {
+        boolean[] mask = new boolean[Constants.N_PIXELS];
+        for (CameraPixel p: set) {
+            mask[p.chid] = true;
+        }
+        return mask;
+    }
+
+
+    public static PixelSet fromBooleanArray(boolean[] mask) {
+        PixelSet pixelSet = new PixelSet();
+        for (int chid = 0; chid < mask.length; chid++) {
+            if (mask[chid]) {
+                pixelSet.addById(chid);
+            }
+        }
+        return pixelSet;
     }
 
     public ArrayList<Integer> toArrayList() {

@@ -43,4 +43,25 @@ public class PixelSetTest {
         assertTrue(pixelSet.containsAllIDs(new int[]{1, 100}));
     }
 
+    @Test
+    public void testToBooleanArray() {
+
+        PixelSet pixelSet = new PixelSet();
+        pixelSet.addById(2);
+        pixelSet.addById(3);
+        pixelSet.addById(5);
+        pixelSet.addById(7);
+        pixelSet.addById(511);
+
+        boolean[] mask = pixelSet.toBooleanArray();
+        assertTrue(mask[2]);
+        assertTrue(mask[3]);
+        assertTrue(mask[5]);
+        assertTrue(mask[7]);
+        assertTrue(mask[511]);
+        assertFalse(mask[510]);
+        assertFalse(mask[1]);
+        assertFalse(mask[0]);
+    }
+
 }

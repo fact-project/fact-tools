@@ -1,6 +1,7 @@
 package fact.io;
 
 import fact.VersionInformation;
+import fact.container.PixelSet;
 import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
 import nom.tam.util.BufferedFile;
@@ -213,6 +214,9 @@ public class FITSWriter extends Writer implements StatefulProcessor {
         // if the value is an array, we can directly add it
         if (type.isArray()) {
             return serializable;
+        } else if (ClassUtils.isAssignable(type, PixelSet.class)) {
+            PixelSet pixels = (PixelSet) serializable;
+            return pixels.toBooleanArray();
         } else {
             // primitive values need to be wrapped into an array of length 1
             if (ClassUtils.isAssignable(type, String.class)) {
