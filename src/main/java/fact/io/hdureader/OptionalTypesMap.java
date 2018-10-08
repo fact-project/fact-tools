@@ -132,7 +132,7 @@ public class OptionalTypesMap<K, V> extends ForwardingMap<K, V> {
     }
 
     /**
-     * Get the value for the keyword in the header as long if it exists and the value can be cast to Long.
+     * Get the value for the given key as long if it exists and the value can be cast to Long.
      *
      * @return an optional holding the value for the key
      */
@@ -145,7 +145,7 @@ public class OptionalTypesMap<K, V> extends ForwardingMap<K, V> {
     }
 
     /**
-     * Get the value for the keyword in the header as long array if it exists and the value can be cast to long[].
+     * Get the value for the given key as long array if it exists and the value can be cast to long[].
      *
      * @return an optional holding the value for the key
      */
@@ -158,7 +158,7 @@ public class OptionalTypesMap<K, V> extends ForwardingMap<K, V> {
     }
 
     /**
-     * Get the value for the keyword in the header as boolean  if it exists and the value can be cast to boolean.
+     * Get the value for the given key as boolean  if it exists and the value can be cast to boolean.
      *
      * @return an optional holding the value for the key
      */
@@ -171,7 +171,7 @@ public class OptionalTypesMap<K, V> extends ForwardingMap<K, V> {
     }
 
     /**
-     * Get the value for the keyword in the header as boolean array if it exists and the value can be cast to boolean[].
+     * Get the value for the given key as boolean array if it exists and the value can be cast to boolean[].
      *
      * @return an optional holding the value for the key
      */
