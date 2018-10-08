@@ -43,7 +43,7 @@ public class AboveThreshold implements Processor {
             for (int slice = 0; slice < roi; slice++) {
                 final int pos = pix * roi + slice;
                 if (timeSeries[pos] > thresholdShort) {
-                    pixelsAboveThreshold.addById(pix);
+                    pixelsAboveThreshold.addByCHID(pix);
                     numSlicesAboveThreshold += 1;
                 }
             }

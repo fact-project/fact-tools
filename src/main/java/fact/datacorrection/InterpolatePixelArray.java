@@ -13,7 +13,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -67,7 +66,7 @@ public class InterpolatePixelArray implements Processor {
 
     double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
         for (int chid = 0; chid < Constants.N_PIXELS; chid++){
-            if (badPixels.containsID(chid) || (!Double.isFinite(pixelArray[chid]))) {
+            if (badPixels.containsCHID(chid) || (!Double.isFinite(pixelArray[chid]))) {
                 CameraPixel[] currentNeighbors = pixelMap.getNeighborsFromID(chid);
 
                 double avg = 0.0;

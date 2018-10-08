@@ -105,4 +105,26 @@ public class BinTableTests {
         assertThat(b.numberOfRowsInTable, is(15));
         assertThat(b.numberOfColumnsInTable, is(12));
     }
+
+    @Test
+    public void testFitsBoolean() throws Exception {
+        URL u = BinTableTests.class.getResource("/testBoolean.fits.gz");
+
+        FITS f = new FITS(u);
+
+        BinTable b = f.getBinTableByName("Events").orElseThrow(IOException::new);
+        BinTableReader reader = BinTableReader.forBinTable(b);
+
+        boolean[] bool = {true, false, true};
+        boolean[][] boolarray = {{true, false}, {false, true},  {true, false}};
+
+        for (int i = 0; i < bool.length; i++) {
+            OptionalTypesMap<String, Serializable> row = reader.getNextRow();
+
+            assertEquals(bool[i], row.getBoolean("bool").orElseThrow(IOException::new));
+            boolean[] read = row.getBooleanArray("boolarray").orElseThrow(IOException::new);
+            assertEquals(boolarray[i][0], read[0]);
+            assertEquals(boolarray[i][1], read[1]);
+        }
+    }
 }

@@ -32,7 +32,7 @@ public class CleaningPerformance implements Processor {
 
         if (data.containsKey(pixelSetKey) && data.get(pixelSetKey) != null) {
             PixelSet pixelSet = (PixelSet) data.get(pixelSetKey);
-            int[] shower = pixelSet.toIntArray();
+            int[] shower = pixelSet.toCHIDArray();
             int numShowerpixel = shower.length;
 
             performance = getPerformanceMatrixShower(McPhotoncharge, shower, numShowerpixel);

@@ -5,11 +5,13 @@
   <property name="infile" value="" />
   <property name="drsfile" value="" />
   <property name="outfile" value="" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
 
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
   <service id="gainService" class="fact.gainservice.GainService" />
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
 
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
@@ -22,10 +24,14 @@
 
       <include url="classpath:/analysis/calibration.xml" />
       <include url="classpath:/analysis/extraction.xml" />
+      <include url="classpath:/analysis/cleaning.xml" />
+
+      <fact.io.PrintKeys keys="num_pixel_in_shower,EventNum"/>
+      <Skip condition="%{data.num_pixel_in_shower} &lt; 5" />
     
       <fact.io.FITSWriter
         url="${outfile}"
-        keys="EventNum,TriggerNum,TriggerType,UnixTimeUTC,timestamp,photonCharge,arrivalTime"
+        keys="EventNum,TriggerNum,TriggerType,UnixTimeUTC,timestamp,photoncharge,arrivalTime,shower"
         headerKeys="TELESCOP,CREATOR,COMPILED,ORIGIN,TIMESYS,TIMEUNIT,MJDREF,PACKAGE,VERSION,REVISION,DATE,NIGHT,RUNID,NBOARD,NPIX,NTMARK,NCELLS,NROI,NROITM,TMSHHIFT,CAMERA,DAQ,ADCRANGE,ADC,RUNTYPE,PRESC,PHASE,DRSCALIB,TSTARTI,TSTARTF,TSTOPI,TSTOPF,DATE-OBS,DATE-END,NTRG,NTRGPED,NTRGPED,NTRGTIM,NTRGLPI,NTRGEXT1,NTRGEXT2,NTRGMISC"
       />
 

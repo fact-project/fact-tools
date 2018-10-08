@@ -1,6 +1,7 @@
 package fact.io;
 
 import fact.VersionInformation;
+import fact.container.PixelSet;
 import nom.tam.fits.*;
 import nom.tam.util.ArrayFuncs;
 import nom.tam.util.BufferedFile;
@@ -156,12 +157,12 @@ public class FITSWriter extends Writer implements StatefulProcessor {
                 }
             } else if (elem instanceof boolean[]) {
                 for (boolean val : (boolean[]) elem) {
-                    buffer.put((byte) (val ? 1 : 0));
+                    byte b = (byte) (val ? 'T' : 'F');
+                    buffer.put(b);
                 }
             } else {
                 throw new RuntimeException("Serializable cannot be saved to FITS");
             }
-
         }
 
         buffer.flip();
@@ -213,6 +214,9 @@ public class FITSWriter extends Writer implements StatefulProcessor {
         // if the value is an array, we can directly add it
         if (type.isArray()) {
             return serializable;
+        } else if (ClassUtils.isAssignable(type, PixelSet.class)) {
+            PixelSet pixels = (PixelSet) serializable;
+            return pixels.toBooleanArray();
         } else {
             // primitive values need to be wrapped into an array of length 1
             if (ClassUtils.isAssignable(type, String.class)) {

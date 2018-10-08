@@ -39,7 +39,7 @@ public class IdentifyPixelAboveThreshold implements Processor {
             matchArray[pix] = 0;
             if (featureArray[pix] > threshold) {
                 matchArray[pix] = 1;
-                pixelSet.addById(pix);
+                pixelSet.addByCHID(pix);
             }
         }
 

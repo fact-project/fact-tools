@@ -62,15 +62,15 @@ public class HandleSaturation implements Processor {
             if (photonCharge[px] > limitForSaturatedPixel) {
                 resultArrivalTimes[px] = arrivalTimeSaturated[px];
                 resultPhotonCharge[px] = photonChargeSaturated[px];
-                saturatedPixelSet.addById(px);
+                saturatedPixelSet.addByCHID(px);
             }
         }
 
         item.put(outputKeyArrivalTime, resultArrivalTimes);
         item.put(outputKeyPhotonCharge, resultPhotonCharge);
 
-        if (saturatedPixelSet.toIntArray().length != 0) {
-            item.put(saturatedPixelKey, saturatedPixelSet.toIntArray());
+        if (saturatedPixelSet.toCHIDArray().length != 0) {
+            item.put(saturatedPixelKey, saturatedPixelSet.toCHIDArray());
         }
         item.put(saturatedPixelKey + "Overlay", saturatedPixelSet);
 
