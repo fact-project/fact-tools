@@ -36,30 +36,30 @@ public class JumpInfos implements Serializable {
     }
 
     public void addPixelWithSpikes(int pixel) {
-        pixelWithSpikes.addById(pixel);
+        pixelWithSpikes.addByCHID(pixel);
     }
 
     public void addPatchWithSignalFlanks(int patch) {
         for (int px = 0; px < 9; px++) {
-            pixelWithSignalFlanks.addById(patch * 9 + px);
+            pixelWithSignalFlanks.addByCHID(patch * 9 + px);
         }
     }
 
     public void addPatchWithRinging(int patch) {
         for (int px = 0; px < 9; px++) {
-            pixelWithRinging.addById(patch * 9 + px);
+            pixelWithRinging.addByCHID(patch * 9 + px);
         }
     }
 
     public void addPatchWithCorrectedJumps(int patch) {
         for (int px = 0; px < 9; px++) {
-            pixelWithCorrectedJumps.addById(patch * 9 + px);
+            pixelWithCorrectedJumps.addByCHID(patch * 9 + px);
         }
     }
 
     public void addPatchWithWrongTiming(int patch) {
         for (int px = 0; px < 9; px++) {
-            pixelWithWrongTimeDepend.addById(patch * 9 + px);
+            pixelWithWrongTimeDepend.addByCHID(patch * 9 + px);
         }
     }
 

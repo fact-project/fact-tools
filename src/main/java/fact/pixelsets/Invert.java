@@ -45,7 +45,7 @@ public class Invert implements Processor {
     public PixelSet createFullCameraSet(int npix) {
         PixelSet wholeCamSet = new PixelSet();
         for (int pix = 0; pix < npix; pix++) {
-            wholeCamSet.addById(pix);
+            wholeCamSet.addByCHID(pix);
         }
         return wholeCamSet;
     }

@@ -30,8 +30,8 @@ public class SumUpPatchesTest {
         double[][] pixelData = generateTestData();
         SumUpPatches sumUpPatches = new SumUpPatches();
         PixelSet invalid_pixels = new PixelSet();
-        invalid_pixels.addById(1093);
-        invalid_pixels.addById(80);
+        invalid_pixels.addByCHID(1093);
+        invalid_pixels.addByCHID(80);
         double[] sum = sumUpPatches.sumPixelsOfPatch(pixelData, 0, invalid_pixels);
         double[] result = generateExpectedResult(0,0);
         Assert.assertArrayEquals(result, sum, Double.MIN_NORMAL);

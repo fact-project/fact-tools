@@ -27,7 +27,7 @@ public class ToChidArray implements Processor {
     public Data process(Data item) {
         Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
         PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
-        item.put(outputKey, pixelSet.toIntArray());
+        item.put(outputKey, pixelSet.toCHIDArray());
         return item;
     }
 }

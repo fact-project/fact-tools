@@ -104,7 +104,7 @@ public class SumUpPatches implements Processor {
         for (int pix = 0; pix < Constants.N_PIXELS_PER_PATCH; pix++) {
             int current_pix = first_pix_id + pix;
 
-            if (invalid_pixels.containsID(current_pix)) {
+            if (invalid_pixels.containsCHID(current_pix)) {
                 continue;
             }
 
