@@ -24,7 +24,7 @@ public class SpikeInfos implements Serializable {
 
     public void addSpike(int px, int sl, short startCell, double spikeHeight, double averTopSlope) {
 
-        spikesSet.addById(px);
+        spikesSet.addByCHID(px);
 
         spPixel.add(px);
         spLogSlice.add(sl);

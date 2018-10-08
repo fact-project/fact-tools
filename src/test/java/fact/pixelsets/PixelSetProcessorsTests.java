@@ -25,7 +25,7 @@ public class PixelSetProcessorsTests {
 
         PixelSet testSet = new PixelSet();
         for (int pix = 0; pix < 20; pix++) {
-            testSet.addById(pix);
+            testSet.addByCHID(pix);
         }
         item.put("testSet", testSet);
         item.put("NPIX", Constants.N_PIXELS);
@@ -46,9 +46,9 @@ public class PixelSetProcessorsTests {
     public void intersectionTest() {
         Data item = DataFactory.create();
 
-        PixelSet setA = PixelSet.fromIDs(new int[]{1, 2, 3});
-        PixelSet setB = PixelSet.fromIDs(new int[]{2, 3, 4, 5});
-        PixelSet setIntersection = PixelSet.fromIDs(new int[]{2, 3});
+        PixelSet setA = PixelSet.fromCHIDs(new int[]{1, 2, 3});
+        PixelSet setB = PixelSet.fromCHIDs(new int[]{2, 3, 4, 5});
+        PixelSet setIntersection = PixelSet.fromCHIDs(new int[]{2, 3});
 
         item.put("setA", setA);
         item.put("setB", setB);
@@ -107,9 +107,9 @@ public class PixelSetProcessorsTests {
     public void unionTest() {
         Data item = DataFactory.create();
 
-        PixelSet setA = PixelSet.fromIDs(new int[]{1, 2, 3});
-        PixelSet setB = PixelSet.fromIDs(new int[]{3, 4, 5});
-        PixelSet setUnion = PixelSet.fromIDs(new int[]{1, 2, 3, 4, 5});
+        PixelSet setA = PixelSet.fromCHIDs(new int[]{1, 2, 3});
+        PixelSet setB = PixelSet.fromCHIDs(new int[]{3, 4, 5});
+        PixelSet setUnion = PixelSet.fromCHIDs(new int[]{1, 2, 3, 4, 5});
 
         item.put("setA", setA);
         item.put("setB", setB);

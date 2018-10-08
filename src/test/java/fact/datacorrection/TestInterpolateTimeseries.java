@@ -23,7 +23,7 @@ public class TestInterpolateTimeseries {
         mock[3 * roi] = 1;
 
         InterpolateTimeSeries p = new InterpolateTimeSeries();
-        mock = p.interpolateTimeSeries(mock, PixelSet.fromIDs(badPixelChids));
+        mock = p.interpolateTimeSeries(mock, PixelSet.fromCHIDs(badPixelChids));
         assertTrue("Not interpolated correctly", mock[2 * roi] == 1.0 / 6.0);
     }
 

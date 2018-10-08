@@ -55,7 +55,7 @@ public class ClusterArrivalTimes implements Processor {
 
 
         //get 'shower' as int array with pixel id's from 'pixelSet' (HashSet)
-        int[] shower = pixelSet.toIntArray();
+        int[] shower = pixelSet.toCHIDArray();
         int[] showerArray = new int[Constants.N_PIXELS];
 
         for (int p : shower) {

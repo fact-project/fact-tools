@@ -68,7 +68,7 @@ public class TimeOverThreshold implements Processor {
             if (data[pos + positionOfMaximum] < threshold) {
                 continue;
             }
-            pixelSet.addById(pix);
+            pixelSet.addByCHID(pix);
             numPixelAboveThreshold++;
 
             int timeOverThreshold = 0;
@@ -117,7 +117,7 @@ public class TimeOverThreshold implements Processor {
         item.put(outputKey + "SetOverlay", pixelSet);
 
 
-        item.put(outputKey + "Set", pixelSet.toIntArray());
+        item.put(outputKey + "Set", pixelSet.toCHIDArray());
         return item;
     }
 }

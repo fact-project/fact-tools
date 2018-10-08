@@ -143,9 +143,9 @@ public class FITSWriterTest {
         log.info("testFitsWriterPixelSet {}", f.getAbsolutePath());
 
         PixelSet pixelSet = new PixelSet();
-        pixelSet.addById(1);
-        pixelSet.addById(5);
-        pixelSet.addById(15);
+        pixelSet.addByCHID(1);
+        pixelSet.addByCHID(5);
+        pixelSet.addByCHID(15);
         Data item = DataFactory.create();
         item.put("shower", pixelSet);
 
@@ -164,9 +164,9 @@ public class FITSWriterTest {
 
         boolean[] read = row.getBooleanArray("shower").orElseThrow(() -> new RuntimeException("Shower not found"));
         PixelSet pixelsRead = PixelSet.fromBooleanArray(read);
-        assertTrue(pixelsRead.containsID(5));
-        assertTrue(pixelsRead.containsID(5));
-        assertTrue(pixelsRead.containsID(15));
+        assertTrue(pixelsRead.containsCHID(5));
+        assertTrue(pixelsRead.containsCHID(5));
+        assertTrue(pixelsRead.containsCHID(15));
     }
 
     @Test

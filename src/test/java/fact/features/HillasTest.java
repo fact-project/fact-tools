@@ -21,7 +21,7 @@ public class HillasTest {
     final double EPSILON = 1e-9;
 
     int[] showerPixelIds = {278, 281, 279, 282, 285, 284, 256, 259, 276, 377};
-    PixelSet showerPixels = PixelSet.fromIDs(showerPixelIds);
+    PixelSet showerPixels = PixelSet.fromCHIDs(showerPixelIds);
     double[] pixelX = showerPixels.stream().mapToDouble((p) -> p.getXPositionInMM()).toArray();
     double[] pixelY = showerPixels.stream().mapToDouble((p) -> p.getYPositionInMM()).toArray();
     private double[] cog;
