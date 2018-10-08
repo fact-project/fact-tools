@@ -30,7 +30,8 @@ public class Header {
         this.headerSizeInBytes = headerSizeInBytes;
         //iterate over each header string and parse all interesting information.
         headerMap = headerLines.stream()
-                .filter(a -> !a.matches("COMMENT\\s.+|HISTORY\\s.+|END$"))
+                .filter(a -> !a.matches("COMMENT\\s.+|INFO\\s.+|HISTORY\\s.+|END$"))
+                .filter(a -> a.length() > 8 && a.charAt(8) == '=') // Ignore lines not containing key/value pairs
                 .map(HeaderLine::fromString)
                 .collect(Collectors.toMap(
                         hduline -> hduline.key,
