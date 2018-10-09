@@ -1,5 +1,8 @@
 package fact.io.hdureader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -26,17 +29,22 @@ public class Header {
     public final String comment;
     public final String history;
 
+    private final Logger log = LoggerFactory.getLogger(Header.class);
+
     Header(List<String> headerLines, int headerSizeInBytes) {
         this.headerSizeInBytes = headerSizeInBytes;
         //iterate over each header string and parse all interesting information.
         headerMap = headerLines.stream()
-                .filter(a -> !a.matches("COMMENT\\s.+|INFO\\s.+|HISTORY\\s.+|END$"))
+                .filter(a -> !a.matches("COMMENT\\s.+|HISTORY\\s.+|END$"))
                 .filter(a -> a.length() > 8 && a.charAt(8) == '=') // Ignore lines not containing key/value pairs
                 .map(HeaderLine::fromString)
                 .collect(Collectors.toMap(
                         hduline -> hduline.key,
-                        Function.identity()
-                        )
+                        Function.identity(),
+                        (hduline1, hduline2) -> {
+                            log.warn("Ignoring duplicate key {}", hduline2.key);
+                            return hduline1;
+                        })
                 );
 
         comment = headerLines.stream()
