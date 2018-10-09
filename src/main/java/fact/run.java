@@ -63,7 +63,13 @@ public class run {
             @Override
             protected URLConnection openConnection(URL u) throws IOException {
                 final URL resourceUrl =   ClasspathURLStreamHandler.class.getResource(u.getPath());
-                return resourceUrl.openConnection();
+                URLConnection connection = resourceUrl.openConnection();
+
+                // set these to false because otherwise this will produce problems in java versions < 9
+                // see https://bugs.openjdk.java.net/browse/JDK-6947916
+                connection.setUseCaches(false);
+                connection.setDefaultUseCaches(false);
+                return connection;
             }
         }
     }
