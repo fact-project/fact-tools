@@ -7,6 +7,7 @@ import org.junit.Test;
 import stream.Data;
 
 /**
+ * Tests element wise summation of pixel time series of patches.
  * Created by jbuss on 15.11.17.
  */
 public class SumUpPatchesTest {

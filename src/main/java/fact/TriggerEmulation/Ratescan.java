@@ -17,7 +17,7 @@ import static fact.TriggerEmulation.Discriminator.booleanToInt;
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
 
 /**
- * Emulates a ratescan on summed patch time series
+ * Emulates a ratescan on summed patch time series.
  * Created by jbuss on 16.11.17.
  */
 public class Ratescan implements StatefulProcessor {

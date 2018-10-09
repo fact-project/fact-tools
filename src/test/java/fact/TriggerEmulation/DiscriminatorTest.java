@@ -8,6 +8,7 @@ import java.util.Arrays;
 import static fact.TriggerEmulation.Discriminator.millivoltToDAC;
 
 /**
+ * Tests the discriminator functions
  * Created by jbuss on 16.11.17.
  */
 public class DiscriminatorTest {

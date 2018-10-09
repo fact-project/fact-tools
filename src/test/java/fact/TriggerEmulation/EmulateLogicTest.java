@@ -5,7 +5,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
-
+/**
+ * Tests the trigger logic emulation.
+ * Created by jbuss
+ */
 public class EmulateLogicTest {
 
     @Test
