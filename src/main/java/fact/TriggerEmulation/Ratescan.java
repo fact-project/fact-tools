@@ -119,11 +119,11 @@ public class Ratescan implements StatefulProcessor {
     ) {
         int n_patches = Constants.N_PATCHES;
 
-        int n_tiggered_patches = n_patches;
+        int nTiggeredPatches = n_patches;
 
         RatescanResult ratescanResult = new RatescanResult();
 
-        for (int i = 0; n_tiggered_patches > 0 && i < nThresholds; i++) {
+        for (int i = 0; nTiggeredPatches > 0 && i < nThresholds; i++) {
             int threshold = minThreshold+i*stepSize;
 
             ratescanResult.thresholds_arr.add(threshold);
@@ -140,11 +140,11 @@ public class Ratescan implements StatefulProcessor {
                     skipLast
             );
 
-            n_tiggered_patches = countPrimitives(currentTriggerPrimitives);
+            nTiggeredPatches = countPrimitives(currentTriggerPrimitives);
 
-            log.debug("Threshold: "+threshold+" nPrimitives: "+n_tiggered_patches);
+            log.debug("Threshold: "+threshold+" nPrimitives: "+nTiggeredPatches);
 
-            ratescanResult.n_primitives_arr.add(n_tiggered_patches);
+            ratescanResult.n_primitives_arr.add(nTiggeredPatches);
             ratescanResult.triggerPrimitives_arr.add(currentTriggerPrimitives);
             ratescanResult.patchTriggerSlices_arr.add(patchTriggerSlice);
 
