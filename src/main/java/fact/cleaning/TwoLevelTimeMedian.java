@@ -5,11 +5,13 @@ import fact.Utils;
 import fact.container.PixelSet;
 import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
+import fact.starservice.StarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+import stream.annotations.Service;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -55,10 +57,10 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
     public int minNumberOfPixel;
 
     @Parameter(required = false)
-    public String[] starPositionKeys = null;
+    public String starPositionsKey = null;
 
     @Parameter(required = false, defaultValue = "Constants.PIXEL_SIZE_MM")
-    public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
+    public double starRadiusInCamera = 11.0;
 
     @Parameter
     public boolean showDifferentCleaningSets = true;
@@ -113,12 +115,12 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
             addLevelToDataItem(showerPixel, outputKey + "_level5", item);
         }
 
-        if (starPositionKeys != null) {
-            PixelSet starSet = new PixelSet();
-            for (String starPositionKey : starPositionKeys) {
-                Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
-                CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
+        if (starPositionsKey != null) {
 
+            CameraCoordinate[] starsInFOV = (CameraCoordinate[]) item.get(starPositionsKey);
+            PixelSet starSet = new PixelSet();
+
+            for (CameraCoordinate starPosition : starsInFOV) {
                 showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true) {
                     addLevelToDataItem(showerPixel, outputKey + "_level6", item);

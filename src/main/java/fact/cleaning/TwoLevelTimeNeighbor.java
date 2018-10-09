@@ -59,12 +59,11 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
             " If Size is smaller than minSize the Pixels will be discarded.")
     public int minNumberOfPixel;
 
-
     @Parameter(required = false)
-    public String[] starPositionKeys = null;
+    public String starPositionsKey = null;
 
     @Parameter(required = false, defaultValue = "Constants.PIXEL_SIZE")
-    public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
+    public double starRadiusInCamera = 11.0;
 
     @Parameter(description = "Add PixelSets for the different cleaning steps")
     public boolean showDifferentCleaningSets = false;
@@ -124,15 +123,14 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
             addLevelToDataItem(showerPixel, outputKey + "_level6", item);
         }
 
-        if (starPositionKeys != null) {
+        if (starPositionsKey != null) {
+            CameraCoordinate[] starsInFOV = (CameraCoordinate[]) item.get(starPositionsKey);
             PixelSet starSet = new PixelSet();
-            for (String starPositionKey : starPositionKeys) {
-                Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
-                CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
 
+            for (CameraCoordinate starPosition : starsInFOV) {
                 showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true) {
-                    addLevelToDataItem(showerPixel, outputKey + "_level7", item);
+                    addLevelToDataItem(showerPixel, outputKey + "_level6", item);
                     item.put("Starset", starSet);
                 }
             }
