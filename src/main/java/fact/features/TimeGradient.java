@@ -61,8 +61,8 @@ public class TimeGradient implements Processor {
         SimpleRegression regressionTrans = new SimpleRegression();
 
         for (CameraPixel px : shower) {
-            double x = px.getXPositionInMM();
-            double y = px.getYPositionInMM();
+            double x = px.coordinate.xMM;
+            double y = px.coordinate.yMM;
             double[] ellipseCoord = Utils.transformToEllipseCoordinates(x, y, cog.xMM, cog.yMM, delta);
             double time = arrivalTime[px.id];
             regressionLong.addData(ellipseCoord[0], time);

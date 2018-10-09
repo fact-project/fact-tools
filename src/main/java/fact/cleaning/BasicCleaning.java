@@ -118,7 +118,7 @@ public class BasicCleaning {
         starSet.add(starPixel);
 
         for (CameraPixel px : pixelMap.getNeighborsForPixel(starPixel)) {
-            if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
+            if (starPosition.euclideanDistance(px.coordinate) < starRadiusInCamera) {
                 starSet.add(px);
             }
         }
@@ -140,22 +140,9 @@ public class BasicCleaning {
         item.put(name, overlay);
     }
 
-    /**
-     * Calculates the Distance between a pixel and a given position
-     *
-     * @param chid
-     * @param x
-     * @param y
-     * @return
-     */
-    private double calculateDistance(int chid, double x, double y) {
-        double xdist = pixelMap.getPixelFromId(chid).getXPositionInMM() - x;
-        double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
-
-        return Math.sqrt((xdist * xdist) + (ydist * ydist));
-    }
-
+    // this setter is needed as streams fails to set services on base classes otherwise
     public void setCalibService(CalibrationService calibService) {
         this.calibService = calibService;
     }
+
 }

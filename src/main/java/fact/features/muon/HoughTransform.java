@@ -212,8 +212,8 @@ public class HoughTransform implements StatefulProcessor {
         boolean[] octants = {false, false, false, false, false, false, false, false};
 
         for (CameraPixel pix : cleaningPixel) {
-            double pix_x = pix.getXPositionInMM();
-            double pix_y = pix.getYPositionInMM();
+            double pix_x = pix.coordinate.xMM;
+            double pix_y = pix.coordinate.yMM;
 
             double distance = euclidean_distance2d(pix_x, pix_y, best_x[0], best_y[0]);
 
@@ -256,8 +256,8 @@ public class HoughTransform implements StatefulProcessor {
                 PixelSet CirclePixelSet = new PixelSet();
                 for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
                     CameraPixel p = m.getPixelFromId(pix);
-                    double pix_x = p.getXPositionInMM();
-                    double pix_y = p.getYPositionInMM();
+                    double pix_x = p.coordinate.xMM;
+                    double pix_y = p.coordinate.yMM;
                     distance = euclidean_distance2d(pix_x, pix_y, best_x[i], best_y[i]);
                     if (Math.abs(distance - best_r[i]) <= Constants.PIXEL_SIZE_MM) {
                         CirclePixelSet.addByCHID(pix);
@@ -308,8 +308,8 @@ public class HoughTransform implements StatefulProcessor {
         for (int chid = 0; chid < Constants.N_PIXELS; chid++) {
             ArrayList<int[]> circles = new ArrayList<>();
             CameraPixel pix = m.getPixelFromId(chid);
-            double pix_x = pix.getXPositionInMM();
-            double pix_y = pix.getYPositionInMM();
+            double pix_x = pix.coordinate.xMM;
+            double pix_y = pix.coordinate.yMM;
             for (int r = 0; r < circle_r.length; r++) {
                 for (int x = 0; x < circle_x.length; x++) {
                     for (int y = 0; y < circle_y.length; y++) {
