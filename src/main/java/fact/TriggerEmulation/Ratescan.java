@@ -117,7 +117,7 @@ public class Ratescan implements StatefulProcessor {
             int stepSize,
             int nThresholds
     ) {
-        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
+        int n_patches = Constants.N_PATCHES;
 
         int n_tiggered_patches = n_patches;
 

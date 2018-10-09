@@ -62,7 +62,7 @@ public class EmulateDiscriminator implements Processor{
     public Data process(Data item) {
         double[][] data = (double[][]) item.get(key);
 
-        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
+        int n_patches = Constants.N_PATCHES;
         double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
         if (thresholdKey != null){

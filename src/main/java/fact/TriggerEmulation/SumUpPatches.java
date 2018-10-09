@@ -45,7 +45,7 @@ public class SumUpPatches implements Processor {
 
         int roi = (int) item.get("NROI");
 
-        int n_patches = Constants.N_PIXELS/Constants.N_PIXELS_PER_PATCH;
+        int n_patches = Constants.N_PATCHES;
 
         //Load a given pixelset, otherwise use the the whole camera
 
