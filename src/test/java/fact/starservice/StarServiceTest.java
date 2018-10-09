@@ -21,7 +21,7 @@ public class StarServiceTest {
 
         // standard wobble position for crab
         EquatorialCoordinate pointing = EquatorialCoordinate.fromDegrees(84.12915, 22.3994);
-        StarService.Star[] starsInFOV = starService.getStarsInFov(pointing, 6.5);
+        Star[] starsInFOV = starService.getStarsInFov(pointing, 6.5);
         Arrays.sort(starsInFOV);
 
         assertEquals("Standard Crab Pointing position should have 3 bright stars in FOV", 3, starsInFOV.length);
@@ -36,7 +36,7 @@ public class StarServiceTest {
 
         // standard wobble position for crab
         EquatorialCoordinate pointing = EquatorialCoordinate.fromDegrees(84.12915, 22.3994);
-        StarService.Star[] starsInFOV = starService.getStarsInFov(pointing, 4);
+        Star[] starsInFOV = starService.getStarsInFov(pointing, 4);
 
         assertEquals("Standard Crab Pointing position should have 1 star brighter 4 in FOV", 1, starsInFOV.length);
         assertEquals("Brightest star in Crab Nebula FOV should be Zeta Tauri", 26451, starsInFOV[0].id);

@@ -3,18 +3,14 @@ package fact.starservice;
 
 import fact.Constants;
 import fact.coordinates.EquatorialCoordinate;
-import fact.coordinates.HorizontalCoordinate;
 import fact.io.hdureader.BinTable;
 import fact.io.hdureader.BinTableReader;
 import fact.io.hdureader.FITS;
 import fact.io.hdureader.OptionalTypesMap;
-import stream.annotations.Parameter;
 import stream.service.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -55,26 +51,7 @@ public class StarService implements Service {
         return stars.toArray(new Star[]{});
     }
 
-    public static class Star implements  Comparable<Star> {
-        public final EquatorialCoordinate equatorialCoordinate;
-        public final double magnitude;
-        public final int id;
-
-        public Star(EquatorialCoordinate equatorialCoordinate, double magnitude, int id) {
-            this.equatorialCoordinate = equatorialCoordinate;
-            this.magnitude = magnitude;
-            this.id = id;
-        }
-
-        @Override
-        public int compareTo(Star star) {
-            return Double.compare(magnitude, star.magnitude);
-        }
-    }
-
 
     @Override
-    public void reset() throws Exception {
-
-    }
+    public void reset() {}
 }
