@@ -52,10 +52,10 @@ public class TwoLevelTimeMedian extends BasicCleaning implements Processor {
             " If Size is smaller than minSize the Pixels will be discarded.")
     public int minNumberOfPixel;
 
-    @Parameter(required = false)
+    @Parameter(required = false, description = "Key pointing to a CameraCoordinate[] for star positons, calculate with StarsInFOV")
     public String starPositionsKey = null;
 
-    @Parameter(required = false, defaultValue = "Constants.PIXEL_SIZE_MM")
+    @Parameter(required = false, defaultValue = "11.0", description = "Maximum distance of star position to pixel center")
     public double starRadiusInCamera = 11.0;
 
     @Parameter

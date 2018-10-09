@@ -2,6 +2,9 @@ package fact.starservice;
 
 import fact.coordinates.EquatorialCoordinate;
 
+/**
+ * A simple data class holding information about a star, coordinate, magnitude, catalogue id and name
+ */
 public class Star implements  Comparable<Star> {
     public final EquatorialCoordinate equatorialCoordinate;
     public final double magnitude;

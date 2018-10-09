@@ -23,18 +23,14 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 
 /**
- * This calculates the position of the source in the camera.
+ * Find bright stars in the field of view and add their positions in the camera to the data item
  *
  * @author Maximilian Noethe &lt;maximilian.noethe@tu-dortmund.de&gt;
  */
 
 public class StarsInFOV implements Processor {
 
-
-    private static final Logger log = LoggerFactory.getLogger(fact.features.source.SourcePosition.class);
-
-
-    @Parameter(required = true, description = "The key to the sourcepos array that will be written to the map.")
+    @Parameter(required = true, description = "Output key for the resulting CameraCoordinate[] of star positions")
     public String outputKey = null;
 
     @Service(description = "Name of the service that provides aux files")

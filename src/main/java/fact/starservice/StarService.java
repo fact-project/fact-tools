@@ -14,6 +14,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * This service provides access to the Yale Bright Star catalog
+ * and can find stars around a position in the sky
+ */
 public class StarService implements Service {
 
     Star[] catalog;
