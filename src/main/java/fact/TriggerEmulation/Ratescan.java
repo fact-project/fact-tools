@@ -24,7 +24,9 @@ public class Ratescan implements StatefulProcessor {
 
     static Logger log = LoggerFactory.getLogger(Ratescan.class);
 
-    @Parameter(required = true)
+    @Parameter(required = true,
+               description = "double array[n_patches][roi] with time series from " +
+                    "summed trigger patches")
     public String key;
 
     @Parameter(required = false,
