@@ -3,7 +3,7 @@
     <fact.starservice.StarsInFOV
       outputKey="StarsInFOV"
       auxService="auxService"
-      maxMagnitude="6.0"
+      maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
   </If>
   <fact.cleaning.TwoLevelTimeNeighbor
