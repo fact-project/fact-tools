@@ -152,18 +152,6 @@ public class Ratescan implements StatefulProcessor {
         return ratescanResult;
     }
 
-    public static long lin2log(int z) {
-        int x = 1;
-        int y = 256;
-        double b = Math.log(y/x)/(y-x);
-        double a = 10 / Math.exp(b*10);
-        double tempAnswer = a * Math.exp(b*z);
-        long finalAnswer = Math.max(Math.round(tempAnswer) - 1, 0);
-
-        return finalAnswer;
-
-    }
-
     /**
      * Output container for the ratescan
      */
