@@ -4,7 +4,7 @@
  *
  * <ul>
  * <li>{@link fact.TriggerEmulation.Discriminator} is a class with functions to
- * discriminate the signal of a given patch (or a bunch of them). Furhtermore it contains helper funtions
+ * discriminate the signal of a given patch (or a bunch of them). Furthermore it contains helper funtions
  * for the discrimination e.g. conversion between DAC and mV.
  * <li>{@link fact.TriggerEmulation.EmulateDiscriminator} is a processor that emulates
  * a discriminator that is working on the summed timeseries of patches. It uses functions from {@link fact.TriggerEmulation.Discriminator}
