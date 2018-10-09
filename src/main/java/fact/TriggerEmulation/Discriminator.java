@@ -2,6 +2,10 @@ package fact.TriggerEmulation;
 
 import fact.Constants;
 
+/**
+ *Class with functions to discriminate the signals of a given patch (or a bunch of them).
+ * Furhtermore it contains helper functions for the discrimination e.g. conversion between DAC and mV
+ */
 public class Discriminator {
 
     public static int default_slice = 0;

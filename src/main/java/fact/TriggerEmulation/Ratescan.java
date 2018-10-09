@@ -164,6 +164,9 @@ public class Ratescan implements StatefulProcessor {
 
     }
 
+    /**
+     * Output container for the ratescan
+     */
     public class RatescanResult {
         ArrayList<Integer> thresholds_arr = new ArrayList<>();
         ArrayList<Integer> n_primitives_arr = new ArrayList<>();
@@ -189,6 +192,11 @@ public class Ratescan implements StatefulProcessor {
         }
     }
 
+    /**
+     * Count the number of patches with a signal
+     * @param primitives
+     * @return
+     */
     public int countPrimitives(boolean[] primitives){
         int counts = 0;
         for (boolean primitive:
