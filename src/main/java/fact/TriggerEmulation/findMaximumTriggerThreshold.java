@@ -10,7 +10,7 @@ import stream.annotations.Parameter;
 
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
 import static fact.TriggerEmulation.Discriminator.dacToMillivolt;
-import static fact.TriggerEmulation.EmulateLogic.isTriggerDecision;
+import static fact.TriggerEmulation.EmulateLogic.hasTriggered;
 
 /**
  * Scan the TriggerThreshold for each event in order to find the maximum possible threshold to keep the event
@@ -92,7 +92,7 @@ public class findMaximumTriggerThreshold implements Processor {
                     skipLast
             );
 
-            boolean triggerDecision = isTriggerDecision(
+            boolean triggerDecision = hasTriggered(
                     triggerPrimitives,
                     patchTriggerSlice,
                     nOutOf4,

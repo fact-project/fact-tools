@@ -58,7 +58,7 @@ public class EmulateLogic implements Processor {
         boolean[] triggerPrimitives = (boolean[]) item.get(primitivesKey);
         int[] patchTriggerSlice = (int[]) item.get(triggerSliceKey);
 
-        boolean triggerDecision = isTriggerDecision(
+        boolean triggerDecision = hasTriggered(
                 triggerPrimitives,
                 patchTriggerSlice,
                 nOutOf4,
@@ -79,7 +79,16 @@ public class EmulateLogic implements Processor {
         return ftus;
     }
 
-    public static boolean isTriggerDecision(
+    /**
+     * Iterate over patches and decide weather the event has triggered for the given trigger properties
+     * @param triggerPrimitives Array with discriminator trigger decisions
+     * @param patchTriggerSlice Array with discriminator trigger times
+     * @param nOutOf4 numper of necessary trigger patches to have a signal
+     * @param nOutOf40 numper of necessary trigger units to have a signal
+     * @param timeWindowSize duration of coincidence of the triggered patches
+     * @return
+     */
+    public static boolean hasTriggered(
             boolean[] triggerPrimitives,
             int[] patchTriggerSlice,
             int nOutOf4,
