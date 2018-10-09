@@ -12,7 +12,7 @@ public class StarServiceTest {
     @Test
     public void testLoadCatalog() {
         StarService starService = new StarService();
-        assertEquals(5044, starService.catalog.length);
+        assertEquals(5080, starService.catalog.length);
     }
 
     @Test
@@ -25,9 +25,9 @@ public class StarServiceTest {
         Arrays.sort(starsInFOV);
 
         assertEquals("Standard Crab Pointing position should have 3 bright stars in FOV", 3, starsInFOV.length);
-        assertEquals("Brightest star in Crab Nebula FOV should be Zeta Tauri", 26451, starsInFOV[0].id);
-        assertEquals("Second brightest star in Crab Nebula FOV should be o Tauri", 25539, starsInFOV[1].id);
-        assertEquals("Third brightest star in Crab Nebula FOV should be 121 Tauri", 26248, starsInFOV[2].id);
+        assertEquals("Brightest star in Crab Nebula FOV should be Zeta Tauri", 1910, starsInFOV[0].id);
+        assertEquals("Second brightest star in Crab Nebula FOV should be o Tauri", 1810, starsInFOV[1].id);
+        assertEquals("Third brightest star in Crab Nebula FOV should be 121 Tauri", 1875, starsInFOV[2].id);
     }
 
     @Test
@@ -39,6 +39,6 @@ public class StarServiceTest {
         Star[] starsInFOV = starService.getStarsInFov(pointing, 4);
 
         assertEquals("Standard Crab Pointing position should have 1 star brighter 4 in FOV", 1, starsInFOV.length);
-        assertEquals("Brightest star in Crab Nebula FOV should be Zeta Tauri", 26451, starsInFOV[0].id);
+        assertEquals("Brightest star in Crab Nebula FOV should be Zeta Tauri", 1910, starsInFOV[0].id);
     }
 }

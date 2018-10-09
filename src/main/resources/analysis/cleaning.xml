@@ -15,7 +15,7 @@
       timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
       minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
       outputKey="shower"
-      starPositions="starsInFOV"
+      starPositions="starsInFOV"      
   />
   <fact.pixelsets.Length
     pixelSetKey="shower"
