@@ -25,7 +25,7 @@ public class TestInterpolatePixelArray {
 
         InterpolatePixelArray p = new InterpolatePixelArray();
 
-        mock = p.interpolatePixelArray(mock, PixelSet.fromIDs(new int[] {2}));
+        mock = p.interpolatePixelArray(mock, PixelSet.fromCHIDs(new int[] {2}));
         assertEquals("Not interpolated correctly", 2.0/6.0, mock[2], 1e-16);
     }
 
@@ -40,7 +40,7 @@ public class TestInterpolatePixelArray {
 
         InterpolatePixelArray p = new InterpolatePixelArray();
         try {
-            mock = p.interpolatePixelArray(mock, PixelSet.fromIDs(new int[]{0, 2, 3, 17, 32}));
+            mock = p.interpolatePixelArray(mock, PixelSet.fromCHIDs(new int[]{0, 2, 3, 17, 32}));
             fail("InterpolatePixelArray did not throw to few pixels error");
         } catch (RuntimeException e) {
 

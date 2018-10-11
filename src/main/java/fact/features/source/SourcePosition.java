@@ -58,6 +58,9 @@ public class SourcePosition implements StatefulProcessor {
     @Service(required = false, description = "Name of the service that provides aux files")
     public AuxiliaryService auxService;
 
+    @Parameter(required = false, description = "The key containing the event timestamp")
+    public String timeStampKey = "timestamp";
+
     @Parameter(description = "If set, the fixed x position of the source in mm")
     public Double x = null;
 
@@ -94,8 +97,8 @@ public class SourcePosition implements StatefulProcessor {
      * It also adds an overlay to the item so the position can be displayed in the viewer.
      */
     @Override
-    public Data process(Data data) {
-        EquatorialCoordinate sourceEquatorial;
+    public Data process(Data item) {
+        EquatorialCoordinate sourceEquatorial = null;
         HorizontalCoordinate sourceHorizontal;
         CameraCoordinate sourceCamera;
 
@@ -113,10 +116,10 @@ public class SourcePosition implements StatefulProcessor {
             sourceHorizontal = HorizontalCoordinate.fromDegrees(0, 0);
 
         } else if (hasMcWobblePosition) {
-            double pointingZd = Utils.valueToDouble(data.get(pointingZdKey));
-            double pointingAz = Utils.valueToDouble(data.get(pointingAzKey));
-            double sourceZd = Utils.valueToDouble(data.get(sourceZdKey));
-            double sourceAz = Utils.valueToDouble(data.get(sourceAzKey));
+            double pointingZd = Utils.valueToDouble(item.get(pointingZdKey));
+            double pointingAz = Utils.valueToDouble(item.get(pointingAzKey));
+            double sourceZd = Utils.valueToDouble(item.get(sourceZdKey));
+            double sourceAz = Utils.valueToDouble(item.get(sourceAzKey));
             // Due to the fact, that Ceres handle the coordinate in a different way, we have to
             // rotate the coordinate system by 180 deg such that 0 deg is north
             pointingAz = 180 + pointingAz;
@@ -133,13 +136,9 @@ public class SourcePosition implements StatefulProcessor {
 
         } else {
             // Assume observations
-            int[] unixTimeUTC = (int[]) data.get("UnixTimeUTC");
-            if (unixTimeUTC == null) {
-                log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
-                return null;
-            }
+            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
+            ZonedDateTime timeStamp = (ZonedDateTime) item.get(timeStampKey);
 
-            ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
 
             // the source position is not updated very often. We have to get the point from the auxfile which
             // was written earlier to the current event
@@ -172,35 +171,40 @@ public class SourcePosition implements StatefulProcessor {
             sourceHorizontal = sourceEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
             sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
-            String sourceName = sourcePoint.getString("Name");
-            data.put("sourceName", sourceName);
-
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
 
             auxPointingHorizontal = HorizontalCoordinate.fromDegrees(auxZd, auxAz);
+
+            String sourceName = sourcePoint.getString("Name");
+            item.put("source_name", sourceName);
         }
 
-        data.put(outputKey, sourceCamera);
-        data.put(outputKey + "_x", sourceCamera.xMM);
-        data.put(outputKey + "_y", sourceCamera.yMM);
+        item.put(outputKey, sourceCamera);
+        item.put(outputKey + "_x", sourceCamera.xMM);
+        item.put(outputKey + "_y", sourceCamera.yMM);
 
-        data.put("aux_pointing_position", auxPointingHorizontal);
-        data.put("pointing_position", pointingHorizontal);
-        data.put("source_position_horizontal", sourceHorizontal);
+        item.put("aux_pointing_position", auxPointingHorizontal);
+        item.put("pointing_position", pointingHorizontal);
+        item.put("source_position_horizontal", sourceHorizontal);
 
-        data.put("source_position_zd", sourceHorizontal.getZenithDeg());
-        data.put("source_position_az", sourceHorizontal.getAzimuthDeg());
+        item.put("source_position_zd", sourceHorizontal.getZenithDeg());
+        item.put("source_position_az", sourceHorizontal.getAzimuthDeg());
 
-        data.put("aux_pointing_position_zd", auxPointingHorizontal.getZenithDeg());
-        data.put("aux_pointing_position_az", auxPointingHorizontal.getAzimuthDeg());
+        item.put("aux_pointing_position_zd", auxPointingHorizontal.getZenithDeg());
+        item.put("aux_pointing_position_az", auxPointingHorizontal.getAzimuthDeg());
 
-        data.put("pointing_position_zd", pointingHorizontal.getZenithDeg());
-        data.put("pointing_position_az", pointingHorizontal.getAzimuthDeg());
+        item.put("pointing_position_zd", pointingHorizontal.getZenithDeg());
+        item.put("pointing_position_az", pointingHorizontal.getAzimuthDeg());
 
-        data.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
+        if (sourceEquatorial != null) {
+            item.put("source_position_ra", sourceEquatorial.getRightAscensionDeg());
+            item.put("source_position_dec", sourceEquatorial.getDeclinationDeg());
+        }
 
-        return data;
+        item.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
+
+        return item;
     }
 
 

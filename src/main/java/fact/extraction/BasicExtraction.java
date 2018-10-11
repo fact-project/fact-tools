@@ -59,13 +59,11 @@ public class BasicExtraction implements Processor {
     public Data process(Data item) {
         Utils.mapContainsKeys(item, dataKey, "NROI");
 
-
         double[] integralGains;
-        int[] unixTimeUTC = (int[]) item.get("UnixTimeUTC");
-        if (unixTimeUTC == null) {
+        if (!item.containsKey("timestamp")) {
             integralGains = gainService.getSimulationGains();
         } else {
-            ZonedDateTime timestamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
+            ZonedDateTime timestamp = Utils.getTimeStamp(item);
             integralGains = gainService.getGains(timestamp);
         }
 

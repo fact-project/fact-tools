@@ -23,9 +23,9 @@ public class BFSTest {
 
     @Before
     public void createMockList() {
-        mock = PixelSet.fromIDs(pixels);
-        cluster1 = PixelSet.fromIDs(pixelsCluster1);
-        cluster2 = PixelSet.fromIDs(pixelsCluster2);
+        mock = PixelSet.fromCHIDs(pixels);
+        cluster1 = PixelSet.fromCHIDs(pixelsCluster1);
+        cluster2 = PixelSet.fromCHIDs(pixelsCluster2);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class BFSTest {
                 assertTrue("This cluster should contain the pixel chids {0,3,6,17,2,5,29,27,25}", cluster.containsAll(cluster1));
                 continue;
             } else if (cluster.size() == 1) {
-                assertTrue("Cluster should have the pixel 200", cluster.containsID(200));
+                assertTrue("Cluster should have the pixel 200", cluster.containsCHID(200));
                 continue;
             } else if (cluster.size() == 3) {
                 assertTrue("This cluster should contain the pixel chids {156,154,153};", cluster.containsAll(cluster2));

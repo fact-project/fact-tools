@@ -1,8 +1,6 @@
 package fact.cleaning;
 
 import fact.container.PixelSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -42,7 +40,7 @@ public class MuonRingClean implements Processor {
         for (int i = 0; i < ringPixel.length; i++) {
             if (photonCharge[ringPixel[i]] >= photonChargeThreshold) {
                 cleanRingList.add(ringPixel[i]);
-                cleanPixelSet.addById(ringPixel[i]);
+                cleanPixelSet.addByCHID(ringPixel[i]);
             }
         }
 
@@ -70,7 +68,7 @@ public class MuonRingClean implements Processor {
             for (int i = 0; i < cleanRingList.size(); i++) {
                 if (Math.abs(median - arrivalTime[cleanRingList.get(i)]) <= timeThreshold) {
                     timeCleanRingList.add(cleanRingList.get(i));
-                    cleanPixelSet.addById(cleanRingList.get(i));
+                    cleanPixelSet.addByCHID(cleanRingList.get(i));
                 }
             }
 

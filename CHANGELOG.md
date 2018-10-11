@@ -1,5 +1,13 @@
 # Changelog for the fact-tools
 
+# Version 1.0.3 -- 23.05.2018
+
+* Enable to revert DRSCalibration
+* `SourcePosition` and `CameraToEquatorial` now throw errors instead of closing the stream.
+* Remove `SQLiteService`
+* Use `AuxService` for erna xmls
+* Enable setting drsfile to `@drsFile` to signal that the drsfile should be read from this key in the data item
+
 # Version 1.0.2 -- 03.05.2018
 
 * Fix exit code being 0 even if an error occured by updating to streams 1.0.5

@@ -74,7 +74,8 @@ public class BinTableReader implements Reader {
         Serializable b = null;
         switch (c.type) {
             case BOOLEAN:
-                b = stream.readBoolean();
+                char raw = (char) stream.readByte();
+                b = raw == 'T';
                 break;
             case CHAR:
                 byte[] s = new byte[]{stream.readByte()};
@@ -107,7 +108,8 @@ public class BinTableReader implements Reader {
         if (c.type == BinTable.ColumnType.BOOLEAN) {
             boolean[] bools = new boolean[c.repeatCount];
             for (int i = 0; i < c.repeatCount; i++) {
-                bools[i] = stream.readBoolean();
+                char raw = (char) stream.readByte();
+                bools[i] = raw == 'T';
             }
             return bools;
         }
@@ -147,7 +149,7 @@ public class BinTableReader implements Reader {
     /**
      * Skips the given number of rows.
      *
-     * @param num The amount of rows to skip.
+     * @param amount The amount of rows to skip.
      * @throws IOException
      */
     @Override

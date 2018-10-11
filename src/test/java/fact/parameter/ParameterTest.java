@@ -61,7 +61,7 @@ public class ParameterTest {
 
         URL drsUrl = FITSStreamTest.class.getResource("/testDrsFile.drs.fits.gz");
         DrsCalibration pr = new DrsCalibration();
-        pr.url = drsUrl;
+        pr.url = drsUrl.toString();
         pr.outputKey = key;
         pr.init(null);
         pr.process(item);

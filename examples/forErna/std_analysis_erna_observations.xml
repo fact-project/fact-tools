@@ -5,11 +5,13 @@
   -->
   <properties url="classpath:/default/settings.properties" />
 
-  <property name="aux_source" value="file:./2015.sqlite" />
+  <property name="aux_source" value="file:src/main/resources/aux/" />
 
   <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
 
-  <service id="auxService" class="fact.auxservice.SqliteService" url="${aux_source}" />
+  <property name="drsfile" value="@drsFile" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${aux_source}" />
   <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
   <service id="gainService" class="fact.gainservice.GainService" />
 

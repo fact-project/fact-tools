@@ -199,7 +199,7 @@ public class HoughTransform implements StatefulProcessor {
 
         PixelSet bestRingPixel = new PixelSet();
         for (int chid : circle2chids.get(bestRing)) {
-            bestRingPixel.addById(chid);
+            bestRingPixel.addByCHID(chid);
         }
         item.put(bestRingPixelKey, bestRingPixel);
 
@@ -260,7 +260,7 @@ public class HoughTransform implements StatefulProcessor {
                     double pix_y = p.getYPositionInMM();
                     distance = euclidean_distance2d(pix_x, pix_y, best_x[i], best_y[i]);
                     if (Math.abs(distance - best_r[i]) <= Constants.PIXEL_SIZE_MM) {
-                        CirclePixelSet.addById(pix);
+                        CirclePixelSet.addByCHID(pix);
                     }
                 }
                 item.put(bestCircleKey + String.valueOf(i + 1), CirclePixelSet);

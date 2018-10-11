@@ -34,6 +34,9 @@ public class TimeseriesFeatures implements Processor {
     @Parameter(required = true, description = "name of the key of the calculated features")
     public String outputKey = null;
 
+    @Parameter(required = false, description = "Whether to do the calculation with the substraction of the smoothed data.")
+    public boolean substractSmoothData = false;
+
     private int numberOfBins = 200;
     private double histogramMinBin = -10.0;
     private double histogramMaxBin = 10.0;
@@ -82,6 +85,13 @@ public class TimeseriesFeatures implements Processor {
             for (int sl = searchWindowLeft; sl < searchWindowRight; sl++) {
                 int slice = pix * roi + sl;
                 values[sl - searchWindowLeft] = data[slice];
+
+                if (substractSmoothData) {
+                    values[sl - searchWindowLeft] = data[slice] - movingAverage[slice];
+                } else {
+                    values[sl - searchWindowLeft] = data[slice];
+                }
+
                 int binNumber = findBinNumber((data[slice] - movingAverage[slice]));
                 histogram[binNumber] += 1;
             }

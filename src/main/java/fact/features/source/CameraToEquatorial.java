@@ -33,12 +33,8 @@ public class CameraToEquatorial implements Processor {
 
     @Override
     public Data process(Data item) {
-        int[] unixTimeUTC = (int[]) item.get("UnixTimeUTC");
-        if (unixTimeUTC == null) {
-            log.error("The key \"UnixTimeUTC\" was not found in the event. Ignoring event");
-            return null;
-        }
-        ZonedDateTime timeStamp = Utils.unixTimeUTCToZonedDateTime(unixTimeUTC);
+        Utils.isKeyValid(item,"timestamp", ZonedDateTime.class);
+        ZonedDateTime timeStamp = (ZonedDateTime) item.get("timestamp");
         Utils.isKeyValid(item, cameraCoordinateKey, CameraCoordinate.class);
         Utils.isKeyValid(item, pointingPositionKey, HorizontalCoordinate.class);
 

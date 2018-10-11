@@ -13,7 +13,6 @@ import stream.Processor;
 import stream.annotations.Parameter;
 import stream.annotations.Service;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -50,17 +49,7 @@ public class InterpolatePixelArray implements Processor {
 
         double[] input = (double[]) item.get(inputKey);
 
-        ZonedDateTime timeStamp;
-
-        if (item.containsKey("UnixTimeUTC")) {
-            Utils.isKeyValid(item, "UnixTimeUTC", int[].class);
-            int[] eventTime = (int[]) item.get("UnixTimeUTC");
-            timeStamp = Utils.unixTimeUTCToZonedDateTime(eventTime);
-        } else {
-            // MC Files don't have a UnixTimeUTC in the data item. Here the timestamp is hardcoded to 1.1.2000
-            // => The 12 bad pixels we have from the beginning on are used.
-            timeStamp = ZonedDateTime.of(2000, 1, 1, 0, 0,0,0, ZoneOffset.UTC);
-        }
+        ZonedDateTime timeStamp = Utils.getTimeStamp(item);
         PixelSet badPixelsSet = calibService.getBadPixels(timeStamp);
 
         double[] output;
@@ -77,7 +66,7 @@ public class InterpolatePixelArray implements Processor {
 
     double[] interpolatePixelArray(double[] pixelArray, PixelSet badPixels) {
         for (int chid = 0; chid < Constants.N_PIXELS; chid++){
-            if (badPixels.containsID(chid) || (!Double.isFinite(pixelArray[chid]))) {
+            if (badPixels.containsCHID(chid) || (!Double.isFinite(pixelArray[chid]))) {
                 CameraPixel[] currentNeighbors = pixelMap.getNeighborsFromID(chid);
 
                 double avg = 0.0;
