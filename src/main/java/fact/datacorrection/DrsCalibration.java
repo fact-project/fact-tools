@@ -43,7 +43,7 @@ public class DrsCalibration implements StatefulProcessor {
 
 	@Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
 			defaultValue = "Null. Will try to find path to drsFile from the stream.")
-	public URL url = null;
+	public String url = null;
 
 	@Service(description = "A DrsFileService which helps to find drs files automagically." +
 			" Either this or the url must be set.", required = false)
@@ -121,7 +121,7 @@ public class DrsCalibration implements StatefulProcessor {
      */
     @Override
     public Data process(Data data) {
-		if( this.url == null && this.drsService != null){
+		if( this.drsFileURL == null && this.drsService != null){
 			//file not loaded yet. try to find through service
 			try {
 
@@ -132,9 +132,7 @@ public class DrsCalibration implements StatefulProcessor {
 			} catch (NullPointerException | IOException e) {
 				throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
 			}
-		}
-
-        if (this.url == null && this.drsService == null) {
+		} else if (this.drsFileURL == null && this.drsService == null) {
             //file not loaded yet. try to find by magic.
             File drsFile = (File) data.get(drsKey);
             if (drsFile != null) {
@@ -144,12 +142,11 @@ public class DrsCalibration implements StatefulProcessor {
                         log.info("Using .drs File " + drsFile.getAbsolutePath());
                         loadDrsData(drsFile.toURI().toURL());
                     } catch (MalformedURLException e) {
-                        //pass.
                         throw new RuntimeException("URL malformed");
                     }
                 }
             } else {
-                throw new IllegalArgumentException("No drs file set or no @drsFile key in data stream");
+                throw new IllegalArgumentException("No drs file set or drsKey in data stream");
             }
         }
 
@@ -363,7 +360,7 @@ public class DrsCalibration implements StatefulProcessor {
     @Override
     public void init(ProcessContext processContext) throws Exception {
 
-        if (!url.equals("@drsFile")) {
+        if (!url.equals(drsKey)) {
             try {
                 drsFileURL = new URL(url);
             } catch (MalformedURLException e) {
