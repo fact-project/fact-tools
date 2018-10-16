@@ -2,6 +2,7 @@ package fact.features;
 
 import fact.Utils;
 import fact.container.PixelSet;
+import fact.hexmap.CameraPixel;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -27,35 +28,27 @@ public class TimeSpread implements Processor {
 
         double[] arrivalTime = (double[]) item.get(arrivalTimeKey);
         double[] weights = (double[]) item.get(weightsKey);
-        int[] shower = ((PixelSet) item.get(pixelSetKey)).toCHIDArray();
+        PixelSet shower = (PixelSet) item.get(pixelSetKey);
 
-        // NumberShowerPixel
-        int n = shower.length;
+        int n = shower.size();
+        double sumT = 0.0;
+        double sumW = 0.0;
+        double sumWT = 0.0;
+        double sumT2 = 0.0;
+        double sumWT2 = 0.0;
 
-        // Times of shower pixel
-        double[] t = new double[n];
-        // Weights of shower pixel
-        double[] w = new double[n];
-        for (int i = 0; i < n; i++) {
-            int chid = shower[i];
-            t[i] = arrivalTime[chid];
-            w[i] = weights[chid];
+        for (CameraPixel pixel: shower) {
+            double t = arrivalTime[pixel.id];
+            double w = weights[pixel.id];
+            sumT += t;
+            sumW += w;
+            sumWT += w * t;
+            sumT2 += t * t;
+            sumWT2 += w * t * t;
         }
 
-        // Sum over the time array:
-        double sumt = Utils.arraySum(t);
-        // Sum over the weight array:
-        double sumw = Utils.arraySum(w);
-        // Sum over the weighted time array:
-        double sumwt = Utils.arraySum(Utils.arrayMultiplication(w, t));
-        // Sum over the element wise multiplication of t and t:
-        double sumtt = Utils.arraySum(Utils.arrayMultiplication(t, t));
-        // Sum over the element wise multiplication of t and t, weighted:
-        double sumwtt = Utils.arraySum(Utils.arrayMultiplication(w, Utils.arrayMultiplication(t, t)));
-
-
-        double timespread = Math.sqrt(sumtt / n - Math.pow(sumt / n, 2));
-        double weightedTimespread = Math.sqrt(sumwtt / sumw - Math.pow(sumwt / sumw, 2));
+        double timespread = Math.sqrt(sumT2 / n - Math.pow(sumT / n, 2));
+        double weightedTimespread = Math.sqrt(sumWT2 / sumW - Math.pow(sumWT / sumW, 2));
 
         item.put(outputKey, timespread);
         item.put(outputKey + "_weighted", weightedTimespread);
