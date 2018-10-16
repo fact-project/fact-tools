@@ -3,6 +3,7 @@ package fact.features;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.hexmap.CameraPixel;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
@@ -30,26 +31,20 @@ public class TimeSpread implements Processor {
         double[] weights = (double[]) item.get(weightsKey);
         PixelSet shower = (PixelSet) item.get(pixelSetKey);
 
-        int n = shower.size();
-        double sumT = 0.0;
-        double sumW = 0.0;
-        double sumWT = 0.0;
-        double sumT2 = 0.0;
-        double sumWT2 = 0.0;
+        double[] t = shower.stream().mapToDouble(p -> arrivalTime[p.id]).toArray();
+        double[] w = shower.stream().mapToDouble(p -> weights[p.id]).toArray();
 
-        for (CameraPixel pixel: shower) {
-            double t = arrivalTime[pixel.id];
-            double w = weights[pixel.id];
-            sumT += t;
-            sumW += w;
-            sumWT += w * t;
-            sumT2 += t * t;
-            sumWT2 += w * t * t;
+        Variance var = new Variance();
+        var.setBiasCorrected(false);
+
+        double timespread = Math.sqrt(var.evaluate(t));
+        double weightedTimespread;
+        if (shower.size() > 0) {
+            var.clear();
+            weightedTimespread = Math.sqrt(var.evaluate(t, w));
+        } else {
+            weightedTimespread = Double.NaN;
         }
-
-        double timespread = Math.sqrt(sumT2 / n - Math.pow(sumT / n, 2));
-        double weightedTimespread = Math.sqrt(sumWT2 / sumW - Math.pow(sumWT / sumW, 2));
-
         item.put(outputKey, timespread);
         item.put(outputKey + "_weighted", weightedTimespread);
 

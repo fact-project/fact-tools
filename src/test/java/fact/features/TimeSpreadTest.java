@@ -67,16 +67,19 @@ public class TimeSpreadTest {
 
     @Test
     public void testTimeSpread() {
-        PixelSet pixelSet = PixelSet.fromCHIDs(new int[] {1, 2, 3, 4, 5});
+        PixelSet pixelSet = PixelSet.fromCHIDs(new int[] {0, 1, 2, 3, 4});
+
+        double[] sampleTimes = new double[] {1.0, 2.0, 3.0, 4.0, 5.0};
+        double[] sampleWeights = new double[] {1.0, 1.0, 6.0, 1.0, 1.0};
 
         Random random = new Random(0);
         double[] weights = new double[1440];
         double[] times = new double[1440];
-        for (CameraPixel pixel: pixelSet) {
-            weights[pixel.id] = random.nextDouble() * 5;
-            times[pixel.id] = random.nextGaussian() * 10 + 50;
-        }
 
+        for (int i = 0; i < sampleTimes.length ; i++) {
+            weights[i] = sampleWeights[i];
+            times[i] = sampleTimes[i];
+        }
         Data item = DataFactory.create();
         item.put("weights", weights);
         item.put("times", times);
@@ -90,7 +93,7 @@ public class TimeSpreadTest {
         timeSpread.outputKey = "timespread";
         timeSpread.process(item);
 
-        assertFalse(Double.isNaN((Double) item.get("timespread")));
-        assertFalse(Double.isNaN((Double) item.get("timespread_weighted")));
+        assertEquals(Math.sqrt(2.0), (Double) item.get("timespread"), 1e-9);
+        assertEquals(1.0, (Double) item.get("timespread_weighted"), 1e-9);
     }
 }
