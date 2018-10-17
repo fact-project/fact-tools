@@ -360,7 +360,7 @@ public class DrsCalibration implements StatefulProcessor {
     @Override
     public void init(ProcessContext processContext) throws Exception {
 
-        if (!url.equals(drsKey)) {
+        if (url != null && !url.equals(drsKey)) {
             try {
                 drsFileURL = new URL(url);
             } catch (MalformedURLException e) {
