@@ -41,6 +41,9 @@ public class DrsFileService implements Service {
             "in FACTS canonical folder structure." )
     public SourceURL rawDataFolder;
 
+    @Parameter(required = false, description = "The DrsStep to look for, should be 1 or 2.")
+    public int drsStep = 2;
+
     private LoadingCache<DrsCacheKey, CalibrationInfo> cache = CacheBuilder.newBuilder()
             .maximumSize(15)
             .expireAfterAccess(20, TimeUnit.MINUTES)
@@ -78,7 +81,7 @@ public class DrsFileService implements Service {
 
     private ZonedDateTime getObservationDate(Path p) {
         FITS fits = FITS.fromPath(p);
-        ZonedDateTime d;
+
         ZonedDateTime minDate = ZonedDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC);
         Optional<ZonedDateTime> dateTime = fits.getHDU("DrsCalibration").map(h -> h.header.date().orElse(minDate));
 
@@ -86,14 +89,23 @@ public class DrsFileService implements Service {
         return dateTime.orElse(minDate);
     }
 
+    private int getDrsStep(Path p) {
+        FITS fits = FITS.fromPath(p);
+        Optional<Integer> dateTime = fits.getHDU("DrsCalibration").map(h -> h.header.getInt("STEP").orElse(-1));
+
+        //return the date found or some date very far in the past.
+        return dateTime.orElse(-1);
+    }
+
 
     private CalibrationInfo readDrsInfos(DrsCacheKey key) throws IOException {
         Path pathToFolder = Paths.get(rawDataFolder.getPath(),  key.partialPathToFolder.toString());
 
-        //find drsfile closest in time to the observationdate
+        // find drsfile closest in time to the observationdate
         Path pathToClosestDrsFile = Files
                 .list(pathToFolder)
                 .filter(p -> p.getFileName().toString().contains(".drs.fits"))
+                .filter(p -> getDrsStep(p) == drsStep)
                 .reduce((a, b) -> {
                     long toA = ChronoUnit.SECONDS.between(getObservationDate(a), key.observationDate);
                     long toB = ChronoUnit.SECONDS.between(getObservationDate(b), key.observationDate);
@@ -108,7 +120,7 @@ public class DrsFileService implements Service {
 
         OptionalTypesMap<String, Serializable> row = BinTableReader.forBinTable(binTable).getNextRow();
 
-        //get the arrays needed for calibration. if one is missing throw an exception.
+        // get the arrays needed for calibration. if one is missing throw an exception.
         float[] baselineMean = row.getFloatArray("BaselineMean")
                 .orElseThrow(()-> new IOException("BaseLineMean not found in BinTable"));
 
