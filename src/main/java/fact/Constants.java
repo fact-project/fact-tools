@@ -9,5 +9,5 @@ public class Constants {
     public static final double FOCAL_LENGTH_MM = 4889.0;
     public static final double PIXEL_SIZE_MM = 9.5;
     public static final int N_PATCHES = N_PIXELS/N_PIXELS_PER_PATCH;
-
+    public static final double FOV_DEG = 4.5;
 }

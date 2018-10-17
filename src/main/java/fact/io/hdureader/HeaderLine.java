@@ -21,25 +21,29 @@ class HeaderLine {
      * @return a HeaderLine object for the given string.
      */
     static HeaderLine fromString(String line) {
-        //split the line on the = and the /
-        List<String> split = Splitter.onPattern("=|\\/").trimResults().splitToList(line);
-
-
-        String key = split.get(0);
-
-        //header values are usually denoted by 'somevalue' if they are strings.
-        //some files however contain 'somevalue____' where ___ denote spaces.
-        //thats why after removing the ' we trim all whitespace.
+        String key = line.substring(0, 8).trim();
+        // values are not mandatory, if no value is present (absence of '= ' in bytes 9 & 10), everything
+        // shall be treated as comment
         String value = "";
-        if (split.size() > 1) {
-            value = split.get(1);
-            value = value.replace("'", "").trim();
-        }
-
-        //comments are not mandatory. in that case this string is empty.
+        // comments are not mandatory. in that case this string is empty.
         String comment = "";
-        if (split.size() > 2) {
-            comment = split.get(2);
+
+        if (line.substring(8, 10).equals("= ")) {
+            //split the line on the = and the /
+            String[] split = line.substring(10, line.length()).split("/", 2);
+
+            // header values are usually denoted by 'somevalue' if they are strings.
+            // some files however contain 'somevalue____' where ___ denote spaces.
+            // that's why after removing the ' we trim all whitespace.
+            value = split[0].trim();
+            value = value.replace("'", "").trim();
+
+            if (split.length > 1) {
+                comment = split[1].trim();
+            }
+
+        } else {
+            comment = line.substring(8, line.length());
         }
 
         return new HeaderLine(key, value, comment);

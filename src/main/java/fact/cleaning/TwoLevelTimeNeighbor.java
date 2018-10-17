@@ -1,7 +1,6 @@
 package fact.cleaning;
 
 
-import fact.Constants;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.coordinates.CameraCoordinate;
@@ -13,7 +12,6 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -59,12 +57,11 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
             " If Size is smaller than minSize the Pixels will be discarded.")
     public int minNumberOfPixel;
 
+    @Parameter(required = false, description = "Key pointing to a CameraCoordinate[] for star positons, calculate with StarsInFOV")
+    public String starPositionsKey = null;
 
-    @Parameter(required = false)
-    public String[] starPositionKeys = null;
-
-    @Parameter(required = false, defaultValue = "Constants.PIXEL_SIZE")
-    public double starRadiusInCamera = Constants.PIXEL_SIZE_MM;
+    @Parameter(required = false, defaultValue = "11.0", description = "Maximum distance of star position to pixel center")
+    public double starRadiusInCamera = 11.0;
 
     @Parameter(description = "Add PixelSets for the different cleaning steps")
     public boolean showDifferentCleaningSets = false;
@@ -124,15 +121,14 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
             addLevelToDataItem(showerPixel, outputKey + "_level6", item);
         }
 
-        if (starPositionKeys != null) {
+        if (starPositionsKey != null) {
+            CameraCoordinate[] starsInFOV = (CameraCoordinate[]) item.get(starPositionsKey);
             PixelSet starSet = new PixelSet();
-            for (String starPositionKey : starPositionKeys) {
-                Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
-                CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
 
+            for (CameraCoordinate starPosition : starsInFOV) {
                 showerPixel = removeStarIslands(showerPixel, starPosition, starSet, starRadiusInCamera, log);
                 if (showDifferentCleaningSets == true) {
-                    addLevelToDataItem(showerPixel, outputKey + "_level7", item);
+                    addLevelToDataItem(showerPixel, outputKey + "_level6", item);
                     item.put("Starset", starSet);
                 }
             }
