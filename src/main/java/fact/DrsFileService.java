@@ -35,14 +35,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class DrsFileService implements Service {
 
-    private Logger log = LoggerFactory.getLogger(DrsFileService.class);
+    private final Logger log = LoggerFactory.getLogger(DrsFileService.class);
 
     @Parameter(required = true, description = "The url pointing to the path containing the FACT raw data " +
             "in FACTS canonical folder structure." )
-    private SourceURL rawDataFolder;
-    public void setRawDataFolder(SourceURL rawDataFolder) {
-        this.rawDataFolder = rawDataFolder;
-    }
+    public SourceURL rawDataFolder;
 
     private LoadingCache<DrsCacheKey, CalibrationInfo> cache = CacheBuilder.newBuilder()
             .maximumSize(15)
