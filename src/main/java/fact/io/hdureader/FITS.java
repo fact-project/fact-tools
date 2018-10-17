@@ -46,7 +46,7 @@ public class FITS {
 
     private Map<String, HDU> hduNames = new HashMap<>();
 
-    //stores the primary HDU for convinience access from the outside.
+    // stores the primary HDU for convenience access from the outside.
     public HDU primaryHDU;
 
     /**
@@ -145,7 +145,7 @@ public class FITS {
     }
 
     /**
-     * Each extension has a keyword called EXTNAME. This method returns the extension with the given name if it exists.
+     * Extensions may have keyword called EXTNAME. This method returns the extension with the given name if it exists.
      *
      * @param extname the HDU to get.
      * @return the HDU with the passed EXTNAME value
@@ -154,14 +154,38 @@ public class FITS {
         return Optional.ofNullable(hduNames.get(extname));
     }
 
+    /**
+     * This method returns the HDU at given index if it exists.
+     *
+     * @param hduIndex the HDU to get.
+     * @return the HDU at the given index
+     */
+    public Optional<HDU> getHDU(int hduIndex) {
+        try {
+            return Optional.of(hdus.get(hduIndex));
+        } catch (IndexOutOfBoundsException  e) {
+            return Optional.empty();
+        }
+    }
+
 
     /**
-     * Get the a mapping of HDU names to all HDU objects in the file.
+     * Get the a mapping of HDU names to all named HDU objects in the file.
      *
      * @return a map of names to HDUs
      */
-    public Map<String, HDU> getHDUs() {
+    public Map<String, HDU> getNamedHDUs() {
         return hduNames;
+    }
+
+
+    /**
+     * Get a list of all HDUs in the fits file.
+     *
+     * @return a map of names to HDUs
+     */
+    public List<HDU> getHDUs() {
+        return hdus;
     }
 
     /**
