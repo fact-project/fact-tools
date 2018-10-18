@@ -31,15 +31,16 @@ public class TimeSpread implements Processor {
         double[] weights = (double[]) item.get(weightsKey);
         PixelSet shower = (PixelSet) item.get(pixelSetKey);
 
-        double[] t = shower.stream().mapToDouble(p -> arrivalTime[p.id]).toArray();
-        double[] w = shower.stream().mapToDouble(p -> weights[p.id]).toArray();
+        // ignore negative weights, should only happen when evaluated on pedestal pixel set
+        double[] t = shower.stream().filter(p -> weights[p.id] > 0).mapToDouble(p -> arrivalTime[p.id]).toArray();
+        double[] w = shower.stream().filter(p -> weights[p.id] > 0).mapToDouble(p -> weights[p.id]).toArray();
 
         Variance var = new Variance();
         var.setBiasCorrected(false);
 
         double timespread = Math.sqrt(var.evaluate(t));
         double weightedTimespread;
-        if (shower.size() > 0) {
+        if (t.length > 0) {
             var.clear();
             weightedTimespread = Math.sqrt(var.evaluate(t, w));
         } else {
