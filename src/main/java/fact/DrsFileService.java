@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -168,11 +169,7 @@ public class DrsFileService implements Service {
 
         @Override
         public int hashCode() {
-            int result = runId;
-            result = 31 * result + month;
-            result = 31 * result + day;
-            result = 31 * result + year;
-            return result;
+            return Objects.hash(runId, day, month, year);
         }
     }
 
