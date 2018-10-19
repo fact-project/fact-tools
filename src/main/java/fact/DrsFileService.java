@@ -132,8 +132,9 @@ public class DrsFileService implements Service {
 
         ZonedDateTime calibrationDateTime = calibrationHDU.header.date()
                 .orElseThrow(()-> new IOException("Date of calibration not found in BinTable"));
+        String fileName = pathToClosestDrsFile.getFileName().toString();
 
-        return new CalibrationInfo(calibrationDateTime, baselineMean, gainMean, triggerOffsetMean);
+        return new CalibrationInfo(fileName, calibrationDateTime, baselineMean, gainMean, triggerOffsetMean);
     }
 
     private class DrsCacheKey {
@@ -180,16 +181,19 @@ public class DrsFileService implements Service {
      * to FACT raw data.
      */
     public class CalibrationInfo{
+        public final String drsFile;
         public final float[] drsBaselineMean;
         public final float[] drsGainMean;
         public final float[] drsTriggerOffsetMean;
         public final ZonedDateTime timeOfCalibration;
 
-        CalibrationInfo(ZonedDateTime timeOfCalibration,
+        CalibrationInfo(String drsFile,
+                        ZonedDateTime timeOfCalibration,
                         float[] drsBaselineMean,
                         float[] drsGainMean,
                         float[] drsTriggerOffsetMean)
         {
+            this.drsFile = drsFile;
             this.drsBaselineMean = drsBaselineMean;
             this.drsGainMean = drsGainMean;
             this.drsTriggerOffsetMean = drsTriggerOffsetMean;

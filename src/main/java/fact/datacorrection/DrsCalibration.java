@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 /**
  * This processor handles the DRS calibration. It requires a DRS data source
@@ -37,18 +38,17 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter(required = false, description = "The data key that will hold the resulting data array.")
     public String outputKey = "DataCalibrated";
 
-	@Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
-	private String key = "Data";
+    @Parameter(required = false, description = "Data array to be calibrated", defaultValue = "Data")
+    private String key = "Data";
 
 
-	@Parameter(required =  false, description = "A URL to the DRS calibration data (in FITS formats)",
-			defaultValue = "Null. Will try to find path to drsFile from the stream.")
-	public String url = null;
+    @Parameter(required = false, description = "A URL to the DRS calibration data (in FITS formats)",
+            defaultValue = "Null. Will try to find path to drsFile from the stream.")
+    public String url = null;
 
-	@Service(description = "A DrsFileService which helps to find drs files automagically." +
-			" Either this or the url must be set.", required = false)
-	private DrsFileService drsService;
-
+    @Service(description = "A DrsFileService which helps to find drs files automagically." +
+            " Either this or the url must be set.", required = false)
+    private DrsFileService drsService;
 
 
     @Parameter(required = false, description = "Key to the StartCellData.")
@@ -63,11 +63,13 @@ public class DrsCalibration implements StatefulProcessor {
     @Parameter(required = false, description = "Whether to reverse the process.", defaultValue = "false")
     public boolean reverse = false;
 
+    @Parameter(required = false, description = "output key for the used drs file")
+    public String drsFileOutputKey = "drs_file";
+
     private double dconv = 2000.0f / 4096.0f;
 
 
     private File currentDrsFile = new File("");
-
 
 
     float[] drsBaselineMean;
@@ -121,20 +123,23 @@ public class DrsCalibration implements StatefulProcessor {
      */
     @Override
     public Data process(Data data) {
-		if( this.drsFileURL == null && this.drsService != null){
-			//file not loaded yet. try to find through service
-			try {
+        String drsFileName;
 
-				DrsFileService.CalibrationInfo calibrationInfo = drsService.getCalibrationConstantsForDataItem(data);
-				this.drsBaselineMean = calibrationInfo.drsBaselineMean;
-				this.drsGainMean = calibrationInfo.drsGainMean;
-				this.drsTriggerOffsetMean = calibrationInfo.drsTriggerOffsetMean;
-			} catch (NullPointerException | IOException e) {
-				throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
-			}
-		} else if (this.drsFileURL == null && this.drsService == null) {
+        if (this.drsFileURL == null && this.drsService != null) {
+            //file not loaded yet. try to find through service
+            try {
+                DrsFileService.CalibrationInfo calibrationInfo = drsService.getCalibrationConstantsForDataItem(data);
+                this.drsBaselineMean = calibrationInfo.drsBaselineMean;
+                this.drsGainMean = calibrationInfo.drsGainMean;
+                this.drsTriggerOffsetMean = calibrationInfo.drsTriggerOffsetMean;
+                drsFileName = calibrationInfo.drsFile;
+            } catch (NullPointerException | IOException e) {
+                throw new RuntimeException("Could not get calibration info from service. \n" + e.getMessage());
+            }
+        } else if (this.drsFileURL == null && this.drsService == null) {
             //file not loaded yet. try to find by magic.
             File drsFile = (File) data.get(drsKey);
+            drsFileName = drsFile.getName();
             if (drsFile != null) {
                 if (!drsFile.equals(currentDrsFile)) {
                     currentDrsFile = drsFile;
@@ -148,7 +153,10 @@ public class DrsCalibration implements StatefulProcessor {
             } else {
                 throw new IllegalArgumentException("No drs file set or drsKey in data stream");
             }
+        } else {
+            drsFileName = Paths.get(this.drsFileURL.getFile()).getFileName().toString();
         }
+        data.put(drsFileOutputKey, drsFileName);
 
         double[] rawfloatData;
         log.debug("Processing Data item by applying DRS calibration...");
@@ -159,7 +167,7 @@ public class DrsCalibration implements StatefulProcessor {
                         + key + ". cannot apply drscalibration");
                 throw new RuntimeException(
                         " data .fits file did not contain the value for the key \""
-                        + key + "\". Cannot apply drs calibration)");
+                                + key + "\". Cannot apply drs calibration)");
             }
 
             rawfloatData = new double[rawData.length];
@@ -205,7 +213,7 @@ public class DrsCalibration implements StatefulProcessor {
         if (destination == null)
             destination = new double[data.length];
         else if (destination.length != data.length)
-            throw new RuntimeException("The data array and the destination array have different lengths, "+data.length+" vs "+destination.length);
+            throw new RuntimeException("The data array and the destination array have different lengths, " + data.length + " vs " + destination.length);
         int roi = data.length / Constants.N_PIXELS;
 
         // We do not entirely know how the calibration constants, which are
@@ -315,8 +323,8 @@ public class DrsCalibration implements StatefulProcessor {
     /**
      * Reverses the drsCalibration performed in applyDrsCalibration.
      *
-     * @param data The calibrated data the decalibrate.
-     * @param destination If given use this as the destination array otherwise a new one is created.
+     * @param data            The calibrated data the decalibrate.
+     * @param destination     If given use this as the destination array otherwise a new one is created.
      * @param startCellVector The array containing the start cells used to know which calibration constants to use.
      * @return The decalibrated data array
      */
@@ -324,7 +332,7 @@ public class DrsCalibration implements StatefulProcessor {
         if (destination == null)
             destination = new double[data.length];
         else if (destination.length != data.length)
-            throw new RuntimeException("The data array and the destination array have different lengths, "+data.length+" vs "+destination.length);
+            throw new RuntimeException("The data array and the destination array have different lengths, " + data.length + " vs " + destination.length);
 
         int roi = data.length / Constants.N_PIXELS;
 
@@ -378,13 +386,13 @@ public class DrsCalibration implements StatefulProcessor {
         }
     }
 
-	@Override
-	public void resetState() throws Exception {
+    @Override
+    public void resetState() throws Exception {
 
-	}
+    }
 
-	@Override
-	public void finish() throws Exception {
-	}
+    @Override
+    public void finish() throws Exception {
+    }
 }
 
