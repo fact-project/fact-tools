@@ -1,5 +1,6 @@
 package fact.camera;
 
+import fact.coordinates.CameraCoordinate;
 import fact.hexmap.CameraPixel;
 import fact.hexmap.FactPixelMapping;
 import org.junit.Test;
@@ -229,7 +230,7 @@ public class PixelMappingTest {
         p = m.getPixelBelowCoordinatesInMM(x, y);
         assertTrue("Map didnt return the right pixel " + chid + " for coordinates: " + x + ", " + y + "\n" +
                 " returnded chid was: " + p.chid + " with coordinates: "
-                + p.getXPositionInMM() + ", " + p.getYPositionInMM(), chid == p.chid);
+                + p.coordinate.toString(), chid == p.chid);
 
 
         //still the same pixel
@@ -262,8 +263,8 @@ public class PixelMappingTest {
         double[] ys = {120.513, 12.22, -80.324, -120.6, -6.93 * 9.5, 100.0, 10.70 * 9.5, -11.26 * 9.5};
 
         for (int i = 0; i < xs.length; i++) {
-            double x = xs[i];
-            double y = ys[i];
+
+            CameraCoordinate coord = new CameraCoordinate(xs[i], ys[i]);
 
             int nearestChid = -1;
             double lowestDistance = 100000.0d;
@@ -271,22 +272,19 @@ public class PixelMappingTest {
             for (int chid = 0; chid < m.getNumberOfPixel(); chid++) {
                 CameraPixel p = m.getPixelFromId(chid);
 
-                double xChid = p.getXPositionInMM();
-                double yChid = p.getYPositionInMM();
-
-                double distance = Math.sqrt(Math.pow(xChid - x, 2) + Math.pow(yChid - y, 2));
+                double distance = coord.euclideanDistance(p.coordinate);
 
                 if (distance <= lowestDistance) {
                     nearestChid = chid;
                     lowestDistance = distance;
                 }
             }
-            CameraPixel pixel = m.getPixelBelowCoordinatesInMM(x, y);
+            CameraPixel pixel = m.getPixelBelowCoordinatesInMM(coord.xMM, coord.yMM);
             if (pixel != null) {
-                assertEquals("Map did not return the right pixel for coordinates: " + x + ", " + y + " (" + i + ")",
+                assertEquals("Map did not return the right pixel for coordinates: " + coord + "(" + i + ")",
                          nearestChid, pixel.chid);
             } else {
-                fail("No pixel returned for coordinates: " + x + ", " + y);
+                fail("No pixel returned for coordinates: " + coord);
             }
         }
     }

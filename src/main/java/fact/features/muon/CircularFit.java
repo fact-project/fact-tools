@@ -107,8 +107,8 @@ public class CircularFit implements StatefulProcessor {
     public void init(ProcessContext processContext) {
         for (int chid = 0; chid < npix; chid++) {
             CameraPixel pixel = mapping.getPixelFromId(chid);
-            pixelX[chid] = pixel.getXPositionInMM();
-            pixelY[chid] = pixel.getYPositionInMM();
+            pixelX[chid] = pixel.coordinate.xMM;
+            pixelY[chid] = pixel.coordinate.yMM;
         }
     }
 }

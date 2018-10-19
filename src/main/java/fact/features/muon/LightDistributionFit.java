@@ -193,8 +193,8 @@ public class LightDistributionFit implements Processor {
         }
 
         public double photon_expectance_pixel(int chid, double r, double x, double y, double sigma, double rho, double phi, double eps) {
-            double pixel_x = pixelMapping.getPixelFromId(chid).getXPositionInMM();
-            double pixel_y = pixelMapping.getPixelFromId(chid).getYPositionInMM();
+            double pixel_x = pixelMapping.getPixelFromId(chid).coordinate.xMM;
+            double pixel_y = pixelMapping.getPixelFromId(chid).coordinate.yMM;
             double pixel_phi = Math.atan2(pixel_y - y, pixel_x - x);
             double pixel_r = Math.sqrt(Math.pow(pixel_x - x, 2.0) + Math.pow(pixel_y - y, 2.0));
             return intensity(pixel_phi - phi, r, rho, eps) * Constants.PIXEL_SIZE_MM * gauss_density(pixel_r, r, sigma);

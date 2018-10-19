@@ -22,8 +22,8 @@ public class HillasTest {
 
     int[] showerPixelIds = {278, 281, 279, 282, 285, 284, 256, 259, 276, 377};
     PixelSet showerPixels = PixelSet.fromCHIDs(showerPixelIds);
-    double[] pixelX = showerPixels.stream().mapToDouble((p) -> p.getXPositionInMM()).toArray();
-    double[] pixelY = showerPixels.stream().mapToDouble((p) -> p.getYPositionInMM()).toArray();
+    double[] pixelX = showerPixels.stream().mapToDouble(p -> p.coordinate.xMM).toArray();
+    double[] pixelY = showerPixels.stream().mapToDouble(p -> p.coordinate.yMM).toArray();
     private double[] cog;
     private EigenDecomposition eig;
     private RealMatrix covarianceMatrix;

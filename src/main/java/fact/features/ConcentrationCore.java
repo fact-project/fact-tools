@@ -61,8 +61,8 @@ public class ConcentrationCore implements Processor {
 
         double photonsInEllipse = 0;
         for (CameraPixel pix : showerPixelSet.set) {
-            double px = pix.getXPositionInMM();
-            double py = pix.getYPositionInMM();
+            double px = pix.coordinate.xMM;
+            double py = pix.coordinate.yMM;
 
             double[] ellipseCoords = Utils.transformToEllipseCoordinates(px, py, cog.xMM, cog.yMM, delta);
 
