@@ -73,7 +73,7 @@ public class PixelSetForSourcePosition implements Processor {
             starSet.add(starPixel);
 
             for (CameraPixel px : pixelMap.getNeighborsForPixel(starPixel)) {
-                if (calculateDistance(px.id, starPosition.xMM, starPosition.yMM) < starRadiusInCamera) {
+                if (starPosition.euclideanDistance(px.coordinate) < starRadiusInCamera) {
                     starSet.add(px);
                 }
             }
