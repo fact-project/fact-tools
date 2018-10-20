@@ -18,14 +18,14 @@ public class Discriminator {
     /**
      *Discriminate the signal of a given patch
      * @param data timeseries, array[n_pixels_pe_patch]
-     * @param threshold threshold of the discriminator in DAC
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
+     * @param thresholdInDAC thresholdInDAC of the discriminator in DAC
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
      */
     public static int discriminatePatch(
             double[] data,
-            int threshold,
+            int thresholdInDAC,
             int minTimeOverThreshold,
             int skipFirst,
             int skipLast
@@ -33,7 +33,7 @@ public class Discriminator {
         int counter = 0;
         int patchTriggerSlice = default_slice;
 
-        double thresholdInMillivolt = dacToMillivolt(threshold);
+        double thresholdInMilliVolt = dacToMillivolt(thresholdInDAC);
 
         for (int slice = skipFirst; slice < data.length-skipLast; slice++) {
             double slice_amplitude = data[slice];
