@@ -16,9 +16,10 @@ public class Discriminator {
     public static int default_slice = 0;
 
     /**
-     *Discriminate the signal of a given patch
      * @param data timeseries, array[n_pixels_pe_patch]
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
+     *Compute the first occurence of a signal that is above a given {@code thresholdInDAC} and stays above it for
+     * a requested time ({@code minTimeOverThreshold}).
      * @param thresholdInDAC thresholdInDAC of the discriminator in DAC
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
