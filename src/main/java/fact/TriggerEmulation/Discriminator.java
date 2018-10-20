@@ -58,7 +58,6 @@ public class Discriminator {
 
     /**
      * loop over pixels patch by patch and discriminate each patch
-     * @param n_patches number of patches to loop over
      * @param data array with dimensions [n_patches][number_of_slices]
      * @param patchTriggerSlice output array[n_patches][n_pixels_pe_patch] for triggered slices
      * @param threshold threshold of the discriminator in DAC
@@ -69,16 +68,15 @@ public class Discriminator {
      */
     public static boolean[] discriminatePatches(
             double[][] data,
-            int n_patches,
             int[] patchTriggerSlice,
             int threshold,
             int minTimeOverThreshold,
             int skipFirst,
             int skipLast)
     {
-        boolean[] triggerPrimitives = new boolean[n_patches];
+        boolean[] triggerPrimitives = new boolean[data.length];
 
-        for (int patch = 0; patch < n_patches; patch++) {
+        for (int patch = 0; patch < data.length; patch++) {
             triggerPrimitives[patch] = false;
 
             patchTriggerSlice[patch] =

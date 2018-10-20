@@ -134,7 +134,6 @@ public class Ratescan implements StatefulProcessor {
 
             boolean[] currentTriggerPrimitives = discriminatePatches(
                     data,
-                    n_patches,
                     patchTriggerSlice,
                     threshold,
                     minTimeOverThreshold,

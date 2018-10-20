@@ -84,7 +84,6 @@ public class findMaximumTriggerThreshold implements Processor {
             int[] patchTriggerSlice = new int[n_patches];
             boolean[] triggerPrimitives = discriminatePatches(
                     data,
-                    n_patches,
                     patchTriggerSlice,
                     threshold,
                     minTimeOverThreshold,
