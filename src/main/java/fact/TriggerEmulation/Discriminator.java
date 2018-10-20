@@ -58,8 +58,8 @@ public class Discriminator {
 
     /**
      * loop over pixels patch by patch and discriminate each patch
-     * @param data array[n_patches][n_pixels_pe_patch]
      * @param n_patches number of patches to loop over
+     * @param data array with dimensions [n_patches][number_of_slices]
      * @param patchTriggerSlice output array[n_patches][n_pixels_pe_patch] for triggered slices
      * @param threshold threshold of the discriminator in DAC
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
