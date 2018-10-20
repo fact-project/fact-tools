@@ -63,8 +63,8 @@ public class ShowerSlope implements Processor {
         int counter = 0;
         for (CameraPixel pixel: shower) {
             int chid = pixel.id;
-            double xcoord = pixel.getXPositionInMM();
-            double ycoord = pixel.getYPositionInMM();
+            double xcoord = pixel.coordinate.xMM;
+            double ycoord = pixel.coordinate.yMM;
             double[] rotPixels = Utils.transformToEllipseCoordinates(xcoord, ycoord, cog.xMM, cog.yMM, delta);
             x[counter] = rotPixels[0];
             y[counter] = rotPixels[1];

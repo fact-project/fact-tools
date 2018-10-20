@@ -131,8 +131,8 @@ public class CenterOfGravity implements Processor {
             for (CameraPixel pixel : showerPixelArray) {
                 int chid = pixel.id;
                 //TODO insert rotate by hillas_delta switch
-                double posx = pixel.getXPositionInMM();
-                double posy = pixel.getXPositionInMM();
+                double posx = pixel.coordinate.xMM;
+                double posy = pixel.coordinate.yMM;
                 size[slice] += dataCalibratedArray[chid * sliceCount + slice] + eventBaseline;
                 cogx[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * posx;
                 cogy[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * posy;
@@ -144,8 +144,8 @@ public class CenterOfGravity implements Processor {
             // Calculate variance and covariance
             for (CameraPixel pixel : showerPixelArray) {
                 int chid = pixel.id;
-                double posx = pixel.getXPositionInMM();
-                double posy = pixel.getXPositionInMM();
+                double posx = pixel.coordinate.xMM;
+                double posy = pixel.coordinate.yMM;
                 varcogx[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posx - cogx[slice]);
                 varcogy[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * (posy - cogy[slice]) * (posy - cogy[slice]);
                 covcog[slice] += (dataCalibratedArray[chid * sliceCount + slice] + eventBaseline) * (posx - cogx[slice]) * (posy - cogy[slice]);

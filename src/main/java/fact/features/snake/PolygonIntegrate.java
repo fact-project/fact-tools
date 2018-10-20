@@ -51,7 +51,7 @@ public class PolygonIntegrate implements Processor {
 
         double erg = 0;
         for (int i = 0; i < Constants.N_PIXELS; i++) {
-            if (poly.contains(pixelMap.getPixelFromId(i).getXPositionInMM(), pixelMap.getPixelFromId(i).getYPositionInMM()))    // Prüfe ob Pixel im Poly/Snake liegt
+            if (poly.contains(pixelMap.getPixelFromId(i).coordinate.xMM, pixelMap.getPixelFromId(i).coordinate.yMM))    // Prüfe ob Pixel im Poly/Snake liegt
             {
                 erg += data[i];
 
