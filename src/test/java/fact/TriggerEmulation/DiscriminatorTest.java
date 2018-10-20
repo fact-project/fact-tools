@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static fact.TriggerEmulation.Discriminator.discriminatePatches;
 import static fact.TriggerEmulation.Discriminator.millivoltToDAC;
 
 /**
@@ -36,6 +37,34 @@ public class DiscriminatorTest {
         );
         int true_slice = 20;
         Assert.assertTrue(estimated_slice == true_slice);
+
+    }
+    @Test
+    public void testDiscriminatePatches(){
+        EmulateDiscriminator emulateDiscriminator = new EmulateDiscriminator();
+        double[][] data = new double[3][300];
+        Arrays.fill(data[0], 200);
+        Arrays.fill(data[1], 200);
+        Arrays.fill(data[2], 200);
+        for (int i = 20; i < 30; i++) {
+            data[1][i] = 300.;
+        }
+
+        int[] patchTriggerSlice = new int[3];
+
+        boolean[] triggerPrimitives = discriminatePatches(
+                data,
+                patchTriggerSlice,
+                millivoltToDAC(220),
+                8,
+                10,
+                50
+        );
+        int default_slice =  Discriminator.default_slice;
+        boolean[] expectedPrimitives = {false, true, false};
+        int[] expectedSlices = {default_slice, 20, default_slice};
+        Assert.assertArrayEquals(expectedPrimitives, triggerPrimitives);
+        Assert.assertArrayEquals(expectedSlices, patchTriggerSlice);
 
     }
 }
