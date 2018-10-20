@@ -80,20 +80,4 @@ public class PixelSetForSourcePosition implements Processor {
         }
         return starSet;
     }
-
-    /**
-     * Calculates the Distance between a pixel and a given position
-     * @param chid
-     * @param x
-     * @param y
-     * @return
-     */
-    private double calculateDistance(int chid, double x, double y)
-    {
-        double xdist = pixelMap.getPixelFromId(chid).getXPositionInMM() - x;
-        double ydist = pixelMap.getPixelFromId(chid).getYPositionInMM() - y;
-
-        return Math.sqrt((xdist*xdist)+(ydist*ydist));
-    }
-
 }
