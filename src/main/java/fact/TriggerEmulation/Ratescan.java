@@ -10,10 +10,8 @@ import stream.StatefulProcessor;
 import stream.annotations.Parameter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
-import static fact.TriggerEmulation.Discriminator.booleanToInt;
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
 
 /**
@@ -128,7 +126,7 @@ public class Ratescan implements StatefulProcessor {
         for (int i = 0; nTiggeredPatches > 0 && i < nThresholds; i++) {
             int threshold = minThreshold+i*stepSize;
 
-            ratescanResult.thresholds_arr.add(threshold);
+            ratescanResult.thresholdsArray.add(threshold);
 
             int[] patchTriggerSlice = new int[n_patches];
 
@@ -145,9 +143,9 @@ public class Ratescan implements StatefulProcessor {
 
             log.debug("Threshold: "+threshold+" nPrimitives: "+nTiggeredPatches);
 
-            ratescanResult.n_primitives_arr.add(nTiggeredPatches);
-            ratescanResult.triggerPrimitives_arr.add(currentTriggerPrimitives);
-            ratescanResult.patchTriggerSlices_arr.add(patchTriggerSlice);
+            ratescanResult.nPrimitivesArray.add(nTiggeredPatches);
+            ratescanResult.triggerPrimitivesArray.add(currentTriggerPrimitives);
+            ratescanResult.patchTriggerSlicesArray.add(patchTriggerSlice);
 
         }
         return ratescanResult;
@@ -157,27 +155,27 @@ public class Ratescan implements StatefulProcessor {
      * Output container for the ratescan
      */
     public class RatescanResult {
-        ArrayList<Integer> thresholds_arr = new ArrayList<>();
-        ArrayList<Integer> n_primitives_arr = new ArrayList<>();
-        ArrayList<boolean[]> triggerPrimitives_arr = new ArrayList<>();
-        ArrayList<int[]> patchTriggerSlices_arr = new ArrayList<>();
+        ArrayList<Integer> thresholdsArray = new ArrayList<>();
+        ArrayList<Integer> nPrimitivesArray = new ArrayList<>();
+        ArrayList<boolean[]> triggerPrimitivesArray = new ArrayList<>();
+        ArrayList<int[]> patchTriggerSlicesArray = new ArrayList<>();
 
         public int[] getThresholds(){
-            return thresholds_arr.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
+            return thresholdsArray.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
         }
 
         public int[] getNumberOfPrimitives(){
-            return n_primitives_arr.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
+            return nPrimitivesArray.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
         }
 
         public boolean[][] getPrimitives(){
             boolean[][] primitives = new boolean[1][1];
-            return triggerPrimitives_arr.toArray(primitives);
+            return triggerPrimitivesArray.toArray(primitives);
         }
 
         public int[][] getTriggerSlices(){
             int[][] triggerSlices = new int[1][1];
-            return patchTriggerSlices_arr.toArray(triggerSlices);
+            return patchTriggerSlicesArray.toArray(triggerSlices);
         }
     }
 
