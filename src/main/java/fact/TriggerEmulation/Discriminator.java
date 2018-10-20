@@ -3,7 +3,12 @@ package fact.TriggerEmulation;
 import fact.Constants;
 
 /**
- *Class with functions to discriminate the signals of a given patch (or a bunch of them).
+ * Class that implements a software addaption of a discriminator in the sense of
+ * the device used on FACTs FTU (Trigger Unit) boards.
+ * (Source: Design and operation of FACT - the first G-APD Cherenkov telescope,
+ * DOI: 10.1088/1748-0221/8/06/P06008, P.20)
+ * The class contains functions to digitize the signals of a given patch (or a bunch of them)
+ * by comparing them to a given threshold.
  * Furhtermore it contains helper functions for the discrimination e.g. conversion between DAC and mV
  */
 public class Discriminator {
