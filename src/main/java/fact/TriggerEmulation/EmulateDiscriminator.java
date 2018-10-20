@@ -55,15 +55,11 @@ public class EmulateDiscriminator implements Processor{
             description = "number of slices to ignore at the end of the time series")
     public int skipLast = 40;
 
-
-    public int default_slice = Integer.MAX_VALUE;
-
     @Override
     public Data process(Data item) {
         double[][] data = (double[][]) item.get(key);
 
         int n_patches = Constants.N_PATCHES;
-        double millivoltPerDAC = Constants.MILLIVOLT_PER_DAC;
 
         if (thresholdKey != null){
             Utils.isKeyValid(item, thresholdKey, Integer.class);
