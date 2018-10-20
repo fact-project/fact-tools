@@ -32,7 +32,7 @@ public class Discriminator {
             int skipFirst,
             int skipLast
     ) {
-        int counter = 0;
+        int timeOverThreshold = 0;
         int patchTriggerSlice = default_slice;
 
         double thresholdInMilliVolt = dacToMillivolt(thresholdInDAC);
@@ -40,16 +40,16 @@ public class Discriminator {
         for (int slice = skipFirst; slice < data.length-skipLast; slice++) {
             double slice_amplitude = data[slice];
 
-            if (slice_amplitude >= thresholdInMillivolt){
-                if (counter == 0){
+            if (slice_amplitude >= thresholdInMilliVolt){
+                if (timeOverThreshold == 0){
                     patchTriggerSlice = slice;
                 }
-                counter++;
+                timeOverThreshold++;
             }
-            else if (slice_amplitude < thresholdInMillivolt){
-                counter = 0;
+            else if (slice_amplitude < thresholdInMilliVolt){
+                timeOverThreshold = 0;
             }
-            if (counter >= minTimeOverThreshold){
+            if (timeOverThreshold >= minTimeOverThreshold){
                 return patchTriggerSlice;
             }
         }
