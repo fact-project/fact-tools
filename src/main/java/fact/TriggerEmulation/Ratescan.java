@@ -188,7 +188,7 @@ public class Ratescan implements StatefulProcessor {
      * @param primitives
      * @return
      */
-    public int countPrimitives(boolean[] primitives){
+    public static int countPrimitives(boolean[] primitives){
         int counts = 0;
         for (boolean primitive: primitives) {
             if (primitive){
