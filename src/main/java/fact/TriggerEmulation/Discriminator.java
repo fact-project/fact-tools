@@ -65,7 +65,7 @@ public class Discriminator {
     /**
      * loop over pixels patch by patch and discriminate each patch
      * @param data array with dimensions [n_patches][number_of_slices]
-     * @param threshold threshold of the discriminator in DAC
+     * @param thresholdInDAC thresholdInDAC of the discriminator in DAC
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
@@ -73,7 +73,7 @@ public class Discriminator {
      */
     public static DiscriminatorOutput[] discriminatePatches(
             double[][] data,
-            int threshold,
+            int thresholdInDAC,
             int minTimeOverThreshold,
             int skipFirst,
             int skipLast)
@@ -85,7 +85,7 @@ public class Discriminator {
             results[patch] =
                     discriminatePatch(
                             data[patch],
-                            threshold,
+                            thresholdInDAC,
                             minTimeOverThreshold,
                             skipFirst,
                             skipLast
