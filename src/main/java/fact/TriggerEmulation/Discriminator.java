@@ -1,6 +1,11 @@
 package fact.TriggerEmulation;
 
+import com.google.common.primitives.Booleans;
 import fact.Constants;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Class that implements a software addaption of a discriminator in the sense of
@@ -121,5 +126,18 @@ public class Discriminator {
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * A simple class to hold the result of the discriminator
+     */
+    public static class DiscriminatorOutput implements Serializable {
+        public final int triggerSlice;
+        public final boolean triggerPrimitive;
+
+        public DiscriminatorOutput(int triggerSlice, boolean triggerPrimitive) {
+            this.triggerSlice = triggerSlice;
+            this.triggerPrimitive = triggerPrimitive;
+        }
     }
 }
