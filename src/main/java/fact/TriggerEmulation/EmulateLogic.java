@@ -135,7 +135,7 @@ public class EmulateLogic implements Processor {
     }
 
     /**
-     * Check if nOutOf40 triggerPrimitives where in the given time window
+     * Check if nOutOf40 triggerPrimitive where in the given time window
      * @param list
      * @return
      */
