@@ -30,7 +30,7 @@ public class Discriminator {
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
      */
-    public static int discriminatePatch(
+    public static DiscriminatorOutput discriminatePatch(
             double[] data,
             int thresholdInDAC,
             int minTimeOverThreshold,
@@ -55,36 +55,33 @@ public class Discriminator {
                 timeOverThreshold = 0;
             }
             if (timeOverThreshold >= minTimeOverThreshold){
-                return patchTriggerSlice;
+                return new DiscriminatorOutput(patchTriggerSlice, true);
             }
         }
-        return default_slice;
+        return new DiscriminatorOutput(patchTriggerSlice, false);
     }
 
     /**
      * loop over pixels patch by patch and discriminate each patch
      * @param data array with dimensions [n_patches][number_of_slices]
-     * @param patchTriggerSlice output array[n_patches][n_pixels_pe_patch] for triggered slices
      * @param threshold threshold of the discriminator in DAC
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
      * @return
      */
-    public static boolean[] discriminatePatches(
+    public static DiscriminatorOutput[] discriminatePatches(
             double[][] data,
-            int[] patchTriggerSlice,
             int threshold,
             int minTimeOverThreshold,
             int skipFirst,
             int skipLast)
     {
-        boolean[] triggerPrimitives = new boolean[data.length];
+
+        DiscriminatorOutput[] results = new DiscriminatorOutput[data.length];
 
         for (int patch = 0; patch < data.length; patch++) {
-            triggerPrimitives[patch] = false;
-
-            patchTriggerSlice[patch] =
+            results[patch] =
                     discriminatePatch(
                             data[patch],
                             threshold,
@@ -92,12 +89,8 @@ public class Discriminator {
                             skipFirst,
                             skipLast
                     );
-
-            if (patchTriggerSlice[patch] > default_slice){
-                triggerPrimitives[patch] = true;
-            }
         }
-        return triggerPrimitives;
+        return results;
     }
 
     /**

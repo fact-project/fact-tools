@@ -5,8 +5,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static fact.TriggerEmulation.Discriminator.discriminatePatches;
-import static fact.TriggerEmulation.Discriminator.millivoltToDAC;
+import static fact.TriggerEmulation.Discriminator.*;
 
 /**
  * Tests the discriminator functions
@@ -28,7 +27,7 @@ public class DiscriminatorTest {
         for (int i = 20; i < 30; i++) {
             data[i] = 300.;
         }
-        int estimated_slice = Discriminator.discriminatePatch(
+        DiscriminatorOutput discriminatorOutputs = Discriminator.discriminatePatch(
                 data,
                 millivoltToDAC(220),
                 8,
@@ -36,7 +35,7 @@ public class DiscriminatorTest {
                 50
         );
         int true_slice = 20;
-        Assert.assertTrue(estimated_slice == true_slice);
+        Assert.assertTrue(discriminatorOutputs.triggerSlice == true_slice);
 
     }
     @Test
@@ -50,11 +49,8 @@ public class DiscriminatorTest {
             data[1][i] = 300.;
         }
 
-        int[] patchTriggerSlice = new int[3];
-
-        boolean[] triggerPrimitives = discriminatePatches(
+        DiscriminatorOutput[] discriminatorOutputs = discriminatePatches(
                 data,
-                patchTriggerSlice,
                 millivoltToDAC(220),
                 8,
                 10,
@@ -63,8 +59,8 @@ public class DiscriminatorTest {
         int default_slice =  Discriminator.default_slice;
         boolean[] expectedPrimitives = {false, true, false};
         int[] expectedSlices = {default_slice, 20, default_slice};
-        Assert.assertArrayEquals(expectedPrimitives, triggerPrimitives);
-        Assert.assertArrayEquals(expectedSlices, patchTriggerSlice);
+        Assert.assertArrayEquals(expectedPrimitives, discriminatorOutputsToTriggerPrimitiveArray(discriminatorOutputs));
+        Assert.assertArrayEquals(expectedSlices, discriminatorOutputsToTriggerSliceArray(discriminatorOutputs));
 
     }
 }

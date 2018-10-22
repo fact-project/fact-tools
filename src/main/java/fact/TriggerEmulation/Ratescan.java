@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static fact.TriggerEmulation.Discriminator.discriminatePatches;
+import static fact.TriggerEmulation.Discriminator.discriminatorOutputsToTriggerPrimitiveArray;
+import static fact.TriggerEmulation.Discriminator.discriminatorOutputsToTriggerSliceArray;
 
 /**
  * Emulates a ratescan on summed patch time series.
@@ -128,16 +130,18 @@ public class Ratescan implements StatefulProcessor {
 
             ratescanResult.thresholdsArray.add(threshold);
 
-            int[] patchTriggerSlice = new int[n_patches];
-
-            boolean[] currentTriggerPrimitives = discriminatePatches(
+            Discriminator.DiscriminatorOutput[] discriminatorOutputs = discriminatePatches(
                     data,
-                    patchTriggerSlice,
                     threshold,
                     minTimeOverThreshold,
                     skipFirst,
                     skipLast
             );
+
+            int[] patchTriggerSlice = discriminatorOutputsToTriggerSliceArray(discriminatorOutputs);
+
+            boolean[] currentTriggerPrimitives = discriminatorOutputsToTriggerPrimitiveArray(discriminatorOutputs);
+
 
             nTiggeredPatches = countPrimitives(currentTriggerPrimitives);
 

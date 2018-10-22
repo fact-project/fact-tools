@@ -8,8 +8,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import static fact.TriggerEmulation.Discriminator.booleanToInt;
-import static fact.TriggerEmulation.Discriminator.discriminatePatches;
+import static fact.TriggerEmulation.Discriminator.*;
 
 /**
  * Emulate a discriminator that is working on the summed timeseries of the patches. Signals are digitized according to
@@ -67,16 +66,21 @@ public class EmulateDiscriminator implements Processor{
         }
 
 
-        int[] patchTriggerSlice = new int[n_patches];
 
-        boolean[] triggerPrimitives = discriminatePatches(
+
+        DiscriminatorOutput[] discriminatorOutputs = discriminatePatches(
                 data,
-                patchTriggerSlice,
                 threshold,
                 minTimeOverThreshold,
                 skipFirst,
                 skipLast
         );
+
+        int[] patchTriggerSlice = discriminatorOutputsToTriggerSliceArray(discriminatorOutputs);
+
+        boolean[] triggerPrimitives = discriminatorOutputsToTriggerPrimitiveArray(discriminatorOutputs);
+
+
 
         if (visualize){
             putAsDataArray(item, n_patches, triggerPrimitives, patchTriggerSlice);
@@ -89,7 +93,7 @@ public class EmulateDiscriminator implements Processor{
     }
 
     /**
-     * Convert triggerPrimitives and triggerSlice to arrays of length 1440 in order to visualize this in the viewer.
+     * Convert triggerPrimitive and triggerSlice to arrays of length 1440 in order to visualize this in the viewer.
      * Put the arrays
      * @param item
      * @param n_patches

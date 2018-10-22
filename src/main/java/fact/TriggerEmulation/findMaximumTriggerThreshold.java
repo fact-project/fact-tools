@@ -8,8 +8,7 @@ import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
 
-import static fact.TriggerEmulation.Discriminator.discriminatePatches;
-import static fact.TriggerEmulation.Discriminator.dacToMillivolt;
+import static fact.TriggerEmulation.Discriminator.*;
 import static fact.TriggerEmulation.EmulateLogic.hasTriggered;
 
 /**
@@ -81,15 +80,18 @@ public class findMaximumTriggerThreshold implements Processor {
 
         for (int threshold = minThreshold; threshold <= maxThreshold; threshold+=thresholdIncrement) {
 
-            int[] patchTriggerSlice = new int[n_patches];
-            boolean[] triggerPrimitives = discriminatePatches(
+            DiscriminatorOutput[] discriminatorOutputs = discriminatePatches(
                     data,
-                    patchTriggerSlice,
                     threshold,
                     minTimeOverThreshold,
                     skipFirst,
                     skipLast
             );
+
+            int[] patchTriggerSlice = discriminatorOutputsToTriggerSliceArray(discriminatorOutputs);
+
+            boolean[] triggerPrimitives = discriminatorOutputsToTriggerPrimitiveArray(discriminatorOutputs);
+
 
             boolean triggerDecision = hasTriggered(
                     triggerPrimitives,
