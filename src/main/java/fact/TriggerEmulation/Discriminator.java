@@ -128,6 +128,29 @@ public class Discriminator {
         return 0;
     }
 
+    /***
+     * Get the triggerSlice members from an array of DiscriminatorOutputs and return them as native int array
+     * @param discriminatorOutputs
+     * @return
+     */
+    public static int[] discriminatorOutputsToTriggerSliceArray(DiscriminatorOutput[] discriminatorOutputs) {
+        return Arrays.stream(discriminatorOutputs)
+                .mapToInt(p -> p.triggerSlice).toArray();
+    }
+
+    /***
+     * Get the triggerPrimitive members from an array of DiscriminatorOutputs and return them as native boolean array
+     * @param discriminatorOutputs
+     * @return
+     */
+    public static boolean[] discriminatorOutputsToTriggerPrimitiveArray(DiscriminatorOutput[] discriminatorOutputs) {
+
+        return Booleans.toArray(
+                Arrays.stream(discriminatorOutputs)
+                        .map(p -> p.triggerPrimitive).collect(Collectors.toList())
+        );
+    }
+
     /**
      * A simple class to hold the result of the discriminator
      */
