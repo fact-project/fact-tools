@@ -29,6 +29,7 @@ public class Discriminator {
      * @param minTimeOverThreshold minimum time (in unit slices) the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
+     * @return a DiscriminatorOutputObject
      */
     public static DiscriminatorOutput discriminatePatch(
             double[] data,
@@ -68,7 +69,7 @@ public class Discriminator {
      * @param minTimeOverThreshold minimum time the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
-     * @return
+     * @return array of DiscriminatorOutputObjects
      */
     public static DiscriminatorOutput[] discriminatePatches(
             double[][] data,
@@ -95,8 +96,8 @@ public class Discriminator {
 
     /**
      * Convert threshold in DAC units to millivolt units
-     * @param amplitude
-     * @return
+     * @param amplitude in DAC units
+     * @return amplitude in Millivolts
      */
     public static double dacToMillivolt(int amplitude) {
         return Constants.MILLIVOLT_PER_DAC*amplitude;
@@ -104,8 +105,8 @@ public class Discriminator {
 
     /**
      * Convert amplitude in DAC units to millivolt units
-     * @param amplitude
-     * @return
+     * @param amplitude in millivolt units
+     * @return amplitude in DAC units
      */
     public static int millivoltToDAC(double amplitude) {
         long res = Math.round(amplitude/Constants.MILLIVOLT_PER_DAC);
@@ -123,8 +124,8 @@ public class Discriminator {
 
     /***
      * Get the triggerSlice members from an array of DiscriminatorOutputs and return them as native int array
-     * @param discriminatorOutputs
-     * @return
+     * @param discriminatorOutputs array of DiscriminatorOutputs
+     * @return boolean array with trigger slices from DiscriminatorOutput objects
      */
     public static int[] discriminatorOutputsToTriggerSliceArray(DiscriminatorOutput[] discriminatorOutputs) {
         return Arrays.stream(discriminatorOutputs)
@@ -133,8 +134,8 @@ public class Discriminator {
 
     /***
      * Get the triggerPrimitive members from an array of DiscriminatorOutputs and return them as native boolean array
-     * @param discriminatorOutputs
-     * @return
+     * @param discriminatorOutputs array of DiscriminatorOutputs
+     * @return boolean array with trigger primitives from DiscriminatorOutput objects
      */
     public static boolean[] discriminatorOutputsToTriggerPrimitiveArray(DiscriminatorOutput[] discriminatorOutputs) {
 
