@@ -159,10 +159,10 @@ public class Ratescan implements StatefulProcessor {
      * Output container for the ratescan
      */
     public class RatescanResult {
-        ArrayList<Integer> thresholdsArray = new ArrayList<>();
-        ArrayList<Integer> nPrimitivesArray = new ArrayList<>();
-        ArrayList<boolean[]> triggerPrimitivesArray = new ArrayList<>();
-        ArrayList<int[]> patchTriggerSlicesArray = new ArrayList<>();
+        public final ArrayList<Integer> thresholdsArray = new ArrayList<>();
+        public final ArrayList<Integer> nPrimitivesArray = new ArrayList<>();
+        public final ArrayList<boolean[]> triggerPrimitivesArray = new ArrayList<>();
+        public final ArrayList<int[]> patchTriggerSlicesArray = new ArrayList<>();
 
         public int[] getThresholds(){
             return thresholdsArray.stream().filter(Objects::nonNull).mapToInt(j -> j).toArray();
