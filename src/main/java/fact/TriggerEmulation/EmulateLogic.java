@@ -125,13 +125,13 @@ public class EmulateLogic implements Processor {
 
     /**
      * sorted insert of int value into an int array
-     * @param x
-     * @param list
+     * @param valueToInsert
+     * @param integerArrayList int ArrayList
      */
-    public static void insertToArrayListSorted(int x, ArrayList<Integer> list) {
-        int pos = Collections.binarySearch(list, x);
+    public static void insertToArrayListSorted(int valueToInsert, ArrayList<Integer> integerArrayList) {
+        int pos = Collections.binarySearch(integerArrayList, valueToInsert);
         if (pos < 0) {
-            list.add(-pos-1, x);
+            integerArrayList.add(-pos-1, valueToInsert);
         } 
     }
 
