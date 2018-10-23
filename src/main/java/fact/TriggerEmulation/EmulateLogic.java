@@ -125,13 +125,13 @@ public class EmulateLogic implements Processor {
 
     /**
      * sorted insert of int value into an int array
-     * @param valueToInsert
-     * @param integerArrayList int ArrayList
+     * @param triggerSlicesToAdd
+     * @param triggerSlicesArrayList int ArrayList holding trigger times added so far
      */
-    public static void insertToArrayListSorted(int valueToInsert, ArrayList<Integer> integerArrayList) {
-        int pos = Collections.binarySearch(integerArrayList, valueToInsert);
+    public static void insertToArrayListSorted(int triggerSlicesToAdd, ArrayList<Integer> triggerSlicesArrayList) {
+        int pos = Collections.binarySearch(triggerSlicesArrayList, triggerSlicesToAdd);
         if (pos < 0) {
-            integerArrayList.add(-pos-1, valueToInsert);
+            triggerSlicesArrayList.add(-pos-1, triggerSlicesToAdd);
         } else {
             throw new ValueException("Found invalid position (pos>=0) to insert value in array ");
         }
