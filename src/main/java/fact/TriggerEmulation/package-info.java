@@ -2,6 +2,21 @@
  * @author Jens Buß, jens.buss@tu-dortmund.de
  * This package contains classes and processors to emulate the hardware trigger and trigger logic of FACT.
  *
+ * It supports the following features of the real hardware trigger:
+ *
+ * - Discrimator (digitization of the analog signals in a patch)
+ * - Conversion from DAC to millivolt forth and back
+ * - Trigger Logic emulation
+ *   - N-out-of-4 logic
+ *   - N-out-of-40 logic
+ *   - simple trigger coincidence for n == 1 in a n-out-of-4 and a n-out-of-40 logic
+ * - Ratescans (scanning the trigger thresholds of the patches)
+ *
+ * The following features are known to be NOT YET implemented:
+ *
+ * - Coincidence of trigger signals of a n-out-of-4 and a n-out-of-40 logic for n > 1
+ *      (It is not clear how this is realized in the hardware
+ *
  * <ul>
  * <li>{@link fact.TriggerEmulation.Discriminator} is a class with functions to
  * discriminate the signal of a given patch (or a bunch of them). Furthermore it contains helper funtions
