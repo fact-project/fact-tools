@@ -132,7 +132,9 @@ public class EmulateLogic implements Processor {
         int pos = Collections.binarySearch(integerArrayList, valueToInsert);
         if (pos < 0) {
             integerArrayList.add(-pos-1, valueToInsert);
-        } 
+        } else {
+            throw new ValueException("Found invalid position (pos>=0) to insert value in array ");
+        }
     }
 
     /**
