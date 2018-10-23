@@ -2,6 +2,7 @@ package fact.TriggerEmulation;
 
 import fact.Constants;
 import fact.Utils;
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
@@ -153,6 +154,9 @@ public class EmulateLogic implements Processor {
              *  how the real trigger is handling it. However, since is currently only operating with a 1-OutOf-4 FTU
              *  and a 1-OutOf40 FTM logic this case is never met.
             **/
+            if (nOutOf40 > 1) {
+                throw new ValueException("Currently only nOutOf40 <= 1 is implemented correctly for the coincidence check");
+            }
             int currTimeSpann = list.get(i+nOutOf40-1) - list.get(i);
             if (currTimeSpann < timeWindowSize){
                 return true;
