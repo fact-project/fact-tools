@@ -40,7 +40,7 @@
     />
     
     <fact.features.source.PixelSetForStarPosition
-            starPositionKeys="StarsInFOV"
+            starPositionsKey="StarsInFOV"
             starRadiusInCamera="11.0"
             outsetKey="starset"
     />
@@ -76,6 +76,8 @@
                         <!--specialDoubleValuesAsString="True"-->
                         <!--pixelSetsAsInt="True"-->
     <!--/>-->
+
+    <PrintData/>
 
   </process>
 </container>

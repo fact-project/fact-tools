@@ -14,7 +14,7 @@ import stream.annotations.Parameter;
 
 
 /**
- * generate a pixel set from the coordinates of stars in the camera given by the starPositionKeys
+ * generate a pixel set from the coordinates of stars in the camera given by the starPositionsKey
  * Created by jbuss on 30.08.18.
  */
 public class PixelSetForStarPosition implements Processor {
@@ -22,7 +22,7 @@ public class PixelSetForStarPosition implements Processor {
     static Logger log = LoggerFactory.getLogger(PixelSetForStarPosition.class);
 
     @Parameter(required = true)
-    public String starPositionKeys[] = null;
+    public String starPositionsKey = null;
 
     @Parameter(required = false)
     public String outsetKey;
@@ -43,27 +43,23 @@ public class PixelSetForStarPosition implements Processor {
     }
 
     /**
-     * generates the pixel set with star pixels to be excluded from the trigger
+     * generates the pixel set with star pixels to be put to the data item
      * @param item
      * @return pixelset
      */
     public PixelSet calculateStarPixelSet(Data item) {
         PixelSet starSet = new PixelSet();
 
-        if (starPositionKeys == null) {
+        if (starPositionsKey == null) {
             return starSet;
         }
 
-        for (String starPositionKey : starPositionKeys)
+        Utils.isKeyValid(item, starPositionsKey, CameraCoordinate[].class);
+        CameraCoordinate[] starsInFOV = (CameraCoordinate[]) item.get(starPositionsKey);
+
+        for (CameraCoordinate starInFOV : starsInFOV)
         {
-            if (!item.containsKey(starPositionKey)){
-                continue;
-            }
-
-            Utils.isKeyValid(item, starPositionKey, CameraCoordinate.class);
-            CameraCoordinate starPosition = (CameraCoordinate) item.get(starPositionKey);
-
-            CameraPixel starPixel = pixelMap.getPixelBelowCoordinatesInMM(starPosition.xMM, starPosition.yMM);
+            CameraPixel starPixel = pixelMap.getPixelBelowCoordinatesInMM(starInFOV.xMM, starInFOV.yMM);
 
             if (starPixel == null) {
                 log.debug("Star not in camera window");
@@ -72,7 +68,7 @@ public class PixelSetForStarPosition implements Processor {
             starSet.add(starPixel);
 
             for (CameraPixel px : pixelMap.getNeighborsForPixel(starPixel)) {
-                if (starPosition.euclideanDistance(px.coordinate) < starRadiusInCamera) {
+                if (starInFOV.euclideanDistance(px.coordinate) < starRadiusInCamera) {
                     starSet.add(px);
                 }
             }
