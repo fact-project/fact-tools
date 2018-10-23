@@ -131,16 +131,21 @@ public class EmulateLogic implements Processor {
         int pos = Collections.binarySearch(list, x);
         if (pos < 0) {
             list.add(-pos-1, x);
-        }
+        } 
     }
 
     /**
      * Check if nOutOf40 triggerPrimitive where in the given time window
      * @param list
+     * @param nOutOf40
+     * @param timeWindowSize
      * @return
      */
-    public static boolean areEnoughTriggersInOneTimeWindow(ArrayList<Integer> list,
-                                                           int nOutOf40, int timeWindowSize){
+    public static boolean areEnoughTriggersInOneTimeWindow(
+                                                  ArrayList<Integer> list,
+                                                  int nOutOf40, 
+                                                  int timeWindowSize
+                                                ) {
         for (int i = 0; i <= list.size() - nOutOf40; i++) {
             /**TODO: This does not distinguish between patches from the same FTU, so it may happen that nOutOf40 or more
              * FTUs reply a positive trigger and less than nOutOf40 are in the same time window, but in case enough FTUs
