@@ -148,9 +148,8 @@ public class EmulateLogic implements Processor {
                                                   int timeWindowSize
                                                 ) {
         for (int i = 0; i <= list.size() - nOutOf40; i++) {
-            /**TODO: This does not distinguish between patches from the same FTU, so it may happen that nOutOf40 or more
-             * FTUs reply a positive trigger and less than nOutOf40 are in the same time window, but in case enough FTUs
-             * have patches within right time window this would still lead to a positive overall trigger. I don'' know
+            /**TODO: The coincidence does not distinguish between patches from the same and different FTUs,
+             * so it may happen that pathces from the same FTU contribute to the coincidence. I don't know
              *  how the real trigger is handling it. However, since is currently only operating with a 1-OutOf-4 FTU
              *  and a 1-OutOf40 FTM logic this case is never met.
             **/
