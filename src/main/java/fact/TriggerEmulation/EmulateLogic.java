@@ -115,7 +115,7 @@ public class EmulateLogic implements Processor {
                 }
             }
             if (n_units >= nOutOf40){
-                if (areEnoughTriggersInOneTimeWindow(triggerTimes, nOutOf40, timeWindowSize)){
+                if (hasCoincidentTriggers(triggerTimes, nOutOf40, timeWindowSize)){
                     return true;
                 }
             }
@@ -136,13 +136,13 @@ public class EmulateLogic implements Processor {
     }
 
     /**
-     * Check if nOutOf40 triggerPrimitive where in the given time window
+     * Test for nOutOf40 coincident triggerPrimitives in the given time window
      * @param list
      * @param nOutOf40
      * @param timeWindowSize
      * @return
      */
-    public static boolean areEnoughTriggersInOneTimeWindow(
+    public static boolean hasCoincidentTriggers(
                                                   ArrayList<Integer> list,
                                                   int nOutOf40, 
                                                   int timeWindowSize
