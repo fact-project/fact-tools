@@ -82,14 +82,13 @@ public class Discriminator {
         DiscriminatorOutput[] results = new DiscriminatorOutput[data.length];
 
         for (int patch = 0; patch < data.length; patch++) {
-            results[patch] =
-                    discriminatePatch(
-                            data[patch],
-                            thresholdInDAC,
-                            minTimeOverThreshold,
-                            skipFirst,
-                            skipLast
-                    );
+            results[patch] = discriminatePatch(
+                                data[patch],
+                                thresholdInDAC,
+                                minTimeOverThreshold,
+                                skipFirst,
+                                skipLast
+                                );
         }
         return results;
     }
