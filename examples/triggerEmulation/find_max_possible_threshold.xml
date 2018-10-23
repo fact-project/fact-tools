@@ -39,7 +39,7 @@
       maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
     
-    <fact.features.source.PixelSetForSourcePosition
+    <fact.features.source.PixelSetForStarPosition
             starPositionKeys="StarsInFOV"
             starRadiusInCamera="11.0"
             outsetKey="starset"

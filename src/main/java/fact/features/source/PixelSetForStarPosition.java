@@ -1,7 +1,6 @@
 package fact.features.source;
 
 import fact.Constants;
-import fact.TriggerEmulation.SumUpPatches;
 import fact.Utils;
 import fact.container.PixelSet;
 import fact.coordinates.CameraCoordinate;
@@ -18,9 +17,9 @@ import stream.annotations.Parameter;
  * generate a pixel set from the coordinates of stars in the camera given by the starPositionKeys
  * Created by jbuss on 30.08.18.
  */
-public class PixelSetForSourcePosition implements Processor {
+public class PixelSetForStarPosition implements Processor {
 
-    static Logger log = LoggerFactory.getLogger(PixelSetForSourcePosition.class);
+    static Logger log = LoggerFactory.getLogger(PixelSetForStarPosition.class);
 
     @Parameter(required = true)
     public String starPositionKeys[] = null;
