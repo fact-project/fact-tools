@@ -265,7 +265,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
         table.addRow(row);
 
         Header header = new Header();
-        addFACTToolsData(header);
+        addFACTToolsMetaData(header);
         fillHeader(header, headerItem);
         table.fillHeader(header);
 
@@ -282,7 +282,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
 
     }
 
-    public void addFACTToolsData(Header header) throws FitsException{
+    public void addFACTToolsMetaData(Header header) throws FitsException{
         header.addValue(
                 "VERSION",
                 VersionInformation.getInstance().gitDescribe,
@@ -304,7 +304,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
 
         // We first have to write an empty header because a binary table cannot be the first hdu
         BasicHDU bhdu = BasicHDU.getDummyHDU();
-        addFACTToolsData(bhdu.getHeader());
+        addFACTToolsMetaData(bhdu.getHeader());
         bhdu.write(bf);
     }
 
