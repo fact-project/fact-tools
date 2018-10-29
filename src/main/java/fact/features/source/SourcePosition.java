@@ -136,7 +136,8 @@ public class SourcePosition implements StatefulProcessor {
 
         } else {
             // Assume observations
-            ZonedDateTime timeStamp = Utils.getTimeStamp(item, timeStampKey);
+            Utils.isKeyValid(item, timeStampKey, ZonedDateTime.class);
+            ZonedDateTime timeStamp = (ZonedDateTime) item.get(timeStampKey);
 
 
             // the source position is not updated very often. We have to get the point from the auxfile which
