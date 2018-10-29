@@ -83,7 +83,7 @@ public class FITS {
     public FITS(URL url) throws IOException {
         this.url = url;
         DataInputStream stream = getUnGzippedDataStream(url);
-        log.info("Reading file: "+url.toString());
+        log.debug("Reading file: {}", url);
         long absoluteHduOffsetInFile = 0;
 
         try {
