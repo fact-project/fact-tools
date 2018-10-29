@@ -265,14 +265,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
         table.addRow(row);
 
         Header header = new Header();
-        header.addValue(
-                "VERSION",
-                VersionInformation.getInstance().gitDescribe,
-                "The FACT-Tools Version used to write this file"
-        );
-        header.addValue("TELESCOP", "FACT", "");
-        header.addValue("ORIGIN", "FACT", "");
-        header.addValue("CREATOR", "FACT-Tools " + VersionInformation.getInstance().gitDescribe, "");
+        addFACTToolsMetaData(header);
         fillHeader(header, headerItem);
         table.fillHeader(header);
 
@@ -289,6 +282,19 @@ public class FITSWriter extends Writer implements StatefulProcessor {
 
     }
 
+    public void addFACTToolsMetaData(Header header) throws FitsException{
+        header.addValue(
+                "VERSION",
+                VersionInformation.getInstance().gitDescribe,
+                "The FACT-Tools Version used to write this file"
+        );
+        header.addValue("ORIGIN", "FACT", "");
+        header.addValue("TELESCOP", "FACT", "");
+        header.addValue("INSTRUME", "FACT", "");
+        header.addValue("PACKAGE", "FACT-Tools", "");
+        header.addValue("CREATOR", "FACT-Tools " + VersionInformation.getInstance().gitDescribe, "");
+    }
+
 
     @Override
     public void init(ProcessContext processContext) throws Exception {
@@ -298,11 +304,7 @@ public class FITSWriter extends Writer implements StatefulProcessor {
 
         // We first have to write an empty header because a binary table cannot be the first hdu
         BasicHDU bhdu = BasicHDU.getDummyHDU();
-        bhdu.getHeader().addValue(
-                "VERSION",
-                VersionInformation.getInstance().gitDescribe,
-                "The FACT-Tools Version used to write this file"
-        );
+        addFACTToolsMetaData(bhdu.getHeader());
         bhdu.write(bf);
     }
 
