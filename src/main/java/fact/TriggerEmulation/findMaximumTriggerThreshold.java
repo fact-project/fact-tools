@@ -19,7 +19,7 @@ import static fact.TriggerEmulation.EmulateLogic.hasTriggered;
 public class findMaximumTriggerThreshold implements Processor {
     static Logger log = LoggerFactory.getLogger(findMaximumTriggerThreshold.class);
 
-    @Parameter(required = true, description = "2D array of summed patches [doubl]")
+    @Parameter(required = true, description = "2D array of summed patches [double]")
     public String key;
 
     @Parameter(required = true, description = "maximum possible threshold for event to pass trigger decission")
