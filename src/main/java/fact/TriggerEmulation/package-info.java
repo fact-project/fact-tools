@@ -2,13 +2,18 @@
  * @author Jens Buß, jens.buss@tu-dortmund.de
  * This package contains classes and processors to emulate the hardware trigger 
  * and trigger logic of FACT.
+ * 
+ * Sources for the physics background:
+ * [S1] Design and operation of FACT - the first G-APD Cherenkov telescope
+ *      (DOI: 10.1088/1748-0221/8/06/P06008)
+ * [S2] P.Voglers PhD thesis (DOI: 10.3929/ETHZ-A-010568419)
  *
  * It supports the following features of the real hardware trigger:
  *
  * - Discrimator (digitization of the analog signals in a patch, by testing if
  *                the signal amplitude is above a given threshold for a given 
- *               tiem over threshold)
- * - Conversion from DAC (12 bit, 2.5V full range) to millivolt forth and back 
+ *               time over threshold of 4ns according to [S2])
+ * - Conversion from DAC (12 bit, 2.5V full range[S2]) to millivolt forth and back 
  * - Trigger Logic emulation
  *   - N-out-of-4 logic (by counting how many patches per FTU have a signal 
  *     above threshold)
