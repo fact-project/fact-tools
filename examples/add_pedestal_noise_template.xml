@@ -21,7 +21,7 @@
     <property name="OUTPUT_KEYS" value="${MC_KEYS},${LONS_KEYS}"/>
 
     <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-        <stream class="fact.io.hdureader.FITSStream" id="fact" />
+        <stream class="fact.io.CeresStream" id="fact" />
     </stream>
 
     <process id="1" input="fact">
