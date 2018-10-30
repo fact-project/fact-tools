@@ -1,21 +1,27 @@
 /**
  * @author Jens Buß, jens.buss@tu-dortmund.de
- * This package contains classes and processors to emulate the hardware trigger and trigger logic of FACT.
+ * This package contains classes and processors to emulate the hardware trigger 
+ * and trigger logic of FACT.
  *
  * It supports the following features of the real hardware trigger:
  *
- * - Discrimator (digitization of the analog signals in a patch)
- * - Conversion from DAC to millivolt forth and back
+ * - Discrimator (digitization of the analog signals in a patch, by testing if
+ *                the signal amplitude is above a given threshold for a given 
+ *               tiem over threshold)
+ * - Conversion from DAC (12 bit, 2.5V full range) to millivolt forth and back 
  * - Trigger Logic emulation
- *   - N-out-of-4 logic
- *   - N-out-of-40 logic
- *   - simple trigger coincidence for n == 1 in a n-out-of-4 and a n-out-of-40 logic
+ *   - N-out-of-4 logic (by counting how many patches per FTU have a signal 
+ *     above threshold)
+ *   - N-out-of-40 logic (by counting how many FTUs responded to have triggered)
+ *   - simple trigger coincidence for n == 1 in a n-out-of-4 and a n-out-of-40 
+ *     logic (by determining on a sorted list of trigger slices, n-out-of-40
+ *     have a trigger with the duration of a given time window)
  * - Ratescans (scanning the trigger thresholds of the patches)
  *
  * The following features are known to be NOT YET implemented:
  *
- * - Coincidence of trigger signals of a n-out-of-4 and a n-out-of-40 logic for n > 1
- *      (It is not clear how this is realized in the hardware
+ * - Coincidence of trigger signals of a n-out-of-4 and a n-out-of-40 logic 
+ *   for n > 1 (It is not clear how this is realized in the hardware)
  *
  * <ul>
  * <li>{@link fact.TriggerEmulation.Discriminator} is a class with functions to
@@ -34,6 +40,8 @@
  * <li>{@link fact.TriggerEmulation.SumUpPatches} lets you sum up the signals of each patch element wise and
  * returns an array of patchwise timeseries;
  * </ul>
+ *
+ *
  *
  *
  * <p>A typical process for a software trigger
