@@ -97,8 +97,7 @@ public class FITS {
                 h.header.get("EXTNAME").ifPresent(name -> {
                     hduNames.put(name, h);
                 });
-
-                ByteStreams.skipFully(stream, h.offsetToNextHDU());
+                skipFullyFast(stream, h.offsetToNextHDU());
             }
 
         } catch (EOFException e) {
@@ -106,6 +105,40 @@ public class FITS {
             stream.close();
 
             log.debug("A total of {} HDUs were found in the file.", hdus.size());
+        }
+    }
+
+    /**
+     * Tries to skip the given number of bytes. Throws an EOFException if not all bytes could be skipped.
+     * This is way faster than ByteStreams.skipFully in most cases. It might not be as robust.
+     *
+     * @param stream
+     * @param offset
+     * @throws IOException
+     */
+    private void skipFullyFast(DataInputStream stream, long offset) throws IOException {
+
+        if (offset > Integer.MAX_VALUE){
+            ByteStreams.skipFully(stream, offset);
+            return;
+        }
+
+        int n = 0;
+        int retry = 0;
+        int maxRetry = 5;
+        while(n < offset && retry < maxRetry){
+            n += stream.skipBytes((int) offset);
+            if (n == offset){
+                return;
+            }
+            retry += 1;
+            log.debug("Retry while skipping bytes: " + retry);
+        }
+        if (n < offset){
+            //file has probably ended sooner than expected.
+            log.debug("Couldn't skip all bytes in file. File might be broken.");
+            throw new EOFException("File ended too soon maybe");
+
         }
     }
 
