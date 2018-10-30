@@ -139,17 +139,17 @@ public class EmulateLogic implements Processor {
 
     /**
      * Test for nOutOf40 coincident triggerPrimitives in the given time window
-     * @param list
+     * @param triggerSlicesSorted
      * @param nOutOf40
      * @param timeWindowSize
      * @return
      */
     public static boolean hasCoincidentTriggers(
-                                                  ArrayList<Integer> list,
+                                                  ArrayList<Integer> triggerSlicesSorted,
                                                   int nOutOf40, 
                                                   int timeWindowSize
                                                 ) {
-        for (int i = 0; i <= list.size() - nOutOf40; i++) {
+        for (int i = 0; i <= triggerSlicesSorted.size() - nOutOf40; i++) {
             /**TODO: The coincidence does not distinguish between patches from the same and different FTUs,
              * so it may happen that pathces from the same FTU contribute to the coincidence. I don't know
              *  how the real trigger is handling it. However, since is currently only operating with a 1-OutOf-4 FTU
@@ -158,7 +158,7 @@ public class EmulateLogic implements Processor {
             if (nOutOf40 > 1) {
                 throw new ValueException("Currently only nOutOf40 <= 1 is implemented correctly for the coincidence check");
             }
-            int currTimeSpann = list.get(i+nOutOf40-1) - list.get(i);
+            int currTimeSpann = triggerSlicesSorted.get(i+nOutOf40-1) - triggerSlicesSorted.get(i);
             if (currTimeSpann < timeWindowSize){
                 return true;
             }
