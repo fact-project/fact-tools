@@ -44,6 +44,7 @@
             topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
             maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
         />
+
         <fact.datacorrection.InterpolateTimeSeries
                 calibService="calibService"
                 dataKey="DataCalibrated"
@@ -113,12 +114,7 @@
                 reverse="True"
         />
         
-        <stream.script.JavaScript>
-            function process(item){
-                item.put( "CREATOR", "Ceres_Pedestal" );
-                return item;
-            }
-        </stream.script.JavaScript>
+        <SetValue key="CREATOR" value="Ceres_Pedestal"/>
         
         <!--<fact.ShowViewer key="DataCalibrated" />-->
 
