@@ -22,11 +22,11 @@ public class Discriminator {
 
     /**
      *Compute the first occurence of a signal that is above a given {@code thresholdInDAC} and stays above it for
-     * a requested time ({@code minTimeOverThreshold}).
+     * a requested time ({@code minTimeOverThresholdInSlices}).
      *
      * @param data timeseries
      * @param thresholdInDAC thresholdInDAC of the discriminator in DAC
-     * @param minTimeOverThreshold minimum time (in unit slices) the signal has to stay above the threhold
+     * @param minTimeOverThresholdInSlices minimum time (in unit slices) the signal has to stay above the threhold
      * @param skipFirst number of slices to ignore at the beginning of the time series
      * @param skipLast number of slices to ignore at the end of the time series
      * @return a DiscriminatorOutputObject
@@ -34,7 +34,7 @@ public class Discriminator {
     public static DiscriminatorOutput discriminatePatch(
             double[] data,
             int thresholdInDAC,
-            int minTimeOverThreshold,
+            int minTimeOverThresholdInSlices,
             int skipFirst,
             int skipLast
     ) {
@@ -55,7 +55,7 @@ public class Discriminator {
             else if (slice_amplitude < thresholdInMilliVolt){
                 timeOverThreshold = 0;
             }
-            if (timeOverThreshold >= minTimeOverThreshold){
+            if (timeOverThreshold >= minTimeOverThresholdInSlices){
                 return new DiscriminatorOutput(patchTriggerSlice, true);
             }
         }
