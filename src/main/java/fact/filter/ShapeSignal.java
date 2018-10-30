@@ -1,11 +1,15 @@
 package fact.filter;
 
+import fact.Constants;
 import fact.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.Processor;
 import stream.annotations.Parameter;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /**
  * Created by jbuss on 07.10.14.
@@ -21,11 +25,18 @@ public class ShapeSignal implements Processor {
     @Parameter(required = true)
     public String outputKey;
 
-    @Parameter(required = true)
-    public int shift = 10;
+    @Parameter(required = true,
+            description = "shift of the inverted signal in units of time slices (.5 ns)")
+    public int shift = 20;
 
-    @Parameter
-    public double factor = 0.66;
+    @Parameter(required = false)
+    int skipLeft = 30;
+
+    @Parameter(required = false)
+    int skipRight = 40;
+
+    @Parameter(description = "damping factor of the inverted signal")
+    public double factor = 0.96;
 
 
     @Override
@@ -33,16 +44,27 @@ public class ShapeSignal implements Processor {
 
         Utils.isKeyValid(item, key, double[].class);
         double[] data = (double[]) item.get(key);
-        double[] shifted_data = new double[data.length];
         double[] result = new double[data.length];
 
+        int n_pixels = Constants.N_PIXELS;
+        int roi = data.length/1440;
 
-        for (int i = 0; i < data.length; i++) {
-            shifted_data[(i + shift) % data.length] = (-1) * factor * data[i];
-        }
+        for (int pix = 0; pix < n_pixels; pix++) {
+            double[] pixel_data = Arrays.copyOfRange(data, pix*roi+skipLeft, roi*(pix+1)-skipRight);
+            double[] shifted_data = new double[pixel_data.length];
 
-        for (int i = 0; i < data.length; i++) {
-            result[i] = data[i] + shifted_data[i];
+            int validRoi = roi - skipLeft - skipRight;
+
+            for (int i=0 ; i < pixel_data.length ; i++)
+            {
+                shifted_data[(i+shift) % validRoi] = (-1) * factor * pixel_data[ i ];
+            }
+
+            for (int i=0 ; i < pixel_data.length ; i++)
+            {
+                int sl = Utils.absPos(pix,i+skipLeft,roi);
+                result[sl] = data[sl] + shifted_data[i];
+            }
         }
 
         item.put(outputKey, result);
