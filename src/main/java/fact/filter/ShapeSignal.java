@@ -25,8 +25,9 @@ public class ShapeSignal implements Processor {
     @Parameter(required = true)
     public String outputKey;
 
-    @Parameter(required = true)
-    public int shift = 10;
+    @Parameter(required = true,
+            description = "shift of the inverted signal in units of time slices (.5 ns)")
+    public int shift = 20;
 
     @Parameter(required = false)
     int skipLeft = 30;
@@ -34,8 +35,8 @@ public class ShapeSignal implements Processor {
     @Parameter(required = false)
     int skipRight = 40;
 
-    @Parameter
-    public double factor = 0.66;
+    @Parameter(description = "damping factor of the inverted signal")
+    public double factor = 0.96;
 
 
     @Override
