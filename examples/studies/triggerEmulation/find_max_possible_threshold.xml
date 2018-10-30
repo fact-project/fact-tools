@@ -26,6 +26,11 @@
     <include url="classpath:/analysis/extraction.xml" />
     <include url="classpath:/analysis/cleaning.xml" />
 
+    <!--  According to P.Voglers PhD thesis (DOI: 10.3929/ETHZ-A-010568419) 
+          the trigger signal branch as signal losses of about 4% corresponding 
+          to a damping factor of 0.96. Furthermore the clipped signal is shifted 
+          by 10 ns which corresponds to 20 time slices 
+    -->
     <fact.filter.ShapeSignal
             key="DataCalibrated"
             outputKey="DataShaped"
