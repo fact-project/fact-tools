@@ -12,8 +12,8 @@
  *
  * - Discrimator (digitization of the analog signals in a patch, by testing if
  *                the signal amplitude is above a given threshold for a given 
- *               time over threshold of 4ns according to [S2])
- * - Conversion from DAC (12 bit, 2.5V full range[S2]) to millivolt forth and back 
+ *               time over threshold of 4ns according to [S2, P.136])
+ * - Conversion from DAC (12 bit, 2.5V full range[S2, P.136]) to millivolt forth and back 
  * - Trigger Logic emulation
  *   - N-out-of-4 logic (by counting how many patches per FTU have a signal 
  *     above threshold)
