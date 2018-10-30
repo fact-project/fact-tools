@@ -14,7 +14,7 @@ public class Constants {
      *  URL: https://www.research-collection.ethz.ch/handle/20.500.11850/108302,
      *  2015, P.56
      */
-    public static final double MILLIVOLT_PER_DAC = 610e-3; //source 1 (below)
+    public static final double MILLIVOLT_PER_DAC = 610e-3; //source 1 (above)
 }
 
 
