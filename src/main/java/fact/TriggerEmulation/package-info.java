@@ -25,6 +25,7 @@
  *
  * The following features are known to be NOT YET implemented:
  *
+ * - A lower bandwidth of the n-out-of-4 logic
  * - Coincidence of trigger signals of a n-out-of-4 and a n-out-of-40 logic 
  *   for n > 1 (It is not clear how this is realized in the hardware)
  *
