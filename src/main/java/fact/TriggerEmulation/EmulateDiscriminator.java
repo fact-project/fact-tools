@@ -13,6 +13,9 @@ import static fact.TriggerEmulation.Discriminator.*;
 /**
  * Emulate a discriminator that is working on the summed timeseries of the patches. Signals are digitized according to
  * the provided threshold and the minimum time a signal has to stay above it.
+ *
+ * According to P.Voglers PhD thesis (DOI: 10.3929/ETHZ-A-010568419) the time over threshold can be assumed
+ * as 4ns.
  * Created by jbuss on 15.11.17.
  */
 public class EmulateDiscriminator implements Processor{
