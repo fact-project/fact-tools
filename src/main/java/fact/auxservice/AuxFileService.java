@@ -123,7 +123,7 @@ public class AuxFileService implements AuxiliaryService {
         }
     }
 
-    private TreeSet<AuxPoint> readDataFromFile(AuxCache.CacheKey key) throws Exception {
+    private TreeSet<AuxPoint> readDataFromFile(AuxCache.CacheKey key) throws IOException {
         TreeSet<AuxPoint> result = new TreeSet<>();
 
         Path pathToFile = Paths.get(auxFolder.getPath(), key.path.toString());
@@ -139,6 +139,7 @@ public class AuxFileService implements AuxiliaryService {
 
             if (!pathToFile.toFile().canRead()) {
                 log.error("Could not load aux file in given directory {}", auxFolder);
+                throw new IOException("Could not load aux file in given directory " + auxFolder);
             }
         }
 
