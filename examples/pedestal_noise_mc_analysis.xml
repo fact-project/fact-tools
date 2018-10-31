@@ -24,8 +24,6 @@
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
 
-    <fact.features.UnixTimeUTC2DateTime inputKey="LONS_UnixTimeUTC" outputKey="LONS_timestamp" />
-
     <!--Cleaning-->
     <fact.features.source.SourcePosition
             outputKey="Cetatauri"
