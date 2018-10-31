@@ -16,9 +16,10 @@
     <property name="noiseBinning" value="2" />
 
     <property name="LONS_KEYS" value="LONS_NIGHT,LONS_RUNID,LONS_EventNum,LONS_UnixTimeUTC,LONS_Tries"/>
+    <property name="MC_HEADER_KEYS" value="MCorsikaRunHeader.*,RUNID,MMcRunHeader.*,MCorsikaRunHeader.*,MMcCorsikaRunHeader.*,MMcRunHeader.*,RUNTYPE"/>
     <property name="MC_KEYS" value="IncidentAngle.fVal,MCorsikaEvtHeader.fEvtNumber,MCorsikaEvtHeader.fNumReuse,MCorsikaEvtHeader.fTotalEnergy,MCorsikaEvtHeader.fStartAltitude,MCorsikaEvtHeader.fFirstTargetNum,CorsikaEvtHeader.fFirstInteractionHeight,MCorsikaEvtHeader.fMomentumX,MCorsikaEvtHeader.fMomentumY,MCorsikaEvtHeader.fMomentumZ,MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,MCorsikaEvtHeader.fX,MCorsikaEvtHeader.fY,MCorsikaEvtHeader.fWeightedNumPhotons,MMcEvt.fEvtNumber,MMcEvt.fThick0,MMcEvt.fFirstTarget,MMcEvt.fZFirstInteraction,MMcEvt.fCoreD,MMcEvt.fCoreX,MMcEvt.fCoreY,MMcEvt.fTimeFirst,MMcEvt.fTimeLast,MMcEvt.fLongiNmax,MMcEvt.fLongit0,MMcEvt.fLongitmax,MMcEvt.fLongia,MMcEvt.fLongib,MMcEvt.fLongic,MMcEvt.fLongichi2,MMcEvt.fPhotIni,MMcEvt.fPassPhotAtm,MMcEvt.fPassPhotRef,MMcEvt.fPassPhotCone,MMcEvt.fPhotElfromShower,MMcEvt.fPhotElinCamera,MMcEvt.fElecCphFraction,MMcEvt.fMuonCphFraction,MMcEvt.fOtherCphFraction,MMcEvt.fFadcTimeJitter,MMcEvt.fEventReuse,MMcEvtBasic.fEnergy,MMcEvtBasic.fImpact,MMcEvtBasic.fTelescopePhi,MMcEvtBasic.fTelescopeTheta,MMcEvtBasic.fTheta,MMcEvtBasic.fPhi,MPointingPos.fZd,MPointingPos.fAz,MPointingPos.fRa,MPointingPos.fHa,MPointingPos.fDec,MRawEvtData.fHiGainPixId,Data,StartCellData,TriggerType,MRawEvtData.fNumBytesPerSample,MRawEvtData.fIsSigned,EventNum,MRawEvtHeader.fNumTrigLvl1,MRawEvtHeader.fTrigPattern,MSimSourcePos.fZd,MSimSourcePos.fAz,MSimSourcePos.fRa,MSimSourcePos.fHa,MSimSourcePos.fDec,McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McMuonCherPhotNumber,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"/>
     
-    <property name="OUTPUT_KEYS" value="${MC_KEYS},${LONS_KEYS}"/>
+    <property name="OUTPUT_KEYS" value="${MC_HEADER_KEYS},${MC_KEYS},${LONS_KEYS}"/>
 
     <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
         <stream class="fact.io.CeresStream" id="fact" />
