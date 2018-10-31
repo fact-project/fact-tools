@@ -56,8 +56,8 @@ public class SamplePedestalEvent implements StatefulProcessor {
                                             "If multivalue: Each value is the length of a single step starting with zenith=0.")
     public String[] binning;
 
-    @Parameter(required = true, description = "The binning key of the double value from the noise database.")
-    public String dbBinningKey;
+    @Parameter(required = true, description = "The binning key of the double value from the noise database. e.g. key of the Zd value in the provided noise DB. A bin will be chosen according to the itemBinningKey")
+    private String dbBinningKey;
 
     @Parameter(required = true, description = "The binning key of the double value from the item.")
     public String itemBinningKey;
