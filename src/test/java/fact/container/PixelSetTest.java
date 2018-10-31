@@ -23,24 +23,45 @@ public class PixelSetTest {
 
         assertFalse(pixelSet.contains(pixel1));
         assertFalse(pixelSet.contains(pixel100));
-        assertFalse(pixelSet.containsID(pixel1.id));
-        assertFalse(pixelSet.containsID(pixel100.id));
+        assertFalse(pixelSet.containsCHID(pixel1.id));
+        assertFalse(pixelSet.containsCHID(pixel100.id));
 
         pixelSet.add(pixel1);
 
         assertTrue(pixelSet.contains(pixel1));
         assertFalse(pixelSet.contains(pixel100));
-        assertTrue(pixelSet.containsID(pixel1.id));
-        assertFalse(pixelSet.containsID(pixel100.id));
+        assertTrue(pixelSet.containsCHID(pixel1.id));
+        assertFalse(pixelSet.containsCHID(pixel100.id));
 
         pixelSet2.add(pixel1);
         pixelSet2.add(pixel100);
         assertFalse(pixelSet.containsAll(pixelSet2));
-        assertFalse(pixelSet.containsAllIDs(new int[]{1, 100}));
+        assertFalse(pixelSet.containsAllCHIDs(new int[]{1, 100}));
 
         pixelSet.add(pixel100);
         assertTrue(pixelSet.containsAll(pixelSet2));
-        assertTrue(pixelSet.containsAllIDs(new int[]{1, 100}));
+        assertTrue(pixelSet.containsAllCHIDs(new int[]{1, 100}));
+    }
+
+    @Test
+    public void testToBooleanArray() {
+
+        PixelSet pixelSet = new PixelSet();
+        pixelSet.addByCHID(2);
+        pixelSet.addByCHID(3);
+        pixelSet.addByCHID(5);
+        pixelSet.addByCHID(7);
+        pixelSet.addByCHID(511);
+
+        boolean[] mask = pixelSet.toBooleanArray();
+        assertTrue(mask[2]);
+        assertTrue(mask[3]);
+        assertTrue(mask[5]);
+        assertTrue(mask[7]);
+        assertTrue(mask[511]);
+        assertFalse(mask[510]);
+        assertFalse(mask[1]);
+        assertFalse(mask[0]);
     }
 
 }

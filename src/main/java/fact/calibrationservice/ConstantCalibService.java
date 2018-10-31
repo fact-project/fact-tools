@@ -1,7 +1,6 @@
 package fact.calibrationservice;
 
 import fact.container.PixelSet;
-import fact.hexmap.FactPixelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +59,13 @@ public class ConstantCalibService implements CalibrationService {
 
     boolean isInit = false;
 
-    public static final PixelSet deadPixels = PixelSet.fromIDs(new int[]{80, 873, 927});
-    public static final PixelSet crazyPixels = PixelSet.fromIDs(new int[]{297, 863, 868});
-    public static final PixelSet twinPixels = PixelSet.fromIDs(new int[]{527, 528, 721, 722, 1093, 1094});
+    public static final PixelSet deadPixels = PixelSet.fromCHIDs(new int[]{80, 873, 927});
+    public static final PixelSet crazyPixels = PixelSet.fromCHIDs(new int[]{297, 863, 868});
+    public static final PixelSet twinPixels = PixelSet.fromCHIDs(new int[]{527, 528, 721, 722, 1093, 1094});
 
-    public static final PixelSet brokenDrsBoard20142015 = PixelSet.fromIDs(new int[]{720, 721, 722, 723, 724, 725, 726, 727, 728});
-    public static final PixelSet biasPatch38 = PixelSet.fromIDs(new int[] {171, 172, 173, 174});
-    public static final PixelSet biasPatch272 = PixelSet.fromIDs(new int[] {1296, 1297, 1298, 1299});
+    public static final PixelSet brokenDrsBoard20142015 = PixelSet.fromCHIDs(new int[]{720, 721, 722, 723, 724, 725, 726, 727, 728});
+    public static final PixelSet biasPatch38 = PixelSet.fromCHIDs(new int[] {171, 172, 173, 174});
+    public static final PixelSet biasPatch272 = PixelSet.fromCHIDs(new int[] {1296, 1297, 1298, 1299});
 
     public void init() {
         set = new TreeSet<>();
@@ -88,14 +87,14 @@ public class ConstantCalibService implements CalibrationService {
         //  in the night of 2015-01-08, two pixels were broken additionally (729 & 750)
         HardwareConfiguration config20150108 = new HardwareConfiguration(ZonedDateTime.of(2015, 1, 8, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150108.badPixels.addAll(badPixelsFromBeginning);
-        config20150108.badPixels.addById(729);
-        config20150108.badPixels.addById(750);
+        config20150108.badPixels.addByCHID(729);
+        config20150108.badPixels.addByCHID(750);
         config20150108.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         // On 2015-01-09, pixel 729 recovered
         HardwareConfiguration config20150109 = new HardwareConfiguration(ZonedDateTime.of(2015, 1, 9, 12, 0, 0, 0, ZoneOffset.UTC));
         config20150109.badPixels.addAll(badPixelsFromBeginning);
-        config20150109.badPixels.addById(750);
+        config20150109.badPixels.addByCHID(750);
         config20150109.notUsablePixels.addAll(brokenDrsBoard20142015);
 
         // On 2015-01-31, pixel 750 recovered

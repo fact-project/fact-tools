@@ -108,8 +108,8 @@ public class GaussianFit implements StatefulProcessor {
         FactPixelMapping mapping = FactPixelMapping.getInstance();
 
         for (int pix = 0; pix < npix; pix++) {
-            pixelX[pix] = mapping.getPixelFromId(pix).getXPositionInMM();
-            pixelY[pix] = mapping.getPixelFromId(pix).getYPositionInMM();
+            pixelX[pix] = mapping.getPixelFromId(pix).coordinate.xMM;
+            pixelY[pix] = mapping.getPixelFromId(pix).coordinate.yMM;
         }
     }
 

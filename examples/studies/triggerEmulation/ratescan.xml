@@ -1,0 +1,90 @@
+<container>
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="classpath:/testDataFile.fits.gz" />
+  <property name="drsfile" value="classpath:/testDrsFile.drs.fits.gz" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
+
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+  <property name="output" value="file:testTrigger.json.gz" />
+
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.gainservice.GainService" />
+
+  <property name="RatescanFeatures" value="ratescan_trigger_*"/>
+
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
+
+  <process id="2" input="fact">
+    <include url="classpath:/analysis/init.xml" />
+    <!-- This skips events created by our malfunctioning LED light pulser (27s Events) -->
+    <Skip condition="%{data.saturated_slices_percentage} &gt; 0.2" />
+    <!-- Only analyze physics trigger events -->
+    <Skip condition="%{data.TriggerType} != 4" />
+
+    <include url="classpath:/analysis/calibration.xml" />
+    <include url="classpath:/analysis/extraction.xml" />
+    <include url="classpath:/analysis/cleaning.xml" />
+    <include url="classpath:/analysis/pedestalParameters.xml" />
+
+    <!--  According to P.Voglers PhD thesis (DOI: 10.3929/ETHZ-A-010568419) 
+          the trigger signal branch as signal losses of about 4% corresponding 
+          to a damping factor of 0.96. Furthermore the clipped signal is shifted 
+          by 10 ns which corresponds to 20 time slices 
+    -->
+    <fact.filter.ShapeSignal
+            key="DataCalibrated"
+            outputKey="DataShaped"
+            shift="20"
+            factor="0.96"
+    />
+
+    <fact.starservice.StarsInFOV
+      outputKey="StarsInFOV"
+      auxService="auxService"
+      maxMagnitude="${StarsInFOV.maxMagnitude}"
+    />
+
+    <fact.features.source.PixelSetForStarPosition
+            starPositionsKey="StarsInFOV"
+            starRadiusInCamera="11.0"
+            outsetKey="starset"
+    />
+
+    <fact.pixelsets.Invert
+            insetKey="badPixels"
+            outsetKey="goodPixels"
+    />
+
+    <fact.pixelsets.Union
+            setAKey="badPixels"
+            setBKey="starset"
+            outsetKey="triggerPixelsExcluded"
+    />
+
+    <fact.TriggerEmulation.SumUpPatches
+            key="DataShaped"
+            outKey="SummedPatches"
+            pixelSetExcludeKey="triggerPixelsExcluded"
+    />
+
+    <fact.TriggerEmulation.Ratescan
+            key="SummedPatches"
+    />
+
+    <fact.utils.SanitizeKeys />
+
+    <!--<PrintData/>-->
+
+    <!--<fact.io.JSONWriter keys="${event_metadata_common},${event_metadata_observations},${RatescanFeatures},${pointing},${pointing},${pedestals}"-->
+                        <!--url="${output}"-->
+                        <!--writeListOfItems="True"-->
+                        <!--pixelSetsAsInt="True"-->
+                        <!--jsonl="True"-->
+                        <!--gzip="True"-->
+    <!--/>-->
+
+  </process>
+</container>

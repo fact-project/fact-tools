@@ -76,8 +76,8 @@ public class HillasParameters implements Processor {
         double[] weights = (double[])  item.get(weightsKey);
 
         double[] showerWeights = showerPixel.stream().mapToDouble((p) -> weights[p.id]).toArray();
-        double[] pixelX = showerPixel.stream().mapToDouble((p) -> p.getXPositionInMM()).toArray();
-        double[] pixelY = showerPixel.stream().mapToDouble((p) -> p.getYPositionInMM()).toArray();
+        double[] pixelX = showerPixel.stream().mapToDouble(p -> p.coordinate.xMM).toArray();
+        double[] pixelY = showerPixel.stream().mapToDouble(p -> p.coordinate.yMM).toArray();
 
         Weighted2dStatistics stats2d = Weighted2dStatistics.ofArrays(pixelX, pixelY, showerWeights);
         double size = stats2d.weightsSum;

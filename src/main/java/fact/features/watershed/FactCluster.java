@@ -91,9 +91,9 @@ public class FactCluster {
 
         for (int i = 0; i < contentPixel.size(); i++) {
             cogX += contentPixelPhotoncharge.get(i)
-                    * mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM();
+                    * mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM;
             cogY += contentPixelPhotoncharge.get(i)
-                    * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM();
+                    * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM;
             size += contentPixelPhotoncharge.get(i);
 
         }
@@ -126,8 +126,8 @@ public class FactCluster {
 
         for (int i = 0; i < getNumPixel(); i++) {
             sumX2 = sumX2 + (contentPixelPhotoncharge.get(i) + 10) *
-                    mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM() * mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM();
-            sumX = sumX + (contentPixelPhotoncharge.get(i) + 10) * mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM();
+                    mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM * mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM;
+            sumX = sumX + (contentPixelPhotoncharge.get(i) + 10) * mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM;
             sumD = sumD + (contentPixelPhotoncharge.get(i) + 10);
         }
 
@@ -141,8 +141,8 @@ public class FactCluster {
 
         for (int i = 0; i < getNumPixel(); i++) {
             sumD = sumD + (contentPixelPhotoncharge.get(i) + 10);
-            sumY2 = sumY2 + (contentPixelPhotoncharge.get(i) + 10) * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM() * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM();
-            sumY = sumY + (contentPixelPhotoncharge.get(i) + 10) * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM();
+            sumY2 = sumY2 + (contentPixelPhotoncharge.get(i) + 10) * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM;
+            sumY = sumY + (contentPixelPhotoncharge.get(i) + 10) * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM;
 
         }
 
@@ -156,8 +156,8 @@ public class FactCluster {
 
         for (int i = 0; i < getNumPixel(); i++) {
             sumX2 = sumX2 + (contentPixelArrivaltime.get(i)) *
-                    mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM() * mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM();
-            sumX = sumX + (contentPixelArrivaltime.get(i)) * mapping.getPixelFromId(contentPixel.get(i)).getXPositionInMM();
+                    mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM * mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM;
+            sumX = sumX + (contentPixelArrivaltime.get(i)) * mapping.getPixelFromId(contentPixel.get(i)).coordinate.xMM;
             sumD = sumD + (contentPixelArrivaltime.get(i));
         }
 
@@ -171,8 +171,8 @@ public class FactCluster {
 
         for (int i = 0; i < getNumPixel(); i++) {
             sumD = sumD + (contentPixelArrivaltime.get(i));
-            sumY2 = sumY2 + (contentPixelArrivaltime.get(i)) * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM() * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM();
-            sumY = sumY + (contentPixelArrivaltime.get(i)) * mapping.getPixelFromId(contentPixel.get(i)).getYPositionInMM();
+            sumY2 = sumY2 + (contentPixelArrivaltime.get(i)) * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM;
+            sumY = sumY + (contentPixelArrivaltime.get(i)) * mapping.getPixelFromId(contentPixel.get(i)).coordinate.yMM;
 
         }
 
@@ -203,8 +203,8 @@ public class FactCluster {
     //calculates the distance between the center of gravity (weighted by photon charge) an the center of the camera
     public double distanceCamCenter() {
         int cog = cogId();
-        double cogX = mapping.getPixelFromId(cog).getXPositionInMM();
-        double cogY = mapping.getPixelFromId(cog).getYPositionInMM();
+        double cogX = mapping.getPixelFromId(cog).coordinate.xMM;
+        double cogY = mapping.getPixelFromId(cog).coordinate.yMM;
 
         return Math.sqrt(cogX * cogX + cogY * cogY);
 
@@ -212,8 +212,8 @@ public class FactCluster {
 
     public double distanceCog(double showerCogX, double showerCogY) {
         int cog = cogId();
-        double clusterCogX = mapping.getPixelFromId(cog).getXPositionInMM();
-        double clusterCogY = mapping.getPixelFromId(cog).getYPositionInMM();
+        double clusterCogX = mapping.getPixelFromId(cog).coordinate.xMM;
+        double clusterCogY = mapping.getPixelFromId(cog).coordinate.yMM;
 
         double absX = Math.abs(clusterCogX - showerCogX);
         double absY = Math.abs(clusterCogY - showerCogY);
@@ -224,8 +224,8 @@ public class FactCluster {
 
     public double distanceSource(double sourceX, double sourceY) {
         int cog = cogId();
-        double clusterCogX = mapping.getPixelFromId(cog).getXPositionInMM();
-        double clusterCogY = mapping.getPixelFromId(cog).getYPositionInMM();
+        double clusterCogX = mapping.getPixelFromId(cog).coordinate.xMM;
+        double clusterCogY = mapping.getPixelFromId(cog).coordinate.yMM;
 
         double absX = Math.abs(clusterCogX - sourceX);
         double absY = Math.abs(clusterCogY - sourceY);

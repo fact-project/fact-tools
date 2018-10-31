@@ -13,6 +13,9 @@
 
   <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
 
+  <!-- Show more stars in viewer -->
+  <property name="StarsInFOV.maxMagnitude" value="6.0" />
+
   <!-- Description of the process and the corresponding stream -->
   <process id="2" input="fact">
     <include url="classpath:/analysis/init.xml" />

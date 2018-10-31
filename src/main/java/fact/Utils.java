@@ -65,7 +65,7 @@ public class Utils {
         } else {
             Utils.isKeyValid(item, pixelSetKey, PixelSet.class);
             PixelSet pixelSet = (PixelSet) item.get(pixelSetKey);
-            pixels = pixelSet.toIntArray();
+            pixels = pixelSet.toCHIDArray();
         }
 
         return pixels;
@@ -131,7 +131,7 @@ public class Utils {
                         }
                     }
                 }
-                clusters.add(PixelSet.fromIDs(q.stream().mapToInt(p -> p.id).toArray()));
+                clusters.add(PixelSet.fromCHIDs(q.stream().mapToInt(p -> p.id).toArray()));
             }
         }
         return clusters;

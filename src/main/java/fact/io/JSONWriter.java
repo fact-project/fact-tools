@@ -250,7 +250,7 @@ public class JSONWriter extends Writer implements StatefulProcessor {
                 jsonWriter.nullValue();
             } else {
                 jsonWriter.beginArray();
-                for (int chid : pixelSet.toIntArray()) {
+                for (int chid : pixelSet.toCHIDArray()) {
                     jsonWriter.value(chid);
                 }
                 jsonWriter.endArray();
