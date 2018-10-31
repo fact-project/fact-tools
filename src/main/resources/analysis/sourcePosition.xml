@@ -1,5 +1,5 @@
 <module>
-  <If condition="%{data.CREATOR}=='Ceres'">
+  <If condition="%{data.CREATOR}=='Ceres' or %{data.CREATOR}=='Ceres_Pedestal'">
     <fact.features.source.SourcePosition
       outputKey="source_position"
       pointingZdKey="MPointingPos.fZd"
@@ -8,7 +8,7 @@
       sourceAzKey="MSimSourcePos.fAz"
     />
   </If>
-  <If condition="%{data.CREATOR}!='Ceres'">
+  <If condition="%{data.CREATOR}!='Ceres' and %{data.CREATOR}!='Ceres_Pedestal'">
     <fact.features.source.SourcePosition
         outputKey="source_position"
         auxService="auxService"
