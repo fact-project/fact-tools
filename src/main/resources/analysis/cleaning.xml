@@ -1,9 +1,17 @@
 <module>
-  <If condition="%{data.CREATOR} != 'Ceres'">
+  <If condition="%{data.CREATOR} != 'Ceres' and %{data.CREATOR} != 'Ceres_Pedestal'">
     <fact.starservice.StarsInFOV
       outputKey="StarsInFOV"
       auxService="auxService"
       maxMagnitude="${StarsInFOV.maxMagnitude}"
+    />
+  </If>
+  <If condition="%{data.CREATOR} == 'Ceres_Pedestal'">
+    <fact.starservice.StarsInFOV
+            outputKey="StarsInFOV"
+            auxService="auxService"
+            timestampKey="LONS_timestamp"
+            maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
   </If>
   <fact.cleaning.TwoLevelTimeNeighbor
