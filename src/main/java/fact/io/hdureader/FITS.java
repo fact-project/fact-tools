@@ -46,7 +46,7 @@ public class FITS {
 
     private Map<String, HDU> hduNames = new HashMap<>();
 
-    //stores the primary HDU for convinience access from the outside.
+    // stores the primary HDU for convenience access from the outside.
     public HDU primaryHDU;
 
     /**
@@ -98,8 +98,7 @@ public class FITS {
                 h.header.get("EXTNAME").ifPresent(name -> {
                     hduNames.put(name, h);
                 });
-
-                ByteStreams.skipFully(stream, h.offsetToNextHDU());
+                skipFullyFast(stream, h.offsetToNextHDU());
             }
 
         } catch (EOFException e) {
@@ -107,6 +106,40 @@ public class FITS {
             stream.close();
 
             log.debug("A total of {} HDUs were found in the file.", hdus.size());
+        }
+    }
+
+    /**
+     * Tries to skip the given number of bytes. Throws an EOFException if not all bytes could be skipped.
+     * This is way faster than ByteStreams.skipFully in most cases. It might not be as robust.
+     *
+     * @param stream
+     * @param offset
+     * @throws IOException
+     */
+    private void skipFullyFast(DataInputStream stream, long offset) throws IOException {
+
+        if (offset > Integer.MAX_VALUE){
+            ByteStreams.skipFully(stream, offset);
+            return;
+        }
+
+        int n = 0;
+        int retry = 0;
+        int maxRetry = 5;
+        while(n < offset && retry < maxRetry){
+            n += stream.skipBytes((int) offset);
+            if (n == offset){
+                return;
+            }
+            retry += 1;
+            log.debug("Retry while skipping bytes: " + retry);
+        }
+        if (n < offset){
+            //file has probably ended sooner than expected.
+            log.debug("Couldn't skip all bytes in file. File might be broken.");
+            throw new EOFException("File ended too soon maybe");
+
         }
     }
 
@@ -146,7 +179,7 @@ public class FITS {
     }
 
     /**
-     * Each extension has a keyword called EXTNAME. This method returns the extension with the given name if it exists.
+     * Extensions may have keyword called EXTNAME. This method returns the extension with the given name if it exists.
      *
      * @param extname the HDU to get.
      * @return the HDU with the passed EXTNAME value
@@ -155,14 +188,38 @@ public class FITS {
         return Optional.ofNullable(hduNames.get(extname));
     }
 
+    /**
+     * This method returns the HDU at given index if it exists.
+     *
+     * @param hduIndex the HDU to get.
+     * @return the HDU at the given index
+     */
+    public Optional<HDU> getHDU(int hduIndex) {
+        try {
+            return Optional.of(hdus.get(hduIndex));
+        } catch (IndexOutOfBoundsException  e) {
+            return Optional.empty();
+        }
+    }
+
 
     /**
-     * Get the a mapping of HDU names to all HDU objects in the file.
+     * Get the a mapping of HDU names to all named HDU objects in the file.
      *
      * @return a map of names to HDUs
      */
-    public Map<String, HDU> getHDUs() {
+    public Map<String, HDU> getNamedHDUs() {
         return hduNames;
+    }
+
+
+    /**
+     * Get a list of all HDUs in the fits file.
+     *
+     * @return a map of names to HDUs
+     */
+    public List<HDU> getHDUs() {
+        return hdus;
     }
 
     /**

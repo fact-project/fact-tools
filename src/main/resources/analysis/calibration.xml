@@ -1,5 +1,5 @@
 <module>
-  <If condition="%{data.CREATOR}=='Ceres'">
+  <If condition="%{data.CREATOR}=='Ceres' or %{data.CREATOR}=='Ceres_Pedestal'">
     <fact.utils.Remapping
         key="Data" 
         outputKey="Data"
@@ -8,12 +8,13 @@
         keys="McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"
     />
   </If>
+
   <fact.datacorrection.DrsCalibration
       url="${drsfile}"
       key="Data"
       outputKey="DataCalibrated"
   />  
-  <If condition="%{data.CREATOR}!='Ceres'">
+  <If condition="%{data.CREATOR}!='Ceres' and %{data.CREATOR}!='Ceres_Pedestal'">
     <fact.datacorrection.PatchJumpRemoval
         dataKey="DataCalibrated"
         outputKey="DataCalibrated"

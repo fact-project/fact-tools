@@ -117,7 +117,7 @@ public class FactHexMapDisplay extends JPanel implements SliceObserver, MouseLis
         tiles = new FactHexTile[pixelMapping.getNumberOfPixel()];
         for (int i = 0; i < tiles.length; i++) {
             CameraPixel pixel = pixelMapping.getPixelFromId(i);
-            Point center = cameraCoordinateToPixels(pixel.getXPositionInMM(), pixel.getYPositionInMM());
+            Point center = cameraCoordinateToPixels(pixel.coordinate.xMM, pixel.coordinate.yMM);
             FactHexTile t = new FactHexTile(center, pixel, radius);
             tiles[i] = t;
         }

@@ -11,7 +11,7 @@ public class LeakageTest {
     @Test
     public void borderPixelFunction() {
         int[] pixelIds = {70, 16, 944, 768, 686, 433, 1196};
-        PixelSet pixelSet = PixelSet.fromIDs(pixelIds);
+        PixelSet pixelSet = PixelSet.fromCHIDs(pixelIds);
         Leakage l = new Leakage();
         for (CameraPixel pixel : pixelSet) {
             assertTrue("Pixel with chid " + pixel.id + " should be recognized as a borderpixel.",

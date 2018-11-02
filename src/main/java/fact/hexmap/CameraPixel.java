@@ -1,6 +1,7 @@
 package fact.hexmap;
 
 import fact.Constants;
+import fact.coordinates.CameraCoordinate;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -11,79 +12,35 @@ import java.util.Arrays;
 public class CameraPixel implements Serializable {
     private static final long serialVersionUID = 7526472295622776147L;
 
-    public int id;
-    public int geometricX;
-    public int geometricY;
+    public final int id;
+    public final int geometricX;
+    public final int geometricY;
 
-    public int chid;
-    public int board;
-    public int softid;
-    public int crate;
-    public int patch;
-    public int hardid;
-    public int drs_chip;
-
-    public double width = 1;
-    public double length = 1;
+    public final int chid;
+    public final int board;
+    public final int softid;
+    public final int crate;
+    public final int patch;
+    public final int hardid;
+    public final int drs_chip;
+    public final CameraCoordinate coordinate;
 
     @Override
     public String toString() {
         return "ID: " + this.id;
     }
 
-    public double posX;
-    public double posY;
-
-    /**
-     * This sets the chid of this pixel.
-     *
-     * @param chid
-     */
-    public void setId(int chid) {
-        this.id = chid;
-    }
-
-    public void setHardID(int hardID) {
+    public CameraPixel(int softID, int hardID, double posX, double posY, int geometricX, int geometricY){
         this.hardid = hardID;
-        this.crate = hardid / 1000;
-        this.board = (hardid / 100) % 10;
-        this.patch = (hardid / 10) % 10;
-        this.chid = (hardid % 10) + 9 * patch + 36 * board + 360 * crate;
+        this.softid = softID;
+        this.crate = hardID / 1000;
+        this.board = (hardID / 100) % 10;
+        this.patch = (hardID / 10) % 10;
+        this.chid = (hardID % 10) + 9 * patch + 36 * board + 360 * crate;
         this.drs_chip = this.chid / 9;
         this.id = this.chid;
+        this.geometricX = geometricX;
+        this.geometricY = geometricY;
+        this.coordinate = new CameraCoordinate(posX * Constants.PIXEL_SIZE_MM, posY * Constants.PIXEL_SIZE_MM);
     }
-
-    public void setSoftID(int softID) {
-        this.softid = softID;
-    }
-
-    public double getXPositionInMM() {
-        return posX * Constants.PIXEL_SIZE_MM;
-    }
-
-    public double getYPositionInMM() {
-        return posY * Constants.PIXEL_SIZE_MM;
-    }
-
-    public double getXPositionInPixelUnits() {
-        return posX;
-    }
-
-    public double getYPositionInPixelUnits() {
-        return posY;
-    }
-
-    /**
-     * This function returns the data contained in this pixel from the big data array containing the data for all pixels
-     *
-     * @param data the array containing the data for all pixels
-     * @param roi  the region of interest in the data. Usually 300 slices or 1024
-     * @return the data for this pixel
-     */
-    public double[] getPixelData(double[] data, int roi) {
-        double[] pixelData = Arrays.copyOfRange(data, id * roi, id * roi + roi);
-        return pixelData;
-    }
-
-
 }

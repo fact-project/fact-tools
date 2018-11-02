@@ -63,9 +63,7 @@ public class ConcentrationAtCenterOfGravity implements Processor {
 
         // search for the two nearest neighbors
         for (CameraPixel pix : neighbors) {
-            double x = pix.getXPositionInMM();
-            double y = pix.getYPositionInMM();
-            double dist = (cog.xMM - x) * (cog.xMM - x) + (cog.yMM - y) * (cog.yMM - y);
+            double dist = cog.euclideanDistance(pix.coordinate);
 
             if (dist < mindist1) {
                 mindist2 = mindist1;

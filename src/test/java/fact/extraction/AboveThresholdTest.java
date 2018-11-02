@@ -50,9 +50,9 @@ public class AboveThresholdTest {
         short[] raw_fact_data = new short[Constants.N_PIXELS * 300];
 
         PixelSet testPixels = new PixelSet();
-        testPixels.addById(42);
-        testPixels.addById(314);
-        testPixels.addById(1337);
+        testPixels.addByCHID(42);
+        testPixels.addByCHID(314);
+        testPixels.addByCHID(1337);
 
         for (int pix = 0; pix < Constants.N_PIXELS; pix++) {
             for (int slice = 0; slice < 300; slice++) {

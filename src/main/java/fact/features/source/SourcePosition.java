@@ -98,7 +98,7 @@ public class SourcePosition implements StatefulProcessor {
      */
     @Override
     public Data process(Data item) {
-        EquatorialCoordinate sourceEquatorial;
+        EquatorialCoordinate sourceEquatorial = null;
         HorizontalCoordinate sourceHorizontal;
         CameraCoordinate sourceCamera;
 
@@ -171,13 +171,13 @@ public class SourcePosition implements StatefulProcessor {
             sourceHorizontal = sourceEquatorial.toHorizontal(timeStamp, EarthLocation.FACT);
             sourceCamera = sourceHorizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
 
-            String sourceName = sourcePoint.getString("Name");
-            item.put("sourceName", sourceName);
-
             Double auxZd = trackingPoint.getDouble("Zd");
             Double auxAz = trackingPoint.getDouble("Az");
 
             auxPointingHorizontal = HorizontalCoordinate.fromDegrees(auxZd, auxAz);
+
+            String sourceName = sourcePoint.getString("Name");
+            item.put("source_name", sourceName);
         }
 
         item.put(outputKey, sourceCamera);
@@ -196,6 +196,11 @@ public class SourcePosition implements StatefulProcessor {
 
         item.put("pointing_position_zd", pointingHorizontal.getZenithDeg());
         item.put("pointing_position_az", pointingHorizontal.getAzimuthDeg());
+
+        if (sourceEquatorial != null) {
+            item.put("source_position_ra", sourceEquatorial.getRightAscensionDeg());
+            item.put("source_position_dec", sourceEquatorial.getDeclinationDeg());
+        }
 
         item.put(outputKey + "Marker", new SourcePositionOverlay(outputKey, sourceCamera));
 

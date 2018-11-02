@@ -1,8 +1,8 @@
 <container>
     <!-- This xml takes a given mc set and adds the choosen data noise onto the event.
          The Creator will be changed from Ceres -> Ceres_Pedestal
-        @parameters SET_noiseDB    The noise database jsonl file created from the fact-eventlist.
-        @parameters SET_dataFolder The folder containing the fact files, structured in the fact data folder convention.
+        @parameters noiseDB    The noise database jsonl file created from the fact-eventlist.
+        @parameters dataFolder The folder containing the fact files, structured in the fact data folder convention.
         @parameters input          The multidata json file (see processor). Containing the MC data which should be added.
         @output     output         The name of the finished fits file.
     -->
@@ -11,17 +11,18 @@
     <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
     
     
-    <property name="noiseDB" value="file:${SET_noiseDB}" />
-    <property name="dataFolder" value="${SET_dataFolder}" />
+    <property name="noiseDB" value="file:" />
+    <property name="dataFolder" value="" />
     <property name="noiseBinning" value="2" />
 
     <property name="LONS_KEYS" value="LONS_NIGHT,LONS_RUNID,LONS_EventNum,LONS_UnixTimeUTC,LONS_Tries"/>
-    <property name="MC_KEYS" value="IncidentAngle.fVal,MCorsikaEvtHeader.fEvtNumber,MCorsikaEvtHeader.fNumReuse,MCorsikaEvtHeader.fTotalEnergy,MCorsikaEvtHeader.fStartAltitude,MCorsikaEvtHeader.fFirstTargetNum,CorsikaEvtHeader.fFirstInteractionHeight,MCorsikaEvtHeader.fMomentumX,MCorsikaEvtHeader.fMomentumY,MCorsikaEvtHeader.fMomentumZ,MCorsikaEvtHeader.fZd,MCorsikaEvtHeader.fAz,MCorsikaEvtHeader.fX,MCorsikaEvtHeader.fY,MCorsikaEvtHeader.fWeightedNumPhotons,MMcEvt.fEvtNumber,MMcEvt.fThick0,MMcEvt.fFirstTarget,MMcEvt.fZFirstInteraction,MMcEvt.fCoreD,MMcEvt.fCoreX,MMcEvt.fCoreY,MMcEvt.fTimeFirst,MMcEvt.fTimeLast,MMcEvt.fLongiNmax,MMcEvt.fLongit0,MMcEvt.fLongitmax,MMcEvt.fLongia,MMcEvt.fLongib,MMcEvt.fLongic,MMcEvt.fLongichi2,MMcEvt.fPhotIni,MMcEvt.fPassPhotAtm,MMcEvt.fPassPhotRef,MMcEvt.fPassPhotCone,MMcEvt.fPhotElfromShower,MMcEvt.fPhotElinCamera,MMcEvt.fElecCphFraction,MMcEvt.fMuonCphFraction,MMcEvt.fOtherCphFraction,MMcEvt.fFadcTimeJitter,MMcEvt.fEventReuse,MMcEvtBasic.fEnergy,MMcEvtBasic.fImpact,MMcEvtBasic.fTelescopePhi,MMcEvtBasic.fTelescopeTheta,MMcEvtBasic.fTheta,MMcEvtBasic.fPhi,MPointingPos.fZd,MPointingPos.fAz,MPointingPos.fRa,MPointingPos.fHa,MPointingPos.fDec,MRawEvtData.fHiGainPixId,Data,StartCellData,TriggerType,MRawEvtData.fNumBytesPerSample,MRawEvtData.fIsSigned,EventNum,MRawEvtHeader.fNumTrigLvl1,MRawEvtHeader.fTrigPattern,MSimSourcePos.fZd,MSimSourcePos.fAz,MSimSourcePos.fRa,MSimSourcePos.fHa,MSimSourcePos.fDec,McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McMuonCherPhotNumber,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"/>
+    <property name="MC_HEADER_KEYS" value="MCorsikaRunHeader.*,RUNID,MMcRunHeader.*,MCorsikaRunHeader.*,MMcCorsikaRunHeader.*,MMcRunHeader.*,RUNTYPE"/>
+    <property name="MC_KEYS" value="IncidentAngle.fVal,MCorsikaEvtHeader.*,CorsikaEvtHeader.*,MMcEvt.*,MMcEvtBasic.*,MPointingPos.*,MRawEvtData.*,Data,StartCellData,TriggerType,EventNum,MRawEvtHeader.*,MSimSourcePos.*,McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McMuonCherPhotNumber,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"/>
     
-    <property name="OUTPUT_KEYS" value="${MC_KEYS},${LONS_KEYS}"/>
+    <property name="OUTPUT_KEYS" value="${MC_HEADER_KEYS},${MC_KEYS},${LONS_KEYS}"/>
 
     <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
-        <stream class="fact.io.hdureader.FITSStream" id="fact" />
+        <stream class="fact.io.CeresStream" id="fact" />
     </stream>
 
     <process id="1" input="fact">
@@ -44,6 +45,7 @@
             topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
             maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
         />
+
         <fact.datacorrection.InterpolateTimeSeries
                 calibService="calibService"
                 dataKey="DataCalibrated"
@@ -113,12 +115,7 @@
                 reverse="True"
         />
         
-        <stream.script.JavaScript>
-            function process(item){
-                item.put( "CREATOR", "Ceres_Pedestal" );
-                return item;
-            }
-        </stream.script.JavaScript>
+        <SetValue key="CREATOR" value="Ceres_Pedestal"/>
         
         <!--<fact.ShowViewer key="DataCalibrated" />-->
 

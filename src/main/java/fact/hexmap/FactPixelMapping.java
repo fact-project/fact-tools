@@ -10,6 +10,7 @@ import stream.Data;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -279,21 +280,26 @@ public class FactPixelMapping implements PixelMapping {
      * @return a pixel with the info from the item
      */
     private CameraPixel getPixelFromCSVItem(Data item) {
-        CameraPixel p = new CameraPixel();
-        p.setSoftID((Integer) (item.get("softID")));
-        p.setHardID((Integer) (item.get("hardID")));
-        p.geometricX = (Integer) (item.get("geom_i"));
-        p.geometricY = (Integer) (item.get("geom_j"));
-
-        double x = Float.parseFloat(item.get("pos_X").toString());
-        double y = Float.parseFloat(item.get("pos_Y").toString());
+        int softID = (int) item.get("softID");
+        int hardID = (int) item.get("hardID");
+        int geometricX = (int) item.get("geom_i");
+        int geometricY = (int) item.get("geom_j");
 
         // rotate camera by 90 degrees to have the following coordinate definition:
         // When looking from the telescope dish onto the camera, x points right, y points up
-        p.posX = -y;
-        p.posY = x;
+        double x = -toDouble(item.get("pos_Y"));
+        double y = toDouble(item.get("pos_X"));
 
-        return p;
+        return new CameraPixel(softID, hardID, x, y, geometricX, geometricY);
+    }
+
+
+    public double toDouble(Serializable value) {
+        try {
+            return (double) value;
+        } catch (ClassCastException e) {
+            return ((Integer) value).doubleValue();
+        }
     }
 
     /**

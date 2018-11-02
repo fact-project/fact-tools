@@ -24,37 +24,7 @@
 
     <include url="classpath:/analysis/calibration.xml" />
     <include url="classpath:/analysis/extraction.xml" />
-
-    <fact.features.UnixTimeUTC2DateTime inputKey="UnixTimeUTC" outputKey="LONS_timestamp" />
-
-
-    \
-    <!--Cleaning-->
-    <fact.features.source.SourcePosition
-            outputKey="Cetatauri"
-            sourceRightAscension="5.627416667"
-            sourceDeclination="21.1425"
-            auxService="auxService"
-            timeStampKey="LONS_timestamp"
-    />
-    <fact.cleaning.TwoLevelTimeNeighbor
-            calibService="calibService"
-            photonChargeKey="photoncharge"
-            arrivalTimeKey="arrivalTime"
-            corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
-            neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
-            timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
-            minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
-            starPositionKeys="Cetatauri"
-            starRadiusInCamera="11.0"
-            outputKey="shower"
-    />
-
-    <fact.pixelsets.Length
-            pixelSetKey="shower"
-            outputKey="num_pixel_in_shower"
-    />
-
+    <include url="classpath:/analysis/cleaning.xml" />
 
 
     <!-- Only analyze events with at least 5 pixels after cleaning -->

@@ -66,7 +66,7 @@ public class TimeOverThresholdTL implements Processor {
             }
 
             if (timeOverThreshold > 0) {
-                pixelSet.addById(pix);
+                pixelSet.addByCHID(pix);
             }
 
             timeOverThresholdArray[pix] = timeOverThreshold;
@@ -78,8 +78,8 @@ public class TimeOverThresholdTL implements Processor {
         item.put(outputKey + "SetOverlay", pixelSet);
 
         //Add totPixelSet only to data item if it is not empty
-        if (pixelSet.toIntArray().length != 0) {
-            item.put(outputKey + "Set", pixelSet.toIntArray());
+        if (pixelSet.toCHIDArray().length != 0) {
+            item.put(outputKey + "Set", pixelSet.toCHIDArray());
         }
         return item;
     }
