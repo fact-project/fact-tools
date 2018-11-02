@@ -1,0 +1,127 @@
+<container>
+    <!-- This xml takes a given mc set and adds the choosen data noise onto the event.
+         The Creator will be changed from Ceres -> Ceres_Pedestal
+        @parameters noiseDB    The noise database jsonl file created from the fact-eventlist.
+        @parameters dataFolder The folder containing the fact files, structured in the fact data folder convention.
+        @parameters input          The multidata json file (see processor). Containing the MC data which should be added.
+        @output     output         The name of the finished fits file.
+    -->
+    <properties url="classpath:/default/settings.properties" />
+
+    <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+    
+    
+    <property name="noiseDB" value="file:" />
+    <property name="dataFolder" value="" />
+    <property name="noiseBinning" value="2" />
+
+    <property name="LONS_KEYS" value="LONS_NIGHT,LONS_RUNID,LONS_EventNum,LONS_UnixTimeUTC,LONS_Tries"/>
+    <property name="MC_HEADER_KEYS" value="MCorsikaRunHeader.*,RUNID,MMcRunHeader.*,MCorsikaRunHeader.*,MMcCorsikaRunHeader.*,MMcRunHeader.*,RUNTYPE"/>
+    <property name="MC_KEYS" value="IncidentAngle.fVal,MCorsikaEvtHeader.*,CorsikaEvtHeader.*,MMcEvt.*,MMcEvtBasic.*,MPointingPos.*,MRawEvtData.*,Data,StartCellData,TriggerType,EventNum,MRawEvtHeader.*,MSimSourcePos.*,McCherPhotWeight,McCherPhotNumber,McMuonCherPhotWeight,McMuonCherPhotNumber,McNoisePhotWeight,McCherArrTimeMean,McCherArrTimeVar,McCherArrTimeMin,McCherArrTimeMax"/>
+    
+    <property name="OUTPUT_KEYS" value="${MC_HEADER_KEYS},${MC_KEYS},${LONS_KEYS}"/>
+
+    <stream id="fact" class="fact.io.FactFileListMultiStream"   url="${input}">
+        <stream class="fact.io.CeresStream" id="fact" />
+    </stream>
+
+    <process id="1" input="fact">
+        <fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+        />
+
+        <fact.datacorrection.DrsCalibration
+                key="Data"
+                outputKey="DataCalibrated"
+        />
+
+        <fact.datacorrection.RemoveSpikes
+            dataKey="DataCalibrated"
+            outputKey="DataCalibrated"
+            startCellKey="StartCellData"
+            leftBorder="${RemoveSpikes.leftBorder}"
+            spikeLimit="${RemoveSpikes.spikeLimit}"
+            topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+            maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+        />
+
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="DataCalibrated"
+                dataOutputKey="DataCalibrated"
+        />
+        
+        
+    <!-- Sample Pedestal Event and calibrate it -->	
+        <fact.pedestalSuperpostion.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}"
+                                        dbBinningKey="Zd" itemBinningKey="MPointingPos.fZd" binning="${noiseBinning}"
+                                        samplingTryKey="Tries"
+        />
+        
+        <fact.features.UnixTimeUTC2DateTime inputKey="LONS_UnixTimeUTC" outputKey="LONS_timestamp" />
+    
+        <fact.datacorrection.DrsCalibration
+                drsKey="LONS_drspath"
+                key="LONS_Data"
+                outputKey="LONS_DataCalibrated"
+                startCellKey="LONS_StartCellData"
+        />
+
+        <fact.datacorrection.PatchJumpRemoval
+                dataKey="LONS_DataCalibrated"
+                outputKey="LONS_DataCalibrated"
+                prevEventsKey="LONS_prevEvents"
+                startCellKey="LONS_StartCellData"
+                unixTimeKey="LONS_UnixTimeUTC"
+                jumpLimit="${PatchJumpRemoval.jumpLimit}"
+        />
+
+         <fact.datacorrection.RemoveSpikes
+                dataKey="LONS_DataCalibrated"
+                outputKey="LONS_DataCalibrated"
+                startCellKey="LONS_StartCellData"
+                leftBorder="${RemoveSpikes.leftBorder}"
+                spikeLimit="${RemoveSpikes.spikeLimit}"
+                topSlopeLimit="${RemoveSpikes.topSlopeLimit}"
+                maxSpikeLength="${RemoveSpikes.maxSpikeLength}"
+        />
+
+        <fact.datacorrection.DrsTimeCalibration
+                startCellKey = "LONS_StartCellData"
+                dataKey      = "LONS_DataCalibrated"
+                outputKey    = "LONS_DataCalibrated"
+        />
+
+        <fact.datacorrection.InterpolateTimeSeries
+                calibService="calibService"
+                dataKey="LONS_DataCalibrated"
+                dataOutputKey="LONS_DataCalibrated"
+                badPixelKey="LONS_badPixel"
+                timeStampKey="LONS_timestamp"
+        />
+
+        <fact.utils.CombineDataArrays firstArrayKey="DataCalibrated" secondArrayKey="LONS_DataCalibrated"
+                                      outputKey="DataCalibrated" op="add"/>
+        
+         <fact.datacorrection.DrsCalibration
+                key="DataCalibrated"
+                outputKey="Data"
+                reverse="true"
+        />
+        <fact.utils.Remapping
+                key="Data"
+                outputKey="Data"
+                reverse="True"
+        />
+        
+        <SetValue key="CREATOR" value="Ceres_Pedestal"/>
+        
+        <!--<fact.ShowViewer key="DataCalibrated" />-->
+
+        <fact.io.FITSWriter url="${output}"
+                            keys="${OUTPUT_KEYS}"
+                            headerKeys="CREATOR,NROI,NPIX,TELESCOP,RUNTYPE,CAMERA"
+        />
+    </process>
+</container>
