@@ -15,7 +15,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <streams.scope>compile</streams.scope>
-    <streams.version>1.0.5</streams.version>
+    <streams.version>1.0.9</streams.version>
     <binary.name>fact-tools-${git.commit.id.describe}</binary.name>
     <skipTests>false</skipTests>
     <finalName>fact-tools-${git.commit.id.describe}</finalName>
