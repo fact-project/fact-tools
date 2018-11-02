@@ -1,4 +1,4 @@
-package fact.utils;
+package fact.pedestalSuperposition;
 
 import org.junit.Test;
 

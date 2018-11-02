@@ -54,7 +54,7 @@
         
         
     <!-- Sample Pedestal Event and calibrate it -->	
-        <fact.utils.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}"
+        <fact.pedestalSuperpostion.SamplePedestalEvent prependKey="LONS_" noiseDatabase="${noiseDB}" dataFolder="${dataFolder}"
                                         dbBinningKey="Zd" itemBinningKey="MPointingPos.fZd" binning="${noiseBinning}"
                                         samplingTryKey="Tries"
         />
