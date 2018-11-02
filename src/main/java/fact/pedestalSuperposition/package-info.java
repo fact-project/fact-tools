@@ -25,4 +25,44 @@ package fact.pedestalSuperposition;
  * conditions.
  * A collection of methods to generate such an index and a noise db file,
  * can be found at: https://github.com/fact-project/EventList
+ *
+ *
+ * Minimal example: Superposition process:
+ * ======================================
+ *
+ * <pre>
+ * <fact.datacorrection.DrsCalibration
+ *                  key="Data"
+ *                  outputKey="DataCalibrated"/>
+ *
+ * <fact.pedestalSuperpostion.SamplePedestalEvent
+ *                  prependKey="LONS_"
+ *                  noiseDatabase="./noiseDB.json"
+ *                  dataFolder="/fact/raw"
+ *                  dbBinningKey="Zd"
+ *                  itemBinningKey="MPointingPos.fZd"
+ *                  binning="2" />
+ *
+ * <fact.datacorrection.DrsCalibration
+ *                  drsKey="LONS_drspath"
+ *                  key="LONS_Data"
+ *                  outputKey="LONS_DataCalibrated" />
+ *
+ * <fact.utils.CombineDataArrays
+ *                  firstArrayKey="DataCalibrated"
+ *                  secondArrayKey="LONS_DataCalibrated"
+ *                  outputKey="DataCalibrated"
+ *                  op="add" />
+ *
+ * <fact.datacorrection.DrsCalibration
+ *                  key="DataCalibrated"
+ *                  outputKey="Data"
+ *                  reverse="true"
+ * />
+ * <fact.utils.Remapping
+ *                  key="Data"
+ *                  outputKey="Data"
+ *                  reverse="True"
+ * />
+ *</pre>
  **/
