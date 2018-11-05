@@ -1,5 +1,30 @@
 # Changelog for the fact-tools
 
+
+# Version 1.1.0 -- 05.11.2018
+
+## New Features
+
+* Add processors to add noise from measured pedestal events to simulated showers (#364)
+* Add `DrsFileService`, a service that automatically finds the right drs file (#359)
+* Add classes and processors to simulate the FACT Trigger (#263)
+* Add a service that finds bright stars in the FoV from the Yale Bright Star catalogue 
+  instead of hard-coding Ceta-Tauri (#369)
+* Add the possibility to write `PixelSet`s to FITS files as boolean arrays (#368)
+* Write the source position in equatorial coordinates into the data item when available (#367)
+
+## Fixes
+
+* Fix for the surefire plugin using jdk 1.8.0_181 (#381)
+* Update streams to 1.09 (#380) 
+* Improve error reporting in `AuxFileService` (#378)
+* Use ISO8601 date format in logs (#375)
+* Write more Metadata to FITS headers (#374)
+* Refactor `CameraPixel` to better work with `CameraCoordinate` (#371)
+* Fix timespread processor for empty pixel sets (#373)
+* Fixes an error reading files using `classpath://` (#370)
+
+
 # Version 1.0.3 -- 23.05.2018
 
 * Enable to revert DRSCalibration
