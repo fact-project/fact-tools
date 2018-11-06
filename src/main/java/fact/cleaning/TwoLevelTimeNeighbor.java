@@ -122,6 +122,7 @@ public class TwoLevelTimeNeighbor extends BasicCleaning implements Processor {
         }
 
         if (starPositionsKey != null) {
+            Utils.isKeyValid(item, starPositionsKey, CameraCoordinate[].class);
             CameraCoordinate[] starsInFOV = (CameraCoordinate[]) item.get(starPositionsKey);
             PixelSet starSet = new PixelSet();
 

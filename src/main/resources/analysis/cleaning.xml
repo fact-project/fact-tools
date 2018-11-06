@@ -1,14 +1,14 @@
 <module>
   <If condition="%{data.CREATOR} != 'Ceres' and %{data.CREATOR} != 'Ceres_Pedestal'">
     <fact.starservice.StarsInFOV
-      outputKey="StarsInFOV"
+      outputKey="starsInFOV"
       auxService="auxService"
       maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
   </If>
   <If condition="%{data.CREATOR} == 'Ceres_Pedestal'">
     <fact.starservice.StarsInFOV
-            outputKey="StarsInFOV"
+            outputKey="starsInFOV"
             auxService="auxService"
             timestampKey="LONS_timestamp"
             maxMagnitude="${StarsInFOV.maxMagnitude}"
@@ -23,7 +23,7 @@
       timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
       minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
       outputKey="shower"
-      starPositions="starsInFOV"      
+      starPositionsKey="starsInFOV"
   />
   <fact.pixelsets.Length
     pixelSetKey="shower"
