@@ -1,30 +1,44 @@
 <module>
   <If condition="%{data.CREATOR} != 'Ceres' and %{data.CREATOR} != 'Ceres_Pedestal'">
     <fact.starservice.StarsInFOV
-      outputKey="StarsInFOV"
+      outputKey="starsInFOV"
       auxService="auxService"
       maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
   </If>
   <If condition="%{data.CREATOR} == 'Ceres_Pedestal'">
     <fact.starservice.StarsInFOV
-            outputKey="StarsInFOV"
+            outputKey="starsInFOV"
             auxService="auxService"
             timestampKey="LONS_timestamp"
             maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
   </If>
-  <fact.cleaning.TwoLevelTimeNeighbor
-      calibService="calibService"
-      photonChargeKey="photoncharge"
-      arrivalTimeKey="arrivalTime"
-      corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
-      neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
-      timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
-      minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
-      outputKey="shower"
-      starPositions="starsInFOV"      
-  />
+  <If condition="%{data.CREATOR} != 'Ceres'">
+    <fact.cleaning.TwoLevelTimeNeighbor
+        calibService="calibService"
+        photonChargeKey="photoncharge"
+        arrivalTimeKey="arrivalTime"
+        corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
+        neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
+        timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
+        minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
+        outputKey="shower"
+        starPositionsKey="starsInFOV"
+    />
+  </If>
+  <If condition="%{data.CREATOR} == 'Ceres'">
+    <fact.cleaning.TwoLevelTimeNeighbor
+        calibService="calibService"
+        photonChargeKey="photoncharge"
+        arrivalTimeKey="arrivalTime"
+        corePixelThreshold="${TwoLevelTimeNeighbor.coreThreshold}"
+        neighborPixelThreshold="${TwoLevelTimeNeighbor.neighborThreshold}"
+        timeLimit="${TwoLevelTimeNeighbor.timeLimit}"
+        minNumberOfPixel="${TwoLevelTimeNeighbor.minNumberOfPixel}"
+        outputKey="shower"
+    />
+  </If>
   <fact.pixelsets.Length
     pixelSetKey="shower"
     outputKey="num_pixel_in_shower"

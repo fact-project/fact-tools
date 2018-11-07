@@ -42,13 +42,13 @@
     />
 
     <fact.starservice.StarsInFOV
-      outputKey="StarsInFOV"
+      outputKey="starsInFOV"
       auxService="auxService"
       maxMagnitude="${StarsInFOV.maxMagnitude}"
     />
 
     <fact.features.source.PixelSetForStarPosition
-            starPositionsKey="StarsInFOV"
+            starPositionsKey="starsInFOV"
             starRadiusInCamera="11.0"
             outsetKey="starset"
     />
