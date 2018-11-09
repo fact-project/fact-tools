@@ -58,6 +58,9 @@ public class FITSWriter extends Writer implements StatefulProcessor {
     @Parameter(required = false, description = "Set if you want to allow non existing keys.")
     public boolean allowNullKeys = false;
 
+    @Parameter(required = false, description = "If the matching of the keys should be done case sensitive")
+    public boolean caseSensitive = true;
+
     private BufferedFile bf;
     private ByteBuffer buffer;
     private BinaryTableHDU bhdu;
@@ -79,6 +82,9 @@ public class FITSWriter extends Writer implements StatefulProcessor {
         }
 
         Data outputItem = DataFactory.create();
+
+        keys.setCaseInsensitive(!caseSensitive);
+        headerKeys.setCaseInsensitive(!caseSensitive);
 
         for (String key : keys.select(item)) {
             outputItem.put(key, item.get(key));
