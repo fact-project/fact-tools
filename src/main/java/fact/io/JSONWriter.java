@@ -123,6 +123,9 @@ public class JSONWriter extends Writer implements StatefulProcessor {
     @Parameter(required = false, description = "Set if you want to allow empty keys.")
     public boolean allowNullKeys = false;
 
+    @Parameter(required = false, description = "If the matching of the keys should be done case sensitive")
+    public boolean caseSensitive = true;
+
     @Parameter(required = true)
     public URL url;
 
@@ -140,6 +143,8 @@ public class JSONWriter extends Writer implements StatefulProcessor {
             log.info("Getting default outputkeys");
             keys = getDefaultKeys(isSimulated(item));
         }
+
+        keys.setCaseInsensitive(!caseSensitive);
 
         for (String key : keys.select(data)) {
             item.put(key, data.get(key));

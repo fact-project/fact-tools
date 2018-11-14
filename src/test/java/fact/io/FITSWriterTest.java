@@ -193,5 +193,37 @@ public class FITSWriterTest {
         assertEquals(FITSWriter.formatDateTime(date6), "2013-11-01T00:00:00.000000Z");
     }
 
+    @Test
+    public void testCaseSensitive() throws Exception {
+
+        File f = File.createTempFile("test_fits", ".fits");
+        log.info("testFitsWriter with path {}", f.getAbsolutePath());
+
+        URL url = new URL("file:" + f.getAbsolutePath());
+
+        FITSWriter fitsWriter = new FITSWriter();
+        fitsWriter.url = url;
+        fitsWriter.keys = new Keys("night");
+        fitsWriter.headerKeys = new Keys("NIGHT");
+        fitsWriter.init(null);
+
+        Data item = DataFactory.create();
+        item.put("NIGHT", 1);
+        item.put("night", 4);
+
+        fitsWriter.process(item);
+        fitsWriter.finish();
+
+        FITS fits = FITS.fromFile(f);
+        BinTable table = fits.getBinTableByName("Events").get();
+        BinTableReader tableReader = BinTableReader.forBinTable(table);
+        OptionalTypesMap<String, Serializable> row = tableReader.getNextRow();
+
+        assertFalse(row.getInt("NIGHT").isPresent());
+        assertEquals(1, (int) table.header.getInt("NIGHT").orElse(-1));
+
+        assertFalse(table.header.getInt("night").isPresent());
+        assertEquals(4, (int) row.getInt("night").orElse(-1));
+    }
 
 }
