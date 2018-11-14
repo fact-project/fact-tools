@@ -1,5 +1,10 @@
 # Changelog for the fact-tools
 
+# Version 1.1.1 -- 14.11.2018
+
+* Make Writer keys case sensitive by default (#384)
+* Ignore keys that are given as streams regex expression in the check for existing keys (#385)
+* Fix the `cleaning.xml`, the stars were not taken into account (#383)
 
 # Version 1.1.0 -- 05.11.2018
 
