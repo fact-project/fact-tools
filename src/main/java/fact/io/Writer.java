@@ -61,6 +61,7 @@ public abstract class Writer {
     public void testKeys(Data item, Keys keys, boolean allowNullKeys) {
         if (!allowNullKeys) {
             List<String> keysList = Arrays.stream(keys.getKeyValues())
+                    .filter(p -> !(p.startsWith("/") && p.endsWith("/"))) // filter stream regex keys
                     .filter(p -> !p.contains("*"))
                     .filter(p -> !p.startsWith("!"))
                     .collect(Collectors.toList());
