@@ -646,7 +646,7 @@ public final class ZFITSHeapReader implements Reader {
         Serializable b = null;
         switch (c.type) {
             case BOOLEAN:
-                b = buffer.get() > 0;
+                b = buffer.get() == 'T';
                 break;
             case CHAR:
                 b = buffer.getChar();
@@ -682,7 +682,7 @@ public final class ZFITSHeapReader implements Reader {
             case BOOLEAN:
                 boolean[] bools = new boolean[c.repeatCount];
                 for (int i = 0; i < c.repeatCount; i++) {
-                    bools[i] = buffer.get() > 0;
+                    bools[i] = buffer.get() == 'T';
                 }
                 return bools;
             case CHAR:

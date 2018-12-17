@@ -4,7 +4,7 @@
 
 * Fix reading of uncompressed values from zfits heap tiles (Issue #389)
   Before, the same value was repeated for every row in one tile.
-  This affects e.g. `UnixTimeUTC` and `BoardTime`.
+  This affects e.g. `UnixTimeUTC` and `BoardTime` and booleans.
 
 # Version 1.1.1 -- 14.11.2018
 
