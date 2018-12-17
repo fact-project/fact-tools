@@ -125,7 +125,7 @@ public final class ZFITSHeapReader implements Reader {
         if (resultingRow >= this.numberOfRowsInTable) {
             throw new IOException("Not enough rows in table, need "+(amount+numberOfRowsRead)+" have "+numberOfRowsInTable);
         }
-        
+
         // check if resulting row is in the current catalog remainer
         int remainer = zTileLen - numberOfRowsRead%zTileLen;
         if (amount<remainer) { // no need to deal with the catalog as we just work within one
@@ -649,7 +649,7 @@ public final class ZFITSHeapReader implements Reader {
                 b = buffer.get() > 0;
                 break;
             case CHAR:
-                b = buffer.asCharBuffer().toString();
+                b = buffer.getChar();
                 break;
             case BYTE:
                 b = buffer.get();
@@ -674,43 +674,52 @@ public final class ZFITSHeapReader implements Reader {
     }
 
     private Serializable readArrayFromBuffer(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
-
-        if (c.type == BinTable.ColumnType.BOOLEAN) {
-            boolean[] bools = new boolean[c.repeatCount];
-            for (int i = 0; i < c.repeatCount; i++) {
-                bools[i] = buffer.get() > 0;
-            }
-            return bools;
-        }
-
         switch (c.type) {
-            case CHAR:
-                char[] chars = new char[c.repeatCount];
-                buffer.asCharBuffer().get(chars);
-                return chars;
             case BYTE:
                 byte[] b = new byte[c.repeatCount];
                 buffer.get(b);
                 return b;
+            case BOOLEAN:
+                boolean[] bools = new boolean[c.repeatCount];
+                for (int i = 0; i < c.repeatCount; i++) {
+                    bools[i] = buffer.get() > 0;
+                }
+                return bools;
+            case CHAR:
+                char[] chars = new char[c.repeatCount];
+                for (int i = 0; i < c.repeatCount; i++) {
+                    chars[i] = buffer.getChar();
+                }
+                return chars;
             case SHORT:
                 short[] shorts = new short[c.repeatCount];
-                buffer.asShortBuffer().get(shorts);
+                for (int i = 0; i < c.repeatCount; i++) {
+                    shorts[i] = buffer.getShort();
+                }
                 return shorts;
             case INT:
                 int[] ints = new int[c.repeatCount];
-                buffer.asIntBuffer().get(ints);
+                for (int i = 0; i < c.repeatCount; i++) {
+                    ints[i] = buffer.getInt();
+                }
                 return ints;
             case LONG:
                 long[] longs = new long[c.repeatCount];
-                buffer.asLongBuffer().get(longs);
+                for (int i = 0; i < c.repeatCount; i++) {
+                    longs[i] = buffer.getLong();
+                }
                 return longs;
             case FLOAT:
                 float[] floats = new float[c.repeatCount];
-                buffer.asFloatBuffer().get(floats);
+                for (int i = 0; i < c.repeatCount; i++) {
+                    floats[i] = buffer.getFloat();
+                }
                 return floats;
             case DOUBLE:
                 double[] doubles = new double[c.repeatCount];
-                buffer.asDoubleBuffer().get(doubles);
+                for (int i = 0; i < c.repeatCount; i++) {
+                    doubles[i] = buffer.getDouble();
+                }
                 return doubles;
         }
         return null;
