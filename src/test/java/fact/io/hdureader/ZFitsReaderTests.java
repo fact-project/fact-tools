@@ -50,6 +50,29 @@ public class ZFitsReaderTests {
         assertTrue(num == 6);
     }
 
+
+    @Test
+    public void testUnixTimeUTCIncreases() throws Exception {
+        URL u = ZFitsReaderTests.class.getResource("/testDataFileZTILELEN.fits.fz");
+
+        FITS f = new FITS(u);
+        HDU events = f.getHDU("Events").orElseThrow(() -> new RuntimeException("File did not contain HDU 'Events'"));
+        BinTable binTable = events.getBinTable();
+        ZFITSHeapReader heapReader = ZFITSHeapReader.forTable(binTable);
+
+        long lastTimestamp = -1;
+        for (OptionalTypesMap<String, Serializable> p : heapReader) {
+            assertTrue(p.containsKey("Data"));
+
+            int[] unixTimeUTC = p.getIntArray("UnixTimeUTC").orElseThrow(RuntimeException::new);
+            long timestamp = ((long) unixTimeUTC[0]) * 1000000 + unixTimeUTC[1];
+
+            assertTrue(timestamp > lastTimestamp);
+            lastTimestamp = timestamp;
+        }
+    }
+
+
     @Test
     public void testZTileLen() throws Exception {
         //URL u =  CompareOldAndNewReaders.class.getResource("/testDataFile.fits.fz");
