@@ -257,11 +257,10 @@ public final class ZFITSHeapReader implements Reader {
                 shortBuffer.get(data);
                 map.put(column.name, data);
             } else {
-                ByteBuffer byteBuffer = (ByteBuffer) curBuffer;
                 if (column.repeatCount == 1) {
-                    map.put(column.name, readSingleValueFromBuffer(column, byteBuffer));
+                    map.put(column.name, readSingleValueFromBuffer(column, (ByteBuffer) curBuffer));
                 } else {
-                    map.put(column.name, readArrayFromBuffer(column, byteBuffer));
+                    map.put(column.name, readArrayFromBuffer(column, curBuffer));
                 }
             }
         }
@@ -324,10 +323,40 @@ public final class ZFITSHeapReader implements Reader {
                 // convert to int, no block is bigger than 4GB
                 int numberBytes = Math.toIntExact(block.getDataSize());
                 byte[] cache = new byte[numberBytes];
-                for (int i = 0; i < numberBytes; i++) {
-                    cache[i] = tileBuffer.get();
+                tileBuffer.get(cache);
+
+                ByteBuffer byteBuffer = ByteBuffer.wrap(cache).order(ByteOrder.LITTLE_ENDIAN);
+
+                if (column.repeatCount > 1) {
+                    switch (column.type) {
+                        case BYTE:
+                            tileCache.put(column.name, byteBuffer);
+                            break;
+                        case BOOLEAN:
+                            tileCache.put(column.name, byteBuffer);
+                            break;
+                        case CHAR:
+                            tileCache.put(column.name, byteBuffer.asCharBuffer());
+                            break;
+                        case SHORT:
+                            tileCache.put(column.name, byteBuffer.asShortBuffer());
+                            break;
+                        case INT:
+                            tileCache.put(column.name, byteBuffer.asIntBuffer());
+                            break;
+                        case LONG:
+                            tileCache.put(column.name, byteBuffer.asLongBuffer());
+                            break;
+                        case FLOAT:
+                            tileCache.put(column.name, byteBuffer.asFloatBuffer());
+                            break;
+                        case DOUBLE:
+                            tileCache.put(column.name, byteBuffer.asDoubleBuffer());
+                            break;
+                    }
+                } else {
+                    tileCache.put(column.name, byteBuffer);
                 }
-                tileCache.put(column.name, ByteBuffer.wrap(cache).order(ByteOrder.LITTLE_ENDIAN));
             } else {
                 throw new NotImplementedException("Compression: '" + block.compression.name() + "' is not implemented");
             }
@@ -673,53 +702,42 @@ public final class ZFITSHeapReader implements Reader {
         return b;
     }
 
-    private Serializable readArrayFromBuffer(BinTable.TableColumn c, ByteBuffer buffer) throws IOException {
+    private Serializable readArrayFromBuffer(BinTable.TableColumn c, Buffer buffer) throws IOException {
         switch (c.type) {
             case BYTE:
                 byte[] b = new byte[c.repeatCount];
-                buffer.get(b);
+                ((ByteBuffer) buffer).get(b);
                 return b;
             case BOOLEAN:
                 boolean[] bools = new boolean[c.repeatCount];
+                ByteBuffer byteBuffer = (ByteBuffer) buffer;
                 for (int i = 0; i < c.repeatCount; i++) {
-                    bools[i] = buffer.get() == 'T';
+                    bools[i] = byteBuffer.get() == 'T';
                 }
                 return bools;
             case CHAR:
                 char[] chars = new char[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    chars[i] = buffer.getChar();
-                }
+                ((CharBuffer) buffer).get(chars);
                 return chars;
             case SHORT:
                 short[] shorts = new short[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    shorts[i] = buffer.getShort();
-                }
+                ((ShortBuffer) buffer).get(shorts);
                 return shorts;
             case INT:
                 int[] ints = new int[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    ints[i] = buffer.getInt();
-                }
+                ((IntBuffer) buffer).get(ints);
                 return ints;
             case LONG:
                 long[] longs = new long[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    longs[i] = buffer.getLong();
-                }
+                ((LongBuffer) buffer).get(longs);
                 return longs;
             case FLOAT:
                 float[] floats = new float[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    floats[i] = buffer.getFloat();
-                }
+                ((FloatBuffer) buffer).get(floats);
                 return floats;
             case DOUBLE:
                 double[] doubles = new double[c.repeatCount];
-                for (int i = 0; i < c.repeatCount; i++) {
-                    doubles[i] = buffer.getDouble();
-                }
+                ((DoubleBuffer) buffer).get(doubles);
                 return doubles;
         }
         return null;
