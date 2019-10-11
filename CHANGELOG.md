@@ -1,5 +1,10 @@
 # Changelog for the fact-tools
 
+# Version 1.1.2 -- 11.10.2019
+
+* Better error message for broken FITS files 
+* Allow only skipping empty files in FileListMultiStream
+
 # Version 1.1.2 -- 17.12.2018
 
 * Fix reading of uncompressed values from zfits heap tiles (Issue #389)
