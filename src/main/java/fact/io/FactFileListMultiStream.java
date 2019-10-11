@@ -170,7 +170,7 @@ public class FactFileListMultiStream extends AbstractMultiStream {
         } catch (FITSStream.MissingHDUException e) {
             log.info("File: {} does not contain the Events HDU", stream.getUrl());
             if (skipEmpty) {
-                log.info("Skipping empty file. Continuing with next file.");
+                log.warn("Skipping empty file {}. Continuing with next file.", stream.getUrl());
                 stream = null;
                 return this.readNext();
             } else {
@@ -180,9 +180,8 @@ public class FactFileListMultiStream extends AbstractMultiStream {
             }
         } catch (IOException e) {
             log.info("File: " + stream.getUrl().toString() + " throws IOException.");
-
             if (skipErrors) {
-                log.info("Skipping broken files. Continuing with next file.");
+                log.warn("Skipping broken file {}. Continuing with next file.", stream.getUrl());
                 e.printStackTrace();
                 stream = null;
                 return this.readNext();
@@ -204,21 +203,5 @@ public class FactFileListMultiStream extends AbstractMultiStream {
     @Override
     public void setUrl(SourceURL url) {
         this.url = url;
-    }
-
-    public void setSkipErrors(boolean skipErrors) {
-        this.skipErrors = skipErrors;
-    }
-
-    public void setSkipEmpty(boolean skipEmpty) {
-        this.skipEmpty = skipEmpty;
-    }
-
-    public void setDrsPathKey(String drsPathKey) {
-        this.drsPathKey = drsPathKey;
-    }
-
-    public void setDataPathKey(String dataPathKey) {
-        this.dataPathKey = dataPathKey;
     }
 }
