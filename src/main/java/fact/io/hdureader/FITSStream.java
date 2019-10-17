@@ -72,7 +72,7 @@ public class FITSStream extends AbstractStream {
 
         }
         // create a refrence to the events hdu
-        eventHDU = fits.getHDU(nameHDU).orElseThrow(() -> new IOException("Inputfile did not contain HDU '" + nameHDU + "'"));
+        eventHDU = fits.getHDU(nameHDU).orElseThrow(() -> new MissingHDUException("Inputfile did not contain HDU '" + nameHDU + "'"));
 
         BinTable eventsTable = eventHDU.getBinTable();
 
@@ -136,5 +136,11 @@ public class FITSStream extends AbstractStream {
      */
     public void skipRows(int amount) throws IOException{
         reader.skipRows(amount);
+    }
+
+    public class MissingHDUException extends IOException {
+        public MissingHDUException(String errorMessage) {
+            super(errorMessage);
+        }
     }
 }

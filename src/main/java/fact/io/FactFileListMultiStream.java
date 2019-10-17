@@ -2,6 +2,9 @@ package fact.io;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import fact.io.hdureader.FITSStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.annotations.Parameter;
 import stream.io.AbstractStream;
@@ -43,6 +46,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class FactFileListMultiStream extends AbstractMultiStream {
 
+    Logger log = LoggerFactory.getLogger(FactFileListMultiStream.class);
+
     private DataDrsPair dataDrsPair;
 
     public FactFileListMultiStream(SourceURL url) {
@@ -67,16 +72,19 @@ public class FactFileListMultiStream extends AbstractMultiStream {
 
 
     @Parameter(required = true, description = "A file containing a json array of dicts with the paths to the files.")
-    private SourceURL url = null;
+    public SourceURL url = null;
 
     @Parameter(required = false, description = "Flag indicating whether next file should be tried in case of errors in underlying stream.", defaultValue = "false")
-    private boolean skipErrors = false;
+    public boolean skipErrors = false;
+
+    @Parameter(required = false, description = "Similar to skipErrors but will only skip the MissingHDU exception, i.e. empty files", defaultValue = "false")
+    public boolean skipEmpty = false;
 
     @Parameter(required = false, defaultValue = "drs_path")
-    private String drsPathKey = "drs_path";
+    public String drsPathKey = "drs_path";
 
     @Parameter(required = false, defaultValue = "data_path")
-    private String dataPathKey = "data_path";
+    public String dataPathKey = "data_path";
 
     //counts how many files have been processed
     private int filesCounter = 0;
@@ -91,6 +99,9 @@ public class FactFileListMultiStream extends AbstractMultiStream {
      */
     @Override
     public void init() throws Exception {
+        log.info("Skipping empty files: {}", skipEmpty);
+        log.info("Skipping broken files: {}", skipErrors);
+
         if (!fileQueue.isEmpty()) {
             log.debug("files already loaded");
             return;
@@ -155,11 +166,22 @@ public class FactFileListMultiStream extends AbstractMultiStream {
             data.put("@drsFile", dataDrsPair.drsFile);
             return data;
 
+
+        } catch (FITSStream.MissingHDUException e) {
+            log.info("File: {} does not contain the Events HDU", stream.getUrl());
+            if (skipEmpty) {
+                log.warn("Skipping empty file {}. Continuing with next file.", stream.getUrl());
+                stream = null;
+                return this.readNext();
+            } else {
+                log.error("Stopping stream because of missing HDU in one input file");
+                stream.close();
+                throw new RuntimeException(e);
+            }
         } catch (IOException e) {
             log.info("File: " + stream.getUrl().toString() + " throws IOException.");
-
             if (skipErrors) {
-                log.info("Skipping broken files. Continuing with next file.");
+                log.warn("Skipping broken file {}. Continuing with next file.", stream.getUrl());
                 e.printStackTrace();
                 stream = null;
                 return this.readNext();
@@ -177,20 +199,9 @@ public class FactFileListMultiStream extends AbstractMultiStream {
         log.info("In total {} files were processed.", filesCounter);
     }
 
+
+    @Override
     public void setUrl(SourceURL url) {
         this.url = url;
     }
-
-    public void setDrsPathKey(String drsPathKey) {
-        this.drsPathKey = drsPathKey;
-    }
-
-    public void setDataPathKey(String dataPathKey) {
-        this.dataPathKey = dataPathKey;
-    }
-
-    public void setSkipErrors(boolean skipErrors) {
-        this.skipErrors = skipErrors;
-    }
-
 }

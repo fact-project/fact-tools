@@ -102,7 +102,11 @@ public class FITS {
             }
 
         } catch (EOFException e) {
-            primaryHDU = hdus.get(0);
+            if (hdus.size() < 1) {
+                log.warn("File '{}' does not contain any HDUs", url);
+            } else {
+                primaryHDU = hdus.get(0);
+            }
             stream.close();
 
             log.debug("A total of {} HDUs were found in the file.", hdus.size());

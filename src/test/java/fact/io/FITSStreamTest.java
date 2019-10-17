@@ -61,4 +61,12 @@ public class FITSStreamTest {
         }
     }
 
+    @Test(expected=FITSStream.MissingHDUException.class)
+    public void testEmptyFile() throws Exception {
+        URL u = FITSStreamTest.class.getResource("/empty_fits.fits.gz");
+        SourceURL url = new SourceURL(u);
+        FITSStream stream = new FITSStream(url);
+        stream.init();
+    }
+
 }
