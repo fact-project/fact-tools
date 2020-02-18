@@ -82,7 +82,10 @@ public class StarsInFOV implements Processor {
             Star star = starsInFOV[i];
             HorizontalCoordinate horizontal = star.equatorialCoordinate.toHorizontal(timeStamp, EarthLocation.FACT);
             starPositions[i] = horizontal.toCamera(pointingHorizontal, Constants.FOCAL_LENGTH_MM);
-            item.put(outputKey + "_" + i, new SourcePositionOverlay(star.name, starPositions[i]));
+//            item.put(outputKey + "_" + i, new SourcePositionOverlay(star.name, starPositions[i]));
+            item.put(outputKey + "_" + i + "_x", starPositions[i].xMM);
+            item.put(outputKey + "_" + i + "_y", starPositions[i].yMM);
+            item.put(outputKey + "_" + i + "_id", star.id);
         }
 
         item.put(outputKey, starPositions);

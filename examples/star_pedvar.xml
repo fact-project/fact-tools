@@ -1,0 +1,52 @@
+<container>
+
+  <properties url="classpath:/default/settings.properties" />
+
+  <property name="infile" value="" />
+  <property name="drsfile" value="" />
+  <property name="outfile" value="" />
+  <property name="auxFolder" value="file:src/main/resources/aux/" />
+
+  <property name="pixelDelayFile" value="classpath:/default/delays_lightpulser_20150217.csv" />
+
+  <service id="calibService" class="fact.calibrationservice.ConstantCalibService" />
+  <service id="gainService" class="fact.gainservice.GainService" />
+  <service id="auxService" class="fact.auxservice.AuxFileService" auxFolder="${auxFolder}" />
+
+  <stream id="fact" class="fact.io.hdureader.FITSStream" url="${infile}"/>
+
+  <process id="2" input="fact">
+      <include url="classpath:/analysis/init.xml" />
+      <include url="classpath:/analysis/calibration.xml" />
+      <include url="classpath:/analysis/extraction.xml" />
+
+      <fact.starservice.StarsInFOV
+        outputKey="starsInFOV"
+        auxService="auxService"
+        maxMagnitude="${StarsInFOV.maxMagnitude}"
+      />
+      <fact.io.PrintKeys keys="EventNum,starsInFOV" />
+      <fact.pixelsets.Invert
+        insetKey="badPixels"
+        outsetKey="goodPixels"
+      />
+      <fact.extraction.WaveformFluctuation
+        key="DataCalibrated"
+        pixelSetKey="goodPixels"
+        outputKey="ped"
+        skipFirst="35"
+        skipLast="50"
+        windowSize="30"
+      />
+      <fact.statistics.ArrayStatistics
+        key="ped_var"
+        outputKey="ped_var"
+        pixelSetKey="pedestal"
+      />
+      <fact.io.FITSWriter
+        url="${outfile}"
+        keys="EventNum,starsInFOV_*,ped_var"
+      />
+
+    </process>
+</container>
